@@ -29,9 +29,9 @@
   Testing: Can volunteers successfully fill out the volunteer form if
   they visit the website for the first time (typically landing on the home page)?
  */
-import {UserFactory} from '../../utilities/common/user-factory';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import testConstants from '../../utilities/common/test-constants';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
+import testConstants from '../../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 

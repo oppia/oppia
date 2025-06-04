@@ -16,12 +16,12 @@
  * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes creating a subtopic, story, adding chapters to it, and deleting the story, subtopics and chapters.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {TopicManager} from '../../utilities/user/topic-manager';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {TopicManager} from '../../../utilities/user/topic-manager';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

@@ -15,9 +15,9 @@
 /**
  * @fileoverview Acceptance Test for preview tab in exploration editor.
  */
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS: number =
   testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;

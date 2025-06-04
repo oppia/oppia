@@ -16,10 +16,10 @@
  * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes opening the question editor for a selected skill, editing a question that includes an image, associating and disassociating skills with the question, creating questions for a skill using the skill editor page, deleting the question, and previewing a question.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {TopicManager} from '../../utilities/user/topic-manager';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {TopicManager} from '../../../utilities/user/topic-manager';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

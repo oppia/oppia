@@ -16,12 +16,12 @@
  * @fileoverview Acceptance Test for creating and modifying an exploration on/via the settings tab.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {VoiceoverAdmin} from '../../../utilities/user/voiceover-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

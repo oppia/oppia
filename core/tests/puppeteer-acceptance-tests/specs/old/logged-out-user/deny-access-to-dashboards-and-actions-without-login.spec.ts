@@ -17,10 +17,10 @@
  * is restricted from accessing certain pages and actions.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 

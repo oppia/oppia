@@ -24,9 +24,9 @@
   4. Similarly, within the same modal, find and click on the "Read our blog" button to confirm its functionality.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import testConstants from '../../utilities/common/test-constants';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
+import testConstants from '../../../utilities/common/test-constants';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 

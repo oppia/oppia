@@ -17,10 +17,10 @@
  * can open all the links on the "Terms of Service" page.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {showMessage} from '../../utilities/common/show-message';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
+import {showMessage} from '../../../utilities/common/show-message';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 

@@ -17,9 +17,9 @@
  * can open all the links on the "Creator Guidelines" page.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 

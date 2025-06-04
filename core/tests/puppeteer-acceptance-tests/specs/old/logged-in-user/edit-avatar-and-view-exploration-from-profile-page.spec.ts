@@ -17,9 +17,9 @@
  * and view created and edited lessons in the profile page.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const PROFILE_PICTURE = testConstants.data.profilePicture;

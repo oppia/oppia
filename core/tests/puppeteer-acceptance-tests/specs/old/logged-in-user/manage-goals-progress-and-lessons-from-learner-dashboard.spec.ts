@@ -16,13 +16,13 @@
  * @fileoverview Acceptance tests for learner dashboard functionalities.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {TopicManager} from '../../utilities/user/topic-manager';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {TopicManager} from '../../../utilities/user/topic-manager';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

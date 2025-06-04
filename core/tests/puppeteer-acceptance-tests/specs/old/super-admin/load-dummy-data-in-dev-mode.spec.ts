@@ -16,10 +16,10 @@
  * @fileoverview Acceptance Test for loading dummy data in development mode
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {SuperAdmin} from '../../utilities/user/super-admin';
-import {showMessage} from '../../utilities/common/show-message';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {SuperAdmin} from '../../../utilities/user/super-admin';
+import {showMessage} from '../../../utilities/common/show-message';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const mathClassroomURl = testConstants.URLs.MathClassroom;
 const ROLES = testConstants.Roles;

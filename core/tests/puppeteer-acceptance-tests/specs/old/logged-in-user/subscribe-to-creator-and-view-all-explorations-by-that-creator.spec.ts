@@ -17,10 +17,10 @@
  * and view all explorations created by that creator
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 

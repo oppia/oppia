@@ -15,14 +15,14 @@
 /**
  * @fileoverview Acceptance Test for covering usage of voiceovers and available translation in an exploration.
  */
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
-import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
+import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
+import {VoiceoverAdmin} from '../../../utilities/user/voiceover-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const INTRO_CONTENT_VOICEOVER_IN_HI =

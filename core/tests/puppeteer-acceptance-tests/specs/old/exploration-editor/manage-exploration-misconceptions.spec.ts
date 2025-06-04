@@ -15,13 +15,13 @@
 /**
  * @fileoverview Acceptance Test for translation modification modal in exploration editor.
  */
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
-import {TopicManager} from '../../utilities/user/topic-manager';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
+import {TopicManager} from '../../../utilities/user/topic-manager';
+import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

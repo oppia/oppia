@@ -18,11 +18,11 @@
  * playing the exploration from the learner dashboard, and then removing it from 'play later'.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 

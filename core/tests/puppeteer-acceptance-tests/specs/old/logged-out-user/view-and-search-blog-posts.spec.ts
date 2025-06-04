@@ -16,11 +16,11 @@
  * @fileoverview Acceptance Test for viewing and searching blog posts as a logged-out user.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {SuperAdmin} from '../../utilities/user/super-admin';
-import testConstants from '../../utilities/common/test-constants';
-import {showMessage} from '../../utilities/common/show-message';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
+import {SuperAdmin} from '../../../utilities/user/super-admin';
+import testConstants from '../../../utilities/common/test-constants';
+import {showMessage} from '../../../utilities/common/show-message';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const NUM_OF_DUMMY_BLOGS = 30;

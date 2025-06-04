@@ -17,11 +17,11 @@
  * along with their respective access permissions within an exploration.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 enum INTERACTION_TYPES {

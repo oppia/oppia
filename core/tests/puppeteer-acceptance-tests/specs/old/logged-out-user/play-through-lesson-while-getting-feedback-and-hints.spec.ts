@@ -19,11 +19,11 @@
  * - User Journey: Navigation to the exploration, interaction with different types of questions, receiving feedback, using hints, viewing previous responses, and reaching a checkpoint by a logged-out user.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const REVISION_CARD_CONTENT =

@@ -16,11 +16,11 @@
  * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes the inability to edit topics and stories not owned, create and delete topics and skills, add a skill as a diagnostic test skill for a topic, and access the classroom-admin page.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {TopicManager} from '../../utilities/user/topic-manager';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {TopicManager} from '../../../utilities/user/topic-manager';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

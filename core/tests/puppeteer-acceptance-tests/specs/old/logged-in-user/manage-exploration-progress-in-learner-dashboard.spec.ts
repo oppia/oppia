@@ -17,12 +17,12 @@
  * interactions with components that use exploration and collectons data (community lessons).
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

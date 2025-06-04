@@ -16,9 +16,9 @@
  * @fileoverview Acceptance Test for creating blog post with required details only.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {BlogPostEditor} from '../../../utilities/user/blog-post-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

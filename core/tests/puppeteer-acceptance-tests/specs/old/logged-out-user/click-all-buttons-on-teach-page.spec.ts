@@ -17,10 +17,10 @@
  * can open links by clicking all buttons in teach page
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import testConstants from '../../utilities/common/test-constants';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
+import testConstants from '../../../utilities/common/test-constants';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 

@@ -16,12 +16,12 @@
  * @fileoverview Acceptance Test to use all the features in the misc tab of the admin page.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {SuperAdmin} from '../../utilities/user/super-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
+import {SuperAdmin} from '../../../utilities/user/super-admin';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {BlogPostEditor} from '../../../utilities/user/blog-post-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

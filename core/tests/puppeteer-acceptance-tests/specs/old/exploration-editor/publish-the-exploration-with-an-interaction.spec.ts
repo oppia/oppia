@@ -16,10 +16,10 @@
  * @fileoverview Acceptance Test for publishing an exploration with an interaction.
  */
 
-import testConstants from '../../utilities/common/test-constants';
-import {UserFactory} from '../../utilities/common/user-factory';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import testConstants from '../../../utilities/common/test-constants';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 

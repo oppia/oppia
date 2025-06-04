@@ -16,11 +16,11 @@
  * @fileoverview Acceptance tests for the Release Coordinator's ability
  * to run a Beam job, view its output, and copy it.
  */
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {ReleaseCoordinator} from '../../../utilities/user/release-coordinator';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

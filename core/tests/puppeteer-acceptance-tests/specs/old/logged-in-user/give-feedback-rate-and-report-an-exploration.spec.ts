@@ -16,13 +16,13 @@
  * @fileoverview Acceptance test to cover learner journey for an exploration that includes sharing of the exploration, generation of attribution, giving feedback, and not be able to report or rate the exploration
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {showMessage} from '../../utilities/common/show-message';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {showMessage} from '../../../utilities/common/show-message';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 

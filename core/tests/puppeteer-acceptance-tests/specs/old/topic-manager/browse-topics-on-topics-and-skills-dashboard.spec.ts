@@ -16,10 +16,10 @@
  * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes filtering topics by status, classroom, and keyword, sorting topics, using the paginator, and opening an existing topic.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {TopicManager} from '../../utilities/user/topic-manager';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {TopicManager} from '../../../utilities/user/topic-manager';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
