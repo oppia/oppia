@@ -20,8 +20,10 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import exp_services
+from core.domain import opportunity_services
 from core.domain import skill_services
 from core.domain import story_fetchers
+from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -30,6 +32,9 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+
+import result
+
 from typing import Iterable, List, Optional, Tuple
 
 MYPY = False
@@ -67,25 +72,108 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                     include_deleted=False))
         )
 
-        translation_general_suggestions_stats = (
+        translation_suggestions = (
             general_suggestions_models
-             | 'Filter reviewed translate suggestions' >> beam.Filter(
+            | 'Filter translation suggestions' >> beam.Filter(
                 lambda m: (
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
                 ))
+            | 'Group submitted translation suggestions by target' >> (
+                beam.GroupBy(lambda m: m.target_id))
+        )
+
+        exp_opportunities = (
+            self.pipeline
+            | 'Get all non-deleted exp opportunity models' >> ndb_io.GetModels(
+                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
+                    include_deleted=False))
+            | 'Transform to exp opportunity domain object' >> beam.Map(
+                opportunity_services.
+                get_exploration_opportunity_summary_from_model)
+            | 'Group exp opportunity by ID' >> beam.GroupBy(lambda m: m.id)
+        )
+
+        exp_opportunity_to_submitted_suggestions = (
+            {
+                'suggestion': translation_suggestions,
+                'opportunity': exp_opportunities
+            }
+            | 'Merge translation suggestion objects' >> beam.CoGroupByKey()
+            | 'Get rid of key of submitted translation objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
+        )
+
+        shortlisted_translation_suggestions = (
+            exp_opportunity_to_submitted_suggestions
+            | 'Filter valid translation suggestions' >> beam.Filter(
+                lambda grouped_data: (
+                    len(grouped_data['opportunity']) > 0 and 
+                    len(grouped_data['suggestion']) > 0
+                ))
+            | 'Extract translation suggestions only' >> beam.Map(
+                lambda grouped_data: grouped_data['suggestion'])
+            # | 'Flatten translation suggestion lists' >> beam.FlatMap(
+            #     lambda suggestions: suggestions)
+            | 'Extract and fully flatten t suggestions' >> beam.FlatMap(
+                lambda grouped_data: [suggestion
+                    for suggestion in grouped_data[0]])
+        )
+
+        translation_general_suggestions_stats = (
+            shortlisted_translation_suggestions
             | 'Group by language and user' >> beam.Map(
                 lambda stats: ((stats.language_code, stats.author_id), stats)
             )
         )
 
-        question_general_suggestions_stats = (
+        question_suggestions = (
             general_suggestions_models
-             | 'Filter reviewed questions suggestions' >> beam.Filter(
+            | 'Filter question suggestions' >> beam.Filter(
                 lambda m: (
                     m.suggestion_type ==
                     feconf.SUGGESTION_TYPE_ADD_QUESTION
                 ))
+            | 'Group submitted question suggestions by target' >> (
+                beam.GroupBy(lambda m: m.target_id))
+        )
+
+        skill_opportunities = (
+            self.pipeline
+            | 'Get all non-deleted skill opportunity models' >> (
+                ndb_io.GetModels(
+                    opportunity_models.SkillOpportunityModel.get_all(
+                        include_deleted=False)))
+            | 'Transform to skill opportunity domain object' >> beam.Map(
+                opportunity_services.get_skill_opportunity_from_model)
+            | 'Group skill opportunity by ID' >> beam.GroupBy(lambda m: m.id)
+        )
+
+        skill_opportunity_to_submitted_suggestions = (
+            {
+                'suggestion': question_suggestions,
+                'opportunity': skill_opportunities
+            }
+            | 'Merge submitted question objects' >> beam.CoGroupByKey()
+            | 'Get rid of key of submitted question objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
+        )
+
+        shortlisted_question_suggestions = (
+            skill_opportunity_to_submitted_suggestions
+            | 'Filter valid question suggestions' >> beam.Filter(
+                lambda grouped_data: (
+                    len(grouped_data['opportunity']) > 0 and 
+                    len(grouped_data['suggestion']) > 0
+                ))
+            | 'Extract question suggestions only' >> beam.Map(
+                lambda grouped_data: grouped_data['suggestion'])
+            | 'Extract and fully flatten suggestions' >> beam.FlatMap(
+                lambda grouped_data: [suggestion
+                    for suggestion in grouped_data[0]])
+            # | 'Flatten question suggestion lists' >> beam.FlatMap(lambda suggestions: suggestions)
+        )
+
+        question_general_suggestions_stats = (
+            shortlisted_question_suggestions
             | 'Group by user' >> beam.Map(
                 lambda stats: (stats.author_id, stats)
             )
@@ -149,7 +237,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             )
         )
 
-        translation_submitter_total_stats_models_and_logs = (
+        translation_submitter_total_stats_model_results = (
             {
                 'translation_contribution_stats':
                     translation_contribution_stats,
@@ -169,22 +257,19 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         )
 
         translation_submitter_total_stats_models = (
-            translation_submitter_total_stats_models_and_logs
-            | 'Unpack translation submitter contribution models' >> beam.Map(
-                lambda element: element[0])
-            | 'Filter out translation stats with None values' >> beam.Filter(
-                lambda x: x is not None)
+            translation_submitter_total_stats_model_results
+            | 'Filter translation contribution ok results' >> beam.Filter(
+                lambda res: res.is_ok())
+            | 'Unpack translation contribution result' >> beam.Map(
+                lambda res: res.unwrap())
         )
 
-        translation_submitter_debug_logs = (
-            translation_submitter_total_stats_models_and_logs
-            | 'Filter out translation logs with None values' >> beam.Filter(
-                lambda element: element[1] is not None)
-            | 'Unpack and get translation debug logs result' >> beam.Map(
-                lambda element: (
-                    job_run_result.JobRunResult.as_stdout(element[1])
-                )
-            )
+        translation_submitter_error_job_run_results = (
+            translation_submitter_total_stats_model_results
+            | 'Filter translation contribution err results' >> beam.Filter(
+                lambda res: res.is_err())
+            | 'Transform translation contribution error to job run result' >> (
+                job_result_transforms.ResultsToJobRunResults())
         )
 
         translation_reviewer_total_stats_models = (
@@ -195,7 +280,7 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 beam.MapTuple(self.transform_translation_review_stats)
         )
 
-        question_submitter_total_stats_models_and_logs = (
+        question_submitter_total_stats_model_results = (
             {
                 'question_contribution_stats':
                     question_contribution_stats,
@@ -215,22 +300,19 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         )
 
         question_submitter_total_stats_models = (
-            question_submitter_total_stats_models_and_logs
-            | 'Unpack question contribution models' >> beam.Map(
-                lambda element: element[0])
-            | 'Filter out question stats with None values' >> beam.Filter(
-                lambda x: x is not None)
+            question_submitter_total_stats_model_results
+            | 'Filter question contribution ok result' >> beam.Filter(
+                lambda res: res.is_ok())
+            | 'Unpack question contribution result' >> beam.Map(
+                lambda res: res.unwrap())
         )
 
-        question_submitter_debug_logs = (
-            question_submitter_total_stats_models_and_logs
-            | 'Filter out question logs with None values' >> beam.Filter(
-                lambda element: element[1] is not None)
-            | 'Unpack and get question debug logs result' >> beam.Map(
-                lambda element: (
-                    job_run_result.JobRunResult.as_stdout(element[1])
-                )
-            )
+        question_submitter_error_job_run_results = (
+            question_submitter_total_stats_model_results
+            | 'Filter question contribution err results' >> beam.Filter(
+                lambda res: res.is_err())
+            | 'Transform question contribution error to job run result' >> (
+                job_result_transforms.ResultsToJobRunResults())
         )
 
         question_reviewer_total_stats_models = (
@@ -304,8 +386,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 translation_reviewer_models_job_run_results,
                 question_submitter_models_job_run_results,
                 question_reviewer_models_job_run_results,
-                translation_submitter_debug_logs,
-                question_submitter_debug_logs
+                translation_submitter_error_job_run_results,
+                question_submitter_error_job_run_results
             )
             | 'Merge job run results' >> beam.Flatten()
         )
@@ -316,10 +398,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         translation_contribution_stats:
             Iterable[suggestion_models.TranslationContributionStatsModel],
         translation_general_suggestions_stats:
-            Iterable[suggestion_models.GeneralSuggestionModel]) -> Tuple[
-        Optional[
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel],
-        Optional[str]]:
+            Iterable[suggestion_models.GeneralSuggestionModel]) -> (
+        result.Result[
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel,
+            str]):
         """Transforms TranslationContributionStatsModel and
         GeneralSuggestionModel to
         TranslationSubmitterTotalContributionStatsModel.
@@ -337,11 +419,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 (language_code, author_id).
 
         Returns:
-            A 2-tuple with the following elements:
-            - suggestion_models.TranslationSubmitterTotalContributionStatsModel.
-            New TranslationReviewerTotalContributionStatsModel model, if
-            possible.
-            - The debug logs, if error detected.
+            TranslationSubmitterTotalContributionStatsModel. It generates and
+            returns a TranslationSubmitterTotalContributionStatsModel.
         """
         # The key for sorting is defined separately because of a mypy bug.
         # A [no-any-return] is thrown if key is defined in the sort() method
@@ -390,78 +469,12 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             '%s.%s' % (language_code, contributor_user_id)
         )
 
-        exp_ids_with_translation_suggestions = sorted(
-            {v.target_id for v in general_suggestion_stats})
-
-        topic_ids_with_translation_submissions_list = []
-        with datastore_services.get_ndb_context():
-            for exp_id in exp_ids_with_translation_suggestions:
-                story_id = exp_services.get_story_id_linked_to_exploration(
-                    exp_id)
-                if story_id is not None:
-                    story = story_fetchers.get_story_by_id(story_id)
-                    if story is not None:
-                        topic_ids_with_translation_submissions_list.append(
-                            story.corresponding_topic_id)
-
-        topic_ids_with_translation_submissions = sorted(
-            set(topic_ids_with_translation_submissions_list))
-
-        topic_ids_with_contribution_stats = sorted(
-            {v.topic_id for v in translation_contribution_stats})
-
         for stat in translation_contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 translation_contribution_stats.remove(stat)
 
-        valid_topic_ids_with_contribution_stats = sorted(
-            {v.topic_id for v in translation_contribution_stats})
-
-        # We only generate total contribution stats model if there exists a
-        # valid contribution stats model for each pair of language code and
-        # topic id, a contributor submitted a translation suggestion to.
-        # Otherwise we return the debugging logs.
-        if topic_ids_with_translation_submissions != (
-            valid_topic_ids_with_contribution_stats):
-
-            # Collects all the debug logs.
-            debug_logs = (
-                'Translation submitter ID: %s, Language code: %s\n' % (
-                    contributor_user_id, language_code))
-
-            debug_logs += (
-                'Unique exp IDs with translation suggestion: \n')
-
-            with datastore_services.get_ndb_context():
-                for exp_id in exp_ids_with_translation_suggestions:
-                    debug_logs += (
-                        '- %s\n' % exp_id)
-                    story_id = exp_services.get_story_id_linked_to_exploration(
-                        exp_id)
-                    if story_id is not None:
-                        debug_logs += (
-                            '-- Story ID: %s\n' % story_id)
-                        story = story_fetchers.get_story_by_id(story_id)
-                        if story is not None:
-                            debug_logs += (
-                                '---- Topic ID: %s\n' % (
-                                    story.corresponding_topic_id))
-
-            debug_logs += (
-                'Unique topic IDs with contribution stats: \n')
-            for topic_id in topic_ids_with_contribution_stats:
-                debug_logs += (
-                    '- %s\n' % topic_id)
-
-            debug_logs += (
-                'Unique valid topic IDs with contribution stats: \n')
-            for topic_id in valid_topic_ids_with_contribution_stats:
-                debug_logs += (
-                    '- %s\n' % topic_id)
-            return (None, debug_logs)
-
-        else:
+        try:
             topic_ids = (
                 [v.topic_id for v in translation_contribution_stats])
             submitted_translations_count = sum(
@@ -524,7 +537,12 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                     )
                 )
                 translation_submit_stats_models.update_timestamps()
-                return (translation_submit_stats_models, None)
+                return result.Ok(translation_submit_stats_models)
+        except Exception as e:
+            return result.Err(
+                'Unable to create total translation contribution stats for '
+                'contributor id(%s) and language code(%s): %s' % (
+                    contributor_user_id, language_code, e))
 
     @staticmethod
     def transform_translation_review_stats(
@@ -610,9 +628,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
         question_contribution_stats:
             Iterable[suggestion_models.QuestionContributionStatsModel],
         question_general_suggestions_stats:
-            Iterable[suggestion_models.GeneralSuggestionModel]) -> Tuple[
-                Optional[suggestion_models.QuestionSubmitterTotalContributionStatsModel],  # pylint: disable=line-too-long
-                Optional[str]]:
+            Iterable[suggestion_models.GeneralSuggestionModel]) -> (
+        result.Result[
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel,
+            str]):
         """Transforms QuestionContributionStatsModel and GeneralSuggestionModel
         to QuestionSubmitterTotalContributionStatsModel.
 
@@ -627,11 +646,8 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 GeneralSuggestionModel grouped by author_id.
 
         Returns:
-            A 2-tuple with the following elements:
-            - suggestion_models.QuestionSubmitterTotalContributionStatsModel.
-            New QuestionSubmitterTotalContributionStatsModel model, if
-            possible.
-            - The debug logs, if error detected.
+            QuestionSubmitterTotalContributionStatsModel. It generates and
+            returns a QuestionSubmitterTotalContributionStatsModel.
         """
         # The key for sorting is defined separately because of a mypy bug.
         # A [no-any-return] is thrown if key is defined in the sort() method
@@ -679,74 +695,12 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
 
         entity_id = contributor_user_id
 
-        by_topic_id = lambda m: m.topic_id
-
-        skill_ids_with_question_suggestions = sorted(
-            {v.target_id for v in general_suggestion_stats})
-
-        topic_ids_with_question_submissions_list = []
-        with datastore_services.get_ndb_context():
-            for skill_id in skill_ids_with_question_suggestions:
-                topic_assignments = sorted(
-                    skill_services.get_all_topic_assignments_for_skill(
-                        skill_id), key=by_topic_id)
-                for topic_assignment in topic_assignments:
-                    topic_ids_with_question_submissions_list.append(
-                        topic_assignment.topic_id)
-
-        topic_ids_with_question_submissions = sorted(
-            set(topic_ids_with_question_submissions_list))
-
-        topic_ids_with_contribution_stats = sorted(
-            {v.topic_id for v in question_contribution_stats})
-
         for stat in question_contribution_stats:
             if GenerateContributorAdminStatsJob.not_validate_topic(
                 stat.topic_id):
                 question_contribution_stats.remove(stat)
 
-        valid_topic_ids_with_contribution_stats = sorted(
-            {v.topic_id for v in question_contribution_stats})
-
-        # We only generate total contribution stats model if there exists a
-        # valid contribution stats model for each topic id, a contributor
-        # submitted a question suggestion to. Otherwise we return the debugging
-        # logs.
-        if topic_ids_with_question_submissions != (
-            valid_topic_ids_with_contribution_stats):
-
-            # Collects all the debug logs.
-            debug_logs = (
-                'Question submitter ID: %s.\n' % contributor_user_id)
-
-            debug_logs += (
-                'Unique skill IDs with question suggestion: \n')
-
-            with datastore_services.get_ndb_context():
-                for skill_id in skill_ids_with_question_suggestions:
-                    debug_logs += (
-                        '- %s\n' % skill_id)
-                    topic_assignments = sorted(
-                        skill_services.get_all_topic_assignments_for_skill(
-                            skill_id), key=by_topic_id)
-                    for topic_assignment in topic_assignments:
-                        debug_logs += (
-                            '-- Topic ID: %s\n' % topic_assignment.topic_id)
-
-            debug_logs += (
-                'Unique topic IDs with contribution stats: \n')
-            for topic_id in topic_ids_with_contribution_stats:
-                debug_logs += (
-                    '- %s\n' % topic_id)
-
-            debug_logs += (
-                'Unique valid topic IDs with contribution stats: \n')
-            for topic_id in valid_topic_ids_with_contribution_stats:
-                debug_logs += (
-                    '- %s\n' % topic_id)
-            return (None, debug_logs)
-
-        else:
+        try:
             topic_ids = (
                 [v.topic_id for v in question_contribution_stats])
             submitted_questions_count = sum(
@@ -793,7 +747,11 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                     )
                 )
                 question_submit_stats_models.update_timestamps()
-                return (question_submit_stats_models, None)
+                return result.Ok(question_submit_stats_models)
+        except Exception as e:
+            return result.Err(
+                'Unable to create total question contribution stats for '
+                'contributor id(%s): %s' % (contributor_user_id, e))
 
     @staticmethod
     def transform_question_review_stats(
