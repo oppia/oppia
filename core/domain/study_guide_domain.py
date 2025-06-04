@@ -27,11 +27,6 @@ from core.domain import translation_domain
 
 from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 
-from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
-
-# TODO(#14537): Refactor this file and remove imports marked
-# with 'invalid-import-from'.
-
 STUDY_GUIDE_PROPERTY_SECTIONS_HEADING: Final = 'sections_heading'
 STUDY_GUIDE_PROPERTY_SECTIONS_CONTENT: Final = 'sections_content'
 
@@ -261,8 +256,8 @@ class StudyGuideSection:
         """Creates a study guide sections object from a dictionary.
 
         Args:
-        section_dict: dict. The dict representation of
-            StudyGuideSection object.
+            section_dict: dict. The dict representation of
+                StudyGuideSection object.
 
         Returns:
             StudyGuideSection. The corresponding object.
@@ -291,12 +286,20 @@ class StudyGuideDict(TypedDict):
     version: int
 
 
+class StudyGuidePageContentsDict(TypedDict):
+    """Dictionary representing the Android Study Guide
+    PageContents object.
+    """
+
+    subtitled_html: state_domain.SubtitledHtmlDict
+
+
 class StudyGuideAndroidDict(TypedDict):
     """Dictionary representing the Android StudyGuide object."""
 
     id: str
     topic_id: str
-    page_contents: state_domain.SubtitledHtmlDict
+    page_contents: StudyGuidePageContentsDict
     page_contents_schema_version: int
     language_code: str
     version: int
@@ -369,9 +372,9 @@ class StudyGuide:
         for section in self.sections:
             section_dict = section.to_dict()
             heading_html = (
-                f'<p><strong>' +
+                '<p><strong>' +
                 f'{section_dict["heading"]["unicode_str"]}' +
-                f'</strong></p>'
+                '</strong></p>'
             )
             concatenated_html_parts.append(heading_html)
             concatenated_html_parts.append(section_dict['content']['html'])
@@ -520,15 +523,15 @@ class StudyGuide:
         """The new value for the heading data field.
 
         Args:
-        new_section_heading: SubtitledUnicode. The new heading for a
-            section of the study guide.
-        old_section_heading_content_id: str. The content id of the
-            old heading for a section of the study guide to be
-            updated.
+            new_section_heading: SubtitledUnicode. The new heading for a
+                section of the study guide.
+            old_section_heading_content_id: str. The content id of the
+                old heading for a section of the study guide to be
+                updated.
 
         Raises:
-        Exception. The provided old_section_heading_content_id
-            does not exist.
+            Exception. The provided old_section_heading_content_id
+                does not exist.
         """
         for section in self.sections:
             if old_section_heading_content_id == section.heading.content_id:
@@ -556,8 +559,8 @@ class StudyGuide:
                 guide to be updated.
 
         Raises:
-        Exception. The provided old_section_content_content_id
-            does not exist.
+            Exception. The provided old_section_content_content_id
+                does not exist.
         """
         for section in self.sections:
             if old_section_content_content_id == section.content.content_id:
@@ -605,17 +608,17 @@ class StudyGuide:
         """Deletes a section from the study guide.
 
         Args:
-        heading_content_id: str. The content id of the heading of the
-            section to be deleted.
-        content_content_id: str. The content id of the content of the
-            section to be deleted.
+            heading_content_id: str. The content id of the heading of the
+                section to be deleted.
+            content_content_id: str. The content id of the content of the
+                section to be deleted.
 
         Raises:
-        Exception: The provided heading_content_id or
-            content_content_id does not exist.
+            Exception: The provided heading_content_id or
+                content_content_id does not exist.
         """
         for i, section in enumerate(self.sections):
-            if (section.heading.content_id == heading_content_id and 
+            if (section.heading.content_id == heading_content_id and
                 section.content.content_id == content_content_id):
                 del self.sections[i]
                 return

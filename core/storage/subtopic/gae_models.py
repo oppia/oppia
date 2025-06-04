@@ -215,12 +215,12 @@ class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         in the parent class.
 
         Args:
-        study_guide_page_id: str. The id of the study guide being edited.
-        version: int. The version number of the study guide after the
-            commit.
+            study_guide_page_id: str. The id of the study guide being edited.
+            version: int. The version number of the study guide after the
+                commit.
 
         Returns:
-        str. The commit id with the study guide id and version number.
+            str. The commit id with the study guide id and version number.
         """
         return 'studyguide-%s-%s' % (study_guide_page_id, version)
 
