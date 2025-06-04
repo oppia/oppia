@@ -311,7 +311,7 @@ const desktopStoryTitleSelector = '.e2e-test-story-title-in-topic-page';
 const mobileStoryTitleSelector = '.e2e-test-mobile-story-title';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const oppiaTopicTitleSelector = '.oppia-topic-title';
-const topicPageLessonTabSelector = '.e2e-test-revision-tab-link';
+const topicPageLessonTabSelector = '.e2e-test-study-tab-link';
 const subTopicTitleInLessTabSelector = '.subtopic-title';
 const reviewCardTitleSelector = '.oppia-subtopic-title';
 const topicNameSelector = '.e2e-test-topic-name';
@@ -3276,14 +3276,14 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Navigates to the revision tab on the topic page.
+   * Navigates to the study tab on the topic page.
    */
-  async navigateToRevisionTab(): Promise<void> {
+  async navigateToStudyTab(): Promise<void> {
     await this.page.waitForSelector(topicPageLessonTabSelector);
-    const topicPageRevisionTabSelectorElement = await this.page.$(
+    const topicPageStudyTabSelectorElement = await this.page.$(
       topicPageLessonTabSelector
     );
-    await topicPageRevisionTabSelectorElement?.click();
+    await topicPageStudyTabSelectorElement?.click();
   }
 
   /**

@@ -55,7 +55,7 @@ export class VoiceoverLanguageManagementService {
   }
 
   canVoiceoverForLanguage(languageCode: string): boolean {
-    return this.languageCodesMapping.hasOwnProperty(languageCode);
+    return this.languageCodesMapping?.hasOwnProperty(languageCode);
   }
 
   setCloudSupportedLanguageAccents(languageCode: string): void {

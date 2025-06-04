@@ -58,6 +58,6 @@ describe('subtopic viewer pre logo action component', () => {
 
   it('should set the topic url from the url fragment correctly', () => {
     component.ngOnInit();
-    expect(component.topicUrl).toBe('/learn/math/url-fragment/revision');
+    expect(component.topicUrl).toBe('/learn/math/url-fragment/studyguide');
   });
 });
