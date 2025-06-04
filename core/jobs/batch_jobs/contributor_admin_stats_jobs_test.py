@@ -1767,15 +1767,15 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'ERROR: \"Unable to create total question contribution '
+                    'ERROR: "Unable to create total question contribution '
                     'stats for contributor id(user1): min() arg is an '
-                    'empty sequence\": 1'
+                    'empty sequence": 1'
                 )),
             job_run_result.JobRunResult(
                 stderr=(
-                    'ERROR: \"Unable to create total translation contribution '
+                    'ERROR: "Unable to create total translation contribution '
                     'stats for contributor id(user1) and language code(hi): '
-                    'min() arg is an empty sequence\": 1'
+                    'min() arg is an empty sequence": 1'
                 ))
         ])
 

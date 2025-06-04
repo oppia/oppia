@@ -23,7 +23,6 @@ from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import skill_services
 from core.domain import story_fetchers
-from core.domain import suggestion_services
 from core.domain import topic_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -107,16 +106,13 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             exp_opportunity_to_submitted_suggestions
             | 'Filter valid translation suggestions' >> beam.Filter(
                 lambda grouped_data: (
-                    len(grouped_data['opportunity']) > 0 and 
+                    len(grouped_data['opportunity']) > 0 and
                     len(grouped_data['suggestion']) > 0
                 ))
             | 'Extract translation suggestions only' >> beam.Map(
                 lambda grouped_data: grouped_data['suggestion'])
-            # | 'Flatten translation suggestion lists' >> beam.FlatMap(
-            #     lambda suggestions: suggestions)
             | 'Extract and fully flatten t suggestions' >> beam.FlatMap(
-                lambda grouped_data: [suggestion
-                    for suggestion in grouped_data[0]])
+                lambda grouped_data: list(grouped_data[0]))
         )
 
         translation_general_suggestions_stats = (
@@ -161,15 +157,13 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
             skill_opportunity_to_submitted_suggestions
             | 'Filter valid question suggestions' >> beam.Filter(
                 lambda grouped_data: (
-                    len(grouped_data['opportunity']) > 0 and 
+                    len(grouped_data['opportunity']) > 0 and
                     len(grouped_data['suggestion']) > 0
                 ))
             | 'Extract question suggestions only' >> beam.Map(
                 lambda grouped_data: grouped_data['suggestion'])
             | 'Extract and fully flatten suggestions' >> beam.FlatMap(
-                lambda grouped_data: [suggestion
-                    for suggestion in grouped_data[0]])
-            # | 'Flatten question suggestion lists' >> beam.FlatMap(lambda suggestions: suggestions)
+                lambda grouped_data: list(grouped_data[0]))
         )
 
         question_general_suggestions_stats = (
