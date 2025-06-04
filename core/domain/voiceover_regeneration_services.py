@@ -106,7 +106,6 @@ def parse_html(html_content: str) -> str:
     Returns:
         str. The plain text retrieved from the HTML content.
     """
-
     soup = bs4.BeautifulSoup(html_content, 'html.parser')
     for custom_tag_element in ALLOWED_CUSTOM_OPPIA_RTE_TAGS:
         for element in soup.find_all(custom_tag_element):
@@ -167,7 +166,6 @@ def synthesize_voiceover_for_html_string(
             feconf.OPPIA_AUTOMATIC_VOICEOVER_PROVIDER
         )
     )
-
     audio_offset_list: List[Dict[str, Union[str, float]]] = []
 
     is_cached_model_used_for_voiceovers = False

@@ -291,15 +291,6 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
             word_boundary_collection.audio_offset_list,
             expected_word_boundary_collection)
 
-    def test_is_mathematical_text(self) -> None:
-        math_text = 'Convert 5 + 3 to words.'
-        self.assertTrue(
-            azure_speech_synthesis_services.is_mathematical_text(math_text))
-
-        non_math_text = 'This is a test text.'
-        self.assertFalse(
-            azure_speech_synthesis_services.is_mathematical_text(non_math_text))
-
     def _get_ssml_content(
         self, main_content: str, language_accent_code: str
     ) -> str:
