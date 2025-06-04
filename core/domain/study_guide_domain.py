@@ -523,7 +523,7 @@ class StudyGuide:
         """The new value for the heading data field.
 
         Args:
-            new_section_heading: SubtitledUnicode. The new heading for a
+            new_section_heading: str. The new heading for a
                 section of the study guide.
             old_section_heading_content_id: str. The content id of the
                 old heading for a section of the study guide to be
@@ -535,7 +535,7 @@ class StudyGuide:
         """
         for section in self.sections:
             if old_section_heading_content_id == section.heading.content_id:
-                section.heading = new_section_heading
+                section.heading.unicode_str = new_section_heading
                 return
 
         raise Exception(
@@ -552,7 +552,7 @@ class StudyGuide:
         """The new value for the content data field.
 
         Args:
-            new_section_content: SubtitledHtml. The new content
+            new_section_content: str. The new content
                 for a section of the study guide.
             old_section_content_content_id: str. The content id
                 of the old content for a section of the study
@@ -564,7 +564,7 @@ class StudyGuide:
         """
         for section in self.sections:
             if old_section_content_content_id == section.content.content_id:
-                section.content = new_section_content
+                section.content.html = new_section_content
                 return
 
         raise Exception(

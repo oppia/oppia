@@ -271,10 +271,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         """Test updating section content with invalid content ID
         raises exception.
         """
-        new_content = state_domain.SubtitledHtml(
-            'updated_content_id',
-            '<p>Updated content</p>'
-        )
+        new_content = '<p>Updated content</p>'
 
         with self.assertRaisesRegex(
             Exception,
