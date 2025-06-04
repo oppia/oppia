@@ -268,7 +268,9 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_update_section_content_with_invalid_content_id(self) -> None:
-        """Test updating section content with invalid content ID raises exception."""
+        """Test updating section content with invalid content ID
+        raises exception.
+        """
         new_content = state_domain.SubtitledHtml(
             'updated_content_id',
             '<p>Updated content</p>'
