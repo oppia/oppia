@@ -16,10 +16,9 @@
  * @fileoverview Unit tests for the ParamType model.
  */
 
-import { ParamType } from 'domain/exploration/param-type.model';
+import {ParamType} from 'domain/exploration/param-type.model';
 
 describe('ParamType objects', () => {
-
   it('should have its registry frozen', () => {
     expect(Object.isFrozen(ParamType.registry)).toBe(true);
   });

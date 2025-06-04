@@ -61,9 +61,7 @@ export class ParamSpecObjectFactory {
    */
   createFromBackendDict(paramSpecBackendDict: ParamSpecBackendDict): ParamSpec {
     return new ParamSpec(
-      ParamType.getTypeFromBackendName(
-        paramSpecBackendDict.obj_type
-      )
+      ParamType.getTypeFromBackendName(paramSpecBackendDict.obj_type)
     );
   }
 
