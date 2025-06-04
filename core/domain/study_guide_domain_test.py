@@ -461,7 +461,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
     def test_update_study_guide_property_sections_content_change(self) -> None:
         """Test creation of UpdateStudyGuidePropertySectionsContentCmd."""
 
-        change_dict = {
+        change_object = study_guide_domain.StudyGuideChange({
             'cmd': 'update_study_guide_property',
             'study_guide_id': 1,
             'property_name': 'sections_content',
@@ -473,8 +473,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
                 'content_id': 'section_content_3',
                 'html': '<p>New content</p>'
             }
-        }
-        change_object = study_guide_domain.StudyGuideChange(change_dict)
+        })
 
         self.assertEqual(
             change_object.cmd,
@@ -511,13 +510,16 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_dict(self) -> None:
         """Test StudyGuideChange to_dict method."""
-        change_dict = {
+        change_object = study_guide_domain.StudyGuideChange({
             'cmd': 'create_new',
             'topic_id': 'topic_id',
             'study_guide_id': 1
-        }
-        change_object = study_guide_domain.StudyGuideChange(change_dict)
-        self.assertEqual(change_object.to_dict(), change_dict)
+        })
+        self.assertEqual(change_object.to_dict(), {
+            'cmd': 'create_new',
+            'topic_id': 'topic_id',
+            'study_guide_id': 1
+        })
 
 
 class StudyGuideSummaryDomainUnitTests(test_utils.GenericTestBase):
