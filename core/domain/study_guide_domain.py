@@ -453,6 +453,14 @@ class StudyGuide:
             content_id_generator.next_content_id_index,
             constants.DEFAULT_LANGUAGE_CODE, 1)
 
+    def get_study_guide_id_from_study_guide_page_id(self) -> int:
+        """Returns the id from the study guide page id of the object.
+
+        Returns:
+            int. The study_guide_id of the object.
+        """
+        return int(self.id[len(self.topic_id) + 1:])
+
     def update_section_heading(
         self,
         new_section_heading: str,
