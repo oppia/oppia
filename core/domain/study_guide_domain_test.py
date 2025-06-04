@@ -269,7 +269,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
 
     def test_topic_id_validation(self) -> None:
         """Test validation of topic_id field."""
-        # Here we use MyPy ignore because we are assigning an integer 
+        # Here we use MyPy ignore because we are assigning an integer
         # value where string is expected, and this is done to replace
         # the stored instance with an integer in order to trigger the
         # validation error during update.
@@ -280,6 +280,10 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
 
     def test_version_validation(self) -> None:
         """Test validation of version field."""
+        # Here we use MyPy ignore because we are assigning a string
+        # value where an integer is expected, and this is done to
+        # replace the stored instance with a string in order to
+        # trigger the validation error during update.
         self.study_guide.version = 'invalid_version'  # type: ignore[assignment]
         self._assert_study_guide_validation_error(
             'Expected version number to be an int'
@@ -287,7 +291,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
 
     def test_sections_schema_version_type_validation(self) -> None:
         """Test validation of sections schema version type."""
-        # Here we use MyPy ignore because we are assigning a string 
+        # Here we use MyPy ignore because we are assigning a string
         # value where an integer is expected, and this is done to
         # replace the stored instance with a string in order to
         # trigger the validation error during update.
@@ -306,7 +310,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
 
     def test_language_code_validation(self) -> None:
         """Test validation of language_code field."""
-        # Here we use MyPy ignore because we are assigning an integer 
+        # Here we use MyPy ignore because we are assigning an integer
         # value where string is expected, and this is done to replace
         # the stored instance with an integer in order to trigger the
         # validation error during update.

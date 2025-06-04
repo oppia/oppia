@@ -614,7 +614,7 @@ class StudyGuide:
                 section to be deleted.
 
         Raises:
-            Exception: The provided heading_content_id or
+            Exception. The provided heading_content_id or
                 content_content_id does not exist.
         """
         for i, section in enumerate(self.sections):
