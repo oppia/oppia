@@ -4292,9 +4292,18 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Verifies if the voiceover is playing.
    */
-  async verifyVoiceoverIsPlaying(shouldBePlaying: true): Promise<void> {
-    // If the pause button is present, it means the audio is playing.
-    await this.page.waitForSelector(pauseVoiceoverButton);
+  async verifyVoiceoverIsPlaying(shouldBePlaying: boolean): Promise<void> {
+    if (shouldBePlaying) {
+      // If the pause button is present, it means the audio is playing.
+      await this.page.waitForSelector(pauseVoiceoverButton);
+    } else {
+      const pauseButton = await this.page.$(pauseVoiceoverButton);
+      if (pauseButton !== null) {
+        throw new Error(
+          'Pause button should not be present when voiceover is paused.'
+        );
+      }
+    }
     showMessage(`Voiceover is ${shouldBePlaying ? 'playing' : 'paused'}.`);
   }
 

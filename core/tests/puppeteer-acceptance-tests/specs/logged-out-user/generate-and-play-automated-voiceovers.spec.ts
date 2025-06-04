@@ -139,13 +139,13 @@ describe('Exploration Editor', function () {
       'Algebra I'
     );
 
-    // Generating voiceovers to the exploration.
+    // Generate voiceovers for the exploration.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.reloadPage();
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.navigateToTranslationsTab();
     await explorationEditor.dismissTranslationTabWelcomeModal();
-    await explorationEditor.regenerateVoiceoverToContent(
+    await explorationEditor.regenerateVoiceoverForContent(
       'English',
       'English (United States)',
       'Content'
@@ -154,7 +154,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.navigateToTranslationsTab();
-    await explorationEditor.regenerateVoiceoverToContent(
+    await explorationEditor.regenerateVoiceoverForContent(
       'English',
       'English (United States)',
       'Interaction'
@@ -163,7 +163,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.navigateToTranslationsTab();
-    await explorationEditor.regenerateVoiceoverToContent(
+    await explorationEditor.regenerateVoiceoverForContent(
       'English',
       'English (United States)',
       'Content'
@@ -193,6 +193,7 @@ describe('Exploration Editor', function () {
       await loggedOutUser.startVoiceover();
       await loggedOutUser.verifyVoiceoverIsPlaying(true);
       await loggedOutUser.pauseVoiceover();
+      await loggedOutUser.verifyVoiceoverIsPlaying(false);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

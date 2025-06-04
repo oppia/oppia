@@ -2425,7 +2425,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} languageAccent - Language accent for which the voiceover has to be added.
    * @param {string} contentType - Type of the content such as "Interaction" or "Hint".
    */
-  async regenerateVoiceoverToContent(
+  async regenerateVoiceoverForContent(
     language: string,
     languageAccent: string,
     contentType: string
