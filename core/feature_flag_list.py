@@ -64,6 +64,8 @@ class FeatureNames(enum.Enum):
     LABEL_ACCENT_TO_VOICE_ARTIST = 'label_accent_to_voice_artist'
     SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS = (
         'show_voiceover_tab_for_non_curated_explorations')
+    SHOW_RESTRUCTURED_STUDY_GUIDES = (
+        'show_restructured_study_guides')
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -89,7 +91,8 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
-    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -273,6 +276,15 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'The flag enables the voiceover tab for non-curated explorations.',
             feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value: (
+        (
+            'Allows the creators to access the updated study guide editor page '
+            'and learners to access the updated study guide user interface '
+            '(the actual content displayed by the study guides will be the '
+            'same, just the user interface will be different).',
+            feature_flag_domain.ServerMode.DEV
         )
     )
 }

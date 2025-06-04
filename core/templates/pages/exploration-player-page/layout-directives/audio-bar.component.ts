@@ -217,10 +217,21 @@ export class AudioBarComponent {
 
     let contentId = this.voiceoverPlayerService.activeContentId;
 
-    this.voiceoverToBePlayed = entityVoiceover.getManualVoiceover(
+    let manualVoiceover = entityVoiceover.getManualVoiceover(
+      contentId
+    ) as Voiceover;
+    let automaticVoiceover = entityVoiceover.getAutomaticVoiceover(
       contentId
     ) as Voiceover;
 
+    if (manualVoiceover && manualVoiceover.needsUpdate === false) {
+      this.voiceoverToBePlayed = manualVoiceover;
+    } else if (automaticVoiceover && automaticVoiceover.needsUpdate === false) {
+      this.voiceoverToBePlayed = automaticVoiceover;
+    }
+
+    this.audioPreloaderService.contentIdsToVoiceovers =
+      this.entityVoiceoversService.getAllContentIdsToVoiceovers();
     this.audioPreloaderService.restartAudioPreloader(
       this.playerPositionService.getCurrentStateName()
     );
