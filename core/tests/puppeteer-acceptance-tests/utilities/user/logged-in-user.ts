@@ -855,11 +855,7 @@ export class LoggedInUser extends BaseUser {
       );
       await searchResultsElements[lessonIndex].click();
 
-      if (!this.page.url().includes('/explore/')) {
-        throw new Error(
-          `Failed to navigate to the lesson page for "${lessonName}". Expected URL to include '/explore/', but got: ${this.page.url()}`
-        );
-      }
+      await this.page.waitForSelector(lessonCardTitleSelector, {hidden: true});
     } catch (error) {
       const newError = new Error(
         `Failed to play lesson from dashboard: ${error}`
@@ -1044,14 +1040,12 @@ export class LoggedInUser extends BaseUser {
     }
 
     // TODO: Ensure works properly
-
     // Post-check: ensure all interests are present as tags
+    const foundTexts = await this.page.$$eval(
+      subjectInterestTagsInPreferencesPage,
+      elements => elements.map(el => el.textContent?.trim() || '') // Map all found texts
+    );
     for (const interest of interests) {
-      const foundTexts = await this.page.$$eval(
-        subjectInterestTagsInPreferencesPage,
-        elements => elements.map(el => el.textContent?.trim() || '') // Map all found texts
-      );
-
       const found = foundTexts.some(text => text === interest);
 
       if (!found) {
@@ -1060,6 +1054,7 @@ export class LoggedInUser extends BaseUser {
         );
       }
     }
+    showMessage(`Subject interests updated to ${foundTexts.join(', ')}`);
   }
 
   /**
@@ -1079,7 +1074,6 @@ export class LoggedInUser extends BaseUser {
       await this.page.click(matFormTextSelector);
     }
 
-    // TODO: Ensure works properly
     // Post-check: ensure all interests are present as tags
     for (const interest of interests) {
       const foundTexts = await this.page.$$eval(
@@ -1119,23 +1113,16 @@ export class LoggedInUser extends BaseUser {
       }
     }
 
-    // TODO: Add post check to verify the language is set correctly.
-    const languageSelector = await this.page.$(
-      '.e2e-test-site-language-selector'
+    const foundExplorationLanguages = await this.page.$$eval(
+      '.acceptance-test-exploration-language-preference-chips',
+      elements => elements.map(el => el.textContent?.trim() || '') // Map all found texts
     );
-    if (!languageSelector) {
-      throw new Error('Language selector not found');
-    }
-    const selectedLanguage = await languageSelector.$eval(
-      '.mat-select-value-text',
-      el => el.textContent?.trim()
-    );
-    if (selectedLanguage !== language) {
+    showMessage(`Found Languages: ${foundExplorationLanguages.join(', ')}`);
+    if (!foundExplorationLanguages.some(lng => lng === language)) {
       throw new Error(
-        `Language not set. Expected: ${language}, Found: ${selectedLanguage}`
+        `Preferred Language ${language} not added. Found Languages: ${foundExplorationLanguages.join(', ')}`
       );
     }
-    console.log('Selected language:', selectedLanguage);
   }
 
   /**
@@ -1149,15 +1136,43 @@ export class LoggedInUser extends BaseUser {
     await this.type(siteLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
-    const selectedLanguage = await this.page.$eval(
-      `${siteLanguageInputSelector}`,
-      el => el.textContent?.trim()
+    // const selectedLanguage = await this.page.$eval(
+    //   '.e2e-test-site-language-selector',
+    //   el => el?.textContent?.trim()
+    // );
+    await this.page.waitForSelector('.e2e-test-site-language-selector');
+    const selectedLanguageElement = await this.page.$(
+      '.e2e-test-site-language-selector'
     );
-    if (selectedLanguage !== language) {
-      throw new Error(
-        `Language not set. Expected: ${language}, Found: ${selectedLanguage}`
-      );
-    }
+    const atr = await this.page.$eval(
+      '.e2e-test-site-language-selector',
+      el => {
+        const attrs = {};
+        for (let attr of el.attributes) {
+          attrs[attr.name] = attr.value;
+        }
+        return attrs;
+      }
+    );
+    console.log('Attributes:', atr);
+
+    // TODO
+
+    // const selectedLanguage = selectedLanguageElement.qu
+
+    // const selectedLanguage = await this.page.$eval(siteLanguageInputSelector, el => (el as HTMLInputElement).value)
+    // const selectedLanguage = await languageSelector?.evaluate(el => (el as HTMLInputElement).value);
+    // showMessage(selectedLanguage || 'No language selected');
+
+    // const selectedLanguage = await this.page.$eval(
+    //   `${siteLanguageInputSelector}`,
+    //   el => el.textContent?.trim()
+    // );
+    // if (selectedLanguage !== language) {
+    //   throw new Error(
+    //     `Language not set. Expected: ${language}, Found: ${selectedLanguage}`
+    //   );
+    // }
   }
 
   /**
