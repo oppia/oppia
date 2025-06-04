@@ -16,10 +16,10 @@
  * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes assigning and unassigning a skill to a topic, merging two skills and using filters to select a skill for merging.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {TopicManager} from '../../utilities/user/topic-manager';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {TopicManager} from '../../../utilities/user/topic-manager';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

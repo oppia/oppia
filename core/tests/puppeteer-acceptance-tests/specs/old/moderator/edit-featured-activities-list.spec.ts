@@ -17,11 +17,11 @@
  * featured activities list by a moderator.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {Moderator} from '../../utilities/user/moderator';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {Moderator} from '../../../utilities/user/moderator';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

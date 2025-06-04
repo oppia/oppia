@@ -17,11 +17,11 @@
  * can add voiceover artist to an exploration
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {VoiceoverAdmin} from '../../../utilities/user/voiceover-admin';
+import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

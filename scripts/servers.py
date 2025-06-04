@@ -768,6 +768,14 @@ def managed_acceptance_tests_server(
         common.NODE_MODULES_PATH, '.bin', 'jest')
     puppeteer_acceptance_tests_dir_path = os.path.join(
         common.CURR_DIR, 'core', 'tests', 'puppeteer-acceptance-tests', 'specs')
+    
+    # Check if file there is file at given path, if not then try searching 
+    # 'old' directory.
+    filepath = os.path.join(
+        puppeteer_acceptance_tests_dir_path, suite_name, 'specs.js')
+    if not os.path.isfile(filepath):
+        puppeteer_acceptance_tests_dir_path = os.path.join(
+            puppeteer_acceptance_tests_dir_path, 'old')
 
     acceptance_tests_args = [
         nodemodules_jest_bin_path,

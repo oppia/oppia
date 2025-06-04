@@ -16,11 +16,11 @@
  * @fileoverview Acceptance Test for question submitters to submit practice questions with different interactions and difficulties.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {QuestionAdmin} from '../../utilities/user/question-admin';
-import {QuestionSubmitter} from '../../utilities/user/question-submitter';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {QuestionAdmin} from '../../../utilities/user/question-admin';
+import {QuestionSubmitter} from '../../../utilities/user/question-submitter';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

@@ -16,9 +16,9 @@
  * @fileoverview Acceptance Test for platform parameter management by site admin
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {SuperAdmin} from '../../utilities/user/super-admin';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {SuperAdmin} from '../../../utilities/user/super-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 

@@ -16,10 +16,10 @@
  * @fileoverview Acceptance Test for Blog Admin
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {BlogAdmin} from '../../utilities/user/blog-admin';
-import {SuperAdmin} from '../../utilities/user/super-admin';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {BlogAdmin} from '../../../utilities/user/blog-admin';
+import {SuperAdmin} from '../../../utilities/user/super-admin';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

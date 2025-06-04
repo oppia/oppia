@@ -16,11 +16,11 @@
  * @fileoverview Acceptance Test for topic management by curriculum admin
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {CurriculumAdmin} from '../../../utilities/user/curriculum-admin';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
+import {ConsoleReporter} from '../../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;

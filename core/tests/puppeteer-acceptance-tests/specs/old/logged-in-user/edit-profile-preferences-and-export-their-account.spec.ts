@@ -19,10 +19,10 @@
  *   verifying changes on profile page, exporting account, and account deletion by a logged-out user.
  */
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {UserFactory} from '../../../utilities/common/user-factory';
+import testConstants from '../../../utilities/common/test-constants';
+import {LoggedInUser} from '../../../utilities/user/logged-in-user';
+import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const PROFILE_PICTURE = testConstants.data.profilePicture;
