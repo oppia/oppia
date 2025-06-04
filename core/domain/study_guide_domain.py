@@ -25,7 +25,7 @@ from core.domain import change_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
+from typing import Final, List, Literal, Optional, TypedDict, Union
 
 STUDY_GUIDE_PROPERTY_SECTIONS_HEADING: Final = 'sections_heading'
 STUDY_GUIDE_PROPERTY_SECTIONS_CONTENT: Final = 'sections_content'
