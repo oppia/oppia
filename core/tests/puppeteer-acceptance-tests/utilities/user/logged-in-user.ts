@@ -178,7 +178,7 @@ const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 
-// Auth Pages
+// Auth Pages selectors.
 const loginPage = '.e2e-test-login-page';
 
 // Learner dashboard selectors.
@@ -206,14 +206,14 @@ const deleteMyAcccountButton = '.e2e-test-delete-my-account-button';
 const subjectInterestTagsInPreferencesPage =
   '.acceptance-test-subject-interest-chip';
 
-// Profile Page
+// Profile Page selectors.
 const profileContainerSelector = '.acceptance-test-profile-container';
 
-// Exploration player selectors
+// Exploration player selectors.
 const explorationSuccessfullyFlaggedMessage =
   '.acceptance-test-exploration-flagged-success-message';
 
-// Feedback updates page
+// Feedback updates page.
 const feedbackUpdatesMainContentContainer =
   '.acceptance-test-feedback-updates-main-content-container';
 
@@ -1040,10 +1040,10 @@ export class LoggedInUser extends BaseUser {
     }
 
     // TODO: Ensure works properly
-    // Post-check: ensure all interests are present as tags
+    // Post-check: ensure all interests are present as tags.
     const foundTexts = await this.page.$$eval(
       subjectInterestTagsInPreferencesPage,
-      elements => elements.map(el => el.textContent?.trim() || '') // Map all found texts
+      elements => elements.map(el => el.textContent?.trim() || '')
     );
     for (const interest of interests) {
       const found = foundTexts.some(text => text === interest);
@@ -1074,11 +1074,11 @@ export class LoggedInUser extends BaseUser {
       await this.page.click(matFormTextSelector);
     }
 
-    // Post-check: ensure all interests are present as tags
+    // Post-check: ensure all interests are present as tags.
     for (const interest of interests) {
       const foundTexts = await this.page.$$eval(
         subjectInterestTagsInPreferencesPage,
-        elements => elements.map(el => el.textContent?.trim() || '') // Map all found texts
+        elements => elements.map(el => el.textContent?.trim() || '')
       );
 
       const found = foundTexts.some(text => text === interest);
@@ -1115,7 +1115,7 @@ export class LoggedInUser extends BaseUser {
 
     const foundExplorationLanguages = await this.page.$$eval(
       '.acceptance-test-exploration-language-preference-chips',
-      elements => elements.map(el => el.textContent?.trim() || '') // Map all found texts
+      elements => elements.map(el => el.textContent?.trim() || '')
     );
     showMessage(`Found Languages: ${foundExplorationLanguages.join(', ')}`);
     if (!foundExplorationLanguages.some(lng => lng === language)) {
@@ -1136,18 +1136,17 @@ export class LoggedInUser extends BaseUser {
     await this.type(siteLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
-    // TODO
+    // TODO: Fix it
     await this.page.waitForSelector(
       '.e2e-test-site-language-selector .mat-select-value-text .mat-select-min-line'
     );
 
-    // Get the selected language text
+    // Get the selected language text.
     const selectedLanguage = await this.page.$eval(
       '.e2e-test-site-language-selector .mat-select-value-text .mat-select-min-line',
       el => el?.textContent?.trim()
     );
 
-    // Assert the language is English
     expect(selectedLanguage).toBe(language);
   }
 
