@@ -517,7 +517,7 @@ class StudyGuide:
 
     def update_section_heading(
         self,
-        new_section_heading: state_domain.SubtitledUnicode,
+        new_section_heading: str,
         old_section_heading_content_id: str
     ) -> None:
         """The new value for the heading data field.
@@ -538,15 +538,15 @@ class StudyGuide:
                 section.heading = new_section_heading
                 return
 
-            raise Exception(
-                'Invalid heading content_id: %s; '
-                'it is not in the list of sections for '
-                'this study guide' % (old_section_heading_content_id)
-            )
+        raise Exception(
+            'Invalid heading content_id: %s; '
+            'it is not in the list of sections for '
+            'this study guide' % (old_section_heading_content_id)
+        )
 
     def update_section_content(
         self,
-        new_section_content: state_domain.SubtitledHtml,
+        new_section_content: str,
         old_section_content_content_id: str
     ) -> None:
         """The new value for the content data field.
@@ -567,11 +567,11 @@ class StudyGuide:
                 section.content = new_section_content
                 return
 
-            raise Exception(
-                'Invalid content content_id: %s; '
-                'it is not in the list of sections for '
-                'this study guide' % (old_section_content_content_id)
-            )
+        raise Exception(
+            'Invalid content content_id: %s; '
+            'it is not in the list of sections for '
+            'this study guide' % (old_section_content_content_id)
+        )
 
     def add_section(
             self,

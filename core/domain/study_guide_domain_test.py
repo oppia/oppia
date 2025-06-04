@@ -196,9 +196,9 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         self.study_guide.add_section('Second Heading', '<p>Second content</p>')
 
         # Get the content IDs of the first section.
-        first_section = self.study_guide.sections[0]
-        heading_content_id = first_section.heading.content_id
-        content_content_id = first_section.content.content_id
+        old_section = self.study_guide.sections[1]
+        heading_content_id = old_section.heading.content_id
+        content_content_id = old_section.content.content_id
 
         initial_count = len(self.study_guide.sections)
         self.study_guide.delete_section(heading_content_id, content_content_id)
@@ -207,7 +207,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         # The remaining section should be the second one.
         self.assertEqual(
             self.study_guide.sections[0].heading.unicode_str,
-            'Second Heading'
+            'Test Heading'
         )
 
     def test_delete_section_with_invalid_content_ids(self) -> None:
@@ -226,20 +226,13 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_section_heading(self) -> None:
         """Test updating a section heading."""
-        first_section = self.study_guide.sections[0]
-        old_content_id = first_section.heading.content_id
-        new_heading = state_domain.SubtitledUnicode(
-            'section_heading_2',
-            'Updated Heading'
-        )
+        old_section = self.study_guide.sections[1]
+        old_content_id = old_section.heading.content_id
+        new_heading = 'Updated Heading'
 
         self.study_guide.update_section_heading(new_heading, old_content_id)
 
-        updated_section = self.study_guide.sections[0]
-        self.assertEqual(
-            updated_section.heading.content_id,
-            'section_heading_2'
-        )
+        updated_section = self.study_guide.sections[1]
         self.assertEqual(
             updated_section.heading.unicode_str,
             'Updated Heading'
@@ -249,15 +242,42 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         """Test updating section heading with invalid
             content ID raises exception.
         """
-        new_heading = state_domain.SubtitledUnicode(
-            'section_heading_2',
-            'Updated Heading'
-        )
+        new_heading = 'Updated Heading'
 
         with self.assertRaisesRegex(
             Exception,
             'Invalid heading content_id: invalid_id'):
             self.study_guide.update_section_heading(new_heading, 'invalid_id')
+
+    def test_update_section_content(self) -> None:
+        """Test updating a section's content."""
+        # Add a second section to have multiple sections to test with.
+        self.study_guide.add_section('Second Heading', '<p>Second content</p>')
+
+        old_section = self.study_guide.sections[1]
+        old_content_id = old_section.content.content_id
+
+        new_content = '<p>Updated content</p>'
+
+        self.study_guide.update_section_content(new_content, old_content_id)
+
+        updated_section = self.study_guide.sections[1]
+        self.assertEqual(
+            updated_section.content.html,
+            '<p>Updated content</p>'
+        )
+
+    def test_update_section_content_with_invalid_content_id(self) -> None:
+        """Test updating section content with invalid content ID raises exception."""
+        new_content = state_domain.SubtitledHtml(
+            'updated_content_id',
+            '<p>Updated content</p>'
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid content content_id: invalid_id'):
+            self.study_guide.update_section_content(new_content, 'invalid_id')
 
     def _assert_study_guide_validation_error(
         self, expected_error_substring: str
