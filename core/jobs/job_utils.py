@@ -196,7 +196,7 @@ def get_beam_entity_from_ndb_model(
     with datastore_services.get_ndb_context():
         model_to_put = ndb_model._entity_to_ds_entity( # pylint: disable=protected-access
             model
-    )
+        )
     return beam_datastore_types.Entity.from_client_entity(model_to_put)
 
 
