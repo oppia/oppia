@@ -1,5 +1,5 @@
 <mat-card class="oppia-editor-card-with-avatar oppia-page-card oppia-long-text-card">
-  <h3>Update language/accent pairs that learners and voice artists can select</h3>
+  <h3 class="header-text">Update language/accent pairs that learners and voice artists can select</h3>
   <div class="card-content">
     <div *ngIf="!pageIsInitialized">
       <p>Loading ...</p>
@@ -38,12 +38,14 @@
                     <mat-icon>info</mat-icon>
                   </span>
                 </span>
-                <mat-form-field *ngIf="isAutogenerationSupportedByCloudService(languageAccentCodeToDescription.key)">
+                <mat-form-field *ngIf="isAutogenerationSupportedByCloudService(languageAccentCodeToDescription.key)"
+                                class="autogeneration-select-field">
                   <mat-select
                     [(ngModel)]="languageAccentCodesToSupportsAutogeneration[languageAccentCodeToDescription.key]"
-                    (selectionChange)="updateSupportsAutogenerationField(languageAccentCodeToDescription.key, $event.value)">
-                    <mat-option [value]="true">Yes</mat-option>
-                    <mat-option [value]="false">No</mat-option>
+                    (selectionChange)="updateSupportsAutogenerationField(languageAccentCodeToDescription.key, $event.value)"
+                    [ngClass]="'e2e-test-' + languageAccentCodeToDescription.key + '-supports-autogeneration-select'">
+                    <mat-option class="e2e-test-autogeneration-option-selector" [value]="true">Yes</mat-option>
+                    <mat-option class="e2e-test-autogeneration-option-selector" [value]="false">No</mat-option>
                   </mat-select>
                 </mat-form-field>
               </span>
@@ -253,5 +255,55 @@
   /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
   ::ng-deep .mat-select-panel {
     margin-left: 15px;
+  }
+
+  @media (max-width: 600px) {
+    .language-accent-description {
+      width: 50%;
+    }
+    .oppia-supported-language-pair-heading {
+      font-size: 1rem;
+      margin-left: 0;
+    }
+    .oppia-long-text-card {
+      padding: 8px 2px 8px 2px;
+    }
+    .language-accent-header {
+      margin-right: 0%;
+    }
+    .header-text {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+    .oppia-language-accent-list {
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: bold;
+      gap: 8px;
+      justify-content: flex-start;
+      padding: 5px 0;
+      width: 100%;
+    }
+    .language-accent-autogeneration-status {
+      width: 30%;
+    }
+    .autogeneration-select-field {
+      width: 100%;
+    }
+    .oppia-language-accent-dropdown-selector {
+      min-width: 120px;
+      width: 100%;
+    }
+    .voice-artist-table {
+      font-size: 0.85rem;
+    }
+    .modify-accent {
+      margin-top: 5px;
+      width: 100%;
+    }
+    .mat-card.oppia-page-card {
+      margin: 20% 5%;
+      padding: 10px;
+    }
   }
 </style>
