@@ -91,7 +91,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
-    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES
 ]
 
@@ -104,7 +103,8 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
-    FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS
+    FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -262,7 +262,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'The flag enables the automatic regeneration of voiceovers '
             'directly from the exploration editor page.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST.value: (
