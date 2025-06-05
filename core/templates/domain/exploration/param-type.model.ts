@@ -47,6 +47,9 @@ export class ParamType {
     }),
   };
 
+  /** @private @static */
+  private static isInitialized = false;
+
   /**
    * @private @constructor
    * Defines a specific type that a parameter can take.
@@ -69,11 +72,35 @@ export class ParamType {
     }
 
     /** @member {String} */
-    this._name = ''; // Será preenchido pela lógica de finalização para itens do registry.
+    this._name = '';
     /** @member {Function.<Object, Boolean>} */
     this.valueIsValid = typeDefinitionObject.validate;
     /** @member {Object} */
     this.defaultValue = typeDefinitionObject.default_value;
+  }
+
+  private static initializeRegistry(): void {
+    if (ParamType.isInitialized) {
+      return;
+    }
+
+    const definitions: Record<string, TypeDefinitionObject> = {
+      UnicodeString: {
+        validate: (value: Object) =>
+          typeof value === 'string' || value instanceof String,
+        default_value: '',
+      },
+    };
+
+    for (const [name, definition] of Object.entries(definitions)) {
+      const paramType = new ParamType(definition);
+      paramType._name = name;
+      Object.freeze(paramType); // Prevent mutation of instance
+      ParamType.registry[name] = paramType;
+    }
+
+    Object.freeze(ParamType.registry); // Prevent mutation of registry
+    ParamType.isInitialized = true;
   }
 
   /** @returns {Object} - A valid default value for this particular type. */
@@ -88,6 +115,7 @@ export class ParamType {
 
   /** @returns {ParamType} - Implementation-defined default parameter type. */
   static getDefaultType(): ParamType {
+    ParamType.initializeRegistry;
     return this.registry.UnicodeString;
   }
 
@@ -97,27 +125,10 @@ export class ParamType {
    * @throws {Error} - When the given type name isn't registered.
    */
   static getTypeFromBackendName(backendName: string): ParamType {
+    ParamType.initializeRegistry;
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }
     return this.registry[backendName];
   }
 }
-
-// To finalize type registration, we encode the name of each type into their
-// definition, then freeze them from modifications.
-Object.keys(ParamType.registry).forEach((paramTypeName: string) => {
-  // The bracket notation is needed since 'paramTypeName' is a dynamic
-  // property and is not defined on 'registry'.
-  /* eslint-disable-next-line dot-notation */
-  const paramType = ParamType.registry[paramTypeName];
-  // Assegura que paramType não seja undefined, o que não deveria acontecer aqui
-  // se o registry estiver corretamente populado.
-  if (paramType) {
-    paramType._name = paramTypeName;
-    Object.freeze(paramType);
-  }
-});
-
-// Finally, we freeze the registry itself.
-Object.freeze(ParamType.registry);
