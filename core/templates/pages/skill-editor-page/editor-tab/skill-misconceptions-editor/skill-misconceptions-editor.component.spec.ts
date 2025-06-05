@@ -30,7 +30,7 @@ import {of, Subscription} from 'rxjs';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {DeleteMisconceptionModalComponent} from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';

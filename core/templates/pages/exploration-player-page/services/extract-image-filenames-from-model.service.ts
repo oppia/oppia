@@ -21,7 +21,7 @@ import {Injectable} from '@angular/core';
 import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {State} from 'domain/state/StateObjectFactory';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {ImageClickInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 

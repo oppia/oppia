@@ -30,8 +30,6 @@ export interface SkillBackendDict {
   version: number;
 }
 
-import {Injectable} from '@angular/core';
-
 import {
   ConceptCard,
   ConceptCardBackendDict,
@@ -43,6 +41,7 @@ import {
 import {Rubric, RubricBackendDict} from 'domain/skill/rubric.model';
 import {ValidatorsService} from 'services/validators.service';
 import {AppConstants} from 'app.constants';
+import {Injectable} from '@angular/core';
 
 export class Skill {
   _id: string;
@@ -259,7 +258,7 @@ export class Skill {
 @Injectable({
   providedIn: 'root',
 })
-export class SkillObjectFactory {
+export class SkillFactory {
   constructor(private validatorService: ValidatorsService) {}
 
   hasValidDescription(description: string): boolean {

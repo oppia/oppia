@@ -20,10 +20,7 @@ import {TestBed} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
-import {
-  SkillBackendDict,
-  SkillObjectFactory,
-} from 'domain/skill/SkillObjectFactory';
+import {SkillBackendDict, SkillFactory} from 'domain/skill/skill.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {FaviconService} from 'services/favicon.service';
 import {LocalStorageService} from 'services/local-storage.service';
@@ -93,7 +90,7 @@ const skillDict: SkillBackendDict = {
 
 describe('Skill editor staleness detection service', () => {
   let skillEditorStalenessDetectionService: SkillEditorStalenessDetectionService;
-  let skillObjectFactory: SkillObjectFactory;
+  let skillFactory: SkillFactory;
   let skillEditorStateService: SkillEditorStateService;
   let localStorageService: LocalStorageService;
   let ngbModal: NgbModal;
@@ -122,7 +119,7 @@ describe('Skill editor staleness detection service', () => {
     skillEditorStalenessDetectionService = TestBed.inject(
       SkillEditorStalenessDetectionService
     );
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    skillFactory = TestBed.inject(SkillFactory);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     localStorageService = TestBed.inject(LocalStorageService);
     ngbModal = TestBed.inject(NgbModal);
@@ -132,7 +129,7 @@ describe('Skill editor staleness detection service', () => {
   });
 
   it('should show stale tab info modal and change the favicon', () => {
-    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    let skill = skillFactory.createFromBackendDict(skillDict);
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(skill);
     let skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
       'skill',
@@ -174,7 +171,7 @@ describe('Skill editor staleness detection service', () => {
     'should open or close presence of unsaved changes info modal ' +
       'depending on the presence of unsaved changes on some other tab',
     () => {
-      let skill = skillObjectFactory.createFromBackendDict(skillDict);
+      let skill = skillFactory.createFromBackendDict(skillDict);
       spyOn(skillEditorStateService, 'getSkill').and.returnValue(skill);
       let skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
         'skill',

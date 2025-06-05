@@ -22,7 +22,7 @@ import {AppConstants} from 'app.constants';
 
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {Misconception} from 'domain/skill/misconception.model';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 
 interface MisconceptionFormSchema {

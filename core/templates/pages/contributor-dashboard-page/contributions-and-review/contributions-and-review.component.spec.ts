@@ -37,7 +37,7 @@ import {
 } from './contributions-and-review.component';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {SkillFactory} from 'domain/skill/skill.model';
 import {ContextService} from 'services/context.service';
 import {UserService} from 'services/user.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
@@ -87,7 +87,7 @@ describe('Contributions and review component', () => {
   var contributionAndReviewService: ContributionAndReviewService;
   var contributionOpportunitiesService: ContributionOpportunitiesService;
   var skillBackendApiService: SkillBackendApiService;
-  var skillObjectFactory: SkillObjectFactory;
+  var skillFactory: SkillFactory;
   var translationTopicService: TranslationTopicService;
   var userService: UserService;
   let alertsService: AlertsService;
@@ -141,7 +141,7 @@ describe('Contributions and review component', () => {
         FormatRtePreviewPipe,
         HtmlEscaperService,
         QuestionObjectFactory,
-        SkillObjectFactory,
+        SkillFactory,
         CsrfTokenService,
         TranslationTopicService,
         {
@@ -164,7 +164,7 @@ describe('Contributions and review component', () => {
     ngbModal = TestBed.inject(NgbModal);
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     alertsService = TestBed.inject(AlertsService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    skillFactory = TestBed.inject(SkillFactory);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     userService = TestBed.inject(UserService);
     contextService = TestBed.inject(ContextService);
@@ -491,7 +491,7 @@ describe('Contributions and review component', () => {
     ).and.returnValue(mockActiveTopicEventEmitter);
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
-        skill: skillObjectFactory.createFromBackendDict({
+        skill: skillFactory.createFromBackendDict({
           id: 'skill1',
           description: 'test description 1',
           misconceptions: [

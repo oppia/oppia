@@ -22,7 +22,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill, SkillFactory} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {SkillRubricsEditorComponent} from './skill-rubrics-editor.component';
@@ -33,7 +33,7 @@ describe('Skill Rubrics Editor Component', () => {
   let component: SkillRubricsEditorComponent;
   let fixture: ComponentFixture<SkillRubricsEditorComponent>;
   let skillEditorStateService: SkillEditorStateService;
-  let skillObjectFactory: SkillObjectFactory;
+  let skillFactory: SkillFactory;
   let skillUpdateService: SkillUpdateService;
   let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();
@@ -62,7 +62,7 @@ describe('Skill Rubrics Editor Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SkillRubricsEditorComponent);
     component = fixture.componentInstance;
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    skillFactory = TestBed.inject(SkillFactory);
     skillUpdateService = TestBed.inject(SkillUpdateService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
@@ -82,7 +82,7 @@ describe('Skill Rubrics Editor Component', () => {
       },
     };
 
-    sampleSkill = skillObjectFactory.createFromBackendDict({
+    sampleSkill = skillFactory.createFromBackendDict({
       id: '1',
       description: 'test description',
       misconceptions: [],

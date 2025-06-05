@@ -28,7 +28,7 @@ import {ContributionOpportunitiesBackendApiService} from 'pages/contributor-dash
 import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
 import {AlertsService} from 'services/alerts.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {SkillFactory} from 'domain/skill/skill.model';
 import {UserService} from 'services/user.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
@@ -59,7 +59,7 @@ describe('Question opportunities component', () => {
   let ngbModal: NgbModal;
   let questionUndoRedoService: QuestionUndoRedoService;
   let siteAnalyticsService: SiteAnalyticsService;
-  let skillObjectFactory: SkillObjectFactory;
+  let skillFactory: SkillFactory;
   let userService: UserService;
   let opportunitiesArray: SkillOpportunity[] = [];
 
@@ -74,7 +74,7 @@ describe('Question opportunities component', () => {
         },
         AlertsService,
         SiteAnalyticsService,
-        SkillObjectFactory,
+        SkillFactory,
         UserService,
         ContributionOpportunitiesBackendApiService,
         ContributionOpportunitiesService,
@@ -91,7 +91,7 @@ describe('Question opportunities component', () => {
     ngbModal = TestBed.inject(NgbModal);
     alertsService = TestBed.inject(AlertsService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    skillFactory = TestBed.inject(SkillFactory);
     userService = TestBed.inject(UserService);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService
@@ -273,7 +273,7 @@ describe('Question opportunities component', () => {
     } as NgbModalRef);
 
     component.createQuestion(
-      skillObjectFactory.createFromBackendDict({
+      skillFactory.createFromBackendDict({
         id: '1',
         description: 'test description',
         misconceptions: [],
@@ -324,7 +324,7 @@ describe('Question opportunities component', () => {
     let openSpy = spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: MockNgbModalRef,
       result: Promise.resolve({
-        skill: skillObjectFactory.createFromBackendDict({
+        skill: skillFactory.createFromBackendDict({
           id: '1',
           description: 'test description',
           misconceptions: [],
@@ -380,7 +380,7 @@ describe('Question opportunities component', () => {
     let openSpy = spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: MockNgbModalRef,
       result: Promise.resolve({
-        skill: skillObjectFactory.createFromBackendDict({
+        skill: skillFactory.createFromBackendDict({
           id: '1',
           description: 'test description',
           misconceptions: [],

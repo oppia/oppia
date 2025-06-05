@@ -38,7 +38,7 @@ import {Misconception} from 'domain/skill/misconception.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {SkillFactory} from 'domain/skill/skill.model';
 import {State} from 'domain/state/StateObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
@@ -89,7 +89,7 @@ describe('Questions List Component', () => {
   let questionUndoRedoService: QuestionUndoRedoService;
   let contextService: ContextService;
   let questionValidationService: QuestionValidationService;
-  let skillObjectFactory: SkillObjectFactory;
+  let skillFactory: SkillFactory;
   let question = null;
   let questionStateData = null;
   let skill = null;
@@ -127,7 +127,7 @@ describe('Questions List Component', () => {
     component = fixture.componentInstance;
 
     ngbModal = TestBed.inject(NgbModal);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    skillFactory = TestBed.inject(SkillFactory);
 
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     questionsListService = TestBed.inject(QuestionsListService);
@@ -229,7 +229,7 @@ describe('Questions List Component', () => {
 
     questionStateData = question.getStateData();
 
-    skill = skillObjectFactory.createFromBackendDict({
+    skill = skillFactory.createFromBackendDict({
       id: 'skillId1',
       description: 'test description 1',
       misconceptions: [
@@ -347,7 +347,7 @@ describe('Questions List Component', () => {
     fakeAsync(() => {
       component.selectedSkillId = 'true';
 
-      const skillWithExplanations = skillObjectFactory.createFromBackendDict({
+      const skillWithExplanations = skillFactory.createFromBackendDict({
         id: 'skillId1',
         description: 'test description 1',
         misconceptions: [],
@@ -431,7 +431,7 @@ describe('Questions List Component', () => {
   });
 
   it('should populate misconceptions when a question is created', fakeAsync(() => {
-    const skill = skillObjectFactory.createFromBackendDict({
+    const skill = skillFactory.createFromBackendDict({
       id: 'skillId1',
       description: 'test description 1',
       misconceptions: [
