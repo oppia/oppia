@@ -296,7 +296,8 @@
                         <ngx-mat-select-search
                           ngModel
                           (ngModelChange)="filterTopicsByName($event)"
-                          placeholderLabel="Search topic name here...">
+                          placeholderLabel="Search topic name"
+                          noEntriesFoundLabel="No available topics">
                         </ngx-mat-select-search>
                       </mat-option>
                       <mat-option *ngFor="let option of filteredTopicsToClassroomRelation"
