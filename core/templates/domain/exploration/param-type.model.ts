@@ -38,25 +38,14 @@ export class ParamType {
 
   // Type registration.
   /** @type {Object.<String, ParamType>} */
-  static registry: RegistryType = (() => {
-    const registry: RegistryType = {
-      UnicodeString: new ParamType({
-        validate: (value: Object) => {
-          return typeof value === 'string' || value instanceof String;
-        },
-        default_value: '',
-      }),
-    };
-
-    Object.keys(registry).forEach((paramTypeName: string) => {
-      const paramType = registry[paramTypeName];
-      paramType._name = paramTypeName;
-      Object.freeze(paramType);
-    });
-
-    Object.freeze(registry);
-    return registry;
-  })();
+  static registry: RegistryType = {
+    UnicodeString: new ParamType({
+      validate: (value: Object) => {
+        return typeof value === 'string' || value instanceof String;
+      },
+      default_value: '',
+    }),
+  };
 
   /**
    * @private @constructor
@@ -71,7 +60,22 @@ export class ParamType {
    * @param {Object} defaultValue - simple value any parameter of this type can
    * take.
    */
+
   constructor(typeDefinitionObject: TypeDefinitionObject) {
+    // To finalize type registration, we encode the name of each type into their
+    // definition, then freeze them from modifications.
+    Object.keys(ParamType.registry).forEach((paramTypeName: string) => {
+      // The bracket notation is needed since 'paramTypeName' is a dynamic
+      // property and is not defined on 'registry'.
+      /* eslint-disable-next-line dot-notation */
+      var paramType = ParamType.registry[paramTypeName];
+      paramType._name = paramTypeName;
+      Object.freeze(paramType);
+    });
+
+    // Finally, we freeze the registry itself.
+    Object.freeze(ParamType.registry);
+
     if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
       throw new Error(
         'The default value is invalid according to validation function'
