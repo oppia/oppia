@@ -173,7 +173,6 @@ describe('Preview Tab Component', () => {
     component = fixture.componentInstance;
     numberAttemptsService = TestBed.inject(NumberAttemptsService);
     routerService = TestBed.inject(RouterService);
-    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     editableExplorationBackendApiService = TestBed.inject(

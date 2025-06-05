@@ -22,10 +22,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {
-  ParamChange,
-  ParamChangeObjectFactory,
-} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model'; // ✅ Updated import
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
@@ -54,9 +51,6 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 export class PreviewTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  // These properties below are initialized using Angular lifecycle hooks
-  // where we need to do non-null assertion. For more information see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   previewWarning!: string;
   isExplorationPopulated!: boolean;
   allParams: ExplorationParams | object = {};
@@ -76,7 +70,6 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private learnerParamsService: LearnerParamsService,
     private ngbModal: NgbModal,
     private numberAttemptsService: NumberAttemptsService,
-    private paramChangeObjectFactory: ParamChangeObjectFactory,
     private parameterMetadataService: ParameterMetadataService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
@@ -92,16 +85,14 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         initStateNameForPreview,
       ]);
 
-    // Construct array to hold required parameter changes.
     let manualParamChanges: ParamChange[] = [];
     for (let i = 0; i < unsetParametersInfo.length; i++) {
-      let newParamChange = this.paramChangeObjectFactory.createEmpty(
+      let newParamChange = ParamChange.createEmpty(
         unsetParametersInfo[i].paramName
       );
       manualParamChanges.push(newParamChange);
     }
 
-    // Use modal to populate parameter change values.
     if (manualParamChanges.length > 0) {
       this.showSetParamsModal(manualParamChanges, () => {
         return Promise.resolve(manualParamChanges);

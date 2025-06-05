@@ -16,16 +16,19 @@
  * @fileoverview Factory for creating new frontend instances of ParamChange
  * domain objects.
  */
-
 import cloneDeep from 'lodash/cloneDeep';
 
-import {Injectable} from '@angular/core';
+interface ParamChangeCustomizationArgs {
+  parse_with_jinja?: boolean;
+  value?: string;
+  list_of_values?: string[];
+}
 
 interface CustomizationArgs {
   [generatorId: string]: ParamChangeCustomizationArgs;
 }
 
-var DEFAULT_CUSTOMIZATION_ARGS: CustomizationArgs = {
+const DEFAULT_CUSTOMIZATION_ARGS: CustomizationArgs = {
   Copier: {
     parse_with_jinja: true,
     value: '5',
@@ -34,12 +37,6 @@ var DEFAULT_CUSTOMIZATION_ARGS: CustomizationArgs = {
     list_of_values: ['sample value'],
   },
 };
-
-interface ParamChangeCustomizationArgs {
-  parse_with_jinja?: boolean;
-  value?: string;
-  list_of_values?: string[];
-}
 
 export interface ParamChangeBackendDict {
   customization_args: ParamChangeCustomizationArgs;
@@ -75,13 +72,9 @@ export class ParamChange {
       DEFAULT_CUSTOMIZATION_ARGS[this.generatorId]
     );
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class ParamChangeObjectFactory {
-  createFromBackendDict(
+  // ✅ Replaces: factory.createFromBackendDict(...)
+  static createFromBackendDict(
     paramChangeBackendDict: ParamChangeBackendDict
   ): ParamChange {
     return new ParamChange(
@@ -91,7 +84,8 @@ export class ParamChangeObjectFactory {
     );
   }
 
-  createEmpty(paramName: string): ParamChange {
+  // ✅ Replaces: factory.createEmpty(...)
+  static createEmpty(paramName: string): ParamChange {
     return new ParamChange(
       {
         parse_with_jinja: true,
@@ -102,7 +96,8 @@ export class ParamChangeObjectFactory {
     );
   }
 
-  createDefault(paramName: string): ParamChange {
+  // ✅ Replaces: factory.createDefault(...)
+  static createDefault(paramName: string): ParamChange {
     return new ParamChange(
       cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier),
       'Copier',

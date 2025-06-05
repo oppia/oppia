@@ -30,8 +30,9 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateParamChangesService} from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
 import {
   ParamChange,
-  ParamChangeObjectFactory,
-} from 'domain/exploration/ParamChangeObjectFactory';
+} from 'domain/exploration/param-change.model';
+import { ParamChange } from 'domain/exploration/param-change.model';
+
 import {
   ParamSpecs,
   ParamSpecsObjectFactory,
@@ -59,7 +60,6 @@ describe('Param Changes Editor Component', () => {
   let editabilityService: EditabilityService;
   let explorationParamSpecsService: ExplorationParamSpecsService;
   let explorationStatesService: ExplorationStatesService;
-  let paramChangeObjectFactory: ParamChangeObjectFactory;
   let paramSpecsObjectFactory: ParamSpecsObjectFactory;
   let stateParamChangesService: StateParamChangesService;
   let postSaveHookSpy = jasmine.createSpy('postSaveHook', () => {});
@@ -99,7 +99,6 @@ describe('Param Changes Editor Component', () => {
     component = fixture.componentInstance;
 
     alertsService = TestBed.inject(AlertsService);
-    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     paramSpecsObjectFactory = TestBed.inject(ParamSpecsObjectFactory);
     stateParamChangesService = TestBed.inject(StateParamChangesService);
     editabilityService = TestBed.inject(EditabilityService);
@@ -139,24 +138,24 @@ describe('Param Changes Editor Component', () => {
   });
 
   it(
-    'should reset customization args from param change when changing' +
-      ' generator type',
-    () => {
-      let paramChange = paramChangeObjectFactory.createFromBackendDict({
-        customization_args: {
-          list_of_values: ['first value', 'second value'],
-        },
-        generator_id: 'RandomSelector',
-        name: 'a',
-      });
+  'should reset customization args from param change when changing ' +
+  'generator type',
+  () => {
+    const paramChange = ParamChange.createFromBackendDict({
+      customization_args: {
+        list_of_values: ['first value', 'second value'],
+      },
+      generator_id: 'RandomSelector',
+      name: 'a',
+    });
 
-      component.onChangeGeneratorType(paramChange);
+    component.onChangeGeneratorType(paramChange);
 
-      expect(paramChange.customizationArgs).toEqual({
-        list_of_values: ['sample value'],
-      });
-    }
-  );
+    expect(paramChange.customizationArgs).toEqual({
+      list_of_values: ['sample value'],
+    });
+  }
+);
 
   it('should get complete image path corresponding to a given relative path', () => {
     expect(component.getStaticImageUrl('/path/to/image.png')).toBe(
@@ -277,111 +276,91 @@ describe('Param Changes Editor Component', () => {
   });
 
   it(
-    'should check param changes as invalid when it has an empty parameter' +
-      ' name',
-    () => {
-      component.paramChangesService.displayed = [
-        paramChangeObjectFactory.createDefault(''),
-      ];
-
-      expect(component.areDisplayedParamChangesValid()).toBe(false);
-      expect(component.warningText).toBe(
-        'Please pick a non-empty parameter name.'
-      );
-    }
-  );
-
-  it(
-    'should check param changes as invalid when it has a reserved parameter' +
-      ' name',
-    () => {
-      component.paramChangesService.displayed = [
-        paramChangeObjectFactory.createDefault('answer'),
-      ];
-
-      expect(component.areDisplayedParamChangesValid()).toBe(false);
-      expect(component.warningText).toBe(
-        "The parameter name 'answer' is reserved."
-      );
-    }
-  );
-
-  it(
-    'should check param changes as invalid when it has non alphabetic' +
-      ' characters in parameter name',
-    () => {
-      component.paramChangesService.displayed = [
-        paramChangeObjectFactory.createDefault('123'),
-      ];
-
-      expect(component.areDisplayedParamChangesValid()).toBe(false);
-      expect(component.warningText).toBe(
-        'Parameter names should use only alphabetic characters.'
-      );
-    }
-  );
-
-  it(
-    'should check param changes as invalid when it has no default' +
-      ' generator id',
-    () => {
-      component.paramChangesService.displayed = [
-        paramChangeObjectFactory.createFromBackendDict({
-          customization_args: {},
-          generator_id: '',
-          name: 'a',
-        }),
-      ];
-
-      component.areDisplayedParamChangesValid();
-      expect(component.areDisplayedParamChangesValid()).toBe(false);
-      expect(component.warningText).toBe(
-        'Each parameter should have a generator id.'
-      );
-    }
-  );
-
-  it(
-    'should check param changes as invalid when it has no values and its' +
-      ' generator id is RandomSelector',
-    () => {
-      component.paramChangesService.displayed = [
-        paramChangeObjectFactory.createFromBackendDict({
-          customization_args: {
-            list_of_values: [],
-          },
-          generator_id: 'RandomSelector',
-          name: 'a',
-        }),
-      ];
-
-      component.areDisplayedParamChangesValid();
-      expect(component.areDisplayedParamChangesValid()).toBe(false);
-      expect(component.warningText).toBe(
-        'Each parameter should have at least one possible value.'
-      );
-    }
-  );
-
-  it('should not save param changes when it is invalid', fakeAsync(() => {
-    spyOn(alertsService, 'addWarning');
+  'should check param changes as invalid when it has an empty parameter name',
+  () => {
     component.paramChangesService.displayed = [
-      paramChangeObjectFactory.createDefault('123'),
+      ParamChange.createDefault(''),
     ];
 
-    component.postSaveHook = () => {
-      let value = 'value';
-      return value;
-    };
+    expect(component.areDisplayedParamChangesValid()).toBe(false);
+    expect(component.warningText).toBe('Please pick a non-empty parameter name.');
+  }
+);
 
-    component.currentlyInSettingsTab = false;
-    component.saveParamChanges();
-    tick();
+it(
+  'should check param changes as invalid when it has a reserved parameter name',
+  () => {
+    component.paramChangesService.displayed = [
+      ParamChange.createDefault('answer'),
+    ];
 
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Invalid parameter changes.'
-    );
-  }));
+    expect(component.areDisplayedParamChangesValid()).toBe(false);
+    expect(component.warningText).toBe("The parameter name 'answer' is reserved.");
+  }
+);
+
+it(
+  'should check param changes as invalid when it has non-alphabetic characters in parameter name',
+  () => {
+    component.paramChangesService.displayed = [
+      ParamChange.createDefault('123'),
+    ];
+
+    expect(component.areDisplayedParamChangesValid()).toBe(false);
+    expect(component.warningText).toBe('Parameter names should use only alphabetic characters.');
+  }
+);
+
+it(
+  'should check param changes as invalid when it has no default generator id',
+  () => {
+    component.paramChangesService.displayed = [
+      ParamChange.createFromBackendDict({
+        customization_args: {},
+        generator_id: '',
+        name: 'a',
+      }),
+    ];
+
+    expect(component.areDisplayedParamChangesValid()).toBe(false);
+    expect(component.warningText).toBe('Each parameter should have a generator id.');
+  }
+);
+
+it(
+  'should check param changes as invalid when it has no values and generator id is RandomSelector',
+  () => {
+    component.paramChangesService.displayed = [
+      ParamChange.createFromBackendDict({
+        customization_args: {
+          list_of_values: [],
+        },
+        generator_id: 'RandomSelector',
+        name: 'a',
+      }),
+    ];
+
+    expect(component.areDisplayedParamChangesValid()).toBe(false);
+    expect(component.warningText).toBe('Each parameter should have at least one possible value.');
+  }
+);
+
+it('should not save param changes when they are invalid', fakeAsync(() => {
+  spyOn(alertsService, 'addWarning');
+  
+  component.paramChangesService.displayed = [
+    ParamChange.createDefault('123'),
+  ];
+
+  component.postSaveHook = () => 'value';
+
+  component.currentlyInSettingsTab = false;
+  component.saveParamChanges();
+  tick();
+
+  expect(alertsService.addWarning).toHaveBeenCalledWith('Invalid parameter changes.');
+}));
+
 
   it('should save param changes when it is valid', fakeAsync(() => {
     spyOn(component, 'generateParamNameChoices').and.stub();
@@ -462,8 +441,8 @@ describe('Param Changes Editor Component', () => {
     jasmine.createSpy('moveItemInArray').and.stub();
 
     component.paramChangesService.displayed = [
-      paramChangeObjectFactory.createDefault(''),
-      paramChangeObjectFactory.createDefault(''),
+      ParamChange.createDefault(''),
+      ParamChange.createDefault(''),
     ];
 
     component.drop({

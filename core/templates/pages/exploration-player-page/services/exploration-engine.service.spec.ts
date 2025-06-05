@@ -28,10 +28,8 @@ import {
   ExplorationObjectFactory,
 } from 'domain/exploration/ExplorationObjectFactory';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {
-  ParamChangeBackendDict,
-  ParamChangeObjectFactory,
-} from 'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangeBackendDict } from 'domain/exploration/param-change.model';
+import { ParamChange } from 'domain/exploration/param-change.model';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
@@ -75,7 +73,6 @@ describe('Exploration engine service ', () => {
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
-  let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: InteractionRulesService;
   let translateService: TranslateService;
   let explorationDict: ExplorationBackendDict;
@@ -447,7 +444,7 @@ describe('Exploration engine service ', () => {
     () => {
       let initSuccessCb = jasmine.createSpy('success');
       let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+        ParamChange.createFromBackendDict(paramChangeDict);
       // Setting exploration editor page.
       spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
       spyOn(urlService, 'getPathname').and.returnValue('/create/in/path/name');

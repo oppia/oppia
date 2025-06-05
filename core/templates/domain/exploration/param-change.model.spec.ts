@@ -13,20 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ParamChangeObjectFactory.
+ * @fileoverview Unit tests for ParamChange.
  */
 
-import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
+import { ParamChange, ParamChangeBackendDict } from 'domain/exploration/param-change.model';
 
-describe('Param Change Object Factory', () => {
-  let pcof: ParamChangeObjectFactory;
 
-  beforeEach(() => {
-    pcof = new ParamChangeObjectFactory();
-  });
-
+describe('ParamChange', () => {
   it('should create a param change object from backend dict', () => {
-    const sampleData = {
+    const sampleData: ParamChangeBackendDict = {
       customization_args: {
         parse_with_jinja: false,
         value: '10',
@@ -34,10 +29,12 @@ describe('Param Change Object Factory', () => {
       generator_id: 'Copier',
       name: 'Param change from backend',
     };
-    const paramChangeObject = pcof.createFromBackendDict(sampleData);
+
+    const paramChangeObject = ParamChange.createFromBackendDict(sampleData);
 
     expect(paramChangeObject.toBackendDict()).toEqual(sampleData);
   });
+
 
   it(
     'should reset a copier custom customization args from param change ' +
