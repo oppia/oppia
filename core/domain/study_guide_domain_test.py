@@ -93,12 +93,12 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
     """Tests for StudyGuide domain objects."""
 
     topic_id: str = 'topic_id'
-    study_guide_id: int = 1
+    subtopic_id: int = 1
 
     def setUp(self) -> None:
         super().setUp()
         self.study_guide = study_guide_domain.StudyGuide.create_study_guide(
-            self.study_guide_id,
+            self.subtopic_id,
             self.topic_id,
             'Test Heading',
             '<p>Test content</p>'
@@ -126,21 +126,21 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(study_guide.version, 1)
 
-    def test_get_study_guide_page_id(self) -> None:
-        """Test generation of study guide page ID."""
-        page_id = study_guide_domain.StudyGuide.get_study_guide_page_id(
+    def test_get_study_guide_id(self) -> None:
+        """Test generation of study guide ID."""
+        page_id = study_guide_domain.StudyGuide.get_study_guide_id(
             'abc',
             5
         )
         self.assertEqual(page_id, 'abc-5')
 
-    def test_get_study_guide_id_from_study_guide_page_id(self) -> None:
-        """Test extraction of study guide ID from page ID."""
-        study_guide_id = (
+    def test_get_subtopic_id_from_study_guide_id(self) -> None:
+        """Test extraction of subtopic ID from study guide ID."""
+        subtopic_id = (
             self.study_guide
-            .get_study_guide_id_from_study_guide_page_id()
+            .get_subtopic_id_from_study_guide_id()
         )
-        self.assertEqual(study_guide_id, self.study_guide_id)
+        self.assertEqual(subtopic_id, self.subtopic_id)
 
     def test_to_dict(self) -> None:
         """Test conversion of study guide to dictionary."""
@@ -153,7 +153,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(set(study_guide_dict.keys()), expected_keys)
         self.assertEqual(
             study_guide_dict['id'],
-            f'{self.topic_id}-{self.study_guide_id}'
+            f'{self.topic_id}-{self.subtopic_id}'
         )
         self.assertEqual(study_guide_dict['topic_id'], self.topic_id)
 
@@ -376,7 +376,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             study_guide_domain.StudyGuideChange({
                 'cmd': study_guide_domain.CMD_CREATE_NEW,
                 'topic_id': 'topic_id',
-                'study_guide_id': 1,
+                'subtopic_id': 1,
                 'invalid': 'invalid'
             })
 
@@ -388,7 +388,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             'invalid is not allowed'):
             study_guide_domain.StudyGuideChange({
                 'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
-                'study_guide_id': 1,
+                'subtopic_id': 1,
                 'property_name': 'invalid',
                 'old_value': {
                     'content_id': 'section_heading_0',
@@ -405,12 +405,12 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
         change_object = study_guide_domain.StudyGuideChange({
             'cmd': 'create_new',
             'topic_id': 'topic_id',
-            'study_guide_id': 1
+            'subtopic_id': 1
         })
 
         self.assertEqual(change_object.cmd, study_guide_domain.CMD_CREATE_NEW)
         self.assertEqual(change_object.topic_id, 'topic_id')
-        self.assertEqual(change_object.study_guide_id, 1)
+        self.assertEqual(change_object.subtopic_id, 1)
 
     def test_add_new_section_change(self) -> None:
         """Test creation of AddNewSectionCmd."""
@@ -418,7 +418,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             'cmd': study_guide_domain.CMD_ADD_NEW_SECTION,
             'heading_plaintext': 'New Heading',
             'content_html': '<p>New content</p>',
-            'study_guide_id': 1
+            'subtopic_id': 1
         })
 
         self.assertEqual(
@@ -427,7 +427,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(change_object.heading_plaintext, 'New Heading')
         self.assertEqual(change_object.content_html, '<p>New content</p>')
-        self.assertEqual(change_object.study_guide_id, 1)
+        self.assertEqual(change_object.subtopic_id, 1)
 
     def test_delete_section_change(self) -> None:
         """Test creation of DeleteSectionCmd."""
@@ -435,7 +435,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             'cmd': 'delete_section',
             'heading_content_id': 'section_heading_0',
             'content_content_id': 'section_content_1',
-            'study_guide_id': 1
+            'subtopic_id': 1
         })
 
         self.assertEqual(
@@ -444,14 +444,14 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(change_object.heading_content_id, 'section_heading_0')
         self.assertEqual(change_object.content_content_id, 'section_content_1')
-        self.assertEqual(change_object.study_guide_id, 1)
+        self.assertEqual(change_object.subtopic_id, 1)
 
     def test_update_study_guide_property_sections_heading_change(self) -> None:
         """Test creation of UpdateStudyGuidePropertySectionsHeadingCmd."""
 
         change_object = study_guide_domain.StudyGuideChange({
             'cmd': 'update_study_guide_property',
-            'study_guide_id': 1,
+            'subtopic_id': 1,
             'property_name': 'sections_heading',
             'old_value': {
                 'content_id': 'section_heading_0',
@@ -467,7 +467,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             change_object.cmd,
             study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY
         )
-        self.assertEqual(change_object.study_guide_id, 1)
+        self.assertEqual(change_object.subtopic_id, 1)
         self.assertEqual(change_object.property_name, 'sections_heading')
         self.assertEqual(change_object.old_value, {
             'content_id': 'section_heading_0',
@@ -483,7 +483,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
 
         change_object = study_guide_domain.StudyGuideChange({
             'cmd': 'update_study_guide_property',
-            'study_guide_id': 1,
+            'subtopic_id': 1,
             'property_name': 'sections_content',
             'old_value': {
                 'content_id': 'section_content_1',
@@ -499,7 +499,7 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
             change_object.cmd,
             study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY
         )
-        self.assertEqual(change_object.study_guide_id, 1)
+        self.assertEqual(change_object.subtopic_id, 1)
         self.assertEqual(change_object.property_name, 'sections_content')
         self.assertEqual(change_object.old_value, {
             'content_id': 'section_content_1',
@@ -533,30 +533,30 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
         change_object = study_guide_domain.StudyGuideChange({
             'cmd': 'create_new',
             'topic_id': 'topic_id',
-            'study_guide_id': 1
+            'subtopic_id': 1
         })
         self.assertEqual(change_object.to_dict(), {
             'cmd': 'create_new',
             'topic_id': 'topic_id',
-            'study_guide_id': 1
+            'subtopic_id': 1
         })
 
 
 class StudyGuideSummaryDomainUnitTests(test_utils.GenericTestBase):
     """Tests for StudyGuideSummary domain objects."""
 
-    STUDY_GUIDE_ID = 1
-    STUDY_GUIDE_TITLE = 'study_guide_title'
+    SUBTOPIC_ID = 1
+    SUBTOPIC_TITLE = 'subtopic_title'
     PARENT_TOPIC_ID = 'topic_id'
     PARENT_TOPIC_NAME = 'topic_title'
-    STUDY_GUIDE_MASTERY = 0.75
+    SUBTOPIC_MASTERY = 0.75
 
     def setUp(self) -> None:
         super().setUp()
         self.study_guide_summary = study_guide_domain.StudyGuideSummary(
-            self.STUDY_GUIDE_ID, self.STUDY_GUIDE_TITLE, self.PARENT_TOPIC_ID,
+            self.SUBTOPIC_ID, self.SUBTOPIC_TITLE, self.PARENT_TOPIC_ID,
             self.PARENT_TOPIC_NAME, 'thumbnail_filename', 'blue',
-            self.STUDY_GUIDE_MASTERY, 'topic-url', 'classroom-url'
+            self.SUBTOPIC_MASTERY, 'topic-url', 'classroom-url'
         )
 
     def test_to_dict(self) -> None:
@@ -564,13 +564,13 @@ class StudyGuideSummaryDomainUnitTests(test_utils.GenericTestBase):
         study_guide_summary_dict = self.study_guide_summary.to_dict()
 
         expected_dict = {
-            'study_guide_id': self.STUDY_GUIDE_ID,
-            'study_guide_title': self.STUDY_GUIDE_TITLE,
+            'subtopic_id': self.SUBTOPIC_ID,
+            'subtopic_title': self.SUBTOPIC_TITLE,
             'parent_topic_id': self.PARENT_TOPIC_ID,
             'parent_topic_name': self.PARENT_TOPIC_NAME,
             'thumbnail_filename': 'thumbnail_filename',
             'thumbnail_bg_color': 'blue',
-            'study_guide_mastery': self.STUDY_GUIDE_MASTERY,
+            'subtopic_mastery': self.SUBTOPIC_MASTERY,
             'parent_topic_url_fragment': 'topic-url',
             'classroom_url_fragment': 'classroom-url'
         }
@@ -580,20 +580,20 @@ class StudyGuideSummaryDomainUnitTests(test_utils.GenericTestBase):
     def test_to_dict_with_none_values(self) -> None:
         """Test StudyGuideSummary to_dict with None values."""
         study_guide_summary = study_guide_domain.StudyGuideSummary(
-            self.STUDY_GUIDE_ID, self.STUDY_GUIDE_TITLE, self.PARENT_TOPIC_ID,
+            self.SUBTOPIC_ID, self.SUBTOPIC_TITLE, self.PARENT_TOPIC_ID,
             self.PARENT_TOPIC_NAME, None, None, None, None, None
         )
 
         study_guide_summary_dict = study_guide_summary.to_dict()
 
         expected_dict = {
-            'study_guide_id': self.STUDY_GUIDE_ID,
-            'study_guide_title': self.STUDY_GUIDE_TITLE,
+            'subtopic_id': self.SUBTOPIC_ID,
+            'subtopic_title': self.SUBTOPIC_TITLE,
             'parent_topic_id': self.PARENT_TOPIC_ID,
             'parent_topic_name': self.PARENT_TOPIC_NAME,
             'thumbnail_filename': None,
             'thumbnail_bg_color': None,
-            'study_guide_mastery': None,
+            'subtopic_mastery': None,
             'parent_topic_url_fragment': None,
             'classroom_url_fragment': None
         }
