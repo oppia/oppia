@@ -95,11 +95,11 @@ export class ParamType {
     for (const [name, definition] of Object.entries(definitions)) {
       const paramType = new ParamType(definition);
       paramType._name = name;
-      Object.freeze(paramType); // Prevent mutation of instance
+      Object.freeze(paramType);
       ParamType.registry[name] = paramType;
     }
 
-    Object.freeze(ParamType.registry); // Prevent mutation of registry
+    Object.freeze(ParamType.registry);
     ParamType.isInitialized = true;
   }
 
