@@ -41,14 +41,7 @@ export class ParamType {
 
   // Type registration.
   /** @type {Object.<String, ParamType>} */
-  private static registry: Record<string, ParamType> = {
-    UnicodeString: new ParamType({
-      validate: (value: Object) => {
-        return typeof value === 'string' || value instanceof String;
-      },
-      default_value: '',
-    }),
-  };
+  private static registry: Record<string, ParamType> = {};
 
   /**
    * @private @constructor
