@@ -115,7 +115,7 @@ export class ParamType {
 
   /** @returns {ParamType} - Implementation-defined default parameter type. */
   static getDefaultType(): ParamType {
-    ParamType.initializeRegistry;
+    ParamType.initializeRegistry();
     return this.registry.UnicodeString;
   }
 
@@ -125,7 +125,7 @@ export class ParamType {
    * @throws {Error} - When the given type name isn't registered.
    */
   static getTypeFromBackendName(backendName: string): ParamType {
-    ParamType.initializeRegistry;
+    ParamType.initializeRegistry();
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }
