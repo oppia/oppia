@@ -36,9 +36,12 @@ export class ParamType {
   valueIsValid: (arg0: Object) => boolean;
   defaultValue: Object;
 
+  /** @private @static */
+  private static isInitialized = false;
+
   // Type registration.
   /** @type {Object.<String, ParamType>} */
-  static registry: RegistryType = {
+  private static registry: Record<string, ParamType> = {
     UnicodeString: new ParamType({
       validate: (value: Object) => {
         return typeof value === 'string' || value instanceof String;
@@ -46,9 +49,6 @@ export class ParamType {
       default_value: '',
     }),
   };
-
-  /** @private @static */
-  private static isInitialized = false;
 
   /**
    * @private @constructor
