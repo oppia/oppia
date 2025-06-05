@@ -47,6 +47,22 @@ export class ParamType {
     }),
   };
 
+  static {
+    // To finalize type registration, we encode the name of each type into their
+    // definition, then freeze them from modifications.
+    Object.keys(ParamType.registry).forEach((paramTypeName: string) => {
+      // The bracket notation is needed since 'paramTypeName' is a dynamic
+      // property and is not defined on 'registry'.
+      /* eslint-disable-next-line dot-notation */
+      const paramType = ParamType.registry[paramTypeName];
+      paramType._name = paramTypeName;
+      Object.freeze(paramType);
+    });
+
+    // Finally, we freeze the registry itself.
+    Object.freeze(ParamType.registry);
+  }
+
   /**
    * @private @constructor
    * Defines a specific type that a parameter can take.
@@ -62,20 +78,6 @@ export class ParamType {
    */
 
   constructor(typeDefinitionObject: TypeDefinitionObject) {
-    // To finalize type registration, we encode the name of each type into their
-    // definition, then freeze them from modifications.
-    Object.keys(ParamType.registry).forEach((paramTypeName: string) => {
-      // The bracket notation is needed since 'paramTypeName' is a dynamic
-      // property and is not defined on 'registry'.
-      /* eslint-disable-next-line dot-notation */
-      var paramType = ParamType.registry[paramTypeName];
-      paramType._name = paramTypeName;
-      Object.freeze(paramType);
-    });
-
-    // Finally, we freeze the registry itself.
-    Object.freeze(ParamType.registry);
-
     if (!typeDefinitionObject.validate(typeDefinitionObject.default_value)) {
       throw new Error(
         'The default value is invalid according to validation function'
