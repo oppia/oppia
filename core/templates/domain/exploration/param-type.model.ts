@@ -47,22 +47,6 @@ export class ParamType {
     }),
   };
 
-  static {
-    // To finalize type registration, we encode the name of each type into their
-    // definition, then freeze them from modifications.
-    Object.keys(ParamType.registry).forEach((paramTypeName: string) => {
-      // The bracket notation is needed since 'paramTypeName' is a dynamic
-      // property and is not defined on 'registry'.
-      /* eslint-disable-next-line dot-notation */
-      const paramType = ParamType.registry[paramTypeName];
-      paramType._name = paramTypeName;
-      Object.freeze(paramType);
-    });
-
-    // Finally, we freeze the registry itself.
-    Object.freeze(ParamType.registry);
-  }
-
   /**
    * @private @constructor
    * Defines a specific type that a parameter can take.
@@ -72,7 +56,7 @@ export class ParamType {
    * for an example.
    *
    * @param {Function.<?, Boolean>} validateFunction - Returns true when a value
-   *    is valid.
+   * is valid.
    * @param {Object} defaultValue - simple value any parameter of this type can
    * take.
    */
@@ -85,7 +69,7 @@ export class ParamType {
     }
 
     /** @member {String} */
-    this._name = '';
+    this._name = ''; // Será preenchido pela lógica de finalização para itens do registry.
     /** @member {Function.<Object, Boolean>} */
     this.valueIsValid = typeDefinitionObject.validate;
     /** @member {Object} */
@@ -119,3 +103,21 @@ export class ParamType {
     return this.registry[backendName];
   }
 }
+
+// To finalize type registration, we encode the name of each type into their
+// definition, then freeze them from modifications.
+Object.keys(ParamType.registry).forEach((paramTypeName: string) => {
+  // The bracket notation is needed since 'paramTypeName' is a dynamic
+  // property and is not defined on 'registry'.
+  /* eslint-disable-next-line dot-notation */
+  const paramType = ParamType.registry[paramTypeName];
+  // Assegura que paramType não seja undefined, o que não deveria acontecer aqui
+  // se o registry estiver corretamente populado.
+  if (paramType) {
+    paramType._name = paramTypeName;
+    Object.freeze(paramType);
+  }
+});
+
+// Finally, we freeze the registry itself.
+Object.freeze(ParamType.registry);
