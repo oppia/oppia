@@ -54,7 +54,7 @@ import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
-import { ParamChange } from 'domain/exploration/param-change.model';
+import {ParamChange} from 'domain/exploration/param-change.model';
 import {
   SubtitledHtml,
   SubtitledHtmlBackendDict,

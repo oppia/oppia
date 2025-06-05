@@ -28,10 +28,8 @@ import {
 } from '@angular/core/testing';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateParamChangesService} from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
-import {
-  ParamChange,
-} from 'domain/exploration/param-change.model';
-import { ParamChange } from 'domain/exploration/param-change.model';
+import {ParamChange} from 'domain/exploration/param-change.model';
+import {ParamChange} from 'domain/exploration/param-change.model';
 
 import {
   ParamSpecs,
@@ -138,24 +136,24 @@ describe('Param Changes Editor Component', () => {
   });
 
   it(
-  'should reset customization args from param change when changing ' +
-  'generator type',
-  () => {
-    const paramChange = ParamChange.createFromBackendDict({
-      customization_args: {
-        list_of_values: ['first value', 'second value'],
-      },
-      generator_id: 'RandomSelector',
-      name: 'a',
-    });
+    'should reset customization args from param change when changing ' +
+      'generator type',
+    () => {
+      const paramChange = ParamChange.createFromBackendDict({
+        customization_args: {
+          list_of_values: ['first value', 'second value'],
+        },
+        generator_id: 'RandomSelector',
+        name: 'a',
+      });
 
-    component.onChangeGeneratorType(paramChange);
+      component.onChangeGeneratorType(paramChange);
 
-    expect(paramChange.customizationArgs).toEqual({
-      list_of_values: ['sample value'],
-    });
-  }
-);
+      expect(paramChange.customizationArgs).toEqual({
+        list_of_values: ['sample value'],
+      });
+    }
+  );
 
   it('should get complete image path corresponding to a given relative path', () => {
     expect(component.getStaticImageUrl('/path/to/image.png')).toBe(
@@ -275,45 +273,38 @@ describe('Param Changes Editor Component', () => {
     expect(component.warningText).toBe('');
   });
 
-  it(
-  'should check param changes as invalid when it has an empty parameter name',
-  () => {
-    component.paramChangesService.displayed = [
-      ParamChange.createDefault(''),
-    ];
+  it('should check param changes as invalid when it has an empty parameter name', () => {
+    component.paramChangesService.displayed = [ParamChange.createDefault('')];
 
     expect(component.areDisplayedParamChangesValid()).toBe(false);
-    expect(component.warningText).toBe('Please pick a non-empty parameter name.');
-  }
-);
+    expect(component.warningText).toBe(
+      'Please pick a non-empty parameter name.'
+    );
+  });
 
-it(
-  'should check param changes as invalid when it has a reserved parameter name',
-  () => {
+  it('should check param changes as invalid when it has a reserved parameter name', () => {
     component.paramChangesService.displayed = [
       ParamChange.createDefault('answer'),
     ];
 
     expect(component.areDisplayedParamChangesValid()).toBe(false);
-    expect(component.warningText).toBe("The parameter name 'answer' is reserved.");
-  }
-);
+    expect(component.warningText).toBe(
+      "The parameter name 'answer' is reserved."
+    );
+  });
 
-it(
-  'should check param changes as invalid when it has non-alphabetic characters in parameter name',
-  () => {
+  it('should check param changes as invalid when it has non-alphabetic characters in parameter name', () => {
     component.paramChangesService.displayed = [
       ParamChange.createDefault('123'),
     ];
 
     expect(component.areDisplayedParamChangesValid()).toBe(false);
-    expect(component.warningText).toBe('Parameter names should use only alphabetic characters.');
-  }
-);
+    expect(component.warningText).toBe(
+      'Parameter names should use only alphabetic characters.'
+    );
+  });
 
-it(
-  'should check param changes as invalid when it has no default generator id',
-  () => {
+  it('should check param changes as invalid when it has no default generator id', () => {
     component.paramChangesService.displayed = [
       ParamChange.createFromBackendDict({
         customization_args: {},
@@ -323,13 +314,12 @@ it(
     ];
 
     expect(component.areDisplayedParamChangesValid()).toBe(false);
-    expect(component.warningText).toBe('Each parameter should have a generator id.');
-  }
-);
+    expect(component.warningText).toBe(
+      'Each parameter should have a generator id.'
+    );
+  });
 
-it(
-  'should check param changes as invalid when it has no values and generator id is RandomSelector',
-  () => {
+  it('should check param changes as invalid when it has no values and generator id is RandomSelector', () => {
     component.paramChangesService.displayed = [
       ParamChange.createFromBackendDict({
         customization_args: {
@@ -341,26 +331,28 @@ it(
     ];
 
     expect(component.areDisplayedParamChangesValid()).toBe(false);
-    expect(component.warningText).toBe('Each parameter should have at least one possible value.');
-  }
-);
+    expect(component.warningText).toBe(
+      'Each parameter should have at least one possible value.'
+    );
+  });
 
-it('should not save param changes when they are invalid', fakeAsync(() => {
-  spyOn(alertsService, 'addWarning');
-  
-  component.paramChangesService.displayed = [
-    ParamChange.createDefault('123'),
-  ];
+  it('should not save param changes when they are invalid', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
 
-  component.postSaveHook = () => 'value';
+    component.paramChangesService.displayed = [
+      ParamChange.createDefault('123'),
+    ];
 
-  component.currentlyInSettingsTab = false;
-  component.saveParamChanges();
-  tick();
+    component.postSaveHook = () => 'value';
 
-  expect(alertsService.addWarning).toHaveBeenCalledWith('Invalid parameter changes.');
-}));
+    component.currentlyInSettingsTab = false;
+    component.saveParamChanges();
+    tick();
 
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Invalid parameter changes.'
+    );
+  }));
 
   it('should save param changes when it is valid', fakeAsync(() => {
     spyOn(component, 'generateParamNameChoices').and.stub();

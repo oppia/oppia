@@ -17,7 +17,7 @@
  */
 
 import {Injectable} from '@angular/core';
-import { ParamChange, ParamChangeBackendDict } from './param-change.model';
+import {ParamChange, ParamChangeBackendDict} from './param-change.model';
 import {ParamChangesObjectFactory} from './ParamChangesObjectFactory';
 import {
   ParamSpecs,

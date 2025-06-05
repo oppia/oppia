@@ -17,7 +17,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import { ParamChangeBackendDict } from 'domain/exploration/param-change.model';
+import {ParamChangeBackendDict} from 'domain/exploration/param-change.model';
 import {
   ExplorationFeaturesService,
   ExplorationDataDict,

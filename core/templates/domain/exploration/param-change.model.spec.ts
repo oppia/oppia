@@ -16,8 +16,10 @@
  * @fileoverview Unit tests for ParamChange.
  */
 
-import { ParamChange, ParamChangeBackendDict } from 'domain/exploration/param-change.model';
-
+import {
+  ParamChange,
+  ParamChangeBackendDict,
+} from 'domain/exploration/param-change.model';
 
 describe('ParamChange', () => {
   it('should create a param change object from backend dict', () => {
@@ -34,7 +36,6 @@ describe('ParamChange', () => {
 
     expect(paramChangeObject.toBackendDict()).toEqual(sampleData);
   });
-
 
   it(
     'should reset a copier custom customization args from param change ' +

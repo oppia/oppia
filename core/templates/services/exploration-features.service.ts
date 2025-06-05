@@ -20,7 +20,7 @@
 import {Injectable} from '@angular/core';
 
 import {ExplorationFeatures} from 'services/exploration-features-backend-api.service';
-import { ParamChangeBackendDict } from 'domain/exploration/ParamChange.model';
+import {ParamChangeBackendDict} from 'domain/exploration/ParamChange.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 
 export interface ExplorationDataDict {
