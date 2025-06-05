@@ -766,6 +766,37 @@ def remove_subtopic_page_reference_from_learner_groups(
         models_to_put)
     learner_group_models.LearnerGroupModel.put_multi(models_to_put)
 
+def remove_study_guide_reference_from_learner_groups(
+    topic_id: str,
+    study_guide_id: int
+) -> None:
+    """Removes a given study guide from all learner groups that have it's
+    reference.
+
+    Args:
+        topic_id: str. Id of the topic of the study guide.
+        study_guide_id: int. Id of the study guide.
+    """
+    study_guide_page_id = '{}:{}'.format(topic_id, study_guide_id)
+
+    learner_group_model_cls = learner_group_models.LearnerGroupModel
+    found_models: Sequence[learner_group_models.LearnerGroupModel] = (
+        learner_group_model_cls.get_all().filter(
+            datastore_services.any_of(
+                learner_group_model_cls.study_guide_page_ids == study_guide_page_id
+            )
+        ).fetch()
+    )
+
+    models_to_put = []
+    for model in found_models:
+        model.study_guide_page_ids.remove(study_guide_page_id)
+        models_to_put.append(model)
+
+    learner_group_models.LearnerGroupModel.update_timestamps_multi(
+        models_to_put)
+    learner_group_models.LearnerGroupModel.put_multi(models_to_put)
+
 
 def update_progress_sharing_permission(
     user_id: str,

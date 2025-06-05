@@ -38,6 +38,8 @@ from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import study_guide_domain
+from core.domain import study_guide_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
@@ -199,14 +201,24 @@ def apply_change_list(
     """
     topic = topic_fetchers.get_topic_by_id(topic_id)
     newly_created_subtopic_ids: List[int] = []
+    newly_created_study_guide_ids: List[int] = []
     existing_subtopic_page_ids_to_be_modified: List[int] = []
+    existing_study_guide_ids_to_be_modified: List[int] = []
     deleted_subtopic_ids: List[int] = []
+    deleted_study_guide_ids: List[int] = []
     modified_subtopic_pages_list: List[
         Optional[subtopic_page_domain.SubtopicPage]
     ] = []
+    modified_study_guides_list: List[
+        Optional[study_guide_domain.StudyGuide]
+    ] = []
     modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage] = {}
+    modified_study_guides: Dict[str, study_guide_domain.StudyGuide] = {}
     modified_subtopic_change_cmds: Dict[
         str, List[subtopic_page_domain.SubtopicPageChange]
+    ] = collections.defaultdict(list)
+    modified_study_guide_change_cmds: Dict[
+        str, List[study_guide_domain.StudyGuideChange]
     ] = collections.defaultdict(list)
 
     for change in change_list:
@@ -216,6 +228,10 @@ def apply_change_list(
             # TopicChange to a specific change command.
             update_subtopic_page_property_cmd = cast(
                 subtopic_page_domain.UpdateSubtopicPagePropertyCmd,
+                change
+            )
+            update_study_guide_property_cmd = cast(
+                study_guide_domain.UpdateStudyGuidePropertyCmd,
                 change
             )
             if (
@@ -231,13 +247,33 @@ def apply_change_list(
                 )
                 modified_subtopic_change_cmds[subtopic_page_id].append(
                     update_subtopic_page_property_cmd)
+            if (
+                update_study_guide_property_cmd.study_guide_id <
+                topic.next_subtopic_id
+            ):
+                existing_study_guide_ids_to_be_modified.append(
+                    update_study_guide_property_cmd.study_guide_id)
+                study_guide_page_id = (
+                    study_guide_domain.StudyGuide.get_study_guide_page_id(
+                        topic_id, update_study_guide_property_cmd.study_guide_id
+                    )
+                )
+                modified_study_guide_change_cmds[study_guide_page_id].append(
+                    update_study_guide_property_cmd)
     modified_subtopic_pages_list = (
         subtopic_page_services.get_subtopic_pages_with_ids(
             topic_id, existing_subtopic_page_ids_to_be_modified))
+    modified_study_guides_list = (
+        study_guide_services.get_study_guides_with_ids(
+            topic_id, existing_study_guide_ids_to_be_modified))
     for subtopic_page in modified_subtopic_pages_list:
         # Ruling out the possibility of None for mypy type checking.
         assert subtopic_page is not None
         modified_subtopic_pages[subtopic_page.id] = subtopic_page
+    for study_guide in modified_study_guides_list:
+        # Ruling out the possibility of None for mypy type checking.
+        assert study_guide is not None
+        modified_study_guides[study_guide.id] = study_guide
 
     try:
         for change in change_list:
@@ -255,8 +291,15 @@ def apply_change_list(
                 subtopic_page_id = (
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                         topic_id, add_subtopic_cmd.subtopic_id))
+                study_guide_page_id = (
+                    study_guide_domain.StudyGuide.get_study_guide_page_id(
+                        topic_id, add_subtopic_cmd.subtopic_id))
                 modified_subtopic_pages[subtopic_page_id] = (
                     subtopic_page_domain.SubtopicPage.create_default_subtopic_page( # pylint: disable=line-too-long
+                        add_subtopic_cmd.subtopic_id, topic_id)
+                )
+                modified_study_guides[study_guide_page_id] = (
+                    study_guide_domain.StudyGuide.create_study_guide( # pylint: disable=line-too-long
                         add_subtopic_cmd.subtopic_id, topic_id)
                 )
                 modified_subtopic_change_cmds[subtopic_page_id].append(

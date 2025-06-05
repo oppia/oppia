@@ -26,7 +26,6 @@ from core.domain import classroom_config_services
 from core.domain import learner_group_services
 from core.domain import skill_services
 from core.domain import study_guide_domain
-from core.domain import study_guide_domain
 from core.domain import topic_fetchers
 from core.platform import models
 
@@ -37,40 +36,6 @@ if MYPY: # pragma: no cover
     from mypy_imports import subtopic_models
 
 (study_guide_models,) = models.Registry.import_models([models.Names.STUDY_GUIDE])
-
-
-def _migrate_sections_to_latest_schema(
-    versioned_sections: (
-        study_guide_domain.VersionedStudyGuideSectionsDict
-    )
-) -> None:
-    """Holds the responsibility of performing a step-by-step, sequential update
-    of the sections structure based on the schema version of the input
-    sections list. If the current sections schema changes, a
-    new conversion function must be added and some code appended to this
-    function to account for that new version.
-
-    Args:
-        versioned_page_contents: dict. A dict with two keys:
-          - schema_version: int. The schema version for the page_contents dict.
-          - page_contents: dict. The dict comprising the page contents.
-
-    Raises:
-        Exception. The schema version of the page_contents is outside of what
-            is supported at present.
-    """
-    page_contents_schema_version = versioned_page_contents['schema_version']
-    if not (1 <= page_contents_schema_version
-            <= feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
-        raise Exception(
-            'Sorry, we can only process v1-v%d page schemas at '
-            'present.' % feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION)
-
-    while (page_contents_schema_version <
-           feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
-        study_guide_domain.SubtopicPage.update_page_contents_from_model(
-            versioned_page_contents, page_contents_schema_version)
-        page_contents_schema_version += 1
 
 
 def get_study_guide_from_model(
@@ -91,14 +56,20 @@ def get_study_guide_from_model(
         'schema_version': study_guide_model.sections_schema_version,
         'sections': copy.deepcopy(study_guide_model.sections)
     }
-    if (study_guide_model.sections_schema_version !=
-            feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION):
-        _migrate_sections_to_latest_schema(versioned_sections)
+    # TODO: Add migrate_sections_to_latest_schema method call if the model
+    # schema version is not equal to CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
+    # once the migrate_sections_to_latest_schema method is created.
+    sections = []
+    for section in versioned_sections['sections']:
+        sections.append(
+            study_guide_domain.StudyGuideSection.from_dict(
+                section
+            )
+        )
     return study_guide_domain.StudyGuide(
         study_guide_model.id,
         study_guide_model.topic_id,
-        study_guide_domain.StudyGuideSection.from_dict(
-            versioned_sections['sections']),
+        sections,
         versioned_sections['schema_version'],
         study_guide_model.next_content_id_index,
         study_guide_model.language_code,
@@ -178,208 +149,213 @@ def get_study_guide_by_id(
         return None
 
 
-def get_subtopic_pages_with_ids(
+def get_study_guides_with_ids(
     topic_id: str,
-    subtopic_ids: List[int]
-) -> List[Optional[study_guide_domain.SubtopicPage]]:
+    study_guide_ids: List[int]
+) -> List[Optional[study_guide_domain.StudyGuide]]:
     """Returns a list of domain objects with given ids.
 
     Args:
-        topic_id: str. ID of the topic that the subtopics belong to.
-        subtopic_ids: list(int). The ids of the subtopics.
+        topic_id: str. ID of the topic that the study guides belong to.
+        study_guide_ids: list(int). The ids of the study guides.
 
     Returns:
-        list(SubtopicPage) or None. The list of domain objects representing the
-        subtopic pages corresponding to given ids list or None if none exist.
+        list(StudyGuide) or None. The list of domain objects representing the
+        study guides corresponding to given ids list or None if none exist.
     """
-    subtopic_page_ids = []
-    for subtopic_id in subtopic_ids:
-        subtopic_page_ids.append(
-            study_guide_domain.SubtopicPage.get_subtopic_page_id(
-                topic_id, subtopic_id))
-    subtopic_page_models = subtopic_models.SubtopicPageModel.get_multi(
-        subtopic_page_ids)
-    subtopic_pages: List[Optional[study_guide_domain.SubtopicPage]] = []
-    for subtopic_page_model in subtopic_page_models:
-        if subtopic_page_model is None:
-            subtopic_pages.append(subtopic_page_model)
+    study_guide_page_ids = []
+    for study_guide_id in study_guide_ids:
+        study_guide_page_ids.append(
+            study_guide_domain.StudyGuide.get_study_guide_page_id(
+                topic_id, study_guide_id))
+    study_guide_models = subtopic_models.StudyGuideModel.get_multi(
+        study_guide_page_ids)
+    study_guides: List[Optional[study_guide_domain.StudyGuide]] = []
+    for study_guide_model in study_guide_models:
+        if study_guide_model is None:
+            study_guides.append(study_guide_model)
         else:
-            subtopic_pages.append(
-                get_subtopic_page_from_model(subtopic_page_model))
-    return subtopic_pages
+            study_guides.append(
+                get_study_guide_from_model(study_guide_model))
+    return study_guides
 
 
 @overload
-def get_subtopic_page_contents_by_id(
-    topic_id: str, subtopic_id: int
-) -> study_guide_domain.SubtopicPageContents: ...
+def get_study_guide_sections_by_id(
+    topic_id: str, study_guide_id: int
+) -> List[study_guide_domain.StudyGuideSection]: ...
 
 
 @overload
-def get_subtopic_page_contents_by_id(
+def get_study_guide_sections_by_id(
     topic_id: str,
-    subtopic_id: int,
+    study_guide_id: int,
     *,
     strict: Literal[True]
-) -> study_guide_domain.SubtopicPageContents: ...
+) -> List[study_guide_domain.StudyGuideSection]: ...
 
 
 @overload
-def get_subtopic_page_contents_by_id(
+def get_study_guide_sections_by_id(
     topic_id: str,
-    subtopic_id: int,
+    study_guide_id: int,
     *,
     strict: Literal[False]
-) -> Optional[study_guide_domain.SubtopicPageContents]: ...
+) -> Optional[List[study_guide_domain.StudyGuideSection]]: ...
 
 
-def get_subtopic_page_contents_by_id(
+def get_study_guide_sections_by_id(
     topic_id: str,
-    subtopic_id: int,
+    study_guide_id: int,
     strict: bool = True
-) -> Optional[study_guide_domain.SubtopicPageContents]:
-    """Returns the page contents of a subtopic
+) -> Optional[List[study_guide_domain.StudyGuideSection]]:
+    """Returns the list of sections of a study guide
 
     Args:
-        topic_id: str. ID of the topic that the subtopic belong to.
-        subtopic_id: int. The id of the subtopic.
-        strict: bool. Whether to fail noisily if no subtopic page with the given
+        topic_id: str. ID of the topic that the study guide belongs to.
+        study_guide_id: int. The id of the study guide.
+        strict: bool. Whether to fail noisily if no study guide with the given
             id exists in the datastore.
 
     Returns:
-        SubtopicPageContents or None. The page contents for a subtopic page,
-        or None if subtopic page does not exist.
+        List[SubtopicPageContents] or None. The list of sections for a study guide,
+        or None if study guide does not exist.
     """
-    subtopic_page = get_study_guide_by_id(
-        topic_id, subtopic_id, strict=strict)
-    if subtopic_page is not None:
-        return subtopic_page.page_contents
+    study_guide = get_study_guide_by_id(
+        topic_id, study_guide_id, strict=strict)
+    if study_guide is not None:
+        return study_guide.sections
     else:
         return None
 
 
-def save_subtopic_page(
+def save_study_guide(
     committer_id: str,
-    subtopic_page: study_guide_domain.SubtopicPage,
+    study_guide: study_guide_domain.StudyGuide,
     commit_message: Optional[str],
     change_list: Sequence[change_domain.BaseChange]
 ) -> None:
-    """Validates a subtopic page and commits it to persistent storage. If
-    successful, increments the version number of the incoming subtopic page
+    """Validates a study guide and commits it to persistent storage. If
+    successful, increments the version number of the incoming study guide
     domain object by 1.
 
     Args:
         committer_id: str. ID of the given committer.
-        subtopic_page: SubtopicPage. The subtopic page domain object to be
+        study_guide: StudyGuide. The study guide domain object to be
             saved.
         commit_message: str|None. The commit description message, for
             unpublished topics, it may be equal to None.
-        change_list: list(SubtopicPageChange). List of changes applied to a
-            subtopic page.
+        change_list: list(StudyGuideChange). List of changes applied to a
+            study guide.
 
     Raises:
         Exception. Received invalid change list.
-        Exception. The subtopic page model and the incoming subtopic page domain
+        Exception. The study guide and the incoming study guide domain
             object have different version numbers.
     """
     if not change_list:
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
-            'save topic %s: %s' % (subtopic_page.id, change_list))
-    subtopic_page.validate()
+            'save topic %s: %s' % (study_guide.id, change_list))
+    study_guide.validate()
 
-    subtopic_page_model = subtopic_models.SubtopicPageModel.get(
-        subtopic_page.id, strict=False)
-    if subtopic_page_model is None:
-        subtopic_page_model = subtopic_models.SubtopicPageModel(
-            id=subtopic_page.id)
+    study_guide_model = subtopic_models.StudyGuideModel.get(
+        study_guide.id, strict=False)
+    if study_guide_model is None:
+        study_guide_model = subtopic_models.StudyGuideModel(
+            id=study_guide.id)
     else:
-        if subtopic_page.version > subtopic_page_model.version:
+        if study_guide.version > study_guide_model.version:
             raise Exception(
                 'Unexpected error: trying to update version %s of topic '
                 'from version %s. Please reload the page and try again.'
-                % (subtopic_page_model.version, subtopic_page.version))
+                % (study_guide_model.version, study_guide.version))
 
-        if subtopic_page.version < subtopic_page_model.version:
+        if study_guide.version < study_guide_model.version:
             raise Exception(
                 'Trying to update version %s of topic from version %s, '
                 'which is too old. Please reload the page and try again.'
-                % (subtopic_page_model.version, subtopic_page.version))
+                % (study_guide_model.version, study_guide.version))
 
-    subtopic_page_model.topic_id = subtopic_page.topic_id
-    subtopic_page_model.page_contents = subtopic_page.page_contents.to_dict()
-    subtopic_page_model.language_code = subtopic_page.language_code
-    subtopic_page_model.page_contents_schema_version = (
-        subtopic_page.page_contents_schema_version)
+    study_guide_model.topic_id = study_guide.topic_id
+    sections = []
+    for section in study_guide.sections():
+        sections.append(section.to_dict())
+    study_guide_model.sections = sections
+    study_guide_model.language_code = study_guide.language_code
+    study_guide_model.sections_schema_version = (
+        study_guide.sections_schema_version)
+    study_guide_model.next_content_id_index = (
+        study_guide.next_content_id_index)
     change_dicts = [change.to_dict() for change in change_list]
-    subtopic_page_model.commit(committer_id, commit_message, change_dicts)
-    subtopic_page.version += 1
+    study_guide_model.commit(committer_id, commit_message, change_dicts)
+    study_guide.version += 1
 
 
-def delete_subtopic_page(
+def delete_study_guide(
     committer_id: str,
     topic_id: str,
-    subtopic_id: int,
+    study_guide_id: int,
     force_deletion: bool = False
 ) -> None:
     """Delete a topic summary model.
 
     Args:
-        committer_id: str. The user who is deleting the subtopic page.
-        topic_id: str. The ID of the topic that this subtopic belongs to.
-        subtopic_id: int. ID of the subtopic which was removed.
-        force_deletion: bool. If true, the subtopic page and its history are
-            fully deleted and are unrecoverable. Otherwise, the subtopic page
+        committer_id: str. The user who is deleting the study guide.
+        topic_id: str. The ID of the topic that this study guide belongs to.
+        study_guide_id: int. ID of the study guide which was removed.
+        force_deletion: bool. If true, the study guide and its history are
+            fully deleted and are unrecoverable. Otherwise, the study guide
             and all its history are marked as deleted, but the corresponding
             models are still retained in the datastore. This last option is the
             preferred one.
     """
-    subtopic_page_id = study_guide_domain.SubtopicPage.get_subtopic_page_id(
-        topic_id, subtopic_id)
-    subtopic_models.SubtopicPageModel.get(subtopic_page_id).delete(
-        committer_id, feconf.COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED,
+    study_guide_page_id = study_guide_domain.StudyGuide.get_study_guide_page_id(
+        topic_id, study_guide_id)
+    subtopic_models.StudyGuideModel.get(study_guide_page_id).delete(
+        committer_id, feconf.COMMIT_MESSAGE_STUDY_GUIDE_DELETED,
         force_deletion=force_deletion)
-    learner_group_services.remove_subtopic_page_reference_from_learner_groups(
-        topic_id, subtopic_id)
+    learner_group_services.remove_study_guide_reference_from_learner_groups(
+        topic_id, study_guide_id)
 
 
-def get_topic_ids_from_subtopic_page_ids(
-    subtopic_page_ids: List[str]
+def get_topic_ids_from_study_guide_page_ids(
+    study_guide_page_ids: List[str]
 ) -> List[str]:
-    """Returns the topic ids corresponding to the given set of subtopic page
+    """Returns the topic ids corresponding to the given set of study guide
     ids.
 
     Args:
-        subtopic_page_ids: list(str). The ids of the subtopic pages.
+        study_guide_page_ids: list(str). The ids of the study guides.
 
     Returns:
-        list(str). The topic ids corresponding to the given subtopic page ids.
+        list(str). The topic ids corresponding to the given study guide page ids.
         The returned list of topic ids is deduplicated and ordered
         alphabetically.
     """
     return sorted(list({
-        subtopic_page_id.split(':')[0] for subtopic_page_id in
-        subtopic_page_ids
+        study_guide_page_id.split(':')[0] for study_guide_page_id in
+        study_guide_page_ids
     }))
 
 
-def get_multi_users_subtopic_pages_progress(
+def get_multi_users_study_guides_progress(
     user_ids: List[str],
-    subtopic_page_ids: List[str]
-) -> Dict[str, List[study_guide_domain.SubtopicPageSummaryDict]]:
-    """Returns the progress of the given user on the given subtopic pages.
+    study_guide_page_ids: List[str]
+) -> Dict[str, List[study_guide_domain.StudyGuideSummaryDict]]:
+    """Returns the progress of the given user on the given study guides.
 
     Args:
         user_ids: list(str). The ids of the users.
-        subtopic_page_ids: list(str). The ids of the subtopic pages.
+        study_guide_page_ids: list(str). The page ids of the study guide.
 
     Returns:
-        dict(str, list(SubtopicPageSummaryDict)). User IDs as keys and Subtopic
-        Page Summary domain object dictionaries containing details of the
-        subtopic page and users mastery in it as values.
+        dict(str, list(StudyGuideSummaryDict)). User IDs as keys and Study
+        Guide Summary domain object dictionaries containing details of the
+        study guide and users mastery in it as values.
     """
 
-    topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
+    topic_ids = get_topic_ids_from_study_guide_page_ids(study_guide_page_ids)
     topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
 
     all_skill_ids_lists = [
@@ -398,13 +374,13 @@ def get_multi_users_subtopic_pages_progress(
         )
     )
 
-    all_users_subtopic_prog_summaries: Dict[
-        str, List[study_guide_domain.SubtopicPageSummaryDict]
+    all_users_study_guide_prog_summaries: Dict[
+        str, List[study_guide_domain.StudyGuideSummaryDict]
     ] = {user_id: [] for user_id in user_ids}
     for topic in topics:
-        for subtopic in topic.subtopics:
-            subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
-            if subtopic_page_id not in subtopic_page_ids:
+        for study_guide in topic.study_guides:
+            study_guide_page_id = '{}:{}'.format(topic.id, study_guide.id)
+            if study_guide_page_id not in study_guide_page_ids:
                 continue
             for user_id, skills_mastery_dict in (
                 all_users_skill_mastery_dicts.items()
@@ -413,26 +389,26 @@ def get_multi_users_subtopic_pages_progress(
                     skill_id: mastery
                     for skill_id, mastery in skills_mastery_dict.items()
                     if mastery is not None and (
-                        skill_id in subtopic.skill_ids
+                        skill_id in study_guide.skill_ids
                     )
                 }
-                subtopic_mastery: Optional[float] = None
+                study_guide_mastery: Optional[float] = None
 
-                # Subtopic mastery is average of skill masteries.
+                # Study guide mastery is average of skill masteries.
                 if skill_mastery_dict:
-                    subtopic_mastery = (
+                    study_guide_mastery = (
                         sum(skill_mastery_dict.values()) /
                         len(skill_mastery_dict)
                     )
 
-                all_users_subtopic_prog_summaries[user_id].append({
-                    'subtopic_id': subtopic.id,
-                    'subtopic_title': subtopic.title,
+                all_users_study_guide_prog_summaries[user_id].append({
+                    'study_guide_id': study_guide.id,
+                    'study_guide_title': study_guide.title,
                     'parent_topic_id': topic.id,
                     'parent_topic_name': topic.name,
-                    'thumbnail_filename': subtopic.thumbnail_filename,
-                    'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                    'subtopic_mastery': subtopic_mastery,
+                    'thumbnail_filename': study_guide.thumbnail_filename,
+                    'thumbnail_bg_color': study_guide.thumbnail_bg_color,
+                    'study_guide_mastery': study_guide_mastery,
                     'parent_topic_url_fragment': topic.url_fragment,
                     'classroom_url_fragment': (
                         classroom_config_services
@@ -440,66 +416,69 @@ def get_multi_users_subtopic_pages_progress(
                                 topic.id))
                 })
 
-    return all_users_subtopic_prog_summaries
+    return all_users_study_guide_prog_summaries
 
 
-def get_learner_group_syllabus_subtopic_page_summaries(
-    subtopic_page_ids: List[str]
-) -> List[study_guide_domain.SubtopicPageSummaryDict]:
-    """Returns summary dicts corresponding to the given subtopic page ids.
+def get_learner_group_syllabus_study_guide_summaries(
+    study_guide_page_ids: List[str]
+) -> List[study_guide_domain.StudyGuideSummaryDict]:
+    """Returns summary dicts corresponding to the given study guide ids.
 
     Args:
-        subtopic_page_ids: list(str). The ids of the subtopic pages.
+        study_guide_page_ids: list(str). The page ids of the study guides.
 
     Returns:
-        list(SubtopicPageSummaryDict). The summary dicts corresponding to the
-        given subtopic page ids.
+        list(StudyGuideSummaryDict). The summary dicts corresponding to the
+        given study guide page ids.
     """
-    topic_ids = get_topic_ids_from_subtopic_page_ids(subtopic_page_ids)
+    topic_ids = get_topic_ids_from_study_guide_page_ids(study_guide_page_ids)
     topics = topic_fetchers.get_topics_by_ids(topic_ids, strict=True)
 
-    all_learner_group_subtopic_page_summaries: List[
-        study_guide_domain.SubtopicPageSummaryDict
+    all_learner_group_study_guide_summaries: List[
+        study_guide_domain.StudyGuideSummaryDict
     ] = []
     for topic in topics:
-        for subtopic in topic.subtopics:
-            subtopic_page_id = '{}:{}'.format(topic.id, subtopic.id)
-            if subtopic_page_id not in subtopic_page_ids:
+        for study_guide in topic.study_guides:
+            study_guide_page_id = '{}:{}'.format(topic.id, study_guide.id)
+            if study_guide_page_id not in study_guide_page_ids:
                 continue
-            all_learner_group_subtopic_page_summaries.append({
-                'subtopic_id': subtopic.id,
-                'subtopic_title': subtopic.title,
+            all_learner_group_study_guide_summaries.append({
+                'study_guide_id': study_guide.id,
+                'study_guide_title': study_guide.title,
                 'parent_topic_id': topic.id,
                 'parent_topic_name': topic.name,
-                'thumbnail_filename': subtopic.thumbnail_filename,
-                'thumbnail_bg_color': subtopic.thumbnail_bg_color,
-                'subtopic_mastery': None,
+                'thumbnail_filename': study_guide.thumbnail_filename,
+                'thumbnail_bg_color': study_guide.thumbnail_bg_color,
+                'study_guide_mastery': None,
                 'parent_topic_url_fragment': topic.url_fragment,
                 'classroom_url_fragment': None
             })
 
-    return all_learner_group_subtopic_page_summaries
+    return all_learner_group_study_guide_summaries
 
 
-def populate_subtopic_page_model_fields(
-    subtopic_page_model: subtopic_models.SubtopicPageModel,
-    subtopic_page: study_guide_domain.SubtopicPage
-) -> subtopic_models.SubtopicPageModel:
-    """Populate subtopic page model with the data from subtopic page object.
+def populate_study_guide_model_fields(
+    study_guide_model: subtopic_models.StudyGuideModel,
+    study_guide: study_guide_domain.StudyGuide
+) -> subtopic_models.StudyGuideModel:
+    """Populate study guide model with the data from study guide object.
 
     Args:
-        subtopic_page_model: SubtopicPageModel. The model to populate.
-        subtopic_page: SubtopicPage. The subtopic page domain object which
+        study_guide_model: StudyGuideModel. The model to populate.
+        study_guide: StudyGuide. The study guide domain object which
             should be used to populate the model.
 
     Returns:
-        SubtopicPageModel. Populated model.
+        StudyGuideModel. Populated model.
     """
-    subtopic_page_model.topic_id = subtopic_page.topic_id
-    subtopic_page_model.page_contents = subtopic_page.page_contents.to_dict()
-    subtopic_page_model.page_contents_schema_version = (
-        subtopic_page.page_contents_schema_version)
+    study_guide_model.topic_id = study_guide.topic_id
+    sections = []
+    for section in study_guide.sections:
+        sections.append(section.to_dict())
+    study_guide_model.sections = sections
+    study_guide_model.sections_schema_version = (
+        study_guide.sections_schema_version)
 
-    subtopic_page_model.language_code = subtopic_page.language_code
+    study_guide_model.language_code = study_guide.language_code
 
-    return subtopic_page_model
+    return study_guide_model

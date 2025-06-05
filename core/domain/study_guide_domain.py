@@ -140,7 +140,7 @@ class DeleteSectionCmd(StudyGuideChange):
     content_content_id: str
 
 
-class UpdateSubtopicPagePropertyCmd(StudyGuideChange):
+class UpdateStudyGuidePropertyCmd(StudyGuideChange):
     """Class representing the StudyGuideChange's
     CMD_UPDATE_STUDY_GUIDE_PROPERTY command.
     """
@@ -322,7 +322,7 @@ class StudyGuide:
 
         Args:
             study_guide_page_id: str. The unique ID of the study guide.
-            topic_id: str. The ID of the topic that this subtopic is a part of.
+            topic_id: str. The ID of the topic that this study guide is a part of.
             sections: StudyGuideSection. List of sections consisting of heading
                 and content pairs of the to be shown to the user.
             sections_schema_version: int. The schema version for the sections
