@@ -73,7 +73,6 @@ export class ParamChange {
     );
   }
 
-  // ✅ Replaces: factory.createFromBackendDict(...)
   static createFromBackendDict(
     paramChangeBackendDict: ParamChangeBackendDict
   ): ParamChange {
@@ -84,7 +83,6 @@ export class ParamChange {
     );
   }
 
-  // ✅ Replaces: factory.createEmpty(...)
   static createEmpty(paramName: string): ParamChange {
     return new ParamChange(
       {
@@ -96,7 +94,6 @@ export class ParamChange {
     );
   }
 
-  // ✅ Replaces: factory.createDefault(...)
   static createDefault(paramName: string): ParamChange {
     return new ParamChange(
       cloneDeep(DEFAULT_CUSTOMIZATION_ARGS.Copier),

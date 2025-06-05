@@ -16,11 +16,11 @@
  * @fileoverview Unit tests for ParamChange.
  */
 
-import { ParamChange, ParamChangeBackendDict } from './param-change.model';
+import {ParamChange} from './param-change.model';
 
-describe('ParamChange', () => {
+describe('ParamChange model', () => {
   it('should create a param change object from backend dict', () => {
-    const sampleData: ParamChangeBackendDict = {
+    const sampleData = {
       customization_args: {
         parse_with_jinja: false,
         value: '10',
@@ -34,60 +34,53 @@ describe('ParamChange', () => {
     expect(paramChangeObject.toBackendDict()).toEqual(sampleData);
   });
 
+  it('should reset a copier customization args from param change object', () => {
+    const sampleData = {
+      customization_args: {
+        parse_with_jinja: false,
+        value: '',
+      },
+      generator_id: 'Copier',
+      name: 'Reset copier custom customization args',
+    };
 
-  it(
-    'should reset a copier custom customization args from param change ' +
-      'object',
-    () => {
-      const sampleData = {
-        customization_args: {
-          parse_with_jinja: false,
-          value: '',
-        },
-        generator_id: 'Copier',
-        name: 'Reset copier custom customization args',
-      };
-      const paramChangeObject = pcof.createFromBackendDict(sampleData);
-      paramChangeObject.resetCustomizationArgs();
+    const paramChangeObject = ParamChange.createFromBackendDict(sampleData);
+    paramChangeObject.resetCustomizationArgs();
 
-      expect(paramChangeObject.toBackendDict()).toEqual({
-        customization_args: {
-          parse_with_jinja: true,
-          value: '5',
-        },
-        generator_id: 'Copier',
-        name: 'Reset copier custom customization args',
-      });
-    }
-  );
+    expect(paramChangeObject.toBackendDict()).toEqual({
+      customization_args: {
+        parse_with_jinja: true,
+        value: '5',
+      },
+      generator_id: 'Copier',
+      name: 'Reset copier custom customization args',
+    });
+  });
 
-  it(
-    'should reset a random selector custom customization args from param ' +
-      'change object',
-    () => {
-      const sampleData = {
-        customization_args: {
-          parse_with_jinja: false,
-          value: '10',
-        },
-        generator_id: 'RandomSelector',
-        name: 'Reset random selector custom customization args',
-      };
-      const paramChangeObject = pcof.createFromBackendDict(sampleData);
-      paramChangeObject.resetCustomizationArgs();
+  it('should reset a random selector customization args', () => {
+    const sampleData = {
+      customization_args: {
+        parse_with_jinja: false,
+        value: '10',
+      },
+      generator_id: 'RandomSelector',
+      name: 'Reset random selector custom customization args',
+    };
 
-      expect(paramChangeObject.toBackendDict()).toEqual({
-        customization_args: {
-          list_of_values: ['sample value'],
-        },
-        generator_id: 'RandomSelector',
-        name: 'Reset random selector custom customization args',
-      });
-    }
-  );
+    const paramChangeObject = ParamChange.createFromBackendDict(sampleData);
+    paramChangeObject.resetCustomizationArgs();
+
+    expect(paramChangeObject.toBackendDict()).toEqual({
+      customization_args: {
+        list_of_values: ['sample value'],
+      },
+      generator_id: 'RandomSelector',
+      name: 'Reset random selector custom customization args',
+    });
+  });
 
   it('should create an empty param change object', () => {
-    const emptyParamChangeObject = pcof.createEmpty('param');
+    const emptyParamChangeObject = ParamChange.createEmpty('param');
 
     expect(emptyParamChangeObject.toBackendDict()).toEqual({
       customization_args: {
@@ -100,9 +93,9 @@ describe('ParamChange', () => {
   });
 
   it('should create a default param change object', () => {
-    const emptyParamChangeObject = pcof.createDefault('param');
+    const defaultParamChangeObject = ParamChange.createDefault('param');
 
-    expect(emptyParamChangeObject.toBackendDict()).toEqual({
+    expect(defaultParamChangeObject.toBackendDict()).toEqual({
       customization_args: {
         parse_with_jinja: true,
         value: '5',
