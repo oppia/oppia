@@ -22,7 +22,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {ParamChange} from 'domain/exploration/param-change.model'; // ✅ Updated import
+import {ParamChange} from 'domain/exploration/param-change.model';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
