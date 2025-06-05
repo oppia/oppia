@@ -260,9 +260,15 @@ export class ClassroomAdminPageComponent implements OnInit {
   getAvailableTopics(): TopicClassroomRelationDict[] {
     const seen = new Set();
     return this.topicsToClassroomRelation.filter(value => {
-      if (value.classroom_name !== null) return false;
-      if (this.topicNames.includes(value.topic_name)) return false;
-      if (seen.has(value.topic_name)) return false;
+      if (value.classroom_name !== null) {
+        return false;
+      }
+      if (this.topicNames.includes(value.topic_name)) {
+        return false;
+      }
+      if (seen.has(value.topic_name)) {
+        return false;
+      }
       seen.add(value.topic_name);
       return true;
     });
