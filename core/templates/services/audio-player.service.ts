@@ -45,6 +45,8 @@ export class AudioPlayerService {
     new EventEmitter<void | AutoPlayAudioEvent>();
 
   private _stopIntervalSubject = new Subject<void>();
+  private _audioEndSubject = new Subject<void>();
+
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private contextService: ContextService,
@@ -74,6 +76,7 @@ export class AudioPlayerService {
             successCallback();
           });
           this._currentTrack.on('end', () => {
+            this._audioEndSubject.next();
             this._stopIntervalSubject.next();
             this._currentTrack = null;
             this._currentTrackFilename = null;
@@ -222,5 +225,9 @@ export class AudioPlayerService {
 
   get onAudioStop(): Subject<void> {
     return this._stopIntervalSubject;
+  }
+
+  get onAudioEnd(): Subject<void> {
+    return this._audioEndSubject;
   }
 }
