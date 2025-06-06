@@ -183,39 +183,39 @@ const loginPage = '.e2e-test-login-page';
 
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
-  '.acceptance-test-community-lessons-section';
+  '.e2e-test-community-lessons-section';
 const homeTabSectionInLearnerDashboard =
-  '.acceptance-test-learner-dash-home-tab';
+  '.e2e-test-learner-dash-home-tab';
 const progressTabSectionInLearnerDashboard =
-  '.acceptance-test-learner-dash-progress-tab';
+  '.e2e-test-learner-dash-progress-tab';
 const goalsTabSectionInLearnerDashboard = '.e2e-test-current-goals-section';
 
 // Creator dashboard selectors.
 const creatorDashboardContainerSelector =
-  '.acceptance-test-creator-dashboard-container';
-const settingsTabMainContent = '.acceptance-test-settings-card';
+  '.e2e-test-creator-dashboard-container';
+const settingsTabMainContent = '.e2e-test-settings-card';
 
 // Contributor dashboard selectors.
 const contributorDashboardContainerSelector =
-  '.acceptance-test-oppia-contributor-home';
+  '.e2e-test-oppia-contributor-home';
 
 // Preferences page selectors.
-const preferencesContainerSelector = '.acceptance-test-preferences-container';
-const deleteAccountPage = '.acceptance-test-delete-account';
+const preferencesContainerSelector = '.e2e-test-preferences-container';
+const deleteAccountPage = '.e2e-test-delete-account';
 const deleteMyAcccountButton = '.e2e-test-delete-my-account-button';
 const subjectInterestTagsInPreferencesPage =
-  '.acceptance-test-subject-interest-chip';
+  '.e2e-test-subject-interest-chip';
 
 // Profile Page selectors.
-const profileContainerSelector = '.acceptance-test-profile-container';
+const profileContainerSelector = '.e2e-test-profile-container';
 
 // Exploration player selectors.
 const explorationSuccessfullyFlaggedMessage =
-  '.acceptance-test-exploration-flagged-success-message';
+  '.e2e-test-exploration-flagged-success-message';
 
 // Feedback updates page.
 const feedbackUpdatesMainContentContainer =
-  '.acceptance-test-feedback-updates-main-content-container';
+  '.e2e-test-feedback-updates-main-content-container';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1114,7 +1114,7 @@ export class LoggedInUser extends BaseUser {
     }
 
     const foundExplorationLanguages = await this.page.$$eval(
-      '.acceptance-test-exploration-language-preference-chips',
+      '.e2e-test-exploration-language-preference-chips',
       elements => elements.map(el => el.textContent?.trim() || '')
     );
     showMessage(`Found Languages: ${foundExplorationLanguages.join(', ')}`);
