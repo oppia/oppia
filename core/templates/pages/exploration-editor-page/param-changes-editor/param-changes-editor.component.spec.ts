@@ -29,7 +29,6 @@ import {
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateParamChangesService} from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
 import {ParamChange} from 'domain/exploration/param-change.model';
-
 import {
   ParamSpecs,
   ParamSpecsObjectFactory,

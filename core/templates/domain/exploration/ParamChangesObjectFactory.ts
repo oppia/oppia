@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {
   ParamChange,
   ParamChangeBackendDict,
