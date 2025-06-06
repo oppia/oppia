@@ -23,7 +23,7 @@ export const TopicViewerDomainConstants = {
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/story/' +
     '<story_url_fragment>',
   SUBTOPIC_VIEWER_URL_TEMPLATE:
-    '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision/' +
+    '/learn/<classroom_url_fragment>/<topic_url_fragment>/studyguide/' +
     '<subtopic_url_fragment>',
   REVIEW_TESTS_URL_TEMPLATE:
     '/learn/<classroom_url_fragment>/<topic_url_fragment>/review-test/' +
