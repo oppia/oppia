@@ -205,6 +205,8 @@ const deleteAccountPage = '.e2e-test-delete-account';
 const deleteMyAcccountButton = '.e2e-test-delete-my-account-button';
 const subjectInterestTagsInPreferencesPage =
   '.e2e-test-subject-interest-chip';
+const explorationLanguagePerferenceChipsSelector =
+  '.e2e-test-exploration-language-preference-chips';
 
 // Profile Page selectors.
 const profileContainerSelector = '.e2e-test-profile-container';
@@ -744,6 +746,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Adds a lesson to the 'Play Later' list from community library page.
    * @param {string} lessonTitle - The title of the lesson to add to the 'Play Later' list.
+   * @param {boolean} skipVerification - Skip verification that user is logged in and login popup has closed.
    */
   async addLessonToPlayLater(
     lessonTitle: string,
@@ -1114,7 +1117,7 @@ export class LoggedInUser extends BaseUser {
     }
 
     const foundExplorationLanguages = await this.page.$$eval(
-      '.e2e-test-exploration-language-preference-chips',
+      explorationLanguagePerferenceChipsSelector,
       elements => elements.map(el => el.textContent?.trim() || '')
     );
     showMessage(`Found Languages: ${foundExplorationLanguages.join(', ')}`);

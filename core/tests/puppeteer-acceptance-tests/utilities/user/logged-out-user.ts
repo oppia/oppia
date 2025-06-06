@@ -540,7 +540,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the classrooms page.
    */
-  async navigateToClassroomsPage(verifyURL = false): Promise<void> {
+  async navigateToClassroomsPage(verifyURL: boolean = true): Promise<void> {
     if (this.page.url() === classroomsPageUrl) {
       await this.page.reload();
     }
