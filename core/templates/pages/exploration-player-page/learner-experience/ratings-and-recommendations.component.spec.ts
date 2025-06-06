@@ -43,7 +43,7 @@ import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-bac
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
 import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
-import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {ReadOnlyTopic} from '../../../domain/topic_viewer/read-only-topic.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
@@ -228,7 +228,8 @@ describe('Ratings and recommendations component', () => {
             {},
             true,
             'metatag',
-            'page_title_fragment'
+            'page_title_fragment',
+            'math'
           )
         )
       );

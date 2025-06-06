@@ -22,29 +22,23 @@ import {
 } from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import {
-  ReadOnlyTopic,
-  ReadOnlyTopicBackendDict,
-  ReadOnlyTopicObjectFactory,
-} from 'domain/topic_viewer/read-only-topic-object.factory';
-import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import {ReadOnlyTopic, ReadOnlyTopicBackendDict} from './read-only-topic.model';
+import {TopicViewerBackendApiService} from './topic-viewer-backend-api.service';
 
 describe('Topic viewer backend API service', () => {
   let topicViewerBackendApiService: TopicViewerBackendApiService;
   let httpTestingController: HttpTestingController;
   let sampleDataResultsObjects: ReadOnlyTopic;
   let sampleDataResults: ReadOnlyTopicBackendDict;
-  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
+  let readOnlyTopicObjectFactory: ReadOnlyTopic;
 
   beforeEach(() => {
-    readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory();
-
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
-    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
+    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopic);
 
     let nodeDict = {
       id: 'node_1',
@@ -124,7 +118,7 @@ describe('Topic viewer backend API service', () => {
     };
 
     sampleDataResultsObjects =
-      readOnlyTopicObjectFactory.createFromBackendDict(sampleDataResults);
+      ReadOnlyTopic.createFromBackendDict(sampleDataResults);
   });
 
   afterEach(() => {
