@@ -23,7 +23,7 @@
   </h1>
 </ng-template>
 <ng-template #span let-childNode>
-  <span>
+  <span [attr.id]="childNode.attrs.id || ''">
     <ng-container [ngTemplateOutlet]="tree" [ngTemplateOutletContext]="{ $implicit: childNode }">
     </ng-container>
   </span>

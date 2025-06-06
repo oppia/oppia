@@ -93,7 +93,7 @@ export class CreateNewSubtopicModalComponent
     this.subtopicTitle = '';
     this.errorMsg = null;
     this.subtopicUrlFragmentExists = false;
-    this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment} /${this.topic.getUrlFragment()}/revision`;
+    this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment} /${this.topic.getUrlFragment()}/studyguide`;
   }
 
   getSchema(): object {
