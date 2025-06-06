@@ -17,28 +17,21 @@
  * domain objects.
  */
 
-import {Injectable} from '@angular/core';
-
+import { Injectable } from '@angular/core';
 import {
   ParamChange,
   ParamChangeBackendDict,
 } from 'domain/exploration/param-change.model';
 
-import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
-
 @Injectable({
   providedIn: 'root',
 })
 export class ParamChangesObjectFactory {
-  constructor(private paramChangeObjectFactory: ParamChangeObjectFactory) {}
-
   createFromBackendList(
     paramChangeBackendList: readonly ParamChangeBackendDict[]
   ): ParamChange[] {
     return paramChangeBackendList.map(paramChangeBackendDict => {
-      return this.paramChangeObjectFactory.createFromBackendDict(
-        paramChangeBackendDict
-      );
+      return ParamChange.createFromBackendDict(paramChangeBackendDict);
     });
   }
 }
