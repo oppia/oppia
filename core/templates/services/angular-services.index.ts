@@ -121,7 +121,7 @@ import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-back
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic.model';
+import { ReadOnlyTopic } from 'domain/topic_viewer/read-only-topic.model';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
