@@ -762,7 +762,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
   ['ReadOnlyExplorationBackendApiService',
     ReadOnlyExplorationBackendApiService],
-  ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
+  ['ReadOnlyTopic', ReadOnlyTopic],
   ['RefresherExplorationConfirmationModalService',
     RefresherExplorationConfirmationModalService],
   ['ReleaseCoordinatorBackendApiService', ReleaseCoordinatorBackendApiService],

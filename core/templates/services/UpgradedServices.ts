@@ -941,8 +941,22 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']
       );
-    upgradedServices['ReadOnlyTopicObjectFactory'] =
-      new ReadOnlyTopicObjectFactory();
+    upgradedServices['ReadOnlyTopic'] = new ReadOnlyTopic(
+      'Sample Topic',
+      'topic_id_123',
+      'A topic for testing.',
+      [],
+      [],
+      [],
+      [],
+      {},
+      {},
+      true,
+      'meta content',
+      'title-fragment',
+      'math'
+    );
+
     upgradedServices['ReviewTestBackendApiService'] =
       new ReviewTestBackendApiService(
         upgradedServices['HttpClient'],
