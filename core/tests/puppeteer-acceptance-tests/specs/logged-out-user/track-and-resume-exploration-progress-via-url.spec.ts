@@ -17,10 +17,10 @@
  * User Journey: Lesson info modal usage, progress tracking, state answering, progress URL generation and usage.
  */
 
-import {UserFactory} from '../../../utilities/common/user-factory';
-import testConstants from '../../../utilities/common/test-constants';
-import {LoggedOutUser} from '../../../utilities/user/logged-out-user';
-import {ExplorationEditor} from '../../../utilities/user/exploration-editor';
+import {UserFactory} from '../../utilities/common/user-factory';
+import testConstants from '../../utilities/common/test-constants';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const PROGRESS_URL_VALIDITY_INFO =

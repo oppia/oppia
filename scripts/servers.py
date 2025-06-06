@@ -772,7 +772,7 @@ def managed_acceptance_tests_server(
     # Check if file there is file at given path, if not then try searching 
     # 'old' directory.
     filepath = os.path.join(
-        puppeteer_acceptance_tests_dir_path, suite_name, 'specs.js')
+        puppeteer_acceptance_tests_dir_path, suite_name + 'spec.ts')
     if not os.path.isfile(filepath):
         puppeteer_acceptance_tests_dir_path = os.path.join(
             puppeteer_acceptance_tests_dir_path, 'old')

@@ -58,8 +58,8 @@ describe('Logged-out User', function () {
       return;
     }
     explorationEditor = await UserFactory.createNewUser(
-      'explorationEditor',
-      'exploration_editor@example.com'
+      'explorationEditorX',
+      'exploration_editorX@example.com'
     );
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
@@ -149,9 +149,18 @@ describe('Logged-out User', function () {
         EXPLORATION_ATTRIBUTION_PRINT
       );
       await loggedOutUser.closeAttributionModal();
-      await loggedOutUser.shareExploration('Facebook', explorationId);
-      await loggedOutUser.shareExploration('Twitter', explorationId);
-      await loggedOutUser.shareExploration('Classroom', explorationId);
+      await loggedOutUser.shareExplorationAndVerifyRedirect(
+        'Facebook',
+        explorationId
+      );
+      await loggedOutUser.shareExplorationAndVerifyRedirect(
+        'Twitter',
+        explorationId
+      );
+      await loggedOutUser.shareExplorationAndVerifyRedirect(
+        'Classroom',
+        explorationId
+      );
 
       await loggedOutUser.embedThisLesson(EXPECTED_EMBED_URL(explorationId));
 

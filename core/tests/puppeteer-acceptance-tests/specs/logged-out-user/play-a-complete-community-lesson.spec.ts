@@ -1,0 +1,125 @@
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Acceptance Test for checking if a learner can play an exploration
+ * in the embedded player.
+ */
+
+import {UserFactory} from '../../utilities/common/user-factory';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+
+describe('Logged-Out Learner', function () {
+  let loggedOutLearner: LoggedOutUser;
+  let explorationEditor: ExplorationEditor;
+  let explorationId: string | null;
+
+  beforeAll(async function () {
+    loggedOutLearner = await UserFactory.createLoggedOutUser();
+    // explorationEditor = await UserFactory.login(
+    //   'exploration_editor@example.com'
+    // );
+
+    if (false) {
+      explorationEditor = await UserFactory.createNewUser(
+        'explorationEditor',
+        'exploration_editor@example.com'
+      );
+
+      // Create a new exploration "What are the place values?" using the
+      // curriculum admin user.
+      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.dismissWelcomeModal();
+      await explorationEditor.addExplorationDescriptionContainingAllRTEComponents();
+      await explorationEditor.addInteraction('Continue Button');
+      await explorationEditor.viewOppiaResponses();
+      await explorationEditor.directLearnersToNewCard('Last Card');
+      await explorationEditor.saveExplorationDraft();
+
+      await explorationEditor.navigateToCard('Last Card');
+      await explorationEditor.updateCardContent(
+        'I hope you enjoyed this exploration! '
+      );
+      await explorationEditor.addInteraction('End Exploration');
+      await explorationEditor.saveExplorationDraft();
+      explorationId = await explorationEditor.publishExplorationWithMetadata(
+        'What are the place values?',
+        'Learn about place values',
+        'Algorithms'
+      );
+
+      if (!explorationId) {
+        throw new Error('Exploration ID is null or undefined.');
+      }
+      // Create two more dummy explorations to test the community library.
+      await explorationEditor.createAndPublishExplorationWithCards(
+        'Dummy Exploration 1',
+        'Algorithms'
+      );
+      await explorationEditor.createAndPublishExplorationWithCards(
+        'Dummy Exploration 2',
+        'Algorithms'
+      );
+    }
+
+    explorationId = 'IrvwEirUhno5';
+  });
+
+  it('should use all RTE components in the exploration', async function () {
+    // Navigate to community library page and expect it to contain 3
+    // different explorations.
+    await loggedOutLearner.navigateToCommunityLibraryPage();
+    await loggedOutLearner.expectSearchResultsToContain([
+      'What are the place values?',
+      'Dummy Exploration 1',
+      'Dummy Exploration 2',
+    ]);
+
+    // Search and play the exploration "What are the place values?".
+    // Expect to be on the exploration player page and there is "Lesson info" text.
+    await loggedOutLearner.searchForLessonInSearchBar(
+      'What are the place values?'
+    );
+    await loggedOutLearner.playLessonFromSearchResults(
+      'What are the place values?'
+    );
+    await loggedOutLearner.expectToBeOnPage(
+      `http://localhost:8181/explore/${explorationId}`
+    );
+
+    // Concept Card RTE
+
+    // Video RTE
+    await loggedOutLearner.expectVideoRTEToBePresent();
+
+    // Link RTE
+    await loggedOutLearner.expectLinkRTEToPresent('https://www.oppia.org');
+
+    // Collapsible RTE
+    await loggedOutLearner.expectCollapsibleRTEToBePresent();
+
+    // Tab RTE
+
+    // Continue to next card and check for lesson player.
+    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.expectGoBackToPreviousCardButton(true);
+    await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
+  });
+
+  afterAll(async function () {
+    // await UserFactory.closeAllBrowsers();
+  });
+});

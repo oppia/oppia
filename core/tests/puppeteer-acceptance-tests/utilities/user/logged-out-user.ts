@@ -332,6 +332,7 @@ const checkpointModalSelector = '.lesson-info-tooltip-add-ons';
 const feedbackSelector = '.e2e-test-conversation-feedback-latest';
 const previousCardButton = '.e2e-test-back-button';
 const hintButtonSelector = '.e2e-test-view-hint';
+const hintModelBodySelector = '.e2e-test-hint-modal-body';
 const gotItButtonSelector = '.e2e-test-learner-got-it-button';
 const responsesDropdownSelector = '.conversation-skin-responses-dropdown-text';
 const responseSelector = 'oppia-interaction-display';
@@ -397,6 +398,11 @@ const blogPaginationPrevSelector = '.e2e-test-pagination-prev-button';
 const blogPostTitleContainerSelector =
   '.e2e-test-blog-post-page-title-container';
 const blogPostContentSelector = '.e2e-test-blog-post-content';
+
+const youtubePlayerSelector = '.e2e-test-youtube-player';
+const collapsibleRTEHeaderSelector = 'e2e-test-collapsible-heading';
+const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -3429,6 +3435,61 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Opens the feedback popup and checks if the feedback form is present.
+   */
+  async openFeedbackPopup(): Promise<void> {
+    await this.page.waitForSelector('nav-options', {visible: true});
+    await this.page.waitForSelector(feedbackPopupSelector, {visible: true});
+    await this.clickOn(feedbackPopupSelector);
+    await this.page.waitForSelector(feedbackTextarea, {visible: true});
+  }
+
+  /**
+   * Write feedback in the feedback popup and submit it.
+   * @param {string} feedback - The feedback to write in the popup.
+   * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
+   * @param {boolean} verifyFeedbackPopup - Whether to verify the feedback popup after submission.
+   * @returns {Promise<void>}
+   */
+  async writeAndSubmitFeedback(
+    feedback: string,
+    stayAnonymous: boolean = false,
+    verifyFeedbackPopup: boolean = true
+  ): Promise<void> {
+    await this.page.waitForSelector(feedbackTextarea, {
+      visible: true,
+    });
+    await this.type(feedbackTextarea, feedback);
+
+    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
+    if (stayAnonymous) {
+      await this.clickOn(stayAnonymousCheckbox);
+    }
+
+    await this.clickOn('Submit');
+
+    if (verifyFeedbackPopup) {
+      await this.verifyFeedbackSubmissionSuccess();
+    }
+  }
+
+  /**
+   * Verifies that the feedback submission was successful by checking for the presence of the feedback popup.
+   * @returns {Promise<void>}
+   */
+  async verifyFeedbackSubmissionSuccess(): Promise<void> {
+    try {
+      await this.page.waitForFunction(
+        'document.querySelector(".oppia-feedback-popup-container") !== null',
+        {timeout: 5000}
+      );
+      showMessage('Feedback submitted successfully');
+    } catch (error) {
+      throw new Error('Feedback was not successfully submitted');
+    }
+  }
+
+  /**
    * Gives feedback on the exploration.
    * @param {string} feedback - The feedback to give on the exploration.
    * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
@@ -3441,27 +3502,8 @@ export class LoggedOutUser extends BaseUser {
     if (process.env.MOBILE === 'true') {
       return;
     }
-    await this.page.waitForSelector('nav-options', {visible: true});
-    await this.clickOn(feedbackPopupSelector);
-    await this.page.waitForSelector(feedbackTextarea, {visible: true});
-    await this.type(feedbackTextarea, feedback);
-
-    // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
-    if (stayAnonymous) {
-      await this.clickOn(stayAnonymousCheckbox);
-    }
-
-    await this.clickOn('Submit');
-
-    try {
-      await this.page.waitForFunction(
-        'document.querySelector(".oppia-feedback-popup-container") !== null',
-        {timeout: 5000}
-      );
-      showMessage('Feedback submitted successfully');
-    } catch (error) {
-      throw new Error('Feedback was not successfully submitted');
-    }
+    await this.openFeedbackPopup();
+    await this.writeAndSubmitFeedback(feedback, stayAnonymous);
   }
 
   /**
@@ -3535,7 +3577,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
    * @param {string | null} explorationId - The id of the exploration.
    */
-  async shareExploration(
+  async shareExplorationAndVerifyRedirect(
     platform: string,
     explorationId: string | null
   ): Promise<void> {
@@ -3580,10 +3622,7 @@ export class LoggedOutUser extends BaseUser {
     await this.closeAttributionModal();
   }
 
-  /**
-   * Function to embed a lesson.
-   */
-  async embedThisLesson(expectedCode: string): Promise<void> {
+  async getEmbedCode(): Promise<string> {
     await this.clickOn(shareExplorationButtonSelector);
 
     await this.waitForStaticAssetsToLoad();
@@ -3593,6 +3632,14 @@ export class LoggedOutUser extends BaseUser {
       embedCodeSelector,
       element => element.textContent
     );
+
+    return embedCode?.trim() || '';
+  }
+  /**
+   * Function to embed a lesson.
+   */
+  async embedThisLesson(expectedCode: string): Promise<void> {
+    let embedCode = await this.getEmbedCode();
     if (embedCode?.trim() !== expectedCode) {
       throw new Error(
         'Embed code does not match the expected code. Expected: ' +
@@ -3674,6 +3721,14 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(previousCardButton);
   }
 
+  async expectGoBackToPreviousCardButton(visibility: boolean = true) {
+    if (visibility) {
+      await this.page.waitForSelector(previousCardButton, {visible: true});
+    } else {
+      await this.page.waitForSelector(previousCardButton, {hidden: true});
+    }
+  }
+
   /**
    * Function to verify if the page does not have any input fields.
    */
@@ -3692,6 +3747,14 @@ export class LoggedOutUser extends BaseUser {
   async viewHint(): Promise<void> {
     await this.page.waitForSelector(hintButtonSelector);
     await this.clickOn(hintButtonSelector);
+  }
+
+  async expectHintToBePresent(): Promise<void> {
+    await this.page.waitForSelector(hintModelBodySelector, {visible: true});
+    const hintModalElement = await this.page.$(hintModelBodySelector);
+    if (!hintModalElement) {
+      throw new Error('Hint modal is not present on the page.');
+    }
   }
 
   /**
@@ -4211,12 +4274,12 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectToBeOnPage(expectedPage: string): Promise<void> {
     await this.waitForStaticAssetsToLoad();
-    const url = await this.page.url();
+    const url = this.page.url();
 
     // Replace spaces in the expectedPage with hyphens.
     const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
 
-    if (!url.includes(expectedPageInUrl.toLowerCase())) {
+    if (!url.toLocaleLowerCase().includes(expectedPageInUrl.toLowerCase())) {
       throw new Error(
         `Expected to be on page ${expectedPage}, but found ${url}`
       );
@@ -4316,8 +4379,102 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to and plays an exploration by its ID.
    * @param {string | null} explorationId - The ID of the exploration to play.
    */
-  async playExploration(explorationId: string | null): Promise<void> {
-    await this.goto(`${baseUrl}/explore/${explorationId as string}`);
+  async playExploration(
+    explorationId: string | null,
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(`${baseUrl}/explore/${explorationId as string}`, verifyURL);
+  }
+
+  async expectStayAnonymousCheckboxToBePresent(
+    status: boolean = true
+  ): Promise<void> {
+    if (status) {
+      await this.page.waitForSelector(stayAnonymousCheckbox, {visible: true});
+      showMessage('Stay anonymous checkbox is present.');
+      return;
+    } else {
+      try {
+        await this.page.waitForSelector(stayAnonymousCheckbox, {visible: true});
+        throw new Error(
+          'Stay anonymous checkbox is present, but it should not be.'
+        );
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          showMessage('Stay anonymous checkbox is not present, as expected.');
+        } else {
+          throw error;
+        }
+      }
+    }
+  }
+
+  async expectContinueToNextCardButtonToBePresent(
+    status: boolean = true
+  ): Promise<void> {
+    if (status) {
+      await this.page.waitForSelector(nextCardButton, {visible: true});
+      showMessage('Continue button is present.');
+      return;
+    } else {
+      try {
+        await this.page.waitForSelector(nextCardButton, {visible: true});
+        throw new Error('Continue button is present, but it should not be.');
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          showMessage('Continue button is not present, as expected.');
+        } else {
+          throw error;
+        }
+      }
+    }
+  }
+
+  async expectVideoRTEToBePresent(): Promise<void> {
+    await this.page.waitForSelector(youtubePlayerSelector, {visible: true});
+  }
+
+  async expectLinkRTEToPresent(linkURL: string): Promise<void> {
+    const linkSelector = `oppia-noninteractive-link a.linkText[href="${linkURL}"]`;
+    await this.page.waitForSelector(linkSelector, {visible: true});
+  }
+
+  async expectCollapsibleRTEToBePresent(
+    header: string = 'Sample Header',
+    content: string = 'You have opened the collapsible block.'
+  ): Promise<void> {
+    await this.page.waitForSelector(collapsibleRTEHeaderSelector, {
+      visible: true,
+    });
+    const collapsibleRTEHeader = await this.page.$(
+      collapsibleRTEHeaderSelector
+    );
+    const collapsibleRTEHeaderText = await this.page.evaluate(
+      element => element.textContent,
+      collapsibleRTEHeader
+    );
+    if (collapsibleRTEHeaderText !== header) {
+      throw new Error(
+        `Expected collapsible RTE header to be ${header}, but it was ${collapsibleRTEHeaderText}`
+      );
+    }
+
+    await this.clickOn(collapsibleRTEHeaderSelector);
+    await this.page.waitForSelector(collapsibleRTEContentSelector, {
+      visible: true,
+    });
+    const collapsibleRTEContent = await this.page.$(
+      collapsibleRTEContentSelector
+    );
+    const collapsibleRTEContentText = await this.page.evaluate(
+      element => element.textContent,
+      collapsibleRTEContent
+    );
+    if (collapsibleRTEContentText.contains(content)) {
+      throw new Error(
+        `Expected collapsible RTE content to be ${content}, but it was ${collapsibleRTEContentText}`
+      );
+    }
   }
 }
 
