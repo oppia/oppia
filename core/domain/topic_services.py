@@ -234,6 +234,8 @@ def apply_change_list(
                 subtopic_page_domain.UpdateSubtopicPagePropertyCmd,
                 change
             )
+            # Here we use cast because we are narrowing down the type from
+            # TopicChange to a specific study guide change command.
             study_guide_property_change_cmd = cast(
                 study_guide_domain.UpdateStudyGuidePropertyCmd,
                 change
