@@ -228,10 +228,16 @@ def apply_change_list(
                 subtopic_page_domain.UpdateSubtopicPagePropertyCmd,
                 change
             )
-            update_study_guide_property_cmd = cast(
-                study_guide_domain.UpdateStudyGuidePropertyCmd,
-                change
-            )
+            update_study_guide_property_cmd = (
+                study_guide_domain
+                .StudyGuideChange
+            )({
+                'cmd': 'update_study_guide_property',
+                'property_name': 'sections_content',
+                'new_value': change.new_value.get('html'),
+                'old_value': 'section_content_1',
+                'subtopic_id': change.subtopic_id
+            })
             if (
                 update_subtopic_page_property_cmd.subtopic_id <
                 topic.next_subtopic_id
@@ -604,25 +610,7 @@ def apply_change_list(
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_html(
                             page_contents)
-                    if study_guide_id not in modified_study_guides.keys():
-                        modified_study_guide_change_cmds[study_guide_id].append(
-                            study_guide_domain.StudyGuideChange({
-                                'cmd': 'update_study_guide_property',
-                                'property_name': 'sections_content',
-                                'new_value': (update_study_guide_sections_content_cmd
-                                              .new_value.get('html')),
-                                'old_value': 'section_content_1',
-                                'subtopic_id': (update_study_guide_sections_content_cmd
-                                                .subtopic_id)
-                            })
-                        )
-                        modified_study_guides[study_guide_id] = (
-                            study_guide_services.get_study_guide_by_id(
-                                topic_id,
-                                (update_study_guide_sections_content_cmd
-                                 .subtopic_id)
-                            )
-                        )
+
                     modified_study_guides[study_guide_id].update_section_content(
                         update_study_guide_sections_content_cmd.new_value.get('html'),
                         'section_content_1',

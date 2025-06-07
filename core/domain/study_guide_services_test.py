@@ -24,8 +24,8 @@ from core import feconf
 from core.constants import constants
 from core.domain import skill_services
 from core.domain import state_domain
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
+from core.domain import study_guide_domain
+from core.domain import study_guide_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -42,8 +42,8 @@ if MYPY: # pragma: no cover
     models.Names.BASE_MODEL, models.Names.SUBTOPIC])
 
 
-class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
-    """Tests for topic domain objects."""
+class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
+    """Tests for study guide services."""
 
     user_id = 'user_id'
     story_id_1 = 'story_1'
@@ -63,21 +63,24 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
 
-        self.subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                self.subtopic_id, self.TOPIC_ID))
-        subtopic_page_services.save_subtopic_page(
-            self.user_id, self.subtopic_page, 'Added subtopic',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': 1,
-                'title': 'Sample',
-                'url_fragment': 'sample-fragment'
+        # Create a study guide
+        self.study_guide = (
+            study_guide_domain.StudyGuide.create_study_guide(
+                self.TOPIC_ID,
+                self.subtopic_id,
+                'heading',
+                'content'))
+        study_guide_services.save_study_guide(
+            self.user_id, self.study_guide, 'Added study guide',
+            [study_guide_domain.StudyGuideChange({
+                'cmd': study_guide_domain.CMD_CREATE_NEW,
+                'topic_id': self.TOPIC_ID,
+                'subtopic_id': self.subtopic_id
             })]
         )
-        self.subtopic_page_id = (
-            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                self.TOPIC_ID, 1))
+        self.study_guide_id = (
+            study_guide_domain.StudyGuide.get_study_guide_id(
+                self.TOPIC_ID, self.subtopic_id))
 
         self.TOPIC_ID_1 = topic_fetchers.get_new_topic_id()
         # Set up topic and subtopic.
@@ -101,420 +104,202 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         # Publish the topic and its stories.
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
-    def test_get_subtopic_page_from_model(self) -> None:
-        subtopic_page_model = subtopic_models.SubtopicPageModel.get(
-            self.subtopic_page_id)
-        subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
-            subtopic_page_model)
-        self.assertEqual(subtopic_page.to_dict(), self.subtopic_page.to_dict())
+    def test_get_study_guide_from_model(self) -> None:
+        study_guide_model = subtopic_models.StudyGuideModel.get(
+            self.study_guide_id)
+        study_guide = study_guide_services.get_study_guide_from_model(
+            study_guide_model)
+        self.assertEqual(study_guide.to_dict(), self.study_guide.to_dict())
 
-    def test_get_subtopic_page_by_id(self) -> None:
-        subtopic_page_1 = subtopic_page_services.get_subtopic_page_by_id(
+    def test_get_study_guide_by_id(self) -> None:
+        study_guide_1 = study_guide_services.get_study_guide_by_id(
             self.TOPIC_ID, self.subtopic_id)
         self.assertEqual(
-            subtopic_page_1.to_dict(), self.subtopic_page.to_dict())
-        # When the subtopic page with the given subtopic id and topic id
+            study_guide_1.to_dict(), self.study_guide.to_dict())
+        
+        # When the study guide with the given subtopic id and topic id
         # doesn't exist.
-        subtopic_page_2 = subtopic_page_services.get_subtopic_page_by_id(
+        study_guide_2 = study_guide_services.get_study_guide_by_id(
             'topic_id', 1, strict=False)
-        self.assertEqual(subtopic_page_2, None)
+        self.assertEqual(study_guide_2, None)
 
-    def test_get_subtopic_pages_with_ids(self) -> None:
+    def test_get_study_guide_by_id_with_version(self) -> None:
+        # Test getting study guide with specific version
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, self.subtopic_id, version=1)
+        self.assertEqual(study_guide.version, 1)
+        
+        # Test getting study guide with non-existent version
+        study_guide_none = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, self.subtopic_id, version=999, strict=False)
+        self.assertIsNone(study_guide_none)
+
+    def test_get_study_guides_with_ids(self) -> None:
         subtopic_ids = [self.subtopic_id]
-        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
+        study_guides = study_guide_services.get_study_guides_with_ids(
             self.TOPIC_ID, subtopic_ids)
         # Ruling out the possibility of None for mypy type checking.
-        assert subtopic_pages[0] is not None
+        assert study_guides[0] is not None
         self.assertEqual(
-            subtopic_pages[0].to_dict(), self.subtopic_page.to_dict())
+            study_guides[0].to_dict(), self.study_guide.to_dict())
+        
         subtopic_ids = [2]
-        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
+        study_guides = study_guide_services.get_study_guides_with_ids(
             self.TOPIC_ID, subtopic_ids)
-        self.assertEqual(subtopic_pages, [None])
+        self.assertEqual(study_guides, [None])
+        
         subtopic_ids = [self.subtopic_id, 2]
-        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
+        study_guides = study_guide_services.get_study_guides_with_ids(
             self.TOPIC_ID, subtopic_ids)
-        expected_subtopic_pages = [self.subtopic_page.to_dict(), None]
+        expected_study_guides = [self.study_guide.to_dict(), None]
         # Ruling out the possibility of None for mypy type checking.
-        assert subtopic_pages[0] is not None
+        assert study_guides[0] is not None
         self.assertEqual(
-            [subtopic_pages[0].to_dict(), subtopic_pages[1]],
-            expected_subtopic_pages)
+            [study_guides[0].to_dict(), study_guides[1]],
+            expected_study_guides)
+        
         subtopic_ids = []
-        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
+        study_guides = study_guide_services.get_study_guides_with_ids(
             self.TOPIC_ID, subtopic_ids)
-        self.assertEqual(subtopic_pages, [])
+        self.assertEqual(study_guides, [])
+        
         subtopic_ids = [2, 2]
-        subtopic_pages = subtopic_page_services.get_subtopic_pages_with_ids(
+        study_guides = study_guide_services.get_study_guides_with_ids(
             self.TOPIC_ID, subtopic_ids)
-        self.assertEqual(subtopic_pages, [None, None])
+        self.assertEqual(study_guides, [None, None])
 
-    def test_get_subtopic_page_contents_by_id(self) -> None:
-        self.subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-            self.TOPIC_ID, 1)
-        recorded_voiceovers: state_domain.RecordedVoiceoversDict = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'test.mp3',
-                        'file_size_bytes': 100,
-                        'needs_update': False,
-                        'duration_secs': 7.213
-                    }
-                }
-            }
-        }
-        expected_page_contents_dict = {
-            'subtitled_html': {
-                'content_id': 'content', 'html': '<p>hello world</p>'
-            },
-            'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': {
-                'translations_mapping': {
-                    'content': {}
-                }
-            }
-        }
-        self.subtopic_page.update_page_contents_html(
-            state_domain.SubtitledHtml.from_dict({
-                'html': '<p>hello world</p>',
-                'content_id': 'content'
-            }))
-        self.subtopic_page.update_page_contents_audio(
-            state_domain.RecordedVoiceovers.from_dict(recorded_voiceovers))
-        subtopic_page_services.save_subtopic_page(
-            self.user_id, self.subtopic_page, 'Updated page contents',
-            [subtopic_page_domain.SubtopicPageChange({
-                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                'subtopic_id': 1,
-                'property_name': 'page_contents_html',
-                'new_value': 'a',
-                'old_value': 'b'
-            })])
-        subtopic_page_contents = (
-            subtopic_page_services.get_subtopic_page_contents_by_id(
-                self.TOPIC_ID, 1))
-        self.assertEqual(
-            subtopic_page_contents.to_dict(), expected_page_contents_dict)
-        subtopic_page_content = (
-            subtopic_page_services.get_subtopic_page_contents_by_id(
-                self.TOPIC_ID, 2, strict=False))
-        self.assertEqual(subtopic_page_content, None)
+    def test_get_study_guide_sections_by_id(self) -> None:
+        sections = study_guide_services.get_study_guide_sections_by_id(
+            self.TOPIC_ID, self.subtopic_id)
+        self.assertEqual(sections, self.study_guide.sections)
+        
+        # When the study guide doesn't exist
+        sections_none = study_guide_services.get_study_guide_sections_by_id(
+            'nonexistent_topic', 999, strict=False)
+        self.assertIsNone(sections_none)
 
-    def test_save_subtopic_page(self) -> None:
-        subtopic_page_1 = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                1, 'topic_id_1'))
-        subtopic_page_services.save_subtopic_page(
-            self.user_id, subtopic_page_1, 'Added subtopic',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': 1,
-                'title': 'Sample',
-                'url_fragment': 'sample-fragment-one'
+    def test_save_study_guide(self) -> None:
+        study_guide_1 = (
+            study_guide_domain.StudyGuide.create_default_study_guide(
+                'topic_id_1', 1))
+        study_guide_services.save_study_guide(
+            self.user_id, study_guide_1, 'Added study guide',
+            [study_guide_domain.StudyGuideChange({
+                'cmd': study_guide_domain.CMD_CREATE_NEW,
+                'topic_id': 'topic_id_1',
+                'subtopic_id': 1
             })])
+        
+        # Test saving with empty change list should raise exception
         with self.assertRaisesRegex(
             Exception, 'Unexpected error: received an invalid change list *'):
-            subtopic_page_services.save_subtopic_page(
-                self.user_id, subtopic_page_1, 'Added subtopic', [])
-        subtopic_page_id_1 = (
-            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+            study_guide_services.save_study_guide(
+                self.user_id, study_guide_1, 'Added study guide', [])
+        
+        study_guide_id_1 = (
+            study_guide_domain.StudyGuide.get_study_guide_id(
                 'topic_id_1', 1))
-        subtopic_page_model_1 = subtopic_models.SubtopicPageModel.get(
-            subtopic_page_id_1)
-        subtopic_page_1.version = 2
-        subtopic_page_model_1.version = 3
-        with self.assertRaisesRegex(Exception, 'Trying to update version *'):
-            subtopic_page_services.save_subtopic_page(
-                self.user_id, subtopic_page_1, 'Added subtopic',
-                [topic_domain.TopicChange({
-                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                    'subtopic_id': 1,
-                    'title': 'Sample',
-                    'url_fragment': 'fragment'
+        study_guide_model_1 = subtopic_models.StudyGuideModel.get(
+            study_guide_id_1)
+        
+        # Test version conflict - trying to update newer version from older
+        study_guide_1.version = 2
+        study_guide_model_1.version = 3
+        with self.assertRaisesRegex(Exception, 'Please reload the page and try again.*'):
+            study_guide_services.save_study_guide(
+                self.user_id, study_guide_1, 'Added study guide',
+                [study_guide_domain.StudyGuideChange({
+                    'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+                    'property_name': 'language_code',
+                    'new_value': 'es',
+                    'old_value': 'en'
                 })])
-        subtopic_page_1.version = 3
-        subtopic_page_model_1.version = 2
+        
+        # Test version conflict - trying to update older version from newer
+        study_guide_1.version = 3
+        study_guide_model_1.version = 2
         with self.assertRaisesRegex(
             Exception, 'Unexpected error: trying to update version *'):
-            subtopic_page_services.save_subtopic_page(
-                self.user_id, subtopic_page_1, 'Added subtopic',
-                [topic_domain.TopicChange({
-                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                    'subtopic_id': 1,
-                    'title': 'Sample',
-                    'url_fragment': 'sample-frag'
+            study_guide_services.save_study_guide(
+                self.user_id, study_guide_1, 'Added study guide',
+                [study_guide_domain.StudyGuideChange({
+                    'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+                    'property_name': 'language_code',
+                    'new_value': 'es',
+                    'old_value': 'en'
                 })])
 
-    def test_commit_log_entry(self) -> None:
-        subtopic_page_commit_log_entry = (
-            subtopic_models.SubtopicPageCommitLogEntryModel.get_commit(
-                self.subtopic_page_id, 1)
-        )
-        # Ruling out the possibility of None for mypy type checking.
-        assert subtopic_page_commit_log_entry is not None
-        self.assertEqual(subtopic_page_commit_log_entry.commit_type, 'create')
-        self.assertEqual(
-            subtopic_page_commit_log_entry.subtopic_page_id,
-            self.subtopic_page_id)
-        self.assertEqual(subtopic_page_commit_log_entry.user_id, self.user_id)
-
-    def test_delete_subtopic_page(self) -> None:
-        subtopic_page_id = (
-            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                self.TOPIC_ID, 1))
-        subtopic_page_services.delete_subtopic_page(
-            self.user_id, self.TOPIC_ID, 1)
+    def test_delete_study_guide(self) -> None:
+        study_guide_id = (
+            study_guide_domain.StudyGuide.get_study_guide_id(
+                self.TOPIC_ID, self.subtopic_id))
+        study_guide_services.delete_study_guide(
+            self.user_id, self.TOPIC_ID, self.subtopic_id)
+        
         with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             re.escape(
-                'Entity for class SubtopicPageModel with id %s not found' % (
-                    subtopic_page_id))):
-            subtopic_models.SubtopicPageModel.get(subtopic_page_id)
+                'Entity for class StudyGuideModel with id %s not found' % (
+                    study_guide_id))):
+            subtopic_models.StudyGuideModel.get(study_guide_id)
+        
+        # Test deleting non-existent study guide
         with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
             re.escape(
-                'Entity for class SubtopicPageModel with id %s not found' % (
-                    subtopic_page_id))):
-            subtopic_page_services.delete_subtopic_page(
-                self.user_id, self.TOPIC_ID, 1)
+                'Entity for class StudyGuideModel with id %s not found' % (
+                    study_guide_id))):
+            study_guide_services.delete_study_guide(
+                self.user_id, self.TOPIC_ID, self.subtopic_id)
 
-    def test_migrate_page_contents_from_v1_to_v2_schema(self) -> None:
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
-        html_content = (
-            '<p>Value</p><oppia-noninteractive-math raw_latex-with-value="&a'
-            'mp;quot;+,-,-,+&amp;quot;" svg_filename-with-value="&a'
-            'mp;quot;abc.svg&amp;quot;"></oppia-noninteractive-math>')
-        expected_html_content = (
-            '<p>Value</p><oppia-noninteractive-math math_content-with-value='
-            '"{&amp;quot;raw_latex&amp;quot;: &amp;quot;+,-,-,+&amp;quot;, &'
-            'amp;quot;svg_filename&amp;quot;: &amp;quot;abc.svg&amp;quot;}">'
-            '</oppia-noninteractive-math>')
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
-            'translations_mapping': {
-                'content1': {},
-                'feedback_1': {}
-            }
-        }
-        recorded_voiceovers = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'test.mp3',
-                        'file_size_bytes': 100,
-                        'needs_update': False,
-                        'duration_secs': 7.213
-                    }
-                }
-            }
-        }
-        page_contents_dict = {
-            'subtitled_html': {
-                'content_id': 'content_0', 'html': html_content
-            },
-            'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict
-        }
-        expected_page_contents_dict = {
-            'subtitled_html': {
-                'content_id': 'content_0', 'html': expected_html_content
-            },
-            'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict
-        }
+    def test_delete_study_guide_with_force_deletion(self) -> None:
+        # Create a new study guide for force deletion test
+        study_guide_temp = (
+            study_guide_domain.StudyGuide.create_default_study_guide(
+                'temp_topic', 2))
+        study_guide_services.save_study_guide(
+            self.user_id, study_guide_temp, 'Added temp study guide',
+            [study_guide_domain.StudyGuideChange({
+                'cmd': study_guide_domain.CMD_CREATE_NEW,
+                'topic_id': 'temp_topic',
+                'subtopic_id': 2
+            })])
+        
+        study_guide_services.delete_study_guide(
+            self.user_id, 'temp_topic', 2, force_deletion=True)
+        
+        study_guide_id = (
+            study_guide_domain.StudyGuide.get_study_guide_id(
+                'temp_topic', 2))
+        with self.assertRaisesRegex(
+            base_models.BaseModel.EntityNotFoundError,
+            re.escape(
+                'Entity for class StudyGuideModel with id %s not found' % (
+                    study_guide_id))):
+            subtopic_models.StudyGuideModel.get(study_guide_id)
 
-        subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')
-        subtopic_page_model = subtopic_models.SubtopicPageModel(
-            id=subtopic_page_id,
-            topic_id=self.TOPIC_ID,
-            page_contents=page_contents_dict,
-            page_contents_schema_version=1,
-            language_code='en'
-        )
-        self.assertEqual(subtopic_page_model.page_contents_schema_version, 1)
-
-        with current_schema_version_swap:
-            subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
-                subtopic_page_model)
-
-        self.assertEqual(subtopic_page.page_contents_schema_version, 2)
-        self.assertEqual(
-            subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
-
-    def test_migrate_page_contents_from_v2_to_v3_schema(self) -> None:
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 3)
-        html_content = (
-            '<oppia-noninteractive-svgdiagram '
-            'svg_filename-with-value="&quot;img1.svg&quot;"'
-            ' alt-with-value="&quot;Image&quot;">'
-            '</oppia-noninteractive-svgdiagram>'
-        )
-        expected_html_content = (
-            '<oppia-noninteractive-image alt-with-value=\'\"Image\"\''
-            ' caption-with-value="&amp;quot;&amp;quot;" '
-            'filepath-with-value=\'\"img1.svg\"\'>'
-            '</oppia-noninteractive-image>')
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
-            'translations_mapping': {
-                'content1': {},
-                'feedback_1': {}
-            }
-        }
-        recorded_voiceovers = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'test.mp3',
-                        'file_size_bytes': 100,
-                        'needs_update': False,
-                        'duration_secs': 7.213
-                    }
-                }
-            }
-        }
-        page_contents_dict = {
-            'subtitled_html': {
-                'content_id': 'content_0', 'html': html_content
-            },
-            'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict
-        }
-        expected_page_contents_dict = {
-            'subtitled_html': {
-                'content_id': 'content_0', 'html': expected_html_content
-            },
-            'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict
-        }
-
-        subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')
-        subtopic_page_model = subtopic_models.SubtopicPageModel(
-            id=subtopic_page_id,
-            topic_id=self.TOPIC_ID,
-            page_contents=page_contents_dict,
-            page_contents_schema_version=2,
-            language_code='en'
-        )
-        self.assertEqual(subtopic_page_model.page_contents_schema_version, 2)
-
-        with current_schema_version_swap:
-            subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
-                subtopic_page_model)
-
-        self.assertEqual(subtopic_page.page_contents_schema_version, 3)
-        self.assertEqual(
-            subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
-
-    def test_migrate_page_contents_from_v3_to_v4_schema(self) -> None:
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 4)
-        expected_html_content = (
-            '<p>1 × 3 😕 😊</p>'
-        )
-        html_content = (
-            '<p>1 Ã— 3 ðŸ˜• ðŸ˜Š</p>'
-        )
-        written_translations_dict: (
-            translation_domain.WrittenTranslationsDict
-        ) = {
-            'translations_mapping': {
-                'content1': {},
-                'feedback_1': {}
-            }
-        }
-        recorded_voiceovers = {
-            'voiceovers_mapping': {
-                'content': {
-                    'en': {
-                        'filename': 'test.mp3',
-                        'file_size_bytes': 100,
-                        'needs_update': False,
-                        'duration_secs': 7.213
-                    }
-                }
-            }
-        }
-        page_contents_dict = {
-            'subtitled_html': {
-                'content_id': 'content_0', 'html': html_content
-            },
-            'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict
-        }
-        expected_page_contents_dict = {
-            'subtitled_html': {
-                'content_id': 'content_0', 'html': expected_html_content
-            },
-            'recorded_voiceovers': recorded_voiceovers,
-            'written_translations': written_translations_dict
-        }
-
-        subtopic_page_id = subtopic_models.SubtopicPageModel.get_new_id('')
-        subtopic_page_model = subtopic_models.SubtopicPageModel(
-            id=subtopic_page_id,
-            topic_id=self.TOPIC_ID,
-            page_contents=page_contents_dict,
-            page_contents_schema_version=3,
-            language_code='en'
-        )
-        self.assertEqual(subtopic_page_model.page_contents_schema_version, 3)
-
-        with current_schema_version_swap:
-            subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
-                subtopic_page_model)
-
-        self.assertEqual(subtopic_page.page_contents_schema_version, 4)
-        self.assertEqual(
-            subtopic_page.page_contents.to_dict(), expected_page_contents_dict)
-
-    def test_cannot_migrate_page_contents_to_latest_schema_with_invalid_version(
-        self
-    ) -> None:
-        current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception,
-            'Sorry, we can only process v1-v2 page schemas at present.')
-
-        subtopic_page_model = subtopic_models.SubtopicPageModel.get(
-            self.subtopic_page_id)
-        subtopic_page_model.page_contents_schema_version = 0
-        subtopic_page_model.commit(self.user_id, '', [])
-
-        with current_schema_version_swap, (
-            assert_raises_regexp_context_manager):
-            subtopic_page_services.get_subtopic_page_from_model(
-                subtopic_page_model)
-
-    def test_get_topic_ids_from_subtopic_page_ids(self) -> None:
+    def test_get_topic_ids_from_study_guide_ids(self) -> None:
         topic_ids = (
-            subtopic_page_services.get_topic_ids_from_subtopic_page_ids(
+            study_guide_services.get_topic_ids_from_study_guide_ids(
                 ['topic1:subtopic1', 'topic2:subtopic2', 'topic1:subtopic3']
             )
         )
-
         self.assertEqual(topic_ids, ['topic1', 'topic2'])
 
-    def test_get_multi_users_subtopic_pages_progress(self) -> None:
+    def test_get_multi_users_study_guides_progress(self) -> None:
         degree_of_mastery = 0.5
         learner_id_1 = 'learner_1'
         learner_id_2 = 'learner_2'
 
-        # Add some subtopic progress for the learner.
+        # Add some skill mastery for the learner
         skill_services.create_user_skill_mastery(
             learner_id_1, 'skill_id_1', degree_of_mastery
         )
 
-        subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
+        study_guide_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
         progress = (
-            subtopic_page_services.get_multi_users_subtopic_pages_progress(
-                [learner_id_1, learner_id_2], [subtopic_page_id]
+            study_guide_services.get_multi_users_study_guides_progress(
+                [learner_id_1, learner_id_2], [study_guide_id]
             )
         )
 
@@ -523,7 +308,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(learner_1_progress), 1)
         self.assertEqual(len(learner_2_progress), 1)
-        self.assertEqual(learner_1_progress[0]['subtopic_id'], 1)
+        self.assertEqual(learner_1_progress[0]['study_guide_id'], 1)
         self.assertEqual(
             learner_1_progress[0]['subtopic_title'], 'Naming Numbers'
         )
@@ -538,8 +323,8 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertIsNone(learner_2_progress[0]['subtopic_mastery'])
 
-    def test_get_learner_group_syllabus_subtopic_page_summaries(self) -> None:
-        subtopic_page_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
+    def test_get_learner_group_syllabus_study_guide_summaries(self) -> None:
+        study_guide_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
         expected_summaries = [{
             'subtopic_id': 1,
             'subtopic_title': 'Naming Numbers',
@@ -553,35 +338,140 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             'classroom_url_fragment': None
         }]
         summaries = (
-            subtopic_page_services
-                .get_learner_group_syllabus_subtopic_page_summaries(
-                    [subtopic_page_id]))
+            study_guide_services
+                .get_learner_group_syllabus_study_guide_summaries(
+                    [study_guide_id]))
         self.assertEqual(summaries, expected_summaries)
 
-    def test_populate_subtopic_page_model_fields(self) -> None:
-        model = subtopic_models.SubtopicPageModel(
-            id=self.subtopic_id,
+    def test_populate_study_guide_model_fields(self) -> None:
+        model = subtopic_models.StudyGuideModel(
+            id=self.study_guide_id,
             topic_id=self.TOPIC_ID,
-            page_contents={},
-            page_contents_schema_version=3,
+            sections=[],
+            sections_schema_version=1,
+            language_code='en',
+            next_content_id_index=0
         )
-        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+        study_guide = study_guide_services.get_study_guide_by_id(
             self.TOPIC_ID, self.subtopic_id)
         populated_model = (
-            subtopic_page_services.populate_subtopic_page_model_fields(
-            model, subtopic_page)
+            study_guide_services.populate_study_guide_model_fields(
+                model, study_guide)
         )
 
-        self.assertEqual(populated_model.topic_id, subtopic_page.topic_id)
+        self.assertEqual(populated_model.topic_id, study_guide.topic_id)
+        expected_sections = []
+        for section in study_guide.sections:
+            expected_sections.append(section.to_dict())
+        self.assertEqual(populated_model.sections, expected_sections)
         self.assertEqual(
-            populated_model.page_contents,
-            subtopic_page.page_contents.to_dict()
-        )
-        self.assertEqual(
-            populated_model.page_contents_schema_version,
-            subtopic_page.page_contents_schema_version
+            populated_model.sections_schema_version,
+            study_guide.sections_schema_version
         )
         self.assertEqual(
             populated_model.language_code,
-            subtopic_page.language_code
+            study_guide.language_code
         )
+
+    def test_get_multi_users_study_guides_progress_with_multiple_skills(self) -> None:
+        """Test progress calculation with multiple skills per subtopic."""
+        learner_id = 'test_learner'
+        
+        # Create skill masteries for both skills in the subtopic
+        skill_services.create_user_skill_mastery(learner_id, 'skill_id_1', 0.8)
+        skill_services.create_user_skill_mastery(learner_id, 'skill_id_2', 0.6)
+
+        study_guide_id = '{}:{}'.format(self.TOPIC_ID_1, 2)  # Second subtopic has skill_id_2
+        progress = study_guide_services.get_multi_users_study_guides_progress(
+            [learner_id], [study_guide_id]
+        )
+
+        learner_progress = progress[learner_id]
+        self.assertEqual(len(learner_progress), 1)
+        # Average of 0.6 (only skill_id_2 is in subtopic 2)
+        self.assertEqual(learner_progress[0]['subtopic_mastery'], 0.6)
+
+    def test_get_multi_users_study_guides_progress_no_skills(self) -> None:
+        """Test progress calculation when user has no skill masteries."""
+        learner_id = 'test_learner_no_skills'
+        
+        study_guide_id = '{}:{}'.format(self.TOPIC_ID_1, 1)
+        progress = study_guide_services.get_multi_users_study_guides_progress(
+            [learner_id], [study_guide_id]
+        )
+
+        learner_progress = progress[learner_id]
+        self.assertEqual(len(learner_progress), 1)
+        self.assertIsNone(learner_progress[0]['subtopic_mastery'])
+
+    def test_get_learner_group_syllabus_study_guide_summaries_multiple_topics(self) -> None:
+        """Test getting summaries for study guides from multiple topics."""
+        # Create another topic
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        topic_2 = topic_domain.Topic.create_default_topic(
+            topic_id_2, 'Another Topic', 'another', 'description', 'frag2')
+        topic_2.subtopics = [
+            topic_domain.Subtopic(
+                1, 'Another Subtopic', ['skill_id_3'], 'image2.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][1], 21132,
+                'another-subtopic-url')]
+        topic_services.save_new_topic(self.admin_id, topic_2)
+        topic_services.publish_topic(topic_id_2, self.admin_id)
+
+        study_guide_ids = [
+            '{}:{}'.format(self.TOPIC_ID_1, 1),
+            '{}:{}'.format(topic_id_2, 1)
+        ]
+        summaries = (
+            study_guide_services
+                .get_learner_group_syllabus_study_guide_summaries(
+                    study_guide_ids))
+        
+        self.assertEqual(len(summaries), 2)
+        # Verify both topics are represented
+        topic_names = [summary['parent_topic_name'] for summary in summaries]
+        self.assertIn('Place Values', topic_names)
+        self.assertIn('Another Topic', topic_names)
+
+    def test_commit_log_entry(self) -> None:
+        """Test that commit log entries are created properly."""
+        study_guide_commit_log_entry = (
+            subtopic_models.StudyGuideCommitLogEntryModel.get_commit(
+                self.study_guide_id, 1)
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert study_guide_commit_log_entry is not None
+        self.assertEqual(study_guide_commit_log_entry.commit_type, 'create')
+        self.assertEqual(
+            study_guide_commit_log_entry.study_guide_id,
+            self.study_guide_id)
+        self.assertEqual(study_guide_commit_log_entry.user_id, self.user_id)
+
+    def test_save_study_guide_increments_version(self) -> None:
+        """Test that saving a study guide increments its version."""
+        original_version = self.study_guide.version
+        
+        # Make a change to the study guide
+        self.study_guide.language_code = 'es'
+        study_guide_services.save_study_guide(
+            self.user_id, self.study_guide, 'Changed language',
+            [study_guide_domain.StudyGuideChange({
+                'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+                'property_name': 'language_code',
+                'new_value': 'es',
+                'old_value': 'en'
+            })])
+        
+        self.assertEqual(self.study_guide.version, original_version + 1)
+
+    def test_get_study_guide_sections_by_id_with_strict_mode(self) -> None:
+        """Test getting study guide sections with strict mode enabled/disabled."""
+        # Test with strict=True (default) - should not raise exception for existing guide
+        sections = study_guide_services.get_study_guide_sections_by_id(
+            self.TOPIC_ID, self.subtopic_id, strict=True)
+        self.assertIsNotNone(sections)
+        
+        # Test with strict=False for non-existent guide
+        sections_none = study_guide_services.get_study_guide_sections_by_id(
+            'nonexistent', 999, strict=False)
+        self.assertIsNone(sections_none)
