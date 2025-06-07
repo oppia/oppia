@@ -63,8 +63,8 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         # Create a study guide.
         self.study_guide = (
             study_guide_domain.StudyGuide.create_study_guide(
-                self.TOPIC_ID,
                 self.subtopic_id,
+                self.TOPIC_ID,
                 'heading',
                 'content'))
         study_guide_services.save_study_guide(
@@ -177,8 +177,8 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
 
     def test_save_study_guide(self) -> None:
         study_guide_1 = (
-            study_guide_domain.StudyGuide.create_default_study_guide(
-                'topic_id_1', 1))
+            study_guide_domain.StudyGuide.create_study_guide(
+                1, 'topic_id_1', 'heading', 'content'))
         study_guide_services.save_study_guide(
             self.user_id, study_guide_1, 'Added study guide',
             [study_guide_domain.StudyGuideChange({
@@ -255,8 +255,8 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
     def test_delete_study_guide_with_force_deletion(self) -> None:
         # Create a new study guide for force deletion test.
         study_guide_temp = (
-            study_guide_domain.StudyGuide.create_default_study_guide(
-                'temp_topic', 2))
+            study_guide_domain.StudyGuide.create_study_guide(
+                2, 'temp_topic', 'heading', 'content'))
         study_guide_services.save_study_guide(
             self.user_id, study_guide_temp, 'Added temp study guide',
             [study_guide_domain.StudyGuideChange({

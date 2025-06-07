@@ -405,7 +405,7 @@ def get_multi_users_study_guides_progress(
                     )
 
                 all_users_study_guide_prog_summaries[user_id].append({
-                    'study_guide_id': subtopic.id,
+                    'subtopic_id': subtopic.id,
                     'subtopic_title': subtopic.title,
                     'parent_topic_id': topic.id,
                     'parent_topic_name': topic.name,
