@@ -447,6 +447,7 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         topic_2 = topic_domain.Topic.create_default_topic(
             topic_id_2, 'Another Topic', 'another', 'description', 'frag2')
         topic_2.thumbnail_filename = 'thumbnail.svg'
+        topic_2.thumbnail_bg_color = '#C6DCDA'
         topic_2.subtopics = [
             topic_domain.Subtopic(
                 1, 'Another Subtopic', ['skill_id_3'], 'image.svg',
