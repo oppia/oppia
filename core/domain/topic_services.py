@@ -245,20 +245,18 @@ def apply_change_list(
                 )
                 modified_subtopic_change_cmds[subtopic_page_id].append(
                     update_subtopic_page_property_cmd)
-            if (
-                update_study_guide_property_cmd.study_guide_id <
-                topic.next_subtopic_id
-            ):
+
                 existing_study_guide_ids_to_be_modified.append(
-                    update_study_guide_property_cmd.study_guide_id)
+                    update_study_guide_property_cmd.subtopic_id)
                 study_guide_id = (
                     study_guide_domain.StudyGuide.get_study_guide_id(
-                        topic_id, update_study_guide_property_cmd.study_guide_id
+                        topic_id, update_study_guide_property_cmd.subtopic_id
                     )
                 )
                 modified_study_guide_change_cmds[study_guide_id].append(
                     update_study_guide_property_cmd
                 )
+
     modified_subtopic_pages_list = (
         subtopic_page_services.get_subtopic_pages_with_ids(
             topic_id, existing_subtopic_page_ids_to_be_modified))
@@ -606,9 +604,28 @@ def apply_change_list(
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_html(
                             page_contents)
+                    if study_guide_id not in modified_study_guides.keys():
+                        modified_study_guide_change_cmds[study_guide_id].append(
+                            study_guide_domain.StudyGuideChange({
+                                'cmd': 'update_study_guide_property',
+                                'property_name': 'sections_content',
+                                'new_value': (update_study_guide_sections_content_cmd
+                                              .new_value.get('html')),
+                                'old_value': 'section_content_1',
+                                'subtopic_id': (update_study_guide_sections_content_cmd
+                                                .subtopic_id)
+                            })
+                        )
+                        modified_study_guides[study_guide_id] = (
+                            study_guide_services.get_study_guide_by_id(
+                                topic_id,
+                                (update_study_guide_sections_content_cmd
+                                 .subtopic_id)
+                            )
+                        )
                     modified_study_guides[study_guide_id].update_section_content(
-                        update_study_guide_sections_content_cmd.old_value.get('content_id'), # pylint: disable=line-too-long
-                        update_study_guide_sections_content_cmd.new_value.get('html'), # pylint: disable=line-too-long
+                        update_study_guide_sections_content_cmd.new_value.get('html'),
+                        'section_content_1',
                     )
 
                 elif (change.property_name ==
@@ -643,18 +660,32 @@ def apply_change_list(
                     study_guide_id = (
                     study_guide_domain.StudyGuide.get_study_guide_id(
                         topic_id, change.subtopic_id))
-                    if ((modified_study_guides[study_guide_id] is None) or
-                        (change.subtopic_id in deleted_subtopic_ids)):
-                        raise Exception(
-                            'The study guide or subtopic with id %s doesn\'t exist' % (
-                                change.subtopic_id))
                     update_study_guide_sections_heading_cmd = cast(
                         study_guide_domain.UpdateStudyGuidePropertySectionsHeadingCmd,  # pylint: disable=line-too-long
                         change
                     )
+                    if study_guide_id not in modified_study_guides.keys():
+                        modified_study_guide_change_cmds[study_guide_id].append(
+                            study_guide_domain.StudyGuideChange({
+                                'cmd': 'update_study_guide_property',
+                                'property_name': 'sections_content',
+                                'new_value': (update_study_guide_sections_heading_cmd
+                                              .new_value),
+                                'old_value': 'section_heading_0',
+                                'subtopic_id': (update_study_guide_sections_heading_cmd
+                                                .subtopic_id)
+                            })
+                        )
+                        modified_study_guides[study_guide_id] = (
+                            study_guide_services.get_study_guide_by_id(
+                                topic_id,
+                                (update_study_guide_sections_heading_cmd
+                                 .subtopic_id)
+                            )
+                        )
                     modified_study_guides[study_guide_id].update_section_heading(
-                        update_study_guide_sections_heading_cmd.old_value.get('content_id'), # pylint: disable=line-too-long
-                        update_study_guide_sections_heading_cmd.new_value.get('unicode_str'), # pylint: disable=line-too-long
+                        update_study_guide_sections_heading_cmd.new_value,
+                        'section_heading_0',
                     )
                 if (update_subtopic_property_cmd.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME):
@@ -806,8 +837,8 @@ def update_topic_and_subtopic_pages(
         if subtopic_id not in newly_created_subtopic_ids:
             subtopic_page_services.delete_subtopic_page(
                 committer_id, topic_id, subtopic_id)
-            study_guide_services.delete_study_guide((
-                committer_id, topic_id, subtopic_id))
+            study_guide_services.delete_study_guide(
+                committer_id, topic_id, subtopic_id)
 
     for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items():
         subtopic_page_change_list = updated_subtopic_pages_change_cmds_dict[
@@ -819,16 +850,13 @@ def update_topic_and_subtopic_pages(
             subtopic_page_services.save_subtopic_page(
                 committer_id, subtopic_page, commit_message,
                 subtopic_page_change_list)
+
     for study_guide_id, study_guide in updated_study_guides_dict.items():
         study_guide_change_list = updated_study_guides_change_cmds_dict[
-            subtopic_page_id]
+            study_guide_id]
         subtopic_id = study_guide.get_subtopic_id_from_study_guide_id()
         # The following condition prevents the creation of subtopic pages that
         # were deleted above.
-        if subtopic_id not in deleted_subtopic_ids:
-            subtopic_page_services.save_subtopic_page(
-                committer_id, subtopic_page, commit_message,
-                subtopic_page_change_list)
         if subtopic_id not in deleted_subtopic_ids:
             study_guide_services.save_study_guide(
                 committer_id, study_guide, commit_message,

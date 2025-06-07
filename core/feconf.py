@@ -164,7 +164,6 @@ class ValidModelNames(enum.Enum):
     AUTH = 'auth'
     STORY = 'story'
     SUBTOPIC = 'subtopic'
-    STUDY_GUIDE = 'study_guide'
     SUGGESTION = 'suggestion'
     TOPIC = 'topic'
     TRANSLATION = 'translation'

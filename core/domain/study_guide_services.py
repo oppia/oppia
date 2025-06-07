@@ -35,7 +35,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import subtopic_models
 
-(subtopic_models,) = models.Registry.import_models([models.Names.STUDY_GUIDE])
+(subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
 
 def get_study_guide_from_model(
@@ -280,7 +280,7 @@ def save_study_guide(
 
     study_guide_model.topic_id = study_guide.topic_id
     sections = []
-    for section in study_guide.sections():
+    for section in study_guide.sections:
         sections.append(section.to_dict())
     study_guide_model.sections = sections
     study_guide_model.language_code = study_guide.language_code
@@ -299,7 +299,7 @@ def delete_study_guide(
     subtopic_id: int,
     force_deletion: bool = False
 ) -> None:
-    """Delete a topic summary model.
+    """Delete a study guide model.
 
     Args:
         committer_id: str. The user who is deleting the study guide.

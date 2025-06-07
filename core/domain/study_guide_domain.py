@@ -25,7 +25,7 @@ from core.domain import change_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
+from typing import Final, List, Literal, Optional, TypedDict, Union
 
 STUDY_GUIDE_PROPERTY_SECTIONS_HEADING: Final = 'sections_heading'
 STUDY_GUIDE_PROPERTY_SECTIONS_CONTENT: Final = 'sections_content'
@@ -47,14 +47,14 @@ class StudyGuideChange(change_domain.BaseChange):
     """Domain object for changes made to study_guide object.
 
     The allowed commands, together with the attributes:
-        - 'create_new' (with topic_id, study_guide_id).
+        - 'create_new' (with topic_id, subtopic_id).
         - 'add_new_section' (
-            with heading_plaintext, content_html, study_guide_id).
+            with heading_plaintext, content_html, subtopic_id).
         - 'delete_section' (
             with heading_content_id, content_content_id,
-            study_guide_id).
+            subtopic_id).
         - 'update_study_guide_property' (
-            with property_name, new_value, old_value, study_guide_id).
+            with property_name, new_value, old_value, subtopic_id).
     """
 
     # The allowed list of study guide properties which can be used in
@@ -66,7 +66,7 @@ class StudyGuideChange(change_domain.BaseChange):
 
     ALLOWED_COMMANDS: List[feconf.ValidCmdDict] = [{
         'name': CMD_CREATE_NEW,
-        'required_attribute_names': ['topic_id', 'study_guide_id'],
+        'required_attribute_names': ['topic_id', 'subtopic_id'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {},
@@ -74,7 +74,7 @@ class StudyGuideChange(change_domain.BaseChange):
     }, {
         'name': CMD_ADD_NEW_SECTION,
         'required_attribute_names': [
-            'heading_plaintext', 'content_html', 'study_guide_id'],
+            'heading_plaintext', 'content_html', 'subtopic_id'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {},
@@ -83,7 +83,7 @@ class StudyGuideChange(change_domain.BaseChange):
         'name': CMD_DELETE_SECTION,
         'required_attribute_names': [
             'heading_content_id', 'content_content_id',
-            'study_guide_id'
+            'subtopic_id'
         ],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
@@ -92,7 +92,7 @@ class StudyGuideChange(change_domain.BaseChange):
     }, {
         'name': CMD_UPDATE_STUDY_GUIDE_PROPERTY,
         'required_attribute_names': [
-            'property_name', 'new_value', 'old_value', 'study_guide_id'],
+            'property_name', 'new_value', 'old_value', 'subtopic_id'],
         'optional_attribute_names': [],
         'user_id_attribute_names': [],
         'allowed_values': {'property_name': STUDY_GUIDE_PROPERTIES},
@@ -119,7 +119,7 @@ class CreateNewStudyGuideCmd(StudyGuideChange):
     """
 
     topic_id: str
-    study_guide_id: int
+    subtopic_id: int
 
 
 class AddNewSectionCmd(StudyGuideChange):
@@ -145,7 +145,7 @@ class UpdateStudyGuidePropertyCmd(StudyGuideChange):
     CMD_UPDATE_STUDY_GUIDE_PROPERTY command.
     """
 
-    study_guide_id: int
+    subtopic_id: int
     property_name: str
     new_value: AllowedUpdateStudyGuidePropertyCmdTypes
     old_value: AllowedUpdateStudyGuidePropertyCmdTypes
@@ -158,10 +158,10 @@ class UpdateStudyGuidePropertySectionsHeadingCmd(StudyGuideChange):
     allowed value.
     """
 
-    study_guide_id: int
+    subtopic_id: int
     property_name: Literal['sections_heading']
-    new_value: state_domain.SubtitledUnicodeDict
-    old_value: state_domain.SubtitledUnicodeDict
+    new_value: str
+    old_value: str
 
 
 class UpdateStudyGuidePropertySectionsContentCmd(StudyGuideChange):
@@ -171,7 +171,7 @@ class UpdateStudyGuidePropertySectionsContentCmd(StudyGuideChange):
     allowed value.
     """
 
-    study_guide_id: int
+    subtopic_id: int
     property_name: Literal['sections_content']
     new_value: state_domain.SubtitledHtmlDict
     old_value: state_domain.SubtitledHtmlDict
@@ -192,7 +192,7 @@ class VersionedStudyGuideSectionsDict(TypedDict):
 
 
 class StudyGuideSection:
-    """Domain object for the sections on a study guide."""
+    """Domain object for the section of a study guide."""
 
     def __init__(
         self,
@@ -225,7 +225,7 @@ class StudyGuideSection:
         content_content_id: str,
         content_html: str
     ) -> StudyGuideSection:
-        """Creates a default study guide sections object.
+        """Creates a default study guide section object.
 
         Returns:
             StudyGuideSection. A default object.
@@ -253,7 +253,7 @@ class StudyGuideSection:
     def from_dict(
         cls, section_dict: StudyGuideSectionDict
     ) -> StudyGuideSection:
-        """Creates a study guide sections object from a dictionary.
+        """Creates a study guide section object from a dictionary.
 
         Args:
             section_dict: dict. The dict representation of
@@ -310,7 +310,7 @@ class StudyGuide:
 
     def __init__(
         self,
-        study_guide_page_id: str,
+        study_guide_id: str,
         topic_id: str,
         sections: List[StudyGuideSection],
         sections_schema_version: int,
@@ -321,8 +321,9 @@ class StudyGuide:
         """Constructs a StudyGuide domain object.
 
         Args:
-            study_guide_page_id: str. The unique ID of the study guide.
-            topic_id: str. The ID of the topic that this study guide is a part of.
+            study_guide_id: str. The unique ID of the study guide.
+            topic_id: str. The ID of the topic that the subtopic containing
+                this study guide is a part of.
             sections: StudyGuideSection. List of sections consisting of heading
                 and content pairs of the to be shown to the user.
             sections_schema_version: int. The schema version for the sections
@@ -333,7 +334,7 @@ class StudyGuide:
                 study guide is written in.
             version: int. The current version of the study guide.
         """
-        self.id = study_guide_page_id
+        self.id = study_guide_id
         self.next_content_id_index = next_content_id_index
         self.topic_id = topic_id
         self.sections = sections
@@ -396,23 +397,24 @@ class StudyGuide:
         }
 
     @classmethod
-    def get_study_guide_page_id(cls, topic_id: str, study_guide_id: int) -> str:
-        """Returns the study guide page id from the topic_id and study_guide_id.
+    def get_study_guide_id(cls, topic_id: str, subtopic_id: int) -> str:
+        """Returns the study_guide_id from the topic_id and subtopic_id.
 
         Args:
             topic_id: str. The id of the topic that the study guide
                 is a part of.
-            study_guide_id: int. The id of the study guide.
+            subtopic_id: int. The id of the subtopic which contains
+                the study guide.
 
         Returns:
-            str. The study_guide_page_id calculated from the given values.
+            str. The study_guide_id calculated from the given values.
         """
-        return '%s-%s' % (topic_id, study_guide_id)
+        return '%s-%s' % (topic_id, subtopic_id)
 
     @classmethod
     def create_study_guide(
         cls,
-        study_guide_id: int,
+        subtopic_id: int,
         topic_id: str,
         heading_plaintext: str,
         content_html: str
@@ -420,9 +422,10 @@ class StudyGuide:
         """Creates a StudyGuide object with default values.
 
         Args:
-            study_guide_id: int. ID of the study guide.
-            topic_id: str. The Id of the topic to which this page is linked
-                with.
+            subtopic_id: int. ID of the subtopic which contains
+                the study guide.
+            topic_id: str. The Id of the topic to which this study guide
+                is linked with.
             heading_plaintext: str. The heading of the first section.
             content_html: str. The content of the first section.
 
@@ -431,9 +434,9 @@ class StudyGuide:
             sections field.
         """
         content_id_generator = translation_domain.ContentIdGenerator()
-        study_guide_page_id = cls.get_study_guide_page_id(
+        study_guide_id = cls.get_study_guide_id(
             topic_id,
-            study_guide_id
+            subtopic_id
         )
         sections = []
         section = StudyGuideSection.create_study_guide_section(
@@ -447,71 +450,18 @@ class StudyGuide:
                     content_html)
         sections.append(section)
         return cls(
-            study_guide_page_id, topic_id,
+            study_guide_id, topic_id,
             sections,
             feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION,
             content_id_generator.next_content_id_index,
             constants.DEFAULT_LANGUAGE_CODE, 1)
 
-    @classmethod
-    def update_sections_from_model(
-        cls,
-        versioned_sections: VersionedStudyGuideSectionsDict,
-        current_version: int
-    ) -> None:
-        """Converts the sections in the sections list contained
-        in the given versioned_sections dict from current_version to
-        current_version + 1. Note that the versioned_sections being
-        passed in is modified in-place.
-
-        Args:
-            versioned_sections: dict. A dict with two keys:
-                - schema_version: str. The schema version for the
-                    sections dict.
-                - sections: List. The list comprising of the study guide
-                    section dicts.
-            current_version: int. The current schema version of sections.
-        """
-        versioned_sections['schema_version'] = current_version + 1
-
-        for i, section in enumerate(versioned_sections['sections']):
-            conversion_fn = getattr(
-                cls, '_convert_section_v%s_dict_to_v%s_dict' % (
-                    current_version, current_version + 1))
-            versioned_sections['sections'][i] = conversion_fn(section)
-
-    @classmethod
-    def convert_html_fields_in_study_guide_sections(
-        cls,
-        study_guide_section_dicts: List[StudyGuideSectionDict],
-        conversion_fn: Callable[[str], str]
-    ) -> List[StudyGuideSectionDict]:
-        """Applies a conversion function on all the html strings in study
-        guide sections to migrate them to a desired state.
-
-        Args:
-            study_guide_section_dicts: List. The list containing dicts of
-                study guide sections.
-            conversion_fn: function. The conversion function to be applied on
-                the study_guide_section_dicts.
+    def get_subtopic_id_from_study_guide_id(self) -> int:
+        """Returns the subtopic_id from the study_guide_id
+            of the object.
 
         Returns:
-            dict. The converted subtopic_page_contents_dict.
-        """
-        new_study_guide_section_dicts = []
-        for section in study_guide_section_dicts:
-            modified_section = section.copy()
-            modified_section['content']['html'] = (
-                conversion_fn(
-                    modified_section['content']['html']))
-            new_study_guide_section_dicts.append(modified_section)
-        return new_study_guide_section_dicts
-
-    def get_study_guide_id_from_study_guide_page_id(self) -> int:
-        """Returns the id from the study guide page id of the object.
-
-        Returns:
-            int. The study_guide_id of the object.
+            int. The subtopic_id of the object.
         """
         return int(self.id[len(self.topic_id) + 1:])
 
@@ -676,13 +626,13 @@ class StudyGuide:
 class StudyGuideSummaryDict(TypedDict):
     """Dictionary representation of StudyGuideSummary domain object."""
 
-    study_guide_id: int
-    study_guide_title: str
+    subtopic_id: int
+    subtopic_title: str
     parent_topic_id: str
     parent_topic_name: str
     thumbnail_filename: Optional[str]
     thumbnail_bg_color: Optional[str]
-    study_guide_mastery: Optional[float]
+    subtopic_mastery: Optional[float]
     parent_topic_url_fragment: Optional[str]
     classroom_url_fragment: Optional[str]
 
@@ -692,40 +642,40 @@ class StudyGuideSummary:
 
     def __init__(
         self,
-        study_guide_id: int,
-        study_guide_title: str,
+        subtopic_id: int,
+        subtopic_title: str,
         parent_topic_id: str,
         parent_topic_name: str,
         thumbnail_filename: Optional[str],
         thumbnail_bg_color: Optional[str],
-        study_guide_mastery: Optional[float],
+        subtopic_mastery: Optional[float],
         parent_topic_url_fragment: Optional[str],
         classroom_url_fragment: Optional[str]
     ):
         """Initialize a StudyGuideSummary object.
 
         Args:
-            study_guide_id: str. The id of the study guide.
-            study_guide_title: str. The title of the study guide.
+            subtopic_id: str. The id of the study guide.
+            subtopic_title: str. The title of the study guide.
             parent_topic_id: str. The id of the parent topic.
             parent_topic_name: str. The name of the parent topic.
             thumbnail_filename: str. The filename of the thumbnail image.
             thumbnail_bg_color: str. The background color of the thumbnail
                 image.
-            study_guide_mastery: float. The mastery score of a user in the
+            subtopic_mastery: float. The mastery score of a user in the
                 study guide.
             parent_topic_url_fragment: str. The url fragment of the parent
                 topic.
             classroom_url_fragment: str. The url fragment of the classroom
                 to which the parent topic belongs.
         """
-        self.study_guide_id = study_guide_id
-        self.study_guide_title = study_guide_title
+        self.subtopic_id = subtopic_id
+        self.subtopic_title = subtopic_title
         self.parent_topic_id = parent_topic_id
         self.parent_topic_name = parent_topic_name
         self.thumbnail_filename = thumbnail_filename
         self.thumbnail_bg_color = thumbnail_bg_color
-        self.study_guide_mastery = study_guide_mastery
+        self.subtopic_mastery = subtopic_mastery
         self.parent_topic_url_fragment = parent_topic_url_fragment
         self.classroom_url_fragment = classroom_url_fragment
 
@@ -736,13 +686,13 @@ class StudyGuideSummary:
             dict. A dict, mapping all fields of StudyGuideSummary instance.
         """
         return {
-            'study_guide_id': self.study_guide_id,
-            'study_guide_title': self.study_guide_title,
+            'subtopic_id': self.subtopic_id,
+            'subtopic_title': self.subtopic_title,
             'parent_topic_id': self.parent_topic_id,
             'parent_topic_name': self.parent_topic_name,
             'thumbnail_filename': self.thumbnail_filename,
             'thumbnail_bg_color': self.thumbnail_bg_color,
-            'study_guide_mastery': self.study_guide_mastery,
+            'subtopic_mastery': self.subtopic_mastery,
             'parent_topic_url_fragment': self.parent_topic_url_fragment,
             'classroom_url_fragment': self.classroom_url_fragment
         }
