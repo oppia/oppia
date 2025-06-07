@@ -1,8 +1,9 @@
 name: Check Issue Assignee CLA
 on:
-  pull_request:
+  pull_request_target:
     types:
       - opened
+      - reopened
   issues:
     types:
       - assigned
@@ -28,18 +29,35 @@ jobs:
         env:
           SHEETS_CRED: '${{ secrets.SHEETS_CRED }}'
           SPREADSHEET_ID: '${{ secrets.SPREADSHEET_ID }}'
-          USERNAME: '${{ github.event.assignee.login }}'
+          USERNAME: '${{ github.event.pull_request.user.login || github.event.assignee.login }}'
         with:
           script: |
-            try {              
-              const sheetsCredJson = JSON.parse(process.env.SHEETS_CRED);
-              const username = process.env.USERNAME;              
+            try {
+              const sheetsCredRaw = process.env.SHEETS_CRED;
+              let sheetsCredJson;
+              try {
+                sheetsCredJson = JSON.parse(sheetsCredRaw);
+                console.log("SHEETS_CRED parsed successfully");
+              } catch (parseError) {
+                console.error("Failed to parse SHEETS_CRED:", parseError.message);
+                console.log("First 10 chars:", sheetsCredRaw.substring(0, 10) + "...");
+                throw parseError;
+              }
+              console.log("SHEETS_CRED loaded successfully");
+              const username = process.env.USERNAME;
               console.log(`Checking CLA signature for user: ${username}`);
-              
+
               const { google } = require('googleapis');
               const { JWT } = require('google-auth-library');
               const { OAuth2Client } = require('google-auth-library');
-              
+
+              if (!sheetsCredJson.installed || !sheetsCredJson.installed.client_id || !sheetsCredJson.installed.client_secret || !sheetsCredJson.refresh_token) {
+                console.error("SHEETS_CRED is missing required credential fields");
+                core.warning("SHEETS_CRED is missing required credential fields");
+                core.setOutput('has-signed-cla', 'true');
+                return;
+              }
+
               const oauth2Client = new OAuth2Client(
                 sheetsCredJson.installed.client_id,
                 sheetsCredJson.installed.client_secret
@@ -49,13 +67,13 @@ jobs:
               });
 
               const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
-
               console.log(`Fetching data from spreadsheet ID: ${process.env.SPREADSHEET_ID}`);
               const response = await sheets.spreadsheets.values.get({
                 spreadsheetId: process.env.SPREADSHEET_ID,
                 range: 'Usernames!A:A',
               });
-              if(!response) {
+
+              if (!response) {
                 console.log("No response from Google Sheets API");
                 core.setOutput('has-signed-cla', 'false');
                 return;
@@ -67,24 +85,28 @@ jobs:
               }
 
               const lowercaseUsername = username.toLowerCase();
-              const hasSignedCla = response.data.values.some(row => 
+              const hasSignedCla = response.data.values.some(row =>
                 row[0] && row[0].toLowerCase() === lowercaseUsername
               );
-              
+
               console.log(`User ${username} has ${hasSignedCla ? '' : 'not '}signed the CLA`);
               core.setOutput('has-signed-cla', hasSignedCla ? 'true' : 'false');
-              
+
+
             } catch (error) {
               console.error("Error during CLA verification:", error);
               core.warning(`CLA check failed: ${error.message}`);
+              // Don't fail the workflow on error, default to allowing the contribution
               core.setOutput('has-signed-cla', 'true');
             }
+
 
       - name: Remove assignee and notify if CLA not signed
         if: steps.check-cla.outputs.has-signed-cla == 'false'
         uses: actions/github-script@v6
         with:
           script: |
+            // Determine if we're handling a PR or an issue
             const isPullRequest = !!context.payload.pull_request;
             const isIssue = !!context.payload.issue;
             const assignee = context.payload.assignee;
@@ -118,6 +140,7 @@ jobs:
               console.log(`Removed assignee ${assignee.login} from issue #${issue.number} due to unsigned CLA`);
 
             } else if (isPullRequest) {
+              // Handle pull request
               const pr = context.payload.pull_request;
               if (!pr) {
                 core.setFailed('Invalid pull request payload');
@@ -133,7 +156,14 @@ jobs:
                 body: commentBody
               });
 
-              console.log(`Commented on PR #${pr.number} due to unsigned CLA`);
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                state: 'closed'
+              });
+
+              console.log(`Closed and commented on PR #${pr.number} due to unsigned CLA`);
             } else {
               core.setFailed('Unknown event type or missing context');
             }
