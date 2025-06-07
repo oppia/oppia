@@ -234,11 +234,12 @@ def apply_change_list(
                 subtopic_page_domain.UpdateSubtopicPagePropertyCmd,
                 change
             )
-            # Here we use cast because we are narrowing down the type from
-            # TopicChange to a specific study guide change command.
-            study_guide_property_change_cmd = cast(
-                study_guide_domain.UpdateStudyGuidePropertyCmd,
-                change
+            # Here we use cast because we are sure that the new_value is
+            # subtitled html as written translations and recorded
+            # voiceovers are not used.
+            subtitled_html = cast(
+                state_domain.SubtitledHtmlDict,
+                update_subtopic_page_property_cmd.new_value
             )
             update_study_guide_property_cmd = (
                 study_guide_domain
@@ -247,12 +248,7 @@ def apply_change_list(
                 'cmd': 'update_study_guide_property',
                 'property_name': 'sections_content',
                 'new_value': (
-                    # We use update_subtopic_page_property_cmd
-                    # here to avoid mypy errors. We will replace
-                    # this with a study guide alternative once
-                    # we start using study guides exclusively.
-                    study_guide_property_change_cmd
-                    .new_value.get('html')
+                    subtitled_html['html']
                 ),
                 'old_value': 'section_content_1',
                 'subtopic_id': (
