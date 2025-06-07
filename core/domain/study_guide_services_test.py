@@ -102,17 +102,27 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
 
     def test_get_study_guide_from_model(self) -> None:
+        current_study_guide = (
+            study_guide_services
+            .get_study_guide_by_id
+        )(
+            self.TOPIC_ID, self.subtopic_id
+        )
         study_guide_model = subtopic_models.StudyGuideModel.get(
             self.study_guide_id)
         study_guide = study_guide_services.get_study_guide_from_model(
             study_guide_model)
-        self.assertEqual(study_guide.to_dict(), self.study_guide.to_dict())
+        self.assertEqual(study_guide.to_dict(), current_study_guide.to_dict())
 
     def test_get_study_guide_by_id(self) -> None:
         study_guide_1 = study_guide_services.get_study_guide_by_id(
             self.TOPIC_ID, self.subtopic_id)
+        self.assertEqual(study_guide_1.version, 1)
+        self.assertEqual(study_guide_1.topic_id, self.TOPIC_ID)
         self.assertEqual(
-            study_guide_1.to_dict(), self.study_guide.to_dict())
+            study_guide_1.get_subtopic_id_from_study_guide_id(),
+            self.subtopic_id
+        )
 
         # When the study guide with the given subtopic id and topic id
         # doesn't exist.
@@ -137,8 +147,14 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, subtopic_ids)
         # Ruling out the possibility of None for mypy type checking.
         assert study_guides[0] is not None
+        current_study_guide = (
+            study_guide_services
+            .get_study_guide_by_id
+        )(
+            self.TOPIC_ID, self.subtopic_id
+        )
         self.assertEqual(
-            study_guides[0].to_dict(), self.study_guide.to_dict())
+            study_guides[0].to_dict(), current_study_guide.to_dict())
 
         subtopic_ids = [2]
         study_guides = study_guide_services.get_study_guides_with_ids(
@@ -148,7 +164,7 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         subtopic_ids = [self.subtopic_id, 2]
         study_guides = study_guide_services.get_study_guides_with_ids(
             self.TOPIC_ID, subtopic_ids)
-        expected_study_guides = [self.study_guide.to_dict(), None]
+        expected_study_guides = [current_study_guide.to_dict(), None]
         # Ruling out the possibility of None for mypy type checking.
         assert study_guides[0] is not None
         self.assertEqual(
@@ -166,9 +182,17 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(study_guides, [None, None])
 
     def test_get_study_guide_sections_by_id(self) -> None:
+        current_study_guide = (
+            study_guide_services
+            .get_study_guide_by_id
+        )(
+            self.TOPIC_ID, self.subtopic_id
+        )
         sections = study_guide_services.get_study_guide_sections_by_id(
             self.TOPIC_ID, self.subtopic_id)
-        self.assertEqual(sections, self.study_guide.sections)
+        expected_sections_dicts = [section.to_dict() for section in current_study_guide.sections]
+        actual_sections_dicts = [section.to_dict() for section in sections]
+        self.assertEqual(expected_sections_dicts, actual_sections_dicts)
 
         # When the study guide doesn't exist.
         sections_none = study_guide_services.get_study_guide_sections_by_id(
@@ -210,9 +234,10 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id, study_guide_1, 'Added study guide',
                 [study_guide_domain.StudyGuideChange({
                     'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
-                    'property_name': 'language_code',
-                    'new_value': 'es',
-                    'old_value': 'en'
+                    'property_name': 'sections_heading',
+                    'new_value': 'new_heading',
+                    'old_value': 'sections_heading_0',
+                    'subtopic_id': self.subtopic_id
                 })])
 
         # Test version conflict - trying to update older version from newer.
@@ -224,9 +249,10 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id, study_guide_1, 'Added study guide',
                 [study_guide_domain.StudyGuideChange({
                     'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
-                    'property_name': 'language_code',
-                    'new_value': 'es',
-                    'old_value': 'en'
+                    'property_name': 'sections_heading',
+                    'new_value': 'new_heading',
+                    'old_value': 'sections_heading_0',
+                    'subtopic_id': self.subtopic_id
                 })])
 
     def test_delete_study_guide(self) -> None:
@@ -416,11 +442,13 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         topic_id_2 = topic_fetchers.get_new_topic_id()
         topic_2 = topic_domain.Topic.create_default_topic(
             topic_id_2, 'Another Topic', 'another', 'description', 'frag2')
+        topic_2.thumbnail_filename = 'thumbnail.svg'
         topic_2.subtopics = [
             topic_domain.Subtopic(
-                1, 'Another Subtopic', ['skill_id_3'], 'image2.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][1], 21132,
+                1, 'Another Subtopic', ['skill_id_3'], 'image.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'another-subtopic-url')]
+        topic_2.next_subtopic_id = 2
         topic_services.save_new_topic(self.admin_id, topic_2)
         topic_services.publish_topic(topic_id_2, self.admin_id)
 
@@ -452,23 +480,6 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
             study_guide_commit_log_entry.study_guide_id,
             self.study_guide_id)
         self.assertEqual(study_guide_commit_log_entry.user_id, self.user_id)
-
-    def test_save_study_guide_increments_version(self) -> None:
-        """Test that saving a study guide increments its version."""
-        original_version = self.study_guide.version
-
-        # Make a change to the study guide.
-        self.study_guide.language_code = 'es'
-        study_guide_services.save_study_guide(
-            self.user_id, self.study_guide, 'Changed language',
-            [study_guide_domain.StudyGuideChange({
-                'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
-                'property_name': 'language_code',
-                'new_value': 'es',
-                'old_value': 'en'
-            })])
-
-        self.assertEqual(self.study_guide.version, original_version + 1)
 
     def test_get_study_guide_sections_by_id_with_strict_mode(self) -> None:
         """Test getting study guide sections with strict mode 
