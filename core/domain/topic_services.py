@@ -192,12 +192,16 @@ def apply_change_list(
             deletion of subtopics.
 
     Returns:
-        tuple(Topic, dict, list(int), list(int), list(SubtopicPageChange)). The
-        modified topic object, the modified study guides dict keyed
+        tuple(Topic, dict, dict, list(int), list(int),
+        list(SubtopicPageChange), list(StudyGuideChange)). The
+        modified topic object, the modified subtopic pages dict keyed
+        by subtopic page id containing the updated domain objects of
+        each subtopic page, the modified study guide dict keyed
         by study guide id containing the updated domain objects of
         each study guide, a list of ids of the deleted subtopics,
-        a list of ids of the newly created subtopics and a list of changes
-        applied to modified study guide.
+        a list of ids of the newly created subtopics, a list of
+        changes applied to modified subtopic page and a list of
+        changes applied to modified study guide.
     """
     topic = topic_fetchers.get_topic_by_id(topic_id)
     newly_created_subtopic_ids: List[int] = []
@@ -588,7 +592,7 @@ def apply_change_list(
                         (change.subtopic_id in deleted_subtopic_ids)):
                     raise Exception(
                         'The study guide or subtopic with id'
-                        ' %s doesn\'t exist' %(
+                        ' %s doesn\'t exist' % (
                             change.subtopic_id))
 
                 if (change.property_name ==
@@ -601,6 +605,10 @@ def apply_change_list(
                         subtopic_page_domain.UpdateSubtopicPagePropertyPageContentsHtmlCmd,  # pylint: disable=line-too-long
                         change
                     )
+                    # Here we use cast because this 'if'
+                    # condition will force change to have type
+                    # UpdateStudyGuidePropertySectionsContentCmd
+                    # once the subtopic is deprecated.
                     update_study_guide_sections_content_cmd = cast(
                         study_guide_domain.UpdateStudyGuidePropertySectionsContentCmd,  # pylint: disable=line-too-long
                         change
@@ -612,8 +620,10 @@ def apply_change_list(
                         subtopic_page_id].update_page_contents_html(
                             page_contents)
 
-                    (modified_study_guides[study_guide_id]
-                     .update_section_content)(
+                    (
+                        modified_study_guides[study_guide_id]
+                        .update_section_content
+                    )(
                         (
                             update_study_guide_sections_content_cmd
                             .new_value.get('html')
@@ -653,11 +663,13 @@ def apply_change_list(
                     study_guide_id = (
                     study_guide_domain.StudyGuide.get_study_guide_id(
                         topic_id, change.subtopic_id))
+                    # Here we use cast because we are narrowing down the type from
+                    # TopicChange to a specific change command.
                     update_study_guide_sections_heading_cmd = cast(
                         study_guide_domain.UpdateStudyGuidePropertySectionsHeadingCmd,  # pylint: disable=line-too-long
                         change
                     )
-                    if study_guide_id not in modified_study_guides.keys():
+                    if study_guide_id not in modified_study_guides:
                         modified_study_guide_change_cmds[study_guide_id].append(
                             study_guide_domain.StudyGuideChange({
                                 'cmd': 'update_study_guide_property',
@@ -676,8 +688,10 @@ def apply_change_list(
                         modified_study_guides[study_guide_id] = (
                             study_guide_services.get_study_guide_by_id(
                                 topic_id,
-                                (update_study_guide_sections_heading_cmd
-                                 .subtopic_id)
+                                (
+                                    update_study_guide_sections_heading_cmd
+                                    .subtopic_id
+                                )
                             )
                         )
                     (

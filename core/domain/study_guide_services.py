@@ -56,9 +56,10 @@ def get_study_guide_from_model(
         'schema_version': study_guide_model.sections_schema_version,
         'sections': copy.deepcopy(study_guide_model.sections)
     }
-    # TODO(#22781): Add migrate_sections_to_latest_schema method call if the model
-    # schema version is not equal to CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
-    # once the migrate_sections_to_latest_schema method is created.
+    # TODO(#22781): Add migrate_sections_to_latest_schema method
+    # call if the model schema version is not equal to
+    # CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION once the
+    # migrate_sections_to_latest_schema method is created.
     sections = []
     for section in versioned_sections['sections']:
         sections.append(

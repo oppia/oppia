@@ -60,7 +60,7 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
 
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
 
-        # Create a study guide
+        # Create a study guide.
         self.study_guide = (
             study_guide_domain.StudyGuide.create_study_guide(
                 self.TOPIC_ID,
@@ -121,7 +121,7 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(study_guide_2, None)
 
     def test_get_study_guide_by_id_with_version(self) -> None:
-        # Test getting study guide with specific version
+        # Test getting study guide with specific version.
         study_guide = study_guide_services.get_study_guide_by_id(
             self.TOPIC_ID, self.subtopic_id, version=1)
         self.assertEqual(study_guide.version, 1)
@@ -202,7 +202,10 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         # Test version conflict - trying to update newer version from older.
         study_guide_1.version = 2
         study_guide_model_1.version = 3
-        with self.assertRaisesRegex(Exception, 'Please reload the page and try again.*'):
+        with self.assertRaisesRegex(
+            Exception,
+            'Please reload the page and try again.*'
+        ):
             study_guide_services.save_study_guide(
                 self.user_id, study_guide_1, 'Added study guide',
                 [study_guide_domain.StudyGuideChange({
@@ -370,7 +373,8 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
             study_guide.language_code
         )
 
-    def test_get_multi_users_study_guides_progress_with_multiple_skills(self) -> None:
+    def test_get_multi_users_study_guides_progress_with_multiple_skills(
+            self) -> None:
         """Test progress calculation with multiple skills per subtopic."""
         learner_id = 'test_learner'
 
@@ -378,8 +382,12 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         skill_services.create_user_skill_mastery(learner_id, 'skill_id_1', 0.8)
         skill_services.create_user_skill_mastery(learner_id, 'skill_id_2', 0.6)
 
-        study_guide_id = '{}:{}'.format(self.TOPIC_ID_1, 2)  # Second subtopic has skill_id_2
-        progress = study_guide_services.get_multi_users_study_guides_progress(
+        # Second subtopic has skill_id_2.
+        study_guide_id = '{}:{}'.format(self.TOPIC_ID_1, 2)
+        progress = (
+            study_guide_services
+            .get_multi_users_study_guides_progress
+        )(
             [learner_id], [study_guide_id]
         )
 
@@ -401,7 +409,8 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(learner_progress), 1)
         self.assertIsNone(learner_progress[0]['subtopic_mastery'])
 
-    def test_get_learner_group_syllabus_study_guide_summaries_multiple_topics(self) -> None:
+    def test_get_learner_group_syllabus_study_guide_summaries_multiple_topics(
+            self) -> None:
         """Test getting summaries for study guides from multiple topics."""
         # Create another topic.
         topic_id_2 = topic_fetchers.get_new_topic_id()
@@ -462,8 +471,11 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.study_guide.version, original_version + 1)
 
     def test_get_study_guide_sections_by_id_with_strict_mode(self) -> None:
-        """Test getting study guide sections with strict mode enabled/disabled."""
-        # Test with strict=True (default) - should not raise exception for existing guide.
+        """Test getting study guide sections with strict mode 
+            enabled/disabled.
+        """
+        # Test with strict=True (default) - should not raise exception
+        # for existing guide.
         sections = study_guide_services.get_study_guide_sections_by_id(
             self.TOPIC_ID, self.subtopic_id, strict=True)
         self.assertIsNotNone(sections)
