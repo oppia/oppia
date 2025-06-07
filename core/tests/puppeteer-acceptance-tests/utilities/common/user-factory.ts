@@ -155,6 +155,14 @@ export class UserFactory {
     return user as TUser & MultipleRoleIntersection<typeof roles>;
   };
 
+  static enableVoiceoverAutogenerationUsingCloudService =
+    async function (): Promise<void> {
+      if (superAdminInstance === null) {
+        superAdminInstance = await UserFactory.createNewSuperAdmin('superAdm');
+      }
+      await superAdminInstance.enableTextToSpeechSynthesisUsingCloudService();
+    };
+
   static createNewUser = async function <
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],
   >(

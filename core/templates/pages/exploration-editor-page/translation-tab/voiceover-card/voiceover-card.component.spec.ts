@@ -923,6 +923,7 @@ describe('Voiceover card component', () => {
       contextService,
       'isExplorationLinkedToStory'
     );
+    component.isVoiceoverAutogenerationEnabledByAdmins = true;
     component.isVoiceoverAutogenerationSupportedForSelectedAccent = true;
     spyOn(
       component,

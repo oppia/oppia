@@ -75,6 +75,8 @@ describe('Exploration Editor', function () {
       [ROLES.VOICEOVER_ADMIN]
     );
 
+    await UserFactory.enableVoiceoverAutogenerationUsingCloudService();
+
     await voiceoverAdmin.addSupportedLanguageAccentPair(
       'English (United States)'
     );
