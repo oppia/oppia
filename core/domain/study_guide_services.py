@@ -56,7 +56,7 @@ def get_study_guide_from_model(
         'schema_version': study_guide_model.sections_schema_version,
         'sections': copy.deepcopy(study_guide_model.sections)
     }
-    # TODO: Add migrate_sections_to_latest_schema method call if the model
+    # TODO(#22781): Add migrate_sections_to_latest_schema method call if the model
     # schema version is not equal to CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
     # once the migrate_sections_to_latest_schema method is created.
     sections = []
@@ -304,7 +304,8 @@ def delete_study_guide(
     Args:
         committer_id: str. The user who is deleting the study guide.
         topic_id: str. The ID of the topic that this study guide belongs to.
-        subtopic_id: int. ID of the subtopic from which the study guide was removed.
+        subtopic_id: int. ID of the subtopic from which the study guide was
+            removed.
         force_deletion: bool. If true, the study guide and its history are
             fully deleted and are unrecoverable. Otherwise, the study guide
             and all its history are marked as deleted, but the corresponding

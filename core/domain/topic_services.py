@@ -587,7 +587,8 @@ def apply_change_list(
                 if ((modified_study_guides[study_guide_id] is None) or
                         (change.subtopic_id in deleted_subtopic_ids)):
                     raise Exception(
-                        'The study guide or subtopic with id %s doesn\'t exist' % (
+                        'The study guide or subtopic with id'
+                        ' %s doesn\'t exist' %(
                             change.subtopic_id))
 
                 if (change.property_name ==
@@ -611,8 +612,12 @@ def apply_change_list(
                         subtopic_page_id].update_page_contents_html(
                             page_contents)
 
-                    modified_study_guides[study_guide_id].update_section_content(
-                        update_study_guide_sections_content_cmd.new_value.get('html'),
+                    (modified_study_guides[study_guide_id]
+                     .update_section_content)(
+                        (
+                            update_study_guide_sections_content_cmd
+                            .new_value.get('html')
+                        ),
                         'section_content_1',
                     )
 
@@ -657,11 +662,15 @@ def apply_change_list(
                             study_guide_domain.StudyGuideChange({
                                 'cmd': 'update_study_guide_property',
                                 'property_name': 'sections_content',
-                                'new_value': (update_study_guide_sections_heading_cmd
-                                              .new_value),
+                                'new_value': (
+                                    update_study_guide_sections_heading_cmd
+                                    .new_value
+                                ),
                                 'old_value': 'section_heading_0',
-                                'subtopic_id': (update_study_guide_sections_heading_cmd
-                                                .subtopic_id)
+                                'subtopic_id': (
+                                    update_study_guide_sections_heading_cmd
+                                    .subtopic_id
+                                )
                             })
                         )
                         modified_study_guides[study_guide_id] = (
@@ -671,7 +680,10 @@ def apply_change_list(
                                  .subtopic_id)
                             )
                         )
-                    modified_study_guides[study_guide_id].update_section_heading(
+                    (
+                        modified_study_guides[study_guide_id]
+                        .update_section_heading
+                    )(
                         update_study_guide_sections_heading_cmd.new_value,
                         'section_heading_0',
                     )

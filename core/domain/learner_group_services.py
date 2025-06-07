@@ -766,6 +766,7 @@ def remove_subtopic_page_reference_from_learner_groups(
         models_to_put)
     learner_group_models.LearnerGroupModel.put_multi(models_to_put)
 
+
 def remove_study_guide_reference_from_learner_groups(
     topic_id: str,
     subtopic_id: int
