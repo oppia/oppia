@@ -663,8 +663,8 @@ def apply_change_list(
                     study_guide_id = (
                     study_guide_domain.StudyGuide.get_study_guide_id(
                         topic_id, change.subtopic_id))
-                    # Here we use cast because we are narrowing down the type from
-                    # TopicChange to a specific change command.
+                    # Here we use cast because we are narrowing down the
+                    # type from TopicChange to a specific change command.
                     update_study_guide_sections_heading_cmd = cast(
                         study_guide_domain.UpdateStudyGuidePropertySectionsHeadingCmd,  # pylint: disable=line-too-long
                         change
