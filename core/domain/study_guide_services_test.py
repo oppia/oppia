@@ -308,7 +308,7 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(learner_1_progress), 1)
         self.assertEqual(len(learner_2_progress), 1)
-        self.assertEqual(learner_1_progress[0]['study_guide_id'], 1)
+        self.assertEqual(learner_1_progress[0]['subtopic_id'], 1)
         self.assertEqual(
             learner_1_progress[0]['subtopic_title'], 'Naming Numbers'
         )

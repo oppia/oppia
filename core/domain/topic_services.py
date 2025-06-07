@@ -238,9 +238,23 @@ def apply_change_list(
             )({
                 'cmd': 'update_study_guide_property',
                 'property_name': 'sections_content',
-                'new_value': change.new_value.get('html'),
+                'new_value': (
+                    # We use update_subtopic_page_property_cmd
+                    # here to avoid mypy errors. We will replace
+                    # this with a study guide alternative once
+                    # we start using study guides exclusively
+                    update_subtopic_page_property_cmd
+                    .new_value.get
+                )('html'),
                 'old_value': 'section_content_1',
-                'subtopic_id': change.subtopic_id
+                'subtopic_id': (
+                    # We use update_subtopic_page_property_cmd
+                    # here to avoid mypy errors. We will replace
+                    # this with a study guide alternative once
+                    # we start using study guides exclusively
+                    update_subtopic_page_property_cmd
+                    .subtopic_id
+                )
             })
             if (
                 update_subtopic_page_property_cmd.subtopic_id <
@@ -256,11 +270,15 @@ def apply_change_list(
                 modified_subtopic_change_cmds[subtopic_page_id].append(
                     update_subtopic_page_property_cmd)
 
+                # We use update_subtopic_page_property_cmd
+                # here to avoid mypy errors. We will replace
+                # this with a study guide alternative once
+                # we start using study guides exclusively
                 existing_study_guide_ids_to_be_modified.append(
-                    update_study_guide_property_cmd.subtopic_id)
+                    update_subtopic_page_property_cmd.subtopic_id)
                 study_guide_id = (
                     study_guide_domain.StudyGuide.get_study_guide_id(
-                        topic_id, update_study_guide_property_cmd.subtopic_id
+                        topic_id, update_subtopic_page_property_cmd.subtopic_id
                     )
                 )
                 modified_study_guide_change_cmds[study_guide_id].append(
@@ -660,15 +678,17 @@ def apply_change_list(
                         update_subtopic_property_cmd.subtopic_id,
                         update_subtopic_property_cmd.new_value
                     )
-                    study_guide_id = (
-                    study_guide_domain.StudyGuide.get_study_guide_id(
-                        topic_id, change.subtopic_id))
                     # Here we use cast because we are narrowing down the
                     # type from TopicChange to a specific change command.
                     update_study_guide_sections_heading_cmd = cast(
                         study_guide_domain.UpdateStudyGuidePropertySectionsHeadingCmd,  # pylint: disable=line-too-long
                         change
                     )
+                    study_guide_id = (
+                    study_guide_domain.StudyGuide.get_study_guide_id(
+                        topic_id,
+                        update_study_guide_sections_heading_cmd.subtopic_id
+                    ))
                     if study_guide_id not in modified_study_guides:
                         modified_study_guide_change_cmds[study_guide_id].append(
                             study_guide_domain.StudyGuideChange({
