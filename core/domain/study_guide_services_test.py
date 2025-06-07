@@ -190,7 +190,11 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         )
         sections = study_guide_services.get_study_guide_sections_by_id(
             self.TOPIC_ID, self.subtopic_id)
-        expected_sections_dicts = [section.to_dict() for section in current_study_guide.sections]
+        expected_sections_dicts = [
+            section.to_dict() for section in (
+                current_study_guide.sections
+            )
+        ]
         actual_sections_dicts = [section.to_dict() for section in sections]
         self.assertEqual(expected_sections_dicts, actual_sections_dicts)
 
