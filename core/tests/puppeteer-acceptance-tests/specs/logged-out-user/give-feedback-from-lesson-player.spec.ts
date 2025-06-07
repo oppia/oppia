@@ -1,0 +1,119 @@
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Acceptance Test for checking if a learner can give a feedback
+ * from the lesson player.
+ */
+
+import testConstants from '../../utilities/common/test-constants';
+import {UserFactory} from '../../utilities/common/user-factory';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+enum INTERACTION_TYPES {
+  CONTINUE_BUTTON = 'Continue Button',
+  END_EXPLORATION = 'End Exploration',
+}
+enum CARD_NAME {
+  INTRODUCTION = 'Introduction',
+  FINAL_CARD = 'Final Card',
+}
+describe('Logged-Out Learner', function () {
+  let loggedOutLearner: LoggedOutUser;
+  let explorationEditor: ExplorationEditor;
+
+  let explorationId: string | null;
+
+  beforeAll(async function () {
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
+    );
+
+    loggedOutLearner = await UserFactory.createLoggedOutUser();
+
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.updateCardContent('Introduction to Algebra');
+    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+
+    // Add a new card with a question.
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.saveExplorationDraft();
+
+    // // Navigate to the new card and update its content.
+    // await explorationEditor.navigateToCard(CARD_NAME.ALGEBRA_BASICS);
+    // await explorationEditor.updateCardContent(
+    //   'Enter a negative number greater than -100.'
+    // );
+    // await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    // await explorationEditor.addResponsesToTheInteraction(
+    //   INTERACTION_TYPES.NUMERIC_INPUT,
+    //   '-99',
+    //   'Perfect!',
+    //   CARD_NAME.FINAL_CARD,
+    //   true
+    // );
+    // await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+    //   'Wrong, try again!'
+    // );
+
+    // await explorationEditor.saveExplorationDraft();
+
+    // Navigate to the final card and update its content.
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.updateCardContent(
+      'We have practiced negative numbers.'
+    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+
+    // Navigate back to the introduction card and save the draft.
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.saveExplorationDraft();
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
+      'Algebra Basics',
+      'Learn the basics of Algebra',
+      'Algorithms'
+    );
+
+    if (!explorationId) {
+      throw new Error('Error publishing exploration successfully.');
+    }
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+
+  it('should be able to give feedback from the lesson player', async function () {
+    await loggedOutLearner.playExploration(explorationId);
+
+    // Open Feedback popup and check "Stay Anonymous" text isn't visible.
+    await loggedOutLearner.openFeedbackPopup();
+    await loggedOutLearner.expectStayAnonymousCheckboxToBePresent(false);
+    await loggedOutLearner.expectScreenshotToMatch('feedbackPopup', __dirname);
+
+    // Give feedback and verify submission success.
+    await loggedOutLearner.writeAndSubmitFeedback(
+      'This is a great lesson!',
+      true,
+      false
+    );
+    await loggedOutLearner.verifyFeedbackSubmissionSuccess();
+  });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
+});

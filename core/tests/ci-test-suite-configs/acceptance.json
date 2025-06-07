@@ -74,7 +74,7 @@
     },
     {
       "name": "logged-in-user/create-and-delete-account",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-in-user/create-and-delete-account.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/create-and-delete-account.spec.ts"
     },
     {
       "name": "logged-in-user/edit-avatar-and-view-exploration-from-profile-page",
@@ -82,11 +82,11 @@
     },
     {
       "name": "logged-in-user/restart-or-continue-exploration-on-revisit",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-in-user/restart-or-continue-exploration-on-revisit.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/restart-or-continue-exploration-on-revisit.spec.ts"
     },
     {
       "name": "logged-in-user/save-an-exploration-to-play-later",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-in-user/save-an-exploration-to-play-later.spec.ts"
+      "module": "core/tests/puppeteer-acceptance/specs-old/logged-in-user/save-an-exploration-to-play-later.spec.ts"
     },
     {
       "name": "logged-in-user/edit-profile-preferences-and-export-their-account",
@@ -98,11 +98,11 @@
     },
     {
       "name": "logged-in-user/give-feedback-rate-and-report-an-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-in-user/give-feedback-rate-and-report-an-exploration.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/give-feedback-rate-and-report-an-exploration.spec.ts"
     },
     {
       "name": "logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard.spec.ts"
     },
     {
       "name": "logged-in-user/subscribe-to-creator-and-view-all-explorations-by-that-creator",
@@ -118,7 +118,7 @@
     },
     {
       "name": "logged-in-user/deny-access-to-pages-without-additional-roles",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-about-page",
@@ -170,7 +170,7 @@
     },
     {
       "name": "logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers.spec.ts"
     },
     {
       "name": "logged-out-user/generate-and-play-automated-voiceovers",
@@ -178,7 +178,7 @@
     },
     {
       "name": "logged-out-user/play-through-lesson-while-getting-feedback-and-hints",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-out-user/play-through-lesson-while-getting-feedback-and-hints.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-through-lesson-while-getting-feedback-and-hints.spec.ts"
     },
     {
       "name": "logged-out-user/visit-classroom-index-page",
@@ -186,7 +186,7 @@
     },
     {
       "name": "logged-out-user/track-and-resume-exploration-progress-via-url",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-out-user/track-and-resume-exploration-progress-via-url.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/track-and-resume-exploration-progress-via-url.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-links-in-oppia-footer",
@@ -247,6 +247,42 @@
     {
       "name": "logged-out-user/view-and-search-blog-posts",
       "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-out-user/view-and-search-blog-posts.spec.ts"
+    },{
+      "name": "logged-out-user/access-exploration-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/access-exploration-player.spec.ts"
+    },{
+      "name": "logged-out-user/give-feedback-from-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/give-feedback-from-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-out-user/play-a-complete-community-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-a-complete-community-lesson.spec.ts"
+    },{
+      "name": "logged-out-user/play-lesson-in-embedded-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-lesson-in-embedded-player.spec.ts"
+    },
+    {"name": "logged-out-user/share-the-lesson-from-lesson-player",
+  "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/share-the-lesson-from-lesson-player.spec.ts"
+    },
+    {
+      "name": "moderator/approve-and-reject-exploration-submissions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/moderator/approve-and-reject-exploration-submissions.spec.ts"
+    },
+    {
+      "name": "moderator/approve-and-reject-blog-post-submissions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/moderator/approve-and-reject-blog-post-submissions.spec.ts"
+    },
+    {
+      "name": "moderator/view-and-manage-user-profile",
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/moderator/view-and-manage-user-profile.spec.ts"
+    },
+    {
+      "name": "moderator/view-and-manage-exploration-feedback",
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/moderator/view-and-manage-exploration-feedback.spec.ts"
+    },
+    {
+      "name": "moderator/view-and-manage-blog-post-feedback",
+      "module": "core/tests/puppeteer-acceptance-tests/specs-old/moderator/view-and-manage-blog-post-feedback.spec.ts"
     },
     {
       "name": "moderator/edit-featured-activities-list",
