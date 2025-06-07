@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model class for creating new frontend instances of ParamMetadata
+ * @fileoverview Model class for creating new frontend instances of read-only-topic
  */
 
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';

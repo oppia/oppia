@@ -31,8 +31,8 @@ import {
 } from 'domain/exploration/read-only-exploration-backend-api.service';
 import {
   ReadOnlyTopicBackendDict,
-  ReadOnlyTopic,
-} from '../../../../domain/topic_viewer/read-only-topic.model';
+  ReadOnlyTopicObjectFactory,
+} from 'domain/topic_viewer/read-only-topic-object.factory';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContextService} from 'services/context.service';
