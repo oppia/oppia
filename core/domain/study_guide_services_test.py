@@ -448,13 +448,13 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
             topic_id_2, 'Another Topic', 'another', 'description', 'frag2')
         topic_2.thumbnail_filename = 'thumbnail.svg'
         topic_2.thumbnail_bg_color = '#C6DCDA'
-        topic_2.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_2.subtopics = [
             topic_domain.Subtopic(
                 1, 'Another Subtopic', ['skill_id_3'], 'image.svg',
                 constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
                 'another-subtopic-url')]
         topic_2.next_subtopic_id = 2
+        topic_2.skill_ids_for_diagnostic_test = ['skill_id_3']
         topic_services.save_new_topic(self.admin_id, topic_2)
         topic_services.publish_topic(topic_id_2, self.admin_id)
 
