@@ -174,9 +174,11 @@ def apply_change_list(
 ) -> Tuple[
     topic_domain.Topic,
     Dict[str, subtopic_page_domain.SubtopicPage],
+    Dict[str, study_guide_domain.StudyGuide],
     List[int],
     List[int],
-    Dict[str, List[subtopic_page_domain.SubtopicPageChange]]
+    Dict[str, List[subtopic_page_domain.SubtopicPageChange]],
+    Dict[str, List[study_guide_domain.StudyGuideChange]]
 ]:
     """Applies a changelist to a topic and returns the result. The incoming
     changelist should not have simultaneuous creations and deletion of
@@ -244,8 +246,8 @@ def apply_change_list(
                     # this with a study guide alternative once
                     # we start using study guides exclusively.
                     update_subtopic_page_property_cmd
-                    .new_value.get
-                )('html'),
+                    .new_value.get('html')
+                ),
                 'old_value': 'section_content_1',
                 'subtopic_id': (
                     # We use update_subtopic_page_property_cmd
