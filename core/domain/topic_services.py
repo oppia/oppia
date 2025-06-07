@@ -249,9 +249,12 @@ def apply_change_list(
                 modified_subtopic_change_cmds[subtopic_page_id].append(
                     update_subtopic_page_property_cmd)
 
-                if(
-                    update_subtopic_page_property_cmd.property_name == 
-                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+                if (
+                    update_subtopic_page_property_cmd.property_name ==
+                    (
+                        subtopic_page_domain
+                        .SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+                    )
                 ):
                     # Here we use cast because we are sure that the new_value is
                     # subtitled html as written translations and recorded
@@ -287,7 +290,8 @@ def apply_change_list(
                         update_subtopic_page_property_cmd.subtopic_id)
                     study_guide_id = (
                         study_guide_domain.StudyGuide.get_study_guide_id(
-                            topic_id, update_subtopic_page_property_cmd.subtopic_id
+                            topic_id,
+                            update_subtopic_page_property_cmd.subtopic_id
                         )
                     )
                     modified_study_guide_change_cmds[study_guide_id].append(
