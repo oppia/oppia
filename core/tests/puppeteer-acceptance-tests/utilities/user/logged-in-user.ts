@@ -184,8 +184,7 @@ const loginPage = '.e2e-test-login-page';
 // Learner dashboard selectors.
 const communityLessonsSectionInLearnerDashboard =
   '.e2e-test-community-lessons-section';
-const homeTabSectionInLearnerDashboard =
-  '.e2e-test-learner-dash-home-tab';
+const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const progressTabSectionInLearnerDashboard =
   '.e2e-test-learner-dash-progress-tab';
 const goalsTabSectionInLearnerDashboard = '.e2e-test-current-goals-section';
@@ -203,10 +202,11 @@ const contributorDashboardContainerSelector =
 const preferencesContainerSelector = '.e2e-test-preferences-container';
 const deleteAccountPage = '.e2e-test-delete-account';
 const deleteMyAcccountButton = '.e2e-test-delete-my-account-button';
-const subjectInterestTagsInPreferencesPage =
-  '.e2e-test-subject-interest-chip';
+const subjectInterestTagsInPreferencesPage = '.e2e-test-subject-interest-chip';
 const explorationLanguagePerferenceChipsSelector =
   '.e2e-test-exploration-language-preference-chips';
+const siteLanguageValueSelector = `${siteLanguageInputSelector} span.mat-select-min-line`;
+const audioLanguageValueSelector = `${audioLanguageInputSelector} span.mat-select-min-line`;
 
 // Profile Page selectors.
 const profileContainerSelector = '.e2e-test-profile-container';
@@ -608,6 +608,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Enters the provided username into the sign up username field and sign in if the username is correct.
    * @param {string} username - The username to enter.
+   * @param {boolean} verifyLogin - Whether to verify the login after entering the username.
    */
   async signInWithUsername(
     username: string,
@@ -1139,18 +1140,22 @@ export class LoggedInUser extends BaseUser {
     await this.type(siteLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
-    // TODO: Fix it
-    await this.page.waitForSelector(
-      '.e2e-test-site-language-selector .mat-select-value-text .mat-select-min-line'
+    // Post-check: Ensure the site language is properly selected.
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(siteLanguageValueSelector);
+    const siteLanguageValueElement = await this.page.$(
+      siteLanguageValueSelector
     );
-
-    // Get the selected language text.
-    const selectedLanguage = await this.page.$eval(
-      '.e2e-test-site-language-selector .mat-select-value-text .mat-select-min-line',
-      el => el?.textContent?.trim()
+    const selectedSiteLanguage = await this.page.evaluate(
+      el => el.textContent?.trim(),
+      siteLanguageValueElement
     );
-
-    expect(selectedLanguage).toBe(language);
+    if (selectedSiteLanguage !== language) {
+      throw new Error(
+        `Preferred Site Language ${language} not added. Found Site Language: ${selectedSiteLanguage}`
+      );
+    }
+    showMessage(`Preferred Site Language updated to: ${selectedSiteLanguage}`);
   }
 
   /**
@@ -1164,14 +1169,23 @@ export class LoggedInUser extends BaseUser {
     await this.type(audioLanguageInputSelector, language);
     await this.page.keyboard.press('Enter');
 
-    // TODO: Fix
-    await this.page.waitForSelector(
-      '.e2e-test-audio-language-selector .mat-select-min-line',
-      {visible: true}
+    // Post-check: Ensure the audio language is properly selected.
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(audioLanguageValueSelector);
+    const audioLanguageValueElement = await this.page.$(
+      audioLanguageValueSelector
     );
-    const selectedLanguage = await this.page.$eval(
-      '.e2e-test-audio-language-selector .mat-select-min-line',
-      el => el?.innerHTML?.trim()
+    const selectedAudioLanguage = await this.page.evaluate(
+      el => el.textContent?.trim(),
+      audioLanguageValueElement
+    );
+    if (selectedAudioLanguage !== language) {
+      throw new Error(
+        `Preferred Audio Language ${language} not selected. Found Audio Language: ${selectedAudioLanguage}`
+      );
+    }
+    showMessage(
+      `Preferred Audio Language updated to: ${selectedAudioLanguage}`
     );
   }
 

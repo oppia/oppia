@@ -56,7 +56,9 @@ describe('Logged-in User', function () {
       ]);
       await loggedInUser1.updatePreferredExplorationLanguage('Hinglish');
       await loggedInUser1.updatePreferredSiteLanguage('English');
-      await loggedInUser1.updatePreferredAudioLanguage('English');
+      await loggedInUser1.updatePreferredAudioLanguage(
+        'Bahasa Indonesia (Indonesian)'
+      );
       await loggedInUser1.updateEmailPreferences([
         'Receive news and updates about the site',
       ]);
