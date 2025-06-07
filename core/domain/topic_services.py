@@ -242,7 +242,7 @@ def apply_change_list(
                     # We use update_subtopic_page_property_cmd
                     # here to avoid mypy errors. We will replace
                     # this with a study guide alternative once
-                    # we start using study guides exclusively
+                    # we start using study guides exclusively.
                     update_subtopic_page_property_cmd
                     .new_value.get
                 )('html'),
@@ -251,7 +251,7 @@ def apply_change_list(
                     # We use update_subtopic_page_property_cmd
                     # here to avoid mypy errors. We will replace
                     # this with a study guide alternative once
-                    # we start using study guides exclusively
+                    # we start using study guides exclusively.
                     update_subtopic_page_property_cmd
                     .subtopic_id
                 )
@@ -273,7 +273,7 @@ def apply_change_list(
                 # We use update_subtopic_page_property_cmd
                 # here to avoid mypy errors. We will replace
                 # this with a study guide alternative once
-                # we start using study guides exclusively
+                # we start using study guides exclusively.
                 existing_study_guide_ids_to_be_modified.append(
                     update_subtopic_page_property_cmd.subtopic_id)
                 study_guide_id = (
