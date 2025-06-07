@@ -322,6 +322,29 @@ def delete_study_guide(
         topic_id, subtopic_id)
 
 
+def does_study_guide_model_exist(topic_id: str, subtopic_id: int) -> bool:
+    """Check if a study guide model exists or not.
+    
+    Args:
+        topic_id: str. The ID of the topic that this study guide belongs to.
+        subtopic_id: int. ID of the subtopic to which the study guide
+            belongs.
+    
+    Returns:
+        boolean. Whether the study guide model exists or not.
+    """
+    study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+        topic_id, subtopic_id)
+    try:
+        study_guide_model = subtopic_models.StudyGuideModel.get(
+            study_guide_id
+        )
+        if study_guide_model is not None:
+            return True
+    except Exception:
+        return False
+
+
 def get_topic_ids_from_study_guide_ids(
     study_guide_ids: List[str]
 ) -> List[str]:

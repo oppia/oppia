@@ -501,3 +501,19 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         sections_none = study_guide_services.get_study_guide_sections_by_id(
             'nonexistent', 999, strict=False)
         self.assertIsNone(sections_none)
+
+    def test_does_study_guide_model_exist_returns_true_for_existing_guide(
+            self) -> None:
+        """Test that the function returns True for an
+            existing study guide."""
+        result = study_guide_services.does_study_guide_model_exist(
+            self.TOPIC_ID, self.subtopic_id)
+        self.assertTrue(result)
+
+    def test_does_study_guide_model_exist_returns_false_for_nonexistent_guide(
+            self) -> None:
+        """Test that the function returns False for a non-existent
+            study guide."""
+        result = study_guide_services.does_study_guide_model_exist(
+            'nonexistent_topic_id', 999)
+        self.assertFalse(result)

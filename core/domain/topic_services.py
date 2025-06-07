@@ -1224,8 +1224,12 @@ def delete_topic(
     for subtopic in topic_model.subtopics:
         subtopic_page_services.delete_subtopic_page(
             committer_id, topic_id, subtopic['id'])
-        study_guide_services.delete_study_guide(
-            committer_id, topic_id, subtopic['id'])
+        if study_guide_services.does_study_guide_model_exist(
+            topic_id,
+            subtopic['id']
+        ):
+            study_guide_services.delete_study_guide(
+                committer_id, topic_id, subtopic['id'])
 
     all_story_references = (
         topic_model.canonical_story_references +
