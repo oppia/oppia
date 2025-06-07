@@ -234,6 +234,10 @@ def apply_change_list(
                 subtopic_page_domain.UpdateSubtopicPagePropertyCmd,
                 change
             )
+            study_guide_property_change_cmd = cast(
+                study_guide_domain.UpdateStudyGuidePropertyCmd,
+                change
+            )
             update_study_guide_property_cmd = (
                 study_guide_domain
                 .StudyGuideChange
@@ -245,7 +249,7 @@ def apply_change_list(
                     # here to avoid mypy errors. We will replace
                     # this with a study guide alternative once
                     # we start using study guides exclusively.
-                    update_subtopic_page_property_cmd
+                    study_guide_property_change_cmd
                     .new_value.get('html')
                 ),
                 'old_value': 'section_content_1',
