@@ -462,6 +462,7 @@
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
 /core/controllers/classroom*.py @oppia/lace-backend-reviewers
 /core/controllers/topic_*.py @oppia/lace-backend-reviewers
+/core/domain/study_guide_domain*.py @oppia/lace-backend-reviewers
 /core/domain/subtopic_page_domain*.py @oppia/lace-backend-reviewers
 /core/domain/subtopic_page_services*.py @oppia/lace-backend-reviewers
 /core/domain/topic*.py @oppia/lace-backend-reviewers
