@@ -19,7 +19,7 @@
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {DeleteMisconceptionModalComponent} from './delete-misconception-modal.component';
-import {Skill, SkillFactory} from 'domain/skill/skill.model';
+import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {AppConstants} from 'app.constants';
 
@@ -31,7 +31,7 @@ class MockActiveModal {
 
 describe('Delete Misconception Modal Component', () => {
   let skillEditorStateService: SkillEditorStateService;
-  let skillFactory: SkillFactory;
+  let skill: Skill;
   let skillObject: Skill;
   let index = 0;
   let component: DeleteMisconceptionModalComponent;
@@ -63,7 +63,7 @@ describe('Delete Misconception Modal Component', () => {
     component = fixture.componentInstance;
     component.index = index;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    skillFactory = TestBed.inject(SkillFactory);
+    skill = TestBed.inject(Skill);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
 
@@ -91,7 +91,7 @@ describe('Delete Misconception Modal Component', () => {
       },
     };
 
-    skillObject = skillFactory.createFromBackendDict({
+    skillObject = skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1],

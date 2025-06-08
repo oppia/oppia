@@ -34,7 +34,7 @@ import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {Skill, SkillBackendDict, SkillFactory} from 'domain/skill/skill.model';
+import {Skill, SkillBackendDict} from 'domain/skill/skill.model';
 import {UrlService} from 'services/contextual/url.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
@@ -80,7 +80,6 @@ describe('Skill editor page', () => {
   let undoRedoService: UndoRedoService;
   let ngbModal: NgbModal;
   let urlService: UrlService;
-  let skillFactory: SkillFactory;
   let skill: Skill;
   let windowRef: WindowRef;
 
@@ -119,7 +118,7 @@ describe('Skill editor page', () => {
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     undoRedoService = TestBed.inject(UndoRedoService);
     urlService = TestBed.inject(UrlService);
-    skillFactory = TestBed.inject(SkillFactory);
+    skill = TestBed.inject(Skill);
     windowRef = TestBed.inject(WindowRef);
   });
 
@@ -174,7 +173,7 @@ describe('Skill editor page', () => {
       superseding_skill_id: '2',
       next_misconception_id: 3,
     };
-    skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(skill);
     localStorageService.removeOpenedEntityEditorBrowserTabsInfo(
       EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS

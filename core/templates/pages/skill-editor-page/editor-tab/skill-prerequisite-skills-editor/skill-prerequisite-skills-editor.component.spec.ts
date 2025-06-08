@@ -35,7 +35,6 @@ import {
 } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {Skill} from 'domain/skill/skill.model';
-import {SkillFactory} from 'domain/skill/skill.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
 import {of} from 'rxjs';
@@ -49,7 +48,7 @@ describe('Skill editor main tab Component', () => {
   let topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
   let ngbModal: NgbModal;
-  let skillFactory: SkillFactory;
+  let skill: Skill;
 
   let topicAndSkillsDashboardDataBackendDict: TopicsAndSkillDashboardData;
   let sampleSkill: Skill;
@@ -90,7 +89,7 @@ describe('Skill editor main tab Component', () => {
     );
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     ngbModal = TestBed.inject(NgbModal);
-    skillFactory = TestBed.inject(SkillFactory);
+    skill = TestBed.inject(Skill);
 
     skillSummaryDict = {
       id: 'skillId1',
@@ -127,7 +126,7 @@ describe('Skill editor main tab Component', () => {
       },
     };
 
-    sampleSkill = skillFactory.createFromBackendDict({
+    sampleSkill = skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1],

@@ -29,13 +29,13 @@ import {
   // eslint-disable-next-line max-len
 } from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 
-import {SkillBackendDict, SkillFactory} from 'domain/skill/skill.model';
+import {SkillBackendDict, Skill} from 'domain/skill/skill.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Extracting Image file names in the state service', () => {
   let eifms: ExtractImageFilenamesFromModelService;
   let eof: ExplorationObjectFactory;
-  let sof: SkillFactory;
+  let sof: Skill;
   let ecs: ContextService;
   let explorationDict: ExplorationBackendDict;
   let ImageFilenamesInExploration: {[x: string]: string[]};
@@ -49,7 +49,7 @@ describe('Extracting Image file names in the state service', () => {
     eof = TestBed.inject(ExplorationObjectFactory);
     ecs = TestBed.inject(ContextService);
     eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
-    sof = TestBed.inject(SkillFactory);
+    sof = TestBed.inject(Skill);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
 
     explorationDict = {

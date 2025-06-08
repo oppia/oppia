@@ -25,7 +25,7 @@ import {
   tick,
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {SkillFactory} from 'domain/skill/skill.model';
+import {Skill} from 'domain/skill/skill.model';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {QuestionPlayerConceptCardModalComponent} from './question-player-concept-card-modal.component';
@@ -67,7 +67,7 @@ describe('Question Player Concept Card Modal component', () => {
     TestBed.configureTestingModule({
       declarations: [QuestionPlayerConceptCardModalComponent],
       providers: [
-        SkillFactory,
+        Skill,
         UrlService,
         {
           provide: UrlService,

@@ -18,14 +18,14 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {Skill, SkillFactory} from 'domain/skill/skill.model';
+import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import {SkillEditorNavbarBreadcrumbComponent} from './skill-editor-navbar-breadcrumb.component';
 
 describe('SkillEditorNavbarBreadcrumbComponent', () => {
   let component: SkillEditorNavbarBreadcrumbComponent;
   let fixture: ComponentFixture<SkillEditorNavbarBreadcrumbComponent>;
-  let skillFactory: SkillFactory;
+  let skill: Skill;
   let skillObject: Skill;
   let skillEditorStateService: SkillEditorStateService;
 
@@ -39,7 +39,7 @@ describe('SkillEditorNavbarBreadcrumbComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SkillEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
-    skillFactory = TestBed.inject(SkillFactory);
+    skill = TestBed.inject(Skill);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     let misconceptionDict1 = {
       id: 2,
@@ -65,7 +65,7 @@ describe('SkillEditorNavbarBreadcrumbComponent', () => {
       },
     };
 
-    skillObject = skillFactory.createFromBackendDict({
+    skillObject = skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1],

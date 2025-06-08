@@ -32,7 +32,7 @@ import {MisconceptionBackendDict} from 'domain/skill/misconception.model';
 import {RubricBackendDict} from 'domain/skill/rubric.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
-import {Skill, SkillFactory} from 'domain/skill/skill.model';
+import {Skill} from 'domain/skill/skill.model';
 import {ImageFile} from 'domain/utilities/image-file.model';
 import {ExtractImageFilenamesFromModelService} from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import {AlertsService} from 'services/alerts.service';
@@ -71,7 +71,7 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
   let assetsBackendApiService: AssetsBackendApiService;
   let ngbActiveModal: NgbActiveModal;
   let skillBackendApiService: SkillBackendApiService;
-  let skillFactory: SkillFactory;
+  let skill: Skill;
   let extractImageFilenamesFromModelService: ExtractImageFilenamesFromModelService;
   let mockImageFile: ImageFile;
   let mockBlob: Blob;
@@ -111,7 +111,7 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
       assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
       ngbActiveModal = TestBed.inject(NgbActiveModal);
       skillBackendApiService = TestBed.inject(SkillBackendApiService);
-      skillFactory = TestBed.inject(SkillFactory);
+      skill = TestBed.inject(Skill);
       extractImageFilenamesFromModelService = TestBed.inject(
         ExtractImageFilenamesFromModelService
       );
@@ -137,7 +137,7 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
           voiceovers_mapping: {},
         },
       };
-      skill = skillFactory.createFromBackendDict({
+      skill = skill.createFromBackendDict({
         id: skillId,
         description: 'Skill 1 description',
         misconceptions: [misconceptionDict1],

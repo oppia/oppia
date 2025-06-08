@@ -25,11 +25,12 @@ import {
   SubtitledHtmlBackendDict,
 } from 'domain/exploration/subtitled-html.model';
 import {Rubric} from 'domain/skill/rubric.model';
-import {SkillFactory} from 'domain/skill/skill.model';
+import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {ContextService} from 'services/context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {TopicsAndSkillsDashboardPageConstants} from '../topics-and-skills-dashboard-page.constants';
+import { ValidatorsService } from 'services/validators.service';
 
 @Component({
   selector: 'oppia-create-new-skill-modal',
@@ -61,12 +62,22 @@ export class CreateNewSkillModalComponent {
     private imageLocalStorageService: ImageLocalStorageService,
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
-    private skillFactory: SkillFactory,
-    private changeDetectorRef: ChangeDetectorRef
+    private skill: Skill,
+    private changeDetectorRef: ChangeDetectorRef,
+    private validatorService: ValidatorsService
   ) {}
 
   ngOnInit(): void {
     this.contextService.setImageSaveDestinationToLocalStorage();
+  }
+
+  hasValidDescription(description: string): boolean {
+    var allowDescriptionToBeBlank = false;
+    return this.validatorService.isValidEntityName(
+      description,
+      false,
+      allowDescriptionToBeBlank
+    );
   }
 
   updateExplanation($event: string): void {
@@ -85,7 +96,7 @@ export class CreateNewSkillModalComponent {
   }
 
   setErrorMessageIfNeeded(): void {
-    if (!this.skillFactory.hasValidDescription(this.newSkillDescription)) {
+    if (!this.hasValidDescription(this.newSkillDescription)) {
       this.errorMsg =
         'Please use a non-empty description consisting of ' +
         'alphanumeric characters, spaces and/or hyphens.';

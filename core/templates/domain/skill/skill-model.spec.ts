@@ -33,7 +33,7 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {AppConstants} from 'app.constants';
 
 describe('Skill factory', () => {
-  let skillFactory: Skill;
+  let skill: Skill;
   let example1 = null;
   let example2 = null;
   let misconceptionDict1: MisconceptionBackendDict;
@@ -48,7 +48,7 @@ describe('Skill factory', () => {
       providers: [NormalizeWhitespacePipe],
     });
     skillDifficulties = AppConstants.SKILL_DIFFICULTIES;
-    skillFactory = TestBed.inject(Skill);
+    skill = TestBed.inject(Skill);
     misconceptionDict1 = {
       id: 2,
       name: 'test name',
@@ -121,7 +121,7 @@ describe('Skill factory', () => {
   });
 
   it('should create a new skill from a backend dictionary', () => {
-    let skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
     expect(skill.getId()).toEqual('1');
     expect(skill.getDescription()).toEqual('test description');
     expect(skill.getMisconceptions()).toEqual([
@@ -142,7 +142,7 @@ describe('Skill factory', () => {
   });
 
   it('should find misconception by id', () => {
-    let skill = skillFactory.createFromBackendDict(skillDict);
+    let skill = skill.createFromBackendDict(skillDict);
     expect(skill.findMisconceptionById(4)).toEqual(
       Misconception.createFromBackendDict(misconceptionDict2)
     );
@@ -151,7 +151,7 @@ describe('Skill factory', () => {
   it(
     'should throw error when there is no misconception' + ' by the given id',
     () => {
-      let skill = skillFactory.createFromBackendDict(skillDict);
+      skill = skill.createFromBackendDict(skillDict);
       expect(() => skill.findMisconceptionById(55)).toThrowError(
         'Could not find misconception with ID: 55'
       );
@@ -159,7 +159,7 @@ describe('Skill factory', () => {
   );
 
   it('should delete a misconception given its id', () => {
-    let skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
     skill.deleteMisconception(2);
     expect(skill.getMisconceptions()).toEqual([
       Misconception.createFromBackendDict(misconceptionDict2),
@@ -167,7 +167,7 @@ describe('Skill factory', () => {
   });
 
   it('should throw validation errors', () => {
-    let skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
     skill
       .getConceptCard()
       .setExplanation(SubtitledHtml.createDefault('', 'review_material'));
@@ -179,7 +179,7 @@ describe('Skill factory', () => {
   });
 
   it('should add/update a rubric given difficulty', () => {
-    let skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
     expect(skill.getRubrics()[0].getExplanations()).toEqual(['explanation']);
     expect(skill.getRubrics().length).toEqual(1);
 
@@ -202,7 +202,7 @@ describe('Skill factory', () => {
   });
 
   it('should get the correct next misconception id', () => {
-    let skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
     expect(skill.getNextMisconceptionId()).toEqual(6);
     skill.deleteMisconception(4);
     expect(skill.getNextMisconceptionId()).toEqual(6);
@@ -222,7 +222,7 @@ describe('Skill factory', () => {
   });
 
   it('should convert to a backend dictionary', () => {
-    let skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
     expect(skill.toBackendDict()).toEqual(skillDict);
   });
 
@@ -230,7 +230,7 @@ describe('Skill factory', () => {
     'should throw error when there are no rubrics' +
       ' for the given difficulty',
     () => {
-      let skill = skillFactory.createFromBackendDict(skillDict);
+      skill = skill.createFromBackendDict(skillDict);
       expect(() => {
         skill.getRubricExplanations('difficult');
       }).toThrowError(
@@ -241,7 +241,7 @@ describe('Skill factory', () => {
   );
 
   it('should get misconception id', () => {
-    let skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
     expect(skill.getMisconceptionId(0)).toBe(2);
     expect(skill.getMisconceptionId(1)).toBe(4);
   });

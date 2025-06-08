@@ -22,7 +22,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {ConceptCardBackendDict} from './concept-card.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {SkillContentsWorkedExamplesChange} from 'domain/editor/undo_redo/change.model';
-import {SkillBackendDict, SkillFactory} from 'domain/skill/skill.model';
+import {SkillBackendDict, Skill} from 'domain/skill/skill.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
@@ -36,7 +36,7 @@ import {EventEmitter} from '@angular/core';
 
 describe('Skill update service', () => {
   let skillUpdateService: SkillUpdateService;
-  let skillFactory: SkillFactory;
+  let skill: Skill;
   let undoRedoService: UndoRedoService;
   let localStorageService: LocalStorageService;
 
@@ -47,14 +47,14 @@ describe('Skill update service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [SkillUpdateService, UndoRedoService, SkillFactory],
+      providers: [SkillUpdateService, UndoRedoService, Skill],
     });
 
     skillUpdateService = TestBed.inject(SkillUpdateService);
     undoRedoService = TestBed.inject(UndoRedoService);
     localStorageService = TestBed.inject(LocalStorageService);
 
-    skillFactory = TestBed.inject(SkillFactory);
+    skill = TestBed.inject(Skill);
 
     const misconceptionDict1 = {
       id: 2,
@@ -129,7 +129,7 @@ describe('Skill update service', () => {
   });
 
   it('should set/unset the skill description', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     skillUpdateService.setSkillDescription(skill, 'new description');
     expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -148,7 +148,7 @@ describe('Skill update service', () => {
   });
 
   it('should set/unset the concept card explanation', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     skillUpdateService.setConceptCardExplanation(
       skill,
@@ -180,7 +180,7 @@ describe('Skill update service', () => {
   });
 
   it('should add a misconception', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
     const aNewMisconceptionDict = {
       id: 7,
       name: 'test name 3',
@@ -206,7 +206,7 @@ describe('Skill update service', () => {
   });
 
   it('should delete a misconception', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     skillUpdateService.deleteMisconception(skill, 2);
     expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -222,7 +222,7 @@ describe('Skill update service', () => {
   });
 
   it('should add a prerequisite skill', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     skillUpdateService.addPrerequisiteSkill(skill, 'skill_2');
     expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -243,7 +243,7 @@ describe('Skill update service', () => {
   });
 
   it('should delete a prerequisite skill', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     skillUpdateService.deletePrerequisiteSkill(skill, 'skill_1');
     expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -259,7 +259,7 @@ describe('Skill update service', () => {
   });
 
   it('should update a rubric', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     expect(skill.getRubrics().length).toEqual(1);
     skillUpdateService.updateRubricForDifficulty(skill, 'Easy', [
@@ -285,7 +285,7 @@ describe('Skill update service', () => {
   });
 
   it('should not update rubric when skill difficulty is invalid', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     expect(skill.getRubrics().length).toEqual(1);
     const nonExistentSkillDifficulty = 'INSANELY EXTREMELY HARD';
@@ -299,7 +299,7 @@ describe('Skill update service', () => {
   });
 
   it('should update the name of a misconception', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     skillUpdateService.updateMisconceptionName(
       skill,
@@ -323,7 +323,7 @@ describe('Skill update service', () => {
   });
 
   it('should update the notes of a misconception', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     skillUpdateService.updateMisconceptionNotes(
       skill,
@@ -347,7 +347,7 @@ describe('Skill update service', () => {
   });
 
   it('should update the feedback of a misconception', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     skillUpdateService.updateMisconceptionFeedback(
       skill,
@@ -375,7 +375,7 @@ describe('Skill update service', () => {
   });
 
   it('should update the feedback of a misconception', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     skillUpdateService.updateMisconceptionMustBeAddressed(
       skill,
@@ -399,7 +399,7 @@ describe('Skill update service', () => {
   });
 
   it('should add a worked example', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     const newExample: WorkedExampleBackendDict = {
       question: {
@@ -441,7 +441,7 @@ describe('Skill update service', () => {
   });
 
   it('should delete a worked example', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     skillUpdateService.deleteWorkedExample(skill, 0);
 
@@ -467,7 +467,7 @@ describe('Skill update service', () => {
   });
 
   it('should update a worked example', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     const modifiedExample1 = {
       question: {
@@ -510,7 +510,7 @@ describe('Skill update service', () => {
   });
 
   it('should update all worked examples within a skill', () => {
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
 
     const oldWorkedExamples = cloneDeep(
       skill.getConceptCard().getWorkedExamples()
@@ -572,7 +572,7 @@ describe('Skill update service', () => {
       skillEditorBrowserTabsInfo.doesSomeTabHaveUnsavedChanges()
     ).toBeFalse();
 
-    const skill = skillFactory.createFromBackendDict(skillDict);
+    skill = skill.createFromBackendDict(skillDict);
     skillUpdateService.setSkillDescription(skill, 'new description');
 
     expect(

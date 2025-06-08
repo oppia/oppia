@@ -23,7 +23,7 @@ import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {SkillCreationService} from 'components/entity-creation-services/skill-creation.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SkillFactory} from 'domain/skill/skill.model';
+import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {ContextService} from 'services/context.service';
 import {CreateNewSkillModalComponent} from './create-new-skill-modal.component';
@@ -32,7 +32,7 @@ describe('Create new skill modal', () => {
   let fixture: ComponentFixture<CreateNewSkillModalComponent>;
   let componentInstance: CreateNewSkillModalComponent;
   let contextService: ContextService;
-  let skillFactory: SkillFactory;
+  let skill: Skill;
   let testObj: SubtitledHtml = SubtitledHtml.createDefault(
     'test_html',
     'test_id'
@@ -54,7 +54,7 @@ describe('Create new skill modal', () => {
     fixture = TestBed.createComponent(CreateNewSkillModalComponent);
     componentInstance = fixture.componentInstance;
     contextService = TestBed.inject(ContextService);
-    skillFactory = TestBed.inject(SkillFactory);
+    skill = TestBed.inject(Skill);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     skillCreationService = TestBed.inject(SkillCreationService);
@@ -92,7 +92,7 @@ describe('Create new skill modal', () => {
   });
 
   it('should set error message if needed', () => {
-    spyOn(skillFactory, 'hasValidDescription').and.returnValue(false);
+    spyOn(skill, 'hasValidDescription').and.returnValue(false);
     componentInstance.skillDescriptionExists = false;
     componentInstance.setErrorMessageIfNeeded();
     expect(componentInstance.errorMsg).toEqual(
@@ -144,7 +144,7 @@ describe('Create new skill modal', () => {
   });
 
   it('should create new skill modal', () => {
-    spyOn(skillFactory, 'hasValidDescription').and.returnValue(true);
+    spyOn(skill, 'hasValidDescription').and.returnValue(true);
     componentInstance.skillDescriptionExists = false;
     spyOn(ngbActiveModal, 'close');
     componentInstance.createNewSkill();

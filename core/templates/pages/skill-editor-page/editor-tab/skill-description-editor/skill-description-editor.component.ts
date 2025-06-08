@@ -26,9 +26,10 @@ import {
 } from '@angular/core';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {Skill, SkillFactory} from 'domain/skill/skill.model';
+import {Skill} from 'domain/skill/skill.model';
 import {AppConstants} from 'app.constants';
 import {SkillRights} from 'domain/skill/skill-rights.model';
+import { ValidatorsService } from 'services/validators.service';
 
 @Component({
   selector: 'oppia-skill-description-editor',
@@ -44,14 +45,23 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   skillRights!: SkillRights;
-  skill!: Skill;
   tmpSkillDescription!: string;
   skillDescriptionEditorIsShown: boolean = false;
   constructor(
     private skillUpdateService: SkillUpdateService,
     private skillEditorStateService: SkillEditorStateService,
-    private skillFactory: SkillFactory
+    private skill: Skill,
+    private validatorService: ValidatorsService
   ) {}
+
+  hasValidDescription(description: string): boolean {
+    var allowDescriptionToBeBlank = false;
+    return this.validatorService.isValidEntityName(
+      description,
+      false,
+      allowDescriptionToBeBlank
+    );
+  }
 
   canEditSkillDescription(): boolean {
     return this.skillRights.canEditSkillDescription();
@@ -65,7 +75,7 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
     if (newSkillDescription === this.skill.getDescription()) {
       return;
     }
-    if (this.skillFactory.hasValidDescription(newSkillDescription)) {
+    if (this.hasValidDescription(newSkillDescription)) {
       this.skillDescriptionEditorIsShown = false;
       this.skillUpdateService.setSkillDescription(
         this.skill,
