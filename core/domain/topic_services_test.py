@@ -33,6 +33,8 @@ from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import study_guide_domain
+from core.domain import study_guide_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
@@ -1420,6 +1422,28 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': {
                     'html': '<p>New Value</p>',
                     'content_id': 'content'
+                }
+            }),
+        ]
+        with self.assertRaisesRegex(
+            Exception, 'The subtopic with id 2 doesn\'t exist'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin, self.TOPIC_ID, changelist,
+                'Done some changes.')
+
+        # The following is an invalid command as subtopic with id 2 was
+        # deleted in the previous step.
+        changelist = [
+            study_guide_domain.StudyGuideChange({
+                'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+                'property_name': (
+                    study_guide_domain
+                    .STUDY_GUIDE_PROPERTY_SECTIONS_CONTENT),
+                'old_value': 'sections_content_3',
+                'subtopic_id': 2,
+                'new_value': {
+                    'html': '<p>New Value</p>',
+                    'content_id': 'sections_content_3'
                 }
             }),
         ]

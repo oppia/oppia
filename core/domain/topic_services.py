@@ -614,16 +614,13 @@ def apply_change_list(
                 study_guide_id = (
                     study_guide_domain.StudyGuide.get_study_guide_id(
                         topic_id, change.subtopic_id))
-                if ((modified_subtopic_pages[subtopic_page_id] is None) or
-                        (change.subtopic_id in deleted_subtopic_ids)):
+                if (
+                        (modified_subtopic_pages[subtopic_page_id] is None) or
+                        (modified_study_guides[study_guide_id] is None) or
+                        (change.subtopic_id in deleted_subtopic_ids)
+                    ):
                     raise Exception(
                         'The subtopic with id %s doesn\'t exist' % (
-                            change.subtopic_id))
-                if ((modified_study_guides[study_guide_id] is None) or
-                        (change.subtopic_id in deleted_subtopic_ids)):
-                    raise Exception(
-                        'The study guide or subtopic with id'
-                        ' %s doesn\'t exist' % (
                             change.subtopic_id))
 
                 if (change.property_name ==
