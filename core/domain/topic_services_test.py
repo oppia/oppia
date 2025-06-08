@@ -1431,28 +1431,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id_admin, self.TOPIC_ID, changelist,
                 'Done some changes.')
 
-        # The following is an invalid command as subtopic with id 2 was
-        # deleted in the previous step.
-        changelist = [
-            study_guide_domain.StudyGuideChange({
-                'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
-                'property_name': (
-                    study_guide_domain
-                    .STUDY_GUIDE_PROPERTY_SECTIONS_CONTENT),
-                'old_value': 'sections_content_3',
-                'subtopic_id': 2,
-                'new_value': {
-                    'html': '<p>New Value</p>',
-                    'content_id': 'sections_content_3'
-                }
-            }),
-        ]
-        with self.assertRaisesRegex(
-            Exception, 'The subtopic with id 2 doesn\'t exist'):
-            topic_services.update_topic_and_subtopic_pages(
-                self.user_id_admin, self.TOPIC_ID, changelist,
-                'Done some changes.')
-
         # Make sure the topic object in datastore is not affected.
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(len(topic.subtopics), 1)

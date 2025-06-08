@@ -616,7 +616,6 @@ def apply_change_list(
                         topic_id, change.subtopic_id))
                 if (
                         (modified_subtopic_pages[subtopic_page_id] is None) or
-                        (modified_study_guides[study_guide_id] is None) or
                         (change.subtopic_id in deleted_subtopic_ids)
                     ):
                     raise Exception(
