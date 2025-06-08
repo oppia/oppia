@@ -21,7 +21,6 @@ import errno
 import getpass
 from http import client
 import io
-import json
 import os
 import platform
 import re

@@ -191,7 +191,7 @@ def get_acceptance_test_suites_from_acceptance_directory() -> List[TestSuiteDict
         ACCEPTANCE_TEST_SPECS_DIRECTORY, ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD]:
         acceptance_test_files = glob.glob(
             os.path.join(test_specs_directory, '**/*.spec.ts'))
-        
+
         for module in acceptance_test_files:
             acceptance_test_suite_name = os.path.relpath(
                 module, test_specs_directory).replace('.spec.ts', '')

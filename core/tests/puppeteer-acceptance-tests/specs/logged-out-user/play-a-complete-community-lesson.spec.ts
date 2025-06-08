@@ -31,9 +31,6 @@ describe('Logged-Out Learner', function () {
 
   beforeAll(async function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
-    // explorationEditor = await UserFactory.login(
-    //   'exploration_editor@example.com'
-    // );
 
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
@@ -110,18 +107,18 @@ describe('Logged-Out Learner', function () {
       `http://localhost:8181/explore/${explorationId}`
     );
 
-    // Concept Card RTE
+    // Concept Card RTE.
 
-    // Video RTE
+    // Video RTE.
     await loggedOutLearner.expectVideoRTEToBePresent();
 
-    // Link RTE
+    // Link RTE.
     await loggedOutLearner.expectLinkRTEToPresent('https://www.oppia.org');
 
-    // Collapsible RTE
+    // Collapsible RTE.
     await loggedOutLearner.expectCollapsibleRTEToBePresent();
 
-    // Tab RTE
+    // Tab RTE.
 
     // Continue to next card and check for lesson player.
     await loggedOutLearner.continueToNextCard();

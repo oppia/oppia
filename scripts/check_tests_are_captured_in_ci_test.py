@@ -271,7 +271,8 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             return self.temp_directory.name
         os_getcwd_swap = self.swap(os, 'getcwd', mock_get_cwd)
 
-        with self.acceptance_test_specs_directory_swap, self.acceptance_test_specs_old_directory_swap, os_getcwd_swap:
+        with (self.acceptance_test_specs_directory_swap, 
+              self.acceptance_test_specs_old_directory_swap, os_getcwd_swap):
             acceptance_test_suites = (
                 check_tests_are_captured_in_ci
                     .get_acceptance_test_suites_from_acceptance_directory())
@@ -287,7 +288,8 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             ['test2/acceptance_suite2'])
         os_getcwd_swap = self.swap(os, 'getcwd', mock_get_cwd)
 
-        with self.acceptance_test_specs_directory_swap, self.acceptance_test_specs_old_directory_swap, os_getcwd_swap:
+        with (self.acceptance_test_specs_directory_swap, 
+              self.acceptance_test_specs_old_directory_swap, os_getcwd_swap):
             with acceptance_test_suites_that_are_not_run_in_ci_swap:
                 acceptance_test_suites = (
                     check_tests_are_captured_in_ci

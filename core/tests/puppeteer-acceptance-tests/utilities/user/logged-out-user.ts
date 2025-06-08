@@ -4385,7 +4385,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * TODO: Update naming to be more descriptive and start with expect.
+   * TODO(#22716): Update naming to be more descriptive and start with expect.
    * Verifies that the feedback submission was successful by checking for the presence of the feedback popup.
    * @returns {Promise<void>}
    */

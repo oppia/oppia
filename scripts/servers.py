@@ -759,13 +759,13 @@ def managed_acceptance_tests_server(
             suite names.
     """
     available_suites = {}
-    with open(common.ACCEPTANCE_TEST_CONFIG_FILE_PATH, 'r') as f:
+    with open(common.ACCEPTANCE_TEST_CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
         filedata = json.load(f)
         for suite_type in filedata:
             suites = filedata[suite_type]
             for suite in suites:
                 available_suites[suite['name']] = suite['module']
-    if suite_name not in available_suites.keys():
+    if suite_name not in available_suites:
         raise Exception('Invalid suite name: %s' % suite_name)
 
     os.environ['HEADLESS'] = 'true' if headless else 'false'
