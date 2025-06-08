@@ -23,7 +23,6 @@ import {showMessage} from '../common/show-message';
 import {error} from 'console';
 import fs from 'fs';
 import path from 'path';
-import {title} from 'process';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -280,10 +279,10 @@ export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
 };
 
-type TabContent = {
+interface TabContent {
   title: string;
   content: string;
-};
+}
 
 const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-unpublished_exploration-v';
@@ -2869,56 +2868,56 @@ export class ExplorationEditor extends BaseUser {
   }
 
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
-    // Click on RTE
+    // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOn(stateEditSelector);
 
-    // Add Bold text
+    // Add Bold text.
     await this.clickOnCKEditorOptionWithTitle('Bold');
     await this.type(stateContentInputField, 'Bold text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnCKEditorOptionWithTitle('Bold'); // To toggle off bold
+    await this.clickOnCKEditorOptionWithTitle('Bold');
 
-    // Add Italic text
+    // Add Italic text.
     await this.clickOnCKEditorOptionWithTitle('Italic');
     await this.type(stateContentInputField, 'Italic text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnCKEditorOptionWithTitle('Italic'); // To toggle off italic
+    await this.clickOnCKEditorOptionWithTitle('Italic');
 
-    // Add Numbered List
+    // Add Numbered List.
     await this.clickOnCKEditorOptionWithTitle('Numbered List');
     await this.type(stateContentInputField, 'Numbered List Item 1');
     await this.page.keyboard.press('Enter');
     await this.type(stateContentInputField, 'Numbered List Item 2');
     await this.page.keyboard.press('Enter');
-    await this.page.keyboard.press('Enter'); // To ensure the list is properly formatted
+    await this.page.keyboard.press('Enter');
 
-    // Add Bulleted List
+    // Add Bulleted List.
     await this.clickOnCKEditorOptionWithTitle('Bulleted List');
     await this.type(stateContentInputField, 'Bulleted List Item 1');
     await this.page.keyboard.press('Enter');
     await this.type(stateContentInputField, 'Bulleted List Item 2');
     await this.page.keyboard.press('Enter');
-    await this.page.keyboard.press('Enter'); // To ensure the list is properly formatted
-
-    // Add Pre formatted Text
-    await this.clickOnCKEditorOptionWithTitle('Pre');
-    await this.type(stateContentInputField, 'Pre formatted text');
-    await this.clickOnCKEditorOptionWithTitle('Pre'); // To toggle off pre formatted text
     await this.page.keyboard.press('Enter');
 
-    // Add Block Quote
+    // Add Pre formatted Text.
+    await this.clickOnCKEditorOptionWithTitle('Pre');
+    await this.type(stateContentInputField, 'Pre formatted text');
+    await this.clickOnCKEditorOptionWithTitle('Pre');
+    await this.page.keyboard.press('Enter');
+
+    // Add Block Quote.
     await this.clickOnCKEditorOptionWithTitle('Block Quote');
     await this.type(stateContentInputField, 'Block Quote text');
     await this.page.keyboard.press('Enter');
-    await this.clickOnCKEditorOptionWithTitle('Block Quote'); // To toggle off block quote
+    await this.clickOnCKEditorOptionWithTitle('Block Quote');
 
-    // Add Collapsible Block
+    // Add Collapsible Block.
     await this.addCollapsibleBlockRTE();
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
-    // Add Image
+    // Add Image.
     await this.addImageRTE(
       testConstants.data.profilePicture,
       'Test Image',
@@ -2928,17 +2927,17 @@ export class ExplorationEditor extends BaseUser {
 
     await this.page.keyboard.press('ArrowRight');
 
-    // Video
+    // Video.
     await this.addVideoRTE('https://www.youtube.com/watch?v=0tRc75S9MFU');
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
-    // Add LinkEnter
+    // Add LinkEnter.
     await this.addTextWithLinkRTE('Oppia', 'https://www.oppia.org');
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
-    // Math Formula
+    // Math Formula.
     await this.clickOnCKEditorOptionWithTitle('Insert mathematical formula');
     await this.waitForNetworkIdle();
     const textareaElement = await this.page.$(
@@ -2949,7 +2948,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
-    // Concept Card
+    // Concept Card.
     await this.clickOnCKEditorOptionWithTitle('Insert Concept Card Link');
     await this.waitForNetworkIdle();
     const skillSearchElement = await this.page.$(skillNameInput);
@@ -2960,7 +2959,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
-    // Tab Contents
+    // Tab Contents.
     await this.addTabContentsRTE();
     await this.page.keyboard.press('ArrowRight');
 
@@ -2985,7 +2984,7 @@ export class ExplorationEditor extends BaseUser {
 
     const helperModel = await this.page.$('oppia-rte-helper-modal');
 
-    // Get Fields
+    // Get Fields.
     const inputs = await helperModel?.$$('input.e2e-test-text-input');
     const linkInput = inputs?.[0];
     const linkTextInput = inputs?.[1];
@@ -3010,7 +3009,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     const helperModel = await this.page.$('oppia-rte-helper-modal');
 
-    // Get Fields
+    // Get Fields.
     const imageDescriptionInput = await helperModel?.$(descriptionBoxSelector);
     const imageCaptionInput = await helperModel?.$(textInputSelector);
 
@@ -3035,7 +3034,7 @@ export class ExplorationEditor extends BaseUser {
 
     const helperModel = await this.page.$('oppia-rte-helper-modal');
 
-    // Get Fields
+    // Get Fields.
     const videoUrlInput = await helperModel?.$(textInputField);
 
     if (videoUrlInput) {

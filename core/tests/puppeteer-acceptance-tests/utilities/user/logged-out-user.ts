@@ -4448,7 +4448,9 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
-  async expectGoBackToPreviousCardButton(visibility: boolean = true) {
+  async expectGoBackToPreviousCardButton(
+    visibility: boolean = true
+  ): Promise<void> {
     if (visibility) {
       await this.page.waitForSelector(previousCardButton, {visible: true});
     } else {
@@ -4500,7 +4502,7 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
-  async expectLessonInfoTextToBePresent(status: boolean = true) {
+  async expectLessonInfoTextToBePresent(status: boolean = true): Promise<void> {
     if (status) {
       await this.page.waitForSelector(lessonInfoButton, {visible: true});
       showMessage('Lesson info text is present.');

@@ -265,26 +265,6 @@
   "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/share-the-lesson-from-lesson-player.spec.ts"
     },
     {
-      "name": "moderator/approve-and-reject-exploration-submissions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/moderator/approve-and-reject-exploration-submissions.spec.ts"
-    },
-    {
-      "name": "moderator/approve-and-reject-blog-post-submissions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/moderator/approve-and-reject-blog-post-submissions.spec.ts"
-    },
-    {
-      "name": "moderator/view-and-manage-user-profile",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/moderator/view-and-manage-user-profile.spec.ts"
-    },
-    {
-      "name": "moderator/view-and-manage-exploration-feedback",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/moderator/view-and-manage-exploration-feedback.spec.ts"
-    },
-    {
-      "name": "moderator/view-and-manage-blog-post-feedback",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/moderator/view-and-manage-blog-post-feedback.spec.ts"
-    },
-    {
       "name": "moderator/edit-featured-activities-list",
       "module": "core/tests/puppeteer-acceptance-tests/specs-old/moderator/edit-featured-activities-list.spec.ts"
     },
