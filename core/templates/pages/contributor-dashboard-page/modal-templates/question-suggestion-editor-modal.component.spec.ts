@@ -112,7 +112,6 @@ describe('Question Suggestion Editor Modal Component', () => {
   let questionObjectFactory: QuestionObjectFactory;
   let questionUndoRedoService: QuestionUndoRedoService;
   let siteAnalyticsService: SiteAnalyticsService;
-  let skill: Skill;
   let stateEditorService: StateEditorService;
   let question: Question;
   let questionId: string;
