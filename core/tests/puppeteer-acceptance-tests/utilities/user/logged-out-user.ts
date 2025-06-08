@@ -1883,6 +1883,25 @@ export class LoggedOutUser extends BaseUser {
     await this.page.reload();
   }
 
+  async expectLanguageDropdownToBePresent(
+    status: boolean = true
+  ): Promise<void> {
+    const languageDropdownElement = await this.page.$(languageDropdown);
+    if (status && !languageDropdownElement) {
+      throw new Error(
+        'The language dropdown was expected to be present on the page, but it is not.'
+      );
+    } else if (!status && languageDropdownElement) {
+      throw new Error(
+        'The language dropdown was expected to be absent on the page, but it is present.'
+      );
+    } else {
+      showMessage(
+        `The language dropdown is ${status ? 'present' : 'not present'} on the page.`
+      );
+    }
+  }
+
   /**
    * Function to click the Partner With Us button in the Partnerships page
    * and check if it opens the Partnerships Google form.
@@ -4474,6 +4493,25 @@ export class LoggedOutUser extends BaseUser {
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           showMessage('Continue button is not present, as expected.');
+        } else {
+          throw error;
+        }
+      }
+    }
+  }
+
+  async expectLessonInfoTextToBePresent(status: boolean = true) {
+    if (status) {
+      await this.page.waitForSelector(lessonInfoButton, {visible: true});
+      showMessage('Lesson info text is present.');
+      return;
+    } else {
+      try {
+        await this.page.waitForSelector(lessonInfoButton, {visible: true});
+        throw new Error('Lesson info text is present, but it should not be.');
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          showMessage('Lesson info text is not present, as expected.');
         } else {
           throw error;
         }

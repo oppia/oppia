@@ -23,6 +23,7 @@ import {showMessage} from '../common/show-message';
 import {error} from 'console';
 import fs from 'fs';
 import path from 'path';
+import {title} from 'process';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -263,6 +264,8 @@ const descriptionBoxSelector = 'textarea.e2e-test-description-box';
 const textInputSelector = 'input.e2e-test-text-input';
 const closeButtonForExtraModel = '.e2e-test-close-rich-text-component-editor';
 
+const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
+
 enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
@@ -275,6 +278,11 @@ enum INTERACTION_TABS {
 
 export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
+};
+
+type TabContent = {
+  title: string;
+  content: string;
 };
 
 const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
@@ -2828,6 +2836,38 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
+  async addTabContentsRTE(tabContents: TabContent[] = []): Promise<void> {
+    await this.clickOnCKEditorOptionWithTitle('Insert tabs');
+
+    await this.waitForNetworkIdle();
+    const helperModel = await this.page.$('oppia-rte-helper-modal');
+
+    const tabTitleInputElements = await helperModel?.$$(
+      'input.e2e-test-text-input'
+    );
+    const tabContentInputElements = await helperModel?.$$(
+      stateContentInputField
+    );
+
+    showMessage(tabContentInputElements?.length + ' tab contents found.');
+    showMessage(tabTitleInputElements?.length + ' tab titles found.');
+
+    for (let i = 0; i < tabContents.length; i++) {
+      if (i > 1) {
+        await this.clickOn('.e2e-test-add-list-entry');
+      }
+      await this.clearAllTextFrom(
+        `oppia-rte-helper-model input.e2e-test-text-input:nth-child(${i + 1})`
+      );
+      await this.clearAllTextFrom(
+        `oppia-rte-helper-model ${stateContentInputField}:nth-child(${i + 1})`
+      );
+      await tabTitleInputElements?.[i]?.type(tabContents[i].title);
+      await tabContentInputElements?.[i]?.type(tabContents[i].content);
+    }
+    await this.clickOn(closeButtonForExtraModel);
+  }
+
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
     // Click on RTE
     await this.page.waitForSelector(stateEditSelector, {visible: true});
@@ -2875,7 +2915,8 @@ export class ExplorationEditor extends BaseUser {
 
     // Add Collapsible Block
     await this.addCollapsibleBlockRTE();
-    await this.page.keyboard.press('Enter');
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('ArrowRight');
 
     // Add Image
     await this.addImageRTE(
@@ -2883,20 +2924,45 @@ export class ExplorationEditor extends BaseUser {
       'Test Image',
       'Test Image Caption'
     );
+    await this.waitForNetworkIdle();
+
     await this.page.keyboard.press('ArrowRight');
 
     // Video
     await this.addVideoRTE('https://www.youtube.com/watch?v=0tRc75S9MFU');
+    await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
-    // Add Link
+    // Add LinkEnter
     await this.addTextWithLinkRTE('Oppia', 'https://www.oppia.org');
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
 
     // Math Formula
+    await this.clickOnCKEditorOptionWithTitle('Insert mathematical formula');
+    await this.waitForNetworkIdle();
+    const textareaElement = await this.page.$(
+      'textarea[placeholder*="Enter a math expression using LaTeX"]'
+    );
+    await textareaElement?.type('x^2 + y^2 = z^2');
+    await this.clickOn(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
 
     // Concept Card
+    await this.clickOnCKEditorOptionWithTitle('Insert Concept Card Link');
+    await this.waitForNetworkIdle();
+    const skillSearchElement = await this.page.$(skillNameInput);
+    await skillSearchElement?.type('Math');
+    await this.clickOn(skillItemInRTESelector);
+    await this.page.keyboard.press('Enter');
+    await this.clickOn(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
 
-    // Hint Interaction
+    // Tab Contents
+    await this.addTabContentsRTE();
+    await this.page.keyboard.press('ArrowRight');
 
     await this.clickOn(saveContentButton);
   }
@@ -2915,6 +2981,7 @@ export class ExplorationEditor extends BaseUser {
 
   async addTextWithLinkRTE(text: string, url: string): Promise<void> {
     await this.clickOnCKEditorOptionWithTitle('Insert link');
+    await this.waitForNetworkIdle();
 
     const helperModel = await this.page.$('oppia-rte-helper-modal');
 
@@ -2940,6 +3007,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.clickOnCKEditorOptionWithTitle('Insert image');
 
+    await this.waitForNetworkIdle();
     const helperModel = await this.page.$('oppia-rte-helper-modal');
 
     // Get Fields
@@ -2977,6 +3045,9 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.clickOn(closeButtonForExtraModel);
+    await this.page.waitForSelector(closeButtonForExtraModel, {
+      hidden: true,
+    });
   }
 }
 

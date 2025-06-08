@@ -40,23 +40,36 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
   });
   it('should be able to start an embedded lesson', async function () {
-    // TODO: Visit /embed/exploration/expId
+    // Visit the embedded lesson URL, and expect exploration to be present
     await loggedOutUser.goto(
       `http://localhost:8181/embed/exploration/${explorationId}`
     );
-    // TODO: First card of exploration is displayed
-    // TODO: Continue Button is displayed
+    await loggedOutUser.expectCardContentToMatch('Content 0');
+
+    // Verify continue button, and language dropdown are present
     await loggedOutUser.expectContinueToNextCardButtonToBePresent();
-    // TODO: Lesson Info text isn't visible in the footer
+    await loggedOutUser.expectLanguageDropdownToBePresent();
+
+    // Verify lesson info text, and audio bar are not present
+    await loggedOutUser.expectLessonInfoTextToBePresent(false);
     // TODO: Audio Bar isn't visible
-    // TODO: Language option should be visible
-    // TODO: compare screenshots
+
+    // Compare screenshot of the embedded lesson player
+    await loggedOutUser.expectScreenshotToMatch(
+      'lesson-player-embedded',
+      __dirname
+    );
   });
 
-  it('should be able to complete the embedded lesson', async function () {
-    // TODO: complete the lesson to the end
-    // TODO: Lesson completion confetti shows up
-    // TODO: No chapter suggestion.
+  it('should be able to complete the embedded lesson, but not rate the exploration', async function () {
+    // Complete the exploration and expect completion toast message
+    await loggedOutUser.continueToNextCard();
+    await loggedOutUser.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
+
+    // Expect rate options to not be available
+    await loggedOutUser.expectRateOptionsNotAvailable();
   });
 
   afterAll(async function () {

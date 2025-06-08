@@ -56,25 +56,6 @@ describe('Logged-Out Learner', function () {
     await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.saveExplorationDraft();
 
-    // // Navigate to the new card and update its content.
-    // await explorationEditor.navigateToCard(CARD_NAME.ALGEBRA_BASICS);
-    // await explorationEditor.updateCardContent(
-    //   'Enter a negative number greater than -100.'
-    // );
-    // await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
-    // await explorationEditor.addResponsesToTheInteraction(
-    //   INTERACTION_TYPES.NUMERIC_INPUT,
-    //   '-99',
-    //   'Perfect!',
-    //   CARD_NAME.FINAL_CARD,
-    //   true
-    // );
-    // await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-    //   'Wrong, try again!'
-    // );
-
-    // await explorationEditor.saveExplorationDraft();
-
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
     await explorationEditor.updateCardContent(
@@ -107,7 +88,7 @@ describe('Logged-Out Learner', function () {
     // Give feedback and verify submission success.
     await loggedOutLearner.writeAndSubmitFeedback(
       'This is a great lesson!',
-      true,
+      false,
       false
     );
     await loggedOutLearner.verifyFeedbackSubmissionSuccess();

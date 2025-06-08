@@ -17,13 +17,16 @@
  * in the embedded player.
  */
 
+import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
   let explorationEditor: ExplorationEditor;
+  let curriculumAdmin: CurriculumAdmin;
   let explorationId: string | null;
 
   beforeAll(async function () {
@@ -32,51 +35,58 @@ describe('Logged-Out Learner', function () {
     //   'exploration_editor@example.com'
     // );
 
-    if (false) {
-      explorationEditor = await UserFactory.createNewUser(
-        'explorationEditor',
-        'exploration_editor@example.com'
-      );
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_admin@example.com',
+      [testConstants.Roles.CURRICULUM_ADMIN]
+    );
 
-      // Create a new exploration "What are the place values?" using the
-      // curriculum admin user.
-      await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorPage();
-      await explorationEditor.dismissWelcomeModal();
-      await explorationEditor.addExplorationDescriptionContainingAllRTEComponents();
-      await explorationEditor.addInteraction('Continue Button');
-      await explorationEditor.viewOppiaResponses();
-      await explorationEditor.directLearnersToNewCard('Last Card');
-      await explorationEditor.saveExplorationDraft();
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdmin.createTopic('Introduction to Oppia', 'intro-oppia');
+    await curriculumAdmin.createSkillForTopic('Math', 'Introduction to Oppia');
 
-      await explorationEditor.navigateToCard('Last Card');
-      await explorationEditor.updateCardContent(
-        'I hope you enjoyed this exploration! '
-      );
-      await explorationEditor.addInteraction('End Exploration');
-      await explorationEditor.saveExplorationDraft();
-      explorationId = await explorationEditor.publishExplorationWithMetadata(
-        'What are the place values?',
-        'Learn about place values',
-        'Algorithms'
-      );
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
+    );
 
-      if (!explorationId) {
-        throw new Error('Exploration ID is null or undefined.');
-      }
-      // Create two more dummy explorations to test the community library.
-      await explorationEditor.createAndPublishExplorationWithCards(
-        'Dummy Exploration 1',
-        'Algorithms'
-      );
-      await explorationEditor.createAndPublishExplorationWithCards(
-        'Dummy Exploration 2',
-        'Algorithms'
-      );
+    // Create a new exploration "What are the place values?" using the
+    // exploration editor user.
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.addExplorationDescriptionContainingAllRTEComponents();
+    await explorationEditor.expectScreenshotToMatch('testImage', __dirname);
+    await explorationEditor.addInteraction('Continue Button');
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard('Last Card');
+    await explorationEditor.saveExplorationDraft();
+
+    await explorationEditor.navigateToCard('Last Card');
+    await explorationEditor.updateCardContent(
+      'I hope you enjoyed this exploration! '
+    );
+    await explorationEditor.addInteraction('End Exploration');
+    await explorationEditor.saveExplorationDraft();
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
+      'What are the place values?',
+      'Learn about place values',
+      'Algorithms'
+    );
+
+    if (!explorationId) {
+      throw new Error('Exploration ID is null or undefined.');
     }
-
-    explorationId = 'IrvwEirUhno5';
-  });
+    // Create two more dummy explorations to test the community library.
+    await explorationEditor.createAndPublishExplorationWithCards(
+      'Dummy Exploration 1',
+      'Algorithms'
+    );
+    await explorationEditor.createAndPublishExplorationWithCards(
+      'Dummy Exploration 2',
+      'Algorithms'
+    );
+  }, testConstants.DEFAULT_SPEC_TIMEOUT_MSECS * 2);
 
   it('should use all RTE components in the exploration', async function () {
     // Navigate to community library page and expect it to contain 3
@@ -120,6 +130,6 @@ describe('Logged-Out Learner', function () {
   });
 
   afterAll(async function () {
-    // await UserFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });
