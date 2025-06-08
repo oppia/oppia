@@ -31,8 +31,8 @@ import {
 } from 'domain/exploration/read-only-exploration-backend-api.service';
 import {
   ReadOnlyTopicBackendDict,
-  ReadOnlyTopic,
-} from '../../../domain/topic_viewer/read-only-topic.model';
+  ReadOnlyTopicObjectFactory,
+} from 'domain/topic_viewer/read-only-topic-object.factory';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ContextService} from 'services/context.service';
@@ -53,6 +53,7 @@ describe('Learner view info component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
   let topicViewerBackendApiService: TopicViewerBackendApiService;
+  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(waitForAsync(() => {
@@ -67,7 +68,7 @@ describe('Learner view info component', () => {
         UrlInterpolationService,
         UrlService,
         TopicViewerBackendApiService,
-        ReadOnlyTopic,
+        ReadOnlyTopicObjectFactory,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -85,10 +86,11 @@ describe('Learner view info component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
+    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
 
     spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
-      ReadOnlyTopic.createFromBackendDict({
+      readOnlyTopicObjectFactory.createFromBackendDict({
         subtopics: [],
         skill_descriptions: {},
         uncategorized_skill_ids: [],
