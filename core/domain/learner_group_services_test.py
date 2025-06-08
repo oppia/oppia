@@ -497,7 +497,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(learner_group.subtopic_page_ids, ['topic1:1'])
 
     def test_remove_study_guide_reference_from_learner_groups(self) -> None:
-        # Update the learner group to include study guide references
+        # Update the learner group to include study guide references.
         self.learner_group = learner_group_services.update_learner_group(
             self.LEARNER_GROUP_ID, self.learner_group.title,
             self.learner_group.description,
@@ -505,7 +505,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             [self.LEARNER_ID], ['topic1:2', 'topic1:1', 'topic2:3'],
             self.learner_group.story_ids)
 
-        # Remove the study guide reference for topic1, subtopic 2
+        # Remove the study guide reference for topic1, subtopic 2.
         learner_group_services.remove_study_guide_reference_from_learner_groups(
             'topic1', 2
         )
