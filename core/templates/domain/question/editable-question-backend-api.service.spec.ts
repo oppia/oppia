@@ -41,9 +41,6 @@ describe('EditableQuestionBackendApiService', () => {
         content: {
           html: 'Question 1',
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {},
-        },
         interaction: {
           answer_groups: [],
           confirmed_unclassified_answers: [],

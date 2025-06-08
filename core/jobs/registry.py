@@ -75,8 +75,6 @@ from core.jobs.batch_jobs import (                                   # pylint: d
 from core.jobs.batch_jobs import contributor_admin_stats_jobs        # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     story_node_jobs)
-from core.jobs.batch_jobs import manual_voice_artist_name_job        # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import voiceover_migration_job             # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     audit_topic_related_models_relation_jobs)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
@@ -84,8 +82,8 @@ from core.jobs.batch_jobs import (                                   # pylint: d
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     missing_translation_images_repair_jobs)
 from core.jobs.batch_jobs import user_bios_change_jobs               # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import clean_up_voiceover_models_job       # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (skill_inspection_jobs)             # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import delete_voiceover_models_data_job    # pylint: disable=unused-import  # isort: skip
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:

@@ -63,7 +63,7 @@ export class PostChapterRecommendationsComponent {
     );
   }
 
-  getRevisionTabUrl(): string {
+  getStudyTabUrl(): string {
     return (
       this.urlInterpolationService.interpolateUrl(
         PracticeSessionPageConstants.TOPIC_VIEWER_PAGE,
@@ -72,7 +72,7 @@ export class PostChapterRecommendationsComponent {
           classroom_url_fragment:
             this.urlService.getUrlParams().classroom_url_fragment,
         }
-      ) + '/revision'
+      ) + '/studyguide'
     );
   }
 }

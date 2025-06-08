@@ -130,8 +130,14 @@ const dismissTranslationWelcomeModalSelector =
   'button.e2e-test-translation-tab-dismiss-welcome-modal';
 const translationTabButton = '.e2e-test-translation-tab';
 const mobileTranslationTabButton = '.e2e-test-mobile-translation-tab';
-const translationLanguageSelector =
-  'select.e2e-test-translation-language-selector';
+
+const voiceoverLanguageSelector = '.e2e-test-voiceover-language-selector';
+const voiceoverLanguageOptionSelector = '.e2e-test-language-selector-option';
+const voiceoverLanguageAccentSelector =
+  '.e2e-test-voiceover-language-accent-selector';
+const voiceoverLanguageAccentOptionSelector =
+  '.e2e-test-language-accent-selector-option';
+
 const translationModeButton = 'button.e2e-test-translation-mode';
 const editTranslationSelector = 'div.e2e-test-edit-translation';
 const stateTranslationEditorSelector =
@@ -212,7 +218,6 @@ const outcomeDestWhenStuckSelector =
 const intEditorField = '.e2e-test-editor-int';
 const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 const tagsField = '.e2e-test-chip-list-tags';
-const uploadAudioButton = '.e2e-test-accessibility-translation-upload-audio';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
 const feedBackButtonTab = '.e2e-test-feedback-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
@@ -249,6 +254,10 @@ const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
+const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
+const regenerateAutomaticVoiceoverButton = '.e2e-test-regenerate-voiceover';
+const voiceoverConfirmationModalButton =
+  '.e2e-test-voiceover-regeneration-confirm';
 
 enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
@@ -1628,7 +1637,6 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(previewTabButton);
     }
-    await this.page.waitForNavigation();
   }
 
   /**
@@ -2142,18 +2150,32 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to edit a translation for specific content of the current card.
-   * @param {string} languageCode - Code of language for which the translation has to be added.
+   * @param {string} language - Language for which the translation has to be added.
    * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
    * @param {string} translation - The translation which will be added for the content.
    * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
    */
   async editTranslationOfContent(
-    languageCode: string,
+    language: string,
     contentType: string,
     translation: string,
     feedbackIndex?: number
   ): Promise<void> {
-    await this.select(translationLanguageSelector, languageCode);
+    await this.clickOn(voiceoverLanguageSelector);
+    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+    const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === language) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.page.waitForSelector(translationModeButton);
     await this.clickOn(translationModeButton);
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
@@ -2337,17 +2359,20 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to add a voiceover for specific content of the current card.
-   * @param {string} languageCode - Code of language for which the voiceover has to be added.
+   * @param {string} language - Language for which the voiceover has to be added.
+   * @param {string} languageAccent - Language accent for which the voiceover has to be added.
    * @param {string} contentType - Type of the content such as "Interaction" or "Hint"
    * @param {string} voiceoverFilePath - The path of the voiceover file which will be added for the content.
    * @param {number} feedbackIndex - The index of the feedback to edit, since multiple feedback responses exist.
    */
   async addVoiceoverToContent(
-    languageCode: string,
+    language: string,
+    languageAccent: string,
     contentType: string,
     voiceoverFilePath: string
   ): Promise<void> {
-    await this.select(translationLanguageSelector, languageCode);
+    await this.waitForPageToFullyLoad();
+
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
     );
@@ -2357,9 +2382,110 @@ export class ExplorationEditor extends BaseUser {
       );
       await this.clickOn(contentType);
     }
-    await this.clickOn(uploadAudioButton);
+
+    await this.clickOn(voiceoverLanguageSelector);
+    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+    const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === language) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.clickOn(voiceoverLanguageAccentSelector);
+    await this.page.waitForSelector(voiceoverLanguageAccentOptionSelector);
+    const languageAccentOptions = await this.page.$$(
+      voiceoverLanguageAccentOptionSelector
+    );
+
+    for (const option of languageAccentOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === languageAccent) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.clickOn(addManualVoiceoverButton);
     await this.uploadFile(voiceoverFilePath);
     await this.clickOn(saveUploadedAudioButton);
+    await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Function to add a voiceover for specific content of the current card.
+   * @param {string} language - Language for which the voiceover has to be added.
+   * @param {string} languageAccent - Language accent for which the voiceover has to be added.
+   * @param {string} contentType - Type of the content such as "Interaction" or "Hint".
+   */
+  async regenerateVoiceoverForContent(
+    language: string,
+    languageAccent: string,
+    contentType: string
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    const activeContentType = await this.page.$eval(activeTranslationTab, el =>
+      el.textContent?.trim()
+    );
+    if (!activeContentType?.includes(contentType)) {
+      showMessage(
+        `Switching content type from ${activeContentType} to ${contentType}`
+      );
+      await this.clickOn(contentType);
+    }
+
+    await this.clickOn(voiceoverLanguageSelector);
+    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+    const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === language) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.clickOn(voiceoverLanguageAccentSelector);
+    await this.page.waitForSelector(voiceoverLanguageAccentOptionSelector);
+    const languageAccentOptions = await this.page.$$(
+      voiceoverLanguageAccentOptionSelector
+    );
+
+    for (const option of languageAccentOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === languageAccent) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.clickOn(regenerateAutomaticVoiceoverButton);
+
+    await this.page.waitForSelector(voiceoverConfirmationModalButton, {
+      visible: true,
+      timeout: 5000,
+    });
+
+    await this.clickOn(voiceoverConfirmationModalButton);
+
+    await this.page.waitForSelector(voiceoverConfirmationModalButton, {
+      hidden: true,
+    });
+
+    showMessage('Voiceover has been successfully regenerated.');
     await this.waitForNetworkIdle();
   }
 
