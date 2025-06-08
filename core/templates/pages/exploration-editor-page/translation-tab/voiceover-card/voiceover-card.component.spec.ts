@@ -917,4 +917,22 @@ describe('Voiceover card component', () => {
       component.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
     ).toBeTrue();
   });
+
+  it('should show voiceover regeneration section', () => {
+    let explorationLinkedToStorySpy = spyOn(
+      contextService,
+      'isExplorationLinkedToStory'
+    );
+    component.isVoiceoverAutogenerationSupportedForSelectedAccent = true;
+    spyOn(
+      component,
+      'isAutomaticVoiceoverRegenerationFromExpFeatureEnabled'
+    ).and.returnValue(true);
+
+    explorationLinkedToStorySpy.and.returnValue(true);
+    expect(component.shouldShowAutoVoiceoverRegenerationSection()).toBeTrue();
+
+    explorationLinkedToStorySpy.and.returnValue(false);
+    expect(component.shouldShowAutoVoiceoverRegenerationSection()).toBeFalse();
+  });
 });

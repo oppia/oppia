@@ -110,6 +110,72 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
         )
 
 
+class StudyGuideModelUnitTest(test_utils.GenericTestBase):
+    """Tests the StudyGuideModel class."""
+
+    STUDY_GUIDE_PAGE_ID: Final = 'study_guide_page_id'
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sections': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sections_schema_version': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            subtopic_models.StudyGuideModel.get_export_policy(),
+            expected_export_policy_dict)
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            subtopic_models.StudyGuideModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE)
+
+    def test_that_subsidiary_models_are_created_when_new_model_is_saved(
+        self
+    ) -> None:
+        """Tests the _trusted_commit() method."""
+
+        # StudyGuide is created but not committed/saved.
+        study_guide = subtopic_models.StudyGuideModel(
+            id=self.STUDY_GUIDE_PAGE_ID,
+            topic_id='topic_id',
+            sections={},
+            sections_schema_version=(
+                feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION),
+            language_code='en'
+        )
+        # We check that study guide has not been saved before calling
+        # commit().
+        self.assertIsNone(
+            subtopic_models.StudyGuideModel.get(
+                entity_id=self.STUDY_GUIDE_PAGE_ID,
+                strict=False
+            )
+        )
+        # We call commit() expecting that _trusted_commit works fine
+        # and saves study guide to datastore.
+        study_guide.commit(
+            committer_id=feconf.SYSTEM_COMMITTER_ID,
+            commit_message='Created new topic',
+            commit_cmds=[{'cmd': topic_domain.CMD_CREATE_NEW}]
+        )
+        # Now we check that study guide is not None and that actually
+        # now study guide exists, that means that commit() worked fine.
+        self.assertIsNotNone(
+            subtopic_models.StudyGuideModel.get(
+                entity_id=self.STUDY_GUIDE_PAGE_ID,
+                strict=False
+            )
+        )
+
+
 class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Tests the SubtopicPageCommitLogEntryModel class."""
 
@@ -173,4 +239,70 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             subtopic_page_commit_log_entry.id,
             'subtopicpage-entity_id-1'
+        )
+
+
+class StudyGuideCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
+    """Tests the StudyGuideCommitLogEntryModel class."""
+
+    def test_has_reference_to_user_id(self) -> None:
+        commit = subtopic_models.StudyGuideCommitLogEntryModel.create(
+            'b', 0, 'committer_id', 'msg', 'create', [{}],
+            constants.ACTIVITY_STATUS_PUBLIC, False)
+        commit.study_guide_page_id = 'b'
+        commit.update_timestamps()
+        commit.put()
+        self.assertTrue(
+            subtopic_models.StudyGuideCommitLogEntryModel
+            .has_reference_to_user_id('committer_id'))
+        self.assertFalse(
+            subtopic_models.StudyGuideCommitLogEntryModel
+            .has_reference_to_user_id('x_id'))
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            subtopic_models.StudyGuideCommitLogEntryModel.
+                get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER)
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy_dict = {
+            'study_guide_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_cmds': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_message': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'commit_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'post_commit_community_owned': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'post_commit_is_private': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'post_commit_status': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+        }
+        self.assertEqual(
+            subtopic_models.StudyGuideCommitLogEntryModel.get_export_policy(),
+            expected_export_policy_dict)
+
+    def test__get_instance_id(self) -> None:
+        # Calling create() method calls _get_instance (a protected method)
+        # and sets the instance id equal to the result of calling that method.
+        study_guide_commit_log_entry = (
+            subtopic_models.StudyGuideCommitLogEntryModel.create(
+                entity_id='entity_id',
+                version=1,
+                committer_id='committer_id',
+                commit_type='create',
+                commit_message='Created new SubtopicPageCommitLogEntry',
+                commit_cmds=[{'cmd': 'create_new'}],
+                status=constants.ACTIVITY_STATUS_PRIVATE,
+                community_owned=True
+            )
+        )
+        self.assertEqual(
+            study_guide_commit_log_entry.id,
+            'studyguide-entity_id-1'
         )
