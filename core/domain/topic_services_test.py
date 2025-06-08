@@ -1235,7 +1235,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_update_topic_and_subtopic_page(self) -> None:
         changelist: List[Union[
             topic_domain.TopicChange,
-            subtopic_page_domain.SubtopicPageChange
+            subtopic_page_domain.SubtopicPageChange,
+            study_guide_domain.StudyGuideChange
         ]] = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title3',
