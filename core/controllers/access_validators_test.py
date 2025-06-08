@@ -278,6 +278,40 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             '%s/can_access_classrooms_page' % ACCESS_VALIDATION_HANDLER_PREFIX)
 
 
+class TopicViewerPageRevisionRedirectHandlerTests(test_utils.GenericTestBase):
+    """Tests for TopicViewerPageRevisionRedirectHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
+
+    def test_redirect_to_studyguide_url_for_authenticated_user(self) -> None:
+        # Set up curriculum admin and create dummy classroom.
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_classroom'
+            }, csrf_token=csrf_token)
+        self.logout()
+
+        # Login as regular user and test redirect.
+        self.login(self.NEW_USER_EMAIL)
+
+        response = self.get_html_response(
+            '/learn/math/fraction/revision',
+            expected_status_int=301)
+
+        redirect_url = 'http://localhost/learn/math/fraction/studyguide'
+        self.assertEqual(response.headers['Location'], redirect_url)
+
+
 class TopicViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     """Checks the access to the blog home page and its rendering."""
 
@@ -415,6 +449,72 @@ class CollectionViewerPageAccessValidationHandlerTests(
         self.logout()
 
 
+class SubtopicViewerPageRevisionRedirectHandlerTests(
+    test_utils.GenericTestBase):
+    """Test for subtopic viewer page revision redirect handler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+        self.topic_id = 'topic_id'
+        self.subtopic_id_1 = 1
+        self.subtopic_id_2 = 2
+        self.subtopic_page_1 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_1, self.topic_id))
+        self.subtopic_page_2 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id_2, self.topic_id))
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id, self.subtopic_page_1, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': self.subtopic_id_1,
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment'
+            })]
+        )
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id, self.subtopic_page_2, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': self.subtopic_id_2,
+                'title': 'Sample',
+                'url_fragment': 'dummy-fragment'
+            })]
+        )
+
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title', 'url-frag')
+        subtopic.skill_ids = ['skill_id_1']
+        subtopic.url_fragment = 'sub-url-frag-one'
+        subtopic2 = topic_domain.Subtopic.create_default_subtopic(
+            2, 'Subtopic Title 2', 'url-frag-two')
+        subtopic2.skill_ids = ['skill_id_2']
+        subtopic2.url_fragment = 'sub-url-frag-two'
+
+        self.save_new_topic(
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='name', url_fragment='name',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic, subtopic2], next_subtopic_id=3)
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+
+    def test_get_redirects_to_studyguide_url(self) -> None:
+        """Test that GET request redirects to the correct study guide URL."""
+        response = self.get_html_response(
+            '/learn/staging/name/revision/sub-url-frag-one',
+            expected_status_int=301)
+
+        self.assertEqual(
+            response.headers['Location'],
+            'http://localhost/learn/staging/name/studyguide/sub-url-frag-one')
+
+
 class SubtopicViewerPageAccessValidationHandlerTests(
     test_utils.GenericTestBase):
     """Test for subtopic viewer page access validation."""
@@ -490,7 +590,7 @@ class SubtopicViewerPageAccessValidationHandlerTests(
 
     def test_any_user_can_access_subtopic_viewer_page(self) -> None:
         self.get_html_response(
-            '%s/can_access_subtopic_viewer_page/staging/name/revision/sub-url-frag-one' % # pylint: disable=line-too-long
+            '%s/can_access_subtopic_viewer_page/staging/name/studyguide/sub-url-frag-one' % # pylint: disable=line-too-long
             ACCESS_VALIDATION_HANDLER_PREFIX, expected_status_int=200)
 
 
