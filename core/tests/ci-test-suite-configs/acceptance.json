@@ -85,8 +85,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/restart-or-continue-exploration-on-revisit.spec.ts"
     },
     {
-      "name": "logged-in-user/save-an-exploration-to-play-later",
-      "module": "core/tests/puppeteer-acceptance/specs-old/logged-in-user/save-an-exploration-to-play-later.spec.ts"
+      "name": "logged-in-user/add-and-remove-exploration-from-play-later",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/add-and-remove-exploration-from-play-later.spec.ts"
     },
     {
       "name": "logged-in-user/edit-profile-preferences-and-export-their-account",
