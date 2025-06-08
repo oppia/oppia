@@ -78,7 +78,6 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
 
   let misconceptionDict1: MisconceptionBackendDict;
   let rubricDict: RubricBackendDict;
-  let skill: Skill;
   let skillContentsDict: ConceptCardBackendDict;
   let skillDifficulties: string[] = ['easy', 'medium'];
   let skillId: string = 'skill_1';
