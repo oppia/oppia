@@ -288,7 +288,21 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
             bool. True if and only if the source file exists and the destination
             file does not exist.
         """
-        _, copy_info = group
+        key, copy_info = group
+        if length(copy_info['src_exist']) != 1:  # pragma: no cover
+            logging.error(
+                'src_exist for key %s has unexpected length %d: %s',
+                key,
+                length(copy_info['src_exist']),
+                copy_info['src_exist'],
+            )
+        if length(copy_info['dst_exist']) != 1:  # pragma: no cover
+            logging.error(
+                'dst_exist for key %s has unexpected length %d: %s',
+                key,
+                length(copy_info['dst_exist']),
+                copy_info['dst_exist'],
+            )
         src_exist, = copy_info['src_exist']
         dst_exist, = copy_info['dst_exist']
         return src_exist and not dst_exist
