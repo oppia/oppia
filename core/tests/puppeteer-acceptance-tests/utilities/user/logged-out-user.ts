@@ -361,6 +361,9 @@ const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
 const tagsContainerSelector = '.exploration-tags span';
 const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
 
+const topicDescriptionSelector = '.e2e-test-topic-description';
+const storyViewerContainerSelector = '.e2e-test-story-viewer-container';
+
 const LABEL_FOR_SUBMIT_BUTTON = 'Submit and start contributing';
 const desktopNavbarButtonsSelector = '.oppia-navbar-tab-content';
 const mobileNavbarButtonSelector = '.text-uppercase';
@@ -397,6 +400,7 @@ const blogPaginationPrevSelector = '.e2e-test-pagination-prev-button';
 const blogPostTitleContainerSelector =
   '.e2e-test-blog-post-page-title-container';
 const blogPostContentSelector = '.e2e-test-blog-post-content';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -598,8 +602,13 @@ export class LoggedOutUser extends BaseUser {
    * Function to filter blog posts by a keyword
    */
   async filterBlogPostsByKeyword(keyword: string): Promise<void> {
+    await this.page.waitForSelector(blogSearchInputSelector, {
+      visible: true,
+    });
     await this.type(blogSearchInputSelector, keyword);
     await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
+
+    // TODO: Add post Check
   }
 
   /**
@@ -630,12 +639,17 @@ export class LoggedOutUser extends BaseUser {
    * Function to filter blog posts by a tag
    */
   async filterBlogPostsByTag(tagName: string): Promise<void> {
+    await this.page.waitForSelector(blogTagFilterSelector, {
+      visible: true,
+    });
     await this.clickOn(blogTagFilterSelector);
     await this.clickOn(`.e2e-test-select-${tagName}`);
     await this.page.waitForSelector(blogTagFilterDropdownSelector, {
       hidden: true,
     });
     await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
+
+    // TODO: Add post check
   }
 
   /**
@@ -684,6 +698,8 @@ export class LoggedOutUser extends BaseUser {
       return;
     }
     await this.clickOn(blogPaginationNextSelector);
+
+    // TODO: Add post check
   }
 
   /**
@@ -695,6 +711,8 @@ export class LoggedOutUser extends BaseUser {
       return;
     }
     await this.clickOn(blogPaginationPrevSelector);
+
+    // TODO: Add post check
   }
 
   /**
@@ -706,6 +724,9 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
+    await this.page.waitForSelector(button, {
+      visible: true,
+    });
     await this.clickAndWaitForNavigation(button);
 
     expect(this.page.url()).toBe(expectedDestinationPageUrl);
@@ -742,6 +763,9 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickBasicMathematicsButtonInLearnMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarButtonSelector, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarBasicMathematicsButton,
@@ -750,6 +774,9 @@ export class LoggedOutUser extends BaseUser {
         'Math Classroom'
       );
     } else {
+      await this.page.waitForSelector(navbarLearnTab, {
+        visible: true,
+      });
       await this.clickOn(navbarLearnTab);
       await this.clickButtonToNavigateToNewPage(
         navbarLearnTabBasicMathematicsButton,
@@ -766,6 +793,9 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickAboutButtonInAboutMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarButtonSelector, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
       await this.clickButtonToNavigateToNewPage(
@@ -775,6 +805,9 @@ export class LoggedOutUser extends BaseUser {
         'About'
       );
     } else {
+      await this.page.waitForSelector(navbarAboutTab, {
+        visible: true,
+      });
       await this.clickOn(navbarAboutTab);
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabAboutButton,
@@ -791,6 +824,9 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickTeachButtonInAboutMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarButtonSelector, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
       await this.clickButtonToNavigateToNewPage(
@@ -800,6 +836,9 @@ export class LoggedOutUser extends BaseUser {
         'Teach'
       );
     } else {
+      await this.page.waitForSelector(navbarAboutTab, {
+        visible: true,
+      });
       await this.clickOn(navbarAboutTab);
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabTeachButton,
@@ -848,6 +887,9 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickImpactReportButtonInAboutMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarButtonSelector, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
       await this.clickOn(mobileSidebarExpandImpactReportSubMenuButton);
@@ -862,6 +904,9 @@ export class LoggedOutUser extends BaseUser {
         impactReport2022Url
       );
     } else {
+      await this.page.waitForSelector(navbarAboutTab, {
+        visible: true,
+      });
       await this.clickOn(navbarAboutTab);
       await this.openExternalLinkBySelectorAndText(
         navbarAboutTabImpactReportButton,
@@ -882,6 +927,9 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickPartnershipsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarButtonSelector, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
@@ -891,6 +939,9 @@ export class LoggedOutUser extends BaseUser {
         'Partnerships'
       );
     } else {
+      await this.page.waitForSelector(navbarGetInvolvedTab, {
+        visible: true,
+      });
       await this.clickOn(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabSchoolAndOrganizationsButton,
@@ -907,6 +958,9 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickVolunteerButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarButtonSelector, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
@@ -916,6 +970,9 @@ export class LoggedOutUser extends BaseUser {
         'Volunteer'
       );
     } else {
+      await this.page.waitForSelector(navbarGetInvolvedTab, {
+        visible: true,
+      });
       await this.clickOn(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabVolunteerButton,
@@ -932,6 +989,9 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickDonateButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarButtonSelector, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
@@ -941,6 +1001,9 @@ export class LoggedOutUser extends BaseUser {
         'Donate'
       );
     } else {
+      await this.page.waitForSelector(navbarGetInvolvedTab, {
+        visible: true,
+      });
       await this.clickOn(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabDonateButton,
@@ -957,6 +1020,9 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickContactUsButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarButtonSelector, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarOpenSidebarButton);
       await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
       await this.clickButtonToNavigateToNewPage(
@@ -966,6 +1032,9 @@ export class LoggedOutUser extends BaseUser {
         'Contact'
       );
     } else {
+      await this.page.waitForSelector(navbarGetInvolvedTab, {
+        visible: true,
+      });
       await this.clickOn(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabContactUsButton,
@@ -985,8 +1054,14 @@ export class LoggedOutUser extends BaseUser {
       ? navbarDonateMobileButton
       : navbarDonateDesktopButton;
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarButtonSelector, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarOpenSidebarButton);
     }
+    await this.page.waitForSelector(navbarDonateButton, {
+      visible: true,
+    });
     await this.clickButtonToNavigateToNewPage(
       navbarDonateButton,
       'Donate button on navbar',
@@ -1103,6 +1178,7 @@ export class LoggedOutUser extends BaseUser {
    * and if the Donate page is shown.
    */
   async dismissDonationThanksModalOnDonatePage(): Promise<void> {
+    await this.page.waitForSelector(dismissButton, {visible: true});
     await this.clickOn(dismissButton);
     await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
@@ -1132,6 +1208,7 @@ export class LoggedOutUser extends BaseUser {
    * and if the About page is shown.
    */
   async dismissDonationThanksModalOnAboutPage(): Promise<void> {
+    await this.page.waitForSelector(dismissButton, {visible: true});
     await this.clickOn(dismissButton);
     await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
@@ -1183,6 +1260,9 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the Forum page using the oppia website footer.
    */
   async clickOnForumLinkInFooter(): Promise<void> {
+    await this.page.waitForSelector(footerForumlink, {
+      visible: true,
+    });
     await this.clickAndWaitForNavigation(footerForumlink);
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
@@ -1917,6 +1997,9 @@ export class LoggedOutUser extends BaseUser {
    * and check if it opens the Partnerships Brochure.
    */
   async clickDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
+    await this.page.waitForSelector(brochureButtonInPartnershipsPage, {
+      visible: true,
+    });
     const buttonText = (await this.page.$eval(
       brochureButtonInPartnershipsPage,
       element => element.textContent
@@ -2476,6 +2559,9 @@ export class LoggedOutUser extends BaseUser {
       ? partnerLearnMoreMobileButtonInAboutPage
       : partnerLearnMoreDesktopButtonInAboutPage;
 
+    await this.page.waitForSelector(partnerTab, {
+      visible: true,
+    });
     await this.clickOn(partnerTab);
     await this.clickButtonToNavigateToNewPage(
       partnerLearnMoreButtonInAboutPage,
@@ -2498,6 +2584,9 @@ export class LoggedOutUser extends BaseUser {
       ? partnerWithUsMobileButtonInAboutPage
       : partnerWithUsDesktopButtonInAboutPage;
 
+    await this.page.waitForSelector(partnerTab, {
+      visible: true,
+    });
     await this.clickOn(partnerTab);
     await this.openExternalLink(
       partnerWithUsButtonInAboutPage,
@@ -2545,6 +2634,9 @@ export class LoggedOutUser extends BaseUser {
       ? partnerWithUsMobileButtonInAboutPage
       : partnerWithUsDesktopButtonInAboutPage;
 
+    await this.page.waitForSelector(partnerTab, {
+      visible: true,
+    });
     await this.clickOn(partnerTab);
     await this.openExternalLink(
       partnerWithUsButtonInAboutPage,
@@ -2567,6 +2659,9 @@ export class LoggedOutUser extends BaseUser {
       ? donateMobileButtonInAboutPage
       : donateDesktopButtonInAboutPage;
 
+    await this.page.waitForSelector(donorTab, {
+      visible: true,
+    });
     await this.clickOn(donorTab);
     await this.clickOn(donateButtonInAboutPage);
 
@@ -2860,6 +2955,9 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} lessonName - The name of the lesson to search for.
    */
   async searchForLessonInSearchBar(lessonName: string): Promise<void> {
+    await this.page.waitForSelector(searchInputSelector, {
+      visible: true,
+    });
     await this.clickOn(searchInputSelector);
     await this.type(searchInputSelector, lessonName);
 
@@ -2872,6 +2970,9 @@ export class LoggedOutUser extends BaseUser {
    * @param {string[]} categoryNames - The names of the categories to filter by.
    */
   async filterLessonsByCategories(categoryNames: string[]): Promise<void> {
+    await this.page.waitForSelector(categoryFilterDropdownToggler, {
+      visible: true,
+    });
     await this.clickOn(categoryFilterDropdownToggler);
     await this.waitForStaticAssetsToLoad();
 
@@ -3265,6 +3366,10 @@ export class LoggedOutUser extends BaseUser {
     if (isLoginPromptContainerPresent) {
       await this.clickOn('SKIP');
     }
+
+    await this.page.waitForSelector(loginPromptContainer, {
+      hidden: true,
+    });
   }
 
   /**
@@ -3277,6 +3382,10 @@ export class LoggedOutUser extends BaseUser {
     } else {
       await this.clickAndWaitForNavigation(oppiaTopicTitleSelector);
     }
+
+    await this.page.waitForSelector(topicDescriptionSelector, {
+      visible: true,
+    });
   }
 
   /**
