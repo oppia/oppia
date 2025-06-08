@@ -18,7 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {ParamChange} from 'domain/exploration/ParamChange.model';
+import {ParamChange} from './param-change.model';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 
 describe('ParamChangesObjectFactory', () => {
