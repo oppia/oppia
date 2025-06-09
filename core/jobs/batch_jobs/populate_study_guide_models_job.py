@@ -43,6 +43,7 @@ if MYPY: # pragma: no cover
     models.Names.TOPIC, models.Names.SUBTOPIC])
 datastore_services = models.Registry.import_datastore_services()
 
+
 class PopulateStudyGuidesJob(base_jobs.JobBase):
     """Job that populates study guides from subtopic page models."""
 
@@ -69,7 +70,8 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
             a subtopic page model and topic model.
 
         Args:
-            data_tuple: Tuple containing subtopic_page_id and tuple of
+            data_tuple: tuple(SubtopicPageModel, TopicModel). Tuple
+                containing subtopic_page_id and tuple of
                 (SubtopicPageModel, TopicModel).
 
         Returns:
@@ -96,7 +98,9 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
             subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
 
             # Get subtopic title from the topic.
-            subtopic_title = topic.subtopics[topic.get_subtopic_index(subtopic_id)].title
+            subtopic_title = topic.subtopics[
+                topic.get_subtopic_index(subtopic_id)
+            ].title
 
             # Create sections list with heading and content.
             sections = [
@@ -203,7 +207,10 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
             | 'Flatten joined data' >> beam.FlatMap(
                 lambda kv: [
                     (subtopic_page_id, (subtopic_page_model, topic_model))
-                    for subtopic_page_id, subtopic_page_model in kv[1]['subtopic_pages']
+                    for (
+                        subtopic_page_id,
+                        subtopic_page_model
+                    ) in kv[1]['subtopic_pages']
                     for topic_model in kv[1]['topics']
                 ]
             )
@@ -229,7 +236,8 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
             | 'Unwrap ok' >> beam.Map(
                 lambda result_item: result_item.unwrap())
             | 'Get rid of ID and flatten models' >> beam.FlatMap( # pylint: disable=no-value-for-parameter
-                lambda kv: [kv[1][0], kv[1][1]])  # Extract both models from tuple
+                # Extract both models from tuple.
+                lambda kv: [kv[1][0], kv[1][1]])
         )
 
         unused_put_results = (
@@ -260,7 +268,8 @@ class AuditPopulateStudyGuidesJob(base_jobs.JobBase):
             regenerates the study guide model.
 
         Args:
-            data_tuple: Tuple containing subtopic_page_id and tuple of
+            data_tuple: tuple(SubtopicPageModel, TopicModel). Tuple
+                containing subtopic_page_id and tuple of
                 (SubtopicPageModel, TopicModel).
 
         Returns:
@@ -271,7 +280,7 @@ class AuditPopulateStudyGuidesJob(base_jobs.JobBase):
             Exception is returned otherwise.
         """
         subtopic_page_id, (subtopic_page_model, topic_model) = data_tuple
-        
+
         try:
             with datastore_services.get_ndb_context():
                 subtopic_page = (
@@ -327,7 +336,7 @@ class AuditPopulateStudyGuidesJob(base_jobs.JobBase):
             )
 
         study_guide_model.update_timestamps()
-        
+
         return result.Ok((subtopic_page_id, study_guide_model))
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -369,7 +378,10 @@ class AuditPopulateStudyGuidesJob(base_jobs.JobBase):
             | 'Flatten joined data' >> beam.FlatMap(
                 lambda kv: [
                     (subtopic_page_id, (subtopic_page_model, topic_model))
-                    for subtopic_page_id, subtopic_page_model in kv[1]['subtopic_pages']
+                    for (
+                        subtopic_page_id,
+                        subtopic_page_model
+                    ) in kv[1]['subtopic_pages']
                     for topic_model in kv[1]['topics']
                 ]
             )
