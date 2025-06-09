@@ -48,6 +48,8 @@ QUEUE_NAME_EMAILS: Final = 'emails'
 QUEUE_NAME_ONE_OFF_JOBS: Final = 'one-off-jobs'
 # Taskqueue for updating stats models.
 QUEUE_NAME_STATS: Final = 'stats'
+# Taskqueue for regenerating automatic voiceovers using cloud services.
+QUEUE_NAME_VOICEOVER_REGENERATION: Final = 'voiceover-regeneration'
 
 # Function identifiers inform the deferred task handler of which deferred
 # function should be run for the relevant task.
@@ -162,24 +164,50 @@ def create_new_cloud_task_model(
     task_name: str,
     function_id: str
 ) -> cloud_task_models.CloudTaskRunModel:
-    return cloud_task_models.CloudTaskRunModel(
-        id=new_model_id,
+    """The function creates a new CloudTaskRunModel with the provided model ID,
+    task name, and function ID.
+
+    Args:
+        new_model_id: str. The ID for the new CloudTaskRunModel.
+        task_name: str. The task name of the cloud task run.
+        function_id: str. The ID for the function to be executed.
+
+    Returns:
+        CloudTaskRunModel. The newly created CloudTaskRunModel instance.
+    """
+    return cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
+        cloud_task_run_model_id=new_model_id,
         cloud_task_name=task_name,
-        function_id=function_id,
         latest_job_state='PENDING',
+        function_id=function_id,
     )
 
+
 def update_cloud_task_run_model(
-    cloud_task_model: cloud_task_models.CloudTaskRunModel
+    cloud_task_run_domain_instance: cloud_task_domain.CloudTaskRun
 ) -> None:
     """Updates the CloudTaskRunModel with the latest job state and exception
     messages for failed runs.
 
     Args:
-        cloud_task_model: CloudTaskRunModel. The CloudTaskRunModel to update.
+        cloud_task_run_domain_instance: CloudTaskRun. The updated CloudTaskRun.
     """
+    cloud_task_model = cloud_task_models.CloudTaskRunModel.get(
+        cloud_task_run_domain_instance.id, strict=False)
+    if cloud_task_model is None:
+        raise ValueError(
+            'CloudTaskRunModel with id %s does not exist.' %
+            cloud_task_run_domain_instance.id)
+
+    cloud_task_model.latest_job_state = (
+        cloud_task_run_domain_instance.latest_job_state)
+    cloud_task_model.exception_messages_for_failed_runs = (
+        cloud_task_run_domain_instance.exception_messages_for_failed_runs)
+    cloud_task_model.current_retry_attempt = (
+        cloud_task_run_domain_instance.current_retry_attempt)
     cloud_task_model.update_timestamps()
     cloud_task_model.put()
+
 
 def get_cloud_task_run_by_model_id(
     model_id: str
@@ -197,14 +225,10 @@ def get_cloud_task_run_by_model_id(
         model_id, strict=False)
 
     if cloud_task_model is not None:
-        return cloud_task_model
+        return convert_cloud_task_run_model_to_domain_object(cloud_task_model)
     else:
         return None
 
-
-def get_all_cloud_task_models(
-) -> List[cloud_task_models.CloudTaskRunModel]:
-    return cloud_task_models.CloudTaskRunModel.get_all()
 
 def convert_cloud_task_run_model_to_domain_object(
     cloud_task_model: cloud_task_models.CloudTaskRunModel
@@ -231,3 +255,34 @@ def convert_cloud_task_run_model_to_domain_object(
     }
     cloud_task_run = cloud_task_domain.CloudTaskRun.from_dict(model_dict)
     return cloud_task_run
+
+
+def get_cloud_task_run_by_given_params(
+    queue_id: str,
+    start_datetime: datetime.datetime,
+    end_datetime: datetime.datetime
+) -> List[cloud_task_domain.CloudTaskRun]:
+    """Fetches all CloudTaskRunModels with the given queue ID, start datetime,
+    and end datetime.
+
+    Args:
+        queue_id: str. The ID of the queue to filter the CloudTaskRunModels.
+        start_datetime: datetime.datetime. The start datetime to filter the
+            CloudTaskRunModels.
+        end_datetime: datetime.datetime. The end datetime to filter the
+            CloudTaskRunModels.
+
+    Returns:
+        List[CloudTaskRun]. A list of CloudTaskRun domain objects with the
+        specified queue ID.
+    """
+    models = cloud_task_models.CloudTaskRunModel.get_by_queue_id(
+        queue_id)
+    filtered_models = [
+            model for model in models
+            if start_datetime <= model.last_updated <= end_datetime
+        ]
+    return [
+        convert_cloud_task_run_model_to_domain_object(model)
+        for model in filtered_models
+    ]

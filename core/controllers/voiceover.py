@@ -314,21 +314,14 @@ class AutomaticVoiceoverRegenerationRecordHandler(
                 "Day Month Date Year".
         """
         # Convert start_date and end_date to datetime objects
-        start_date_obj = datetime.strptime(start_date, "%a %b %d %Y")
-        end_date_obj = datetime.strptime(end_date, "%a %b %d %Y")
+        start_date_obj: datetime = datetime.strptime(start_date, "%a %b %d %Y")
+        end_date_obj: datetime = datetime.strptime(end_date, "%a %b %d %Y")
 
-        # TODO: Add a filter based on the queue name for voiceover regeneration.
-        cloud_task_models = taskqueue_services.get_all_cloud_task_models()
-
-        filtered_models = [
-            model for model in cloud_task_models
-            if start_date_obj <= model.last_updated <= end_date_obj
-        ]
-
-        cloud_task_run_objects = [
-            taskqueue_services.convert_cloud_task_run_model_to_domain_object(
-                model) for model in filtered_models
-        ]
+        # Fetch only those records that are related to voiceover regeneration.
+        cloud_task_run_objects = (
+            taskqueue_services.get_cloud_task_run_by_given_params(
+                taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+                start_date_obj, end_date_obj))
 
         self.values.update({
             'automatic_voiceover_regeneration_records': [
