@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for jobs.batch_jobs.study_guide_jobs."""
+"""Unit tests for jobs.batch_jobs.populate_study_guide_models_jobs."""
 
 from __future__ import annotations
 
@@ -107,6 +107,7 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             subtopic_schema_version=1,
             story_reference_schema_version=1,
             next_subtopic_id=2,
+            page_title_fragment_for_web='testing-six',
             version=1
         )
 
@@ -211,6 +212,7 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             subtopic_schema_version=1,
             story_reference_schema_version=1,
             next_subtopic_id=3,
+            page_title_fragment_for_web='testing-five',
             version=1
         )
 
@@ -274,6 +276,7 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             subtopic_schema_version=1,
             story_reference_schema_version=1,
             next_subtopic_id=2,
+            page_title_fragment_for_web='testing-four',
             version=1
         )
 
@@ -379,6 +382,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             subtopic_schema_version=1,
             story_reference_schema_version=1,
             next_subtopic_id=2,
+            page_title_fragment_for_web='testing-three',
             version=1
         )
 
@@ -415,6 +419,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             subtopic_schema_version=1,
             story_reference_schema_version=1,
             next_subtopic_id=2,
+            page_title_fragment_for_web='testing-two',
             version=1
         )
 
@@ -454,6 +459,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             subtopic_schema_version=1,
             story_reference_schema_version=1,
             next_subtopic_id=2,
+            page_title_fragment_for_web='testing',
             version=1
         )
 
@@ -516,6 +522,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             subtopic_schema_version=1,
             story_reference_schema_version=1,
             next_subtopic_id=3,
+            page_title_fragment_for_web='testing-one',
             version=1
         )
 
@@ -533,7 +540,9 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             )
         ])
 
-    @mock.patch('core.jobs.batch_jobs.study_guide_jobs.logging')
+    @mock.patch(
+        'core.jobs.batch_jobs.populate_study_guide_models_jobs.logging'
+    )
     def test_exception_logging(self, mock_logging: mock.Mock) -> None:
         # Create subtopic page model.
         subtopic_page_model = self.create_model(
