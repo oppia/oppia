@@ -441,8 +441,8 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(
                 stderr=f'STUDY GUIDE PROCESSED ERROR: '
                        f'"(\'{self.SUBTOPIC_PAGE_ID}\', '
-                       f'Exception(\'Subtopic {self.SUBTOPIC_ID} '
-                       f'not found in topic {self.TOPIC_ID}\'))": 1'
+                       f'Exception(\'The subtopic with id '
+                       f'{self.SUBTOPIC_ID} does not exist\'))": 1'
             )
         ])
 
