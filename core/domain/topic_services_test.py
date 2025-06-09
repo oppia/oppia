@@ -941,13 +941,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': 'title',
             'subtopic_id': 1,
-            'old_value': 'Title',
+            'old_value': 'Dummy Subtopic Title',
             'new_value': 'New Title'
         })]
         topic_services.update_topic_and_subtopic_pages(
-            self.user_id_admin, self.TOPIC_ID, changelist,
+            self.user_id_admin, topic_id_1, changelist,
             'Update title of subtopic.')
-        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        topic = topic_fetchers.get_topic_by_id(topic_id_1)
 
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].title, 'New Title')
@@ -1279,6 +1279,49 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.version, 4)
         self.assertEqual(topic_summary.name, 'New Name')
         self.assertEqual(topic_summary.version, 4)
+
+    def test_simultaneous_subtopic_and_subtopic_page_changes(self) -> None:
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': 'title',
+            'subtopic_id': 1,
+            'old_value': 'Title',
+            'new_value': 'New Title'
+        }),
+        subtopic_page_domain.SubtopicPageChange({
+            'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+            'property_name': (
+                subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
+            'old_value': '',
+            'subtopic_id': 1,
+            'new_value': {
+                'html': '<p>New Value</p>',
+                'content_id': 'content'
+            }
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Update title of subtopic.')
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics), 1)
+        self.assertEqual(topic.subtopics[0].title, 'New Title')
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, 1)
+        self.assertEqual(
+            subtopic_page.page_contents.subtitled_html.html,
+            '<p>New Value</p>')
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 1
+        )
+        study_guide_section = study_guide.sections[0]
+        self.assertEqual(
+            study_guide_section.heading.unicode_str,
+            'New Title'
+        )
+        self.assertEqual(
+            study_guide_section.content.html,
+            '<p>New Value</p>'
+        )
 
     def test_update_topic_and_subtopic_page(self) -> None:
         changelist: List[Union[
