@@ -53,7 +53,7 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        
+
         # Create test subtopic page content.
         self.subtopic_page_contents = {
             'subtitled_html': {
@@ -67,7 +67,7 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
                 'translations_mapping': {}
             }
         }
-        
+
         # Create test topic with subtopic.
         self.subtopic = topic_domain.Subtopic(
             subtopic_id=self.SUBTOPIC_ID,
@@ -152,7 +152,10 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         self.assertEqual(commit_log_entry.study_guide_id, self.SUBTOPIC_PAGE_ID)
         self.assertEqual(commit_log_entry.user_id, feconf.MIGRATION_BOT_USER_ID)
         self.assertEqual(commit_log_entry.commit_type, 'create')
-        self.assertEqual(commit_log_entry.commit_message, 'created new study guide')
+        self.assertEqual(
+            commit_log_entry.commit_message,
+            'created new study guide'
+        )
         self.assertEqual(commit_log_entry.version, 1)
 
         expected_commit_cmds = [
@@ -211,7 +214,13 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             version=1
         )
 
-        self.put_multi([subtopic_page_model_1, subtopic_page_model_2, topic_model])
+        self.put_multi(
+            [
+                subtopic_page_model_1,
+                subtopic_page_model_2,
+                topic_model
+            ]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -220,7 +229,9 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         ])
 
         # Verify both study guides were created.
-        study_guide_1 = subtopic_models.StudyGuideModel.get(self.SUBTOPIC_PAGE_ID)
+        study_guide_1 = subtopic_models.StudyGuideModel.get(
+            self.SUBTOPIC_PAGE_ID
+        )
         study_guide_2 = subtopic_models.StudyGuideModel.get(subtopic_page_id_2)
 
         self.assertIsNotNone(study_guide_1)
@@ -230,7 +241,7 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         # Create subtopic page with invalid data.
         invalid_subtopic_page_contents = {
             'subtitled_html': {
-                'html': '',  # Empty HTML
+                'html': '',
                 'content_id': 'content_id'
             },
             'recorded_voiceovers': {
@@ -276,7 +287,8 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             self.assert_job_output_is([
                 job_run_result.JobRunResult(
                     stderr=f'STUDY GUIDES PROCESSED ERROR: '
-                           f'"(\'{self.SUBTOPIC_PAGE_ID}\', Exception(\'Validation failed\'))": 1'
+                           f'"(\'{self.SUBTOPIC_PAGE_ID}\','
+                           f' Exception(\'Validation failed\'))": 1'
                 )
             ])
 
@@ -293,7 +305,8 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([subtopic_page_model])
 
-        # No topic model exists, so no study guides should be processed.
+        # No topic model exists, so no study guides should
+        # be processed.
         self.assert_job_output_is_empty()
 
 
@@ -398,7 +411,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             description='Test topic description',
             canonical_name='Test Topic',
             language_code=self.LANGUAGE_CODE,
-            subtopics=[],  # Empty subtopics list
+            subtopics=[],
             subtopic_schema_version=1,
             story_reference_schema_version=1,
             next_subtopic_id=2,
@@ -410,13 +423,14 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=f'STUDY GUIDE PROCESSED ERROR: '
-                       f'"(\'{self.SUBTOPIC_PAGE_ID}\', Exception(\'Subtopic {self.SUBTOPIC_ID} '
+                       f'"(\'{self.SUBTOPIC_PAGE_ID}\', '
+                       f'Exception(\'Subtopic {self.SUBTOPIC_ID} '
                        f'not found in topic {self.TOPIC_ID}\'))": 1'
             )
         ])
 
     def test_invalid_topic_validation_raises_error(self) -> None:
-        # Create subtopic page model
+        # Create subtopic page model.
         subtopic_page_model = self.create_model(
             subtopic_models.SubtopicPageModel,
             id=self.SUBTOPIC_PAGE_ID,
@@ -430,7 +444,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         topic_model = self.create_model(
             topic_models.TopicModel,
             id=self.TOPIC_ID,
-            name='',  # Invalid empty name
+            name='',
             abbreviated_name='Test',
             url_fragment='test-topic',
             description='Test topic description',
@@ -453,12 +467,13 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             self.assert_job_output_is([
                 job_run_result.JobRunResult(
                     stderr=f'STUDY GUIDE PROCESSED ERROR: '
-                           f'"(\'{self.SUBTOPIC_PAGE_ID}\', Exception(\'Topic validation failed\'))": 1'
+                           f'"(\'{self.SUBTOPIC_PAGE_ID}\', '
+                           f'Exception(\'Topic validation failed\'))": 1'
                 )
             ])
 
     def test_multiple_subtopic_pages_audit(self) -> None:
-        # Create multiple subtopic pages
+        # Create multiple subtopic pages.
         subtopic_page_id_2 = f'{self.TOPIC_ID}-2'
         subtopic_2 = topic_domain.Subtopic(
             subtopic_id=2,
@@ -504,7 +519,13 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             version=1
         )
 
-        self.put_multi([subtopic_page_model_1, subtopic_page_model_2, topic_model])
+        self.put_multi(
+            [
+                subtopic_page_model_1,
+                subtopic_page_model_2,
+                topic_model
+            ]
+        )
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
@@ -514,7 +535,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
 
     @mock.patch('core.jobs.batch_jobs.study_guide_jobs.logging')
     def test_exception_logging(self, mock_logging: mock.Mock) -> None:
-        # Create subtopic page model
+        # Create subtopic page model.
         subtopic_page_model = self.create_model(
             subtopic_models.SubtopicPageModel,
             id=self.SUBTOPIC_PAGE_ID,
@@ -552,7 +573,8 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             self.assert_job_output_is([
                 job_run_result.JobRunResult(
                     stderr=f'STUDY GUIDE PROCESSED ERROR: '
-                           f'"(\'{self.SUBTOPIC_PAGE_ID}\', Exception(\'Test exception\'))": 1'
+                           f'"(\'{self.SUBTOPIC_PAGE_ID}\', '
+                           f'Exception(\'Test exception\'))": 1'
                 )
             ])
 
