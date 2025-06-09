@@ -5533,7 +5533,8 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             '<topic_url_fragment>/<subtopic_url_fragment>')
         subtopic_page_url = (
             '/mock_subtopic_page/<classroom_url_fragment>/'
-            '<topic_url_fragment>/revision/<subtopic_url_fragment>')
+            '<topic_url_fragment>/studyguide/'
+            '<subtopic_url_fragment>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
                 webapp2.Route(subtopic_data_url, self.MockDataHandler),
@@ -5593,7 +5594,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/000',
+                '/mock_subtopic_page/staging/topic-frag/studyguide/000',
                 expected_status_int=302)
             self.assertEqual(
                 response.headers['location'], 'http://localhost/learn/staging')
@@ -5602,44 +5603,50 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     def test_can_access_subtopic_when_all_url_fragments_are_valid(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
+            studyguide_url_fragment = 'studyguide/sub-one-frag'
             self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/sub-one-frag',
+                '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
                 expected_status_int=200)
 
-    def test_fall_back_to_revision_page_if_subtopic_url_frag_is_invalid(
+    def test_fall_back_to_studyguide_page_if_subtopic_url_frag_is_invalid(
         self
     ) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/000',
+                '/mock_subtopic_page/staging/topic-frag/studyguide/000',
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision',
+                'http://localhost/learn/staging/topic-frag/studyguide',
                 response.headers['location'])
 
-    def test_fall_back_to_revision_page_when_subtopic_page_does_not_exist(
+    def test_fall_back_to_studyguide_page_when_subtopic_page_does_not_exist(
         self
     ) -> None:
+        studyguide_url_fragment = 'studyguide/sub-one-frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         subtopic_swap = self.swap_to_always_return(
             subtopic_page_services, 'get_subtopic_page_by_id', None)
         with testapp_swap, subtopic_swap:
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/sub-one-frag',
+                '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision',
+                'http://localhost/learn/staging/topic-frag/studyguide',
                 response.headers['location'])
 
     def test_redirect_to_classroom_if_abbreviated_topic_is_invalid(
         self
     ) -> None:
+        studyguide_url_fragment = 'studyguide/sub-one-frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/math/invalid-topic/revision/sub-one-frag',
+                '/mock_subtopic_page/math/invalid-topic/%s'
+                % studyguide_url_fragment,
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/math',
@@ -5649,21 +5656,23 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/math/topic-frag/revision/sub-one-frag',
+                '/mock_subtopic_page/math/topic-frag/studyguide/sub-one-frag',
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision'
+                'http://localhost/learn/staging/topic-frag/studyguide'
                 '/sub-one-frag',
                 response.headers['location'])
 
     def test_redirect_with_lowercase_subtopic_url_fragment(self) -> None:
+        studyguide_url_fragment = 'studyguide/Sub-One-Frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/Sub-One-Frag',
+                '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision'
+                'http://localhost/learn/staging/topic-frag/studyguide'
                 '/sub-one-frag',
                 response.headers['location'])
 

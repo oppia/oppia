@@ -418,8 +418,8 @@ class AppFeedbackReport:
             Exception. No topic_id provided for LessonPlayerEntryPoint.
             Exception. No story_id provided for LessonPlayerEntryPoint.
             Exception. No exploration_id provided for LessonPlayerEntryPoint.
-            Exception. No topic_id provided for RevisionCardEntryPoint.
-            Exception. No subtopic_id provided for RevisionCardEntryPoint.
+            Exception. No topic_id provided for StudyGuideEntryPoint.
+            Exception. No subtopic_id provided for StudyGuideEntryPoint.
         """
         entry_point_name = entry_point_json['entry_point_name']
         if entry_point_name == (
@@ -444,16 +444,16 @@ class AppFeedbackReport:
                 entry_point_json['entry_point_story_id'],
                 entry_point_json['entry_point_exploration_id'])
         elif entry_point_name == (
-            app_feedback_report_constants.EntryPoint.REVISION_CARD.value):
+            app_feedback_report_constants.EntryPoint.STUDY_GUIDE.value):
             if entry_point_json['entry_point_topic_id'] is None:
                 raise Exception(
-                    'No topic_id provided for RevisionCardEntryPoint.'
+                    'No topic_id provided for StudyGuideEntryPoint.'
                 )
             if entry_point_json['entry_point_subtopic_id'] is None:
                 raise Exception(
-                    'No subtopic_id provided for RevisionCardEntryPoint.'
+                    'No subtopic_id provided for StudyGuideEntryPoint.'
                 )
-            return RevisionCardEntryPoint(
+            return StudyGuideEntryPoint(
                 entry_point_json['entry_point_topic_id'],
                 entry_point_json['entry_point_subtopic_id'])
         elif entry_point_name == (
@@ -1439,19 +1439,19 @@ class LessonPlayerEntryPoint(EntryPoint):
             self.exploration_id, self.story_id)
 
 
-class RevisionCardEntryPointDict(TypedDict):
-    """Dictionary representing the RevisionCardEntryPoint object."""
+class StudyGuideEntryPointDict(TypedDict):
+    """Dictionary representing the StudyGuideEntryPoint object."""
 
     entry_point_name: str
     topic_id: Optional[str]
     subtopic_id: Optional[str]
 
 
-class RevisionCardEntryPoint(EntryPoint):
-    """Domain object for the Android revision card entry point."""
+class StudyGuideEntryPoint(EntryPoint):
+    """Domain object for the Android study guide entry point."""
 
     def __init__(self, topic_id: str, subtopic_id: str) -> None:
-        """Constructs an RevisionCardEntryPoint domain object.
+        """Constructs an StudyGuideEntryPoint domain object.
 
         Args:
             topic_id: str. The unique ID for the current topic the user is
@@ -1460,15 +1460,15 @@ class RevisionCardEntryPoint(EntryPoint):
                 reviewing when intiating the report.
         """
         super().__init__(
-            app_feedback_report_constants.EntryPoint.REVISION_CARD,
+            app_feedback_report_constants.EntryPoint.STUDY_GUIDE,
             topic_id, None, None, subtopic_id)
 
-    def to_dict(self) -> RevisionCardEntryPointDict:
-        """Returns a dict representing this RevisionCardEntryPoint domain
+    def to_dict(self) -> StudyGuideEntryPointDict:
+        """Returns a dict representing this StudyGuideEntryPoint domain
         object.
 
         Returns:
-            dict. A dict, mapping all fields of RevisionCardEntryPoint
+            dict. A dict, mapping all fields of StudyGuideEntryPoint
             instance.
         """
         return {
@@ -1478,15 +1478,15 @@ class RevisionCardEntryPoint(EntryPoint):
         }
 
     def validate(self) -> None:
-        """Validates this RevisionCardEntryPoint domain object.
+        """Validates this StudyGuideEntryPoint domain object.
 
         Raises:
             ValidationError. One or more attributes of the
-                RevisionCardEntryPoint are not valid.
+                StudyGuideEntryPoint are not valid.
         """
         self.require_valid_entry_point_name(
             self.entry_point_name,
-            app_feedback_report_constants.EntryPoint.REVISION_CARD)
+            app_feedback_report_constants.EntryPoint.STUDY_GUIDE)
         topic_domain.Topic.require_valid_topic_id(self.topic_id)
         if not isinstance(self.subtopic_id, int):
             raise utils.ValidationError(
@@ -1727,7 +1727,7 @@ class AppFeedbackReportTicket:
 AcceptableEntryPointClasses = Union[
     NavigationDrawerEntryPointDict,
     LessonPlayerEntryPointDict,
-    RevisionCardEntryPointDict,
+    StudyGuideEntryPoint,
     CrashEntryPointDict
 ]
 

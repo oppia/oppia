@@ -26,7 +26,7 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-const REVISION_CARD_CONTENT =
+const STUDY_GUIDE_CONTENT =
   'Remember, a fraction represents a part of a whole. It consists of a numerator and a denominator.';
 
 enum INTERACTION_TYPES {
@@ -40,7 +40,7 @@ enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   ALGEBRA_BASICS = 'Algebra Basics',
   FRACTION_CONVERSION = 'Fraction Conversion',
-  REVISION_CARD = 'Revision Card',
+  STUDY_GUIDE = 'Study Guide',
   FINAL_CARD = 'Final Card',
 }
 
@@ -116,7 +116,7 @@ describe('Logged-out User', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Incorrect, try again!',
       undefined,
-      CARD_NAME.REVISION_CARD
+      CARD_NAME.STUDY_GUIDE
     );
 
     await explorationEditor.addHintToState(
@@ -125,9 +125,9 @@ describe('Logged-out User', function () {
     await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.saveExplorationDraft();
 
-    // Navigate to the new card and add revision content.
-    await explorationEditor.navigateToCard(CARD_NAME.REVISION_CARD);
-    await explorationEditor.updateCardContent(REVISION_CARD_CONTENT);
+    // Navigate to the new card and add Study Guide content.
+    await explorationEditor.navigateToCard(CARD_NAME.STUDY_GUIDE);
+    await explorationEditor.updateCardContent(STUDY_GUIDE_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToAlreadyExistingCard(
@@ -194,7 +194,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.viewHint();
       await loggedOutUser.closeHintModal();
 
-      // Again wrong answer is submitted number of times to get stuck and navigate to Revision card.
+      // Again wrong answer is submitted number of times to get stuck and navigate to Study Guide.
       await loggedOutUser.submitAnswer('1/3');
       await loggedOutUser.submitAnswer('1/4');
       await loggedOutUser.simulateDelayToAvoidFatigueDetection();
@@ -204,7 +204,7 @@ describe('Logged-out User', function () {
       await loggedOutUser.continueToNextCard();
 
       // Verifying if navigated to the expected card after getting stuck.
-      await loggedOutUser.expectCardContentToMatch(REVISION_CARD_CONTENT);
+      await loggedOutUser.expectCardContentToMatch(STUDY_GUIDE_CONTENT);
       await loggedOutUser.continueToNextCard();
 
       await loggedOutUser.expectExplorationCompletionToastMessage(

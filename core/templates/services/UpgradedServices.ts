@@ -347,6 +347,7 @@ import {QuestionValidationService} from './question-validation.service';
 import {MathInteractionsService} from './math-interactions.service';
 import {EntityVoiceoversService} from './entity-voiceovers.services';
 import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
+import {AutomaticVoiceoverHighlightService} from './automatic-voiceover-highlight-service';
 
 interface UpgradedServicesDict {
   // Type 'unknown' is used here because we don't know the exact type of
@@ -412,6 +413,10 @@ export class UpgradedServices {
     );
     upgradedServices['VoiceoverLanguageManagementService'] =
       new VoiceoverLanguageManagementService();
+    upgradedServices['AutomaticVoiceoverHighlightService'] =
+      new AutomaticVoiceoverHighlightService(
+        upgradedServices['LocalStorageService']
+      );
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();

@@ -193,3 +193,155 @@ class SubtopicPageModel(base_models.VersionedModel):
                 base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
+
+class StudyGuideCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to study guides.
+
+    A new instance of this model is created and saved every time a commit to
+    StudyGuideModel occurs.
+
+    The id for this model is of the form
+    'studyguide-[study_guide_page_id]-[version]'.
+    """
+
+    # The id of the study guide being edited.
+    study_guide_page_id = (
+        datastore_services.StringProperty(indexed=True, required=True))
+
+    @classmethod
+    def get_instance_id(cls, study_guide_page_id: str, version: int) -> str:
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            study_guide_page_id: str. The id of the study guide being edited.
+            version: int. The version number of the study guide after the
+                commit.
+
+        Returns:
+            str. The commit id with the study guide id and version number.
+        """
+        return 'studyguide-%s-%s' % (study_guide_page_id, version)
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """The history of commits is not relevant for the purposes of Takeout
+        since commits don't contain relevant data corresponding to users.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model contains data corresponding to a user, but this isn't exported
+        because the history of commits isn't deemed as useful for users since
+        commit logs don't contain relevant data corresponding to those users.
+        """
+        return dict(super(cls, cls).get_export_policy(), **{
+            'study_guide_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
+
+
+class StudyGuideModel(base_models.VersionedModel):
+    """Model for storing Study Guides.
+
+    This stores the HTML data for a study guide.
+    """
+
+    SNAPSHOT_METADATA_CLASS = SubtopicPageSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = SubtopicPageSnapshotContentModel
+    COMMIT_LOG_ENTRY_CLASS = StudyGuideCommitLogEntryModel
+    ALLOW_REVERT = False
+
+    # The topic id that this study guide is a part of.
+    topic_id = datastore_services.StringProperty(required=True, indexed=True)
+    # The next_content_id index to use for generation of new content ids.
+    next_content_id_index = datastore_services.IntegerProperty(
+        required=True, default=0, indexed=True)
+    # The json data of the study guide consisting of sections which
+    # is a list of heading and content pairs (sections).
+    sections = datastore_services.JsonProperty(required=True)
+    # The schema version for the sections field.
+    sections_schema_version = datastore_services.IntegerProperty(
+        required=True, indexed=True)
+    # The ISO 639-1 code for the language this study guide is written in.
+    language_code = (
+        datastore_services.StringProperty(required=True, indexed=True))
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    # Here we use MyPy ignore because the signature of this method doesn't
+    # match with VersionedModel.compute_models_to_commit(). Because argument
+    # `commit_message` of super class can accept Optional[str] but this method
+    # can only accept str.
+    def compute_models_to_commit(  # type: ignore[override]
+        self,
+        committer_id: str,
+        commit_type: str,
+        commit_message: str,
+        commit_cmds: base_models.AllowedCommitCmdsListType,
+        # We expect Mapping because we want to allow models that inherit
+        # from BaseModel as the values, if we used Dict this wouldn't
+        # be allowed.
+        additional_models: Mapping[str, base_models.BaseModel]
+    ) -> base_models.ModelsToPutDict:
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+            additional_models: dict(str, BaseModel). Additional models that are
+                needed for the commit process.
+
+        Returns:
+            ModelsToPutDict. A dict of models that should be put into
+            the datastore.
+        """
+        models_to_put = super().compute_models_to_commit(
+            committer_id,
+            commit_type,
+            commit_message,
+            commit_cmds,
+            additional_models
+        )
+
+        study_guide_commit_log_entry = StudyGuideCommitLogEntryModel().create(
+            self.id, self.version, committer_id, commit_type, commit_message,
+            commit_cmds, constants.ACTIVITY_STATUS_PUBLIC, False
+        )
+        study_guide_commit_log_entry.study_guide_page_id = self.id
+        # The order is important here, as the 'versioned_model' needs to be
+        # after 'snapshot_content_model' otherwise it leads to problems with
+        # putting the models into the datastore.
+        return {
+            'snapshot_metadata_model': models_to_put['snapshot_metadata_model'],
+            'snapshot_content_model': models_to_put['snapshot_content_model'],
+            'commit_log_model': study_guide_commit_log_entry,
+            'versioned_model': models_to_put['versioned_model'],
+        }
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'topic_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'next_content_id_index': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sections': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'sections_schema_version':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'language_code': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
