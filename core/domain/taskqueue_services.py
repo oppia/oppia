@@ -22,15 +22,15 @@ import datetime
 import json
 
 from core import feconf
-from core.platform import models
 from core.domain import cloud_task_domain
+from core.platform import models
 
-from typing import Any, Dict, Final, Optional, List
+from typing import Any, Dict, Final, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import platform_taskqueue_services
     from mypy_imports import cloud_task_models
+    from mypy_imports import platform_taskqueue_services
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 
@@ -73,7 +73,9 @@ FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: Final = 'untag_deleted_misconceptions'
 FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: Final = (
     'remove_user_from_rights_models')
 
-CLOUD_TASK_MAX_RETRIES = 3
+# The maximum number of retries allowed for a cloud task. This results in a
+# total of 3 attempts to execute the task, including the first attempt.
+CLOUD_TASK_MAX_RETRIES = 2
 
 
 # Here we use type Any because in defer() function '*args' points to the
@@ -129,6 +131,7 @@ def defer(
         new_cloud_task_model_id, task.task_name, fn_identifier)
 
     update_cloud_task_run_model(task_run_model)
+
 
 # Here we use type Any because the argument 'params' can accept payload
 # dictionaries which can hold the values of type string, set, int and
@@ -224,10 +227,9 @@ def get_cloud_task_run_by_model_id(
     cloud_task_model = cloud_task_models.CloudTaskRunModel.get(
         model_id, strict=False)
 
-    if cloud_task_model is not None:
-        return convert_cloud_task_run_model_to_domain_object(cloud_task_model)
-    else:
+    if cloud_task_model is None:
         return None
+    return convert_cloud_task_run_model_to_domain_object(cloud_task_model)
 
 
 def convert_cloud_task_run_model_to_domain_object(
@@ -245,6 +247,8 @@ def convert_cloud_task_run_model_to_domain_object(
     model_dict = {
         'id': cloud_task_model.id,
         'cloud_task_name': cloud_task_model.cloud_task_name,
+        'cloud_task_id': cloud_task_model.cloud_task_id,
+        'queue_id': cloud_task_model.queue_id,
         'function_id': cloud_task_model.function_id,
         'latest_job_state': cloud_task_model.latest_job_state,
         'exception_messages_for_failed_runs': (
@@ -276,10 +280,10 @@ def get_cloud_task_run_by_given_params(
         List[CloudTaskRun]. A list of CloudTaskRun domain objects with the
         specified queue ID.
     """
-    models = cloud_task_models.CloudTaskRunModel.get_by_queue_id(
+    cloud_task_run_models = cloud_task_models.CloudTaskRunModel.get_by_queue_id(
         queue_id)
     filtered_models = [
-            model for model in models
+            model for model in cloud_task_run_models
             if start_datetime <= model.last_updated <= end_datetime
         ]
     return [

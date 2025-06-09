@@ -25,7 +25,6 @@ import {
   EntityVoiceovers,
   EntityVoiceoversBackendDict,
 } from './entity-voiceovers.model';
-import {start} from 'repl';
 import {
   CloudTaskRun,
   CloudTaskRunBackendDict,
@@ -354,10 +353,9 @@ export class VoiceoverBackendApiService {
   }
 
   async fetchVoiceoverRegenerationRecordAsync(
-    stateDate,
-    endDate
+    stateDate: string,
+    endDate: string
   ): Promise<CloudTaskRun[]> {
-    console.log(stateDate, endDate);
     return new Promise((resolve, reject) => {
       this.http
         .get<CloudTaskRunBackendResponseDict>(

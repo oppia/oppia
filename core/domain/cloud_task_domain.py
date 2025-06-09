@@ -19,7 +19,7 @@
 from __future__ import annotations
 import datetime
 
-from typing import List, TypedDict
+from typing import List
 
 
 class CloudTaskRun:
@@ -29,6 +29,8 @@ class CloudTaskRun:
         self,
         id: str,
         cloud_task_name: str,
+        cloud_task_id: str,
+        queue_id: str,
         latest_job_state: str,
         function_id: str,
         exception_messages_for_failed_runs: List[str],
@@ -38,9 +40,12 @@ class CloudTaskRun:
     ) -> None:
         self.id = id
         self.cloud_task_name = cloud_task_name
+        self.cloud_task_id = cloud_task_id
+        self.queue_id = queue_id
         self.latest_job_state = latest_job_state
         self.function_id = function_id
-        self.exception_messages_for_failed_runs = exception_messages_for_failed_runs
+        self.exception_messages_for_failed_runs = (
+            exception_messages_for_failed_runs)
         self.current_retry_attempt = current_retry_attempt
         self.last_updated = last_updated
         self.created_on = created_on
@@ -50,9 +55,12 @@ class CloudTaskRun:
         return {
             'id': self.id,
             'cloud_task_name': self.cloud_task_name,
+            'cloud_task_id': self.cloud_task_id,
+            'queue_id': self.queue_id,
             'latest_job_state': self.latest_job_state,
             'function_id': self.function_id,
-            'exception_messages_for_failed_runs': self.exception_messages_for_failed_runs,
+            'exception_messages_for_failed_runs': (
+                self.exception_messages_for_failed_runs),
             'current_retry_attempt': self.current_retry_attempt,
             'last_updated': self.last_updated.isoformat(),
             'created_on': self.created_on.isoformat()
@@ -64,9 +72,12 @@ class CloudTaskRun:
         return cls(
             id=cloud_task_run_dict['id'],
             cloud_task_name=cloud_task_run_dict['cloud_task_name'],
+            cloud_task_id=cloud_task_run_dict['cloud_task_id'],
+            queue_id=cloud_task_run_dict['queue_id'],
             latest_job_state=cloud_task_run_dict['latest_job_state'],
             function_id=cloud_task_run_dict['function_id'],
-            exception_messages_for_failed_runs=cloud_task_run_dict['exception_messages_for_failed_runs'],
+            exception_messages_for_failed_runs=cloud_task_run_dict[
+                'exception_messages_for_failed_runs'],
             current_retry_attempt=cloud_task_run_dict['current_retry_attempt'],
             last_updated=cloud_task_run_dict['last_updated'],
             created_on=cloud_task_run_dict['created_on']

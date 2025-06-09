@@ -16,15 +16,16 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import taskqueue_services
 from core.domain import voiceover_regeneration_services
 from core.domain import voiceover_services
-from core.domain import taskqueue_services
 
 from typing import Dict, TypedDict
-from datetime import datetime
 
 
 class VoiceoverAdminDataHandler(
@@ -287,6 +288,9 @@ class EntityVoiceoversBulkHandler(
 class AutomaticVoiceoverRegenerationRecordHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
+    """Handler class to retrieve automatic voiceover regeneration records
+    within a specified date range."""
+
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
         'start_date': {
@@ -304,20 +308,19 @@ class AutomaticVoiceoverRegenerationRecordHandler(
 
     @acl_decorators.can_access_voiceover_admin_page
     def get(self, start_date: str, end_date: str) -> None:
-        """Gets the automatic voiceover regeneration records between the
-        given start and end date.
+        """Retrieves automatic voiceover regeneration records within the
+        specified start and end dates.
 
         Args:
-            start_date: str. The start date in the format of
-                "Day Month Date Year".
-            end_date: str. The end date in the format of
-                "Day Month Date Year".
+            start_date: str. The start date for filtering records.
+            end_date: str. The end date for filtering records.
         """
-        # Convert start_date and end_date to datetime objects
-        start_date_obj: datetime = datetime.strptime(start_date, "%a %b %d %Y")
-        end_date_obj: datetime = datetime.strptime(end_date, "%a %b %d %Y")
+        # Convert start_date and end_date to datetime objects.
+        start_date_obj: datetime = datetime.strptime(start_date, '%a %b %d %Y')
+        end_date_obj: datetime = datetime.strptime(end_date, '%a %b %d %Y')
 
-        # Fetch only those records that are related to voiceover regeneration.
+        # Fetch only those records that are related to voiceover regeneration
+        # and are within the specified date range.
         cloud_task_run_objects = (
             taskqueue_services.get_cloud_task_run_by_given_params(
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
