@@ -21,8 +21,8 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.domain import topic_fetchers
 from core.domain import subtopic_page_services
+from core.domain import topic_fetchers
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -48,7 +48,13 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
 
     @staticmethod
     def _create_study_guide_model(
-        data_tuple: Tuple[str, Tuple[subtopic_models.SubtopicPageModel, topic_models.TopicModel]]
+        data_tuple: Tuple[
+            str,
+            Tuple[
+                subtopic_models.SubtopicPageModel,
+                topic_models.TopicModel
+            ]
+        ]
     ) -> result.Result[
         Tuple[
             str,
@@ -59,35 +65,39 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
         ],
      Tuple[str, Exception]
     ]:
-        """Creates a study guide model and commit log entry from a subtopic page model and topic model.
+        """Creates a study guide model and commit log entry from
+            a subtopic page model and topic model.
 
         Args:
             data_tuple: Tuple containing subtopic_page_id and tuple of
                 (SubtopicPageModel, TopicModel).
 
         Returns:
-            Result((str, (StudyGuideModel, StudyGuideCommitLogEntryModel)), (str, Exception)). 
-            Result containing tuple which consist of subtopic page ID and either tuple of study
-            guide model and commit log entry model or Exception. Models are 
-            returned when the creation was successful and Exception is returned 
+            Result((str, (StudyGuideModel, StudyGuideCommitLogEntryModel)),
+            (str, Exception)). Result containing tuple which consist of
+            subtopic page ID and either tuple of study guide model and
+            commit log entry model or Exception. Models are returned when
+            the creation was successful and Exception is returned
             otherwise.
         """
         subtopic_page_id, (subtopic_page_model, topic_model) = data_tuple
-        
+
         try:
             with datastore_services.get_ndb_context():
-                subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
-                    subtopic_page_model)
+                subtopic_page = (
+                    subtopic_page_services
+                    .get_subtopic_page_from_model
+                )(subtopic_page_model)
                 topic = topic_fetchers.get_topic_from_model(topic_model)
-            
+
             subtopic_page.validate()
-            
+
             # Get subtopic_id from subtopic_page_id.
             subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
-            
+
             # Get subtopic title from the topic.
             subtopic_title = topic.subtopics[topic.get_subtopic_index(subtopic_id)].title
-            
+
             # Create sections list with heading and content.
             sections = [
                 {
@@ -99,7 +109,7 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
                     'html': subtopic_page.page_contents.subtitled_html.html
                 }
             ]
-            
+
         except Exception as e:
             logging.exception(e)
             return result.Err((subtopic_page_id, e))
@@ -114,8 +124,8 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
                 next_content_id_index=2,
                 version=1
             )
-            
-            # Create commit log entry model
+
+            # Create commit log entry model.
             commit_cmds = [
                 {
                     'cmd': 'create_new',
@@ -123,8 +133,11 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
                     'subtopic_id': subtopic_id
                 }
             ]
-            
-            study_guide_commit_log_entry_model = subtopic_models.StudyGuideCommitLogEntryModel(
+
+            study_guide_commit_log_entry_model = (
+                subtopic_models
+                .StudyGuideCommitLogEntryModel
+            )(
                 id='studyguide-%s-1' % subtopic_page_id,
                 study_guide_id=subtopic_page_id,
                 user_id=feconf.MIGRATION_BOT_USER_ID,
@@ -136,11 +149,19 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
                 post_commit_is_private=False,
                 version=1
             )
-        
+
         study_guide_model.update_timestamps()
         study_guide_commit_log_entry_model.update_timestamps()
-        
-        return result.Ok((subtopic_page_id, (study_guide_model, study_guide_commit_log_entry_model)))
+
+        return result.Ok(
+            (
+                subtopic_page_id,
+                (
+                    study_guide_model,
+                    study_guide_commit_log_entry_model
+                )
+            )
+        )
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the study guide
@@ -200,7 +221,7 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults(
                     'STUDY GUIDES PROCESSED'))
         )
-        
+
         study_guide_models_to_put = (
             study_guide_models
             | 'Filter oks' >> beam.Filter(
@@ -224,12 +245,19 @@ class AuditPopulateStudyGuidesJob(base_jobs.JobBase):
 
     @staticmethod
     def _regenerate_study_guide_model(
-        data_tuple: Tuple[str, Tuple[subtopic_models.SubtopicPageModel, topic_models.TopicModel]]
+        data_tuple: Tuple[
+            str,
+            Tuple[
+                subtopic_models.SubtopicPageModel,
+                topic_models.TopicModel
+            ]
+        ]
     ) -> result.Result[
         Tuple[str, subtopic_models.StudyGuideModel],
         Tuple[str, Exception]
     ]:
-        """Validates subtopic page and topic models and regenerates the study guide model.
+        """Validates subtopic page and topic models and
+            regenerates the study guide model.
 
         Args:
             data_tuple: Tuple containing subtopic_page_id and tuple of
@@ -237,32 +265,40 @@ class AuditPopulateStudyGuidesJob(base_jobs.JobBase):
 
         Returns:
             Result((str, StudyGuideModel), (str, Exception)). Result
-            containing tuple which consist of subtopic page ID and either study
-            guide model or Exception. Study guide model is returned when
-            the validation was successful and Exception is returned otherwise.
+            containing tuple which consist of subtopic page ID and
+            either study guide model or Exception. Study guide model
+            is returned when the validation was successful and
+            Exception is returned otherwise.
         """
         subtopic_page_id, (subtopic_page_model, topic_model) = data_tuple
         
         try:
             with datastore_services.get_ndb_context():
-                subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
-                    subtopic_page_model)
+                subtopic_page = (
+                    subtopic_page_services
+                    .get_subtopic_page_from_model
+                )(subtopic_page_model)
                 topic = topic_fetchers.get_topic_from_model(topic_model)
-            
+
             subtopic_page.validate()
             topic.validate()
-            
+
             # Get subtopic_id from subtopic_page_id.
-            subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
-            
+            subtopic_id = (
+                subtopic_page
+                .get_subtopic_id_from_subtopic_page_id
+            )()
+
             # Validate that subtopic exists in topic.
             subtopic_index = topic.get_subtopic_index(subtopic_id)
             if subtopic_index is None:
-                raise Exception(f'Subtopic {subtopic_id} not found in topic {topic.id}')
-            
+                raise Exception(
+                    f'Subtopic {subtopic_id} not found in topic {topic.id}'
+                )
+
             # Get subtopic title from the topic.
             subtopic_title = topic.subtopics[subtopic_index].title
-            
+
             # Create sections list with heading and content.
             sections = [
                 {
@@ -274,7 +310,7 @@ class AuditPopulateStudyGuidesJob(base_jobs.JobBase):
                     'html': subtopic_page.page_contents.subtitled_html.html
                 }
             ]
-            
+
         except Exception as e:
             logging.exception(e)
             return result.Err((subtopic_page_id, e))
@@ -289,7 +325,7 @@ class AuditPopulateStudyGuidesJob(base_jobs.JobBase):
                 next_content_id_index=2,
                 version=1
             )
-            
+
         study_guide_model.update_timestamps()
         
         return result.Ok((subtopic_page_id, study_guide_model))
@@ -351,7 +387,7 @@ class AuditPopulateStudyGuidesJob(base_jobs.JobBase):
                 job_result_transforms.ResultsToJobRunResults(
                     'STUDY GUIDE PROCESSED'))
         )
-        
+
         unused_regenerated_study_guides = (
             study_guide_models
             | 'Filter oks' >> beam.Filter(

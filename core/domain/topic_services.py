@@ -226,10 +226,10 @@ def apply_change_list(
         """Ensures a study guide exists for the given subtopic_id.
 
         Args:
-            subtopic_id: The ID of the subtopic.
+            subtopic_id: int. The ID of the subtopic.
 
         Returns:
-            str or None: The study guide ID if it exists or was created,
+            str or None. The study guide ID if it exists or was created,
             None if it doesn't exist and couldn't be created.
         """
         study_guide_id = (
@@ -287,15 +287,16 @@ def apply_change_list(
                         .SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
                     )
                 ):
-                    # Only update study guide if it exists
+                    # Only update study guide if it exists.
                     study_guide_id = _ensure_study_guide_exists(
                         update_subtopic_page_property_cmd.subtopic_id
                     )
 
                     if study_guide_id is not None:
-                        # Here we use cast because we are sure that the new_value is
-                        # subtitled html as written translations and recorded
-                        # voiceovers are not used.
+                        # Here we use cast because we are sure that the
+                        # new_value is subtitled html as written
+                        # translations and recorded voiceovers are
+                        # not used.
                         subtitled_html = cast(
                             state_domain.SubtitledHtmlDict,
                             update_subtopic_page_property_cmd.new_value
