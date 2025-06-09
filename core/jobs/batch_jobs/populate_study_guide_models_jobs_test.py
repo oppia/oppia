@@ -58,13 +58,17 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         self.subtopic_page_contents = {
             'subtitled_html': {
                 'html': '<p>Test subtopic content</p>',
-                'content_id': 'content_id'
+                'content_id': 'content'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    "content" : {}
+                }
             },
             'written_translations': {
-                'translations_mapping': {}
+                'translations_mapping': {
+                    "content" : {}
+                }
             }
         }
 
@@ -244,13 +248,17 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         invalid_subtopic_page_contents = {
             'subtitled_html': {
                 'html': '',
-                'content_id': 'content_id'
+                'content_id': 'content'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    "content" : {}
+                }
             },
             'written_translations': {
-                'translations_mapping': {}
+                'translations_mapping': {
+                    "content" : {}
+                }
             }
         }
 
@@ -333,13 +341,17 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         self.subtopic_page_contents = {
             'subtitled_html': {
                 'html': '<p>Test subtopic content</p>',
-                'content_id': 'content_id'
+                'content_id': 'content'
             },
             'recorded_voiceovers': {
-                'voiceovers_mapping': {}
+                'voiceovers_mapping': {
+                    "content" : {}
+                }
             },
             'written_translations': {
-                'translations_mapping': {}
+                'translations_mapping': {
+                    "content" : {}
+                }
             }
         }
 
@@ -568,6 +580,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             subtopic_schema_version=1,
             story_reference_schema_version=1,
             next_subtopic_id=2,
+            page_title_fragment_for_web='testing-seven',
             version=1
         )
 
