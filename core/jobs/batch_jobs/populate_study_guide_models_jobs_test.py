@@ -62,12 +62,12 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
-                    "content" : {}
+                    'content': {}
                 }
             },
             'written_translations': {
                 'translations_mapping': {
-                    "content" : {}
+                    'content': {}
                 }
             }
         }
@@ -252,12 +252,12 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
-                    "content" : {}
+                    'content': {}
                 }
             },
             'written_translations': {
                 'translations_mapping': {
-                    "content" : {}
+                    'content': {}
                 }
             }
         }
@@ -345,12 +345,12 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             },
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
-                    "content" : {}
+                    'content': {}
                 }
             },
             'written_translations': {
                 'translations_mapping': {
-                    "content" : {}
+                    'content': {}
                 }
             }
         }
