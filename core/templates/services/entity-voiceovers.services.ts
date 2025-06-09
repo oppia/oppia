@@ -94,6 +94,7 @@ export class EntityVoiceoversService {
           this.languageAccentCodeToEntityVoiceovers = {};
           this.createLanguageAccentCodeToEntityVoiceovers(entityVoiceoversList);
           this.entityVoiceoversLoaded = true;
+          this.activeLanguageAccentCode = this.getLanguageAccentCodes()[0];
           this._voiceoversLoadedEventEmitter.emit();
           resolve();
         });

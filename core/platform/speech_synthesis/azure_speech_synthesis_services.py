@@ -61,11 +61,6 @@ MAIN_CONTENT_SSML_TEMPLATE_BLOCK = """
     </p>
 """
 
-# Standard arithmetic operators used to separate text with math expressions in
-# an SSML string.
-COMMONLY_USED_ARITHMETIC_EXPRESSIONS = [
-    '+', ' - ', '*', ' / ', '×', '÷', '=']
-
 
 class WordBoundaryCollection:
     """This class handles word boundary events to collect the time offsets
@@ -92,24 +87,6 @@ class WordBoundaryCollection:
         audio_offset_record['audio_offset_msecs'] = event.audio_offset / 10000
 
         self.audio_offset_list.append(audio_offset_record)
-
-
-def is_mathematical_text(text: str) -> bool:
-    """The method determines whether the given text is mathematical by checking
-    for the presence of common arithmetic operators.
-
-    Args:
-        text: str. The text to be analyzed for the presence of arithmetic
-            operators.
-
-    Returns:
-        bool. A boolean value that signifies if the given text contains
-        mathematical content.
-    """
-    for expression in COMMONLY_USED_ARITHMETIC_EXPRESSIONS:
-        if expression in text:
-            return True
-    return False
 
 
 def get_azure_voicecode_from_language_accent_code(
