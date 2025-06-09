@@ -168,7 +168,7 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         self.assertEqual(commit_log_entry.commit_cmds, expected_commit_cmds)
 
     def test_multiple_subtopic_pages_processed(self) -> None:
-        # Create multiple subtopic pages
+        # Create multiple subtopic pages.
         subtopic_page_id_2 = f'{self.TOPIC_ID}-2'
         subtopic_2 = topic_domain.Subtopic(
             subtopic_id=2,
