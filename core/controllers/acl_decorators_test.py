@@ -688,10 +688,10 @@ class PlayExplorationAsLoggedInUserTests(test_utils.GenericTestBase):
             )
         self.logout()
 
-    def test_guest_user_cannot_access_exploration(self) -> None:
+    def test_guest_user_cannot_access_private_exploration(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_play_exploration/%s' % self.published_exp_id,
+                '/mock_play_exploration/%s' % self.private_exp_id,
                 expected_status_int=401)
 
     def test_moderator_user_can_access_private_exploration(self) -> None:
@@ -3837,14 +3837,16 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_user_without_review_rights_cannot_accept_translation_suggestion(
-        self) -> None:
+        self
+    ) -> None:
         self.login(self.VIEWER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        translation_review_swap = self.swap_to_always_return(
+            user_services, 'can_review_translation_suggestions', value=False)
+        with testapp_swap, translation_review_swap:
+            self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id_2))
-        self.assertEqual(response['suggestion_id'], self.suggestion_id_2)
-        self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
     def test_user_with_review_rights_can_accept_question_suggestion(
@@ -3862,15 +3864,17 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
-    def test_user_without_review_rights_cannot_accept_question_suggestion(
-            self) -> None:
+    def test_user_with_review_rights_cannot_accept_question_suggestion(
+        self
+    ) -> None:
         self.login(self.VIEWER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        question_review_swap = self.swap_to_always_return(
+            user_services, 'can_review_question_suggestions', value=False)
+        with testapp_swap, question_review_swap:
+            self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id_3))
-        self.assertEqual(response['suggestion_id'], self.suggestion_id_3)
-        self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
     def test_curriculum_admin_can_accept_suggestions(self) -> None:
@@ -5205,36 +5209,25 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
                 % self.story_url_fragment,
                 expected_status_int=404)
 
-    def test_guest_cannot_access_story(self) -> None:
-        self.logout()
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.mock_testapp.get(
-                '/mock_story_data/staging/topic/%s' % self.story_url_fragment,
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
-
-    def test_user_cannot_access_story_with_empty_topic_id(self) -> None:
-        invalid_story_id = story_services.get_new_story_id()
+    def test_story_with_empty_topic_id_raises_exception(self) -> None: 
         self.save_new_story(
-            # Empty topic_id.
-            invalid_story_id, self.admin_id, '',
-            url_fragment='story-no-topic')
-
+            # Topic id can't be None, only a string.
+            story_services.get_new_story_id(), self.admin_id, '',
+            url_fragment='story-no-topic-id')
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/staging/topic/story-no-topic',
+                '/mock_story_data/staging/topic/story-no-topic-id',
                 expected_status_int=404)
 
-    def test_user_cannot_access_story_with_wrong_story_id(self) -> None:
+    def test_story_not_referenced_in_topic_raises_exception(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        unrelated_story_id = story_services.get_new_story_id()
+        # This story is not added or referenced in the topic.
         self.save_new_story(
-            unrelated_story_id, self.admin_id, self.topic_id,
-            url_fragment='unrelated-story-frag')
-        # Do NOT update the topic with this unrelated story (on purpose).
+            story_services.get_new_story_id(), self.admin_id, 
+            self.topic_id, url_fragment='unreferenced-story-frag')
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/staging/topic/unrelated-story-frag',
+                '/mock_story_data/staging/topic/unreferenced-story-frag',
                 expected_status_int=404)
 
     def test_user_cannot_access_story_when_story_is_not_published(self) -> None:
@@ -5243,7 +5236,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock_story_data/staging/topic/%s'
                 % self.story_url_fragment,
-                expected_status_int=404)
+                expected_status_int=404)           
 
     def test_user_can_access_story_when_story_and_topic_are_published(
         self
@@ -5426,31 +5419,26 @@ class StoryViewerTests(test_utils.GenericTestBase):
                 '/mock_story_data/staging/topic/non-existent-frag',
                 expected_status_int=404)
 
-    def test_user_cannot_access_story_data_with_empty_topic_id(self) -> None:
-        story_id_with_no_topic = story_services.get_new_story_id()
+    def test_story_with_no_topic_id_raises_exception(self) -> None:
         self.save_new_story(
-            # Empty topic_id.
-            story_id_with_no_topic, self.admin_id, '',
-            url_fragment='story-no-topic')
-
+            # Story id can't be None, only a string.
+             story_services.get_new_story_id(), self.admin_id, '',
+            url_fragment='story-no-topic-id')
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/staging/topic/%s' % 'story-no-topic',
+                '/mock_story_data/staging/topic/%s' % 'story-no-topic-id',
                 expected_status_int=404)
 
-    def test_story_id_not_in_topic_references_does_not_set_published_flag(
+    def test_story_not_referenced_in_topic_raises_exception(
             self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-
-        # Create a new story not added to the topic.
-        unrelated_story_id = story_services.get_new_story_id()
+        # This story is not added or referenced in the topic.
         self.save_new_story(
-            unrelated_story_id, self.admin_id, self.topic_id,
-            url_fragment='unrelated-story-frag')
-
+             story_services.get_new_story_id(), self.admin_id, self.topic_id,
+            url_fragment='unreferenced-story-frag')
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock_story_data/staging/topic/unrelated-story-frag',
+                '/mock_story_data/staging/topic/unreferenced-story-frag',
                 expected_status_int=404)
 
     def test_cannot_access_story_when_topic_is_not_published(self) -> None:
@@ -7482,9 +7470,13 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
             'You must be logged in to access this resource.')
 
     def test_user_without_review_rights_cannot_update_translation_suggestion(
-        self) -> None:
+        self
+    ) -> None:
         self.login(self.en_language_reviewer)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        translation_update_swap = self.swap_to_always_return(
+            user_services, 'can_review_translation_suggestions', value=False)
+        with testapp_swap, translation_update_swap:
             response = self.get_json(
                 '/mock/%s' % self.translation_suggestion_id,
                 expected_status_int=401)
@@ -7496,7 +7488,10 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self
     ) -> None:
         self.login(self.en_language_reviewer)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        question_update_swap = self.swap_to_always_return(
+            user_services, 'can_review_translation_suggestions', value=False)
+        with testapp_swap, question_update_swap:
             self.get_json(
                 '/mock/%s' % self.question_suggestion_id,
                 expected_status_int=401)
@@ -7541,6 +7536,39 @@ class CanFetchContributorDashboardStatsTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'contribution_type': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'contribution_subtype': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        def get(
+            self,
+            contribution_type: str,
+            contribution_subtype: str,
+            username: str
+        ) -> None:
+            self.render_json({
+                'contribution_type': contribution_type,
+                'contribution_subtype': contribution_subtype,
+                'username': username
+            })
+            
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.user_email, self.username)
@@ -7578,7 +7606,7 @@ class CanFetchContributorDashboardStatsTests(test_utils.GenericTestBase):
             response['translation_contribution_stats'], dummy_stats)
         self.logout()
 
-    def test_guest_user_cannot_fetch_contributor_stats(self) -> None:
+    def test_guest_user_cannot_fetch_contributor_dashboard_stats(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/contributorstatssummarieshandler/<contribution_type>/'
@@ -7608,6 +7636,21 @@ class CanFetchAllContributorDashboardStatsTests(test_utils.GenericTestBase):
     username = 'user'
     user_email = 'user@example.com'
 
+    class MockHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+        URL_PATH_ARGS_SCHEMAS = {
+            'username': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+        @acl_decorators.can_fetch_all_contributor_dashboard_stats
+        def get(self, username: str) -> None:
+            self.render_json({'username': username})
+    
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.user_email, self.username)

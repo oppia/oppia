@@ -142,7 +142,9 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             'new author name'
         )
 
-    def test_get_blog_homepage_data_with_no_published_posts(self) -> None:
+    def test_get_blog_homepage_data_with_no_published_posts_returns_no_summaries(
+        self
+    ) -> None:
         blog_services.unpublish_blog_post(self.blog_post.id)
         self.login(self.user_email)
         json_response = self.get_json(
@@ -382,7 +384,9 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400
         )
 
-    def test_recommendations_when_summaries_are_insufficient(self) -> None:
+    def test_fetch_blog_post_summaries_when_recommendations_are_insufficient(
+        self
+    ) -> None:
         self.login(self.user_email)
 
         # Create fewer blog posts than the recommendation threshold.

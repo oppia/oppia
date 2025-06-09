@@ -396,7 +396,9 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             }
         })
 
-    def test_last_week_stats_missing_average_ratings(self) -> None:
+    def test_last_week_stats_skips_rounding_for_none_average_ratings(
+        self
+    ) -> None:
         self.login(self.OWNER_EMAIL, is_super_admin=True)
 
         get_last_week_dashboard_stats_swap = self.swap(

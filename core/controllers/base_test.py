@@ -2185,7 +2185,7 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
                 csrf_token=self.csrf_token,
                 source='http://localhost:8181/sample_url/')
 
-    def test_post_request_when_payload_arg_a_is_None_raise_error(self) -> None:
+    def test_post_request_when_payload_arg_is_None_raise_error(self) -> None:
         testapp_swap = self.swap(self, 'testapp', self.testapp)
         payload_swap = self.swap(self, 'payload', None)
 
