@@ -44,6 +44,7 @@ export enum FeatureNames {
   AutomaticVoiceoverRegenerationFromExp = 'automatic_voiceover_regeneration_from_exp',
   LabelAccentToVoiceArtist = 'label_accent_to_voice_artist',
   ShowVoiceoverTabForNonCuratedExplorations = 'show_voiceover_tab_for_non_curated_explorations',
+  ShowRestructuredStudyGuides = 'show_restructured_study_guides',
 }
 
 export interface FeatureStatusSummaryBackendDict {

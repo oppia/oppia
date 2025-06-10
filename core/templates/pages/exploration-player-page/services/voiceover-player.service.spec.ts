@@ -33,6 +33,7 @@ describe('Voiceover player service', () => {
   let entityVoiceovers: EntityVoiceovers;
   let voiceoverPlayerService: VoiceoverPlayerService;
   let manualVoiceover: Voiceover;
+  let autoVoiceover: Voiceover;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,16 +49,25 @@ describe('Voiceover player service', () => {
       needs_update: false,
       duration_secs: 10.0,
     };
+    let autoVoiceoverBackendDict: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
 
     let contentIdToVoiceoversMapping = {
       content0: {
         manual: manualVoiceoverBackendDict,
+        auto: autoVoiceoverBackendDict,
       },
     };
 
     manualVoiceover = Voiceover.createFromBackendDict(
       manualVoiceoverBackendDict
     );
+    autoVoiceover = Voiceover.createFromBackendDict(autoVoiceoverBackendDict);
+
     let entityVoiceoversBackendDict = {
       entity_id: 'exp_1',
       entity_type: 'exploration',
@@ -89,6 +99,14 @@ describe('Voiceover player service', () => {
 
     expect(voiceoverPlayerService.activeContentId).toEqual('content1');
     expect(voiceoverPlayerService.activeVoiceover).toBeUndefined();
+
+    entityVoiceovers.toggleManualVoiceoverNeedsUpdate('content0');
+    entityVoiceoversSpy.and.returnValue(entityVoiceovers);
+
+    voiceoverPlayerService.setActiveVoiceover('content0');
+
+    expect(voiceoverPlayerService.activeContentId).toEqual('content0');
+    expect(voiceoverPlayerService.activeVoiceover).toEqual(autoVoiceover);
   });
 
   it('should be able to get active voiceovers', () => {
@@ -102,6 +120,16 @@ describe('Voiceover player service', () => {
     expect(voiceoverPlayerService.getActiveVoiceover().filename).toEqual(
       'b.mp3'
     );
+  });
+
+  it('should be able to get active content id', () => {
+    voiceoverPlayerService.activeContentId = 'content0';
+
+    expect(voiceoverPlayerService.getActiveContentId()).toEqual('content0');
+
+    voiceoverPlayerService.activeContentId = 'content1';
+
+    expect(voiceoverPlayerService.getActiveContentId()).toEqual('content1');
   });
 
   it('should be able to set and get active component name', () => {

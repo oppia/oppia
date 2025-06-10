@@ -4225,7 +4225,7 @@ def can_access_subtopic_viewer_page(
         """
         if subtopic_url_fragment != subtopic_url_fragment.lower():
             _redirect_based_on_return_type(
-                self, '/learn/%s/%s/revision/%s' % (
+                self, '/learn/%s/%s/studyguide/%s' % (
                     classroom_url_fragment,
                     topic_url_fragment,
                     subtopic_url_fragment.lower()),
@@ -4260,7 +4260,7 @@ def can_access_subtopic_viewer_page(
         if not subtopic_id:
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s/revision' %
+                '/learn/%s/%s/studyguide' %
                 (classroom_url_fragment, topic_url_fragment),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return None
@@ -4269,7 +4269,7 @@ def can_access_subtopic_viewer_page(
             classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic.id))
         if classroom_url_fragment != verified_classroom_url_fragment:
-            url_substring = '%s/revision/%s' % (
+            url_substring = '%s/studyguide/%s' % (
                 topic_url_fragment, subtopic_url_fragment)
             _redirect_based_on_return_type(
                 self, '/learn/%s/%s' % (
@@ -4283,7 +4283,7 @@ def can_access_subtopic_viewer_page(
         if subtopic_page is None:
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s/revision' % (
+                '/learn/%s/%s/studyguide' % (
                     classroom_url_fragment, topic_url_fragment),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return None
