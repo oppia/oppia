@@ -731,9 +731,6 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageUrl: string,
     expectedDestinationPageName: string
   ): Promise<void> {
-    await this.page.waitForSelector(button, {
-      visible: true,
-    });
     await this.clickAndWaitForNavigation(button);
 
     expect(this.page.url()).toBe(expectedDestinationPageUrl);
