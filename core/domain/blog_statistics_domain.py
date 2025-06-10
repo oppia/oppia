@@ -403,7 +403,7 @@ class AuthorBlogPostsReadingTime:
             raise utils.ValidationError(
                 'author_id=%r has the wrong format' % self.author_id)
 
-                   
+
 class BlogPostViewedEvent:
     """Domain object representing a blog post viewed event."""
 
