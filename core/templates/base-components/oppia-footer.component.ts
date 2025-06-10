@@ -94,7 +94,7 @@ export class OppiaFooterComponent {
       this.emailDuplicated = true;
     } else {
       this.subscriptionProcessing = true;
-      this.emailsSubscribed.add(this.emailAddress);
+      this.emailsSubscribed.add(this.emailAddress ?? '');
       this.mailingListBackendApiService
         .subscribeUserToMailingList(
           String(this.emailAddress),
