@@ -289,22 +289,20 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
             file does not exist.
         """
         key, copy_info = group
-        if len(copy_info['src_exist']) != 1:  # pragma: no cover
-            logging.error(
-                'src_exist for key %s has unexpected length %d: %s',
-                key,
-                len(copy_info['src_exist']),
-                copy_info['src_exist'],
-            )
-        if len(copy_info['dst_exist']) != 1:  # pragma: no cover
-            logging.error(
-                'dst_exist for key %s has unexpected length %d: %s',
-                key,
-                len(copy_info['dst_exist']),
-                copy_info['dst_exist'],
-            )
-        src_exist, = copy_info['src_exist']
-        dst_exist, = copy_info['dst_exist']
+        # copy_info['src_exist'] and copy_info['dst_exist'] can have multiple
+        # elements (possibly because src was found multiple times among the
+        # translation suggestions). They all should be the same value because
+        # dst is computed deterministically from src and a given file path will
+        # always either exist or not exist regardless of when existence was
+        # checked (ignoring race conditions). Therefore, we assert that the
+        # contents of the lists are the same for each of src and dst, and then
+        # we just use the first elements to represent the whole lists.
+        src_exist_lst = copy_info['src_exist']
+        assert any(src_exist_lst) == all(src_exist_lst), (key, src_exist_lst)
+        src_exist = src_exist_lst[0]
+        dst_exist_lst = copy_info['dst_exist']
+        assert any(dst_exist_lst) == all(dst_exist_lst), (key, dst_exist_lst)
+        dst_exist = dst_exist_lst[0]
         return src_exist and not dst_exist
 
 
