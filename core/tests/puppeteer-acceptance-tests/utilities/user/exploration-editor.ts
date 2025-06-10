@@ -266,6 +266,8 @@ const regenerateAutomaticVoiceoverButton = '.e2e-test-regenerate-voiceover';
 const voiceoverConfirmationModalButton =
   '.e2e-test-voiceover-regeneration-confirm';
 
+const previousCardButton = '.e2e-test-back-button';
+
 enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
@@ -1880,11 +1882,16 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn('Delete skill');
   }
 
-  async expectCurrentURLToBeOf(tab: 'Preview Tab' | 'History Tab') {
+  expectCurrentURLToBeOf(
+    tab: 'Preview Tab' | 'History Tab' | 'Translation Tab' | 'Main Tab'
+  ) {
     const currentUrl = this.page.url();
     const urlPatterns = {
       'Preview Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/preview\/.+$/,
       'History Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/preview\//,
+      'Translation Tab':
+        /^http:\/\/localhost:8181\/create\/[^\/]+#\/translation\/.+$/,
+      'Main Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/gui\/.+$/,
     };
     const isCorrectUrl = urlPatterns[tab].test(currentUrl);
 
@@ -1912,7 +1919,7 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOn(previewTabButton);
     }
-    await this.expectCurrentURLToBeOf('Preview Tab');
+    this.expectCurrentURLToBeOf('Preview Tab');
   }
 
   /**
@@ -1927,7 +1934,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(historyTabButton);
     }
 
-    await this.expectCurrentURLToBeOf('History Tab');
+    this.expectCurrentURLToBeOf('History Tab');
   }
 
   /**
@@ -1957,14 +1964,18 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} fileCount - The number of existing files.
    * @returns {string} - The expected filename.
    */
-  getExpectedFileName(
+  async getExpectedFileName(
     version: number,
     isPublished: boolean,
     fileCount: number
-  ): string {
+  ): Promise<string> {
     const filePrefix = isPublished
       ? PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX
       : UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX;
+
+    await this.page.waitForSelector(filePrefix, {
+      visible: true,
+    });
     return fileCount === 0
       ? `${filePrefix}${version}.zip`
       : `${filePrefix}${version} (${fileCount}).zip`;
@@ -1995,7 +2006,7 @@ export class ExplorationEditor extends BaseUser {
           isExplorationPublished
         );
         const nextNumber = existingFiles.length;
-        const expectedFileName = this.getExpectedFileName(
+        const expectedFileName = await this.getExpectedFileName(
           explorationVersion,
           isExplorationPublished,
           nextNumber
@@ -2055,12 +2066,20 @@ export class ExplorationEditor extends BaseUser {
       if (!element) {
         await this.clickOn(mobileOptionsButtonSelector);
       }
+      await this.page.waitForSelector(mobileNavbarDropdown, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickOn(mobileTranslationTabButton);
     } else {
+      await this.page.waitForSelector(translationTabButton, {
+        visible: true,
+      });
       await this.clickOn(translationTabButton);
     }
+
+    this.expectCurrentURLToBeOf('Translation Tab');
   }
 
   /**
@@ -2075,13 +2094,21 @@ export class ExplorationEditor extends BaseUser {
       if (!element) {
         await this.clickOn(mobileOptionsButtonSelector);
       }
+      await this.page.waitForSelector(mobileNavbarDropdown, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickOn(mobileMainTabButton);
     } else {
+      await this.page.waitForSelector(mainTabButton, {
+        visible: true,
+      });
       await this.clickOn(mainTabButton);
     }
     await this.waitForNetworkIdle();
+
+    this.expectCurrentURLToBeOf('Main Tab');
   }
 
   /**
@@ -2123,6 +2150,10 @@ export class ExplorationEditor extends BaseUser {
         throw error;
       }
     }
+
+    await this.page.waitForSelector(previousCardButton, {
+      visible: true,
+    });
   }
 
   /**
@@ -2199,7 +2230,15 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(mobileOptionsButtonSelector);
       }
     }
+    await this.page.waitForSelector(previewRestartButton, {
+      visible: true,
+    });
     await this.clickOn(previewRestartButton);
+
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(previousCardButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -2439,6 +2478,9 @@ export class ExplorationEditor extends BaseUser {
     translation: string,
     feedbackIndex?: number
   ): Promise<void> {
+    await this.page.waitForSelector(voiceoverLanguageSelector, {
+      visible: true,
+    });
     await this.clickOn(voiceoverLanguageSelector);
     await this.page.waitForSelector(voiceoverLanguageOptionSelector);
     const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
@@ -2499,6 +2541,8 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOn(modifyExistingTranslationsButton);
     await this.waitForNetworkIdle();
+
+    // TODO: Add post-check
   }
 
   /**
@@ -2567,6 +2611,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(modalSaveButton);
     await this.clickOn(modifyTranslationsModalDoneButton);
+    // TODO: Add post check
     showMessage('Successfully updated translation from modal.');
   }
 
@@ -2695,6 +2740,8 @@ export class ExplorationEditor extends BaseUser {
     await this.uploadFile(voiceoverFilePath);
     await this.clickOn(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
+
+    // TODO: Add post check
   }
 
   /**
@@ -2709,6 +2756,9 @@ export class ExplorationEditor extends BaseUser {
     contentType: string
   ): Promise<void> {
     await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(activeTranslationTab, {
+      visible: true,
+    });
 
     const activeContentType = await this.page.$eval(activeTranslationTab, el =>
       el.textContent?.trim()
@@ -2963,6 +3013,7 @@ export class ExplorationEditor extends BaseUser {
 
     if (expectedThread > 0 && expectedThread <= feedbackSubjects.length) {
       await feedbackSubjects[expectedThread - 1].click();
+      // TODO: Add post check
     } else {
       throw new Error(`Expected thread not found: ${expectedThread}`);
     }
@@ -3005,8 +3056,12 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} reply - The reply to the suggestion.
    */
   async replyToSuggestion(reply: string): Promise<void> {
+    await this.page.waitForSelector(responseTextareaSelector, {
+      visible: true,
+    });
     await this.type(responseTextareaSelector, reply);
     await this.clickOn(sendButtonSelector);
+    // TODO: Add post check
   }
 
   /**
@@ -3033,7 +3088,11 @@ export class ExplorationEditor extends BaseUser {
    * Navigates back to the feedback tab.
    */
   async goBackToTheFeedbackTab(): Promise<void> {
+    await this.page.waitForSelector(feedbackTabBackButtonSelector, {
+      visible: true,
+    });
     await this.clickOn(feedbackTabBackButtonSelector);
+    // TODO: Add post check
   }
 
   /**
@@ -3041,6 +3100,9 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} statusValue - The new status value to set for the feedback.
    */
   async changeFeedbackStatus(statusValue: string): Promise<void> {
+    await this.page.waitForSelector(responseTextareaSelector, {
+      visible: true,
+    });
     if (statusValue === 'ignored' || statusValue === 'not_actionable') {
       await this.type(responseTextareaSelector, statusValue);
     }
@@ -3068,7 +3130,11 @@ export class ExplorationEditor extends BaseUser {
    * Presses the back button in the feedback thread tab.
    */
   async pressFeedbackThreadBackButton(): Promise<void> {
+    await this.page.waitForSelector(feedbackTabBackButtonSelector, {
+      visible: true,
+    });
     await this.clickOn(feedbackTabBackButtonSelector);
+    // Add post check
   }
 
   /**
