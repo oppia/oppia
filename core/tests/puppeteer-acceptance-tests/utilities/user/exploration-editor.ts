@@ -1350,6 +1350,9 @@ export class ExplorationEditor extends BaseUser {
         await this.page.type(floatFormInput, answer);
         break;
       case 'Multiple Choice':
+        await this.page.waitForSelector(multipleChoiceResponseDropdown, {
+          visible: true,
+        });
         await this.clickOn(multipleChoiceResponseDropdown);
         await this.page.waitForSelector(multipleChoiceResponseOption, {
           visible: true,
@@ -1374,11 +1377,17 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case 'Text Input':
+        await this.page.waitForSelector(addResponseOptionButton, {
+          visible: true,
+        });
         await this.clickOn(addResponseOptionButton);
         await this.page.waitForSelector(textInputInteractionOption);
         await this.page.type(textInputInteractionOption, answer);
         break;
       case 'Fraction Input':
+        await this.page.waitForSelector(intEditorField, {
+          visible: true,
+        });
         await this.clearAllTextFrom(intEditorField);
         await this.type(intEditorField, answer);
         break;
@@ -1436,6 +1445,9 @@ export class ExplorationEditor extends BaseUser {
     directToCard?: string,
     directToCardWhenStuck?: string
   ): Promise<void> {
+    await this.page.waitForSelector(defaultFeedbackTab, {
+      visible: true,
+    });
     await this.clickOn(defaultFeedbackTab);
 
     if (defaultResponseFeedback) {
@@ -1443,6 +1455,15 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(stateContentInputField);
       await this.type(stateContentInputField, `${defaultResponseFeedback}`);
       await this.clickOn(saveOutcomeFeedbackButton);
+
+      // TODO: Check for text and add post check based on it.
+      // Verify the text was added correctly
+      const newDefaultResponseText = await this.page.$eval(
+        openOutcomeFeedBackEditor,
+        el => el.textContent?.trim()
+      );
+
+      showMessage(`Default response feedback: ${newDefaultResponseText}`);
     }
 
     if (directToCard) {
@@ -1474,6 +1495,7 @@ export class ExplorationEditor extends BaseUser {
     const solutionSelector = isSolutionNumericInput
       ? solutionInputNumeric
       : solutionInputTextArea;
+    await this.page.waitForSelector(stateSolutionTab, {visible: true});
     await this.clickOn(addSolutionButton);
     await this.page.waitForSelector(solutionSelector, {visible: true});
     await this.type(solutionSelector, answer);
@@ -1482,6 +1504,9 @@ export class ExplorationEditor extends BaseUser {
     await this.type(stateContentInputField, answerExplanation);
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
+    await this.page.waitForSelector(submitSolutionButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -1489,17 +1514,42 @@ export class ExplorationEditor extends BaseUser {
    * @param explanation - Updated solution explanation for the state card.
    */
   async updateSolutionExplanation(explanation: string): Promise<void> {
+    await this.page.waitForSelector(stateSolutionTab, {visible: true});
     await this.clickOn(stateSolutionTab);
     await this.clickOn(editStateSolutionExplanationSelector);
     await this.type(stateContentInputField, explanation);
     await this.clickOn(saveSolutionEditButton);
+    await this.page.waitForSelector(saveSolutionEditButton, {
+      hidden: true,
+    });
   }
 
   /**
    * Sets a state as a checkpoint in the exploration.
    */
   async setTheStateAsCheckpoint(): Promise<void> {
-    await this.clickOn(setAsCheckpointButton);
+    await this.page.waitForSelector(setAsCheckpointButton, {
+      visible: true,
+    });
+
+    let checkboxState = await this.page.$eval(
+      `${setAsCheckpointButton} input.mat-checkbox-input`,
+      el => (el as HTMLInputElement).checked
+    );
+
+    if (!checkboxState) {
+      await this.clickOn(setAsCheckpointButton);
+    }
+
+    // Check checkbox value again and throw error if it's still not checked.
+    checkboxState = await this.page.$eval(
+      `${setAsCheckpointButton} input.mat-checkbox-input`,
+      el => (el as HTMLInputElement).checked
+    );
+
+    if (!checkboxState) {
+      throw new Error('Failed to set the state as a checkpoint.');
+    }
   }
 
   /**
@@ -1507,9 +1557,15 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} hint - The hint to be added for the current card.
    */
   async addHintToState(hint: string): Promise<void> {
+    await this.page.waitForSelector(addHintButton, {
+      visible: true,
+    });
     await this.clickOn(addHintButton);
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintButton);
+    await this.page.waitForSelector(saveHintButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -1517,10 +1573,16 @@ export class ExplorationEditor extends BaseUser {
    * @param hint - The updated hint content for the current card.
    */
   async updateHint(hint: string): Promise<void> {
+    await this.page.waitForSelector(stateHintTab, {
+      visible: true,
+    });
     await this.clickOn(stateHintTab);
     await this.clickOn(editStateHintSelector);
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintEditButton);
+    await this.page.waitForSelector(saveHintEditButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -1535,10 +1597,16 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(mobileToggleSkillCard);
       }
     }
+    await this.page.waitForSelector(addSkillButton, {
+      visible: true,
+    });
     await this.clickOn(addSkillButton);
     await this.type(skillNameInput, skillName);
     await this.clickOn(skillItem);
     await this.clickOn(confirmSkillButton);
+    await this.page.waitForSelector(confirmSkillButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -1562,6 +1630,9 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(toggleResponseTab);
       }
     }
+    await this.page.waitForSelector(responseGroupDiv, {
+      visible: true,
+    });
     let responseTabs = await this.page.$$(responseGroupDiv);
 
     await responseTabs[responseIndex].click();
@@ -1587,6 +1658,9 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(leaveTranslationsAsIsButton);
+    await this.page.waitForSelector(leaveTranslationsAsIsButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -1610,6 +1684,9 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(toggleResponseTab);
       }
     }
+    await this.page.waitForSelector(responseGroupDiv, {
+      visible: true,
+    });
     let responseTabs = await this.page.$$(responseGroupDiv);
     await responseTabs[responseIndex].click();
     await this.clickOn(misconceptionEditorTab);
@@ -1632,6 +1709,9 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(leaveTranslationsAsIsButton);
+    await this.page.waitForSelector(leaveTranslationsAsIsButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -1793,8 +1873,26 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(mobileToggleSkillCard);
       }
     }
+    await this.page.waitForSelector(deleteSkillButton, {
+      visible: true,
+    });
     await this.clickOn(deleteSkillButton);
     await this.clickOn('Delete skill');
+  }
+
+  async expectCurrentURLToBeOf(tab: 'Preview Tab' | 'History Tab') {
+    const currentUrl = this.page.url();
+    const urlPatterns = {
+      'Preview Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/preview\/.+$/,
+      'History Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/preview\//,
+    };
+    const isCorrectUrl = urlPatterns[tab].test(currentUrl);
+
+    if (!isCorrectUrl) {
+      throw new Error(
+        `The current URL "${currentUrl}" does not match the expected pattern "${urlPatterns[tab]}".`
+      );
+    }
   }
 
   /**
@@ -1802,12 +1900,19 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarDropdown, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickOn(mobilePreviewTabButton);
     } else {
+      await this.page.waitForSelector(previewTabButton, {
+        visible: true,
+      });
       await this.clickOn(previewTabButton);
     }
+    await this.expectCurrentURLToBeOf('Preview Tab');
   }
 
   /**
@@ -1821,6 +1926,8 @@ export class ExplorationEditor extends BaseUser {
     } else {
       await this.clickOn(historyTabButton);
     }
+
+    await this.expectCurrentURLToBeOf('History Tab');
   }
 
   /**
