@@ -403,12 +403,23 @@ class AuthorBlogPostsReadingTime:
             raise utils.ValidationError(
                 'author_id=%r has the wrong format' % self.author_id)
             
-            
-            
+                    
 class BlogPostViewedEvent:
-    def __init__(self, blog_post_id: str):
+    """Domain object representing a blog post viewed event."""
+
+    def __init__(self, blog_post_id: str) -> None:
+        """Initializes a BlogPostViewedEvent object.
+
+        Args:
+            blog_post_id: str. The ID of the blog post that was viewed.
+        """
         self.blog_post_id = blog_post_id
 
     def validate(self) -> None:
+        """Validates that the blog post ID is a non-empty string.
+
+        Raises:
+            ValueError. If blog_post_id is not a non-empty string.
+        """
         if not isinstance(self.blog_post_id, str) or not self.blog_post_id:
-            raise ValueError("blog_post_id must be a non-empty string.")
+            raise ValueError('blog_post_id must be a non-empty string.')
