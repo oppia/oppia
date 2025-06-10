@@ -36,54 +36,71 @@ describe('Logged-in User', function () {
     await loggedInUser1.closeBrowser();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it('should be able to check admin suggestion', async function () {
-    // Calling openBrowser since we didn't use createNewUser to create loggedInUser2 as it needs a username and a email.
-    await loggedInUser2.openBrowser();
-    await loggedInUser2.navigateToSignUpPage();
+  it(
+    'should be able to check admin suggestion',
+    async function () {
+      // Calling openBrowser since we didn't use createNewUser to create loggedInUser2 as it needs a username and a email.
+      await loggedInUser2.openBrowser();
+      await loggedInUser2.navigateToSignUpPage();
 
-    await loggedInUser2.clickAdminAccessInfoLink();
-    await loggedInUser2.expectAdminEmailSuggestion('testadmin@example.com');
-  });
-  it('should be able to enter a vaild email', async function () {
-    // Entering invalid email.
-    await loggedInUser2.enterEmail('123@gmail.');
-    await loggedInUser2.expectValidationError('Invalid email address');
+      await loggedInUser2.clickAdminAccessInfoLink();
+      await loggedInUser2.expectAdminEmailSuggestion('testadmin@example.com');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    // Entering valid email.
-    await loggedInUser2.enterEmail('logged_in_user2@example.com');
-  });
+  it(
+    'should be able to enter a vaild email',
+    async function () {
+      // Entering invalid email.
+      await loggedInUser2.enterEmail('123@gmail.');
+      await loggedInUser2.expectValidationError('Invalid email address');
 
-  it('should be able to check username availability', async function () {
-    // Checking username availability via entering username that already exists.
-    await loggedInUser2.signInWithUsername('loggedInUser1');
-    await loggedInUser2.expectUsernameError(
-      'Sorry, this username is already taken.'
-    );
+      // Entering valid email.
+      await loggedInUser2.enterEmail('logged_in_user2@example.com');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    // Checking username via entering a username with 'admin' term(which shall is not allowed as  term "admin" is reserved).
-    await loggedInUser2.signInWithUsername('ImAdmin');
-    await loggedInUser2.expectUsernameError(
-      "User names with 'admin' are reserved."
-    );
+  it(
+    'should be able to check username availability',
+    async function () {
+      // Checking username availability via entering username that already exists.
+      await loggedInUser2.signInWithUsername('loggedInUser1');
+      await loggedInUser2.expectUsernameError(
+        'Sorry, this username is already taken.'
+      );
 
-    // Entering valid username and signing up.
-    await loggedInUser2.signInWithUsername('loggedInUser2');
-  });
+      // Checking username via entering a username with 'admin' term(which shall is not allowed as  term "admin" is reserved).
+      await loggedInUser2.signInWithUsername('ImAdmin');
+      await loggedInUser2.expectUsernameError(
+        "User names with 'admin' are reserved."
+      );
 
-  it('should be able to delete account', async function () {
-    // Delete the account.
-    await loggedInUser2.navigateToPreferencesPage();
-    await loggedInUser2.deleteAccount();
-    // Initiating account deletion from /preferences page redirects to /delete-account page.
-    await loggedInUser2.expectToBeOnPage('delete account');
-    await loggedInUser2.confirmAccountDeletion('loggedInUser2');
+      // Entering valid username and signing up.
+      await loggedInUser2.signInWithUsername('loggedInUser2');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    // After confirmation of account deletion, user is redirected to /pending-account-deletion page.
-    await loggedInUser2.expectToBeOnPage('pending account deletion');
-    // Calling closeBrowser since we didn't call createNewUser for loggedInUser2, so loggedInUser2 is not in the array activeUsers.
-    // UserFactory.closeAllBrowsers closes all browsers based on activeUsers. Therefore, closeBrowser is called to close loggedInUser2's browser.
-    await loggedInUser2.closeBrowser();
-  });
+  it(
+    'should be able to delete account',
+    async function () {
+      // Delete the account.
+      await loggedInUser2.navigateToPreferencesPage();
+      await loggedInUser2.deleteAccount();
+      // Initiating account deletion from /preferences page redirects to /delete-account page.
+      await loggedInUser2.expectToBeOnPage('delete account');
+      await loggedInUser2.confirmAccountDeletion('loggedInUser2');
+
+      // After confirmation of account deletion, user is redirected to /pending-account-deletion page.
+      await loggedInUser2.expectToBeOnPage('pending account deletion');
+      // Calling closeBrowser since we didn't call createNewUser for loggedInUser2, so loggedInUser2 is not in the array activeUsers.
+      // UserFactory.closeAllBrowsers closes all browsers based on activeUsers. Therefore, closeBrowser is called to close loggedInUser2's browser.
+      await loggedInUser2.closeBrowser();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

@@ -21,8 +21,8 @@ import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
@@ -77,22 +77,29 @@ describe('Logged-Out Learner', function () {
     }
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it('should be able to give feedback from the lesson player', async function () {
-    await loggedOutLearner.playExploration(explorationId);
+  it(
+    'should be able to give feedback from the lesson player',
+    async function () {
+      await loggedOutLearner.playExploration(explorationId);
 
-    // Open Feedback popup and check "Stay Anonymous" text isn't visible.
-    await loggedOutLearner.openFeedbackPopup();
-    await loggedOutLearner.expectStayAnonymousCheckboxToBePresent(false);
-    await loggedOutLearner.expectScreenshotToMatch('feedbackPopup', __dirname);
+      // Open Feedback popup and check "Stay Anonymous" text isn't visible.
+      await loggedOutLearner.openFeedbackPopup();
+      await loggedOutLearner.expectStayAnonymousCheckboxToBePresent(false);
+      await loggedOutLearner.expectScreenshotToMatch(
+        'feedbackPopup',
+        __dirname
+      );
 
-    // Give feedback and verify submission success.
-    await loggedOutLearner.writeAndSubmitFeedback(
-      'This is a great lesson!',
-      false,
-      false
-    );
-    await loggedOutLearner.verifyFeedbackSubmissionSuccess();
-  });
+      // Give feedback and verify submission success.
+      await loggedOutLearner.writeAndSubmitFeedback(
+        'This is a great lesson!',
+        false,
+        false
+      );
+      await loggedOutLearner.verifyFeedbackSubmissionSuccess();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

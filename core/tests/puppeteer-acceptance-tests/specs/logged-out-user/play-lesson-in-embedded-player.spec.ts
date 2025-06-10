@@ -15,6 +15,8 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import testConstants from '../../utilities/common/test-constants';
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 /**
  * @fileoverview Acceptance Test for checking if a learner can play an
@@ -38,39 +40,48 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
       );
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
-  });
-  it('should be able to start an embedded lesson', async function () {
-    // Visit the embedded lesson URL, and expect exploration to be present.
-    await loggedOutUser.goto(
-      `http://localhost:8181/embed/exploration/${explorationId}`
-    );
-    await loggedOutUser.expectCardContentToMatch('Content 0');
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-    // Verify continue button, and language dropdown are present.
-    await loggedOutUser.expectContinueToNextCardButtonToBePresent();
-    await loggedOutUser.expectLanguageDropdownToBePresent();
+  it(
+    'should be able to start an embedded lesson',
+    async function () {
+      // Visit the embedded lesson URL, and expect exploration to be present.
+      await loggedOutUser.goto(
+        `http://localhost:8181/embed/exploration/${explorationId}`
+      );
+      await loggedOutUser.expectCardContentToMatch('Content 0');
 
-    // Verify lesson info text, and audio bar are not present.
-    await loggedOutUser.expectLessonInfoTextToBePresent(false);
-    // TODO: Audio Bar isn't visible
+      // Verify continue button, and language dropdown are present.
+      await loggedOutUser.expectContinueToNextCardButtonToBePresent();
+      await loggedOutUser.expectLanguageDropdownToBePresent();
 
-    // Compare screenshot of the embedded lesson player.
-    await loggedOutUser.expectScreenshotToMatch(
-      'lesson-player-embedded',
-      __dirname
-    );
-  });
+      // Verify lesson info text, and audio bar are not present.
+      await loggedOutUser.expectLessonInfoTextToBePresent(false);
+      // TODO: Audio Bar isn't visible.
 
-  it('should be able to complete the embedded lesson, but not rate the exploration', async function () {
-    // Complete the exploration and expect completion toast message.
-    await loggedOutUser.continueToNextCard();
-    await loggedOutUser.expectExplorationCompletionToastMessage(
-      'Congratulations for completing this lesson!'
-    );
+      // Compare screenshot of the embedded lesson player.
+      await loggedOutUser.expectScreenshotToMatch(
+        'lesson-player-embedded',
+        __dirname
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    // Expect rate options to not be available.
-    await loggedOutUser.expectRateOptionsNotAvailable();
-  });
+  it(
+    'should be able to complete the embedded lesson, but not rate the exploration',
+    async function () {
+      // Complete the exploration and expect completion toast message.
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
+
+      // Expect rate options to not be available.
+      await loggedOutUser.expectRateOptionsNotAvailable();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

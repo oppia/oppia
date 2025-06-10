@@ -248,8 +248,8 @@
       "name": "logged-out-user/view-and-search-blog-posts",
       "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-out-user/view-and-search-blog-posts.spec.ts"
     },{
-      "name": "logged-out-user/access-exploration-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/access-exploration-player.spec.ts"
+      "name": "logged-out-user/access-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/access-lesson-player.spec.ts"
     },{
       "name": "logged-out-user/give-feedback-from-lesson-player",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/give-feedback-from-lesson-player.spec.ts"

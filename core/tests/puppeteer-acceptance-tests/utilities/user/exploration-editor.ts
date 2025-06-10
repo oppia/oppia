@@ -2841,9 +2841,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     const helperModel = await this.page.$('oppia-rte-helper-modal');
 
-    const tabTitleInputElements = await helperModel?.$$(
-      'input.e2e-test-text-input'
-    );
+    const tabTitleInputElements = await helperModel?.$$(textInputSelector);
     const tabContentInputElements = await helperModel?.$$(
       stateContentInputField
     );
@@ -2985,7 +2983,7 @@ export class ExplorationEditor extends BaseUser {
     const helperModel = await this.page.$('oppia-rte-helper-modal');
 
     // Get Fields.
-    const inputs = await helperModel?.$$('input.e2e-test-text-input');
+    const inputs = await helperModel?.$$(textInputSelector);
     const linkInput = inputs?.[0];
     const linkTextInput = inputs?.[1];
 
