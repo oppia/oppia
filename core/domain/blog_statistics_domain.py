@@ -402,3 +402,13 @@ class AuthorBlogPostsReadingTime:
         if not utils.is_user_id_valid(self.author_id):
             raise utils.ValidationError(
                 'author_id=%r has the wrong format' % self.author_id)
+            
+            
+            
+class BlogPostViewedEvent:
+    def __init__(self, blog_post_id: str):
+        self.blog_post_id = blog_post_id
+
+    def validate(self) -> None:
+        if not isinstance(self.blog_post_id, str) or not self.blog_post_id:
+            raise ValueError("blog_post_id must be a non-empty string.")
