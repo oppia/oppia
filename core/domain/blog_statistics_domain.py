@@ -402,8 +402,8 @@ class AuthorBlogPostsReadingTime:
         if not utils.is_user_id_valid(self.author_id):
             raise utils.ValidationError(
                 'author_id=%r has the wrong format' % self.author_id)
-            
-                    
+
+                   
 class BlogPostViewedEvent:
     """Domain object representing a blog post viewed event."""
 
