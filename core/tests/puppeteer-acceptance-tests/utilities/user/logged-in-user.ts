@@ -792,7 +792,6 @@ export class LoggedInUser extends BaseUser {
       }
 
       // Post-check: Verify if the tooltip appears.
-      // TODO: Verify if post check is proper.
       if (!skipVerification) {
         await this.expectToolTipMessage(
           "Successfully added to your 'Play Later' list."
@@ -1043,7 +1042,6 @@ export class LoggedInUser extends BaseUser {
       await this.page.keyboard.press('Enter');
     }
 
-    // TODO: Ensure works properly
     // Post-check: ensure all interests are present as tags.
     const foundTexts = await this.page.$$eval(
       subjectInterestTagsInPreferencesPage,
