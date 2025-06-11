@@ -22,6 +22,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {Topic} from 'domain/topic/topic-object.model';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
@@ -64,6 +65,7 @@ export class CreateNewSubtopicModalComponent
     private subtopicValidationService: SubtopicValidationService,
     private topicUpdateService: TopicUpdateService,
     private topicEditorStateService: TopicEditorStateService,
+    private platformFeatureService: PlatformFeatureService,
     private windowRef: WindowRef
   ) {
     super(ngbActiveModal);
@@ -159,6 +161,11 @@ export class CreateNewSubtopicModalComponent
     return this.subtopicValidationService.isUrlFragmentValid(
       this.editableUrlFragment.trim()
     );
+  }
+
+  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.ShowRestructuredStudyGuides
+      .isEnabled;
   }
 
   checkSubtopicExistence(): void {

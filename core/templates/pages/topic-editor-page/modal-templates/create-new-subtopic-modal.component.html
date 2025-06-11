@@ -34,7 +34,7 @@
                                        (urlFragmentChange)="onUrlFragmentChange($event)">
         </url-fragment-editor-component>
       </div>
-      <div class="create-new-subtopic-input-field create-new-subtopic-content">
+      <div *ngIf="!isShowRestructuredStudyGuidesFeatureEnabled()" class="create-new-subtopic-input-field create-new-subtopic-content">
         <div>
           <strong>Explanation of the subtopic*</strong>
         </div>
@@ -53,6 +53,35 @@
               Give a description or explanation of the subtopic.
             <i class="fa fa-pen"></i>
           </span>
+        </div>
+      </div>
+
+      <div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="create-new-subtopic-input-field create-new-subtopic-content">
+        <div>
+          <strong>Section of the study guide*</strong>
+        </div>
+        <span class="oppia-input-box-subtitle">
+          <em>
+            A section of the study guide. More sections can be added using the study guide editor after clicking on the create Study Guide Button.
+          </em>
+        </span>
+        <div>
+          <strong>Heading*</strong>
+        </div>
+        <input class="form-control oppia-new-subtopic-editable-field e2e-test-new-subtopic-title-field required"
+               placeholder="Enter heading of the section"
+               [(ngModel)]="subtopicTitle" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
+        <div>
+          <strong>Content*</strong>
+          <div class="description-editor e2e-test-subtopic-description-editor">
+          <div class="oppia-editor-card-body" >
+            <schema-based-editor [schema]="getSchema()"
+                                 class="e2e-test-create-subtopic-page-content"
+                                 [localValue]="htmlData"
+                                 (localValueChange)="localValueChange($event)">
+            </schema-based-editor>
+          </div>
+        </div>
         </div>
       </div>
 

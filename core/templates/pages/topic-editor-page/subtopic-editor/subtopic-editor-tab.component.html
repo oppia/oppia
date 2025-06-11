@@ -157,6 +157,71 @@
           </div>
         </div>
       </mat-card>
+      <mat-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
+      <div class="oppia-editor-card-body">
+        <div class="oppia-editor-card-section worked-example-content">
+          <div class="oppia-worked-examples-header oppia-mobile-collapsible-card-header" (click)="toggleWorkedExampleList()">
+            <strong class="heading-text">Worked Examples</strong>
+            <i class="fa fa-caret-down"
+              *ngIf="!workedExamplesListIsShown"
+              [attr.aria-hidden]="true">
+            </i>
+            <i class="fa fa-caret-up"
+              *ngIf="workedExamplesListIsShown"
+              [attr.aria-hidden]="true">
+            </i>
+          </div>
+          <div *ngIf="workedExamplesListIsShown" class="oppia-mobile-collapsible-card-content">
+            <div class="concept-card-subtitle">
+              These will be displayed one-by-one to the learner, in order, if they ask for them.
+            </div>
+            <div *ngIf="bindableFieldsDict.displayedWorkedExamples.length > 0">
+              <ul cdkDropList (cdkDropListDropped)="drop($event)"
+                  class="oppia-skill-concept-card-preview oppia-option-list nav-stacked nav-pills worked-examples-list">
+                <li cdkDrag *ngFor="let workedExample of bindableFieldsDict.displayedWorkedExamples; let index = index"
+                    [ngClass]="{'active': activeWorkedExampleIndex === index, 'last-element': index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
+                    class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection">
+                  <span class="oppia-worked-example-sort-handle"
+                        *ngIf="bindableFieldsDict.displayedWorkedExamples.length > 1"
+                        (mousedown)="changeActiveWorkedExampleIndex(-1)">
+                    <picture>
+                      <source type="image/webp" [src]="getStaticImageUrl('/general/drag_dots.webp')">
+                      <source type="image/png" [src]="getStaticImageUrl('/general/drag_dots.png')">
+                      <img [src]="getStaticImageUrl('/general/drag_dots.png')" width="10">
+                    </picture>
+                  </span>
+                  <a (click)="changeActiveWorkedExampleIndex(index)"
+                    class="oppia-rule-tab e2e-test-worked-example-{{ index }} oppia-skill-concept-card-preview-list"
+                    [ngClass]="{'oppia-rule-tab-active': activeWorkedExampleIndex === index}">
+                    <oppia-summary-list-header [index]="index"
+                                              [disableSorting]="bindableFieldsDict.displayedWorkedExamples.length === 1"
+                                              [summary]="getWorkedExampleSummary(workedExample.getQuestion().html)"
+                                              [shortSummary]="getWorkedExampleSummary(workedExample.getQuestion().html)"
+                                              [isActive]="index === activeWorkedExampleIndex"
+                                              [isDeleteAvailable]="isEditable"
+                                              (summaryDelete)="deleteWorkedExample($event.index, $event.event)">
+                    </oppia-summary-list-header>
+                  </a>
+                  <div *ngIf="activeWorkedExampleIndex === index">
+                    <div class="oppia-editor-card-section">
+                      <oppia-worked-example-editor [workedExample]="workedExample"
+                                                  [index]="index"
+                                                  [isEditable]="isEditable">
+                      </oppia-worked-example-editor>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <button type="button"
+                    class="btn btn-add-skill-example skill-editor-add-btn e2e-test-add-worked-example"
+                    (click)="openAddWorkedExampleModal()">
+              + ADD WORKED EXAMPLE
+            </button>
+          </div>
+        </div>
+      </div>
+    </mat-card>
       <mat-card class="oppia-subtopics-list-card subtopic-skill-card subtopic-item-container oppia-mobile-collapsible-card" tabindex="0">
         <div class="skill-card-header oppia-mobile-collapsible-card-header"
              (click)="togglePreviewSkillCard()">
