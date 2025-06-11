@@ -266,6 +266,7 @@ export class CurriculumAdmin extends BaseUser {
       `${confirmSkillCreationButton}:not([disabled])`
     );
     await this.clickOn(confirmSkillCreationButton);
+    await this.waitForNetworkIdle();
     await this.page.waitForSelector(confirmSkillCreationButton, {
       hidden: true,
     });
