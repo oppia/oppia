@@ -124,7 +124,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
             study_guide.language_code,
             constants.DEFAULT_LANGUAGE_CODE
         )
-        self.assertEqual(study_guide.version, 1)
+        self.assertEqual(study_guide.version, 0)
 
     def test_get_study_guide_id(self) -> None:
         """Test generation of study guide ID."""
