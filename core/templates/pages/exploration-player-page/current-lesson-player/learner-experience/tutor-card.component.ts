@@ -39,11 +39,11 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
-import {AudioPreloaderService} from '../services/audio-preloader.service';
-import {CurrentInteractionService} from '../services/current-interaction.service';
-import {ExplorationPlayerStateService} from '../services/exploration-player-state.service';
-import {LearnerAnswerInfoService} from '../services/learner-answer-info.service';
-import {PlayerPositionService} from '../services/player-position.service';
+import {AudioPreloaderService} from '../../services/audio-preloader.service';
+import {CurrentInteractionService} from '../../services/current-interaction.service';
+import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
+import {LearnerAnswerInfoService} from '../../services/learner-answer-info.service';
+import {PlayerPositionService} from '../../services/player-position.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {
   animate,
@@ -67,7 +67,7 @@ const STANDARD_ANIMATION_DURATION_IN_MSECS = 4000;
 const MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS = [1, 5, 10, 25, 50];
 
 import './tutor-card.component.css';
-import {VoiceoverPlayerService} from '../services/voiceover-player.service';
+import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 
 @Component({
   selector: 'oppia-tutor-card',

@@ -26,7 +26,7 @@ import {
 } from '@angular/core/testing';
 import {PlayerSidebarComponent} from './player-sidebar.component';
 import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
-import {MobileMenuService} from '../new-lesson-player-services/mobile-menu.service';
+import {MobileMenuService} from '../../services/mobile-menu.service';
 import './player-sidebar.component.css';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {

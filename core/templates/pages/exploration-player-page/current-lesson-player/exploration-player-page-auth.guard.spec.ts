@@ -26,7 +26,7 @@ import {
 } from '@angular/router';
 import {Location} from '@angular/common';
 
-import {AppConstants} from '../../app.constants';
+import {AppConstants} from '../../../app.constants';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.guard';
 

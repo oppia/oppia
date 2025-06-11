@@ -29,7 +29,7 @@ import {PlayerTranscriptService} from 'pages/exploration-player-page/services/pl
 import {
   SwitchContentLanguageRefreshRequiredModalComponent,
   // eslint-disable-next-line max-len
-} from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+} from 'pages/exploration-player-page/current-lesson-player/modals/switch-content-language-refresh-required-modal.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
 import {WindowRef} from 'services/contextual/window-ref.service';

@@ -19,10 +19,10 @@
 import {Component, EventEmitter, Output} from '@angular/core';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {InteractionRulesService} from '../services/answer-classification.service';
-import {ExplorationEngineService} from '../services/exploration-engine.service';
-import {LearnerAnswerInfoService} from '../services/learner-answer-info.service';
-import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {InteractionRulesService} from '../../services/answer-classification.service';
+import {ExplorationEngineService} from '../../services/exploration-engine.service';
+import {LearnerAnswerInfoService} from '../../services/learner-answer-info.service';
+import {PlayerTranscriptService} from '../../services/player-transcript.service';
 
 interface SubmitAnswerEventDataInterface {
   currentAnswer: string;

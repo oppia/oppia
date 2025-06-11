@@ -33,7 +33,7 @@ import {
 } from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
-import {MobileMenuService} from '../new-lesson-player-services/mobile-menu.service';
+import {MobileMenuService} from '../../services/mobile-menu.service';
 
 import './player-header.component.css';
 

@@ -35,11 +35,11 @@ import {Subscription} from 'rxjs';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
-import {CurrentInteractionService} from '../services/current-interaction.service';
-import {PlayerPositionService} from '../services/player-position.service';
+import {CurrentInteractionService} from '../../services/current-interaction.service';
+import {PlayerPositionService} from '../../services/player-position.service';
 
 import './supplemental-card.component.css';
-import {VoiceoverPlayerService} from '../services/voiceover-player.service';
+import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 
 @Component({
   selector: 'oppia-supplemental-card',

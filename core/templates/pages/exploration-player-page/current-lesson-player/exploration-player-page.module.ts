@@ -32,8 +32,8 @@ import {RefresherExplorationConfirmationModal} from './modals/refresher-explorat
 import {ExplorationPlayerPageComponent} from './exploration-player-page.component';
 import {ExplorationPlayerPageRootComponent} from './exploration-player-page-root.component';
 import {ProgressReminderModalComponent} from './templates/progress-reminder-modal.component';
-import {HintAndSolutionModalService} from './services/hint-and-solution-modal.service';
-import {FatigueDetectionService} from './services/fatigue-detection.service';
+import {HintAndSolutionModalService} from '../services/hint-and-solution-modal.service';
+import {FatigueDetectionService} from '../services/fatigue-detection.service';
 
 import 'third-party-imports/guppy.import';
 import 'third-party-imports/midi-js.import';

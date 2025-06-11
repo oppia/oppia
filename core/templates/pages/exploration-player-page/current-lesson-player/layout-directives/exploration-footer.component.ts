@@ -35,20 +35,20 @@ import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UserService} from 'services/user.service';
-import {ExplorationEngineService} from '../services/exploration-engine.service';
-import {ExplorationPlayerStateService} from '../services/exploration-player-state.service';
-import {LearnerViewInfoBackendApiService} from '../services/learner-view-info-backend-api.service';
-import {PlayerPositionService} from '../services/player-position.service';
-import {PlayerTranscriptService} from '../services/player-transcript.service';
-import {LessonInformationCardModalComponent} from 'pages/exploration-player-page/templates/lesson-information-card-modal.component';
+import {ExplorationEngineService} from '../../services/exploration-engine.service';
+import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
+import {LearnerViewInfoBackendApiService} from '../../services/learner-view-info-backend-api.service';
+import {PlayerPositionService} from '../../services/player-position.service';
+import {PlayerTranscriptService} from '../../services/player-transcript.service';
+import {LessonInformationCardModalComponent} from 'pages/exploration-player-page/current-lesson-player/templates/lesson-information-card-modal.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ProgressReminderModalComponent} from 'pages/exploration-player-page/templates/progress-reminder-modal.component';
+import {ProgressReminderModalComponent} from 'pages/exploration-player-page/current-lesson-player/templates/progress-reminder-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 import './exploration-footer.component.css';
 import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
-import {ConceptCardManagerService} from '../services/concept-card-manager.service';
+import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 
 @Component({

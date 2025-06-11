@@ -17,7 +17,7 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {MobileMenuService} from '../new-lesson-player-services/mobile-menu.service';
+import {MobileMenuService} from '../../services/mobile-menu.service';
 import './player-sidebar.component.css';
 import {ContextService} from 'services/context.service';
 import {
