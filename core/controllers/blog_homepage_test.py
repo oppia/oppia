@@ -142,7 +142,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             'new author name'
         )
 
-    def test_get_blog_homepage_data_with_no_published_posts_returns_no_summaries(
+    def test_get_blog_homepage_data_with_no_posts_returns_no_summaries(
         self
     ) -> None:
         blog_services.unpublish_blog_post(self.blog_post.id)

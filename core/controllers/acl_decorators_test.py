@@ -5209,7 +5209,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
                 % self.story_url_fragment,
                 expected_status_int=404)
 
-    def test_story_with_empty_topic_id_raises_exception(self) -> None: 
+    def test_story_with_empty_topic_id_raises_exception(self) -> None:
         self.save_new_story(
             # Topic id can't be None, only a string.
             story_services.get_new_story_id(), self.admin_id, '',
@@ -5223,7 +5223,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         # This story is not added or referenced in the topic.
         self.save_new_story(
-            story_services.get_new_story_id(), self.admin_id, 
+            story_services.get_new_story_id(), self.admin_id,
             self.topic_id, url_fragment='unreferenced-story-frag')
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5236,7 +5236,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock_story_data/staging/topic/%s'
                 % self.story_url_fragment,
-                expected_status_int=404)           
+                expected_status_int=404)
 
     def test_user_can_access_story_when_story_and_topic_are_published(
         self
@@ -7568,7 +7568,7 @@ class CanFetchContributorDashboardStatsTests(test_utils.GenericTestBase):
                 'contribution_subtype': contribution_subtype,
                 'username': username
             })
-            
+
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.user_email, self.username)
@@ -7650,7 +7650,7 @@ class CanFetchAllContributorDashboardStatsTests(test_utils.GenericTestBase):
         @acl_decorators.can_fetch_all_contributor_dashboard_stats
         def get(self, username: str) -> None:
             self.render_json({'username': username})
-    
+
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.user_email, self.username)
