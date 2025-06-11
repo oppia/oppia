@@ -25,15 +25,15 @@ import {
   tick,
 } from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
+import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {FeedbackPopupComponent} from './feedback-popup.component';
-import {UserService} from 'services/user.service';
-import {UserInfo} from 'domain/user/user-info.model';
-import {PlayerPositionService} from '../services/player-position.service';
-import {BackgroundMaskService} from 'services/stateful/background-mask.service';
-import {FeedbackPopupBackendApiService} from '../services/feedback-popup-backend-api.service';
+import {UserService} from '../../../../services/user.service';
+import {UserInfo} from '../../../../domain/user/user-info.model';
+import {PlayerPositionService} from '../../services/player-position.service';
+import {BackgroundMaskService} from '../../../../services/stateful/background-mask.service';
+import {FeedbackPopupBackendApiService} from '../../services/feedback-popup-backend-api.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('FeedbackPopupComponent', () => {

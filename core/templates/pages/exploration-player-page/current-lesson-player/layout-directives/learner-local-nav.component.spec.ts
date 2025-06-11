@@ -26,21 +26,21 @@ import {
 } from '@angular/core/testing';
 import {NgbModal, NgbModalRef, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 
-import {AppConstants} from 'app.constants';
-import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {AlertsService} from 'services/alerts.service';
-import {AttributionService} from 'services/attribution.service';
-import {LoaderService} from 'services/loader.service';
-import {UserService} from 'services/user.service';
-import {ExplorationEngineService} from '../services/exploration-engine.service';
-import {LearnerLocalNavBackendApiService} from '../services/learner-local-nav-backend-api.service';
+import {AppConstants} from '../../../../app.constants';
+import {ReadOnlyExplorationBackendApiService} from '../../../../domain/exploration/read-only-exploration-backend-api.service';
+import {AlertsService} from '../../../../services/alerts.service';
+import {AttributionService} from '../../../../services/attribution.service';
+import {LoaderService} from '../../../../services/loader.service';
+import {UserService} from '../../../../services/user.service';
+import {ExplorationEngineService} from '../../services/exploration-engine.service';
+import {LearnerLocalNavBackendApiService} from '../../services/learner-local-nav-backend-api.service';
 
 import {LearnerLocalNavComponent} from './learner-local-nav.component';
 import {FlagExplorationModalComponent} from '../modals/flag-exploration-modal.component';
-import {UserInfo} from 'domain/user/user-info.model';
+import {UserInfo} from '../../../../domain/user/user-info.model';
 
 describe('Learner Local Nav Component ', () => {
   let component: LearnerLocalNavComponent;

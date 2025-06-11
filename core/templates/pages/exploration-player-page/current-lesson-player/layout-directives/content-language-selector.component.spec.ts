@@ -31,29 +31,29 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {
   ContentLanguageSelectorComponent,
   // eslint-disable-next-line max-len
-} from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
-import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
+} from '../layout-directives/content-language-selector.component';
+import {ContentTranslationLanguageService} from '../../services/content-translation-language.service';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {PlayerTranscriptService} from '../../services/player-transcript.service';
+import {StateCard} from '../../../../domain/state_card/state-card.model';
+import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {
   SwitchContentLanguageRefreshRequiredModalComponent,
   // eslint-disable-next-line max-len
-} from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
-import {AudioPreloaderService} from '../services/audio-preloader.service';
-import {VoiceoverPlayerService} from '../services/voiceover-player.service';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
-import {ExplorationObjectFactory} from 'domain/exploration/ExplorationObjectFactory';
-import {AutomaticVoiceoverHighlightService} from '../../../services/automatic-voiceover-highlight-service';
+} from '../modals/switch-content-language-refresh-required-modal.component';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
+import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
+import {InteractionObjectFactory} from '../../../../domain/exploration/InteractionObjectFactory';
+import {WindowRef} from '../../../../services/contextual/window-ref.service';
+import {PlatformFeatureService} from '../../../../services/platform-feature.service';
+import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';
+import {VoiceoverBackendApiService} from '../../../../domain/voiceover/voiceover-backend-api.service';
+import {AudioPreloaderService} from '../../services/audio-preloader.service';
+import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
+import {PlayerPositionService} from '../../services/player-position.service';
+import {ExplorationObjectFactory} from '../../../../domain/exploration/ExplorationObjectFactory';
+import {AutomaticVoiceoverHighlightService} from '../../../../services/automatic-voiceover-highlight-service';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;

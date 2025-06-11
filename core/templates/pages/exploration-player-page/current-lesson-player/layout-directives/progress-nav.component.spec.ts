@@ -26,26 +26,26 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {UrlService} from 'services/contextual/url.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {StateCard} from '../../../../domain/state_card/state-card.model';
+import {UrlService} from '../../../../services/contextual/url.service';
+import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
+import {FocusManagerService} from '../../../../services/stateful/focus-manager.service';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
-import {ExplorationEngineService} from '../services/exploration-engine.service';
-import {ExplorationPlayerStateService} from '../services/exploration-player-state.service';
+import {ExplorationEngineService} from '../../services/exploration-engine.service';
+import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
 import {
   HelpCardEventResponse,
   PlayerPositionService,
-} from '../services/player-position.service';
-import {PlayerTranscriptService} from '../services/player-transcript.service';
+} from '../../services/player-position.service';
+import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {ProgressNavComponent} from './progress-nav.component';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
-import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
+import {SchemaFormSubmittedService} from '../../../../services/schema-form-submitted.service';
+import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
+import {Interaction} from '../../../../domain/exploration/InteractionObjectFactory';
+import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Progress nav component', () => {
   let fixture: ComponentFixture<ProgressNavComponent>;

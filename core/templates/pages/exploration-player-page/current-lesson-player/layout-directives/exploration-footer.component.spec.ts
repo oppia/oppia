@@ -28,43 +28,43 @@ import {
 import {ExplorationFooterComponent} from './exploration-footer.component';
 import {NgbModal, NgbModalRef, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {LimitToPipe} from 'filters/limit-to.pipe';
+import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
+import {LimitToPipe} from '../../../../filters/limit-to.pipe';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ContextService} from 'services/context.service';
-import {UrlService} from 'services/contextual/url.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {ContextService} from '../../../../services/context.service';
+import {UrlService} from '../../../../services/contextual/url.service';
+import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {
   ExplorationSummaryBackendApiService,
   ExplorationSummaryDict,
-} from 'domain/summary/exploration-summary-backend-api.service';
+} from '../../../../domain/summary/exploration-summary-backend-api.service';
 import {EventEmitter} from '@angular/core';
-import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
-import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
-import {LearnerViewInfoBackendApiService} from '../services/learner-view-info-backend-api.service';
-import {LoggerService} from 'services/contextual/logger.service';
+import {QuestionPlayerStateService} from '../../../../components/question-directives/question-player/services/question-player-state.service';
+import {LearnerExplorationSummaryBackendDict} from '../../../../domain/summary/learner-exploration-summary.model';
+import {LearnerViewInfoBackendApiService} from '../../services/learner-view-info-backend-api.service';
+import {LoggerService} from '../../../../services/contextual/logger.service';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
-} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {ExplorationEngineService} from '../services/exploration-engine.service';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
-import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {PlayerPositionService} from '../services/player-position.service';
-import {PlayerTranscriptService} from '../services/player-transcript.service';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {UserInfo} from 'domain/user/user-info.model';
-import {UserService} from 'services/user.service';
+} from '../../../../domain/exploration/read-only-exploration-backend-api.service';
+import {ExplorationEngineService} from '../../services/exploration-engine.service';
+import {StateObjectFactory} from '../../../../domain/state/StateObjectFactory';
+import {EditableExplorationBackendApiService} from '../../../../domain/exploration/editable-exploration-backend-api.service';
+import {PlayerPositionService} from '../../services/player-position.service';
+import {PlayerTranscriptService} from '../../services/player-transcript.service';
+import {StateCard} from '../../../../domain/state_card/state-card.model';
+import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
+import {UserInfo} from '../../../../domain/user/user-info.model';
+import {UserService} from '../../../../services/user.service';
 import {
   Interaction,
   InteractionObjectFactory,
-} from 'domain/exploration/InteractionObjectFactory';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-import {ConceptCardManagerService} from '../services/concept-card-manager.service';
+} from '../../../../domain/exploration/InteractionObjectFactory';
+import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
+import {WindowRef} from '../../../../services/contextual/window-ref.service';
+import {CheckpointCelebrationUtilityService} from '../../services/checkpoint-celebration-utility.service';
+import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 
 class MockCheckpointCelebrationUtilityService {
   private _openLessonInformationModalEmitter = new EventEmitter<void>();
