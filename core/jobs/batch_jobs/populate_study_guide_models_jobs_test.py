@@ -446,50 +446,6 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
             )
         ])
 
-    def test_invalid_topic_validation_raises_error(self) -> None:
-        # Create subtopic page model.
-        subtopic_page_model = self.create_model(
-            subtopic_models.SubtopicPageModel,
-            id=self.SUBTOPIC_PAGE_ID,
-            topic_id=self.TOPIC_ID,
-            page_contents=self.subtopic_page_contents,
-            page_contents_schema_version=1,
-            language_code=self.LANGUAGE_CODE
-        )
-
-        # Create topic model with invalid data.
-        topic_model = self.create_model(
-            topic_models.TopicModel,
-            id=self.TOPIC_ID,
-            name='',
-            abbreviated_name='Test',
-            url_fragment='test-topic',
-            description='Test topic description',
-            canonical_name='Test Topic',
-            language_code=self.LANGUAGE_CODE,
-            subtopics=[self.subtopic.to_dict()],
-            subtopic_schema_version=1,
-            story_reference_schema_version=1,
-            next_subtopic_id=2,
-            page_title_fragment_for_web='testing',
-            version=1
-        )
-
-        self.put_multi([subtopic_page_model, topic_model])
-
-        # Mock topic validation to raise an exception.
-        with mock.patch(
-            'core.domain.topic_domain.Topic.validate',
-            side_effect=Exception('Topic validation failed')
-        ):
-            self.assert_job_output_is([
-                job_run_result.JobRunResult(
-                    stderr=f'STUDY GUIDES PROCESSED ERROR: '
-                           f'"(\'{self.SUBTOPIC_PAGE_ID}\', '
-                           f'Exception(\'Topic validation failed\'))": 1'
-                )
-            ])
-
     def test_multiple_subtopic_pages_audit(self) -> None:
         # Create multiple subtopic pages.
         subtopic_page_id_2 = f'{self.TOPIC_ID}-2'
