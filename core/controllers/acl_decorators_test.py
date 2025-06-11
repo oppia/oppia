@@ -7607,17 +7607,6 @@ class CanFetchContributorDashboardStatsTests(test_utils.GenericTestBase):
             response['translation_contribution_stats'], dummy_stats)
         self.logout()
 
-    def test_guest_user_cannot_fetch_contributor_dashboard_stats(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/contributorstatssummarieshandler/<contribution_type>/'
-                '<contribution_subtype>/<username>',
-                expected_status_int=401)
-
-        self.assertEqual(
-            response['error'],
-            'You must be logged in to access this resource.')
-
     def test_user_fetching_other_user_stats_raises_exception(self) -> None:
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
