@@ -27,21 +27,21 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 
-import {AudioBarComponent} from 'pages/exploration-player-page/layout-directives/audio-bar.component';
-import {Voiceover} from 'domain/exploration/voiceover.model';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {AudioBarStatusService} from 'services/audio-bar-status.service';
-import {AudioPlayerService} from 'services/audio-player.service';
-import {AudioPreloaderService} from '../services/audio-preloader.service';
-import {PlayerPositionService} from '../services/player-position.service';
-import {ContextService} from 'services/context.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {VoiceoverPlayerService} from '../services/voiceover-player.service';
-import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
-import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
+import {AudioBarComponent} from '../layout-directives/audio-bar.component';
+import {Voiceover} from '../../../../domain/exploration/voiceover.model';
+import {AssetsBackendApiService} from '../../../../services/assets-backend-api.service';
+import {AudioBarStatusService} from '../../../../services/audio-bar-status.service';
+import {AudioPlayerService} from '../../../../services/audio-player.service';
+import {AudioPreloaderService} from '../../services/audio-preloader.service';
+import {PlayerPositionService} from '../../services/player-position.service';
+import {ContextService} from '../../../../services/context.service';
+import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
+import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
+import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';
+import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.model';
+import {VoiceoverBackendDict} from '../../../../domain/exploration/voiceover.model';
 
 describe('Audio Bar Component', () => {
   let component: AudioBarComponent;
