@@ -34,15 +34,15 @@ def update_redis_host(redis_host: str) -> None:
     Args:
         redis_host: str. The Redis host to save.
     """
-    retrieved_redisclient = redis_client_models.RedisClientModel.get(
+    retrieved_redis_client_model = redis_client_models.RedisClientModel.get(
         redis_client_models.REDIS_CLIENT_ID, strict=False)
-    redisclient = (
-        retrieved_redisclient
-        if retrieved_redisclient is not None
+    redis_client_model = (
+        retrieved_redis_client_model
+        if retrieved_redis_client_model is not None
         else redis_client_models.RedisClientModel(
             id=redis_client_models.REDIS_CLIENT_ID
         )
     )
-    redisclient.redishost = redis_host
-    redisclient.update_timestamps()
-    redisclient.put()
+    redis_client_model.redishost = redis_host
+    redis_client_model.update_timestamps()
+    redis_client_model.put()
