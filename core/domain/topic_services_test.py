@@ -931,7 +931,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         # Check that study guide does not exist.
         with self.assertRaisesRegex(
             Exception,
-            'Entity for class StudyGuideModel with id'
+            'Entity for class StudyGuideModel with id %s not found' % (
+                f'{topic_id_1}-1'
+            )
         ):
             study_guide_services.get_study_guide_by_id(topic_id_1, 1)
 
@@ -1281,6 +1283,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.version, 4)
 
     def test_simultaneous_subtopic_and_subtopic_page_changes(self) -> None:
+        # Change the subtopic title first and then the subtopic page contents. 
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': 'title',
@@ -1301,7 +1304,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
-            'Update title of subtopic.')
+            'Update title and content of subtopic.')
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].title, 'New Title')
@@ -1321,6 +1324,51 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             study_guide_section.content.html,
             '<p>New Value</p>'
+        )
+
+        # Change the subtopic page contents first and then the subtopic title. 
+        changelist = [
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                'property_name': (
+                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
+                'old_value': '<p>New Value</p>',
+                'subtopic_id': 1,
+                'new_value': {
+                    'html': '<p>Another New Value</p>',
+                    'content_id': 'content'
+                }
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+                'property_name': 'title',
+                'subtopic_id': 1,
+                'old_value': 'New Title',
+                'new_value': 'Another New Title'
+            })
+        ]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Again update title and content of subtopic.')
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics), 1)
+        self.assertEqual(topic.subtopics[0].title, 'Another New Title')
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, 1)
+        self.assertEqual(
+            subtopic_page.page_contents.subtitled_html.html,
+            '<p>Another New Value</p>')
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 1
+        )
+        study_guide_section = study_guide.sections[0]
+        self.assertEqual(
+            study_guide_section.heading.unicode_str,
+            'Another New Title'
+        )
+        self.assertEqual(
+            study_guide_section.content.html,
+            '<p>Another New Value</p>'
         )
 
     def test_update_topic_and_subtopic_page(self) -> None:
@@ -1565,7 +1613,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         # Check that study guide does not exist.
         with self.assertRaisesRegex(
             Exception,
-            'Entity for class StudyGuideModel with id'
+            'Entity for class StudyGuideModel with id %s not found' % (
+                f'{topic_id_1}-1'
+            )
         ):
             study_guide_services.get_study_guide_by_id(topic_id_1, 1)
 

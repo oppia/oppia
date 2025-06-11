@@ -47,6 +47,8 @@ datastore_services = models.Registry.import_datastore_services()
 class PopulateStudyGuidesJob(base_jobs.JobBase):
     """Job that populates study guides from subtopic page models."""
 
+    DATASTORE_UPDATES_ALLOWED = True
+
     @staticmethod
     def _create_study_guide_model(
         data_tuple: Tuple[
@@ -240,104 +242,19 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
                 lambda kv: [kv[1][0], kv[1][1]])
         )
 
-        unused_put_results = (
-            study_guide_models_to_put
-            | 'Put models into datastore' >> ndb_io.PutModels()
-        )
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_put_results = (
+                study_guide_models_to_put
+                | 'Put models into datastore' >> ndb_io.PutModels()
+            )
 
         return created_study_guide_results
 
 
-class AuditPopulateStudyGuidesJob(base_jobs.JobBase):
+class AuditPopulateStudyGuidesJob(PopulateStudyGuidesJob):
     """Job that audits PopulateStudyGuidesJob."""
 
-    @staticmethod
-    def _regenerate_study_guide_model(
-        data_tuple: Tuple[
-            str,
-            Tuple[
-                subtopic_models.SubtopicPageModel,
-                topic_models.TopicModel
-            ]
-        ]
-    ) -> result.Result[
-        Tuple[str, subtopic_models.StudyGuideModel],
-        Tuple[str, Exception]
-    ]:
-        """Validates subtopic page and topic models and
-            regenerates the study guide model.
-
-        Args:
-            data_tuple: tuple(SubtopicPageModel, TopicModel). Tuple
-                containing subtopic_page_id and tuple of
-                (SubtopicPageModel, TopicModel).
-
-        Returns:
-            Result((str, StudyGuideModel), (str, Exception)). Result
-            containing tuple which consist of subtopic page ID and
-            either study guide model or Exception. Study guide model
-            is returned when the validation was successful and
-            Exception is returned otherwise.
-        """
-        subtopic_page_id, (subtopic_page_model, topic_model) = data_tuple
-
-        try:
-            with datastore_services.get_ndb_context():
-                subtopic_page = (
-                    subtopic_page_services
-                    .get_subtopic_page_from_model
-                )(subtopic_page_model)
-                topic = topic_fetchers.get_topic_from_model(topic_model)
-
-            subtopic_page.validate()
-            topic.validate()
-
-            # Get subtopic_id from subtopic_page_id.
-            subtopic_id = (
-                subtopic_page
-                .get_subtopic_id_from_subtopic_page_id
-            )()
-
-            # Validate that subtopic exists in topic.
-            subtopic_index = topic.get_subtopic_index(subtopic_id)
-            if subtopic_index is None:
-                raise Exception(
-                    f'Subtopic {subtopic_id} not found in topic {topic.id}'
-                )
-
-            # Get subtopic title from the topic.
-            subtopic_title = topic.subtopics[subtopic_index].title
-
-            # Create sections list with heading and content.
-            sections = [
-                {
-                    'content_id': 'section_heading_0',
-                    'unicode_str': subtopic_title
-                },
-                {
-                    'content_id': 'section_content_1',
-                    'html': subtopic_page.page_contents.subtitled_html.html
-                }
-            ]
-
-        except Exception as e:
-            logging.exception(e)
-            return result.Err((subtopic_page_id, e))
-
-        with datastore_services.get_ndb_context():
-            study_guide_model = subtopic_models.StudyGuideModel(
-                id=subtopic_page_id,
-                topic_id=subtopic_page.topic_id,
-                sections=sections,
-                sections_schema_version=1,
-                language_code=subtopic_page.language_code,
-                next_content_id_index=2,
-                version=1
-            )
-
-        study_guide_model.update_timestamps()
-
-        return result.Ok((subtopic_page_id, study_guide_model))
+    DATASTORE_UPDATES_ALLOWED = False
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of results from the study guide audit.
@@ -389,24 +306,34 @@ class AuditPopulateStudyGuidesJob(base_jobs.JobBase):
 
         study_guide_models = (
             joined_data
-            | 'Regenerate study guide models' >> beam.Map(
-                self._regenerate_study_guide_model)
+            | 'Create study guide models' >> beam.Map(
+                self._create_study_guide_model)
         )
 
-        regenerated_study_guide_results = (
+        created_study_guide_results = (
             study_guide_models
             | 'Generate results' >> (
                 job_result_transforms.ResultsToJobRunResults(
-                    'STUDY GUIDE PROCESSED'))
+                    'STUDY GUIDES PROCESSED'))
         )
 
-        unused_regenerated_study_guides = (
+        study_guide_models_to_put = (
             study_guide_models
             | 'Filter oks' >> beam.Filter(
                 lambda result_item: result_item.is_ok())
             | 'Unwrap ok' >> beam.Map(
                 lambda result_item: result_item.unwrap())
-            | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter
+            | 'Get rid of ID and flatten models' >> beam.FlatMap( # pylint: disable=no-value-for-parameter
+                # Extract both models from tuple.
+                lambda kv: [kv[1][0], kv[1][1]])
         )
 
-        return regenerated_study_guide_results
+        # Note: DATASTORE_UPDATES_ALLOWED is False for audit job,
+        # so no models are actually written to datastore
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_put_results = (
+                study_guide_models_to_put
+                | 'Put models into datastore' >> ndb_io.PutModels()
+            )
+
+        return created_study_guide_results
