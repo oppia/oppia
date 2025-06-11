@@ -281,6 +281,7 @@ export class TopicManager extends BaseUser {
    */
   async navigateToQuestionPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.waitForElementToBeVisible(mobileOptionsSelector);
       await this.clickOn(mobileOptionsSelector);
 
       await this.page.waitForSelector(navigationDropdown);
@@ -291,6 +292,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(mobilePreviewTab);
       await this.clickOn(mobilePreviewTab);
     } else {
+      await this.waitForElementToBeVisible(questionPreviewTab);
       await this.page.waitForSelector(questionPreviewTab);
       await this.clickAndWaitForNavigation(questionPreviewTab);
     }

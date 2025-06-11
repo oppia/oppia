@@ -800,7 +800,8 @@ export class BaseUser {
       }
     }
   }
-  /*
+
+  /**
    * Waits for the network to become idle on the given page.
    *
    * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
@@ -890,6 +891,24 @@ export class BaseUser {
       window.scrollTo(0, document.body.scrollHeight);
     });
     await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Waits for the element with given selector to be visible.
+   * @param {string} selector - The selector of the element to wait for.
+   * @param {boolean} hidden - Whether the element should be hidden or not. Default is false.
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
+   */
+  async waitForElementToBeVisible(
+    selector: string,
+    hidden: boolean = false,
+    timeout: number = 30000
+  ): Promise<void> {
+    if (hidden) {
+      await this.page.waitForSelector(selector, {hidden: true, timeout});
+    } else {
+      await this.page.waitForSelector(selector, {visible: true, timeout});
+    }
   }
 }
 
