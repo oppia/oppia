@@ -28,17 +28,17 @@ import {PlayerSidebarComponent} from './player-sidebar.component';
 import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
 import {MobileMenuService} from '../../services/mobile-menu.service';
 import './player-sidebar.component.css';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
-} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {UrlService} from 'services/contextual/url.service';
+} from '../../../../domain/exploration/read-only-exploration-backend-api.service';
+import {UrlService} from '../../../../services/contextual/url.service';
 import {BehaviorSubject} from 'rxjs';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {ContextService} from 'services/context.service';
+import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {ContextService} from '../../../../services/context.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
