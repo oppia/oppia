@@ -1882,9 +1882,10 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn('Delete skill');
   }
 
-  expectCurrentURLToBeOf(
+  async expectCurrentURLToBeOf(
     tab: 'Preview Tab' | 'History Tab' | 'Translation Tab' | 'Main Tab'
   ) {
+    await this.page.waitForNetworkIdle();
     const currentUrl = this.page.url();
     const urlPatterns = {
       'Preview Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/preview\/.+$/,
@@ -1919,7 +1920,7 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOn(previewTabButton);
     }
-    this.expectCurrentURLToBeOf('Preview Tab');
+    await this.expectCurrentURLToBeOf('Preview Tab');
   }
 
   /**
@@ -1934,7 +1935,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(historyTabButton);
     }
 
-    this.expectCurrentURLToBeOf('History Tab');
+    await this.expectCurrentURLToBeOf('History Tab');
   }
 
   /**
@@ -2079,7 +2080,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(translationTabButton);
     }
 
-    this.expectCurrentURLToBeOf('Translation Tab');
+    await this.expectCurrentURLToBeOf('Translation Tab');
   }
 
   /**
@@ -2108,7 +2109,7 @@ export class ExplorationEditor extends BaseUser {
     }
     await this.waitForNetworkIdle();
 
-    this.expectCurrentURLToBeOf('Main Tab');
+    await this.expectCurrentURLToBeOf('Main Tab');
   }
 
   /**
