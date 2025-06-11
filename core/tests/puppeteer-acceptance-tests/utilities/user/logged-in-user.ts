@@ -1749,7 +1749,7 @@ export class LoggedInUser extends BaseUser {
     category: string = 'Algebra'
   ): Promise<string | null> {
     await this.navigateToCreatorDashboardPage();
-    await this.navigateToExplorationEditorFromCreatorDashboard();
+    await this.navigateToExplorationEditorPage();
     await this.dismissWelcomeModal();
     await this.createMinimalExploration(
       'Exploration intro text',
