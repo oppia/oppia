@@ -400,6 +400,7 @@ const blogPaginationPrevSelector = '.e2e-test-pagination-prev-button';
 const blogPostTitleContainerSelector =
   '.e2e-test-blog-post-page-title-container';
 const blogPostContentSelector = '.e2e-test-blog-post-content';
+const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 
 // Topic Viewer Page Selectors.
 const topicPageRevisionTabContentSelector =
@@ -663,7 +664,15 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
 
-    // TODO: Add post check
+    // TODO: Verify post check
+    const url = new URL(this.page.url());
+    const queryParam = url.searchParams.get('tags');
+
+    if (queryParam != `("${tagName}")`) {
+      throw new Error(
+        `Query Parameter doesn't match. Expected ${tagName}, but found ${queryParam}`
+      );
+    }
   }
 
   /**
@@ -707,26 +716,49 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the next button in the pagination controls
    */
   async clickNextBlogPage(): Promise<void> {
+    const firstPostTitle = await this.page.$eval(
+      blogPostTitleSelector,
+      el => el.textContent
+    );
     const nextButton = await this.page.$(blogPaginationNextSelector);
     if (!nextButton) {
       return;
     }
     await this.clickOn(blogPaginationNextSelector);
+    await this.waitForNetworkIdle();
 
-    // TODO: Add post check
+    // TODO: Verify Post check
+    const newFirstPostTitle = await this.page.$eval(
+      blogPostTitleSelector,
+      el => el.textContent
+    );
+    if (newFirstPostTitle === firstPostTitle) {
+      throw new Error('Next button did not navigate to the next page');
+    }
   }
 
   /**
    * Function to click the previous button in the pagination controls
    */
   async clickPreviousBlogPage(): Promise<void> {
+    const firstPostTitle = await this.page.$eval(
+      blogPostTitleSelector,
+      el => el.textContent
+    );
     const prevButton = await this.page.$(blogPaginationPrevSelector);
     if (!prevButton) {
       return;
     }
     await this.clickOn(blogPaginationPrevSelector);
 
-    // TODO: Add post check
+    // TODO: Verify post check
+    const newFirstPostTitle = await this.page.$eval(
+      blogPostTitleSelector,
+      el => el.textContent
+    );
+    if (newFirstPostTitle === firstPostTitle) {
+      throw new Error('Next button did not navigate to the next page');
+    }
   }
 
   /**
@@ -3517,9 +3549,11 @@ export class LoggedOutUser extends BaseUser {
    */
   async returnToStoryFromLastState(): Promise<void> {
     await this.clickAndWaitForNavigation('Return to Story');
-    showMessage('Returned to story from the last state.');
 
-    // TODO: Add post check
+    await this.page.waitForSelector(storyViewerContainerSelector, {
+      visible: true,
+    });
+    showMessage('Returned to story from the last state.');
   }
 
   /**
@@ -4478,7 +4512,16 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();
 
-    // TODO: Add post check
+    // Post check: check if value has changed to new code
+    const selectedLanguageCode = await this.page.$eval(
+      lessonLanguageSelector,
+      el => (el as HTMLSelectElement).value
+    );
+    if (selectedLanguageCode != languageCode) {
+      throw new Error(
+        `Expected language code to be ${languageCode}, but found ${selectedLanguageCode}`
+      );
+    }
   }
 
   /**
