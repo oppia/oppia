@@ -4479,13 +4479,13 @@ export class LoggedOutUser extends BaseUser {
    */
   async startVoiceover(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(voiceoverDropdown, {
-      visible: true,
-    });
     const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
     if (voiceoverDropdownElement) {
       await this.clickOn(voiceoverDropdown);
     }
+    await this.page.waitForSelector(playVoiceoverButton, {
+      visible: true,
+    });
     await this.clickOn(playVoiceoverButton);
     await this.page.waitForSelector(pauseVoiceoverButton, {visible: true});
   }
