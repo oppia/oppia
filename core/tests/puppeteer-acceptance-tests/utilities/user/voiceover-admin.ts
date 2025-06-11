@@ -52,6 +52,12 @@ const addNewLanguageAccentButtonSelector =
   '.e2e-test-add-new-language-accent-button';
 const languageAccentDropdownSelector =
   '.e2e-test-language-accent-dropdown-selector';
+const enableAutogenerationConfirmationButtonSelector =
+  '.e2e-test-autogeneration-confirmation';
+const enableAutogenerationSelectorTemplate = (languageAccentCode: string) =>
+  `.e2e-test-${languageAccentCode}-supports-autogeneration-select`;
+const enableAutogenerationOptionSelector =
+  '.e2e-test-autogeneration-option-selector';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
@@ -265,10 +271,10 @@ export class VoiceoverAdmin extends BaseUser {
 
   /**
    * Function to register supported language and accent combinations for Oppia voiceovers.
-   * @param languageAccentCode - The language-accent code to add.
+   * @param languageAccentDescription - The language-accent to add.
    */
   async addSupportedLanguageAccentPair(
-    languageAccentCode: string
+    languageAccentDescription: string
   ): Promise<void> {
     await this.navigateToVoiceoverAdminPage();
     await this.waitForPageToFullyLoad();
@@ -286,11 +292,55 @@ export class VoiceoverAdmin extends BaseUser {
       const textContent = await option.evaluate(
         el => el.textContent?.trim() || ''
       );
-      if (textContent === languageAccentCode) {
+      if (textContent === languageAccentDescription) {
         await option.click();
         break;
       }
     }
+  }
+
+  /**
+   * Function to register supported language and accent combinations for Oppia voiceovers.
+   * @param languageAccentCode - The language-accent code to enable autogeneration for.
+   */
+  async enableAutogenerationForLanguageAccentPair(
+    languageAccentCode: string
+  ): Promise<void> {
+    const enableAutogenerationSelector =
+      enableAutogenerationSelectorTemplate(languageAccentCode);
+    await this.page.waitForSelector(enableAutogenerationSelector);
+    await this.clickOn(enableAutogenerationSelector);
+
+    await this.page.waitForSelector(enableAutogenerationOptionSelector);
+    const options = await this.page.$$(enableAutogenerationOptionSelector);
+    for (const option of options) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === 'Yes') {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.page.waitForSelector(
+      enableAutogenerationConfirmationButtonSelector,
+      {
+        visible: true,
+        timeout: 5000,
+      }
+    );
+    await this.clickOn(enableAutogenerationConfirmationButtonSelector);
+    await this.page.waitForSelector(
+      enableAutogenerationConfirmationButtonSelector,
+      {
+        hidden: true,
+      }
+    );
+
+    showMessage(
+      `Autogeneration enabled for language-accent pair: ${languageAccentCode}`
+    );
   }
 }
 

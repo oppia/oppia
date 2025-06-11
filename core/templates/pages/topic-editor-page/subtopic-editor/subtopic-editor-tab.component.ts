@@ -91,7 +91,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.topic = this.topicEditorStateService.getTopic();
     this.classroomUrlFragment =
       this.topicEditorStateService.getClassroomUrlFragment();
-    this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}/${this.topic.getUrlFragment()}/revision`;
+    this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}/${this.topic.getUrlFragment()}/studyguide`;
     this.subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
     this.subtopic = this.topic.getSubtopicById(this.subtopicId);
     if (!this.subtopic) {

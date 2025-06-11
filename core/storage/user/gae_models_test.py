@@ -3687,8 +3687,9 @@ class PinnedOpportunityModelTest(test_utils.GenericTestBase):
 
     def test_create_raises_exception_for_existing_instance(self) -> None:
         with self.assertRaisesRegex(
-            Exception, 'There is already a pinned opportunity'
-            ' with the given id:'):
+            Exception,
+            'There is already a pinned opportunity with the given id:'
+        ):
             user_models.PinnedOpportunityModel.create(
                 user_id=self.user_id,
                 language_code=self.language_code,
