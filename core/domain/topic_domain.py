@@ -922,8 +922,7 @@ class Subtopic:
                     'Invalid url fragment: %s' % self.url_fragment)
         else:
             raise utils.ValidationError(
-                'Expected subtopic url fragment to be non '
-                'empty')
+                'Expected subtopic url fragment to be non empty')
 
         if len(self.skill_ids) > len(set(self.skill_ids)):
             raise utils.ValidationError(

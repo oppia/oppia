@@ -61,8 +61,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'Invalid entity_name received: '
-            'invalid_name.'
+            'Invalid entity_name received: invalid_name.'
         ):
             fs_services.GcsFileSystem('invalid_name', 'exp_id')
 
@@ -104,8 +103,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             IOError,
             (
-                'The dir_name should not start with /'
-                ' or end with / : abc/'
+                'The dir_name should not start with / or end with / : abc/'
             )
         ):
             self.fs.listdir('abc/')
