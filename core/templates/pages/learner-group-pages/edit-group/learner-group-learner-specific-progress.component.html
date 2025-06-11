@@ -93,7 +93,7 @@
                 <div *ngFor="let chapterName of storyProgress.getNodeTitles(); let idx = index;">
                   <div class="story-chapter-progress">
                     <div class="chapter-title">
-                      <span>{{ 'I18N_TOPIC_VIEWER_LESSON' | translate }} {{ idx+1 }}: {{ chapterName }}</span>
+                      <span>{{ 'I18N_LESSON_HEADER' | translate }} {{ idx+1 }}: {{ chapterName }}</span>
                     </div>
                     <div class="chapter-progress-container" *ngIf="storiesChaptersProgress">
                       <span *ngIf="getVisitedCheckpointsCount(storyIndex, idx) > 0"
