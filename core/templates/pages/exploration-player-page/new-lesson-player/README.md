@@ -57,11 +57,11 @@ To test the **New Lesson Player**, follow these steps:
    - Concept card
    - Solution
 
-3. `/Progress-tracker`  
-   Manages **checkpoint functionality**, **progress-saving**, and **celebration pop-ups**.
+   i. `/Progress-tracker`  
+      Manages **checkpoint functionality**, **progress-saving**, and **celebration pop-ups**.
 
-4. `/conversation-display`  
-   Contains logic and components for displaying and managing the **conversation interface**.
+   ii. `/conversation-display`  
+      Contains logic and components for displaying and managing the **conversation interface**.
 
 5. `/lesson-header`  
    Contains components and logic required to display and manage the **lesson header** information.
