@@ -817,7 +817,15 @@ export class ExplorationEditor extends BaseUser {
     await this.type(addGoalInputBox, goal);
     await this.page.keyboard.press('Tab');
 
-    // TODO: Add post check based on updateTitleTo function
+    const newGoal = await this.page.$eval(addGoalInputBox, el =>
+      el.textContent?.trim()
+    );
+    if (!newGoal || newGoal !== goal) {
+      throw new Error(
+        `Failed to update goal. Expected: ${goal}, but got: ${newGoal}`
+      );
+    }
+    showMessage(`Goal has been updated to ${goal}`);
   }
 
   /**
@@ -1465,7 +1473,11 @@ export class ExplorationEditor extends BaseUser {
         el => el.textContent?.trim()
       );
 
-      showMessage(`Default response feedback: ${newDefaultResponseText}`);
+      if (newDefaultResponseText !== defaultResponseFeedback) {
+        throw new Error(
+          `Default response feedback was not added correctly. Expected: ${defaultResponseFeedback}, Actual: ${newDefaultResponseText}`
+        );
+      }
     }
 
     if (directToCard) {
@@ -2742,7 +2754,9 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveUploadedAudioButton);
     await this.waitForNetworkIdle();
 
-    // TODO: Add post check
+    await this.page.waitForSelector(saveUploadedAudioButton, {
+      hidden: true,
+    });
   }
 
   /**
