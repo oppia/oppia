@@ -21,7 +21,7 @@ from __future__ import annotations
 from core.platform import models
 
 MYPY = False
-if MYPY:
+if MYPY: # pragma: no cover
     from mypy_imports import redis_client_models
 
 (redis_client_models,) = models.Registry.import_models([
