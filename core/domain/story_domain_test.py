@@ -2013,16 +2013,18 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
-            Exception, 'Expected from_index value to be a number, '
-                       'received None'):
+            Exception,
+            'Expected from_index value to be a number, received None'
+        ):
             self.story.rearrange_node_in_story(None, 2)  # type: ignore[arg-type]
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
-            Exception, 'Expected from_index value to be a number, '
-                       'received a'):
+            Exception,
+            'Expected from_index value to be a number, received a'
+        ):
             self.story.rearrange_node_in_story('a', 2)  # type: ignore[arg-type]
 
     def test_rearrange_node_in_story_fail_with_invalid_to_index_value(
@@ -2032,16 +2034,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
-            Exception, 'Expected to_index value to be a number, '
-                       'received None'):
+            Exception,
+            'Expected to_index value to be a number, received None'
+        ):
             self.story.rearrange_node_in_story(1, None)  # type: ignore[arg-type]
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
-            Exception, 'Expected to_index value to be a number, '
-                       'received a'):
+            Exception, 'Expected to_index value to be a number, received a'
+        ):
             self.story.rearrange_node_in_story(1, 'a')  # type: ignore[arg-type]
 
     def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(
@@ -2116,8 +2119,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-            Exception, 'Expected from_index and to_index values to be '
-                       'different.'):
+            Exception,
+            'Expected from_index and to_index values to be different.'
+        ):
             self.story.rearrange_node_in_story(1, 1)
 
     def test_rearrange_node_in_story(self) -> None:

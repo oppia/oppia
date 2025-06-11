@@ -211,7 +211,9 @@ class BeamEntityToAndFromModelTests(test_utils.TestBase):
         # We use private _from_ds_key here because it provides functionality
         # for obtaining an NDB key from a Beam key, and writing it ourselves
         # would be too complicated.
-        ndb_key = datastore_services.Key._from_ds_key(beam_key.to_client_key())  # pylint: disable=protected-access
+        ndb_key = datastore_services.Key._from_ds_key( # pylint: disable=protected-access
+            beam_key.to_client_key()
+        )
         self.assertEqual(job_utils.get_beam_key_from_ndb_key(ndb_key), beam_key)
 
     def test_get_model_from_beam_entity_with_time(self) -> None:
