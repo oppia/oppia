@@ -20,10 +20,12 @@ When adding or modifying services, please follow these best practices:
 To ensure safe and stable service updates, follow this process:
 
 1. **Unit Tests**
+
    - Write or update unit tests for the service.
    - Cover **expected behaviors**, **edge cases**, and **error handling**.
 
 2. **Run Dependent Component Tests**
+
    - Execute all tests for components that **depend on the service**.
    - This helps detect any unintended side effects.
 

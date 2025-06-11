@@ -30,11 +30,11 @@ import {AudioBarStatusService} from 'services/audio-bar-status.service';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {ContextService} from 'services/context.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {AudioPreloaderService} from '../services/audio-preloader.service';
-import {PlayerPositionService} from '../services/player-position.service';
+import {AudioPreloaderService} from '../../services/audio-preloader.service';
+import {PlayerPositionService} from '../../services/player-position.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {VoiceoverPlayerService} from '../services/voiceover-player.service';
+import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
 

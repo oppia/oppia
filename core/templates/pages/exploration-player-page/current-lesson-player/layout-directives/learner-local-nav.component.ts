@@ -29,8 +29,8 @@ import {
   FlagExplorationModalComponent,
   FlagExplorationModalResult,
 } from '../modals/flag-exploration-modal.component';
-import {ExplorationEngineService} from '../services/exploration-engine.service';
-import {LearnerLocalNavBackendApiService} from '../services/learner-local-nav-backend-api.service';
+import {ExplorationEngineService} from '../../services/exploration-engine.service';
+import {LearnerLocalNavBackendApiService} from '../../services/learner-local-nav-backend-api.service';
 
 @Component({
   selector: 'oppia-learner-local-nav',

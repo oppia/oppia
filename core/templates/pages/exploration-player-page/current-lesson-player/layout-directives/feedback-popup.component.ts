@@ -21,8 +21,8 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {BackgroundMaskService} from 'services/stateful/background-mask.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {UserService} from 'services/user.service';
-import {FeedbackPopupBackendApiService} from '../services/feedback-popup-backend-api.service';
-import {PlayerPositionService} from '../services/player-position.service';
+import {FeedbackPopupBackendApiService} from '../../services/feedback-popup-backend-api.service';
+import {PlayerPositionService} from '../../services/player-position.service';
 import {AppConstants} from 'app.constants';
 
 @Component({

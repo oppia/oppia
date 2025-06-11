@@ -22,7 +22,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ExplorationEngineService} from '../services/exploration-engine.service';
+import {ExplorationEngineService} from '../../services/exploration-engine.service';
 
 @Component({
   selector: 'oppia-refresher-confirmation-modal',

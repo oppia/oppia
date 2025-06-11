@@ -34,9 +34,9 @@ This issue includes:
 
 To test the **New Lesson Player**, follow these steps:
 
-1. ✅ **Enable** the `new_lesson_player` flag from the **Release Coordinator** page.  
-2. ▶️ **Open any lesson** in the player.  
-3. 🌐 **Change the URL** from `/explore` to `/lesson`.  
+1. ✅ **Enable** the `new_lesson_player` flag from the **Release Coordinator** page.
+2. ▶️ **Open any lesson** in the player.
+3. 🌐 **Change the URL** from `/explore` to `/lesson`.
    - **Example:**  
      Change `http://localhost:8081/explore/6`  
      to `http://localhost:8081/lesson/6`
@@ -50,6 +50,7 @@ To test the **New Lesson Player**, follow these steps:
 
 2. `/conversation-skin-components`  
    Includes components related to the **conversation skin**, such as:
+
    - Supplemental card
    - Input-response
    - Hints

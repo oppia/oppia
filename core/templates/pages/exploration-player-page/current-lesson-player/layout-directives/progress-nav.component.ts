@@ -27,9 +27,9 @@ import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
-import {ExplorationPlayerStateService} from '../services/exploration-player-state.service';
-import {PlayerPositionService} from '../services/player-position.service';
-import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
+import {PlayerPositionService} from '../../services/player-position.service';
+import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 import {
@@ -39,7 +39,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
+import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 
 import './progress-nav.component.css';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';

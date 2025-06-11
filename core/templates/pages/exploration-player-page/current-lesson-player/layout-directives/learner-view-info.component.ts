@@ -33,7 +33,7 @@ import {
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {StatsReportingService} from '../services/stats-reporting.service';
+import {StatsReportingService} from '../../services/stats-reporting.service';
 
 import './learner-view-info.component.css';
 

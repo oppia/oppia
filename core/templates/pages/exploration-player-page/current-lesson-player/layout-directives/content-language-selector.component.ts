@@ -31,12 +31,12 @@ import {
   // eslint-disable-next-line max-len
 } from 'pages/exploration-player-page/current-lesson-player/modals/switch-content-language-refresh-required-modal.component';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
+import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {VoiceoverPlayerService} from '../services/voiceover-player.service';
+import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
-import {AudioPreloaderService} from '../services/audio-preloader.service';
+import {AudioPreloaderService} from '../../services/audio-preloader.service';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 
 @Component({
