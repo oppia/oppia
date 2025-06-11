@@ -2008,7 +2008,7 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, user_id: str, story_id: str) -> str:
-        """"Generates the id for StoryProgressModel.
+        """Generates the id for StoryProgressModel.
 
         Args:
             user_id: str. The id of the user.
@@ -2922,7 +2922,8 @@ class UserContributionRightsModel(base_models.BaseModel):
             questions.
         """
         reviewer_keys = cls.query(
-            cls.can_review_questions == True # pylint: disable=singleton-comparison
+            cls.can_review_questions # pylint: disable=singleton-comparison
+            == True
         ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
@@ -2935,7 +2936,8 @@ class UserContributionRightsModel(base_models.BaseModel):
             questions.
         """
         contributor_keys = cls.query(
-            cls.can_submit_questions == True # pylint: disable=singleton-comparison
+            cls.can_submit_questions # pylint: disable=singleton-comparison
+            == True
         ).fetch(keys_only=True)
         return [contributor_key.id() for contributor_key in contributor_keys]
 

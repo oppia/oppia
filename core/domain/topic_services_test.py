@@ -311,7 +311,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(story_id)
         change_list = [
             story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                 'node_id': story.story_contents.nodes[i].id,
                 'old_value': constants.STORY_NODE_STATUS_DRAFT,
@@ -447,7 +447,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_story_and_topic_summary(
                 self.user_id_admin, self.story_id_1,
                 [story_domain.StoryChange({
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                     'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                     'node_id': story.story_contents.nodes[0].id,
                     'old_value': constants.STORY_NODE_STATUS_DRAFT,
@@ -480,7 +480,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_story_and_topic_summary(
             self.user_id_admin, self.story_id_1,
             [story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                 'node_id': story.story_contents.nodes[0].id,
                 'old_value': constants.STORY_NODE_STATUS_DRAFT,
@@ -495,7 +495,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_story_and_topic_summary(
                 self.user_id_admin, self.story_id_1,
                 [story_domain.StoryChange({
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                     'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                     'node_id': story.story_contents.nodes[0].id,
                     'old_value': constants.STORY_NODE_STATUS_PUBLISHED,
@@ -527,7 +527,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_story_and_topic_summary(
             self.user_id_admin, self.story_id_1,
             [story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                 'node_id': story.story_contents.nodes[0].id,
                 'old_value': constants.STORY_NODE_STATUS_DRAFT,
@@ -542,7 +542,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_story_and_topic_summary(
                 self.user_id_admin, self.story_id_1,
                 [story_domain.StoryChange({
-                    'cmd': story_domain.CMD_DELETE_STORY_NODE, 
+                    'cmd': story_domain.CMD_DELETE_STORY_NODE,
                     'node_id': story.story_contents.nodes[0].id,
                 })], 'Delete story chapter.', self.TOPIC_ID)
 
@@ -572,7 +572,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_services.update_story_and_topic_summary(
             self.user_id_admin, self.story_id_1,
             [story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                 'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                 'node_id': story.story_contents.nodes[0].id,
                 'old_value': constants.STORY_NODE_STATUS_DRAFT,
@@ -590,7 +590,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_story_and_topic_summary(
                 self.user_id_admin, self.story_id_1,
                 [story_domain.StoryChange({
-                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY, 
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                     'property_name': (
                         story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
                     'node_id': story.story_contents.nodes[0].id,
@@ -695,9 +695,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_rearrange_story_with_missing_from_index_value(self) -> None:
         with self.assertRaisesRegex(
-            Exception, (
-                'The following required attributes are missing: '
-                'from_index')):
+            Exception,
+                'The following required attributes are missing: from_index'
+            ):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REARRANGE_CANONICAL_STORY,
                 'to_index': 1
@@ -894,9 +894,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-            Exception, (
-                'The following required attributes are '
-                'missing: subtopic_id')):
+            Exception,
+                'The following required attributes are missing: subtopic_id'
+        ):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
                 'property_name': 'invalid property',
