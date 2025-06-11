@@ -329,7 +329,7 @@ class AuditPopulateStudyGuidesJob(PopulateStudyGuidesJob):
         )
 
         # Note: DATASTORE_UPDATES_ALLOWED is False for audit job,
-        # so no models are actually written to datastore
+        # so no models are actually written to datastore.
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_put_results = (
                 study_guide_models_to_put

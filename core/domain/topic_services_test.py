@@ -1283,7 +1283,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.version, 4)
 
     def test_simultaneous_subtopic_and_subtopic_page_changes(self) -> None:
-        # Change the subtopic title first and then the subtopic page contents. 
+        # Change the subtopic title first and then the subtopic page contents.
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
             'property_name': 'title',
@@ -1326,12 +1326,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             '<p>New Value</p>'
         )
 
-        # Change the subtopic page contents first and then the subtopic title. 
+        # Change the subtopic page contents first and then the subtopic title.
         changelist = [
             subtopic_page_domain.SubtopicPageChange({
                 'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                 'property_name': (
-                    subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
+                    (
+                        subtopic_page_domain
+                        .SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+                    )
+                ),
                 'old_value': '<p>New Value</p>',
                 'subtopic_id': 1,
                 'new_value': {
