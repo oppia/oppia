@@ -19,13 +19,13 @@
 import {EventEmitter} from '@angular/core';
 import {TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
 
-import {Hint} from 'domain/exploration/hint-object.model';
+import {Hint} from '../../../domain/exploration/hint-object.model';
 import {
   Solution,
   SolutionObjectFactory,
-} from 'domain/exploration/SolutionObjectFactory';
-import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+} from '../../../domain/exploration/SolutionObjectFactory';
+import {HintsAndSolutionManagerService} from './hints-and-solution-manager.service';
+import {PlayerPositionService} from './player-position.service';
 
 describe('HintsAndSolutionManager service', () => {
   let hasms: HintsAndSolutionManagerService;

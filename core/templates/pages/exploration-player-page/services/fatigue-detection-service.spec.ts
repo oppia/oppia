@@ -17,7 +17,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {FatigueDetectionService} from 'pages/exploration-player-page/services/fatigue-detection.service';
+import {FatigueDetectionService} from './fatigue-detection.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 describe('Fatigue detection service', () => {

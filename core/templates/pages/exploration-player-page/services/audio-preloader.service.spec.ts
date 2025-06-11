@@ -30,15 +30,15 @@ import {
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
-import {InteractionAnswer} from 'interactions/answer-defs';
-import {AudioPreloaderService} from 'pages/exploration-player-page/services/audio-preloader.service';
-import {ContextService} from 'services/context.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
+} from '../../../domain/exploration/ExplorationObjectFactory';
+import {InteractionAnswer} from '../../../../../extensions/interactions/answer-defs';
+import {AudioPreloaderService} from './audio-preloader.service';
+import {ContextService} from '../../../services/context.service';
+import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {
   Voiceover,
   VoiceoverBackendDict,
-} from 'domain/exploration/voiceover.model';
+} from '../../../domain/exploration/voiceover.model';
 
 class MockPlatformFeatureService {
   get status(): object {
