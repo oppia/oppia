@@ -60,6 +60,7 @@ export class PlayerTranscriptService {
   }
 
   hasEncounteredStateBefore(stateName: string): boolean {
+    console.log(this.transcript);
     return this.transcript.some(transcriptItem => {
       return transcriptItem.getStateName() === stateName;
     });
