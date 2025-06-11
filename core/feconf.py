@@ -1077,6 +1077,7 @@ COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 COMMIT_MESSAGE_SKILL_DELETED = 'Skill deleted.'
 COMMIT_MESSAGE_STORY_DELETED = 'Story deleted.'
 COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED = 'Subtopic page deleted.'
+COMMIT_MESSAGE_STUDY_GUIDE_DELETED = 'Study Guide deleted.'
 COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Max number of playthroughs for an issue.
