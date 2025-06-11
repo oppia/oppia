@@ -44,8 +44,9 @@ import cloneDeep from 'lodash/cloneDeep';
 export class QuestionPlayerEngineService {
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
-  private currentIndex: number = null;
-  private nextIndex: number = null;
+  private currentIndex: number | null = null;
+  private nextIndex: number | null = null;
+
 
   constructor(
     private alertsService: AlertsService,
@@ -62,7 +63,7 @@ export class QuestionPlayerEngineService {
     feedbackHtml: string,
     envs: Record<string, string>[]
   ): string {
-    return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
+    return this.expressionInterpolationService.processHtml(feedbackHtml, envs) || '';
   }
 
   // Evaluate question string.
@@ -73,7 +74,7 @@ export class QuestionPlayerEngineService {
     return this.expressionInterpolationService.processHtml(
       newState.content.html,
       envs
-    );
+    ) || '';
   }
 
   private getRandomSuffix(): string {
@@ -102,7 +103,7 @@ export class QuestionPlayerEngineService {
     const initialState = this.questions[0].getStateData();
 
     const questionHtml = this.makeQuestion(initialState, []);
-    if (questionHtml === null) {
+    if (questionHtml === '') {
       this.alertsService.addWarning('Question name should not be empty.');
       errorCallback();
       return;
@@ -158,7 +159,7 @@ export class QuestionPlayerEngineService {
   init(
     questionObjects: Question[],
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-    errorCallback?: () => void
+    errorCallback: () => void
   ): void {
     this.contextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
@@ -287,7 +288,7 @@ export class QuestionPlayerEngineService {
       answer: answerString,
     };
     const feedbackHtml = this.makeFeedback(outcome.feedback.html, [oldParams]);
-    if (feedbackHtml === null) {
+    if (feedbackHtml === '') {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Feedback content should not be empty.');
       return;
@@ -306,7 +307,7 @@ export class QuestionPlayerEngineService {
         answer: 'answer',
       },
     ]);
-    if (questionHtml === null) {
+    if (questionHtml === '') {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Question name should not be empty.');
       return;
@@ -325,7 +326,7 @@ export class QuestionPlayerEngineService {
     const onSameCard = !answerIsCorrect;
 
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
-    let nextCard = null;
+    let nextCard: StateCard | null = null;
     let nextCardIfReallyStuck = null;
     if (!isFinalQuestion) {
       let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
