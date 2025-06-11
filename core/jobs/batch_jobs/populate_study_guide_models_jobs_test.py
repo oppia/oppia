@@ -402,7 +402,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='STUDY GUIDE PROCESSED SUCCESS: 1'
+                stdout='STUDY GUIDES PROCESSED SUCCESS: 1'
             )
         ])
 
@@ -439,7 +439,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stderr=f'STUDY GUIDE PROCESSED ERROR: '
+                stderr=f'STUDY GUIDES PROCESSED ERROR: '
                        f'"(\'{self.SUBTOPIC_PAGE_ID}\', '
                        f'Exception(\'The subtopic with id '
                        f'{self.SUBTOPIC_ID} does not exist.\'))": 1'
@@ -484,7 +484,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         ):
             self.assert_job_output_is([
                 job_run_result.JobRunResult(
-                    stderr=f'STUDY GUIDE PROCESSED ERROR: '
+                    stderr=f'STUDY GUIDES PROCESSED ERROR: '
                            f'"(\'{self.SUBTOPIC_PAGE_ID}\', '
                            f'Exception(\'Topic validation failed\'))": 1'
                 )
@@ -548,7 +548,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
 
         self.assert_job_output_is([
             job_run_result.JobRunResult(
-                stdout='STUDY GUIDE PROCESSED SUCCESS: 2'
+                stdout='STUDY GUIDES PROCESSED SUCCESS: 2'
             )
         ])
 
@@ -594,7 +594,7 @@ class AuditPopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         ):
             self.assert_job_output_is([
                 job_run_result.JobRunResult(
-                    stderr=f'STUDY GUIDE PROCESSED ERROR: '
+                    stderr=f'STUDY GUIDES PROCESSED ERROR: '
                            f'"(\'{self.SUBTOPIC_PAGE_ID}\', '
                            f'Exception(\'Test exception\'))": 1'
                 )
