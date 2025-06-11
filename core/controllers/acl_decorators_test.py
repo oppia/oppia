@@ -7556,6 +7556,7 @@ class CanFetchContributorDashboardStatsTests(test_utils.GenericTestBase):
             }
         }
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+        
         @acl_decorators.can_fetch_contributor_dashboard_stats
         def get(
             self,
