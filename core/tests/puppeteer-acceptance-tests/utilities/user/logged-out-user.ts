@@ -716,6 +716,9 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the next button in the pagination controls
    */
   async clickNextBlogPage(): Promise<void> {
+    await this.page.waitForSelector(blogPostTitleSelector, {
+      visible: true,
+    });
     const firstPostTitle = await this.page.$eval(
       blogPostTitleSelector,
       el => el.textContent
@@ -741,6 +744,9 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the previous button in the pagination controls
    */
   async clickPreviousBlogPage(): Promise<void> {
+    await this.page.waitForSelector(blogPostTitleSelector, {
+      visible: true,
+    });
     const firstPostTitle = await this.page.$eval(
       blogPostTitleSelector,
       el => el.textContent
