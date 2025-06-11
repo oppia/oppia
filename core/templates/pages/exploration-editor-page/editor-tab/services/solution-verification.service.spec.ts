@@ -28,7 +28,6 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 
 describe('Solution Verification Service', () => {
   let explorationStatesService: ExplorationStatesService;
@@ -49,7 +48,6 @@ describe('Solution Verification Service', () => {
       providers: [
         StateInteractionIdService,
         StateCustomizationArgsService,
-        ExplorationHtmlFormatterService,
         StateEditorService,
         SolutionVerificationService,
         ExplorationStatesService,
