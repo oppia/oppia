@@ -1393,8 +1393,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'The explorations with ID exp_id_2 and exp_id_1 have different '
                 'categories.'])
         with self.assertRaisesRegex(
-            Exception, 'All explorations in a story should be of the '
-            'same category'):
+            Exception,
+            'All explorations in a story should be of the same category'
+        ):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 

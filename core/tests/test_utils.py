@@ -343,7 +343,9 @@ def swap_is_feature_flag_enabled_function(
     """
     def mock_is_feature_flag_enabled(
         feature_flag_name: str,
-        feature_flag: Optional[feature_flag_domain.FeatureFlag] = None, # pylint: disable=unused-argument
+        feature_flag: Optional[ # pylint: disable=unused-argument
+            feature_flag_domain.FeatureFlag
+        ] = None,
         user_id: Optional[str] = None # pylint: disable=unused-argument
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
