@@ -41,7 +41,7 @@ class RedisClient:
 
     def __init__(self) -> None:
         self._is_client_initialized = False
-        self._redis_model: Optional[
+        self._redis_client_model: Optional[
             redis_client_models.RedisClientModel] = None
         self._oppia_redis_client: Optional[redis.StrictRedis[str]] = None
         self._cloud_ndb_redis_client: Optional[redis.StrictRedis[str]] = None
@@ -54,15 +54,15 @@ class RedisClient:
             return
 
         with datastore_services.get_ndb_context():
-            self._redis_model = (
+            self._redis_client_model = (
                 redis_client_models.RedisClientModel.get(
                     redis_client_models.REDIS_CLIENT_ID, strict=False
                 )
             )
 
         redishost = (
-            self._redis_model.redishost
-            if self._redis_model is not None
+            self._redis_client_model.redishost
+            if self._redis_client_model is not None
             else feconf.REDISHOST
         )
         self._oppia_redis_client = redis.StrictRedis(
