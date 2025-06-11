@@ -106,6 +106,8 @@ const floatFormInput = '.e2e-test-float-form-input';
 const modifyExistingTranslationsButton = '.e2e-test-modify-translations-button';
 const leaveTranslationsAsIsButton = '.e2e-test-leave-translations-as-is';
 const activeTranslationTab = '.e2e-test-active-translation-tab';
+const modifyTranslationModalSelector =
+  '.e2e-test-modify-translations-modal-body';
 
 const stateNodeSelector = '.e2e-test-node-label';
 const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
@@ -242,6 +244,10 @@ const totalPlaysSelector = '.e2e-test-oppia-total-plays';
 const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
 const avarageRatingSelector = '.e2e-test-oppia-average-rating';
 const usersCountInRatingSelector = '.e2e-test-oppia-total-users';
+const explorationFeedbackCardActiveSelector =
+  '.e2e-test-exploration-feedback-card-active';
+const explorationFeedbackTabContentSelector =
+  '.e2e-test-exploration-feedback-card';
 
 const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
@@ -477,6 +483,10 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }
+
+    await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
+      visible: true,
+    });
   }
 
   /**
@@ -1901,7 +1911,7 @@ export class ExplorationEditor extends BaseUser {
     const currentUrl = this.page.url();
     const urlPatterns = {
       'Preview Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/preview\/.+$/,
-      'History Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/preview\//,
+      'History Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/history\//,
       'Translation Tab':
         /^http:\/\/localhost:8181\/create\/[^\/]+#\/translation\/.+$/,
       'Main Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/gui\/.+$/,
@@ -2555,7 +2565,9 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(modifyExistingTranslationsButton);
     await this.waitForNetworkIdle();
 
-    // TODO: Add post-check
+    await this.page.waitForSelector(modifyTranslationModalSelector, {
+      visible: true,
+    });
   }
 
   /**
@@ -2624,7 +2636,10 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(modalSaveButton);
     await this.clickOn(modifyTranslationsModalDoneButton);
-    // TODO: Add post check
+
+    await this.page.waitForSelector(modifyTranslationsModalDoneButton, {
+      hidden: true,
+    });
     showMessage('Successfully updated translation from modal.');
   }
 
@@ -3028,7 +3043,10 @@ export class ExplorationEditor extends BaseUser {
 
     if (expectedThread > 0 && expectedThread <= feedbackSubjects.length) {
       await feedbackSubjects[expectedThread - 1].click();
-      // TODO: Add post check
+
+      await this.page.waitForSelector(explorationFeedbackCardActiveSelector, {
+        visible: true,
+      });
     } else {
       throw new Error(`Expected thread not found: ${expectedThread}`);
     }
@@ -3076,7 +3094,20 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.type(responseTextareaSelector, reply);
     await this.clickOn(sendButtonSelector);
-    // TODO: Add post check
+
+    // Check if button is disabled after clicking
+    const isButtonDisabled = await this.page.evaluate(() => {
+      const button = document.querySelector(sendButtonSelector) as
+        | HTMLButtonElement
+        | undefined;
+      return button?.disabled;
+    });
+
+    if (!isButtonDisabled) {
+      throw new Error(
+        'Feedback reply button is not disabled after sending a feedback reply.'
+      );
+    }
   }
 
   /**
@@ -3107,7 +3138,9 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(feedbackTabBackButtonSelector);
-    // TODO: Add post check
+    await this.page.waitForSelector(feedbackTabBackButtonSelector, {
+      hidden: true,
+    });
   }
 
   /**
