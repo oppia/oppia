@@ -615,7 +615,14 @@ export class LoggedOutUser extends BaseUser {
     await this.type(blogSearchInputSelector, keyword);
     await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
 
-    // TODO: Add post Check
+    const url = new URL(this.page.url());
+    const queryParam = url.searchParams.get('q');
+
+    if (queryParam != keyword) {
+      throw new Error(
+        `Query Parameter doesn't match. Expected ${keyword}, but found ${queryParam}`
+      );
+    }
   }
 
   /**
