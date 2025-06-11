@@ -19,15 +19,15 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {BackgroundMaskService} from 'services/stateful/background-mask.service';
+import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {BackgroundMaskService} from '../../../../services/stateful/background-mask.service';
 import {LearnerAnswerInfoCard} from './learner-answer-info-card.component';
-import {ExplorationEngineService} from '../services/exploration-engine.service';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {ExplorationEngineService} from '../../services/exploration-engine.service';
+import {StateObjectFactory} from '../../../../domain/state/StateObjectFactory';
+import {ExplorationHtmlFormatterService} from '../../../../services/exploration-html-formatter.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {PlayerTranscriptService} from '../services/player-transcript.service';
-import {LearnerAnswerInfoService} from '../services/learner-answer-info.service';
+import {PlayerTranscriptService} from '../../services/player-transcript.service';
+import {LearnerAnswerInfoService} from '../../services/learner-answer-info.service';
 
 describe('LearnerAnswerInfoCard', () => {
   let component: LearnerAnswerInfoCard;

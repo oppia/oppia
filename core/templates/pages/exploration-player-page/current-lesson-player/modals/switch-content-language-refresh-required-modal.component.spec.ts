@@ -23,8 +23,8 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {
   SwitchContentLanguageRefreshRequiredModalComponent,
   // eslint-disable-next-line max-len
-} from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
-import {WindowRef} from 'services/contextual/window-ref.service';
+} from '../modals/switch-content-language-refresh-required-modal.component';
+import {WindowRef} from '../../../../services/contextual/window-ref.service';
 
 class MockActiveModal {
   dismiss(): void {

@@ -28,24 +28,24 @@ import {
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {ExplorationRatings} from 'domain/summary/learner-exploration-summary.model';
-import {UrlService} from 'services/contextual/url.service';
-import {UserService} from 'services/user.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {ExplorationEngineService} from '../services/exploration-engine.service';
-import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {ExplorationRatings} from '../../../../domain/summary/learner-exploration-summary.model';
+import {UrlService} from '../../../../services/contextual/url.service';
+import {UserService} from '../../../../services/user.service';
+import {WindowRef} from '../../../../services/contextual/window-ref.service';
+import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
+import {ExplorationEngineService} from '../../services/exploration-engine.service';
+import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {LessonInformationCardModalComponent} from './lesson-information-card-modal.component';
-import {LocalStorageService} from 'services/local-storage.service';
-import {DateTimeFormatService} from 'services/date-time-format.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
-import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-import {PlayerPositionService} from '../services/player-position.service';
-import {StateCard} from 'domain/state_card/state-card.model';
+import {LocalStorageService} from '../../../../services/local-storage.service';
+import {DateTimeFormatService} from '../../../../services/date-time-format.service';
+import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
+import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
+import {RatingComputationService} from '../../../../components/ratings/rating-computation/rating-computation.service';
+import {CheckpointCelebrationUtilityService} from '../../services/checkpoint-celebration-utility.service';
+import {PlayerPositionService} from '../../services/player-position.service';
+import {StateCard} from '../../../../domain/state_card/state-card.model';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {

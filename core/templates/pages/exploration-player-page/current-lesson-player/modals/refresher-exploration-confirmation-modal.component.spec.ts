@@ -26,13 +26,13 @@ import {
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {UrlService} from 'services/contextual/url.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {ExplorationEngineService} from '../services/exploration-engine.service';
+import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
+import {UrlService} from '../../../../services/contextual/url.service';
+import {WindowRef} from '../../../../services/contextual/window-ref.service';
+import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {RefresherExplorationConfirmationModal} from './refresher-exploration-confirmation-modal.component';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 
 describe('Refresher Exploration Confirmation Modal', () => {
   let fixture: ComponentFixture<RefresherExplorationConfirmationModal>;

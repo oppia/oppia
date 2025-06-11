@@ -30,23 +30,23 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {AppConstants} from 'app.constants';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {AudioPlayerService} from 'services/audio-player.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
+import {AppConstants} from '../../../../app.constants';
+import {StateCard} from '../../../../domain/state_card/state-card.model';
+import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
+import {AudioPlayerService} from '../../../../services/audio-player.service';
+import {WindowRef} from '../../../../services/contextual/window-ref.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
-import {CurrentInteractionService} from '../services/current-interaction.service';
+import {CurrentInteractionService} from '../../services/current-interaction.service';
 import {
   HelpCardEventResponse,
   PlayerPositionService,
-} from '../services/player-position.service';
+} from '../../services/player-position.service';
 import {SupplementalCardComponent} from './supplemental-card.component';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {VoiceoverPlayerService} from '../services/voiceover-player.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
+import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
+import {Interaction} from '../../../../domain/exploration/InteractionObjectFactory';
+import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
+import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
+import {PlatformFeatureService} from '../../../../services/platform-feature.service';
 
 class MockPlatformFeatureService {
   get status(): object {

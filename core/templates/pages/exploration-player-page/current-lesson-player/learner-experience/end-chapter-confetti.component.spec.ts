@@ -19,7 +19,7 @@
 
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {EndChapterConfettiComponent} from './end-chapter-confetti.component';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 
 describe('End chapter confetti component', function () {
   let component: EndChapterConfettiComponent;

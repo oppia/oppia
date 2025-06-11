@@ -19,9 +19,9 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {ProgressReminderModalComponent} from './progress-reminder-modal.component';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 
 describe('Progress reminder modal component', () => {
   let fixture: ComponentFixture<ProgressReminderModalComponent>;

@@ -19,7 +19,7 @@
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {DisplaySolutionInterstititalModalComponent} from './display-solution-interstitial-modal.component';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 
 describe('Display Interstitial Solution Modal', () => {
   let fixture: ComponentFixture<DisplaySolutionInterstititalModalComponent>;
