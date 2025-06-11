@@ -22,7 +22,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {
   Misconception,
   MisconceptionSkillMap,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 
 interface UpdatedValues {
   misconception: Misconception;

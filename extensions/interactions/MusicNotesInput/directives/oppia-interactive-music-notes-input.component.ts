@@ -27,6 +27,7 @@ import {
   Input,
   OnDestroy,
   OnInit,
+  Renderer2,
 } from '@angular/core';
 import {InteractionAnswer, MusicNotesAnswer} from 'interactions/answer-defs';
 import {
@@ -109,7 +110,8 @@ export class MusicNotesInputComponent
     private musicNotesInputRulesService: MusicNotesInputRulesService,
     private musicPhrasePlayerService: MusicPhrasePlayerService,
     private alertsService: AlertsService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private renderer: Renderer2
   ) {}
 
   private _getAttributes() {
@@ -211,11 +213,16 @@ export class MusicNotesInputComponent
   // must be recalculated in order for the grid to work properly.
   // TODO(#14340): Remove some usages of jQuery from the codebase.
   reinitStaff(): void {
-    $('.oppia-music-input-valid-note-area').css('visibility', 'hidden');
-    setTimeout(() => {
-      $('.oppia-music-input-valid-note-area').css('visibility', 'visible');
-      this.init();
-    }, 20);
+    var elem = document.querySelector('.oppia-music-input-valid-note-area');
+
+    if (elem) {
+      this.renderer.setStyle(elem, 'visibility', 'hidden');
+
+      setTimeout(() => {
+        this.renderer.setStyle(elem, 'visibility', 'visible');
+        this.init();
+      }, 20);
+    }
   }
 
   init(): void {
@@ -517,10 +524,10 @@ export class MusicNotesInputComponent
               while (this.checkIfNotePositionTaken(leftPos)) {
                 leftPos += this.HORIZONTAL_GRID_SPACING;
               }
-              $(ui.helper).css({
-                top: topPos,
-                left: leftPos,
-              });
+              if (ui.helper instanceof HTMLElement) {
+                this.renderer.setStyle(ui.helper, 'top', `${topPos}px`);
+                this.renderer.setStyle(ui.helper, 'left', `${leftPos}px`);
+              }
 
               if (
                 Math.floor(leftPos) >
@@ -537,9 +544,13 @@ export class MusicNotesInputComponent
             // Adjusts note so it is right on top of the staff line by
             // calculating half of the VERTICAL_GRID_SPACING and
             // subtracting that from its current top Position.
-            $(ui.helper).css({
-              top: topPos - this.VERTICAL_GRID_SPACING / 2.0,
-            });
+            if (ui.helper instanceof HTMLElement) {
+              this.renderer.setStyle(
+                ui.helper,
+                'top',
+                `${topPos - this.VERTICAL_GRID_SPACING / 2.0}px`
+              );
+            }
 
             // Add noteStart property to note object.
             if (this.getNoteStartFromLeftPos(leftPos) !== undefined) {

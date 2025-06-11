@@ -18,16 +18,10 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {EndExplorationCustomizationArgs} from 'interactions/customization-args-defs';
 import {EndExplorationValidationService} from 'interactions/EndExploration/directives/end-exploration-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 
@@ -39,7 +33,6 @@ describe('EndExplorationValidationService', () => {
   let badOutcome: Outcome;
   let goodAnswerGroups: AnswerGroup[];
   let customizationArguments: EndExplorationCustomizationArgs;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,12 +41,10 @@ describe('EndExplorationValidationService', () => {
 
     validatorService = TestBed.inject(EndExplorationValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
-    oof = TestBed.inject(OutcomeObjectFactory);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
 
     currentState = 'First State';
 
-    badOutcome = oof.createFromBackendDict({
+    badOutcome = Outcome.createFromBackendDict({
       dest: currentState,
       dest_if_really_stuck: null,
       feedback: {
@@ -73,9 +64,9 @@ describe('EndExplorationValidationService', () => {
     };
 
     goodAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [],
-        oof.createFromBackendDict({
+        Outcome.createFromBackendDict({
           dest: 'Second State',
           dest_if_really_stuck: null,
           feedback: {
@@ -119,13 +110,13 @@ describe('EndExplorationValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Please make sure end exploration interactions do not ' +
-          'have any Oppia responses.',
+          'have any Oppia responses',
       },
       {
         type: WARNING_TYPES.ERROR,
         message:
           'Please make sure end exploration interactions do not ' +
-          'have a default outcome.',
+          'have a default outcome',
       },
     ]);
   });
@@ -138,7 +129,7 @@ describe('EndExplorationValidationService', () => {
     };
     let invalidExplorationIdsWarning = {
       type: WARNING_TYPES.ERROR,
-      message: 'Recommended exploration ID must be non-empty.',
+      message: 'Recommended exploration ID must be non-empty',
     };
 
     var warnings = validatorService.getAllWarnings(
@@ -209,7 +200,7 @@ describe('EndExplorationValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Recommended exploration ID must be a string.',
+        message: 'Recommended exploration ID must be a string',
       },
     ]);
   });
@@ -229,7 +220,7 @@ describe('EndExplorationValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Set of recommended exploration IDs must be list.',
+        message: 'Set of recommended exploration IDs must be list',
       },
     ]);
   });

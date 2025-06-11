@@ -235,6 +235,8 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/set-language-to-rtl-and-navigate-through-site',
     'logged-in-user/give-feedback-rate-and-report-an-exploration',
     'logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard',
+    'logged-in-user/manage-classroom-progress-in-learner-dashboard',
+    'logged-in-user/manage-exploration-progress-in-learner-dashboard',
     'logged-in-user/deny-access-to-pages-without-additional-roles',
     'logged-out-user/check-all-user-flow-of-donor',
     'logged-out-user/check-all-user-flow-of-parent-teacher',
@@ -266,12 +268,14 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-out-user/track-and-resume-exploration-progress-via-url',
     'logged-out-user/play-lesson-in-different-languages-and-listen-'
     'to-voiceovers',
+    'logged-out-user/generate-and-play-automated-voiceovers',
     'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
     'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
     'logged-out-user/view-and-search-blog-posts',
     'moderator/edit-featured-activities-list',
     'moderator/view-recent-commits-and-feedback-messages',
     'practice-question-admin/add-and-remove-contribution-rights',
+    'practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties', # pylint: disable=line-too-long
     'release-coordinator/run-a-beam-job-and-copy-the-output',
     'release-coordinator/update-promo-bar-message',
     'release-coordinator/flush-and-get-profile-of-redis-cache',
@@ -290,6 +294,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'topic-manager/assign-unassign-and-merge-skills',
     'topic-manager/cannot-do-curriculum-admin-actions',
     'topic-manager/edit-and-republish-a-skill',
+    'topic-manager/edit-and-republish-story-with-mobile-supported-explorations',
     'topic-manager/edit-preview-and-save-a-chapter',
     'voiceover-admin/add-voiceover-artist-to-an-exploration'
 ]

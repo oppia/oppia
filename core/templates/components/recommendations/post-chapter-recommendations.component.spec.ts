@@ -74,7 +74,7 @@ describe('End chapter check mark component', function () {
     );
   });
 
-  it('should get revision tab url', () => {
+  it('should get study tab url', () => {
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
       'topic_page'
     );
@@ -83,7 +83,7 @@ describe('End chapter check mark component', function () {
       classroom_url_fragment: 'classroom_url_fragment',
     });
 
-    expect(component.getRevisionTabUrl()).toBe('topic_page/revision');
+    expect(component.getStudyTabUrl()).toBe('topic_page/studyguide');
     expect(urlInterpolationService.interpolateUrl).toHaveBeenCalledWith(
       '/learn/<classroom_url_fragment>/<topic_url_fragment>',
       {

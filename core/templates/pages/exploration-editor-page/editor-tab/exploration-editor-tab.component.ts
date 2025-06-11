@@ -29,8 +29,8 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {RouterService} from '../services/router.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {InteractionData} from 'interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
@@ -46,7 +46,7 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {VersionHistoryService} from '../services/version-history.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {ContextService} from 'services/context.service';
-import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 

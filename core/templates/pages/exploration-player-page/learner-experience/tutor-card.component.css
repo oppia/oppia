@@ -306,8 +306,8 @@ oppia-tutor-card .oppia-mcq-question-description-text {
     white-space: normal;
   }
 
-  oppia-tutor-card .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:focus,
-  oppia-tutor-card .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:hover {
+  oppia-tutor-card .oppia-learner-view-card button.mat-button.mat-default-theme.instructions-button:focus,
+  oppia-tutor-card .oppia-learner-view-card button.mat-button.mat-default-theme.instructions-button:hover {
     background-color: #115fd4;
   }
 

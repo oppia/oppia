@@ -462,14 +462,14 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
                 app_feedback_report_domain.LessonPlayerEntryPoint))
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.EntryPoint.REVISION_CARD.value)
-        revision_card_obj = (
+            app_feedback_report_constants.EntryPoint.STUDY_GUIDE.value)
+        study_guide_obj = (
             feedback_report.get_entry_point_from_json(
                 entry_point_json))
         self.assertTrue(
             isinstance(
-                revision_card_obj,
-                app_feedback_report_domain.RevisionCardEntryPoint))
+                study_guide_obj,
+                app_feedback_report_domain.StudyGuideEntryPoint))
 
         entry_point_json['entry_point_name'] = (
             app_feedback_report_constants.EntryPoint.CRASH.value)
@@ -517,18 +517,18 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
             feedback_report.get_entry_point_from_json(entry_point_json)
 
         entry_point_json['entry_point_name'] = (
-            app_feedback_report_constants.EntryPoint.REVISION_CARD.value)
+            app_feedback_report_constants.EntryPoint.STUDY_GUIDE.value)
 
         with self.assertRaisesRegex(
             Exception,
-            'No topic_id provided for RevisionCardEntryPoint.'
+            'No topic_id provided for StudyGuideEntryPoint.'
         ):
             entry_point_json['entry_point_topic_id'] = None
             feedback_report.get_entry_point_from_json(entry_point_json)
 
         with self.assertRaisesRegex(
             Exception,
-            'No subtopic_id provided for RevisionCardEntryPoint.'
+            'No subtopic_id provided for StudyGuideEntryPoint.'
         ):
             entry_point_json['entry_point_topic_id'] = 'topic_id'
             entry_point_json['entry_point_subtopic_id'] = None
@@ -1181,18 +1181,18 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
             entry_point_obj.validate()
 
 
-class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
+class StudyGuideEntryPointDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
         self.entry_point = (
-            app_feedback_report_domain.RevisionCardEntryPoint(
+            app_feedback_report_domain.StudyGuideEntryPoint(
                 'topic_id', 'subtopic_id'))
 
     def test_to_dict(self) -> None:
         expected_dict = {
             'entry_point_name': (
-                app_feedback_report_constants.EntryPoint.REVISION_CARD.value),
+                app_feedback_report_constants.EntryPoint.STUDY_GUIDE.value),
             'topic_id': 'topic_id',
             'subtopic_id': 'subtopic_id'
         }
@@ -1221,7 +1221,7 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.entry_point,
             'Expected entry point name %s' % (
-                app_feedback_report_constants.EntryPoint.REVISION_CARD.value))
+                app_feedback_report_constants.EntryPoint.STUDY_GUIDE.value))
 
     def test_validation_invalid_topic_id_fails(self) -> None:
         self.entry_point.topic_id = 'invalid_topic_id'
@@ -1248,13 +1248,13 @@ class RevisionCardEntryPointDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
             self,
-            entry_point_obj: app_feedback_report_domain.RevisionCardEntryPoint,
+            entry_point_obj: app_feedback_report_domain.StudyGuideEntryPoint,
             expected_error_substring: str
     ) -> None:
         """Checks that the entry point passes validation.
 
         Args:
-            entry_point_obj: RevisionCardEntryPoint. The domain object to
+            entry_point_obj: StudyGuideEntryPoint. The domain object to
                 validate.
             expected_error_substring: str. String that should be a substring
                 of the expected error message.

@@ -34,7 +34,7 @@ import {
 } from 'domain/question/editable-question-backend-api.service';
 import {QuestionSummary} from 'domain/question/question-summary-object.model';
 import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
@@ -90,7 +90,6 @@ describe('Questions List Component', () => {
   let contextService: ContextService;
   let questionValidationService: QuestionValidationService;
   let skillObjectFactory: SkillObjectFactory;
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let question = null;
   let questionStateData = null;
   let skill = null;
@@ -129,7 +128,6 @@ describe('Questions List Component', () => {
 
     ngbModal = TestBed.inject(NgbModal);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
 
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     questionsListService = TestBed.inject(QuestionsListService);
@@ -216,9 +214,6 @@ describe('Questions List Component', () => {
           id: 'TextInput',
         },
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {},
-        },
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,
@@ -347,6 +342,55 @@ describe('Questions List Component', () => {
     })
   );
 
+  it(
+    'should fetch difficulty count for selected skill on' + ' initialization',
+    fakeAsync(() => {
+      component.selectedSkillId = 'true';
+
+      const skillWithExplanations = skillObjectFactory.createFromBackendDict({
+        id: 'skillId1',
+        description: 'test description 1',
+        misconceptions: [],
+        rubrics: [
+          {
+            difficulty: 'Easy',
+            explanations: ['explanation1'],
+          },
+          {
+            difficulty: 'Medium',
+            explanations: [],
+          },
+        ],
+        skill_contents: {
+          explanation: {html: 'test explanation', content_id: 'explanation'},
+          worked_examples: [],
+          recorded_voiceovers: {voiceovers_mapping: {}},
+        },
+        language_code: 'en',
+        version: 3,
+        prerequisite_skill_ids: [],
+        all_questions_merged: null,
+        next_misconception_id: null,
+        superseding_skill_id: null,
+      });
+
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+        Promise.resolve({
+          skill: skillWithExplanations,
+          assignedSkillTopicData: {},
+          groupedSkillSummaries: {},
+        })
+      );
+
+      expect(component.difficultyCount).toEqual(undefined);
+
+      component.ngOnInit();
+      tick();
+
+      expect(component.difficultyCount).toEqual(1);
+    })
+  );
+
   it('should start creating question on navigating to question editor', () => {
     spyOn(
       skillEditorRoutingService,
@@ -431,7 +475,7 @@ describe('Questions List Component', () => {
 
     expect(component.misconceptionsBySkill).toEqual({
       skillId1: [
-        misconceptionObjectFactory.createFromBackendDict({
+        Misconception.createFromBackendDict({
           id: 2,
           name: 'test name',
           notes: 'test notes',

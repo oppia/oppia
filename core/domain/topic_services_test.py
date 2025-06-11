@@ -33,6 +33,7 @@ from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import study_guide_domain
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
@@ -1234,7 +1235,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_update_topic_and_subtopic_page(self) -> None:
         changelist: List[Union[
             topic_domain.TopicChange,
-            subtopic_page_domain.SubtopicPageChange
+            subtopic_page_domain.SubtopicPageChange,
+            study_guide_domain.StudyGuideChange
         ]] = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title3',
@@ -2670,9 +2672,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_PUBLISHED,
-            'planned_publication_date_msecs': 1690800486000.0,
-            'first_publication_date_msecs': 1672684200000.0,
-            'last_modified_msecs': 1672684200000.0,
+            'planned_publication_date_msecs': 1690800486000,
+            'first_publication_date_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         node_2: story_domain.StoryNodeDict = {
@@ -2690,9 +2692,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_DRAFT,
-            'planned_publication_date_msecs': 1659264486000.0,
+            'planned_publication_date_msecs': 1659264486000,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         node_3: story_domain.StoryNodeDict = {
@@ -2710,9 +2712,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
-            'planned_publication_date_msecs': 1690800486000.0,
+            'planned_publication_date_msecs': 1690800486000,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         node_4: story_domain.StoryNodeDict = {
@@ -2730,9 +2732,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
-            'planned_publication_date_msecs': 1693478886000.0,
+            'planned_publication_date_msecs': 1693478886000,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         story.story_contents.nodes = [

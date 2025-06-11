@@ -52,17 +52,10 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   ) {}
 
   setPageTitle(): void {
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode()
-    );
-
     const translatedTitle = this.translateService.instant(
       'I18N_PRACTICE_SESSION_PAGE_TITLE',
-      {
-        topicName: this.topicName,
-      }
+      {topicName: this.topicName}
     );
-
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
