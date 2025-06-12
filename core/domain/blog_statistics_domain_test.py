@@ -442,7 +442,7 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
             'Blog Post ID must be a string, but got 1234'
         )
 
-        #Reassign for this test of a different type.
+        # Reassign for this test of a different type.
         self.blog_post_viewed_event.blog_post_id = good_blog_post_id
-        # Timestamp not recored in datetimedatetime. 
+        # Timestamp not recored in datetimedatetime.
         self.blog_post_viewed_event.timestamp = None
