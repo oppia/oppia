@@ -311,7 +311,7 @@ const desktopStoryTitleSelector = '.e2e-test-story-title-in-topic-page';
 const mobileStoryTitleSelector = '.e2e-test-mobile-story-title';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const oppiaTopicTitleSelector = '.oppia-topic-title';
-const topicPageLessonTabSelector = '.e2e-test-revision-tab-link';
+const topicPageLessonTabSelector = '.e2e-test-study-tab-link';
 const subTopicTitleInLessTabSelector = '.subtopic-title';
 const reviewCardTitleSelector = '.oppia-subtopic-title';
 const topicNameSelector = '.e2e-test-topic-name';
@@ -3276,14 +3276,14 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Navigates to the revision tab on the topic page.
+   * Navigates to the study tab on the topic page.
    */
-  async navigateToRevisionTab(): Promise<void> {
+  async navigateToStudyTab(): Promise<void> {
     await this.page.waitForSelector(topicPageLessonTabSelector);
-    const topicPageRevisionTabSelectorElement = await this.page.$(
+    const topicPageStudyTabSelectorElement = await this.page.$(
       topicPageLessonTabSelector
     );
-    await topicPageRevisionTabSelectorElement?.click();
+    await topicPageStudyTabSelectorElement?.click();
   }
 
   /**
@@ -4292,9 +4292,18 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Verifies if the voiceover is playing.
    */
-  async verifyVoiceoverIsPlaying(shouldBePlaying: true): Promise<void> {
-    // If the pause button is present, it means the audio is playing.
-    await this.page.waitForSelector(pauseVoiceoverButton);
+  async verifyVoiceoverIsPlaying(shouldBePlaying: boolean): Promise<void> {
+    if (shouldBePlaying) {
+      // If the pause button is present, it means the audio is playing.
+      await this.page.waitForSelector(pauseVoiceoverButton);
+    } else {
+      const pauseButton = await this.page.$(pauseVoiceoverButton);
+      if (pauseButton !== null) {
+        throw new Error(
+          'Pause button should not be present when voiceover is paused.'
+        );
+      }
+    }
     showMessage(`Voiceover is ${shouldBePlaying ? 'playing' : 'paused'}.`);
   }
 
