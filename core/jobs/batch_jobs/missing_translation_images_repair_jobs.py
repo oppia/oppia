@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import html
-import logging
 
 from core import feconf
 from core.jobs import base_jobs
@@ -201,26 +200,19 @@ class CopyMissingTranslationImages(beam.PTransform):  # type: ignore[misc]
                 translation_html_lst: List[str] = [translation_html]
             else:
                 translation_html_lst = translation_html
-            try:
-                for translation_html_str in translation_html_lst:
-                    if not isinstance(
-                            translation_html_str, str):  # pragma: no cover
-                        logging.error(
-                            'Unexpected translation_html_str type: %s. obj: %s',
-                            type(translation_html_str), translation_html_str)
-                    translation_tree = bs4.BeautifulSoup(
-                        translation_html_str, 'html.parser')
-                    image_nodes = translation_tree.findAll(
-                        name='oppia-noninteractive-image')
-                    image_filenames += [
-                        html.unescape(
-                            node.get('filepath-with-value')).strip('"')
-                        for node in image_nodes]
-            except Exception as exception:  # pragma: no cover
-                logging.exception(
-                    'Exception raised while processing "%s": %s',
-                    translation_html, exception)
-                raise exception
+            for translation_html_str in translation_html_lst:
+                assert isinstance(translation_html_str, str), (
+                    'Unexpected translation_html_str type',
+                    type(translation_html_str), translation_html_str
+                )
+                translation_tree = bs4.BeautifulSoup(
+                    translation_html_str, 'html.parser')
+                image_nodes = translation_tree.findAll(
+                    name='oppia-noninteractive-image')
+                image_filenames += [
+                    html.unescape(
+                        node.get('filepath-with-value')).strip('"')
+                    for node in image_nodes]
 
         return (model_id, image_filenames)
 
