@@ -407,30 +407,30 @@ class AuthorBlogPostsReadingTime:
 class BlogPostViewedEventLogEntry:
     """Domain object representing a blog post viewed event."""
 
-    def __init__(self, blog_post_id: str, timestamp: datetime.datetime) -> None:
+    def __init__(
+        self,
+        blog_post_id: str,
+        timestamp: datetime.datetime,
+    ) -> None:
         self.blog_post_id = blog_post_id
         self.timestamp = timestamp
 
     def validate(self) -> None:
-        """Checks whether the blog post id is a valid one.
-
-        Raises:
-            ValidationError. No blog_post_id specified.
-            ValidationError. The blog_post_id is not a string.
-            ValidationError. The blog_post_id is invalid.
-            ValidationError. The timestamp is invalid.
-        """
+        """Validates blog_post_id and timestamp formatting."""
         if not self.blog_post_id:
-            raise utils.ValidationError('No blog_post_id specified')
+            raise utils.ValidationError("No blog_post_id specified")
 
         if not isinstance(self.blog_post_id, str):
             raise utils.ValidationError(
-                'Blog Post ID must be a string, but got %r' % self.blog_post_id)
+                f"Blog Post ID must be a string, but got {self.blog_post_id!r}"
+            )
 
         if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
-                'Blog Post ID %s is invalid' % self.blog_post_id)
+                f"Blog Post ID {self.blog_post_id} is invalid"
+            )
 
         if not isinstance(self.timestamp, datetime.datetime):
             raise utils.ValidationError(
-                f"timestamp must be a datetime.datetime, but got {type(self.timestamp)}")
+                f"timestamp must be datetime.datetime, but got {type(self.timestamp)}"
+            )

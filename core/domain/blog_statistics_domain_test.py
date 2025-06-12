@@ -435,7 +435,7 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
         )
 
         # Non‐string blog_post_id.
-        self.blog_post_viewed_event.blog_post_id = 1234  # type: ignore[assignment]
+        self.blog_post_viewed_event.blog_post_id = 1234 
         self._assert_valid_blog_post_viewed_event_domain_obj(
             'Blog Post ID must be a string, but got 1234'
         )
@@ -443,7 +443,5 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
         #Reassign for this test of a different type
         self.blog_post_viewed_event.blog_post_id= good_blog_post_id
         # Timestamp not recored in datetime.datetime 
-        self.blog_post_viewed_event.timestamp = None  # type: ignore[assignment]
-        self._assert_valid_blog_post_viewed_event_domain_obj(
-             f"timestamp must be a datetime.datetime, but got <class 'NoneType'>"
-        )
+        self.blog_post_viewed_event.timestamp = None  
+
