@@ -431,12 +431,16 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
         )
 
         # Invalid format.
-        self.blog_post_viewed_event.blog_post_id = 'invalidBlogPostId' 
+        self.blog_post_viewed_event.blog_post_id = 'invalidBlogPostId'
         self._assert_valid_blog_post_viewed_event_domain_obj(
             'Blog Post ID invalidBlogPostId is invalid'
         )
 
         # Non‐string blog_post_id.
+        # Here we use MyPy ignore because we are assigning a None value
+        # where instance of 'blog_post_id' as string is expected, and this is
+        # done to Replace the stored instance with int in order to
+        # trigger the unexpected exception during update.
         self.blog_post_viewed_event.blog_post_id = 1234
         self._assert_valid_blog_post_viewed_event_domain_obj(
             'Blog Post ID must be a string, but got 1234' # type: ignore[assignment]
@@ -444,9 +448,13 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
 
         # Reassign for this test of a different type.
         self.blog_post_viewed_event.blog_post_id = good_blog_post_id
-        # Timestamp not recored in datetimedatetime.
+
+        # Timestamp not recorded in datetimedatetime.
+        # Here we use MyPy ignore because we are assigning a None value
+        # where instance of 'timestamp' is expected, and this is
+        # done to Replace the stored instance with None in order to
+        # trigger the unexpected exception during update.
         self.blog_post_viewed_event.timestamp = None # type: ignore[assignment]
         self._assert_valid_blog_post_viewed_event_domain_obj(
-            'timestamp must be datetime.datetime, '
-                f'but got <class None>'
+            'timestamp must be datetime.datetime, but got <class \'NoneType\'>'
         )
