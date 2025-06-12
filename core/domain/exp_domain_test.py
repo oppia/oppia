@@ -86,8 +86,8 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
     def test_exp_change_object_with_missing_attribute_in_cmd(self) -> None:
         with self.assertRaisesRegex(
             utils.ValidationError, (
-                'The following required attributes are missing: '
-                'new_value')):
+                'The following required attributes are missing: new_value')
+        ):
             exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
@@ -834,9 +834,8 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         # second_state a checkpoint raises a validation error.
         second_state.card_is_checkpoint = True
         with self.assertRaisesRegex(
-            Exception, 'Cannot make Second a checkpoint as it is'
-            ' bypassable'
-            ):
+            Exception, 'Cannot make Second a checkpoint as it is bypassable'
+        ):
             self.exploration.validate(strict=True)
         second_state.card_is_checkpoint = False
 
@@ -1257,8 +1256,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.state.content.html = (
             '<oppia-noninteractive-image></oppia-noninteractive-image>')
         self._assert_validation_error(
-            self.new_exploration, 'Image tag does not have \'alt-with-value\' '
-            'attribute.')
+            self.new_exploration,
+            'Image tag does not have \'alt-with-value\' attribute.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;" '
@@ -1284,8 +1284,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-image alt-with-value="&quot;Image&quot;">'
             '</oppia-noninteractive-image>')
         self._assert_validation_error(
-            self.new_exploration, 'Image tag does not have \'caption-with'
-            '-value\' attribute.')
+            self.new_exploration,
+            'Image tag does not have \'caption-with-value\' attribute.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-image filepath-with-value="&quot;&quot;'
@@ -1299,8 +1300,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-image caption-with-value="&quot;&quot;" '
             'alt-with-value="&quot;Image&quot;"></oppia-noninteractive-image>')
         self._assert_validation_error(
-            self.new_exploration, 'Image tag does not have \'filepath-with'
-            '-value\' attribute.')
+            self.new_exploration,
+            'Image tag does not have \'filepath-with-value\' attribute.'
+        )
 
     def test_skill_review_rte_tag(self) -> None:
         """Validate SkillReview tag."""
@@ -1309,8 +1311,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '\"&amp;quot;&amp;quot;\" ></oppia-noninteractive-skillreview>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'SkillReview tag does not have \'text-with'
-            '-value\' attribute.')
+            self.new_exploration,
+            'SkillReview tag does not have \'text-with-value\' attribute.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-skillreview skill_id-with-value='
@@ -1346,8 +1349,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
             'quot;\"></oppia-noninteractive-video>')
         self._assert_validation_error(
-            self.new_exploration, 'Video tag does not have \'start-with'
-            '-value\' attribute.')
+            self.new_exploration,
+            'Video tag does not have \'start-with-value\' attribute.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-video autoplay-with-value=\"true\" '
@@ -1355,8 +1359,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
             'quot;\"></oppia-noninteractive-video>')
         self._assert_validation_error(
-            self.new_exploration, 'Video tag \'start-with-value\' attribute '
-            'should not be empty.')
+            self.new_exploration,
+            'Video tag \'start-with-value\' attribute should not be empty.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-video autoplay-with-value=\"true\" '
@@ -1364,8 +1369,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
             'quot;\"></oppia-noninteractive-video>')
         self._assert_validation_error(
-            self.new_exploration, 'Video tag does not have \'end-with-value\' '
-            'attribute.')
+            self.new_exploration,
+            'Video tag does not have \'end-with-value\' attribute.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-video autoplay-with-value=\"true\" '
@@ -1373,8 +1379,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ' video_id-with-value=\"&amp;quot;Ntcw0H0hwPU&amp;'
             'quot;\"></oppia-noninteractive-video>')
         self._assert_validation_error(
-            self.new_exploration, 'Video tag \'end-with-value\' attribute '
-            'should not be empty.')
+            self.new_exploration,
+            'Video tag \'end-with-value\' attribute should not be empty.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-video '
@@ -1399,8 +1406,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'end-with-value=\"11\" start-with-value=\"9\">'
             '</oppia-noninteractive-video>')
         self._assert_validation_error(
-            self.new_exploration, 'Video tag does not have \'video_id-with'
-            '-value\' attribute.')
+            self.new_exploration,
+            'Video tag does not have \'video_id-with-value\' attribute.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-video autoplay-with-value=\"true\" '
@@ -1408,8 +1416,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ' video_id-with-value=\"&amp;quot;&amp;'
             'quot;\"></oppia-noninteractive-video>')
         self._assert_validation_error(
-            self.new_exploration, 'Video tag \'video_id-with-value\' attribute '
-            'should not be empty.')
+            self.new_exploration,
+            'Video tag \'video_id-with-value\' attribute should not be empty.'
+        )
 
     def test_link_rte_tag(self) -> None:
         """Validate Link tag."""
@@ -1419,8 +1428,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-link>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'Link tag does not have \'text-with-value\' '
-            'attribute.')
+            self.new_exploration,
+            'Link tag does not have \'text-with-value\' attribute.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-link'
@@ -1437,8 +1447,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ' url-with-value=\"\"></oppia-noninteractive-link>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'Link tag \'url-with-value\' attribute '
-            'should not be empty.')
+            self.new_exploration,
+            'Link tag \'url-with-value\' attribute should not be empty.'
+        )
 
         self.state.content.html = (
           '<oppia-noninteractive-link text-with-value="&amp;quot;Google'
@@ -1457,8 +1468,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-math></oppia-noninteractive-math>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'Math tag does not have '
-            '\'math_content-with-value\' attribute.')
+            self.new_exploration,
+            'Math tag does not have \'math_content-with-value\' attribute.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-math'
@@ -1474,8 +1486,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'mathImg.svgas&amp;quot;}\"></oppia-noninteractive-math>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'Math tag does not have \'raw_latex-with'
-            '-value\' attribute.')
+            self.new_exploration,
+            'Math tag does not have \'raw_latex-with-value\' attribute.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-math math_content-with-value='
@@ -1493,8 +1506,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '&amp;quot;}\"></oppia-noninteractive-math>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'Math tag does not have '
-            '\'svg_filename-with-value\' attribute.')
+            self.new_exploration,
+            'Math tag does not have \'svg_filename-with-value\' attribute.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-math math_content-with-value='
@@ -1529,8 +1543,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-tabs></oppia-noninteractive-tabs>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'No content attribute is present inside '
-            'the tabs tag.')
+            self.new_exploration,
+            'No content attribute is present inside the tabs tag.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
@@ -1539,8 +1554,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'quot;}]\'></oppia-noninteractive-tabs>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'No title attribute is present inside '
-            'the tabs tag.')
+            self.new_exploration,
+            'No title attribute is present inside the tabs tag.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
@@ -1558,8 +1574,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'quot;}]\'></oppia-noninteractive-tabs>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'No content attribute is present inside '
-            'the tabs tag.')
+            self.new_exploration,
+            'No content attribute is present inside the tabs tag.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-tabs tab_contents-with-value=\'[{&amp;quot;'
@@ -1590,16 +1607,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'No collapsible content is present '
-            'inside the tag.')
+            self.new_exploration,
+            'No collapsible content is present inside the tag.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-collapsible heading-with-value='
             '\'&amp;quot;head&amp;quot;\'></oppia-noninteractive-collapsible>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'No content attribute present in '
-            'collapsible tag.')
+            self.new_exploration,
+            'No content attribute present in collapsible tag.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-collapsible content-with-value='
@@ -1607,16 +1626,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             '\'&amp;quot;&amp;quot;\'></oppia-noninteractive-collapsible>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'Heading attribute inside the collapsible '
-            'tag is empty.')
+            self.new_exploration,
+            'Heading attribute inside the collapsible tag is empty.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-collapsible content-with-value=\'&amp;'
             'quot;Content&amp;quot;\'></oppia-noninteractive-collapsible>'
         )
         self._assert_validation_error(
-            self.new_exploration, 'No heading attribute present in '
-            'collapsible tag.')
+            self.new_exploration,
+            'No heading attribute present in collapsible tag.'
+        )
 
         self.state.content.html = (
             '<oppia-noninteractive-collapsible content-with-value='
@@ -2697,8 +2718,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         self.state.interaction.customization_args['rows'].value = 15
         with self.assertRaisesRegex(
-            utils.ValidationError, 'Rows value in Text interaction should '
-            'be between 1 and 10.'
+            utils.ValidationError,
+            'Rows value in Text interaction should be between 1 and 10.'
         ):
             self.new_exploration.validate()
 
@@ -2899,8 +2920,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         default_outcome.dest_if_really_stuck = 'ABD'
         self._assert_validation_error(
-            exploration, 'The destination for the stuck learner '
-            'ABD is not a valid state')
+            exploration,
+            'The destination for the stuck learner ABD is not a valid state'
+        )
 
         default_outcome.dest_if_really_stuck = None
 
@@ -2911,8 +2933,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         answer_group.outcome.dest_if_really_stuck = 'XYZ'
         self._assert_validation_error(
-            exploration, 'The destination for the stuck learner '
-            'XYZ is not a valid state')
+            exploration,
+            'The destination for the stuck learner XYZ is not a valid state'
+        )
 
         answer_group.outcome.dest_if_really_stuck = None
 
@@ -3730,9 +3753,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Every outcome should have a destination.'):
             exploration.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally test
-    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_outcome_dest_type(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
@@ -3741,6 +3761,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert exploration.init_state.interaction.default_outcome is not None
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         exploration.init_state.interaction.default_outcome.dest = 1  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'Expected outcome dest to be a string, received 1'):
@@ -3850,8 +3873,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         })]
         with self.assertRaisesRegex(
             Exception,
-            'No parameter named \'invalid\' exists in this '
-            'exploration'):
+            'No parameter named \'invalid\' exists in this exploration'
+        ):
             exploration.validate()
 
     def test_validate_exploration_reserved_param_name(self) -> None:

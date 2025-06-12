@@ -1871,8 +1871,8 @@ class ReportStatsParameterValueCountsDomainTests(test_utils.GenericTestBase):
                 'value_1': -1,
             })
         self._assert_validation_error(
-            counts_obj, 'The parameter value count should be a non-negative '
-            'int')
+            counts_obj, 'The parameter value count should be a non-negative int'
+        )
 
     def _assert_validation_error(
             self,
