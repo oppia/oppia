@@ -167,7 +167,6 @@ describe('Question Suggestion Editor Modal Component', () => {
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-    skill = TestBed.inject(Skill);
     stateEditorService = TestBed.inject(StateEditorService);
     ngbModal = TestBed.inject(NgbModal);
     ngbActiveModal = TestBed.inject(NgbActiveModal);

@@ -235,7 +235,6 @@ describe('State Skill Editor Component', () => {
     stateLinkedSkillIdService = TestBed.inject(StateLinkedSkillIdService);
     userService = TestBed.inject(UserService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
-    skill = TestBed.inject(Skill);
   });
 
   beforeEach(() => {

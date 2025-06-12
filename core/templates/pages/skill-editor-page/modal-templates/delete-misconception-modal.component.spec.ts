@@ -63,7 +63,6 @@ describe('Delete Misconception Modal Component', () => {
     component = fixture.componentInstance;
     component.index = index;
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    skill = TestBed.inject(Skill);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     closeSpy = spyOn(ngbActiveModal, 'close').and.callThrough();
 

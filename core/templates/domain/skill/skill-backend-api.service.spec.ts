@@ -39,7 +39,6 @@ describe('Skill backend API service', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
-    skill = TestBed.inject(Skill);
 
     const misconceptionDict = {
       id: 2,

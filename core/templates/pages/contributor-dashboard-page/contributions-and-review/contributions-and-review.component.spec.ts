@@ -141,7 +141,6 @@ describe('Contributions and review component', () => {
         FormatRtePreviewPipe,
         HtmlEscaperService,
         QuestionObjectFactory,
-        Skill,
         CsrfTokenService,
         TranslationTopicService,
         {
@@ -164,7 +163,6 @@ describe('Contributions and review component', () => {
     ngbModal = TestBed.inject(NgbModal);
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     alertsService = TestBed.inject(AlertsService);
-    skill = TestBed.inject(Skill);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     userService = TestBed.inject(UserService);
     contextService = TestBed.inject(ContextService);

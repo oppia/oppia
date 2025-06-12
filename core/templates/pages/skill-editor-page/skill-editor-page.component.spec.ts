@@ -118,7 +118,6 @@ describe('Skill editor page', () => {
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     undoRedoService = TestBed.inject(UndoRedoService);
     urlService = TestBed.inject(UrlService);
-    skill = TestBed.inject(Skill);
     windowRef = TestBed.inject(WindowRef);
   });
 

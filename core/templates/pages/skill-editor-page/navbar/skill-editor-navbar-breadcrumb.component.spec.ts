@@ -39,7 +39,6 @@ describe('SkillEditorNavbarBreadcrumbComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SkillEditorNavbarBreadcrumbComponent);
     component = fixture.componentInstance;
-    skill = TestBed.inject(Skill);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     let misconceptionDict1 = {
       id: 2,

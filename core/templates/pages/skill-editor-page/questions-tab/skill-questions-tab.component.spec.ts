@@ -44,7 +44,6 @@ describe('Skill question tab component', () => {
     fixture = TestBed.createComponent(SkillQuestionsTabComponent);
     component = fixture.componentInstance;
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skill = TestBed.inject(Skill);
 
     let misconceptionDict1 = {
       id: 2,

@@ -64,7 +64,6 @@ describe('Add Misconception Modal Component', function () {
     fixture = TestBed.createComponent(AddMisconceptionModalComponent);
     component = fixture.componentInstance;
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skill = TestBed.inject(Skill);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
 
     let misconceptionDict1 = {

@@ -57,7 +57,6 @@ describe('Skill Description Editor Component', () => {
 
     skillUpdateService = TestBed.inject(SkillUpdateService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skill = TestBed.inject(Skill);
   });
 
   beforeEach(() => {

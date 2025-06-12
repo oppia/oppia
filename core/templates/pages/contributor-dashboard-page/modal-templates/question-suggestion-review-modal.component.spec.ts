@@ -357,7 +357,6 @@ describe('Question Suggestion Review Modal component', () => {
 
     ngbModal = TestBed.inject(NgbModal);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
-    skill = TestBed.inject(Skill);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
     contextService = TestBed.inject(ContextService);

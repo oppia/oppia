@@ -89,7 +89,6 @@ describe('Skill editor main tab Component', () => {
     );
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     ngbModal = TestBed.inject(NgbModal);
-    skill = TestBed.inject(Skill);
 
     skillSummaryDict = {
       id: 'skillId1',

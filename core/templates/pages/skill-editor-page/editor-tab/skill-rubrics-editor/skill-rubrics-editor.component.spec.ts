@@ -62,7 +62,6 @@ describe('Skill Rubrics Editor Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SkillRubricsEditorComponent);
     component = fixture.componentInstance;
-    skill = TestBed.inject(Skill);
     skillUpdateService = TestBed.inject(SkillUpdateService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);

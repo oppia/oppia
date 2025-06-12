@@ -91,7 +91,6 @@ describe('Question opportunities component', () => {
     ngbModal = TestBed.inject(NgbModal);
     alertsService = TestBed.inject(AlertsService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-    skill = TestBed.inject(Skill);
     userService = TestBed.inject(UserService);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService

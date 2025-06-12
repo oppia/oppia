@@ -68,7 +68,6 @@ interface SkillAssignmentForDiagnosticTestBackendResponse {
 export class SkillBackendApiService {
   constructor(
     private http: HttpClient,
-    private skill: Skill,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 

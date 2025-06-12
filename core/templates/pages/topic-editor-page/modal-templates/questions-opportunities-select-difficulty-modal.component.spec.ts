@@ -110,7 +110,6 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
       assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
       ngbActiveModal = TestBed.inject(NgbActiveModal);
       skillBackendApiService = TestBed.inject(SkillBackendApiService);
-      skill = TestBed.inject(Skill);
       extractImageFilenamesFromModelService = TestBed.inject(
         ExtractImageFilenamesFromModelService
       );

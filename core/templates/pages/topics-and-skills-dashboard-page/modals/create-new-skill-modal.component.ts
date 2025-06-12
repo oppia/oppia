@@ -25,7 +25,6 @@ import {
   SubtitledHtmlBackendDict,
 } from 'domain/exploration/subtitled-html.model';
 import {Rubric} from 'domain/skill/rubric.model';
-import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {ContextService} from 'services/context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
@@ -62,7 +61,6 @@ export class CreateNewSkillModalComponent {
     private imageLocalStorageService: ImageLocalStorageService,
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
-    private skill: Skill,
     private changeDetectorRef: ChangeDetectorRef,
     private validatorService: ValidatorsService
   ) {}

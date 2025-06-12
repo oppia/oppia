@@ -67,7 +67,6 @@ describe('Question Player Concept Card Modal component', () => {
     TestBed.configureTestingModule({
       declarations: [QuestionPlayerConceptCardModalComponent],
       providers: [
-        Skill,
         UrlService,
         {
           provide: UrlService,

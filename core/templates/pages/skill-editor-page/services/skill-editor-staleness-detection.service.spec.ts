@@ -119,7 +119,6 @@ describe('Skill editor staleness detection service', () => {
     skillEditorStalenessDetectionService = TestBed.inject(
       SkillEditorStalenessDetectionService
     );
-    skill = TestBed.inject(Skill);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     localStorageService = TestBed.inject(LocalStorageService);
     ngbModal = TestBed.inject(NgbModal);

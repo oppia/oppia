@@ -54,7 +54,6 @@ describe('Skill update service', () => {
     undoRedoService = TestBed.inject(UndoRedoService);
     localStorageService = TestBed.inject(LocalStorageService);
 
-    skill = TestBed.inject(Skill);
 
     const misconceptionDict1 = {
       id: 2,

@@ -239,7 +239,6 @@ describe('Exploration editor tab component', () => {
       VersionHistoryBackendApiService
     );
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
-    skill = TestBed.inject(Skill);
     alertsService = TestBed.inject(AlertsService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();

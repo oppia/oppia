@@ -238,7 +238,6 @@ describe('Skill editor state service', () => {
     }).compileComponents();
 
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skill = TestBed.inject(Skill);
     skillUpdateService = TestBed.inject(SkillUpdateService);
 
     skillRightsObject = {

@@ -126,7 +126,6 @@ describe('Questions List Component', () => {
     component = fixture.componentInstance;
 
     ngbModal = TestBed.inject(NgbModal);
-    skill = TestBed.inject(Skill);
 
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     questionsListService = TestBed.inject(QuestionsListService);

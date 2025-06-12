@@ -48,7 +48,6 @@ describe('Skill factory', () => {
       providers: [NormalizeWhitespacePipe],
     });
     skillDifficulties = AppConstants.SKILL_DIFFICULTIES;
-    skill = TestBed.inject(Skill);
     misconceptionDict1 = {
       id: 2,
       name: 'test name',
