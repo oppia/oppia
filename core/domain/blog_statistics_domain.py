@@ -418,19 +418,20 @@ class BlogPostViewedEventLogEntry:
     def validate(self) -> None:
         """Validates blog_post_id and timestamp formatting."""
         if not self.blog_post_id:
-            raise utils.ValidationError("No blog_post_id specified")
+            raise utils.ValidationError('No blog_post_id specified')
 
         if not isinstance(self.blog_post_id, str):
             raise utils.ValidationError(
-                f"Blog Post ID must be a string, but got {self.blog_post_id!r}"
+                f'Blog Post ID must be a string, but got {self.blog_post_id!r}'
             )
 
         if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
-                f"Blog Post ID {self.blog_post_id} is invalid"
+                f'Blog Post ID {self.blog_post_id} is invalid'
             )
 
         if not isinstance(self.timestamp, datetime.datetime):
             raise utils.ValidationError(
-                f"timestamp must be datetime.datetime, but got {type(self.timestamp)}"
+                'timestamp must be datetime.datetime, '
+                f'but got {type(self.timestamp)}'
             )

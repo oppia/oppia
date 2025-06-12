@@ -395,7 +395,9 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.blog_post_id = blog_models.BlogPostModel.generate_new_blog_post_id()
+        self.blog_post_id = (
+            blog_models.BlogPostModel.generate_new_blog_post_id()
+        )
         self.timestamp = datetime.datetime.utcnow()
 
         # instance under test
@@ -443,5 +445,5 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
         #Reassign for this test of a different type
         self.blog_post_viewed_event.blog_post_id= good_blog_post_id
         # Timestamp not recored in datetime.datetime 
-        self.blog_post_viewed_event.timestamp = None  
-
+        self.blog_post_viewed_event.timestamp = None
+  
