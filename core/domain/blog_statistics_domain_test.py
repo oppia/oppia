@@ -420,10 +420,10 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
     def test_blog_post_viewed_event_validation(self) -> None:
         # Should pass on valid data.
         self.blog_post_viewed_event.validate()
-        
-        # Keep valid blog_post_id for test of other attributes
+
+        # Keep valid blog_post_id for test of other attributes.
         good_blog_post_id = self.blog_post_id
-        
+
         # Empty blog_post_id.
         self.blog_post_viewed_event.blog_post_id = ''
         self._assert_valid_blog_post_viewed_event_domain_obj(
@@ -437,12 +437,12 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
         )
 
         # Non‐string blog_post_id.
-        self.blog_post_viewed_event.blog_post_id = 1234 
+        self.blog_post_viewed_event.blog_post_id = 1234
         self._assert_valid_blog_post_viewed_event_domain_obj(
             'Blog Post ID must be a string, but got 1234'
         )
-        
+
         #Reassign for this test of a different type.
         self.blog_post_viewed_event.blog_post_id = good_blog_post_id
-        # Timestamp not recored in datetimedatetime . 
+        # Timestamp not recored in datetimedatetime. 
         self.blog_post_viewed_event.timestamp = None
