@@ -113,7 +113,7 @@ class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
 class StudyGuideModelUnitTest(test_utils.GenericTestBase):
     """Tests the StudyGuideModel class."""
 
-    STUDY_GUIDE_PAGE_ID: Final = 'study_guide_page_id'
+    STUDY_GUIDE_ID: Final = 'study_guide_id'
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
@@ -144,7 +144,7 @@ class StudyGuideModelUnitTest(test_utils.GenericTestBase):
 
         # StudyGuide is created but not committed/saved.
         study_guide = subtopic_models.StudyGuideModel(
-            id=self.STUDY_GUIDE_PAGE_ID,
+            id=self.STUDY_GUIDE_ID,
             topic_id='topic_id',
             sections={},
             sections_schema_version=(
@@ -155,7 +155,7 @@ class StudyGuideModelUnitTest(test_utils.GenericTestBase):
         # commit().
         self.assertIsNone(
             subtopic_models.StudyGuideModel.get(
-                entity_id=self.STUDY_GUIDE_PAGE_ID,
+                entity_id=self.STUDY_GUIDE_ID,
                 strict=False
             )
         )
@@ -170,7 +170,7 @@ class StudyGuideModelUnitTest(test_utils.GenericTestBase):
         # now study guide exists, that means that commit() worked fine.
         self.assertIsNotNone(
             subtopic_models.StudyGuideModel.get(
-                entity_id=self.STUDY_GUIDE_PAGE_ID,
+                entity_id=self.STUDY_GUIDE_ID,
                 strict=False
             )
         )
@@ -249,7 +249,7 @@ class StudyGuideCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         commit = subtopic_models.StudyGuideCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'msg', 'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
-        commit.study_guide_page_id = 'b'
+        commit.study_guide_id = 'b'
         commit.update_timestamps()
         commit.put()
         self.assertTrue(
@@ -267,7 +267,7 @@ class StudyGuideCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_export_policy(self) -> None:
         expected_export_policy_dict = {
-            'study_guide_page_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'study_guide_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,

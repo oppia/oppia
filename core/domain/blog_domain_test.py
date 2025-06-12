@@ -247,7 +247,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.blog_post.content, '<p>Hello</p>')
 
     def test_tags_validation_for_blog_post(self) -> None:
-        """"Tests tags validation for blog post."""
+        """Tests tags validation for blog post."""
 
         self._assert_valid_tags_for_blog_post(
             'Tags should only contain alphanumeric characters and spaces, '
@@ -297,8 +297,8 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.blog_post.url_fragment = 'sample-title'
         self.blog_post.content = '<p>Hello</p>'
         self._assert_strict_validation_error(
-            'Expected Thumbnail filename should be a string,'
-            ' received 123')
+            'Expected Thumbnail filename should be a string, received 123'
+        )
 
         self.blog_post.thumbnail_filename = 'thumbnail.svg'
         self.blog_post.validate(strict=True)
@@ -326,8 +326,7 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.blog_post.url_fragment = 123  # type: ignore[assignment]
         self.blog_post.content = '<p>Hello</p>'
         self._assert_valid_url_fragment(
-            'Blog Post URL Fragment field must be a string. '
-            'Received 123.'
+            'Blog Post URL Fragment field must be a string. Received 123.'
         )
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
@@ -592,8 +591,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
     def test_blog_post_passes_valid_url_fragment(self) -> None:
         self.blog_post_summary.url_fragment = 123  # type: ignore[assignment]
         self._assert_url_fragment_passes_valid_url_fragment(
-            'Blog Post URL Fragment field must be a string. '
-            'Received 123')
+            'Blog Post URL Fragment field must be a string. Received 123'
+        )
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally
@@ -644,8 +643,8 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
     def test_blog_post_tags_passes_validation(self) -> None:
         self.blog_post_summary.tags = ['tag', 123]  # type: ignore[list-item]
         self._assert_valid_tag_elements(
-            'Expected each tag in \'tags\' to be a string, received: '
-            '\'123\'')
+            'Expected each tag in \'tags\' to be a string, received: \'123\''
+        )
 
 
 class BlogAuthorDetailsTests(test_utils.GenericTestBase):

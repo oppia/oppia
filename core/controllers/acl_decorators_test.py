@@ -1447,8 +1447,9 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
                 '/mock_view_feedback_thread/%s' % self.private_exp_thread_id,
                 expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to view '
-                'exploration feedback.')
+                response['error'],
+                'You do not have credentials to view exploration feedback.'
+            )
         self.logout()
 
     def test_viewer_cannot_view_feedback_threads_with_invalid_thread_id(
@@ -4757,7 +4758,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=404)
         error_msg = (
-            'Could not find the resource http://localhost/mock_edit_story/%s.' 
+            'Could not find the resource http://localhost/mock_edit_story/%s.'
             % (self.story_id)
         )
         self.assertEqual(response['error'], error_msg)
@@ -6959,8 +6960,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
                 expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to submit'
-                ' images to questions.')
+                response['error'],
+                'You do not have credentials to submit images to questions.'
+            )
         self.logout()
 
     def test_can_submit_images_to_explorations(self) -> None:
