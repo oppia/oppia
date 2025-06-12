@@ -1463,11 +1463,15 @@ describe('Conversation skin component', () => {
       spyOn(explorationEngineService, 'getShortestPathToState').and.returnValue(
         ['Start', 'Mid']
       );
-
       spyOn(explorationEngineService, 'getStateCardByName').and.returnValues(
         stateCards[0],
         stateCards[1],
         stateCards[2]
+      );
+      spyOn(explorationEngineService, 'getStateFromStateName').and.returnValues(
+        expResponse.exploration.states.Start,
+        expResponse.exploration.states.Mid,
+        expResponse.exploration.states.End
       );
 
       spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);

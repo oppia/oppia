@@ -785,12 +785,12 @@ export class ConversationSkinComponent {
           );
 
         let indexToRedirectTo = 0;
-        
 
         for (let i = 0; i < this.prevSessionStatesProgress.length; i++) {
           // Set state name of a previously completed state.
           let stateName = this.prevSessionStatesProgress[i];
-          let stateData = this.explorationEngineService.getStateFromStateName(stateName);
+          let stateData =
+            this.explorationEngineService.getStateFromStateName(stateName);
 
           // Skip the card if it has already been added to transcript.
           if (
@@ -801,7 +801,10 @@ export class ConversationSkinComponent {
             this._addNewCard(stateCard);
           }
 
-          if (!this.visitedCheckpointStateNames.includes(stateName) && stateData.cardIsCheckpoint) {
+          if (
+            !this.visitedCheckpointStateNames.includes(stateName) &&
+            stateData.cardIsCheckpoint
+          ) {
             this.visitedCheckpointStateNames.push(stateName);
           }
 
