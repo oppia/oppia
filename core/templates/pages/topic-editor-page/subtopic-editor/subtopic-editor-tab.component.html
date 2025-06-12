@@ -160,25 +160,24 @@
       <mat-card class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
       <div class="oppia-editor-card-body">
         <div class="oppia-editor-card-section worked-example-content">
-          <div class="oppia-worked-examples-header oppia-mobile-collapsible-card-header" (click)="toggleWorkedExampleList()">
-            <strong class="heading-text">Worked Examples</strong>
+          <div class="oppia-worked-examples-header oppia-mobile-collapsible-card-header" (click)="toggleSectionsList()">
+            <strong class="heading-text">Sections</strong>
             <i class="fa fa-caret-down"
-              *ngIf="!workedExamplesListIsShown"
+              *ngIf="!sectionsListIsShown"
               [attr.aria-hidden]="true">
             </i>
             <i class="fa fa-caret-up"
-              *ngIf="workedExamplesListIsShown"
+              *ngIf="sectionsListIsShown"
               [attr.aria-hidden]="true">
             </i>
           </div>
-          <div *ngIf="workedExamplesListIsShown" class="oppia-mobile-collapsible-card-content">
+          <div *ngIf="sectionsListIsShown" class="oppia-mobile-collapsible-card-content">
             <div class="concept-card-subtitle">
-              These will be displayed one-by-one to the learner, in order, if they ask for them.
+              Sections of the Study Guide.
             </div>
-            <div *ngIf="bindableFieldsDict.displayedWorkedExamples.length > 0">
-              <ul cdkDropList (cdkDropListDropped)="drop($event)"
-                  class="oppia-skill-concept-card-preview oppia-option-list nav-stacked nav-pills worked-examples-list">
-                <li cdkDrag *ngFor="let workedExample of bindableFieldsDict.displayedWorkedExamples; let index = index"
+            <div>
+              <ul class="oppia-skill-concept-card-preview oppia-option-list nav-stacked nav-pills worked-examples-list">
+                <li *ngFor="let section of bindableFieldsDict.displayedWorkedExamples; let index = index"
                     [ngClass]="{'active': activeWorkedExampleIndex === index, 'last-element': index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
                     class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection">
                   <span class="oppia-worked-example-sort-handle"

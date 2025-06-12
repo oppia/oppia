@@ -35,6 +35,7 @@ import {SubtitledHtml} from 'core/templates/domain/exploration/subtitled-html.mo
 import {SubtopicPage} from 'core/templates/domain/topic/subtopic-page.model';
 import {RecordedVoiceovers} from 'core/templates/domain/exploration/recorded-voiceovers.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
+import {StudyGuide} from './study-guide.model';
 
 type TopicUpdateApply = (topicChange: TopicChange, topic: Topic) => void;
 type TopicUpdateReverse = (topicChange: TopicChange, topic: Topic) => void;
@@ -131,6 +132,29 @@ export class TopicUpdateService {
     this._applyChange(
       subtopicPage,
       TopicDomainConstants.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+      {
+        subtopic_id: subtopicId,
+        property_name: propertyName,
+        new_value: cloneDeep(newValue),
+        old_value: cloneDeep(oldValue),
+      },
+      apply,
+      reverse
+    );
+  }
+
+  private _applyStudyGuidePropertyChange(
+    studyGuide: StudyGuide,
+    propertyName: string,
+    subtopicId: number,
+    newValue,
+    oldValue,
+    apply: SubtopicUpdateApply,
+    reverse: SubtopicUpdateReverse
+  ): void {
+    this._applyChange(
+      studyGuide,
+      TopicDomainConstants.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
       {
         subtopic_id: subtopicId,
         property_name: propertyName,
@@ -777,6 +801,31 @@ export class TopicUpdateService {
 
   setSubtopicPageContentsHtml(
     subtopicPage: SubtopicPage,
+    subtopicId: number,
+    newSubtitledHtml: SubtitledHtml
+  ): void {
+    let oldSubtitledHtml = cloneDeep(
+      subtopicPage.getPageContents().getSubtitledHtml()
+    );
+    this._applySubtopicPagePropertyChange(
+      subtopicPage,
+      TopicDomainConstants.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
+      subtopicId,
+      newSubtitledHtml.toBackendDict(),
+      oldSubtitledHtml.toBackendDict(),
+      (changeDict, subtopicPage) => {
+        // ---- Apply ----
+        subtopicPage.getPageContents().setSubtitledHtml(newSubtitledHtml);
+      },
+      (changeDict, subtopicPage) => {
+        // ---- Undo ----
+        subtopicPage.getPageContents().setSubtitledHtml(oldSubtitledHtml);
+      }
+    );
+  }
+
+  setStudyGuideSectionContentHtml(
+    studyGuide: StudyGuide,
     subtopicId: number,
     newSubtitledHtml: SubtitledHtml
   ): void {

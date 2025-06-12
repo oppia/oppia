@@ -583,6 +583,22 @@ interface TopicSubtopicPageHtmlChange {
   subtopic_id: number;
 }
 
+interface TopicStudyGuidePropertySectionsHeadingChange {
+  cmd: 'update_study_guide_property';
+  property_name: 'sections_heading';
+  new_value: string;
+  old_value: string;
+  subtopic_id: number;
+}
+
+interface TopicStudyGuidePropertySectionsContentChange {
+  cmd: 'update_study_guide_property';
+  property_name: 'sections_content';
+  new_value: SubtitledHtmlBackendDict;
+  old_value: SubtitledHtmlBackendDict;
+  subtopic_id: number;
+}
+
 interface TopicSubtopicPageAudioChange {
   cmd: 'update_subtopic_page_property';
   property_name: 'page_contents_audio';
@@ -594,6 +610,10 @@ interface TopicSubtopicPageAudioChange {
 type TopicSubtopicPagePropertyChange =
   | TopicSubtopicPageHtmlChange
   | TopicSubtopicPageAudioChange;
+
+type TopicStudyGuidePropertyChange =
+  | TopicStudyGuidePropertySectionsHeadingChange
+  | TopicStudyGuidePropertySectionsContentChange;
 
 interface TopicAddSubtopicChange {
   cmd: 'add_subtopic';
@@ -663,6 +683,7 @@ export type TopicChange =
   | TopicPropertyChange
   | TopicSubtopicPropertyChange
   | TopicSubtopicPagePropertyChange
+  | TopicStudyGuidePropertyChange
   | TopicAddSubtopicChange
   | TopicAddUncategorizedSkillId
   | TopicDeleteSubtopicChange

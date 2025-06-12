@@ -46,6 +46,7 @@ export const TopicDomainConstants = {
   CMD_UPDATE_TOPIC_PROPERTY: 'update_topic_property',
   CMD_UPDATE_SUBTOPIC_PROPERTY: 'update_subtopic_property',
   CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY: 'update_subtopic_page_property',
+  CMD_UPDATE_STUDY_GUIDE_PROPERTY: 'update_study_guide_property',
 
   TOPIC_PROPERTY_NAME: 'name',
   TOPIC_PROPERTY_ABBREVIATED_NAME: 'abbreviated_name',
