@@ -431,7 +431,7 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
         )
 
         # Invalid format.
-        self.blog_post_viewed_event.blog_post_id = 'invalidBlogPostId'
+        self.blog_post_viewed_event.blog_post_id = 'invalidBlogPostId' 
         self._assert_valid_blog_post_viewed_event_domain_obj(
             'Blog Post ID invalidBlogPostId is invalid'
         )
@@ -439,10 +439,14 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
         # Non‐string blog_post_id.
         self.blog_post_viewed_event.blog_post_id = 1234
         self._assert_valid_blog_post_viewed_event_domain_obj(
-            'Blog Post ID must be a string, but got 1234'
+            'Blog Post ID must be a string, but got 1234' # type: ignore[assignment]
         )
 
         # Reassign for this test of a different type.
         self.blog_post_viewed_event.blog_post_id = good_blog_post_id
         # Timestamp not recored in datetimedatetime.
-        self.blog_post_viewed_event.timestamp = None
+        self.blog_post_viewed_event.timestamp = None # type: ignore[assignment]
+        self._assert_valid_blog_post_viewed_event_domain_obj(
+            'timestamp must be datetime.datetime, '
+                f'but got <class None>'
+        )
