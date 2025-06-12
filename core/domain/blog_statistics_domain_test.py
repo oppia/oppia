@@ -441,9 +441,9 @@ class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
         # where instance of 'blog_post_id' as string is expected, and this is
         # done to Replace the stored instance with int in order to
         # trigger the unexpected exception during update.
-        self.blog_post_viewed_event.blog_post_id = 1234
+        self.blog_post_viewed_event.blog_post_id = 1234  # type: ignore[assignment]
         self._assert_valid_blog_post_viewed_event_domain_obj(
-            'Blog Post ID must be a string, but got 1234' # type: ignore[assignment]
+            'Blog Post ID must be a string, but got 1234'
         )
 
         # Reassign for this test of a different type.
