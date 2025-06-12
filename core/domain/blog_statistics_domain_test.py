@@ -388,3 +388,62 @@ class BlogPostsViewsStatsDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_blog_post_views_domain_obj(
             'Blog Post ID must be a string, but got 1234'
         )
+
+
+class BlogPostViewedEventLogEntryDomainTests(test_utils.GenericTestBase):
+    """Tests for the BlogPostViewedEventLogEntry domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.blog_post_id = blog_models.BlogPostModel.generate_new_blog_post_id()
+        self.timestamp = datetime.datetime.utcnow()
+
+        # instance under test
+        self.blog_post_viewed_event = (
+            blog_statistics_domain.BlogPostViewedEventLogEntry(
+                blog_post_id=self.blog_post_id,
+                timestamp=self.timestamp
+            )
+        )
+
+    def _assert_valid_blog_post_viewed_event_domain_obj(
+        self, expected_error_substring: str
+    ) -> None:
+        """Checks that BlogPostViewedEventLogEntry.validate() raises."""
+        with self.assertRaisesRegex(
+            utils.ValidationError, expected_error_substring
+        ):
+            self.blog_post_viewed_event.validate()
+    
+    def test_blog_post_viewed_event_validation(self) -> None:
+        # Should pass on valid data.
+        self.blog_post_viewed_event.validate()
+        
+        #Keep valid blog_post_id for test of other attributes
+        good_blog_post_id = self.blog_post_id
+        
+        # Empty blog_post_id.
+        self.blog_post_viewed_event.blog_post_id = ''
+        self._assert_valid_blog_post_viewed_event_domain_obj(
+            'No blog_post_id specified'
+        )
+
+        # Invalid format.
+        self.blog_post_viewed_event.blog_post_id = 'invalidBlogPostId'
+        self._assert_valid_blog_post_viewed_event_domain_obj(
+            'Blog Post ID invalidBlogPostId is invalid'
+        )
+
+        # Non‐string blog_post_id.
+        self.blog_post_viewed_event.blog_post_id = 1234  # type: ignore[assignment]
+        self._assert_valid_blog_post_viewed_event_domain_obj(
+            'Blog Post ID must be a string, but got 1234'
+        )
+        
+        #Reassign for this test of a different type
+        self.blog_post_viewed_event.blog_post_id= good_blog_post_id
+        # Timestamp not recored in datetime.datetime 
+        self.blog_post_viewed_event.timestamp = None  # type: ignore[assignment]
+        self._assert_valid_blog_post_viewed_event_domain_obj(
+             f"timestamp must be a datetime.datetime, but got <class 'NoneType'>"
+        )
