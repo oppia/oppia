@@ -21,7 +21,6 @@ from __future__ import annotations
 from core import feconf
 from core.domain import caching_domain
 from core.domain import redis_services
-from core.platform import models
 
 import redis
 from typing import Dict, List, Optional
