@@ -425,6 +425,26 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_without_redis_host_action_update_redis_host_is_not_performed(
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'redis_host\' must be provided when the action'
+            ' is update_redis_host.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'update_redis_host',
+                    'redis_host': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
     def test_without_param_name_action_update_platform_param_is_not_performed(
         self
     ) -> None:
