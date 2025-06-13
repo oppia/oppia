@@ -232,6 +232,12 @@ const mobileCollapsibleCardHeaderSelector =
 const mobileStoryDropdown = '.e2e-test-story-dropdown';
 const confirmDeleteChapterButton = '.e2e-test-confirm-delete-chapter-button';
 
+const questionContainerSelector = '.e2e-test-skill-questions-container';
+const skillPreviewContainerSelector = '.e2e-test-skill-preview-container';
+const topicEditorContainerSelector = '.e2e-test-topic-editor-container';
+const topicEditorMainTabFormSelector = 'e2e-test-topic-editor-main-tab';
+const topicEditorSaveModelSelector = 'oppia-topic-editor-save-modal';
+
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -264,8 +270,11 @@ export class TopicManager extends BaseUser {
       await this.goto(currentUrl.toString());
       await this.page.reload({waitUntil: 'networkidle0'});
     } else {
+      await this.isElementVisible(skillQuestionTab);
       await this.clickAndWaitForNavigation(skillQuestionTab);
     }
+
+    await this.isElementVisible(questionContainerSelector);
   }
 
   /**
@@ -281,7 +290,7 @@ export class TopicManager extends BaseUser {
    */
   async navigateToQuestionPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.waitForElementToBeVisible(mobileOptionsSelector);
+      await this.isElementVisible(mobileOptionsSelector);
       await this.clickOn(mobileOptionsSelector);
 
       await this.page.waitForSelector(navigationDropdown);
@@ -292,10 +301,12 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(mobilePreviewTab);
       await this.clickOn(mobilePreviewTab);
     } else {
-      await this.waitForElementToBeVisible(questionPreviewTab);
+      await this.isElementVisible(questionPreviewTab);
       await this.page.waitForSelector(questionPreviewTab);
       await this.clickAndWaitForNavigation(questionPreviewTab);
     }
+
+    await this.isElementVisible(skillPreviewContainerSelector);
   }
 
   /**
@@ -391,6 +402,8 @@ export class TopicManager extends BaseUser {
       this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
     ]);
     await this.waitForStaticAssetsToLoad();
+
+    await this.isElementVisible(topicEditorContainerSelector);
   }
 
   /**
@@ -410,6 +423,7 @@ export class TopicManager extends BaseUser {
     topicName?: string,
     urlFragment?: string
   ): Promise<void> {
+    await this.isElementVisible(topicEditorMainTabFormSelector);
     if (topicName) {
       await this.clearAllTextFrom(topicNameField);
       await this.type(topicNameField, topicName);
@@ -438,6 +452,14 @@ export class TopicManager extends BaseUser {
     await this.clearAllTextFrom(topicMetaTagInput);
     await this.page.type(topicMetaTagInput, metaTags);
     await this.page.keyboard.press('Tab');
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      await this.waitForElementToBeClickable(mobileSaveTopicButton);
+      await this.clickOn(mobileOptionsSelector);
+    } else {
+      await this.waitForElementToBeClickable(saveTopicButton);
+    }
   }
 
   /**
@@ -449,7 +471,7 @@ export class TopicManager extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsSelector);
       await this.clickOn(mobileSaveTopicButton);
-      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
+      await this.page.waitForSelector(topicEditorSaveModelSelector, {
         visible: true,
       });
       await this.type(
@@ -460,7 +482,7 @@ export class TopicManager extends BaseUser {
         `${closeSaveModalButton}:not([disabled])`
       );
       await this.clickOn(closeSaveModalButton);
-      await this.page.waitForSelector('oppia-topic-editor-save-modal', {
+      await this.page.waitForSelector(topicEditorSaveModelSelector, {
         hidden: true,
       });
       await this.openTopicEditor(topicName);
@@ -490,10 +512,18 @@ export class TopicManager extends BaseUser {
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
+
       showMessage(`Filtered topics by status: ${status}`);
     } catch (error) {
       console.error(error.stack);
       throw error;
+    }
+
+    const textInput = await this.getTextContent(topicStatusDropdownSelector);
+    if (textInput !== status) {
+      throw new Error(
+        `Text did not match within the specified time. Actual text: "${textInput}", expected text: "${status}"`
+      );
     }
   }
 

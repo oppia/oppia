@@ -640,13 +640,29 @@ export class BaseUser {
       showMessage('The exploration is not accessible with the URL.');
     }
   }
-
   /**
-   * Checks if an element is visible on the page.
+   * Waits and checks for the element to be visible.
+   * @param {string} selector - The selector of the element to wait for.
+   * @param {boolean} hidden - Whether the element should be hidden or not. Default is false.
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
    */
-  async isElementVisible(selector: string): Promise<boolean> {
+  async isElementVisible(
+    selector: string,
+    visible: boolean = true,
+    timeout: number = 30000
+  ): Promise<boolean> {
     try {
-      await this.page.waitForSelector(selector, {visible: true, timeout: 3000});
+      if (visible) {
+        await this.page.waitForSelector(selector, {
+          visible: true,
+          timeout: timeout,
+        });
+      } else {
+        await this.page.waitForSelector(selector, {
+          hidden: true,
+          timeout: timeout,
+        });
+      }
       return true;
     } catch {
       return false;
@@ -894,21 +910,16 @@ export class BaseUser {
   }
 
   /**
-   * Waits for the element with given selector to be visible.
-   * @param {string} selector - The selector of the element to wait for.
-   * @param {boolean} hidden - Whether the element should be hidden or not. Default is false.
-   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
+   * Returns text in nested element
+   * @param {string} selector - The selector of the element to get text from.
    */
-  async waitForElementToBeVisible(
-    selector: string,
-    hidden: boolean = false,
-    timeout: number = 30000
-  ): Promise<void> {
-    if (hidden) {
-      await this.page.waitForSelector(selector, {hidden: true, timeout});
-    } else {
-      await this.page.waitForSelector(selector, {visible: true, timeout});
-    }
+  async getTextContent(selector: string) {
+    const element = await this.page.$(selector);
+    const text = await this.page.evaluate(
+      (el: Element) => el.textContent,
+      element
+    );
+    return text?.trim();
   }
 }
 
