@@ -10,13 +10,13 @@
           <a href="/learn">{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_INTRO' | translate }}</a>
           <p>{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_DESCRIPTION' | translate }}</p>
         </div>
-        <div 
-        class="classroom-grid" 
-        [attr.data-classroom-count]="classroomSummaries.length"
-        [ngClass]="{
-          'classroom-grid-one-columns': classroomSummaries.length === 1,
-          'classroom-grid-two-columns': classroomSummaries.length === 2
-          }"
+        <div
+          class="classroom-grid"
+          [attr.data-classroom-count]="classroomSummaries.length"
+          [ngClass]="{
+            'classroom-grid-one-columns': classroomSummaries.length === 1,
+            'classroom-grid-two-columns': classroomSummaries.length === 2
+            }"
         >
           <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
             <div class="classroom-item" (click)="registerClassroomCardClickEvent(classroom.name)">
