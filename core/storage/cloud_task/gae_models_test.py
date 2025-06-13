@@ -66,7 +66,10 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
 
 
     def test_create_new_model_successfully(self) -> None:
+
         model = cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
+            cloud_task_run_model_id=(
+                cloud_task_models.CloudTaskRunModel.get_new_id()),
             cloud_task_name=(
                 'projects/dev-project-id/locations/us-central1/queues/'
                 'voiceover-regeneration/tasks/task1'),
@@ -113,6 +116,8 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_by_queue_id_returns_correct_models(self) -> None:
         cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
+            cloud_task_run_model_id=(
+                cloud_task_models.CloudTaskRunModel.get_new_id()),
             cloud_task_name=(
                 'projects/dev-project-id/locations/us-central1/queues/'
                 'queueA/tasks/task1'),
@@ -121,6 +126,8 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
             current_retry_attempt=0
         )
         cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
+            cloud_task_run_model_id=(
+                cloud_task_models.CloudTaskRunModel.get_new_id()),
             cloud_task_name=(
                 'projects/dev-project-id/locations/us-central1/queues/'
                 'queueB/tasks/task2'),
@@ -129,6 +136,8 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
             current_retry_attempt=0
         )
         cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
+            cloud_task_run_model_id=(
+                cloud_task_models.CloudTaskRunModel.get_new_id()),
             cloud_task_name=(
                 'projects/dev-project-id/locations/us-central1/queues/'
                 'queueA/tasks/task3'),
@@ -144,13 +153,13 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
             cloud_task_models.CloudTaskRunModel.get_by_queue_id('queueA')
         )
         self.assertEqual(len(filtered_models), 2)
-        self.assertEqual(
-            filtered_models[0].cloud_task_name,
-            'projects/dev-project-id/locations/us-central1/queues/queueA'
-            '/tasks/task1'
-        )
-        self.assertEqual(
-            filtered_models[1].cloud_task_name,
-            'projects/dev-project-id/locations/us-central1/queues/queueA'
-            '/tasks/task3'
-        )
+        fetched_task_names = [
+            model.cloud_task_name for model in filtered_models
+        ]
+        expected_task_names = [
+            'projects/dev-project-id/locations/us-central1/queues/queueA/'
+            'tasks/task1',
+            'projects/dev-project-id/locations/us-central1/queues/queueA/'
+            'tasks/task3'
+        ]
+        self.assertListEqual(fetched_task_names, expected_task_names)

@@ -359,16 +359,15 @@ class TasksTests(test_utils.EmailTestBase):
 
     def test_deferred_tasks_handler_raises_correct_exceptions(self) -> None:
         incorrect_function_identifier = 'incorrect_function_id'
-        taskqueue_services.defer(
-            incorrect_function_identifier,
-            taskqueue_services.QUEUE_NAME_DEFAULT)
-
         raises_incorrect_function_id_exception = self.assertRaisesRegex(
             Exception,
-            'The function id, %s, is not valid.' %
-            incorrect_function_identifier)
+            'Value \'%s\' for property function_id is not an allowed choice'
+            % incorrect_function_identifier)
 
         with raises_incorrect_function_id_exception:
+            taskqueue_services.defer(
+                incorrect_function_identifier,
+                taskqueue_services.QUEUE_NAME_DEFAULT)
             self.process_and_flush_pending_tasks()
 
         headers = {

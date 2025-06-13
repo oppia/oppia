@@ -193,8 +193,10 @@ class CloudTaskRunModel(base_models.BaseModel):
             CloudTaskRunModel. The newly created CloudTaskRunModel instance.
         """
 
-        queue_id = cls.get_queue_id_from_task_name(cloud_task_name)
-        task_id = cls.get_task_id_from_task_name(cloud_task_name)
+        queue_id = CloudTaskRunModel.get_queue_id_from_task_name(
+            cloud_task_name)
+        task_id = CloudTaskRunModel.get_task_id_from_task_name(
+            cloud_task_name)
 
         cloud_task_run_model = cls(
             id=cloud_task_run_model_id,
@@ -211,7 +213,7 @@ class CloudTaskRunModel(base_models.BaseModel):
 
         return cloud_task_run_model
 
-    def get_queue_id_from_task_name(self, cloud_task_name: str) -> str:
+    def get_queue_id_from_task_name(cloud_task_name: str) -> str:
         """Returns the queue ID from the cloud task name.
 
         Args:
@@ -229,7 +231,7 @@ class CloudTaskRunModel(base_models.BaseModel):
         queue_id = task_name_components[5]
         return queue_id
 
-    def get_task_id_from_task_name(self, cloud_task_name: str) -> str:
+    def get_task_id_from_task_name(cloud_task_name: str) -> str:
         """Returns the queue ID from the cloud task name.
 
         Args:

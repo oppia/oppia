@@ -501,7 +501,7 @@
 /core/domain/beam_job*.py @oppia/lace-backend-reviewers
 
 # Cloud task run.
-/core/domain/cloud_task_domain.py @oppia/lace-backend-reviewers
+/core/domain/cloud_task_domain*.py @oppia/lace-backend-reviewers
 /core/templates/domain/cloud-task/cloud-task-run.model.ts @oppia/lace-frontend-reviewers
 
 # Infrastructure.
