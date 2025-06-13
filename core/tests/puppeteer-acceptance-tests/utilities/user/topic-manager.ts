@@ -237,6 +237,8 @@ const skillPreviewContainerSelector = '.e2e-test-skill-preview-container';
 const topicEditorContainerSelector = '.e2e-test-topic-editor-container';
 const topicEditorMainTabFormSelector = 'e2e-test-topic-editor-main-tab';
 const topicEditorSaveModelSelector = 'oppia-topic-editor-save-modal';
+const topicPreviewContainerSelector = '.e2e-test-topic-preview-container';
+const skillEditorContainer = '.e2e-test-skill-editor-container';
 
 export class TopicManager extends BaseUser {
   /**
@@ -547,6 +549,8 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
+
+    // TODO: Add post check based on filterTopicsByStatus.
   }
 
   /**
@@ -572,6 +576,8 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
+
+    // TODO: Add post check based on filterTopicsByStatus.
   }
 
   /**
@@ -594,6 +600,8 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
+
+    // TODO: Add post check based on filterTopicsByStatus.
   }
 
   /**
@@ -722,6 +730,8 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(topicPreviewTab);
       await this.clickOn(topicPreviewTab);
     }
+
+    await this.isElementVisible(topicPreviewContainerSelector);
   }
 
   /**
@@ -862,12 +872,13 @@ export class TopicManager extends BaseUser {
    * Function to navigate the skills tab in topics and skills dashboard.
    */
   async navigateToSkillsTab(): Promise<void> {
+    await this.isElementVisible(skillsTab);
+    await this.clickOn(skillsTab);
+
     const skillSelector = this.isViewportAtMobileWidth()
       ? mobileSkillSelector
       : desktopSkillSelector;
-    await this.page.waitForSelector(skillsTab, {visible: true});
-    await this.clickOn(skillsTab);
-    await this.page.waitForSelector(skillSelector, {visible: true});
+    await this.isElementVisible(skillSelector);
   }
 
   /**
@@ -903,6 +914,8 @@ export class TopicManager extends BaseUser {
       this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
       this.waitForStaticAssetsToLoad(),
     ]);
+
+    await this.isElementVisible(skillEditorContainer);
   }
 
   /**
@@ -923,7 +936,7 @@ export class TopicManager extends BaseUser {
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.navigateToSkillsTab();
 
-    const skillItem = await this.selectSkill(skillName);
+    const skillItem = await this.getSkillElementFromSelection(skillName);
     if (!skillItem) {
       throw new Error(`Skill "${skillName}" not found`);
     }
@@ -979,13 +992,17 @@ export class TopicManager extends BaseUser {
       throw new Error('Confirm skill button not found');
     }
     await this.clickOn(confirmUnassignSkillButton);
+
+    await this.isElementVisible(confirmUnassignSkillButton, false);
   }
 
   /**
    * Select a skill from the list of skills.
    * @param {string} skillName - The name of the skill to select.
    */
-  async selectSkill(skillName: string): Promise<ElementHandle> {
+  async getSkillElementFromSelection(
+    skillName: string
+  ): Promise<ElementHandle> {
     const isMobileWidth = this.isViewportAtMobileWidth();
     const skillItemSelector = isMobileWidth
       ? mobileSkillItemSelector
@@ -1043,7 +1060,7 @@ export class TopicManager extends BaseUser {
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.navigateToSkillsTab();
 
-    const skillItem = await this.selectSkill(skillName);
+    const skillItem = await this.getSkillElementFromSelection(skillName);
     if (!skillItem) {
       throw new Error(`Skill "${skillName}" not found`);
     }
@@ -1085,6 +1102,8 @@ export class TopicManager extends BaseUser {
       throw new Error('Confirm move button not found');
     }
     await this.clickOn(confirmMoveButton);
+
+    await this.isElementVisible(confirmMoveButton, false);
   }
 
   /**
@@ -1092,8 +1111,9 @@ export class TopicManager extends BaseUser {
    *
    * @param {string} skillName - The name of the skill to select.
    */
-  async filterAndSelectSkill(skillName: string): Promise<void> {
+  async filterAndSelectSkillInSkillSelector(skillName: string): Promise<void> {
     // Searching by skill name.
+    await this.isElementVisible(skillNameInputSelector);
     await this.type(skillNameInputSelector, skillName);
 
     await this.page.waitForSelector(radioInnerCircleSelector);
@@ -1115,6 +1135,7 @@ export class TopicManager extends BaseUser {
       throw new Error('Confirm skill selection button selector not found');
     }
     await this.clickOn(confirmSkillSelectionButtonSelector);
+    await this.isElementVisible(confirmSkillSelectionButtonSelector, false);
   }
 
   /**
@@ -1133,7 +1154,7 @@ export class TopicManager extends BaseUser {
     await this.navigateToTopicAndSkillsDashboardPage();
     await this.navigateToSkillsTab();
 
-    const skillItem1 = await this.selectSkill(skillName1);
+    const skillItem1 = await this.getSkillElementFromSelection(skillName1);
     if (!skillItem1) {
       throw new Error(`Skill "${skillName1}" not found`);
     }
@@ -1164,7 +1185,7 @@ export class TopicManager extends BaseUser {
       throw new Error('Skill name input selector not found');
     }
     // Searching by skill name.
-    await this.filterAndSelectSkill(skillName2);
+    await this.filterAndSelectSkillInSkillSelector(skillName2);
   }
 
   /**
@@ -1948,7 +1969,7 @@ export class TopicManager extends BaseUser {
       await this.waitForElementToBeClickable(elements[0]);
       await elements[0].click();
     }
-    await this.filterAndSelectSkill(skillName);
+    await this.filterAndSelectSkillInSkillSelector(skillName);
   }
 
   /**
@@ -2905,7 +2926,7 @@ export class TopicManager extends BaseUser {
       await this.waitForElementToBeClickable(elements[0]);
       await elements[0].click();
     }
-    await this.filterAndSelectSkill(skillName);
+    await this.filterAndSelectSkillInSkillSelector(skillName);
   }
 
   /**
