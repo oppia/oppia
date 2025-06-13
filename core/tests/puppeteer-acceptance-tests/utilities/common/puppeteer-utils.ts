@@ -931,7 +931,7 @@ export class BaseUser {
     const currentTextContent = await this.getTextContent(selector);
     if (currentTextContent !== textContent) {
       throw new Error(
-        `Text did not match within the specified time. Actual text: "${currentTextContent}", expected text: "${status}"`
+        `Text did not match within the specified time. Actual text: "${currentTextContent}", expected text: "${textContent}"`
       );
     }
   }

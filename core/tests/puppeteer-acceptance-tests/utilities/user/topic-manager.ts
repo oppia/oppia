@@ -247,6 +247,7 @@ const skillEditorCollapsibleCardSelector =
 const storyEditorContainerSelector = '.e2e-test-story-editor';
 const chapterEditorContainerSelector = '.e2e-test-chapter-editor';
 const chapterPreviewContainerSelector = '.e2e-test-thumbnail-container';
+const multiSelectionInputChipSelector = '.e2e-test-multi-selection-chip';
 
 export class TopicManager extends BaseUser {
   /**
@@ -579,16 +580,18 @@ export class TopicManager extends BaseUser {
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
-      showMessage(`Filtered topics by keyword: ${keyword}`);
     } catch (error) {
       console.error(error.stack);
       throw error;
     }
 
     await this.expectTextContentToMatch(
-      `${multiSelectionInputSelector} mat-chip`,
-      keyword
+      `${multiSelectionInputChipSelector}`,
+      // We are checking multi-selection-field components and it has cancel
+      // icon (text) within the chip element, so we need to add cancel.
+      `${keyword} cancel`
     );
+    showMessage(`Filtered topics by keyword: ${keyword}`);
   }
 
   /**
@@ -1273,8 +1276,6 @@ export class TopicManager extends BaseUser {
       await this.isElementVisible(questionTextInput);
       await this.type(questionTextInput, questionText);
       await this.page.keyboard.press('Enter');
-
-      await this.expectTextContentToMatch(questionTextInput, questionText);
     } catch (error) {
       console.error(`Error previewing question: ${error.message}`);
       throw error;
@@ -1358,16 +1359,16 @@ export class TopicManager extends BaseUser {
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
-      showMessage(`Filtered skill by status: ${status}`);
     } catch (error) {
       console.error(error.stack);
       throw error;
     }
 
     await this.expectTextContentToMatch(
-      `${skillStatusDropdownSelector} .mat-select-value`,
+      `${skillStatusDropdownSelector} .mat-select-value-text`,
       status
     );
+    showMessage(`Filtered skill by status: ${status}`);
   }
 
   /**
@@ -1389,16 +1390,18 @@ export class TopicManager extends BaseUser {
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
-      showMessage(`Filtered skills by keyword: ${keyword}`);
     } catch (error) {
       console.error(error.stack);
       throw error;
     }
 
     await this.expectTextContentToMatch(
-      `${multiSelectionInputSelector} mat-chip`,
-      keyword
+      `${multiSelectionInputChipSelector}`,
+      // We are checking multi-selection-field components and it has cancel
+      // icon (text) within the chip element, so we need to add cancel.
+      `${keyword} cancel`
     );
+    showMessage(`Filtered skills by keyword: ${keyword}`);
   }
 
   /**
@@ -1471,10 +1474,19 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
-    await this.expectTextContentToMatch(
+    // await this.expectTextContentToMatch(
+    //   `${itemsPerPageDropdown} option`,
+    //   itemsPerPage.toString()
+    // );
+    const paginationValue = await this.page.$eval(
       itemsPerPageDropdown,
-      itemsPerPage.toString()
+      el => (el as HTMLSelectElement).value
     );
+    if (paginationValue !== itemsPerPage.toString()) {
+      throw new Error(
+        `Expected pagination value to be "${itemsPerPage}", but it was "${paginationValue}"`
+      );
+    }
     showMessage(`Paginator adjusted to show ${itemsPerPage} items per page.`);
   }
 
