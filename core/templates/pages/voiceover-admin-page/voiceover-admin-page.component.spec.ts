@@ -20,7 +20,9 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
+  discardPeriodicTasks,
   fakeAsync,
+  flush,
   TestBed,
   tick,
 } from '@angular/core/testing';
@@ -145,6 +147,8 @@ describe('Voiceover Admin Page component ', () => {
 
     component.ngOnInit();
     tick();
+    flush();
+    discardPeriodicTasks();
 
     expect(
       voiceoverBackendApiService.fetchVoiceoverAdminDataAsync
