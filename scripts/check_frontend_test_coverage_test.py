@@ -77,19 +77,21 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         )
 
     def test_get_stanzas_from_lcov_file(self) -> None:
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\n'
-            'LF:10\n'
-            'LH:5\n'
-            'end_of_record\n'
-            'SF:/opensource/oppia/file2.ts\n'
-            'LF:10\n'
-            'LH:5\n'
-            'end_of_record\n'
-            'SF:/opensource/oppia/file3.ts\n'
-            'LF:10\n'
-            'LH:5\n'
-            'end_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/file.ts',
+                'LF:10',
+                'LH:5',
+                'end_of_record',
+                'SF:/opensource/oppia/file2.ts',
+                'LF:10',
+                'LH:5',
+                'end_of_record',
+                'SF:/opensource/oppia/file3.ts',
+                'LF:10',
+                'LH:5',
+                'end_of_record',
+            ]
         )
         with self.open_file_swap:
             stanzas = check_frontend_test_coverage.get_stanzas_from_lcov_file()
@@ -107,8 +109,13 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
             self.assertEqual(stanzas[2].covered_lines, 5)
 
     def test_get_stanzas_from_lcov_file_file_name_exception(self) -> None:
-        self.lcov_items_list = (
-            'SF:\nLF:10\nLH:5\nend_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:',
+                'LF:10',
+                'LH:5',
+                'end_of_record',
+            ]
         )
         with self.open_file_swap:
             with self.assertRaisesRegex(
@@ -119,8 +126,13 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 check_frontend_test_coverage.get_stanzas_from_lcov_file()
 
     def test_get_stanzas_from_lcov_file_total_lines_exception(self) -> None:
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\nLF:\nLH:5\nend_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/file.ts',
+                'LF:',
+                'LH:5',
+                'end_of_record',
+            ]
         )
         with self.open_file_swap:
             with self.assertRaisesRegex(
@@ -131,8 +143,13 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 check_frontend_test_coverage.get_stanzas_from_lcov_file()
 
     def test_get_stanzas_from_lcov_file_covered_lines_exception(self) -> None:
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\nLF:10\nLH:\nend_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/file.ts',
+                'LF:10',
+                'LH:',
+                'end_of_record',
+            ]
         )
         with self.open_file_swap:
             with self.assertRaisesRegex(
@@ -143,15 +160,17 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 check_frontend_test_coverage.get_stanzas_from_lcov_file()
 
     def test_check_coverage_changes(self) -> None:
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
-            'SF:/opensource/oppia/file2.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/file.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+                'SF:/opensource/oppia/file2.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+            ]
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
@@ -191,19 +210,21 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 check_frontend_test_coverage.check_coverage_changes()
 
     def test_check_coverage_changes_for_covered_files(self) -> None:
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
-            'SF:/opensource/oppia/file2.ts\n'
-            'LF:10\n'
-            'LH:10\n'
-            'end_of_record\n'
-            'SF:node_modules/oppia/anotherfile.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/file.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+                'SF:/opensource/oppia/file2.ts',
+                'LF:10',
+                'LH:10',
+                'end_of_record',
+                'SF:node_modules/oppia/anotherfile.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+            ]
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage, 'NOT_FULLY_COVERED_FILENAMES', []
@@ -222,11 +243,13 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 )
 
     def test_check_coverage_changes_remove_file(self) -> None:
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\n'
-            'LF:10\n'
-            'LH:10\n'
-            'end_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/file.ts',
+                'LF:10',
+                'LH:10',
+                'end_of_record',
+            ]
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
@@ -253,11 +276,13 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 )
 
     def test_check_coverage_changes_when_renaming_file(self) -> None:
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/newfilename.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/newfilename.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+            ]
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
@@ -284,19 +309,21 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 )
 
     def test_fully_covered_filenames_is_sorted(self) -> None:
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
-            'SF:/opensource/oppia/anotherfile.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
-            'SF:node_modules/oppia/thirdfile.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/file.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+                'SF:/opensource/oppia/anotherfile.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+                'SF:node_modules/oppia/thirdfile.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+            ]
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
@@ -323,15 +350,17 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 )
 
     def test_fully_covered_filenames_is_not_sorted(self) -> None:
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
-            'SF:/opensource/oppia/anotherfile.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/file.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+                'SF:/opensource/oppia/anotherfile.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+            ]
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
@@ -393,19 +422,21 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
         )
 
     def test_check_frontend_test_coverage_with_files_to_check(self) -> None:
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
-            'SF:/opensource/oppia/file2.ts\n'
-            'LF:10\n'
-            'LH:10\n'
-            'end_of_record\n'
-            'SF:/opensource/oppia/file3.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/file.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+                'SF:/opensource/oppia/file2.ts',
+                'LF:10',
+                'LH:10',
+                'end_of_record',
+                'SF:/opensource/oppia/file3.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+            ]
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,
@@ -432,11 +463,13 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 )
 
     def test_function_calls(self) -> None:
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\n'
-            'LF:10\n'
-            'LH:9\n'
-            'end_of_record\n'
+        self.lcov_items_list = '\n'.join(
+            [
+                'SF:/opensource/oppia/file.ts',
+                'LF:10',
+                'LH:9',
+                'end_of_record',
+            ]
         )
         not_fully_covered_files_swap = self.swap(
             check_frontend_test_coverage,

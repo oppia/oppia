@@ -137,7 +137,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
-            'Duplicate pattern(s) found in critical rules section.'
+                'Duplicate pattern(s) found in critical rules section.'
             ], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
@@ -285,7 +285,7 @@ class CodeownerLinterTests(test_utils.LinterTestBase):
             linter = codeowner_linter.CodeownerLintChecksManager(FILE_CACHE)
             lint_task_report = linter.check_codeowner_file()
         self.assert_same_list_elements([
-            'Pattern on line 18 doesn\'t match any file or directory'
+                'Pattern on line 18 doesn\'t match any file or directory'
             ], lint_task_report.trimmed_messages)
         self.assertEqual('CODEOWNERS', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)

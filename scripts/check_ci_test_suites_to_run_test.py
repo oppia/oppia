@@ -280,8 +280,11 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             'w',
             encoding='utf-8'
         ) as f:
-            f.write(
-                'blog-admin-page.module.ts\nblog-dashboard-page.module.ts'
+            f.writelines(
+                [
+                    'blog-admin-page.module.ts\n',
+                    'blog-dashboard-page.module.ts\n'
+                ]
             )
         os.mkdir(
             os.path.join(

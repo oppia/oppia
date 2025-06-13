@@ -293,8 +293,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         def mock_readlines(unused_self: str) -> Tuple[str, ...]:
             return (
                 'Copyright 2020 The Oppia Authors. All Rights Reserved.',
-                ' * @fileoverview Initializes constants for ',
-                'the Oppia codebase.',
+                ' * @fileoverview Initializes constants.',
                 '"DEV_MODE": false,',
                 '"EMULATOR_MODE": true',
             )
@@ -315,8 +314,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         def mock_readlines(unused_self: str) -> Tuple[str, ...]:
             return (
                 'Copyright 2020 The Oppia Authors. All Rights Reserved.',
-                ' * @fileoverview Initializes constants for ',
-                'the Oppia codebase.',
+                ' * @fileoverview Initializes constants.',
                 '"DEV_MODE": true,',
                 '"EMULATOR_MODE": false',
             )
