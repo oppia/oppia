@@ -239,10 +239,14 @@ const topicEditorMainTabFormSelector = 'e2e-test-topic-editor-main-tab';
 const topicEditorSaveModelSelector = 'oppia-topic-editor-save-modal';
 const topicPreviewContainerSelector = '.e2e-test-topic-preview-container';
 const subtopicEditorContainerSelector = '.e2e-test-subtopic-editor-container';
+const subtopicPreviewContainerSelector = '.e2e-test-subtopic-preview-container';
 const skillEditorContainer = '.e2e-test-skill-editor-container';
 const conceptCardPreviewModelSelector = '.e2e-test-concept-card-preview-modal';
 const skillEditorCollapsibleCardSelector =
   '.e2e-test-skill-editor-collapsible-card';
+const storyEditorContainerSelector = '.e2e-test-story-editor';
+const chapterEditorContainerSelector = '.e2e-test-chapter-editor';
+const chapterPreviewContainerSelector = '.e2e-test-thumbnail-container';
 
 export class TopicManager extends BaseUser {
   /**
@@ -1890,7 +1894,7 @@ export class TopicManager extends BaseUser {
    * @param {string} misconceptionName - The name of the misconception to verify.
    * @param {boolean} isPresent - Whether the misconception is expected to be present.
    */
-  async verifyMisconceptionPresent(
+  async verifyMisconceptionPresence(
     misconceptionName: string,
     isPresent: boolean
   ): Promise<void> {
@@ -2345,6 +2349,7 @@ export class TopicManager extends BaseUser {
     explanation: string,
     thumbnail: string
   ): Promise<void> {
+    await this.isElementVisible(subtopicTitleField);
     await this.clearAllTextFrom(subtopicTitleField);
     await this.type(subtopicTitleField, title);
     if (urlFragment) {
@@ -2366,7 +2371,7 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
 
-    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.isElementVisible(photoUploadModal, false);
   }
 
   /**
@@ -2406,6 +2411,7 @@ export class TopicManager extends BaseUser {
             if (deleteButton) {
               await this.waitForElementToBeClickable(deleteButton);
               await deleteButton.click();
+              await this.isElementVisible(deleteSubtopicButtonSelector, false);
               showMessage(
                 `Subtopic ${subtopicName} deleted from the topic ${topicName}.`
               );
@@ -2501,6 +2507,9 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(topicPreviewTab);
       await this.clickOn(topicPreviewTab);
     }
+
+    await this.isElementVisible(subtopicPreviewContainerSelector);
+    showMessage('Navigated to Subtopic Preview Tab');
   }
 
   /**
@@ -2636,6 +2645,8 @@ export class TopicManager extends BaseUser {
           await this.page.waitForNavigation({
             waitUntil: ['load', 'networkidle0'],
           });
+
+          await this.isElementVisible(storyEditorContainerSelector);
           return;
         }
       }
@@ -2650,6 +2661,8 @@ export class TopicManager extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+
+    await this.isElementVisible(storyEditorContainerSelector);
   }
 
   /**
@@ -2743,6 +2756,7 @@ export class TopicManager extends BaseUser {
               await this.waitForElementToBeClickable(deleteButton);
               await deleteButton.click();
               await this.clickOn(confirmStoryDeletionButton);
+              await this.isElementVisible(confirmStoryDeletionButton);
               showMessage(
                 `Story ${storyName} deleted from the topic ${topicName}.`
               );
@@ -2794,7 +2808,10 @@ export class TopicManager extends BaseUser {
    * Click on save new chapter button.
    */
   async clickOnSaveNewChapterButton(): Promise<void> {
+    await this.isElementVisible(createChapterButton);
     await this.clickOn(createChapterButton);
+
+    await this.isElementVisible(createChapterButton, false);
   }
 
   /**
@@ -2855,6 +2872,7 @@ export class TopicManager extends BaseUser {
         if (title === chapterName) {
           await titleElement.click();
           await this.waitForStaticAssetsToLoad();
+          await this.isElementVisible(chapterEditorContainerSelector);
           showMessage(`Chapter ${chapterName} opened in chapter editor.`);
 
           // Collapsing all the collapsible card of chapter editor in the mobile viewport.
@@ -2914,6 +2932,7 @@ export class TopicManager extends BaseUser {
     await this.uploadFile(thumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
+    await this.isElementVisible(uploadPhotoButton, false);
   }
 
   /**
@@ -2927,6 +2946,8 @@ export class TopicManager extends BaseUser {
       throw new Error('Chapter preview button not found');
     }
     await elementHandle.click();
+
+    await this.isElementVisible(chapterPreviewContainerSelector);
   }
 
   /**
@@ -3112,6 +3133,8 @@ export class TopicManager extends BaseUser {
               await this.waitForElementToBeClickable(deleteButton);
               await deleteButton.click();
               await this.clickOn(confirmDeleteChapterButton);
+
+              await this.isElementVisible(confirmDeleteChapterButton, false);
 
               showMessage(
                 `Chapter ${chapterName} deleted from the story ${storyName}.`
