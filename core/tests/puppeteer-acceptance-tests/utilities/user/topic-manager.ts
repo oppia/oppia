@@ -518,17 +518,16 @@ export class TopicManager extends BaseUser {
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
-
-      showMessage(`Filtered topics by status: ${status}`);
     } catch (error) {
       console.error(error.stack);
       throw error;
     }
 
     await this.expectTextContentToMatch(
-      `${topicStatusDropdownSelector} .mat-select-value`,
+      `${topicStatusDropdownSelector} .mat-select-value-text`,
       status
     );
+    showMessage(`Filtered topics by status: ${status}`);
   }
 
   /**
