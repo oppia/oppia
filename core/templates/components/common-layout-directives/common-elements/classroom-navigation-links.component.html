@@ -10,7 +10,14 @@
           <a href="/learn">{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_INTRO' | translate }}</a>
           <p>{{ 'I18N_CLASSROOM_NAVIGATION_LINKS_DESCRIPTION' | translate }}</p>
         </div>
-        <div class="classroom-grid" [attr.data-classroom-count]="classroomSummaries.length">
+        <div 
+        class="classroom-grid" 
+        [attr.data-classroom-count]="classroomSummaries.length"
+        [ngClass]="{
+          'classroom-grid-one-columns': classroomSummaries.length === 1,
+          'classroom-grid-two-columns': classroomSummaries.length === 2
+          }"
+        >
           <div *ngFor="let classroom of classroomSummaries" class="classroom-nav-item-container">
             <div class="classroom-item" (click)="registerClassroomCardClickEvent(classroom.name)">
               <div class="classroom-text-container">
@@ -54,6 +61,14 @@
     gap: 15px;
     grid-auto-flow: row;
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .classroom-grid-one-columns {
+      grid-template-columns: repeat(1, 1fr);
+  }
+
+  .classroom-grid-two-columns {
+      grid-template-columns: repeat(2, 1fr);
   }
 
   .classroom-item {

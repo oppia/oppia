@@ -212,14 +212,6 @@
 }
 
 
-.oppia-top-navigation-bar .learn-dropdown-menu .nav-item-left .two-columns {
-  width: 600px;
-}
-
-.oppia-top-navigation-bar .learn-dropdown-menu .nav-item-left .three-columns {
-  width: 100vw;
-}
-
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-right {
   min-width: 300px;
   padding: 32px;
@@ -542,12 +534,16 @@
 }
 
 @media screen and (max-width : 1212px) {
-  .oppia-top-navigation-bar .classroom-enabled {
-    min-width: 939px;
-  }
 
   .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-left {
     width: 600px;
+  }
+
+  .oppia-top-navigation-bar .two-columns {
+  min-width: 855px;
+  }
+  .oppia-top-navigation-bar .three-columns {
+  min-width: 855px;
   }
 }
 

@@ -111,13 +111,7 @@
               role="menu">
             <li class="nav-item">
               <div class="nav-item-main d-flex">
-                <div
-                [ngClass]="{
-                  'nav-item-left d-flex flex-column justify-content-between': true,
-                  'two-columns': classroomSummariesLength == 2,
-                  'three-columns': classroomSummariesLength >= 3
-                }"
-                >
+                <div class="nav-item-left d-flex flex-column justify-content-between">
                   <oppia-classroom-navigation-links></oppia-classroom-navigation-links>
                 </div>
                 <span class="nav-item-right d-flex flex-column">
