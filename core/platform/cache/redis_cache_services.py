@@ -26,16 +26,6 @@ from core.platform import models
 import redis
 from typing import Dict, List, Optional
 
-MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import redis_client_models
-
-datastore_services = models.Registry.import_datastore_services()
-(redis_client_models,) = models.Registry.import_models([
-    models.Names.REDIS_CLIENT
-])
-
 
 class RedisClient:
     """Redis client for our own implementation of caching."""

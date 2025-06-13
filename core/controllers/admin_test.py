@@ -891,7 +891,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         self.assertEqual(redis_services.get_redis_host(), feconf.REDISHOST)
-        result = self.post_json(
+        self.post_json(
             '/adminhandler', {
                 'action': 'update_redis_host',
                 'redis_host': 'test_host'

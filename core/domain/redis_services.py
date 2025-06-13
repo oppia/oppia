@@ -38,6 +38,7 @@ def get_redis_host() -> str:
     redis_client_model = redis_client_models.RedisClientModel.get(
         redis_client_models.REDIS_CLIENT_ID, strict=False)
     if redis_client_model is not None:
+        assert isinstance(redis_client_model.redishost, str)
         return redis_client_model.redishost
     return feconf.REDISHOST
 
