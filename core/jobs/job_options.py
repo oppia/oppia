@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import argparse
 from core import feconf
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 
 from apache_beam.options import pipeline_options
 
@@ -62,14 +64,20 @@ class JobOptions(pipeline_options.PipelineOptions): # type: ignore[misc]
             joined_unsupported_options = ', '.join(sorted(unsupported_options))
             raise ValueError(
                 'Unsupported option(s): %s' % joined_unsupported_options)
+        oppia_project_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+        assert isinstance(oppia_project_id, str)
         super().__init__(
             # Needed by PipelineOptions.
             flags=flags,
             # Needed by GoogleCloudOptions.
-            project=feconf.OPPIA_PROJECT_ID,
+            project=oppia_project_id,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
-            temp_location=feconf.DATAFLOW_TEMP_LOCATION,
-            staging_location=feconf.DATAFLOW_STAGING_LOCATION,
+            temp_location=(
+                feconf.DATAFLOW_TEMP_LOCATION_TEMPLATE % oppia_project_id),
+            staging_location=(
+                feconf.DATAFLOW_STAGING_LOCATION_TEMPLATE % oppia_project_id),
             # The 'use_runner_v2' is used since some of our jobs require
             # the v2 of the runner. See the docs:
             # https://cloud.google.com/dataflow/docs/guides/deploying-a-pipeline#dataflow-runner-v2
