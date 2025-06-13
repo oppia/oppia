@@ -120,7 +120,7 @@ export class AuthService {
       if (request.status === 200) {
         let jsonResponse = request.responseText.substr(
           request.responseText.indexOf(")]}'") + 4
-        ); // Extract the JSON part.
+        );
         config = jsonResponse;
       }
     } catch (e) {

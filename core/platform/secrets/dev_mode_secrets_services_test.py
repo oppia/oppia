@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 
 from core.platform.secrets import dev_mode_secrets_services
@@ -28,12 +29,20 @@ class DevModeSecretsServicesTests(test_utils.GenericTestBase):
     """Tests for the Python Cloud Secret services."""
 
     def test_get_secret_returns_existing_secret(self) -> None:
-        with self.swap(os, 'environ', {'SECRETS': '{"name": "secret", "name1": {"FIREBASE_CONFIG_API_KEY":"fake-api-key","FIREBASE_CONFIG_AUTH_DOMAIN":""}}'}): # pylint: disable=line-too-long
+        secrets = {
+            "name": "secret",
+            "name1": {
+                "FIREBASE_CONFIG_API_KEY": "fake-api-key",
+                "FIREBASE_CONFIG_AUTH_DOMAIN": ""
+            }
+        }
+        with self.swap(os, 'environ', {'SECRETS': json.dumps(secrets)}):
             self.assertEqual(
                 dev_mode_secrets_services.get_secret('name'), 'secret')
             self.assertEqual(
                 dev_mode_secrets_services.get_secret('name1'),
-                '{"FIREBASE_CONFIG_API_KEY": "fake-api-key", "FIREBASE_CONFIG_AUTH_DOMAIN": ""}') # pylint: disable=line-too-long
+                json.dumps(secrets['name1'])
+            )
 
     def test_get_secret_returns_none_when_secret_does_not_exist(self) -> None:
         with self.swap(os, 'environ', {'SECRETS': '{"name": "secret"}'}):
