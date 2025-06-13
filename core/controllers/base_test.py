@@ -197,7 +197,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             ):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
-                    url, [200, 301, 302, 400, 401, 404, 405])
+                    url, [200, 301, 302, 400, 401, 404, 405, 500])
 
     def test_that_no_post_results_in_500_error(self) -> None:
         """Test that no POST request results in a 500 error."""

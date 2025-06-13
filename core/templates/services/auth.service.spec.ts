@@ -270,14 +270,48 @@ describe('Auth service', function () {
     });
 
     it('should return firebase config', () => {
-      expect(AuthService.firebaseConfig).toEqual({
-        apiKey: 'fake-api-key',
-        authDomain: '',
-        projectId: 'dev-project-id',
-        storageBucket: '',
-        messagingSenderId: '',
-        appId: '',
+      // Mock getConfig function to return a sample configuration.
+      spyOn(AuthService, 'getConfig').and.returnValue({
+        FIREBASE_CONFIG_API_KEY: 'sample-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
+        FIREBASE_CONFIG_PROJECT_ID: 'sample-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: 'sample-storage-bucket',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'sample-sender-id',
+        FIREBASE_CONFIG_APP_ID: 'sample-app-id',
+      });
+      const firebaseConfig = AuthService.firebaseConfig;
+      expect(firebaseConfig).toEqual({
+        apiKey: 'sample-api-key',
+        authDomain: 'sample-auth-domain',
+        projectId: 'sample-project-id',
+        storageBucket: 'sample-storage-bucket',
+        messagingSenderId: 'sample-sender-id',
+        appId: 'sample-app-id',
       });
     });
+
+    it('should return the same config if called multiple times', () => {
+      spyOn(AuthService, 'getConfig').and.returnValue({
+        FIREBASE_CONFIG_API_KEY: 'sample-api-key',
+        FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
+        FIREBASE_CONFIG_PROJECT_ID: 'sample-project-id',
+        FIREBASE_CONFIG_STORAGE_BUCKET: 'sample-storage-bucket',
+        FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'sample-sender-id',
+        FIREBASE_CONFIG_APP_ID: 'sample-app-id',
+      });
+      const firebaseConfig1 = AuthService.firebaseConfig;
+      const firebaseConfig2 = AuthService.firebaseConfig;
+
+      expect(firebaseConfig1).toBe(firebaseConfig2);
+    });
+  });
+
+  it('should call firebase_config API', () => {
+    // Mock getConfig function to return a sample configuration.
+    spyOn(XMLHttpRequest.prototype, 'open').and.callThrough();
+    spyOn(XMLHttpRequest.prototype, 'send');
+    const firebaseConfig = AuthService.getConfig();
+    expect(firebaseConfig).toBe(null);
+    expect(XMLHttpRequest.prototype.open).toHaveBeenCalled();
   });
 });
