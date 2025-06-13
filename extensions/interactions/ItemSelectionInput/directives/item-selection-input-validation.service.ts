@@ -28,6 +28,7 @@ import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 
 import {AppConstants} from 'app.constants';
+import {ItemSelectionRuleInputs} from 'interactions/rule-input-defs';
 
 @Injectable({
   providedIn: 'root',
@@ -170,7 +171,7 @@ export class ItemSelectionInputValidationService {
               'Learner answer ' +
               (ruleIndex + 1) +
               ', ' +
-              'please select only one answer choice.',
+              'please select only one answer choice',
           });
         }
 
@@ -191,7 +192,7 @@ export class ItemSelectionInputValidationService {
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
             'Please add something for Oppia to say in the ' +
-            '"All other answers" response.',
+            '"All other answers" response',
         });
       }
     }
@@ -214,30 +215,9 @@ export class ItemSelectionInputValidationService {
           message:
             `Learner answer ${ruleIndex + 1} from Oppia response ` +
             `${answerIndex + 1} options do not match customization ` +
-            'argument choices.',
+            'argument choices',
         });
       }
-    });
-    return warningsList;
-  }
-
-  private getWarningsForRulesDuplicates(
-    rules: Rule[],
-    answerGroupIndex: number
-  ): Warning[] {
-    const warningsList: Warning[] = [];
-    rules.forEach((rule, ruleIndex) => {
-      const ruleStr = JSON.stringify(rule.toBackendDict());
-      if (this.rulesSet.has(ruleStr)) {
-        warningsList.push({
-          type: AppConstants.WARNING_TYPES.ERROR,
-          message:
-            `The rule ${ruleIndex} of answer group ` +
-            `${answerGroupIndex} of ItemSelectionInput interaction ` +
-            'is a duplicate.',
-        });
-      }
-      this.rulesSet.add(ruleStr);
     });
     return warningsList;
   }
@@ -281,10 +261,6 @@ export class ItemSelectionInputValidationService {
     this.rulesSet.clear();
     answerGroups.forEach((answerGroup, answerIndex) => {
       var rules = answerGroup.rules;
-      warningsList = warningsList.concat(
-        this.getWarningsForRulesDuplicates(rules, answerIndex)
-      );
-
       rules.forEach((rule, ruleIndex) => {
         const ruleInputs = rule.inputs.x as string[];
         warningsList = warningsList.concat(
@@ -307,7 +283,7 @@ export class ItemSelectionInputValidationService {
                 'learner answer ' +
                 (ruleIndex + 1) +
                 ', the "proper ' +
-                'subset" learner answer must include at least 2 options.',
+                'subset" learner answer must include at least 2 options',
             });
           }
         } else if (rule.type === 'Equals') {
@@ -329,7 +305,7 @@ export class ItemSelectionInputValidationService {
                 minAllowedCount +
                 ' and ' +
                 maxAllowedCount +
-                ' (the minimum and maximum allowed selection counts).',
+                ' (the minimum and maximum allowed selection counts)',
             });
           }
         }
@@ -343,13 +319,45 @@ export class ItemSelectionInputValidationService {
                 ', learner answer ' +
                 (ruleIndex + 1) +
                 ', the "ContainsAtLeastOneOf" learner ' +
-                'answer should have at least one option.',
+                'answer should have at least one option',
             });
           }
         }
       });
     });
-
+    // Map serialized rule + input to answer group index.
+    const rulesToAnswerGroupIndex: {[key: string]: number} = {};
+    for (let [answerGroupIndex, group] of answerGroups.entries()) {
+      for (let [ruleIndex, rule] of group.rules.entries()) {
+        const itemSelectionInputs =
+          rule.inputs as unknown as ItemSelectionRuleInputs;
+        // Serialize all rule inputs in a general and reversible way,
+        // Supporting multiple input keys (not just 'x') and ensuring consistent ordering.
+        const inputs = Object.fromEntries(
+          Object.entries(itemSelectionInputs)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([key, value]) => {
+              // If array, sort for consistent ordering.
+              if (Array.isArray(value)) {
+                return [key, [...value].sort()];
+              }
+              // For other types (numbers, strings, booleans, etc.), keep as it is.
+              return [key, value];
+            })
+        );
+        const stringifiedInputs = JSON.stringify(inputs);
+        const ruleKey = `${rule.type}:${stringifiedInputs}`;
+        if (rulesToAnswerGroupIndex.hasOwnProperty(ruleKey)) {
+          const ag = rulesToAnswerGroupIndex[ruleKey];
+          warningsList.push({
+            type: AppConstants.WARNING_TYPES.ERROR,
+            message: `Rule ${ruleIndex + 1} of answer group ${answerGroupIndex + 1} is already present in answer group ${ag} -- please remove or edit the rule in the answer group to avoid duplicate rules`,
+          });
+        } else {
+          rulesToAnswerGroupIndex[ruleKey] = answerGroupIndex + 1;
+        }
+      }
+    }
     return warningsList;
   }
 }

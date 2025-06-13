@@ -227,12 +227,46 @@ describe('Interaction object factory', () => {
       id: 'TextInput',
       solution: solutionDict,
     };
-    const testInteraction = iof.createFromBackendDict(interactionDict);
+    let testInteraction = iof.createFromBackendDict(interactionDict);
+    let contentIdToHtml = testInteraction.getContentIdToContents();
 
-    let contentIdToHtml = testInteraction.getContentIdToHtml();
     expect(contentIdToHtml).toEqual({
       outcome_1: 'Good answer',
       default_outcome: 'Wrong answer',
+      content_id1: '<p>First Hint</p>',
+      content_id2: '<p>Second Hint</p>',
+      solution: 'This is the explanation to the answer',
+      ca_placeholder_0: 'Enter text',
+    });
+
+    testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        choices: {
+          value: [
+            {
+              content_id: 'ca_choices',
+              html: '<p>first</p>',
+            },
+          ],
+        },
+        allowMultipleItemsInSamePosition: {value: true},
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'DragAndDropSortInput',
+      solution: solutionDict,
+    });
+
+    contentIdToHtml = testInteraction.getContentIdToContents();
+    expect(contentIdToHtml).toEqual({
+      outcome_1: 'Good answer',
+      default_outcome: 'Wrong answer',
+      content_id1: '<p>First Hint</p>',
+      content_id2: '<p>Second Hint</p>',
+      solution: 'This is the explanation to the answer',
+      ca_choices: '<p>first</p>',
     });
 
     let contentId = testInteraction.getContentIdForMatchingHtml('Good answer');

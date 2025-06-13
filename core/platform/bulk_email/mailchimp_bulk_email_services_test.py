@@ -187,8 +187,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         sample_email = 'test@example.com'
         subscriber_hash = '55502f40dc8b7c769880b10874abc9d0'
         self.assertEqual(
-            mailchimp_bulk_email_services._get_subscriber_hash(sample_email), # pylint: disable=protected-access
-            subscriber_hash)
+            mailchimp_bulk_email_services._get_subscriber_hash( # pylint: disable=protected-access
+                sample_email
+            ),
+            subscriber_hash,
+        )
 
         # TODO(#13528): Here we use MyPy ignore because we remove this test
         # after the backend is fully type-annotated. Here ignore[arg-type]
@@ -197,7 +200,9 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         sample_email_2 = 5
         with self.assertRaisesRegex(
             Exception, 'Invalid type for email. Expected string, received 5'):
-            mailchimp_bulk_email_services._get_subscriber_hash(sample_email_2) # type: ignore[arg-type]  # pylint: disable=protected-access
+            mailchimp_bulk_email_services._get_subscriber_hash( # pylint: disable=protected-access
+                sample_email_2 # type: ignore[arg-type]
+            )
 
     def test_function_input_validation(self) -> None:
         mailchimp = self.MockMailchimpClass()
