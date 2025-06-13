@@ -921,6 +921,19 @@ export class BaseUser {
     );
     return text?.trim();
   }
+
+  /**
+   * Verify text content inside an element
+   */
+
+  async expectTextContentToMatch(selector: string, textContent: string) {
+    const currentTextContent = await this.getTextContent(selector);
+    if (currentTextContent !== textContent) {
+      throw new Error(
+        `Text did not match within the specified time. Actual text: "${currentTextContent}", expected text: "${status}"`
+      );
+    }
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();

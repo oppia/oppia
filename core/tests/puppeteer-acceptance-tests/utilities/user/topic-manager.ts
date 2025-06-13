@@ -521,12 +521,10 @@ export class TopicManager extends BaseUser {
       throw error;
     }
 
-    const textInput = await this.getTextContent(topicStatusDropdownSelector);
-    if (textInput !== status) {
-      throw new Error(
-        `Text did not match within the specified time. Actual text: "${textInput}", expected text: "${status}"`
-      );
-    }
+    await this.expectTextContentToMatch(
+      `${topicStatusDropdownSelector} .mat-select-value`,
+      status
+    );
   }
 
   /**
@@ -550,7 +548,10 @@ export class TopicManager extends BaseUser {
       throw error;
     }
 
-    // TODO: Add post check based on filterTopicsByStatus.
+    await this.expectTextContentToMatch(
+      `${classroomDropdownSelector} .mat-select-min-line`,
+      classroom
+    );
   }
 
   /**
@@ -577,7 +578,10 @@ export class TopicManager extends BaseUser {
       throw error;
     }
 
-    // TODO: Add post check based on filterTopicsByStatus.
+    await this.expectTextContentToMatch(
+      `${multiSelectionInputSelector} mat-chip`,
+      keyword
+    );
   }
 
   /**
@@ -601,7 +605,10 @@ export class TopicManager extends BaseUser {
       throw error;
     }
 
-    // TODO: Add post check based on filterTopicsByStatus.
+    await this.expectTextContentToMatch(
+      `${sortDropdownSelector} .mat-select-value-text`,
+      sortOption
+    );
   }
 
   /**
