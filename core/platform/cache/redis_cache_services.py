@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import caching_domain
+from core.domain import redis_services
 from core.platform import models
 
 import redis
@@ -41,8 +42,6 @@ class RedisClient:
 
     def __init__(self) -> None:
         self._is_client_initialized = False
-        self._redis_client_model: Optional[
-            redis_client_models.RedisClientModel] = None
         self._oppia_redis_client: Optional[redis.StrictRedis[str]] = None
         self._cloud_ndb_redis_client: Optional[redis.StrictRedis[str]] = None
 
@@ -53,18 +52,7 @@ class RedisClient:
         if self._is_client_initialized:
             return
 
-        with datastore_services.get_ndb_context():
-            self._redis_client_model = (
-                redis_client_models.RedisClientModel.get(
-                    redis_client_models.REDIS_CLIENT_ID, strict=False
-                )
-            )
-
-        redishost = (
-            self._redis_client_model.redishost
-            if self._redis_client_model is not None
-            else feconf.REDISHOST
-        )
+        redishost = redis_services.get_redis_host()
         self._oppia_redis_client = redis.StrictRedis(
             host=redishost,
             port=feconf.REDISPORT,

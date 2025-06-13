@@ -37,6 +37,7 @@ from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
 from core.domain import recommendations_services
+from core.domain import redis_services
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import skill_services
@@ -884,6 +885,19 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             result, {
                 'version': 3
             })
+
+    def test_update_redis_host_action(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        self.assertEqual(redis_services.get_redis_host(), feconf.REDISHOST)
+        result = self.post_json(
+            '/adminhandler', {
+                'action': 'update_redis_host',
+                'redis_host': 'test_host'
+            }, csrf_token=csrf_token)
+        self.assertEqual(redis_services.get_redis_host(), 'test_host')
+        self.logout()
 
     def test_admin_topics_csv_download_handler(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
