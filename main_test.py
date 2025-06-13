@@ -25,7 +25,7 @@ from core.tests import test_utils
 import main
 
 import google.cloud.logging
-from typing import ContextManager, Dict, Optional, cast
+from typing import ContextManager, Dict, cast
 import webapp2
 import webtest
 
