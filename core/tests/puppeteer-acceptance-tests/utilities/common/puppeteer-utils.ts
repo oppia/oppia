@@ -924,8 +924,9 @@ export class BaseUser {
 
   /**
    * Verify text content inside an element
+   * @param {string} selector - The selector of the element to get text from.
+   * @param {string} textContent - The expected text content.
    */
-
   async expectTextContentToMatch(selector: string, textContent: string) {
     const currentTextContent = await this.getTextContent(selector);
     if (currentTextContent !== textContent) {

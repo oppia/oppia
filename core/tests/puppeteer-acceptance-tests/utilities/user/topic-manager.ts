@@ -89,7 +89,7 @@ const desktopSkillQuestionTab = '.e2e-test-questions-tab';
 const toastMessageSelector = '.e2e-test-toast-message';
 const editQuestionButtons = '.e2e-test-edit-question-button';
 const linkOffIcon = '.link-off-icon';
-const removeQuestionConfirmationButton =
+const removeQuestionConfirmationButtonSelector =
   '.e2e-test-remove-question-confirmation-button';
 const questionPreviewTab = '.e2e-test-question-preview-tab';
 const questionTextInput = '.e2e-test-question-text-input';
@@ -238,7 +238,11 @@ const topicEditorContainerSelector = '.e2e-test-topic-editor-container';
 const topicEditorMainTabFormSelector = 'e2e-test-topic-editor-main-tab';
 const topicEditorSaveModelSelector = 'oppia-topic-editor-save-modal';
 const topicPreviewContainerSelector = '.e2e-test-topic-preview-container';
+const subtopicEditorContainerSelector = '.e2e-test-subtopic-editor-container';
 const skillEditorContainer = '.e2e-test-skill-editor-container';
+const conceptCardPreviewModelSelector = '.e2e-test-concept-card-preview-modal';
+const skillEditorCollapsibleCardSelector =
+  '.e2e-test-skill-editor-collapsible-card';
 
 export class TopicManager extends BaseUser {
   /**
@@ -1228,9 +1232,11 @@ export class TopicManager extends BaseUser {
         await this.waitForElementToBeClickable(deleteButton);
         await deleteButton.click();
 
-        await this.page.waitForSelector(removeQuestionConfirmationButton);
+        await this.page.waitForSelector(
+          removeQuestionConfirmationButtonSelector
+        );
         const removeQuestionConfirmationButtonElement = await this.page.$(
-          removeQuestionConfirmationButton
+          removeQuestionConfirmationButtonSelector
         );
         if (!removeQuestionConfirmationButtonElement) {
           throw new Error('Remove question confirmation button not found');
@@ -1240,6 +1246,11 @@ export class TopicManager extends BaseUser {
           removeQuestionConfirmationButtonElement
         );
         await removeQuestionConfirmationButtonElement.click();
+
+        await this.isElementVisible(
+          removeQuestionConfirmationButtonSelector,
+          false
+        );
         return;
       }
 
@@ -1256,8 +1267,11 @@ export class TopicManager extends BaseUser {
    */
   async previewQuestion(questionText: string): Promise<void> {
     try {
+      await this.isElementVisible(questionTextInput);
       await this.type(questionTextInput, questionText);
       await this.page.keyboard.press('Enter');
+
+      await this.expectTextContentToMatch(questionTextInput, questionText);
     } catch (error) {
       console.error(`Error previewing question: ${error.message}`);
       throw error;
@@ -1346,6 +1360,11 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
+
+    await this.expectTextContentToMatch(
+      `${skillStatusDropdownSelector} .mat-select-value`,
+      status
+    );
   }
 
   /**
@@ -1372,6 +1391,11 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
+
+    await this.expectTextContentToMatch(
+      `${multiSelectionInputSelector} mat-chip`,
+      keyword
+    );
   }
 
   /**
@@ -1395,6 +1419,11 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
+
+    await this.expectTextContentToMatch(
+      `${sortDropdownSelector} .mat-select-value-text`,
+      sortOption
+    );
   }
 
   /**
@@ -1406,6 +1435,7 @@ export class TopicManager extends BaseUser {
     selector: string,
     optionText: string
   ): Promise<void> {
+    await this.isElementVisible(selector);
     await this.clickOn(selector);
     await this.page.waitForSelector(filterOptionSelector);
 
@@ -1434,11 +1464,15 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(itemsPerPageDropdown);
       await this.page.waitForSelector(itemsPerPageDropdown);
       await this.page.select(itemsPerPageDropdown, itemsPerPage.toString());
-      showMessage(`Paginator adjusted to show ${itemsPerPage} items per page.`);
     } catch (error) {
       console.error(error.stack);
       throw error;
     }
+    await this.expectTextContentToMatch(
+      itemsPerPageDropdown,
+      itemsPerPage.toString()
+    );
+    showMessage(`Paginator adjusted to show ${itemsPerPage} items per page.`);
   }
 
   /**
@@ -1711,6 +1745,7 @@ export class TopicManager extends BaseUser {
     await this.waitForElementToBeClickable(rteElements[1]);
     await rteElements[1].type(exampleExplanation);
     await this.clickOn(saveWorkedExamplesButton);
+    await this.isElementVisible(saveWorkedExamplesButton, false);
   }
 
   /**
@@ -1746,6 +1781,10 @@ export class TopicManager extends BaseUser {
             await deleteButton.click();
             await this.waitForStaticAssetsToLoad();
             await this.clickOn(confirmDeleteWorkedExampleButton);
+            await this.isElementVisible(
+              confirmDeleteWorkedExampleButton,
+              false
+            );
             exampleFound = true;
             break;
           }
@@ -1764,7 +1803,7 @@ export class TopicManager extends BaseUser {
    * @param {string} workedExample - The title of the worked example to verify.
    * @param {boolean} isPresent - Whether the worked example is expected to be present.
    */
-  async verifyWorkedExamplePresent(
+  async verifyWorkedExamplePresence(
     workedExample: string,
     isPresent: boolean
   ): Promise<void> {
@@ -1843,6 +1882,8 @@ export class TopicManager extends BaseUser {
       await this.clickOn(optionalMisconceptionToggle);
     }
     await this.clickOn(saveMisconceptionButton);
+
+    await this.isElementVisible(saveMisconceptionButton, false);
   }
 
   /**
@@ -1926,6 +1967,11 @@ export class TopicManager extends BaseUser {
             await deleteButton.click();
             await this.waitForStaticAssetsToLoad();
             await this.clickOn(confirmDeleteMisconceptionButton);
+
+            await this.isElementVisible(
+              confirmDeleteMisconceptionButton,
+              false
+            );
             misconceptionFound = true;
             break;
           } else {
@@ -2008,6 +2054,8 @@ export class TopicManager extends BaseUser {
         throw new Error('Confirm skill selection button selector not found');
       }
       await this.clickOn(confirmSkillSelectionButtonSelector);
+
+      await this.isElementVisible(confirmSkillSelectionButtonSelector, false);
       showMessage(`Added prerequisite skill: ${skillName}`);
     } catch (error) {
       console.error(error);
@@ -2135,6 +2183,8 @@ export class TopicManager extends BaseUser {
     await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
     await this.type(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
+
+    await this.isElementVisible(saveRubricExplanationButton, false);
   }
 
   /**
@@ -2143,6 +2193,7 @@ export class TopicManager extends BaseUser {
    */
   async publishUpdatedSkill(updateMessage: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.isElementVisible(mobileOptionsSelector);
       await this.clickOn(mobileOptionsSelector);
       // The mobile view has 2 instances of the element, from which
       // the first one is inapplicable here.
@@ -2177,6 +2228,7 @@ export class TopicManager extends BaseUser {
    */
   async previewConceptCard(): Promise<void> {
     await this.clickOn(' Preview Concept Card ');
+    await this.isElementVisible(conceptCardPreviewModelSelector);
   }
 
   /**
@@ -2217,10 +2269,22 @@ export class TopicManager extends BaseUser {
   }
 
   private async openAllMobileDropdownsInSkillEditor(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage('Skipping opening dropdowns since we are in desktop view');
+    }
     await this.clickOn('Misconceptions');
     await this.clickOn('Worked Examples');
     await this.clickOn(' Prerequisite Skills ');
     await this.clickOn('Rubrics');
+
+    // Post Check: As aim of function is to open all mobile dropdowns, we are checking number of mobile collapsible cards
+    const mobileCollapsibleCards = await this.page.$$(
+      skillEditorCollapsibleCardSelector
+    );
+
+    if (!mobileCollapsibleCards || mobileCollapsibleCards.length < 5) {
+      throw new Error('Failed to open all mobile dropdowns');
+    }
   }
 
   /**
@@ -2264,6 +2328,8 @@ export class TopicManager extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+
+    await this.isElementVisible(subtopicEditorContainerSelector);
   }
 
   /**

@@ -81,7 +81,7 @@ describe('Topic Manager User Journey', function () {
       await topicManager.publishUpdatedSkill('Updated everything');
       await topicManager.openSkillEditor('Double Digit Addition');
 
-      await topicManager.verifyWorkedExamplePresent('Add 2 and 3', false);
+      await topicManager.verifyWorkedExamplePresence('Add 2 and 3', false);
       await topicManager.verifyMisconceptionPresent(
         'Addition Misconception',
         false
