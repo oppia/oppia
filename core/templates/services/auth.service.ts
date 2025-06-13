@@ -127,7 +127,14 @@ export class AuthService {
       console.error('Unable to fetch firebase config : ', e);
     }
     if (config === '') {
-      return null;
+      return {
+        apiKey: AppConstants.FIREBASE_CONFIG_API_KEY,
+        authDomain: AppConstants.FIREBASE_CONFIG_AUTH_DOMAIN,
+        projectId: AppConstants.FIREBASE_CONFIG_PROJECT_ID,
+        storageBucket: AppConstants.FIREBASE_CONFIG_STORAGE_BUCKET,
+        messagingSenderId: AppConstants.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
+        appId: AppConstants.FIREBASE_CONFIG_APP_ID,
+      } as const;
     } else {
       return JSON.parse(config);
     }
