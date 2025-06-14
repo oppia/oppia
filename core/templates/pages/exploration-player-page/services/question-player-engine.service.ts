@@ -44,8 +44,8 @@ import cloneDeep from 'lodash/cloneDeep';
 export class QuestionPlayerEngineService {
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
-  private currentIndex: number = 0;
-  private nextIndex: number = 0;
+  private currentIndex: number = null;
+  private nextIndex: number = null;
 
   constructor(
     private alertsService: AlertsService,
@@ -62,9 +62,7 @@ export class QuestionPlayerEngineService {
     feedbackHtml: string,
     envs: Record<string, string>[]
   ): string {
-    return (
-      this.expressionInterpolationService.processHtml(feedbackHtml, envs) || ''
-    );
+    return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
   }
 
   // Evaluate question string.
@@ -72,11 +70,9 @@ export class QuestionPlayerEngineService {
     newState: State,
     envs: Record<string, string>[]
   ): string {
-    return (
-      this.expressionInterpolationService.processHtml(
-        newState.content.html,
-        envs
-      ) || ''
+    return this.expressionInterpolationService.processHtml(
+      newState.content.html,
+      envs
     );
   }
 
@@ -101,18 +97,12 @@ export class QuestionPlayerEngineService {
   ): void {
     this.contextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.QUESTION,
-      this.questions[0].getId() || ''
+      this.questions[0].getId()
     );
-    const initialState = this.questions[0]?.getStateData();
-
-    if (!initialState) {
-      this.alertsService.addWarning('Initial state is null.');
-      errorCallback();
-      return;
-    }
+    const initialState = this.questions[0].getStateData();
 
     const questionHtml = this.makeQuestion(initialState, []);
-    if (questionHtml === '') {
+    if (questionHtml === null) {
       this.alertsService.addWarning('Question name should not be empty.');
       errorCallback();
       return;
@@ -137,11 +127,11 @@ export class QuestionPlayerEngineService {
       );
     }
     const initialCard = StateCard.createNewCard(
-      '',
+      null,
       questionHtml,
-      interactionHtml || '',
+      interactionHtml,
       interaction,
-      initialState.content.contentId || ''
+      initialState.content.contentId
     );
     successCallback(initialCard, nextFocusLabel);
   }
@@ -150,20 +140,12 @@ export class QuestionPlayerEngineService {
     return this.questions[this.currentIndex].getStateData();
   }
 
-  private getNextStateData(): State {
-    if (this.nextIndex === null) {
-      throw new Error('nextIndex is null');
-    }
+  private getNextStateData() {
     return this.questions[this.nextIndex].getStateData();
   }
 
   private getNextInteractionHtml(labelForFocusTarget: string): string {
-    const interactionId = this.getNextStateData()?.interaction?.id || '';
-
-    if (!interactionId) {
-      this.alertsService.addWarning('Interaction ID is null.');
-      return '';
-    }
+    const interactionId = this.getNextStateData().interaction.id;
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
       this.getNextStateData().interaction.customizationArgs,
@@ -176,7 +158,7 @@ export class QuestionPlayerEngineService {
   init(
     questionObjects: Question[],
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-    errorCallback: () => void
+    errorCallback?: () => void
   ): void {
     this.contextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
@@ -224,7 +206,7 @@ export class QuestionPlayerEngineService {
   }
 
   getCurrentQuestionId(): string {
-    return this.questions[this.currentIndex].getId() || '';
+    return this.questions[this.currentIndex].getId();
   }
 
   getQuestionCount(): number {
@@ -259,30 +241,30 @@ export class QuestionPlayerEngineService {
     answer: InteractionAnswer,
     interactionRulesService: InteractionRulesService,
     successCallback: (
-      nextCard: StateCard | null,
+      nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      refresherExplorationId: string | null,
-      missingPrerequisiteSkillId: string | null,
+      refresherExplorationId,
+      missingPrerequisiteSkillId,
       remainOnCurrentCard: boolean,
-      taggedSkillMisconceptionId: string | null,
-      wasOldStateInitial: boolean | null,
-      isFirstHit: boolean | null,
+      taggedSkillMisconceptionId: string,
+      wasOldStateInitial,
+      isFirstHit,
       isFinalQuestion: boolean,
       nextCardIfReallyStuck: null,
       focusLabel: string
     ) => void
   ): boolean {
     if (this.answerIsBeingProcessed) {
-      return false;
+      return;
     }
 
-    const answerString = (answer as string) || '';
+    const answerString = answer as string;
     this.setAnswerIsBeingProcessed(true);
     const oldState = this.getCurrentStateData();
     const classificationResult =
       this.answerClassificationService.getMatchingClassificationResult(
-        '',
+        null,
         oldState.interaction,
         answer,
         interactionRulesService
@@ -304,13 +286,11 @@ export class QuestionPlayerEngineService {
     const oldParams = {
       answer: answerString,
     };
-    const feedbackHtml = this.makeFeedback(outcome.feedback.html || '', [
-      oldParams,
-    ]);
-    if (feedbackHtml === '') {
+    const feedbackHtml = this.makeFeedback(outcome.feedback.html, [oldParams]);
+    if (feedbackHtml === null) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Feedback content should not be empty.');
-      return false;
+      return;
     }
 
     let newState = null;
@@ -326,20 +306,18 @@ export class QuestionPlayerEngineService {
         answer: 'answer',
       },
     ]);
-    if (questionHtml === '') {
+    if (questionHtml === null) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Question name should not be empty.');
-      return false;
+      return;
     }
     this.setAnswerIsBeingProcessed(false);
 
     const interactionId = oldState.interaction.id;
     const interactionIsInline =
       !interactionId ||
-      (interactionId in InteractionSpecsConstants.INTERACTION_SPECS &&
-        InteractionSpecsConstants.INTERACTION_SPECS[
-          interactionId as keyof typeof InteractionSpecsConstants.INTERACTION_SPECS
-        ].display_mode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
+      InteractionSpecsConstants.INTERACTION_SPECS[interactionId]
+        .display_mode === AppConstants.INTERACTION_DISPLAY_MODE_INLINE;
     const refreshInteraction = answerIsCorrect || interactionIsInline;
 
     this.nextIndex = this.currentIndex + 1;
@@ -347,7 +325,7 @@ export class QuestionPlayerEngineService {
     const onSameCard = !answerIsCorrect;
 
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
-    let nextCard: StateCard | null = null;
+    let nextCard = null;
     let nextCardIfReallyStuck = null;
     if (!isFinalQuestion) {
       let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
@@ -359,7 +337,7 @@ export class QuestionPlayerEngineService {
         questionHtml,
         nextInteractionHtml,
         this.getNextStateData().interaction,
-        this.getNextStateData().content.contentId || ''
+        this.getNextStateData().content.contentId
       );
     }
     successCallback(
