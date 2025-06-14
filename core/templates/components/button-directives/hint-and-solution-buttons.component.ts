@@ -164,7 +164,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
 
   displaySolutionModal(): void {
     this.solutionModalIsActive = true;
-    let inQuestionMode = this.explorationPlayerStateService.isInQuestionMode();
+    let inQuestionMode = this.exploratioModeService.isInQuestionPlayerMode();
     if (!this._editorPreviewMode && !inQuestionMode) {
       this.statsReportingService.recordSolutionHit(
         this.playerPositionService.getCurrentStateName()

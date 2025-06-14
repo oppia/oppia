@@ -29,6 +29,7 @@ import {PlayerTranscriptService} from './player-transcript.service';
   providedIn: 'root',
 })
 export class ConversationFlowService {
+
   constructor(
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private contentTranslationManagerService: ContentTranslationManagerService,
@@ -51,5 +52,9 @@ export class ConversationFlowService {
 
   isSupplementalCardNonempty(card: StateCard): boolean {
     return !card.isInteractionInline();
+  }
+
+  recordNewCardAdded(): void {
+    return this.currentEngineService.recordNewCardAdded();
   }
 }

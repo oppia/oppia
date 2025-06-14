@@ -183,7 +183,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     if (
       newStateName === this.currentStateName ||
       newStateName === this.mostRecentlyReachedCheckpointStateName ||
-      !this.explorationPlayerStateService.isInStoryChapterMode()
+      !this.exploratioModeService.isInStoryChapterMode()
     ) {
       return;
     }

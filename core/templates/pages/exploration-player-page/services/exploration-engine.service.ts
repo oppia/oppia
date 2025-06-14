@@ -313,6 +313,155 @@ export class ExplorationEngineService {
     successCallback(initialCard, nextFocusLabel);
   }
 
+  initializePlayer(
+    callback: (stateCard: StateCard, str: string) => void
+  ): void {
+    this.playerTranscriptService.init();
+    if (this.editorPreviewMode) {
+      this.initExplorationPreviewPlayer(callback);
+    } else {
+      this.initExplorationPlayer(callback);
+    }
+  }
+
+  private initExplorationPreviewPlayer(
+    callback: (sateCard: StateCard, str: string) => void
+  ): void {
+    this.setExplorationMode();
+    Promise.all([
+      this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
+        this.explorationId
+      ),
+      this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
+        this.explorationId
+      ),
+    ]).then(combinedData => {
+      let explorationData = combinedData[0];
+      let featuresData: ExplorationFeatures = combinedData[1];
+
+      this.explorationFeaturesService.init(
+        {
+          param_changes: explorationData.param_changes,
+          states: explorationData.states,
+        },
+        featuresData
+      );
+      this.explorationEngineService.init(
+        explorationData,
+        null,
+        null,
+        null,
+        null,
+        [],
+        callback
+      );
+      this.numberAttemptsService.reset();
+    });
+  }
+
+  private initExplorationPlayer(
+    callback: (stateCard: StateCard, str: string) => void
+  ): void {
+    let explorationDataPromise = this.version
+      ? this.readOnlyExplorationBackendApiService.loadExplorationAsync(
+          this.explorationId,
+          this.version
+        )
+      : this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
+          this.explorationId
+        );
+    Promise.all([
+      explorationDataPromise,
+      this.pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
+        this.explorationId,
+        this.storyUrlFragment
+      ),
+      this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
+        this.explorationId
+      ),
+    ]).then(combinedData => {
+      let explorationData: FetchExplorationBackendResponse = combinedData[0];
+      let pretestQuestionsData = combinedData[1];
+      let featuresData = combinedData[2];
+      this.explorationFeaturesService.init(
+        {
+          ...explorationData.exploration,
+        },
+        featuresData
+      );
+      if (pretestQuestionsData.length > 0) {
+        this.setPretestMode();
+        this.initializeExplorationServices(explorationData, true, callback);
+        this.initializePretestServices(pretestQuestionsData, callback);
+      } else if (
+        this.urlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
+        this.urlService.getUrlParams().hasOwnProperty('node_id')
+      ) {
+        this.setStoryChapterMode();
+        this.initializeExplorationServices(explorationData, false, callback);
+      } else {
+        this.setExplorationMode();
+        this.initializeExplorationServices(explorationData, false, callback);
+      }
+    });
+  }
+
+  private initializeExplorationServices(
+    returnDict: FetchExplorationBackendResponse,
+    arePretestsAvailable: boolean,
+    callback: (stateCard: StateCard, str: string) => void
+  ): void {
+    // For some cases, version is set only after
+    // ReadOnlyExplorationBackendApiService.loadExploration() has completed.
+    // Use returnDict.version for non-null version value.
+    this.statsReportingService.initSession(
+      this.explorationId,
+      returnDict.exploration.title,
+      returnDict.version,
+      returnDict.session_id,
+      this.urlService.getCollectionIdFromExplorationUrl()
+    );
+    this.playthroughService.initSession(
+      this.explorationId,
+      returnDict.version,
+      returnDict.record_playthrough_probability
+    );
+    this.explorationEngineService.init(
+      {
+        auto_tts_enabled: returnDict.auto_tts_enabled,
+        draft_changes: [],
+        is_version_of_draft_valid: true,
+        init_state_name: returnDict.exploration.init_state_name,
+        param_changes: returnDict.exploration.param_changes,
+        param_specs: returnDict.exploration.param_specs,
+        states: returnDict.exploration.states,
+        title: returnDict.exploration.title,
+        draft_change_list_id: returnDict.draft_change_list_id,
+        language_code: returnDict.exploration.language_code,
+        version: returnDict.version,
+        next_content_id_index: returnDict.exploration.next_content_id_index,
+        exploration_metadata: returnDict.exploration_metadata,
+      },
+      returnDict.version,
+      returnDict.preferred_audio_language_code,
+      returnDict.auto_tts_enabled,
+      returnDict.preferred_language_codes,
+      returnDict.displayable_language_codes,
+      arePretestsAvailable ? () => {} : callback
+    );
+  }
+
+  private initializePretestServices(
+    pretestQuestionObjects: Question[],
+    callback: (initialCard: StateCard, nextFocusLabel: string) => void
+  ): void {
+    this.questionPlayerEngineService.init(
+      pretestQuestionObjects,
+      callback,
+      () => {}
+    );
+  }
+
   // Initialize the parameters in the exploration as specified in the
   // exploration-level initial parameter changes list, followed by any
   // manual parameter changes (in editor preview mode).
@@ -436,6 +585,14 @@ export class ExplorationEngineService {
   }
 
   moveToExploration(successCallback: (StateCard, string) => void): void {
+    if (
+      this.urlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
+      this.urlService.getUrlParams().hasOwnProperty('node_id')
+    ) {
+      this.setStoryChapterMode();
+    } else {
+      this.setExplorationMode();
+    }
     this._loadInitialState(successCallback);
   }
 

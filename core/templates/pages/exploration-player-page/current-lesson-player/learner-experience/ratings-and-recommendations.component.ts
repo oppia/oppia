@@ -107,7 +107,7 @@ export class RatingsAndRecommendationsComponent {
 
   ngOnInit(): void {
     this.inStoryMode =
-      this.explorationPlayerStateService.isInStoryChapterMode();
+      this.exploratioModeService.isInStoryChapterMode();
     if (this.inStoryMode) {
       let topicUrlFragment = this.urlService.getUrlParams().topic_url_fragment;
       let storyUrlFragment = this.urlService.getUrlParams().story_url_fragment;

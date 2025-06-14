@@ -28,7 +28,6 @@ import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-ap
 import {ContextService} from 'services/context.service';
 import {CurrentInteractionService} from '../../services/current-interaction.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
 import {ExplorationRecommendationsService} from '../../services/exploration-recommendations.service';
 import {FatigueDetectionService} from '../../services/fatigue-detection.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -82,6 +81,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
+import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
+import { ExplorationModeService } from 'pages/exploration-player-page/services/exploration-mode.service';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -190,9 +191,9 @@ export class ConversationSkinComponent {
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
     private explorationEngineService: ExplorationEngineService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
     private explorationRecommendationsService: ExplorationRecommendationsService,
     private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
+    private exploratioModeService: ExplorationModeService,
     private fatigueDetectionService: FatigueDetectionService,
     private focusManagerService: FocusManagerService,
     private guestCollectionProgressService: GuestCollectionProgressService,
@@ -218,6 +219,7 @@ export class ConversationSkinComponent {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private userService: UserService,
+    private diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService,
     private windowDimensionsService: WindowDimensionsService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
@@ -275,7 +277,7 @@ export class ConversationSkinComponent {
         '/avatar/oppia_avatar_100px.svg'
       );
 
-    if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+    if (this.exploratioModeService.isInQuestionPlayerMode()) {
       this.directiveSubscriptions.add(
         this.hintsAndSolutionManagerService.onHintConsumed.subscribe(() => {
           this.questionPlayerStateService.hintUsed(
@@ -346,7 +348,7 @@ export class ConversationSkinComponent {
           // the end of the exploration.
           if (!this._editorPreviewMode && this.nextCard.isTerminal()) {
             const currentEngineService =
-              this.explorationPlayerStateService.getCurrentEngineService();
+              this.conversationFlowService.getCurrentEngineService();
             this.statsReportingService.recordExplorationCompleted(
               newStateName,
               this.learnerParamsService.getAllParams(),
@@ -398,7 +400,7 @@ export class ConversationSkinComponent {
           this.hasInteractedAtLeastOnce &&
           !this.isInPreviewMode &&
           !this.displayedCard.isTerminal() &&
-          !this.explorationPlayerStateService.isInQuestionMode()
+          !this.exploratioModeService.isInQuestionPlayerMode()
         ) {
           this.statsReportingService.recordMaybeLeaveEvent(
             this.playerTranscriptService.getLastStateName(),
@@ -455,8 +457,8 @@ export class ConversationSkinComponent {
       if (
         !this.isIframed &&
         !this._editorPreviewMode &&
-        !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
-        !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+        !this.exploratioModeService.isInQuestionPlayerMode() &&
+        !this.exploratioModeService.isInDiagnosticTestPlayerMode()
       ) {
         // For the first state which is always a checkpoint.
         let firstStateName: string;
@@ -576,7 +578,7 @@ export class ConversationSkinComponent {
   isLearnAgainButton(): boolean {
     let conceptCardIsBeingShown =
       this.displayedCard.getStateName() === null &&
-      !this.explorationPlayerStateService.isInQuestionMode();
+      !this.exploratioModeService.isInQuestionPlayerMode();
     if (conceptCardIsBeingShown) {
       return false;
     }
@@ -748,7 +750,7 @@ export class ConversationSkinComponent {
   isSupplementalNavShown(): boolean {
     if (
       this.displayedCard.getStateName() === null &&
-      !this.explorationPlayerStateService.isInQuestionMode()
+      !this.exploratioModeService.isInQuestionPlayerMode()
     ) {
       return false;
     }
@@ -848,8 +850,8 @@ export class ConversationSkinComponent {
       index > 0 &&
       !this.isIframed &&
       !this._editorPreviewMode &&
-      !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
-      !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+      !this.exploratioModeService.isInQuestionPlayerMode() &&
+      !this.exploratioModeService.isInDiagnosticTestPlayerMode()
     ) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
@@ -964,7 +966,7 @@ export class ConversationSkinComponent {
         includeAutogeneratedRecommendations = true;
       }
 
-      if (this.explorationPlayerStateService.isInStoryChapterMode()) {
+      if (this.exploratioModeService.isInStoryChapterMode()) {
         recommendedExplorationIds = [];
         includeAutogeneratedRecommendations = false;
         let topicUrlFragment =
@@ -1128,7 +1130,7 @@ export class ConversationSkinComponent {
   private _initializeDirectiveComponents(initialCard, focusLabel): void {
     this._addNewCard(initialCard);
     this.nextCard = initialCard;
-    if (!this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()) {
+    if (!this.exploratioModeService.isInDiagnosticTestPlayerMode()) {
       this.explorationPlayerStateService.onPlayerStateChange.emit(
         this.nextCard.getStateName()
       );
@@ -1140,8 +1142,8 @@ export class ConversationSkinComponent {
     if (
       !this.isIframed &&
       !this._editorPreviewMode &&
-      !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
-      !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+      !this.exploratioModeService.isInQuestionPlayerMode() &&
+      !this.exploratioModeService.isInDiagnosticTestPlayerMode()
     ) {
       // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();
@@ -1176,7 +1178,7 @@ export class ConversationSkinComponent {
   }
 
   skipCurrentQuestion(): void {
-    this.explorationPlayerStateService.skipCurrentQuestion(nextCard => {
+    this.diagnosticTestPlayerEngineService.skipCurrentQuestion(nextCard => {
       this.nextCard = nextCard;
       this.showPendingCard();
     });
@@ -1187,18 +1189,18 @@ export class ConversationSkinComponent {
     this.recommendedExplorationSummaries = [];
     this.playerPositionService.init(this._navigateToDisplayedCard.bind(this));
     if (this.questionPlayerConfig) {
-      this.explorationPlayerStateService.initializeQuestionPlayer(
+      this.questionPlayerEngineService.initQuestionPlayer(
         this.questionPlayerConfig,
         this._initializeDirectiveComponents.bind(this),
         this.showQuestionAreNotAvailable
       );
     } else if (this.diagnosticTestTopicTrackerModel) {
-      this.explorationPlayerStateService.initializeDiagnosticPlayer(
+      this.diagnosticTestPlayerEngineService.init(
         this.diagnosticTestTopicTrackerModel,
         this._initializeDirectiveComponents.bind(this)
       );
     } else {
-      this.explorationPlayerStateService.initializePlayer(
+      this.explorationEngineService.initializePlayer(
         this._initializeDirectiveComponents.bind(this)
       );
     }
@@ -1230,7 +1232,7 @@ export class ConversationSkinComponent {
 
     if (
       !this.isInPreviewMode &&
-      !this.explorationPlayerStateService.isPresentingIsolatedQuestions() &&
+      !this.exploratioModeService.isPresentingIsolatedQuestions() &&
       AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE
     ) {
       this.initLearnerAnswerInfoService(
@@ -1267,7 +1269,7 @@ export class ConversationSkinComponent {
     let timeAtServerCall = new Date().getTime();
     this.playerPositionService.recordAnswerSubmission();
     let currentEngineService =
-      this.explorationPlayerStateService.getCurrentEngineService();
+      this.conversationFlowService.getCurrentEngineService();
     this.answerIsCorrect = currentEngineService.submitAnswer(
       answer,
       interactionRulesService,
@@ -1289,7 +1291,7 @@ export class ConversationSkinComponent {
         this.nextCardIfStuck = nextCardIfReallyStuck;
         if (
           !this._editorPreviewMode &&
-          !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
+          !this.exploratioModeService.isPresentingIsolatedQuestions()
         ) {
           let oldStateName = this.playerPositionService.getCurrentStateName();
           if (!remainOnCurrentCard) {
@@ -1322,13 +1324,13 @@ export class ConversationSkinComponent {
         }
 
         if (
-          !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
+          !this.exploratioModeService.isPresentingIsolatedQuestions()
         ) {
           this.explorationPlayerStateService.onPlayerStateChange.emit(
             nextCard.getStateName()
           );
         } else if (
-          this.explorationPlayerStateService.isInQuestionPlayerMode()
+          this.exploratioModeService.isInQuestionPlayerMode()
         ) {
           this.questionPlayerStateService.answerSubmitted(
             this.questionPlayerEngineService.getCurrentQuestion(),
@@ -1343,7 +1345,7 @@ export class ConversationSkinComponent {
           // already a delay bringing in the help card.
           millisecsLeftToWait = 1.0;
         } else if (
-          this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+          this.exploratioModeService.isInDiagnosticTestPlayerMode()
         ) {
           // Do not wait if the player mode is the diagnostic test. Since no
           // feedback will be presented after attempting a question so delaying
@@ -1472,7 +1474,7 @@ export class ConversationSkinComponent {
     this.pendingCardWasSeenBefore = false;
     this.displayedCard.markAsCompleted();
     if (isFinalQuestion) {
-      if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+      if (this.exploratioModeService.isInQuestionPlayerMode()) {
         // We will redirect to the results page here.
         this.questionSessionCompleted = true;
       }
@@ -1534,7 +1536,7 @@ export class ConversationSkinComponent {
 
   showPendingCard(): void {
     this.startCardChangeAnimation = true;
-    this.explorationPlayerStateService.recordNewCardAdded();
+    this.conversationFlowService.recordNewCardAdded();
 
     setTimeout(
       () => {
@@ -1571,7 +1573,7 @@ export class ConversationSkinComponent {
     let currentIndex = this.playerPositionService.getDisplayedCardIndex();
     let conceptCardIsBeingShown =
       this.displayedCard.getStateName() === null &&
-      !this.explorationPlayerStateService.isInQuestionMode();
+      !this.exploratioModeService.isInQuestionPlayerMode();
     if (
       conceptCardIsBeingShown &&
       this.playerTranscriptService.isLastCard(currentIndex)
@@ -1597,7 +1599,7 @@ export class ConversationSkinComponent {
       this.nextCard.getStateName() === this.displayedCard.getStateName() &&
       this.conceptCard
     ) {
-      this.explorationPlayerStateService.recordNewCardAdded();
+      this.conversationFlowService.recordNewCardAdded();
       this._addNewCard(
         StateCard.createNewCard(
           null,

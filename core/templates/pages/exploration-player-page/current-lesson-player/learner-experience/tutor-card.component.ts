@@ -474,7 +474,7 @@ export class TutorCardComponent {
 
   showAudioBar(): boolean {
     return (
-      !this.isIframed && !this.explorationPlayerStateService.isInQuestionMode()
+      !this.isIframed && !this.exploratioModeService.isInQuestionPlayerMode()
     );
   }
 
