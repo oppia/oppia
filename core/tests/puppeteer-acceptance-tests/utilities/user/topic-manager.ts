@@ -520,6 +520,12 @@ export class TopicManager extends BaseUser {
       }
       await this.page.waitForSelector(topicStatusDropdownSelector);
       await this.selectOption(topicStatusDropdownSelector, status);
+
+      await this.expectTextContentToMatch(
+        `${topicStatusDropdownSelector} .mat-select-value-text`,
+        status
+      );
+      showMessage(`Filtered topics by status: ${status}`);
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
@@ -527,12 +533,6 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
-
-    await this.expectTextContentToMatch(
-      `${topicStatusDropdownSelector} .mat-select-value-text`,
-      status
-    );
-    showMessage(`Filtered topics by status: ${status}`);
   }
 
   /**
@@ -547,6 +547,11 @@ export class TopicManager extends BaseUser {
       }
       await this.page.waitForSelector(classroomDropdownSelector);
       await this.selectOption(classroomDropdownSelector, classroom);
+
+      await this.expectTextContentToMatch(
+        `${classroomDropdownSelector} .mat-select-min-line`,
+        classroom
+      );
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
@@ -555,11 +560,6 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
-
-    await this.expectTextContentToMatch(
-      `${classroomDropdownSelector} .mat-select-min-line`,
-      classroom
-    );
   }
 
   /**
@@ -577,21 +577,20 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(multiSelectionInputSelector);
       await this.type(multiSelectionInputSelector, keyword);
       await this.page.keyboard.press('Enter');
+      await this.expectTextContentToMatch(
+        `${multiSelectionInputChipSelector}`,
+        // We are checking multi-selection-field components and it has cancel
+        // icon (text) within the chip element, so we need to add cancel.
+        `${keyword} cancel`
+      );
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
+      showMessage(`Filtered topics by keyword: ${keyword}`);
     } catch (error) {
       console.error(error.stack);
       throw error;
     }
-
-    await this.expectTextContentToMatch(
-      `${multiSelectionInputChipSelector}`,
-      // We are checking multi-selection-field components and it has cancel
-      // icon (text) within the chip element, so we need to add cancel.
-      `${keyword} cancel`
-    );
-    showMessage(`Filtered topics by keyword: ${keyword}`);
   }
 
   /**
@@ -606,6 +605,10 @@ export class TopicManager extends BaseUser {
       }
       await this.page.waitForSelector(sortDropdownSelector);
       await this.selectOption(sortDropdownSelector, sortOption);
+      await this.expectTextContentToMatch(
+        `${sortDropdownSelector} .mat-select-value-text`,
+        sortOption
+      );
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
@@ -614,11 +617,6 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
-
-    await this.expectTextContentToMatch(
-      `${sortDropdownSelector} .mat-select-value-text`,
-      sortOption
-    );
   }
 
   /**
@@ -1356,19 +1354,18 @@ export class TopicManager extends BaseUser {
       }
       await this.page.waitForSelector(skillStatusDropdownSelector);
       await this.selectOption(skillStatusDropdownSelector, status);
+      await this.expectTextContentToMatch(
+        `${skillStatusDropdownSelector} .mat-select-value-text`,
+        status
+      );
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
+      showMessage(`Filtered skill by status: ${status}`);
     } catch (error) {
       console.error(error.stack);
       throw error;
     }
-
-    await this.expectTextContentToMatch(
-      `${skillStatusDropdownSelector} .mat-select-value-text`,
-      status
-    );
-    showMessage(`Filtered skill by status: ${status}`);
   }
 
   /**
@@ -1387,21 +1384,21 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(multiSelectionInputSelector);
       await this.type(multiSelectionInputSelector, keyword);
       await this.page.keyboard.press('Enter');
+      await this.expectTextContentToMatch(
+        `${multiSelectionInputChipSelector}`,
+        // We are checking multi-selection-field components and it has cancel
+        // icon (text) within the chip element, so we need to add cancel.
+        `${keyword} cancel`
+      );
+
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
+      showMessage(`Filtered skills by keyword: ${keyword}`);
     } catch (error) {
       console.error(error.stack);
       throw error;
     }
-
-    await this.expectTextContentToMatch(
-      `${multiSelectionInputChipSelector}`,
-      // We are checking multi-selection-field components and it has cancel
-      // icon (text) within the chip element, so we need to add cancel.
-      `${keyword} cancel`
-    );
-    showMessage(`Filtered skills by keyword: ${keyword}`);
   }
 
   /**
@@ -1417,6 +1414,10 @@ export class TopicManager extends BaseUser {
       }
       await this.page.waitForSelector(sortDropdownSelector);
       await this.selectOption(sortDropdownSelector, sortOption);
+      await this.expectTextContentToMatch(
+        `${sortDropdownSelector} .mat-select-value-text`,
+        sortOption
+      );
       if (this.isViewportAtMobileWidth()) {
         await this.clickOn(closeMobileFiltersButton);
       }
@@ -1425,11 +1426,6 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
-
-    await this.expectTextContentToMatch(
-      `${sortDropdownSelector} .mat-select-value-text`,
-      sortOption
-    );
   }
 
   /**
