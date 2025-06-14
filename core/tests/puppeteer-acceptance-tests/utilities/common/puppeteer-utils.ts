@@ -935,6 +935,22 @@ export class BaseUser {
       );
     }
   }
+
+  /**
+   * Checks if element is clickable or not.
+   */
+  async expectElementToBeClickable(
+    selector: string,
+    clickable: boolean = true
+  ): Promise<void> {
+    const element = await this.page.$(selector);
+    const isClickable = this.page.waitForFunction(
+      isElementClickable,
+      {},
+      element,
+      clickable
+    );
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();
