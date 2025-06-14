@@ -35,11 +35,18 @@ This issue includes:
 To test the **New Lesson Player**, follow these steps:
 
 1. ✅ **Enable** the `new_lesson_player` flag from the **Release Coordinator** page.
-2. ▶️ **Open any lesson** in the player.
-3. 🌐 **Change the URL** from `/explore` to `/lesson`.
-   - **Example:**  
-     Change `http://localhost:8081/explore/6`  
-     to `http://localhost:8081/lesson/6`
+2. ▶️ **Open any lesson** using one of the following methods:
+
+   - 📄 **Manually change the URL** from `/explore` to `/lesson`
+     - **Example:**  
+       Change `http://localhost:8081/explore/6`  
+       to `http://localhost:8081/lesson/6`
+   - 📘 **Click on a lesson card** or navigate via the regular UI
+
+3. 🔁 **All `/explore/:id` links will automatically redirect** to `/lesson/:id` when the feature flag is enabled.
+   - This ensures you don't need to manually adjust URLs during normal navigation.
+
+> 💡 Whether you arrive via URL or UI, you'll be routed to the new lesson player if the flag is on.
 
 ---
 
@@ -65,3 +72,29 @@ To test the **New Lesson Player**, follow these steps:
 
 3. `/lesson-header`  
    Contains logic and components required for displaying and managing the **lesson header** information.
+
+---
+
+## 🔄 How Is `conversation-skin` Different from `conversation-display`?
+
+The `conversation-skin-components` folder contains the **entire set of components** that make up the **lesson-playing interface**. This includes not just the learner's interaction area but also supporting UI elements like:
+
+- 🎧 **Audiobar**
+- 🧭 **Navigation controls**
+- 📈 **Progress tracker**
+- 💡 **Hints, solutions, and concept cards**
+
+It serves as the **outer shell** that orchestrates the full learner experience.
+
+On the other hand, the `conversation-display` sub-directory is focused **only** on rendering and managing the **core dialogue experience**, including:
+
+- 🗣️ **Question and prompt display**
+- ✍️ **Learner input**
+- 💬 **Feedback and response handling**
+
+> 🧩 **In summary:**  
+> `conversation-skin` = full UI shell for the lesson player  
+> `conversation-display` = core dialogue and response interface
+
+📄 For a visual breakdown, refer to this diagram:  
+ [Conversation Skin Architecture Diagram](https://docs.google.com/document/d/1bSxUBZQjlZ1fiMQwKhgVBiQSmDCPhE8xjoGP0ZouY4c/edit?tab=t.0#bookmark=kix.oyxsgpve86wj)
