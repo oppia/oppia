@@ -1448,7 +1448,6 @@ describe('Conversation skin component', () => {
       ).and.returnValue(false);
       spyOn(componentInstance, 'adjustPageHeight');
       spyOn(playerPositionService.onNewCardOpened, 'emit');
-      componentInstance.isIframed = true;
       spyOn(playerPositionService, 'setDisplayedCardIndex');
       spyOn(playerPositionService, 'getCurrentStateName').and.returnValues(
         'Start',
@@ -1460,6 +1459,8 @@ describe('Conversation skin component', () => {
         readOnlyExplorationBackendApiService,
         'loadLatestExplorationAsync'
       ).and.returnValue(Promise.resolve(expResponse));
+      componentInstance.prevSessionStatesProgress = ['Start', 'Mid'];
+      componentInstance.visitedCheckpointStateNames = ['Start'];
       spyOn(explorationEngineService, 'getShortestPathToState').and.returnValue(
         ['Start', 'Mid']
       );
@@ -1468,10 +1469,26 @@ describe('Conversation skin component', () => {
         stateCards[1],
         stateCards[2]
       );
-      spyOn(explorationEngineService, 'getStateFromStateName').and.returnValues(
-        expResponse.exploration.states.Start,
-        expResponse.exploration.states.Mid,
-        expResponse.exploration.states.End
+
+      spyOn(explorationEngineService, 'getStateFromStateName').and.callFake(
+        stateName => {
+          if (stateName === 'Mid') {
+            return {
+              cardIsCheckpoint: true,
+              ...expResponse.exploration.states.Mid,
+            };
+          } else if (stateName === 'Start') {
+            return {
+              cardIsCheckpoint: true,
+              ...expResponse.exploration.states.Start,
+            };
+          } else if (stateName === 'End') {
+            return {
+              cardIsCheckpoint: false,
+              ...expResponse.exploration.states.End,
+            };
+          }
+        }
       );
 
       spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
@@ -1494,6 +1511,7 @@ describe('Conversation skin component', () => {
       componentInstance.initializePage();
       tick(100);
 
+      expect(componentInstance.visitedCheckpointStateNames).toContain('Mid');
       expect(componentInstance.prevSessionStatesProgress).toEqual(['Start']);
       expect(componentInstance.mostRecentlyReachedCheckpoint).toBe('Mid');
     })
