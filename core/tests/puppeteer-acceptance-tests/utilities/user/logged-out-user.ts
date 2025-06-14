@@ -619,7 +619,7 @@ export class LoggedOutUser extends BaseUser {
     const url = new URL(this.page.url());
     const queryParam = url.searchParams.get('q');
 
-    if (queryParam != keyword) {
+    if (queryParam !== keyword) {
       throw new Error(
         `Query Parameter doesn't match. Expected ${keyword}, but found ${queryParam}`
       );
@@ -664,11 +664,10 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
 
-    // TODO: Verify post check
     const url = new URL(this.page.url());
     const queryParam = url.searchParams.get('tags');
 
-    if (queryParam != `("${tagName}")`) {
+    if (queryParam !== `("${tagName}")`) {
       throw new Error(
         `Query Parameter doesn't match. Expected ${tagName}, but found ${queryParam}`
       );
@@ -730,7 +729,6 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(blogPaginationNextSelector);
     await this.waitForNetworkIdle();
 
-    // TODO: Verify Post check
     const newFirstPostTitle = await this.page.$eval(
       blogPostTitleSelector,
       el => el.textContent
@@ -757,7 +755,6 @@ export class LoggedOutUser extends BaseUser {
     }
     await this.clickOn(blogPaginationPrevSelector);
 
-    // TODO: Verify post check
     const newFirstPostTitle = await this.page.$eval(
       blogPostTitleSelector,
       el => el.textContent
@@ -4518,12 +4515,12 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();
 
-    // Post check: check if value has changed to new code
+    // Post check: check if value has changed to new code.
     const selectedLanguageCode = await this.page.$eval(
       lessonLanguageSelector,
       el => (el as HTMLSelectElement).value
     );
-    if (selectedLanguageCode != languageCode) {
+    if (selectedLanguageCode !== languageCode) {
       throw new Error(
         `Expected language code to be ${languageCode}, but found ${selectedLanguageCode}`
       );
