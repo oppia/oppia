@@ -459,8 +459,8 @@ export class ConversationSkinComponent {
         !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
       ) {
         this.readOnlyExplorationBackendApiService
-        .loadLatestExplorationAsync(this.explorationId, this.pidInUrl)
-        .then(response => {
+          .loadLatestExplorationAsync(this.explorationId, this.pidInUrl)
+          .then(response => {
             // For the first state which is always a checkpoint.
             let expVersion: number = response.version;
             let firstStateName: string = response.exploration.init_state_name;
