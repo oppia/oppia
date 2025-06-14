@@ -458,14 +458,12 @@ export class ConversationSkinComponent {
         !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
         !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
       ) {
-        // For the first state which is always a checkpoint.
-        let firstStateName: string;
-        let expVersion: number;
         this.readOnlyExplorationBackendApiService
-          .loadLatestExplorationAsync(this.explorationId, this.pidInUrl)
-          .then(response => {
-            expVersion = response.version;
-            firstStateName = response.exploration.init_state_name;
+        .loadLatestExplorationAsync(this.explorationId, this.pidInUrl)
+        .then(response => {
+            // For the first state which is always a checkpoint.
+            let expVersion: number = response.version;
+            let firstStateName: string = response.exploration.init_state_name;
             this.mostRecentlyReachedCheckpoint =
               response.most_recently_reached_checkpoint_state_name;
             // If the exploration is freshly started, mark the first state

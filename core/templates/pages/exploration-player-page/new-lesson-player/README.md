@@ -6,7 +6,7 @@ This folder contains all necessary components for the proper functioning of the 
 
 ## ❓ What is the "New Lesson Player"?
 
-The **New Lesson Player** is a redesigned and modernized version of the interface that learners use to go through lessons (explorations). It aims to enhance:
+The **New Lesson Player** is a redesigned and modernized version of the interface that learners use to play lessons (explorations). It aims to enhance:
 
 - 🎯 **User experience and accessibility**
 - 📱 **Responsiveness** on mobile devices
@@ -64,4 +64,4 @@ To test the **New Lesson Player**, follow these steps:
     Contains logic and components for displaying and managing the **conversation interface**.
 
 3. `/lesson-header`  
-   Contains components and logic required to display and manage the **lesson header** information.
+   Contains logic and components required for displaying and managing the **lesson header** information.
