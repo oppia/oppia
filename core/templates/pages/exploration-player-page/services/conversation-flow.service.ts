@@ -42,13 +42,12 @@ export class ConversationFlowService {
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private playerTranscriptService: PlayerTranscriptService,
-    private explorationModeService: ExplorationModeService,
+    private explorationModeService: ExplorationModeService
   ) {}
 
   addNewCard(newCard: StateCard): void {
     this.playerTranscriptService.addNewCard(newCard);
-    const explorationLanguageCode =
-      this.getLanguageCode();
+    const explorationLanguageCode = this.getLanguageCode();
     const selectedLanguageCode =
       this.contentTranslationLanguageService.getCurrentContentLanguageCode();
     if (explorationLanguageCode !== selectedLanguageCode) {
@@ -63,12 +62,14 @@ export class ConversationFlowService {
   }
 
   recordNewCardAdded(): void {
-    let currentEngineService = this.explorationModeService.getCurrentEngineService();
+    let currentEngineService =
+      this.explorationModeService.getCurrentEngineService();
     return currentEngineService.recordNewCardAdded();
   }
 
   getLanguageCode(): string {
-    let currentEngineService = this.explorationModeService.getCurrentEngineService();
+    let currentEngineService =
+      this.explorationModeService.getCurrentEngineService();
     return currentEngineService.getLanguageCode();
   }
 

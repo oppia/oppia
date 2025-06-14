@@ -37,9 +37,9 @@ import {
   Question,
   QuestionBackendDict,
 } from 'domain/question/QuestionObjectFactory';
-import { ExplorationModeService } from './exploration-mode.service';
-import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
-import { PlayerTranscriptService } from './player-transcript.service';
+import {ExplorationModeService} from './exploration-mode.service';
+import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {PlayerTranscriptService} from './player-transcript.service';
 
 interface QuestionPlayerConfigDict {
   skillList: string[];
@@ -52,7 +52,7 @@ interface QuestionPlayerConfigDict {
 })
 export class QuestionPlayerEngineService {
   private _totalQuestionsReceivedEventEmitter: EventEmitter<number> =
-  new EventEmitter();
+    new EventEmitter();
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
   private currentIndex: number = null;
@@ -67,7 +67,7 @@ export class QuestionPlayerEngineService {
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
-    private playerTranscriptService: PlayerTranscriptService,
+    private playerTranscriptService: PlayerTranscriptService
   ) {}
 
   // Evaluate feedback.
@@ -199,22 +199,14 @@ export class QuestionPlayerEngineService {
     let questionObjects = questionDicts.map(function (questionDict) {
       return this.questionObjectFactory.createFromBackendDict(questionDict);
     }, this);
-    this.init(
-      questionObjects,
-      successCallback,
-      errorCallback
-    );
+    this.init(questionObjects, successCallback, errorCallback);
   }
 
   initializePretestServices(
     pretestQuestionObjects: Question[],
     callback: (initialCard: StateCard, nextFocusLabel: string) => void
   ): void {
-    this.init(
-      pretestQuestionObjects,
-      callback,
-      () => {}
-    );
+    this.init(pretestQuestionObjects, callback, () => {});
   }
 
   init(

@@ -222,20 +222,18 @@ export class TutorCardComponent {
       );
 
     this.directiveSubscriptions.add(
-      this.conversationFlowService.onOppiaFeedbackAvailable.subscribe(
-        () => {
-          this.waitingForOppiaFeedback = false;
+      this.conversationFlowService.onOppiaFeedbackAvailable.subscribe(() => {
+        this.waitingForOppiaFeedback = false;
 
-          // Auto scroll to the new feedback on mobile device.
-          if (this.deviceInfoService.isMobileDevice()) {
-            let latestFeedbackIndex =
-              this.displayedCard.getInputResponsePairs().length - 1;
+        // Auto scroll to the new feedback on mobile device.
+        if (this.deviceInfoService.isMobileDevice()) {
+          let latestFeedbackIndex =
+            this.displayedCard.getInputResponsePairs().length - 1;
 
-            this.windowRef.nativeWindow.location.hash =
-              this.getInputResponsePairId(latestFeedbackIndex);
-          }
+          this.windowRef.nativeWindow.location.hash =
+            this.getInputResponsePairId(latestFeedbackIndex);
         }
-      )
+      })
     );
   }
 
@@ -475,9 +473,7 @@ export class TutorCardComponent {
   }
 
   showAudioBar(): boolean {
-    return (
-      !this.isIframed && !this.explorationModeService.isInQuestionMode()
-    );
+    return !this.isIframed && !this.explorationModeService.isInQuestionMode();
   }
 
   isContentAudioTranslationAvailable(): boolean {

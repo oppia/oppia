@@ -39,7 +39,7 @@ import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {DiagnosticTestPlayerStatusService} from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import { ExplorationModeService } from './exploration-mode.service';
+import {ExplorationModeService} from './exploration-mode.service';
 
 @Injectable({
   providedIn: 'root',

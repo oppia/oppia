@@ -18,32 +18,33 @@
  */
 
 import {Injectable} from '@angular/core';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ContextService } from 'services/context.service';
-import { CheckpointProgressService } from './checkpoint-progress.service';
-import { ExplorationModeService } from './exploration-mode.service';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {ContextService} from 'services/context.service';
+import {CheckpointProgressService} from './checkpoint-progress.service';
+import {ExplorationModeService} from './exploration-mode.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProgressUrlService {
   uniqueProgressUrlId: string | null = null;
-  constructor (
-      private editableExplorationBackendApiService: EditableExplorationBackendApiService,
-      private contextService: ContextService,
-      private checkpointProgressService: CheckpointProgressService,
-      private explorationModeService: ExplorationModeService
-  ) { }
+  constructor(
+    private editableExplorationBackendApiService: EditableExplorationBackendApiService,
+    private contextService: ContextService,
+    private checkpointProgressService: CheckpointProgressService,
+    private explorationModeService: ExplorationModeService
+  ) {}
 
-/**
- * Asynchronously requests and sets a unique progress URL ID for a logged-out learner.
- * This ID helps persist progress and is fetched from the backend.
- *
- * @returns {Promise<void>} A promise that resolves when the unique progress URL ID is set.
- */
+  /**
+   * Asynchronously requests and sets a unique progress URL ID for a logged-out learner.
+   * This ID helps persist progress and is fetched from the backend.
+   *
+   * @returns {Promise<void>} A promise that resolves when the unique progress URL ID is set.
+   */
   async setUniqueProgressUrlId(): Promise<void> {
     let explorationId = this.contextService.getExplorationId();
-    let lastCompletedCheckpoint = this.checkpointProgressService.getLastCompletedCheckpoint();
+    let lastCompletedCheckpoint =
+      this.checkpointProgressService.getLastCompletedCheckpoint();
     let version = this.explorationModeService.getExplorationVersion();
     await this.editableExplorationBackendApiService
       .recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
@@ -57,10 +58,10 @@ export class ProgressUrlService {
   }
 
   /**
-* Returns the unique identifier for the progress URL.
-*
-* @returns {string} The unique progress URL ID.
-*/
+   * Returns the unique identifier for the progress URL.
+   *
+   * @returns {string} The unique progress URL ID.
+   */
   getUniqueProgressUrlId(): string {
     return this.uniqueProgressUrlId;
   }

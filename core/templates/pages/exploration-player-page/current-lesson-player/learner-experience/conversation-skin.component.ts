@@ -74,15 +74,15 @@ import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
-import { ProgressUrlService } from 'pages/exploration-player-page/services/progress-url.service';
+import {ProgressUrlService} from 'pages/exploration-player-page/services/progress-url.service';
 
 import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
-import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
-import { ExplorationModeService } from 'pages/exploration-player-page/services/exploration-mode.service';
+import {DiagnosticTestPlayerEngineService} from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -1323,15 +1323,11 @@ export class ConversationSkinComponent {
           }
         }
 
-        if (
-          !this.explorationModeService.isPresentingIsolatedQuestions()
-        ) {
+        if (!this.explorationModeService.isPresentingIsolatedQuestions()) {
           this.conversationFlowService.onPlayerStateChange.emit(
             nextCard.getStateName()
           );
-        } else if (
-          this.explorationModeService.isInQuestionPlayerMode()
-        ) {
+        } else if (this.explorationModeService.isInQuestionPlayerMode()) {
           this.questionPlayerStateService.answerSubmitted(
             this.questionPlayerEngineService.getCurrentQuestion(),
             !remainOnCurrentCard,
@@ -1344,9 +1340,7 @@ export class ConversationSkinComponent {
           // Do not wait if the interaction is supplemental -- there's
           // already a delay bringing in the help card.
           millisecsLeftToWait = 1.0;
-        } else if (
-          this.explorationModeService.isInDiagnosticTestPlayerMode()
-        ) {
+        } else if (this.explorationModeService.isInDiagnosticTestPlayerMode()) {
           // Do not wait if the player mode is the diagnostic test. Since no
           // feedback will be presented after attempting a question so delaying
           // is not required.

@@ -27,7 +27,10 @@ import {
 } from 'domain/exploration/ExplorationObjectFactory';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
-import {FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {
+  FetchExplorationBackendResponse,
+  ReadOnlyExplorationBackendApiService,
+} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
@@ -38,7 +41,10 @@ import {AlertsService} from 'services/alerts.service';
 import {ContextService} from 'services/context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {ExplorationFeatures, ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
+import {
+  ExplorationFeatures,
+  ExplorationFeaturesBackendApiService,
+} from 'services/exploration-features-backend-api.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {
@@ -58,12 +64,12 @@ import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import isEqual from 'lodash/isEqual';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ExplorationFeaturesService } from 'services/exploration-features.service';
-import { NumberAttemptsService } from './number-attempts.service';
-import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
-import { PlaythroughService } from 'services/playthrough.service';
-import { QuestionPlayerEngineService } from './question-player-engine.service';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {ExplorationFeaturesService} from 'services/exploration-features.service';
+import {NumberAttemptsService} from './number-attempts.service';
+import {PretestQuestionBackendApiService} from 'domain/question/pretest-question-backend-api.service';
+import {PlaythroughService} from 'services/playthrough.service';
+import {QuestionPlayerEngineService} from './question-player-engine.service';
 
 @Injectable({
   providedIn: 'root',
@@ -361,15 +367,7 @@ export class ExplorationEngineService {
         },
         featuresData
       );
-      this.init(
-        explorationData,
-        null,
-        null,
-        null,
-        null,
-        [],
-        callback
-      );
+      this.init(explorationData, null, null, null, null, [], callback);
       this.numberAttemptsService.reset();
     });
   }
@@ -386,7 +384,7 @@ export class ExplorationEngineService {
       : this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
           explorationId
         );
-      let storyUrlFragment = this.urlService.getStoryUrlFragmentFromLearnerUrl();
+    let storyUrlFragment = this.urlService.getStoryUrlFragmentFromLearnerUrl();
     Promise.all([
       explorationDataPromise,
       this.pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
@@ -409,7 +407,10 @@ export class ExplorationEngineService {
       if (pretestQuestionsData.length > 0) {
         this.explorationModeService.setPretestMode();
         this.initializeExplorationServices(explorationData, true, callback);
-        this.questionPlayerEngineService.initializePretestServices(pretestQuestionsData, callback);
+        this.questionPlayerEngineService.initializePretestServices(
+          pretestQuestionsData,
+          callback
+        );
       } else if (
         this.urlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
         this.urlService.getUrlParams().hasOwnProperty('node_id')

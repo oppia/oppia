@@ -17,7 +17,7 @@
  */
 
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
-import { ExplorationModeService } from 'pages/exploration-player-page/services/exploration-mode.service';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
