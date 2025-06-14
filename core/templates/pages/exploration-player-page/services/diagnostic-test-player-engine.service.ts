@@ -62,7 +62,7 @@ export class DiagnosticTestPlayerEngineService {
     private answerClassificationService: AnswerClassificationService,
     private contextService: ContextService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
-    private exploratioModeService: ExplorationModeService,
+    private explorationModeService: ExplorationModeService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
     private questionBackendApiService: QuestionBackendApiService,
@@ -76,7 +76,7 @@ export class DiagnosticTestPlayerEngineService {
     diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel,
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void
   ): void {
-    this.exploratioModeService.setDiagnosticTestPlayerMode();
+    this.explorationModeService.setDiagnosticTestPlayerMode();
     this._diagnosticTestTopicTrackerModel = diagnosticTestTopicTrackerModel;
     this._initialCopyOfTopicTrackerModel = cloneDeep(
       diagnosticTestTopicTrackerModel

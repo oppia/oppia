@@ -71,15 +71,15 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
+import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
+import { ProgressUrlService } from 'pages/exploration-player-page/services/progress-url.service';
 
 import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
-import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import { DiagnosticTestPlayerEngineService } from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import { ExplorationModeService } from 'pages/exploration-player-page/services/exploration-mode.service';
@@ -193,7 +193,7 @@ export class ConversationSkinComponent {
     private explorationEngineService: ExplorationEngineService,
     private explorationRecommendationsService: ExplorationRecommendationsService,
     private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
-    private exploratioModeService: ExplorationModeService,
+    private explorationModeService: ExplorationModeService,
     private fatigueDetectionService: FatigueDetectionService,
     private focusManagerService: FocusManagerService,
     private guestCollectionProgressService: GuestCollectionProgressService,
@@ -217,17 +217,17 @@ export class ConversationSkinComponent {
     private statsReportingService: StatsReportingService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
+    private progressUrlService: ProgressUrlService,
     private urlService: UrlService,
     private userService: UserService,
     private diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService,
     private windowDimensionsService: WindowDimensionsService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
-    private platformFeatureService: PlatformFeatureService,
+    private checkpointProgressService: CheckpointProgressService,
     private translateService: TranslateService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
     private conversationFlowService: ConversationFlowService,
-    private entityVoiceoversService: EntityVoiceoversService,
     private voiceoverPlayerService: VoiceoverPlayerService
   ) {}
 
@@ -277,7 +277,7 @@ export class ConversationSkinComponent {
         '/avatar/oppia_avatar_100px.svg'
       );
 
-    if (this.exploratioModeService.isInQuestionPlayerMode()) {
+    if (this.explorationModeService.isInQuestionPlayerMode()) {
       this.directiveSubscriptions.add(
         this.hintsAndSolutionManagerService.onHintConsumed.subscribe(() => {
           this.questionPlayerStateService.hintUsed(
@@ -298,7 +298,7 @@ export class ConversationSkinComponent {
     }
 
     this.directiveSubscriptions.add(
-      this.explorationPlayerStateService.onShowProgressModal.subscribe(() => {
+      this.conversationFlowService.onShowProgressModal.subscribe(() => {
         this.hasFullyLoaded = true;
       })
     );
@@ -335,7 +335,7 @@ export class ConversationSkinComponent {
     );
 
     this.directiveSubscriptions.add(
-      this.explorationPlayerStateService.onPlayerStateChange.subscribe(
+      this.conversationFlowService.onPlayerStateChange.subscribe(
         newStateName => {
           if (!newStateName) {
             return;
@@ -348,7 +348,7 @@ export class ConversationSkinComponent {
           // the end of the exploration.
           if (!this._editorPreviewMode && this.nextCard.isTerminal()) {
             const currentEngineService =
-              this.conversationFlowService.getCurrentEngineService();
+              this.explorationModeService.getCurrentEngineService();
             this.statsReportingService.recordExplorationCompleted(
               newStateName,
               this.learnerParamsService.getAllParams(),
@@ -400,7 +400,7 @@ export class ConversationSkinComponent {
           this.hasInteractedAtLeastOnce &&
           !this.isInPreviewMode &&
           !this.displayedCard.isTerminal() &&
-          !this.exploratioModeService.isInQuestionPlayerMode()
+          !this.explorationModeService.isInQuestionMode()
         ) {
           this.statsReportingService.recordMaybeLeaveEvent(
             this.playerTranscriptService.getLastStateName(),
@@ -457,8 +457,8 @@ export class ConversationSkinComponent {
       if (
         !this.isIframed &&
         !this._editorPreviewMode &&
-        !this.exploratioModeService.isInQuestionPlayerMode() &&
-        !this.exploratioModeService.isInDiagnosticTestPlayerMode()
+        !this.explorationModeService.isInQuestionPlayerMode() &&
+        !this.explorationModeService.isInDiagnosticTestPlayerMode()
       ) {
         // For the first state which is always a checkpoint.
         let firstStateName: string;
@@ -480,7 +480,7 @@ export class ConversationSkinComponent {
                 true
               );
             }
-            this.explorationPlayerStateService.setLastCompletedCheckpoint(
+            this.checkpointProgressService.setLastCompletedCheckpoint(
               firstStateName
             );
             this.visitedCheckpointStateNames.push(firstStateName);
@@ -578,7 +578,7 @@ export class ConversationSkinComponent {
   isLearnAgainButton(): boolean {
     let conceptCardIsBeingShown =
       this.displayedCard.getStateName() === null &&
-      !this.exploratioModeService.isInQuestionPlayerMode();
+      !this.explorationModeService.isInQuestionMode();
     if (conceptCardIsBeingShown) {
       return false;
     }
@@ -750,7 +750,7 @@ export class ConversationSkinComponent {
   isSupplementalNavShown(): boolean {
     if (
       this.displayedCard.getStateName() === null &&
-      !this.exploratioModeService.isInQuestionPlayerMode()
+      !this.explorationModeService.isInQuestionMode()
     ) {
       return false;
     }
@@ -850,8 +850,8 @@ export class ConversationSkinComponent {
       index > 0 &&
       !this.isIframed &&
       !this._editorPreviewMode &&
-      !this.exploratioModeService.isInQuestionPlayerMode() &&
-      !this.exploratioModeService.isInDiagnosticTestPlayerMode()
+      !this.explorationModeService.isInQuestionPlayerMode() &&
+      !this.explorationModeService.isInDiagnosticTestPlayerMode()
     ) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
@@ -863,7 +863,7 @@ export class ConversationSkinComponent {
         this.readOnlyExplorationBackendApiService
           .loadLatestExplorationAsync(this.explorationId)
           .then(response => {
-            this.explorationPlayerStateService.setLastCompletedCheckpoint(
+            this.checkpointProgressService.setLastCompletedCheckpoint(
               currentStateName
             );
             this.editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
@@ -871,7 +871,7 @@ export class ConversationSkinComponent {
               response.version,
               currentStateName,
               this.isLoggedIn,
-              this.explorationPlayerStateService.getUniqueProgressUrlId()
+              this.progressUrlService.getUniqueProgressUrlId()
             );
           });
         this.visitedCheckpointStateNames.push(currentStateName);
@@ -966,7 +966,7 @@ export class ConversationSkinComponent {
         includeAutogeneratedRecommendations = true;
       }
 
-      if (this.exploratioModeService.isInStoryChapterMode()) {
+      if (this.explorationModeService.isInStoryChapterMode()) {
         recommendedExplorationIds = [];
         includeAutogeneratedRecommendations = false;
         let topicUrlFragment =
@@ -1130,8 +1130,8 @@ export class ConversationSkinComponent {
   private _initializeDirectiveComponents(initialCard, focusLabel): void {
     this._addNewCard(initialCard);
     this.nextCard = initialCard;
-    if (!this.exploratioModeService.isInDiagnosticTestPlayerMode()) {
-      this.explorationPlayerStateService.onPlayerStateChange.emit(
+    if (!this.explorationModeService.isInDiagnosticTestPlayerMode()) {
+      this.conversationFlowService.onPlayerStateChange.emit(
         this.nextCard.getStateName()
       );
     }
@@ -1142,8 +1142,8 @@ export class ConversationSkinComponent {
     if (
       !this.isIframed &&
       !this._editorPreviewMode &&
-      !this.exploratioModeService.isInQuestionPlayerMode() &&
-      !this.exploratioModeService.isInDiagnosticTestPlayerMode()
+      !this.explorationModeService.isInQuestionPlayerMode() &&
+      !this.explorationModeService.isInDiagnosticTestPlayerMode()
     ) {
       // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();
@@ -1225,14 +1225,14 @@ export class ConversationSkinComponent {
       this.fatigueDetectionService.recordSubmissionTimestamp();
       if (this.fatigueDetectionService.isSubmittingTooFast()) {
         this.fatigueDetectionService.displayTakeBreakMessage();
-        this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
+        this.conversationFlowService.onOppiaFeedbackAvailable.emit();
         return;
       }
     }
 
     if (
       !this.isInPreviewMode &&
-      !this.exploratioModeService.isPresentingIsolatedQuestions() &&
+      !this.explorationModeService.isPresentingIsolatedQuestions() &&
       AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE
     ) {
       this.initLearnerAnswerInfoService(
@@ -1269,7 +1269,7 @@ export class ConversationSkinComponent {
     let timeAtServerCall = new Date().getTime();
     this.playerPositionService.recordAnswerSubmission();
     let currentEngineService =
-      this.conversationFlowService.getCurrentEngineService();
+      this.explorationModeService.getCurrentEngineService();
     this.answerIsCorrect = currentEngineService.submitAnswer(
       answer,
       interactionRulesService,
@@ -1291,7 +1291,7 @@ export class ConversationSkinComponent {
         this.nextCardIfStuck = nextCardIfReallyStuck;
         if (
           !this._editorPreviewMode &&
-          !this.exploratioModeService.isPresentingIsolatedQuestions()
+          !this.explorationModeService.isPresentingIsolatedQuestions()
         ) {
           let oldStateName = this.playerPositionService.getCurrentStateName();
           if (!remainOnCurrentCard) {
@@ -1324,13 +1324,13 @@ export class ConversationSkinComponent {
         }
 
         if (
-          !this.exploratioModeService.isPresentingIsolatedQuestions()
+          !this.explorationModeService.isPresentingIsolatedQuestions()
         ) {
-          this.explorationPlayerStateService.onPlayerStateChange.emit(
+          this.conversationFlowService.onPlayerStateChange.emit(
             nextCard.getStateName()
           );
         } else if (
-          this.exploratioModeService.isInQuestionPlayerMode()
+          this.explorationModeService.isInQuestionPlayerMode()
         ) {
           this.questionPlayerStateService.answerSubmitted(
             this.questionPlayerEngineService.getCurrentQuestion(),
@@ -1345,7 +1345,7 @@ export class ConversationSkinComponent {
           // already a delay bringing in the help card.
           millisecsLeftToWait = 1.0;
         } else if (
-          this.exploratioModeService.isInDiagnosticTestPlayerMode()
+          this.explorationModeService.isInDiagnosticTestPlayerMode()
         ) {
           // Do not wait if the player mode is the diagnostic test. Since no
           // feedback will be presented after attempting a question so delaying
@@ -1360,7 +1360,7 @@ export class ConversationSkinComponent {
         }
 
         setTimeout(() => {
-          this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
+          this.conversationFlowService.onOppiaFeedbackAvailable.emit();
           this.setActiveVoiceover(feedbackHtml);
           this.voiceoverPlayerService.setActiveComponentName(
             AppConstants.COMPONENT_NAME_FEEDBACK
@@ -1474,7 +1474,7 @@ export class ConversationSkinComponent {
     this.pendingCardWasSeenBefore = false;
     this.displayedCard.markAsCompleted();
     if (isFinalQuestion) {
-      if (this.exploratioModeService.isInQuestionPlayerMode()) {
+      if (this.explorationModeService.isInQuestionPlayerMode()) {
         // We will redirect to the results page here.
         this.questionSessionCompleted = true;
       }
@@ -1573,7 +1573,7 @@ export class ConversationSkinComponent {
     let currentIndex = this.playerPositionService.getDisplayedCardIndex();
     let conceptCardIsBeingShown =
       this.displayedCard.getStateName() === null &&
-      !this.exploratioModeService.isInQuestionPlayerMode();
+      !this.explorationModeService.isInQuestionMode();
     if (
       conceptCardIsBeingShown &&
       this.playerTranscriptService.isLastCard(currentIndex)
@@ -1589,7 +1589,7 @@ export class ConversationSkinComponent {
     }
     if (this.moveToExploration) {
       this.moveToExploration = false;
-      this.explorationPlayerStateService.moveToExploration(
+      this.explorationEngineService.moveToExploration(
         this._initializeDirectiveComponents.bind(this)
       );
       return;

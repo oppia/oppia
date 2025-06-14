@@ -19,10 +19,6 @@
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
-import {
-  Question,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
@@ -40,7 +36,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import {
   Question,
   QuestionBackendDict,
-  QuestionObjectFactory,
 } from 'domain/question/QuestionObjectFactory';
 import { ExplorationModeService } from './exploration-mode.service';
 import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
@@ -67,12 +62,11 @@ export class QuestionPlayerEngineService {
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
     private contextService: ContextService,
-    private exploratioModeService: ExplorationModeService,
+    private explorationModeService: ExplorationModeService,
     private questionBackendApiService: QuestionBackendApiService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
-    private questionObjectFactory: QuestionObjectFactory
     private playerTranscriptService: PlayerTranscriptService,
   ) {}
 
@@ -179,7 +173,7 @@ export class QuestionPlayerEngineService {
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
     errorCallback: () => void
   ): void {
-    this.exploratioModeService.setDiagnosticTestPlayerMode();
+    this.explorationModeService.setQuestionPlayerMode();
     this.playerTranscriptService.init();
     this.questionBackendApiService
       .fetchQuestionsAsync(
@@ -209,6 +203,17 @@ export class QuestionPlayerEngineService {
       questionObjects,
       successCallback,
       errorCallback
+    );
+  }
+
+  initializePretestServices(
+    pretestQuestionObjects: Question[],
+    callback: (initialCard: StateCard, nextFocusLabel: string) => void
+  ): void {
+    this.init(
+      pretestQuestionObjects,
+      callback,
+      () => {}
     );
   }
 

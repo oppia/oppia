@@ -17,14 +17,10 @@
  * story chapter) and provides mode-specific checks.
  */
 
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { StateCard } from 'domain/state_card/state-card.model';
 import {UrlService} from 'services/contextual/url.service';
 import { ContextService } from 'services/context.service';
-import { UrlService } from 'services/contextual/url.service';
-import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
-import { QuestionPlayerConfigDict } from './question-player-engine.service';
 import { DiagnosticTestPlayerEngineService } from './diagnostic-test-player-engine.service';
 import { ExplorationEngineService } from './exploration-engine.service';
 import { QuestionPlayerEngineService } from './question-player-engine.service';
@@ -40,32 +36,24 @@ enum EXPLORATION_MODE {
     STORY_CHAPTER = 'story_chapter',
 }
 
-
 @Injectable({
   providedIn: 'root',
 })
 export class ExplorationModeService {
+  version: number | null = null;
   currentMode: EXPLORATION_MODE;
-  private _playerStateChangeEventEmitter: EventEmitter<string> =
-    new EventEmitter<string>();
-
-  private _oppiaFeedbackAvailableEventEmitter: EventEmitter<void> =
-    new EventEmitter();
-
-  private _playerProgressModalShownEventEmitter: EventEmitter<boolean> =
-    new EventEmitter<boolean>();
   currentEngineService:
     | ExplorationEngineService
     | QuestionPlayerEngineService
     | DiagnosticTestPlayerEngineService;
 
   constructor (
-      explorationEngineService: ExplorationEngineService,
-      questionPlayerEngineService: QuestionPlayerEngineService,
-      diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService,
-      readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
-      contextService: ContextService,
-      urlService: UrlService
+      private explorationEngineService: ExplorationEngineService,
+      private questionPlayerEngineService: QuestionPlayerEngineService,
+      private diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService,
+      private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
+      private contextService: ContextService,
+      private urlService: UrlService
   ) {
       this.init();
   }
@@ -94,43 +82,33 @@ export class ExplorationModeService {
           this.currentMode = EXPLORATION_MODE.QUESTION_PLAYER;
         }
 
-        this.explorationId = this.contextService.getExplorationId();
+        let explorationId = this.contextService.getExplorationId();
         this.version = this.urlService.getExplorationVersionFromUrl();
+        const pathSegment = this.urlService.getPathname().split('/')[1].replace(/"/g, "'");
 
         if (
           this.currentMode !== EXPLORATION_MODE.QUESTION_PLAYER &&
-          !(
-            'skill_editor' ===
-            this.urlService.getPathname().split('/')[1].replace(/"/g, "'")
-          )
+          pathSegment !== 'skill_editor'
         ) {
           this.readOnlyExplorationBackendApiService
-            .loadExplorationAsync(this.explorationId, this.version)
+            .loadExplorationAsync(explorationId, this.version)
             .then(exploration => {
               this.version = exploration.version;
             });
         }
-      } else {
-        this.explorationId = 'test_id';
-        this.version = 1;
       }
-      this.storyUrlFragment = this.urlService.getStoryUrlFragmentFromLearnerUrl();
   }
 
-  getLanguageCode(): string {
-    return this.currentEngineService.getLanguageCode();
+  getExplorationVersion(): number | null {
+    return this.version;
   }
 
-  get onPlayerStateChange(): EventEmitter<string> {
-    return this._playerStateChangeEventEmitter;
+  setExplorationVersion(version: number | null): void {
+    this.version = version;
   }
 
-  get onOppiaFeedbackAvailable(): EventEmitter<void> {
-    return this._oppiaFeedbackAvailableEventEmitter;
-  }
-
-  get onShowProgressModal(): EventEmitter<boolean> {
-    return this._playerProgressModalShownEventEmitter;
+  getCurrentMode(): EXPLORATION_MODE {
+    return this.currentMode;
   }
 
   getCurrentEngineService():
@@ -171,16 +149,23 @@ export class ExplorationModeService {
   isInQuestionMode(): boolean {
     return (
     this.currentMode ===
-      ExplorationPlayerConstants.EXPLORATION_MODE.PRETEST ||
+      EXPLORATION_MODE.PRETEST ||
     this.currentMode ===
-      ExplorationPlayerConstants.EXPLORATION_MODE.QUESTION_PLAYER
+      EXPLORATION_MODE.QUESTION_PLAYER
     );
+  }
+
+  isInExplorationEditorMode(): boolean {
+    return (
+      this.currentMode ===
+      EXPLORATION_MODE.EDITOR_PREVIEW
+  );
   }
 
   isInQuestionPlayerMode(): boolean {
     return (
       this.currentMode ===
-      ExplorationPlayerConstants.EXPLORATION_MODE.QUESTION_PLAYER
+      EXPLORATION_MODE.QUESTION_PLAYER
     );
   }
 
@@ -193,18 +178,18 @@ export class ExplorationModeService {
     // with questions are presented.
     if (
       this.currentMode ===
-        ExplorationPlayerConstants.EXPLORATION_MODE.QUESTION_PLAYER ||
+        EXPLORATION_MODE.QUESTION_PLAYER ||
       this.currentMode ===
-        ExplorationPlayerConstants.EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER ||
+        EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER ||
       this.currentMode ===
-        ExplorationPlayerConstants.EXPLORATION_MODE.PRETEST
+        EXPLORATION_MODE.PRETEST
     ) {
       return true;
     } else if (
       this.currentMode ===
-        ExplorationPlayerConstants.EXPLORATION_MODE.EXPLORATION ||
+        EXPLORATION_MODE.EXPLORATION ||
       this.currentMode ===
-        ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER
+        EXPLORATION_MODE.STORY_CHAPTER
     ) {
       return false;
     } else {
@@ -215,14 +200,14 @@ export class ExplorationModeService {
   isInDiagnosticTestPlayerMode(): boolean {
     return (
       this.currentMode ===
-      ExplorationPlayerConstants.EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER
+      EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER
     );
   }
 
   isInStoryChapterMode(): boolean {
     return (
       this.currentMode ===
-      ExplorationPlayerConstants.EXPLORATION_MODE.STORY_CHAPTER
+      EXPLORATION_MODE.STORY_CHAPTER
     );
   }
 }

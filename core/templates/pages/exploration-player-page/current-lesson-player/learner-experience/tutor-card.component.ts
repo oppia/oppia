@@ -41,7 +41,6 @@ import {UserService} from 'services/user.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {AudioPreloaderService} from '../../services/audio-preloader.service';
 import {CurrentInteractionService} from '../../services/current-interaction.service';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
 import {LearnerAnswerInfoService} from '../../services/learner-answer-info.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -54,10 +53,12 @@ import {
   trigger,
 } from '@angular/animations';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {EndChapterCheckMarkComponent} from './end-chapter-check-mark.component';
 import {EndChapterConfettiComponent} from './end-chapter-confetti.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ExplorationModeService} from '../../services/exploration-mode.service';
 import {QuestionPlayerConfig} from './ratings-and-recommendations.component';
 
 const CHECK_MARK_HIDE_DELAY_IN_MSECS = 500;
@@ -164,7 +165,7 @@ export class TutorCardComponent {
     private contextService: ContextService,
     private currentInteractionService: CurrentInteractionService,
     private deviceInfoService: DeviceInfoService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private explorationModeService: ExplorationModeService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private playerPositionService: PlayerPositionService,
@@ -176,7 +177,8 @@ export class TutorCardComponent {
     public platformFeatureService: PlatformFeatureService,
     private renderer: Renderer2,
     private translateService: TranslateService,
-    private voiceoverPlayerService: VoiceoverPlayerService
+    private voiceoverPlayerService: VoiceoverPlayerService,
+    private conversationFlowService: ConversationFlowService
   ) {}
 
   async getUserInfoAsync(): Promise<void> {
@@ -220,7 +222,7 @@ export class TutorCardComponent {
       );
 
     this.directiveSubscriptions.add(
-      this.explorationPlayerStateService.onOppiaFeedbackAvailable.subscribe(
+      this.conversationFlowService.onOppiaFeedbackAvailable.subscribe(
         () => {
           this.waitingForOppiaFeedback = false;
 
@@ -474,7 +476,7 @@ export class TutorCardComponent {
 
   showAudioBar(): boolean {
     return (
-      !this.isIframed && !this.exploratioModeService.isInQuestionPlayerMode()
+      !this.isIframed && !this.explorationModeService.isInQuestionMode()
     );
   }
 

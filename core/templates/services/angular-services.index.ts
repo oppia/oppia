@@ -446,6 +446,8 @@ import { StoryEditorPageAuthGuard } from 'pages/story-editor-page/story-editor-p
 import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 import { ExplorationModeService } from 'pages/exploration-player-page/services/exploration-mode.service';
+import { CheckpointProgressService } from 'pages/exploration-player-page/services/checkpoint-progress.service';
+import { ProgressUrlService } from 'pages/exploration-player-page/services/progress-url.service';
 
 
 export const angularServices: [string, Type<{}>][] = [
@@ -738,6 +740,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['PlaythroughIssuesService', PlaythroughIssuesService],
   ['PlayerPositionService', PlayerPositionService],
   ['PlayerTranscriptService', PlayerTranscriptService],
+  ['ExplorationModeService', ExplorationModeService],
+  ['CheckpointProgressService', CheckpointProgressService],
+  ['ProgressUrlService', ProgressUrlService],
   ['PlaythroughBackendApiService', PlaythroughBackendApiService],
   ['PlaythroughIssuesBackendApiService', PlaythroughIssuesBackendApiService],
   ['PopulateRuleContentIdsService', PopulateRuleContentIdsService],

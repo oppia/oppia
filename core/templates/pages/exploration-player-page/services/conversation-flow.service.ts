@@ -19,28 +19,36 @@
  */
 
 import {StateCard} from 'domain/state_card/state-card.model';
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
-import {ExplorationPlayerStateService} from './exploration-player-state.service';
 import {PlayerTranscriptService} from './player-transcript.service';
+import {ExplorationModeService} from './exploration-mode.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ConversationFlowService {
+  private _playerStateChangeEventEmitter: EventEmitter<string> =
+    new EventEmitter<string>();
+
+  private _oppiaFeedbackAvailableEventEmitter: EventEmitter<void> =
+    new EventEmitter();
+
+  private _playerProgressModalShownEventEmitter: EventEmitter<boolean> =
+    new EventEmitter<boolean>();
 
   constructor(
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private contentTranslationManagerService: ContentTranslationManagerService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
-    private playerTranscriptService: PlayerTranscriptService
+    private playerTranscriptService: PlayerTranscriptService,
+    private explorationModeService: ExplorationModeService,
   ) {}
 
   addNewCard(newCard: StateCard): void {
     this.playerTranscriptService.addNewCard(newCard);
     const explorationLanguageCode =
-      this.explorationPlayerStateService.getLanguageCode();
+      this.getLanguageCode();
     const selectedLanguageCode =
       this.contentTranslationLanguageService.getCurrentContentLanguageCode();
     if (explorationLanguageCode !== selectedLanguageCode) {
@@ -55,6 +63,24 @@ export class ConversationFlowService {
   }
 
   recordNewCardAdded(): void {
-    return this.currentEngineService.recordNewCardAdded();
+    let currentEngineService = this.explorationModeService.getCurrentEngineService();
+    return currentEngineService.recordNewCardAdded();
+  }
+
+  getLanguageCode(): string {
+    let currentEngineService = this.explorationModeService.getCurrentEngineService();
+    return currentEngineService.getLanguageCode();
+  }
+
+  get onPlayerStateChange(): EventEmitter<string> {
+    return this._playerStateChangeEventEmitter;
+  }
+
+  get onOppiaFeedbackAvailable(): EventEmitter<void> {
+    return this._oppiaFeedbackAvailableEventEmitter;
+  }
+
+  get onShowProgressModal(): EventEmitter<boolean> {
+    return this._playerProgressModalShownEventEmitter;
   }
 }

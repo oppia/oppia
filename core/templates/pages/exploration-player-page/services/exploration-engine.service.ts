@@ -27,7 +27,7 @@ import {
 } from 'domain/exploration/ExplorationObjectFactory';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
-import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {FetchExplorationBackendResponse, ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
@@ -38,7 +38,7 @@ import {AlertsService} from 'services/alerts.service';
 import {ContextService} from 'services/context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
+import {ExplorationFeatures, ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {
@@ -49,6 +49,7 @@ import {AudioPreloaderService} from './audio-preloader.service';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {ImagePreloaderService} from './image-preloader.service';
+import {ExplorationModeService} from './exploration-mode.service';
 import {
   ExplorationParams,
   LearnerParamsService,
@@ -57,6 +58,12 @@ import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import isEqual from 'lodash/isEqual';
+import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
+import { ExplorationFeaturesService } from 'services/exploration-features.service';
+import { NumberAttemptsService } from './number-attempts.service';
+import { PretestQuestionBackendApiService } from 'domain/question/pretest-question-backend-api.service';
+import { PlaythroughService } from 'services/playthrough.service';
+import { QuestionPlayerEngineService } from './question-player-engine.service';
 
 @Injectable({
   providedIn: 'root',
@@ -89,20 +96,27 @@ export class ExplorationEngineService {
     private answerClassificationService: AnswerClassificationService,
     private audioPreloaderService: AudioPreloaderService,
     private contentTranslationLanguageService: ContentTranslationLanguageService,
+    private numberAttemptsService: NumberAttemptsService,
     private contextService: ContextService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private entityTranslationsService: EntityTranslationsService,
+    private explorationModeService: ExplorationModeService,
+    private playthroughService: PlaythroughService,
+    private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
     private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private explorationObjectFactory: ExplorationObjectFactory,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
+    private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private imagePreloaderService: ImagePreloaderService,
     private learnerParamsService: LearnerParamsService,
     private playerTranscriptService: PlayerTranscriptService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
     private translateService: TranslateService,
+    private questionPlayerEngineService: QuestionPlayerEngineService,
+    private explorationFeaturesService: ExplorationFeaturesService,
     private urlService: UrlService
   ) {
     this.setExplorationProperties();
@@ -317,7 +331,7 @@ export class ExplorationEngineService {
     callback: (stateCard: StateCard, str: string) => void
   ): void {
     this.playerTranscriptService.init();
-    if (this.editorPreviewMode) {
+    if (this.explorationModeService.isInExplorationEditorMode()) {
       this.initExplorationPreviewPlayer(callback);
     } else {
       this.initExplorationPlayer(callback);
@@ -327,13 +341,14 @@ export class ExplorationEngineService {
   private initExplorationPreviewPlayer(
     callback: (sateCard: StateCard, str: string) => void
   ): void {
-    this.setExplorationMode();
+    this.explorationModeService.setExplorationMode();
+    let explorationId = this.contextService.getExplorationId();
     Promise.all([
       this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
-        this.explorationId
+        explorationId
       ),
       this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
-        this.explorationId
+        explorationId
       ),
     ]).then(combinedData => {
       let explorationData = combinedData[0];
@@ -346,7 +361,7 @@ export class ExplorationEngineService {
         },
         featuresData
       );
-      this.explorationEngineService.init(
+      this.init(
         explorationData,
         null,
         null,
@@ -362,22 +377,24 @@ export class ExplorationEngineService {
   private initExplorationPlayer(
     callback: (stateCard: StateCard, str: string) => void
   ): void {
+    let explorationId = this.contextService.getExplorationId();
     let explorationDataPromise = this.version
       ? this.readOnlyExplorationBackendApiService.loadExplorationAsync(
-          this.explorationId,
+          explorationId,
           this.version
         )
       : this.readOnlyExplorationBackendApiService.loadLatestExplorationAsync(
-          this.explorationId
+          explorationId
         );
+      let storyUrlFragment = this.urlService.getStoryUrlFragmentFromLearnerUrl();
     Promise.all([
       explorationDataPromise,
       this.pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
-        this.explorationId,
-        this.storyUrlFragment
+        explorationId,
+        storyUrlFragment
       ),
       this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
-        this.explorationId
+        explorationId
       ),
     ]).then(combinedData => {
       let explorationData: FetchExplorationBackendResponse = combinedData[0];
@@ -390,17 +407,17 @@ export class ExplorationEngineService {
         featuresData
       );
       if (pretestQuestionsData.length > 0) {
-        this.setPretestMode();
+        this.explorationModeService.setPretestMode();
         this.initializeExplorationServices(explorationData, true, callback);
-        this.initializePretestServices(pretestQuestionsData, callback);
+        this.questionPlayerEngineService.initializePretestServices(pretestQuestionsData, callback);
       } else if (
         this.urlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
         this.urlService.getUrlParams().hasOwnProperty('node_id')
       ) {
-        this.setStoryChapterMode();
+        this.explorationModeService.setStoryChapterMode();
         this.initializeExplorationServices(explorationData, false, callback);
       } else {
-        this.setExplorationMode();
+        this.explorationModeService.setExplorationMode();
         this.initializeExplorationServices(explorationData, false, callback);
       }
     });
@@ -411,22 +428,23 @@ export class ExplorationEngineService {
     arePretestsAvailable: boolean,
     callback: (stateCard: StateCard, str: string) => void
   ): void {
+    let explorationId = this.contextService.getExplorationId();
     // For some cases, version is set only after
     // ReadOnlyExplorationBackendApiService.loadExploration() has completed.
     // Use returnDict.version for non-null version value.
     this.statsReportingService.initSession(
-      this.explorationId,
+      explorationId,
       returnDict.exploration.title,
       returnDict.version,
       returnDict.session_id,
       this.urlService.getCollectionIdFromExplorationUrl()
     );
     this.playthroughService.initSession(
-      this.explorationId,
+      explorationId,
       returnDict.version,
       returnDict.record_playthrough_probability
     );
-    this.explorationEngineService.init(
+    this.init(
       {
         auto_tts_enabled: returnDict.auto_tts_enabled,
         draft_changes: [],
@@ -448,17 +466,6 @@ export class ExplorationEngineService {
       returnDict.preferred_language_codes,
       returnDict.displayable_language_codes,
       arePretestsAvailable ? () => {} : callback
-    );
-  }
-
-  private initializePretestServices(
-    pretestQuestionObjects: Question[],
-    callback: (initialCard: StateCard, nextFocusLabel: string) => void
-  ): void {
-    this.questionPlayerEngineService.init(
-      pretestQuestionObjects,
-      callback,
-      () => {}
     );
   }
 
@@ -589,9 +596,9 @@ export class ExplorationEngineService {
       this.urlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
       this.urlService.getUrlParams().hasOwnProperty('node_id')
     ) {
-      this.setStoryChapterMode();
+      this.explorationModeService.setStoryChapterMode();
     } else {
-      this.setExplorationMode();
+      this.explorationModeService.setExplorationMode();
     }
     this._loadInitialState(successCallback);
   }

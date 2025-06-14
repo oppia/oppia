@@ -34,7 +34,6 @@ import {
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';

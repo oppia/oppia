@@ -17,7 +17,7 @@
  * story chapter) and provides mode-specific checks.
  */
 
-import {Injectable, EventEmitter} from '@angular/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
   providedIn: 'root',

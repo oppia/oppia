@@ -28,7 +28,6 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {QuestionPlayerConceptCardModalComponent} from './question-player-concept-card-modal.component';
