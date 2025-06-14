@@ -965,7 +965,7 @@ def update_topic_and_subtopic_pages(
         .value, None
     ):
         for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items(): # pylint: disable=line-too-long
-            subtopic_page_change_list =(
+            subtopic_page_change_list = (
                 updated_subtopic_pages_change_cmds_dict[
                 subtopic_page_id]
             )
