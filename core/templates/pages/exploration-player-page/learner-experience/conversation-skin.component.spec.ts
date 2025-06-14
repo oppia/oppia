@@ -1460,7 +1460,6 @@ describe('Conversation skin component', () => {
         'loadLatestExplorationAsync'
       ).and.returnValue(Promise.resolve(expResponse));
       componentInstance.prevSessionStatesProgress = ['Start', 'Mid'];
-      componentInstance.visitedCheckpointStateNames = ['Start'];
       spyOn(explorationEngineService, 'getShortestPathToState').and.returnValue(
         ['Start', 'Mid']
       );
@@ -1514,6 +1513,11 @@ describe('Conversation skin component', () => {
       expect(componentInstance.visitedCheckpointStateNames).toContain('Mid');
       expect(componentInstance.prevSessionStatesProgress).toEqual(['Start']);
       expect(componentInstance.mostRecentlyReachedCheckpoint).toBe('Mid');
+
+      componentInstance.prevSessionStatesProgress = [];
+      componentInstance.visitedCheckpointStateNames = [];
+      componentInstance.initializePage();
+      tick(100);
     })
   );
 
