@@ -29,8 +29,8 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
-from core.domain import subtopic_page_domain
 from core.domain import study_guide_domain
+from core.domain import subtopic_page_domain
 
 from typing import Dict, List, Literal, Optional, TypedDict
 
@@ -150,7 +150,7 @@ class TopicChange(change_domain.BaseChange):
     # update_subtopic_page_property command.
     SUBTOPIC_PAGE_PROPERTIES: List[str] = (
         subtopic_page_domain.SubtopicPageChange.SUBTOPIC_PAGE_PROPERTIES)
-    
+
     # The allowed list of study guide properties which can be used in
     # update_study_guide_property command.
     STUDY_GUIDE_PROPERTIES: List[str] = (
@@ -293,7 +293,7 @@ class TopicChange(change_domain.BaseChange):
         'user_id_attribute_names': [],
         'allowed_values': {'property_name': STUDY_GUIDE_PROPERTIES},
         'deprecated_values': {}
-    },{
+    }, {
         'name': CMD_UPDATE_TOPIC_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],

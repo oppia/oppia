@@ -226,8 +226,10 @@ def apply_change_list(
     ] = collections.defaultdict(list)
 
     for change in change_list:
-        if(change.cmd ==
-            study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY):
+        if (
+            change.cmd ==
+            study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY
+        ):
             # Here we use cast because we are narrowing down the type from
             # TopicChange to a specific change command.
             update_study_guide_property_cmd = cast(
@@ -640,7 +642,7 @@ def apply_change_list(
                     raise Exception(
                         'The subtopic with id %s doesn\'t exist' % (
                             change.subtopic_id))
-                
+
                 if (change.property_name ==
                     study_guide_domain.
                     STUDY_GUIDE_PROPERTY_SECTIONS):
@@ -768,7 +770,8 @@ def apply_change_list(
                             update_study_guide_sections_heading_cmd.subtopic_id
                         ))
                         if study_guide_id not in modified_study_guides:
-                            modified_study_guide_change_cmds[study_guide_id].append(
+                            modified_study_guide_change_cmds[
+                                study_guide_id].append(
                                 study_guide_domain.StudyGuideChange({
                                     'cmd': 'update_study_guide_property',
                                     'property_name': 'sections_content',
@@ -961,7 +964,7 @@ def update_topic_and_subtopic_pages(
         feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES
         .value, None
     ):
-        for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items():
+        for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items(): # pylint: disable=line-too-long
             subtopic_page_change_list =(
                 updated_subtopic_pages_change_cmds_dict[
                 subtopic_page_id]

@@ -399,9 +399,6 @@ class StudyGuide:
             StudyGuide. A study guide object with given id, topic_id and
             sections field.
         """
-        print("create called")
-        print(f"plaintext: {heading_plaintext}")
-        print(f"html: {content_html}")
         content_id_generator = translation_domain.ContentIdGenerator()
         study_guide_id = cls.get_study_guide_id(
             topic_id,
@@ -491,7 +488,7 @@ class StudyGuide:
             'it is not in the list of sections for '
             'this study guide' % (old_section_content_content_id)
         )
-    
+
     def update_sections(
         self,
         new_sections: List[StudyGuideSection]
@@ -505,8 +502,7 @@ class StudyGuide:
         for new_section, old_section in zip(
             new_sections, self.sections
         ):
-            
-            if (len(new_sections) == len(self.sections)):
+            if len(new_sections) == len(self.sections):
                 for new_section, old_section in zip(
                     new_sections, self.sections
                 ):

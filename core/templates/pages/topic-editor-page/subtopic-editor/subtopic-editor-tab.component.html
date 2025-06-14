@@ -157,61 +157,61 @@
           </div>
         </div>
       </mat-card>
-    <mat-card *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
-      <div class="oppia-editor-card-body">
-        <div class="oppia-editor-card-section study-guide-section-content">
-          <div class="oppia-study-guide-sections-header oppia-mobile-collapsible-card-header" (click)="toggleSectionsList()">
-            <strong class="heading-text">Sections</strong>
-            <i class="fa fa-caret-down"
-              *ngIf="!sectionsListIsShown"
-              [attr.aria-hidden]="true">
-            </i>
-            <i class="fa fa-caret-up"
-              *ngIf="sectionsListIsShown"
-              [attr.aria-hidden]="true">
-            </i>
-          </div>
-          <div *ngIf="sectionsListIsShown" class="oppia-mobile-collapsible-card-content">
-            <div class="study-guide-section-subtitle">
-              Sections of the Study Guide.
+      <mat-card *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
+        <div class="oppia-editor-card-body">
+          <div class="oppia-editor-card-section study-guide-section-content">
+            <div class="oppia-study-guide-sections-header oppia-mobile-collapsible-card-header" (click)="toggleSectionsList()">
+              <strong class="heading-text">Sections</strong>
+              <i class="fa fa-caret-down"
+                 *ngIf="!sectionsListIsShown"
+                 [attr.aria-hidden]="true">
+              </i>
+              <i class="fa fa-caret-up"
+                 *ngIf="sectionsListIsShown"
+                 [attr.aria-hidden]="true">
+              </i>
             </div>
-            <div>
-              <ul class="oppia-study-guide-section-preview oppia-option-list nav-stacked nav-pills study-guide-sections-list">
-                <li *ngFor="let section of sections; let index = index"
-                    [ngClass]="{'active': activeSectionIndex === index, 'last-element': index === sections.length - 1}"
-                    class="oppia-rule-block oppia-prevent-selection">
-                  <a (click)="changeActiveSectionIndex(index)"
-                    class="oppia-rule-tab e2e-test-study-guide-section-{{ index }} oppia-study-guide-section-preview-list"
-                    [ngClass]="{'oppia-rule-tab-active': activeSectionIndex === index}">
-                    <oppia-summary-list-header [index]="index"
-                                              [disableSorting]="true"
-                                              [summary]="section.getHeadingPlaintext()"
-                                              [shortSummary]="section.getHeadingPlaintext()"
-                                              [isActive]="index === activeSectionIndex"
-                                              [isDeleteAvailable]="sections.length > 1"
-                                              (summaryDelete)="deleteSection($event.index, $event.event)">
-                    </oppia-summary-list-header>
-                  </a>
-                  <div *ngIf="activeSectionIndex === index">
-                    <div class="oppia-editor-card-section">
-                      <oppia-study-guide-section-editor [section]="section"
-                                                  [index]="index"
-                                                  [isEditable]="isEditable">
-                      </oppia-study-guide-section-editor>
+            <div *ngIf="sectionsListIsShown" class="oppia-mobile-collapsible-card-content">
+              <div class="study-guide-section-subtitle">
+                Sections of the Study Guide.
+              </div>
+              <div>
+                <ul class="oppia-study-guide-section-preview oppia-option-list nav-stacked nav-pills study-guide-sections-list">
+                  <li *ngFor="let section of sections; let index = index"
+                      [ngClass]="{'active': activeSectionIndex === index, 'last-element': index === sections.length - 1}"
+                      class="oppia-rule-block oppia-prevent-selection">
+                    <a (click)="changeActiveSectionIndex(index)"
+                       class="oppia-rule-tab e2e-test-study-guide-section-{{ index }} oppia-study-guide-section-preview-list"
+                       [ngClass]="{'oppia-rule-tab-active': activeSectionIndex === index}">
+                      <oppia-summary-list-header [index]="index"
+                                                 [disableSorting]="true"
+                                                 [summary]="section.getHeadingPlaintext()"
+                                                 [shortSummary]="section.getHeadingPlaintext()"
+                                                 [isActive]="index === activeSectionIndex"
+                                                 [isDeleteAvailable]="sections.length > 1"
+                                                 (summaryDelete)="deleteSection($event.index, $event.event)">
+                      </oppia-summary-list-header>
+                    </a>
+                    <div *ngIf="activeSectionIndex === index">
+                      <div class="oppia-editor-card-section">
+                        <oppia-study-guide-section-editor [section]="section"
+                                                     [index]="index"
+                                                     [isEditable]="isEditable">
+                        </oppia-study-guide-section-editor>
+                      </div>
                     </div>
-                  </div>
-                </li>
-              </ul>
+                  </li>
+                </ul>
+              </div>
+              <button type="button"
+                      class="btn btn-add-study-guide-section skill-editor-add-btn e2e-test-add-study-guide-section"
+                      (click)="openAddSectionModal()">
+                + ADD SECTION
+              </button>
             </div>
-            <button type="button"
-                    class="btn btn-add-study-guide-section skill-editor-add-btn e2e-test-add-study-guide-section"
-                    (click)="openAddSectionModal()">
-              + ADD SECTION
-            </button>
           </div>
         </div>
-      </div>
-    </mat-card>
+      </mat-card>
       <mat-card class="oppia-subtopics-list-card subtopic-skill-card subtopic-item-container oppia-mobile-collapsible-card" tabindex="0">
         <div class="skill-card-header oppia-mobile-collapsible-card-header"
              (click)="togglePreviewSkillCard()">
@@ -601,9 +601,6 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-  }
-  .skill-card-header i {
-    display: none;
   }
   .oppia-study-guide-section-preview-list {
     display: block;
