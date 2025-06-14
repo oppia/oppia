@@ -105,7 +105,7 @@
       </div>
       <div class="add-new-manual-voiceovers" *ngIf="!automaticVoiceover">
         <button (click)="generateVoiceover()"
-                class="add-automatic-voiceover-button"
+                class="add-automatic-voiceover-button e2e-test-regenerate-voiceover"
                 *ngIf="!isAutomaticVoiceoverGenerating"
                 [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
           GENERATE AUTOMATIC VOICEOVER
