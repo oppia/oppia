@@ -289,7 +289,7 @@ def apply_change_list(
                     )
                     update_study_guide_property_cmd = (
                         study_guide_domain
-                        .StudyGuideChange
+                        .UpdateStudyGuidePropertyCmd
                     )({
                         'cmd': 'update_study_guide_property',
                         'property_name': 'sections_content',

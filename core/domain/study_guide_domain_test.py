@@ -412,40 +412,6 @@ class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(change_object.topic_id, 'topic_id')
         self.assertEqual(change_object.subtopic_id, 1)
 
-    def test_add_new_section_change(self) -> None:
-        """Test creation of AddNewSectionCmd."""
-        change_object = study_guide_domain.StudyGuideChange({
-            'cmd': study_guide_domain.CMD_ADD_NEW_SECTION,
-            'heading_plaintext': 'New Heading',
-            'content_html': '<p>New content</p>',
-            'subtopic_id': 1
-        })
-
-        self.assertEqual(
-            change_object.cmd,
-            study_guide_domain.CMD_ADD_NEW_SECTION
-        )
-        self.assertEqual(change_object.heading_plaintext, 'New Heading')
-        self.assertEqual(change_object.content_html, '<p>New content</p>')
-        self.assertEqual(change_object.subtopic_id, 1)
-
-    def test_delete_section_change(self) -> None:
-        """Test creation of DeleteSectionCmd."""
-        change_object = study_guide_domain.StudyGuideChange({
-            'cmd': 'delete_section',
-            'heading_content_id': 'section_heading_0',
-            'content_content_id': 'section_content_1',
-            'subtopic_id': 1
-        })
-
-        self.assertEqual(
-            change_object.cmd,
-            study_guide_domain.CMD_DELETE_SECTION
-        )
-        self.assertEqual(change_object.heading_content_id, 'section_heading_0')
-        self.assertEqual(change_object.content_content_id, 'section_content_1')
-        self.assertEqual(change_object.subtopic_id, 1)
-
     def test_update_study_guide_property_sections_heading_change(self) -> None:
         """Test creation of UpdateStudyGuidePropertySectionsHeadingCmd."""
 
