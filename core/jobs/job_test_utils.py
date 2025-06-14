@@ -145,7 +145,8 @@ class PipelinedTestBase(test_utils.AppEngineTestBase):
             ValueError. A required property's default value is invalid.
         """
         property_values = {
-            p._name: p._default for p in model_class._properties.values() # pylint: disable=protected-access
+            p._name: p._default # pylint: disable=protected-access
+            for p in model_class._properties.values() # pylint: disable=protected-access
             if p._required # pylint: disable=protected-access
         }
         property_values['created_on'] = self.YEAR_AGO
