@@ -36,6 +36,7 @@ import {SubtopicPage} from 'core/templates/domain/topic/subtopic-page.model';
 import {RecordedVoiceovers} from 'core/templates/domain/exploration/recorded-voiceovers.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {StudyGuide} from './study-guide.model';
+import {StudyGuideSection} from './study-guide-sections.model';
 
 type TopicUpdateApply = (topicChange: TopicChange, topic: Topic) => void;
 type TopicUpdateReverse = (topicChange: TopicChange, topic: Topic) => void;
@@ -46,6 +47,14 @@ type SubtopicUpdateApply = (
 type SubtopicUpdateReverse = (
   topicChange: TopicChange,
   subtopicPage: SubtopicPage
+) => void;
+type StudyGuideUpdateApply = (
+  topicChange: TopicChange,
+  studyGuide: StudyGuide
+) => void;
+type StudyGuideUpdateReverse = (
+  topicChange: TopicChange,
+  studyGuide: StudyGuide
 ) => void;
 
 @Injectable({
@@ -61,8 +70,11 @@ export class TopicUpdateService {
     entity,
     command: string,
     params,
-    apply: TopicUpdateApply | SubtopicUpdateApply,
-    reverse: TopicUpdateReverse | SubtopicUpdateReverse
+    apply: TopicUpdateApply | SubtopicUpdateApply | StudyGuideUpdateApply,
+    reverse:
+      | TopicUpdateReverse
+      | SubtopicUpdateReverse
+      | StudyGuideUpdateReverse
   ) {
     let changeDict = cloneDeep(params);
     changeDict.cmd = command;
@@ -149,8 +161,8 @@ export class TopicUpdateService {
     subtopicId: number,
     newValue,
     oldValue,
-    apply: SubtopicUpdateApply,
-    reverse: SubtopicUpdateReverse
+    apply: StudyGuideUpdateApply,
+    reverse: StudyGuideUpdateReverse
   ): void {
     this._applyChange(
       studyGuide,
@@ -824,29 +836,65 @@ export class TopicUpdateService {
     );
   }
 
-  setStudyGuideSectionContentHtml(
+  // Use new and old value vars.
+  addSection(
     studyGuide: StudyGuide,
-    subtopicId: number,
-    newSubtitledHtml: SubtitledHtml
+    newSection: StudyGuideSection,
+    subtopicId: number
   ): void {
-    let oldSubtitledHtml = cloneDeep(
-      subtopicPage.getPageContents().getSubtitledHtml()
-    );
-    this._applySubtopicPagePropertyChange(
-      subtopicPage,
-      TopicDomainConstants.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
+    const oldSections = cloneDeep(studyGuide.getSections());
+    const newSections = cloneDeep(oldSections);
+    newSections.push(newSection);
+    this.updateSections(studyGuide, newSections, subtopicId);
+  }
+
+  updateSections(
+    studyGuide: StudyGuide,
+    newSections: StudyGuideSection[],
+    subtopicId: number
+  ): void {
+    const oldSections = cloneDeep(studyGuide.getSections());
+    this._applyStudyGuidePropertyChange(
+      studyGuide,
+      TopicDomainConstants.STUDY_GUIDE_PROPERTY_SECTIONS,
       subtopicId,
-      newSubtitledHtml.toBackendDict(),
-      oldSubtitledHtml.toBackendDict(),
-      (changeDict, subtopicPage) => {
-        // ---- Apply ----
-        subtopicPage.getPageContents().setSubtitledHtml(newSubtitledHtml);
+      newSections.map(section => {
+        return section.toBackendDict();
+      }),
+      oldSections.map(section => {
+        return section.toBackendDict();
+      }),
+      (changeDict, studyGuide) => {
+        studyGuide.setSections(newSections);
       },
-      (changeDict, subtopicPage) => {
-        // ---- Undo ----
-        subtopicPage.getPageContents().setSubtitledHtml(oldSubtitledHtml);
+      (changeDict, studyGuide) => {
+        studyGuide.setSections(oldSections);
       }
     );
+  }
+
+  updateSection(
+    studyGuide: StudyGuide,
+    sectionIndex: number,
+    newSectionHeadingPlaintext: string,
+    newSectionContentHtml: string,
+    subtopicId: number
+  ): void {
+    const newSections = cloneDeep(studyGuide.getSections());
+    newSections[sectionIndex].setHeadingPlaintext(newSectionHeadingPlaintext);
+    newSections[sectionIndex].setContentHtml(newSectionContentHtml);
+    this.updateSections(studyGuide, newSections, subtopicId);
+  }
+
+  deleteSection(
+    studyGuide: StudyGuide,
+    sectionIndex: number,
+    subtopicId: number
+  ): void {
+    const oldSections = cloneDeep(studyGuide.getSections());
+    const newSections = cloneDeep(oldSections);
+    newSections.splice(sectionIndex, 1);
+    this.updateSections(studyGuide, newSections, subtopicId);
   }
 
   setSubtopicPageContentsAudio(

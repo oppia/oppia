@@ -135,8 +135,10 @@ export class TopicEditorStateService {
       'en'
     );
     let sections: StudyGuideSection[] = [];
-    sections.push(StudyGuideSection.createDefault());
-    this._studyGuide = new StudyGuide('id', 'topic_id', sections, 'en');
+    sections.push(
+      StudyGuideSection.createDefault('section_heading_0', 'section_content_1')
+    );
+    this._studyGuide = new StudyGuide('id', 'topic_id', sections, 2, 'en');
   }
 
   // Rename this to _getStudyGuideId once Subtopic Pages are deprecated.

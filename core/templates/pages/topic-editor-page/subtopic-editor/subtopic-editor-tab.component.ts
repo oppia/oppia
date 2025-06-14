@@ -39,8 +39,6 @@ import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DeleteStudyGuideSectionComponent} from 'pages/skill-editor-page/modal-templates/delete-study-guide-section-modal.component';
 import {AddStudyGuideSectionModalComponent} from 'pages/skill-editor-page/modal-templates/add-study-guide-section.component';
-import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 
 @Component({
   selector: 'oppia-subtopic-editor-tab',
@@ -71,6 +69,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   allowedBgColors;
   htmlData: string;
   sections: StudyGuideSection[];
+  isEditable: boolean = false;
   uncategorizedSkillSummaries: ShortSkillSummary[];
   schemaEditorIsShown: boolean;
   htmlDataBeforeUpdate: string;
@@ -144,13 +143,13 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       this.editableThumbnailBgColor = this.subtopic.getThumbnailBgColor();
       this.editableUrlFragment = this.subtopic.getUrlFragment();
       this.initialSubtopicUrlFragment = this.subtopic.getUrlFragment();
-      if (this.isShowRestructuredStudyGuidesFeatureEnabled) {
+      if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
         this.studyGuide = this.topicEditorStateService.getStudyGuide();
       } else {
         this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
       }
       this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic;
-      if (this.isShowRestructuredStudyGuidesFeatureEnabled) {
+      if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
         var sections = this.studyGuide.getSections();
         if (sections) {
           this.sections = sections;
@@ -377,16 +376,22 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       })
       .result.then(
         result => {
+          let contentIdIndex = this.studyGuide.getNextContentIdIndex();
           let newSection = StudyGuideSection.create(
-            SubtitledUnicode.createDefault(result.sectionHeadingPlaintext, '1'),
-            SubtitledHtml.createDefault(result.sectionContentHtml, '1')
+            result.sectionHeadingPlaintext,
+            result.sectionContentHtml,
+            `section_heading_${contentIdIndex}`,
+            `section_content_${contentIdIndex + 1}`
           );
-          this.topicUpdateService.addStudyGuideSection(
+          this.studyGuide.setNextContentIdIndex(contentIdIndex + 2);
+          this.topicUpdateService.addSection(
             this.studyGuide,
-            newSection
+            newSection,
+            this.subtopicId
           );
-          this.sections = this.studyGuide.getSections();
-          this.getConceptCardChange.emit();
+          this.sections.push(newSection);
+          this.studyGuide.setSections(this.sections);
+          this.topicEditorStateService.setStudyGuide(this.studyGuide);
         },
         () => {
           // Note to developers:
@@ -403,13 +408,17 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          this.topicUpdateService.deleteStudyGuideSection(
+          let newSections = cloneDeep(this.sections);
+          newSections.splice(index, 1);
+          this.topicUpdateService.deleteSection(
             this.studyGuide,
-            index
+            index,
+            this.subtopicId
           );
-          this.sections = this.studyGuide.getSections();
-          this.activeWorkedExampleIndex = null;
-          this.getConceptCardChange.emit();
+          this.sections = newSections;
+          this.studyGuide.setSections(this.sections);
+          this.topicEditorStateService.setStudyGuide(this.studyGuide);
+          this.activeSectionIndex = null;
         },
         () => {
           // Note to developers:
@@ -433,13 +442,22 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.subtopicPreviewCardIsShown = false;
     this.subtopicEditorCardIsShown = true;
     this.schemaEditorIsShown = false;
-    this.directiveSubscriptions.add(
-      this.topicEditorStateService.onSubtopicPageLoaded.subscribe(() => {
-        this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
-        var pageContents = this.subtopicPage.getPageContents();
-        this.htmlData = pageContents.getHtml();
-      })
-    );
+    if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+      this.directiveSubscriptions.add(
+        this.topicEditorStateService.onStudyGuideLoaded.subscribe(() => {
+          this.studyGuide = this.topicEditorStateService.getStudyGuide();
+          this.sections = this.studyGuide.getSections();
+        })
+      );
+    } else {
+      this.directiveSubscriptions.add(
+        this.topicEditorStateService.onSubtopicPageLoaded.subscribe(() => {
+          this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
+          var pageContents = this.subtopicPage.getPageContents();
+          this.htmlData = pageContents.getHtml();
+        })
+      );
+    }
     this.directiveSubscriptions.add(
       this.topicEditorStateService.onTopicInitialized.subscribe(() => {
         this.initEditor();
@@ -456,6 +474,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.maxCharsInSubtopicTitle = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
     this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT =
       AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT;
+    this.isEditable = true;
   }
 
   ngOnDestroy(): void {

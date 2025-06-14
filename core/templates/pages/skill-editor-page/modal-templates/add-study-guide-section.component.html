@@ -6,14 +6,18 @@
   <form name="addStudyGuideSectionForm.studyGuideSectionTextForm"
         class="form-inline">
     <div class="oppia-rule-details-header">
-      <strong>Heading</strong>
-      <input class="form-control oppia-new-study-guide-editable-field e2e-test-study-guide-heading-field required"
-               placeholder="Enter the heading of the section."
-               [(ngModel)]="tmpSectionHeadingPlaintext" (change)="updateLocalHeading($event)" maxlength="{{MAX_CHARS_IN_STUDY_GUIDE_HEADING_TITLE}}" autofocus>
-      <div class="section-content-section">
+      <div class="section-heading-and-content-section">
+        <strong>Heading</strong>
+        <schema-based-editor class="e2e-test-study-guide-section-heading"
+                              [schema]="getHeadingSchema()"
+                              [localValue]="tmpSectionHeadingHtml"
+                              (localValueChange)="this.updateLocalHeading($event)">
+        </schema-based-editor>
+      </div>
+      <div class="section-heading-and-content-section">
         <strong>Content</strong>
         <schema-based-editor class="e2e-test-study-guide-section-content"
-                             [schema]="getSchema()"
+                             [schema]="getContentSchema()"
                              [localValue]="tmpSectionContentHtml"
                              (localValueChange)="this.updateLocalContent($event)">
         </schema-based-editor>
@@ -31,7 +35,7 @@
   </button>
 </div>
 <style>
-  .section-content-section {
+  .section-heading-and-content-section {
     margin-top: 2.5vh;
   }
   .oppia-new-study-guide-editable-field {

@@ -34,6 +34,8 @@ import {Skill} from 'domain/skill/SkillObjectFactory';
 import {Story} from 'domain/story/story.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
+import {SubtitledUnicodeBackendDict} from 'domain/exploration/subtitled-unicode.model';
+import {StudyGuide} from 'domain/topic/study-guide.model';
 
 interface CollectionTitleChange {
   cmd: 'edit_collection_property';
@@ -586,8 +588,8 @@ interface TopicSubtopicPageHtmlChange {
 interface TopicStudyGuidePropertySectionsHeadingChange {
   cmd: 'update_study_guide_property';
   property_name: 'sections_heading';
-  new_value: string;
-  old_value: string;
+  new_value: SubtitledUnicodeBackendDict;
+  old_value: SubtitledUnicodeBackendDict;
   subtopic_id: number;
 }
 
@@ -709,7 +711,8 @@ export type DomainObject =
   | Skill
   | Story
   | Topic
-  | SubtopicPage;
+  | SubtopicPage
+  | StudyGuide;
 
 export class Change {
   _backendChangeObject: BackendChangeObject;

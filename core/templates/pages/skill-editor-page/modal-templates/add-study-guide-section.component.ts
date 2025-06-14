@@ -21,7 +21,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 interface HtmlFormSchema {
-  type: 'html';
+  type: 'html' | 'unicode';
   ui_config: object;
 }
 
@@ -38,8 +38,12 @@ export class AddStudyGuideSectionModalComponent
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   tmpSectionHeadingPlaintext!: string;
   tmpSectionContentHtml!: string;
-  SECTION_FORM_SCHEMA: HtmlFormSchema = {
+  SECTION_FORM_CONTENT_SCHEMA: HtmlFormSchema = {
     type: 'html',
+    ui_config: {},
+  };
+  SECTION_FORM_HEADING_SCHEMA: HtmlFormSchema = {
+    type: 'unicode',
     ui_config: {},
   };
 
@@ -55,8 +59,12 @@ export class AddStudyGuideSectionModalComponent
     this.tmpSectionContentHtml = '';
   }
 
-  getSchema(): HtmlFormSchema {
-    return this.SECTION_FORM_SCHEMA;
+  getContentSchema(): HtmlFormSchema {
+    return this.SECTION_FORM_CONTENT_SCHEMA;
+  }
+
+  getHeadingSchema(): HtmlFormSchema {
+    return this.SECTION_FORM_HEADING_SCHEMA;
   }
 
   updateLocalHeading($event: string): void {

@@ -81,16 +81,24 @@ export class StudyGuideSection {
   }
 
   static create(
-    heading: SubtitledUnicode,
-    content: SubtitledHtml
+    headingPlaintext: string,
+    contentHtml: string,
+    headingContentId: string,
+    contentContentId: string
   ): StudyGuideSection {
-    return new StudyGuideSection(heading, content);
+    return new StudyGuideSection(
+      SubtitledUnicode.createDefault(headingPlaintext, headingContentId),
+      SubtitledHtml.createDefault(contentHtml, contentContentId)
+    );
   }
 
-  static createDefault(): StudyGuideSection {
+  static createDefault(
+    headingContentId: string,
+    contentContentId: string
+  ): StudyGuideSection {
     return new StudyGuideSection(
-      SubtitledUnicode.createDefault('', 'section_heading'),
-      SubtitledHtml.createDefault('', 'section_content')
+      SubtitledUnicode.createDefault('', headingContentId),
+      SubtitledHtml.createDefault('', contentContentId)
     );
   }
 

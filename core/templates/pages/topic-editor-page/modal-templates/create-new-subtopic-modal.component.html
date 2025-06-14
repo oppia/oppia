@@ -68,9 +68,9 @@
         <div>
           <strong>Heading*</strong>
         </div>
-        <input class="form-control oppia-new-subtopic-editable-field e2e-test-new-subtopic-title-field required"
+        <input class="form-control oppia-new-subtopic-editable-field e2e-test-new-subtopic-study-guide-section-heading-field required"
                placeholder="Enter heading of the section"
-               [(ngModel)]="subtopicTitle" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
+               [(ngModel)]="sectionHeadingPlaintext" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
         <div>
           <strong>Content*</strong>
           <div class="description-editor e2e-test-subtopic-description-editor">
@@ -78,7 +78,7 @@
             <schema-based-editor [schema]="getSchema()"
                                  class="e2e-test-create-subtopic-page-content"
                                  [localValue]="htmlData"
-                                 (localValueChange)="localValueChange($event)">
+                                 (localValueChange)="localContentValueChange($event)">
             </schema-based-editor>
           </div>
         </div>

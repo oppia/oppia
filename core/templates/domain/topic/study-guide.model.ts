@@ -22,11 +22,13 @@ import {
   StudyGuideSection,
   StudyGuideSectionBackendDict,
 } from './study-guide-sections.model';
+import {AppConstants} from 'app.constants';
 
 export interface StudyGuideBackendDict {
   id: string;
   topic_id: string;
   sections: StudyGuideSectionBackendDict[];
+  next_content_id_index: number;
   language_code: string;
 }
 
@@ -35,6 +37,7 @@ export class StudyGuide {
     private id: string,
     private topicId: string,
     private sections: StudyGuideSection[],
+    private nextContentIdIndex: number,
     private languageCode: string
   ) {}
 
@@ -59,6 +62,14 @@ export class StudyGuide {
     this.sections = cloneDeep(sections);
   }
 
+  getNextContentIdIndex(): number {
+    return this.nextContentIdIndex;
+  }
+
+  setNextContentIdIndex(newNextContentIdIndex: number): void {
+    this.nextContentIdIndex = newNextContentIdIndex;
+  }
+
   // Returns the language code for the study guide.
   getLanguageCode(): string {
     return this.languageCode;
@@ -68,6 +79,7 @@ export class StudyGuide {
     this.id = otherStudyGuide.getId();
     this.topicId = otherStudyGuide.getTopicId();
     this.sections = cloneDeep(otherStudyGuide.getSections());
+    this.nextContentIdIndex = otherStudyGuide.nextContentIdIndex;
     this.languageCode = otherStudyGuide.getLanguageCode();
   }
 
@@ -81,6 +93,7 @@ export class StudyGuide {
       studyGuideBackendDict.id,
       studyGuideBackendDict.topic_id,
       sections,
+      studyGuideBackendDict.next_content_id_index,
       studyGuideBackendDict.language_code
     );
   }
@@ -91,11 +104,17 @@ export class StudyGuide {
 
   static createDefault(topicId: string, subtopicId: number): StudyGuide {
     let sections: StudyGuideSection[] = [];
-    sections.push(StudyGuideSection.createDefault());
+    sections.push(
+      StudyGuideSection.createDefault(
+        AppConstants.DEFAULT_SECTION_HEADING_CONTENT_ID,
+        AppConstants.DEFAULT_SECTION_CONTENT_CONTENT_ID
+      )
+    );
     return new StudyGuide(
       this.getStudyGuideId(topicId, subtopicId),
       topicId,
       sections,
+      2,
       'en'
     );
   }
