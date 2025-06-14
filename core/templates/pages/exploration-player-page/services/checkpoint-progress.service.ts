@@ -19,17 +19,18 @@
 
 import {Injectable, EventEmitter} from '@angular/core';
 
-
 @Injectable({
   providedIn: 'root',
 })
 export class CheckpointProgressService {
-
-  constructor (
-  ) {}
+  lastCompletedCheckpoint: string;
+  constructor() {}
 
   setLastCompletedCheckpoint(checkpointStateName: string): void {
     this.lastCompletedCheckpoint = checkpointStateName;
   }
 
+  getLastCompletedCheckpoint(): string {
+    return this.lastCompletedCheckpoint;
+  }
 }
