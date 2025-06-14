@@ -63,6 +63,13 @@ export type ModalUserInteractions = (
   container: string
 ) => Promise<void>;
 
+const actionStatusMessageSelector = '.e2e-test-status-message';
+
+export enum StringComparisonType {
+  EXACT_MATCH = 'Exact Match',
+  INCLUDES = 'Includes',
+}
+
 export class BaseUser {
   page!: Page;
   browserObject!: Browser;
@@ -950,6 +957,45 @@ export class BaseUser {
       element,
       clickable
     );
+  }
+
+  /**
+   * Verifies that the action status message matches the expected message.
+   * @param {string} statusMessage - The expected status message to check for.
+   * @param {StringComparisonType} comparasionType - The type of string comparison to perform.
+   *   Can be either EXACT_MATCH (default) to check for exact string equality,
+   *   or INCLUDES to check if the actual message contains the expected message.
+   * @throws {Error} If the actual status message does not match the expected message according to the comparison type.
+   */
+  async expectActionStatusMessageToBe(
+    statusMessage: string,
+    comparasionType: StringComparisonType = StringComparisonType.EXACT_MATCH
+  ) {
+    const actualStatusMessage = await this.page.$eval(
+      actionStatusMessageSelector,
+      el => el.textContent?.trim()
+    );
+
+    switch (comparasionType) {
+      case StringComparisonType.EXACT_MATCH:
+        if (actualStatusMessage !== statusMessage) {
+          throw new Error(
+            `Action status message did not match within the specified time. Actual status message: "${actualStatusMessage}", expected status message: "${statusMessage}"`
+          );
+        }
+        return;
+      case StringComparisonType.INCLUDES:
+        if (!actualStatusMessage?.includes(statusMessage)) {
+          throw new Error(
+            `Action status message did not include the expected text. Actual status message: "${actualStatusMessage}", expected text: "${statusMessage}"`
+          );
+        }
+        return;
+      default:
+        throw new Error(
+          `Invalid comparison type: ${comparasionType}. Please use StringComparisonType.`
+        );
+    }
   }
 }
 

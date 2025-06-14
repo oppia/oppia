@@ -194,7 +194,16 @@ export class BlogPostEditor extends BaseUser {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
 
-    await this.expectTextContentToMatch(blogTitleInput, newBlogPostTitle);
+    const modelValue = await this.page.$eval(blogTitleInput, el =>
+      el.getAttribute('ng-reflect-model')
+    );
+    if (modelValue !== newBlogPostTitle) {
+      throw new Error(
+        `Title is not updated! Found ${modelValue}, expected ${newBlogPostTitle}`
+      );
+    }
+
+    // await this.expectTextContentToMatch(blogTitleInput, newBlogPostTitle);
   }
 
   /**
