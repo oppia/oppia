@@ -76,8 +76,8 @@ import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {LoaderService} from 'services/loader.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {RteHelperService} from 'services/rte-helper.service';
-import {AddStudyGuideSectionModalComponent} from 'pages/skill-editor-page/modal-templates/add-study-guide-section.component';
-import {DeleteStudyGuideSectionComponent} from 'pages/skill-editor-page/modal-templates/delete-study-guide-section-modal.component';
+import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtopic-editor/add-study-guide-section.component';
+import {DeleteStudyGuideSectionComponent} from 'pages/topic-editor-page/subtopic-editor/delete-study-guide-section-modal.component';
 import {StudyGuideSectionEditorComponent} from './subtopic-editor/study-guide-section-editor.component';
 
 @NgModule({

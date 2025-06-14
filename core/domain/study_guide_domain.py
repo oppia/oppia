@@ -499,43 +499,45 @@ class StudyGuide:
             new_sections: list(StudyGuideSection). The new list of
                 sections.
         """
-        for new_section, old_section in zip(
-            new_sections, self.sections
-        ):
-            if len(new_sections) == len(self.sections):
-                for new_section, old_section in zip(
-                    new_sections, self.sections
+        if len(new_sections) == len(self.sections):
+            for new_section, old_section in zip(
+                new_sections, self.sections
+            ):
+                if (
+                    new_section.heading.unicode_str != (
+                        old_section.heading.unicode_str)
                 ):
-                    if (
-                        new_section.heading.unicode_str != (
-                            old_section.heading.unicode_str)
-                    ):
-                        old_section.heading.unicode_str = (
-                            new_section.heading.unicode_str)
-                    elif (
-                        new_section.content.html != (
-                            old_section.content.html)
-                    ):
-                        old_section.content.html = (
-                            new_section.content.html)
-            elif (len(new_sections) < len(self.sections)):
-                for i, new_section in enumerate(new_sections):
-                    old_section = self.sections[i]
-                    if (new_section.heading.content_id != (
-                        old_section.heading.content_id) and
-                        new_section.content.content_id != (
-                        old_section.content.content_id)
-                    ):
-                        self.delete_section(
-                            old_section.heading.content_id,
-                            old_section.content.content_id
-                        )
-            else:
-                new_section = new_sections[-1]
-                self.add_section(
-                    new_section.heading.unicode_str,
-                    new_section.content.html
-                )
+                    old_section.heading.unicode_str = (
+                        new_section.heading.unicode_str)
+                elif (
+                    new_section.content.html != (
+                        old_section.content.html)
+                ):
+                    old_section.content.html = (
+                        new_section.content.html)
+        elif (len(new_sections) < len(self.sections)):
+            for i, new_section in enumerate(new_sections):
+                old_section = self.sections[i]
+                if (new_section.heading.content_id != (
+                    old_section.heading.content_id) and
+                    new_section.content.content_id != (
+                    old_section.content.content_id)
+                ):
+                    self.delete_section(
+                        old_section.heading.content_id,
+                        old_section.content.content_id
+                    )
+                    return
+            self.delete_section(
+                self.sections[-1].heading.content_id,
+                self.sections[-1].content.content_id,
+            )
+        else:
+            new_section = new_sections[-1]
+            self.add_section(
+                new_section.heading.unicode_str,
+                new_section.content.html
+            )
 
     def add_section(
             self,

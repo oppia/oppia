@@ -37,8 +37,8 @@ import {StudyGuide} from 'domain/topic/study-guide.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {DeleteStudyGuideSectionComponent} from 'pages/skill-editor-page/modal-templates/delete-study-guide-section-modal.component';
-import {AddStudyGuideSectionModalComponent} from 'pages/skill-editor-page/modal-templates/add-study-guide-section.component';
+import {DeleteStudyGuideSectionComponent} from 'pages/topic-editor-page/subtopic-editor/delete-study-guide-section-modal.component';
+import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtopic-editor/add-study-guide-section.component';
 
 @Component({
   selector: 'oppia-subtopic-editor-tab',
