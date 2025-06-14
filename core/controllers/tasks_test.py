@@ -67,7 +67,19 @@ class TasksTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_email_sent_when_feedback_in_thread(self) -> None:
@@ -160,7 +172,23 @@ class TasksTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+                'http://localhost:8181'
+            )
         ]
     )
     def test_email_is_sent_when_contributor_achieves_a_new_rank(self) -> None:
@@ -210,7 +238,19 @@ class TasksTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_instant_feedback_reply_email(self) -> None:
@@ -258,7 +298,19 @@ class TasksTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_email_sent_when_status_changed(self) -> None:
@@ -306,7 +358,19 @@ class TasksTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
-            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender')
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_email_sent_to_moderator_after_flag(self) -> None:

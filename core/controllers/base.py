@@ -568,7 +568,9 @@ class BaseHandler(
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'get' method with different number of arguments and types.
-    def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
+    def get(
+        self, *args: Any, **kwargs: Any # pylint: disable=unused-argument
+    ) -> None:
         """Base method to handle GET requests."""
         logging.warning('Invalid URL requested: %s', self.request.uri)
         self.error(404)
