@@ -133,10 +133,6 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       .isEnabled;
   }
 
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
-  }
-
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return subtitledHtml.html;

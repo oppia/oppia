@@ -53,7 +53,7 @@
         "core.controllers.release_coordinator_test",
         "core.platform.secrets.dev_mode_secrets_services_test",
         "scripts.generate_root_files_mapping_test",
-        "core.jobs.batch_jobs.clean_up_voiceover_models_job_test"
+        "core.jobs.batch_jobs.delete_voiceover_models_data_job_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
@@ -111,6 +111,8 @@
         "core.controllers.beam_jobs_test",
         "core.controllers.contributor_dashboard_admin_test",
         "core.controllers.oppia_root_test",
+        "core.domain.study_guide_domain_test",
+        "core.domain.study_guide_services_test",
         "core.domain.subtopic_page_domain_test",
         "core.domain.subscription_services_test",
         "core.domain.draft_upgrade_services_test",
@@ -207,6 +209,7 @@
         "core.domain.learner_group_fetchers_test",
         "core.domain.question_fetchers_test",
         "core.domain.exp_domain_test",
+        "core.domain.exp_rights_domain_test",
         "core.domain.customization_args_util_test",
         "core.domain.auth_domain_test",
         "core.domain.action_registry_test",
@@ -317,8 +320,6 @@
         "core.jobs.batch_jobs.topic_migration_jobs_test",
         "core.jobs.batch_jobs.blog_post_search_indexing_jobs_test",
         "core.jobs.batch_jobs.rejecting_suggestion_for_invalid_content_ids_jobs_test",
-        "core.jobs.batch_jobs.manual_voice_artist_name_job_test",
-        "core.jobs.batch_jobs.voiceover_migration_job_test",
         "core.jobs.io.cache_io_test",
         "core.platform.secrets.cloud_secrets_services_test",
         "extensions.interactions.ItemSelectionInput.ItemSelectionInput_test",

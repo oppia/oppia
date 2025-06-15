@@ -20,11 +20,10 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
-import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
 import {
-  AudioTranslationLanguageService,
+  ContentTranslationLanguageService,
   ExplorationLanguageInfo,
-} from 'pages/exploration-player-page/services/audio-translation-language.service';
+} from 'pages/exploration-player-page/services/content-translation-language.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {
@@ -35,10 +34,10 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {AudioPreloaderService} from '../services/audio-preloader.service';
+import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 
 @Component({
   selector: 'oppia-content-language-selector',
@@ -56,11 +55,10 @@ export class ContentLanguageSelectorComponent implements OnInit {
     private ngbModal: NgbModal,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private windowRef: WindowRef,
-    private platformFeatureService: PlatformFeatureService,
     private voiceoverPlayerService: VoiceoverPlayerService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private audioPreloaderService: AudioPreloaderService,
-    private audioTranslationLanguageService: AudioTranslationLanguageService
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -93,10 +91,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
       }
     }
 
-    if (
-      this.isVoiceoverContributionWithAccentEnabled() &&
-      this.audioPreloaderService.exploration !== undefined
-    ) {
+    if (this.audioPreloaderService.exploration !== undefined) {
       this.voiceoverBackendApiService
         .fetchVoiceoverAdminDataAsync()
         .then(response => {
@@ -104,10 +99,6 @@ export class ContentLanguageSelectorComponent implements OnInit {
             response.languageAccentMasterList;
           this.voiceoverPlayerService.languageCodesMapping =
             response.languageCodesMapping;
-
-          this.audioTranslationLanguageService.setCurrentAudioLanguageCode(
-            this.selectedLanguageCode
-          );
 
           this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
             this.selectedLanguageCode,
@@ -121,21 +112,20 @@ export class ContentLanguageSelectorComponent implements OnInit {
     }
   }
 
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
-  }
-
   onSelectLanguage(newLanguageCode: string): void {
-    if (this.isVoiceoverContributionWithAccentEnabled()) {
-      this.entityVoiceoversService.setLanguageCode(newLanguageCode);
+    this.entityVoiceoversService.setLanguageCode(newLanguageCode);
 
-      this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
-        this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
-          newLanguageCode,
-          this.entityVoiceoversService.getLanguageAccentCodes()
-        );
-      });
-    }
+    this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+      this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+        newLanguageCode,
+        this.entityVoiceoversService.getLanguageAccentCodes()
+      );
+      this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+        this.entityVoiceoversService.getActiveEntityVoiceovers()
+          ?.automatedVoiceoversAudioOffsetsMsecs || {}
+      );
+      this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+    });
 
     if (this.shouldPromptForRefresh()) {
       const modalRef = this.ngbModal.open(

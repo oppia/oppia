@@ -158,7 +158,7 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
     'category': 'Algorithms',
     'author_notes': '',
     'blurb': '',
-    'states_schema_version': 55,
+    'states_schema_version': 57,
     'init_state_name': 'Introduction',
     'language_code': 'en',
     'objective': 'Learn the exploration',
@@ -194,11 +194,6 @@ SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict({
             },
             'classifier_model_id': None,
             'linked_skill_id': None,
-            'recorded_voiceovers': {
-                    'voiceovers_mapping': {
-                    'content_0': {}
-                }
-            },
             'solicit_answer_details': False,
             'card_is_checkpoint': True,
             'inapplicable_skill_misconception_ids': []
@@ -2439,7 +2434,9 @@ class AdminSuperAdminPrivilegesHandler(
             NotFoundException. No such user exists.
         """
         assert self.normalized_payload is not None
-        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+        if self.email != parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value
+        ):
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
         username = self.normalized_payload['username']
@@ -2463,7 +2460,9 @@ class AdminSuperAdminPrivilegesHandler(
                 super admin account.
         """
         assert self.normalized_request is not None
-        if self.email != feconf.ADMIN_EMAIL_ADDRESS:
+        admin_email_address = parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value)
+        if self.email != admin_email_address:
             raise self.UnauthorizedUserException(
                 'Only the default system admin can manage super admins')
         username = self.normalized_request['username']
@@ -2472,7 +2471,7 @@ class AdminSuperAdminPrivilegesHandler(
         if user_settings is None:
             raise self.NotFoundException('No such user exists')
 
-        if user_settings.email == feconf.ADMIN_EMAIL_ADDRESS:
+        if user_settings.email == admin_email_address:
             raise self.InvalidInputException(
                 'Cannot revoke privileges from the default super admin account')
 
