@@ -21,7 +21,6 @@ from __future__ import annotations
 import logging
 import textwrap
 
-from core import feconf
 from core.domain import platform_parameter_list
 from core.platform.email import dev_mode_email_services
 from core.tests import test_utils
@@ -31,6 +30,11 @@ from typing import Dict, Union
 
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_email_address = 'testadmin@example.com'
+        self.system_email_address = 'system@example.com'
 
     @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
@@ -57,6 +61,7 @@ class EmailTests(test_utils.GenericTestBase):
             Body:
                 Content-type: text/html
                 Data length: %d
+                Html content: %s
 
             Bcc: None
             Reply_to: None
@@ -65,8 +70,8 @@ class EmailTests(test_utils.GenericTestBase):
 
             Attachments: None
             """ % (
-                feconf.SYSTEM_EMAIL_ADDRESS, feconf.ADMIN_EMAIL_ADDRESS,
-                'subject', 4, 4))
+                self.system_email_address, self.admin_email_address,
+                'subject', 4, 4, 'html'))
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
             'You are not currently sending out real emails since this is a '
@@ -75,7 +80,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
-                feconf.SYSTEM_EMAIL_ADDRESS, [feconf.ADMIN_EMAIL_ADDRESS],
+                self.system_email_address, [self.admin_email_address],
                 'subject', 'body', 'html')
         self.assertEqual(len(observed_log_messages), 2)
         self.assertEqual(
@@ -116,6 +121,7 @@ class EmailTests(test_utils.GenericTestBase):
             Body:
                 Content-type: text/html
                 Data length: %d
+                Html content: %s
 
             Bcc: %s
             Reply_to: %s
@@ -124,8 +130,8 @@ class EmailTests(test_utils.GenericTestBase):
 
             Attachments: %s
             """ % (
-                feconf.SYSTEM_EMAIL_ADDRESS, recipient_email_list_str,
-                'subject', 4, 4, bcc_email_list_str, '123',
+                self.system_email_address, recipient_email_list_str,
+                'subject', 4, 4, 'html', bcc_email_list_str, '123',
                 len(recipient_variables), 'attachment.txt'))
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
@@ -135,7 +141,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         with self.swap(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
-                feconf.SYSTEM_EMAIL_ADDRESS,
+                self.system_email_address,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],
                 'subject', 'body', 'html',
                 bcc=['e@e.com', 'f@f.com', 'g@g.com', 'h@h.com'],

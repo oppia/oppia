@@ -53,7 +53,9 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
                 queue_name: str,
                 url: str,
                 payload: Dict[str, Any],
-                scheduled_for: Optional[datetime.datetime] = None, # pylint: disable=unused-argument
+                scheduled_for: Optional[ # pylint: disable=unused-argument
+                    datetime.datetime
+                ] = None,
                 task_name: Optional[str] = None,
         ) -> None:
             self.assertEqual(queue_name, correct_queue_name)

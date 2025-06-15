@@ -1447,8 +1447,9 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
                 '/mock_view_feedback_thread/%s' % self.private_exp_thread_id,
                 expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to view '
-                'exploration feedback.')
+                response['error'],
+                'You do not have credentials to view exploration feedback.'
+            )
         self.logout()
 
     def test_viewer_cannot_view_feedback_threads_with_invalid_thread_id(
@@ -1791,7 +1792,8 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -1828,7 +1830,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2285,7 +2287,8 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -2320,7 +2323,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/run-anny-job', expected_status_int=401)
@@ -2417,7 +2420,8 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -2454,7 +2458,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2615,7 +2619,8 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
@@ -2633,7 +2638,7 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
 
     def test_primary_admin_can_delete_any_user(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
@@ -4757,7 +4762,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=404)
         error_msg = (
-            'Could not find the resource http://localhost/mock_edit_story/%s.' 
+            'Could not find the resource http://localhost/mock_edit_story/%s.'
             % (self.story_id)
         )
         self.assertEqual(response['error'], error_msg)
@@ -6959,8 +6964,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
                 expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to submit'
-                ' images to questions.')
+                response['error'],
+                'You do not have credentials to submit images to questions.'
+            )
         self.logout()
 
     def test_can_submit_images_to_explorations(self) -> None:
