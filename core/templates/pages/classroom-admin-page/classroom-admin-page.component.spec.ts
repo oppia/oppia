@@ -26,7 +26,7 @@ import {
 } from '@angular/core/testing';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
 import {ClassroomAdminPageComponent} from 'pages/classroom-admin-page/classroom-admin-page.component';

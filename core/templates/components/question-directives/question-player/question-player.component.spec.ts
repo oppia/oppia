@@ -26,7 +26,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
@@ -56,7 +56,7 @@ describe('Question Player Component', () => {
   let ngbModal: NgbModal;
   let playerPositionService: PlayerPositionService;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let questionPlayerEngineService: QuestionPlayerEngineService;
   let questionPlayerStateService: QuestionPlayerStateService;
   let userService: UserService;
   let windowRef: WindowRef;
@@ -125,7 +125,7 @@ describe('Question Player Component', () => {
           useClass: MockPlayerPositionService,
         },
         {
-          provide: ExplorationPlayerStateService,
+          provide: QuestionPlayerEngineService,
           useClass: MockExplorationPlayerStateService,
         },
         {
@@ -153,8 +153,8 @@ describe('Question Player Component', () => {
     preventPageUnloadEventService = TestBed.inject(
       PreventPageUnloadEventService
     );
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
+    questionPlayerEngineService = TestBed.inject(
+      QuestionPlayerEngineService
     );
     questionPlayerStateService = TestBed.inject(QuestionPlayerStateService);
     userService = TestBed.inject(UserService);
@@ -190,7 +190,7 @@ describe('Question Player Component', () => {
 
   it('should add subscriptions on initialization', fakeAsync(() => {
     spyOn(playerPositionService.onCurrentQuestionChange, 'subscribe');
-    spyOn(explorationPlayerStateService.onTotalQuestionsReceived, 'subscribe');
+    spyOn(questionPlayerEngineService.onTotalQuestionsReceived, 'subscribe');
     spyOn(questionPlayerStateService.onQuestionSessionCompleted, 'subscribe');
 
     component.ngOnInit();
@@ -205,7 +205,7 @@ describe('Question Player Component', () => {
       playerPositionService.onCurrentQuestionChange.subscribe
     ).toHaveBeenCalled();
     expect(
-      explorationPlayerStateService.onTotalQuestionsReceived.subscribe
+      questionPlayerEngineService.onTotalQuestionsReceived.subscribe
     ).toHaveBeenCalled();
     expect(
       questionPlayerStateService.onQuestionSessionCompleted.subscribe

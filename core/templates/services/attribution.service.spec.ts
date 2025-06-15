@@ -23,7 +23,7 @@ import {
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {AttributionService} from 'services/attribution.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('AttributionService', () => {

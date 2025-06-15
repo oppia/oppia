@@ -34,7 +34,7 @@ import {UserService} from 'services/user.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {ChangeListService} from '../services/change-list.service';
 import {HelpModalComponent} from '../modal-templates/help-modal.component';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';

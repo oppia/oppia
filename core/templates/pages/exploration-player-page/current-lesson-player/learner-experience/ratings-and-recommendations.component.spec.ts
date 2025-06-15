@@ -35,7 +35,7 @@ import {UserService} from '../../../../services/user.service';
 import {LearnerViewRatingService} from '../../services/learner-view-rating.service';
 import {MockLimitToPipe} from '../templates/lesson-information-card-modal.component.spec';
 import {RatingsAndRecommendationsComponent} from './ratings-and-recommendations.component';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
+import {ExplorationModeService} from '../../../../services/exploration-mode.service';
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {AssetsBackendApiService} from '../../../../services/assets-backend-api.service';
@@ -54,7 +54,7 @@ describe('Ratings and recommendations component', () => {
   let learnerViewRatingService: LearnerViewRatingService;
   let urlService: UrlService;
   let userService: UserService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let explorationModeService: ExplorationModeService;
   let urlInterpolationService: UrlInterpolationService;
   let localStorageService: LocalStorageService;
   let assetsBackendApiService: AssetsBackendApiService;
@@ -87,7 +87,7 @@ describe('Ratings and recommendations component', () => {
         LearnerViewRatingService,
         UrlService,
         UserService,
-        ExplorationPlayerStateService,
+        ExplorationModeService,
         UrlInterpolationService,
         AssetsBackendApiService,
         StoryViewerBackendApiService,
@@ -113,8 +113,8 @@ describe('Ratings and recommendations component', () => {
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
+    explorationModeService = TestBed.inject(
+      ExplorationModeService
     );
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     localStorageService = TestBed.inject(LocalStorageService);
@@ -179,7 +179,7 @@ describe('Ratings and recommendations component', () => {
         }
       );
       spyOn(
-        explorationPlayerStateService,
+        explorationModeService,
         'isInStoryChapterMode'
       ).and.returnValue(true);
       spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
@@ -245,7 +245,7 @@ describe('Ratings and recommendations component', () => {
       tick(1000);
 
       expect(
-        explorationPlayerStateService.isInStoryChapterMode
+        explorationModeService.isInStoryChapterMode
       ).toHaveBeenCalled();
       expect(componentInstance.inStoryMode).toBe(true);
       expect(componentInstance.storyId).toBe('story_id');
@@ -275,7 +275,7 @@ describe('Ratings and recommendations component', () => {
       expect(componentInstance.storyViewerUrl).toBe(undefined);
 
       spyOn(
-        explorationPlayerStateService,
+        explorationModeService,
         'isInStoryChapterMode'
       ).and.returnValue(false);
       spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
@@ -286,7 +286,7 @@ describe('Ratings and recommendations component', () => {
       tick();
 
       expect(
-        explorationPlayerStateService.isInStoryChapterMode
+        explorationModeService.isInStoryChapterMode
       ).toHaveBeenCalled();
       expect(componentInstance.inStoryMode).toBe(false);
       expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();

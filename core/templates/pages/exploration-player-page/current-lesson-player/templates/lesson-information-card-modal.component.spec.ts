@@ -40,7 +40,7 @@ import {PlayerTranscriptService} from '../../services/player-transcript.service'
 import {LessonInformationCardModalComponent} from './lesson-information-card-modal.component';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {DateTimeFormatService} from '../../../../services/date-time-format.service';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
+import {ProgressUrlService} from '../../services/progress-url.service';
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 import {RatingComputationService} from '../../../../components/ratings/rating-computation/rating-computation.service';
 import {CheckpointCelebrationUtilityService} from '../../services/checkpoint-celebration-utility.service';
@@ -137,7 +137,7 @@ describe('Lesson Information card modal component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
   let userService: UserService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let progressUrlService: ProgressUrlService;
   let localStorageService: LocalStorageService;
   let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
   let playerPositionService: PlayerPositionService;
@@ -232,8 +232,8 @@ describe('Lesson Information card modal component', () => {
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
+    progressUrlService = TestBed.inject(
+      ProgressUrlService
     );
     checkpointCelebrationUtilityService = TestBed.inject(
       CheckpointCelebrationUtilityService
@@ -360,7 +360,7 @@ describe('Lesson Information card modal component', () => {
       'when unique progress URL ID exists',
     fakeAsync(() => {
       spyOn(
-        explorationPlayerStateService,
+        progressUrlService,
         'isInStoryChapterMode'
       ).and.returnValue(true);
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
@@ -375,7 +375,7 @@ describe('Lesson Information card modal component', () => {
         ''
       );
       spyOn(
-        explorationPlayerStateService,
+        progressUrlService,
         'getUniqueProgressUrlId'
       ).and.returnValue('abcdef');
 
@@ -480,11 +480,11 @@ describe('Lesson Information card modal component', () => {
 
   it('should save logged-out learner progress correctly', fakeAsync(() => {
     spyOn(
-      explorationPlayerStateService,
+      progressUrlService,
       'setUniqueProgressUrlId'
     ).and.returnValue(Promise.resolve());
     spyOn(
-      explorationPlayerStateService,
+      progressUrlService,
       'getUniqueProgressUrlId'
     ).and.returnValue('abcdef');
     spyOn(urlService, 'getOrigin').and.returnValue('https://oppia.org');

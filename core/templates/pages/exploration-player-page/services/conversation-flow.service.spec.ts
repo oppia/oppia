@@ -24,7 +24,6 @@ import {ConversationFlowService} from './conversation-flow.service';
 import {StateCard} from '../../../domain/state_card/state-card.model';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
-import {ExplorationPlayerStateService} from './exploration-player-state.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
@@ -34,7 +33,6 @@ describe('Conversation flow service', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let conversationFlowService: ConversationFlowService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
   let playerTranscriptService: PlayerTranscriptService;
 
   let createCard = function (interactionType: string): StateCard {
@@ -71,15 +69,15 @@ describe('Conversation flow service', () => {
       ContentTranslationManagerService
     );
     conversationFlowService = TestBed.inject(ConversationFlowService);
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
+    conversationFlowService = TestBed.inject(
+      ConversationFlowService
     );
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
   }));
 
   it('should handle adding new cards to transcript', () => {
     spyOn(playerTranscriptService, 'addNewCard');
-    spyOn(explorationPlayerStateService, 'getLanguageCode').and.returnValue(
+    spyOn(conversationFlowService, 'getLanguageCode').and.returnValue(
       'en'
     );
     spyOn(

@@ -34,8 +34,8 @@ import {MockTranslateService} from 'components/forms/schema-based-editors/integr
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
-import {PageContextService} from 'services/context.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
 import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
@@ -72,7 +72,7 @@ describe('Preview Tab Component', () => {
   let explorationEngineService: ExplorationEngineService;
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationFeaturesService: ExplorationFeaturesService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let conversationFlowService: ConversationFlowService;
   let explorationParamChangesService: ExplorationParamChangesService;
   let explorationStatesService: ExplorationStatesService;
   let graphDataService: GraphDataService;
@@ -183,8 +183,8 @@ describe('Preview Tab Component', () => {
     explorationInitStateNameService = TestBed.inject(
       ExplorationInitStateNameService
     );
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
+    conversationFlowService = TestBed.inject(
+      ConversationFlowService
     );
     explorationParamChangesService = TestBed.inject(
       ExplorationParamChangesService
@@ -218,7 +218,7 @@ describe('Preview Tab Component', () => {
       'onUpdateActiveStateIfInEditor'
     ).and.returnValue(mockUpdateActiveStateIfInEditorEventEmitter);
     spyOnProperty(
-      explorationPlayerStateService,
+      conversationFlowService,
       'onPlayerStateChange'
     ).and.returnValue(mockPlayerStateChangeEventEmitter);
     spyOn(explorationEngineService, 'initSettingsFromEditor').and.stub();

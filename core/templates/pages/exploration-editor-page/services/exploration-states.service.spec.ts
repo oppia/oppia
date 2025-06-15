@@ -19,7 +19,7 @@
 import {ChangeListService} from './change-list.service';
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationStatesService} from './exploration-states.service';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';

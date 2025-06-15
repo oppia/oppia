@@ -31,7 +31,7 @@ import {
 } from '@angular/core/testing';
 import {ImageEditorComponent} from './image-editor.component';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {AppConstants} from 'app.constants';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';

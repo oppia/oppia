@@ -27,7 +27,7 @@ import {Injectable} from '@angular/core';
   providedIn: 'root',
 })
 export class CheckpointProgressService {
-  lastCompletedCheckpoint: string;
+  lastCompletedCheckpoint!: string;
   constructor() {}
 
   setLastCompletedCheckpoint(checkpointStateName: string): void {

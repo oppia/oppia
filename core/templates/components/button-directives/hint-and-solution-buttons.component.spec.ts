@@ -34,7 +34,7 @@ import {
 } from 'domain/exploration/InteractionObjectFactory';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
@@ -52,7 +52,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   let interactionObjectFactory: InteractionObjectFactory;
   let playerTranscriptService: PlayerTranscriptService;
   let hintAndSolutionModalService: HintAndSolutionModalService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let explorationModeService: ExplorationModeService;
   let statsReportingService: StatsReportingService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
@@ -138,8 +138,8 @@ describe('HintAndSolutionButtonsComponent', () => {
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     hintAndSolutionModalService = TestBed.inject(HintAndSolutionModalService);
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
+    explorationModeService = TestBed.inject(
+      ExplorationModeService
     );
     statsReportingService = TestBed.inject(StatsReportingService);
 
@@ -433,7 +433,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         hintsAndSolutionManagerService,
         'isSolutionConsumed'
       ).and.returnValue(true);
-      spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValue(
+      spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(
         false
       );
       spyOn(statsReportingService, 'recordSolutionHit');
@@ -460,7 +460,7 @@ describe('HintAndSolutionButtonsComponent', () => {
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       true
     );
-    spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValue(
+    spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(
       false
     );
     spyOn(statsReportingService, 'recordSolutionHit');

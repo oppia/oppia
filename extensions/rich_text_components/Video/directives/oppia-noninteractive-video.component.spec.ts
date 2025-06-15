@@ -19,7 +19,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {NoninteractiveVideo} from './oppia-noninteractive-video.component';
 import {HtmlEscaperService} from 'services/html-escaper.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {NO_ERRORS_SCHEMA, SimpleChanges} from '@angular/core';
 import {AutoplayedVideosService} from 'services/autoplayed-videos.service';
 import {ServicesConstants} from 'services/services.constants';

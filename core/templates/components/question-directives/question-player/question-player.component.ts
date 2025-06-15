@@ -37,6 +37,7 @@ import {UserService} from 'services/user.service';
 import {QuestionPlayerStateService} from './services/question-player-state.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
+import {QuestionPlayerEngineService} from './services/question-player-engine.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlService} from 'services/contextual/url.service';
 
@@ -112,7 +113,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
   constructor(
     private pageContextService: PageContextService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private questionPlayerEngineService: QuestionPlayerEngineService,
     private location: Location,
     private ngbModal: NgbModal,
     private playerPositionService: PlayerPositionService,
@@ -552,7 +553,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       );
 
       this.componentSubscription.add(
-        this.explorationPlayerStateService.onTotalQuestionsReceived.subscribe(
+        this.questionPlayerEngineService.onTotalQuestionsReceived.subscribe(
           result => this.updateTotalQuestions(result)
         )
       );

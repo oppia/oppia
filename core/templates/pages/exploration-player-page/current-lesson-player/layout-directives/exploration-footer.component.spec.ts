@@ -32,7 +32,7 @@ import {MockTranslateService} from '../../../../components/forms/schema-based-ed
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {LimitToPipe} from '../../../../filters/limit-to.pipe';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {PageContextService} from '../../../../services/context.service';
+import {PageContextService} from '../../../../services/page-context.service';
 import {UrlService} from '../../../../services/contextual/url.service';
 import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {

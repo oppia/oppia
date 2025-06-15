@@ -48,8 +48,8 @@ enum EXPLORATION_MODE {
 })
 export class ExplorationModeService {
   version: number | null = null;
-  currentMode: EXPLORATION_MODE;
-  currentEngineService:
+  currentMode!: EXPLORATION_MODE;
+  currentEngineService!:
     | ExplorationEngineService
     | QuestionPlayerEngineService
     | DiagnosticTestPlayerEngineService;

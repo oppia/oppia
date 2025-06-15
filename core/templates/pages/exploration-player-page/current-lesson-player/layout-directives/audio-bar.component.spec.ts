@@ -36,7 +36,7 @@ import {AudioBarStatusService} from '../../../../services/audio-bar-status.servi
 import {AudioPlayerService} from '../../../../services/audio-player.service';
 import {AudioPreloaderService} from '../../services/audio-preloader.service';
 import {PlayerPositionService} from '../../services/player-position.service';
-import {PageContextService} from '../../../../services/context.service';
+import {PageContextService} from '../../../../services/page-context.service';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';

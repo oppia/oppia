@@ -17,7 +17,7 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationPropertyService} from './exploration-property.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ExplorationLanguageCodeService} from './exploration-language-code.service';

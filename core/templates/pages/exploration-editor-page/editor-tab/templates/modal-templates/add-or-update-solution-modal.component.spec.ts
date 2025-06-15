@@ -27,7 +27,7 @@ import {
   SolutionObjectFactory,
 } from 'domain/exploration/SolutionObjectFactory';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {AddOrUpdateSolutionModalComponent} from './add-or-update-solution-modal.component';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';

@@ -43,7 +43,7 @@ import {State} from 'domain/state/StateObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import {AlertsService} from 'services/alerts.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {QuestionValidationService} from 'services/question-validation.service';

@@ -26,7 +26,7 @@ import {
 import {ImageWithRegionsEditorComponent} from './image-with-regions-editor.component';
 import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ImageWithRegionsResetConfirmationModalComponent} from './image-with-regions-reset-confirmation.component';
 import {AppConstants} from 'app.constants';

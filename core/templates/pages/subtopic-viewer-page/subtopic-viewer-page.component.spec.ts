@@ -31,7 +31,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {ReadOnlySubtopicPageData} from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 import {SubtopicViewerPageComponent} from './subtopic-viewer-page.component';
 import {AlertsService} from 'services/alerts.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {LoaderService} from 'services/loader.service';
 import {SubtopicViewerBackendApiService} from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';

@@ -32,7 +32,7 @@ import {
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
 import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
 import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('retrieving threads service', () => {

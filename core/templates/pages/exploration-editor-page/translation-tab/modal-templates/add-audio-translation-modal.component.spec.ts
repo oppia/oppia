@@ -27,7 +27,7 @@ import {
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {AddAudioTranslationModalComponent} from './add-audio-translation-modal.component';
 
 class MockActiveModal {

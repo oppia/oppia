@@ -29,7 +29,6 @@ import {UserService} from 'services/user.service';
 import {LearnerViewRatingService} from '../../services/learner-view-rating.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -95,9 +94,7 @@ export class RatingsAndRecommendationsComponent {
     private urlService: UrlService,
     private userService: UserService,
     private windowRef: WindowRef,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
     private urlInterpolationService: UrlInterpolationService,
-    private platformFeatureService: PlatformFeatureService,
     private localStorageService: LocalStorageService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private topicViewerBackendApiService: TopicViewerBackendApiService,

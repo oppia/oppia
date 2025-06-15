@@ -44,7 +44,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {AppConstants} from 'app.constants';
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';

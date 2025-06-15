@@ -29,7 +29,7 @@ import {
 } from '@angular/core/testing';
 import {InteractiveEndExplorationComponent} from './oppia-interactive-end-exploration.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EndExplorationBackendApiService} from './end-exploration-backend-api.service';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';

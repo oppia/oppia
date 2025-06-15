@@ -19,7 +19,7 @@
 import {TestBed, async, ComponentFixture} from '@angular/core/testing';
 
 import {AttributionGuideComponent} from './attribution-guide.component';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {UrlService} from 'services/contextual/url.service';
 import {AttributionService} from 'services/attribution.service';
