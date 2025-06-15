@@ -13,9 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tracks the current mode of the exploration player (exploration, pretest, questions, diagnostics,
- * story chapter) and provides mode-specific checks.
+ * @fileoverview Service to determine and manage the current mode of the exploration player.
+ *
+ * This service identifies the context in which an exploration or question is being played.
+ * It differentiates between various modes such as exploration, editor preview, question player,
+ * pretest, diagnostic test, and story chapter modes. Depending on the current mode, it assigns
+ * the appropriate engine service for handling state and interaction logic.
+ *
+ * It also provides utility methods to check the current mode, determine if only questions are
+ * being presented (isolated questions), and manage the exploration version information.
+ *
  */
+
 
 import {Injectable} from '@angular/core';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';

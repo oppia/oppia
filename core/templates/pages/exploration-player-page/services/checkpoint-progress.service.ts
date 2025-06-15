@@ -13,8 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tracks the current mode of the exploration player (exploration, pretest, questions, diagnostics,
- * story chapter) and provides mode-specific checks.
+ * @fileoverview Service to manage learner checkpoints in an exploration.
+ *
+ * This service handles the logic for tracking and recording learner progress through checkpoints. It provides methods to:
+ * - Get the total and completed checkpoint counts.
+ * - Mark checkpoints as reached.
+ * - Track and update the last completed checkpoint.
  */
 
 import {Injectable} from '@angular/core';

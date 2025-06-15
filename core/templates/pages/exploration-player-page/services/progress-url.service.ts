@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tracks the current mode of the exploration player (exploration, pretest, questions, diagnostics,
- * story chapter) and provides mode-specific checks.
+ * @fileoverview Generates and retrieves a unique progress URL ID for logged-out learners.
  */
 
 import {Injectable} from '@angular/core';
