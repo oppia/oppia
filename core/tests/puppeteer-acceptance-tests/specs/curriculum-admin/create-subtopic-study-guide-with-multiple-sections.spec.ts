@@ -13,24 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for Creating, Updating, Publishing, and Deleting a Classroom by a Curriculum Admin.
+ * @fileoverview Acceptance Test for Creating, Updating and Deleting Subtopic Study Guide Sections by a Curriculum Admin.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 ConsoleReporter.setConsoleErrorsToIgnore([/[\s\S]*/]);
 
 describe('Curriculum Admin', function () {
   let curriculumAdmin: CurriculumAdmin;
-  let loggedOutUser: LoggedOutUser;
   let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
@@ -39,8 +36,6 @@ describe('Curriculum Admin', function () {
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
-
-    loggedOutUser = await UserFactory.createLoggedOutUser();
 
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
@@ -55,21 +50,6 @@ describe('Curriculum Admin', function () {
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Addition and Subtraction', 'addsub');
-
-    await curriculumAdmin.createSkillForTopic(
-      'Diagnostic Test Skill',
-      'Addition and Subtraction'
-    );
-    await curriculumAdmin.createQuestionsForSkill('Diagnostic Test Skill', 3);
-    await curriculumAdmin.addSkillToDiagnosticTest(
-      'Diagnostic Test Skill',
-      'Addition and Subtraction'
-    );
-
-    await curriculumAdmin.createSkillForTopic(
-      'Addition',
-      'Addition and Subtraction'
-    );
 
     // Setup taking longer than 300000 ms.
   }, 480000);
@@ -88,15 +68,35 @@ describe('Curriculum Admin', function () {
       'Section content',
       1
     );
+    await curriculumAdmin.expectScreenshotToMatch(
+      'subtopicWithTwoSections',
+      __dirname
+    );
     await curriculumAdmin.addSubtopicStudyGuideSection(
       'Section heading 2',
       'Section content 2',
       2
     );
     await curriculumAdmin.expandStudyGuideSectionTile(0);
+    await curriculumAdmin.expectScreenshotToMatch(
+      'sectionTileOneExpanded',
+      __dirname
+    );
     await curriculumAdmin.expandStudyGuideSectionTile(2);
+    await curriculumAdmin.expectScreenshotToMatch(
+      'sectionTileThreeExpanded',
+      __dirname
+    );
     await curriculumAdmin.openSectionHeadingEditor();
+    await curriculumAdmin.expectScreenshotToMatch(
+      'sectionTileThreeHeadingEditable',
+      __dirname
+    );
     await curriculumAdmin.openSectionContentEditor();
+    await curriculumAdmin.expectScreenshotToMatch(
+      'sectionTileThreeContentEditable',
+      __dirname
+    );
     await curriculumAdmin.deleteStudyGuideSection(1);
     await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
   });

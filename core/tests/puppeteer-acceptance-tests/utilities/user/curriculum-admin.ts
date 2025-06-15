@@ -100,7 +100,7 @@ const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
 const subtopicStudyGuideHeadingField =
   '.e2e-test-new-subtopic-study-guide-section-heading-field';
 const subtopicStudyGuideContentField =
-  '.e2e-test-subtopic-study-guide-section-content-editor';
+  '.e2e-test-create-subtopic-page-content-rich-text-editor';
 const showSectionsList = '.e2e-test-show-study-guide-sections-list';
 const firstStudyGuideSectionTile = '.e2e-test-study-guide-section-0';
 const addStudyGuideSectionButton = '.e2e-test-add-study-guide-section';
@@ -618,7 +618,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.type(subtopicUrlFragmentField, urlFragment);
 
     await this.page.type(subtopicStudyGuideHeadingField, heading);
-    await this.page.type(subtopicStudyGuideContentField, content);
+    await this.clickOn(subtopicStudyGuideContentField);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(richTextAreaField, content);
 
     await this.clickOn(subtopicPhotoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
@@ -635,6 +637,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(firstStudyGuideSectionTile, {
       visible: true,
     });
+    await this.expectScreenshotToMatch('subtopicWithSingleSection', __dirname);
     await this.saveTopicDraft(topicName);
     showMessage(`Subtopic ${title} is created.`);
   }
@@ -650,7 +653,9 @@ export class CurriculumAdmin extends BaseUser {
   ): Promise<void> {
     await this.clickOn(addStudyGuideSectionButton);
     await this.type(addStudyGuideSectionModalHeading, sectionHeading);
-    await this.type(addStudyGuideSectionModalContent, sectionContent);
+    await this.clickOn(addStudyGuideSectionModalContent);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(richTextAreaField, sectionContent);
     await this.clickOn(addStudyGuideSectionModalSaveButton);
     await this.page.waitForSelector(
       `.e2e-test-study-guide-section-${currentNumberOfSections}`,
@@ -672,16 +677,19 @@ export class CurriculumAdmin extends BaseUser {
   async checkAddSectionModalShowsLengthError(): Promise<void> {
     await this.clickOn(addStudyGuideSectionButton);
     await this.type(addStudyGuideSectionModalHeading, 'Section Heading');
+    await this.clickOn(addStudyGuideSectionModalContent);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.type(
-      addStudyGuideSectionModalContent,
+      richTextAreaField,
       'Section Content Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam qu'
     );
     await this.page.waitForSelector(addStudyGuideSectionContentLength, {
       visible: true,
     });
-    await this.clearAllTextFrom(addStudyGuideSectionModalContent);
+    await this.expectScreenshotToMatch('sectionContentLengthError', __dirname);
+    await this.clearAllTextFrom(richTextAreaField);
     await this.page.waitForSelector(addStudyGuideSectionContentLength, {
-      visible: false,
+      hidden: true,
     });
     await this.clickOn(addStudyGuideSectionModalCancelButton);
   }
