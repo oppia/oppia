@@ -203,8 +203,6 @@ export class BlogPostEditor extends BaseUser {
         `Title is not updated! Found ${modelValue}, expected ${newBlogPostTitle}`
       );
     }
-
-    // await this.expectTextContentToMatch(blogTitleInput, newBlogPostTitle);
   }
 
   /**
