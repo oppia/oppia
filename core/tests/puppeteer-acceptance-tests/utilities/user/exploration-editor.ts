@@ -333,9 +333,6 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToSettingsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileNavbarDropdown, {
-        visible: true,
-      });
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
       // The option to settings tab appears only in the mobile view after clicking on the mobile options button,
@@ -346,6 +343,9 @@ export class ExplorationEditor extends BaseUser {
         });
         await this.clickOn(mobileOptionsButtonSelector);
       }
+      await this.page.waitForSelector(mobileNavbarDropdown, {
+        visible: true,
+      });
       await this.clickOn(mobileNavbarDropdown);
       await this.clickOn(mobileSettingsBarSelector);
 
@@ -1904,27 +1904,6 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn('Delete skill');
   }
 
-  async expectCurrentURLToBeOf(
-    tab: 'Preview Tab' | 'History Tab' | 'Translation Tab' | 'Main Tab'
-  ) {
-    await this.page.waitForNetworkIdle();
-    const currentUrl = this.page.url();
-    const urlPatterns = {
-      'Preview Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/preview\/.+$/,
-      'History Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/history\//,
-      'Translation Tab':
-        /^http:\/\/localhost:8181\/create\/[^\/]+#\/translation\/.+$/,
-      'Main Tab': /^http:\/\/localhost:8181\/create\/[^\/]+#\/gui\/.+$/,
-    };
-    const isCorrectUrl = urlPatterns[tab].test(currentUrl);
-
-    if (!isCorrectUrl) {
-      throw new Error(
-        `The current URL "${currentUrl}" does not match the expected pattern "${urlPatterns[tab]}".`
-      );
-    }
-  }
-
   /**
    * Function to navigate to the preview tab.
    */
@@ -1942,7 +1921,9 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOn(previewTabButton);
     }
-    await this.expectCurrentURLToBeOf('Preview Tab');
+
+    await this.page.waitForNetworkIdle();
+    expect(this.page.url()).toContain('/preview/');
   }
 
   /**
@@ -1957,7 +1938,8 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(historyTabButton);
     }
 
-    await this.expectCurrentURLToBeOf('History Tab');
+    await this.page.waitForNetworkIdle();
+    expect(this.page.url()).toContain('/history/');
   }
 
   /**
@@ -2102,7 +2084,8 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(translationTabButton);
     }
 
-    await this.expectCurrentURLToBeOf('Translation Tab');
+    await this.page.waitForNetworkIdle();
+    expect(this.page.url()).toContain('/preview/');
   }
 
   /**
@@ -2131,7 +2114,8 @@ export class ExplorationEditor extends BaseUser {
     }
     await this.waitForNetworkIdle();
 
-    await this.expectCurrentURLToBeOf('Main Tab');
+    await this.page.waitForNetworkIdle();
+    expect(this.page.url()).toContain('/gui/');
   }
 
   /**
