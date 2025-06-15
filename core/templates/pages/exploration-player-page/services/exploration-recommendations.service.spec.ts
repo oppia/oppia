@@ -56,7 +56,9 @@ describe('Exploration Recommendations Service', () => {
       node_id: NODE_ID,
     });
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue(EXPLORATION_ID);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      EXPLORATION_ID
+    );
   });
 
   describe('when used in the editor page', () => {

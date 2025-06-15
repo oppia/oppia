@@ -79,7 +79,9 @@ describe('Welcome Modal Component', () => {
       siteAnalyticsService,
       'registerTutorialModalOpenEvent'
     );
-    spyOn(pageContextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     fixture.detectChanges();
   });
 

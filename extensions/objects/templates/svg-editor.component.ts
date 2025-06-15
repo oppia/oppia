@@ -218,7 +218,8 @@ export class SvgEditorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.imageSaveDestination = this.pageContextService.getImageSaveDestination();
+    this.imageSaveDestination =
+      this.pageContextService.getImageSaveDestination();
     this.entityId = this.pageContextService.getEntityId();
     this.entityType = this.pageContextService.getEntityType();
     const domReady = new Promise((resolve, reject) => {

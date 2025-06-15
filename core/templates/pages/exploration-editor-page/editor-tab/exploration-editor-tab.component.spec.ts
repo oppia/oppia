@@ -243,7 +243,9 @@ describe('Exploration editor tab component', () => {
     alertsService = TestBed.inject(AlertsService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('explorationId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'explorationId'
+    );
     spyOn(
       stateEditorService,
       'checkEventListenerRegistrationStatus'

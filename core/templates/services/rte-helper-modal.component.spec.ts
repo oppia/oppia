@@ -384,7 +384,9 @@ describe('RteHelperModalComponent', () => {
         'empty for a math expression',
       fakeAsync(() => {
         spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
-        spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+        spyOn(pageContextService, 'getEntityType').and.returnValue(
+          'exploration'
+        );
         component.ngOnInit();
         flush();
         component.customizationArgsForm.value[0] = {

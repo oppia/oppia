@@ -200,7 +200,9 @@ describe('Editor Navigation Component', () => {
         StateTutorialFirstTimeService
       );
 
-      spyOn(pageContextService, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(pageContextService, 'getExplorationId').and.returnValue(
+        explorationId
+      );
 
       isImprovementsTabEnabledAsyncSpy = spyOn(
         explorationImprovementsService,

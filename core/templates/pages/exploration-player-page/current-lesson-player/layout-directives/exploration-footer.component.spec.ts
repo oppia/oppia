@@ -255,10 +255,13 @@ describe('ExplorationFooterComponent', () => {
       );
       spyOn(component, 'getCheckpointCount').and.returnValue(Promise.resolve());
       spyOn(component, 'showProgressReminderModal');
-      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(false);
-      spyOn(pageContextService, 'getQuestionPlayerIsManuallySet').and.returnValue(
-        true
+      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(
+        false
       );
+      spyOn(
+        pageContextService,
+        'getQuestionPlayerIsManuallySet'
+      ).and.returnValue(true);
       spyOn(
         explorationSummaryBackendApiService,
         'loadPublicAndPrivateExplorationSummariesAsync'
@@ -1369,9 +1372,10 @@ describe('ExplorationFooterComponent', () => {
         mockResizeEventEmitter
       );
       spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
-      spyOn(pageContextService, 'getQuestionPlayerIsManuallySet').and.returnValue(
-        false
-      );
+      spyOn(
+        pageContextService,
+        'getQuestionPlayerIsManuallySet'
+      ).and.returnValue(false);
       spyOn(
         explorationSummaryBackendApiService,
         'loadPublicAndPrivateExplorationSummariesAsync'

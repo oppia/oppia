@@ -112,7 +112,10 @@ export class NoninteractiveMath implements OnInit, OnChanges {
     // preloader service beforehand.
     if (
       this.imagePreloaderService.inExplorationPlayer() &&
-      !(this.pageContextService.getEntityType() === AppConstants.ENTITY_TYPE.SKILL)
+      !(
+        this.pageContextService.getEntityType() ===
+        AppConstants.ENTITY_TYPE.SKILL
+      )
     ) {
       this.imagePreloaderService
         .getImageUrlAsync(mathExpressionContent.svg_filename)

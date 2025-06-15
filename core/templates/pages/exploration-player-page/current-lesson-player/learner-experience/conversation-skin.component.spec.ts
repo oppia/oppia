@@ -573,7 +573,9 @@ describe('Conversation skin component', () => {
       username: true,
     };
     let newStateName = 'newState';
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(
         new UserInfo([], false, false, false, false, false, '', '', '', true)
@@ -731,7 +733,9 @@ describe('Conversation skin component', () => {
       is_topic_manager: false,
       username: true,
     };
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(
         new UserInfo([], false, false, false, false, false, '', '', '', true)
@@ -873,7 +877,9 @@ describe('Conversation skin component', () => {
     };
     let expResponse = sampleExpResponse;
     expResponse.is_logged_in = false;
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(
         new UserInfo([], false, false, false, false, false, '', '', '', false)
@@ -1014,7 +1020,9 @@ describe('Conversation skin component', () => {
         is_topic_manager: false,
         username: true,
       };
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(
           new UserInfo([], false, false, false, false, false, '', '', '', true)
@@ -1152,7 +1160,9 @@ describe('Conversation skin component', () => {
         new UserInfo([], false, false, false, false, false, '', '', '', true)
       )
     );
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(true);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      true
+    );
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
       'collection_id'
     );
@@ -1525,8 +1535,12 @@ describe('Conversation skin component', () => {
     'should display the exploration after the the progress reminder modal' +
       'has loaded',
     () => {
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
-      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(true);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
+      spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+        true
+      );
       spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
         null
       );
@@ -2814,7 +2828,9 @@ describe('Conversation skin component', () => {
       is_topic_manager: false,
       username: true,
     };
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(
         new UserInfo([], false, false, false, false, false, '', '', '', true)

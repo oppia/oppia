@@ -173,7 +173,9 @@ describe('OppiaInteractiveContinue', () => {
     );
 
     it('should set isInEditorMode to true when in exploration editor', () => {
-      spyOn(pageContextService, 'isInExplorationEditorMode').and.returnValue(true);
+      spyOn(pageContextService, 'isInExplorationEditorMode').and.returnValue(
+        true
+      );
       expect(component.isInEditorMode).toBe(false);
 
       component.ngOnInit();

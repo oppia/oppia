@@ -80,7 +80,9 @@ describe('Stats reporting service ', () => {
     spyOn(playthroughService, 'recordExplorationStartAction').and.callThrough();
     spyOn(playthroughService, 'recordExplorationQuitAction').and.callThrough();
     spyOn(playthroughService, 'storePlaythrough').and.callThrough();
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(true);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      true
+    );
     spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
     statsReportingService.stateStopwatch = Stopwatch.create();
   });

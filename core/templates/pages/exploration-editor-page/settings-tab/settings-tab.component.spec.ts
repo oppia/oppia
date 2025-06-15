@@ -237,7 +237,9 @@ describe('Settings Tab Component', () => {
       explorationTagsService,
       'onExplorationPropertyChanged'
     ).and.returnValue(mockExplorationTagsServiceonPropertyChanged);
-    spyOn(pageContextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     spyOn(
       userExplorationPermissionsService,
       'getPermissionsAsync'

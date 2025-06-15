@@ -164,12 +164,16 @@ describe('AttributionService', () => {
   }));
 
   it('should allow attribution generation in exp player page', () => {
-    spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(true);
+    spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+      true
+    );
     expect(attributionService.isGenerateAttributionAllowed()).toBeTrue();
   });
 
   it('should not allow attribution generation in non exp player pages', () => {
-    spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+      false
+    );
     expect(attributionService.isGenerateAttributionAllowed()).toBeFalse();
   });
 });

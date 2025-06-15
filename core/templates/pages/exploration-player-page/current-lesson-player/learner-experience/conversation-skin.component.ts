@@ -238,7 +238,8 @@ export class ConversationSkinComponent {
   }
 
   ngOnInit(): void {
-    this._editorPreviewMode = this.pageContextService.isInExplorationEditorPage();
+    this._editorPreviewMode =
+      this.pageContextService.isInExplorationEditorPage();
 
     this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     this.pidInUrl = this.urlService.getPidFromUrl();

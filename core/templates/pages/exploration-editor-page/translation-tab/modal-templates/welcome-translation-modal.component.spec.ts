@@ -66,7 +66,9 @@ describe('Welcome Translation Modal Component', function () {
     pageContextService = TestBed.inject(PageContextService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     spyOn(
       siteAnalyticsService,
       'registerTutorialModalOpenEvent'

@@ -87,7 +87,9 @@ describe('Post Publish Modal Controller', function () {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     pageContextService = TestBed.inject(PageContextService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    spyOn(pageContextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     spyOn(
       urlInterpolationService,
       'getStaticCopyrightedImageUrl'

@@ -351,7 +351,9 @@ describe('Translator Overview component', () => {
   });
 
   it('should initialize component properties after controller is initialized', () => {
-    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(true);
+    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+      true
+    );
     component.canShowTabModeSwitcher();
 
     expect(component.inTranslationMode).toBe(true);
@@ -377,7 +379,9 @@ describe('Translator Overview component', () => {
     });
 
     it('should show mode switcher if exploration is linked to story', () => {
-      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(true);
+      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+        true
+      );
       expect(component.canShowTabModeSwitcher()).toBeTrue;
     });
 

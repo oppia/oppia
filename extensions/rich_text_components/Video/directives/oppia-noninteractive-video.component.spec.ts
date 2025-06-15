@@ -52,7 +52,11 @@ describe('NoninteractiveVideo', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [NoninteractiveVideo],
-      providers: [HtmlEscaperService, PageContextService, AutoplayedVideosService],
+      providers: [
+        HtmlEscaperService,
+        PageContextService,
+        AutoplayedVideosService,
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -72,7 +76,9 @@ describe('NoninteractiveVideo', () => {
 
   it('should initialize component when video is added to the RTE', () => {
     spyOn(htmlEscaperService, 'escapedJsonToObj').and.callThrough();
-    spyOn(pageContextService, 'isInExplorationEditorMode').and.returnValue(true);
+    spyOn(pageContextService, 'isInExplorationEditorMode').and.returnValue(
+      true
+    );
     spyOnProperty(window, 'innerHeight', 'get').and.returnValue(1054);
     spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1098);
     spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(
@@ -92,7 +98,9 @@ describe('NoninteractiveVideo', () => {
 
   it('should enable video when not in exploration editor', () => {
     spyOn(htmlEscaperService, 'escapedJsonToObj').and.callThrough();
-    spyOn(pageContextService, 'isInExplorationEditorMode').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorMode').and.returnValue(
+      false
+    );
     spyOnProperty(window, 'innerHeight', 'get').and.returnValue(1054);
     spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1098);
     spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(

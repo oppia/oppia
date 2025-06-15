@@ -43,7 +43,8 @@ export class StatsReportingService {
     private urlService: UrlService,
     private ngZone: NgZone
   ) {
-    this.editorPreviewMode = this.pageContextService.isInExplorationEditorPage();
+    this.editorPreviewMode =
+      this.pageContextService.isInExplorationEditorPage();
     this.questionPlayerMode = this.pageContextService.isInQuestionPlayerMode();
     this.refreshAggregatedStats();
   }

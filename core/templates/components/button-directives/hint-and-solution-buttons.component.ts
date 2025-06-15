@@ -67,7 +67,8 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this._editorPreviewMode = this.pageContextService.isInExplorationEditorPage();
+    this._editorPreviewMode =
+      this.pageContextService.isInExplorationEditorPage();
     this.iframed = this.urlService.isIframed();
     this.resetLocalHintsArray();
     this.directiveSubscriptions.add(

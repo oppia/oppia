@@ -126,7 +126,9 @@ describe('Lesson player header component', () => {
     let topicUrl = 'topic_url';
 
     spyOn(urlService, 'getPathname').and.returnValue('/explore/');
-    spyOn(pageContextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     spyOn(
       readOnlyExplorationBackendApiService,
       'fetchExplorationAsync'
@@ -170,7 +172,9 @@ describe('Lesson player header component', () => {
     let explorationTitle = 'Exploration Title';
 
     spyOn(urlService, 'getPathname').and.returnValue('/explore/');
-    spyOn(pageContextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     spyOn(
       readOnlyExplorationBackendApiService,
       'fetchExplorationAsync'

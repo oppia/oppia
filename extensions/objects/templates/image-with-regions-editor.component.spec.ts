@@ -161,7 +161,9 @@ describe('ImageWithRegionsEditorComponent', () => {
       AppConstants.ENTITY_TYPE.EXPLORATION
     );
     spyOn(pageContextService, 'getEntityId').and.returnValue('skill_1');
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exploration_id');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'exploration_id'
+    );
     spyOn(component.valueChanged, 'emit');
     spyOn(component, 'getPreviewUrl');
 
@@ -801,7 +803,9 @@ describe('ImageWithRegionsEditorComponent', () => {
     spyOn(pageContextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION
     );
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exploration_id');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'exploration_id'
+    );
 
     component.onSvgMouseUp();
 

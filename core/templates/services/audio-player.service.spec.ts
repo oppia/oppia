@@ -43,7 +43,11 @@ describe('AudioPlayerService', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [AudioPlayerService, PageContextService, AssetsBackendApiService],
+      providers: [
+        AudioPlayerService,
+        PageContextService,
+        AssetsBackendApiService,
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     });
   }));

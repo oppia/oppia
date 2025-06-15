@@ -265,7 +265,11 @@ export class ImagePreloaderService {
           this.isInFailedDownload(filename))
       ) {
         this.assetsBackendApiService
-          .loadImage(entityType, this.pageContextService.getEntityId(), filename)
+          .loadImage(
+            entityType,
+            this.pageContextService.getEntityId(),
+            filename
+          )
           .then(loadedImageFile => {
             if (this.isInFailedDownload(loadedImageFile.filename)) {
               this.removeFromFailedDownload(loadedImageFile.filename);

@@ -62,7 +62,9 @@ describe('Exploration Save Prompt Modal Component', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     pageContextService = TestBed.inject(PageContextService);
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('explorationId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'explorationId'
+    );
     fixture.detectChanges();
   });
 

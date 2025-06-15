@@ -104,7 +104,9 @@ describe('PlayerSidebarComponent', () => {
     let explorationObjective = 'Exploration Objective';
 
     spyOn(urlService, 'getPathname').and.returnValue('/lesson/');
-    spyOn(pageContextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     spyOn(
       readOnlyExplorationBackendApiService,
       'fetchExplorationAsync'

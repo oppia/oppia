@@ -25,7 +25,6 @@
  *
  */
 
-
 import {Injectable} from '@angular/core';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';

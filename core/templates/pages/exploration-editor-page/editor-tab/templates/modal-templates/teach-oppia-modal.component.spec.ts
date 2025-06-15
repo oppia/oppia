@@ -239,7 +239,9 @@ describe('Teach Oppia Modal Component', () => {
       trainingModalService = TestBed.inject(TrainingModalService);
 
       spyOn(injector, 'get').and.stub();
-      spyOn(pageContextService, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(pageContextService, 'getExplorationId').and.returnValue(
+        explorationId
+      );
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName
       );

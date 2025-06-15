@@ -391,7 +391,9 @@ describe('Exploration engine service ', () => {
   });
 
   beforeEach(() => {
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('explorationId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'explorationId'
+    );
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(2);
     spyOn(contentTranslationLanguageService, 'init').and.returnValue(null);
     spyOn(imagePreloaderService, 'init').and.returnValue(null);
@@ -419,7 +421,9 @@ describe('Exploration engine service ', () => {
     () => {
       let initSuccessCb = jasmine.createSpy('success');
       // Setting exploration player page.
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       expect(explorationEngineService.isInPreviewMode()).toBe(false);
       expect(() => {
@@ -449,9 +453,13 @@ describe('Exploration engine service ', () => {
       let paramChanges =
         paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
       // Setting exploration editor page.
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(true);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        true
+      );
       spyOn(urlService, 'getPathname').and.returnValue('/create/in/path/name');
-      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(false);
+      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(
+        false
+      );
 
       // Since the constructor will be automatically called in unit tests, it
       // is hard to test or spy on the constructor. So, we have created a
@@ -718,7 +726,9 @@ describe('Exploration engine service ', () => {
         'content_id'
       );
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
@@ -786,7 +796,9 @@ describe('Exploration engine service ', () => {
         'content_id'
       );
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
@@ -902,7 +914,9 @@ describe('Exploration engine service ', () => {
         'content_id'
       );
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
@@ -964,7 +978,9 @@ describe('Exploration engine service ', () => {
     fakeAsync(() => {
       let initSuccessCb = jasmine.createSpy('success');
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
       spyOn(
         explorationFeaturesBackendApiService,
         'fetchExplorationFeaturesAsync'
@@ -1005,7 +1021,9 @@ describe('Exploration engine service ', () => {
     () => {
       let initSuccessCb = jasmine.createSpy('success');
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       expect(() => {
         explorationEngineService.getExplorationTitle();
@@ -1032,7 +1050,9 @@ describe('Exploration engine service ', () => {
     () => {
       let initSuccessCb = jasmine.createSpy('success');
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       // Here 1 is default value, this is being initialized in the constructor.
       expect(explorationEngineService.getExplorationVersion()).toBe(1);
@@ -1059,7 +1079,9 @@ describe('Exploration engine service ', () => {
     () => {
       let initSuccessCb = jasmine.createSpy('success');
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       expect(() => {
         explorationEngineService.getAuthorRecommendedExpIdsByStateName('Start');
@@ -1126,7 +1148,9 @@ describe('Exploration engine service ', () => {
         'content_id'
       );
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
@@ -1161,7 +1185,9 @@ describe('Exploration engine service ', () => {
 
   it('should load initial state when moved to new exploration', () => {
     let moveToExplorationCb = jasmine.createSpy('success');
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
 
     explorationEngineService.exploration =
       explorationObjectFactory.createFromBackendDict(explorationDict);
@@ -1183,7 +1209,9 @@ describe('Exploration engine service ', () => {
     () => {
       let initSuccessCb = jasmine.createSpy('success');
 
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       expect(() => {
         explorationEngineService.isCurrentStateInitial();
@@ -1207,7 +1235,9 @@ describe('Exploration engine service ', () => {
 
   it("should return current state when calling 'getState'", () => {
     let initSuccessCb = jasmine.createSpy('success');
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
     let lastStateNameSpy = spyOn(playerTranscriptService, 'getLastStateName');
 
     expect(() => {
@@ -1247,7 +1277,9 @@ describe('Exploration engine service ', () => {
 
   it("should return language code when calling 'getLanguageCode'", () => {
     let initSuccessCb = jasmine.createSpy('success');
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
 
     expect(() => {
       explorationEngineService.getLanguageCode();
@@ -1310,7 +1342,9 @@ describe('Exploration engine service ', () => {
 
   it("should return state when calling 'getStateFromStateName'", () => {
     let initSuccessCb = jasmine.createSpy('success');
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
 
     expect(() => {
       explorationEngineService.getStateFromStateName('Start');
@@ -1339,7 +1373,9 @@ describe('Exploration engine service ', () => {
 
   it("should return state card when calling 'getStateCardByName'", () => {
     let initSuccessCb = jasmine.createSpy('success');
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
 
     expect(() => {
       explorationEngineService.getStateCardByName('Start');
@@ -1373,7 +1409,9 @@ describe('Exploration engine service ', () => {
       "'getShortestPathToState'",
     () => {
       let initSuccessCb = jasmine.createSpy('success');
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       explorationEngineService.init(
         explorationDict,

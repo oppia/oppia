@@ -437,7 +437,9 @@ describe('Customize Interaction Modal Component', () => {
       ' question mode and linked to story',
     fakeAsync(() => {
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
-      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(true);
+      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+        true
+      );
       jasmine
         .createSpy('stateCustomizationArgsService.savedMemento.hasOwnProperty')
         .and.returnValue(false);

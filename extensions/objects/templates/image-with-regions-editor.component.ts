@@ -379,7 +379,8 @@ export class ImageWithRegionsEditorComponent implements OnInit {
   }
 
   getPreviewUrl(imageUrl: string): string {
-    const entityType: string = this.pageContextService.getEntityType() as string;
+    const entityType: string =
+      this.pageContextService.getEntityType() as string;
     if (
       this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&

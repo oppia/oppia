@@ -59,7 +59,9 @@ describe('NoninteractiveLink', () => {
   });
 
   it('should initilise when user inserts link to the rich text editor', () => {
-    spyOn(pageContextService, 'isInExplorationEditorMode').and.returnValue(true);
+    spyOn(pageContextService, 'isInExplorationEditorMode').and.returnValue(
+      true
+    );
     component.ngOnInit();
 
     expect(component.url).toBe('https://www.oppia.org/');

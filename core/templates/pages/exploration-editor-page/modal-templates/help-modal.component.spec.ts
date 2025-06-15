@@ -46,7 +46,9 @@ describe('Exploration Player Suggestion Modal Controller', function () {
     pageContextService = TestBed.inject(PageContextService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
   });
 
   it('should begin editor tutorial when closing the modal', function () {

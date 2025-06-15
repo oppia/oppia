@@ -198,7 +198,9 @@ describe('Preview Tab Component', () => {
     pageContextService = TestBed.inject(PageContextService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
 
-    spyOn(pageContextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     getUnsetParametersInfo = spyOn(
       parameterMetadataService,
       'getUnsetParametersInfo'

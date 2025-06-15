@@ -292,7 +292,9 @@ describe('State Interaction component', () => {
       } as NgbModalRef;
     });
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
-    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(true);
+    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+      true
+    );
     spyOn(stateEditorService.onHandleCustomArgsUpdate, 'emit').and.stub();
 
     component.openInteractionCustomizerModal();
@@ -395,7 +397,9 @@ describe('State Interaction component', () => {
     spyOn(interactionDetailsCacheService, 'set').and.stub();
     spyOn(stateContentService, 'saveDisplayedValue').and.stub();
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
-    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(true);
+    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+      true
+    );
     spyOn(stateEditorService.onHandleCustomArgsUpdate, 'emit').and.stub();
     spyOn(component.onSaveInteractionData, 'emit').and.stub();
 

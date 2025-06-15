@@ -175,7 +175,8 @@ describe('Translation Modal Component', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    OppiaAngularRootComponent.pageContextService = TestBed.inject(PageContextService);
+    OppiaAngularRootComponent.pageContextService =
+      TestBed.inject(PageContextService);
     pageContextService = OppiaAngularRootComponent.pageContextService;
   }));
 
