@@ -265,10 +265,11 @@ const closeButtonForExtraModel = '.e2e-test-close-rich-text-component-editor';
 
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 
-enum INTERACTION_TYPES {
+export enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
+  NUMERIC_INPUT = 'Number Input',
 }
 
 enum INTERACTION_TABS {

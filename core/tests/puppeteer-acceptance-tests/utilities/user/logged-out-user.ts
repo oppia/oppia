@@ -401,6 +401,9 @@ const blogPostContentSelector = '.e2e-test-blog-post-content';
 const youtubePlayerSelector = '.e2e-test-youtube-player';
 const collapsibleRTEHeaderSelector = 'e2e-test-collapsible-heading';
 const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
+
+const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -594,6 +597,14 @@ export class LoggedOutUser extends BaseUser {
     if (!allPostsHaveTags) {
       throw new Error('Not all blog posts have tags');
     }
+  }
+
+  /**
+   * Return to Learner Dashboard from exploration completion card.
+   */
+  async returnToLibraryFromExplorationCompletion() {
+    await this.isElementVisible(returnToLibraryButtonSelector);
+    await this.clickOn(returnToLibraryButtonSelector);
   }
 
   /**

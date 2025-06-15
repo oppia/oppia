@@ -418,6 +418,17 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Check if rating stars are displayed.
+   */
+  async expectRatingStarsToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(ratingsHeaderSelector);
+    const ratingStars = await this.page.$$(ratingStarSelector);
+    if (ratingStars.length !== 5) {
+      throw new Error('Rating stars are not visible.');
+    }
+  }
+
+  /**
    * Rates an exploration by clicking on the rating stars, providing feedback, and optionally staying anonymous.
    *
    * @param {number} rating - The rating to give to the exploration.

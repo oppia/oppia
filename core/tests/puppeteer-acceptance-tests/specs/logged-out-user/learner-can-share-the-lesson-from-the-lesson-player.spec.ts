@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if a learner can give a feedback
+ * @fileoverview Acceptance Test for checking if a learner can share a lesson
  * from the lesson player.
  */
 
@@ -21,20 +21,28 @@ import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
+  NUMERIC_INPUT = 'Number Input',
   END_EXPLORATION = 'End Exploration',
 }
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
+  ALGEBRA_BASICS = 'Algebra Basics',
   FINAL_CARD = 'Final Card',
 }
-describe('Logged-Out Learner', function () {
-  let loggedOutLearner: LoggedOutUser;
-  let explorationEditor: ExplorationEditor;
 
+const EXPLORATION_ATTRIBUTION_HTML = (explorationId: string | null) =>
+  `<a href="http://localhost:8181/explore/${explorationId}#">Oppia</a> // <a href="https://creativecommons.org/licenses/by-sa/4.0">CC BY SA 4.0</a>`;
+const EXPLORATION_ATTRIBUTION_PRINT =
+  '"Algebra Basics" by explorationEditor. Oppia. http://localhost:8181/explore/';
+
+describe('Logged-Out Learner', function () {
+  let explorationEditor: ExplorationEditor;
+  let loggedOutUser: LoggedOutUser;
   let explorationId: string | null;
 
   beforeAll(async function () {
@@ -43,7 +51,7 @@ describe('Logged-Out Learner', function () {
       'exploration_editor@example.com'
     );
 
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+    loggedOutUser = await UserFactory.createLoggedOutUser();
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorPage();
@@ -53,7 +61,26 @@ describe('Logged-Out Learner', function () {
 
     // Add a new card with a question.
     await explorationEditor.viewOppiaResponses();
-    await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.directLearnersToNewCard(CARD_NAME.ALGEBRA_BASICS);
+    await explorationEditor.saveExplorationDraft();
+
+    // Navigate to the new card and update its content.
+    await explorationEditor.navigateToCard(CARD_NAME.ALGEBRA_BASICS);
+    await explorationEditor.updateCardContent(
+      'Enter a negative number greater than -100.'
+    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await explorationEditor.addResponsesToTheInteraction(
+      INTERACTION_TYPES.NUMERIC_INPUT,
+      '-99',
+      'Perfect!',
+      CARD_NAME.FINAL_CARD,
+      true
+    );
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong, try again!'
+    );
+
     await explorationEditor.saveExplorationDraft();
 
     // Navigate to the final card and update its content.
@@ -76,30 +103,33 @@ describe('Logged-Out Learner', function () {
       throw new Error('Error publishing exploration successfully.');
     }
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  it('should be able to share the lesson using copy link', async function () {
+    await loggedOutUser.playExploration(explorationId);
+    await loggedOutUser.continueToNextCard();
 
-  it(
-    'should be able to give feedback from the lesson player',
-    async function () {
-      await loggedOutLearner.playExploration(explorationId);
+    await loggedOutUser.generateAttribution();
+    await loggedOutUser.expectAttributionInHtmlSectionToBe(
+      EXPLORATION_ATTRIBUTION_HTML(explorationId)
+    );
+    await loggedOutUser.expectAttributionInPrintToBe(
+      EXPLORATION_ATTRIBUTION_PRINT
+    );
+    await loggedOutUser.closeAttributionModal();
+  });
 
-      // Open Feedback popup and check "Stay Anonymous" text isn't visible.
-      await loggedOutLearner.openFeedbackPopup();
-      await loggedOutLearner.expectStayAnonymousCheckboxToBePresent(false);
-      await loggedOutLearner.expectScreenshotToMatch(
-        'feedbackPopup',
-        __dirname
-      );
+  it('should be able to share the lesson on Google Classroom', async function () {
+    await loggedOutUser.shareExplorationAndVerifyRedirect(
+      'Classroom',
+      explorationId
+    );
+  });
 
-      // Give feedback and verify submission success.
-      await loggedOutLearner.writeAndSubmitFeedback(
-        'This is a great lesson!',
-        false,
-        false
-      );
-      await loggedOutLearner.verifyFeedbackSubmissionSuccess();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  it('should be able to share the lesson on Facebook', async function () {
+    await loggedOutUser.shareExplorationAndVerifyRedirect(
+      'Facebook',
+      explorationId
+    );
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

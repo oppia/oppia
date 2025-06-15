@@ -58,6 +58,7 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
       // Verify lesson info text, and audio bar are not present.
       await loggedOutUser.expectLessonInfoTextToBePresent(false);
       // TODO: Audio Bar isn't visible.
+      // TODO: Sign In Button isn't visible
 
       // Compare screenshot of the embedded lesson player.
       await loggedOutUser.expectScreenshotToMatch(
