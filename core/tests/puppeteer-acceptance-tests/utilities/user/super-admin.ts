@@ -17,7 +17,7 @@
  */
 
 import puppeteer from 'puppeteer';
-import {BaseUser, StringComparisonType} from '../common/puppeteer-utils';
+import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
@@ -899,7 +899,7 @@ export class SuperAdmin extends BaseUser {
       await saveButton.click();
 
       await platformParameter.waitForSelector(
-        `${paramSaveChangesButton}[disabled]`,
+        `${paramSaveChangesButton} .btn[disabled]`,
         {visible: true}
       );
     } catch (error) {
@@ -1014,8 +1014,7 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(regenerateOpportunitiesButton);
 
     await this.expectActionStatusMessageToBe(
-      'No. of opportunities model created:',
-      StringComparisonType.INCLUDES
+      'No. of opportunities model created:'
     );
   }
 
@@ -1044,8 +1043,7 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(rollbackExplorationButton);
 
     await this.expectActionStatusMessageToBe(
-      'Exploration rolledback to version:',
-      StringComparisonType.INCLUDES
+      'Exploration rolledback to version:'
     );
   }
 
@@ -1079,8 +1077,7 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(getPendingDeletionRequestsCountButton);
 
     await this.expectActionStatusMessageToBe(
-      'The number of users that are being deleted is:',
-      StringComparisonType.INCLUDES
+      'The number of users that are being deleted is:'
     );
   }
 

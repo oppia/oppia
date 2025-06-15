@@ -82,7 +82,10 @@ export class TranslationAdmin extends BaseUser {
     await this.select(addContributonRightsLanguageDropdown, languageCode);
     await this.clickOn(addContributionRightsSubmitButton);
 
-    await this.expectActionStatusMessageToBe('Success.');
+    await this.expectActionStatusMessageToBe(
+      'Success.',
+      'Adding contribution rights'
+    );
   }
 
   /**

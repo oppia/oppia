@@ -194,8 +194,9 @@ export class BlogPostEditor extends BaseUser {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
 
-    const modelValue = await this.page.$eval(blogTitleInput, el =>
-      el.getAttribute('ng-reflect-model')
+    const modelValue = await this.page.$eval(
+      blogTitleInput,
+      el => (el as HTMLInputElement).value
     );
     if (modelValue !== newBlogPostTitle) {
       throw new Error(

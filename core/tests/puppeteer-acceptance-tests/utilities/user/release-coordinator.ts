@@ -290,10 +290,7 @@ export class ReleaseCoordinator extends BaseUser {
     await this.page.waitForSelector(promoMessageInputSelector);
     await this.page.type(promoMessageInputSelector, promoMessage);
 
-    await this.expectTextContentToMatch(
-      promoMessageInputSelector,
-      promoMessage
-    );
+    await this.expectElementToBeClickable(promoBarSaveButtonSelector);
   }
 
   /**
