@@ -73,8 +73,6 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.headingEditorIsOpen = false;
-    this.contentEditorIsOpen = false;
     this.container = {
       sectionHeadingPlaintext: this.section.getHeadingText(),
       sectionContentHtml: this.section.getContentHtml(),

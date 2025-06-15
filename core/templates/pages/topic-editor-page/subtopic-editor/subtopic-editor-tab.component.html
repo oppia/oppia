@@ -192,13 +192,11 @@
                                                  (summaryDelete)="deleteSection($event.index, $event.event)">
                       </oppia-summary-list-header>
                     </a>
-                    <div *ngIf="activeSectionIndex === index">
-                      <div class="oppia-editor-card-section e2e-test-study-guide-section-{{ index }}-expanded">
-                        <oppia-study-guide-section-editor [section]="section"
-                                                          [index]="index"
-                                                          [isEditable]="isEditable">
-                        </oppia-study-guide-section-editor>
-                      </div>
+                    <div *ngIf="activeSectionIndex === index" class="oppia-editor-card-section e2e-test-study-guide-section-{{ index }}-expanded">
+                      <oppia-study-guide-section-editor [section]="section"
+                                                        [index]="index"
+                                                        [isEditable]="isEditable">
+                      </oppia-study-guide-section-editor>
                     </div>
                   </li>
                 </ul>
