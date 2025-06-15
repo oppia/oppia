@@ -946,7 +946,7 @@ export class BaseUser {
     clickable: boolean = true
   ): Promise<void> {
     const element = await this.page.$(selector);
-    this.page.waitForFunction(isElementClickable, {}, element, clickable);
+    await this.page.waitForFunction(isElementClickable, {}, element, clickable);
   }
 
   /**
