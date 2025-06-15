@@ -88,7 +88,7 @@ describe('Logged-In User', function () {
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
     // Navigate back to the introduction card and save the draft.
-    await explorationEditor.navigateToCard('Introducation');
+    await explorationEditor.navigateToCard('Introduction');
     await explorationEditor.saveExplorationDraft();
 
     await explorationEditor.publishExplorationWithMetadata(

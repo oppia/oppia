@@ -4538,6 +4538,9 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if all dropdowns in navbar open properly.
+   */
   async expectDropdownsInNavbarToWorkProperly() {
     await this.clickOn(navbarLearnTab);
     await this.isElementVisible(navbarLearnDropdownContainerSelector);

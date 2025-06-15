@@ -50,6 +50,7 @@ describe('Logged-In Learner', function () {
   it(
     'should be able to rate the lesson',
     async function () {
+      await loggedInUser.playExploration(explorationId);
       await loggedInUser.continueToNextCard();
 
       // Rate exploration and give feedback.

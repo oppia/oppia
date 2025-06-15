@@ -117,10 +117,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs-old/logged-in-user/manage-exploration-progress-in-learner-dashboard.spec.ts"
     },
     {
-      "name": "logged-in-user/deny-access-to-pages-without-additional-roles",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
-    },
-    {
       "name": "logged-in-user/learner-can-provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/learner-can-provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player.spec.ts"
     },
@@ -274,14 +270,8 @@
     },{
       "name": "logged-out-user/learner-can-access-the-lesson-player",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/learner-can-access-the-lesson-player.spec.ts"
-    },{
-      "name": "logged-out-user/give-feedback-from-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/give-feedback-from-lesson-player.spec.ts"
     },
     {
-      "name": "logged-out-user/play-a-complete-community-lesson",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-a-complete-community-lesson.spec.ts"
-    },{
       "name": "logged-out-user/learner-can-complete-the-embedded-lesson",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/learner-can-complete-the-embedded-lesson.spec.ts"
     },
@@ -294,7 +284,7 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/learner-can-listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts"
     },
     {
-      "name": "learner-can-give-feedback-on-the-lesson-from-the-lesson-player",
+      "name": "logged-out-user/learner-can-give-feedback-on-the-lesson-from-the-lesson-player",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/learner-can-give-feedback-on-the-lesson-from-the-lesson-player.spec.ts"
     },
     {

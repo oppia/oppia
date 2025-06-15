@@ -19,7 +19,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-Out Learner', function () {
-  let loggedInUser: LoggedInUser & LoggedOutUser = Object.assign(
+  const loggedInUser: LoggedInUser & LoggedOutUser = Object.assign(
     new LoggedInUser(),
     new LoggedOutUser()
   );
