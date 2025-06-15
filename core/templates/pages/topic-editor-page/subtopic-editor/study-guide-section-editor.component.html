@@ -6,7 +6,7 @@
     <div class="oppia-readonly-rule-tile"
          [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview">
-        <div class="oppia-click-to-start-editing" (click)="openHeadingEditor()">
+        <div class="oppia-click-to-start-editing e2e-test-section-heading-edit-icon" (click)="openHeadingEditor()">
           <i *ngIf="isEditable"
              class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
              title="Edit Study Guide Section">
@@ -26,7 +26,8 @@
           (submit)="saveSection()">
       <div class="oppia-rule-details-header">
         <strong>Section Heading</strong>
-        <schema-based-editor  [schema]="getHeadingSchema()"
+        <schema-based-editor  class="e2e-test-study-guide-section-heading-plaintext-editor"
+                              [schema]="getHeadingSchema()"
                               [localValue]="container.sectionHeadingPlaintext"
                               (localValueChange)="this.updateLocalHeading($event)">
         </schema-based-editor>
@@ -58,7 +59,7 @@
     <div class="oppia-readonly-rule-tile"
          [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview">
-        <div class="oppia-click-to-start-editing" (click)="openContentEditor()">
+        <div class="oppia-click-to-start-editing e2e-test-section-content-edit-icon" (click)="openContentEditor()">
           <i *ngIf="isEditable"
              class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
              title="Edit Study GuideSection">
@@ -78,12 +79,17 @@
           (submit)="saveSection()">
       <div class="oppia-rule-details-header">
         <strong>Section Content</strong>
-        <schema-based-editor [schema]="getContentSchema()"
+        <schema-based-editor class="e2e-test-study-guide-section-content-rich-text-editor"
+                             [schema]="getContentSchema()"
                              [localValue]="container.sectionContentHtml"
                              (localValueChange)="this.updateLocalContent($event)">
         </schema-based-editor>
       </div>
     </form>
+
+    <div *ngIf="isSectionContentLengthExceeded()" class="oppia-length-validation-error">
+      The content length is too long. Please use at most 1000 characters.
+    </div>
 
     <div class="oppia-rule-save-cancel-buttons">
       <div class="modal-footer">
@@ -94,7 +100,7 @@
         </button>
         <button type="button"
                 class="btn btn-success"
-                [disabled]="!container.sectionContentHtml"
+                [disabled]="!container.sectionContentHtml || isSectionContentLengthExceeded()"
                 (click)="saveSection(false)">
           Save
         </button>

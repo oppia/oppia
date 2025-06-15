@@ -97,6 +97,36 @@ const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
 
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
 const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subtopicStudyGuideHeadingField =
+  '.e2e-test-new-subtopic-study-guide-section-heading-field';
+const subtopicStudyGuideContentField =
+  '.e2e-test-subtopic-study-guide-section-content-editor';
+const showSectionsList = '.e2e-test-show-study-guide-sections-list';
+const firstStudyGuideSectionTile = '.e2e-test-study-guide-section-0';
+const addStudyGuideSectionButton = '.e2e-test-add-study-guide-section';
+const addStudyGuideSectionModalHeading =
+  '.e2e-test-add-study-guide-section-modal-heading-field';
+const addStudyGuideSectionModalContent =
+  '.e2e-test-add-study-guide-section-modal-content-field';
+const addStudyGuideSectionModalSaveButton =
+  '.e2e-test-add-study-guide-section-modal-save-button';
+const addStudyGuideSectionModalCancelButton =
+  '.e2e-test-add-study-guide-section-modal-cancel-button';
+const addStudyGuideSectionContentLength =
+  '.e2e-test-add-study-guide-section-content-length-error';
+const deleteStudyGuideSectionButton = '.e2e-test-delete-example-button';
+const expandedStudyGuideSectionTileHeading =
+  '.e2e-test-study-guide-section-heading-field';
+const expandedStudyGuideSectionTileContent =
+  '.e2e-test-study-guide-section-content-field';
+const editStudyGuideSectionHeadingIcon = '.e2e-test-section-heading-edit-icon';
+const editStudyGuideSectionContentIcon = '.e2e-test-section-content-edit-icon';
+const editStudyGuideSectionHeadingEditor =
+  '.e2e-test-study-guide-section-heading-plaintext-editor';
+const editStudyGuideSectionContentEditor =
+  '.e2e-test-study-guide-section-content-rich-text-editor';
+const studyGuideSectionDeleteConfirmButton =
+  '.e2e-test-confirm-delete-study-guide-section-button';
 const subtopicUrlFragmentField =
   '.e2e-test-create-new-subtopic .e2e-test-url-fragment-field';
 const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
@@ -564,6 +594,147 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(createSubtopicButton);
     await this.saveTopicDraft(topicName);
     showMessage(`Subtopic ${title} is created.`);
+  }
+
+  /**
+   * Create a subtopic as a curriculum admin.
+   */
+  async createSubtopicWithStudyGuideForTopic(
+    title: string,
+    urlFragment: string,
+    heading: string,
+    content: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+    await this.clickOn(addSubtopicButton);
+    await this.type(subtopicTitleField, title);
+    await this.page.waitForSelector(subtopicUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(subtopicUrlFragmentField, urlFragment);
+
+    await this.page.type(subtopicStudyGuideHeadingField, heading);
+    await this.page.type(subtopicStudyGuideContentField, content);
+
+    await this.clickOn(subtopicPhotoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createSubtopicButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(showSectionsList);
+    }
+    await this.page.waitForSelector(firstStudyGuideSectionTile, {
+      visible: true,
+    });
+    await this.saveTopicDraft(topicName);
+    showMessage(`Subtopic ${title} is created.`);
+  }
+
+  /**
+   * Add a section to the subtopic study guide. Make sure you are
+   * on the subtopic editor tab for this to work.
+   */
+  async addSubtopicStudyGuideSection(
+    sectionHeading: string,
+    sectionContent: string,
+    currentNumberOfSections: number
+  ): Promise<void> {
+    await this.clickOn(addStudyGuideSectionButton);
+    await this.type(addStudyGuideSectionModalHeading, sectionHeading);
+    await this.type(addStudyGuideSectionModalContent, sectionContent);
+    await this.clickOn(addStudyGuideSectionModalSaveButton);
+    await this.page.waitForSelector(
+      `.e2e-test-study-guide-section-${currentNumberOfSections}`,
+      {
+        visible: true,
+      }
+    );
+    await this.page.waitForSelector(deleteStudyGuideSectionButton, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Checks if the length error shows up in the Add
+   * Study Guide Section Modal of the subtopic study
+   * guide. Make sure you are on the subtopic editor
+   * tab for this to work.
+   */
+  async checkAddSectionModalShowsLengthError(): Promise<void> {
+    await this.clickOn(addStudyGuideSectionButton);
+    await this.type(addStudyGuideSectionModalHeading, 'Section Heading');
+    await this.type(
+      addStudyGuideSectionModalContent,
+      'Section Content Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam qu'
+    );
+    await this.page.waitForSelector(addStudyGuideSectionContentLength, {
+      visible: true,
+    });
+    await this.clearAllTextFrom(addStudyGuideSectionModalContent);
+    await this.page.waitForSelector(addStudyGuideSectionContentLength, {
+      visible: false,
+    });
+    await this.clickOn(addStudyGuideSectionModalCancelButton);
+  }
+
+  /**
+   * Clicks on a Study Guide Section Tile to expand it.
+   * Indexes start from 0.
+   */
+  async expandStudyGuideSectionTile(index: number): Promise<void> {
+    await this.clickOn(`.e2e-test-study-guide-section-${index}`);
+    await this.page.waitForSelector(
+      `.e2e-test-study-guide-section-${index}-expanded`,
+      {
+        visible: true,
+      }
+    );
+    await this.page.waitForSelector(expandedStudyGuideSectionTileHeading, {
+      visible: true,
+    });
+    await this.page.waitForSelector(expandedStudyGuideSectionTileContent, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Clicks on the Section heading to open the heading editor.
+   */
+  async openSectionHeadingEditor(): Promise<void> {
+    await this.clickOn(editStudyGuideSectionHeadingIcon);
+    await this.page.waitForSelector(editStudyGuideSectionHeadingEditor, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Clicks on the Section content to open the content editor.
+   */
+  async openSectionContentEditor(): Promise<void> {
+    await this.clickOn(editStudyGuideSectionContentIcon);
+    await this.page.waitForSelector(editStudyGuideSectionContentEditor, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Deletes a Section of the subtopic study guide.
+   * Indexes start from 0.
+   */
+  async deleteStudyGuideSection(index: number): Promise<void> {
+    await this.clickOn(
+      `.e2e-test-study-guide-section-${index} ${deleteStudyGuideSectionButton}`
+    );
+    await this.clickOn(studyGuideSectionDeleteConfirmButton);
   }
 
   /**

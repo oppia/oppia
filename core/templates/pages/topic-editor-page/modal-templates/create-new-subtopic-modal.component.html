@@ -73,14 +73,17 @@
                [(ngModel)]="sectionHeadingPlaintext" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
         <div>
           <strong>Content*</strong>
-          <div class="description-editor e2e-test-subtopic-description-editor">
+          <div class="description-editor e2e-test-subtopic-study-guide-section-content-editor">
             <div class="oppia-editor-card-body" >
               <schema-based-editor [schema]="getSchema()"
                                    class="e2e-test-create-subtopic-page-content"
-                                   [localValue]="htmlData"
+                                   [localValue]="sectionContentHtml"
                                    (localValueChange)="localContentValueChange($event)">
               </schema-based-editor>
             </div>
+          </div>
+          <div *ngIf="isSectionContentLengthExceeded()" class="oppia-length-validation-error">
+            The content length is too long. Please use at most 1000 characters.
           </div>
         </div>
       </div>
@@ -102,7 +105,7 @@
   <div class="modal-footer">
     <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
     <button class="btn btn-success e2e-test-confirm-subtopic-creation-button"
-            type="submit" [disabled]="!isSubtopicValid() || subtopicUrlFragmentExists" (click)="save()">
+            type="submit" [disabled]="!isSubtopicValid() || subtopicUrlFragmentExists || (isShowRestructuredStudyGuidesFeatureEnabled() && isSectionContentLengthExceeded())" (click)="save()">
       Create Subtopic
     </button>
   </div>

@@ -29,6 +29,10 @@ import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
 import {SubtopicValidationService} from 'pages/topic-editor-page/services/subtopic-validation.service';
 import {StudyGuide} from 'domain/topic/study-guide.model';
+import {
+  CALCULATION_TYPE_CHARACTER,
+  HtmlLengthService,
+} from 'services/html-length.service';
 
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
@@ -71,6 +75,7 @@ export class CreateNewSubtopicModalComponent
     private topicUpdateService: TopicUpdateService,
     private topicEditorStateService: TopicEditorStateService,
     private platformFeatureService: PlatformFeatureService,
+    private htmlLengthService: HtmlLengthService,
     private windowRef: WindowRef
   ) {
     super(ngbActiveModal);
@@ -145,6 +150,15 @@ export class CreateNewSubtopicModalComponent
 
   resetErrorMsg(): void {
     this.errorMsg = null;
+  }
+
+  isSectionContentLengthExceeded(): boolean {
+    return Boolean(
+      this.htmlLengthService.computeHtmlLength(
+        this.sectionContentHtml,
+        CALCULATION_TYPE_CHARACTER
+      ) > AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT
+    );
   }
 
   isSubtopicValid(): boolean {

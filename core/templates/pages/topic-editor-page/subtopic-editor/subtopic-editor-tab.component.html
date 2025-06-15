@@ -162,7 +162,7 @@
           <div class="oppia-editor-card-section study-guide-section-content">
             <div class="oppia-study-guide-sections-header oppia-mobile-collapsible-card-header" (click)="toggleSectionsList()">
               <strong class="heading-text">Sections</strong>
-              <i class="fa fa-caret-down"
+              <i class="fa fa-caret-down e2e-test-show-study-guide-sections-list"
                  *ngIf="!sectionsListIsShown"
                  [attr.aria-hidden]="true">
               </i>
@@ -193,7 +193,7 @@
                       </oppia-summary-list-header>
                     </a>
                     <div *ngIf="activeSectionIndex === index">
-                      <div class="oppia-editor-card-section">
+                      <div class="oppia-editor-card-section e2e-test-study-guide-section-{{ index }}-expanded">
                         <oppia-study-guide-section-editor [section]="section"
                                                           [index]="index"
                                                           [isEditable]="isEditable">

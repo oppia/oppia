@@ -21,6 +21,11 @@ import cloneDeep from 'lodash/cloneDeep';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
+import {
+  CALCULATION_TYPE_CHARACTER,
+  HtmlLengthService,
+} from 'services/html-length.service';
+import {AppConstants} from 'app.constants';
 
 interface HtmlFormSchema {
   type: 'html' | 'unicode';
@@ -63,7 +68,8 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private topicEditorStateService: TopicEditorStateService,
-    private topicUpdateService: TopicUpdateService
+    private topicUpdateService: TopicUpdateService,
+    private htmlLengthService: HtmlLengthService
   ) {}
 
   ngOnInit(): void {
@@ -96,6 +102,15 @@ export class StudyGuideSectionEditorComponent implements OnInit {
       this.container.sectionContentHtml = $event;
       this.changeDetectorRef.detectChanges();
     }
+  }
+
+  isSectionContentLengthExceeded(): boolean {
+    return Boolean(
+      this.htmlLengthService.computeHtmlLength(
+        this.container.sectionContentHtml,
+        CALCULATION_TYPE_CHARACTER
+      ) > AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT
+    );
   }
 
   openHeadingEditor(): void {

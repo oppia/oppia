@@ -18,7 +18,12 @@
 
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {
+  CALCULATION_TYPE_CHARACTER,
+  HtmlLengthService,
+} from 'services/html-length.service';
 
 interface HtmlFormSchema {
   type: 'html' | 'unicode';
@@ -49,7 +54,8 @@ export class AddStudyGuideSectionModalComponent
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private htmlLengthService: HtmlLengthService
   ) {
     super(ngbActiveModal);
   }
@@ -79,6 +85,15 @@ export class AddStudyGuideSectionModalComponent
       this.tmpSectionContentHtml = $event;
       this.changeDetectorRef.detectChanges();
     }
+  }
+
+  isSectionContentLengthExceeded(): boolean {
+    return Boolean(
+      this.htmlLengthService.computeHtmlLength(
+        this.tmpSectionContentHtml,
+        CALCULATION_TYPE_CHARACTER
+      ) > AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT
+    );
   }
 
   saveSection(): void {
