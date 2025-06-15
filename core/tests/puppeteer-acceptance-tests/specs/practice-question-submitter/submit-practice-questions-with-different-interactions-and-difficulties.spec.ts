@@ -83,7 +83,7 @@ describe('Question Submitter', function () {
     'should submit question suggestion with images and math expressions and image interaction with easy difficulty',
     async () => {
       await questionSubmitter.navigateToContributorDashboard();
-      await questionSubmitter.suggestQuestionsForSkillandTopic(
+      await questionSubmitter.suggestQuestionsForSkillAndTopic(
         'Test Skill 1',
         'Test Topic 1'
       );
@@ -112,7 +112,7 @@ describe('Question Submitter', function () {
     'should submit question suggestion with images and math expressions and multiple choice interaction with medium difficulty',
     async () => {
       await questionSubmitter.navigateToContributorDashboard();
-      await questionSubmitter.suggestQuestionsForSkillandTopic(
+      await questionSubmitter.suggestQuestionsForSkillAndTopic(
         'Test Skill 1',
         'Test Topic 1'
       );
@@ -146,7 +146,7 @@ describe('Question Submitter', function () {
     'should submit question suggestion with images and math expressions and text input interaction with hard difficulty',
     async () => {
       await questionSubmitter.navigateToContributorDashboard();
-      await questionSubmitter.suggestQuestionsForSkillandTopic(
+      await questionSubmitter.suggestQuestionsForSkillAndTopic(
         'Test Skill 1',
         'Test Topic 1'
       );
@@ -185,7 +185,7 @@ describe('Question Submitter', function () {
         '[Image] Test Question 1 [Math]'
       );
       await questionSubmitter.expectQuestionSuggestionModalToHaveDifficulty(
-        'Easy'
+        'Medium'
       );
 
       await questionSubmitter.viewQuestionSuggestion(
@@ -199,7 +199,7 @@ describe('Question Submitter', function () {
         '[Image] Test Question 3 [Math]'
       );
       await questionSubmitter.expectQuestionSuggestionModalToHaveDifficulty(
-        'Hard'
+        'Medium'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

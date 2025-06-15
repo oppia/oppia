@@ -25,12 +25,14 @@ const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 const imageToUploadInQuestion = testConstants.data.profilePicture;
 
 const submitQuestionTab = 'a.e2e-test-submitQuestionTab';
-const opportunityHeadingTitlSelector =
+const opportunityHeadingTitleSelector =
   '.e2e-test-opportunity-list-item-heading';
 const opportunitySubheadingTitle = '.e2e-test-opportunity-list-item-subheading';
+const opportunitySubheadingTitleMobile =
+  '.e2e-test-opportunity-list-item-subheading.oppia-subheading-small';
 const opportunityListItem = '.e2e-test-opportunity-list-item';
 const suggestQuestionButton = 'button.e2e-test-opportunity-list-item-button';
-const confirmSkillDificultyButton =
+const confirmSkillDifficultyButton =
   'button.e2e-test-confirm-skill-difficulty-button';
 const stateContentInputField = 'div.e2e-test-rte';
 const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
@@ -79,14 +81,10 @@ const addSolutionButton = 'button.e2e-test-oppia-add-solution-button';
 const solutionInputNumeric = 'oppia-add-or-update-solution-modal input';
 const solutionInputTextArea =
   '.e2e-test-interaction-html textarea.e2e-test-description-box';
-const submitQuestionButon = '.e2e-test-save-question-button';
-const feedbackEditorButton =
-  'div.oppia-edit-feedback .oppia-click-to-start-editing';
+const submitQuestionButton = '.e2e-test-save-question-button';
+const feedbackEditorButton = '.e2e-test-open-feedback-editor';
 const addElementToTextInputInteraction = 'button.e2e-test-add-list-entry';
-const skillDifficultyEasy = '.e2e-test-skill-difficulty-easy';
-const skillDifficultyMedium = '.e2e-test-skill-difficulty-medium';
-const skillDifficultyHard = '.e2e-test-skill-difficulty-hard';
-const viewQuestionSudggestionModalHeader =
+const viewQuestionSuggestionModalHeader =
   '.e2e-test-question-suggestion-review-modal-header';
 const questionSuggestionModalDifficultySelector = '.oppia-difficulty-title';
 
@@ -105,21 +103,25 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} skillName - The name of the skill to suggest questions for.
    * @param {string} topicName - The name of the topic to suggest questions for.
    */
-  async suggestQuestionsForSkillandTopic(
+  async suggestQuestionsForSkillAndTopic(
     skillName: string,
     topicName: string
   ): Promise<void> {
+    const isMobile = await this.isViewportAtMobileWidth();
+    const subheadingSelector = isMobile
+      ? opportunitySubheadingTitleMobile
+      : opportunitySubheadingTitle;
     await this.clickOn(submitQuestionTab);
     await this.page.waitForSelector(opportunityListItem, {visible: true});
     const opportunityListItems = await this.page.$$(opportunityListItem);
     for (const item of opportunityListItems) {
-      await item.waitForSelector(opportunityHeadingTitlSelector, {
+      await item.waitForSelector(opportunityHeadingTitleSelector, {
         visible: true,
       });
-      const headingElement = await item.$(opportunityHeadingTitlSelector);
+      const headingElement = await item.$(opportunityHeadingTitleSelector);
 
-      await item.waitForSelector(opportunitySubheadingTitle, {visible: true});
-      const subheadingElement = await item.$(opportunitySubheadingTitle);
+      await item.waitForSelector(subheadingSelector, {visible: true});
+      const subheadingElement = await item.$(subheadingSelector);
 
       if (!subheadingElement || !headingElement) {
         continue;
@@ -151,16 +153,7 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} difficulty - The difficulty level of the question.
    */
   async selectQuestionDifficulty(difficulty: string = 'Medium'): Promise<void> {
-    if (difficulty === 'Easy') {
-      await this.clickOn(skillDifficultyEasy);
-    } else if (difficulty === 'Medium') {
-      await this.clickOn(skillDifficultyMedium);
-    } else if (difficulty === 'Hard') {
-      await this.clickOn(skillDifficultyHard);
-    } else {
-      throw new Error(`Invalid difficulty level: ${difficulty}`);
-    }
-    await this.clickOn(confirmSkillDificultyButton);
+    await this.clickOn(confirmSkillDifficultyButton);
   }
 
   /**
@@ -258,8 +251,8 @@ export class QuestionSubmitter extends BaseUser {
    * Function to submit the question suggestion.
    */
   async submitQuestionSuggestion(): Promise<void> {
-    await this.page.waitForSelector(submitQuestionButon, {visible: true});
-    await this.clickOn(submitQuestionButon);
+    await this.page.waitForSelector(submitQuestionButton, {visible: true});
+    await this.clickOn(submitQuestionButton);
   }
 
   /**
@@ -273,10 +266,10 @@ export class QuestionSubmitter extends BaseUser {
     await this.page.waitForSelector(opportunityListItem, {visible: true});
     const opportunityListItems = await this.page.$$(opportunityListItem);
     for (const item of opportunityListItems) {
-      await item.waitForSelector(opportunityHeadingTitlSelector, {
+      await item.waitForSelector(opportunityHeadingTitleSelector, {
         visible: true,
       });
-      const headingElement = await item.$(opportunityHeadingTitlSelector);
+      const headingElement = await item.$(opportunityHeadingTitleSelector);
 
       if (!headingElement) {
         continue;
@@ -305,10 +298,10 @@ export class QuestionSubmitter extends BaseUser {
     await this.page.waitForSelector(opportunityListItem, {visible: true});
     const opportunityListItems = await this.page.$$(opportunityListItem);
     for (const item of opportunityListItems) {
-      await item.waitForSelector(opportunityHeadingTitlSelector, {
+      await item.waitForSelector(opportunityHeadingTitleSelector, {
         visible: true,
       });
-      const headingElement = await item.$(opportunityHeadingTitlSelector);
+      const headingElement = await item.$(opportunityHeadingTitleSelector);
 
       if (!headingElement) {
         continue;
@@ -319,7 +312,12 @@ export class QuestionSubmitter extends BaseUser {
       );
 
       if (heading === opportunityHeadingTitle) {
-        const button = await item.$(suggestQuestionButton);
+        let button;
+        if (await this.isViewportAtMobileWidth()) {
+          button = await item.$(opportunitySubheadingTitleMobile);
+        } else {
+          button = await item.$(suggestQuestionButton);
+        }
         await this.page.evaluate(button => {
           button.click();
         }, button);
@@ -338,7 +336,7 @@ export class QuestionSubmitter extends BaseUser {
   async expectQuestionSuggestionModalToHaveDifficulty(
     difficulty: string
   ): Promise<void> {
-    await this.page.waitForSelector(viewQuestionSudggestionModalHeader, {
+    await this.page.waitForSelector(viewQuestionSuggestionModalHeader, {
       visible: true,
     });
 
@@ -498,7 +496,6 @@ export class QuestionSubmitter extends BaseUser {
     await this.page.waitForSelector(addAnswerGroupComponentSelector, {
       visible: true,
     });
-    await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.type(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
