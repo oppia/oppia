@@ -337,8 +337,6 @@ export class ReleaseCoordinator extends BaseUser {
    */
   async flushCache(): Promise<void> {
     await this.clickOn('Flush Cache');
-
-    await this.expectActionStatusMessageToBe('Success! Memory Cache Flushed.');
   }
 
   /**

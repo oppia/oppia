@@ -1014,7 +1014,8 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(regenerateOpportunitiesButton);
 
     await this.expectActionStatusMessageToBe(
-      'No. of opportunities model created:'
+      'No. of opportunities model created:',
+      'Regenerating opportunities...'
     );
   }
 

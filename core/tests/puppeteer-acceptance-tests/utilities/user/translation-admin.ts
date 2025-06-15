@@ -104,7 +104,7 @@ export class TranslationAdmin extends BaseUser {
     await this.select(removeContributonRightsLanguageSelect, languageCode);
     await this.clickOn(removeContributionRightsSubmitButton);
 
-    await this.expectActionStatusMessageToBe('Success.');
+    await this.expectActionStatusMessageToBe('Success.', 'Processing query...');
   }
 
   /**
