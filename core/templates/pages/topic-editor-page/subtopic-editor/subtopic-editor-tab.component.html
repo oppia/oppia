@@ -185,8 +185,8 @@
                        [ngClass]="{'oppia-rule-tab-active': activeSectionIndex === index}">
                       <oppia-summary-list-header [index]="index"
                                                  [disableSorting]="true"
-                                                 [summary]="section.getHeadingPlaintext()"
-                                                 [shortSummary]="section.getHeadingPlaintext()"
+                                                 [summary]="section.getHeadingText()"
+                                                 [shortSummary]="section.getHeadingText()"
                                                  [isActive]="index === activeSectionIndex"
                                                  [isDeleteAvailable]="sections.length > 1"
                                                  (summaryDelete)="deleteSection($event.index, $event.event)">

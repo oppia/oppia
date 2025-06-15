@@ -59,7 +59,7 @@ export class StudyGuide {
 
   // Sets the sections data for the study guide.
   setSections(sections: StudyGuideSection[]): void {
-    this.sections = cloneDeep(sections);
+    this.sections = sections;
   }
 
   getNextContentIdIndex(): number {

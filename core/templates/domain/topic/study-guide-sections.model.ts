@@ -17,8 +17,6 @@
  * study guide section domain objects.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
-
 import {
   SubtitledHtmlBackendDict,
   SubtitledHtml,
@@ -46,10 +44,10 @@ export class StudyGuideSection {
   }
 
   setHeading(newHeading: SubtitledUnicode): void {
-    this.heading = cloneDeep(newHeading);
+    this.heading = newHeading;
   }
 
-  getHeadingPlaintext(): string {
+  getHeadingText(): string {
     return this.heading.unicode;
   }
 
@@ -62,7 +60,7 @@ export class StudyGuideSection {
   }
 
   setContent(newContent: SubtitledHtml): void {
-    this.content = cloneDeep(newContent);
+    this.content = newContent;
   }
 
   getContentHtml(): string {

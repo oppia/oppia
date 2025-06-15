@@ -76,7 +76,7 @@ export class StudyGuideSectionEditorComponent implements OnInit {
     this.headingEditorIsOpen = false;
     this.contentEditorIsOpen = false;
     this.container = {
-      sectionHeadingPlaintext: this.section.getHeadingPlaintext(),
+      sectionHeadingPlaintext: this.section.getHeadingText(),
       sectionContentHtml: this.section.getContentHtml(),
     };
   }
