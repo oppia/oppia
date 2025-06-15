@@ -105,7 +105,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   voiceArtistsDataCount: number = 0;
   fetchingrenegenratedVoiceoverData: boolean = false;
 
-  readonly range = new FormGroup({
+  range = new FormGroup({
     start: new FormControl(null),
     end: new FormControl(null),
   });
@@ -272,7 +272,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   }
 
   isAutogenerationSupportedByCloudService(languageAccentCode: string): boolean {
-    return this.cloudSupportedLanguageAccentCodes.includes(languageAccentCode);
+    return this.cloudSupportedLanguageAccentCodes?.includes(languageAccentCode);
   }
 
   updateSupportsAutogenerationField(
@@ -372,14 +372,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
   removeLanguageAccentDropdown(): void {
     this.languageAccentDropdownIsShown = false;
-  }
-
-  initializeDateRange(): void {
-    const currentMonth = new Date();
-    this.range.setValue({
-      start: new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1),
-      end: new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0),
-    });
   }
 
   fetchVoiceoverRegenerationRecord(): void {

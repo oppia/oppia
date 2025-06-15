@@ -27,14 +27,14 @@ export interface CloudTaskRunBackendDict {
   created_on: Date;
 }
 
-class MatIcon {
+export class MatIcon {
   constructor(
-    public readonly tooltip: string,
-    public readonly code: string,
+    public tooltip: string,
+    public code: string,
     // The color is null for the job state 'cancelling', 'cancelled' and
     // 'drained' since we want their respective icons to use the default
     // font color of the component and not any of the theme colors.
-    public readonly color: string | null
+    public color: string | null
   ) {}
 }
 
