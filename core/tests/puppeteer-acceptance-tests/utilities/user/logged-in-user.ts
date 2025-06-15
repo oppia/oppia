@@ -175,6 +175,7 @@ const explorationControlsSettingsDropdown =
 const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
+const greetingSelector = '.e2e-learner-dashboard-greeting';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1814,6 +1815,25 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(anonymousCheckboxSelector);
     }
     await this.clickOn(submitButtonSelector);
+  }
+
+  /**
+   * Checks if Learner is on the learner dashboard page.
+   */
+  expectToBeOnLearnerDashboardPage(): void {
+    expect(this.page.url()).toBe(`${baseUrl}/learner-dashboard`);
+  }
+
+  /**
+   * Checks if greeting has name of the user
+   */
+  async expectGreetingToHaveNameOfUser(userName: string): Promise<void> {
+    const greetingElement = await this.page.$(greetingSelector);
+    const greetingText = await this.page.evaluate(
+      el => el.textContent,
+      greetingElement
+    );
+    expect(greetingText).toContain(userName);
   }
 }
 

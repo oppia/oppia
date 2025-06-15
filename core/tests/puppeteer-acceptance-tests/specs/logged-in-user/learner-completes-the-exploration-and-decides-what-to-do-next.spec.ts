@@ -23,6 +23,8 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+
 describe('Logged-In Learner', function () {
   let explorationEditor: ExplorationEditor;
   let loggedInUser: LoggedInUser & LoggedOutUser;
@@ -43,16 +45,24 @@ describe('Logged-In Learner', function () {
       'loggedInUser',
       'loggedInUser@example.com'
     );
-  });
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it('should be able to rate the lesson', async function () {
-    await loggedInUser.continueToNextCard();
+  it(
+    'should be able to rate the lesson',
+    async function () {
+      await loggedInUser.continueToNextCard();
 
-    // Rate exploration and give feedback.
-    await loggedInUser.expectRatingStarsToBeVisible();
-    await loggedInUser.rateExploration(3, 'Nice!', false);
+      // Rate exploration and give feedback.
+      await loggedInUser.expectRatingStarsToBeVisible();
+      await loggedInUser.rateExploration(3, 'Nice!', false);
 
-    // Return to learner dashboard
-    await loggedInUser.returnToLibraryFromExplorationCompletion();
-  });
+      // Return to learner dashboard
+      await loggedInUser.returnToLibraryFromExplorationCompletion();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 });

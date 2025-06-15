@@ -106,6 +106,12 @@ const navbarGetInvolvedTabContactUsButton =
 const navbarDonateDesktopButton = 'a.e2e-test-navbar-donate-desktop-button';
 const navbarDonateMobileButton = 'a.e2e-test-navbar-donate-mobile-button';
 
+const navbarLearnDropdownContainerSelector =
+  '.e2e-test-classroom-oppia-list-item';
+const navbarAboutDropdownConatinaerSelector = '.e2e-test-about-oppia-list-item';
+const navbarGetInvolvedDropdownContainerSelector =
+  '.e2e-test-navbar-get-involved-menu';
+
 const footerAboutLink = 'a.e2e-test-footer-about-link';
 const footerBlogLink = 'a.e2e-test-footer-blog-link';
 const footerForumlink = 'a.e2e-test-footer-forum-link';
@@ -4530,6 +4536,17 @@ export class LoggedOutUser extends BaseUser {
         }
       }
     }
+  }
+
+  async expectDropdownsInNavbarToWorkProperly() {
+    await this.clickOn(navbarLearnTab);
+    await this.isElementVisible(navbarLearnDropdownContainerSelector);
+
+    await this.clickOn(navbarAboutTab);
+    await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
+
+    await this.clickOn(navbarGetInvolvedTab);
+    await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
   }
 }
 

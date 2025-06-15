@@ -148,4 +148,8 @@ describe('Logged-in User', function () {
     // in CUJ. When back button is clicked, no save progress button is
     // displayed.
   });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 });

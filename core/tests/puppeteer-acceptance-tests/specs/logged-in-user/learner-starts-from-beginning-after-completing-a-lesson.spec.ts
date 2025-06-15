@@ -109,4 +109,8 @@ describe('Logged-In User', function () {
     // the exploration should start from the beginning, not from the previous checkpoint.
     // see: https://github.com/oppia/oppia/issues/20563.
   });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 });
