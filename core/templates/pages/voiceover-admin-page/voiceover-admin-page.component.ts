@@ -127,6 +127,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.cloudSupportedLanguageAccentCodes =
           response.autoGeneratableLanguageAccentCodes;
         this.pageIsInitialized = true;
+        this.cdr.detectChanges();
       });
     this.voiceoverBackendApiService
       .fetchVoiceArtistMetadataAsync()
@@ -142,12 +143,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.voiceArtistIdToVoiceArtistName =
           response.voiceArtistIdToVoiceArtistName;
       });
-
-    this.initializeDateRange();
-
-    setInterval(() => {
-      this.fetchVoiceoverRegenerationRecord();
-    }, 300000);
   }
 
   isLabelingVoiceArtistFeatureEnabled(): boolean {

@@ -151,6 +151,13 @@
 <mat-card class="oppia-page-card oppia-long-text-card automatic-voiceover-regeneration-record-card">
   <h3>Automatic voiceovers regeneration status</h3>
 
+  <p>
+    <i>
+      <strong>Note: </strong>
+      <span>Use the date picker below to choose the date range for fetching voiceover regeneration records.</span>
+    </i>
+  </p>
+
   <div>
     <div class="datepicker-container date-selector-inner-container">
       <mat-form-field class="datepicker-form-container">
@@ -165,16 +172,11 @@
       </mat-form-field>
 
       <button (click)="fetchVoiceoverRegenerationRecord()"
-              class="btn btn-secondary apply-datepicker-button">
+              class="btn btn-primary apply-datepicker-button">
         Apply
       </button>
     </div>
-  </div>
 
-  <div>
-    <p class="refresh-data-info-container">
-      The data updates automatically every five minutes.
-    </p>
   </div>
 
   <div *ngIf="fetchingrenegenratedVoiceoverData">
@@ -187,7 +189,7 @@
     </p>
   </div>
 
-  <div *ngIf="cloudTaskRunList.length > 0">
+  <div *ngIf="cloudTaskRunList.length > 0" class="datepicker-table-container">
     <table mat-table [dataSource]="cloudTaskRunList" class="voice-artist-table">
       <ng-container matColumnDef="state">
         <th mat-header-cell *matHeaderCellDef> State </th>
@@ -242,11 +244,9 @@
     margin: 20px;
     text-align: right;
   }
-  .apply-datepicker-button {
-    height: 50px;
-    width: 100px;
-    text-align: center;
-    margin: 20px;
+  .datepicker-table-container {
+    max-height: 250px;
+    overflow: auto;
   }
   .datepicker-container {
     display: flex;
@@ -400,12 +400,11 @@
 
   /* :ng-deep is used to style the form field.*/
   /* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-  ::ng-deep .mat-form-field {
-    .mat-form-field-infix {
-      align-items: center;
-      display: flex;
-      width: auto;
-    }
+  ::ng-deep .datepicker-form-container .mat-form-field-infix {
+    align-items: center;
+    display: flex;
+    width: auto;
+  }
 
   @media (max-width: 600px) {
     .language-accent-description {
