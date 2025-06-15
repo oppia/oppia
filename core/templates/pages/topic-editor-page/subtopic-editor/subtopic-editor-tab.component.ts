@@ -65,7 +65,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   studyGuide: StudyGuide;
   // Index can be null. It means that no section is active.
   // This also help in closing the study guide section editor.
-  activeSectionIndex!: number | null;
+  activeSectionIndex!: number;
   allowedBgColors;
   htmlData: string;
   sections: StudyGuideSection[];
@@ -363,7 +363,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   changeActiveSectionIndex(idx: number): void {
     if (idx === this.activeSectionIndex) {
       this.sections = this.studyGuide.getSections();
-      this.activeSectionIndex = null;
+      this.activeSectionIndex = -1;
     } else {
       this.activeSectionIndex = idx;
     }
@@ -418,7 +418,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
           this.sections = newSections;
           this.studyGuide.setSections(this.sections);
           this.topicEditorStateService.setStudyGuide(this.studyGuide);
-          this.activeSectionIndex = null;
+          this.activeSectionIndex = -1;
         },
         () => {
           // Note to developers:

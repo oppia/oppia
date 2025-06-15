@@ -57,30 +57,29 @@
       </div>
 
       <div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="create-new-subtopic-input-field create-new-subtopic-content">
-        <div>
-          <strong>Section of the study guide*</strong>
-        </div>
-        <span class="oppia-input-box-subtitle">
+        <h3>
+          Section of the study guide*
+        </h3>
+        <p class="oppia-input-box-subtitle">
           <em>
             A section of the study guide. More sections can be added using the study guide editor after clicking on the create Study Guide Button.
           </em>
-        </span>
+        </p>
         <div>
-          <strong>Heading*</strong>
+          <h4>Heading*</h4>
+          <input class="form-control oppia-new-subtopic-editable-field e2e-test-new-subtopic-study-guide-section-heading-field required"
+                label="Enter heading of the section"       
+                placeholder="Enter heading of the section"
+                [(ngModel)]="sectionHeadingPlaintext" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
         </div>
-        <input class="form-control oppia-new-subtopic-editable-field e2e-test-new-subtopic-study-guide-section-heading-field required"
-               placeholder="Enter heading of the section"
-               [(ngModel)]="sectionHeadingPlaintext" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
-        <div>
-          <strong>Content*</strong>
-          <div class="description-editor e2e-test-subtopic-study-guide-section-content-editor">
-            <div class="oppia-editor-card-body" >
-              <schema-based-editor [schema]="getSchema()"
-                                   class="e2e-test-create-subtopic-page-content-rich-text-editor"
-                                   [localValue]="sectionContentHtml"
-                                   (localValueChange)="localContentValueChange($event)">
-              </schema-based-editor>
-            </div>
+        <div class="section-content-box">
+          <h4>Content*</h4>
+          <div class="description-editor e2e-test-subtopic-study-guide-section-content-editor oppia-editor-card-body" >
+            <schema-based-editor [schema]="getSchema()"
+                                  class="e2e-test-create-subtopic-page-content-rich-text-editor"
+                                  [localValue]="sectionContentHtml"
+                                  (localValueChange)="localContentValueChange($event)">
+            </schema-based-editor>
           </div>
           <div *ngIf="isSectionContentLengthExceeded()" class="oppia-length-validation-error">
             The content length is too long. Please use at most 1000 characters.
@@ -131,6 +130,12 @@
   }
   .oppia-create-new-subtopic-container .oppia-new-subtopic-editable-field {
     font-size: 12px;
+  }
+  .section-content-box h4 {
+    margin: 10px 0 5px;
+  }
+  .section-content-box .description-editor {
+    margin-top: 0;
   }
   @media screen and (max-width: 768px) {
     .create-new-subtopic .modal-dialog {

@@ -1,12 +1,15 @@
 <div class="h-100">
   <!-- Heading Editor -->
   <div *ngIf="!headingEditorIsOpen"
-       class="h-100"
-       title="Edit study guide section heading">
+       class="h-100">
     <div class="oppia-readonly-rule-tile"
          [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview">
-        <div class="oppia-click-to-start-editing e2e-test-section-heading-edit-icon" (click)="openHeadingEditor()">
+        <div class="oppia-click-to-start-editing e2e-test-section-heading-edit-icon"
+             (click)="openHeadingEditor()"
+             aria-label="Edit section heading"
+             role="button"
+             tabindex="0">
           <i *ngIf="isEditable"
              class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
              title="Edit Study Guide Section">
@@ -36,12 +39,12 @@
 
     <div class="oppia-rule-save-cancel-buttons">
       <div class="modal-footer">
-        <button type="button"
+        <button type="reset"
                 class="btn btn-secondary"
                 (click)="cancelEditHeading()">
           Cancel
         </button>
-        <button type="button"
+        <button type="submit"
                 class="btn btn-success"
                 [disabled]="!container.sectionHeadingPlaintext"
                 (click)="saveSection(true)">
@@ -54,15 +57,18 @@
 
   <!-- Content Editor -->
   <div *ngIf="!contentEditorIsOpen"
-       class="h-100 section-content-part"
-       title="Edit study guide section content">
+       class="h-100 section-content-part">
     <div class="oppia-readonly-rule-tile"
          [ngClass]="{'oppia-editable-section': isEditable}">
       <div class="oppia-rule-preview">
-        <div class="oppia-click-to-start-editing e2e-test-section-content-edit-icon" (click)="openContentEditor()">
+        <div class="oppia-click-to-start-editing e2e-test-section-content-edit-icon"
+             (click)="openContentEditor()"
+             aria-label="Edit section content"
+             role="button"
+             tabindex="0">
           <i *ngIf="isEditable"
              class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
-             title="Edit Study GuideSection">
+             title="Edit Study Guide Section">
           </i>
         </div>
 
@@ -93,12 +99,12 @@
 
     <div class="oppia-rule-save-cancel-buttons">
       <div class="modal-footer">
-        <button type="button"
+        <button type="reset"
                 class="btn btn-secondary"
                 (click)="cancelEditContent()">
           Cancel
         </button>
-        <button type="button"
+        <button type="submit"
                 class="btn btn-success"
                 [disabled]="!container.sectionContentHtml || isSectionContentLengthExceeded()"
                 (click)="saveSection(false)">

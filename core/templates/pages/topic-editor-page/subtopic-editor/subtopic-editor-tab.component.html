@@ -160,7 +160,10 @@
       <mat-card *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
         <div class="oppia-editor-card-body">
           <div class="oppia-editor-card-section study-guide-section-content">
-            <div class="oppia-study-guide-sections-header oppia-mobile-collapsible-card-header" (click)="toggleSectionsList()">
+            <div class="oppia-study-guide-sections-header oppia-mobile-collapsible-card-header"
+                 (click)="toggleSectionsList()"
+                 role="button"
+                 tabindex="0">
               <strong class="heading-text">Sections</strong>
               <i class="fa fa-caret-down e2e-test-show-study-guide-sections-list"
                  *ngIf="!sectionsListIsShown"
@@ -172,13 +175,13 @@
               </i>
             </div>
             <div *ngIf="sectionsListIsShown" class="oppia-mobile-collapsible-card-content">
-              <div class="study-guide-section-subtitle">
+              <p class="study-guide-section-subtitle">
                 Sections of the Study Guide.
-              </div>
+              </p>
               <div>
                 <ul class="oppia-study-guide-section-preview oppia-option-list nav-stacked nav-pills study-guide-sections-list">
                   <li *ngFor="let section of sections; let index = index"
-                      [ngClass]="{'active': activeSectionIndex === index, 'last-element': index === sections.length - 1}"
+                      [ngClass]="{'active': activeSectionIndex === index}"
                       class="oppia-rule-block oppia-prevent-selection">
                     <a (click)="changeActiveSectionIndex(index)"
                        class="oppia-rule-tab e2e-test-study-guide-section-{{ index }} oppia-study-guide-section-preview-list"
@@ -579,8 +582,9 @@
     font-size: 14px;
     padding: 10px 0;
   }
-  .last-element {
+  .oppia-rule-block:last-child {
     border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
   }
   .oppia-study-guide-sections-header {
     display: flex;
@@ -588,17 +592,6 @@
   }
   .oppia-study-guide-sections-header i {
     display: none;
-  }
-  .skill-card-header-text {
-    font-size: 19px;
-    margin-bottom: 15px;
-    margin-left: 20px;
-    margin-top: 30px;
-  }
-  .skill-card-header {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
   }
   .oppia-study-guide-section-preview-list {
     display: block;
@@ -620,14 +613,7 @@
     .oppia-study-guide-sections-header i {
       display: block;
     }
-    .skill-card-header-text {
-      margin: 0;
-    }
     .study-guide-section-content {
-      padding: 0;
-    }
-    .review-material-container {
-      margin-top: 30px;
       padding: 0;
     }
     .mat-card {

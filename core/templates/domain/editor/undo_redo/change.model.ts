@@ -34,8 +34,8 @@ import {Skill} from 'domain/skill/SkillObjectFactory';
 import {Story} from 'domain/story/story.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
-import {SubtitledUnicodeBackendDict} from 'domain/exploration/subtitled-unicode.model';
 import {StudyGuide} from 'domain/topic/study-guide.model';
+import {StudyGuideSectionBackendDict} from 'domain/topic/study-guide-sections.model';
 
 interface CollectionTitleChange {
   cmd: 'edit_collection_property';
@@ -585,19 +585,11 @@ interface TopicSubtopicPageHtmlChange {
   subtopic_id: number;
 }
 
-interface TopicStudyGuidePropertySectionsHeadingChange {
+interface TopicStudyGuidePropertySectionsChange {
   cmd: 'update_study_guide_property';
-  property_name: 'sections_heading';
-  new_value: SubtitledUnicodeBackendDict;
-  old_value: SubtitledUnicodeBackendDict;
-  subtopic_id: number;
-}
-
-interface TopicStudyGuidePropertySectionsContentChange {
-  cmd: 'update_study_guide_property';
-  property_name: 'sections_content';
-  new_value: SubtitledHtmlBackendDict;
-  old_value: SubtitledHtmlBackendDict;
+  property_name: 'sections';
+  new_value: StudyGuideSectionBackendDict[];
+  old_value: StudyGuideSectionBackendDict[];
   subtopic_id: number;
 }
 
@@ -613,9 +605,7 @@ type TopicSubtopicPagePropertyChange =
   | TopicSubtopicPageHtmlChange
   | TopicSubtopicPageAudioChange;
 
-type TopicStudyGuidePropertyChange =
-  | TopicStudyGuidePropertySectionsHeadingChange
-  | TopicStudyGuidePropertySectionsContentChange;
+type TopicStudyGuidePropertyChange = TopicStudyGuidePropertySectionsChange;
 
 interface TopicAddSubtopicChange {
   cmd: 'add_subtopic';

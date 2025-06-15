@@ -52,8 +52,8 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   tmpSectionHeadingPlaintext!: string;
   tmpSectionContentHtml!: string;
   // Below properties are null when the editor is closed.
-  sectionHeadingMemento!: string | null;
-  sectionContentMemento!: string | null;
+  sectionHeadingBackup!: string | null;
+  sectionContentBackup!: string | null;
   headingEditorIsOpen: boolean = false;
   contentEditorIsOpen: boolean = false;
   STUDY_GUIDE_SECTION_HEADING_FORM_SCHEMA: HtmlFormSchema = {
@@ -113,7 +113,7 @@ export class StudyGuideSectionEditorComponent implements OnInit {
 
   openHeadingEditor(): void {
     if (this.isEditable) {
-      this.sectionHeadingMemento = cloneDeep(
+      this.sectionHeadingBackup = cloneDeep(
         this.container.sectionHeadingPlaintext
       );
       this.headingEditorIsOpen = true;
@@ -122,7 +122,7 @@ export class StudyGuideSectionEditorComponent implements OnInit {
 
   openContentEditor(): void {
     if (this.isEditable) {
-      this.sectionContentMemento = cloneDeep(this.container.sectionContentHtml);
+      this.sectionContentBackup = cloneDeep(this.container.sectionContentHtml);
       this.contentEditorIsOpen = true;
     }
   }
@@ -134,10 +134,10 @@ export class StudyGuideSectionEditorComponent implements OnInit {
       this.contentEditorIsOpen = false;
     }
     let contentHasChanged =
-      this.sectionHeadingMemento !== this.container.sectionHeadingPlaintext ||
-      this.sectionContentMemento !== this.container.sectionContentHtml;
-    this.sectionHeadingMemento = null;
-    this.sectionContentMemento = null;
+      this.sectionHeadingBackup !== this.container.sectionHeadingPlaintext ||
+      this.sectionContentBackup !== this.container.sectionContentHtml;
+    this.sectionHeadingBackup = null;
+    this.sectionContentBackup = null;
 
     if (contentHasChanged) {
       let studyGuide = this.topicEditorStateService.getStudyGuide();
@@ -153,22 +153,22 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   }
 
   cancelEditHeading(): void {
-    if (this.sectionHeadingMemento === null) {
+    if (this.sectionHeadingBackup === null) {
       return;
     }
     this.container.sectionHeadingPlaintext = cloneDeep(
-      this.sectionHeadingMemento
+      this.sectionHeadingBackup
     );
-    this.sectionHeadingMemento = null;
+    this.sectionHeadingBackup = null;
     this.headingEditorIsOpen = false;
   }
 
   cancelEditContent(): void {
-    if (this.sectionContentMemento === null) {
+    if (this.sectionContentBackup === null) {
       return;
     }
-    this.container.sectionContentHtml = cloneDeep(this.sectionContentMemento);
-    this.sectionContentMemento = null;
+    this.container.sectionContentHtml = cloneDeep(this.sectionContentBackup);
+    this.sectionContentBackup = null;
     this.contentEditorIsOpen = false;
   }
 }

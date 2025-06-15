@@ -134,10 +134,9 @@ export class TopicEditorStateService {
       SubtopicPageContents.createDefault(),
       'en'
     );
-    let sections: StudyGuideSection[] = [];
-    sections.push(
-      StudyGuideSection.createDefault('section_heading_0', 'section_content_1')
-    );
+    let sections: StudyGuideSection[] = [
+      StudyGuideSection.createDefault('section_heading_0', 'section_content_1'),
+    ];
     this._studyGuide = new StudyGuide('id', 'topic_id', sections, 2, 'en');
   }
 
@@ -208,12 +207,10 @@ export class TopicEditorStateService {
   }
 
   private _getStudyGuideIndex(studyGuideId: string): number | null {
-    for (let i = 0; i < this._cachedStudyGuides.length; i++) {
-      if (this._cachedStudyGuides[i].getId() === studyGuideId) {
-        return i;
-      }
-    }
-    return null;
+    const index = this._cachedStudyGuides.findIndex(
+      guide => guide.getId() === studyGuideId
+    );
+    return index !== -1 ? index : null;
   }
 
   private _updateClassroomUrlFragment(
