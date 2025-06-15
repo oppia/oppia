@@ -106,6 +106,12 @@ const navbarGetInvolvedTabContactUsButton =
 const navbarDonateDesktopButton = 'a.e2e-test-navbar-donate-desktop-button';
 const navbarDonateMobileButton = 'a.e2e-test-navbar-donate-mobile-button';
 
+const navbarLearnDropdownContainerSelector =
+  '.e2e-test-classroom-oppia-list-item';
+const navbarAboutDropdownConatinaerSelector = '.e2e-test-about-oppia-list-item';
+const navbarGetInvolvedDropdownContainerSelector =
+  '.e2e-test-navbar-get-involved-menu';
+
 const footerAboutLink = 'a.e2e-test-footer-about-link';
 const footerBlogLink = 'a.e2e-test-footer-blog-link';
 const footerForumlink = 'a.e2e-test-footer-forum-link';
@@ -401,6 +407,9 @@ const blogPostContentSelector = '.e2e-test-blog-post-content';
 const youtubePlayerSelector = '.e2e-test-youtube-player';
 const collapsibleRTEHeaderSelector = 'e2e-test-collapsible-heading';
 const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
+
+const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -594,6 +603,14 @@ export class LoggedOutUser extends BaseUser {
     if (!allPostsHaveTags) {
       throw new Error('Not all blog posts have tags');
     }
+  }
+
+  /**
+   * Return to Learner Dashboard from exploration completion card.
+   */
+  async returnToLibraryFromExplorationCompletion() {
+    await this.isElementVisible(returnToLibraryButtonSelector);
+    await this.clickOn(returnToLibraryButtonSelector);
   }
 
   /**
@@ -4519,6 +4536,20 @@ export class LoggedOutUser extends BaseUser {
         }
       }
     }
+  }
+
+  /**
+   * Checks if all dropdowns in navbar open properly.
+   */
+  async expectDropdownsInNavbarToWorkProperly() {
+    await this.clickOn(navbarLearnTab);
+    await this.isElementVisible(navbarLearnDropdownContainerSelector);
+
+    await this.clickOn(navbarAboutTab);
+    await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
+
+    await this.clickOn(navbarGetInvolvedTab);
+    await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
   }
 }
 

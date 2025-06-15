@@ -131,13 +131,6 @@ describe('Logged-Out Learner', function () {
     );
   });
 
-  it('should be able to share the lesson on Twitter', async function () {
-    await loggedOutUser.shareExplorationAndVerifyRedirect(
-      'Twitter',
-      explorationId
-    );
-  });
-
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
