@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {PageContextService} from 'services/page-context.service';
 import {CheckpointProgressService} from './checkpoint-progress.service';
-import {ExplorationModeService} from './exploration-mode.service';
+import {ExplorationEngineService} from './exploration-engine.service';
 
 @Injectable({
   providedIn: 'root',
@@ -31,7 +31,7 @@ export class ProgressUrlService {
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private pageContextService: PageContextService,
     private checkpointProgressService: CheckpointProgressService,
-    private explorationModeService: ExplorationModeService
+    private explorationEngineService: ExplorationEngineService
   ) {}
 
   /**
@@ -44,7 +44,7 @@ export class ProgressUrlService {
     let explorationId = this.pageContextService.getExplorationId();
     let lastCompletedCheckpoint =
       this.checkpointProgressService.getLastCompletedCheckpoint();
-    let version = this.explorationModeService.getExplorationVersion();
+    let version = this.explorationEngineService.getExplorationVersion();
     await this.editableExplorationBackendApiService
       .recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
         explorationId,

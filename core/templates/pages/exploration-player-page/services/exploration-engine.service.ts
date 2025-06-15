@@ -75,9 +75,7 @@ import {QuestionPlayerEngineService} from './question-player-engine.service';
   providedIn: 'root',
 })
 export class ExplorationEngineService {
-  private _explorationId: string;
-  private _editorPreviewMode: boolean;
-  private _questionPlayerMode: boolean;
+  private _explorationId!: string;
   private _updateActiveStateIfInEditorEventEmitter: EventEmitter<string> =
     new EventEmitter();
 
@@ -148,16 +146,15 @@ export class ExplorationEngineService {
     if (explorationContext) {
       this._explorationId = this.pageContextService.getExplorationId();
       this.version = this.urlService.getExplorationVersionFromUrl();
-      this._editorPreviewMode =
-        this.pageContextService.isInExplorationEditorPage();
-      this._questionPlayerMode =
-        this.pageContextService.isInQuestionPlayerMode();
+
+      const pathSegment = this.urlService
+        .getPathname()
+        .split('/')[1]
+        .replace(/"/g, "'");
+
       if (
-        !this._questionPlayerMode &&
-        !(
-          'skill_editor' ===
-          this.urlService.getPathname().split('/')[1].replace(/"/g, "'")
-        )
+        this.explorationModeService.isInQuestionPlayerMode() &&
+        pathSegment !== 'skill_editor'
       ) {
         this.readOnlyExplorationBackendApiService
           .loadExplorationAsync(this._explorationId, this.version)
@@ -168,8 +165,6 @@ export class ExplorationEngineService {
     } else {
       this._explorationId = 'test_id';
       this.version = 1;
-      this._editorPreviewMode = false;
-      this._questionPlayerMode = false;
     }
   }
 
@@ -318,7 +313,7 @@ export class ExplorationEngineService {
       return;
     }
 
-    if (!this._editorPreviewMode) {
+    if (!this.explorationModeService.isInExplorationEditorPreviewMode()) {
       this.statsReportingService.recordExplorationStarted(
         this.exploration.initStateName,
         newParams
@@ -339,7 +334,7 @@ export class ExplorationEngineService {
     callback: (stateCard: StateCard, str: string) => void
   ): void {
     this.playerTranscriptService.init();
-    if (this.explorationModeService.isInExplorationEditorMode()) {
+    if (this.explorationModeService.isInExplorationEditorPreviewMode()) {
       this.initExplorationPreviewPlayer(callback);
     } else {
       this.initExplorationPlayer(callback);
@@ -521,7 +516,7 @@ export class ExplorationEngineService {
     activeStateNameFromPreviewTab: string,
     manualParamChangesToInit: ParamChange[]
   ): void {
-    if (this._editorPreviewMode) {
+    if (this.explorationModeService.isInExplorationEditorPreviewMode()) {
       this.manualParamChanges = manualParamChangesToInit;
       this.initStateName = activeStateNameFromPreviewTab;
     } else {
@@ -555,7 +550,7 @@ export class ExplorationEngineService {
     this.exploration =
       this.explorationObjectFactory.createFromBackendDict(explorationDict);
     this.answerIsBeingProcessed = false;
-    if (this._editorPreviewMode) {
+    if (this.explorationModeService.isInExplorationEditorPreviewMode()) {
       this.exploration.setInitialStateName(this.initStateName);
       this.visitedStateNames = [this.exploration.getInitialState().name];
       this.initParams(this.manualParamChanges);
@@ -643,10 +638,6 @@ export class ExplorationEngineService {
     return this.exploration.getLanguageCode();
   }
 
-  isInPreviewMode(): boolean {
-    return !!this._editorPreviewMode;
-  }
-
   submitAnswer(
     answer: string,
     interactionRulesService: InteractionRulesService,
@@ -688,7 +679,7 @@ export class ExplorationEngineService {
     let outcome = {...classificationResult.outcome};
     let newStateName: string = outcome.dest;
 
-    if (!this._editorPreviewMode) {
+    if (!this.explorationModeService.isInExplorationEditorPreviewMode()) {
       let feedbackIsUseful: boolean =
         this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
           oldStateName,

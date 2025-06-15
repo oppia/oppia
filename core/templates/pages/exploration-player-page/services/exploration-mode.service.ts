@@ -18,11 +18,7 @@
  * This service identifies the context in which an exploration or question is being played.
  * It differentiates between various modes such as exploration, editor preview, question player,
  * pretest, diagnostic test, and story chapter modes. Depending on the current mode, it assigns
- * the appropriate engine service for handling state and interaction logic.
- *
- * It also provides utility methods to check the current mode, determine if only questions are
- * being presented (isolated questions), and manage the exploration version information.
- *
+ * the appropriate engine service for handling state and interaction logic./
  */
 
 import {Injectable} from '@angular/core';
@@ -47,7 +43,6 @@ enum EXPLORATION_MODE {
   providedIn: 'root',
 })
 export class ExplorationModeService {
-  version: number | null = null;
   currentMode!: EXPLORATION_MODE;
   currentEngineService!:
     | ExplorationEngineService
@@ -88,33 +83,7 @@ export class ExplorationModeService {
       } else if (this.pageContextService.isInQuestionPlayerMode()) {
         this.currentMode = EXPLORATION_MODE.QUESTION_PLAYER;
       }
-
-      let explorationId = this.pageContextService.getExplorationId();
-      this.version = this.urlService.getExplorationVersionFromUrl();
-      const pathSegment = this.urlService
-        .getPathname()
-        .split('/')[1]
-        .replace(/"/g, "'");
-
-      if (
-        this.currentMode !== EXPLORATION_MODE.QUESTION_PLAYER &&
-        pathSegment !== 'skill_editor'
-      ) {
-        this.readOnlyExplorationBackendApiService
-          .loadExplorationAsync(explorationId, this.version)
-          .then(exploration => {
-            this.version = exploration.version;
-          });
-      }
     }
-  }
-
-  getExplorationVersion(): number | null {
-    return this.version;
-  }
-
-  setExplorationVersion(version: number | null): void {
-    this.version = version;
   }
 
   getCurrentMode(): EXPLORATION_MODE {
@@ -160,7 +129,7 @@ export class ExplorationModeService {
     );
   }
 
-  isInExplorationEditorMode(): boolean {
+  isInExplorationEditorPreviewMode(): boolean {
     return this.currentMode === EXPLORATION_MODE.EDITOR_PREVIEW;
   }
 

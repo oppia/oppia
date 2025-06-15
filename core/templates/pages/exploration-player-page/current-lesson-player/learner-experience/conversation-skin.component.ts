@@ -269,7 +269,7 @@ export class ConversationSkinComponent {
     }
 
     this.explorationId = this.explorationEngineService.getExplorationId();
-    this.isInPreviewMode = this.explorationEngineService.isInPreviewMode();
+    this.isInPreviewMode = this.explorationModeService.isInExplorationEditorPreviewMode();
     this.isIframed = this.urlService.isIframed();
     this.loaderService.showLoadingScreen('Loading');
 
