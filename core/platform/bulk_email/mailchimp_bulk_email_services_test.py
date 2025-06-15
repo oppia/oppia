@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
+from core.domain import platform_parameter_list
 from core.platform import models
 from core.platform.bulk_email import mailchimp_bulk_email_services
 from core.tests import test_utils
@@ -187,8 +187,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         sample_email = 'test@example.com'
         subscriber_hash = '55502f40dc8b7c769880b10874abc9d0'
         self.assertEqual(
-            mailchimp_bulk_email_services._get_subscriber_hash(sample_email), # pylint: disable=protected-access
-            subscriber_hash)
+            mailchimp_bulk_email_services._get_subscriber_hash( # pylint: disable=protected-access
+                sample_email
+            ),
+            subscriber_hash,
+        )
 
         # TODO(#13528): Here we use MyPy ignore because we remove this test
         # after the backend is fully type-annotated. Here ignore[arg-type]
@@ -197,7 +200,9 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
         sample_email_2 = 5
         with self.assertRaisesRegex(
             Exception, 'Invalid type for email. Expected string, received 5'):
-            mailchimp_bulk_email_services._get_subscriber_hash(sample_email_2) # type: ignore[arg-type]  # pylint: disable=protected-access
+            mailchimp_bulk_email_services._get_subscriber_hash( # pylint: disable=protected-access
+                sample_email_2 # type: ignore[arg-type]
+            )
 
     def test_function_input_validation(self) -> None:
         mailchimp = self.MockMailchimpClass()
@@ -241,9 +246,6 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_get_mailchimp_class_errors_when_username_is_not_available(
         self
     ) -> None:
-        swap_mailchimp_username = self.swap(
-            feconf, 'MAILCHIMP_USERNAME', None
-        )
         swap_get_secret = self.swap_with_checks(
             secrets_services,
             'get_secret',
@@ -251,7 +253,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             expected_args=[('MAILCHIMP_API_KEY',)]
         )
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with swap_mailchimp_username, swap_get_secret:
+            with swap_get_secret:
                 self.assertIsNone(
                     mailchimp_bulk_email_services._get_mailchimp_class() # pylint: disable=protected-access
                 )
@@ -295,6 +297,15 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             mailchimp_bulk_email_services.permanently_delete_user_from_list(
                 'sample_email')
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
+            'username'
+        ), (
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            ''
+        )]
+    )
     def test_add_or_update_mailchimp_user_status(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
@@ -302,9 +313,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
         swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
-        swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
 
-        with swap_mailchimp_context, swap_api, swap_username:
+        with swap_mailchimp_context, swap_api:
             # Tests condition where user was initally unsubscribed in list and
             # becomes subscribed.
             self.assertEqual(
@@ -353,10 +363,22 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
                     self.user_email_1, {}, 'Web',
                     can_receive_email_updates=True)
                 self.assertItemsEqual(
-                    ['Mailchimp error prevented email signup: Server Error'],
+                    [
+                        'Mailchimp error prevented email signup: '
+                        '{\'status\': 401, \'detail\': \'Server Error\'}'
+                    ],
                     logs
                 )
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
+            'username'
+        ), (
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            ''
+        )]
+    )
     def test_android_merge_fields(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
@@ -364,9 +386,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
         swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
-        swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
 
-        with swap_mailchimp_context, swap_api, swap_username:
+        with swap_mailchimp_context, swap_api:
             # Tests condition where user was initally unsubscribed in list and
             # becomes subscribed.
             self.assertEqual(
@@ -379,6 +400,15 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 mailchimp.lists.members.tags.tag_names, ['Android'])
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
+            'username'
+        ), (
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            ''
+        )]
+    )
     def test_catch_or_raise_errors_when_creating_new_invalid_user(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
@@ -386,9 +416,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
         swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
-        swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
 
-        with swap_mailchimp_context, swap_api, swap_username:
+        with swap_mailchimp_context, swap_api:
             # Creates a mailchimp entry for a deleted user.
             self.assertEqual(len(mailchimp.lists.members.users_data), 3)
             return_status = (
@@ -399,12 +428,24 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(mailchimp.lists.members.users_data), 3)
 
             # Create user raises exception for other errors.
-            with self.assertRaisesRegex(
-                Exception, 'Server Issue'):
+            with self.capture_logging(min_level=logging.ERROR) as logs:
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     'test5@example.com', {}, 'Web',
                     can_receive_email_updates=True)
+                self.assertItemsEqual(
+                    ['Mailchimp error prevented email signup: Server Issue'],
+                    logs
+                )
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.MAILCHIMP_USERNAME,
+            'username'
+        ), (
+            platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
+            ''
+        )]
+    )
     def test_permanently_delete_user(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
@@ -412,9 +453,8 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             mailchimp_bulk_email_services, '_get_mailchimp_class',
             swapped_mailchimp)
         swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
-        swap_username = self.swap(feconf, 'MAILCHIMP_USERNAME', 'username')
 
-        with swap_mailchimp_context, swap_api, swap_username:
+        with swap_mailchimp_context, swap_api:
             self.assertEqual(len(mailchimp.lists.members.users_data), 3)
             mailchimp_bulk_email_services.permanently_delete_user_from_list(
                 self.user_email_1)

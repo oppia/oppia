@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal, NgbPopover} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -133,10 +132,3 @@ export class LearnerLocalNavComponent implements OnInit {
     this.feedbackPopOver.close();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaLearnerLocalNav',
-  downgradeComponent({
-    component: LearnerLocalNavComponent,
-  }) as angular.IDirectiveFactory
-);

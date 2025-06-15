@@ -117,13 +117,6 @@ describe('Donation flow', function () {
 });
 
 describe('Static Pages Tour', function () {
-  var getStartedPage = new GetStartedPage.GetStartedPage();
-  it('should visit the Get started page', async function () {
-    await getStartedPage.get();
-    await waitFor.pageToFullyLoad();
-    expect(await $('.e2e-test-get-started-page').isExisting()).toBe(true);
-  });
-
   it('should visit the Login page', async function () {
     await browser.url('/login');
     await waitFor.pageToFullyLoad();
@@ -225,15 +218,6 @@ describe('Static Pages Tour', function () {
     await waitFor.visibilityOf(
       $('.e2e-test-partnerships-page'),
       'Partnerships page takes too long to appear'
-    );
-  });
-
-  it('should visit the About the Oppia Foundation page', async function () {
-    await browser.url('/about-foundation');
-    await waitFor.pageToFullyLoad();
-    await waitFor.visibilityOf(
-      $('.e2e-test-about-foundation-page'),
-      'About Foundation page takes too long to appear'
     );
   });
 

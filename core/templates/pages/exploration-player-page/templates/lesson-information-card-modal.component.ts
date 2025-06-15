@@ -26,6 +26,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,
@@ -34,6 +35,8 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
 import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {ExplorationEngineService} from '../services/exploration-engine.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
 interface ExplorationTagSummary {
@@ -97,9 +100,12 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private urlService: UrlService,
     private userService: UserService,
     private windowRef: WindowRef,
+    private explorationEngineService: ExplorationEngineService,
+    private playerTranscriptService: PlayerTranscriptService,
     private localStorageService: LocalStorageService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
-    private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService
+    private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
+    private playerPositionService: PlayerPositionService
   ) {
     super(ngbActiveModal);
   }
@@ -274,6 +280,51 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(urlId);
       this.windowRef.nativeWindow.location.href = loginUrl;
     });
+  }
+
+  /**
+   * Retrieves the indexes of cards that are marked as checkpoints.
+   *
+   * @returns {number[]} An array of indexes of cards. Each index corresponds to a card that is a checkpoint.
+   */
+  getCheckpointCardIndexes(): number[] {
+    const checkpointCardIndexes: number[] = [];
+    const numberOfCards = this.playerTranscriptService.getNumCards();
+
+    for (let i = 0; i < numberOfCards; i++) {
+      const stateName = this.playerTranscriptService.getCard(i).getStateName();
+      const correspondingState =
+        this.explorationEngineService.getStateFromStateName(stateName);
+      if (correspondingState.cardIsCheckpoint) {
+        checkpointCardIndexes.push(i);
+      }
+    }
+    return checkpointCardIndexes;
+  }
+
+  /**
+   * If the checkpoint is completed, this function returns the user to the checkpoint.
+   *
+   * @param {number} checkpointNumber - The number of the checkpoint to return to.
+   * @returns {void} This function does not return a value. It changes the displayed card if the checkpoint is completed.
+   */
+  returnToCheckpointIfCompleted(checkpointNumber: number): void {
+    const checkpointCardIndexes = this.getCheckpointCardIndexes();
+    const cardIndex = checkpointCardIndexes[checkpointNumber];
+
+    if (cardIndex === undefined) {
+      console.error('No card index associated with this checkpoint.');
+    }
+    if (
+      this.checkpointStatusArray[checkpointNumber] !==
+      CHECKPOINT_STATUS_COMPLETED
+    ) {
+      return;
+    } else {
+      this.playerPositionService.setDisplayedCardIndex(cardIndex);
+      this.playerPositionService.onActiveCardChanged.emit();
+      this.ngbActiveModal.close();
+    }
   }
 
   closeSaveProgressMenu(): void {

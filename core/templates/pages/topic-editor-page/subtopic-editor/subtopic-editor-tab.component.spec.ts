@@ -32,6 +32,8 @@ import {QuestionBackendApiService} from 'domain/question/question-backend-api.se
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
+import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
+import {By} from '@angular/platform-browser';
 
 class MockQuestionBackendApiService {
   async fetchTotalQuestionCountForSkillIdsAsync() {
@@ -79,7 +81,7 @@ describe('Subtopic editor tab', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [SubtopicEditorTabComponent],
+      declarations: [SubtopicEditorTabComponent, UrlFragmentEditorComponent],
       providers: [
         TopicEditorStateService,
         TopicEditorRoutingService,
@@ -425,5 +427,32 @@ describe('Subtopic editor tab', () => {
     let navigateSpy = spyOn(topicEditorRoutingService, 'navigateToMainTab');
     component.initEditor();
     expect(navigateSpy).toHaveBeenCalled();
+  });
+
+  it('should call onSubtopicUrlFragmentChange when urlFragmentChange event is emitted', async () => {
+    fixture.detectChanges();
+    await fixture.whenStable();
+    spyOn(component, 'onSubtopicUrlFragmentChange');
+    const childComponent = fixture.debugElement.query(
+      By.directive(UrlFragmentEditorComponent)
+    );
+    expect(childComponent).toBeTruthy();
+    const testFragment = 'test-subtopic-url-fragment';
+    childComponent.triggerEventHandler('urlFragmentChange', testFragment);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(component.onSubtopicUrlFragmentChange).toHaveBeenCalledWith(
+      testFragment
+    );
+  });
+
+  it('should update editableUrlFragment and call updateSubtopicUrlFragment', () => {
+    spyOn(component, 'updateSubtopicUrlFragment');
+    const newUrlFragment = 'new-subtopic-url';
+    component.onSubtopicUrlFragmentChange(newUrlFragment);
+    expect(component.editableUrlFragment).toBe(newUrlFragment);
+    expect(component.updateSubtopicUrlFragment).toHaveBeenCalledWith(
+      newUrlFragment
+    );
   });
 });

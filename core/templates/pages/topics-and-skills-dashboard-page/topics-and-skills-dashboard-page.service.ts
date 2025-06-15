@@ -16,7 +16,6 @@
  * @fileoverview Service for topics and skills dashboard page.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
@@ -77,6 +76,14 @@ export class TopicsAndSkillsDashboardPageService {
         if (filterObject.classroom === 'Unassigned' && !topic.classroom) {
           return true;
         }
+
+        if (
+          filterObject.classroom ===
+          TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_ONLY_CLASSROOMS
+        ) {
+          return !!topic.classroom;
+        }
+
         return (
           topic.classroom &&
           filterObject.classroom.toLowerCase() === topic.classroom.toLowerCase()
@@ -179,10 +186,3 @@ export class TopicsAndSkillsDashboardPageService {
     return filteredTopics;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TopicsAndSkillsDashboardPageService',
-    downgradeInjectable(TopicsAndSkillsDashboardPageService)
-  );

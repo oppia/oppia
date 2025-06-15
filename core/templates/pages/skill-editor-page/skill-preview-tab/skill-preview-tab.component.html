@@ -8,6 +8,7 @@
           <div *ngIf="questionsFetched">
             <div class="question-filters">
               <input type="text"
+                     class="e2e-test-question-text-input"
                      [(ngModel)]="questionTextFilter"
                      (change)="applyFilters()">
               <select [(ngModel)]="interactionFilter"

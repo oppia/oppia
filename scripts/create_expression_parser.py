@@ -22,7 +22,6 @@ import subprocess
 from typing import Optional, Sequence
 
 from . import common
-from . import setup
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -35,7 +34,6 @@ The root folder MUST be named 'oppia'.
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Produces the expression parser."""
     unused_parsed_args = _PARSER.parse_args(args=args)
-    setup.main(args=[])
 
     expression_parser_definition = os.path.join(
         'core', 'templates', 'expressions', 'parser.pegjs')

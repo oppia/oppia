@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {DragAndDropAnswer} from 'interactions/answer-defs';
 
@@ -64,10 +63,3 @@ export class ShortResponseDragAndDropSortInputComponent implements OnInit {
       : 'drag-and-drop-response-subitem';
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaShortResponseDragAndDropSortInput',
-  downgradeComponent({
-    component: ShortResponseDragAndDropSortInputComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -35,6 +35,7 @@ export class ClassroomAdminDataService {
   nameValidationError: string = '';
   urlValidationError: string = '';
   topicsGraphValidationError: string = '';
+  classroomValidationErrors: string[] = [];
 
   onClassroomNameChange(classroom: ClassroomData): void {
     this.nameValidationError = classroom.getClassroomNameValidationErrors();
@@ -90,6 +91,7 @@ export class ClassroomAdminDataService {
     );
     if (tempClassroom instanceof ExistingClassroomData) {
       this.onTopicDependencyChange(tempClassroom);
+      this.classroomValidationErrors = tempClassroom.getAllValidationErrors();
     }
 
     tempClassroom.setClassroomValidityFlag(
@@ -99,7 +101,18 @@ export class ClassroomAdminDataService {
     );
   }
 
+  getAllClassroomValidationErrors(): string[] {
+    return this.classroomValidationErrors;
+  }
+
+  getSaveClassroomValidationErrors(): string[] {
+    return [this.nameValidationError, this.urlValidationError].filter(
+      error => error !== ''
+    );
+  }
+
   reinitializeErrorMsgs(): void {
+    this.classroomValidationErrors = [];
     this.nameValidationError = '';
     this.urlValidationError = '';
     this.topicsGraphValidationError = '';

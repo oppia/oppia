@@ -136,6 +136,30 @@ describe('LocalStorageService', () => {
       );
     });
 
+    it('should correctly save language accent code', () => {
+      localStorageService.setLastSelectedLanguageAccentCode('en-US');
+
+      expect(localStorageService.getLastSelectedLanguageAccentCode()).toEqual(
+        'en-US'
+      );
+
+      localStorageService.setLastSelectedLanguageAccentCode('en-IN');
+
+      expect(localStorageService.getLastSelectedLanguageAccentCode()).toBe(
+        'en-IN'
+      );
+    });
+
+    it('should not save a language accent code when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      localStorageService.setLastSelectedLanguageAccentCode('en-IN');
+
+      expect(
+        localStorageService.getLastSelectedLanguageAccentCode()
+      ).toBeNull();
+    });
+
     it('should not save a language code when storage is not available', () => {
       spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
 
@@ -319,6 +343,25 @@ describe('LocalStorageService', () => {
       expect(
         localStorageService.getUniqueProgressIdOfLoggedOutLearner()
       ).toBeNull();
+    });
+
+    it('should set Last Page View Time of a page correctly', () => {
+      const key = 'lastAboutPageViewTime';
+      const currentTime = new Date().getTime();
+      localStorageService.setLastPageViewTime(key);
+
+      expect(
+        localStorageService.getLastPageViewTime(key)
+      ).toBeGreaterThanOrEqual(currentTime);
+    });
+
+    it('should not save Last Page View Time of a page when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+
+      const key = 'lastAboutPageViewTime';
+      localStorageService.setLastPageViewTime(key);
+
+      expect(localStorageService.getLastPageViewTime()).toBeNull();
     });
   });
 });

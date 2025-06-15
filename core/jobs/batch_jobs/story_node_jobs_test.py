@@ -27,8 +27,7 @@ from core.jobs.batch_jobs import story_node_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Type
-from typing_extensions import Final
+from typing import Final, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -159,7 +158,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         story_1_snapshot_metadata_model_1 = self.create_model(
             story_models.StorySnapshotMetadataModel,
-            id=self.STORY_1_ID + '-1',
+            id='%s-1' % self.STORY_1_ID,
             commit_cmds=[{
                 'cmd': 'add_story_node',
                 'node_id': 'node_1'
@@ -170,7 +169,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         story_1_snapshot_metadata_model_2 = self.create_model(
             story_models.StorySnapshotMetadataModel,
-            id=self.STORY_1_ID + '-2',
+            id='%s-2' % self.STORY_1_ID,
             commit_cmds=[{
                 'cmd': 'update_story_node_property',
                 'node_id': 'node_1',
@@ -187,7 +186,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         story_2_snapshot_metadata_model_1 = self.create_model(
             story_models.StorySnapshotMetadataModel,
-            id=self.STORY_2_ID + '-1',
+            id='%s-1' % self.STORY_2_ID,
             commit_cmds=[{
                 'cmd': 'add_story_node',
                 'node_id': 'node_11'
@@ -198,7 +197,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         topic_snapshot_metadata_model_1 = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
-            id=self.TOPIC_1_ID + '-1',
+            id='%s-1' % self.TOPIC_1_ID,
             commit_cmds=[{
                 'cmd': 'add_canonical_story',
                 'story_id': self.STORY_1_ID
@@ -212,7 +211,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         topic_snapshot_metadata_model_2 = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
-            id=self.TOPIC_1_ID + '-2',
+            id='%s-2' % self.TOPIC_1_ID,
             commit_cmds=[{
                 'cmd': 'publish_story',
                 'story_id': self.STORY_1_ID
@@ -303,7 +302,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         story_snapshot_metadata_model = self.create_model(
             story_models.StorySnapshotMetadataModel,
-            id=self.STORY_1_ID + '-1',
+            id='%s-1' % self.STORY_1_ID,
             commit_cmds=[{
                 'cmd': 'add_story_node',
                 'node_id': 'node_1'
@@ -359,7 +358,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         story_snapshot_metadata_model = self.create_model(
             story_models.StorySnapshotMetadataModel,
-            id=self.STORY_1_ID + '-1',
+            id='%s-1' % self.STORY_1_ID,
             commit_cmds=[{
                 'cmd': 'add_story_node',
                 'node_id': 'node_2'
@@ -370,7 +369,7 @@ class PopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         topic_snapshot_metadata_model = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
-            id=self.TOPIC_1_ID + '-1',
+            id='%s-1' % self.TOPIC_1_ID,
             commit_cmds=[{
                 'cmd': 'add_canonical_story',
                 'story_id': self.STORY_1_ID
@@ -515,7 +514,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         story_1_snapshot_metadata_model_1 = self.create_model(
             story_models.StorySnapshotMetadataModel,
-            id=self.STORY_1_ID + '-1',
+            id='%s-1' % self.STORY_1_ID,
             commit_cmds=[{
                 'cmd': 'add_story_node',
                 'node_id': 'node_1'
@@ -526,7 +525,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         story_1_snapshot_metadata_model_2 = self.create_model(
             story_models.StorySnapshotMetadataModel,
-            id=self.STORY_1_ID + '-2',
+            id='%s-2' % self.STORY_1_ID,
             commit_cmds=[{
                 'cmd': 'update_story_node_property',
                 'node_id': 'node_1',
@@ -543,7 +542,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         story_2_snapshot_metadata_model_1 = self.create_model(
             story_models.StorySnapshotMetadataModel,
-            id=self.STORY_2_ID + '-1',
+            id='%s-1' % self.STORY_2_ID,
             commit_cmds=[{
                 'cmd': 'add_story_node',
                 'node_id': 'node_11'
@@ -554,7 +553,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         topic_snapshot_metadata_model_1 = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
-            id=self.TOPIC_1_ID + '-1',
+            id='%s%s' % (self.TOPIC_1_ID, '-1'),
             commit_cmds=[{
                 'cmd': 'add_canonical_story',
                 'story_id': self.STORY_1_ID
@@ -568,7 +567,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         topic_snapshot_metadata_model_2 = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
-            id=self.TOPIC_1_ID + '-2',
+            id='%s-2' % self.TOPIC_1_ID,
             commit_cmds=[{
                 'cmd': 'publish_story',
                 'story_id': self.STORY_1_ID
@@ -623,7 +622,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         story_snapshot_metadata_model = self.create_model(
             story_models.StorySnapshotMetadataModel,
-            id=self.STORY_1_ID + '-1',
+            id='%s-1' % self.STORY_1_ID,
             commit_cmds=[{
                 'cmd': 'add_story_node',
                 'node_id': 'node_1'
@@ -679,7 +678,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         story_snapshot_metadata_model = self.create_model(
             story_models.StorySnapshotMetadataModel,
-            id=self.STORY_1_ID + '-1',
+            id='%s-1' % self.STORY_1_ID,
             commit_cmds=[{
                 'cmd': 'add_story_node',
                 'node_id': 'node_2'
@@ -690,7 +689,7 @@ class AuditPopulateStoryNodeJobTests(job_test_utils.JobTestBase):
         )
         topic_snapshot_metadata_model = self.create_model(
             topic_models.TopicSnapshotMetadataModel,
-            id=self.TOPIC_1_ID + '-1',
+            id='%s-1' % self.TOPIC_1_ID,
             commit_cmds=[{
                 'cmd': 'add_canonical_story',
                 'story_id': self.STORY_1_ID

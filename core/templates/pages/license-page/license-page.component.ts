@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-license-page',
@@ -25,10 +24,3 @@ import {downgradeComponent} from '@angular/upgrade/static';
   styleUrls: [],
 })
 export class LicensePageComponent {}
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaLicensePage',
-    downgradeComponent({component: LicensePageComponent})
-  );

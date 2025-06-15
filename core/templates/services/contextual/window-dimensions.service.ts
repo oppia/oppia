@@ -16,7 +16,6 @@
  * @fileoverview Service for computing the window dimensions.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {fromEvent, Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -52,10 +51,3 @@ export class WindowDimensionsService {
     return this.getWidth() <= NORMAL_NAVBAR_CUTOFF_WIDTH_PX;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'WindowDimensionsService',
-    downgradeInjectable(WindowDimensionsService)
-  );

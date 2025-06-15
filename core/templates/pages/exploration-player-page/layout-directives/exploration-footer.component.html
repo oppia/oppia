@@ -1,12 +1,12 @@
 <div class="footer navbar-fixed-bottom oppia-exploration-footer">
-  <div *ngIf="shouldRenderLessonInfoTooltip()" aria-live="assertive">
+  <div *ngIf="!iframed && shouldRenderLessonInfoTooltip()" aria-live="assertive">
     <div class="close-tooltip e2e-test-close-lesson-info-tooltip" (click)="learnerHasViewedLessonInfo()" (keydown.enter)="learnerHasViewedLessonInfo()" tabindex="0"></div>
     <div class="lesson-info-tooltip lesson-info-tooltip-add-ons"
          [innerHTML]="'I18N_LESSON_INFO_TOOLTIP_MESSAGE' | translate">
     </div>
   </div>
   <div class="row">
-    <div [ngClass]="{'col-sm-5': isLanguageRTL(), 'col-sm-3': !isLanguageRTL()}">
+    <div class="col-sm-5">
       <button class="oppia-lesson-info"
               #lessonInfoButton
               (keydown.escape)="learnerHasViewedLessonInfo()"
@@ -26,12 +26,10 @@
           <span class="oppia-icon-accessibility-label">{{ 'I18N_PLAYER_INFO_TOOLTIP' | translate }}</span>
         </div>
       </button>
-      <oppia-hint-and-solution-buttons *ngIf="windowIsNarrow && hintsAndSolutionsAreSupported">
-      </oppia-hint-and-solution-buttons>
     </div>
-    <div [ngClass]="{'col-sm-7': isLanguageRTL(), 'col-sm-9': !isLanguageRTL()}">
+    <div class="col-sm-7">
       <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
-        <oppia-hint-and-solution-buttons *ngIf="!windowIsNarrow && hintsAndSolutionsAreSupported">
+        <oppia-hint-and-solution-buttons *ngIf="hintsAndSolutionsAreSupported">
         </oppia-hint-and-solution-buttons>
         <div class="hint-container">
           <div class="hint-box hint-box-add-ons" *ngIf="isVisible && isTooltipVisible()">
@@ -45,7 +43,7 @@
           </div>
         </div>
         <button *ngIf="isConceptCardButtonVisible()"
-                class="oppia-learner-hint-solution-button md-button md-default-theme e2e-test-view-hint"
+                mat-button class="oppia-learner-hint-solution-button e2e-test-view-hint"
                 (click)="showConceptCard()">
           <mat-icon>description</mat-icon>
         </button>
@@ -58,7 +56,7 @@
   .oppia-navbar-breadcrumb-icon .oppia-footer-info-icon .fa-info-circle {
     padding: 6%;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button {
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button {
     border-radius: 50%;
     height: 32px;
     line-height: 32px;
@@ -69,27 +67,27 @@
     padding: inherit;
     width: 32px;
   }
-  .md-button.oppia-learner-hint-solution-button {
+  .mat-button.oppia-learner-hint-solution-button {
     background: #6c58b6;
     color: #fff;
     padding: 6px 12px;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button:focus,
-  .md-button.md-default-theme.oppia-learner-hint-solution-button:hover {
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button:focus,
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button:hover {
     background-color: #7968b8;
     text-decoration: none;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed {
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button.viewed {
     background: #009688;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:hover,
-  .md-button.md-default-theme.oppia-learner-hint-solution-button.viewed:focus {
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button.viewed:hover,
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button.viewed:focus {
     background: #038a7d;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons {
+  .mat-button.mat-default-theme.oppia-learner-hint-solution-button .material-icons {
     font-size: 22px;
   }
-  .md-button.md-default-theme.oppia-learner-hint-solution-button .material-icons.oppia-lightbulb-yellow {
+  .mdatbutton.mat-default-theme.oppia-learner-hint-solution-button .material-icons.oppia-lightbulb-yellow {
     color: #f5da57;
     font-size: 23px;
   }
@@ -122,7 +120,7 @@
     font-size: 17px;
     height: 40px;
     margin-right: 10px;
-    min-width: 395px;
+    min-width: 350px;
     padding: 20px 10px 20px 10px;
     position: relative;
     text-align: center;
@@ -183,4 +181,18 @@
       -webkit-transform: translateY(0);
     }
   }
+
+  @media (max-width: 475px) {
+
+    .hint-box-add-ons::after {
+    margin-left: 141px;
+  }
+  .hint-box-add-ons::before {
+    margin-left: 139px;
+  }
+
+  .hint-box {
+    font-size: 14px;
+  }
+}
 </style>

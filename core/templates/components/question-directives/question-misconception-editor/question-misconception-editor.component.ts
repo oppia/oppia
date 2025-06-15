@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -25,11 +24,12 @@ import {
   Misconception,
   MisconceptionSkillMap,
   TaggedMisconception,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {ExternalSaveService} from 'services/external-save.service';
 import {TagMisconceptionModalComponent} from './tag-misconception-modal-component';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {Rule} from 'domain/exploration/rule.model';
+import {Subscription} from 'rxjs';
 
 export interface MisconceptionUpdatedValues {
   misconception: Misconception;
@@ -58,13 +58,15 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
   @Input() outcome!: Outcome;
   @Input() isEditable!: boolean;
   @Input() rules!: Rule;
-  @Input() taggedSkillMisconceptionId!: string;
+  @Input() taggedSkillMisconceptionId!: string | null;
   misconceptionName!: string;
   misconceptionsBySkill!: MisconceptionSkillMap;
   selectedMisconception!: Misconception;
   selectedMisconceptionSkillId!: string;
   feedbackIsUsed: boolean = false;
   misconceptionEditorIsOpen: boolean = false;
+  previousFeedbackIsUsed: boolean | null = null;
+  directiveSubscriptions = new Subscription();
 
   constructor(
     private externalSaveService: ExternalSaveService,
@@ -76,6 +78,33 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     this.misconceptionsBySkill =
       this.stateEditorService.getMisconceptionsBySkill();
     this.misconceptionEditorIsOpen = false;
+    this.initValues();
+    if (!this.stateEditorService.isInQuestionMode()) {
+      this.directiveSubscriptions.add(
+        this.stateEditorService.onUpdateMisconceptions.subscribe(() => {
+          this.misconceptionsBySkill =
+            this.stateEditorService.getMisconceptionsBySkill();
+          this.initValues();
+        })
+      );
+
+      this.directiveSubscriptions.add(
+        this.stateEditorService.onChangeLinkedSkillId.subscribe(() => {
+          this.misconceptionsBySkill =
+            this.stateEditorService.getMisconceptionsBySkill();
+          this.taggedSkillMisconceptionId = null;
+          this.initValues();
+        })
+      );
+      if (this.previousFeedbackIsUsed !== null) {
+        this.feedbackIsUsed = this.previousFeedbackIsUsed;
+      } else {
+        this.feedbackIsUsed = true;
+      }
+    }
+  }
+
+  initValues(): void {
     let skillMisconceptionId = this.taggedSkillMisconceptionId;
     if (skillMisconceptionId) {
       if (
@@ -91,6 +120,11 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
             this.misconceptionName = misconceptions[i].getName();
             this.selectedMisconception = misconceptions[i];
             this.selectedMisconceptionSkillId = skillId;
+            if (this.previousFeedbackIsUsed === null) {
+              this.feedbackIsUsed =
+                this.outcome.feedback.html.trim() ===
+                misconceptions[i].getFeedback().trim();
+            }
           }
         }
       } else {
@@ -100,23 +134,37 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
         );
       }
     }
-    this.feedbackIsUsed = true;
   }
 
   containsMisconceptions(): boolean {
     let containsMisconceptions = false;
-    Object.keys(this.misconceptionsBySkill).forEach(skillId => {
-      if (this.misconceptionsBySkill[skillId].length > 0) {
-        containsMisconceptions = true;
-      }
-    });
+    if (this.stateEditorService.isInQuestionMode()) {
+      Object.keys(this.misconceptionsBySkill).forEach(skillId => {
+        if (this.misconceptionsBySkill[skillId].length > 0) {
+          containsMisconceptions = true;
+        }
+      });
+    } else {
+      let linkedSkillId = this.stateEditorService.getLinkedSkillId();
+      Object.keys(this.misconceptionsBySkill).forEach(skillId => {
+        if (
+          skillId === linkedSkillId &&
+          this.misconceptionsBySkill[skillId].length > 0
+        ) {
+          containsMisconceptions = true;
+        }
+      });
+    }
     return containsMisconceptions;
   }
 
   updateValues(newValues: MisconceptionUpdatedValues): void {
+    if (this.feedbackIsUsed !== newValues.feedbackIsUsed) {
+      this.previousFeedbackIsUsed = this.feedbackIsUsed;
+      this.feedbackIsUsed = newValues.feedbackIsUsed;
+    }
     this.selectedMisconception = newValues.misconception;
     this.selectedMisconceptionSkillId = newValues.skillId;
-    this.feedbackIsUsed = newValues.feedbackIsUsed;
   }
 
   tagAnswerGroupWithMisconception(): void {
@@ -155,20 +203,22 @@ export class QuestionMisconceptionEditorComponent implements OnInit {
     let outcome = cloneDeep(this.outcome);
     if (this.feedbackIsUsed) {
       outcome.feedback.html = this.selectedMisconception.getFeedback();
-      this.saveAnswerGroupFeedback.emit(outcome);
-      this.externalSaveService.onExternalSave.emit();
+    } else {
+      if (outcome.feedback.html === this.selectedMisconception.getFeedback()) {
+        outcome.feedback.html = '';
+      }
     }
+
+    this.saveAnswerGroupFeedback.emit(outcome);
+    this.externalSaveService.onExternalSave.emit();
     this.misconceptionEditorIsOpen = false;
   }
 
   editMisconception(): void {
     this.misconceptionEditorIsOpen = true;
   }
-}
 
-angular
-  .module('oppia')
-  .directive(
-    'oppiaQuestionMisconceptionEditor',
-    downgradeComponent({component: QuestionMisconceptionEditorComponent})
-  );
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+}

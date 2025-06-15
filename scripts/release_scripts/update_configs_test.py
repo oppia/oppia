@@ -315,16 +315,19 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         )
         constants_text = (
             '  "GA_ANALYTICS_ID": "123"\n'
+            '  "GTM_ANALYTICS_ID": "456"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
         analytics_constants_config_text = (
             '  "GA_ANALYTICS_ID": ""\n'
+            '  "GTM_ANALYTICS_ID": ""\n'
             '  "SITE_NAME_FOR_ANALYTICS": ""\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": false\n'
         )
         expected_analytics_constants_config_text = (
             '  "GA_ANALYTICS_ID": "123"\n'
+            '  "GTM_ANALYTICS_ID": "456"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
@@ -347,6 +350,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         )
         analytics_constants_config_text = (
             '  "GA_ANALYTICS_ID": ""\n'
+            '  "GTM_ANALYTICS_ID": ""\n'
             '  "SITE_NAME_FOR_ANALYTICS": ""\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": false\n'
         )
@@ -356,6 +360,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         # Testing invalid GA_ANALYTICS_ID key.
         constants_text = (
             '  "GA_analytics_ID": "123"\n'
+            '  "GTM_ANALYTICS_ID": "456"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
@@ -369,9 +374,27 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 temp_constants_path
             )
 
+        # Testing invalid GTM_ANALYTICS_ID key.
+        constants_text = (
+            '  "GA_ANALYTICS_ID": "123"\n'
+            '  "GTM_blablabla_ID": "123"\n'
+            '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
+            '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
+        )
+        with utils.open_file(temp_constants_path, 'w') as f:
+            f.write(constants_text)
+        with self.assertRaisesRegex(
+            Exception, 'Error: No GTM_ANALYTICS_ID key found.'
+        ):
+            update_configs.update_analytics_constants_based_on_config(
+                temp_analytics_constants_config_path,
+                temp_constants_path
+            )
+
         # Testing invalid SITE_NAME_FOR_ANALYTICS key.
         constants_text = (
             '  "GA_ANALYTICS_ID": "123"\n'
+            '  "GTM_ANALYTICS_ID": "456"\n'
             '  "SITE_name_for_ANALYTICS": "site-name"\n'
             '  "CAN_SEND_ANALYTICS_EVENTS": true\n'
         )
@@ -388,6 +411,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         # Testing invalid CAN_SEND_ANALYTICS_EVENTS key.
         constants_text = (
             '  "GA_ANALYTICS_ID": "123"\n'
+            '  "GTM_ANALYTICS_ID": "456"\n'
             '  "SITE_NAME_FOR_ANALYTICS": "site-name"\n'
             '  "can_SEND_analytics_EVENTS": true\n'
         )

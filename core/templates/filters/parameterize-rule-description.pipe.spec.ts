@@ -209,7 +209,7 @@ describe('ParameterizeRuleDescriptionPipe', () => {
       null
     );
 
-    expect(result).toEqual('is equal to ');
+    expect(result).toEqual('has the same value and units as ');
   });
 
   it('should correctly parameterize for MusicPhrase', () => {

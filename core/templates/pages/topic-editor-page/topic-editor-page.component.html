@@ -1,4 +1,4 @@
-<div class="navbar-helper" ng-if="$ctrl.topic">
+<div class="navbar-helper" *ngIf="topic">
   <div class="navbar-tabs">
     <div class="navbar-text">
       {{ getNavbarText() }}
@@ -83,7 +83,7 @@
            aria-label="Preview button"
            role="menuitem"
            (keydown.enter)="openTopicViewer()">
-          <i class="fas fa-play navbar-tab-icon"
+          <i class="fas fa-play navbar-tab-icon e2e-test-topic-preview-button"
              [ngClass]="{'navbar-tab-active-icon': isInPreviewTab()}">
           </i>
         </a>

@@ -1,0 +1,7 @@
+core/templates/pages/admin-page/admin-page.module.ts
+core/templates/pages/blog-admin-page/blog-admin-page.module.ts
+core/templates/pages/blog-dashboard-page/blog-dashboard-page.module.ts
+core/templates/pages/creator-dashboard-page/creator-dashboard-page.module.ts
+core/templates/pages/exploration-editor-page/exploration-editor-page.module.ts
+core/templates/pages/topic-editor-page/topic-editor-page.module.ts
+core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module.ts

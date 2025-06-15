@@ -18,11 +18,12 @@
  */
 
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
-import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
-import {ExplorationLanguageInfo} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import {
+  ContentTranslationLanguageService,
+  ExplorationLanguageInfo,
+} from 'pages/exploration-player-page/services/content-translation-language.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {
@@ -32,6 +33,11 @@ import {
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {VoiceoverPlayerService} from '../services/voiceover-player.service';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {AudioPreloaderService} from '../services/audio-preloader.service';
+import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 
 @Component({
   selector: 'oppia-content-language-selector',
@@ -45,9 +51,14 @@ export class ContentLanguageSelectorComponent implements OnInit {
     private contentTranslationManagerService: ContentTranslationManagerService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
+    private entityVoiceoversService: EntityVoiceoversService,
     private ngbModal: NgbModal,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private voiceoverPlayerService: VoiceoverPlayerService,
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private audioPreloaderService: AudioPreloaderService,
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService
   ) {}
 
   // These properties are initialized using Angular lifecycle hooks
@@ -79,9 +90,43 @@ export class ContentLanguageSelectorComponent implements OnInit {
         break;
       }
     }
+
+    if (this.audioPreloaderService.exploration !== undefined) {
+      this.voiceoverBackendApiService
+        .fetchVoiceoverAdminDataAsync()
+        .then(response => {
+          this.voiceoverPlayerService.languageAccentMasterList =
+            response.languageAccentMasterList;
+          this.voiceoverPlayerService.languageCodesMapping =
+            response.languageCodesMapping;
+
+          this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+            this.selectedLanguageCode,
+            this.entityVoiceoversService.getLanguageAccentCodes()
+          );
+
+          this.audioPreloaderService.kickOffAudioPreloader(
+            this.playerPositionService.getCurrentStateName()
+          );
+        });
+    }
   }
 
   onSelectLanguage(newLanguageCode: string): void {
+    this.entityVoiceoversService.setLanguageCode(newLanguageCode);
+
+    this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+      this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+        newLanguageCode,
+        this.entityVoiceoversService.getLanguageAccentCodes()
+      );
+      this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+        this.entityVoiceoversService.getActiveEntityVoiceovers()
+          ?.automatedVoiceoversAudioOffsetsMsecs || {}
+      );
+      this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+    });
+
     if (this.shouldPromptForRefresh()) {
       const modalRef = this.ngbModal.open(
         SwitchContentLanguageRefreshRequiredModalComponent
@@ -111,10 +156,3 @@ export class ContentLanguageSelectorComponent implements OnInit {
     return firstCard.getInputResponsePairs().length > 0;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaContentLanguageSelector',
-    downgradeComponent({component: ContentLanguageSelectorComponent})
-  );

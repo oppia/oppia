@@ -17,7 +17,6 @@
  * necessary to have a fully-qualified URL.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -168,7 +167,7 @@ export class UrlInterpolationService {
         'Every parameter passed into interpolateUrl must have string values, ' +
           'but received: {' +
           nonStringParams
-            .map(([key, val]) => key + ': ' + angular.toJson(val))
+            .map(([key, val]) => key + ': ' + JSON.stringify(val))
             .join(', ') +
           '}'
       );
@@ -211,12 +210,13 @@ export class UrlInterpolationService {
   }
 
   /**
-   * @param {string} videoPath - A video path relative to /assets/videos folder.
+   * @param {string} imagePath - An image path relative to /assets/images
+   * folder.
    * @return {string} The complete url path to that image.
    */
-  getStaticVideoUrl(videoPath: string): string {
-    this.validateResourcePath(videoPath);
-    return this._getCompleteUrl('/assets', '/videos' + videoPath);
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    this.validateResourcePath(imagePath);
+    return '/assets' + '/copyrighted-images' + imagePath;
   }
 
   /**
@@ -238,20 +238,6 @@ export class UrlInterpolationService {
   }
 
   /**
-   * @param {string} path - A complete url path to an asset.
-   * @return {string} The url including the current url origin and the complete
-   * url path.
-   */
-  getFullStaticAssetUrl(path: string): string {
-    this.validateResourcePath(path);
-    if (this.DEV_MODE) {
-      return this.urlService.getOrigin() + path;
-    } else {
-      return this.urlService.getOrigin() + '/build' + path;
-    }
-  }
-
-  /**
    * @param {string} interactionId - An interaction id.
    * @return {string} The complete url path to the thumbnail image for the
    * interaction.
@@ -267,10 +253,3 @@ export class UrlInterpolationService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'UrlInterpolationService',
-    downgradeInjectable(UrlInterpolationService)
-  );

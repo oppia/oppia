@@ -20,8 +20,6 @@ from __future__ import annotations
 
 from core import feature_flag_list
 from core.constants import constants
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
 from core.domain import learner_group_fetchers
 from core.domain import learner_group_services
 from core.domain import topic_domain
@@ -246,15 +244,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_matching_syllabus_to_add_with_classroom_filter(self) -> None:
         # Test 4: Classroom name filter.
-        classroom = classroom_config_domain.Classroom(
-            classroom_id=classroom_config_services.get_new_classroom_id(),
-            name='math',
-            url_fragment='math',
-            course_details='',
-            topic_list_intro='',
-            topic_id_to_prerequisite_topic_ids={}
-        )
-        classroom_config_services.update_or_create_classroom_model(classroom)
+        self.save_new_valid_classroom()
         matching_syllabus = (
             learner_group_services.get_matching_learner_group_syllabus_to_add(
                 self.LEARNER_GROUP_ID, 'Place', 'All',
@@ -503,6 +493,44 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         learner_group = learner_group_fetchers.get_learner_group_by_id(
             self.LEARNER_GROUP_ID)
         # Ruling out the possibility of None for mypy type checking.
+        assert learner_group is not None
+        self.assertEqual(learner_group.subtopic_page_ids, ['topic1:1'])
+
+    def test_remove_study_guide_reference_from_learner_groups(self) -> None:
+        # Update the learner group to include study guide references.
+        self.learner_group = learner_group_services.update_learner_group(
+            self.LEARNER_GROUP_ID, self.learner_group.title,
+            self.learner_group.description,
+            self.learner_group.facilitator_user_ids, [],
+            [self.LEARNER_ID], ['topic1:2', 'topic1:1', 'topic2:3'],
+            self.learner_group.story_ids)
+
+        # Remove the study guide reference for topic1, subtopic 2.
+        learner_group_services.remove_study_guide_reference_from_learner_groups(
+            'topic1', 2
+        )
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            self.LEARNER_GROUP_ID)
+        assert learner_group is not None
+        self.assertEqual(
+            learner_group.subtopic_page_ids, ['topic1:1', 'topic2:3'])
+
+        learner_group_services.remove_study_guide_reference_from_learner_groups(
+            'topic2', 3
+        )
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            self.LEARNER_GROUP_ID)
+        assert learner_group is not None
+        self.assertEqual(learner_group.subtopic_page_ids, ['topic1:1'])
+
+        learner_group_services.remove_study_guide_reference_from_learner_groups(
+            'nonexistent_topic', 99
+        )
+
+        learner_group = learner_group_fetchers.get_learner_group_by_id(
+            self.LEARNER_GROUP_ID)
         assert learner_group is not None
         self.assertEqual(learner_group.subtopic_page_ids, ['topic1:1'])
 

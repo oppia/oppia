@@ -66,9 +66,13 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
         )
         self.assertNotIn('profile_picture_data_url', user_1.to_dict())
         self.assertNotIn(
-            'profile_picture_data_url', user_1._values)  # pylint: disable=protected-access
+            'profile_picture_data_url',
+            user_1._values # pylint: disable=protected-access
+        )
         self.assertNotIn(
-            'profile_picture_data_url', user_1._properties)  # pylint: disable=protected-access
+            'profile_picture_data_url',
+            user_1._properties # pylint: disable=protected-access
+        )
 
         self.put_multi([user_1])
         self.assert_job_output_is([
@@ -83,9 +87,13 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
         self.assertNotIn(
             'profile_picture_data_url', migrated_setting_model.to_dict())
         self.assertNotIn(
-            'profile_picture_data_url', migrated_setting_model._values)  # pylint: disable=protected-access
+            'profile_picture_data_url',
+            migrated_setting_model._values # pylint: disable=protected-access
+        )
         self.assertNotIn(
-            'profile_picture_data_url', migrated_setting_model._properties)  # pylint: disable=protected-access
+            'profile_picture_data_url',
+            migrated_setting_model._properties # pylint: disable=protected-access
+        )
 
     def test_removal_of_profile_field(self) -> None:
         with self.swap(
@@ -115,14 +123,22 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
             self.put_multi([user_1, user_2])
 
             self.assertIn(
-                'profile_picture_data_url', user_1._values)  # pylint: disable=protected-access
+                'profile_picture_data_url',
+                user_1._values # pylint: disable=protected-access
+            )
             self.assertIn(
-                'profile_picture_data_url', user_1._properties)  # pylint: disable=protected-access
+                'profile_picture_data_url',
+                user_1._properties # pylint: disable=protected-access
+            )
 
             self.assertIn(
-                'profile_picture_data_url', user_2._values)  # pylint: disable=protected-access
+                'profile_picture_data_url',
+                user_2._values # pylint: disable=protected-access
+            )
             self.assertIn(
-                'profile_picture_data_url', user_2._properties)  # pylint: disable=protected-access
+                'profile_picture_data_url',
+                user_2._properties # pylint: disable=protected-access
+            )
 
             self.assert_job_output_is([
                 job_run_result.JobRunResult(
@@ -137,10 +153,12 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
                 migrated_setting_model_user_1.to_dict())
             self.assertNotIn(
                 'profile_picture_data_url',
-                migrated_setting_model_user_1._values)  # pylint: disable=protected-access
+                migrated_setting_model_user_1._values # pylint: disable=protected-access
+            )
             self.assertNotIn(
                 'profile_picture_data_url',
-                migrated_setting_model_user_1._properties)  # pylint: disable=protected-access
+                migrated_setting_model_user_1._properties # pylint: disable=protected-access
+            )
 
             migrated_setting_model_user_2 = (
                 user_models.UserSettingsModel.get_by_id(user_2.id))
@@ -150,7 +168,9 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
                 migrated_setting_model_user_2.to_dict())
             self.assertNotIn(
                 'profile_picture_data_url',
-                migrated_setting_model_user_2._values)  # pylint: disable=protected-access
+                migrated_setting_model_user_2._values # pylint: disable=protected-access
+            )
             self.assertNotIn(
                 'profile_picture_data_url',
-                migrated_setting_model_user_2._properties)  # pylint: disable=protected-access
+                migrated_setting_model_user_2._properties # pylint: disable=protected-access
+            )

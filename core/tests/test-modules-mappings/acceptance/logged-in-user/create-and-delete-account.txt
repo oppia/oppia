@@ -1,0 +1,4 @@
+core/templates/pages/delete-account-page/delete-account-page.module.ts
+core/templates/pages/logout-page/logout-page.module.ts
+core/templates/pages/pending-account-deletion-page/pending-account-deletion-page.module.ts
+core/templates/pages/preferences-page/preferences-page.module.ts

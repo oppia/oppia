@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
@@ -32,7 +31,7 @@ import {TopicEditorRoutingService} from './services/topic-editor-routing.service
 import {TopicEditorStateService} from './services/topic-editor-state.service';
 
 @Component({
-  selector: './oppia-topic-editor-page',
+  selector: 'oppia-topic-editor-page',
   templateUrl: './topic-editor-page.component.html',
 })
 export class TopicEditorPageComponent implements OnInit, OnDestroy {
@@ -204,10 +203,3 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTopicEditorPage',
-  downgradeComponent({
-    component: TopicEditorPageComponent,
-  }) as angular.IDirectiveFactory
-);

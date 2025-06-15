@@ -17,7 +17,6 @@
  */
 
 import {Component, HostListener} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TopicCreationService} from 'components/entity-creation-services/topic-creation.service';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
@@ -93,7 +92,9 @@ export class TopicsAndSkillsDashboardPageComponent {
   skillPageNumber: number = 0;
   lastSkillPage: number = 0;
   itemsPerPageChoice: number[] = [10, 15, 20];
-  classrooms: string[] = [];
+  classrooms: string[] = [
+    TopicsAndSkillsDashboardPageConstants.TOPIC_FILTER_ONLY_CLASSROOMS,
+  ];
   sortOptions: string[] = [];
   statusOptions: (ETopicPublishedOptions | ETopicStatusOptions)[] = [];
   displayedTopicSummaries: CreatorTopicSummary[] = [];
@@ -419,14 +420,8 @@ export class TopicsAndSkillsDashboardPageComponent {
           this.initSkillDashboard();
           this.focusManagerService.setFocus('createSkillBtn');
         }
-        this.classrooms = response.allClassroomNames;
+
+        this.classrooms.push(...response.allClassroomNames);
       });
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaTopicsAndSkillsDashboardPage',
-    downgradeComponent({component: TopicsAndSkillsDashboardPageComponent})
-  );

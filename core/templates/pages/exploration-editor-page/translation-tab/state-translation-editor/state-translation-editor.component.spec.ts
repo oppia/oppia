@@ -34,6 +34,10 @@ import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFacto
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslationStatusService} from '../services/translation-status.service';
+import {ContextService} from 'services/context.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
+import {Voiceover} from 'domain/exploration/voiceover.model';
 
 class MockNgbModalRef {
   result: Promise<void> = Promise.resolve();
@@ -51,6 +55,7 @@ describe('State Translation Editor Component', () => {
   let ngbModal: NgbModal;
   let editabilityService: EditabilityService;
   let entityTranslationsService: EntityTranslationsService;
+  let entityVoiceoversService: EntityVoiceoversService;
   let changeListService: ChangeListService;
   let explorationStatesService: ExplorationStatesService;
   let stateObjectFactory: StateObjectFactory;
@@ -59,6 +64,7 @@ describe('State Translation Editor Component', () => {
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationStatusService: TranslationStatusService;
   let state: State;
+  let contextService: ContextService;
 
   let mockActiveLanguageChangedEventEmitter = new EventEmitter<void>();
   let mockActiveLanguageIdChangedEventEmitter = new EventEmitter<string>();
@@ -87,6 +93,7 @@ describe('State Translation Editor Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     changeListService = TestBed.inject(ChangeListService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     externalSaveService = TestBed.inject(ExternalSaveService);
     translationTabActiveContentIdService = TestBed.inject(
@@ -96,6 +103,7 @@ describe('State Translation Editor Component', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     translationStatusService = TestBed.inject(TranslationStatusService);
+    contextService = TestBed.inject(ContextService);
 
     state = stateObjectFactory.createDefaultState(
       '',
@@ -105,6 +113,8 @@ describe('State Translation Editor Component', () => {
     state.content.html = 'This is a html text1';
     spyOn(explorationStatesService, 'getState').and.returnValue(state);
 
+    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(contextService, 'getExplorationVersion').and.returnValue(5);
     spyOn(
       translationTabActiveContentIdService,
       'getActiveContentId'
@@ -125,7 +135,7 @@ describe('State Translation Editor Component', () => {
       translationTabActiveContentIdService,
       'onActiveContentIdChanged'
     ).and.returnValue(mockActiveLanguageIdChangedEventEmitter);
-    entityTranslationsService.languageCodeToEntityTranslations = {
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {
       hi: EntityTranslation.createFromBackendDict({
         entity_id: 'id',
         entity_type: 'type',
@@ -162,18 +172,25 @@ describe('State Translation Editor Component', () => {
 
   describe('on clicking save button', () => {
     it('should open model asking whether voiceover needs update', () => {
-      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content1: {
-            hi: {
-              filename: 'filename1.mp3',
-              file_size_bytes: 100,
-              needs_update: false,
-              duration_secs: 10,
-            },
+      let manualVoiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
+
+      let entityVoiceovers = new EntityVoiceovers(
+        'exp_id',
+        'exploration',
+        5,
+        'hi-IN',
+        {
+          content_0: {
+            manual: manualVoiceover1,
           },
-        },
-      });
+        }
+      );
+
+      entityVoiceoversService.init('exp_id', 'exploration', 5);
+      entityVoiceoversService.setLanguageCode('hi');
+      entityVoiceoversService.setActiveLanguageAccentCode('hi-IN');
+      entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+
       spyOn(ngbModal, 'open').and.callThrough();
 
       component.onSaveTranslationButtonClicked();
@@ -207,18 +224,25 @@ describe('State Translation Editor Component', () => {
     });
 
     it('should accept NO on voiceover needs update modal', () => {
-      state.recordedVoiceovers = RecordedVoiceovers.createFromBackendDict({
-        voiceovers_mapping: {
-          content1: {
-            hi: {
-              filename: 'filename1.mp3',
-              file_size_bytes: 100,
-              needs_update: false,
-              duration_secs: 10,
-            },
+      let manualVoiceover1 = new Voiceover('a.mp3', 1000, false, 10.0);
+
+      let entityVoiceovers = new EntityVoiceovers(
+        'exp_id',
+        'exploration',
+        5,
+        'hi-IN',
+        {
+          content_0: {
+            manual: manualVoiceover1,
           },
-        },
-      });
+        }
+      );
+
+      entityVoiceoversService.init('exp_id', 'exploration', 5);
+      entityVoiceoversService.setLanguageCode('hi');
+      entityVoiceoversService.setActiveLanguageAccentCode('hi-IN');
+      entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
+
       const mockNgbModalRef = new MockNgbModalRef();
       mockNgbModalRef.result = Promise.reject();
       spyOn(ngbModal, 'open').and.returnValue(mockNgbModalRef as NgbModalRef);
@@ -233,11 +257,34 @@ describe('State Translation Editor Component', () => {
 
     it('should add editTranslation changes to draft change list', () => {
       spyOn(changeListService, 'editTranslation');
+      (
+        translationLanguageService.getActiveLanguageCode as jasmine.Spy
+      ).and.returnValue('fr');
+      component.activeWrittenTranslation = TranslatedContent.createNew('html');
+      component.activeWrittenTranslation.translation = 'Test translation';
       component.onSaveTranslationButtonClicked();
       expect(changeListService.editTranslation).toHaveBeenCalled();
     });
 
-    it('should update the translation with edited translation', () => {});
+    it('should remove translation if edited translation is blank', () => {
+      spyOn(changeListService, 'editTranslation');
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
+          'content1'
+        )
+      ).toBeTrue();
+
+      component.activeWrittenTranslation = TranslatedContent.createNew('html');
+      component.activeWrittenTranslation.translation = '';
+      component.onSaveTranslationButtonClicked();
+
+      expect(changeListService.editTranslation).toHaveBeenCalled();
+      expect(
+        entityTranslationsService.languageCodeToLatestEntityTranslations.hi.translationMapping.hasOwnProperty(
+          'content1'
+        )
+      ).toBeFalse();
+    });
 
     it('should refresh the translation status', () => {
       spyOn(translationStatusService, 'refresh');
@@ -335,6 +382,15 @@ describe('State Translation Editor Component', () => {
       expect(component.initEditor).toHaveBeenCalled();
     }
   );
+
+  it('should create new active translation if needed when initializing editor', () => {
+    entityTranslationsService.languageCodeToLatestEntityTranslations = {};
+    component.dataFormat = 'html';
+    component.initEditor();
+    expect(component.activeWrittenTranslation).toEqual(
+      TranslatedContent.createNew('html')
+    );
+  });
 
   it('should save translation if translation editor is open', () => {
     component.translationEditorIsOpen = true;

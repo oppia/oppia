@@ -16,9 +16,8 @@
  * @fileoverview Service to send changes to a story to the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 
 import {StoryChange} from 'domain/editor/undo_redo/change.model';
 import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
@@ -213,7 +212,7 @@ export class EditableStoryBackendApiService {
   private _doesStoryWithUrlFragmentExist(
     storyUrlFragment: string,
     successCallback: (value: boolean) => void,
-    errorCallback: (reason: string) => void
+    errorCallback: (reason: HttpErrorResponse) => void
   ): void {
     const storyUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
       StoryDomainConstants.STORY_URL_FRAGMENT_HANDLER_URL_TEMPLATE,
@@ -232,7 +231,7 @@ export class EditableStoryBackendApiService {
         },
         errorResponse => {
           if (errorCallback) {
-            errorCallback(errorResponse.error.error);
+            errorCallback(errorResponse);
           }
         }
       );
@@ -309,10 +308,3 @@ export class EditableStoryBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditableStoryBackendApiService',
-    downgradeInjectable(EditableStoryBackendApiService)
-  );

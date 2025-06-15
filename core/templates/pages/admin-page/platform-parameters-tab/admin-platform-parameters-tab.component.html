@@ -1,11 +1,4 @@
 <oppia-loading-message [message]="loadingMessage"></oppia-loading-message>
-<div class="save-default-values-button">
-  <button
-          class="btn btn-primary"
-          (click)="saveDefaultValueToStorage()">
-    Save default values to storage
-  </button>
-</div>
 <div *ngFor="let platformParameter of platformParameters;" class="container oppia-page-card oppia-long-text oppia-admin-parameters e2e-test-platform-param">
   <div class="row oppia-parameter-name">
     <div class="col-10">
@@ -208,7 +201,7 @@
       <schema-based-editor [schema]="getPlatformParamSchema(platformParameter.dataType, platformParameter.name)" [(ngModel)]="platformParameter.defaultValue">
       </schema-based-editor>
     </div>
-    <div *ngIf="!platformParametersInEditMode.get(platformParameter.name)" class="col-10">{{platformParameter.defaultValue}}</div>
+    <div *ngIf="!platformParametersInEditMode.get(platformParameter.name)" class="col-10 e2e-test-param-default-value">{{platformParameter.defaultValue}}</div>
   </div>
   <div class="row oppia-control-buttons-container oppia-parameter-top-margin">
     <!-- Control Buttons -->
@@ -223,8 +216,8 @@
               [disabled]="!isPlatformParamChanged(platformParameter) || getWarnings(platformParameter).length > 0">
         Save
       </button>
-      <li class="uib-dropdown nav-item icon nav-list-item">
-        <ul class="uib-dropdown-menu oppia-editor-warnings-box dropdown-menu warning-box" *ngIf="warningsAreShown && getWarnings(platformParameter).length > 0">
+      <li ngbDropdown class="dropdown icon nav-list-item">
+        <ul ngbDropdownMenu class="oppia-editor-warnings-box dropdown-menu warning-box" *ngIf="warningsAreShown && getWarnings(platformParameter).length > 0">
           <span class="oppia-editor-warnings-header">Please fix the errors below before saving</span>
           <li class="oppia-editor-warnings-text" *ngFor="let warning of getWarnings(platformParameter); index as index">
             <hr class="oppia-editor-warnings-separator">
@@ -249,7 +242,7 @@
     position: relative;
   }
 
-  .save-button-container .uib-dropdown {
+  .save-button-container .dropdown {
     left: 0;
     opacity: 0;
     position: absolute;
@@ -259,7 +252,7 @@
     z-index: 1;
   }
 
-  .save-button-container:hover .uib-dropdown {
+  .save-button-container:hover .dropdown {
     opacity: 1;
     visibility: visible;
   }
@@ -293,15 +286,6 @@
     display: flex;
     justify-content: space-between;
     padding: 16px;
-  }
-
-  .save-default-values-button {
-    align-items: center;
-    display: flex;
-    float: right;
-    font-size: 12px;
-    justify-content: space-between;
-    margin-top: 20px;
   }
 
   .oppia-admin-parameters .oppia-flex-center {

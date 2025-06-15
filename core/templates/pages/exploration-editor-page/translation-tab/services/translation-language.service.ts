@@ -18,10 +18,10 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {LoggerService} from 'services/contextual/logger.service';
+import {LocalStorageService} from 'services/local-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -31,14 +31,17 @@ export class TranslationLanguageService {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   private activeLanguageCode!: string;
+  private activeLanguageAccentCode!: string;
   private allAudioLanguageCodes: string[] =
     this.languageUtilService.getAllVoiceoverLanguageCodes();
 
   private _activeLanguageChangedEventEmitter = new EventEmitter<void>();
+  private _activeLanguageAccentChangedEventEmitter = new EventEmitter<void>();
 
   constructor(
     private languageUtilService: LanguageUtilService,
-    private loggerService: LoggerService
+    private loggerService: LoggerService,
+    private localStorageService: LocalStorageService
   ) {}
 
   getActiveLanguageCode(): string {
@@ -76,14 +79,23 @@ export class TranslationLanguageService {
     );
   }
 
+  getActiveLanguageAccentCode(): string {
+    return this.activeLanguageAccentCode;
+  }
+
+  setActiveLanguageAccentCode(newLanguageAccentCode: string): void {
+    this.localStorageService.setLastSelectedLanguageAccentCode(
+      newLanguageAccentCode
+    );
+    this.activeLanguageAccentCode = newLanguageAccentCode;
+    this._activeLanguageAccentChangedEventEmitter.emit();
+  }
+
   get onActiveLanguageChanged(): EventEmitter<void> {
     return this._activeLanguageChangedEventEmitter;
   }
-}
 
-angular
-  .module('oppia')
-  .service(
-    'TranslationLanguageService',
-    downgradeInjectable(TranslationLanguageService)
-  );
+  get onActiveLanguageAccentChanged(): EventEmitter<void> {
+    return this._activeLanguageAccentChangedEventEmitter;
+  }
+}

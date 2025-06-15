@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {EditabilityService} from 'services/editability.service';
@@ -40,6 +39,7 @@ export class ExplorationSaveAndPublishButtonsComponent
   directiveSubscriptions = new Subscription();
 
   isModalDisplayed: boolean = false;
+  autosaveIsInProgress: boolean;
   saveIsInProcess: boolean;
   publishIsInProcess: boolean;
   loadingDotsAreShown: boolean;
@@ -168,7 +168,6 @@ export class ExplorationSaveAndPublishButtonsComponent
       .finally(() => {
         this.publishIsInProcess = false;
         this.loadingDotsAreShown = false;
-        this.entityTranslationsService.reset();
       });
   }
 
@@ -185,7 +184,6 @@ export class ExplorationSaveAndPublishButtonsComponent
         () => {
           this.saveIsInProcess = false;
           this.loadingDotsAreShown = false;
-          this.entityTranslationsService.reset();
         },
         () => {}
       );
@@ -217,6 +215,14 @@ export class ExplorationSaveAndPublishButtonsComponent
     );
 
     this.directiveSubscriptions.add(
+      this.changeListService.autosaveInProgressEventEmitter.subscribe(
+        (autosaveInProgress: boolean) => {
+          this.autosaveIsInProgress = autosaveInProgress;
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
       this.internetConnectivityService.onInternetStateChange.subscribe(
         internetAccessible => {
           this.connectedToInternet = internetAccessible;
@@ -229,10 +235,3 @@ export class ExplorationSaveAndPublishButtonsComponent
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'explorationSaveAndPublishButtons',
-  downgradeComponent({
-    component: ExplorationSaveAndPublishButtonsComponent,
-  })
-);

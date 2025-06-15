@@ -43,10 +43,10 @@ class FeedbackThreadSummariesLoadTests(test_utils.GenericTestBase):
     EXP_ID_1: Final = 'eid1'
 
     EXPECTED_THREAD_DICT: ExpectedThreadDict = {
-        'status': u'open',
+        'status': 'open',
         'summary': None,
         'original_author_username': None,
-        'subject': u'a subject'
+        'subject': 'a subject'
     }
 
     USER_EMAIL: Final = 'user@example.com'

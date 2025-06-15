@@ -18,14 +18,13 @@
 
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {AddMisconceptionModalComponent} from 'pages/skill-editor-page/modal-templates/add-misconception-modal.component';
 import {DeleteMisconceptionModalComponent} from 'pages/skill-editor-page/modal-templates/delete-misconception-modal.component';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {Misconception} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {Skill} from 'domain/skill/SkillObjectFactory';
 
 @Component({
@@ -155,10 +154,3 @@ export class SkillMisconceptionsEditorComponent implements OnInit {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaSkillMisconceptionsEditor',
-    downgradeComponent({component: SkillMisconceptionsEditorComponent})
-  );

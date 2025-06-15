@@ -26,6 +26,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
+import {By} from '@angular/platform-browser';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -43,11 +44,13 @@ import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback
 import {FeedbackThreadSummary} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {I18nService} from 'i18n/i18n.service';
-import {CookieService} from 'ngx-cookie';
+import {CookieService, CookieModule} from 'ngx-cookie';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {UrlService} from 'services/contextual/url.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -107,7 +110,7 @@ describe('TopNavigationBarComponent', () => {
   let i18nService: I18nService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   let urlInterpolationService: UrlInterpolationService;
-
+  let urlService: UrlService;
   let threadSummaryList = [
     {
       status: 'open',
@@ -150,7 +153,7 @@ describe('TopNavigationBarComponent', () => {
     mockResizeEmitter = new EventEmitter();
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, NgbModule],
+      imports: [HttpClientTestingModule, NgbModule, CookieModule.forRoot()],
       declarations: [TopNavigationBarComponent, MockTranslatePipe],
       providers: [
         NavigationService,
@@ -194,6 +197,7 @@ describe('TopNavigationBarComponent', () => {
     deviceInfoService = TestBed.inject(DeviceInfoService);
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     i18nService = TestBed.inject(I18nService);
+    urlService = TestBed.inject(UrlService);
     feedbackUpdatesBackendApiService = TestBed.inject(
       FeedbackUpdatesBackendApiService
     );
@@ -408,32 +412,44 @@ describe('TopNavigationBarComponent', () => {
     expect(component.isSidebarShown()).toBe(false);
   });
 
-  it(
-    'should navigate to classroom page when user clicks' +
-      " on 'Basic Mathematics'",
-    fakeAsync(() => {
-      expect(mockWindowRef.nativeWindow.location.href).toBe('');
+  it('should register About header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
-      component.navigateToClassroomPage('/classroom/url');
-      tick(151);
+    component.navigateToAboutPage();
 
-      expect(mockWindowRef.nativeWindow.location.href).toBe('/classroom/url');
-    })
-  );
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
 
-  it(
-    'should registers classroom header click event when user clicks' +
-      " on 'Basic Mathematics'",
-    () => {
-      spyOn(siteAnalyticsService, 'registerClassroomHeaderClickEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
+  });
 
-      component.navigateToClassroomPage('/classroom/url');
+  it('should register Volunteer header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
-      expect(
-        siteAnalyticsService.registerClassroomHeaderClickEvent
-      ).toHaveBeenCalled();
-    }
-  );
+    component.navigateToVolunteerPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.VOLUNTEER);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/volunteer');
+  });
+
+  it('should register Teach header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToTeachPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
+  });
 
   it('should check if i18n has been run', () => {
     spyOn(document, 'querySelectorAll')
@@ -473,6 +489,24 @@ describe('TopNavigationBarComponent', () => {
     expect(component.truncateNavbar()).toBe(undefined);
     expect(component.checkIfI18NCompleted).not.toHaveBeenCalled();
     expect(document.querySelector).not.toHaveBeenCalled();
+  });
+
+  it('should show logo and language dropdown when component is embedded', () => {
+    expect(component.getStaticImageUrl('/logo/288x128_logo_white.webp')).toBe(
+      '/assets/images/logo/288x128_logo_white.webp'
+    );
+    expect(component.getStaticImageUrl('/logo/288x128_logo_white.png')).toBe(
+      '/assets/images/logo/288x128_logo_white.png'
+    );
+
+    component.pageIsIframed = true;
+
+    fixture.detectChanges();
+
+    const languageChangeElement = fixture.debugElement.query(
+      By.css('.oppia-language-dropdown-button')
+    );
+    expect(languageChangeElement).toBeTruthy();
   });
 
   it(
@@ -804,4 +838,33 @@ describe('TopNavigationBarComponent', () => {
       ).toBeTrue();
     }
   );
+
+  it('should not check learner groups feature on signup page', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    const learnerGroupSpy = spyOn(
+      learnerGroupBackendApiService,
+      'isLearnerGroupFeatureEnabledAsync'
+    );
+
+    mockWindowRef.nativeWindow.location.pathname = '/signup';
+    component.ngOnInit();
+    tick();
+
+    expect(learnerGroupSpy).not.toHaveBeenCalled();
+    expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBeFalse();
+  }));
+
+  it('should hide menu icon when page contains a back button', () => {
+    spyOn(urlService, 'getPathname').and.returnValue('/blog/post123');
+    component.PAGES_WITH_BACK_STATE = ['/blog/'];
+    component.ngOnInit();
+    expect(component.menuIconIsShown).toBeFalse();
+  });
+
+  it('should show menu icon when page does not contain a back button', () => {
+    spyOn(urlService, 'getPathname').and.returnValue('/classroom/math');
+    component.PAGES_WITH_BACK_STATE = ['/blog/', '/learner-dashboard/'];
+    component.ngOnInit();
+    expect(component.menuIconIsShown).toBeTrue();
+  });
 });

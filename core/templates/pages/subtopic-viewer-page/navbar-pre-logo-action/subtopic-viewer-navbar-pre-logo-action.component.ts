@@ -18,7 +18,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -43,7 +42,7 @@ export class SubtopicViewerNavbarPreLogoActionComponent implements OnInit {
   ngOnInit(): void {
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.topicUrl = this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE,
+      ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE,
       {
         topic_url_fragment: this.topicUrlFragment,
         classroom_url_fragment:
@@ -52,10 +51,3 @@ export class SubtopicViewerNavbarPreLogoActionComponent implements OnInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .component(
-    'subtopicViewerNavbarPreLogoActionComponent',
-    downgradeComponent({component: SubtopicViewerNavbarPreLogoActionComponent})
-  );

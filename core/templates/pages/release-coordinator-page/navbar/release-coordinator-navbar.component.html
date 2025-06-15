@@ -76,6 +76,56 @@
       <div class="navbar-header float-right">
         <ul class="nav oppia-navbar-nav oppia-navbar-profile-release-coordinator">
           <li>
+            <ul class="nav oppia-navbar-tabs-release-coordinator oppia-release-coordinator-page-dropdown">
+              <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : dropdownMenuIsActive}">
+                <a ngbDropdownToggle class="nav-link dropdown-toggle oppia-navbar-tab oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
+                   data-toggle="dropdown"
+                   (mouseenter)="activateDropdownMenu()"
+                   (mouseleave)="deactivateDropdownMenu()">
+                  <i class="fa fa-bars oppia-release-coordinator-page-dropdown-icon"></i>
+                </a>
+                <ul ngbDropdownMenu class="dropdown-menu dropdown-menu oppia-navbar-dropdown"
+                    role="menu"
+                    (mouseenter)="activateDropdownMenu()"
+                    (mouseleave)="deactivateDropdownMenu()">
+                  <li>
+                    <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab"
+                       (click)="switchTab(TAB_ID_BEAM_JOBS)"
+                       href="#"
+                       [ngClass]="{ 'active': activeTab == TAB_ID_BEAM_JOBS }"
+                       ngbTooltip="Jobs"
+                       placement="bottom"
+                       container="body">
+                      Beam Jobs
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab e2e-test-features-tab-mobile"
+                       (click)="switchTab(TAB_ID_FEATURES)"
+                       href="#"
+                       [ngClass]="{ 'active': activeTab == TAB_ID_FEATURES }"
+                       ngbTooltip="Features"
+                       placement="bottom"
+                       container="body">
+                      Features
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item oppia-dropdown-item-text nav-link oppia-navbar-tab e2e-test-misc-tab-mobile"
+                       (click)="switchTab(TAB_ID_MISC)"
+                       href="#"
+                       [ngClass]="{ 'active': activeTab == TAB_ID_MISC }"
+                       ngbTooltip="Miscellaneous"
+                       placement="bottom"
+                       container="body">
+                      Misc
+                    </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>
             <ul class="nav oppia-navbar-tabs-release-coordinator oppia-hide-in-small-width-screens">
               <li class="nav-item oppia-clickable-navbar-element float-right">
                 <a class="nav-link oppia-navbar-tab"
@@ -88,8 +138,8 @@
                   Beam Jobs
                 </a>
               </li>
-              <li class="nav-item oppia-clickable-navbar-element float-right">
-                <a class="nav-link oppia-navbar-tab e2e-test-features-tab"
+              <li class="nav-item oppia-clickable-navbar-element float-right e2e-test-features-tab">
+                <a class="nav-link oppia-navbar-tab"
                    (click)="switchTab(TAB_ID_FEATURES)"
                    href="#"
                    [ngClass]="{ 'active': activeTab == TAB_ID_FEATURES }"

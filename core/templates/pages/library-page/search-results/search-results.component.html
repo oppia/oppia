@@ -5,9 +5,12 @@
   <div *ngIf="!someResultsExist" class="oppia-search-results-intro">
     <div class="oppia-search-results-no-match">
       <picture>
-        <source type="image/webp" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.webp')">
-        <source type="image/png" [srcset]="getStaticImageUrl('/images/general/no_explorations_found.png')">
-        <img *ngIf="!profilePictureDataUrl" [src]="getStaticImageUrl('/general/no_explorations_found.png')">
+        <source type="image/webp"
+                [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.webp')">
+        <source type="image/png"
+                [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
+        <img *ngIf="!profilePictureDataUrl"
+             [src]="getStaticCopyrightedImageUrl('/general/no_explorations_found.png')">
       </picture>
       <p class="text-center">
         <span>{{ 'I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY' | translate }}</span><br><br>

@@ -34,7 +34,7 @@
   <div class="oppia-story-title" dir="auto" *ngIf="!checkTabletView()">
     <strong class="title-text">
       <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">
-        <span *ngIf="!isHackyStoryTitleTranslationDisplayed()">
+        <span *ngIf="!isHackyStoryTitleTranslationDisplayed()" class="e2e-test-story-title-in-topic-page">
           {{ storyTitle }}
         </span>
         <span *ngIf="isHackyStoryTitleTranslationDisplayed()">
@@ -88,7 +88,7 @@
       </div>
       <div class="oppia-story-title" dir="ltr" *ngIf="checkTabletView()">
         <strong class="title-text">
-          <a [href]="storyLink" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storyTitle }} </a>
+          <a [href]="storyLink" class="e2e-test-mobile-story-title" [ngClass]="{'disabled-link': !classroomUrlFragment}">{{ storyTitle }}</a>
         </strong>
         <span dir="auto" class="oppia-chapters-count">
           <p class="oppia-chapters-count-text" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:nodeCount, messageFormat: true}"></p>

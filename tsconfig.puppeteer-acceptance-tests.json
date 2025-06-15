@@ -6,7 +6,8 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "noImplicitReturns": true,
-    "rootDir": "core/tests/puppeteer-acceptance-tests",
+    "downlevelIteration": true,
+    "rootDir": "core/tests",
     "outDir": "core/tests/puppeteer-acceptance-tests/build",
     "sourceMap": true,
     "typeRoots": [
@@ -15,7 +16,8 @@
     ],
     "types": [
       "node",
-      "jasmine",
+      "jest",
+      "jest-image-snapshot",
       "puppeteer"
     ],
     "lib": [
@@ -24,10 +26,8 @@
     ]
   },
   "include": [
-    "core/tests/puppeteer-acceptance-tests/puppeteer-testing-utilities",
-    "core/tests/puppeteer-acceptance-tests/spec",
+    "core/tests/puppeteer-acceptance-tests/specs",
     "core/tests/puppeteer-acceptance-tests/user-utilities",
-    "core/tests/puppeteer-acceptance-tests/helpers",
     "core/tests/puppeteer-acceptance-tests/functions"
   ],
 }

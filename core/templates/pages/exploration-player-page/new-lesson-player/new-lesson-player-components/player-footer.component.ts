@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import './player-footer.component.css';
 
 @Component({
@@ -26,10 +25,3 @@ import './player-footer.component.css';
   styleUrls: ['./player-footer.component.css'],
 })
 export class PlayerFooterComponent {}
-
-angular.module('oppia').directive(
-  'oppiaPlayerFooter',
-  downgradeComponent({
-    component: PlayerFooterComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -36,7 +36,7 @@ from urllib import request as urlrequest
 from core import feconf
 from scripts import servers
 
-from typing import Dict, Final, Generator, List, Optional, Union
+from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
@@ -54,12 +54,6 @@ NODE_VERSION = '16.13.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = '1.22.15'
-
-# Buf version.
-BUF_VERSION = '0.29.0'
-
-# Must match the version of protobuf in requirements_dev.in.
-PROTOC_VERSION = '3.18.3'
 
 # IMPORTANT STEPS FOR DEVELOPERS TO UPGRADE REDIS:
 # 1. Download the new version of the redis cli.
@@ -90,7 +84,7 @@ GOOGLE_CLOUD_SDK_HOME = (
     if feconf.OPPIA_IS_DOCKERIZED
     else os.path.join(
         OPPIA_TOOLS_DIR_ABS_PATH,
-        'google-cloud-sdk-364.0.0',
+        'google-cloud-sdk-500.0.0',
         'google-cloud-sdk'
     )
 )
@@ -189,7 +183,6 @@ NODEMODULES_WDIO_BIN_PATH = (
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
-    os.path.join(CURR_DIR, 'proto_files'),
     CURR_DIR,
     THIRD_PARTY_PYTHON_LIBS_DIR,
 ]
@@ -212,21 +205,98 @@ CHROME_PATHS = [
 ]
 
 ACCEPTANCE_TESTS_SUITE_NAMES = [
-    'blog-admin-tests/assign-roles-to-users-and-change-tag-properties',
-    'blog-editor-tests/try-to-publish-a-duplicate-blog-post-and-get-blocked',
-    'curriculum-admin-tests/create-and-publish-topics-and-stories',
-    'exploration-editor-tests/create-exploration-and-change-basic-settings',
-    'exploration-editor-tests/load-complete-and-restart-exploration-preview',
-    'logged-in-user-tests/click-all-buttons-on-about-page',
-    'logged-in-user-tests/click-all-buttons-on-about-foundation-page',
-    'logged-in-user-tests/click-all-buttons-on-thanks-for-donating-page',
-    'logged-in-user-tests/click-all-buttons-on-navbar',
-    'logged-in-user-tests/click-all-links-in-about-oppia-footer',
-    'logged-in-user-tests/click-all-links-on-get-started-page',
-    'practice-question-admin-tests/add-and-remove-contribution-rights',
-    'translation-admin-tests/add-translation-rights',
-    'translation-admin-tests/remove-translation-rights',
-    'voiceover-admin-tests/add-voiceover-artist-to-an-exploration'
+    'blog-admin/assign-roles-to-users-and-change-tag-properties',
+    'blog-editor/create-and-delete-draft-blog-post',
+    'blog-editor/create-and-publish-a-blog-post-with-required-details',
+    'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
+    'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
+    'curriculum-admin/create-edit-and-delete-classroom',
+    'exploration-editor/create-exploration-and-change-basic-settings',
+    'exploration-editor/manage-exploration-misconceptions',
+    'exploration-editor/modify-translations-through-modal',
+    'exploration-editor/load-complete-and-restart-exploration-preview',
+    'exploration-editor/publish-the-exploration-with-an-interaction',
+    'exploration-editor/save-draft-publish-and-discard-the-changes',
+    'exploration-editor/download-any-version-exploration',
+    'exploration-editor/verify-statistics-and-previous-explorations',
+    'exploration-editor/create-exploration-with-multiple-states'
+    '-answer-group-hint-solution',
+    'exploration-editor/validate-exploration-managers-collaborators'
+    '-playtesters-access-permissions',
+    'exploration-editor/submit-review-and-respond-to-feedback',
+    'logged-in-user/subscribe-to-creator-and-view-all-'
+    'explorations-by-that-creator',
+    'logged-in-user/access-dashboards-from-profile-menu',
+    'logged-in-user/create-and-delete-account',
+    'logged-in-user/edit-avatar-and-view-exploration-from-profile-page',
+    'logged-in-user/save-an-exploration-to-play-later',
+    'logged-in-user/restart-or-continue-exploration-on-revisit',
+    'logged-in-user/edit-profile-preferences-and-export-their-account',
+    'logged-in-user/set-language-to-rtl-and-navigate-through-site',
+    'logged-in-user/give-feedback-rate-and-report-an-exploration',
+    'logged-in-user/manage-goals-progress-and-lessons-from-learner-dashboard',
+    'logged-in-user/manage-classroom-progress-in-learner-dashboard',
+    'logged-in-user/manage-exploration-progress-in-learner-dashboard',
+    'logged-in-user/deny-access-to-pages-without-additional-roles',
+    'logged-out-user/check-all-user-flow-of-donor',
+    'logged-out-user/check-all-user-flow-of-parent-teacher',
+    'logged-out-user/check-all-user-flow-of-partner',
+    'logged-out-user/check-all-user-flow-of-volunteer',
+    'logged-out-user/click-all-buttons-on-about-page',
+    'logged-out-user/click-all-buttons-on-contact-us-page',
+    'logged-out-user/click-all-buttons-on-donation-thanks-page',
+    'logged-out-user/click-all-buttons-on-navbar',
+    'logged-out-user/click-all-buttons-on-partnerships-page',
+    'logged-out-user/click-all-buttons-on-teach-page',
+    'logged-out-user/click-all-buttons-on-volunteer-page',
+    'logged-out-user/click-all-links-in-oppia-footer',
+    'logged-out-user/click-all-links-on-creator-guidelines-page',
+    'logged-out-user/click-all-links-on-get-started-page',
+    'logged-out-user/click-all-links-on-privacy-policy-page',
+    'logged-out-user/click-all-links-on-terms-page',
+    'logged-out-user/click-all-buttons-on-donate-page',
+    'logged-out-user/visit-classroom-index-page',
+    'logged-out-user/browse-and-search-for-lessons-in-community-library',
+    'logged-out-user/select-and-play-topic-from-classroom-page',
+    'logged-out-user/choose-what-to-do-from-the-last-card-of-an-exploration',
+    'logged-out-user/play-through-lesson-while-getting-feedback-and-hints',
+    'logged-out-user/share-and-give-feedback-for-exploration-'
+    'but-not-report-and-rate-it',
+    'logged-out-user/use-keyboard-shortcuts-to-navigate-and-shift-focus',
+    'logged-out-user/change-site-language-and-engage-with-original-exploration',
+    'logged-out-user/sign-in-and-save-exploration-progress',
+    'logged-out-user/track-and-resume-exploration-progress-via-url',
+    'logged-out-user/play-lesson-in-different-languages-and-listen-'
+    'to-voiceovers',
+    'logged-out-user/generate-and-play-automated-voiceovers',
+    'logged-out-user/deny-access-to-dashboards-and-actions-without-login',
+    'logged-out-user/subscribe-to-newsletter-and-click-all-buttons',
+    'logged-out-user/view-and-search-blog-posts',
+    'moderator/edit-featured-activities-list',
+    'moderator/view-recent-commits-and-feedback-messages',
+    'practice-question-admin/add-and-remove-contribution-rights',
+    'practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties', # pylint: disable=line-too-long
+    'release-coordinator/run-a-beam-job-and-copy-the-output',
+    'release-coordinator/update-promo-bar-message',
+    'release-coordinator/flush-and-get-profile-of-redis-cache',
+    'release-coordinator/edit-feature-rollout-configuration',
+    'super-admin/edit-user-roles',
+    'super-admin/load-dummy-data-in-dev-mode',
+    'super-admin/edit-platform-parameters',
+    'super-admin/use-misc-tab-features',
+    'topic-manager/edit-and-preview-a-subtopic',
+    'topic-manager/edit-and-preview-a-topic',
+    'translation-admin/add-and-remove-translation-rights',
+    'topic-manager/create-and-delete-subtopic-and-story',
+    'topic-manager/browse-skills-on-topics-and-skills-dashboard',
+    'topic-manager/browse-topics-on-topics-and-skills-dashboard',
+    'topic-manager/create-and-delete-questions-in-skill-editor',
+    'topic-manager/assign-unassign-and-merge-skills',
+    'topic-manager/cannot-do-curriculum-admin-actions',
+    'topic-manager/edit-and-republish-a-skill',
+    'topic-manager/edit-and-republish-story-with-mobile-supported-explorations',
+    'topic-manager/edit-preview-and-save-a-chapter',
+    'voiceover-admin/add-voiceover-artist-to-an-exploration'
 ]
 
 GAE_PORT_FOR_E2E_TESTING: Final = 8181
@@ -258,10 +328,8 @@ def is_x64_architecture() -> bool:
     return sys.maxsize > 2**32
 
 
-NODE_BIN_PATH = os.path.join(
-    NODE_PATH, '' if is_windows_os() else 'bin', 'node')
-NPX_BIN_PATH = os.path.join(
-    NODE_PATH, '' if is_windows_os() else 'bin', 'npx')
+NODE_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'node')
+NPX_BIN_PATH = os.path.join(NODE_PATH, 'bin', 'npx')
 
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join([
@@ -590,21 +658,6 @@ def get_personal_access_token() -> str:
     return personal_access_token
 
 
-def convert_to_posixpath(file_path: str) -> str:
-    """Converts a Windows style filepath to posixpath format. If the operating
-    system is not Windows, this function does nothing.
-
-    Args:
-        file_path: str. The path to be converted.
-
-    Returns:
-        str. Returns a posixpath version of the file path.
-    """
-    if not is_windows_os():
-        return file_path
-    return file_path.replace('\\', '/')
-
-
 def create_readme(dir_path: str, readme_content: str) -> None:
     """Creates a readme in a given dir path with the specified
     readme content.
@@ -815,11 +868,29 @@ def url_retrieve(
         Exception. Raised when the provided URL does not use HTTPS but
             enforce_https is True.
     """
-    failures = 0
-    success = False
     if enforce_https and not url.startswith('https://'):
         raise Exception(
             'The URL %s should use HTTPS.' % url)
+
+    # Try downloading using curl initially.
+    print('Downloading %s to %s using curl...' % (url, output_path))
+    curl_task = subprocess.Popen(
+    # The -L flag is for following redirects.
+        ['curl', '-L', url, '--output', output_path],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8')
+    with curl_task:
+        out, err = curl_task.communicate()
+    if curl_task.returncode == 0:
+        # The download was successful.
+        print(out)
+        print(err)
+        return
+
+    # Download with urlopen if curl fails.
+    print('Downloading using curl failed. Trying with urlopen.')
+    print('Error log for curl: %s' % err)
+    failures = 0
+    success = False
     while not success and failures < max_attempts:
         try:
             with urlrequest.urlopen(
@@ -834,6 +905,7 @@ def url_retrieve(
             failures += 1
             print('Attempt %d of %d failed when downloading %s.' % (
                 failures, max_attempts, url))
+            print('Error in common.url_retrieve: %s' % exception)
             if failures >= max_attempts:
                 raise exception
             print('Error: %s' % exception)
@@ -981,3 +1053,11 @@ def is_oppia_server_already_running() -> bool:
                 'Exiting.' % port)
             return True
     return False
+
+
+def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
+    """Starts subprocess and returns (stdout, stderr)."""
+    task = subprocess.Popen(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, err = task.communicate()
+    return out, err

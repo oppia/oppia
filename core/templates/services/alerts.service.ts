@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {LoggerService} from 'services/contextual/logger.service';
 
@@ -158,7 +157,7 @@ export class AlertsService {
    */
   addSuccessMessage(message: string, timeoutMilliseconds?: number): void {
     if (timeoutMilliseconds === undefined) {
-      timeoutMilliseconds = 1500;
+      timeoutMilliseconds = 3000;
     }
     this.addMessage('success', message, timeoutMilliseconds);
   }
@@ -170,7 +169,3 @@ export class AlertsService {
     this.messages.splice(0, this.messages.length);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('AlertsService', downgradeInjectable(AlertsService));

@@ -126,7 +126,7 @@ def initialize_android_test_data() -> str:
             del topic_id_to_prerequisite_topic_ids[topic.id]
             classroom.topic_id_to_prerequisite_topic_ids = (
                 topic_id_to_prerequisite_topic_ids)
-            classroom_config_services.update_or_create_classroom_model(
+            classroom_config_services.update_classroom(
                 classroom)
 
     # Generate new Structure id for topic, story, skill and question.
@@ -183,7 +183,7 @@ def initialize_android_test_data() -> str:
         subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
             1, topic_id))
     subtopic_page.page_contents.subtitled_html.html = (
-        'Example revision card. Click <oppia-noninteractive-skillreview '
+        'Example Study Guide. Click <oppia-noninteractive-skillreview '
         'skill_id-with-value="&amp;quot;%s&amp;quot;" text-with-value="'
         '&amp;quot;here&amp;quot;"></oppia-noninteractive-skillreview> to'
         ' open a concept card.' % skill_id
@@ -577,7 +577,7 @@ def initialize_android_test_data() -> str:
     classrooms = classroom_config_services.get_all_classrooms()
     for classroom in classrooms:
         classroom.topic_id_to_prerequisite_topic_ids[topic_id] = []
-        classroom_config_services.update_or_create_classroom_model(classroom)
+        classroom_config_services.update_classroom(classroom)
     return topic_id
 
 

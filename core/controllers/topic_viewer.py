@@ -23,28 +23,16 @@ from core import utils
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import classroom_config_services
 from core.domain import email_manager
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import skill_services
 from core.domain import story_fetchers
 from core.domain import topic_fetchers
+from core.domain import topic_services
 
 from typing import Dict
-
-
-class TopicViewerPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """Renders the topic viewer page."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_topic_viewer_page
-    def get(self, _: str) -> None:
-        """Handles GET requests."""
-
-        self.render_template('topic-viewer-page.mainpage.html')
 
 
 class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
@@ -146,7 +134,13 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic.id)
             )
-            if feconf.CAN_SEND_EMAILS:
+            server_can_send_emails = (
+                platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS
+                    .value
+                )
+            )
+            if server_can_send_emails:
                 email_manager.send_mail_to_admin(
                     'Deleted skills present in topic',
                     'The deleted skills: %s are still present in topic with '
@@ -160,6 +154,10 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             for skill_id in all_skill_ids:
                 degrees_of_mastery[skill_id] = None
 
+        classroom_name = (
+            classroom_config_services.get_classroom_name_for_topic_id(
+                topic.id))
+
         self.values.update({
             'topic_id': topic.id,
             'topic_name': topic.name,
@@ -172,6 +170,47 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             'skill_descriptions': skill_descriptions,
             'practice_tab_is_displayed': topic.practice_tab_is_displayed,
             'meta_tag_content': topic.meta_tag_content,
-            'page_title_fragment_for_web': topic.page_title_fragment_for_web
+            'page_title_fragment_for_web': topic.page_title_fragment_for_web,
+            'classroom_name': (
+                None if (
+                    classroom_name
+                    ==
+                    str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
+                ) else classroom_name
+            )
+        })
+        self.render_json(self.values)
+
+
+class TopicNameHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """A data handler for checking if a topic with given name exists."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_name': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_TOPIC_NAME
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self, topic_name: str) -> None:
+        """Handler that receives a topic name and checks whether
+        a topic with the same name exists.
+
+        Args:
+            topic_name: str. The topic name.
+        """
+        self.values.update({
+            'topic_name_exists': (
+                topic_services.does_topic_with_name_exist(topic_name))
         })
         self.render_json(self.values)

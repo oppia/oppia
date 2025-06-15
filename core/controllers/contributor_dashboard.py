@@ -61,20 +61,6 @@ class ClientSideSkillOpportunityDict(opportunity_domain.SkillOpportunityDict):
     topic_name: str
 
 
-class ContributorDashboardPage(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Page showing the contributor dashboard."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.open_access
-    def get(self) -> None:
-        """Handles GET requests and renders the contributor dashboard page."""
-        self.render_template('contributor-dashboard-page.mainpage.html')
-
-
 class ContributionOpportunitiesHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of ContributionOpportunitiesHandler's
     normalized_request dictionary.
@@ -378,34 +364,34 @@ class ReviewableOpportunitiesHandler(
         pinned_opportunity_summary = None
         if topic_name is None:
             topic_exp_ids = (
-                topic_services.get_all_published_story_exploration_ids())
+                topic_services.get_all_published_story_exploration_ids()
+            )
         else:
             topic = topic_fetchers.get_topic_by_name(topic_name)
             if topic is None:
                 raise self.InvalidInputException(
-                    'The supplied input topic: %s is not valid' % topic_name)
-            topic_exp_ids = (
-                topic_services.get_all_published_story_exploration_ids(
-                    topic_id=topic.id))
+                    'The supplied input topic: %s is not valid' % topic_name
+                )
             if language and self.user_id:
                 pinned_opportunity_summary = (
                     opportunity_services.get_pinned_lesson(
                         self.user_id,
                         language,
                         topic.id
-                    ))
-
-        # TODO (#19664): Implement fetching target IDs using GAE projection
-        # queries.
-        in_review_suggestions, _ = (
+                    )
+                )
+            topic_exp_ids = (
+                topic_services.get_all_published_story_exploration_ids(
+                    topic_id=topic.id
+                )
+            )
+        in_review_suggestion_target_ids = (
             suggestion_services
-            .get_reviewable_translation_suggestions_by_offset(
-                user_id, topic_exp_ids, None, 0, None, language))
-        # This is defined as a set as we only care about the unique IDs.
-        in_review_suggestion_target_ids = {
-            suggestion.target_id for suggestion in in_review_suggestions
-        }
-        exp_ids = [
+            .get_reviewable_translation_suggestion_target_ids(
+                user_id, language
+            )
+        )
+        topic_exp_ids_targeted_by_in_review_suggestions = [
             exp_id
             for exp_id in topic_exp_ids
             if exp_id in in_review_suggestion_target_ids
@@ -413,7 +399,7 @@ class ReviewableOpportunitiesHandler(
 
         exp_opp_summaries = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids(
-                exp_ids
+                topic_exp_ids_targeted_by_in_review_suggestions
             )
         )
 
@@ -882,6 +868,52 @@ class TranslatableTopicNamesHandler(
         self.render_json(self.values)
 
 
+class TranslatableTopicNamesPerClassroomHandlerDict(TypedDict):
+    """A dictionary representing all topics associated to classroom."""
+
+    classroom: str
+    topics: List[str]
+
+
+class TranslatableTopicNamesPerClassroomHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Provides names of all translatable topics associated with classroom in
+    the datastore."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Gets all translatable topics grouped by classroom.
+        Returns a JSON response containing topics organized by classroom name.
+        """
+        # Build mapping of topic IDs to classroom names.
+        topic_id_to_classroom = {
+            topic_id: classroom.name
+            for classroom in classroom_config_services.get_all_classrooms()
+            for topic_id in classroom.get_topic_ids()
+        }
+
+        # Group topics by classroom and format response.
+        topics_per_classroom: Dict[str, List[str]] = {}
+        for summary in topic_fetchers.get_published_topic_summaries():
+            classroom_name = topic_id_to_classroom.get(summary.id, '')
+            topics_per_classroom.setdefault(
+                classroom_name, []).append(summary.name)
+
+        self.values = {
+            'topic_names_per_classroom': [
+                TranslatableTopicNamesPerClassroomHandlerDict(
+                    classroom=classroom, topics=topics)
+                for classroom, topics in topics_per_classroom.items()
+            ]
+        }
+        self.render_json(self.values)
+
+
 class TranslationPreferenceHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of TranslationPreferenceHandler's
     normalized_request dictionary.
@@ -1052,6 +1084,16 @@ class ContributorStatsSummariesHandler(
         self.render_json(self.values)
 
 
+class CertificateDataResponse(TypedDict):
+    """Dict holding a ContributorCertificateInfoDict, or None to represent
+    no contributor certificate information.
+    """
+
+    certificate_data: Optional[
+        suggestion_registry.ContributorCertificateInfoDict
+    ]
+
+
 class ContributorCertificateHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -1133,9 +1175,14 @@ class ContributorCertificateHandler(
             raise self.InvalidInputException(
                 'To date should not be a future date.')
 
-        response = suggestion_services.generate_contributor_certificate_data(
-            username, suggestion_type, language, from_datetime,
-            to_datetime)
+        certificate_data = (
+            suggestion_services.generate_contributor_certificate_data(
+                username, suggestion_type, language, from_datetime,
+                to_datetime))
+
+        response: CertificateDataResponse = {
+            'certificate_data': certificate_data
+        }
 
         self.render_json(response)
 

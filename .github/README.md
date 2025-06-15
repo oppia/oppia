@@ -1,4 +1,4 @@
-# [Oppia](https://www.oppia.org) [![End-to-End and Lighthouse CI performance tests](https://github.com/oppia/oppia/actions/workflows/e2e_lighthouse_performance_acceptance_tests.yml/badge.svg)](https://github.com/oppia/oppia/actions/workflows/e2e_lighthouse_performance_acceptance_tests.yml)
+# [Oppia](https://www.oppia.org) [![Full-stack tests](https://github.com/oppia/oppia/actions/workflows/full_stack_tests.yml/badge.svg)](https://github.com/oppia/oppia/actions/workflows/full_stack_tests.yml)
 
 Oppia is an online learning tool that enables anyone to easily create and share interactive activities (called 'explorations'). These activities simulate a one-on-one conversation with a tutor, enabling students to learn by doing while getting feedback.
 
@@ -10,7 +10,6 @@ The Oppia web application is built using Python, Angular, and Google App Engine.
 - [User Documentation](https://oppia.github.io/)
 - [Contributors' wiki](https://github.com/oppia/oppia/wiki)
 - [GitHub Discussions](https://github.com/oppia/oppia/discussions)
-- [Developer announcements](http://groups.google.com/group/oppia-dev)
 - [File an issue](https://github.com/oppia/oppia/issues/new/choose)
 
 You can also sign up to our [email newsletter](https://shorturl.at/CHPY6) for news and updates about the Oppia project.

@@ -18,7 +18,6 @@
 
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
@@ -43,8 +42,10 @@ interface FetchTopicBackendResponse {
   skill_id_to_rubrics_dict: {
     [skillId: string]: RubricBackendDict[];
   };
-  classroom_url_fragment: string;
+  classroom_url_fragment: string | null;
+  classroom_name: string | null;
   skill_creation_is_allowed: boolean;
+  curriculum_admin_usernames: string[];
 }
 
 export interface FetchTopicResponse {
@@ -59,8 +60,10 @@ export interface FetchTopicResponse {
   skillIdToRubricsDict: {
     [skillId: string]: RubricBackendDict[];
   };
-  classroomUrlFragment: string;
+  classroomUrlFragment: string | null;
+  classroomName: string | null;
   skillCreationIsAllowed: boolean;
+  curriculumAdminUsernames: string[];
 }
 
 interface FetchStoriesBackendResponse {
@@ -136,11 +139,6 @@ export class EditableTopicBackendApiService {
       .then(
         response => {
           if (successCallback) {
-            // The response is passed as a dict with 2 fields and not as 2
-            // parameters, because the successCallback is called as the resolve
-            // callback function in $q in fetchTopic(), and according to its
-            // documentation (https://docs.angularjs.org/api/ng/service/$q),
-            // resolve or reject can have only a single parameter.
             successCallback({
               topicDict: response.topic_dict,
               groupedSkillSummaries: response.grouped_skill_summary_dicts,
@@ -150,7 +148,9 @@ export class EditableTopicBackendApiService {
               },
               skillIdToRubricsDict: response.skill_id_to_rubrics_dict,
               classroomUrlFragment: response.classroom_url_fragment,
+              classroomName: response.classroom_name,
               skillCreationIsAllowed: response.skill_creation_is_allowed,
+              curriculumAdminUsernames: response.curriculum_admin_usernames,
             });
           }
         },
@@ -442,10 +442,3 @@ export class EditableTopicBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'EditableTopicBackendApiService',
-    downgradeInjectable(EditableTopicBackendApiService)
-  );

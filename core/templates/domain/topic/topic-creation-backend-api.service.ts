@@ -17,7 +17,6 @@
  * topic_id.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -86,10 +85,3 @@ export class TopicCreationBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TopicCreationBackendApiService',
-    downgradeInjectable(TopicCreationBackendApiService)
-  );

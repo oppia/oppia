@@ -2,14 +2,14 @@
 #
 # Copyright 2023 The Oppia Authors. All Rights Reserved.
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License, Version 2.0 (the 'License');
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS-IS" BASIS,
+# distributed under the License is distributed on an 'AS-IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -22,6 +22,8 @@ import datetime
 
 from core import feconf
 from core.domain import change_domain
+from core.domain import skill_domain
+from core.domain import state_domain
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.jobs import job_test_utils
@@ -33,10 +35,20 @@ from typing import Final, Mapping, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import exp_models
+    from mypy_imports import story_models
     from mypy_imports import suggestion_models
+    from mypy_imports import topic_models
 
-(suggestion_models, ) = models.Registry.import_models([
-    models.Names.SUGGESTION
+(
+    exp_models,
+    story_models,
+    suggestion_models,
+    topic_models) = models.Registry.import_models([
+    models.Names.EXPLORATION,
+    models.Names.STORY,
+    models.Names.SUGGESTION,
+    models.Names.TOPIC
 ])
 
 
@@ -69,10 +81,13 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
         datetime.date(2023, 4, 2)
     ]
 
-    score_category: str = 'translation' + '.' + 'English'
+    score_category: str = 'translation.English'
 
     topic_name = 'topic'
     target_id = 'exp1'
+    target_id_2 = 'exp2'
+    target_id_3 = 'exp3'
+    target_id_4 = 'exp4'
     target_version_at_submission = 1
     change_cmd: Mapping[
         str, change_domain.AcceptableChangeDictTypes
@@ -89,6 +104,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_1 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=1,
             language_code='hi',
             contributor_user_id='user1',
             topic_id='topic2',
@@ -107,6 +123,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_2 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=2,
             language_code='hi',
             contributor_user_id='user1',
             topic_id='topic1',
@@ -125,6 +142,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_3 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=3,
             language_code=self.LANGUAGE_CODE,
             contributor_user_id='user2',
             topic_id='topic1',
@@ -144,6 +162,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_4 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=4,
             language_code='hi',
             contributor_user_id='user1',
             topic_id='topic3',
@@ -162,6 +181,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_with_no_topic = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=5,
             language_code='hi',
             contributor_user_id='user1',
             topic_id='',
@@ -181,6 +201,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
         self.translation_contribution_model_with_invalid_topic = (
             self.create_model(
                 suggestion_models.TranslationContributionStatsModel,
+                id=6,
                 language_code='hi',
                 contributor_user_id='user1',
                 topic_id='invalid_topic',
@@ -199,6 +220,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_contribution_model_5 = self.create_model(
             suggestion_models.TranslationContributionStatsModel,
+            id=7,
             language_code='hi',
             contributor_user_id='user3',
             topic_id='topic3',
@@ -216,8 +238,29 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             contribution_dates=self.CONTRIBUTION_DATES
         )
 
+        self.translation_contribution_model_6 = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            id=8,
+            language_code='hi',
+            contributor_user_id='user4',
+            topic_id='topic2',
+            submitted_translations_count=self.SUBMITTED_TRANSLATIONS_COUNT,
+            submitted_translation_word_count=(
+                self.SUBMITTED_TRANSLATION_WORD_COUNT),
+            accepted_translations_count=self.ACCEPTED_TRANSLATIONS_COUNT,
+            accepted_translations_without_reviewer_edits_count=(
+                self.ACCEPTED_TRANSLATIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            accepted_translation_word_count=(
+                self.ACCEPTED_TRANSLATION_WORD_COUNT),
+            rejected_translations_count=self.REJECTED_TRANSLATIONS_COUNT,
+            rejected_translation_word_count=(
+                self.REJECTED_TRANSLATION_WORD_COUNT),
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+
         self.translation_review_model_1 = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
+            id=9,
             language_code=self.LANGUAGE_CODE,
             reviewer_user_id='user1',
             topic_id='topic1',
@@ -235,6 +278,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_review_model_2 = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
+            id=10,
             language_code=self.LANGUAGE_CODE,
             reviewer_user_id='user1',
             topic_id='topic2',
@@ -252,6 +296,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_review_model_3 = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
+            id=11,
             language_code='hi',
             reviewer_user_id='user2',
             topic_id='topic1',
@@ -269,6 +314,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_review_model_4 = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
+            id=12,
             language_code=self.LANGUAGE_CODE,
             reviewer_user_id='user3',
             topic_id='topic4',
@@ -286,6 +332,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_review_model_with_invalid_topic = self.create_model(
             suggestion_models.TranslationReviewStatsModel,
+            id=13,
             language_code=self.LANGUAGE_CODE,
             reviewer_user_id='user3',
             topic_id='invalid_topic',
@@ -303,6 +350,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_contribution_model_1 = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
+            id=14,
             contributor_user_id='user1',
             topic_id='topic1',
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
@@ -315,6 +363,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_contribution_model_2 = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
+            id=15,
             contributor_user_id='user1',
             topic_id='topic2',
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
@@ -327,6 +376,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_contribution_model_3 = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
+            id=16,
             contributor_user_id='user2',
             topic_id='topic1',
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
@@ -339,7 +389,21 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_contribution_model_4 = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
+            id=17,
             contributor_user_id='user3',
+            topic_id='topic1',
+            submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
+            accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
+            accepted_questions_without_reviewer_edits_count=(
+                self.ACCEPTED_QUESTIONS_WITHOUT_REVIEWER_EDITS_COUNT),
+            first_contribution_date=self.FIRST_CONTRIBUTION_DATE,
+            last_contribution_date=self.LAST_CONTRIBUTION_DATE
+        )
+
+        self.question_contribution_model_5 = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            id=18,
+            contributor_user_id='user4',
             topic_id='topic1',
             submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
             accepted_questions_count=self.ACCEPTED_QUESTIONS_COUNT,
@@ -352,6 +416,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
         self.question_contribution_model_with_invalid_topic = (
             self.create_model(
                 suggestion_models.QuestionContributionStatsModel,
+                id=19,
                 contributor_user_id='user3',
                 topic_id='invalid_topic',
                 submitted_questions_count=self.SUBMITTED_QUESTION_COUNT,
@@ -364,6 +429,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_review_model_1 = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
+            id=20,
             reviewer_user_id='user1',
             topic_id='topic1',
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
@@ -376,6 +442,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_review_model_2 = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
+            id=21,
             reviewer_user_id='user1',
             topic_id='topic2',
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
@@ -388,6 +455,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_review_model_3 = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
+            id=22,
             reviewer_user_id='user2',
             topic_id='topic1',
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
@@ -400,6 +468,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_review_model_4 = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
+            id=23,
             reviewer_user_id='user3',
             topic_id='topic1',
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
@@ -412,6 +481,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_review_model_with_invalid_topic = self.create_model(
             suggestion_models.QuestionReviewStatsModel,
+            id=24,
             reviewer_user_id='user3',
             topic_id='invalid_topic',
             reviewed_questions_count=self.REVIEWED_QUESTIONS_COUNT,
@@ -424,6 +494,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_suggestion_rejected_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=25,
             suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -438,6 +509,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_suggestion_accepted_with_edits_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=26,
             suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -453,6 +525,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.question_suggestion_accepted_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=27,
             suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -466,8 +539,58 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             edited_by_reviewer=False,
             created_on=datetime.datetime(2023, 3, 2))
 
+        self.question_suggestion_accepted_model_user2 = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id=28,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id_2,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id='user2',
+            final_reviewer_id='reviewer_3',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code=None,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 3, 2))
+
+        self.question_suggestion_accepted_model_user3 = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id=29,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id_2,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id='user3',
+            final_reviewer_id='reviewer_3',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code=None,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 3, 2))
+
+        self.question_suggestion_accepted_model_with_incomplete_contribution_stats = ( # pylint: disable=line-too-long
+            self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                id=30,
+                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id=self.target_id,
+                target_version_at_submission=self.target_version_at_submission,
+                status=suggestion_models.STATUS_ACCEPTED,
+                author_id='user4',
+                final_reviewer_id='reviewer_2',
+                change_cmd=self.change_cmd,
+                score_category=self.score_category,
+                language_code=None,
+                edited_by_reviewer=False,
+                created_on=datetime.datetime(2023, 3, 2)))
+
         self.translation_suggestion_rejected_model_user1 = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=31,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -483,6 +606,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_suggestion_rejected_model_user2 = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=32,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -498,9 +622,10 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_suggestion_accepted_with_edits_model = self.create_model( # pylint: disable=line-too-long
             suggestion_models.GeneralSuggestionModel,
+            id=33,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id=self.target_id,
+            target_id=self.target_id_2,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
             author_id='user1',
@@ -513,9 +638,10 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_suggestion_accepted_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=34,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id=self.target_id,
+            target_id=self.target_id_3,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
             author_id='user1',
@@ -528,6 +654,7 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
 
         self.translation_suggestion_in_review_model = self.create_model(
             suggestion_models.GeneralSuggestionModel,
+            id=35,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
             target_id=self.target_id,
@@ -540,6 +667,375 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             language_code='hi',
             edited_by_reviewer=False,
             created_on=datetime.datetime(2023, 2, 2))
+
+        self.translation_suggestion_in_review_model_user3 = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id=36,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id_3,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='user3',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 2, 2))
+
+        self.translation_suggestion_in_review_model_user4 = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id=37,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id_2,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='user4',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 2, 2))
+
+        self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats = self.create_model( # pylint: disable=line-too-long
+            suggestion_models.GeneralSuggestionModel,
+            id=38,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='user4',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 2, 2))
+
+        self.transaltion_suggestion_model_with_none_story_id = self.create_model( # pylint: disable=line-too-long
+            suggestion_models.GeneralSuggestionModel,
+            id=39,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp5',
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='user5',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 2, 2))
+
+        self.transaltion_suggestion_model_with_no_story_model = self.create_model( # pylint: disable=line-too-long
+            suggestion_models.GeneralSuggestionModel,
+            id=40,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp6',
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='user6',
+            final_reviewer_id='reviewer_3',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='pt',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime(2023, 2, 2))
+
+        self.exp_1 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.target_id,
+            title='exploration 1 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state1',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            states={
+                'state1': state_domain.State.create_default_state(
+                    'state1', 'content_0', 'default_outcome_1',
+                    is_initial_state=True
+                ).to_dict(),
+                'state2': state_domain.State.create_default_state(
+                    'state2', 'content_2', 'default_outcome_3',
+                ).to_dict()
+            },
+            next_content_id_index=4
+        )
+
+        self.exp_2 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.target_id_2,
+            title='exploration 2 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state1',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            states={
+                'state1': state_domain.State.create_default_state(
+                    'state1', 'content_0', 'default_outcome_1',
+                    is_initial_state=True
+                ).to_dict(),
+                'state2': state_domain.State.create_default_state(
+                    'state2', 'content_2', 'default_outcome_3',
+                ).to_dict()
+            },
+            next_content_id_index=4
+        )
+
+        self.exp_3 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.target_id_3,
+            title='exploration 3 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state1',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            states={
+                'state1': state_domain.State.create_default_state(
+                    'state1', 'content_0', 'default_outcome_1',
+                    is_initial_state=True
+                ).to_dict(),
+                'state2': state_domain.State.create_default_state(
+                    'state2', 'content_2', 'default_outcome_3',
+                ).to_dict()
+            },
+            next_content_id_index=4
+        )
+
+        self.exp_4 = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.target_id_4,
+            title='exploration 4 title',
+            category='category',
+            objective='objective',
+            language_code='en',
+            init_state_name='state1',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            states={
+                'state1': state_domain.State.create_default_state(
+                    'state1', 'content_0', 'default_outcome_1',
+                    is_initial_state=True
+                ).to_dict(),
+                'state2': state_domain.State.create_default_state(
+                    'state2', 'content_2', 'default_outcome_3',
+                ).to_dict()
+            },
+            next_content_id_index=4
+        )
+
+        self.exp_context_1 = self.create_model(
+            exp_models.ExplorationContextModel,
+            id=self.target_id,
+            story_id='story1'
+        )
+
+        self.exp_context_2 = self.create_model(
+            exp_models.ExplorationContextModel,
+            id=self.target_id_2,
+            story_id='story2'
+        )
+
+        self.exp_context_3 = self.create_model(
+            exp_models.ExplorationContextModel,
+            id=self.target_id_3,
+            story_id='story3'
+        )
+
+        self.exp_context_4 = self.create_model(
+            exp_models.ExplorationContextModel,
+            id=self.target_id_4,
+            story_id='story4'
+        )
+
+        self.exp_context_with_no_story_model = self.create_model(
+            exp_models.ExplorationContextModel,
+            id='exp6',
+            story_id='story6'
+        )
+
+        self.topic_model_1 = self.create_model(
+            topic_models.TopicModel,
+            id='topic1',
+            name='name1',
+            canonical_name='name-a',
+            description='description',
+            story_reference_schema_version=1,
+            uncategorized_skill_ids=[
+                self.target_id, self.target_id_2],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='cs',
+            url_fragment='topic1',
+            canonical_story_references=[{
+                'story_id': 'story1',
+                'story_is_published': False
+            }],
+            page_title_fragment_for_web='fragm',
+        )
+
+        self.topic_model_2 = self.create_model(
+            topic_models.TopicModel,
+            id='topic2',
+            name='name2',
+            canonical_name='name-b',
+            description='description',
+            story_reference_schema_version=1,
+            uncategorized_skill_ids=[self.target_id],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='cs',
+            url_fragment='topic2',
+            canonical_story_references=[{
+                'story_id': 'story2',
+                'story_is_published': False
+            }],
+            page_title_fragment_for_web='fragmm',
+        )
+
+        self.topic_model_3 = self.create_model(
+            topic_models.TopicModel,
+            id='topic3',
+            name='name3',
+            canonical_name='name-c',
+            description='description',
+            story_reference_schema_version=1,
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='cs',
+            url_fragment='topic3',
+            canonical_story_references=[{
+                'story_id': 'story3',
+                'story_is_published': False
+            }],
+            page_title_fragment_for_web='fragmmm',
+        )
+
+        self.topic_model_4 = self.create_model(
+            topic_models.TopicModel,
+            id='topic4',
+            name='name4',
+            canonical_name='name-d',
+            description='description',
+            story_reference_schema_version=1,
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='cs',
+            url_fragment='topic4',
+            canonical_story_references=[{
+                'story_id': 'story4',
+                'story_is_published': False
+            }],
+            page_title_fragment_for_web='fragmmmm',
+        )
+
+        self.story_1 = self.create_model(
+            story_models.StoryModel,
+            id='story1',
+            title='story title',
+            language_code='en',
+            story_contents_schema_version=1,
+            corresponding_topic_id='topic1',
+            url_fragment='story',
+            story_contents={
+                'nodes': [{
+                    'id': 'node',
+                    'outline': 'outline',
+                    'title': 'node title',
+                    'description': 'description',
+                    'destination_node_ids': ['123'],
+                    'acquired_skill_ids': [],
+                    'exploration_id': self.target_id,
+                    'prerequisite_skill_ids': [],
+                    'outline_is_finalized': True
+                }],
+                'initial_node_id': 'abc',
+                'next_node_id': 'efg'
+            },
+            notes='note')
+
+        self.story_2 = self.create_model(
+            story_models.StoryModel,
+            id='story2',
+            title='story title',
+            language_code='en',
+            story_contents_schema_version=1,
+            corresponding_topic_id='topic2',
+            url_fragment='story',
+            story_contents={
+                'nodes': [{
+                    'id': 'node',
+                    'outline': 'outline',
+                    'title': 'node title',
+                    'description': 'description',
+                    'destination_node_ids': ['123'],
+                    'acquired_skill_ids': [],
+                    'exploration_id': self.target_id_2,
+                    'prerequisite_skill_ids': [],
+                    'outline_is_finalized': True
+                }],
+                'initial_node_id': 'abc',
+                'next_node_id': 'efg'
+            },
+            notes='note')
+
+        self.story_3 = self.create_model(
+            story_models.StoryModel,
+            id='story3',
+            title='story title',
+            language_code='en',
+            story_contents_schema_version=1,
+            corresponding_topic_id='topic3',
+            url_fragment='story',
+            story_contents={
+                'nodes': [{
+                    'id': 'node',
+                    'outline': 'outline',
+                    'title': 'node title',
+                    'description': 'description',
+                    'destination_node_ids': ['123'],
+                    'acquired_skill_ids': [],
+                    'exploration_id': self.target_id_3,
+                    'prerequisite_skill_ids': [],
+                    'outline_is_finalized': True
+                }],
+                'initial_node_id': 'abc',
+                'next_node_id': 'efg'
+            },
+            notes='note')
+
+        self.story_4 = self.create_model(
+            story_models.StoryModel,
+            id='story4',
+            title='story title',
+            language_code='en',
+            story_contents_schema_version=1,
+            corresponding_topic_id='topic4',
+            url_fragment='story',
+            story_contents={
+                'nodes': [{
+                    'id': 'node',
+                    'outline': 'outline',
+                    'title': 'node title',
+                    'description': 'description',
+                    'destination_node_ids': ['123'],
+                    'acquired_skill_ids': [],
+                    'exploration_id': self.target_id_4,
+                    'prerequisite_skill_ids': [],
+                    'outline_is_finalized': True
+                }],
+                'initial_node_id': 'abc',
+                'next_node_id': 'efg'
+            },
+            notes='note')
 
         topic = topic_domain.Topic.create_default_topic(
             'topic1', 'name1', 'name-a', 'description', 'fragm')
@@ -557,6 +1053,13 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             'topic4', 'name4', 'name-d', 'description', 'fragmmmmm')
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
 
+        # Skill ids 'exp1' and 'exp2' are assigned to topic1.
+        unused_topic_assignment = skill_domain.TopicAssignment(
+            'topic1', 'name1', 2, 1)
+        # Skill id 'exp1' is assigned to topic2.
+        unused_topic_assignment = skill_domain.TopicAssignment(
+            'topic2', 'name1', 2, 1)
+
 
 class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
@@ -568,7 +1071,6 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.assert_job_output_is_empty()
 
     def test_job_creates_admin_stats(self) -> None:
-
         self.translation_contribution_model_1.update_timestamps()
         self.translation_contribution_model_2.update_timestamps()
         self.translation_contribution_model_3.update_timestamps()
@@ -594,11 +1096,30 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.question_suggestion_rejected_model.update_timestamps()
         self.question_suggestion_accepted_with_edits_model.update_timestamps()
         self.question_suggestion_accepted_model.update_timestamps()
+        self.question_suggestion_accepted_model_user2.update_timestamps()
+        self.question_suggestion_accepted_model_user3.update_timestamps()
         self.translation_suggestion_rejected_model_user1.update_timestamps()
         self.translation_suggestion_rejected_model_user2.update_timestamps()
         self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
         self.translation_suggestion_accepted_model.update_timestamps()
         self.translation_suggestion_in_review_model.update_timestamps()
+        self.translation_suggestion_in_review_model_user3.update_timestamps()
+        self.topic_model_1.update_timestamps()
+        self.topic_model_2.update_timestamps()
+        self.topic_model_3.update_timestamps()
+        self.topic_model_4.update_timestamps()
+        self.exp_1.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.exp_3.update_timestamps()
+        self.exp_4.update_timestamps()
+        self.story_1.update_timestamps()
+        self.story_2.update_timestamps()
+        self.story_3.update_timestamps()
+        self.story_4.update_timestamps()
+        self.exp_context_1.update_timestamps()
+        self.exp_context_2.update_timestamps()
+        self.exp_context_3.update_timestamps()
+        self.exp_context_4.update_timestamps()
 
         self.put_multi([
             self.translation_contribution_model_1,
@@ -626,11 +1147,30 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             self.question_suggestion_rejected_model,
             self.question_suggestion_accepted_with_edits_model,
             self.question_suggestion_accepted_model,
+            self.question_suggestion_accepted_model_user2,
+            self.question_suggestion_accepted_model_user3,
             self.translation_suggestion_rejected_model_user1,
             self.translation_suggestion_rejected_model_user2,
             self.translation_suggestion_accepted_with_edits_model,
             self.translation_suggestion_accepted_model,
-            self.translation_suggestion_in_review_model
+            self.translation_suggestion_in_review_model,
+            self.translation_suggestion_in_review_model_user3,
+            self.topic_model_1,
+            self.topic_model_2,
+            self.topic_model_3,
+            self.topic_model_4,
+            self.exp_1,
+            self.exp_2,
+            self.exp_3,
+            self.exp_4,
+            self.story_1,
+            self.story_2,
+            self.story_3,
+            self.story_4,
+            self.exp_context_1,
+            self.exp_context_2,
+            self.exp_context_3,
+            self.exp_context_4
         ])
 
         self.assert_job_output_is([
@@ -641,7 +1181,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             job_run_result.JobRunResult(
                 stdout='Question Submitter Models SUCCESS: 3'),
             job_run_result.JobRunResult(
-                stdout='Question Reviewer Models SUCCESS: 3'),
+                stdout='Question Reviewer Models SUCCESS: 3')
         ])
 
         # Check for TranslationSubmitterTotalContributionStatsModel.
@@ -925,7 +1465,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 id=i + 130,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 target_type=feconf.ENTITY_TYPE_EXPLORATION,
-                target_id=self.target_id,
+                target_id=self.target_id_2,
                 target_version_at_submission=self.target_version_at_submission,
                 status=suggestion_models.STATUS_ACCEPTED,
                 author_id='user1',
@@ -939,7 +1479,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 id=i + 130,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 target_type=feconf.ENTITY_TYPE_EXPLORATION,
-                target_id=self.target_id,
+                target_id=self.target_id_2,
                 target_version_at_submission=self.target_version_at_submission,
                 status=suggestion_models.STATUS_REJECTED,
                 author_id='user1',
@@ -953,7 +1493,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 id=i + 130,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 target_type=feconf.ENTITY_TYPE_EXPLORATION,
-                target_id=self.target_id,
+                target_id=self.target_id_2,
                 target_version_at_submission=self.target_version_at_submission,
                 status=suggestion_models.STATUS_ACCEPTED,
                 author_id='user1',
@@ -967,7 +1507,7 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 id=i + 130,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 target_type=feconf.ENTITY_TYPE_EXPLORATION,
-                target_id=self.target_id,
+                target_id=self.target_id_2,
                 target_version_at_submission=self.target_version_at_submission,
                 status=suggestion_models.STATUS_IN_REVIEW,
                 author_id='user1',
@@ -977,6 +1517,15 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 language_code='hi',
                 edited_by_reviewer=False).put()
 
+        self.topic_model_1.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.story_2.update_timestamps()
+        self.exp_context_2.update_timestamps()
+        self.put_multi([
+            self.topic_model_1,
+            self.exp_2,
+            self.story_2,
+            self.exp_context_2])
         self.translation_contribution_model_1.update_timestamps()
         self.translation_contribution_model_1.put()
         self.question_contribution_model_1.update_timestamps()
@@ -1006,6 +1555,178 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         assert question_model is not None
 
         self.assertEqual(100, len(question_model.recent_review_outcomes))
+
+    def test_job_does_not_creates_stats_if_contribution_stats_model_does_not_exist_for_a_question_suggestion(self) -> None: # pylint: disable=line-too-long
+        self.question_contribution_model_1.update_timestamps()
+        self.question_contribution_model_2.update_timestamps()
+        self.question_contribution_model_5.update_timestamps()
+        self.question_suggestion_rejected_model.update_timestamps()
+        self.question_suggestion_accepted_with_edits_model.update_timestamps()
+        self.question_suggestion_accepted_model.update_timestamps()
+        self.question_suggestion_accepted_model_with_incomplete_contribution_stats.update_timestamps() # pylint: disable=line-too-long
+        self.topic_model_1.update_timestamps()
+        self.topic_model_2.update_timestamps()
+
+        self.put_multi([
+            self.question_contribution_model_1,
+            self.question_contribution_model_2,
+            self.question_contribution_model_5,
+            self.question_suggestion_rejected_model,
+            self.question_suggestion_accepted_with_edits_model,
+            self.question_suggestion_accepted_model,
+            self.question_suggestion_accepted_model_with_incomplete_contribution_stats, # pylint: disable=line-too-long
+            self.topic_model_1,
+            self.topic_model_2,
+        ])
+
+        # The model is only created for user1, and not for user4. The job also
+        # prints the debugging logs for user4.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Question Submitter Models SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout=(
+                    'Question submitter ID: user4.\nUnique skill IDs '
+                    'with question suggestion: \n- exp1\n-- Topic ID: topic1\n'
+                    '-- Topic ID: topic2\nUnique topic IDs with contribution '
+                    'stats: \n- topic1\nUnique valid topic IDs with '
+                    'contribution stats: \n- topic1\n'))
+        ])
+
+        # Check for QuestionSubmitterTotalContributionStatsModel.
+        question_submitter_all_models = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get_all()
+        )
+        self.assertEqual(1, question_submitter_all_models.count())
+
+        question_submitter_total_stats = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+            .get('user1')
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert question_submitter_total_stats is not None
+        self.assertItemsEqual(
+            ['topic1', 'topic2'],
+            question_submitter_total_stats
+            .topic_ids_with_question_submissions
+        )
+        self.assertEqual(
+            ['accepted', 'accepted_with_edits', 'rejected'],
+            question_submitter_total_stats.recent_review_outcomes
+        )
+
+    def test_job_does_not_creates_stats_if_contribution_stats_model_does_not_exist_for_a_translation_suggestion(self) -> None: # pylint: disable=line-too-long
+        self.translation_contribution_model_1.update_timestamps()
+        self.translation_contribution_model_2.update_timestamps()
+        self.translation_contribution_model_4.update_timestamps()
+        self.translation_contribution_model_6.update_timestamps()
+        self.translation_suggestion_rejected_model_user1.update_timestamps()
+        self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
+        self.translation_suggestion_accepted_model.update_timestamps()
+        self.translation_suggestion_in_review_model_user4.update_timestamps()
+        self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats.update_timestamps() # pylint: disable=line-too-long
+        self.topic_model_1.update_timestamps()
+        self.topic_model_2.update_timestamps()
+        self.topic_model_3.update_timestamps()
+        self.exp_1.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.exp_3.update_timestamps()
+        self.story_1.update_timestamps()
+        self.story_2.update_timestamps()
+        self.story_3.update_timestamps()
+        self.exp_context_1.update_timestamps()
+        self.exp_context_2.update_timestamps()
+        self.exp_context_3.update_timestamps()
+
+        self.put_multi([
+            self.translation_contribution_model_1,
+            self.translation_contribution_model_2,
+            self.translation_contribution_model_4,
+            self.translation_contribution_model_6,
+            self.translation_suggestion_rejected_model_user1,
+            self.translation_suggestion_accepted_with_edits_model,
+            self.translation_suggestion_accepted_model,
+            self.translation_suggestion_in_review_model_user4,
+            self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats, # pylint: disable=line-too-long
+            self.topic_model_1,
+            self.topic_model_2,
+            self.topic_model_3,
+            self.exp_1,
+            self.exp_2,
+            self.exp_3,
+            self.story_1,
+            self.story_2,
+            self.story_3,
+            self.exp_context_1,
+            self.exp_context_2,
+            self.exp_context_3,
+        ])
+
+        # The model is only created for user1, and not for user4. The job also
+        # prints the debugging logs for user4.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Translation Submitter Models SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout=(
+                    'Translation submitter ID: user4, Language code: hi\n'
+                    'Unique exp IDs with translation suggestion: \n- exp1\n-- '
+                    'Story ID: story1\n---- Topic ID: topic1\n- exp2\n-- '
+                    'Story ID: story2\n---- Topic ID: topic2\nUnique topic '
+                    'IDs with contribution stats: \n- topic2\nUnique valid '
+                    'topic IDs with contribution stats: \n- topic2\n'))
+        ])
+
+        # Check for TranslationSubmitterTotalContributionStatsModel.
+        translation_submitter_all_models = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get_all()
+        )
+        self.assertEqual(1, translation_submitter_all_models.count())
+
+        translation_submitter_total_stats = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+            .get('hi', 'user1')
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert translation_submitter_total_stats is not None
+        self.assertItemsEqual(
+            ['topic1', 'topic2', 'topic3'],
+            translation_submitter_total_stats
+            .topic_ids_with_translation_submissions
+        )
+        self.assertEqual(
+            ['accepted', 'accepted_with_edits', 'rejected'],
+            translation_submitter_total_stats.recent_review_outcomes
+        )
+
+    def test_job_does_not_creates_stats_if_no_contribution_stats_model_exist(self) -> None: # pylint: disable=line-too-long
+        self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
+        self.topic_model_2.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.story_2.update_timestamps()
+        self.exp_context_2.update_timestamps()
+
+        self.put_multi([
+            self.translation_suggestion_accepted_with_edits_model,
+            self.topic_model_2,
+            self.exp_2,
+            self.story_2,
+            self.exp_context_2,
+        ])
+
+        # The model is only created for user1, and not for user4. The job also
+        # prints the debugging logs for user4.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout=(
+                    'Translation submitter ID: user1, Language code: hi\n'
+                    'Unique exp IDs with translation suggestion: \n- exp2\n-- '
+                    'Story ID: story2\n---- Topic ID: topic2\nUnique topic '
+                    'IDs with contribution stats: \nUnique valid topic IDs '
+                    'with contribution stats: \n'))
+        ])
 
 
 class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
@@ -1039,10 +1760,29 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.question_suggestion_rejected_model.update_timestamps()
         self.question_suggestion_accepted_with_edits_model.update_timestamps()
         self.question_suggestion_accepted_model.update_timestamps()
+        self.question_suggestion_accepted_model_user2.update_timestamps()
+        self.question_suggestion_accepted_model_user3.update_timestamps()
         self.translation_suggestion_rejected_model_user1.update_timestamps()
         self.translation_suggestion_rejected_model_user2.update_timestamps()
         self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
         self.translation_suggestion_accepted_model.update_timestamps()
+        self.translation_suggestion_in_review_model_user3.update_timestamps()
+        self.topic_model_1.update_timestamps()
+        self.topic_model_2.update_timestamps()
+        self.topic_model_3.update_timestamps()
+        self.topic_model_4.update_timestamps()
+        self.exp_1.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.exp_3.update_timestamps()
+        self.exp_4.update_timestamps()
+        self.story_1.update_timestamps()
+        self.story_2.update_timestamps()
+        self.story_3.update_timestamps()
+        self.story_4.update_timestamps()
+        self.exp_context_1.update_timestamps()
+        self.exp_context_2.update_timestamps()
+        self.exp_context_3.update_timestamps()
+        self.exp_context_4.update_timestamps()
 
         self.put_multi([
             self.translation_contribution_model_1,
@@ -1065,10 +1805,29 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             self.question_suggestion_rejected_model,
             self.question_suggestion_accepted_with_edits_model,
             self.question_suggestion_accepted_model,
+            self.question_suggestion_accepted_model_user2,
+            self.question_suggestion_accepted_model_user3,
             self.translation_suggestion_rejected_model_user1,
             self.translation_suggestion_rejected_model_user2,
             self.translation_suggestion_accepted_with_edits_model,
-            self.translation_suggestion_accepted_model
+            self.translation_suggestion_accepted_model,
+            self.translation_suggestion_in_review_model_user3,
+            self.topic_model_1,
+            self.topic_model_2,
+            self.topic_model_3,
+            self.topic_model_4,
+            self.exp_1,
+            self.exp_2,
+            self.exp_3,
+            self.exp_4,
+            self.story_1,
+            self.story_2,
+            self.story_3,
+            self.story_4,
+            self.exp_context_1,
+            self.exp_context_2,
+            self.exp_context_3,
+            self.exp_context_4
         ])
 
         self.assert_job_output_is([
@@ -1079,7 +1838,7 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             job_run_result.JobRunResult(
                 stdout='Question Submitter Models SUCCESS: 3'),
             job_run_result.JobRunResult(
-                stdout='Question Reviewer Models SUCCESS: 3'),
+                stdout='Question Reviewer Models SUCCESS: 3')
         ])
 
     def test_job_for_recent_review_outcomes_limit(self) -> None:
@@ -1103,7 +1862,7 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             id=i + 120,
             suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
             target_type=feconf.ENTITY_TYPE_EXPLORATION,
-            target_id=self.target_id,
+            target_id=self.target_id_2,
             target_version_at_submission=self.target_version_at_submission,
             status=suggestion_models.STATUS_ACCEPTED,
             author_id='user1',
@@ -1113,6 +1872,15 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             language_code='hi',
             edited_by_reviewer=True).put()
 
+        self.topic_model_1.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.story_2.update_timestamps()
+        self.exp_context_2.update_timestamps()
+        self.put_multi([
+            self.topic_model_1,
+            self.exp_2,
+            self.story_2,
+            self.exp_context_2])
         self.translation_contribution_model_1.update_timestamps()
         self.translation_contribution_model_1.put()
         self.question_contribution_model_1.update_timestamps()
@@ -1123,4 +1891,217 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 stdout='Translation Submitter Models SUCCESS: 1'),
             job_run_result.JobRunResult(
                 stdout='Question Submitter Models SUCCESS: 1')
+        ])
+
+    def test_job_does_not_audits_stats_if_contribution_stats_model_does_not_exist_for_a_suggestion(self) -> None: # pylint: disable=line-too-long
+
+        self.question_contribution_model_1.update_timestamps()
+        self.question_contribution_model_2.update_timestamps()
+        self.question_contribution_model_5.update_timestamps()
+        self.question_suggestion_rejected_model.update_timestamps()
+        self.question_suggestion_accepted_with_edits_model.update_timestamps()
+        self.question_suggestion_accepted_model.update_timestamps()
+        self.question_suggestion_accepted_model_with_incomplete_contribution_stats.update_timestamps() # pylint: disable=line-too-long
+        self.topic_model_1.update_timestamps()
+        self.topic_model_2.update_timestamps()
+
+        self.put_multi([
+            self.question_contribution_model_1,
+            self.question_contribution_model_2,
+            self.question_contribution_model_5,
+            self.question_suggestion_rejected_model,
+            self.question_suggestion_accepted_with_edits_model,
+            self.question_suggestion_accepted_model,
+            self.question_suggestion_accepted_model_with_incomplete_contribution_stats, # pylint: disable=line-too-long
+            self.topic_model_1,
+            self.topic_model_2,
+        ])
+
+        # The model is only created for user1, and not for user4. The job also
+        # prints the debugging logs for user4.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Question Submitter Models SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout=(
+                    'Question submitter ID: user4.\nUnique skill IDs '
+                    'with question suggestion: \n- exp1\n-- Topic ID: topic1\n'
+                    '-- Topic ID: topic2\nUnique topic IDs with contribution '
+                    'stats: \n- topic1\nUnique valid topic IDs with '
+                    'contribution stats: \n- topic1\n'))
+        ])
+
+    def test_job_does_not_audits_stats_if_contribution_stats_model_does_not_exist_for_a_translation_suggestion(self) -> None: # pylint: disable=line-too-long
+        self.translation_contribution_model_1.update_timestamps()
+        self.translation_contribution_model_2.update_timestamps()
+        self.translation_contribution_model_4.update_timestamps()
+        self.translation_contribution_model_6.update_timestamps()
+        self.translation_suggestion_rejected_model_user1.update_timestamps()
+        self.translation_suggestion_accepted_with_edits_model.update_timestamps() # pylint: disable=line-too-long
+        self.translation_suggestion_accepted_model.update_timestamps()
+        self.translation_suggestion_in_review_model_user4.update_timestamps()
+        self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats.update_timestamps() # pylint: disable=line-too-long
+        self.topic_model_1.update_timestamps()
+        self.topic_model_2.update_timestamps()
+        self.topic_model_3.update_timestamps()
+        self.exp_1.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.exp_3.update_timestamps()
+        self.story_1.update_timestamps()
+        self.story_2.update_timestamps()
+        self.story_3.update_timestamps()
+        self.exp_context_1.update_timestamps()
+        self.exp_context_2.update_timestamps()
+        self.exp_context_3.update_timestamps()
+
+        self.put_multi([
+            self.translation_contribution_model_1,
+            self.translation_contribution_model_2,
+            self.translation_contribution_model_4,
+            self.translation_contribution_model_6,
+            self.translation_suggestion_rejected_model_user1,
+            self.translation_suggestion_accepted_with_edits_model,
+            self.translation_suggestion_accepted_model,
+            self.translation_suggestion_in_review_model_user4,
+            self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats, # pylint: disable=line-too-long
+            self.topic_model_1,
+            self.topic_model_2,
+            self.topic_model_3,
+            self.exp_1,
+            self.exp_2,
+            self.exp_3,
+            self.story_1,
+            self.story_2,
+            self.story_3,
+            self.exp_context_1,
+            self.exp_context_2,
+            self.exp_context_3,
+        ])
+
+        # The model is only created for user1, and not for user4. The job also
+        # prints the debugging logs for user4.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Translation Submitter Models SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout=(
+                    'Translation submitter ID: user4, Language code: hi\n'
+                    'Unique exp IDs with translation suggestion: \n- exp1\n-- '
+                    'Story ID: story1\n---- Topic ID: topic1\n- exp2\n-- '
+                    'Story ID: story2\n---- Topic ID: topic2\nUnique topic '
+                    'IDs with contribution stats: \n- topic2\nUnique valid '
+                    'topic IDs with contribution stats: \n- topic2\n'))
+        ])
+
+
+class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
+    ContributorDashboardTest):
+
+    JOB_CLASS: Type[
+        contributor_admin_stats_jobs
+            .AuditAndLogIncorretDataInContributorAdminStatsJob
+    ] = (
+        contributor_admin_stats_jobs
+            .AuditAndLogIncorretDataInContributorAdminStatsJob)
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='LOGGED TRANSLATION SUGGESTION COUNT SUCCESS: 0'),
+            job_run_result.JobRunResult(
+                stdout='LOGGED QUESTION SUGGESTION COUNT SUCCESS: 0')
+        ])
+
+    def test_job_audits_admin_stats(self) -> None:
+
+        self.translation_contribution_model_3.update_timestamps()
+        self.translation_contribution_model_with_invalid_topic.update_timestamps() # pylint: disable=line-too-long
+        self.translation_review_model_1.update_timestamps()
+        self.translation_review_model_2.update_timestamps()
+        self.question_contribution_model_1.update_timestamps()
+        self.question_contribution_model_with_invalid_topic.update_timestamps()
+        self.question_review_model_1.update_timestamps()
+        self.question_review_model_2.update_timestamps()
+        self.question_suggestion_accepted_model.update_timestamps()
+        self.question_suggestion_accepted_model_user2.update_timestamps()
+        self.translation_suggestion_rejected_model_user1.update_timestamps()
+        self.translation_suggestion_rejected_model_user2.update_timestamps()
+        self.transaltion_suggestion_model_with_none_story_id.update_timestamps() # pylint: disable=line-too-long
+        self.transaltion_suggestion_model_with_no_story_model.update_timestamps() # pylint: disable=line-too-long
+        self.topic_model_1.update_timestamps()
+        self.topic_model_2.update_timestamps()
+        self.exp_1.update_timestamps()
+        self.exp_2.update_timestamps()
+        self.story_1.update_timestamps()
+        self.story_2.update_timestamps()
+        self.exp_context_1.update_timestamps()
+        self.exp_context_2.update_timestamps()
+        self.exp_context_with_no_story_model.update_timestamps()
+
+        self.put_multi([
+            self.translation_contribution_model_3,
+            self.translation_contribution_model_with_invalid_topic,
+            self.translation_review_model_1,
+            self.translation_review_model_2,
+            self.question_contribution_model_1,
+            self.question_contribution_model_with_invalid_topic,
+            self.question_review_model_1,
+            self.question_review_model_2,
+            self.question_suggestion_accepted_model,
+            self.question_suggestion_accepted_model_user2,
+            self.translation_suggestion_rejected_model_user1,
+            self.translation_suggestion_rejected_model_user2,
+            self.transaltion_suggestion_model_with_none_story_id,
+            self.transaltion_suggestion_model_with_no_story_model,
+            self.topic_model_1,
+            self.topic_model_2,
+            self.exp_1,
+            self.exp_2,
+            self.story_1,
+            self.story_2,
+            self.exp_context_1,
+            self.exp_context_2,
+            self.exp_context_with_no_story_model
+        ])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(stdout=(
+                '<====TRANSLATION_CONTRIBUTION====>\n{\nsuggestion_id: 31,\n'
+                'suggestion_type: translate_content,\ntarget_type: exploration'
+                ',\ntraget_id: exp1,\ntarget_verion_at_submission: 1,\nstatus:'
+                ' rejected,\nlanguage_code: hi,\ncorresponding_topic_id: [\n{'
+                'topic_id: topic1, problem: no_stats_model},\n],\n'
+                'exp_opportunity_model_exists: False,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                '<====TRANSLATION_CONTRIBUTION====>\n{\nsuggestion_id: 39,\n'
+                'suggestion_type: translate_content,\ntarget_type: exploration'
+                ',\ntraget_id: exp5,\ntarget_verion_at_submission: 1,\nstatus:'
+                ' review,\nlanguage_code: hi,\ncorresponding_topic_id: [\n{'
+                'topic_id: None, problem: no_exp_context_model},\n],\n'
+                'exp_opportunity_model_exists: False,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                '<====TRANSLATION_CONTRIBUTION====>\n{\nsuggestion_id: 40,\n'
+                'suggestion_type: translate_content,\ntarget_type: exploration'
+                ',\ntraget_id: exp6,\ntarget_verion_at_submission: 1,\nstatus:'
+                ' review,\nlanguage_code: pt,\ncorresponding_topic_id: [\n{'
+                'topic_id: None, problem: no_story_model},\n],\n'
+                'exp_opportunity_model_exists: False,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                '<====QUESTION_CONTRIBUTION====>\n{\nsuggestion_id: 27,\n'
+                'suggestion_type: add_question,\ntarget_type: exploration,'
+                '\ntraget_id: exp1,\ntarget_verion_at_submission: 1,\nstatus:'
+                ' accepted,\ncorresponding_topic_id: [\n{topic_id: topic2, '
+                'problem: no_stats_model},\n],\nskill_opportunity_model_exists'
+                ': False,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                '<====QUESTION_CONTRIBUTION====>\n{\nsuggestion_id: 28,\n'
+                'suggestion_type: add_question,\ntarget_type: exploration,\n'
+                'traget_id: exp2,\ntarget_verion_at_submission: 1,\nstatus: '
+                'accepted,\ncorresponding_topic_id: [\n{topic_id: topic1, '
+                'problem: no_stats_model},\n],\nskill_opportunity_model_exists'
+                ': False,\n},\n')),
+            job_run_result.JobRunResult(stdout=(
+                'LOGGED QUESTION SUGGESTION COUNT SUCCESS: 2')),
+            job_run_result.JobRunResult(stdout=(
+                'LOGGED TRANSLATION SUGGESTION COUNT SUCCESS: 3'))
         ])

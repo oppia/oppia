@@ -24,6 +24,7 @@ from core import utils
 from core.constants import constants
 from core.domain import activity_services
 from core.domain import change_domain
+from core.domain import exp_rights_domain
 from core.domain import rights_domain
 from core.domain import role_services
 from core.domain import subscription_services
@@ -75,7 +76,7 @@ def get_activity_rights_from_model(
             activity_rights_model,
             exp_models.ExplorationRightsModel
         )
-        cloned_from_value = activity_rights_model.cloned_from
+        return get_exploration_rights_from_model(activity_rights_model)
 
     return rights_domain.ActivityRights(
         activity_rights_model.id,
@@ -88,6 +89,34 @@ def get_activity_rights_from_model(
         status=activity_rights_model.status,
         viewable_if_private=activity_rights_model.viewable_if_private,
         first_published_msec=activity_rights_model.first_published_msec
+    )
+
+
+def get_exploration_rights_from_model(
+    exploration_rights_model: exp_models.ExplorationRightsModel
+) -> exp_rights_domain.ExplorationRights:
+    """Constructs an ExplorationRights object from the given exploration
+    rights model.
+
+    Args:
+        exploration_rights_model: ExplorationRightsModel. Exploration
+            rights from the datastore.
+
+    Returns:
+        ExplorationRights. The exploration rights object created
+        from the model.
+    """
+    return exp_rights_domain.ExplorationRights(
+        exploration_rights_model.id,
+        exploration_rights_model.owner_ids,
+        exploration_rights_model.editor_ids,
+        exploration_rights_model.voice_artist_ids,
+        exploration_rights_model.viewer_ids,
+        community_owned=exploration_rights_model.community_owned,
+        cloned_from=exploration_rights_model.cloned_from,
+        status=exploration_rights_model.status,
+        viewable_if_private=exploration_rights_model.viewable_if_private,
+        first_published_msec=exploration_rights_model.first_published_msec
     )
 
 
@@ -123,12 +152,10 @@ def _save_activity_rights(
     )
 
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-        model: Union[
-            exp_models.ExplorationRightsModel,
-            collection_models.CollectionRightsModel
-        ] = exp_models.ExplorationRightsModel.get(
-            activity_rights.id, strict=True
-        )
+        assert isinstance(activity_rights, exp_rights_domain.ExplorationRights)
+        _save_exploration_rights(
+            committer_id, activity_rights, commit_message, commit_cmds)
+        return
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
         model = collection_models.CollectionRightsModel.get(
             activity_rights.id, strict=True
@@ -146,22 +173,57 @@ def _save_activity_rights(
     model.commit(committer_id, commit_message, commit_cmds)
 
 
-def _update_exploration_summary(
-    activity_rights: rights_domain.ActivityRights
+def _save_exploration_rights(
+    committer_id: str,
+    exploration_rights: exp_rights_domain.ExplorationRights,
+    commit_message: str,
+    commit_cmds: Sequence[Mapping[str, change_domain.AcceptableChangeDictTypes]]
 ) -> None:
-    """Updates the exploration summary for the activity associated with the
-    given rights object.
-
-    The ID of rights object is the same as the ID of associated activity.
+    """Saves an ExplorationRights domain object to the datastore.
 
     Args:
-        activity_rights: ActivityRights. The rights object for the given
-            activity.
+        committer_id: str. ID of the committer.
+        exploration_rights: ExplorationRights. The exploration rights object
+            for the given exploration.
+        commit_message: str. Descriptive message for the commit.
+        commit_cmds: list(dict). A list of commands describing what kind of
+            commit was done.
+    """
+    exploration_rights.validate()
+
+    model: exp_models.ExplorationRightsModel = (
+        exp_models.ExplorationRightsModel.get(
+            exploration_rights.id, strict=True
+        ))
+    model.owner_ids = exploration_rights.owner_ids
+    model.editor_ids = exploration_rights.editor_ids
+    model.viewer_ids = exploration_rights.viewer_ids
+    model.voice_artist_ids = exploration_rights.voice_artist_ids
+    model.community_owned = exploration_rights.community_owned
+    model.status = exploration_rights.status
+    model.viewable_if_private = exploration_rights.viewable_if_private
+    model.first_published_msec = exploration_rights.first_published_msec
+
+    model.commit(committer_id, commit_message, commit_cmds)
+
+
+def _update_exploration_summary(
+    exploration_rights: exp_rights_domain.ExplorationRights
+) -> None:
+    """Updates the exploration summary for the exploration associated with
+    the given exploration rights object.
+
+    The ID of exploration rights object is the same as the ID of
+        associated exploration.
+
+    Args:
+        exploration_rights: ExplorationRights. The exploration rights
+            object for the given exploration.
     """
     # TODO(msl): Get rid of inline imports by refactoring code.
     from core.domain import exp_services
     exp_services.regenerate_exploration_and_contributors_summaries(
-        activity_rights.id)
+        exploration_rights.id)
 
 
 def _update_collection_summary(
@@ -198,6 +260,7 @@ def _update_activity_summary(
             activity.
     """
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+        assert isinstance(activity_rights, exp_rights_domain.ExplorationRights)
         _update_exploration_summary(activity_rights)
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
         _update_collection_summary(activity_rights)
@@ -213,7 +276,7 @@ def create_new_exploration_rights(
         exploration_id: str. ID of the exploration.
         committer_id: str. ID of the committer.
     """
-    exploration_rights = rights_domain.ActivityRights(
+    exploration_rights = exp_rights_domain.ExplorationRights(
         exploration_id, [committer_id], [], [], [])
     commit_cmds: List[Dict[str, str]] = [{'cmd': rights_domain.CMD_CREATE_NEW}]
 
@@ -236,30 +299,30 @@ def create_new_exploration_rights(
 @overload
 def get_exploration_rights(
     exploration_id: str
-) -> rights_domain.ActivityRights: ...
+) -> exp_rights_domain.ExplorationRights: ...
 
 
 @overload
 def get_exploration_rights(
     exploration_id: str, *, strict: Literal[True]
-) -> rights_domain.ActivityRights: ...
+) -> exp_rights_domain.ExplorationRights: ...
 
 
 @overload
 def get_exploration_rights(
     exploration_id: str, *, strict: Literal[False]
-) -> Optional[rights_domain.ActivityRights]: ...
+) -> Optional[exp_rights_domain.ExplorationRights]: ...
 
 
 @overload
 def get_exploration_rights(
     exploration_id: str, *, strict: bool = False
-) -> Optional[rights_domain.ActivityRights]: ...
+) -> Optional[exp_rights_domain.ExplorationRights]: ...
 
 
 def get_exploration_rights(
     exploration_id: str, strict: bool = True
-) -> Optional[rights_domain.ActivityRights]:
+) -> Optional[exp_rights_domain.ExplorationRights]:
     """Retrieves the rights for this exploration from the datastore.
 
     Args:
@@ -268,7 +331,8 @@ def get_exploration_rights(
             matching the given ID.
 
     Returns:
-        ActivityRights. The rights object for the given exploration.
+        ExplorationRights. The exploration rights object for the
+        given exploration.
 
     Raises:
         EntityNotFoundError. The exploration with ID exploration_id was not
@@ -278,35 +342,34 @@ def get_exploration_rights(
         exploration_id, strict=strict)
     if model is None:
         return None
-    return get_activity_rights_from_model(
-        model, constants.ACTIVITY_TYPE_EXPLORATION)
+    return get_exploration_rights_from_model(model)
 
 
 def get_multiple_exploration_rights_by_ids(
     exp_ids: List[str]
-) -> List[Optional[rights_domain.ActivityRights]]:
-    """Returns a list of ActivityRights objects for given exploration ids.
+) -> List[Optional[exp_rights_domain.ExplorationRights]]:
+    """Returns a list of ExplorationRights objects for given exploration ids.
 
     Args:
         exp_ids: list(str). List of exploration ids.
 
     Returns:
-        list(ActivityRights or None). List of rights object --> ActivityRights
-        objects for existing exploration or None.
+        list(ExplorationRights or None). List of exploration rights
+        object --> ExplorationRights objects for existing exploration or None.
     """
     exp_rights_models = exp_models.ExplorationRightsModel.get_multi(
         exp_ids)
-    activity_rights_list: List[Optional[rights_domain.ActivityRights]] = []
+    exploration_rights_list: List[
+        Optional[exp_rights_domain.ExplorationRights]] = []
 
     for model in exp_rights_models:
         if model is None:
-            activity_rights_list.append(None)
+            exploration_rights_list.append(None)
         else:
-            activity_rights_list.append(
-                get_activity_rights_from_model(
-                    model, constants.ACTIVITY_TYPE_EXPLORATION))
+            exploration_rights_list.append(
+                get_exploration_rights_from_model(model))
 
-    return activity_rights_list
+    return exploration_rights_list
 
 
 def _get_activity_rights_where_user_is_owner(
@@ -358,19 +421,27 @@ def _get_activity_rights_where_user_is_owner(
 
 def get_exploration_rights_where_user_is_owner(
     user_id: str
-) -> List[rights_domain.ActivityRights]:
+) -> List[exp_rights_domain.ExplorationRights]:
     """Returns a list of exploration rights where the user is the owner.
 
     Args:
         user_id: str. The id of the user.
 
     Returns:
-        list(ActivityRights). List of domain objects where the user is
+        list(ExplorationRights). List of domain objects where the user is
         the owner.
     """
-    return _get_activity_rights_where_user_is_owner(
-        constants.ACTIVITY_TYPE_EXPLORATION, user_id
-    )
+    exploration_rights_models: Sequence[
+            exp_models.ExplorationRightsModel
+        ] = exp_models.ExplorationRightsModel.query(
+            datastore_services.any_of(
+                exp_models.ExplorationRightsModel.owner_ids == user_id
+            )
+        ).fetch()
+    return [
+        get_exploration_rights_from_model(exploration_rights_model)
+        for exploration_rights_model in exploration_rights_models
+    ]
 
 
 def get_collection_rights_where_user_is_owner(
@@ -589,7 +660,10 @@ def _get_activity_rights(
     if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
         activity_rights = get_exploration_rights(activity_id, strict=strict)
     elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-        activity_rights = get_collection_rights(activity_id, strict=strict)
+        # Here we use MyPy ignore because of an assignment type mismatch.
+        # This will be removed once the CollectionRights domain object
+        # is implemented.
+        activity_rights = get_collection_rights(activity_id, strict=strict) # type: ignore[assignment]
     else:
         raise Exception(
             'Cannot get activity rights for unknown activity type: %s' % (

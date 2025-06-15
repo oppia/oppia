@@ -36,8 +36,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import payload_validator
 from core.domain import auth_domain
-from core.domain import classifier_domain
-from core.domain import classifier_services
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import taskqueue_services
@@ -47,7 +45,7 @@ from core.platform import models
 from core.tests import test_utils
 import main
 
-from typing import Dict, Final, FrozenSet, List, Optional, TypedDict
+from typing import Dict, Final, FrozenSet, List, Optional, TypedDict, cast
 import webapp2
 from webapp2_extras import routes
 import webtest
@@ -133,21 +131,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             """
             self.render_template('invalid_page.html')
 
-    class MockHandlerForTestingErrorPageWithIframed(
-        base.BaseHandler[Dict[str, str], Dict[str, str]]
-    ):
-        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-        # Here we use MyPy ignore because the signature of 'get' method does not
-        # match with the signature of super class's (BaseHandler) 'get' method,
-        # and this happens because all handler methods in the main codebase have
-        # decorators which modify the function signature accordingly, but these
-        # methods in base_test.py do not.
-        def get(self) -> None:  # type: ignore[override]
-            self.iframed = True
-            self.render_template('invalid_page.html')
-
     class MockHandlerForTestingUiAccessWrapper(
         base.BaseHandler[Dict[str, str], Dict[str, str]]
     ):
@@ -209,24 +192,63 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            # This url is ignored since it is only needed for a protractor test.
-            # The backend tests fetch templates from
-            # core/templates/pages instead of webpack_bundles since we
-            # skip webpack compilation for backend tests.
-            # The console_errors.html template is present in
-            # core/templates/tests and we want one canonical
-            # directory for retrieving templates so we ignore this url.
-            if url == '/console_errors':
-                continue
+            with self.swap_to_always_return(
+                secrets_services, 'get_secret', 'secret'
+            ):
+                # Some of these will 404 or 302. This is expected.
+                self.get_response_without_checking_for_errors(
+                    url, [200, 301, 302, 400, 401, 404, 405])
+
+    def test_that_no_post_results_in_500_error(self) -> None:
+        """Test that no POST request results in a 500 error."""
+
+        for route in main.URLS:
+            url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
             with self.swap_to_always_return(
                 secrets_services, 'get_secret', 'secret'
             ):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
-                    url, [200, 301, 302, 400, 401, 404])
+                    url,
+                    [200, 301, 302, 400, 401, 404, 405],
+                    http_method='POST',
+                    params={}
+                )
 
-        # TODO(sll): Add similar tests for POST, PUT, DELETE.
+    def test_that_no_put_results_in_500_error(self) -> None:
+        """Test that no PUT request results in a 500 error."""
+
+        for route in main.URLS:
+            url = re.sub('<([^/^:]+)>', 'abc123', route.template)
+
+            with self.swap_to_always_return(
+                secrets_services, 'get_secret', 'secret'
+            ):
+                # Some of these will 404 or 302. This is expected.
+                self.get_response_without_checking_for_errors(
+                    url,
+                    [200, 301, 302, 400, 401, 404, 405],
+                    http_method='PUT',
+                    params={}
+                )
+
+    def test_that_no_delete_results_in_500_error(self) -> None:
+        """Test that no DELETE request results in a 500 error."""
+
+        for route in main.URLS:
+            url = re.sub('<([^/^:]+)>', 'abc123', route.template)
+
+            with self.swap_to_always_return(
+                secrets_services, 'get_secret', 'secret'
+            ):
+                # Some of these will 404 or 302. This is expected.
+                self.get_response_without_checking_for_errors(
+                    url,
+                    [200, 301, 302, 400, 401, 404, 405],
+                    http_method='DELETE',
+                    params={}
+                )
 
     def test_requests_for_missing_csrf_token(self) -> None:
         """Tests request without csrf_token results in 401 error."""
@@ -317,25 +339,6 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 observed_log_messages[0],
                 'Not a recognized request method.')
-
-    def test_renders_error_page_with_iframed(self) -> None:
-        # Modify the testapp to use the mock handler.
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route(
-                '/mock_iframed', self.MockHandlerForTestingErrorPageWithIframed,
-                name='MockHandlerForTestingErrorPageWithIframed')],
-            debug=feconf.DEBUG,
-        ))
-        # The 500 is expected because the template file does not exist
-        # (so it is a legitimate server error caused by the
-        # MockHandlerForTestingErrorPageWithIframed).
-        response = self.get_html_response(
-            '/mock_iframed', expected_status_int=500)
-
-        self.assertIn(
-            b'<oppia-error-iframed-page-root></oppia-error-iframed-page-root>',
-            response.body
-        )
 
     def test_dev_mode_cannot_be_true_on_production(self) -> None:
         server_software_swap = self.swap(
@@ -539,7 +542,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 params=None,
                 expected_status_int=500)
 
-        self.assertRegexpMatches(
+        self.assertRegex(
             logs[0],
             'uh-oh: request GET /')
 
@@ -615,9 +618,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.swap_with_call_counter(auth_services, 'destroy_auth_session'))
 
         response = self.get_html_response(
-            '/community-library', expected_status_int=200)
+            '/community-library', expected_status_int=302)
 
-        self.assertIn(b'<oppia-maintenance-page>', response.body)
         self.assertNotIn(b'<oppia-library-page-root>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
@@ -673,7 +675,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def test_signup_fails(self) -> None:
         with self.assertRaisesRegex(
-            Exception, '\'<oppia-maintenance-page>\' unexpectedly found in'):
+            Exception, '302 Moved Temporarily'):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_maintenance_mode_is_disabled(self) -> None:
@@ -720,8 +722,8 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
-        response = self.get_html_response('/url_handler?current_url=/')
-        self.assertIn(b'<oppia-maintenance-page>', response.body)
+        self.get_html_response(
+            '/url_handler?current_url=/', expected_status_int=302)
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
 
@@ -1334,11 +1336,11 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
 
         response = self.get_html_response(
             '/mock', params={'iframe_restriction': 'DENY'})
-        self.assertEqual(response.headers['X-Frame-Options'], 'DENY')
+        self.assertEqual(response.headers['Content-Security-Policy'], 'frame-ancestors \'none\'')
 
         response = self.get_html_response(
             '/mock', params={'iframe_restriction': 'SAMEORIGIN'})
-        self.assertEqual(response.headers['X-Frame-Options'], 'SAMEORIGIN')
+        self.assertEqual(response.headers['Content-Security-Policy'], 'frame-ancestors \'self\'')
 
         self.logout()
 
@@ -1427,122 +1429,6 @@ class CsrfTokenHandlerTests(test_utils.GenericTestBase):
 
         self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
             None, csrf_token))
-
-
-class CorrectMockVMHandlerNormalizedPayloadDict(TypedDict):
-    """Type for the CorrectMockVMHandler's normalized_payload dictionary."""
-
-    vm_id: str
-    signature: str
-    message: bytes
-
-
-class OppiaMLVMHandlerTests(test_utils.GenericTestBase):
-    """Unit tests for OppiaMLVMHandler class."""
-
-    class IncorrectMockVMHandler(
-        base.OppiaMLVMHandler[Dict[str, str], Dict[str, str]]
-    ):
-        """Derived VM Handler class with missing function implementation for
-        extract_request_message_vm_id_and_signature function.
-        """
-
-        REQUIRE_PAYLOAD_CSRF_CHECK = False
-        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'POST': {
-                'vm_id': {'schema': {'type': 'basestring'}},
-                'signature': {'schema': {'type': 'basestring'}},
-                'message': {'schema': {'type': 'basestring'}},
-            }
-        }
-
-        @acl_decorators.is_from_oppia_ml
-        def post(self) -> None:
-            return self.render_json({})
-
-    class CorrectMockVMHandler(
-        base.OppiaMLVMHandler[
-            CorrectMockVMHandlerNormalizedPayloadDict,
-            Dict[str, str]
-        ]
-    ):
-        """Derived VM Handler class with
-        extract_request_message_vm_id_and_signature function implementation.
-        """
-
-        REQUIRE_PAYLOAD_CSRF_CHECK = False
-        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'POST': {
-                'vm_id': {'schema': {'type': 'basestring'}},
-                'signature': {'schema': {'type': 'basestring'}},
-                'message': {'schema': {'type': 'basestring'}},
-            }
-        }
-
-        def extract_request_message_vm_id_and_signature(
-            self
-        ) -> classifier_domain.OppiaMLAuthInfo:
-            """Returns the message, vm_id and signature retrieved from the
-            incoming requests.
-            """
-            assert self.normalized_payload is not None
-            signature = self.normalized_payload['signature']
-            vm_id = self.normalized_payload['vm_id']
-            message = self.normalized_payload['message']
-            return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
-
-        @acl_decorators.is_from_oppia_ml
-        def post(self) -> None:
-            self.render_json({'job_id': 'new_job'})
-
-    def setUp(self) -> None:
-        super(OppiaMLVMHandlerTests, self).setUp()
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication([
-            webapp2.Route('/incorrectmock', self.IncorrectMockVMHandler),
-            webapp2.Route('/correctmock', self.CorrectMockVMHandler)],
-            debug=feconf.DEBUG,
-        ))
-
-    def test_that_incorrect_derived_class_raises_exception(self) -> None:
-        payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            payload['message'].encode('utf-8'),
-            payload['vm_id'])
-
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.post_json(
-                '/incorrectmock', payload, expected_status_int=500)
-
-    def test_that_correct_derived_class_does_not_raise_exception(self) -> None:
-        def _mock_get_secret(name: str) -> Optional[str]:
-            if name == 'VM_ID':
-                return 'vm_default'
-            elif name == 'SHARED_SECRET_KEY':
-                return '1a2b3c4e'
-            return None
-        swap_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            _mock_get_secret,
-            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
-        )
-        payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            payload['message'].encode('utf-8'),
-            payload['vm_id'])
-        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
-            self.post_json(
-                '/correctmock', payload, expected_status_int=200)
 
 
 class SchemaValidationIntegrationTests(test_utils.GenericTestBase):
@@ -2549,3 +2435,204 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
             self.post_json(
                 '/mock_without_schema', self.payload, csrf_token=self.csrf_token,
                 expected_status_int=200)
+
+
+class LogTypeTests(test_utils.GenericTestBase):
+    """Tests for the LogType Enum."""
+
+    def test_log_type_enum_values(self) -> None:
+        """Test that LogType enum contains the correct values."""
+        self.assertEqual(base.LogType.WARNING, 'warning')
+        self.assertEqual(base.LogType.EXCEPTION, 'exception')
+
+
+class ExceptionsLoggingTests(test_utils.GenericTestBase):
+    """Tests the logging behavior of handle_exception in BaseHandler."""
+
+    def setUp(self) -> None:
+        """Creates a mock request, response, and logging methods for capturing log outputs."""
+        super().setUp()
+        self.mock_request = webapp2.Request.blank('/')
+        self.mock_request.environ['REQUEST_METHOD'] = 'POST'
+        self.mock_response = webapp2.Response()
+
+        self.logged_warnings: List[str] = []
+        self.logged_exceptions: List[str] = []
+
+        def mock_logging_warning(msg: str) -> None:
+            self.logged_warnings.append(msg)
+
+        def mock_logging_exception(msg: str) -> None:
+            self.logged_exceptions.append(msg)
+
+        self.mock_logging_warning = mock_logging_warning
+        self.mock_logging_exception = mock_logging_exception
+
+        self.handler: base.BaseHandler[Dict[str, str], Dict[str, str]] = base.BaseHandler(
+            self.mock_request, self.mock_response
+        )
+
+    def test_handle_not_logged_in_exception_logs_warning(self) -> None:
+        """Ensures NotLoggedInException logs a warning with the correct format."""
+        with self.swap(logging, 'warning', self.mock_logging_warning):
+            self.handler.handle_exception(
+                self.handler.NotLoggedInException('Unauthenticated user'),
+                False
+            )
+        expected_log_message = f"""
+
+NotLoggedInException: Unauthenticated user
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_warnings,
+            msg='NotLoggedInException message not match'
+        )
+
+    def test_not_found_exception_logs_warning(self) -> None:
+        """Ensures NotFoundException logs a warning with the correct format."""
+        with self.swap(logging, 'warning', self.mock_logging_warning):
+            self.handler.handle_exception(
+                self.handler.NotFoundException('Invalid URL requested'),
+                False
+            )
+        expected_log_message = f"""
+
+NotFoundException: Invalid URL requested
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_warnings,
+            msg='NotFoundException message not match'
+        )
+
+    def test_unauthorized_user_exception_logs_warning(self) -> None:
+        """Ensures UnauthorizedUserException logs an exception with the correct format."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(
+                self.handler.UnauthorizedUserException('Unauthorized User'),
+                False
+            )
+        expected_log_message = f"""
+
+UnauthorizedUserException: Exception raised
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='UnauthorizedUserException message not match'
+        )
+
+    def test_invalid_input_exception_logs_warning(self) -> None:
+        """Ensures InvalidInputException logs an exception with the correct format."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(
+                self.handler.InvalidInputException('Invalid Input'),
+                False
+            )
+        expected_log_message = f"""
+
+InvalidInputException: Exception raised
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='InvalidInputException message not match'
+        )
+
+    def test_internal_error_exception_logs_warning(self) -> None:
+        """Ensures InternalErrorException logs an exception with the correct format."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            self.handler.handle_exception(
+                self.handler.InternalErrorException('Internal Error'),
+                False
+            )
+        expected_log_message = f"""
+
+InternalErrorException: Exception raised
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+        self.assertIn(
+            expected_log_message,
+            self.logged_exceptions,
+            msg='InternalErrorException message not match'
+        )
+
+    def test_invalid_log_type_raises_exception(self) -> None:
+        """Tests that _log_exception_message raises an Exception when an
+        invalid log type is passed."""
+        with self.assertRaisesRegex(Exception, 'Invalid log type value: invalid'):
+            self.handler._log_exception_message('TestException', cast(base.LogType, "invalid"), 'Test error')
+
+    def test_generic_exception_logging_logs_exception(self) -> None:
+        """Tests that a generic exception logs using LogType.EXCEPTION."""
+        with self.swap(logging, 'exception', self.mock_logging_exception):
+            generic_exception = Exception('Generic error')
+            self.handler.handle_exception(generic_exception, False)
+            expected_log_message = f"""
+
+Exception: Exception raised
+
+Stack Trace: 
+NoneType: None
+
+URL requested: {self.handler.request.uri}
+Request method: POST
+Handler class name: BaseHandler
+"""
+            self.assertIn(expected_log_message, self.logged_exceptions)
+
+    def test_stack_trace_logged_from_existing_handler(self) -> None:
+        """Ensures that calling an actual handler logs a real stack trace."""
+        self.testapp = webtest.TestApp(webapp2.WSGIApplication([
+            webapp2.Route(
+                '/mock', BaseHandlerTests.MockHandlerWithInvalidReturnType
+            )
+        ], debug=feconf.DEBUG))
+
+        self.logged_exceptions = []
+
+        def mock_logging_exception(msg: str) -> None:
+            self.logged_exceptions.append(msg)
+
+        with self.swap(logging, 'exception', mock_logging_exception):
+            self.testapp.get('/mock', status=500)
+
+        self.assertTrue(
+            any('Traceback (most recent call last)' in log for log in self.logged_exceptions),
+            msg='Expected non-empty stack trace in exception logs.'
+        )

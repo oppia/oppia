@@ -208,7 +208,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             [line.decode('utf-8') for line in lines],
-            ['sample', u'✓', 'output']
+            ['sample', '✓', 'output']
         )
 
     def test_rerun_when_tests_fail_with_rerun_yes(self) -> None:

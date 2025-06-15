@@ -24,7 +24,6 @@ import {
   Input,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {
   ContributionAndReviewStatsService,
@@ -430,10 +429,3 @@ export class ContributorStatsComponent {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaOpportunitiesList',
-    downgradeComponent({component: ContributorStatsComponent})
-  );

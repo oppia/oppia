@@ -1,37 +1,46 @@
-<div class="learner-story-summary-tile">
-  <div class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
-    {{nextIncompleteNodeTitle}}
-  </div>
-  <mat-card class="oppia-story-dashboard-card" (mouseenter)="cardIsHovered=true" (mouseleave)="cardIsHovered=false">
-    <a [href]="getStoryLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
-      <div class="story-card">
-        <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
-            <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
-          <img class="oppia-thumbnail-image" alt="" [src]="thumbnailUrl" [attr.style]="isCardHovered()">
-          <div class="oppia-story-completion">
-            <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
-            <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
-              {{storyProgress}}% Complete
-            </p>
+<ng-container>
+  <div class="learner-story-summary-tile" *ngIf="!redesignFeatureFlag">
+    <div class="next-incomplete-chapter" *ngIf="isDisplayAreaHome()">
+      {{nextIncompleteNodeTitle}}
+    </div>
+    <mat-card class="oppia-story-dashboard-card" (mouseenter)="cardIsHovered=true" (mouseleave)="cardIsHovered=false">
+      <div class="classroom-name-container">
+        <p class="classroom-name">{{ storySummary.getClassroomName() }}</p>
+      </div>
+      <a [href]="getStoryLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}" class="oppia-story-link">
+        <div class="story-card">
+          <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
+              <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
+            <img class="oppia-thumbnail-image" alt="" [src]="thumbnailUrl" [attr.style]="isCardHovered()">
+            <div class="oppia-story-completion">
+              <img [src]="starImageUrl" alt="star image" class="oppia-svg-star-image" *ngIf="storyCompleted">
+              <p class="oppia-percent-story-completed" [ngClass]="{'oppia-story-completed-percent': storyCompleted}">
+                {{storyProgress}}% Complete
+              </p>
+            </div>
+          </div>
+          <div class="oppia-summary-section">
+            <span class="oppia-story-title e2e-test-story-name-in-learner-story-summary-tile">
+              {{storyTitle}}
+            </span>
+            <span class="oppia-topic-title e2e-test-topic-name-in-learner-story-summary-tile">
+              {{topicName}}
+            </span>
           </div>
         </div>
-        <div class="oppia-summary-section">
-          <span class="oppia-story-title e2e-test-story-name-in-learner-story-summary-tile">
-            {{storyTitle}}
-          </span>
-          <span class="oppia-topic-title e2e-test-topic-name-in-learner-story-summary-tile">
-            {{topicName}}
-          </span>
+        <div class="continue-button" *ngIf="isDisplayAreaHome()">
+          <p class="continue-button-text">
+            Continue
+          </p>
         </div>
-      </div>
-      <div class="continue-button" *ngIf="isDisplayAreaHome()">
-        <p class="continue-button-text">
-          Continue
-        </p>
-      </div>
-    </a>
-  </mat-card>
-</div>
+      </a>
+    </mat-card>
+  </div>
+  <ng-container *ngIf="redesignFeatureFlag">
+    <lesson-card [story]="storySummary" [topic]="topicName">
+    </lesson-card>
+  </ng-container>
+</ng-container>
 <style>
   .learner-story-summary-tile .oppia-story-title {
     color: #333;
@@ -162,5 +171,27 @@
   .learner-story-summary-tile .oppia-story-dashboard-card:hover .continue-button {
     display: block;
     float: left;
+  }
+  .classroom-name-container {
+    align-items: center;
+    background: #005240;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: row;
+    height: 24px;
+    justify-content: center;
+    padding: 5px;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 38px;
+  }
+  .classroom-name-container .classroom-name {
+    color: #f3f2ef;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 14px;
   }
 </style>

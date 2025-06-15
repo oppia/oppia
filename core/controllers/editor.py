@@ -21,6 +21,7 @@ from __future__ import annotations
 import datetime
 import logging
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -31,14 +32,17 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import image_validation_services
 from core.domain import question_services
+from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
+from core.domain import translation_fetchers
 from core.domain import user_services
 
 from typing import Dict, List, Optional, TypedDict
@@ -81,27 +85,6 @@ SCHEMA_FOR_VERSION = {
         'min_value': 1
     }]
 }
-
-
-class ExplorationPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """The editor page for a single exploration."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'exploration_id': {
-            'schema': SCHEMA_FOR_EXPLORATION_ID
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_play_exploration
-    def get(self, unused_exploration_id: str) -> None:
-        """Renders an exploration editor page.
-
-        Args:
-            unused_exploration_id: str. The unused exploration ID.
-        """
-
-        self.render_template('exploration-editor-page.mainpage.html')
 
 
 class ExplorationHandlerNormalizedRequestDict(TypedDict):
@@ -256,10 +239,19 @@ class ExplorationHandler(
         commit_message = self.normalized_payload.get('commit_message')
         change_list = self.normalized_payload['change_list']
 
+        # Validate commit message for public explorations.
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id
+        )
+        if exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC:
+            if not commit_message:
+                raise self.InvalidInputException(
+                    'Exploration is public so expected a commit '
+                    'message but received none.'
+                )
+
         changes_are_mergeable = exp_services.are_changes_mergeable(
             exploration_id, version, change_list)
-        exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id)
         can_edit = rights_manager.check_can_edit_activity(
             self.user, exploration_rights)
         can_voiceover = rights_manager.check_can_voiceover_activity(
@@ -310,6 +302,74 @@ class ExplorationHandler(
             self.roles, self.user_id, exploration_id)
         logging.info(log_info_string)
         self.render_json(self.values)
+
+
+class EntityTranslationsBulkHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handles fetching all available translations for a given entity."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'entity_type': {
+            'schema': {
+                'type': 'basestring',
+                'choices': [
+                    feconf.ENTITY_TYPE_EXPLORATION,
+                    feconf.ENTITY_TYPE_QUESTION
+                ]
+            }
+        },
+        'entity_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'entity_version': {
+            'schema': {
+                'type': 'int',
+                'validators': [{
+                    'id': 'is_at_least',
+                    # Version must be greater than zero.
+                    'min_value': 1
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {}
+    }
+
+    @acl_decorators.open_access
+    def get(
+        self,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+    ) -> None:
+        exploration_editor_can_modify_translations = (
+            feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.
+                EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value,
+                self.user_id))
+
+        if exploration_editor_can_modify_translations:
+            translations = {}
+            entity_translations = (
+                translation_fetchers.get_all_entity_translations_for_entity(
+                    feconf.TranslatableEntityType(entity_type), entity_id,
+                    entity_version))
+
+            for translation in entity_translations:
+                translations[translation.language_code] = translation.to_dict()
+
+            self.render_json(translations)
+        else:
+            raise self.NotFoundException
 
 
 class UserExplorationPermissionsHandler(
@@ -659,27 +719,24 @@ class ExplorationModeratorRightsHandler(
         version = self.normalized_payload['version']
         _require_valid_version(version, exploration.version)
 
-        # If moderator emails can be sent, check that all the prerequisites are
-        # satisfied, otherwise do nothing.
-        if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
-            if not email_body:
-                raise self.InvalidInputException(
-                    'Moderator actions should include an email to the '
-                    'recipient.')
-            email_manager.require_moderator_email_prereqs_are_satisfied()
+        # Check that all the prerequisites are satisfied, otherwise do nothing.
+        if not email_body:
+            raise self.InvalidInputException(
+                'Moderator actions should include an email to the recipient.'
+            )
+        email_manager.require_moderator_email_prereqs_are_satisfied()
 
         # Unpublish exploration.
         rights_manager.unpublish_exploration(self.user, exploration_id)
         search_services.delete_explorations_from_search_index([exploration_id])
         exp_rights = rights_manager.get_exploration_rights(exploration_id)
 
-        # If moderator emails can be sent, send an email to the all owners of
-        # the exploration notifying them of the change.
-        if feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
-            for owner_id in exp_rights.owner_ids:
-                email_manager.send_moderator_action_email(
-                    self.user_id, owner_id, 'unpublish_exploration',
-                    exploration.title, email_body)
+        # Send an email to the all owners of the exploration notifying them
+        # of the change.
+        for owner_id in exp_rights.owner_ids:
+            email_manager.send_moderator_action_email(
+                self.user_id, owner_id, 'unpublish_exploration',
+                exploration.title, email_body)
 
         self.render_json({
             'rights': exp_rights.to_dict(),
@@ -1332,7 +1389,9 @@ class ImageUploadHandler(
                     'type': 'basestring',
                     'validators': [{
                         'id': 'is_regex_matched',
-                        'regex_pattern': r'\w+[.]\w+'
+                        'regex_pattern': (
+                            utils.get_image_filename_regex_pattern()
+                        ),
                     }]
                 }
             },

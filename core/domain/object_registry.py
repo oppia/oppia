@@ -80,7 +80,7 @@ class Registry:
 
 def get_default_object_values() -> Dict[str, AllowedDefaultValueTypes]:
     """Returns a dictionary containing the default object values."""
-    # TODO(wxy): Cache this as it is accessed many times.
+    # TODO(#20401): Cache this as it is accessed many times.
 
     default_object_values: Dict[str, AllowedDefaultValueTypes] = json.loads(
         constants.get_package_file_contents(

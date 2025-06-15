@@ -18,7 +18,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {HelpModalComponent} from 'pages/exploration-editor-page/modal-templates/help-modal.component';
@@ -44,6 +43,7 @@ import {UserExplorationPermissionsService} from '../services/user-exploration-pe
 })
 export class EditorNavigationComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
+  autosaveIsInProgress: boolean = false;
   screenIsLarge: boolean = false;
   isPublishButtonEnabled: boolean = false;
   postTutorialHelpPopoverIsShown: boolean = false;
@@ -281,6 +281,14 @@ export class EditorNavigationComponent implements OnInit, OnDestroy {
     );
 
     this.directiveSubscriptions.add(
+      this.changeListService.autosaveInProgressEventEmitter.subscribe(
+        (autosaveInProgress: boolean) => {
+          this.autosaveIsInProgress = autosaveInProgress;
+        }
+      )
+    );
+
+    this.directiveSubscriptions.add(
       this.internetConnectivityService.onInternetStateChange.subscribe(
         internetAccessible => {
           this.connectedToInternet = internetAccessible;
@@ -308,10 +316,3 @@ export class EditorNavigationComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaEditorNavigation',
-  downgradeComponent({
-    component: EditorNavigationComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -80,18 +80,21 @@ var TopicsAndSkillsDashboardPage = function () {
   var topicFilterKeywordField = $('.e2e-test-select-keyword-dropdown');
   var topicFilterClassroomField = $('.e2e-test-select-classroom-dropdown');
   var topicsListItem = $('.e2e-test-topics-list-item');
-  var topicsListItemsSelector = function () {
-    return $$('.e2e-test-topics-list-item');
+  var topicsListItemsSelector = async function () {
+    await waitFor.pageToFullyLoad();
+    return await $$('.e2e-test-topics-list-item');
   };
   var topicNameField = $('.e2e-test-new-topic-name-field');
   var topicNameFieldElement = $('.e2e-test-topic-name-field');
-  var topicNamesSelector = function () {
-    return $$('.e2e-test-topic-name');
+  var topicNamesSelector = async function () {
+    return await $$('.e2e-test-topic-name');
   };
   var topicPageTitleFragmentField = $('.e2e-test-new-page-title-fragm-field');
   var topicResetFilters = $('.e2e-test-topic-filter-reset');
   var topicThumbnailButton = $('.e2e-test-photo-button');
-  var topicUrlFragmentField = $('.e2e-test-new-topic-url-fragment-field');
+  var topicUrlFragmentField = $(
+    '.e2e-test-new-topic-url-fragment-field .e2e-test-url-fragment-field'
+  );
   var topicsTable = $('.e2e-test-topics-table');
   var topicsTableMobile = $('.e2e-test-mobile-topic-table');
   var unassignSkillButton = $('.e2e-test-unassign-skill-button');
@@ -278,6 +281,10 @@ var TopicsAndSkillsDashboardPage = function () {
       'Create Topic modal takes too long to appear.'
     );
     await action.setValue('Topic name field', topicNameField, topicName);
+    await waitFor.visibilityOf(
+      topicUrlFragmentField,
+      'Url fragment editor component takes too long to appear'
+    );
     await action.setValue(
       'Topic URL fragment field',
       topicUrlFragmentField,
@@ -362,7 +369,8 @@ var TopicsAndSkillsDashboardPage = function () {
       topicFilterKeywordField,
       'Topic Dashboard keyword filter parent taking too long to appear.'
     );
-    var filterKeywordInput = topicFilterKeywordField.$(
+
+    var filterKeywordInput = await topicFilterKeywordField.$(
       '.e2e-test-multi-selection-input'
     );
 

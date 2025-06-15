@@ -1,0 +1,5 @@
+core/templates/pages/classroom-admin-page/classroom-admin-page.module.ts
+core/templates/pages/classroom-page/classroom-page.module.ts
+core/templates/pages/skill-editor-page/skill-editor-page.module.ts
+core/templates/pages/topic-editor-page/topic-editor-page.module.ts
+core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module.ts

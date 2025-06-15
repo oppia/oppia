@@ -161,6 +161,11 @@ def _apply_changes(
         elif change.cmd == exp_domain.CMD_MARK_TRANSLATIONS_NEEDS_UPDATE:
             entity_translation.mark_translations_needs_update(
                 [change.content_id])
+        elif change.cmd == (
+            exp_domain.CMD_MARK_TRANSLATION_NEEDS_UPDATE_FOR_LANGUAGE):
+            if entity_translation.language_code == change.language_code:
+                entity_translation.mark_translations_needs_update(
+                    [change.content_id])
         else:
             raise Exception(
                 'Invalid translation change cmd: %s' % change.cmd)
@@ -172,7 +177,7 @@ def compute_translation_related_change(
     updated_exploration: exp_domain.Exploration,
     translation_changes: List[exp_domain.ExplorationChange]
 ) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
-    """Cretase new EntityTranslation models corresponding to translation related
+    """Create new EntityTranslation models corresponding to translation related
     changes.
 
     Args:
@@ -226,6 +231,55 @@ def compute_translation_related_change(
                 entity_translation.entity_type,
                 entity_translation.entity_id,
                 entity_translation.entity_version + 1,
+                entity_translation.language_code,
+                entity_translation.to_dict()['translations']
+            )
+        )
+    return new_translation_models, translation_counts
+
+
+def compute_translation_related_changes_upon_revert(
+    reverted_exploration: exp_domain.Exploration,
+    revert_to_version: int
+) -> Tuple[List[translation_models.EntityTranslationsModel], Dict[str, int]]:
+    """Create new EntityTranslation models corresponding to translation related
+    changes upon exploration revert.
+
+    Args:
+        reverted_exploration: Exploration. The reverted explortaion. Note that
+            this object should already reflect the revert.
+        revert_to_version: int. The version of the exploration to which the
+            exploration is getting reverted to.
+
+    Returns:
+        Tuple(list(EntityTranslationsModel), dict(str, int)). A tuple containing
+        list of new EntityTranslationsModel and a dict with count of translated
+        contents as value and the languages as key.
+    """
+    language_code_to_entity_translation = {
+        entity_translation.language_code: entity_translation
+        for entity_translation in (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION,
+                reverted_exploration.id,
+                revert_to_version
+            )
+        )
+    }
+
+    # Create entity_translation models for all languages.
+    new_translation_models = []
+    translation_counts = {}
+    for entity_translation in language_code_to_entity_translation.values():
+
+        translation_counts[entity_translation.language_code] = (
+            reverted_exploration.get_translation_count(entity_translation))
+
+        new_translation_models.append(
+            translation_models.EntityTranslationsModel.create_new(
+                entity_translation.entity_type,
+                entity_translation.entity_id,
+                reverted_exploration.version,
                 entity_translation.language_code,
                 entity_translation.to_dict()['translations']
             )

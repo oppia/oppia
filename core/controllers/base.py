@@ -16,9 +16,9 @@
 
 from __future__ import annotations
 
-import abc
 import base64
 import datetime
+import enum
 import functools
 import hmac
 import io
@@ -27,6 +27,7 @@ import logging
 import os
 import re
 import time
+import traceback
 import urllib
 
 from core import feconf
@@ -35,7 +36,6 @@ from core import utils
 from core.controllers import payload_validator
 from core.domain import auth_domain
 from core.domain import auth_services
-from core.domain import classifier_domain
 from core.domain import user_services
 
 from typing import (
@@ -61,6 +61,15 @@ AUTH_HANDLER_PATHS: Final = (
     '/session_begin',
     '/session_end',
 )
+
+
+class LogType(str, enum.Enum):
+    """Enum for logging types."""
+
+    # Represents the warning logging level.
+    WARNING = 'warning'
+    # Represents the exception logging level.
+    EXCEPTION = 'exception'
 
 
 class ResponseValueDict(TypedDict):
@@ -310,8 +319,12 @@ class BaseHandler(
             self.redirect('https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if not self._is_requested_path_currently_accessible_to_user():
-            self.render_template('maintenance-page.mainpage.html')
+        if (
+            not self._is_requested_path_currently_accessible_to_user()
+            and request_split.path != '/maintenance'
+
+        ):
+            self.redirect('/maintenance')
             return
 
         if self.user_is_scheduled_for_deletion:
@@ -555,7 +568,9 @@ class BaseHandler(
 
     # Here we use type Any because the sub-classes of 'Basehandler' can have
     # 'get' method with different number of arguments and types.
-    def get(self, *args: Any, **kwargs: Any) -> None:  # pylint: disable=unused-argument
+    def get(
+        self, *args: Any, **kwargs: Any # pylint: disable=unused-argument
+    ) -> None:
         """Base method to handle GET requests."""
         logging.warning('Invalid URL requested: %s', self.request.uri)
         self.error(404)
@@ -675,7 +690,7 @@ class BaseHandler(
                 True when the template is compiled by angular AoT compiler.
 
         Raises:
-            Exception. Invalid X-Frame-Options.
+            Exception. Invalid iframe restriction value.
         """
 
         # The 'no-store' must be used to properly invalidate the cache when we
@@ -686,14 +701,16 @@ class BaseHandler(
             'max-age=31536000; includeSubDomains')
         self.response.headers['X-Content-Type-Options'] = 'nosniff'
         self.response.headers['X-Xss-Protection'] = '1; mode=block'
-
         if iframe_restriction is not None:
-            if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers['X-Frame-Options'] = (
-                    str(iframe_restriction))
+            if iframe_restriction == 'SAMEORIGIN':
+                self.response.headers['Content-Security-Policy'] = (
+                    'frame-ancestors \'self\'')
+            elif iframe_restriction == 'DENY':
+                self.response.headers['Content-Security-Policy'] = (
+                    'frame-ancestors \'none\'')
             else:
                 raise Exception(
-                    'Invalid X-Frame-Options: %s' % iframe_restriction)
+                    'Invalid iframe restriction value: %s' % iframe_restriction)
 
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
@@ -715,17 +732,11 @@ class BaseHandler(
 
         if return_type == feconf.HANDLER_TYPE_HTML and method == 'GET':
             self.values.update(values)
-            if self.iframed:
-                self.render_template(
-                    'error-iframed.mainpage.html', iframe_restriction=None)
-            elif values['status_code'] == 404:
+            if values['status_code'] == 404:
                 # Only 404 routes can be handled with angular router as it only
                 # has access to the path, not to the status code.
                 # That's why 404 status code is treated differently.
                 self.render_template('oppia-root.mainpage.html')
-            else:
-                self.render_template(
-                    'error-page-%s.mainpage.html' % values['status_code'])
         else:
             if return_type not in (
                     feconf.HANDLER_TYPE_JSON, feconf.HANDLER_TYPE_DOWNLOADABLE):
@@ -743,7 +754,7 @@ class BaseHandler(
         """
         # The error codes here should be in sync with the error pages
         # generated via webpack.common.config.ts.
-        assert values['status_code'] in [400, 401, 404, 500]
+        assert values['status_code'] in [400, 401, 404, 405, 500]
         method = self.request.environ['REQUEST_METHOD']
 
         if method == 'GET':
@@ -764,6 +775,48 @@ class BaseHandler(
                 feconf.HANDLER_TYPE_JSON, values
             )
 
+    def _log_exception_message(
+        self, exception_type: str, log_type: LogType, error_message: str
+    ) -> None:
+        """Logs exception details.
+
+        Args:
+            exception_type: str. Name of the exception.
+            log_type: LogType. Log level ('warning', 'exception').
+            error_message: str. Detailed error message.
+
+        Raises:
+            Exception. Invalid log type value.
+        """
+
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
+        url = self.request.uri
+        stack_trace = traceback.format_exc()
+
+        msg = (
+            '\n\n%s: %s\n\n'
+            'Stack Trace: \n%s\n'
+            'URL requested: %s\n'
+            'Request method: %s\n'
+            'Handler class name: %s\n'
+            % (
+                exception_type,
+                error_message,
+                stack_trace,
+                url,
+                request_method,
+                handler_class_name
+            )
+        )
+
+        if log_type == LogType.WARNING:
+            logging.warning(msg)
+        elif log_type == LogType.EXCEPTION:
+            logging.exception(msg)
+        else:
+            raise Exception('Invalid log type value: %s' % log_type)
+
     def handle_exception(
         self, exception: BaseException, unused_debug_mode: bool
     ) -> None:
@@ -774,6 +827,9 @@ class BaseHandler(
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
+        handler_class_name = self.__class__.__name__
+        request_method = self.request.environ['REQUEST_METHOD']
+        exception_type = type(exception).__name__
         if isinstance(exception, self.NotLoggedInException):
             # This checks if the response should be JSON or HTML.
             # For GET requests, there is no payload, so we check against
@@ -787,6 +843,11 @@ class BaseHandler(
             payload_exists = (
                 self.payload is not None and
                 not isinstance(self.payload, RaiseErrorOnGet)
+            )
+            self._log_exception_message(
+                exception_type,
+                LogType.WARNING,
+                'Unauthenticated user'
             )
             if (
                     payload_exists or
@@ -803,11 +864,12 @@ class BaseHandler(
                 self.redirect(user_services.create_login_url(self.request.uri))
             return
 
-        logging.exception(
-            'Exception raised at %s: %s', self.request.uri, exception)
-
         if isinstance(exception, self.NotFoundException):
-            logging.warning('Invalid URL requested: %s', self.request.uri)
+            self._log_exception_message(
+                exception_type,
+                LogType.WARNING,
+                'Invalid URL requested'
+            )
             self.error(404)
             values = {
                 'error': 'Could not find the resource %s.' % self.request.uri,
@@ -816,7 +878,11 @@ class BaseHandler(
             self._render_exception(values)
             return
 
-        logging.exception('Exception raised: %s', exception)
+        self._log_exception_message(
+            exception_type,
+            LogType.EXCEPTION,
+            'Exception raised'
+        )
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
@@ -841,6 +907,16 @@ class BaseHandler(
             values = {
                 'error': str(exception),
                 'status_code': 500
+            }
+            self._render_exception(values)
+            return
+
+        if isinstance(exception, TypeError):
+            self.error(405)
+            values = {
+                'error': 'Invalid method %s for %s' % (
+                    request_method, handler_class_name),
+                'status_code': 405
             }
             self._render_exception(values)
             return
@@ -1011,40 +1087,3 @@ class CsrfTokenHandler(BaseHandler[Dict[str, str], Dict[str, str]]):
         self.render_json({
             'token': csrf_token,
         })
-
-
-class OppiaMLVMHandler(
-    BaseHandler[_NormalizedPayloadDictType, _NormalizedRequestDictType]
-):
-    """Base class for the handlers that communicate with Oppia-ML VM instances.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
-    # contain different schemas with different types of values, like str,
-    # complex Dicts and etc.
-    URL_PATH_ARGS_SCHEMAS: Dict[str, Any] = {}
-    # Here we use type Any because the sub-classes of OppiaMLVMHandler can
-    # contain different schemas with different types of values, like str,
-    # complex Dicts and etc.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Any] = {}
-
-    @abc.abstractmethod
-    def extract_request_message_vm_id_and_signature(
-        self
-    ) -> classifier_domain.OppiaMLAuthInfo:
-        """Returns the OppiaMLAuthInfo domain object containing
-        information from the incoming request that is necessary for
-        authentication.
-
-        Since incoming request can be either a protobuf serialized binary or
-        a JSON object, the derived classes must implement the necessary
-        logic to decode the incoming request and return a tuple of size 3
-        where message is at index 0, vm_id is at index 1 and signature is at
-        index 2.
-
-        Raises:
-            NotImplementedError. The derived child classes must implement the
-                necessary logic as described above.
-        """
-        raise NotImplementedError

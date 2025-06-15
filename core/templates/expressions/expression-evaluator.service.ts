@@ -45,7 +45,7 @@
  * All system variables, system operators, and system functions are defined in
  * the 'system' variable in this service.
  *
- * TODO(kashida): Split the following section into two:
+ * TODO(#20339): Split the following section into two:
  * 1.  A general overview of operators (including some concrete examples)
  * 2.  A numbered sequence of steps which a new contributor should follow in
  *     order to define a new operator.
@@ -72,7 +72,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {ExpressionParserService} from 'expressions/expression-parser.service';
 import {
@@ -138,10 +137,3 @@ export class ExpressionEvaluatorService {
     return parsed;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExpressionEvaluatorService',
-    downgradeInjectable(ExpressionEvaluatorService)
-  );

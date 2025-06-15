@@ -83,16 +83,25 @@
                 </div>
               </div>
             </div>
-            <div class="donate-learners-container">
+            <div class="donate-learners-section">
               <p> {{ 'I18N_DONATE_PAGE_CONTENT_HEADING_4' | translate }} </p>
-              <div class="donate-learners-bg">
-                <div class="donate-learners-carousel">
-                  <div class="donate-learners-tile" #tiles *ngFor="let learner of learners">
-                    <picture>
-                      <source class="donate-learners-img" type="image/webp" [srcset]="getStaticImageUrl(learner.webpUrl)">
-                      <source class="donate-learners-img" type="image/png" [srcset]="getStaticImageUrl(learner.imageUrl)">
-                      <img class="donate-learners-img" [src]="getStaticImageUrl(learner.imageUrl)" loading="lazy" alt="Photo of learner">
-                    </picture>
+              <div class="donate-learner-container e2e-donate-page-learner-carousel">
+                <button class="donate-learner-carousel-prev-btn e2e-test-donate-page-learner-carousel-prev-btn"
+                        (click)="moveLearnerCarouselToPreviousSlide()">
+                  <i class="donate-learner-testimonial-carousel-prev-icon fas"
+                      [ngClass]="{'fa-chevron-left': !isLanguageRTL(), 'fa-chevron-right': isLanguageRTL()}">
+                  </i>
+                  <span class="sr-only">Previous</span>
+                </button>
+                <ngb-carousel #learnerCarousel [interval]="0" [showNavigationArrows]="false" [animation]="false">
+                  <ng-template ngbSlide *ngFor="let learner of learners">
+                    <div class="donate-learners-tile">
+                      <picture>
+                        <source class="donate-learners-img" type="image/webp" [srcset]="getStaticImageUrl(learner.webpUrl)">
+                        <source class="donate-learners-img" type="image/png" [srcset]="getStaticImageUrl(learner.imageUrl)">
+                        <img class="donate-learners-img" [src]="getStaticImageUrl(learner.imageUrl)" loading="lazy" alt="Photo of learner">
+                      </picture>
+                    </div>
                     <div class="donate-learners-content">
                       <p class="donate-learners-country">{{ learner.country | translate }}</p>
                       <div class="donate-learners-text">
@@ -100,11 +109,15 @@
                       </div>
                       <p class="donate-learners-name">- {{ learner.name | translate }} </p>
                     </div>
-                  </div>
-                </div>
-                <div class="donate-learners-nav">
-                  <button [attr.aria-label]="'learner-' + num + ' button'" class="donate-learners-nav-item" role="button" [class.active]="tileShown === num" *ngFor="let num of [0, 1, 2, 3, 4]" (click)="nextTile(num)"> </button>
-                </div>
+                  </ng-template>
+                </ngb-carousel>
+                <button class="donate-learner-carousel-next-btn e2e-test-donate-page-learner-carousel-next-btn"
+                        (click)="moveLearnerCarouselToNextSlide()">
+                  <i class="donate-learner-testimonial-carousel-next-icon fas"
+                    [ngClass]="{'fa-chevron-right': !isLanguageRTL(), 'fa-chevron-left': isLanguageRTL()}">
+                  </i>
+                  <span class="sr-only">Next</span>
+                </button>
               </div>
             </div>
           </div>
@@ -155,6 +168,63 @@
     max-width: 550px;
     overflow: hidden;
     width: 100%;
+  }
+
+  .donate-page .donate-learner-container > button {
+    background-color: transparent;
+    padding: 24px;
+  }
+
+  .donate-page .donate-learner-container > button,
+  .donate-page .donate-learner-container > button:active,
+  .donate-page .donate-learner-container > button:focus,
+  .donate-page .donate-learner-container > button:hover {
+    border: none;
+    outline: none;
+  }
+
+  .donate-page .donate-learner-container i {
+    color: #00645c;
+    font-size: 28px;
+  }
+
+  .donate-page .donate-learner-container {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    padding: 48px 16px 52px;
+  }
+
+
+  @media only screen and (min-width: 922px) {
+    .donate-page .donate-learner-container > button {
+      display: none;
+    }
+    .donate-page .donate-learner-container {
+      align-items: center;
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      padding: 48px 16px 52px;
+    }
+  }
+
+  @media only screen and (max-width: 641px) {
+    .donate-page .donate-learner-container {
+      gap: 8px;
+      padding: 32px 16px 52px;
+    }
+  }
+
+  @media only screen and (max-width: 553px) {
+    .donate-page .donate-learner-container {
+      gap: 4px;
+      padding: 32px 0 52px;
+    }
+    .donate-page .donate-learner-container > button {
+      padding: 15px;
+    }
   }
 
   @media (max-width: 1155px) {
@@ -412,7 +482,7 @@
   }
 
   .donate-highlights > p,
-  .donate-learners-container > p {
+  .donate-learners-section > p {
     font-size: 20px;
     font-weight: 500;
     line-height: 23px;
@@ -432,11 +502,11 @@
     border: none;
   }
 
-  .donate-learners-container {
+  .donate-learners-section {
     margin-top: 16px;
   }
 
-  .donate-learners-bg {
+  .donate-learner-container {
     align-items: center;
     background-color: #eee;
     display: flex;
@@ -444,28 +514,18 @@
     padding: 25px 16px;
   }
 
-  .donate-learners-carousel {
+  .donate-learners-container {
     display: flex;
     gap: 0 24px;
-    max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: visible;
     padding: 0 16px;
-  }
-
-  @media (max-width: 400px) {
-    .donate-learners-carousel {
-      padding: 0 0 0 calc((100vw - 372px) / 2);
-    }
-
-    .donate-learners-bg {
-      padding: 25px 12px;
-    }
   }
 
   .donate-learners-content {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    flex-wrap: wrap;
     padding: 8px 16px;
   }
 
@@ -476,7 +536,8 @@
   }
 
   .donate-learners-img {
-    height: 164.83px;
+    box-shadow: 0 4px 4px 0 #00000040;
+    height: auto;
     width: 300px;
   }
 
@@ -486,26 +547,6 @@
     font-size: 14px;
     font-weight: 500;
     margin: 8px 0;
-  }
-
-  .donate-learners-nav {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    width: 114px;
-  }
-
-  .donate-learners-nav-item {
-    border: 2px solid #00645c;
-    border-radius: 50%;
-    height: 16px;
-    width: 16px;
-  }
-
-  @media (max-width: 500px) {
-    .donate-learners-nav {
-      width: 130px;
-    }
   }
 
   .donate-learners-nav-item.active {
@@ -524,27 +565,9 @@
 
   .donate-learners-tile {
     align-items: center;
-    background-color: #fff;
-    box-shadow: 0 4px 4px 0 #00000040;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    width: 300px;
-  }
-
-  @media (max-width: 364px) {
-    .donate-learners-carousel {
-      padding: 0 0 0 calc((100vw - 326px) / 2);
-    }
-
-    .donate-learners-img {
-      height: 139.55px;
-      width: 254px;
-    }
-
-    .donate-learners-tile {
-      width: 254px;
-    }
   }
 
   .donate-today-content > p:first-child {

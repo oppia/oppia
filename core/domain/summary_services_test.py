@@ -201,18 +201,18 @@ class ExplorationDisplayableSummariesTest(
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 [self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5]))
         expected_summary = {
-            'category': u'Algebra',
+            'category': 'Algebra',
             'community_owned': False,
             'id': self.EXP_ID_2,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
-            'objective': u'An objective',
+            'objective': 'An objective',
             'ratings': feconf.get_empty_ratings(),
             'status': 'public',
             'tags': [],
             'thumbnail_bg_color': '#cc4b00',
             'thumbnail_icon_url': '/subjects/Algebra.svg',
-            'title': u'Exploration 2 Albert title',
+            'title': 'Exploration 2 Albert title',
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
         self.assertDictContainsSubset(
@@ -296,7 +296,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'id': '3',
             'title': 'Root Linear Coefficient Theorem',
             'activity_type': 'exploration',
-            'category': u'Algebra',
+            'category': 'Algebra',
             'objective': 'discover the Root Linear Coefficient Theorem',
             'language_code': 'en',
             'human_readable_contributors_summary': {},
@@ -467,7 +467,7 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
     def test_get_displayable_collection_summary_dicts_matching_ids(
         self
     ) -> None:
-        collection_id_1 = self.COLLECTION_ID + '_1'
+        collection_id_1 = '%s_1' % self.COLLECTION_ID
         self.save_new_valid_collection(self.COLLECTION_ID, self.owner_id)
         self.save_new_valid_collection(collection_id_1, self.owner_id)
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
@@ -718,18 +718,18 @@ class TopRatedExplorationDisplayableSummariesTest(
                 [constants.DEFAULT_LANGUAGE_CODE],
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
         expected_summary = {
-            'status': u'public',
+            'status': 'public',
             'thumbnail_bg_color': '#cc4b00',
             'community_owned': False,
             'tags': [],
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'thumbnail_icon_url': '/subjects/Algebra.svg',
             'id': self.EXP_ID_3,
-            'category': u'Algebra',
-            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 1},
-            'title': u'A title',
+            'category': 'Algebra',
+            'ratings': {'1': 0, '3': 0, '2': 0, '5': 1, '4': 1},
+            'title': 'A title',
             'num_views': 0,
-            'objective': u'An objective'
+            'objective': 'An objective'
         }
 
         self.assertDictContainsSubset(
@@ -756,18 +756,18 @@ class TopRatedExplorationDisplayableSummariesTest(
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE))
 
         expected_summary = {
-            'status': u'public',
+            'status': 'public',
             'thumbnail_bg_color': '#cc4b00',
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
-            'category': u'Algebra',
-            'ratings': {u'1': 0, u'3': 0, u'2': 0, u'5': 1, u'4': 0},
-            'title': u'A title',
+            'category': 'Algebra',
+            'ratings': {'1': 0, '3': 0, '2': 0, '5': 1, '4': 0},
+            'title': 'A title',
             'num_views': 0,
-            'objective': u'An objective'
+            'objective': 'An objective'
         }
         self.assertDictContainsSubset(
             expected_summary, top_rated_exploration_summaries[0])
@@ -845,11 +845,11 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_1,
-            'category': u'Algebra',
+            'category': 'Algebra',
             'ratings': feconf.get_empty_ratings(),
-            'title': u'A title',
+            'title': 'A title',
             'num_views': 0,
-            'objective': u'An objective'
+            'objective': 'An objective'
         }
         test_summary_2 = {
             'status': 'public',
@@ -859,11 +859,11 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
-            'category': u'Algebra',
+            'category': 'Algebra',
             'ratings': feconf.get_empty_ratings(),
-            'title': u'A title',
+            'title': 'A title',
             'num_views': 0,
-            'objective': u'An objective'
+            'objective': 'An objective'
         }
         test_summary_3 = {
             'status': 'public',
@@ -873,11 +873,11 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'thumbnail_icon_url': '/subjects/Algebra.svg',
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_3,
-            'category': u'Algebra',
+            'category': 'Algebra',
             'ratings': feconf.get_empty_ratings(),
-            'title': u'A title',
+            'title': 'A title',
             'num_views': 0,
-            'objective': u'An objective'
+            'objective': 'An objective'
         }
 
         self.assertDictContainsSubset(
@@ -907,7 +907,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
 
 
 class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
-    """Tests for requiring that activity references are public."""
+    """Tests for checking id validity of activities 
+    that don't exist or are private."""
 
     EXP_ID_0: Final = 'exp_id_0'
     EXP_ID_1: Final = 'exp_id_1'
@@ -919,19 +920,44 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.get_user_actions_info(self.owner_id)
 
-    def test_requiring_nonexistent_activities_be_public_raises_exception(
+    def test_checking_activity_id_validity_on_nonexistent_activities(
         self
     ) -> None:
-        with self.assertRaisesRegex(Exception, 'non-existent exploration'):
-            summary_services.require_activities_to_be_public([
-                activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_EXPLORATION, 'fake')])
-        with self.assertRaisesRegex(Exception, 'non-existent collection'):
-            summary_services.require_activities_to_be_public([
-                activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_COLLECTION, 'fake')])
+        non_existent_exploration_id = 'non-existent exploration'
+        non_existent_collection_id = 'non-existent collection'
 
-    def test_requiring_private_activities_to_be_public_raises_exception(
+        non_existent_activity_ids = [
+            activity_domain.ActivityReference(
+                constants.ACTIVITY_TYPE_EXPLORATION,
+                non_existent_exploration_id
+            ),
+            activity_domain.ActivityReference(
+                constants.ACTIVITY_TYPE_COLLECTION,
+                non_existent_collection_id
+            )
+        ]
+
+        (
+            non_existent_exploration_ids,
+            non_existent_collection_ids,
+            private_exploration_ids,
+            private_collection_ids
+        ) = summary_services.check_activity_id_validity(
+            non_existent_activity_ids
+        )
+
+        self.assertIn(
+            non_existent_exploration_id,
+            non_existent_exploration_ids
+        )
+        self.assertIn(
+            non_existent_collection_id,
+            non_existent_collection_ids
+        )
+        self.assertEqual(private_exploration_ids, [])
+        self.assertEqual(private_collection_ids, [])
+
+    def test_checking_activity_id_validity_on_private_activities(
         self
     ) -> None:
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
@@ -939,16 +965,28 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
 
-        with self.assertRaisesRegex(Exception, 'private exploration'):
-            summary_services.require_activities_to_be_public([
+        private_activity_ids = [
                 activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0)])
-        with self.assertRaisesRegex(Exception, 'private collection'):
-            summary_services.require_activities_to_be_public([
+                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
                 activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
+                    constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)
+        ]
 
-    def test_requiring_public_activities_to_be_public_succeeds(self) -> None:
+        (
+            non_existent_exploration_ids,
+            non_existent_collection_ids,
+            private_exploration_ids,
+            private_collection_ids
+        ) = summary_services.check_activity_id_validity(
+            private_activity_ids
+        )
+
+        self.assertEqual(non_existent_exploration_ids, [])
+        self.assertEqual(non_existent_collection_ids, [])
+        self.assertIn(self.EXP_ID_0, private_exploration_ids)
+        self.assertIn(self.COL_ID_2, private_collection_ids)
+
+    def test_checking_activity_id_validity_on_valid_activities(self) -> None:
         self.save_new_valid_exploration(self.EXP_ID_0, self.owner_id)
         self.save_new_valid_collection(
             self.COL_ID_2, self.owner_id, exploration_id=self.EXP_ID_0)
@@ -956,12 +994,26 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         rights_manager.publish_collection(self.owner, self.COL_ID_2)
 
-        # There are no validation errors.
-        summary_services.require_activities_to_be_public([
+        valid_activity_ids = [
             activity_domain.ActivityReference(
                 constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0),
             activity_domain.ActivityReference(
-                constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)])
+                constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2)
+        ]
+
+        (
+            non_existent_exploration_ids,
+            non_existent_collection_ids,
+            private_exploration_ids,
+            private_collection_ids
+        ) = summary_services.check_activity_id_validity(
+            valid_activity_ids
+        )
+
+        self.assertEqual(non_existent_exploration_ids, [])
+        self.assertEqual(non_existent_collection_ids, [])
+        self.assertEqual(private_exploration_ids, [])
+        self.assertEqual(private_collection_ids, [])
 
 
 class CollectionNodeMetadataDictsTest(
@@ -1032,16 +1084,16 @@ class CollectionNodeMetadataDictsTest(
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID1,
-            'objective': u'An objective 1',
-            'title': u'Exploration 1 Albert title',
+            'objective': 'An objective 1',
+            'title': 'Exploration 1 Albert title',
         }, {
             'id': self.EXP_ID2,
-            'objective': u'An objective 2',
-            'title': u'Exploration 2 Albert title',
+            'objective': 'An objective 2',
+            'title': 'Exploration 2 Albert title',
         }, {
             'id': self.EXP_ID3,
-            'objective': u'An objective 3',
-            'title': u'Exploration 3 Albert title',
+            'objective': 'An objective 3',
+            'title': 'Exploration 3 Albert title',
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
@@ -1059,8 +1111,8 @@ class CollectionNodeMetadataDictsTest(
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID4,
-            'objective': u'An objective 4',
-            'title': u'Exploration 4 Bob title',
+            'objective': 'An objective 4',
+            'title': 'Exploration 4 Bob title',
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
@@ -1070,16 +1122,16 @@ class CollectionNodeMetadataDictsTest(
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID2,
-            'objective': u'An objective 2',
-            'title': u'Exploration 2 Albert title',
+            'objective': 'An objective 2',
+            'title': 'Exploration 2 Albert title',
         }, {
             'id': self.EXP_ID3,
-            'objective': u'An objective 3',
-            'title': u'Exploration 3 Albert title',
+            'objective': 'An objective 3',
+            'title': 'Exploration 3 Albert title',
         }, {
             'id': self.EXP_ID4,
-            'objective': u'An objective 4',
-            'title': u'Exploration 4 Bob title',
+            'objective': 'An objective 4',
+            'title': 'Exploration 4 Bob title',
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
@@ -1091,12 +1143,12 @@ class CollectionNodeMetadataDictsTest(
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID3,
-            'objective': u'An objective 3',
-            'title': u'Exploration 3 Albert title',
+            'objective': 'An objective 3',
+            'title': 'Exploration 3 Albert title',
         }, {
             'id': self.EXP_ID4,
-            'objective': u'An objective 4',
-            'title': u'Exploration 4 Bob title',
+            'objective': 'An objective 4',
+            'title': 'Exploration 4 Bob title',
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
@@ -1107,8 +1159,8 @@ class CollectionNodeMetadataDictsTest(
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID1,
-            'objective': u'An objective 1',
-            'title': u'Exploration 1 Albert title',
+            'objective': 'An objective 1',
+            'title': 'Exploration 1 Albert title',
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
@@ -1118,8 +1170,8 @@ class CollectionNodeMetadataDictsTest(
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID3,
-            'objective': u'An objective 3',
-            'title': u'Exploration 3 Albert title',
+            'objective': 'An objective 3',
+            'title': 'Exploration 3 Albert title',
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
 
@@ -1130,12 +1182,12 @@ class CollectionNodeMetadataDictsTest(
 
         expected_metadata_dicts = [{
             'id': self.EXP_ID3,
-            'objective': u'An objective 3',
-            'title': u'Exploration 3 Albert title',
+            'objective': 'An objective 3',
+            'title': 'Exploration 3 Albert title',
         }, {
             'id': self.EXP_ID4,
-            'objective': u'An objective 4',
-            'title': u'Exploration 4 Bob title',
+            'objective': 'An objective 4',
+            'title': 'Exploration 4 Bob title',
         }]
 
         self.assertEqual(metadata_dicts, expected_metadata_dicts)

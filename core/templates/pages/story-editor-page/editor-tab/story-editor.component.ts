@@ -27,7 +27,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {AlertsService} from 'services/alerts.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StoryNode} from 'domain/story/story-node.model';
 import {StoryEditorNavigationService} from '../services/story-editor-navigation.service';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
@@ -81,6 +80,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
       startupFocusEnabled: false,
     },
   };
+  generatedUrlPrefix: string;
 
   constructor(
     private alertsService: AlertsService,
@@ -109,6 +109,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
 
   hostname = this.windowRef.nativeWindow.location.hostname;
   TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
+  validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
 
   _init(): void {
     this.story = this.storyEditorStateService.getStory();
@@ -185,6 +186,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   }
 
   _initEditor(): void {
+    this.generatedUrlPrefix = `${this.hostname}/learn/${this.getClassroomUrlFragment()}/${this.getTopicUrlFragment()}/story`;
     this.story = this.storyEditorStateService.getStory();
     if (this.story) {
       this.storyContents = this.story.getStoryContents();
@@ -268,6 +270,11 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
           // No further action is needed.
         }
       );
+  }
+
+  onStoryEditorUrlFragmentChange(urlFragment: string): void {
+    this.editableUrlFragment = urlFragment;
+    this.updateStoryUrlFragment(urlFragment);
   }
 
   createNode(): void {
@@ -397,6 +404,9 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
             this.story,
             newUrlFragment
           );
+        },
+        () => {
+          return;
         }
       );
     } else {
@@ -523,10 +533,3 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStoryEditor',
-  downgradeComponent({
-    component: StoryEditorComponent,
-  })
-);

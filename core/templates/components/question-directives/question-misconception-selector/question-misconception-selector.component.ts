@@ -22,7 +22,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {
   Misconception,
   MisconceptionSkillMap,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 
 interface UpdatedValues {
   misconception: Misconception;
@@ -50,7 +50,9 @@ export class QuestionMisconceptionSelectorComponent implements OnInit {
   constructor(private stateEditorService: StateEditorService) {}
 
   ngOnInit(): void {
-    this.misconceptionFeedbackIsUsed = true;
+    if (this.misconceptionFeedbackIsUsed !== false) {
+      this.misconceptionFeedbackIsUsed = true;
+    }
     this.misconceptionsBySkill =
       this.stateEditorService.getMisconceptionsBySkill();
   }
@@ -68,5 +70,11 @@ export class QuestionMisconceptionSelectorComponent implements OnInit {
 
   toggleMisconceptionFeedbackUsage(): void {
     this.misconceptionFeedbackIsUsed = !this.misconceptionFeedbackIsUsed;
+    let updatedValues = {
+      misconception: this.selectedMisconception,
+      skillId: this.selectedMisconceptionSkillId,
+      feedbackIsUsed: this.misconceptionFeedbackIsUsed,
+    };
+    this.updateMisconceptionValues.emit(updatedValues);
   }
 }

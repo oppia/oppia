@@ -1,0 +1,53 @@
+name: Generate build files
+description: 'Generate build files'
+runs:
+  using: composite
+  steps:
+    - name: Attempt to download build files
+      id: download_artifact
+      uses: actions/download-artifact@v4
+      continue-on-error: true
+      with:
+        name: cached_build_files
+        path: /home/runner/work/oppia
+    - name: Unzip build files
+      if: steps.download_artifact.outcome != 'failure'
+      run: |
+        echo "Successfully downloaded build files"
+        pwd
+        ls -la
+        unzip build_files.zip
+        rm build_files.zip
+        echo "Files in ./:"
+        ls -la .
+        echo "Files in oppia_tools:"
+        ls -la oppia_tools
+        echo "Files in oppia:"
+        ls -la oppia
+        echo "Files in build:"
+        ls -la oppia/build
+        echo "Files in third_party:"
+        ls -la oppia/third_party
+      working-directory: /home/runner/work/oppia
+      shell: bash
+    - name: Build Webpack
+      if: steps.download_artifact.outcome == 'failure'
+      run: |
+        echo "Failed to download build files. Regenerating."
+        python -m scripts.build --prod_env
+      shell: bash
+    - name: Zip build files
+      # We avoid using ../ or absolute paths because unzip treats these as
+      # security issues and will refuse to follow them.
+      run: |
+        zip -rqy build_files.zip oppia/build oppia/webpack_bundles oppia/app.yaml oppia/assets/hashes.json oppia/backend_prod_files oppia/dist oppia/third_party/generated
+      working-directory: /home/runner/work/oppia
+      shell: bash
+    - name: Upload build files artifact
+      if: steps.download_artifact.outcome == 'failure'
+      uses: actions/upload-artifact@v4
+      with:
+        name: cached_build_files
+        path: /home/runner/work/oppia/build_files.zip
+        retention-days: 7
+        overwrite: true

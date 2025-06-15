@@ -24,45 +24,29 @@ fi
 OS_NAME=$(uname)
 echo "Installing Node.js..."
 
-# We need to check for Msys because, from Windows 11 uname returns Msys instead of Windows.
-if [ "$OS_NAME" = "Windows" ] || [ $(uname -o) = "Msys" ]; then
-    if [ "$(uname -m)" = "x86_64" ]; then
-        architecture=x64
+if [ "$(getconf LONG_BIT)" = "64" ] || [ "$(uname -m)" = "x86_64" ]; then
+    if [ "$OS_NAME" = "Darwin" ]; then
+        node_file_name="node-v16.13.0-darwin-x64"
+    elif [ "$OS_NAME" = "Linux" ]; then
+        node_file_name="node-v16.13.0-linux-x64"
     else
-        architecture=x86
+        echo "System's Operating System is not compatible."
+        exit 1
     fi
-    extension=".zip"
-    node_file_name="node-v16.13.0-win-$architecture"
-    url_to_retrieve="https://nodejs.org/dist/v16.13.0/$node_file_name$extension"
-    curl -o node-download.zip "$url_to_retrieve"
-    powershell.exe -c "Expand-Archive -Path node-download.zip -DestinationPath ../oppia_tools"
-    rm node-download.zip
 else
-    extension=".tar.gz"
-    if [ "$(python -c 'import sys; print(sys.maxsize > 2**32)')" = "True" ] || [ "$(uname -m)" = "x86_64" ]; then
-        if [ "$OS_NAME" = "Darwin" ]; then
-            node_file_name="node-v16.13.0-darwin-x64"
-        elif [ "$OS_NAME" = "Linux" ]; then
-            node_file_name="node-v16.13.0-linux-x64"
-        else
-            echo "System's Operating System is not compatible."
-            exit 1
-        fi
-    else
-        node_file_name="node-v16.13.0"
-    fi
-    curl -o node-download "https://nodejs.org/dist/v16.13.0/$node_file_name$extension"
-    mkdir -p ../oppia_tools
-    tar -xvf node-download -C ../oppia_tools
-    rm node-download
+    node_file_name="node-v16.13.0"
+fi
+curl -o node-download "https://nodejs.org/dist/v16.13.0/$node_file_name.tar.gz"
+mkdir -p ../oppia_tools
+tar -xvf node-download -C ../oppia_tools
+rm node-download
 
-    # Build node.js if it is installed using source code (more info https://github.com/nodejs/node/blob/v16.x/BUILDING.md#building-nodejs-1).
-    # The process of building from source code is intended for non-x64 Linux/Darwin systems.
-    if [ "$node_file_name" = "node-v16.13.0" ]; then
-        cd ../oppia_tools/node-16.13.0
-        ./configure
-        make
-    fi
+# Build node.js if it is installed using source code (more info https://github.com/nodejs/node/blob/v16.x/BUILDING.md#building-nodejs-1).
+# The process of building from source code is intended for non-x64 Linux/Darwin systems.
+if [ "$node_file_name" = "node-v16.13.0" ]; then
+    cd ../oppia_tools/node-16.13.0
+    ./configure
+    make
 fi
 
 # Rename node directory to node-16.13.0.

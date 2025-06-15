@@ -136,10 +136,9 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model.delete()
         all_models = base_models.BaseModel.get_all()
         self.assertEqual(all_models.count(), 0)
-        self.assertEqual(model_id, 4)
         with self.assertRaisesRegex(
             base_models.BaseModel.EntityNotFoundError,
-            'Entity for class BaseModel with id 4 not found'
+            f'Entity for class BaseModel with id {model_id} not found'
         ):
             model.get(model_id)
 

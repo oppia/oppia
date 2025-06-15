@@ -1,0 +1,55 @@
+<a [href]="classroomUrl" target="_self"
+  [ngClass]="'mb-4 oppia-learner-dash-button-lg oppia-learner-dash-button--' + variant">
+  <span class="fas fa-arrow-right"></span>
+  {{ 'I18N_LEARNER_DASHBOARD_HOME_CLASSROOM_SECTION_LINK' | translate }}
+</a>
+
+<style>
+  .oppia-learner-dash-button-lg {
+    align-items: center;
+    border: 1px solid;
+    border-radius: 4px;
+    display: inline-flex;
+    font-weight: 700;
+    gap: 0 4px;
+    justify-content: center;
+    max-width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    text-decoration: none;
+    transition: all 300ms ease-out;
+    width: 344px;
+  }
+
+  .oppia-learner-dash-button-lg:hover {
+    text-decoration: none;
+  }
+
+  .oppia-learner-dash-button-lg:focus {
+    text-decoration: none;
+  }
+
+  @media screen and (max-width: 500px) {
+    .oppia-learner-dash-button-lg {
+      padding: 10px 8px;
+    }
+  }
+
+  .oppia-learner-dash-button--blue {
+    background-color: #fff;
+    border-color: #205d86;
+    color: #205d86;
+  }
+
+  .oppia-learner-dash-button--blue:hover {
+    background-color: #cadbda;
+    border-color: #205d86;
+    color: #205d86;
+  }
+
+  .oppia-learner-dash-button--blue:focus {
+    background-color: #429488;
+    border-color: #205d86;
+    color: #fff;
+  }
+</style>

@@ -27,6 +27,7 @@ import {FeatureFlagDomainConstants} from 'domain/feature-flag/feature-flag-domai
 import {FeatureFlag} from 'domain/feature-flag/feature-flag.model';
 import {FeatureStage} from 'domain/platform-parameter/platform-parameter.model';
 import {FeatureStatusSummary} from 'domain/feature-flag/feature-status-summary.model';
+import {UserGroup} from 'domain/release_coordinator/user-group.model';
 
 describe('FeatureFlagBackendApiService', () => {
   let httpTestingController: HttpTestingController;
@@ -44,6 +45,13 @@ describe('FeatureFlagBackendApiService', () => {
       },
     ],
     server_stage: 'dev',
+    user_group_dicts: [
+      {
+        user_group_id: 'userGroupId1',
+        name: 'UserGroup1',
+        member_usernames: ['User1', 'User2', 'User3'],
+      },
+    ],
   };
 
   beforeEach(() => {
@@ -68,6 +76,9 @@ describe('FeatureFlagBackendApiService', () => {
         FeatureFlag.createFromBackendDict(dict)
       ),
       serverStage: featureFlagsResponse.server_stage,
+      userGroups: featureFlagsResponse.user_group_dicts.map(dict =>
+        UserGroup.createFromBackendDict(dict)
+      ),
     };
     featureFlagBackendApiService
       .getFeatureFlags()

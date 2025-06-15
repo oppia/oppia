@@ -23,6 +23,8 @@ import hashlib
 import logging
 
 from core import feconf
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.platform import models
 
 import mailchimp3
@@ -74,7 +76,11 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
         logging.error('Mailchimp API key is not available.')
         return None
 
-    if not feconf.MAILCHIMP_USERNAME:
+    mailchimp_username = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.MAILCHIMP_USERNAME.value))
+    assert isinstance(mailchimp_username, str)
+    if not mailchimp_username:
         logging.error('Mailchimp username is not set.')
         return None
 
@@ -82,7 +88,7 @@ def _get_mailchimp_class() -> Optional[mailchimp3.MailChimp]:
     # username and hence cannot be tested directly. The mailchimp functions are
     # tested with a mock class.
     return mailchimp3.MailChimp(    # pragma: no cover
-        mc_api=mailchimp_api_key, mc_user=feconf.MAILCHIMP_USERNAME)
+        mc_api=mailchimp_api_key, mc_user=mailchimp_username)
 
 
 def _create_user_in_mailchimp_db(
@@ -111,8 +117,12 @@ def _create_user_in_mailchimp_db(
             mailchimp API.
     """
     try:
+        mailchimp_audience_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value))
+        assert isinstance(mailchimp_audience_id, str)
         client.lists.members.create(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscribed_mailchimp_data)
+            mailchimp_audience_id, subscribed_mailchimp_data)
     except mailchimpclient.MailChimpError as error:
         error_message = ast.literal_eval(str(error))
         # This is the specific error message returned for the case where the
@@ -146,14 +156,18 @@ def permanently_delete_user_from_list(user_email: str) -> None:
     """
     client = _get_mailchimp_class()
     if not client:
-        return None
-    subscriber_hash = _get_subscriber_hash(user_email)
+        return
 
+    subscriber_hash = _get_subscriber_hash(user_email)
     try:
+        mailchimp_audience_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value))
+        assert isinstance(mailchimp_audience_id, str)
         client.lists.members.get(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
+            mailchimp_audience_id, subscriber_hash)
         client.lists.members.delete_permanent(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
+            mailchimp_audience_id, subscriber_hash)
     except mailchimpclient.MailChimpError as error:
         # This has to be done since the message can only be accessed from
         # MailChimpError by error.message in Python2, but this is deprecated in
@@ -201,6 +215,9 @@ def add_or_update_user_status(
 
     Raises:
         Exception. Raised if the tag or merge fields are invalid.
+        MailChimpError. Raised if MailChimp throws an error besides a 404 error
+            for a missing user. Should be caught by outer try-except block so
+            long as the error thrown by MailChimp inherits from Exception.
     """
     client = _get_mailchimp_class()
     if not client:
@@ -266,42 +283,53 @@ def add_or_update_user_status(
                 merge_fields['NAME'])
 
     try:
-        client.lists.members.get(
-            feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash)
+        try:
+            mailchimp_audience_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID.value))
+            assert isinstance(mailchimp_audience_id, str)
+            client.lists.members.get(
+                mailchimp_audience_id, subscriber_hash)
 
-        # If member is already added to mailchimp list, we cannot permanently
-        # delete a list member, since they cannot be programmatically added
-        # back, so we change their status based on preference.
-        if can_receive_email_updates:
-            client.lists.members.tags.update(
-                feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash, tag_data)
-            client.lists.members.update(
-                feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,
-                subscribed_mailchimp_data)
-        else:
-            client.lists.members.update(
-                feconf.MAILCHIMP_AUDIENCE_ID, subscriber_hash,
-                unsubscribed_mailchimp_data)
-
-    except Exception as error:
-        # This has to be done since the message can only be accessed from
-        # MailChimpError by error.message in Python2, but this is deprecated in
-        # Python3.
-        # In Python3, the message can be accessed directly by KeyError
-        # (https://github.com/VingtCinq/python-mailchimp/pull/65), so as a
-        # workaround for Python2, the 'message' attribute is obtained by
-        # str() and then it is converted to dict. This works in Python3 as well.
-        error_message = ast.literal_eval(str(error))
-        # Error 404 corresponds to 'User does not exist'.
-        if error_message['status'] == 404:
+            # If member is already added to mailchimp list, we cannot
+            # permanently delete a list member, since they cannot be
+            # programmatically added back, so we change their status based on
+            # preference.
             if can_receive_email_updates:
-                user_creation_successful = _create_user_in_mailchimp_db(
-                    client, new_user_mailchimp_data)
-                if not user_creation_successful:
-                    return False
-        else:
-            logging.error(
-                'Mailchimp error prevented email signup: %s',
-                error_message['detail'])
-            return False
+                client.lists.members.tags.update(
+                    mailchimp_audience_id, subscriber_hash, tag_data)
+                client.lists.members.update(
+                    mailchimp_audience_id, subscriber_hash,
+                    subscribed_mailchimp_data)
+            else:
+                client.lists.members.update(
+                    mailchimp_audience_id, subscriber_hash,
+                    unsubscribed_mailchimp_data)
+        except mailchimpclient.MailChimpError as mailchimp_err:
+            # This has to be done since the message can only be accessed from
+            # MailChimpError by error.message in Python2, but this is deprecated
+            # in Python3.  In Python3, the message can be accessed directly by
+            # KeyError (https://github.com/VingtCinq/python-mailchimp/pull/65),
+            # so as a workaround for Python2, the 'message' attribute is
+            # obtained by str() and then it is converted to dict. This works in
+            # Python3 as well.
+            error_message = ast.literal_eval(str(mailchimp_err))
+            # Error 404 corresponds to 'User does not exist'.
+            if error_message['status'] == 404:
+                if can_receive_email_updates:
+                    user_creation_successful = _create_user_in_mailchimp_db(
+                        client, new_user_mailchimp_data)
+                    if not user_creation_successful:
+                        return False
+            else:
+                raise mailchimp_err
+    except Exception as error:
+        # If our MailChimp operations fail for any reason, we want to still let
+        # the user complete their operation (e.g. signing-up for Oppia), so we
+        # log the error message and return False so that the caller can surface
+        # an error message to the user. Note that this is also where we handle
+        # the non-404 errors caught in the preceding try-except block, since
+        # those errors are re-raised in the preceding except block.
+        logging.error('Mailchimp error prevented email signup: %s', error)
+        return False
     return True

@@ -47,13 +47,13 @@
                           [addState]="addState.bind(this)"
                           [interactionIsShown]="interactionIsShown"
                           [explorationIsLinkedToStory]="explorationIsLinkedToStory"
-                          [stateContentShouldStayVisibleOnScroll]="false"
                           (onSaveStateContent)="saveStateContent($event)"
                           (onSaveNextContentIdIndex)="saveNextContentIdIndex()"
                           (onSaveInteractionData)="saveInteractionData($event)"
                           (onSaveInteractionDefaultOutcome)="saveInteractionDefaultOutcome($event)"
                           (onSaveInteractionAnswerGroups)="saveInteractionAnswerGroups($event)"
                           (onSaveLinkedSkillId)="saveLinkedSkillId($event)"
+                          (onSaveInapplicableSkillMisconceptionIds)="saveInapplicableSkillMisconceptionIds($event)"
                           (onSaveSolution)="saveSolution($event)"
                           (onSaveHints)="saveHints($event)"
                           (onSaveSolicitAnswerDetails)="saveSolicitAnswerDetails($event)"
@@ -106,11 +106,11 @@
       display: none;
     }
   }
-  md-checkbox.checkpoint-selection-checkbox.md-icon {
+  mat-checkbox.checkpoint-selection-checkbox.md-icon {
     border-color: #0d48a1;
     top: 2px;
   }
-  md-checkbox.checkpoint-selection-checkbox.md-checked .md-icon {
+  mat-checkbox.checkpoint-selection-checkbox.md-checked .md-icon {
     background-color: rgba(71, 151, 136, 1);
   }
 </style>

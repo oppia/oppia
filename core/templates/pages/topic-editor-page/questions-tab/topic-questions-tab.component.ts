@@ -27,7 +27,6 @@ import {Subscription} from 'rxjs';
 import {QuestionsListService} from 'services/questions-list.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 
@@ -44,6 +43,9 @@ export class TopicQuestionsTabComponent
   skillIdToRubricsObject!: object;
   allSkillSummaries!: ShortSkillSummary[];
   canEditQuestion!: boolean;
+  questionEditorOpened: boolean = false;
+  newQuestionEditor: boolean = false;
+  selectedSkillName!: string;
   selectedSkillId!: string;
   getSkillsCategorizedByTopics!: CategorizedSkills;
   getUntriagedSkillSummaries!: SkillSummary[];
@@ -81,6 +83,17 @@ export class TopicQuestionsTabComponent
         this.getUntriagedSkillSummaries = response.untriagedSkillSummaries;
       });
     this.canEditQuestion = this.topicRights.canEditTopic();
+    this.questionEditorOpened =
+      this.topicEditorStateService.isQuestionEditorOpened();
+    this.newQuestionEditor = this.topicEditorStateService.isNewQuestionEditor();
+    this.selectedSkillName = this.topicEditorStateService.getSelectedSkillName(
+      this.selectedSkillId,
+      this.allSkillSummaries
+    );
+  }
+
+  getEditorAction(): string {
+    return this.newQuestionEditor ? 'Creating new' : 'Editing';
   }
 
   reinitializeQuestionsList(skillId: string): void {
@@ -108,17 +121,16 @@ export class TopicQuestionsTabComponent
         this._initTab()
       )
     );
+    this.directiveSubscriptions.add(
+      this.topicEditorStateService.onQuestionEditorOpened.subscribe(() =>
+        this._initTab()
+      )
+    );
     this._initTab();
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    this.topicEditorStateService.toggleQuestionEditor(false);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTopicQuestionsTab',
-  downgradeComponent({
-    component: TopicQuestionsTabComponent,
-  }) as angular.IDirectiveFactory
-);

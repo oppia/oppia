@@ -1,0 +1,4 @@
+core/templates/pages/skill-editor-page/skill-editor-page.module.ts
+core/templates/pages/topic-editor-page/topic-editor-page.module.ts
+core/templates/pages/topic-viewer-page/topic-viewer-page.module.ts
+core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module.ts

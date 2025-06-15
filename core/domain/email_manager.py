@@ -27,7 +27,6 @@ from core.constants import constants
 from core.domain import change_domain
 from core.domain import email_services
 from core.domain import html_cleaner
-from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
 from core.domain import platform_parameter_services
@@ -108,57 +107,6 @@ REMOVED_CD_USER_EMAIL_DATA: Dict[str, Dict[str, str]] = {
     }
 }
 
-EMAIL_SENDER_NAME: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
-        'The default sender name for outgoing emails.',
-        platform_parameter_domain.DataTypes.STRING,
-        default='Site Admin'
-    )
-)
-
-EMAIL_FOOTER: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.EMAIL_FOOTER,
-        'The footer to append to all outgoing emails. (This should '
-        'be written in HTML and include an unsubscribe link.)',
-        platform_parameter_domain.DataTypes.STRING,
-        default=(
-            'You can change your email preferences via the '
-            '<a href="%s%s">Preferences</a> page.' % (
-                feconf.OPPIA_SITE_URL, feconf.PREFERENCES_URL)
-        )
-    )
-)
-
-_PLACEHOLDER_SUBJECT: Final = 'THIS IS A PLACEHOLDER.'
-_PLACEHOLDER_HTML_BODY: Final = (
-    'THIS IS A <b>PLACEHOLDER</b> AND SHOULD BE REPLACED.'
-)
-
-SIGNUP_EMAIL_SUBJECT_CONTENT: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
-        'Content of email sent after a new user signs up. Set the email '
-        'subject. These emails are only sent if the functionality is enabled '
-        'in feconf.py.',
-        platform_parameter_domain.DataTypes.STRING,
-        default=_PLACEHOLDER_SUBJECT
-    )
-)
-
-SIGNUP_EMAIL_BODY_CONTENT: platform_parameter_domain.PlatformParameter = (
-    PlatformParameterRegistry.create_platform_parameter(
-        platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT,
-        'Content of email sent after a new user signs up. (The email body '
-        'should be written with HTML and not include a salutation or footer.) '
-        'These emails are only sent if the functionality is enabled in '
-        'feconf.py.',
-        platform_parameter_domain.DataTypes.STRING,
-        default=_PLACEHOLDER_HTML_BODY
-    )
-)
-
 EXPLORATION_ROLE_MANAGER: Final = 'manager rights'
 EXPLORATION_ROLE_EDITOR: Final = 'editor rights'
 EXPLORATION_ROLE_VOICE_ARTIST: Final = 'voice artist rights'
@@ -181,36 +129,21 @@ _EDITOR_ROLE_EMAIL_HTML_RIGHTS: Dict[str, str] = {
 # We don't include "can_voiceover" for managers and editors, since this is
 # implied by the email description for "can_edit".
 EDITOR_ROLE_EMAIL_RIGHTS_FOR_ROLE: Dict[str, str] = {
-    EXPLORATION_ROLE_MANAGER: (
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
-    EXPLORATION_ROLE_EDITOR: (
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
-    EXPLORATION_ROLE_VOICE_ARTIST: (
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_voiceover'] +
-        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']),
+    EXPLORATION_ROLE_MANAGER: ('%s%s%s' % (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_manage'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
+    ),
+    EXPLORATION_ROLE_EDITOR: ('%s%s' % (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_edit'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
+    ),
+    EXPLORATION_ROLE_VOICE_ARTIST: ('%s%s' % (
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_voiceover'],
+        _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play'])
+    ),
     EXPLORATION_ROLE_PLAYTESTER: _EDITOR_ROLE_EMAIL_HTML_RIGHTS['can_play']
 }
-
-UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY: (
-    platform_parameter_domain.PlatformParameter) = (
-        PlatformParameterRegistry.create_platform_parameter(
-            (
-                platform_parameter_list.ParamName.
-                UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY
-            ),
-            'Default content for the email sent after an exploration is '
-            'unpublished by a moderator. These emails are only sent if the '
-            'functionality is enabled in feconf.py. Leave this field blank '
-            'if emails should not be sent.',
-            platform_parameter_domain.DataTypes.STRING,
-            default=(
-                'I\'m writing to inform you that I have unpublished the above '
-                'exploration.')
-        )
-    )
 
 CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     'email_body_template': (
@@ -242,13 +175,11 @@ CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     ),
     'upcoming_chapters_template': (
         'The following stories have unpublished chapters which are due for '
-        'publication in the next ' +
-        str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)
-        + ' days. Please ensure they are published '
+        'publication in the next %s days. Please ensure they are published '
         'on or before the planned date or adjust the planned publication date.'
         '<br><br>'
-        '<ol>%s</ol>'
-    ),
+        '<ol>%%s</ol>'
+    ) % constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS,
     'email_subject': 'Chapter Publication Notifications'
 }
 
@@ -314,8 +245,8 @@ ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA: Dict[str, str] = {
     'question_template': (
         'There have been <b>question suggestions</b> created on the '
         '<a href="%s%s">Contributor Dashboard page</a> where there are not '
-        'enough reviewers.<br><br>' % (
-            feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_URL))
+        'enough reviewers.<br><br>'
+    )
 }
 
 ADMIN_NOTIFICATION_FOR_SUGGESTIONS_NEEDING_REVIEW_EMAIL_DATA: Dict[str, str] = {
@@ -501,14 +432,10 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
         user_services.is_curriculum_admin),
     feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.BULK_EMAIL_INTENT_ML_JOB_FAILURE: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_TEST: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
-    feconf.EMAIL_INTENT_ML_JOB_FAILURE: (
-        lambda x: x == feconf.SYSTEM_COMMITTER_ID)
 }
 
 
@@ -561,7 +488,8 @@ def _send_email(
     sender_email: str,
     bcc_admin: bool = False,
     sender_name: Optional[str] = None,
-    recipient_email: Optional[str] = None
+    recipient_email: Optional[str] = None,
+    attachments: Optional[List[Dict[str, str]]] = None
 ) -> None:
     """Sends an email to the given recipient.
 
@@ -586,12 +514,15 @@ def _send_email(
             This should only be used when the user with user_id equal to
             recipient_id does not exist or is deleted and their email cannot be
             retrieved via get_email_from_user_id.
+        attachments: list(dict)|None. Optional argument. A list of
+            dictionaries, where each dictionary includes the keys `filename`
+            and `path` with their corresponding values.
     """
 
     if sender_name is None:
         email_sender_name = (
             platform_parameter_services.get_platform_parameter_value(
-                EMAIL_SENDER_NAME.name)
+                platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value)
         )
         assert isinstance(email_sender_name, str)
         sender_name = email_sender_name
@@ -632,7 +563,8 @@ def _send_email(
 
         email_services.send_mail(
             sender_name_email, recipient_email_address, email_subject,
-            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin)
+            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin,
+            attachments=attachments)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email_address, sender_id, sender_name_email,
             intent, email_subject, cleaned_html_body, datetime.datetime.utcnow()
@@ -649,7 +581,8 @@ def _send_bulk_mail(
     email_html_body: str,
     sender_email: str,
     sender_name: str,
-    instance_id: str
+    instance_id: str,
+    attachments: Optional[List[Dict[str, str]]] = None
 ) -> None:
     """Sends an email to all given recipients.
 
@@ -663,6 +596,9 @@ def _send_bulk_mail(
         sender_name: str. The name to be shown in the "sender" field of the
             email.
         instance_id: str. The ID of the BulkEmailModel entity instance.
+        attachments: list(dict)|None. Optional argument. A list of
+            dictionaries, where each dictionary includes the keys `filename`
+            and `path` with their corresponding values.
     """
     require_sender_id_is_valid(intent, sender_id)
 
@@ -694,38 +630,13 @@ def _send_bulk_mail(
 
         email_services.send_bulk_mail(
             sender_name_email, recipient_emails, email_subject,
-            cleaned_plaintext_body, cleaned_html_body)
+            cleaned_plaintext_body, cleaned_html_body, attachments)
 
         email_models.BulkEmailModel.create(
             instance_id, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
     _send_bulk_mail_transactional(instance_id)
-
-
-def send_job_failure_email(job_id: str) -> None:
-    """Sends an email to admin regarding the ML job failure.
-
-    Args:
-        job_id: str. The Job ID of the failing job.
-    """
-    mail_subject = 'Failed ML Job'
-    mail_body = ((
-        'ML job %s has failed. For more information,'
-        'please visit the admin page at:\n'
-        'https://www.oppia.org/admin#/jobs') % job_id)
-    admin_user_settings = user_services.get_user_settings_from_email(
-        feconf.ADMIN_EMAIL_ADDRESS)
-    # Rulling out the possibility of admin_user_settings is None for
-    # the mypy checks.
-    assert admin_user_settings is not None
-    _send_email(
-        admin_user_settings.user_id, feconf.SYSTEM_COMMITTER_ID,
-        feconf.EMAIL_INTENT_ML_JOB_FAILURE,
-        mail_subject, mail_body,
-        feconf.SYSTEM_EMAIL_ADDRESS, False,
-        feconf.SYSTEM_EMAIL_NAME
-    )
 
 
 def send_dummy_mail_to_admin(username: str) -> None:
@@ -738,11 +649,19 @@ def send_dummy_mail_to_admin(username: str) -> None:
     email_body = 'This is a test mail from %s.' % (username)
     email_subject = 'Test Mail'
     system_name_email = '%s <%s>' % (
-        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME.value),
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+    admin_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+    assert isinstance(admin_email_address, str)
 
     email_services.send_mail(
-        system_name_email, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
-        email_body, email_body.replace('\n', '<br/>'), bcc_admin=False)
+        system_name_email, admin_email_address,
+        email_subject, email_body, email_body.replace('\n', '<br/>'),
+        bcc_admin=False)
 
 
 def send_mail_to_admin(email_subject: str, email_body: str) -> None:
@@ -758,10 +677,17 @@ def send_mail_to_admin(email_subject: str, email_body: str) -> None:
     app_id = app_identity_services.get_application_id()
     body = '(Sent from %s)\n\n%s' % (app_id, email_body)
     system_name_email = '%s <%s>' % (
-        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME.value),
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+    admin_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+    assert isinstance(admin_email_address, str)
     email_services.send_mail(
-        system_name_email, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
-        body, body.replace('\n', '<br/>'), bcc_admin=False)
+        system_name_email, admin_email_address,
+        email_subject, body, body.replace('\n', '<br/>'), bcc_admin=False)
 
 
 def send_post_signup_email(
@@ -771,39 +697,54 @@ def send_post_signup_email(
     """Sends a post-signup email to the given user.
 
     Raises an exception if emails are not allowed to be sent to users (i.e.
-    feconf.CAN_SEND_EMAILS is False).
+    SERVER_CAN_SEND_EMAILS platform parameter is False).
 
     Args:
         user_id: str. User ID of the user that signed up.
         test_for_duplicate_email: bool. For testing duplicate emails.
     """
 
+    email_subject_content_param_name = (
+        platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT.value
+    )
     email_subject_content = (
         platform_parameter_services.get_platform_parameter_value(
-            SIGNUP_EMAIL_SUBJECT_CONTENT.name)
+            email_subject_content_param_name)
     )
     # Here we use assert because the get_platform_parameter_value returns
     # value of type platform_parameter_domain.PlatformDataTypes and we
     # are sure that email_subject_content is of type str. This helps us
     # avoid the mypy error.
     assert isinstance(email_subject_content, str)
+    email_body_content_param_name = (
+        platform_parameter_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT.value
+    )
     email_body_content = (
         platform_parameter_services.get_platform_parameter_value(
-            SIGNUP_EMAIL_BODY_CONTENT.name)
+            email_body_content_param_name)
     )
+    assert isinstance(email_body_content, str)
     if not test_for_duplicate_email:
         email_subject_content_default_value = (
-            SIGNUP_EMAIL_SUBJECT_CONTENT.default_value)
+            platform_parameter_registry.Registry.get_platform_parameter(
+                email_subject_content_param_name
+            ).default_value
+        )
         email_body_content_default_value = (
-            SIGNUP_EMAIL_BODY_CONTENT.default_value)
-        if email_subject_content_default_value == email_subject_content:
+            platform_parameter_registry.Registry.get_platform_parameter(
+                email_body_content_param_name
+            ).default_value
+        )
+        if not email_subject_content or (
+                email_subject_content_default_value == email_subject_content):
             logging.error(
                 'Please ensure that the value for the admin platform '
                 'property SIGNUP_EMAIL_SUBJECT_CONTENT is set, before allowing '
                 'post-signup emails to be sent.'
             )
             return
-        if email_body_content_default_value == email_body_content:
+        if not email_body_content or (
+                email_body_content_default_value == email_body_content):
             logging.error(
                 'Please ensure that the value for the admin platform '
                 'property SIGNUP_EMAIL_BODY_CONTENT is set, before allowing '
@@ -813,13 +754,17 @@ def send_post_signup_email(
 
     recipient_username = user_services.get_username(user_id)
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     email_body = 'Hi %s,<br><br>%s<br><br>%s' % (
         recipient_username, email_body_content, email_footer)
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
 
     _send_email(
         user_id, feconf.SYSTEM_COMMITTER_ID, feconf.EMAIL_INTENT_SIGNUP,
-        email_subject_content, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+        email_subject_content, email_body, noreply_email_address)
 
 
 def get_moderator_unpublish_exploration_email() -> str:
@@ -840,7 +785,8 @@ def get_moderator_unpublish_exploration_email() -> str:
 
     unpublish_exp_email_html_body = (
         platform_parameter_services.get_platform_parameter_value(
-            UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.name)
+            platform_parameter_list.ParamName.
+            UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value)
     )
     # Ruling out the possibility of Any for mypy type checking.
     assert isinstance(unpublish_exp_email_html_body, str)
@@ -851,18 +797,18 @@ def require_moderator_email_prereqs_are_satisfied() -> None:
     """Raises an exception if, for any reason, moderator emails cannot be sent.
 
     Raises:
-        ValidationError. The feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION is False.
-        ValidationError. The feconf.CAN_SEND_EMAILS is False.
+        ValidationError. The SERVER_CAN_SEND_EMAILS platform parameter is False.
     """
 
-    if not feconf.REQUIRE_EMAIL_ON_MODERATOR_ACTION:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         raise utils.ValidationError(
             'For moderator emails to be sent, please ensure that '
-            'REQUIRE_EMAIL_ON_MODERATOR_ACTION is set to True.')
-    if not feconf.CAN_SEND_EMAILS:
-        raise utils.ValidationError(
-            'For moderator emails to be sent, please ensure that '
-            'CAN_SEND_EMAILS is set to True.')
+            'SERVER_CAN_SEND_EMAILS is set to True.')
 
 
 def send_moderator_action_email(
@@ -876,7 +822,7 @@ def send_moderator_action_email(
     delete) to the given user.
 
     Raises an exception if emails are not allowed to be sent to users (i.e.
-    feconf.CAN_SEND_EMAILS is False).
+    SERVER_CAN_SEND_EMAILS platform parameter is False).
 
     Args:
         sender_id: str. User ID of the sender.
@@ -910,14 +856,18 @@ def send_moderator_action_email(
     assert callable(email_signoff_html_fn)
     email_signoff_html = email_signoff_html_fn(sender_username)
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     full_email_content = (
         '%s<br><br>%s<br><br>%s<br><br>%s' % (
             email_salutation_html, email_body, email_signoff_html,
             email_footer))
+    system_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+    assert isinstance(system_email_address, str)
     _send_email(
         recipient_id, sender_id, intent, email_subject, full_email_content,
-        feconf.SYSTEM_EMAIL_ADDRESS, bcc_admin=True)
+        system_email_address, bcc_admin=True)
 
 
 def send_role_notification_email(
@@ -971,12 +921,17 @@ def send_role_notification_email(
         '<br>%s')
 
     # Return from here if sending email is turned off.
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
     # Return from here is sending editor role email is disabled.
-    if not feconf.CAN_SEND_EDITOR_ROLE_EMAILS:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send editor role emails to users.')
         return
 
@@ -997,15 +952,19 @@ def send_role_notification_email(
 
     email_subject = email_subject_template % exploration_title
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     email_body = email_body_template % (
         recipient_username, inviter_username, role_description, exploration_id,
         exploration_title, rights_html, exploration_id, email_footer)
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
 
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body,
-        feconf.NOREPLY_EMAIL_ADDRESS, sender_name=inviter_username)
+        noreply_email_address, sender_name=inviter_username)
 
 
 def send_emails_to_subscribers(
@@ -1039,11 +998,16 @@ def send_emails_to_subscribers(
         '- The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
-    if not feconf.CAN_SEND_SUBSCRIPTION_EMAILS:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send subscription emails to users.')
         return
 
@@ -1054,18 +1018,22 @@ def send_emails_to_subscribers(
     )
     recipients_preferences = user_services.get_users_email_preferences(
         recipient_list)
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
     for index, username in enumerate(recipients_usernames):
         if recipients_preferences[index].can_receive_subscription_email:
             email_footer = (
                 platform_parameter_services.get_platform_parameter_value(
-                    EMAIL_FOOTER.name))
+                    platform_parameter_list.ParamName.EMAIL_FOOTER.value))
             email_body = email_body_template % (
                 username, creator_name, exploration_id,
                 exploration_title, email_footer)
             _send_email(
                 recipient_list[index], feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,
-                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+                email_subject, email_body, noreply_email_address)
 
 
 def send_feedback_message_email(
@@ -1102,11 +1070,16 @@ def send_feedback_message_email(
         'The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
-    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send feedback message emails to users.')
         return
 
@@ -1130,17 +1103,22 @@ def send_feedback_message_email(
         (count_messages, 's') if count_messages > 1 else ('a', ''))
 
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
 
     email_body = email_body_template % (
         recipient_username, count_messages if count_messages > 1
         else 'a', 's' if count_messages > 1 else '', messages_html,
         email_footer)
 
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
+
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION,
-        email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+        email_subject, email_body, noreply_email_address)
 
 
 def can_users_receive_thread_email(
@@ -1214,31 +1192,39 @@ def send_suggestion_email(
         '- The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
-    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send feedback message emails to users.')
         return
 
     author_username = user_services.get_username(author_id)
     can_users_receive_email = (
         can_users_receive_thread_email(recipient_list, exploration_id, True))
+    email_footer = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
     for index, recipient_id in enumerate(recipient_list):
         recipient_username = user_services.get_username(recipient_id)
         # Send email only if recipient wants to receive.
         if can_users_receive_email[index]:
-            email_footer = (
-                platform_parameter_services.get_platform_parameter_value(
-                    EMAIL_FOOTER.name))
             email_body = email_body_template % (
                 recipient_username, author_username, exploration_id,
                 exploration_title, exploration_id, email_footer)
             _send_email(
                 recipient_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
-                email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+                email_subject, email_body, noreply_email_address)
 
 
 def send_instant_feedback_message_email(
@@ -1274,11 +1260,16 @@ def send_instant_feedback_message_email(
         'The Oppia team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
-    if not feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS:
+    if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send feedback message emails to users.')
         return
 
@@ -1288,14 +1279,18 @@ def send_instant_feedback_message_email(
 
     if recipient_preferences.can_receive_feedback_message_email:
         email_footer = platform_parameter_services.get_platform_parameter_value(
-            EMAIL_FOOTER.name)
+            platform_parameter_list.ParamName.EMAIL_FOOTER.value)
         email_body = email_body_template % (
             recipient_username, thread_title, exploration_id,
             exploration_title, sender_username, message, email_footer)
+        noreply_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+        assert isinstance(noreply_email_address, str)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,
-            email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+            email_body, noreply_email_address)
 
 
 def send_flag_exploration_email(
@@ -1326,18 +1321,28 @@ def send_flag_exploration_email(
         '- The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
     reporter_username = user_services.get_username(reporter_id)
 
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
 
     email_body = email_body_template % (
         reporter_username, exploration_title, report_text, exploration_id,
         email_footer)
+
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
 
     recipient_list = user_services.get_user_ids_by_role(
         feconf.ROLE_ID_MODERATOR)
@@ -1345,7 +1350,7 @@ def send_flag_exploration_email(
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
-            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+            email_subject, email_body, noreply_email_address)
 
 
 def send_query_completion_email(recipient_id: str, query_id: str) -> None:
@@ -1372,13 +1377,17 @@ def send_query_completion_email(recipient_id: str, query_id: str) -> None:
 
     recipient_username = user_services.get_username(recipient_id)
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     email_body = email_body_template % (
         recipient_username, query_id, query_id, email_footer)
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION, email_subject,
-        email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+        email_body, noreply_email_address)
 
 
 def send_query_failure_email(
@@ -1408,13 +1417,17 @@ def send_query_failure_email(
 
     recipient_username = user_services.get_username(recipient_id)
     email_footer = platform_parameter_services.get_platform_parameter_value(
-        EMAIL_FOOTER.name)
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
     email_body = email_body_template % (
         recipient_username, query_id, email_footer)
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
     _send_email(
         recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION, email_subject,
-        email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+        email_body, noreply_email_address)
 
     admin_email_subject = 'Query job has failed.'
     admin_email_body_template = (
@@ -1507,7 +1520,12 @@ def send_mail_to_onboard_new_reviewers(
         '- The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -1518,13 +1536,17 @@ def send_mail_to_onboard_new_reviewers(
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
         email_footer = platform_parameter_services.get_platform_parameter_value(
-            EMAIL_FOOTER.name)
+            platform_parameter_list.ParamName.EMAIL_FOOTER.value)
         email_body = email_body_template % (
             recipient_username, category, category, email_footer)
+        noreply_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+        assert isinstance(noreply_email_address, str)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_ONBOARD_CD_USER,
-            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+            email_subject, email_body, noreply_email_address)
 
 
 def send_mail_to_notify_users_to_review(
@@ -1553,7 +1575,12 @@ def send_mail_to_notify_users_to_review(
         '- The Oppia Team<br>'
         '<br>%s')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -1564,13 +1591,17 @@ def send_mail_to_notify_users_to_review(
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
         email_footer = platform_parameter_services.get_platform_parameter_value(
-            EMAIL_FOOTER.name)
+            platform_parameter_list.ParamName.EMAIL_FOOTER.value)
         email_body = email_body_template % (
             recipient_username, category, email_footer)
+        noreply_email_address = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+        assert isinstance(noreply_email_address, str)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REVIEW_CREATOR_DASHBOARD_SUGGESTIONS,
-            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+            email_subject, email_body, noreply_email_address)
 
 
 def _create_html_for_reviewable_suggestion_email_info(
@@ -1661,7 +1692,12 @@ def send_mail_to_notify_admins_suggestions_waiting_long(
             content and review submission date. The objects are sorted in
             descending order based on review wait time.
     """
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -1751,6 +1787,15 @@ def _send_suggestions_waiting_too_long_email(
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
     ]))
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
+
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
 
     for index, admin_id in enumerate(admin_ids):
         if not admin_emails[index]:
@@ -1758,16 +1803,16 @@ def _send_suggestions_waiting_too_long_email(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
         email_body = email_body_template % (
-            curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+            curriculum_admin_usernames[index], oppia_site_url,
             feconf.CONTRIBUTOR_DASHBOARD_URL,
             suggestion_models.SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS,
-            feconf.OPPIA_SITE_URL, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
+            oppia_site_url, feconf.CONTRIBUTOR_DASHBOARD_ADMIN_URL,
             list_of_suggestion_descriptions)
 
         _send_email(
             admin_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
-            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
+            email_subject, email_body, noreply_email_address,
             recipient_email=admin_emails[index])
 
 
@@ -1784,9 +1829,19 @@ def send_reviewer_notifications(
         reviewer_ids_by_language: dict. A dictionary that organizes reviewer
             IDs by language code.
     """
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
+
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
 
     for language_code, suggestions in suggestions_by_language.items():
         reviewer_ids = reviewer_ids_by_language[language_code]
@@ -1799,14 +1854,14 @@ def send_reviewer_notifications(
         email_subject = 'Contributor Dashboard New Reviewer Opportunities'
         email_body_template = (
             'Hi %s,<br><br>'
-            'There are new <a href="%s%s">opportunities</a>' +
-            ' to review translations that we think you might be interested' +
-            ' in on the Contributor Dashboard page. Here are some examples' +
-            ' of contributions that are waiting for review:<br><br>' +
-            'The following suggestions are available for review: ' +
-            '<br><br><ul>%s</ul><br>Please take some time to review any ' +
-            'of the above contributions (if they still need a review)' +
-            ' or any other contributions on the dashboard.' +
+            'There are new <a href="%s%s">opportunities</a>'
+            ' to review translations that we think you might be interested'
+            ' in on the Contributor Dashboard page. Here are some examples'
+            ' of contributions that are waiting for review:<br><br>'
+            'The following suggestions are available for review: '
+            '<br><br><ul>%s</ul><br>Please take some time to review any '
+            'of the above contributions (if they still need a review)'
+            ' or any other contributions on the dashboard.'
             ' We appreciate your help!<br><br>Thanks again, '
             'and happy reviewing!<br><br>The Oppia Contributor Dashboard Team'
         )
@@ -1815,10 +1870,15 @@ def send_reviewer_notifications(
             suggestion_descriptions.append(
                 _create_html_for_reviewable_suggestion_email_info(suggestion))
 
+        noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+        assert isinstance(noreply_email_address, str)
+
         for reviewer_id in reviewer_ids:
             reviewer_username = user_services.get_username(reviewer_id)
             email_body = email_body_template % (
-                reviewer_username, feconf.OPPIA_SITE_URL,
+                reviewer_username, oppia_site_url,
                 feconf.CONTRIBUTOR_DASHBOARD_URL, ''.join(
                     suggestion_descriptions))
 
@@ -1828,9 +1888,7 @@ def send_reviewer_notifications(
             _send_email(
                 reviewer_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_ADDRESS_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
-                email_subject,
-                email_body,
-                feconf.NOREPLY_EMAIL_ADDRESS,
+                email_subject, email_body, noreply_email_address,
                 recipient_email=reviewer_email)
 
 
@@ -1861,7 +1919,12 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             would be a set of language codes that translations are offered in
             that need more reviewers.
     """
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -1886,6 +1949,11 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         logging.error('There were no admins to notify.')
         return
 
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
+
     if feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT in (
             suggestion_types_needing_reviewers):
         translation_suggestions_needing_reviewers_paragraphs = []
@@ -1900,7 +1968,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
                     'one_language_template'] % (
                         utils.get_supported_audio_language_description(
                             language_codes_that_need_reviewers.pop()),
-                        feconf.OPPIA_SITE_URL,
+                        oppia_site_url,
                         feconf.CONTRIBUTOR_DASHBOARD_URL))
 
         else:
@@ -1915,7 +1983,7 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
             translation_suggestions_needing_reviewers_paragraphs.append(
                 ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
                     'multi_language_template'] % (
-                        feconf.OPPIA_SITE_URL,
+                        oppia_site_url,
                         feconf.CONTRIBUTOR_DASHBOARD_URL,
                         html_for_languages_that_need_more_reviewers))
         translation_suggestions_needing_reviewers_html = ''.join(
@@ -1932,7 +2000,9 @@ def send_mail_to_notify_admins_that_reviewers_are_needed(
         question_suggestions_needing_reviewers_paragraphs = []
         question_suggestions_needing_reviewers_paragraphs.append(
             ADMIN_NOTIFICATION_FOR_REVIEWER_SHORTAGE_EMAIL_DATA[
-                'question_template'])
+                'question_template'] % (
+                    oppia_site_url, feconf.CONTRIBUTOR_DASHBOARD_URL
+                ))
         question_suggestions_needing_reviewers_html = ''.join(
             question_suggestions_needing_reviewers_paragraphs)
         user_ids = []
@@ -1966,20 +2036,28 @@ def _send_reviews_needed_email_to_admins(
         if admin_user_setting is not None else (None, None)
         for admin_user_setting in admin_user_settings
     ]))
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
 
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
     for index, admin_id in enumerate(admin_ids):
         if not admin_emails[index]:
             logging.error(
                 'There was no email for the given admin id: %s.' % admin_id)
             continue
         email_body = email_body_template % (
-            curriculum_admin_usernames[index], feconf.OPPIA_SITE_URL,
+            curriculum_admin_usernames[index], oppia_site_url,
             feconf.ADMIN_URL, suggestions_needing_reviewers_html)
 
         _send_email(
             admin_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
-            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
+            email_subject, email_body, noreply_email_address,
             recipient_email=admin_emails[index])
 
 
@@ -2009,7 +2087,12 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         CONTRIBUTOR_DASHBOARD_REVIEWER_NOTIFICATION_EMAIL_DATA[
             'email_body_template'])
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2035,6 +2118,18 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         for reviewer_user_setting in reviewer_user_settings
     ]))
 
+    email_footer = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.EMAIL_FOOTER.value)
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
+
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
+
     for index, reviewer_id in enumerate(reviewer_ids):
         if not reviewers_suggestion_email_infos[index]:
             logging.info(
@@ -2055,12 +2150,9 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
                 _create_html_for_reviewable_suggestion_email_info(
                     reviewer_suggestion_email_info))
 
-        email_footer = platform_parameter_services.get_platform_parameter_value(
-            EMAIL_FOOTER.name)
-
         email_body = email_body_template % (
             reviewer_usernames[index],
-            feconf.OPPIA_SITE_URL,
+            oppia_site_url,
             feconf.CONTRIBUTOR_DASHBOARD_URL,
             ''.join(suggestion_descriptions),
             email_footer
@@ -2069,7 +2161,7 @@ def send_mail_to_notify_contributor_dashboard_reviewers(
         _send_email(
             reviewer_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REVIEW_CONTRIBUTOR_DASHBOARD_SUGGESTIONS,
-            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
+            email_subject, email_body, noreply_email_address,
             recipient_email=reviewer_emails[index])
 
 
@@ -2084,7 +2176,12 @@ def send_mail_to_notify_contributor_ranking_achievement(
             ContributorMilestoneEmailInfo. An object with contributor ranking
             email information.
     """
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2093,6 +2190,11 @@ def send_mail_to_notify_contributor_ranking_achievement(
     can_user_receive_email = user_services.get_email_preferences(
         contributor_ranking_email_info.contributor_user_id
     ).can_receive_email_updates
+
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
 
     if can_user_receive_email:
         email_template = CONTRIBUTOR_RANK_ACHIEVEMENT_NOTIFICATION[
@@ -2111,23 +2213,27 @@ def send_mail_to_notify_contributor_ranking_achievement(
                     recipient_username,
                     contributor_ranking_email_info.rank_name,
                     language,
-                    feconf.OPPIA_SITE_URL,
+                    oppia_site_url,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
             )
         else:
             email_body = email_template['email_body_template'] % (
                     recipient_username,
                     contributor_ranking_email_info.rank_name,
-                    feconf.OPPIA_SITE_URL,
+                    oppia_site_url,
                     feconf.CONTRIBUTOR_DASHBOARD_URL
             )
+
+        noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+        assert isinstance(noreply_email_address, str)
 
         _send_email(
             contributor_ranking_email_info.contributor_user_id,
             feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS,
-            email_template['email_subject'], email_body,
-            feconf.NOREPLY_EMAIL_ADDRESS)
+            email_template['email_subject'], email_body, noreply_email_address)
 
 
 def send_reminder_mail_to_notify_curriculum_admins(
@@ -2143,7 +2249,12 @@ def send_reminder_mail_to_notify_curriculum_admins(
             of stories having behind-schedule or upcoming chapters to be
             notified.
     """
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
     if len(curriculum_admin_ids) == 0:
@@ -2160,14 +2271,21 @@ def send_reminder_mail_to_notify_curriculum_admins(
     chapters_are_upcoming = False
 
     overdue_stories_html = ''
+
+    oppia_site_url = platform_parameter_services.get_platform_parameter_value(
+        platform_parameter_list.ParamName.OPPIA_SITE_URL_FOR_EMAILS.value
+    )
+    assert isinstance(oppia_site_url, str)
+
     for overdue_story in chapter_notifications_list:
         if len(overdue_story.overdue_chapters) == 0:
             continue
         chapters_are_overdue = True
-        story_link = (
-            str(feconf.OPPIA_SITE_URL) +
-            str(feconf.STORY_EDITOR_URL_PREFIX) +
-            '/' + overdue_story.id)
+        story_link = ('%s%s/%s' % (
+            oppia_site_url,
+            str(feconf.STORY_EDITOR_URL_PREFIX),
+            overdue_story.id
+        ))
         story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
             overdue_story.story_name, overdue_story.topic_name,
             story_link)
@@ -2185,10 +2303,11 @@ def send_reminder_mail_to_notify_curriculum_admins(
         if len(upcoming_story.upcoming_chapters) == 0:
             continue
         chapters_are_upcoming = True
-        story_link = (
-            str(feconf.OPPIA_SITE_URL) +
-            str(feconf.STORY_EDITOR_URL_PREFIX) +
-            '/' + upcoming_story.id)
+        story_link = ('%s%s/%s' % (
+            oppia_site_url,
+            str(feconf.STORY_EDITOR_URL_PREFIX),
+            upcoming_story.id
+        ))
         story_html = '<li>%s (%s) - <a href="%s">Link</a><ul>' % (
             upcoming_story.story_name, upcoming_story.topic_name,
             story_link)
@@ -2203,13 +2322,22 @@ def send_reminder_mail_to_notify_curriculum_admins(
 
     email_body += 'Regards,<br> Oppia Foundation'
 
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
+    system_email_name = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME.value))
+    assert isinstance(system_email_name, str)
+
     if chapters_are_overdue or chapters_are_upcoming:
         bulk_email_model_id = email_models.BulkEmailModel.get_new_id('')
         _send_bulk_mail(
             curriculum_admin_ids, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS,
-            email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS,
-            feconf.SYSTEM_EMAIL_NAME, bulk_email_model_id)
+            email_subject, email_body, noreply_email_address, system_email_name,
+            bulk_email_model_id)
 
 
 def send_account_deleted_email(user_id: str, user_email: str) -> None:
@@ -2226,16 +2354,24 @@ def send_account_deleted_email(user_id: str, user_email: str) -> None:
         'Your account was successfully deleted.<br><br>'
         '- The Oppia Team')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
     email_body = email_body_template % user_email
+    noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+    assert isinstance(noreply_email_address, str)
     _send_email(
         user_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_ACCOUNT_DELETED, email_subject, email_body,
-        feconf.NOREPLY_EMAIL_ADDRESS, bcc_admin=True,
-        recipient_email=user_email)
+        noreply_email_address, bcc_admin=True, recipient_email=user_email)
 
 
 def send_account_deletion_failed_email(user_id: str, user_email: str) -> None:
@@ -2265,14 +2401,14 @@ def send_email_to_new_cd_user(
 
     Args:
         recipient_id: str. The ID of the user.
-        category: str. The category in which user can review or submit 
+        category: str. The category in which user can review or submit
             contributions.
-        language_code: None|str. The language code for a language if 
+        language_code: None|str. The language code for a language if
             the category is 'translation' else None.
 
     Raises:
         Exception. The contribution category is not valid.
-        Exception. The language_code cannot be None if the 
+        Exception. The language_code cannot be None if the
             category is 'translation'.
     """
     if category not in NEW_CD_USER_EMAIL_DATA:
@@ -2305,7 +2441,12 @@ def send_email_to_new_cd_user(
         rights_message = (
             category_data['rights_message'])
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2352,10 +2493,14 @@ def send_email_to_new_cd_user(
 
     # Send email only if recipient wants to receive.
     if can_user_receive_email:
+        noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+        assert isinstance(noreply_email_address, str)
         _send_email(
             recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_ONBOARD_CD_USER, email_subject, email_body,
-            feconf.NOREPLY_EMAIL_ADDRESS)
+            noreply_email_address)
 
 
 def send_email_to_removed_cd_user(
@@ -2363,12 +2508,12 @@ def send_email_to_removed_cd_user(
     category: str,
     language_code: Optional[str] = None
 ) -> None:
-    """Sends an email to user who is removed from a specific 
+    """Sends an email to user who is removed from a specific
         contributor position.
 
     Args:
         user_id: str. The ID of the user.
-        category: str. The category in which user can no longer review or 
+        category: str. The category in which user can no longer review or
             submit contributions.
         language_code: None|str. The language code for a language if the review
             item is translation else None.
@@ -2417,7 +2562,12 @@ def send_email_to_removed_cd_user(
         'Best wishes,<br>'
         'The Oppia Community')
 
-    if not feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if not server_can_send_emails:
         logging.error('This app cannot send emails to users.')
         return
 
@@ -2431,10 +2581,14 @@ def send_email_to_removed_cd_user(
             recipient_username, role_description,
             rights_message,
             category_data['category'])
+        noreply_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS.value))
+        assert isinstance(noreply_email_address, str)
         _send_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REMOVE_CD_USER, email_subject, email_body,
-            feconf.NOREPLY_EMAIL_ADDRESS)
+            noreply_email_address)
 
 
 def send_not_mergeable_change_list_to_admin_for_review(
@@ -2469,7 +2623,12 @@ def send_not_mergeable_change_list_to_admin_for_review(
         'Backend Version: %s<br><br>'
         'Thanks!')
 
-    if feconf.CAN_SEND_EMAILS:
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
+    if server_can_send_emails:
         email_body = email_body_template % (
             exp_id, change_list_dict, frontend_version, backend_version)
         send_mail_to_admin(email_subject, email_body)

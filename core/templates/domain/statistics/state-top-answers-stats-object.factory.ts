@@ -16,7 +16,6 @@
  * @fileoverview Domain object for state top answers stats.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -69,10 +68,3 @@ export class StateTopAnswersStatsObjectFactory {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StateTopAnswersStatsObjectFactory',
-    downgradeInjectable(StateTopAnswersStatsObjectFactory)
-  );

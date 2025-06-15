@@ -20,10 +20,9 @@
 import cloneDeep from 'lodash/cloneDeep';
 import {Observable} from 'rxjs';
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter, Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {
@@ -34,7 +33,7 @@ import {
   MultipleChoiceInputCustomizationArgs,
 } from 'extensions/interactions/customization-args-defs';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {State} from 'domain/state/StateObjectFactory';
@@ -70,6 +69,8 @@ export class StateEditorService {
   >();
 
   private _stateNamesChangedEventEmitter = new EventEmitter<void>();
+  private _updateMisconceptionsEventEmitter = new EventEmitter<void>();
+  private _onChangeLinkedSkillIdEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
 
   activeStateName: string | null = null;
@@ -292,7 +293,7 @@ export class StateEditorService {
   }
 
   getInapplicableSkillMisconceptionIds(): string[] {
-    return this.inapplicableSkillMisconceptionIds;
+    return this.inapplicableSkillMisconceptionIds || [];
   }
 
   isCurrentSolutionValid(): boolean {
@@ -356,8 +357,12 @@ export class StateEditorService {
   get onObjectFormValidityChange(): EventEmitter<boolean> {
     return this._objectFormValidityChangeEventEmitter;
   }
-}
 
-angular
-  .module('oppia')
-  .factory('StateEditorService', downgradeInjectable(StateEditorService));
+  get onUpdateMisconceptions(): EventEmitter<void> {
+    return this._updateMisconceptionsEventEmitter;
+  }
+
+  get onChangeLinkedSkillId(): EventEmitter<void> {
+    return this._onChangeLinkedSkillIdEventEmitter;
+  }
+}

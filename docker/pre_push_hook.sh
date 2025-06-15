@@ -28,7 +28,6 @@
 DEV_CONTAINER="dev-server"
 DOCKER_EXEC_COMMAND="docker compose exec -T $DEV_CONTAINER "
 
-
 # Location of git hooks directory
 HOOKS_DIR=".git/hooks"
 
@@ -101,14 +100,48 @@ if [ "$is_container_running" != "0" ]; then
 fi
 
 # Run hook in container
-CMD="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PRE_PUSH_SYMLINK $@"
-echo "Running $CMD"
+# Run commands in parallel and capture their outputs
+python_hook_cmd="$DOCKER_EXEC_COMMAND python3 ./$PYTHON_PRE_PUSH_SYMLINK $@"
+mypy_checks_cmd="make run_tests.mypy"
 
-$CMD
+# Create temp files for storing outputs
+python_hook_output=$(mktemp)
+mypy_checks_output=$(mktemp)
 
-# Save exit code from the docker command, so we can later use it to exit this pre-push hook at end.
-exitcode=$?
-echo "Python script exited with code $exitcode"
+# Run commands in background and redirect output to temp files
+$python_hook_cmd >"$python_hook_output" 2>&1 &
+python_hook_pid=$!
+
+$mypy_checks_cmd >"$mypy_checks_output" 2>&1 &
+mypy_checks_pid=$!
+
+# Wait for both processes to complete
+wait $python_hook_pid
+python_hook_exit=$?
+
+wait $mypy_checks_pid
+mypy_checks_exit=$?
+
+# Print outputs
+echo "Python hook output:"
+cat "$python_hook_output"
+echo "Mypy checks output:"
+cat "$mypy_checks_output"
+
+# Cleanup temp files
+rm "$python_hook_output"
+rm "$mypy_checks_output"
+
+# Exit with non-zero if either check failed
+if [ $python_hook_exit -ne 0 ]; then
+    echo "Some checks Failed!"
+    exitcode=1
+elif [ $mypy_checks_exit -ne 0 ]; then
+    echo "MYPY checks failed!"
+    exitcode=1
+else
+    exitcode=0
+fi
 
 # Shut down containers if they were not running before pre-push hook execution.
 if [ "$is_container_running" != "0" ]; then

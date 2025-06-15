@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -49,6 +48,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   canonicalStorySummaries: StorySummary[] = [];
   topicUrlFragment: string = '';
   classroomUrlFragment: string = '';
+  classroomName: string | null = '';
   topicIsLoading: boolean = true;
   topicId: string = '';
   topicName: string = '';
@@ -74,7 +74,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    if (this.urlService.getPathname().endsWith('revision')) {
+    if (this.urlService.getPathname().endsWith('studyguide')) {
       this.activeTab = 'subtopics';
     } else if (this.urlService.getPathname().endsWith('practice')) {
       this.activeTab = 'practice';
@@ -97,6 +97,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
           this.topicName = readOnlyTopic.getTopicName();
           this.topicDescription = readOnlyTopic.getTopicDescription();
           this.pageTitleFragment = readOnlyTopic.getPageTitleFragmentForWeb();
+          this.classroomName = readOnlyTopic.getClassroomName();
 
           // The onLangChange event is initially fired before the topic is
           // loaded. Hence the first setpageTitle() call needs to made
@@ -175,7 +176,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     } else if (newActiveTabName === 'practice') {
       this.setUrlAccordingToActiveTab('practice');
     } else {
-      this.setUrlAccordingToActiveTab('revision');
+      this.setUrlAccordingToActiveTab('studyguide');
     }
     this.activeTab = newActiveTabName;
   }
@@ -192,7 +193,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation.replace('revision', newTabName)
+        getCurrentLocation.replace('studyguide', newTabName)
       );
     } else {
       this.windowRef.nativeWindow.history.pushState(
@@ -203,10 +204,3 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'topicViewerPage',
-    downgradeComponent({component: TopicViewerPageComponent})
-  );

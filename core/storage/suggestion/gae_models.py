@@ -700,6 +700,40 @@ class GeneralSuggestionModel(base_models.BaseModel):
         )
 
     @classmethod
+    def get_in_review_translation_suggestion_target_ids(
+        cls,
+        user_id: str,
+        language_codes: List[str]
+    ) -> List[str]:
+        """Fetches all target ids of translation suggestion that are in-review
+        where the author_id != user_id and language_code matches one of the
+        supplied language_codes.
+
+        Args:
+            user_id: str. The id of the user trying to make this query. As a
+                user cannot review their own suggestions, suggestions authored
+                by the user will be excluded.
+            language_codes: list(str). List of language codes that the
+                suggestions should match.
+
+        Returns:
+            list(str). A list of target ids of the matching suggestions.
+        """
+        fetched_models: Sequence[
+            GeneralSuggestionModel
+        ] = cls.get_all().filter(datastore_services.all_of(
+            cls.status == STATUS_IN_REVIEW,
+            cls.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            cls.author_id != user_id,
+            cls.language_code.IN(language_codes)
+        )).fetch(
+            projection=[cls.target_id]
+        )
+
+        # We start with a set as we only care about unique target IDs.
+        return list({model.target_id for model in fetched_models})
+
+    @classmethod
     def get_reviewable_translation_suggestions(
         cls,
         user_id: str,
@@ -2336,8 +2370,9 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch
                 contributor stats for.
-            max_days_since_last_activity: int. To get number of users
-                who are active in max_days_since_last_activity.
+            max_days_since_last_activity: Optional[int]. The number of days
+                before today from which to start considering users'
+                contributions, to filter users.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
@@ -2755,14 +2790,15 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
             language_code: str. The language code to get results for.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            max_days_since_last_activity: int|None. To get number of users
-                who are active in max_days_since_last_activity.
+            max_days_since_last_activity: Optional[int]. The number of days
+                before today from which to start considering users'
+                contributions, to filter users.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
-                    list(TranslationSubmitterTotalContributionStatsModel).
-                    The list of models which match the supplied language_code,
+                    list(TranslationReviewerTotalContributionStatsModel).
+                    The list of models which match the supplied language_code
                     and max_days_since_last_activity filters, returned in the
                     order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
@@ -3081,16 +3117,17 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
                 result.
             topic_ids: List[str]|None. List of topic ID(s) to fetch contributor
                 stats for.
-            max_days_since_last_activity: int|None. To get number of users
-                who are active in max_days_since_last_activity.
+            max_days_since_last_activity: Optional[int]. The number of days
+                before today from which to start considering users'
+                contributions, to filter users.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(QuestionSubmitterTotalContributionStatsModel).
                     The list of models which match the supplied topic_ids
-                    and max_days_since_last_activity filters,
-                    returned in the order specified by sort_by.
+                    and max_days_since_last_activity filters, returned in the
+                    order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results
@@ -3377,16 +3414,17 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
                 results matching the query.
             sort_by: SortChoices|None. A string indicating how to sort the
                 result.
-            max_days_since_last_activity: int|None. To get number of users
-                who are active in max_days_since_last_activity.
+            max_days_since_last_activity: Optional[int]. The number of days
+                before today from which to start considering users'
+                contributions, to filter users.
 
         Returns:
             3-tuple(sorted_results, next_offset, more). where:
                 sorted_results:
                     list(QuestionReviewerTotalContributionStatsModel).
                     The list of models which match the supplied
-                    max_days_since_last_activity filters,
-                    returned in the order specified by sort_by.
+                    max_days_since_last_activity filter, returned in the
+                    order specified by sort_by.
                 next_offset: int. Number of results to skip in next batch.
                 more: bool. If True, there are (probably) more results after
                     this batch. If False, there are no further results

@@ -18,22 +18,23 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
+
+import {AppConstants} from 'app.constants';
+import {Rule} from 'domain/exploration/rule.model';
+import {MusicNotesInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
+import cloneDeep from 'lodash/cloneDeep';
 
 describe('MusicNotesInputValidationService', () => {
   let validatorService: MusicNotesInputValidationService;
+  let customizationArgs: MusicNotesInputCustomizationArgs;
 
   let currentState: string;
-  let goodAnswerGroups: AnswerGroup[], goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
+  let answerGroups: AnswerGroup[],
+    goodAnswerGroups: AnswerGroup[],
+    goodDefaultOutcome: Outcome;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,11 +43,8 @@ describe('MusicNotesInputValidationService', () => {
 
     validatorService = TestBed.get(MusicNotesInputValidationService);
 
-    oof = TestBed.get(OutcomeObjectFactory);
-    agof = TestBed.get(AnswerGroupObjectFactory);
-
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -58,7 +56,7 @@ describe('MusicNotesInputValidationService', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     });
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], '')];
+    goodAnswerGroups = [AnswerGroup.createNew([], goodDefaultOutcome, [], '')];
   });
 
   it('should be able to perform basic validation', () => {
@@ -76,5 +74,46 @@ describe('MusicNotesInputValidationService', () => {
       goodDefaultOutcome
     );
     expect(warnings).toEqual([]);
+  });
+
+  it('should throw error when rule HasLengthInclusivelyBetween is invalid', () => {
+    var answerGroup = AnswerGroup.createNew(
+      [
+        Rule.createNew(
+          'HasLengthInclusivelyBetween',
+          {
+            a: 5,
+            b: 0,
+          },
+          {
+            a: 'NonnegativeInt',
+            b: 'NonnegativeInt',
+          }
+        ),
+      ],
+      goodDefaultOutcome,
+      [],
+      null
+    );
+
+    answerGroups = [answerGroup, cloneDeep(answerGroup)];
+
+    var warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArgs,
+      answerGroups,
+      goodDefaultOutcome
+    );
+
+    expect(warnings).toEqual([
+      {
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The rule in response group 1 is invalid -- 5 is more than 0',
+      },
+      {
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The rule in response group 2 is invalid -- 5 is more than 0',
+      },
+    ]);
   });
 });

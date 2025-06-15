@@ -3,7 +3,6 @@ This folder contains the frontend & backend code for various extensions & plugin
 - actions: Definitions of domain classes for various user actions on Oppia website.
 - answer_summarizers: Model definitions for answer summarizers.
 - ckeditor_plugins: Plugins used in CKEditor RTE.
-- classifiers: Various common services used for tokenization and prediction.
 - interactions: The frontend & backend code for interactions supported on Oppia website.
 - objects: The frontend & backend code for various typed editors like boolean editor, filepath editor etc.
 - rich_text_components: The frontend & backend code for rich text components supported on Oppia RTE.

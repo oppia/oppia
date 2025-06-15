@@ -1,0 +1,5 @@
+core/templates/pages/contact-page/contact-page.module.ts
+core/templates/pages/donate-page/donate-page.module.ts
+core/templates/pages/partnerships-page/partnerships-page.module.ts
+core/templates/pages/teach-page/teach-page.module.ts
+core/templates/pages/volunteer-page/volunteer-page.module.ts

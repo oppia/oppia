@@ -68,7 +68,7 @@
               <div class="oppia-filter-selector-inner-container e2e-test-language-selector-selected">
                 <b>Language: </b>{{selectedLanguage.language}}
                 <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
-                      [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
+                  [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
                 </span>
               </div>
               <div *ngIf="languageDropdownShown"
@@ -84,25 +84,15 @@
           </div>
         </div>
         <div class="filter-sub-container">
-          <div class="last-activity-selector-container">
-            <div #activityDropdown  class="oppia-filter-selector-container e2e-test-last-activity-selector"
-                 (click)="toggleActivityDropdown()">
-              <div class="oppia-filter-selector-inner-container e2e-test-last-activity-selector-selected">
-                <b>Filter by last activity: </b>
-                   {{ selectedLastActivity ? 'Within past ' + selectedLastActivity + ' days' : 'All time' }}
-                <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
-                      [@lastActivityDropdown]="activityDropdownShown ? 'expanded' : 'collapsed'">
-                </span>
-              </div>
-              <div *ngIf="activityDropdownShown"
-                   class="oppia-filter-selector-dropdown-container e2e-test-last-activity-selector-dropdown">
-                <div class="oppia-filter-selector-dropdown-option e2e-test-last-activity-selector-option"
-                     *ngFor="let option of lastActivity"
-                     (click)="selectLastActivity(option)"
-                     [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLastActivity}">
-                  {{ option ? 'Within past ' + option + ' days' : 'All time' }}
-                </div>
-              </div>
+          <div class="date-selector-container">
+            <div class="date-selector-inner-container">
+              <b *ngIf="isSubmitterTab()" class="filter-label">Filter by Last Contributed after:</b>
+              <b *ngIf="isReviewerTab()" class="filter-label">Filter by Last Reviewed after:</b>
+              <mat-form-field>
+                <input matInput class="e2e-test-last-date-picker-input" [matDatepicker]="lastDatePicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
+                <mat-datepicker-toggle matSuffix class="e2e-test-last-date-picker-toggle" [for]="lastDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #lastDatePicker></mat-datepicker>
+              </mat-form-field>
             </div>
           </div>
           <div class="topic-selector-container">
@@ -117,7 +107,7 @@
       </div>
       <contributor-admin-stats-table [inputs]="{ activeTab: activeTab, filter: filter }"></contributor-admin-stats-table>
     </div>
-    <div class="dashboard-content-mobile"  *ngIf="checkMobileView()">
+    <div class="dashboard-content-mobile" *ngIf="checkMobileView()">
       <div class="dropdown">
         <mat-form-field class="choices-field">
           <mat-select placeholder="Contribution Type"
@@ -142,7 +132,7 @@
               <div class="selector-icon-div">
                 {{selectedLanguage.language}}
                 <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
-                      [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
+                  [@languageDropdownTrigger]="languageDropdownShown ? 'expanded' : 'collapsed'">
                 </span>
               </div>
             </div>
@@ -157,28 +147,15 @@
             </div>
           </div>
         </div>
-        <div class="last-activity-selector-container">
-          <div class="oppia-filter-selector-container e2e-test-topic-selector" (click)="toggleActivityDropdown()">
-            <div class="oppia-filter-selector-inner-container e2e-test-topic-selector-selected">
-              <b *ngIf="activeTab === TAB_NAME_TRANSLATION_SUBMITTER">Last Translated:</b>
-              <b *ngIf="(activeTab === TAB_NAME_TRANSLATION_REVIEWER) || (activeTab === TAB_NAME_QUESTION_REVIEWER)">Last Reviewed:</b>
-              <b *ngIf="activeTab === TAB_NAME_QUESTION_SUBMITTER">Last Submitted:</b>
-              <div class="selector-icon-div">
-                {{ selectedLastActivity ? 'Within past ' + selectedLastActivity + ' days' : 'All time' }}
-                <span class="fas fa-caret-down oppia-filter-selector-inner-container-arrow"
-                      [@lastActivityDropdown]="activityDropdownShown ? 'expanded' : 'collapsed'">
-                </span>
-              </div>
-            </div>
-            <div *ngIf="activityDropdownShown"
-                 class="oppia-filter-selector-dropdown-container e2e-test-topic-selector-dropdown">
-              <div class="oppia-filter-selector-dropdown-option e2e-test-topic-selector-option"
-                   *ngFor="let option of lastActivity"
-                   (click)="selectLastActivity(option)"
-                   [ngClass]="{'oppia-filter-selector-dropdown-option-selected' : option === selectedLastActivity}">
-                {{ option ? 'Within past ' + option + ' days' : 'All time' }}
-              </div>
-            </div>
+        <div class="date-selector-container">
+          <div class="date-selector-inner-container">
+            <b *ngIf="isSubmitterTab()" class="filter-label">Filter by Last Contributed after:</b>
+            <b *ngIf="isReviewerTab()" class="filter-label">Filter by Last Reviewed after:</b>
+            <mat-form-field>
+              <input matInput class="e2e-test-mobile-last-date-picker-input" [matDatepicker]="lastDatePicker" (dateChange)="changeLastDate($event.value)" [(ngModel)]="lastDateToFilterUsersActivity" [max]="today">
+              <mat-datepicker-toggle matSuffix class="e2e-test-mobile-last-date-picker-toggle" [for]="lastDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #lastDatePicker></mat-datepicker>
+            </mat-form-field>
           </div>
         </div>
         <div class="topic-selector-container">

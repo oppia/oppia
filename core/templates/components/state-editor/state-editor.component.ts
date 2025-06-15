@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {State} from 'domain/state/StateObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
@@ -43,11 +42,11 @@ import {StateSolutionService} from './state-editor-properties-services/state-sol
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {InteractionData} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 
 @Component({
   selector: 'oppia-state-editor',
@@ -81,7 +80,6 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   @Input() interactionIsShown!: boolean;
   @Input() stateContentSaveButtonPlaceholder!: string;
   @Input() stateContentPlaceholder!: string;
-  @Input() stateContentShouldStayVisibleOnScroll!: boolean;
 
   oppiaBlackImgUrl!: string;
   // State name is null if their is no state selected or have no active state.
@@ -186,9 +184,10 @@ export class StateEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_avatar_100px.svg'
-    );
+    this.oppiaBlackImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg'
+      );
     this.currentStateIsTerminal = false;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
     this.interactionIdIsSet = false;
@@ -212,6 +211,12 @@ export class StateEditorComponent implements OnInit, OnDestroy {
         this.stateData = stateData;
         this.stateName = this.stateEditorService.getActiveStateName();
         this.stateEditorService.setInteraction(stateData.interaction);
+        this.stateEditorService.setLinkedSkillId(stateData.linkedSkillId);
+        if (!this.stateEditorService.isInQuestionMode()) {
+          this.stateEditorService.setInapplicableSkillMisconceptionIds(
+            stateData.inapplicableSkillMisconceptionIds
+          );
+        }
         this.stateContentService.init(this.stateName, stateData.content);
         this.stateLinkedSkillIdService.init(
           this.stateName,
@@ -258,10 +263,3 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateEditor',
-  downgradeComponent({
-    component: StateEditorComponent,
-  }) as angular.IDirectiveFactory
-);

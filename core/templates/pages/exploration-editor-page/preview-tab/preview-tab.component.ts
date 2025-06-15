@@ -18,7 +18,6 @@
  */
 
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -46,6 +45,7 @@ import {GraphDataService} from '../services/graph-data.service';
 import {ParameterMetadataService} from '../services/parameter-metadata.service';
 import {RouterService} from '../services/router.service';
 import {PreviewSetParametersModalComponent} from './templates/preview-set-parameters-modal.component';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 @Component({
   selector: 'oppia-preview-tab',
@@ -60,6 +60,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
   previewWarning!: string;
   isExplorationPopulated!: boolean;
   allParams: ExplorationParams | object = {};
+  voiceoversAreLoaded: boolean = false;
 
   constructor(
     private contextService: ContextService,
@@ -79,7 +80,8 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private parameterMetadataService: ParameterMetadataService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
-    private paramChangesObjectFactory: ParamChangesObjectFactory
+    private paramChangesObjectFactory: ParamChangesObjectFactory,
+    private entityVoiceoversService: EntityVoiceoversService
   ) {}
 
   getManualParamChanges(
@@ -252,6 +254,17 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
             }
           );
         }
+
+        this.entityVoiceoversService.init(
+          this.contextService.getExplorationId(),
+          'exploration',
+          explorationData.version as number,
+          explorationData.language_code
+        );
+
+        this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+          this.voiceoversAreLoaded = true;
+        });
       });
   }
 
@@ -259,10 +272,3 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaPreviewTab',
-  downgradeComponent({
-    component: PreviewTabComponent,
-  }) as angular.IDirectiveFactory
-);

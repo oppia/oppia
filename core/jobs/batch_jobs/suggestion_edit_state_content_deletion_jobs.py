@@ -106,7 +106,7 @@ class AuditDeprecatedSuggestionEditStateContentModelsDeletionJob(
 
         job_run_results = (
             self.pipeline
-            | 'Perform fetching and deletion of edit state content' +
+            | 'Perform fetching and deletion of edit state content'
                 ' suggestion results' >> (
                 GetDeprecatedSuggestionEditStateContentModels())
         )[1]

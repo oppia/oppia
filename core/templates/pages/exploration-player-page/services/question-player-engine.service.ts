@@ -17,10 +17,8 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
-import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {
   Question,
   QuestionObjectFactory,
@@ -38,7 +36,7 @@ import {AlertsService} from 'services/alerts.service';
 import {ContextService} from 'services/context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Injectable({
   providedIn: 'root',
@@ -52,7 +50,6 @@ export class QuestionPlayerEngineService {
   constructor(
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
-    private audioTranslationLanguageService: AudioTranslationLanguageService,
     private contextService: ContextService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
@@ -80,10 +77,9 @@ export class QuestionPlayerEngineService {
   }
 
   private getRandomSuffix(): string {
-    // This is a bit of a hack. When a refresh to a $scope variable
-    // happens,
-    // AngularJS compares the new value of the variable to its previous
-    // value. If they are the same, then the variable is not updated.
+    // This is a bit of a hack. When a refresh to a component property
+    // happens, Angular compares the new value of the property to its previous
+    // value. If they are the same, then the property is not updated.
     // Appending a random suffix makes the new value different from the
     // previous one, and thus indirectly forces a refresh.
     let randomSuffix = '';
@@ -135,9 +131,7 @@ export class QuestionPlayerEngineService {
       questionHtml,
       interactionHtml,
       interaction,
-      initialState.recordedVoiceovers,
-      initialState.content.contentId,
-      this.audioTranslationLanguageService
+      initialState.content.contentId
     );
     successCallback(initialCard, nextFocusLabel);
   }
@@ -250,7 +244,6 @@ export class QuestionPlayerEngineService {
       nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      feedbackAudioTranslations: BindableVoiceovers,
       refresherExplorationId,
       missingPrerequisiteSkillId,
       remainOnCurrentCard: boolean,
@@ -269,7 +262,6 @@ export class QuestionPlayerEngineService {
     const answerString = answer as string;
     this.setAnswerIsBeingProcessed(true);
     const oldState = this.getCurrentStateData();
-    const recordedVoiceovers = oldState.recordedVoiceovers;
     const classificationResult =
       this.answerClassificationService.getMatchingClassificationResult(
         null,
@@ -286,18 +278,15 @@ export class QuestionPlayerEngineService {
           .taggedSkillMisconceptionId;
     }
 
-    // Use angular.copy() to clone the object
+    // Use cloneDeep() to clone the object
     // since classificationResult.outcome points
     // at oldState.interaction.default_outcome.
-    const outcome = angular.copy(classificationResult.outcome);
+    const outcome = cloneDeep(classificationResult.outcome);
     // Compute the data for the next state.
     const oldParams = {
       answer: answerString,
     };
     const feedbackHtml = this.makeFeedback(outcome.feedback.html, [oldParams]);
-    const feedbackContentId = outcome.feedback.contentId;
-    const feedbackAudioTranslations =
-      recordedVoiceovers.getBindableVoiceovers(feedbackContentId);
     if (feedbackHtml === null) {
       this.setAnswerIsBeingProcessed(false);
       this.alertsService.addWarning('Feedback content should not be empty.');
@@ -348,16 +337,13 @@ export class QuestionPlayerEngineService {
         questionHtml,
         nextInteractionHtml,
         this.getNextStateData().interaction,
-        this.getNextStateData().recordedVoiceovers,
-        this.getNextStateData().content.contentId,
-        this.audioTranslationLanguageService
+        this.getNextStateData().content.contentId
       );
     }
     successCallback(
       nextCard,
       refreshInteraction,
       feedbackHtml,
-      feedbackAudioTranslations,
       null,
       null,
       onSameCard,
@@ -371,10 +357,3 @@ export class QuestionPlayerEngineService {
     return answerIsCorrect;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'QuestionPlayerEngineService',
-    downgradeInjectable(QuestionPlayerEngineService)
-  );

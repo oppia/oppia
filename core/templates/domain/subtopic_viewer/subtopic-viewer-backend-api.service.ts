@@ -16,7 +16,6 @@
  * @fileoverview Service to get subtopic data.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -87,10 +86,3 @@ export class SubtopicViewerBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SubtopicViewerBackendApiService',
-    downgradeInjectable(SubtopicViewerBackendApiService)
-  );

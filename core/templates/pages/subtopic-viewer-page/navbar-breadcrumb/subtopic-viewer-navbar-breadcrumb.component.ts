@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {ReadOnlySubtopicPageData} from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
@@ -83,7 +82,7 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
 
   getTopicUrl(): string {
     return this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE,
+      ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE,
       {
         topic_url_fragment: this.topicUrlFragment,
         classroom_url_fragment: this.classroomUrlFragment,
@@ -107,10 +106,3 @@ export class SubtopicViewerNavbarBreadcrumbComponent implements OnInit {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'subtopicViewerNavbarBreadcrumb',
-    downgradeComponent({component: SubtopicViewerNavbarBreadcrumbComponent})
-  );

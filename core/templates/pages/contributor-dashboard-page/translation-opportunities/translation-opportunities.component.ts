@@ -17,7 +17,6 @@
  */
 
 import {Component, Injector} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
@@ -141,7 +140,7 @@ export class TranslationOpportunitiesComponent {
       this.languageSelected = true;
     } else {
       this.OPPIA_AVATAR_IMAGE_URL =
-        this.urlInterpolationService.getStaticImageUrl(
+        this.urlInterpolationService.getStaticCopyrightedImageUrl(
           '/avatar/oppia_avatar_100px.svg'
         );
     }
@@ -171,10 +170,3 @@ export class TranslationOpportunitiesComponent {
       .then(this.getPresentableOpportunitiesData.bind(this));
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaTranslationOpportunities',
-    downgradeComponent({component: TranslationOpportunitiesComponent})
-  );

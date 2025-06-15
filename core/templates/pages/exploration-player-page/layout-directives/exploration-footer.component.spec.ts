@@ -55,7 +55,6 @@ import {PlayerPositionService} from '../services/player-position.service';
 import {PlayerTranscriptService} from '../services/player-transcript.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from '../services/audio-translation-language.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {UserService} from 'services/user.service';
 import {
@@ -131,7 +130,6 @@ describe('ExplorationFooterComponent', () => {
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let userService: UserService;
   let urlInterpolationService: UrlInterpolationService;
   let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
@@ -218,9 +216,6 @@ describe('ExplorationFooterComponent', () => {
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
     userService = TestBed.inject(UserService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     checkpointCelebrationUtilityService = TestBed.inject(
@@ -359,8 +354,7 @@ describe('ExplorationFooterComponent', () => {
           },
         }),
         RecordedVoiceovers.createEmpty(),
-        'content',
-        audioTranslationLanguageService
+        'content'
       );
 
       component.ngOnInit();
@@ -369,7 +363,6 @@ describe('ExplorationFooterComponent', () => {
 
       expect(component.explorationId).toBe('exp1');
       expect(component.iframed).toBeTrue();
-      expect(component.windowIsNarrow).toBeFalse();
       expect(
         explorationSummaryBackendApiService.loadPublicAndPrivateExplorationSummariesAsync
       ).toHaveBeenCalledWith(['exp1']);
@@ -495,11 +488,6 @@ describe('ExplorationFooterComponent', () => {
 
     const endState = {
       classifier_model_id: null,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-        },
-      },
       solicit_answer_details: false,
       interaction: {
         solution: null,
@@ -586,11 +574,6 @@ describe('ExplorationFooterComponent', () => {
 
     const endState = {
       classifier_model_id: null,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-        },
-      },
       solicit_answer_details: false,
       interaction: {
         solution: null,
@@ -711,15 +694,6 @@ describe('ExplorationFooterComponent', () => {
         states: {
           Start: {
             classifier_model_id: null,
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                ca_placeholder_0: {},
-                feedback_1: {},
-                rule_input_2: {},
-                content: {},
-                default_outcome: {},
-              },
-            },
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -792,11 +766,6 @@ describe('ExplorationFooterComponent', () => {
           },
           End: {
             classifier_model_id: null,
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                content: {},
-              },
-            },
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -821,15 +790,6 @@ describe('ExplorationFooterComponent', () => {
           },
           Mid: {
             classifier_model_id: null,
-            recorded_voiceovers: {
-              voiceovers_mapping: {
-                ca_placeholder_0: {},
-                feedback_1: {},
-                rule_input_2: {},
-                content: {},
-                default_outcome: {},
-              },
-            },
             solicit_answer_details: false,
             interaction: {
               solution: null,
@@ -987,11 +947,6 @@ describe('ExplorationFooterComponent', () => {
 
     const endState = {
       classifier_model_id: null,
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-        },
-      },
       solicit_answer_details: false,
       written_translations: {
         translations_mapping: {
@@ -1078,8 +1033,7 @@ describe('ExplorationFooterComponent', () => {
       '<interaction></interaction>',
       null,
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
     spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue(
@@ -1121,12 +1075,6 @@ describe('ExplorationFooterComponent', () => {
         },
         linked_skill_id: null,
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         solicit_answer_details: false,
         card_is_checkpoint: true,
       })
@@ -1177,7 +1125,6 @@ describe('ExplorationFooterComponent', () => {
           Introduction: {
             param_changes: [],
             classifier_model_id: null,
-            recorded_voiceovers: null,
             solicit_answer_details: true,
             card_is_checkpoint: true,
             linked_skill_id: null,
@@ -1270,7 +1217,6 @@ describe('ExplorationFooterComponent', () => {
           Introduction: {
             param_changes: [],
             classifier_model_id: null,
-            recorded_voiceovers: null,
             solicit_answer_details: true,
             card_is_checkpoint: true,
             linked_skill_id: null,
@@ -1388,12 +1334,9 @@ describe('ExplorationFooterComponent', () => {
     spyOn(contextService, 'getQuestionPlayerIsManuallySet').and.returnValue(
       false
     );
-    component.windowIsNarrow = true;
 
     component.ngOnInit();
     mockResizeEventEmitter.emit();
-
-    expect(component.windowIsNarrow).toBeFalse();
   });
 
   it('should open lesson info modal if emitter emits', () => {

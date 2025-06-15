@@ -25,18 +25,17 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import {Subscription} from 'rxjs';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {MisconceptionSkillMap} from 'domain/skill/MisconceptionObjectFactory';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Question} from 'domain/question/QuestionObjectFactory';
 import {QuestionUpdateService} from 'domain/question/question-update.service';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {State} from 'domain/state/StateObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -60,7 +59,6 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   @Input() question!: Question;
   @Input() questionId!: string;
   @Input() questionStateData!: State;
-  @Input() stateContentShouldStayVisibleOnScroll!: boolean;
   interactionIsShown!: boolean;
   oppiaBlackImgUrl!: string;
   stateEditorIsInitialized!: boolean;
@@ -230,9 +228,10 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this.stateEditorService.setMisconceptionsBySkill(
       this.misconceptionsBySkill
     );
-    this.oppiaBlackImgUrl = this.urlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_avatar_100px.svg'
-    );
+    this.oppiaBlackImgUrl =
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
+        '/avatar/oppia_avatar_100px.svg'
+      );
 
     this.interactionIsShown = false;
     this.stateEditorIsInitialized = false;
@@ -248,10 +247,3 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this.componentSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaQuestionEditor',
-  downgradeComponent({
-    component: QuestionEditorComponent,
-  }) as angular.IDirectiveFactory
-);

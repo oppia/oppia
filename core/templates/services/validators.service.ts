@@ -17,7 +17,6 @@
  * warning messages if the validation fails.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
@@ -107,7 +106,7 @@ export class ValidatorsService {
   isNonempty(input: string, showWarnings: boolean): boolean {
     if (!input) {
       if (showWarnings) {
-        // TODO(sll): Allow this warning to be more specific in terms of
+        // TODO(#20336): Allow this warning to be more specific in terms of
         // what needs to be entered.
         this.alerts.addWarning('Please enter a non-empty value.');
       }
@@ -143,7 +142,3 @@ export class ValidatorsService {
     return true;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('ValidatorsService', downgradeInjectable(ValidatorsService));

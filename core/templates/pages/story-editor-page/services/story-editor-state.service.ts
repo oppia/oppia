@@ -19,7 +19,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {StoryChange} from 'domain/editor/undo_redo/change.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
@@ -28,6 +27,7 @@ import {Story, StoryBackendDict} from 'domain/story/story.model';
 import {EditableStoryBackendApiService} from 'domain/story/editable-story-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {LoaderService} from 'services/loader.service';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Injectable({
   providedIn: 'root',
@@ -84,7 +84,7 @@ export class StoryEditorStateService {
   }
 
   private _setSkillSummaries(skillSummaries: SkillSummaryBackendDict[]): void {
-    this._skillSummaries = angular.copy(skillSummaries);
+    this._skillSummaries = cloneDeep(skillSummaries);
   }
 
   private _setTopicName(topicName: string): void {
@@ -387,7 +387,8 @@ export class StoryEditorStateService {
    */
   updateExistenceOfStoryUrlFragment(
     storyUrlFragment: string,
-    successCallback: (value?: Object) => void
+    successCallback: (value?: Object) => void,
+    errorCallback: () => void
   ): void {
     this.editableStoryBackendApiService
       .doesStoryWithUrlFragmentExistAsync(storyUrlFragment)
@@ -398,20 +399,25 @@ export class StoryEditorStateService {
             successCallback();
           }
         },
-        error => {
-          this.alertsService.addWarning(
-            error ||
-              'There was an error when checking if the story url fragment ' +
-                'exists for another story.'
-          );
+        errorResponse => {
+          if (errorCallback) {
+            errorCallback();
+          }
+          /**
+           * This backend api service uses a HTTP link which is generated with
+           * the help of inputted url fragment. So, whenever a url fragment is
+           * entered against the specified reg-ex(or rules) wrong HTTP link is
+           * generated and causes server to respond with 400 error. Because
+           * server also checks for reg-ex match.
+           */
+          if (errorResponse?.status !== 400) {
+            this.alertsService.addWarning(
+              errorResponse?.message ||
+                'There was an error when checking if the story url fragment ' +
+                  'exists for another story.'
+            );
+          }
         }
       );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'StoryEditorStateService',
-    downgradeInjectable(StoryEditorStateService)
-  );

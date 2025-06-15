@@ -18,10 +18,12 @@
 
 import {Component, Input} from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
-import {ContributorCertificateResponse} from '../services/contribution-and-review-backend-api.service';
+import {
+  ContributorCertificateResponse,
+  ContributorCertificateInfo,
+} from '../services/contribution-and-review-backend-api.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 
 interface CertificateContentData {
@@ -72,16 +74,16 @@ export class CertificateDownloadModalComponent {
   }
 
   validateDate(): void {
-    if (
-      !this.fromDate ||
-      !this.toDate ||
-      new Date(this.fromDate) >= new Date(this.toDate)
-    ) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const toDate = new Date(this.toDate);
+    toDate.setHours(0, 0, 0, 0);
+    if (!this.fromDate || !this.toDate || new Date(this.fromDate) >= toDate) {
       this.errorsFound = true;
       this.errorMessage = 'Invalid date range.';
       return;
     }
-    if (new Date() < new Date(this.toDate)) {
+    if (toDate >= today) {
       this.errorsFound = true;
       this.errorMessage =
         "Please select a 'To' date that is earlier than " + "today's date";
@@ -104,7 +106,13 @@ export class CertificateDownloadModalComponent {
         this.toDate
       )
       .then((response: ContributorCertificateResponse) => {
-        this.createCertificate(response);
+        if (response.certificate_data) {
+          this.createCertificate(response.certificate_data);
+        } else {
+          this.errorsFound = true;
+          this.errorMessage =
+            'There are no contributions for the given date range.';
+        }
         this.certificateDownloading = false;
       })
       .catch((err: HttpErrorResponse) => {
@@ -118,7 +126,7 @@ export class CertificateDownloadModalComponent {
     return this.fromDate === undefined || this.toDate === undefined;
   }
 
-  createCertificate(response: ContributorCertificateResponse): void {
+  createCertificate(info: ContributorCertificateInfo): void {
     const canvas = document.createElement('canvas');
     const currentDate = new Date();
     // Intl.DateTimeFormatOptions is used to enable language sensitive date
@@ -199,13 +207,13 @@ export class CertificateDownloadModalComponent {
             text:
               "for their dedication and time in translating Oppia's " +
               'basic maths lessons to ' +
-              response.language,
+              info.language,
             linePosition: linePosition,
           },
           {
             text:
               'which will help our ' +
-              response.language +
+              info.language +
               '-speaking ' +
               'learners better understand the lessons.',
             linePosition: (linePosition += 40),
@@ -215,7 +223,7 @@ export class CertificateDownloadModalComponent {
               'This certificate confirms that ' +
               this.username +
               ' has contributed ' +
-              response.contribution_hours +
+              info.contribution_hours +
               ' hours ' +
               'worth of',
             linePosition: (linePosition += 80),
@@ -223,9 +231,9 @@ export class CertificateDownloadModalComponent {
           {
             text:
               'translations from ' +
-              response.from_date +
+              info.from_date +
               ' to ' +
-              response.to_date +
+              info.to_date +
               '.',
             linePosition: (linePosition += 40),
           },
@@ -253,12 +261,12 @@ export class CertificateDownloadModalComponent {
               'This certificate confirms that ' +
               this.username +
               ' has contributed ' +
-              response.contribution_hours +
+              info.contribution_hours +
               ' hours',
             linePosition: (linePosition += 80),
           },
           {
-            text: `to Oppia from ${response.from_date} to ${response.to_date}.`,
+            text: `to Oppia from ${info.from_date} to ${info.to_date}.`,
             linePosition: (linePosition += 40),
           },
         ];
@@ -270,7 +278,7 @@ export class CertificateDownloadModalComponent {
       ctx.fillStyle = '#000000';
       linePosition += 100;
       ctx.fillText(
-        response.team_lead,
+        info.team_lead,
         this.SIGNATURE_BASE_COORDINATE,
         linePosition
       );
@@ -312,10 +320,3 @@ export class CertificateDownloadModalComponent {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'certificateDownloadModal',
-    downgradeComponent({component: CertificateDownloadModalComponent})
-  );

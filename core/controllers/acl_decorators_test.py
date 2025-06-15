@@ -28,10 +28,6 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.controllers import incoming_app_feedback_report
 from core.domain import blog_services
-from core.domain import classifier_domain
-from core.domain import classifier_services
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -53,7 +49,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Optional, TypedDict, Union
+from typing import Dict, Final, List, Union
 import webapp2
 import webtest
 
@@ -979,18 +975,7 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        math_classroom_dict: classroom_config_domain.ClassroomDict = {
-            'classroom_id': 'math_classroom_id',
-            'name': 'math',
-            'url_fragment': 'math',
-            'course_details': 'Course details for classroom.',
-            'topic_list_intro': 'Topics covered for classroom',
-            'topic_id_to_prerequisite_topic_ids': {}
-        }
-        math_classroom = classroom_config_domain.Classroom.from_dict(
-            math_classroom_dict)
-
-        classroom_config_services.create_new_classroom(math_classroom)
+        self.save_new_valid_classroom()
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -1462,8 +1447,9 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
                 '/mock_view_feedback_thread/%s' % self.private_exp_thread_id,
                 expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to view '
-                'exploration feedback.')
+                response['error'],
+                'You do not have credentials to view exploration feedback.'
+            )
         self.logout()
 
     def test_viewer_cannot_view_feedback_threads_with_invalid_thread_id(
@@ -1806,7 +1792,8 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -1843,7 +1830,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2300,7 +2287,8 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -2335,7 +2323,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/run-anny-job', expected_status_int=401)
@@ -2432,7 +2420,8 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -2469,7 +2458,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2495,8 +2484,6 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
 
     username = 'user'
     user_email = 'user@example.com'
-    QUESTION_ADMIN_EMAIL: Final = 'questionExpert@app.com'
-    QUESTION_ADMIN_USERNAME: Final = 'questionExpert'
     TRANSLATION_ADMIN_EMAIL: Final = 'translatorExpert@app.com'
     TRANSLATION_ADMIN_USERNAME: Final = 'translationExpert'
 
@@ -2632,7 +2619,8 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
@@ -2650,7 +2638,7 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
 
     def test_primary_admin_can_delete_any_user(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
@@ -4774,7 +4762,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=404)
         error_msg = (
-            'Could not find the resource http://localhost/mock_edit_story/%s.' 
+            'Could not find the resource http://localhost/mock_edit_story/%s.'
             % (self.story_id)
         )
         self.assertEqual(response['error'], error_msg)
@@ -5534,7 +5522,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             unused_topic_url_fragment: str,
             unused_subtopic_url_fragment: str
         ) -> None:
-            self.render_template('subtopic-viewer-page.mainpage.html')
+            self.render_template('subtopic-viewer-page-root.component.html')
 
     def setUp(self) -> None:
         super().setUp()
@@ -5550,7 +5538,8 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             '<topic_url_fragment>/<subtopic_url_fragment>')
         subtopic_page_url = (
             '/mock_subtopic_page/<classroom_url_fragment>/'
-            '<topic_url_fragment>/revision/<subtopic_url_fragment>')
+            '<topic_url_fragment>/studyguide/'
+            '<subtopic_url_fragment>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
                 webapp2.Route(subtopic_data_url, self.MockDataHandler),
@@ -5610,7 +5599,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/000',
+                '/mock_subtopic_page/staging/topic-frag/studyguide/000',
                 expected_status_int=302)
             self.assertEqual(
                 response.headers['location'], 'http://localhost/learn/staging')
@@ -5619,44 +5608,50 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     def test_can_access_subtopic_when_all_url_fragments_are_valid(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
+            studyguide_url_fragment = 'studyguide/sub-one-frag'
             self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/sub-one-frag',
+                '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
                 expected_status_int=200)
 
-    def test_fall_back_to_revision_page_if_subtopic_url_frag_is_invalid(
+    def test_fall_back_to_studyguide_page_if_subtopic_url_frag_is_invalid(
         self
     ) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/000',
+                '/mock_subtopic_page/staging/topic-frag/studyguide/000',
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision',
+                'http://localhost/learn/staging/topic-frag/studyguide',
                 response.headers['location'])
 
-    def test_fall_back_to_revision_page_when_subtopic_page_does_not_exist(
+    def test_fall_back_to_studyguide_page_when_subtopic_page_does_not_exist(
         self
     ) -> None:
+        studyguide_url_fragment = 'studyguide/sub-one-frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
         testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
         subtopic_swap = self.swap_to_always_return(
             subtopic_page_services, 'get_subtopic_page_by_id', None)
         with testapp_swap, subtopic_swap:
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/sub-one-frag',
+                '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision',
+                'http://localhost/learn/staging/topic-frag/studyguide',
                 response.headers['location'])
 
     def test_redirect_to_classroom_if_abbreviated_topic_is_invalid(
         self
     ) -> None:
+        studyguide_url_fragment = 'studyguide/sub-one-frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/math/invalid-topic/revision/sub-one-frag',
+                '/mock_subtopic_page/math/invalid-topic/%s'
+                % studyguide_url_fragment,
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/math',
@@ -5666,21 +5661,23 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/math/topic-frag/revision/sub-one-frag',
+                '/mock_subtopic_page/math/topic-frag/studyguide/sub-one-frag',
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision'
+                'http://localhost/learn/staging/topic-frag/studyguide'
                 '/sub-one-frag',
                 response.headers['location'])
 
     def test_redirect_with_lowercase_subtopic_url_fragment(self) -> None:
+        studyguide_url_fragment = 'studyguide/Sub-One-Frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
-                '/mock_subtopic_page/staging/topic-frag/revision/Sub-One-Frag',
+                '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
                 expected_status_int=302)
             self.assertEqual(
-                'http://localhost/learn/staging/topic-frag/revision'
+                'http://localhost/learn/staging/topic-frag/studyguide'
                 '/sub-one-frag',
                 response.headers['location'])
 
@@ -5727,8 +5724,9 @@ class TopicViewerTests(test_utils.GenericTestBase):
         HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
         @acl_decorators.can_access_topic_viewer_page
-        def get(self, unused_topic_name: str) -> None:
-            self.render_template('topic-viewer-page.mainpage.html')
+        def get(self, _: str) -> None:
+            """Handles GET requests."""
+            pass
 
     def setUp(self) -> None:
         super().setUp()
@@ -5779,13 +5777,6 @@ class TopicViewerTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_topic_data/staging/topic',
-                expected_status_int=200)
-
-    def test_can_access_topic_when_all_url_fragments_are_valid(self) -> None:
-        topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_html_response(
-                '/mock_topic_page/staging/topic',
                 expected_status_int=200)
 
     def test_redirect_to_classroom_if_abbreviated_topic_is_invalid(
@@ -6973,8 +6964,9 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
                 feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
                 expected_status_int=401)
             self.assertEqual(
-                response['error'], 'You do not have credentials to submit'
-                ' images to questions.')
+                response['error'],
+                'You do not have credentials to submit images to questions.'
+            )
         self.logout()
 
     def test_can_submit_images_to_explorations(self) -> None:
@@ -7177,162 +7169,6 @@ class SaveExplorationTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
-
-
-class MockHandlerNormalizedPayloadDict(TypedDict):
-    """Type for the MockHandler's normalized_payload dictionary."""
-
-    signature: str
-    vm_id: str
-    message: bytes
-
-
-class OppiaMLAccessDecoratorTest(test_utils.GenericTestBase):
-    """Tests for oppia_ml_access decorator."""
-
-    class MockHandler(
-        base.OppiaMLVMHandler[
-            MockHandlerNormalizedPayloadDict, Dict[str, str]
-        ]
-    ):
-        REQUIRE_PAYLOAD_CSRF_CHECK = False
-        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-        URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-        HANDLER_ARGS_SCHEMAS = {
-            'POST': {
-                'vm_id': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                },
-                'message': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                },
-                'signature': {
-                    'schema': {
-                        'type': 'basestring'
-                    }
-                }
-            }
-        }
-
-        def extract_request_message_vm_id_and_signature(
-            self
-        ) -> classifier_domain.OppiaMLAuthInfo:
-            """Returns message, vm_id and signature retrived from incoming
-            request.
-
-            Returns:
-                OppiaMLAuthInfo. Message at index 0, vm_id at index 1 and
-                signature at index 2.
-            """
-            assert self.normalized_payload is not None
-            signature = self.normalized_payload['signature']
-            vm_id = self.normalized_payload['vm_id']
-            message = self.normalized_payload['message']
-            return classifier_domain.OppiaMLAuthInfo(message, vm_id, signature)
-
-        @acl_decorators.is_from_oppia_ml
-        def post(self) -> None:
-            self.render_json({'job_id': 'new_job'})
-
-    def _mock_get_secret(self, name: str) -> Optional[str]:
-        """Mock for the get_secret function.
-
-        Args:
-            name: str. The name of the secret to retrieve the value.
-
-        Returns:
-            Optional[str]. The value of the secret.
-        """
-        if name == 'VM_ID':
-            return 'vm_default'
-        elif name == 'SHARED_SECRET_KEY':
-            return '1a2b3c4e'
-        return None
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/ml/nextjobhandler', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
-
-    def test_unauthorized_vm_cannot_fetch_jobs(self) -> None:
-        payload = {}
-        payload['vm_id'] = 'fake_vm'
-        secret = 'fake_secret'
-        payload['message'] = json.dumps('malicious message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            payload['message'].encode('utf-8'),
-            payload['vm_id'])
-        swap_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            self._mock_get_secret,
-            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
-        )
-
-        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
-            self.post_json(
-                '/ml/nextjobhandler', payload,
-                expected_status_int=401)
-
-    def test_default_vm_id_raises_exception_in_prod_mode(self) -> None:
-        payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('malicious message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            payload['message'].encode('utf-8'),
-            payload['vm_id'])
-        with self.swap(self, 'testapp', self.mock_testapp):
-            with self.swap(constants, 'DEV_MODE', False):
-                self.post_json(
-                    '/ml/nextjobhandler', payload, expected_status_int=401)
-
-    def test_that_invalid_signature_raises_exception(self) -> None:
-        payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('malicious message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'), 'message'.encode('utf-8'), payload['vm_id'])
-        swap_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            self._mock_get_secret,
-            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
-        )
-
-        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
-            self.post_json(
-                '/ml/nextjobhandler', payload, expected_status_int=401)
-
-    def test_that_no_excpetion_is_raised_when_valid_vm_access(self) -> None:
-        payload = {}
-        payload['vm_id'] = feconf.DEFAULT_VM_ID
-        secret = feconf.DEFAULT_VM_SHARED_SECRET
-        payload['message'] = json.dumps('message')
-        payload['signature'] = classifier_services.generate_signature(
-            secret.encode('utf-8'),
-            payload['message'].encode('utf-8'),
-            payload['vm_id'])
-        swap_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            self._mock_get_secret,
-            expected_args=[('VM_ID',), ('SHARED_SECRET_KEY',)],
-        )
-
-        with self.swap(self, 'testapp', self.mock_testapp), swap_secret:
-            json_response = self.post_json('/ml/nextjobhandler', payload)
-
-        self.assertEqual(json_response['job_id'], 'new_job')
 
 
 class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
@@ -7578,7 +7414,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
                 '/mock/%s' % 'suggestion-id',
                 expected_status_int=400)
         self.assertEqual(
-            response['error'], 'Invalid format for suggestion_id. ' +
+            response['error'], 'Invalid format for suggestion_id. '
             'It must contain 3 parts separated by \'.\'')
         self.logout()
 
@@ -7586,7 +7422,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self.login(self.hi_language_reviewer)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % 'exploration.exp1.' +
+                '/mock/%s' % 'exploration.exp1.'
                 'WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
                 expected_status_int=404)
         self.logout()

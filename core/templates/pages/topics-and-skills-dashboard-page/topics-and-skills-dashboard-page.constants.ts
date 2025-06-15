@@ -57,5 +57,6 @@ export const TopicsAndSkillsDashboardPageConstants = {
   TOPIC_PUBLISHED_OPTIONS: ETopicPublishedOptions,
   TOPIC_STATUS_OPTIONS: ETopicStatusOptions,
   TOPIC_FILTER_CLASSROOM_ALL: 'All',
+  TOPIC_FILTER_ONLY_CLASSROOMS: 'All Classrooms',
   SKILL_STATUS_OPTIONS: AppConstants.SKILL_STATUS_OPTIONS,
 } as const;

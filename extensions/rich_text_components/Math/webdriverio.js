@@ -93,7 +93,7 @@ const SVGTAGS = {
 };
 
 var expectComponentDetailsToMatch = async function (elem, rawLatex) {
-  // TODO(Jacob): Check that the actual latex being displayed is correct.
+  // TODO(#20444): Check that the actual latex being displayed is correct.
   var mathComponent = await elem.getAttribute('math_content-with-value');
   expect(escapedJsonToObj(mathComponent).raw_latex).toBe(rawLatex);
   var mathSvgImage = elem.$('.e2e-test-math-svg');

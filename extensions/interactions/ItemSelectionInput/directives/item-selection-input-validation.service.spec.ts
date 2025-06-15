@@ -18,15 +18,9 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ItemSelectionInputValidationService} from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
@@ -42,7 +36,6 @@ describe('ItemSelectionInputValidationService', () => {
   let customizationArguments: ItemSelectionInputCustomizationArgs,
     badCustomizationArguments: ItemSelectionInputCustomizationArgs;
   let IsProperSubsetValidOption: AnswerGroup[];
-  let oof: OutcomeObjectFactory, agof: AnswerGroupObjectFactory;
   let ThreeInputsAnswerGroups: AnswerGroup[],
     OneInputAnswerGroups: AnswerGroup[],
     NoInputAnswerGroups: AnswerGroup[],
@@ -56,12 +49,9 @@ describe('ItemSelectionInputValidationService', () => {
     validatorService = TestBed.inject(ItemSelectionInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
-    oof = TestBed.inject(OutcomeObjectFactory);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
-
     currentState = 'First State';
 
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -104,7 +94,7 @@ describe('ItemSelectionInputValidationService', () => {
       },
     };
     goodAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -122,7 +112,7 @@ describe('ItemSelectionInputValidationService', () => {
       ),
     ];
     ThreeInputsAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -140,7 +130,7 @@ describe('ItemSelectionInputValidationService', () => {
       ),
     ];
     OneInputAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -158,7 +148,7 @@ describe('ItemSelectionInputValidationService', () => {
       ),
     ];
     NoInputAnswerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -176,7 +166,7 @@ describe('ItemSelectionInputValidationService', () => {
       ),
     ];
     NoInputAnswerGroupsWithEqualsRule = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -194,7 +184,7 @@ describe('ItemSelectionInputValidationService', () => {
       ),
     ];
     IsProperSubsetValidOption = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -328,7 +318,7 @@ describe('ItemSelectionInputValidationService', () => {
           type: WARNING_TYPES.ERROR,
           message:
             'Learner answer 1 from Oppia response 1 options do not match ' +
-            'customization argument choices.',
+            'customization argument choices',
         },
       ]);
     }
@@ -353,7 +343,7 @@ describe('ItemSelectionInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 from Oppia response 1 options do not match ' +
-          'customization argument choices.',
+          'customization argument choices',
       },
     ]);
   });
@@ -393,7 +383,7 @@ describe('ItemSelectionInputValidationService', () => {
           type: WARNING_TYPES.ERROR,
           message:
             'In Oppia response 1, learner answer 1, ' +
-            'the "proper subset" learner answer must include at least 2 options.',
+            'the "proper subset" learner answer must include at least 2 options',
         },
       ]);
     }
@@ -418,7 +408,7 @@ describe('ItemSelectionInputValidationService', () => {
           message:
             'In Oppia response 1, Learner answer 1, the number of correct ' +
             'options in the "Equals" learner answer should be between 2 and 2 ' +
-            '(the minimum and maximum allowed selection counts).',
+            '(the minimum and maximum allowed selection counts)',
         },
       ]);
     }
@@ -441,7 +431,7 @@ describe('ItemSelectionInputValidationService', () => {
           message:
             'In Oppia response 1, Learner answer 1, the number of correct ' +
             'options in the "Equals" learner answer should be between 1 and 2 ' +
-            '(the minimum and maximum allowed selection counts).',
+            '(the minimum and maximum allowed selection counts)',
         },
       ]);
     }
@@ -462,7 +452,7 @@ describe('ItemSelectionInputValidationService', () => {
           type: WARNING_TYPES.ERROR,
           message:
             'In Oppia response 1, learner answer 1, the "ContainsAtLeastOneOf"' +
-            ' learner answer should have at least one option.',
+            ' learner answer should have at least one option',
         },
       ]);
     }
@@ -482,7 +472,7 @@ describe('ItemSelectionInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Learner answer 1 from Oppia response 1 options do not match ' +
-          'customization argument choices.',
+          'customization argument choices',
       },
     ]);
   });
@@ -495,7 +485,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments.maxAllowableSelectionCount.value = 1;
     customizationArguments.minAllowableSelectionCount.value = 0;
     let answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -525,7 +515,7 @@ describe('ItemSelectionInputValidationService', () => {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'In Oppia Response 1, Learner answer 1, ' +
-          'please select only one answer choice.',
+          'please select only one answer choice',
       },
       {
         type: AppConstants.WARNING_TYPES.ERROR,
@@ -534,7 +524,7 @@ describe('ItemSelectionInputValidationService', () => {
           'Learner answer 1, the number of correct ' +
           'options in the "Equals" learner answer should be between ' +
           '0 and 1' +
-          ' (the minimum and maximum allowed selection counts).',
+          ' (the minimum and maximum allowed selection counts)',
       },
     ]);
   });
@@ -543,7 +533,7 @@ describe('ItemSelectionInputValidationService', () => {
     customizationArguments.maxAllowableSelectionCount.value = 1;
     customizationArguments.minAllowableSelectionCount.value = 0;
     let answerGroups = [
-      agof.createNew(
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -579,7 +569,7 @@ describe('ItemSelectionInputValidationService', () => {
       customizationArguments.maxAllowableSelectionCount.value = 1;
       goodDefaultOutcome.feedback.html = '';
       let answerGroups = [
-        agof.createNew(
+        AnswerGroup.createNew(
           [
             Rule.createFromBackendDict(
               {
@@ -613,7 +603,7 @@ describe('ItemSelectionInputValidationService', () => {
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
             'Please add something for Oppia to say in the ' +
-            '"All other answers" response.',
+            '"All other answers" response',
         },
       ]);
     }
@@ -626,7 +616,7 @@ describe('ItemSelectionInputValidationService', () => {
     () => {
       customizationArguments.maxAllowableSelectionCount.value = 1;
       let answerGroups = [
-        agof.createNew(
+        AnswerGroup.createNew(
           [
             Rule.createFromBackendDict(
               {
@@ -666,7 +656,7 @@ describe('ItemSelectionInputValidationService', () => {
         new SubtitledHtml('Selection 3', 'ca_2'),
       ];
       let answerGroups = [
-        agof.createNew(
+        AnswerGroup.createNew(
           [
             Rule.createFromBackendDict(
               {
@@ -700,19 +690,19 @@ describe('ItemSelectionInputValidationService', () => {
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
             'Please add something for Oppia to say in the ' +
-            '"All other answers" response.',
+            '"All other answers" response',
         },
         {
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
             'Learner answer 1 from Oppia response 1 options do not' +
-            ' match customization argument choices.',
+            ' match customization argument choices',
         },
         {
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
             'Learner answer 1 from Oppia response 1 options do not' +
-            ' match customization argument choices.',
+            ' match customization argument choices',
         },
       ]);
     }
@@ -725,7 +715,7 @@ describe('ItemSelectionInputValidationService', () => {
     () => {
       customizationArguments.maxAllowableSelectionCount.value = 1;
       let answerGroups = [
-        agof.createNew(
+        AnswerGroup.createNew(
           [
             Rule.createFromBackendDict(
               {
@@ -762,7 +752,7 @@ describe('ItemSelectionInputValidationService', () => {
       goodDefaultOutcome.feedback.html = '';
       customizationArguments.maxAllowableSelectionCount.value = 1;
       let answerGroups = [
-        agof.createNew(
+        AnswerGroup.createNew(
           [
             Rule.createFromBackendDict(
               {
@@ -796,15 +786,15 @@ describe('ItemSelectionInputValidationService', () => {
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
             'Please add something for Oppia to say in the ' +
-            '"All other answers" response.',
+            '"All other answers" response',
         },
       ]);
     }
   );
 
-  it('should warn about duplicated rules', () => {
-    const answerGroups = [
-      agof.createNew(
+  it('should warn about duplicated rules in the same answer group', () => {
+    const answerGroup = [
+      AnswerGroup.createNew(
         [
           Rule.createFromBackendDict(
             {
@@ -833,6 +823,56 @@ describe('ItemSelectionInputValidationService', () => {
     const warnings = validatorService.getAllWarnings(
       currentState,
       customizationArguments,
+      answerGroup,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Rule 2 of answer group 1 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
+      },
+    ]);
+  });
+
+  it('should warn about duplicated rules in the different answer group', () => {
+    const answerGroups = [
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
       answerGroups,
       goodDefaultOutcome
     );
@@ -840,8 +880,197 @@ describe('ItemSelectionInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'The rule 1 of answer group 0 of ItemSelectionInput interaction ' +
-          'is a duplicate.',
+          'Rule 1 of answer group 2 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
+      },
+    ]);
+  });
+
+  it('should not warn if rules have different inputs', () => {
+    const answerGroups = [
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_1'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([]);
+  });
+
+  it('should not warn if rules have same inputs but different rule types', () => {
+    const answerGroups = [
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'ContainsAtLeastOneOf',
+              inputs: {
+                x: ['ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([]);
+  });
+
+  it('should warn if rules have same inputs in different order', () => {
+    const answerGroups = [
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_0', 'ca_1'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_1', 'ca_0'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Rule 1 of answer group 2 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
+      },
+    ]);
+  });
+
+  it('should warn if rules have multiple identical keys/values in different order', () => {
+    const answerGroups = [
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                y: 'extra',
+                x: ['ca_0', 'ca_1'],
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+      AnswerGroup.createNew(
+        [
+          Rule.createFromBackendDict(
+            {
+              rule_type: 'Equals',
+              inputs: {
+                x: ['ca_1', 'ca_0'],
+                y: 'extra',
+              },
+            },
+            'ItemSelectionInput'
+          ),
+        ],
+        goodDefaultOutcome,
+        [],
+        null
+      ),
+    ];
+    const warnings = validatorService.getAllWarnings(
+      currentState,
+      customizationArguments,
+      answerGroups,
+      goodDefaultOutcome
+    );
+    expect(warnings).toEqual([
+      {
+        type: WARNING_TYPES.ERROR,
+        message:
+          'Rule 1 of answer group 2 is already present in answer group 1 -- please remove or edit the rule in the answer group to avoid duplicate rules',
       },
     ]);
   });

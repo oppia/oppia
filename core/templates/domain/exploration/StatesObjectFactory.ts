@@ -16,7 +16,6 @@
  * @fileoverview Factory for creating new frontend instances of State
  * domain objects given a list of backend state dictionaries.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -56,7 +55,7 @@ export class States {
     return this._states[stateName];
   }
 
-  // TODO(tjiang11): Remove getStateObjects() and replace calls
+  // TODO(#20441): Remove getStateObjects() and replace calls
   // with an object to represent data to be manipulated inside
   // ExplorationDiffService.
 
@@ -155,35 +154,6 @@ export class States {
     }
     return finalStateNames;
   }
-
-  getAllVoiceoverLanguageCodes(): string[] {
-    const allLanguageCodes = new Set<string>();
-    Object.values(this._states).forEach(state => {
-      state.recordedVoiceovers.getAllContentIds().forEach(contentId => {
-        const contentLanguageCodes =
-          state.recordedVoiceovers.getLanguageCodes(contentId);
-        contentLanguageCodes.forEach(allLanguageCodes.add, allLanguageCodes);
-      });
-    });
-    return [...allLanguageCodes];
-  }
-
-  getAllVoiceovers(languageCode: string): VoiceoverObjectsDict {
-    let allAudioTranslations: VoiceoverObjectsDict = {};
-    for (let stateName in this._states) {
-      let state = this._states[stateName];
-      allAudioTranslations[stateName] = [];
-      let contentIdsList = state.recordedVoiceovers.getAllContentIds();
-      contentIdsList.forEach(contentId => {
-        let audioTranslations =
-          state.recordedVoiceovers.getBindableVoiceovers(contentId);
-        if (audioTranslations.hasOwnProperty(languageCode)) {
-          allAudioTranslations[stateName].push(audioTranslations[languageCode]);
-        }
-      });
-    }
-    return allAudioTranslations;
-  }
 }
 
 @Injectable({
@@ -202,7 +172,3 @@ export class StatesObjectFactory {
     return new States(this.stateObject, stateObjectsDict);
   }
 }
-
-angular
-  .module('oppia')
-  .factory('StatesObjectFactory', downgradeInjectable(StatesObjectFactory));

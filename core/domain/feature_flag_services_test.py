@@ -317,8 +317,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with swap_all_feature_flags, swap_all_feature_names_set:
             with swap_name_to_description_feature_stage_registry_dict:
                 with self.assertRaisesRegex(
-                    Exception, 'Feature flag not found: '
-                    'feature_that_does_not_exist.'
+                    Exception,
+                    'Feature flag not found: feature_that_does_not_exist.'
                 ):
                     feature_services.is_feature_flag_enabled(
                         'feature_that_does_not_exist', self.owner_id)
@@ -604,10 +604,10 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         (user_1_id, user_2_id, user_3_id) = (
             self._signup_multiple_users_and_return_ids())
         user_models.UserGroupModel(
-            id=self.USER_GROUP_1, users=[
+            id=self.USER_GROUP_1, name='USER_GROUP_1', user_ids=[
                 user_1_id, user_2_id, user_3_id]).put()
         user_models.UserGroupModel(
-            id=self.USER_GROUP_2, users=[
+            id=self.USER_GROUP_2, name='USER_GROUP_2', user_ids=[
                 user_1_id, user_2_id]).put()
         swap_name_to_description_feature_stage_registry_dict = (
             self._swap_name_to_description_feature_stage_registry())
@@ -686,7 +686,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         user_ids_for_which_feature_flag_enabled_for_10_perc = set()
         count_feature_flag_enabled_for_10_perc = 0
         for count in range(1, 1001):
-            user_ids_list.append('userid' + str(count))
+            user_ids_list.append('userid%s' % str(count))
 
         with swap_name_to_description_feature_stage_registry_dict:
             with swap_all_feature_names_set:

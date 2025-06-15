@@ -21,12 +21,29 @@
   margin-left: 25px;
 }
 .playbook .oppia-about-buttons-container {
+  display: flex;
+  justify-content: space-evenly;
   text-align: center;
+}
+.playbook .btn.oppia-about-button {
+  background-color: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 1.0);
+  font-weight: 500;
+  letter-spacing: 0.7px;
+  margin: 0 auto 4%;
+  max-width: 80%;
+  min-width: 40%;
+  padding: 10px 30px;
+  text-transform: uppercase;
+}
+.playbook .btn.oppia-about-button:hover {
+  background-color: #fff;
+  color: #009688;
 }
 .playbook .oppia-about-extra-info {
   background-color: #009788;
   color: #fff;
-  height: 245px;
+  height: 160px;
   width: 100%;
 }
 
@@ -43,6 +60,15 @@
 .playbook .oppia-about-extra-container h3 {
   color: #fff;
   text-align: center;
+}
+
+@media(max-width: 1000px) {
+  .playbook .oppia-about-buttons-container {
+    flex-direction: column;
+  }
+  .playbook .btn.oppia-about-button {
+    min-width: 80%;
+  }
 }
 
 @media only screen and (min-width: 1400px) {

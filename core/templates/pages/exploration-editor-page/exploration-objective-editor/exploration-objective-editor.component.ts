@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {ExplorationObjectiveService} from 'pages/exploration-editor-page/services/exploration-objective.service';
 
 @Component({
@@ -41,10 +40,3 @@ export class ExplorationObjectiveEditorComponent {
     this.onInputFieldBlur.emit();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationObjectiveEditor',
-  downgradeComponent({
-    component: ExplorationObjectiveEditorComponent,
-  })
-);

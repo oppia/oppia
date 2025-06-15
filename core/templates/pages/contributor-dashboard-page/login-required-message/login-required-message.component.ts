@@ -21,7 +21,6 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'login-required-message',
@@ -43,7 +42,7 @@ export class LoginRequiredMessageComponent {
 
   ngOnInit(): void {
     this.OPPIA_AVATAR_IMAGE_URL =
-      this.urlInterpolationService.getStaticImageUrl(
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
   }
@@ -61,10 +60,3 @@ export class LoginRequiredMessageComponent {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'loginRequiredMessage',
-    downgradeComponent({component: LoginRequiredMessageComponent})
-  );

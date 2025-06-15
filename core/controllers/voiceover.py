@@ -19,6 +19,7 @@ from __future__ import annotations
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import voiceover_regeneration_services
 from core.domain import voiceover_services
 
 from typing import Dict, TypedDict
@@ -33,7 +34,7 @@ class VoiceoverAdminDataHandler(
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
-    @acl_decorators.can_access_voiceover_admin_page
+    @acl_decorators.open_access
     def get(self) -> None:
         """Retrieves relevant data for the voiceover admin page."""
 
@@ -42,10 +43,16 @@ class VoiceoverAdminDataHandler(
 
         language_codes_mapping: Dict[str, Dict[str, bool]] = (
             voiceover_services.get_all_language_accent_codes_for_voiceovers())
+
+        autogeneratable_language_accent_codes = (
+            voiceover_services.get_autogeneratable_language_accent_codes())
+
         self.values.update({
             'language_accent_master_list':
                 language_accent_master_list,
-            'language_codes_mapping': language_codes_mapping
+            'language_codes_mapping': language_codes_mapping,
+            'autogeneratable_language_accent_codes':
+                autogeneratable_language_accent_codes
         })
         self.render_json(self.values)
 
@@ -217,4 +224,130 @@ class GetSampleVoiceoversForGivenVoiceArtistHandler(
         self.values.update({
             'exploration_id_to_filenames': exploration_id_to_filenames,
         })
+        self.render_json(self.values)
+
+
+class EntityVoiceoversBulkHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler class to get entity voiceovers data for a given language code
+    of an exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'entity_type': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'entity_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'entity_version': {
+            'schema': {
+                'type': 'int'
+            }
+        },
+        'language_code': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.open_access
+    def get(
+        self,
+        entity_type: str,
+        entity_id: str,
+        entity_version: int,
+        language_code: str,
+    ) -> None:
+        entity_voiceovers_objects = (
+            voiceover_services.fetch_entity_voiceovers_by_language_code(
+                entity_id, entity_type, entity_version, language_code)
+        )
+        entity_voiceovers_dicts = []
+
+        for entity_voiceovers in entity_voiceovers_objects:
+            entity_voiceovers_dicts.append(entity_voiceovers.to_dict())
+
+        self.values.update({
+            'entity_voiceovers_list': entity_voiceovers_dicts
+        })
+        self.render_json(self.values)
+
+
+class RegenerateAutomaticVoiceoverHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Regenerates the automatic voiceover for the given exploration data."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {
+            'schema': {
+                'type': 'basestring'
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'exploration_version': {
+                'schema': {
+                    'type': 'int'
+                }
+            },
+            'state_name': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'content_id': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            },
+            'language_accent_code': {
+                'schema': {
+                    'type': 'basestring'
+                }
+            }
+        }
+    }
+
+    @acl_decorators.can_voiceover_exploration
+    def put(self, exploration_id: str) -> None:
+        """Regenerates the voiceover for the given exploration data."""
+        assert self.normalized_payload is not None
+        state_name: str = self.normalized_payload['state_name']
+        content_id: str = self.normalized_payload['content_id']
+        language_accent_code: str = self.normalized_payload[
+            'language_accent_code']
+        exploration_version: int = int(self.normalized_payload[
+            'exploration_version'])
+
+        generated_voiceover, sentence_tokens_with_durations = (
+            voiceover_regeneration_services.
+            regenerate_voiceover_for_exploration_content(
+                exploration_id,
+                exploration_version,
+                state_name,
+                content_id,
+                language_accent_code
+            )
+        )
+
+        self.values.update({
+            'filename': generated_voiceover.filename,
+            'duration_secs': generated_voiceover.duration_secs,
+            'file_size_bytes': generated_voiceover.file_size_bytes,
+            'needs_update': generated_voiceover.needs_update,
+            'sentence_tokens_with_durations': sentence_tokens_with_durations
+        })
+
         self.render_json(self.values)

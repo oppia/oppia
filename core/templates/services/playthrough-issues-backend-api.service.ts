@@ -16,7 +16,6 @@
  * @fileoverview Service for fetching issues and playthroughs from the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -30,6 +29,7 @@ import {
 } from 'domain/statistics/playthrough-issue.model';
 import {ServicesConstants} from 'services/services.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import isEqual from 'lodash/isEqual';
 
 @Injectable({providedIn: 'root'})
 export class PlaythroughIssuesBackendApiService {
@@ -109,7 +109,7 @@ export class PlaythroughIssuesBackendApiService {
           () => {
             if (this.cachedIssues.length !== 0) {
               const issueIndex = this.cachedIssues.findIndex(issue =>
-                angular.equals(issue, issueToResolve)
+                isEqual(issue, issueToResolve)
               );
               if (issueIndex !== -1) {
                 this.cachedIssues.splice(issueIndex, 1);
@@ -159,10 +159,3 @@ export class PlaythroughIssuesBackendApiService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'PlaythroughIssuesBackendApiService',
-    downgradeInjectable(PlaythroughIssuesBackendApiService)
-  );

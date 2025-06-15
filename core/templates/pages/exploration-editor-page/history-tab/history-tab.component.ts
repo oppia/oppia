@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit, OnDestroy, ChangeDetectorRef} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
@@ -377,6 +376,8 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
         };
         this.historyTabBackendApiService.postData(data).then(
           () => {
+            const currentUrl = this.windowRef.nativeWindow.location.href;
+            this.windowRef.nativeWindow.location.href = `${currentUrl}#/history`;
             this.windowRef.nativeWindow.location.reload();
           },
           () => {
@@ -518,10 +519,3 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaHistoryTab',
-  downgradeComponent({
-    component: HistoryTabComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -35,7 +35,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {
   FeatureStatusChecker,
@@ -165,19 +164,14 @@ export class PlatformFeatureService {
    * Clears results from the sessionStorage, if any.
    */
   private clearSavedResults(): void {
-    this.windowRef.nativeWindow.sessionStorage.removeItem(
-      PlatformFeatureService.SESSION_STORAGE_KEY
-    );
+    if (this.windowRef.nativeWindow.sessionStorage) {
+      this.windowRef.nativeWindow.sessionStorage.removeItem(
+        PlatformFeatureService.SESSION_STORAGE_KEY
+      );
+    }
   }
 }
 
 export const platformFeatureInitFactory = (service: PlatformFeatureService) => {
   return async (): Promise<void> => service.initialize();
 };
-
-angular
-  .module('oppia')
-  .factory(
-    'PlatformFeatureService',
-    downgradeInjectable(PlatformFeatureService)
-  );

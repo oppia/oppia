@@ -16,8 +16,6 @@
  * @fileoverview Component for the translation modal.
  */
 
-import isEqual from 'lodash/isEqual';
-
 import {
   ChangeDetectorRef,
   Component,
@@ -25,8 +23,7 @@ import {
   Input,
   ViewChild,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {AlertsService} from 'services/alerts.service';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
@@ -40,8 +37,8 @@ import {
 } from 'pages/contributor-dashboard-page/services/translate-text.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {UserService} from 'services/user.service';
+import {TranslationValidationService} from 'services/translation-validation.service';
 import {AppConstants} from 'app.constants';
-import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
 import {ListSchema, UnicodeSchema} from 'services/schema-default-value.service';
 import {
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
@@ -52,6 +49,9 @@ import {
 // @ts-ignore
 import {RteOutputDisplayComponent} from 'rich_text_components/rte-output-display.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -77,6 +77,15 @@ export interface TranslationOpportunity {
   totalCount: number;
   translationsCount: number;
 }
+export interface ModifyTranslationOpportunity {
+  id: string;
+  contentId: string;
+  heading: string;
+  subheading: string;
+  textToTranslate: string;
+  currentContentTranslation: TranslatedContent;
+  interactionId?: string;
+}
 export interface HTMLSchema {
   type: string;
   ui_config: UiConfig;
@@ -85,25 +94,6 @@ export interface ImageDetails {
   filePaths: string[];
   alts: string[];
   descriptions: string[];
-}
-export class TranslationError {
-  constructor(
-    private _hasDuplicateAltTexts: boolean,
-    private _hasDuplicateDescriptions: boolean,
-    private _hasUntranslatedElements: boolean
-  ) {}
-
-  get hasDuplicateDescriptions(): boolean {
-    return this._hasDuplicateDescriptions;
-  }
-
-  get hasDuplicateAltTexts(): boolean {
-    return this._hasDuplicateAltTexts;
-  }
-
-  get hasUntranslatedElements(): boolean {
-    return this._hasUntranslatedElements;
-  }
 }
 
 @Component({
@@ -115,6 +105,7 @@ export class TranslationModalComponent {
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() opportunity!: TranslationOpportunity;
+  @Input() modifyTranslationOpportunity!: ModifyTranslationOpportunity;
   activeDataFormat!: string;
   activeWrittenTranslation: string | string[] = '';
   activeContentType!: string;
@@ -173,21 +164,25 @@ export class TranslationModalComponent {
   @ViewChild('translationContainer')
   translationContainer!: ElementRef;
 
+  private beforeUnloadHandler: (e: BeforeUnloadEvent) => string | undefined =
+    () => undefined;
+
   constructor(
     public readonly activeModal: NgbActiveModal,
     private readonly alertsService: AlertsService,
     private readonly ckEditorCopyContentService: CkEditorCopyContentService,
     private readonly contextService: ContextService,
     private readonly imageLocalStorageService: ImageLocalStorageService,
+    private readonly ngbModal: NgbModal,
     private readonly siteAnalyticsService: SiteAnalyticsService,
     private readonly translateTextService: TranslateTextService,
     private readonly translationLanguageService: TranslationLanguageService,
     private readonly userService: UserService,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly wds: WindowDimensionsService
-  ) {
-    this.contextService = OppiaAngularRootComponent.contextService;
-  }
+    private readonly wds: WindowDimensionsService,
+    private readonly translationValidationService: TranslationValidationService,
+    private readonly windowRef: WindowRef
+  ) {}
 
   public get expansionTabType(): typeof ExpansionTabType {
     return ExpansionTabType;
@@ -196,27 +191,53 @@ export class TranslationModalComponent {
   ngOnInit(): void {
     this.activeLanguageCode =
       this.translationLanguageService.getActiveLanguageCode();
-    // We need to set the context here so that the rte fetches
-    // images for the given ENTITY_TYPE and targetId.
-    this.contextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.EXPLORATION,
-      this.opportunity.id
-    );
-    this.subheading = this.opportunity.subheading;
-    this.heading = this.opportunity.heading;
+    this.subheading = this.opportunity
+      ? this.opportunity.subheading
+      : this.modifyTranslationOpportunity.subheading;
+    this.heading = this.opportunity
+      ? this.opportunity.heading
+      : this.modifyTranslationOpportunity.heading;
     this.contextService.setImageSaveDestinationToLocalStorage();
     this.languageDescription =
       this.translationLanguageService.getActiveLanguageDescription();
-    this.translateTextService.init(
-      this.opportunity.id,
-      this.translationLanguageService.getActiveLanguageCode(),
-      () => {
-        const translatableItem = this.translateTextService.getTextToTranslate();
-        this.updateActiveState(translatableItem);
-        ({more: this.moreAvailable} = translatableItem);
-        this.loadingData = false;
-      }
-    );
+
+    if (!this.modifyTranslationOpportunity) {
+      // We need to set the context here so that the rte fetches
+      // images for the given ENTITY_TYPE and targetId.
+      this.contextService.setCustomEntityContext(
+        AppConstants.ENTITY_TYPE.EXPLORATION,
+        this.opportunity.id
+      );
+
+      this.translateTextService.init(
+        this.opportunity.id,
+        this.translationLanguageService.getActiveLanguageCode(),
+        () => {
+          const translatableItem =
+            this.translateTextService.getTextToTranslate();
+          this.updateActiveState(translatableItem);
+          ({more: this.moreAvailable} = translatableItem);
+          this.loadingData = false;
+        }
+      );
+    } else {
+      // Initialize the translation modal with the "modify translation" opportunity
+      // in case it was called from the exploration editor page for modifying
+      // a particular translation.
+      this.textToTranslate = this.modifyTranslationOpportunity.textToTranslate;
+      const contentType =
+        this.modifyTranslationOpportunity.contentId.split('_')[0];
+      this.activeContentType = this.getFormattedContentType(
+        contentType,
+        this.modifyTranslationOpportunity.interactionId
+      );
+      this.activeWrittenTranslation =
+        this.modifyTranslationOpportunity.currentContentTranslation.translation;
+      this.activeDataFormat =
+        this.modifyTranslationOpportunity.currentContentTranslation.dataFormat;
+      this.loadingData = false;
+    }
+
     this.userService
       .getUserContributionRightsDataAsync()
       .then(userContributionRights => {
@@ -241,6 +262,21 @@ export class TranslationModalComponent {
           this.translationLanguageService.getActiveLanguageDirection(),
       },
     };
+
+    this.beforeUnloadHandler = (e: BeforeUnloadEvent) => {
+      if (
+        this.activeWrittenTranslation &&
+        this.activeWrittenTranslation.length > 0
+      ) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+    this.windowRef.nativeWindow.addEventListener(
+      'beforeunload',
+      this.beforeUnloadHandler
+    );
   }
 
   ngAfterViewInit(): void {
@@ -279,11 +315,39 @@ export class TranslationModalComponent {
     this.editorIsShown = true;
   }
 
-  close(): void {
-    this.activeModal.close();
+  private checkForUnsavedChanges(action: () => void): void {
+    if (
+      this.activeWrittenTranslation &&
+      this.activeWrittenTranslation.length > 0
+    ) {
+      const modalRef = this.ngbModal.open(
+        ConfirmTranslationExitModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
 
-    // Reset copyMode to the default value and avoid console errors.
-    this.ckEditorCopyContentService.copyModeActive = false;
+      modalRef.result.then(
+        () => {
+          // If user confirms, execute the passed action.
+          action();
+        },
+        () => {
+          // If user cancels or closes, no action is needed.
+        }
+      );
+    } else {
+      // No unsaved changes, directly execute the action.
+      action();
+    }
+  }
+
+  close(): void {
+    this.checkForUnsavedChanges(() => {
+      this.activeModal.close();
+      // Reset copyMode to the default value and avoid console errors.
+      this.ckEditorCopyContentService.copyModeActive = false;
+    });
   }
 
   getHtmlSchema(): HTMLSchema {
@@ -365,10 +429,12 @@ export class TranslationModalComponent {
   }
 
   skipActiveTranslation(): void {
-    const translatableItem = this.translateTextService.getTextToTranslate();
-    this.updateActiveState(translatableItem);
-    ({more: this.moreAvailable} = translatableItem);
-    this.resetEditor();
+    this.checkForUnsavedChanges(() => {
+      const translatableItem = this.translateTextService.getTextToTranslate();
+      this.updateActiveState(translatableItem);
+      ({more: this.moreAvailable} = translatableItem);
+      this.resetEditor();
+    });
   }
 
   isSubmitted(): boolean {
@@ -376,11 +442,13 @@ export class TranslationModalComponent {
   }
 
   returnToPreviousTranslation(): void {
-    const translatableItem =
-      this.translateTextService.getPreviousTextToTranslate();
-    this.updateActiveState(translatableItem);
-    this.moreAvailable = true;
-    this.resetEditor();
+    this.checkForUnsavedChanges(() => {
+      const translatableItem =
+        this.translateTextService.getPreviousTextToTranslate();
+      this.updateActiveState(translatableItem);
+      this.moreAvailable = true;
+      this.resetEditor();
+    });
   }
 
   isSetOfStringDataFormat(): boolean {
@@ -422,138 +490,13 @@ export class TranslationModalComponent {
     );
   }
 
-  getElementAttributeTexts(
-    elements: HTMLCollectionOf<Element>,
-    type: string
-  ): string[] {
-    const textWrapperLength = 6;
-    const attributes = Array.from(elements, function (element: Element) {
-      // A sample element would be as <oppia-noninteractive-image alt-with-value
-      // ="&amp;quot;Image description&amp;quot;" caption-with-value=
-      // "&amp;quot;Image caption&amp;quot;" filepath-with-value="&amp;quot;
-      // img_2021029_210552_zbmdt94_height_54_width_490.png&amp;quot;">
-      // </oppia-noninteractive-image>
-      if (element.localName === 'oppia-noninteractive-image') {
-        const attribute = element.attributes[
-          type as keyof NamedNodeMap
-        ] as Attr;
-        const attributeValue = attribute.value;
-        return attributeValue.substring(
-          textWrapperLength,
-          attributeValue.length - textWrapperLength
-        );
-      }
-    });
-    // Typecasted to string[] because Array.from() returns
-    // (string | undefined)[] and we need to remove the undefined elements.
-    return attributes.filter(attributeValues => attributeValues) as string[];
-  }
-
-  getImageAttributeTexts(
-    htmlElements: HTMLCollectionOf<Element>
-  ): ImageDetails {
-    return {
-      filePaths: this.getElementAttributeTexts(
-        htmlElements,
-        'filepath-with-value'
-      ),
-      alts: this.getElementAttributeTexts(htmlElements, 'alt-with-value'),
-      descriptions: this.getElementAttributeTexts(
-        htmlElements,
-        'caption-with-value'
-      ),
-    };
-  }
-
-  hasSomeDuplicateElements(
-    originalElements: string[],
-    translatedElements: string[]
-  ): boolean {
-    // This regular expression matches a number, optionally negative, with an
-    // optional decimal number followed by zero or more operators (including
-    // equals sign) and number pairs. It also allows for whitespace between
-    // numbers and operators. Examples 1+1=2 1+1 1*1=1.
-    const mathEquationRegex = new RegExp(
-      /(?:(?:^|[-+_*/=])(?:\s*-?\d+(\.\d+)?(?:[eE][+-]?\d+)?\s*))+$/
-    );
-    if (originalElements.length === 0) {
-      return false;
-    }
-    const hasMatchingTranslatedElement = (element: string) =>
-      translatedElements.includes(element) &&
-      originalElements.length > 0 &&
-      !mathEquationRegex.test(element);
-    return originalElements.some(hasMatchingTranslatedElement);
-  }
-
-  isTranslationCompleted(
-    originalElements: HTMLCollectionOf<Element>,
-    translatedElements: HTMLCollectionOf<Element>
-  ): boolean {
-    // Checks if there are custom tags present in the original content but not
-    // in the translated content.
-    const filteredOriginalElements = Array.from(originalElements, el =>
-      el.tagName.toLowerCase()
-    )
-      .filter(tagName =>
-        this.ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION.includes(tagName)
-      )
-      .sort();
-    const filteredTranslatedElements = Array.from(translatedElements, el =>
-      el.tagName.toLowerCase()
-    )
-      .filter(tagName =>
-        this.ALLOWED_CUSTOM_TAGS_IN_TRANSLATION_SUGGESTION.includes(tagName)
-      )
-      .sort();
-    return isEqual(filteredOriginalElements, filteredTranslatedElements);
-  }
-
-  validateTranslation(
-    textToTranslate: HTMLCollectionOf<Element>,
-    translatedText: HTMLCollectionOf<Element>
-  ): TranslationError {
-    const translatedElements: ImageDetails =
-      this.getImageAttributeTexts(translatedText);
-    const originalElements: ImageDetails =
-      this.getImageAttributeTexts(textToTranslate);
-
-    const hasDuplicateAltTexts = this.hasSomeDuplicateElements(
-      originalElements.alts,
-      translatedElements.alts
-    );
-    const hasDuplicateDescriptions = this.hasSomeDuplicateElements(
-      originalElements.descriptions,
-      translatedElements.descriptions
-    );
-    const hasUntranslatedElements = !this.isTranslationCompleted(
-      textToTranslate,
-      translatedText
-    );
-
-    return new TranslationError(
-      hasDuplicateAltTexts,
-      hasDuplicateDescriptions,
-      hasUntranslatedElements
-    );
-  }
-
-  suggestTranslatedText(): void {
+  canTranslatedTextBeSubmitted(): boolean {
     if (!this.isSetOfStringDataFormat()) {
-      const domParser = new DOMParser();
-      const originalElements = domParser.parseFromString(
-        this.textToTranslate as string,
-        'text/html'
-      );
-      const translatedElements = domParser.parseFromString(
-        this.activeWrittenTranslation as string,
-        'text/html'
-      );
-
-      const translationError = this.validateTranslation(
-        originalElements.getElementsByTagName('*'),
-        translatedElements.getElementsByTagName('*')
-      );
+      const translationError =
+        this.translationValidationService.validateTranslationFromHtmlStrings(
+          this.textToTranslate as string,
+          this.activeWrittenTranslation as string
+        );
 
       this.hasImgTextError =
         translationError.hasDuplicateAltTexts ||
@@ -567,12 +510,19 @@ export class TranslationModalComponent {
         this.uploadingTranslation ||
         this.loadingData
       ) {
-        return;
+        return false;
       }
 
       if (this.hadCopyParagraphError) {
         this.hadCopyParagraphError = false;
       }
+    }
+    return true;
+  }
+
+  suggestTranslatedText(): void {
+    if (!this.canTranslatedTextBeSubmitted()) {
+      return;
     }
 
     if (!this.uploadingTranslation && !this.loadingData) {
@@ -612,11 +562,17 @@ export class TranslationModalComponent {
       this.close();
     }
   }
-}
+  updateTranslatedText(): void {
+    if (!this.canTranslatedTextBeSubmitted()) {
+      return;
+    }
+    this.activeModal.close(this.activeWrittenTranslation);
+  }
 
-angular
-  .module('oppia')
-  .directive(
-    'oppiaTranslationModal',
-    downgradeComponent({component: TranslationModalComponent})
-  );
+  ngOnDestroy(): void {
+    this.windowRef.nativeWindow.removeEventListener(
+      'beforeunload',
+      this.beforeUnloadHandler
+    );
+  }
+}

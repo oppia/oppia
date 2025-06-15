@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationPropertyService} from './exploration-property.service';
 import {AppConstants} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
@@ -47,7 +46,7 @@ export class ExplorationTagsService extends ExplorationPropertyService {
     for (let i = 0; i < value.length; i++) {
       value[i] = value[i].trim().replace(/\s+/g, ' ');
     }
-    // TODO(sll): Prevent duplicate tags from being added.
+
     return value;
   }
 
@@ -68,10 +67,3 @@ export class ExplorationTagsService extends ExplorationPropertyService {
     return true;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationTagsService',
-    downgradeInjectable(ExplorationTagsService)
-  );

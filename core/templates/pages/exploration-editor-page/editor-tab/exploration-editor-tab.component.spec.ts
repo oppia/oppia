@@ -25,15 +25,15 @@ import {
   ComponentFixture,
   waitForAsync,
 } from '@angular/core/testing';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {OutcomeObjectFactory} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ExplorationDataService} from '../services/exploration-data.service';
@@ -71,17 +71,22 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationNextContentIdIndexService} from '../services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from '../services/version-history.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
+import {
+  FetchSkillResponse,
+  SkillBackendApiService,
+} from 'domain/skill/skill-backend-api.service';
+import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
+import {AlertsService} from 'services/alerts.service';
 
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
   let fixture: ComponentFixture<ExplorationEditorTabComponent>;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let editabilityService: EditabilityService;
   let explorationFeaturesService: ExplorationFeaturesService;
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationStatesService: ExplorationStatesService;
   let explorationWarningsService: ExplorationWarningsService;
-  let outcomeObjectFactory: OutcomeObjectFactory;
   let routerService: RouterService;
   let siteAnalyticsService: SiteAnalyticsService;
   let stateEditorRefreshService: StateEditorRefreshService;
@@ -98,6 +103,9 @@ describe('Exploration editor tab component', () => {
   let stateObjectFactory: StateObjectFactory;
   let stateObject: StateBackendDict;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
+  let skillBackendApiService: SkillBackendApiService;
+  let skillObjectFactory: SkillObjectFactory;
+  let alertsService: AlertsService;
 
   class MockJoyrideService {
     startTour() {
@@ -202,10 +210,8 @@ describe('Exploration editor tab component', () => {
     fixture = TestBed.createComponent(ExplorationEditorTabComponent);
     component = fixture.componentInstance;
 
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
@@ -232,6 +238,9 @@ describe('Exploration editor tab component', () => {
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
+    skillBackendApiService = TestBed.inject(SkillBackendApiService);
+    skillObjectFactory = TestBed.inject(SkillObjectFactory);
+    alertsService = TestBed.inject(AlertsService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
     spyOn(contextService, 'getExplorationId').and.returnValue('explorationId');
@@ -258,12 +267,6 @@ describe('Exploration editor tab component', () => {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -369,20 +372,6 @@ describe('Exploration editor tab component', () => {
           linked_skill_id: null,
           param_changes: [],
           solicit_answer_details: false,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {
-                en: {
-                  filename: 'myfile2.mp3',
-                  file_size_bytes: 120000,
-                  needs_update: false,
-                  duration_secs: 1.2,
-                },
-              },
-            },
-          },
         },
         'Second State': {
           classifier_model_id: null,
@@ -390,13 +379,6 @@ describe('Exploration editor tab component', () => {
           content: {
             content_id: 'content',
             html: 'Second State Content',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-            },
           },
           interaction: {
             id: 'TextInput',
@@ -660,6 +642,102 @@ describe('Exploration editor tab component', () => {
     );
   });
 
+  it('should save inapplicable misconception ids', () => {
+    stateEditorService.setActiveStateName('First State');
+    expect(
+      explorationStatesService.getState('First State')
+        .inapplicableSkillMisconceptionIds
+    ).toEqual(undefined);
+
+    component.saveInapplicableSkillMisconceptionIds(['skill_id1']);
+    expect(
+      explorationStatesService.getState('First State')
+        .inapplicableSkillMisconceptionIds
+    ).toEqual(['skill_id1']);
+  });
+
+  it('should populate misconceptions for state', fakeAsync(() => {
+    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+      Promise.resolve({
+        skill: skillObjectFactory.createFromBackendDict({
+          id: 'skill_id1',
+          description: 'test description 1',
+          misconceptions: [
+            {
+              id: 2,
+              name: 'test name',
+              notes: 'test notes',
+              feedback: 'test feedback',
+              must_be_addressed: true,
+            },
+          ],
+          rubrics: [
+            {
+              difficulty: 'Easy',
+              explanations: ['explanation'],
+            },
+          ],
+          skill_contents: {
+            explanation: {
+              html: 'test explanation',
+              content_id: 'explanation',
+            },
+            worked_examples: [],
+            recorded_voiceovers: {
+              voiceovers_mapping: {},
+            },
+          },
+          language_code: 'en',
+          version: 3,
+          prerequisite_skill_ids: ['skill_id1'],
+          all_questions_merged: false,
+          next_misconception_id: 0,
+          superseding_skill_id: '',
+        }),
+      } as FetchSkillResponse)
+    );
+    spyOn(stateEditorService, 'setMisconceptionsBySkill');
+
+    component.populateMisconceptionsForState('skill_id1');
+    tick();
+
+    expect(component.misconceptionsBySkill).toEqual({
+      skill_id1: [
+        Misconception.createFromBackendDict({
+          id: 2,
+          name: 'test name',
+          notes: 'test notes',
+          feedback: 'test feedback',
+          must_be_addressed: true,
+        }),
+      ],
+    });
+    expect(stateEditorService.setMisconceptionsBySkill).toHaveBeenCalledWith({
+      skill_id1: [
+        Misconception.createFromBackendDict({
+          id: 2,
+          name: 'test name',
+          notes: 'test notes',
+          feedback: 'test feedback',
+          must_be_addressed: true,
+        }),
+      ],
+    });
+  }));
+
+  it('should show warning message if fetching skill fails', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+      Promise.reject('Error occurred.')
+    );
+
+    component.populateMisconceptionsForState('');
+    tick();
+
+    expect(skillBackendApiService.fetchSkillAsync).toHaveBeenCalled();
+    expect(alertsService.addWarning).toHaveBeenCalled();
+  }));
+
   it('should save interaction answer groups', () => {
     stateEditorService.setActiveStateName('First State');
     stateEditorService.setInteraction(
@@ -667,7 +745,7 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.answerGroups).toEqual([
-      answerGroupObjectFactory.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
           training_data: null,
@@ -690,7 +768,7 @@ describe('Exploration editor tab component', () => {
     ]);
 
     let displayedValue = [
-      answerGroupObjectFactory.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
           outcome: {
@@ -723,7 +801,7 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.defaultOutcome).toEqual(
-      outcomeObjectFactory.createFromBackendDict({
+      Outcome.createFromBackendDict({
         dest: 'default',
         dest_if_really_stuck: null,
         feedback: {
@@ -737,7 +815,7 @@ describe('Exploration editor tab component', () => {
       })
     );
 
-    let displayedValue = outcomeObjectFactory.createFromBackendDict({
+    let displayedValue = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {

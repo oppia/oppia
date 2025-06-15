@@ -25,6 +25,7 @@ import copy
 import datetime
 import functools
 import inspect
+import io
 import itertools
 import json
 import logging
@@ -33,7 +34,6 @@ import os
 import random
 import re
 import string
-from types import TracebackType
 import unittest
 
 from core import feature_flag_list
@@ -45,7 +45,8 @@ from core.controllers import base
 from core.domain import auth_domain
 from core.domain import blog_services
 from core.domain import caching_domain
-from core.domain import classifier_domain
+from core.domain import classroom_config_domain
+from core.domain import classroom_config_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -53,10 +54,12 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_services
-from core.domain import fs_services
 from core.domain import interaction_registry
 from core.domain import object_registry
 from core.domain import param_domain
+from core.domain import platform_parameter_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -76,15 +79,14 @@ from core.platform import models
 from core.platform.search import elastic_search_services
 from core.platform.taskqueue import cloud_tasks_emulator
 import main
-from proto_files import text_classifier_pb2
 from scripts import common
 
 import elasticsearch
 import requests_mock
 from typing import (
-    IO, Any, Callable, Collection, Dict, Final, Iterable, Iterator, List,
-    Literal, Mapping, Optional, OrderedDict, Pattern, Sequence, Set, Tuple,
-    Type, TypedDict, TypeVar, Union, cast, overload
+    Any, Callable, Collection, Dict, Final, Iterable, Iterator, List,
+    Literal, Mapping, Optional, OrderedDict, Pattern, Sequence, Set,
+    Tuple, Type, TypedDict, TypeVar, Union, cast, overload
 )
 import webapp2
 import webtest
@@ -223,12 +225,6 @@ def get_filepath_from_filename(filename: str, rootdir: str) -> Optional[str]:
     Raises:
         Exception. Multiple files found with given file name.
     """
-    # This is required since error files are served according to error status
-    # code. The file served is error-page.mainpage.html but it is compiled and
-    # stored as error-page-{status_code}.mainpage.html.  So, we need to swap the
-    # name here to obtain the correct filepath.
-    if filename.startswith('error-page'):
-        filename = 'error-page.mainpage.html'
     matches = list(itertools.chain.from_iterable(
         (os.path.join(subdir, f) for f in filenames if f == filename)
         for subdir, _, filenames in os.walk(rootdir)))
@@ -317,7 +313,7 @@ def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
                     yield clazz
 
 
-def generate_random_hexa_str() -> str:
+def generate_random_hexa_str() -> str: # docker: no cover
     """Generate 32 character random string that looks like hex number.
 
     Returns:
@@ -325,7 +321,9 @@ def generate_random_hexa_str() -> str:
     """
     uppercase = 'ABCDEF'
     lowercase = 'abcdef'
-    return ''.join(random.choices(uppercase + lowercase + string.digits, k=32))
+    characters = '%s%s%s' % (uppercase, lowercase, string.digits)
+
+    return ''.join(random.choices(characters, k=32))
 
 
 @contextlib.contextmanager
@@ -345,7 +343,9 @@ def swap_is_feature_flag_enabled_function(
     """
     def mock_is_feature_flag_enabled(
         feature_flag_name: str,
-        feature_flag: Optional[feature_flag_domain.FeatureFlag] = None, # pylint: disable=unused-argument
+        feature_flag: Optional[ # pylint: disable=unused-argument
+            feature_flag_domain.FeatureFlag
+        ] = None,
         user_id: Optional[str] = None # pylint: disable=unused-argument
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
@@ -414,6 +414,115 @@ def enable_feature_flags(
     return decorator
 
 
+@contextlib.contextmanager
+def swap_get_platform_parameter_value_function(
+    platform_parameter_name_value_tuples: List[
+        Tuple[
+            platform_parameter_list.ParamName,
+            platform_parameter_domain.PlatformDataTypes
+        ]
+    ]
+) -> Iterator[None]:
+    """Mocks get_platform_parameter_value function within the context of a
+    'with' statement. get_platform_parameter_value will return the value of
+    the platform parameter if the parameter is present in the
+    platform_parameter_names list.
+
+    Args:
+        platform_parameter_name_value_tuples: List[Tuple[ParamName,
+            PlatformDataTypes]]. The list of the names of the platform
+            parameters and their corresponding values that will be enabled.
+
+    Yields:
+        context. The context with function replaced.
+    """
+    def mock_get_platform_parameter_value(
+        parameter_name: str
+    ) -> platform_parameter_domain.PlatformDataTypes:
+        """Mocks get_platform_parameter_value function to return the value of
+        the platform parameter if the parameter is present in the
+        platform_parameter_names list.
+
+        Args:
+            parameter_name: str. The name of the platform parameter whose
+                value is required.
+
+        Returns:
+            PlatformDataTypes. The value of the platform parameter if the
+            parameter is present in the platform_parameter_names list.
+
+        Raises:
+            Exception. The parameter_name is not present in the
+                platform_parameter_names list.
+        """
+        platform_parameter_name_value_dict = dict(
+            (x.value, y) for x, y in platform_parameter_name_value_tuples
+        )
+        if parameter_name not in platform_parameter_name_value_dict:
+            raise Exception(
+                'The value for the platform parameter %s was needed in this '
+                'test, but not specified in the set_platform_parameters '
+                'decorator. Please use this information in the decorator.'
+                % parameter_name
+            )
+        return platform_parameter_name_value_dict[parameter_name]
+
+    original_get_platform_parameter_value = getattr(
+        platform_parameter_services, 'get_platform_parameter_value')
+    setattr(
+        platform_parameter_services,
+        'get_platform_parameter_value',
+        mock_get_platform_parameter_value
+    )
+    try:
+        yield
+    finally:
+        setattr(
+            platform_parameter_services,
+            'get_platform_parameter_value',
+            original_get_platform_parameter_value
+        )
+
+
+def set_platform_parameters(
+    platform_parameter_name_value_tuples: List[
+        Tuple[
+            platform_parameter_list.ParamName,
+            platform_parameter_domain.PlatformDataTypes
+        ]
+    ]
+) -> Callable[
+        [Callable[..., _GenericHandlerFunctionReturnType]],
+        Callable[..., _GenericHandlerFunctionReturnType]
+]:
+    """This method guarantees to enable the given platform parameters for the
+    scope of the test.
+
+    Args:
+        platform_parameter_name_value_tuples: List[Tuple[ParamName,
+            PlatformDataTypes]]. The list of the names of the platform
+            parameters and their corresponding values that will be enabled.
+
+    Returns:
+        function. The newly decorated function that enables given platform
+        parameters for the scope of the test.
+    """
+    def decorator(
+        func: Callable[..., _GenericHandlerFunctionReturnType]
+    ) -> Callable[..., _GenericHandlerFunctionReturnType]:
+        # Here we use type Any because this method can accept arbitrary number
+        # of arguments with different types.
+        def wrapper(
+            *args: Any, **kwargs: Any
+        ) -> _GenericHandlerFunctionReturnType:
+            with swap_get_platform_parameter_value_function(
+                platform_parameter_name_value_tuples
+            ):
+                return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
 class ElasticSearchStub:
     """This stub class mocks the functionality of ES in
     elastic_search_services.py.
@@ -441,9 +550,9 @@ class ElasticSearchStub:
         Args:
             index_name: str. The index that was not found.
 
-        Returns:
+        Raises:
             elasticsearch.NotFoundError. A manually-constructed error
-            indicating that the index was not found.
+                indicating that the index was not found.
         """
         raise elasticsearch.NotFoundError(
             404, 'index_not_found_exception', {
@@ -644,7 +753,7 @@ class ElasticSearchStub:
             'total': index_size,
             'batches': 1,
             'requests_per_second': -1.0,
-            'retries': {u'search': 0, u'bulk': 0},
+            'retries': {'search': 0, 'bulk': 0},
             'timed_out': False,
             'deleted': index_size
         }
@@ -1389,93 +1498,24 @@ class TestBase(unittest.TestCase):
         """
         captured_logs: List[str] = []
 
-        class ListStream(IO[str]):
+        class ListStream(io.StringIO):
             """Stream-like object that appends writes to the captured logs."""
 
-            # Here we use MyPy ignore because the signature of this
-            # method doesn't match with IO's write().
-            def write(self, msg: str) -> None:  # type: ignore[override]
-                """Appends stripped messages to captured logs."""
+            def write(self, msg: str) -> int:
+                """Appends stripped messages to captured logs.
+
+                Args:
+                    msg: str. The string to be written.
+
+                Returns:
+                    int. The length of the written string in bytes.
+                """
                 captured_logs.append(msg.strip())
+                return len(msg.strip())
 
             def flush(self) -> None:
                 """Does nothing."""
                 pass
-
-            # Here, class ListStream inherits from IO and making an instance
-            # below but due to the absence of some methods MyPy throws an error
-            # that 'Cannot instantiate abstract class 'ListStream' with abstract
-            # attributes'. So, to suppress the error, we defined all the methods
-            # that was present in super class. Since these are just added for
-            # type checking, we don't need to test them and so have excluded
-            # them from the coverage checks.
-            @property
-            def mode(self) -> str:
-                pass  # pragma: no cover
-
-            @property
-            def name(self) -> str:
-                pass  # pragma: no cover
-
-            def close(self) -> None:
-                pass  # pragma: no cover
-
-            @property
-            def closed(self) -> bool:
-                pass  # pragma: no cover
-
-            def fileno(self) -> int:
-                pass  # pragma: no cover
-
-            def isatty(self) -> bool:
-                pass  # pragma: no cover
-
-            def read(self, n: int = -1) -> str:
-                pass  # pragma: no cover
-
-            def readable(self) -> bool:
-                pass  # pragma: no cover
-
-            def readline(self, limit: int = -1) -> str:
-                pass  # pragma: no cover
-
-            def readlines(self, hint: int = -1) -> List[str]:
-                pass  # pragma: no cover
-
-            def seek(self, offset: int, whence: int = 0) -> int:
-                pass  # pragma: no cover
-
-            def seekable(self) -> bool:
-                pass  # pragma: no cover
-
-            def tell(self) -> int:
-                pass  # pragma: no cover
-
-            def truncate(self, size: Optional[int] = None) -> int:
-                pass  # pragma: no cover
-
-            def writable(self) -> bool:
-                pass  # pragma: no cover
-
-            def writelines(self, lines: Iterable[str]) -> None:
-                pass  # pragma: no cover
-
-            def __enter__(self) -> IO[str]:
-                pass  # pragma: no cover
-
-            def __exit__(
-                self,
-                type: Optional[Type[BaseException]], # pylint: disable=redefined-builtin
-                value: Optional[BaseException],
-                traceback: Optional[TracebackType]
-            ) -> None:
-                pass  # pragma: no cover
-
-            def __iter__(self) -> Iterator[str]:
-                pass  # pragma: no cover
-
-            def __next__(self) -> str:
-                pass  # pragma: no cover
 
         list_stream_handler = logging.StreamHandler(ListStream())
 
@@ -2042,6 +2082,58 @@ class AppEngineTestBase(TestBase):
         """
         raise Exception('Please mock this method in the test.')
 
+    @contextlib.contextmanager
+    def mock_datetime_utcnow(
+        self, mocked_now: datetime.datetime
+    ) -> Iterator[None]:
+        """Mocks parts of the datastore to accept a fake datetime type that
+        always returns the same value for utcnow.
+
+        Example:
+            import datetime
+            mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+            with mock_datetime_utcnow(mocked_now):
+                self.assertEqual(datetime.datetime.utcnow(), mocked_now)
+            actual_now = datetime.datetime.utcnow() # Returns actual time.
+
+        Args:
+            mocked_now: datetime.datetime. The datetime which will be used
+                instead of the current UTC datetime.
+
+        Yields:
+            None. Empty yield statement.
+
+        Raises:
+            Exception. Given argument is not a datetime.
+        """
+        if not isinstance(mocked_now, datetime.datetime):
+            raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
+
+        old_datetime = datetime.datetime
+
+        class MockDatetimeType(type):
+            """Overrides isinstance() behavior."""
+
+            @classmethod
+            def __instancecheck__(mcs, instance: datetime.datetime) -> bool:
+                return isinstance(instance, old_datetime)
+
+        class MockDatetime(datetime.datetime, metaclass=MockDatetimeType):
+            """Always returns mocked_now as the current UTC time."""
+
+            # Here we use MyPy ignore because the signature of this
+            # method doesn't match with datetime.datetime's utcnow().
+            @classmethod
+            def utcnow(cls) -> datetime.datetime:  # type: ignore[override]
+                """Returns the mocked datetime."""
+                return mocked_now
+
+        setattr(datetime, 'datetime', MockDatetime)
+        try:
+            yield
+        finally:
+            setattr(datetime, 'datetime', old_datetime)
+
 
 class GenericTestBase(AppEngineTestBase):
     """Base test class with common/generic helper methods.
@@ -2081,6 +2173,10 @@ class GenericTestBase(AppEngineTestBase):
     OWNER_USERNAME: Final = 'owner'
     EDITOR_EMAIL: Final = 'editor@example.com'
     EDITOR_USERNAME: Final = 'editor'
+    QUESTION_ADMIN_EMAIL: Final = 'questionExpert@app.com'
+    QUESTION_ADMIN_USERNAME: Final = 'questionExpert'
+    QUESTION_REVIEWER_EMAIL: Final = 'questionreviewer@example.com'
+    QUESTION_REVIEWER_USERNAME: Final = 'question'
     TOPIC_MANAGER_EMAIL: Final = 'topicmanager@example.com'
     TOPIC_MANAGER_USERNAME: Final = 'topicmanager'
     VOICE_ARTIST_EMAIL: Final = 'voiceartist@example.com'
@@ -2328,6 +2424,7 @@ states:
     content:
       content_id: content_0
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2347,10 +2444,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   New state:
     card_is_checkpoint: false
@@ -2358,6 +2451,7 @@ states:
     content:
       content_id: content_2
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2377,10 +2471,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_2: {}
-        default_outcome_3: {}
     solicit_answer_details: false
 states_schema_version: %d
 tags: []
@@ -2413,23 +2503,24 @@ version: 1
 
         with contextlib.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
+            es_client = elastic_search_services.ES.get_client()
             stack.enter_context(self.swap(
-                elastic_search_services.ES.indices, 'create',
+                es_client.indices, 'create',
                 es_stub.mock_create_index))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'index',
+                es_client, 'index',
                 es_stub.mock_index))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'exists',
+                es_client, 'exists',
                 es_stub.mock_exists))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'delete',
+                es_client, 'delete',
                 es_stub.mock_delete))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'delete_by_query',
+                es_client, 'delete_by_query',
                 es_stub.mock_delete_by_query))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'search',
+                es_client, 'search',
                 es_stub.mock_search))
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_caches',
@@ -2470,58 +2561,6 @@ version: 1
         os.environ['USER_ID'] = ''
         os.environ['USER_EMAIL'] = ''
         os.environ['USER_IS_ADMIN'] = '0'
-
-    @contextlib.contextmanager
-    def mock_datetime_utcnow(
-        self, mocked_now: datetime.datetime
-    ) -> Iterator[None]:
-        """Mocks parts of the datastore to accept a fake datetime type that
-        always returns the same value for utcnow.
-
-        Example:
-            import datetime
-            mocked_now = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-            with mock_datetime_utcnow(mocked_now):
-                self.assertEqual(datetime.datetime.utcnow(), mocked_now)
-            actual_now = datetime.datetime.utcnow() # Returns actual time.
-
-        Args:
-            mocked_now: datetime.datetime. The datetime which will be used
-                instead of the current UTC datetime.
-
-        Yields:
-            None. Empty yield statement.
-
-        Raises:
-            Exception. Given argument is not a datetime.
-        """
-        if not isinstance(mocked_now, datetime.datetime):
-            raise Exception('mocked_now must be datetime, got: %r' % mocked_now)
-
-        old_datetime = datetime.datetime
-
-        class MockDatetimeType(type):
-            """Overrides isinstance() behavior."""
-
-            @classmethod
-            def __instancecheck__(mcs, instance: datetime.datetime) -> bool:
-                return isinstance(instance, old_datetime)
-
-        class MockDatetime(datetime.datetime, metaclass=MockDatetimeType):
-            """Always returns mocked_now as the current UTC time."""
-
-            # Here we use MyPy ignore because the signature of this
-            # method doesn't match with datetime.datetime's utcnow().
-            @classmethod
-            def utcnow(cls) -> datetime.datetime:  # type: ignore[override]
-                """Returns the mocked datetime."""
-                return mocked_now
-
-        setattr(datetime, 'datetime', MockDatetime)
-        try:
-            yield
-        finally:
-            setattr(datetime, 'datetime', old_datetime)
 
     @contextlib.contextmanager
     def login_context(
@@ -2891,6 +2930,7 @@ version: 1
         self,
         url: str,
         expected_status_int_list: List[int],
+        http_method: Optional[str] = 'GET',
         params: Optional[Dict[str, str]] = None
     ) -> webtest.TestResponse:
         """Get a response, transformed to a Python object and checks for a list
@@ -2900,10 +2940,16 @@ version: 1
             url: str. The URL to fetch the response.
             expected_status_int_list: list(int). A list of integer status code
                 to expect.
+            http_method: str. The http method by which the request is to be
+                sent.
             params: dict. A dictionary that will be encoded into a query string.
 
         Returns:
             webtest.TestResponse. The test response.
+
+        Raises:
+            Exception. If the http method is not one of GET, POST, PUT or
+                DELETE, then this exception is raised.
         """
         if params is not None:
             self.assertIsInstance(
@@ -2915,7 +2961,26 @@ version: 1
         # only produced after webpack compilation which is not performed during
         # backend tests.
         with self.swap(base, 'load_template', mock_load_template):
-            response = self.testapp.get(url, params=params, expect_errors=True)
+
+            if http_method == 'GET':
+                response = self.testapp.get(
+                    url, params=params, expect_errors=True
+                )
+
+        if http_method == 'POST':
+            response = self.testapp.post(
+                url, params=params, expect_errors=True
+            )
+        elif http_method == 'PUT':
+            response = self.testapp.put(
+                url, params=params, expect_errors=True
+            )
+        elif http_method == 'DELETE':
+            response = self.testapp.delete(
+                url, params=params, expect_errors=True
+            )
+        elif http_method != 'GET':
+            raise Exception('Invalid http method %s' % http_method)
 
         self.assertIn(response.status_int, expected_status_int_list)
 
@@ -3948,9 +4013,11 @@ version: 1
         the latter approach would result in an question with the *current* state
         data schema version.
         """
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + skill_id)
+        score_category = '%s%s%s' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER,
+            skill_id
+        )
         change: Dict[
             str,
             Union[str, float, Dict[str, Union[Optional[Collection[str]], int]]]
@@ -4103,7 +4170,87 @@ version: 1
         assert state.interaction.default_outcome is not None
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
+        state.inapplicable_skill_misconception_ids = []
         return state
+
+    def save_new_valid_classroom(
+        self,
+        classroom_id: str = 'math_classroom_id',
+        name: str = 'math',
+        url_fragment: str = 'math',
+        course_details: str = 'Course Details',
+        teaser_text: str = 'Teaser Text',
+        topic_list_intro: str = 'Topic list intro',
+        topic_id_to_prerequisite_topic_ids: Optional[
+            Dict[str, List[str]]] = None,
+        is_published: bool = True,
+        diagnostic_test_is_enabled: bool = False,
+        thumbnail_data: Optional[
+            classroom_config_domain.ImageData
+        ] = None,
+        banner_data: Optional[
+            classroom_config_domain.ImageData
+        ] = None
+    ) -> classroom_config_domain.Classroom:
+        """Saves a new strictly-validated classroom.
+
+        Args:
+            classroom_id: str. Classroom ID of the newly-created classroom.
+            name: str. The name of the classroom.
+            url_fragment: str. The url fragment of the classroom.
+            course_details: str. A text to provide course details present in
+                the classroom.
+            teaser_text: str. A text to provide a summary of the classroom.
+            topic_list_intro: str. A text to provide an introduction for all
+                the topics in the classroom.
+            topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]. A dict
+                with topic ID as key and list of topic IDs as value.
+            is_published: bool. Whether this classroom is published or not.
+            diagnostic_test_is_enabled: bool. Whether this classroom
+                is published or not.
+            thumbnail_data: Optional[ImageData]. Image data object for
+                thumbnail.
+            banner_data: Optional[ImageData]. Image data object for banner.
+
+        Returns:
+            Classroom. The classroom domain object.
+        """
+        dummy_thumbnail_data = classroom_config_domain.ImageData(
+            'thumbnail.svg', 'transparent', 1000
+        )
+        dummy_banner_data = classroom_config_domain.ImageData(
+            'banner.png', 'transparent', 1000
+        )
+        classroom = classroom_config_domain.Classroom(
+            classroom_id=classroom_id,
+            name=name,
+            url_fragment=url_fragment,
+            teaser_text=teaser_text,
+            course_details=course_details,
+            topic_list_intro=topic_list_intro,
+            topic_id_to_prerequisite_topic_ids=(
+                topic_id_to_prerequisite_topic_ids
+                if topic_id_to_prerequisite_topic_ids is not None
+                else {}
+            ),
+            is_published=is_published,
+            diagnostic_test_is_enabled=(
+                diagnostic_test_is_enabled),
+            thumbnail_data=(
+                thumbnail_data
+                if thumbnail_data is not None
+                else dummy_thumbnail_data
+            ),
+            banner_data=(
+                banner_data
+                if banner_data is not None
+                else dummy_banner_data
+            ),
+            index=0
+        )
+
+        classroom_config_services.create_new_classroom(classroom)
+        return classroom
 
 
 class LinterTestBase(GenericTestBase):
@@ -4171,7 +4318,8 @@ class EmailMessageMock:
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
             Dict[str, Dict[str, Union[str, int]]]
-        ] = None
+        ] = None,
+        attachments: Optional[List[Dict[str, str]]] = None
     ) -> None:
         """Inits a mock email message with all the necessary data.
 
@@ -4202,6 +4350,9 @@ class EmailMessageMock:
                     subject = 'Hey, %recipient.first%'
                 For more information about this format, see:
                 https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
+            attachments: list(dict)|None. Optional argument. A list of
+                dictionaries, where each dictionary includes the keys `filename`
+                and `path` with their corresponding values.
         """
         self.sender = sender_email
         self.to = recipient_email
@@ -4211,6 +4362,7 @@ class EmailMessageMock:
         self.bcc = bcc
         self.reply_to = reply_to
         self.recipient_variables = recipient_variables
+        self.attachments = attachments
 
 
 class GenericEmailTestBase(GenericTestBase):
@@ -4250,7 +4402,8 @@ class GenericEmailTestBase(GenericTestBase):
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
             Dict[str, Dict[str, Union[str, int]]]
-        ] = None
+        ] = None,
+        attachments: Optional[List[Dict[str, str]]] = None
     ) -> bool:
         """Mocks sending an email to each email in recipient_emails.
 
@@ -4281,6 +4434,9 @@ class GenericEmailTestBase(GenericTestBase):
                     subject = 'Hey, %recipient.first%'
                 For more information about this format, see:
                 https://documentation.mailgun.com/en/latest/user_manual.html#batch-sending
+            attachments: list(dict)|None. Optional argument. A list of
+                dictionaries, where each dictionary includes the keys `filename`
+                and `path` with their corresponding values.
 
         Returns:
             bool. Whether the emails are sent successfully.
@@ -4293,7 +4449,8 @@ class GenericEmailTestBase(GenericTestBase):
             sender_email, recipient_emails, subject, plaintext_body, html_body,
             bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
             recipient_variables=(
-                recipient_variables if recipient_variables else None))
+                recipient_variables if recipient_variables else None),
+            attachments=attachments if attachments else None)
         for recipient_email in recipient_emails:
             self.emails_dict[recipient_email].append(new_email)
         return True
@@ -4323,90 +4480,6 @@ class GenericEmailTestBase(GenericTestBase):
 
 
 EmailTestBase = GenericEmailTestBase
-
-
-class ClassifierTestBase(GenericEmailTestBase):
-    """Base class for classifier test classes that need common functions
-    for related to reading classifier data and mocking the flow of the
-    storing the trained models through post request.
-
-    This class is derived from GenericEmailTestBase because the
-    TrainedClassifierHandlerTests test suite requires email services test
-    functions in addition to the classifier functions defined below.
-    """
-
-    # Here we use type Any because method 'post_blob' can return a JSON
-    # dict which can contain different types of values. So, to allow every
-    # type of value we used Any here.
-    def post_blob(
-        self, url: str, payload: bytes, expected_status_int: int = 200
-    ) -> Dict[str, Any]:
-        """Post a BLOB object to the server; return the received object.
-
-        Note that this method should only be used for
-        classifier.TrainedClassifierHandler handler and for no one else. The
-        reason being, we don't have any general mechanism for security for
-        transferring binary data. TrainedClassifierHandler implements a
-        specific mechanism which is restricted to the handler.
-
-        Args:
-            url: str. The URL to which BLOB object in payload should be sent
-                through a post request.
-            payload: bytes. Binary data which needs to be sent.
-            expected_status_int: int. The status expected as a response of post
-                request.
-
-        Returns:
-            dict. Parsed JSON response received upon invoking the post request.
-        """
-        data = payload
-
-        expect_errors = False
-        if expected_status_int >= 400:
-            expect_errors = True
-        response = self._send_post_request(
-            self.testapp, url, data,
-            expect_errors, expected_status_int=expected_status_int,
-            headers={'content-type': 'application/octet-stream'})
-        # Testapp takes in a status parameter which is the expected status of
-        # the response. However this expected status is verified only when
-        # expect_errors=False. For other situations we need to explicitly check
-        # the status.
-        # Reference URL:
-        # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
-
-        self.assertEqual(response.status_int, expected_status_int)
-        # Here we use type Any because the 'result' is a JSON result dict
-        # that can contain different types of values. So, to allow every type
-        # of value we used Any here.
-        result: Dict[str, Any] = self._parse_json_response(
-            response,
-            expect_errors
-        )
-        return result
-
-    def _get_classifier_data_from_classifier_training_job(
-        self, classifier_training_job: classifier_domain.ClassifierTrainingJob
-    ) -> text_classifier_pb2.TextClassifierFrozenModel:
-        """Retrieves classifier training job from GCS using metadata stored in
-        classifier_training_job.
-
-        Args:
-            classifier_training_job: ClassifierTrainingJob. Domain object
-                containing metadata of the training job which is used to
-                retrieve the trained model.
-
-        Returns:
-            FrozenModel. Protobuf object containing classifier data.
-        """
-        filename = classifier_training_job.classifier_data_filename
-        fs = fs_services.GcsFileSystem(
-            feconf.ENTITY_TYPE_EXPLORATION, classifier_training_job.exp_id)
-        classifier_data = utils.decompress_from_zlib(fs.get(filename))
-        classifier_data_proto = text_classifier_pb2.TextClassifierFrozenModel()
-        classifier_data_proto.ParseFromString(classifier_data)
-        return classifier_data_proto
 
 
 class FunctionWrapper:

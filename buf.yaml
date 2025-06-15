@@ -1,6 +1,0 @@
-# This line should be the first line in the config file.
-# See: https://docs.buf.build/build-configuration
-version: v1beta1
-build:
-  roots:
-    - third_party/oppia-ml-proto-0.0.0

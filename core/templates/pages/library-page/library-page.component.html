@@ -1,3 +1,81 @@
+<div class="classroom-cards-wrapper" *ngIf="publicClassroomsCount > 0">
+  <div class="classroom-cards-inner-container"
+       [ngClass]="{
+         'classroom-width-1': publicClassroomsCount === 1,
+         'classroom-width-2': publicClassroomsCount === 2,
+         'classroom-width-more': publicClassroomsCount > 2
+       }">
+    <div class="classroom-cards-text-container">
+      <h1>{{ 'I18N_COMMUNITY_LIBRARY_PAGE_CLASSROOMS_HINT_TEXT' | translate }}</h1>
+      <p>{{ 'I18N_BROWSE_LESSONS_TEXT' | translate }}</p>
+    </div>
+    <div class="individual-classroom-cards" *ngIf="publicClassroomsCount <= 2">
+      <ng-container *ngFor="let classroomSummary of classroomSummaries">
+        <oppia-classroom-card (click)="registerClassroomCardClickEvent(classroomSummary.name)"
+                              *ngIf="classroomSummary.is_published"
+                              [classroomSummary]="classroomSummary"
+                              [usedInCarousel]="false">
+        </oppia-classroom-card>
+      </ng-container>
+    </div>
+    <div class="classrooms-carousel" *ngIf="publicClassroomsCount > 2">
+      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn left-carousel-btn"
+              *ngIf="publicClassroomsCount > 3"
+              [disabled]="!shouldShowPreviousClassroomChunkButton()"
+              (click)="moveClassroomCarouselToPreviousSlide()"
+              aria-label="Previous Slide">
+        <i class="fa fa-angle-left"></i>
+      </button>
+      <div class="carousel-container"
+           (swipeleft)="moveClassroomCarouselToNextSlide()"
+           (swiperight)="moveClassroomCarouselToPreviousSlide()">
+        <div class="classrooms-card-container"
+             [ngStyle]="{'transform': 'translateX(' + translateX + 'px)'}">
+          <ng-container *ngFor="let classroomSummary of classroomSummaries">
+            <oppia-classroom-card (click)="registerClassroomCardClickEvent(classroomSummary.name)"
+                                  *ngIf="classroomSummary.is_published"
+                                  [classroomSummary]="classroomSummary"
+                                  [usedInCarousel]="true">
+            </oppia-classroom-card>
+          </ng-container>
+        </div>
+      </div>
+      <button class="classrooms-carousel-change-slide-btn desktop-carousel-btn right-carousel-btn"
+              *ngIf="publicClassroomsCount > 3"
+              [disabled]="!shouldShowNextClassroomChunkButton()"
+              (click)="moveClassroomCarouselToNextSlide()"
+              aria-label="Next Slide">
+        <i class="fa fa-angle-right"></i>
+      </button>
+      <div class="navigation-dots" *ngIf="publicClassroomsCount > 3">
+        <span *ngFor="let dot of dots; let i = index"
+              [class.active]="dot === 1"
+              (click)="moveToSlide(i)">
+        </span>
+      </div>
+      <div class="mobile-buttons" *ngIf="publicClassroomsCount > 3">
+        <button class="mobile-carousel-btn mobile-prev-btn"
+                (click)="moveClassroomCarouselToPreviousSlide()"
+                [disabled]="!shouldShowPreviousClassroomChunkButton()"
+                aria-label="Previous Slide">
+          <i class="fa fa-angle-left"></i>
+        </button>
+        <div class="mobile-navigation-dots" *ngIf="publicClassroomsCount > 3">
+          <span *ngFor="let dot of dots; let i = index"
+                [class.active]="dot === 1"
+                (click)="moveToSlide(i)">
+          </span>
+        </div>
+        <button class="mobile-carousel-btn mobile-next-btn"
+                (click)="moveClassroomCarouselToNextSlide()"
+                [disabled]="!shouldShowNextClassroomChunkButton()"
+                aria-label="Next Slide">
+          <i class="fa fa-angle-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="oppia-library-container d-flex">
   <div class="oppia-library-container-inner m-auto">
     <div>
@@ -38,12 +116,24 @@
       </div>
 
       <div class="oppia-exp-summary-tiles-container" *ngIf="pageMode === LIBRARY_PAGE_MODES.INDEX">
+        <div class="community-library-breadcrumbs-container">
+          <a href="/">{{ 'I18N_TOPNAV_HOME' | translate }}</a>
+          <i class="fa fa-angle-right"></i>
+          <span>{{ 'I18N_TOPNAV_LIBRARY_TEXT' | translate }}</span>
+        </div>
+        <div class="community-library-mobile-breadcrumbs-container">
+          <i class="fa fa-angle-left"></i>
+          <a href="/">{{ 'I18N_BACK_TO_HOME_TEXT' | translate }}</a>
+        </div>
+        <div class="text-center w-100 mt-4" tabindex="0">
+          <h1 class="oppia-library-h1 e2e-test-library-main-header">{{ 'I18N_LIBRARY_MAIN_HEADER' | translate }}</h1>
+        </div>
         <img [src]="bannerImageFileUrl"
              align="center"
+             class="e2e-test-library-banner"
              width="100%"
              alt="page banner">
         <div class="text-center w-100 mt-4" tabindex="0">
-          <h1 class="oppia-library-h1 e2e-test-library-main-header">{{ 'I18N_LIBRARY_MAIN_HEADER' | translate }}</h1>
           <h2 class="oppia-library-h2">{{ 'I18N_LIBRARY_SUB_HEADER' | translate }}</h2>
         </div>
 
@@ -51,30 +141,9 @@
           <oppia-search-bar [enableDropup]="false"></oppia-search-bar>
         </div>
 
-        <div class="oppia-classroom-div">
-          <div class="oppia-classroom-text">
-            <h1 class="oppia-classroom-h2" tabindex="0">{{ 'I18N_CLASSROOM_CALLOUT_HEADING_2' | translate }}</h1>
-            <h2 class="oppia-classroom-h1" tabindex="0">{{ 'I18N_CLASSROOM_CALLOUT_HEADING_1' | translate }}</h2>
-            <p class="oppia-classroom-p" tabindex="0">{{ 'I18N_CLASSROOM_CALLOUT_PARAGRAPH_1' | translate }}</p>
-            <a class="btn oppia-dashboard-intro-button oppia-transition-200"
-               tabindex="0"
-               href="/learn/math"
-               smartRouterLink="/learn/math">
-               {{ 'I18N_CLASSROOM_CALLOUT_BUTTON' | translate }}
-            </a>
-          </div>
-          <picture class="classroom-promo-image">
-            <source type="image/webp"
-                    [srcset]="getStaticImageUrl('/landing/math/fractions/matthew_paper.webp')">
-            <source type="image/png"
-                    [srcset]="getStaticImageUrl('/landing/math/fractions/matthew_paper.png')">
-            <img [src]="getStaticImageUrl('/assets/images/landing/math/fractions/matthew_paper.png')"
-                 alt="math classroom illustration">
-          </picture>
-        </div>
-
         <div *ngIf="libraryGroups?.length === 0"
-             class="text-center w-100 oppia-library-no-exploration-groups">
+             class="text-center w-100 oppia-library-no-exploration-groups"
+             tabindex="0">
              {{ 'I18N_LIBRARY_NO_EXPLORATION_GROUPS' | translate }}
         </div>
 

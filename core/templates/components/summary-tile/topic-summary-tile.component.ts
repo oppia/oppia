@@ -17,7 +17,6 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
@@ -108,11 +107,8 @@ export class TopicSummaryTileComponent {
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
   }
-}
 
-angular.module('oppia').directive(
-  'oppiaTopicSummaryTile',
-  downgradeComponent({
-    component: TopicSummaryTileComponent,
-  }) as angular.IDirectiveFactory
-);
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
+}

@@ -18,7 +18,6 @@
 
 import {InteractionsExtensionsConstants} from 'interactions/interactions-extension.constants';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {MusicNotesAnswer} from 'interactions/answer-defs';
 import {UtilsService} from 'services/utils.service';
@@ -67,7 +66,7 @@ export class MusicNotesInputRulesService {
     );
   }
 
-  // TODO(wxy): Validate that inputs.a <= inputs.b.
+  // TODO(#20443): Validate that inputs.a <= inputs.b.
   HasLengthInclusivelyBetween(
     answer: MusicNotesAnswer[],
     inputs: {a: number; b: number}
@@ -135,10 +134,3 @@ export class MusicNotesInputRulesService {
     return numWrongNotes <= inputs.k;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'MusicNotesInputRulesService',
-    downgradeInjectable(MusicNotesInputRulesService)
-  );

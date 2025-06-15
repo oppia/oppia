@@ -17,7 +17,6 @@
  */
 
 import {Component, ViewChild, ElementRef} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {AppConstants} from 'app.constants';
@@ -380,7 +379,7 @@ export class PreferencesPageComponent {
           formGrp.controls.canReceiveEmailUpdates.setValue(false);
           this.showEmailSignupLink = true;
         } else {
-          this.alertsService.addInfoMessage('Saved!', 1000);
+          this.alertsService.addInfoMessage('Saved!', 3000);
         }
         if (this.preferencesForm.controls.profilePicturePngDataUrl.dirty) {
           // TODO(#19737): Remove the following 'if' condition.
@@ -400,10 +399,3 @@ export class PreferencesPageComponent {
       });
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaPreferencesPage',
-  downgradeComponent({
-    component: PreferencesPageComponent,
-  }) as angular.IDirectiveFactory
-);

@@ -21,7 +21,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NumberConversionService} from 'services/number-conversion.service';
 
@@ -49,10 +48,3 @@ export class ShortResponseNumericInput implements OnInit {
       this.numberConversionService.convertToLocalizedNumber(recievedAnswer);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaShortResponseNumericInput',
-  downgradeComponent({
-    component: ShortResponseNumericInput,
-  }) as angular.IDirectiveFactory
-);

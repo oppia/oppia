@@ -19,7 +19,6 @@
 import {Injectable, Optional} from '@angular/core';
 import {FirebaseOptions} from '@angular/fire';
 import {AngularFireAuth} from '@angular/fire/auth';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import {md5} from 'hash-wasm';
@@ -127,9 +126,8 @@ export class AuthService {
   }
 
   static get firebaseEmulatorConfig(): readonly [string, number] | undefined {
-    let firebaseHost = process.env.OPPIA_IS_DOCKERIZED
-      ? '0.0.0.0'
-      : 'localhost';
+    let firebaseHost =
+      process.env.USE_FIREBASE_ENDPOINT === 'true' ? 'firebase' : 'localhost';
     // TODO(#18260): Change this when we permanently move to the Docker Setup.
     return AuthService.firebaseEmulatorIsEnabled
       ? [firebaseHost, 9099]
@@ -201,7 +199,3 @@ export class AuthService {
     await this.authBackendApiService.endSessionAsync();
   }
 }
-
-angular
-  .module('oppia')
-  .factory('AuthService', downgradeInjectable(AuthService));

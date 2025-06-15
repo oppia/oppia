@@ -27,6 +27,7 @@ from core.domain import collection_services
 from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import fs_services
+from core.domain import platform_parameter_list
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_domain
@@ -292,11 +293,16 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
         email_preferences = user_services.get_email_preferences(self.user_1_id)
+        # TODO(release-scripts#137): Update once project ID is verified on
+        # all servers.
         self.assertItemsEqual(
             observed_log_messages,
             ['Email ID %s permanently deleted from bulk email provider\'s db. '
              'Cannot access API, since this is a dev environment'
-             % self.USER_1_EMAIL])
+             % self.USER_1_EMAIL] + ([
+                 'Logging project ID for debugging: dev-project-id'
+                 ] * 6)
+             )
         self.assertFalse(email_preferences.can_receive_email_updates)
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
@@ -680,6 +686,19 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         self.assertIsNotNone(
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
+    )
     def test_run_user_deletion_completion_with_user_properly_deleted(
         self
     ) -> None:
@@ -695,7 +714,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             )]
         )
 
-        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with send_email_swap:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -717,6 +736,19 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             auth_services.verify_external_auth_associations_are_deleted(
                 self.user_1_id))
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
+    )
     def test_run_user_deletion_completion_user_wrongly_deleted_emails_enabled(
         self
     ) -> None:
@@ -738,7 +770,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             expected_args=[('WIPEOUT: Account deletion failed', email_content)]
         )
 
-        with send_email_swap, self.swap(feconf, 'CAN_SEND_EMAILS', True):
+        with send_email_swap:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -769,7 +801,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             called=False
         )
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False), send_email_swap:
+        with send_email_swap:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request),
@@ -1205,6 +1237,25 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             metadata_model.committer_id, config_mappings[self.CONFIG_1_ID])
+
+    def test_remove_user_from_user_groups(self) -> None:
+        user_group_model = user_models.UserGroupModel(
+            id='group_1',
+            name='Test Group',
+            user_ids=[self.user_1_id, self.user_2_id]
+        )
+        user_group_model.put()
+
+        existing_user_group_model = user_models.UserGroupModel.get_by_id(
+            'group_1')
+        self.assertIn(self.user_1_id, existing_user_group_model.user_ids)
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id))
+
+        updated_user_group_model = user_models.UserGroupModel.get_by_id(
+            'group_1')
+        self.assertNotIn(self.user_1_id, updated_user_group_model.user_ids)
 
     def test_one_config_property_when_the_deletion_is_repeated_is_pseudonymized(
         self
@@ -5644,15 +5695,24 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
-        self.can_send_email_swap = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_email_swap = self.swap(
-            feconf, 'CAN_SEND_EMAILS', False)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
+    )
     def test_repeated_deletion_is_successful_when_emails_enabled(
         self
     ) -> None:
-        with self.send_mail_to_admin_swap, self.can_send_email_swap:
+        with self.send_mail_to_admin_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertIn('SUCCESS', self.email_bodies[0])
             self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -5670,12 +5730,15 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             # Func shouldn't be called when emails are disabled.
             called=False
         )
-        with send_mail_to_admin_swap, self.cannot_send_email_swap:
+        with send_mail_to_admin_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_no_email_is_sent_when_there_are_no_users_pending_deletion(
         self
     ) -> None:
@@ -5685,13 +5748,26 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel.query().fetch())
         for pending_deletion_request_model in pending_deletion_request_models:
             pending_deletion_request_model.delete()
-        with self.send_mail_to_admin_swap, self.can_send_email_swap:
+        with self.send_mail_to_admin_swap:
             # When there are no pending deletion models, expect no emails.
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
+    )
     def test_regular_deletion_is_successful(self) -> None:
-        with self.send_mail_to_admin_swap, self.can_send_email_swap:
+        with self.send_mail_to_admin_swap:
             wipeout_service.delete_users_pending_to_be_deleted()
         self.assertIn('SUCCESS', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -5755,15 +5831,14 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
 
         self.send_mail_to_admin_swap = self.swap(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin)
-        self.can_send_email_swap = self.swap(
-            feconf, 'CAN_SEND_EMAILS', True)
-        self.cannot_send_email_swap = self.swap(
-            feconf, 'CAN_SEND_EMAILS', False)
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+    )
     def test_verification_when_user_is_not_deleted_emails_enabled(
         self
     ) -> None:
-        with self.send_mail_to_admin_swap, self.can_send_email_swap:
+        with self.send_mail_to_admin_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('NOT DELETED', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -5778,10 +5853,32 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             # Func shouldn't be called when emails are disabled.
             called=False
         )
-        with send_mail_to_admin_swap, self.cannot_send_email_swap:
+        with send_mail_to_admin_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertEqual(len(self.email_bodies), 0)
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'senderName'),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
+    )
     def test_verification_when_user_is_deleted_is_successful(self) -> None:
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -5790,7 +5887,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
         wipeout_service.save_pending_deletion_requests(
             [pending_deletion_request])
 
-        with self.send_mail_to_admin_swap, self.can_send_email_swap:
+        with self.send_mail_to_admin_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('SUCCESS', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -5798,6 +5895,19 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
         self.assertIsNone(
             user_models.UserSettingsModel.get_by_id(self.user_1_id))
 
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
+    )
     def test_verification_when_user_is_wrongly_deleted_fails(self) -> None:
         pending_deletion_request = (
             wipeout_service.get_pending_deletion_request(self.user_1_id))
@@ -5811,7 +5921,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(
             story_ids=[], learnt_topic_ids=[]
         ).put()
 
-        with self.send_mail_to_admin_swap, self.can_send_email_swap:
+        with self.send_mail_to_admin_swap:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('FAILURE', self.email_bodies[-1])
         self.assertIn(self.user_1_id, self.email_bodies[-1])

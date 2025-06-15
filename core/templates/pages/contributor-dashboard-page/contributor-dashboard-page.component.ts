@@ -18,7 +18,6 @@
 
 import {AppConstants} from 'app.constants';
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {
@@ -238,16 +237,9 @@ export class ContributorDashboardPageComponent implements OnInit {
       // TODO(#13015): Remove use of unknown as a type.
     } as unknown as ContributorDashboardTabsDetails;
     this.OPPIA_AVATAR_IMAGE_URL =
-      this.urlInterpolationService.getStaticImageUrl(
+      this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
   }
 }
-
-angular.module('oppia').directive(
-  'contributorDashboardPage',
-  downgradeComponent({
-    component: ContributorDashboardPageComponent,
-  }) as angular.IDirectiveFactory
-);

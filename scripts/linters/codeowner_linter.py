@@ -205,8 +205,8 @@ class CodeownerLintChecksManager(linter_utils.BaseLinter):
         """Checks the CODEOWNERS file for any uncovered dirs/files and also
         checks that every pattern in the CODEOWNERS file matches at least one
         file/dir. Note that this checks the CODEOWNERS file according to the
-        glob patterns supported by Python2.7 environment. For more information
-        please refer https://docs.python.org/2/library/glob.html.
+        glob patterns supported by Python 3 environment. For more information
+        please refer https://docs.python.org/3/library/glob.html.
         This function also ensures that the most important rules are at the
         bottom of the CODEOWNERS file.
 

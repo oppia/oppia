@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 import {UrlService} from 'services/contextual/url.service';
@@ -53,17 +52,10 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   ) {}
 
   setPageTitle(): void {
-    this.translateService.use(
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode()
-    );
-
     const translatedTitle = this.translateService.instant(
       'I18N_PRACTICE_SESSION_PAGE_TITLE',
-      {
-        topicName: this.topicName,
-      }
+      {topicName: this.topicName}
     );
-
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
@@ -153,10 +145,3 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'practiceSessionPage',
-  downgradeComponent({
-    component: PracticeSessionPageComponent,
-  }) as angular.IDirectiveFactory
-);

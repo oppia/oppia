@@ -92,6 +92,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_image_upload_with_invalid_filename_raises_error(self) -> None:
+        """Test that filenames starting with dot are rejected."""
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -104,15 +105,17 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             {'filename': '.png'},
             csrf_token=csrf_token,
-            upload_files=[('image', 'unused_filename', raw_image)],
-            expected_status_int=400)
+            expected_status_int=400,
+            upload_files=[('image', 'unused_filename', raw_image)]
+        )
 
         error_msg = (
             'At \'http://localhost/createhandler/imageupload/exploration/0\' '
             'these errors are happening:\n'
-            'Schema validation for \'filename\' failed: Validation'
-            ' failed: is_regex_matched ({\'regex_pattern\': '
-            '\'\\\\w+[.]\\\\w+\'}) for object .png'
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
+            ') for object .png'
         )
         self.assertEqual(response_dict['error'], error_msg)
 
@@ -347,22 +350,59 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_upload_bad_image(self) -> None:
-        """Test upload of a malformed image."""
+    def test_upload_unsupported_image_format(self) -> None:
+        """Test upload of a valid image with an unsupported format."""
 
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        # Upload an invalid image.
+        # Simulate valid image data of a different type (e.g., BMP).
+        bmp_image_data = (
+            b'BM\x1a\x00\x00\x00\x00\x00\x00\x00\x1a\x00\x00\x00'
+            b'\x0c\x00\x00\x00\x01\x00\x01\x00\x01\x00\x18\x00\xff\xff\xff'
+            b'\x00\x00\x00'
+        )
+
+        # Upload the BMP image.
         response_dict = self.post_json(
             '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
             {'filename': 'test.png'},
             csrf_token=csrf_token,
             expected_status_int=400,
-            upload_files=[('image', 'unused_filename', b'non_image_data')]
+            upload_files=[('image', 'unused_filename', bmp_image_data)]
         )
+
+        # Assert the response.
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(response_dict['error'], 'Image not recognized')
+        self.assertEqual(
+            response_dict['error'], 'Image uses unsupported format')
+
+        self.logout()
+
+    def test_upload_corrupted_image(self) -> None:
+        """Test upload of a corrupted image."""
+
+        self.login(self.EDITOR_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        # Simulate corrupted image data.
+        corrupted_image_data = (
+            b'\x00\x11\x22\x33\x44\x55\x66\x77\x88\x99\xaa\xbb\xcc\xdd\xee\xff')
+
+        # Upload the corrupted image.
+        response_dict = self.post_json(
+            '%s/exploration/0' % feconf.EXPLORATION_IMAGE_UPLOAD_PREFIX,
+            {'filename': 'test.png'},
+            csrf_token=csrf_token,
+            expected_status_int=400,
+            upload_files=[('image', 'unused_filename', corrupted_image_data)]
+        )
+
+        # Assert the response.
+        self.assertEqual(response_dict['status_code'], 400)
+        self.assertEqual(
+            response_dict['error'],
+            'Image not recognized')
 
         self.logout()
 
@@ -421,8 +461,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         )
 
     def test_bad_filenames_are_detected(self) -> None:
-        # TODO(sll): Add more tests here.
-
+        """Test that filenames with invalid characters are rejected."""
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -441,14 +480,19 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self.assertEqual(response_dict['status_code'], 400)
 
         error_msg = (
+            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
+            'these errors are happening:\n'
             'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({\'regex_pattern\': \'\\\\w+[.]\\\\w+\'}) '
-            'for object test/a.png')
-        self.assertIn(error_msg, response_dict['error'])
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
+            ') for object test/a.png'
+        )
+        self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
 
     def test_missing_extensions_are_detected(self) -> None:
+        """Test that filenames without extensions are rejected."""
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         with utils.open_file(
@@ -469,13 +513,16 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             'At \'http://localhost/createhandler/imageupload/exploration/0\' '
             'these errors are happening:\n'
             'Schema validation for \'filename\' failed: Validation failed: '
-            'is_regex_matched ({\'regex_pattern\': \'\\\\w+[.]\\\\w+\'}) '
-            'for object test')
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
+            ') for object test'
+        )
         self.assertEqual(error_msg, response_dict['error'])
 
         self.logout()
 
     def test_bad_extensions_are_detected(self) -> None:
+        """Test that invalid file extensions are rejected."""
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -492,9 +539,16 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             upload_files=[('image', 'unused_filename', raw_image)],
         )
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertIn(
-            'Expected a filename ending in .png, received test.pdf',
-            response_dict['error'])
+
+        error_msg = (
+            'At \'http://localhost/createhandler/imageupload/exploration/0\' '
+            'these errors are happening:\n'
+            'Schema validation for \'filename\' failed: Validation failed: '
+            'is_regex_matched ({\'regex_pattern\': '
+            '\'^[a-zA-Z0-9\\\\-_]+\\\\.(jpg|jpeg|png|gif|svg)$\'}'
+            ') for object test.pdf'
+        )
+        self.assertEqual(response_dict['error'], error_msg)
 
         self.logout()
 
@@ -958,6 +1012,45 @@ class ValueGeneratorHandlerTests(test_utils.GenericTestBase):
     def test_html_response(self) -> None:
         copier_id = 'Copier'
         response = self.get_html_response(
-            '/value_generator_handler/' + copier_id
+            '/value_generator_handler/%s' % copier_id
         )
         self.assertIn(b'<object-editor [objType]="objType"', response.body)
+
+
+class FaviconHandlerTest(test_utils.GenericTestBase):
+    """Test for the FaviconHandler."""
+
+    def test_redirect_to_assetsstatic(self) -> None:
+        response = self.get_html_response(
+            '/favicon.ico', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost:8181/assetsstatic/favicon.ico',
+            response.headers['location']
+        )
+
+
+class RobotsTxtHandlerTest(test_utils.GenericTestBase):
+    """Test for the RobotsTxtHandler."""
+
+    def test_redirect_to_assetsstatic(self) -> None:
+        response = self.get_html_response(
+            '/robots.txt', expected_status_int=302)
+        self.assertEqual(
+            'http://localhost:8181/assetsstatic/robots.txt',
+            response.headers['location']
+        )
+
+
+class CopyrightImagesHandlerTest(test_utils.GenericTestBase):
+    """Test for the CopyrightImagesHandler."""
+
+    def test_redirect_to_assetsstatic(self) -> None:
+        response = self.get_html_response(
+            '/assets/copyrighted-images/general/mascot.svg',
+            expected_status_int=302
+        )
+        self.assertEqual(
+            'http://localhost:8181/assetsstatic/copyrighted-images/'
+            'general/mascot.svg',
+            response.headers['location']
+        )

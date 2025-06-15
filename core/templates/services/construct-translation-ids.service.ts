@@ -16,7 +16,6 @@
  * @fileoverview Service to dynamically construct translation ids for i18n.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 @Injectable({
@@ -36,17 +35,10 @@ export class ConstructTranslationIdsService {
 
   // Construct a translation id for a classroom title from name.
   getClassroomTitleId(name: string): string {
-    return 'I18N_CLASSROOM_' + name.toUpperCase() + '_TITLE';
+    return 'I18N_CLASSROOM_' + name.toUpperCase() + '_NAME';
   }
 
   getSyllabusTypeTitleId(name: string): string {
     return 'I18N_SYLLABUS_' + name.toUpperCase() + '_TITLE';
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ConstructTranslationIdsService',
-    downgradeInjectable(ConstructTranslationIdsService)
-  );

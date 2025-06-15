@@ -1,0 +1,2 @@
+core/templates/pages/blog-admin-page/blog-admin-page.module.ts
+core/templates/pages/blog-dashboard-page/blog-dashboard-page.module.ts

@@ -1,7 +1,8 @@
-<div tabindex="0" aria-label="audio menu" class="audio-header" *ngIf="isAudioBarAvailable()"
+<div aria-label="audio menu" class="audio-header" *ngIf="isAudioBarAvailable()"
      [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
+
   <div *ngIf="audioBarIsExpanded" class="audio-bar-expanded" headroom>
-    <div class="audio-controls" [ngClass]="{'audio-controls-margin': progressBarIsShown}">
+    <div #audioControls tabindex="0" class="audio-controls" [ngClass]="{'audio-controls-margin': progressBarIsShown}">
       <div class="oppia-audio-header-control-buttons fx-row fx-main-center fx-cross-center">
         <div class="audio-header-control-icons">
           <a (click)="onBackwardButtonClicked()">
@@ -11,10 +12,10 @@
             </span>
           </a>
           <a (click)="onPlayButtonClicked()" (keydown.enter)="onPlayButtonClicked()"
-             [ngbTooltip]="!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : ''"
+             [ngbTooltip]="!isAudioAvailableInCurrentLanguageAccent() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:selectedLanguageAccentDescription}) : ''"
              placement="right">
             <i class="fas oppia-audio-controls-button-icon" tabindex="0" aria-label="Press enter to Listen to the Lesson"
-               [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle e2e-test-play-circle': !isAudioPlaying(), 'fa-pause-circle e2e-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
+               [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle e2e-test-play-circle': !isAudioPlaying(), 'fa-pause-circle e2e-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguageAccent() || audioIsLoading}">
             </i>
           </a>
           <a (click)="onForwardButtonClicked()">
@@ -29,9 +30,9 @@
             <mat-progress-bar mode="indeterminate"></mat-progress-bar>
           </div>
           <div *ngIf="!audioLoadingIndicatorIsShown">
-            <oppia-audio-slider [value]="audioPlayerService.getCurrentTime()"
+            <oppia-audio-slider [value]="this.currentVoiceoverTime"
                                 [dir]="isLanguageRTL() ? 'rtl' : 'ltr'"
-                                [max]="audioPlayerService.getAudioDuration()"
+                                [max]="this.totalVoiceoverDurationSecs"
                                 (valueChange)="setProgress($event)"
                                 aria-label="audio-slider">
             </oppia-audio-slider>
@@ -40,18 +41,19 @@
                 class="audio-controls-message">
             {{ 'I18N_PLAYER_AUDIO_LOADING_AUDIO' | translate }}
           </span>
-          <span *ngIf="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()"
+          <span *ngIf="isAudioAvailableInCurrentLanguageAccent() && doesCurrentAudioTranslationNeedUpdate()"
                 class="audio-controls-message">
             {{ 'I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT' | translate }}
           </span>
           <!--Filler space for message-->
           <span class="audio-controls-message">&zwnj;</span>
         </div>
+
         <div class="oppia-audio-header-select">
           <select class="audio-language-select e2e-test-audio-lang-select"
-                  [(ngModel)]="selectedLanguage.value"
-                  (change)="onNewLanguageSelected()">
-            <option *ngFor="let opt of languagesInExploration" [value]="opt.value">{{ opt.displayed }}</option>
+                  [(ngModel)]="selectedLanguageAccentDescription"
+                  (change)="updateSelectedLanguageAccent()">
+            <option *ngFor="let opt of languageAccentDecriptions" [value]="opt">{{ opt }}</option>
           </select>
         </div>
       </div>

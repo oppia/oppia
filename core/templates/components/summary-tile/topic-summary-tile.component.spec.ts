@@ -122,4 +122,11 @@ describe('TopicSummaryTileCompoennt', () => {
 
     expect(component.isHackyTopicNameTranslationDisplayed()).toBe(true);
   });
+
+  it('should get RTL language status correctly', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
 });

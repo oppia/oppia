@@ -20,37 +20,32 @@
 </div>
 
 <div class="modal-body">
-  <section class="oppia-suggestion-review-container">
-    <div class="oppia-question-details" tabindex="0">
-      <div class="oppia-question-suggestion">
-        <strong class="oppia-difficulty-title">
-          Selected Difficulty: {{skillDifficultyLabel}}
-        </strong>
-        <div *ngIf="skillRubricExplanations.length > 0">
-          <strong class="oppia-skill-rubrics"
-                  title="Use these notes to make sure your question is at the right difficulty.">
-            Notes from Skill Rubric
-          </strong>
-          <ul>
-            <li *ngFor="let explanation of skillRubricExplanations">
-              <span class="oppia-skill-explanation" [innerHtml]="explanation"></span>
-            </li>
-          </ul>
-        </div>
-      </div>
+  <div class="oppia-question-details" tabindex="0">
+    <strong class="oppia-difficulty-title">
+      Selected Difficulty: {{skillDifficultyLabel}}
+    </strong>
+    <div *ngIf="skillRubricExplanations.length > 0">
+      <strong class="oppia-skill-rubrics"
+              title="Use these notes to make sure your question is at the right difficulty.">
+        Notes from Skill Rubric
+      </strong>
+      <ul>
+        <li *ngFor="let explanation of skillRubricExplanations">
+          <span class="oppia-skill-explanation" [innerHtml]="explanation"></span>
+        </li>
+      </ul>
     </div>
-    <div *ngIf="showQuestion">
-      <oppia-question-editor [questionId]="questionId"
-                             [misconceptionsBySkill]="misconceptionsBySkill"
-                             [questionStateData]="questionStateData"
-                             [question]="question"
-                             [userCanEditQuestion]="canEditQuestion"
-                             [stateContentShouldStayVisibleOnScroll]="true"
-                             (questionChange)="questionChanged()"
-                             tabindex="0">
-      </oppia-question-editor>
-    </div>
-  </section>
+  </div>
+  <div *ngIf="showQuestion">
+    <oppia-question-editor [questionId]="questionId"
+                           [misconceptionsBySkill]="misconceptionsBySkill"
+                           [questionStateData]="questionStateData"
+                           [question]="question"
+                           [userCanEditQuestion]="canEditQuestion"
+                           (questionChange)="questionChanged()"
+                           tabindex="0">
+    </oppia-question-editor>
+  </div>
   <section [hidden]="!reviewable"
            class="oppia-reviewer-actions">
     <div class="oppia-suggestion-review-message">
@@ -115,17 +110,6 @@
 </div>
 
 <style>
-  .modal-header {
-    background-color: #fff;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
-  .oppia-suggestion-review-container {
-    height: 1300px;
-    padding-bottom: 0;
-    padding-top: 0;
-  }
   .oppia-close-button-position {
     font-size: 2.5rem;
     position: absolute;
@@ -197,7 +181,7 @@
   }
   .oppia-question-suggestion {
     height: 100%;
-    overflow: auto;
+    overflow: scroll;
   }
   .oppia-reviewer-actions {
     border-top: 1px solid #e5e5e5;

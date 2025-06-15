@@ -19,9 +19,9 @@
 import {TestBed} from '@angular/core/testing';
 
 import {
-  AnswerGroupObjectFactory,
+  AnswerGroup,
   AnswerGroupBackendDict,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
 import {
@@ -29,15 +29,12 @@ import {
   Interaction,
   InteractionBackendDict,
 } from 'domain/exploration/InteractionObjectFactory';
-import {
-  OutcomeBackendDict,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
 import {
   SolutionBackendDict,
   SolutionObjectFactory,
 } from 'domain/exploration/SolutionObjectFactory';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {MultipleChoiceInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {
@@ -47,8 +44,6 @@ import {
 
 describe('Interaction object factory', () => {
   let iof: InteractionObjectFactory;
-  let oof: OutcomeObjectFactory;
-  let agof: AnswerGroupObjectFactory;
   let sof: SolutionObjectFactory;
   let answerGroupsDict: AnswerGroupBackendDict[];
   let defaultOutcomeDict: OutcomeBackendDict;
@@ -61,8 +56,6 @@ describe('Interaction object factory', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     iof = TestBed.inject(InteractionObjectFactory);
-    oof = TestBed.inject(OutcomeObjectFactory);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     sof = TestBed.inject(SolutionObjectFactory);
     defaultOutcomeDict = {
       dest: 'dest_default',
@@ -156,6 +149,128 @@ describe('Interaction object factory', () => {
         value: false,
       },
     });
+  });
+
+  it('should be able to get contentId to html of an interaction', () => {
+    defaultOutcomeDict = {
+      dest: 'dest_default',
+      dest_if_really_stuck: null,
+      feedback: {
+        content_id: 'default_outcome',
+        html: 'Wrong answer',
+      },
+      labelled_as_correct: false,
+      param_changes: [],
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null,
+    };
+    answerGroupsDict = [
+      {
+        rule_specs: [],
+        outcome: {
+          dest: 'dest_1',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: 'outcome_1',
+            html: 'Good answer',
+          },
+          labelled_as_correct: false,
+          param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
+        },
+        training_data: ['training_data'],
+        tagged_skill_misconception_id: 'skill_id-1',
+      },
+    ];
+    hintsDict = [
+      {
+        hint_content: {
+          html: '<p>First Hint</p>',
+          content_id: 'content_id1',
+        },
+      },
+      {
+        hint_content: {
+          html: '<p>Second Hint</p>',
+          content_id: 'content_id2',
+        },
+      },
+    ];
+
+    solutionDict = {
+      answer_is_exclusive: false,
+      correct_answer: 'This is a correct answer!',
+      explanation: {
+        content_id: 'solution',
+        html: 'This is the explanation to the answer',
+      },
+    };
+
+    interactionDict = {
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        placeholder: {
+          value: {
+            content_id: 'ca_placeholder_0',
+            unicode_str: 'Enter text',
+          },
+        },
+        rows: {value: 1},
+        catchMisspellings: {
+          value: false,
+        },
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'TextInput',
+      solution: solutionDict,
+    };
+    let testInteraction = iof.createFromBackendDict(interactionDict);
+    let contentIdToHtml = testInteraction.getContentIdToContents();
+
+    expect(contentIdToHtml).toEqual({
+      outcome_1: 'Good answer',
+      default_outcome: 'Wrong answer',
+      content_id1: '<p>First Hint</p>',
+      content_id2: '<p>Second Hint</p>',
+      solution: 'This is the explanation to the answer',
+      ca_placeholder_0: 'Enter text',
+    });
+
+    testInteraction = iof.createFromBackendDict({
+      answer_groups: answerGroupsDict,
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        choices: {
+          value: [
+            {
+              content_id: 'ca_choices',
+              html: '<p>first</p>',
+            },
+          ],
+        },
+        allowMultipleItemsInSamePosition: {value: true},
+      },
+      default_outcome: defaultOutcomeDict,
+      hints: hintsDict,
+      id: 'DragAndDropSortInput',
+      solution: solutionDict,
+    });
+
+    contentIdToHtml = testInteraction.getContentIdToContents();
+    expect(contentIdToHtml).toEqual({
+      outcome_1: 'Good answer',
+      default_outcome: 'Wrong answer',
+      content_id1: '<p>First Hint</p>',
+      content_id2: '<p>Second Hint</p>',
+      solution: 'This is the explanation to the answer',
+      ca_choices: '<p>first</p>',
+    });
+
+    let contentId = testInteraction.getContentIdForMatchingHtml('Good answer');
+    expect(contentId).toEqual('outcome_1');
   });
 
   it(
@@ -535,7 +650,7 @@ describe('Interaction object factory', () => {
       tagged_skill_misconception_id: 'skill_id-1',
     };
     expect(testInteraction.answerGroups).toEqual([
-      agof.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
           outcome: {
@@ -556,7 +671,7 @@ describe('Interaction object factory', () => {
         'TextInput'
       ),
     ]);
-    const newAnswerGroup = agof.createFromBackendDict(
+    const newAnswerGroup = AnswerGroup.createFromBackendDict(
       newAnswerGroupBackendDict,
       'TextInput'
     );
@@ -579,9 +694,11 @@ describe('Interaction object factory', () => {
       refresher_exploration_id: null,
       missing_prerequisite_skill_id: null,
     };
-    const newDefaultOutcome = oof.createFromBackendDict(newDefaultOutcomeDict);
+    const newDefaultOutcome = Outcome.createFromBackendDict(
+      newDefaultOutcomeDict
+    );
     expect(testInteraction.defaultOutcome).toEqual(
-      oof.createFromBackendDict({
+      Outcome.createFromBackendDict({
         dest: 'dest_default',
         dest_if_really_stuck: null,
         feedback: {

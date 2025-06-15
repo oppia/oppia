@@ -20,7 +20,6 @@
 import cloneDeep from 'lodash/cloneDeep';
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
@@ -317,10 +316,3 @@ export class SkillEditorStateService {
     this._setSkillRights(skillRights);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SkillEditorStateService',
-    downgradeInjectable(SkillEditorStateService)
-  );

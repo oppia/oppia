@@ -195,7 +195,7 @@ describe('Admin misc tab component ', () => {
       let regenerateTopicSpy = spyOn(
         adminBackendApiService,
         'regenerateOpportunitiesRelatedToTopicAsync'
-      ).and.returnValue(Promise.resolve(10));
+      ).and.returnValue(Promise.resolve({opportunities_count: 10}));
 
       component.regenerateOpportunitiesRelatedToTopic();
       tick();
@@ -857,6 +857,56 @@ describe('Admin misc tab component ', () => {
         'Server error: Exploration does not exist'
       );
       expect(component.explorationInteractionIds).toEqual([]);
+    }));
+  });
+
+  describe('when controlling azure admin config', () => {
+    it('should be able to get azure admin config data on load', fakeAsync(() => {
+      component.voiceoverAutogenerationIsEnabled = false;
+
+      let getAzureAdminConfigSpy = spyOn(
+        adminBackendApiService,
+        'getAdminConfigForAutomaticVoiceoversAsync'
+      ).and.resolveTo(true);
+
+      component.ngOnInit();
+      tick();
+
+      expect(getAzureAdminConfigSpy).toHaveBeenCalled();
+      expect(component.voiceoverAutogenerationIsEnabled).toBeTrue();
+    }));
+
+    it('should be able to update azure admin config data', fakeAsync(() => {
+      component.voiceoverAutogenerationIsEnabled = false;
+
+      let updateAzureAdminConfigSpy = spyOn(
+        adminBackendApiService,
+        'updateAutomaticVoiceoverSynthesisConfigAsync'
+      ).and.resolveTo();
+
+      component.updateAutomaticVoiceoverSynthesisUsingAzure();
+      tick();
+
+      expect(updateAzureAdminConfigSpy).toHaveBeenCalledWith(false);
+    }));
+
+    it('should fail to update azure admin config data', fakeAsync(() => {
+      component.voiceoverAutogenerationIsEnabled = false;
+
+      let updateAzureAdminConfigSpy = spyOn(
+        adminBackendApiService,
+        'updateAutomaticVoiceoverSynthesisConfigAsync'
+      ).and.rejectWith({
+        error: {error: 'Failed to update Azure admin config.'},
+      });
+
+      component.updateAutomaticVoiceoverSynthesisUsingAzure();
+      tick();
+
+      expect(updateAzureAdminConfigSpy).toHaveBeenCalledWith(false);
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Server error: Failed to update Azure admin config.'
+      );
     }));
   });
 });

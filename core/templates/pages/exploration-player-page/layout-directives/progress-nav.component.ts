@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {
   InteractionSpecsConstants,
@@ -247,10 +246,3 @@ export class ProgressNavComponent {
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaProgressNav',
-  downgradeComponent({
-    component: ProgressNavComponent,
-  }) as angular.IDirectiveFactory
-);

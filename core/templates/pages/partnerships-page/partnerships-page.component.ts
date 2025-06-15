@@ -17,12 +17,12 @@
  */
 
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
 import {PageTitleService} from 'services/page-title.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {AppConstants} from 'app.constants';
 
 @Component({
   selector: 'partnerships-page',
@@ -71,10 +71,13 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
     let userLang = this.translateService.currentLang;
 
     if (userLang === 'en' || userLang === 'pcm' || userLang === 'kab') {
-      this.formLink = 'https://forms.gle/Y71U8FdhQwZpicJj8';
+      this.formLink = AppConstants.PARTNERSHIPS_FORM_LINK;
     } else {
       let interpolatedLanguage = userLang === 'pt-br' ? 'pt' : userLang;
-      this.formLink = `https://docs-google-com.translate.goog/forms/d/e/1FAIpQLSdL5mjFO7RxDtg8yfXluEtciYj8WnAqTL9fZWnwPgOqXV-9lg/viewform?_x_tr_sl=en&_x_tr_tl=${interpolatedLanguage}&_x_tr_hl=en-US&_x_tr_pto=wapp`;
+      this.formLink =
+        AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.PREFIX +
+        interpolatedLanguage +
+        AppConstants.PARTNERSHIPS_FORM_TRANSLATED_LINK.SUFFIX;
     }
   }
 
@@ -151,10 +154,3 @@ export class PartnershipsPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'partnershipsPage',
-    downgradeComponent({component: PartnershipsPageComponent})
-  );

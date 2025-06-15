@@ -30,11 +30,12 @@ from core.constants import constants
 from core.controllers import base
 from core.domain import android_services
 from core.domain import blog_services
-from core.domain import classifier_services
 from core.domain import classroom_config_services
 from core.domain import email_manager
 from core.domain import feature_flag_services
 from core.domain import feedback_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -1347,7 +1348,7 @@ def can_delete_any_user(
         self: _SelfBaseHandlerType, **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and is a primary admin e.g. user with
-        email address equal to feconf.SYSTEM_EMAIL_ADDRESS.
+        email address equal to SYSTEM_EMAIL_ADDRESS.
 
         Args:
             **kwargs: *. Keyword arguments.
@@ -1364,7 +1365,9 @@ def can_delete_any_user(
             raise self.NotLoggedInException
 
         email = user_services.get_email_from_user_id(self.user_id)
-        if email != feconf.SYSTEM_EMAIL_ADDRESS:
+        if email != platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        ):
             raise self.UnauthorizedUserException(
                 '%s cannot delete any user.' % self.user_id)
 
@@ -4226,7 +4229,7 @@ def can_access_subtopic_viewer_page(
         """
         if subtopic_url_fragment != subtopic_url_fragment.lower():
             _redirect_based_on_return_type(
-                self, '/learn/%s/%s/revision/%s' % (
+                self, '/learn/%s/%s/studyguide/%s' % (
                     classroom_url_fragment,
                     topic_url_fragment,
                     subtopic_url_fragment.lower()),
@@ -4261,7 +4264,7 @@ def can_access_subtopic_viewer_page(
         if not subtopic_id:
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s/revision' %
+                '/learn/%s/%s/studyguide' %
                 (classroom_url_fragment, topic_url_fragment),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return None
@@ -4270,7 +4273,7 @@ def can_access_subtopic_viewer_page(
             classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic.id))
         if classroom_url_fragment != verified_classroom_url_fragment:
-            url_substring = '%s/revision/%s' % (
+            url_substring = '%s/studyguide/%s' % (
                 topic_url_fragment, subtopic_url_fragment)
             _redirect_based_on_return_type(
                 self, '/learn/%s/%s' % (
@@ -4284,7 +4287,7 @@ def can_access_subtopic_viewer_page(
         if subtopic_page is None:
             _redirect_based_on_return_type(
                 self,
-                '/learn/%s/%s/revision' % (
+                '/learn/%s/%s/studyguide' % (
                     classroom_url_fragment, topic_url_fragment),
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return None
@@ -4597,53 +4600,6 @@ def can_play_entity(
     return test_can_play_entity
 
 
-def is_from_oppia_ml(
-    handler: Callable[..., _GenericHandlerFunctionReturnType]
-) -> Callable[..., _GenericHandlerFunctionReturnType]:
-    """Decorator to check whether the incoming request is from a valid Oppia-ML
-    VM instance.
-
-    Args:
-        handler: function. The function to be decorated.
-
-    Returns:
-        function. The newly decorated function that now can check if incoming
-        request is from a valid VM instance.
-    """
-
-    # Here we use type Any because this method can accept arbitrary number of
-    # arguments with different types.
-    @functools.wraps(handler)
-    def test_request_originates_from_valid_oppia_ml_instance(
-        self: base.OppiaMLVMHandler[Dict[str, str], Dict[str, str]],
-        **kwargs: Any
-    ) -> _GenericHandlerFunctionReturnType:
-        """Checks if the incoming request is from a valid Oppia-ML VM
-        instance.
-
-        Args:
-            **kwargs: *. Keyword arguments.
-
-        Returns:
-            *. The return value of the decorated function.
-
-        Raises:
-            UnauthorizedUserException. If incoming request is not from a valid
-                Oppia-ML VM instance.
-        """
-        oppia_ml_auth_info = (
-            self.extract_request_message_vm_id_and_signature())
-        if (oppia_ml_auth_info.vm_id == feconf.DEFAULT_VM_ID and
-                not constants.DEV_MODE):
-            raise self.UnauthorizedUserException
-        if not classifier_services.verify_signature(oppia_ml_auth_info):
-            raise self.UnauthorizedUserException
-
-        return handler(self, **kwargs)
-
-    return test_request_originates_from_valid_oppia_ml_instance
-
-
 def can_update_suggestion(
     handler: Callable[..., _GenericHandlerFunctionReturnType]
 ) -> Callable[..., _GenericHandlerFunctionReturnType]:
@@ -4697,7 +4653,7 @@ def can_update_suggestion(
 
         if len(suggestion_id.split('.')) != 3:
             raise self.InvalidInputException(
-                'Invalid format for suggestion_id.' +
+                'Invalid format for suggestion_id.'
                 ' It must contain 3 parts separated by \'.\'')
 
         suggestion = suggestion_services.get_suggestion_by_id(

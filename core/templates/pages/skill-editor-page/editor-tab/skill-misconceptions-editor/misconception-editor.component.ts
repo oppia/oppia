@@ -24,13 +24,12 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {Skill} from 'domain/skill/SkillObjectFactory';
-import {Misconception} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 
 interface MisconceptionFormSchema {
   type: 'html';
@@ -189,10 +188,3 @@ export class MisconceptionEditorComponent implements OnInit {
     this.feedbackEditorIsOpen = false;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaMisconceptionEditor',
-    downgradeComponent({component: MisconceptionEditorComponent})
-  );

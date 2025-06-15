@@ -23,6 +23,10 @@ export interface VoiceoverBackendDict {
   needs_update: boolean;
 }
 
+export interface VoiceoverTypeToVoiceoversBackendDict {
+  [manual: string]: VoiceoverBackendDict;
+}
+
 export class Voiceover {
   filename: string;
   fileSizeBytes: number;
@@ -72,13 +76,13 @@ export class Voiceover {
   }
 
   static createFromBackendDict(
-    translationBackendDict: VoiceoverBackendDict
+    voiceoverBackendDict: VoiceoverBackendDict
   ): Voiceover {
     return new Voiceover(
-      translationBackendDict.filename,
-      translationBackendDict.file_size_bytes,
-      translationBackendDict.needs_update,
-      translationBackendDict.duration_secs
+      voiceoverBackendDict.filename,
+      voiceoverBackendDict.file_size_bytes,
+      voiceoverBackendDict.needs_update,
+      voiceoverBackendDict.duration_secs
     );
   }
 }

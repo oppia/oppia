@@ -25,7 +25,6 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerTopicSummaryTileComponent} from './learner-topic-summary-tile.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 
 describe('Learner Topic Summary Tile Component', () => {
   let component: LearnerTopicSummaryTileComponent;
@@ -34,12 +33,7 @@ describe('Learner Topic Summary Tile Component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        MaterialModule,
-        FormsModule,
-        SmartRouterModule,
-        HttpClientTestingModule,
-      ],
+      imports: [MaterialModule, FormsModule, HttpClientTestingModule],
       declarations: [LearnerTopicSummaryTileComponent, MockTranslatePipe],
       providers: [UrlInterpolationService],
       schemas: [NO_ERRORS_SCHEMA],
@@ -87,7 +81,8 @@ describe('Learner Topic Summary Tile Component', () => {
       total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroom: 'math',
+      classroom_name: 'math',
+      classroom_url_fragment: 'math',
       practice_tab_is_displayed: false,
       canonical_story_summary_dict: [
         {

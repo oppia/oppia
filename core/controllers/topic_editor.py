@@ -29,6 +29,8 @@ from core.domain import classroom_config_services
 from core.domain import email_manager
 from core.domain import fs_services
 from core.domain import image_validation_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
@@ -200,7 +202,7 @@ class TopicEditorStoryHandler(
                 'story_is_published': (
                     story_id_to_publication_status_map[summary['id']]),
                 'completed_node_titles': [],
-                'all_node_dicts': [],
+                'all_node_dicts': [node.to_dict() for node in nodes],
                 'total_chapters_count': total_chapters_count,
                 'published_chapters_count': published_chapters_count,
                 'upcoming_chapters_count': upcoming_chapters_count,
@@ -311,41 +313,6 @@ class TopicEditorStoryHandler(
         self.render_json({
             'storyId': new_story_id
         })
-
-
-class TopicEditorPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
-    """The editor page for a single topic."""
-
-    URL_PATH_ARGS_SCHEMAS = {
-        'topic_id': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'is_regex_matched',
-                    'regex_pattern': constants.ENTITY_ID_REGEX
-                }]
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id: str) -> None:
-        """Displays the topic editor page.
-
-        Args:
-            topic_id: str. The ID of the topic.
-
-        Raises:
-            Exception. The topic with the given id doesn't exist.
-        """
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-
-        if topic is None:
-            raise self.NotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
-
-        self.render_template('topic-editor-page.mainpage.html')
 
 
 class EditableSubtopicPageDataHandler(
@@ -511,7 +478,13 @@ class EditableTopicDataHandler(
                     'The deleted skills: %s are still present in topic with '
                     'id %s' % (deleted_skills_string, topic_id)
                 )
-                if feconf.CAN_SEND_EMAILS:
+                server_can_send_emails = (
+                    platform_parameter_services.get_platform_parameter_value(
+                        platform_parameter_list.ParamName
+                        .SERVER_CAN_SEND_EMAILS.value
+                    )
+                )
+                if server_can_send_emails:
                     email_manager.send_mail_to_admin(
                         'Deleted skills present in topic',
                         'The deleted skills: %s are still present in '
@@ -525,6 +498,9 @@ class EditableTopicDataHandler(
         classroom_url_fragment = (
             classroom_config_services.get_classroom_url_fragment_for_topic_id(
                 topic_id))
+        classroom_name = (
+            classroom_config_services.get_classroom_name_for_topic_id(
+                topic_id))
         skill_question_count_dict = {}
         for skill_id in topic.get_all_skill_ids():
             skill_question_count_dict[skill_id] = (
@@ -533,14 +509,31 @@ class EditableTopicDataHandler(
         skill_creation_is_allowed = (
             role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
 
+        curriculum_admin_usernames = (
+            user_services.get_usernames_by_role('ADMIN'))
+
         self.values.update({
-            'classroom_url_fragment': classroom_url_fragment,
+            'classroom_url_fragment': (
+                None if (
+                    classroom_url_fragment
+                    ==
+                    str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
+                ) else classroom_url_fragment
+            ),
+            'classroom_name': (
+                None if (
+                    classroom_name
+                    ==
+                    str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
+                ) else classroom_name
+            ),
             'topic_dict': topic.to_dict(),
             'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
             'skill_question_count_dict': skill_question_count_dict,
             'skill_id_to_description_dict': skill_id_to_description_dict,
             'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict,
-            'skill_creation_is_allowed': skill_creation_is_allowed
+            'skill_creation_is_allowed': skill_creation_is_allowed,
+            'curriculum_admin_usernames': curriculum_admin_usernames
         })
 
         self.render_json(self.values)
@@ -604,7 +597,13 @@ class EditableTopicDataHandler(
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic_id)
             )
-            if feconf.CAN_SEND_EMAILS:
+            server_can_send_emails = (
+                platform_parameter_services.get_platform_parameter_value(
+                    platform_parameter_list.ParamName
+                    .SERVER_CAN_SEND_EMAILS.value
+                )
+            )
+            if server_can_send_emails:
                 email_manager.send_mail_to_admin(
                     'Deleted skills present in topic',
                     'The deleted skills: %s are still present in topic with '
@@ -624,12 +623,27 @@ class EditableTopicDataHandler(
 
         Args:
             topic_id: str. The ID of the topic.
+
+        Raises:
+            Exception. If topic is assigned to a classroom.
         """
         assert self.user_id is not None
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.NotFoundException(
                 'The topic with the given id doesn\'t exist.')
+
+        classroom_name = (
+            classroom_config_services.get_classroom_name_for_topic_id(
+                topic_id))
+
+        if classroom_name != str(
+            constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS):
+            raise Exception(
+                f'The topic is assigned to the {classroom_name} classroom. '
+                f'Contact the curriculum admins to remove it '
+                'from the classroom first.')
+
         topic_services.delete_topic(self.user_id, topic_id)
 
         self.render_json(self.values)
@@ -736,8 +750,13 @@ class TopicPublishSendMailHandler(
             topic_id: str. The ID of the topic.
         """
         assert self.normalized_payload is not None
-        topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
-        if feconf.CAN_SEND_EMAILS:
+        topic_url = '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id)
+        server_can_send_emails = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if server_can_send_emails:
             email_manager.send_mail_to_admin(
                 'Request to review and publish a topic',
                 '%s wants to publish topic: %s at URL %s, please review'
@@ -808,10 +827,20 @@ class TopicPublishHandler(
 
         publish_status = self.normalized_payload['publish_status']
 
+        classroom_name = (
+            classroom_config_services.get_classroom_name_for_topic_id(
+                topic_id))
+
         try:
             if publish_status:
                 topic_services.publish_topic(topic_id, self.user_id)
             else:
+                if classroom_name != str(
+                    constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS):
+                    raise Exception(
+                        f'The topic is assigned to the {classroom_name} '
+                        f'classroom. Contact the curriculum admins to '
+                        'remove it from the classroom first.')
                 topic_services.unpublish_topic(topic_id, self.user_id)
         except Exception as e:
             raise self.UnauthorizedUserException(e)
@@ -843,40 +872,6 @@ class TopicUrlFragmentHandler(
             'topic_url_fragment_exists': (
                 topic_services.does_topic_with_url_fragment_exist(
                     topic_url_fragment))
-        })
-        self.render_json(self.values)
-
-
-class TopicNameHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """A data handler for checking if a topic with given name exists."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'topic_name': {
-            'schema': {
-                'type': 'basestring',
-                'validators': [{
-                    'id': 'has_length_at_most',
-                    'max_value': constants.MAX_CHARS_IN_TOPIC_NAME
-                }]
-            }
-        }
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_create_topic
-    def get(self, topic_name: str) -> None:
-        """Handler that receives a topic name and checks whether
-        a topic with the same name exists.
-
-        Args:
-            topic_name: str. The topic name.
-        """
-        self.values.update({
-            'topic_name_exists': (
-                topic_services.does_topic_with_name_exist(topic_name))
         })
         self.render_json(self.values)
 

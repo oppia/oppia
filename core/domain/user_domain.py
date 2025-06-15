@@ -526,6 +526,114 @@ class UserSettings:
         self.has_viewed_lesson_info_modal_once = True
 
 
+class UserGroupDict(TypedDict):
+    """Dictionary representing the UserGroup object."""
+
+    user_group_id: str
+    name: str
+    member_usernames: List[str]
+
+
+class UserGroup:
+    """A domain representation for user group."""
+
+    ALPHANUMERIC_REGEX = r'^[a-zA-Z0-9 ]+$'
+
+    def __init__(
+        self,
+        user_group_id: str,
+        name: str,
+        member_usernames: List[str]
+    ) -> None:
+        """Constructs a UserGroup domain object.
+
+        Args:
+            user_group_id: str. The id of the user group.
+            name: str. The name of the user group.
+            member_usernames: List[str]. The list of user usernames
+                attached to user group.
+        """
+        self.user_group_id = user_group_id
+        self.name = name
+        self.member_usernames = member_usernames
+
+    def validate(self) -> None:
+        """Validate various properties of UserGroup."""
+        if not isinstance(self.name, str):
+            raise utils.ValidationError(
+                'Expected name to be a string, received %s.' % self.name)
+
+        if not re.match(self.ALPHANUMERIC_REGEX, self.name):
+            raise utils.ValidationError(
+                'Invalid user group name %s. User group name can only '
+                'contain alphanumeric characters and spaces.' % self.name
+            )
+
+        if not isinstance(self.member_usernames, list):
+            raise utils.ValidationError(
+                'Expected \'member_usernames\' to be a list, ' +
+                'received %s.' % self.member_usernames
+            )
+
+        for user_username in self.member_usernames:
+            if not isinstance(user_username, str):
+                raise utils.ValidationError(
+                    'Expected each user username to be a string, ' +
+                    'received %s.' % user_username
+                )
+
+    def update_name(self, updated_name: str) -> None:
+        """Update user group name.
+
+        Args:
+            updated_name: str. Updated user group name.
+        """
+        self.name = updated_name
+        self.validate()
+
+    def update_member_usernames(
+        self, updated_member_usernames: List[str]) -> None:
+        """Update member_usernames of user group.
+
+        Args:
+            updated_member_usernames: List[str]. The updated list of
+                user usernames.
+        """
+        self.member_usernames = updated_member_usernames
+        self.validate()
+
+    def to_dict(self) -> UserGroupDict:
+        """Convert the UserGroup domain instance into a dictionary form
+        with its keys as the attributes of this class.
+
+        Returns:
+            dict. A dictionary containing the UserGroup class information
+            in a dictionary form.
+        """
+        return {
+            'user_group_id': self.user_group_id,
+            'name': self.name,
+            'member_usernames': self.member_usernames
+        }
+
+    @classmethod
+    def from_dict(cls, user_group_dict: UserGroupDict) -> UserGroup:
+        """Returns UserGroup domain object from dictionary.
+
+        Args:
+            user_group_dict: UserGroupDict. A dictionary represention of
+                UserGroup object.
+
+        Returns:
+            UserGroup. Returns UserGroup domain object.
+        """
+        return UserGroup(
+            user_group_dict['user_group_id'],
+            user_group_dict['name'],
+            user_group_dict['member_usernames']
+        )
+
+
 class UserActionsInfo:
     """A class representing information of user actions.
     Attributes:

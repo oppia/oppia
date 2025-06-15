@@ -15,7 +15,7 @@
 
 build_cmd="python -m scripts.build"
 dev_appserver_cmd="/app/vm_deps/google-cloud-sdk/bin/dev_appserver.py \
---runtime=python38 \
+--runtime=python39 \
 --host=0.0.0.0 \
 --port=8181 \
 --admin_host=0.0.0.0 \
@@ -46,5 +46,4 @@ else
 fi
 
 $build_cmd
-cp /app/oppia/docker/patched_wsgi_server.py /app/vm_deps/google-cloud-sdk/platform/google_appengine/google/appengine/tools/devappserver2/wsgi_server.py
 $dev_appserver_cmd

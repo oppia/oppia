@@ -1,3 +1,0 @@
-from typing import Text
-
-def add(path: Text, index: int = ...) -> None: ...

@@ -24,17 +24,21 @@ import os
 import socket
 import subprocess
 import sys
+import tempfile
 import threading
+import unittest.mock
 
 from core import feconf
 from core import utils
 from core.tests import test_utils
 from scripts import common
 from scripts import concurrent_task_utils
+from scripts import git_changes_utils
 from scripts import install_third_party_libs
+from scripts import run_backend_tests
 from scripts import servers
 
-from typing import Callable, Final, List, Tuple
+from typing import Callable, Final, List, Set, Tuple
 
 TEST_RUNNER_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'gae_suite.py'
@@ -142,8 +146,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             expected_args=((self.coverage_exc_list,),))
 
         expected_result = 'LOG_INFO_TEST: This is task output.\n'
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         with swap_popen, self.swap_logs:
             returned_result = run_backend_tests.run_shell_cmd(
                 self.coverage_exc_list)
@@ -165,17 +167,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         swap_popen = self.swap_with_checks(
             subprocess, 'Popen', mock_popen,
             expected_args=((self.coverage_exc_list,),))
-
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         with swap_popen, self.swap_logs:
             with self.assertRaisesRegex(
                     Exception, 'Error 1\nError XYZ occured.'):
                 run_backend_tests.run_shell_cmd(self.coverage_exc_list)
 
     def test_duplicate_test_files_in_shards_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
             shards_spec = json.load(shards_file)
@@ -192,8 +189,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             returned_error_msg)
 
     def test_module_in_shards_not_found_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
             shards_spec = json.load(shards_file)
@@ -212,8 +207,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             returned_error_msg)
 
     def test_module_not_in_shards_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         test_modules = run_backend_tests.get_all_test_targets_from_path()
         test_modules.append('scripts.new_script_test')
@@ -233,20 +226,17 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_tests_in_load_tests_dir_are_not_included_when_flag_is_passed(
             self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         test_modules = run_backend_tests.get_all_test_targets_from_path(
             include_load_tests=False)
         self.assertNotIn(os.path.join(
             _LOAD_TESTS_DIR, 'new_test.py'), test_modules)
 
     def test_subprocess_error_while_execution_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         test_cmd = 'python -m scripts.run_backend_tests'
         task1 = concurrent_task_utils.create_task(
-            test_function('unused_arg'), False, self.semaphore, name='test')
+            test_function('unused_arg'), False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11'])
         task1.exception = subprocess.CalledProcessError(
             returncode=1, cmd=test_cmd
         )
@@ -265,11 +255,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 tasks, task_to_taskspec)
 
     def test_empty_test_files_show_no_tests_were_run(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         task1 = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task1.exception = Exception('No tests were run.')
         task1.finished = True
@@ -288,11 +277,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             'ERROR     %s: No tests found.' % test_target, self.print_arr)
 
     def test_failed_test_suite_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         task1 = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task1.exception = Exception(
             'Test suite failed: 6 tests run, 0 errors, '
@@ -314,11 +302,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             self.print_arr)
 
     def test_tests_failed_due_to_internal_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         task1 = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task1.exception = Exception('Some internal error.')
         task1.finished = True
@@ -341,11 +328,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             '    This is most likely due to an import error.', self.print_arr)
 
     def test_unfinished_tests_are_cancelled(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         task = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task.finished = False
         task_output = ['Ran 9 tests in 1.244s', '98']
@@ -366,38 +352,92 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn('CANCELED  %s' % test_target, self.print_arr)
 
     def test_successfull_test_run_message_is_printed_correctly(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
-        task = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+        task1 = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
-        task.finished = True
-        task_output = ['Ran 9 tests in 1.234s', '100']
-        task_result = concurrent_task_utils.TaskResult(
-            'task1', False, task_output, task_output)
-        task.task_results.append(task_result)
+        task1.finished = True
+        task1_output = ['Ran 9 tests in 1.234s', '100']
+        task1_result = concurrent_task_utils.TaskResult(
+            'task1', False, task1_output, task1_output)
+        task1.task_results.append(task1_result)
 
-        tasks = [task]
+        task2 = concurrent_task_utils.create_task(
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
+        )
+        task2.finished = True
+        task2_output = ['Ran 9 tests in 2.542s', '100']
+        task2_result = concurrent_task_utils.TaskResult(
+            'task2', False, task2_output, task2_output)
+        task2.task_results.append(task2_result)
+
+        tasks = [task1, task2]
         task_to_taskspec = {}
-        test_target = 'scripts.new_script.py'
+        test1_target = 'scripts.new_script_one_test.py'
+        task2_target = 'scripts.new_script_two_test.py'
         task_to_taskspec[tasks[0]] = run_backend_tests.TestingTaskSpec(
-            test_target, True)
+            test1_target, True)
+        task_to_taskspec[tasks[1]] = run_backend_tests.TestingTaskSpec(
+            task2_target, True)
 
-        with self.print_swap:
-            run_backend_tests.check_test_results(
+        with self.print_swap, self.swap(
+            run_backend_tests, 'AVERAGE_TEST_CASE_TIME', 1
+        ):
+            _, _, _, time_report = run_backend_tests.check_test_results(
                 tasks, task_to_taskspec)
 
+        self.assertEqual(
+            time_report,
+            {
+                'scripts.new_script_one_test.py': (1.234, 9),
+                'scripts.new_script_two_test.py': (2.542, 9)
+            }
+        )
         self.assertIn(
-            'SUCCESS   %s: 9 tests (1.2 secs)' % test_target,
+            'SUCCESS   %s: 9 tests (1.2 secs)' % test1_target,
+            self.print_arr)
+        self.assertIn(
+            'SUCCESS   %s: 9 tests (2.5 secs)' % task2_target,
             self.print_arr)
 
+    def test_successful_test_run_with_generate_time_report_flag(self) -> None:
+        expected_time_report = {
+            'scripts.new_script_one_test.py': [1.234, 9],
+            'scripts.new_script_two_test.py': [2.542, 9]
+        }
+        swap_check_results = self.swap(
+            run_backend_tests, 'check_test_results',
+            lambda *unused_args, **unused_kwargs: (
+                100, 0, 0, expected_time_report)
+        )
+        swap_check_coverage = self.swap(
+            run_backend_tests, 'check_coverage',
+            lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00)
+        )
+        time_report_temp_file = tempfile.NamedTemporaryFile('w+')
+        time_report_path = time_report_temp_file.name
+        swap_time_report_path = self.swap(
+            run_backend_tests, 'TIME_REPORT_PATH', time_report_path)
+
+        with self.swap_execute_task, swap_check_coverage:
+            with self.swap_cloud_datastore_emulator, swap_check_results:
+                with swap_time_report_path, self.swap_redis_server:
+                    with self.swap(
+                        run_backend_tests, 'AVERAGE_TEST_CASE_TIME', 1
+                    ), self.print_swap:
+                        run_backend_tests.main(
+                            args=['--generate_time_report'])
+        loaded_time_report = json.loads(time_report_temp_file.read())
+        self.assertEqual(loaded_time_report, expected_time_report)
+        time_report_temp_file.close()
+
     def test_test_failed_due_to_error_in_parsing_coverage_report(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         task = concurrent_task_utils.create_task(
-            test_function, False, self.semaphore, name='test'
+            test_function, False, self.semaphore, name='test',
+            errors_to_retry_on=['Error -11']
         )
         task.finished = True
         task_output = ['XYZ', '100']
@@ -421,8 +461,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             self.print_arr)
 
     def test_invalid_directory_in_sys_path_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         def mock_path_exists(dirname: str) -> bool:
             for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
@@ -438,8 +476,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             run_backend_tests.main(args=[])
 
     def test_invalid_delimiter_in_test_path_argument_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         with self.assertRaisesRegex(
             Exception, r'The delimiter in test_path should be a slash \(/\)'
@@ -447,23 +483,21 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             run_backend_tests.main(
                 args=['--test_path', 'scripts.run_backend_tests'])
 
-    def test_invalid_delimiter_in_test_target_argument_throws_error(
+    def test_invalid_delimiter_in_test_targets_argument_throws_error(
             self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
-        with self.assertRaisesRegex(
-            Exception, r'The delimiter in test_target should be a dot \(\.\)'
-        ):
-            run_backend_tests.main(
-                args=['--test_target', 'scripts/run_backend_tests'])
+        with self.swap_redis_server, self.swap_cloud_datastore_emulator:
+            with self.assertRaisesRegex(
+                Exception,
+                r'The delimiter in each test_target should be a dot \(\.\)'
+            ):
+                run_backend_tests.main(
+                    args=['--test_targets', 'scripts/run_backend_tests'])
 
-    def test_invalid_test_target_message_is_displayed_correctly(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
+    def test_invalid_test_targets_message_is_displayed_correctly(self) -> None:
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swapcheck_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
@@ -471,20 +505,18 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 with self.print_swap:
                     run_backend_tests.main(
-                        args=['--test_target', 'scripts.run_backend_tests.py'])
+                        args=['--test_targets', 'scripts.run_backend_tests.py'])
 
         self.assertIn(
-            'WARNING : test_target flag should point to the test file.',
+            'WARNING : each test_target should point to the test file.',
             self.print_arr)
         self.assertIn(
             'Redirecting to its corresponding test file...', self.print_arr)
 
-    def test_invalid_test_target_message_is_displayed_docker(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
+    def test_invalid_test_targets_message_is_displayed_docker(self) -> None:
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swapcheck_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
@@ -493,21 +525,19 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 with self.swap_cloud_datastore_emulator, swap_check_results:
                     with self.print_swap, self.swap_redis_server:
                         run_backend_tests.main(
-                            args=['--test_target',
+                            args=['--test_targets',
                                   'scripts.run_backend_tests.py'])
 
         self.assertIn(
-            'WARNING : test_target flag should point to the test file.',
+            'WARNING : each test_target should point to the test file.',
             self.print_arr)
         self.assertIn(
             'Redirecting to its corresponding test file...', self.print_arr)
 
     def test_error_in_matching_shards_with_tests_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swapcheck_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
@@ -526,11 +556,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                         run_backend_tests.main(args=['--test_shard', '1'])
 
     def test_no_tests_run_raises_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (0, 0, 0))
+            lambda *unused_args, **unused_kwargs: (0, 0, 0, {}))
         swapcheck_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00))
@@ -541,15 +569,16 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     Exception, 'WARNING: No tests were run.'
                 ):
                     run_backend_tests.main(
-                        args=['--test_target', 'scripts.run_backend_tests_test']
+                        args=[
+                            '--test_targets',
+                            'scripts.run_backend_tests_test'
+                        ]
                     )
 
     def test_incomplete_overall_backend_coverage_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swapcheck_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 98.00))
@@ -566,8 +595,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Coverage report', self.print_arr)
 
     def test_failure_in_test_execution_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         def mock_execute_tasks(*_: str) -> None:
             raise Exception('XYZ error occured.')
@@ -575,7 +602,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             concurrent_task_utils, 'execute_tasks', mock_execute_tasks)
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
 
         with self.swap_execute_task, self.swap_redis_server, swap_check_results:
             with self.swap_cloud_datastore_emulator, self.assertRaisesRegex(
@@ -584,11 +611,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 run_backend_tests.main(args=[])
 
     def test_errors_in_test_suite_throw_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 2, 0))
+            lambda *unused_args, **unused_kwargs: (100, 2, 0, {}))
 
         with self.swap_execute_task, self.swap_redis_server, swap_check_results:
             with self.swap_cloud_datastore_emulator, self.print_swap:
@@ -598,8 +623,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn('(2 ERRORS, 0 FAILURES)', self.print_arr)
 
     def test_individual_test_in_test_file_is_run_successfully(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         executed_tasks = []
         test_target = (
@@ -615,12 +638,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             concurrent_task_utils, 'execute_tasks', mock_execute)
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swap_check_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
 
-        args = ['--test_target', test_target, '--generate_coverage_report']
+        args = ['--test_targets', test_target, '--generate_coverage_report']
         with self.print_swap:
             with swap_check_coverage, self.swap_redis_server, swap_execute_task:
                 with self.swap_cloud_datastore_emulator, swap_check_results:
@@ -631,12 +654,102 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn('All tests passed.', self.print_arr)
         self.assertIn('Done!', self.print_arr)
 
-    def test_all_test_pass_successfully_with_full_coverage(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
+    def test_multiple_tests_in_test_targets_argument_is_run_successfully(
+        self
+    ) -> None:
+
+        executed_tasks = []
+        test_targets = (
+            'scripts.test_file_test,'
+            'scripts.another_test_file_test'
+        )
+
+        def mock_execute(
+            tasks: List[concurrent_task_utils.TaskThread], *_: str
+        ) -> None:
+            for task in tasks:
+                executed_tasks.append(task)
+
+        swap_execute_task = self.swap(
+            concurrent_task_utils, 'execute_tasks', mock_execute)
         swap_check_results = self.swap(
             run_backend_tests, 'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0))
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
+
+        args = ['--test_targets', test_targets]
+        with self.print_swap, self.swap_redis_server, swap_execute_task:
+            with self.swap_cloud_datastore_emulator, swap_check_results:
+                run_backend_tests.main(args=args)
+
+        self.assertEqual(len(executed_tasks), 2)
+        self.assertEqual(
+            executed_tasks[0].name, test_targets.split(',', maxsplit=1)[0])
+        self.assertEqual(executed_tasks[1].name, test_targets.split(',')[1])
+        self.assertIn('All tests passed.', self.print_arr)
+        self.assertIn('Done!', self.print_arr)
+
+    def test_successful_test_run_with_run_on_changed_files_in_branch_flag(
+        self
+    ) -> None:
+
+        def mock_get_changed_python_test_files() -> Set[str]:
+            return {
+                'test.file1_test',
+                'test.file2_test',
+                'test.file3_test'
+            }
+
+        executed_tasks = []
+
+        def mock_execute(
+            tasks: List[concurrent_task_utils.TaskThread], *_: str
+        ) -> None:
+            for task in tasks:
+                executed_tasks.append(task)
+
+        swap_execute_task = self.swap(
+            concurrent_task_utils, 'execute_tasks', mock_execute)
+        get_changed_python_test_files_swap = self.swap(
+            git_changes_utils, 'get_changed_python_test_files',
+            mock_get_changed_python_test_files)
+        swap_check_results = self.swap(
+            run_backend_tests, 'check_test_results',
+            lambda *unused_args, **unused_kwargs: (
+                100, 0, 0, {})
+        )
+
+        with swap_execute_task, self.print_swap:
+            with self.swap_cloud_datastore_emulator, swap_check_results:
+                with self.swap_redis_server, get_changed_python_test_files_swap:
+                    run_backend_tests.main(
+                        args=['--run_on_changed_files_in_branch'])
+
+        self.assertEqual(len(executed_tasks), 3)
+        self.assertIn('All tests passed.', self.print_arr)
+        self.assertIn('Done!', self.print_arr)
+
+    def test_backend_tests_with_run_on_changed_files_in_branch_no_remote(
+        self
+    ) -> None:
+
+        def mock_get_remote_name() -> str:
+            return ''
+
+        get_remote_name_swap = self.swap(
+            git_changes_utils, 'get_local_git_repository_remote_name',
+            mock_get_remote_name)
+
+        with get_remote_name_swap, self.swap_redis_server:
+            with self.swap_cloud_datastore_emulator, self.assertRaisesRegex(
+                SystemExit, 'Error: No remote repository found.'
+            ):
+                run_backend_tests.main(
+                    args=['--run_on_changed_files_in_branch'])
+
+    def test_all_test_pass_successfully_with_full_coverage(self) -> None:
+        swap_check_results = self.swap(
+            run_backend_tests, 'check_test_results',
+            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}))
         swap_check_coverage = self.swap(
             run_backend_tests, 'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00))
@@ -652,8 +765,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Done!', self.print_arr)
 
     def test_failure_to_combine_coverage_report_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         failed_process_output = MockProcessOutput()
         failed_process_output.returncode = 1
 
@@ -675,8 +786,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             run_backend_tests.check_coverage(True)
 
     def test_failure_to_calculate_coverage_report_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         failed_process_output = MockProcessOutput()
         failed_process_output.returncode = 1
 
@@ -698,8 +807,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             run_backend_tests.check_coverage(True)
 
     def test_coverage_is_calculated_correctly_for_specific_files(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         include_files = (
             'scripts/run_backend_tests.py', 'core/domain/exp_domain.py')
         self.coverage_check_cmd.append('--include=%s' % ','.join(include_files))
@@ -725,8 +832,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(coverage, 86)
 
     def test_coverage_is_calculated_correctly_for_a_single_file(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         data_file = '.coverage.hostname.12345.987654321'
         coverage_report_output = (
             'Name                                                       '
@@ -758,8 +863,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(coverage, 62.0)
 
     def test_no_data_to_report_returns_full_coverage(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
         coverage_report_output = 'No data to report.'
         process = MockProcessOutput()
         process.stdout = coverage_report_output
@@ -782,8 +885,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(coverage, 100)
 
     def test_failure_to_run_test_tasks_throws_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         def mock_run_shell_cmd(*_: str, **__: str) -> None:
             raise Exception('XYZ error.')
@@ -799,8 +900,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 task.run()
 
     def test_tasks_run_again_if_race_condition_occurs(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         def mock_run_shell_cmd(*_: str, **__: str) -> str:
             if self.call_count == 1:
@@ -821,8 +920,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Task result', results[0].messages)
 
     def test_coverage_is_not_calculated_when_flag_is_not_passed(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import run_backend_tests
 
         def mock_run_shell_cmd(*_: str, **__: str) -> str:
             if self.call_count == 1:
@@ -841,3 +938,35 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         self.assertIn('Task result', results[0].messages)
         self.assertEqual(len(results[0].messages), 1)
+
+    def test_skip_install_with_third_party_installation_skipped(self) -> None:
+        with unittest.mock.patch(
+            'scripts.install_third_party_libs.main'
+        ) as mock_third_party_install:
+            swap_check_results = self.swap(
+                run_backend_tests, 'check_test_results',
+                lambda *_: (100, 0, 0, {}))
+            swap_coverage = self.swap(
+                run_backend_tests, 'check_coverage',
+                lambda *_: ('', 100.0))
+            with self.swap_redis_server:
+                with self.swap_cloud_datastore_emulator, swap_check_results:
+                    with swap_coverage, self.swap_execute_task:
+                        run_backend_tests.main(args=['--skip-install'])
+            mock_third_party_install.assert_not_called()
+
+    def test_third_party_install_with_skip_flag_not_set(self) -> None:
+        with unittest.mock.patch(
+            'scripts.install_third_party_libs.main'
+        ) as mock_third_party_install:
+            swap_check_results = self.swap(
+                run_backend_tests, 'check_test_results',
+                lambda *_: (100, 0, 0, {}))
+            swap_coverage = self.swap(
+                run_backend_tests, 'check_coverage',
+                lambda *_: ('', 100.0))
+            with self.swap_redis_server:
+                with self.swap_cloud_datastore_emulator, swap_check_results:
+                    with swap_coverage, self.swap_execute_task:
+                        run_backend_tests.main(args=[])
+            mock_third_party_install.assert_called_once()

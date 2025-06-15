@@ -17,7 +17,12 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
+import {
+  NO_ERRORS_SCHEMA,
+  EventEmitter,
+  Renderer2,
+  ElementRef,
+} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -49,6 +54,8 @@ import {
   LibraryIndexData,
   LibraryPageBackendApiService,
 } from './services/library-page-backend-api.service';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -56,6 +63,7 @@ class MockWindowRef {
       pathname: '/community-library/top-rated',
       href: '',
     },
+    gtag: jasmine.createSpy('gtag'),
   };
 }
 
@@ -98,6 +106,18 @@ describe('Library Page Component', () => {
   let loggerService: LoggerService;
   let searchService: SearchService;
   let translateService: TranslateService;
+  let classroomBackendApiService: ClassroomBackendApiService;
+  let siteAnalyticsService: SiteAnalyticsService;
+
+  const dummyClassroomSummary = {
+    classroom_id: 'mathclassroom',
+    name: 'math',
+    url_fragment: 'math',
+    teaser_text: 'Learn math',
+    is_published: true,
+    thumbnail_filename: 'thumbnail.svg',
+    thumbnail_bg_color: 'transparent',
+  };
 
   let explorationList: CreatorExplorationSummaryBackendDict[] = [
     {
@@ -224,11 +244,20 @@ describe('Library Page Component', () => {
           provide: WindowDimensionsService,
           useClass: MockWindowDimensionsService,
         },
+        {
+          provide: Renderer2,
+          useValue: {listen: () => () => {}},
+        },
+        {
+          provide: ElementRef,
+          useValue: {nativeElement: document.createElement('div')},
+        },
         PageTitleService,
         {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
+        ClassroomBackendApiService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -248,6 +277,8 @@ describe('Library Page Component', () => {
     keyboardShortcutService = TestBed.inject(KeyboardShortcutService);
     loggerService = TestBed.inject(LoggerService);
     searchService = TestBed.inject(SearchService);
+    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   afterEach(() => {
@@ -752,4 +783,134 @@ describe('Library Page Component', () => {
     ).toHaveBeenCalled();
     expect(componentInstance.resizeSubscription.unsubscribe).toHaveBeenCalled();
   });
+
+  it('should get all classrooms data', fakeAsync(() => {
+    let response = [
+      {
+        classroom_id: 'mathclassroom',
+        name: 'math',
+        url_fragment: 'math',
+        teaser_text: 'Learn math',
+        is_published: true,
+        thumbnail_filename: 'thumbnail.svg',
+        thumbnail_bg_color: 'transparent',
+      },
+    ];
+    spyOn(
+      classroomBackendApiService,
+      'getAllClassroomsSummaryAsync'
+    ).and.returnValue(Promise.resolve(response));
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(
+      classroomBackendApiService.getAllClassroomsSummaryAsync
+    ).toHaveBeenCalled();
+    expect(componentInstance.classroomSummaries).toEqual(response);
+    expect(componentInstance.publicClassroomsCount).toEqual(1);
+  }));
+
+  it('should handle carousel navigation correctly', () => {
+    componentInstance.cardsToShow = 3;
+    componentInstance.translateX = 0;
+    componentInstance.currentCardIndex = 0;
+    componentInstance.dots = [];
+    componentInstance.classroomSummaries = Array(5).fill(dummyClassroomSummary);
+    componentInstance.updateActiveDot();
+
+    componentInstance.moveClassroomCarouselToNextSlide();
+    expect(componentInstance.currentCardIndex).toBe(1);
+    expect(componentInstance.translateX).toBe(
+      -componentInstance.getCardWidth()
+    );
+    expect(componentInstance.dots).toEqual([0, 1, 0]);
+
+    componentInstance.moveClassroomCarouselToPreviousSlide();
+    expect(componentInstance.currentCardIndex).toBe(0);
+    expect(componentInstance.translateX).toBe(0);
+    expect(componentInstance.dots).toEqual([1, 0, 0]);
+
+    const middleIndex = 2;
+    componentInstance.moveToSlide(middleIndex);
+    expect(componentInstance.currentCardIndex).toBe(middleIndex);
+    expect(componentInstance.translateX).toBe(
+      -middleIndex * componentInstance.getCardWidth()
+    );
+    expect(componentInstance.dots).toEqual([0, 0, 1]);
+
+    componentInstance.currentCardIndex = 0;
+    expect(
+      componentInstance.shouldShowPreviousClassroomChunkButton()
+    ).toBeFalse();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeTrue();
+
+    componentInstance.currentCardIndex = 2;
+    expect(
+      componentInstance.shouldShowPreviousClassroomChunkButton()
+    ).toBeTrue();
+    expect(componentInstance.shouldShowNextClassroomChunkButton()).toBeFalse();
+  });
+
+  it('should record analytics when classroom card is clicked', () => {
+    spyOn(
+      siteAnalyticsService,
+      'registerClickClassroomCardEvent'
+    ).and.callThrough();
+    componentInstance.registerClassroomCardClickEvent('Math');
+    expect(
+      siteAnalyticsService.registerClickClassroomCardEvent
+    ).toHaveBeenCalled();
+  });
+  it('should set max-width style on carousel element when it exists', fakeAsync(() => {
+    const originalLibraryTileWidth = AppConstants.LIBRARY_TILE_WIDTH_PX;
+    AppConstants.LIBRARY_TILE_WIDTH_PX = 200;
+
+    componentInstance.tileDisplayCount = 3;
+    componentInstance.libraryWindowIsNarrow = false;
+    componentInstance.libraryGroups = [
+      {
+        activity_summary_dicts: [],
+        categories: [],
+        header_i18n_id: 'header1',
+        has_full_results_page: true,
+        full_results_url: '/results1',
+        protractor_id: 'protractor1',
+      },
+      {
+        activity_summary_dicts: [],
+        categories: [],
+        header_i18n_id: 'header2',
+        has_full_results_page: false,
+        full_results_url: '/results2',
+        protractor_id: 'protractor2',
+      },
+    ];
+
+    let carouselElement = document.createElement('div');
+    carouselElement.setAttribute('class', 'oppia-library-carousel');
+    componentInstance.el.nativeElement.appendChild(carouselElement);
+
+    spyOn(componentInstance.el.nativeElement, 'querySelector').and.returnValue(
+      carouselElement
+    );
+
+    let rendererSetStyleSpy = spyOn(
+      componentInstance.renderer,
+      'setStyle'
+    ).and.callThrough();
+
+    componentInstance.initCarousels();
+    tick();
+
+    let width = '400px';
+    expect(rendererSetStyleSpy).toHaveBeenCalledWith(
+      carouselElement,
+      'max-width',
+      width
+    );
+    expect(rendererSetStyleSpy).toHaveBeenCalledTimes(1);
+
+    AppConstants.LIBRARY_TILE_WIDTH_PX = originalLibraryTileWidth;
+  }));
 });

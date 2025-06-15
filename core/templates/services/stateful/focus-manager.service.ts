@@ -20,7 +20,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {IdGenerationService} from 'services/id-generation.service';
@@ -84,7 +83,3 @@ export class FocusManagerService {
     return this.focusEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('FocusManagerService', downgradeInjectable(FocusManagerService));

@@ -52,7 +52,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     """Test the story services module."""
 
     EXP_ID: Final = 'exp_id'
-    NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
+    NODE_ID_1: Final = '%s1' % story_domain.NODE_ID_PREFIX
     NODE_ID_2: Final = 'node_2'
     USER_ID: Final = 'user'
 
@@ -363,16 +363,17 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story.story_contents.nodes[1].status,
             constants.STORY_NODE_STATUS_PUBLISHED)
         self.assertEqual(
-            story.story_contents.nodes[1].
-            planned_publication_date, datetime.datetime(2023, 1, 2, 0, 0),
+            story.story_contents.nodes[1].planned_publication_date,
+            datetime.datetime(2023, 1, 2, 0, 0, tzinfo=datetime.timezone.utc),
             msg='Incorrect planned publication date received.')
         self.assertEqual(
-            story.story_contents.nodes[1].
-            first_publication_date, datetime.datetime(2023, 1, 1, 0, 0),
+            story.story_contents.nodes[1].first_publication_date,
+            datetime.datetime(2023, 1, 1, 0, 0, tzinfo=datetime.timezone.utc),
             msg='Incorrect first publication date received.')
         self.assertEqual(
             story.story_contents.nodes[1].
-            last_modified, datetime.datetime(2023, 1, 1, 0, 0),
+            last_modified, datetime.datetime(
+                2023, 1, 1, 0, 0, tzinfo=datetime.timezone.utc),
             msg='Incorrect last modified date received.')
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
@@ -1392,8 +1393,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'The explorations with ID exp_id_2 and exp_id_1 have different '
                 'categories.'])
         with self.assertRaisesRegex(
-            Exception, 'All explorations in a story should be of the '
-            'same category'):
+            Exception,
+            'All explorations in a story should be of the same category'
+        ):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 

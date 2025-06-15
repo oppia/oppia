@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   trigger,
   state,
@@ -126,8 +125,6 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
 
   username: string = '';
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
-
-  DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
 
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
@@ -415,10 +412,3 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
     return decodeURIComponent(base64ImageData);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaFeedbackUpdatesPage',
-  downgradeComponent({
-    component: FeedbackUpdatesPageComponent,
-  }) as angular.IDirectiveFactory
-);

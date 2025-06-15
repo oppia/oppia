@@ -18,7 +18,6 @@
 
 import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
@@ -126,10 +125,3 @@ export class StoryViewerNavbarBreadcrumbComponent implements OnInit, OnDestroy {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaStoryViewerNavbarBreadcrumb',
-    downgradeComponent({component: StoryViewerNavbarBreadcrumbComponent})
-  );

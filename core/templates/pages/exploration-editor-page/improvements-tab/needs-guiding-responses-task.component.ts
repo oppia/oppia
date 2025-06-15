@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {NeedsGuidingResponsesTask} from 'domain/improvements/needs-guiding-response-task.model';
 import {SupportingStateStats} from 'services/exploration-improvements-task-registry.service';
@@ -52,10 +51,3 @@ export class NeedsGuidingResponsesTaskComponent implements OnInit {
     this.sortedTilesTotalFrequency = this.stats.stateStats.totalAnswersCount;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaNeedsGuidingResponsesTask',
-  downgradeComponent({
-    component: NeedsGuidingResponsesTaskComponent,
-  }) as angular.IDirectiveFactory
-);

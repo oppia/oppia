@@ -20,7 +20,7 @@ import {TestBed} from '@angular/core/testing';
 import cloneDeep from 'lodash/cloneDeep';
 
 import {ConceptCardBackendDict} from './concept-card.model';
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {SkillContentsWorkedExamplesChange} from 'domain/editor/undo_redo/change.model';
 import {
   SkillBackendDict,
@@ -40,7 +40,6 @@ import {EventEmitter} from '@angular/core';
 describe('Skill update service', () => {
   let skillUpdateService: SkillUpdateService;
   let skillObjectFactory: SkillObjectFactory;
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let undoRedoService: UndoRedoService;
   let localStorageService: LocalStorageService;
 
@@ -51,19 +50,13 @@ describe('Skill update service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
-        SkillUpdateService,
-        UndoRedoService,
-        MisconceptionObjectFactory,
-        SkillObjectFactory,
-      ],
+      providers: [SkillUpdateService, UndoRedoService, SkillObjectFactory],
     });
 
     skillUpdateService = TestBed.inject(SkillUpdateService);
     undoRedoService = TestBed.inject(UndoRedoService);
     localStorageService = TestBed.inject(LocalStorageService);
 
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
     const misconceptionDict1 = {
@@ -199,7 +192,7 @@ describe('Skill update service', () => {
       must_be_addressed: true,
     };
 
-    const aNewMisconception = misconceptionObjectFactory.createFromBackendDict(
+    const aNewMisconception = Misconception.createFromBackendDict(
       aNewMisconceptionDict
     );
     skillUpdateService.addMisconception(skill, aNewMisconception);

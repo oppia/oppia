@@ -20,6 +20,7 @@ var FirebaseAdmin = require('firebase-admin');
 const process = require('process');
 const puppeteer = require('puppeteer');
 const {PuppeteerScreenRecorder} = require('puppeteer-screen-recorder');
+const fs = require('fs');
 
 const ADMIN_URL = 'http://localhost:8181/admin';
 const CREATOR_DASHBOARD_URL = 'http://localhost:8181/creator-dashboard';
@@ -33,6 +34,11 @@ var explorationEditorUrl = 'Exploration editor not loaded';
 var topicEditorUrl = 'Topic editor not loaded';
 var skillEditorUrl = 'Skill editor not loaded';
 var storyEditorUrl = 'Story editor not loaded';
+
+var explorationId = 'Exploration editor not loaded';
+var topicId = 'Topic editor not loaded';
+var skillId = 'Skill editor not loaded';
+var storyId = 'Story editor not loaded';
 
 var emailInput = '.e2e-test-sign-in-email-input';
 var signInButton = '.e2e-test-sign-in-button';
@@ -58,8 +64,9 @@ var expCategoryDropdownElement =
 var expConfirmPublishButton = '.e2e-test-confirm-pre-publication';
 var explorationConfirmPublish = '.e2e-test-confirm-publish';
 var createTopicButtonSelector = '.e2e-test-create-topic-button';
+var topicUrlFragmentField =
+  '.e2e-test-new-topic-url-fragment-field .e2e-test-url-fragment-field';
 var topicNameField = '.e2e-test-new-topic-name-field';
-var topicUrlFragmentField = '.e2e-test-new-topic-url-fragment-field';
 var topicDescriptionField = '.e2e-test-new-topic-description-field';
 var topicPageTitleFragmField = '.e2e-test-new-page-title-fragm-field';
 var topicThumbnailButton = '.e2e-test-photo-button';
@@ -71,7 +78,8 @@ var createdTopicLink = '.e2e-test-topic-name';
 
 var createStoryButtonSelector = '.e2e-test-create-story-button';
 var storyNameField = '.e2e-test-new-story-title-field';
-var storyUrlFragmentField = '.e2e-test-new-story-url-fragment-field';
+var storyUrlFragmentField =
+  '.e2e-test-create-new-story-url-fragment-field .e2e-test-url-fragment-field';
 var storyDescriptionField = '.e2e-test-new-story-description-field';
 var storyThumbnailButton =
   'oppia-create-new-story-modal .e2e-test-photo-button';
@@ -230,6 +238,7 @@ const getExplorationEditorUrl = async function (browser, page) {
     await page.click(explorationConfirmPublish);
 
     explorationEditorUrl = await page.url();
+    explorationId = explorationEditorUrl.split('/')[4];
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -246,6 +255,9 @@ const getTopicEditorUrl = async function (browser, page) {
 
     await page.waitForSelector(topicNameField, {visible: true});
     await page.type(topicNameField, 'Topic1 TASD');
+    await page.waitForSelector(topicUrlFragmentField, {
+      visible: true,
+    });
     await page.type(topicUrlFragmentField, 'topic-tasd-one');
     await page.type(topicDescriptionField, 'Topic 1 description');
     await page.type(topicPageTitleFragmField, 'page-fragment');
@@ -273,6 +285,7 @@ const getTopicEditorUrl = async function (browser, page) {
     await page.waitForSelector(createStoryButtonSelector);
 
     topicEditorUrl = await page.url();
+    topicId = topicEditorUrl.split('/')[4];
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -289,6 +302,9 @@ const getStoryEditorUrl = async function (browser, page) {
 
     await page.waitForSelector(storyNameField, {visible: true});
     await page.type(storyNameField, 'Story TASD');
+    await page.waitForSelector(storyUrlFragmentField, {
+      visible: true,
+    });
     await page.type(storyUrlFragmentField, 'storyurlone');
     await page.type(storyDescriptionField, 'Story 1 description');
     await page.click(storyThumbnailButton);
@@ -305,6 +321,7 @@ const getStoryEditorUrl = async function (browser, page) {
     await page.click(confirmStoryCreationButton);
     await page.waitForTimeout(15000);
     storyEditorUrl = await page.url();
+    storyId = storyEditorUrl.split('/')[4];
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log(e);
@@ -336,6 +353,7 @@ const getSkillEditorUrl = async function (browser, page) {
     skillEditorUrl = await pages[2].url();
     if (await skillEditorUrl.includes('topic_editor')) {
       skillEditorUrl = await pages[3].url();
+      skillId = skillEditorUrl.split('/')[4];
     }
   } catch (e) {
     // eslint-disable-next-line no-console
@@ -457,10 +475,15 @@ const addThumbnailToTopic = async function (page, topicName) {
 };
 
 const main = async function () {
-  process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+  process.env.FIREBASE_AUTH_EMULATOR_HOST = 'firebase:9099';
   FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
   // Change headless to false to see the puppeteer actions.
-  const browser = await puppeteer.launch({headless: true});
+  const browser = await puppeteer.launch({
+    headless: true,
+    // Sandbox requires a non-root user, and we use a root user in docker.
+    // Thus, we need to disable the sandbox.
+    args: ['--no-sandbox'],
+  });
   const page = await browser.newPage();
   await page.setViewport({
     width: 1920,
@@ -505,6 +528,15 @@ const main = async function () {
   await getSkillEditorUrl(browser, page);
   await generateDataForTopicAndStoryPlayer(browser, page);
   await generateDataForClassroom(browser, page);
+
+  fs.writeFileSync(
+    'core/tests/puppeteer/.env',
+    `exploration_id=${explorationId}\n` +
+      `story_id=${storyId}\n` +
+      `topic_id=${topicId}\n` +
+      `skill_id=${skillId}\n`
+  );
+
   await process.stdout.write(
     [explorationEditorUrl, topicEditorUrl, storyEditorUrl, skillEditorUrl].join(
       '\n'

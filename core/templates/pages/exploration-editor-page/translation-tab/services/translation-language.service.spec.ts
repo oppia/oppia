@@ -19,14 +19,17 @@
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {TestBed} from '@angular/core/testing';
+import {LocalStorageService} from 'services/local-storage.service';
 
 describe('Translation language service', () => {
   let translationLanguageService: TranslationLanguageService;
   let languageUtilService: LanguageUtilService;
+  let localStorageService: LocalStorageService;
 
   beforeEach(() => {
     translationLanguageService = TestBed.get(TranslationLanguageService);
     languageUtilService = TestBed.get(LanguageUtilService);
+    localStorageService = TestBed.get(LocalStorageService);
     spyOn(languageUtilService, 'getAllVoiceoverLanguageCodes').and.returnValue([
       'en',
       'hi',
@@ -39,6 +42,7 @@ describe('Translation language service', () => {
         return descriptions[activeLanguageCode];
       }
     );
+    spyOn(localStorageService, 'setLastSelectedLanguageAccentCode');
   });
 
   describe('Translation language service', () => {
@@ -82,6 +86,23 @@ describe('Translation language service', () => {
       expect(
         translationLanguageService.getActiveLanguageDescription()
       ).toBeNull();
+    });
+
+    it('should be able to get and set language accent code', () => {
+      spyOn(
+        translationLanguageService.onActiveLanguageAccentChanged,
+        'subscribe'
+      );
+      let languageAccentCode =
+        translationLanguageService.getActiveLanguageAccentCode();
+
+      expect(languageAccentCode).toBeUndefined();
+
+      translationLanguageService.setActiveLanguageAccentCode('en-US');
+      languageAccentCode =
+        translationLanguageService.getActiveLanguageAccentCode();
+
+      expect(languageAccentCode).toEqual('en-US');
     });
   });
 });

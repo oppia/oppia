@@ -31,7 +31,7 @@
           </div>
         </div>
         <div class="oppia-contributions-option-group-label e2e-test-accomplishments-tab-enabled-indicator"
-             *ngIf="accomplishmentsTabIsEnabled && userIsLoggedIn">
+             *ngIf="userIsLoggedIn">
           Accomplishments
         </div>
         <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of accomplishmentsTabs">
@@ -46,7 +46,7 @@
     </div>
   </div>
   <div class="oppia-contributions-show-review-side-navbar-container" >
-    <div class="oppia-contributions-side-navbar-part" *ngIf="reviewTabs.length > 0" tabindex="0">
+    <div class="oppia-contributions-side-navbar-part e2e-test-available-task-label" *ngIf="reviewTabs.length > 0" tabindex="0">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Available Tasks" aria-label="Available tasks">
         <div class="oppia-contributions-navbar-item e2e-test-review-buttons" *ngFor="let tab of reviewTabs">
           <button class="oppia-contributions-navbar-button"
@@ -66,7 +66,7 @@
           </button>
         </div>
       </div>
-      <div class="oppia-contributions-side-navbar-part" *ngIf="accomplishmentsTabIsEnabled && userIsLoggedIn" tabindex="0">
+      <div class="oppia-contributions-side-navbar-part" *ngIf="userIsLoggedIn" tabindex="0">
         <div class="oppia-contributions-navbar-items-list" navbar-label="Accomplishments" aria-label="Accomplishments">
           <div class="oppia-contributions-navbar-item" *ngFor="let tab of accomplishmentsTabs">
             <button *ngIf="tab && tab.enabled"
@@ -133,11 +133,11 @@
                                   [showPinUnpinButton]="false">
         </oppia-opportunities-list>
       </div>
-      <div *ngIf="accomplishmentsTabIsEnabled && isAccomplishmentsTabActive() && activeTabSubtype === 'stats'">
+      <div *ngIf="isAccomplishmentsTabActive() && activeTabSubtype === 'stats'">
         <contributor-stats [type]="defaultContributionType">
         </contributor-stats>
       </div>
-      <div *ngIf="accomplishmentsTabIsEnabled && isAccomplishmentsTabActive() && activeTabSubtype === 'badges'">
+      <div *ngIf="isAccomplishmentsTabActive() && activeTabSubtype === 'badges'">
         <contributor-badges>
         </contributor-badges>
       </div>

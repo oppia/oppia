@@ -32,7 +32,6 @@ import {
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 
 @Component({
@@ -79,6 +78,10 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
       this.groupedSkillSummaries.others
     );
     const allowSkillsFromOtherTopics = true;
+    const skillIdsToExclude = new Set([
+      ...this.skill.getPrerequisiteSkillIds(),
+      this.skill.getId(),
+    ]);
 
     const modalRef: NgbModalRef = this.ngbModal.open(
       SelectSkillModalComponent,
@@ -96,6 +99,7 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
       allowSkillsFromOtherTopics;
     modalRef.componentInstance.untriagedSkillSummaries =
       this.untriagedSkillSummaries;
+    modalRef.componentInstance.skillIdsToExclude = skillIdsToExclude;
 
     const whenResolved = (summary: SkillSummary): void => {
       let skillId = summary.id;
@@ -195,10 +199,3 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSkillPrerequisiteSkillsEditor',
-  downgradeComponent({
-    component: SkillPrerequisiteSkillsEditorComponent,
-  }) as angular.IDirectiveFactory
-);

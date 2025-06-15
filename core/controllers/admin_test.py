@@ -25,6 +25,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import blog_services
+from core.domain import caching_services
 from core.domain import classroom_config_services
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -44,10 +45,12 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.domain import wipeout_service
 from core.platform import models
 from core.platform.auth import firebase_auth_services
@@ -60,13 +63,15 @@ if MYPY: # pragma: no cover
     from mypy_imports import exp_models
     from mypy_imports import opportunity_models
     from mypy_imports import user_models
+    from mypy_imports import voiceover_models
 
 (
     audit_models, blog_models, exp_models, opportunity_models,
-    user_models
+    user_models, voiceover_models
 ) = models.Registry.import_models([
     models.Names.AUDIT, models.Names.BLOG, models.Names.EXPLORATION,
-    models.Names.OPPORTUNITY, models.Names.USER
+    models.Names.OPPORTUNITY, models.Names.USER,
+    models.Names.VOICEOVER
 ])
 
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
@@ -85,11 +90,26 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
         super().setUp()
-        self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
+
+        self.admin_email_address = 'testadmin@example.com'
+
+        self.original_parameter_registry = (
+            platform_parameter_registry.Registry.parameter_registry.copy())
+        platform_parameter_registry.Registry.parameter_registry.clear()
+        caching_services.delete_multi(
+            caching_services.CACHE_NAMESPACE_PLATFORM_PARAMETER, None,
+            ['test_param_1'])
+
+        self.signup(self.admin_email_address, 'testsuper')
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+
+    def tearDown(self) -> None:
+        super().tearDown()
+        platform_parameter_registry.Registry.parameter_registry = (
+            self.original_parameter_registry)
 
     def test_admin_get(self) -> None:
         """Test `/admin` returns a 200 response."""
@@ -221,6 +241,90 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_without_skill_id_dummy_question_suggestions_action_is_not_performed( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'skill_id\' must be provided when the '
+            'action is _generate_dummy_question_suggestions.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_question_suggestions',
+                    'skill_id': None,
+                    'num_dummy_question_suggestions_generate': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_without_num_dummy_question_suggestions_generate_action_is_not_performed( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_question_suggestions_generate\' must be provided'
+            ' when the action is _generate_dummy_question_suggestions.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_question_suggestions',
+                    'skill_id': 'N8daS2n2aoQr',
+                    'num_dummy_question_suggestions_generate': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_dummy_story_generation_fail_without_topic_id(# pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'topic_id\' must be provided when the '
+            'action is generate_dummy_stories.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_stories',
+                    'topic_id': None,
+                    'num_dummy_stories_to_generate': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_dummy_story_generation_fail_without_num_dummy_stories_to_generate( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_stories_to_generate\' must be provided'
+            ' when the action is generate_dummy_stories.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_stories',
+                    'topic_id': 'topic', 
+                    'num_dummy_stories_to_generate': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
     def test_without_data_action_upload_topic_similarities_is_not_performed(
         self
     ) -> None:
@@ -237,6 +341,48 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 '/adminhandler', {
                     'action': 'upload_topic_similarities',
                     'data': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_dummy_chapter_generation_fail_without_story_id(# pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'story_id\' must be provided when the '
+            'action is generate_dummy_chapters.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_chapters',
+                    'story_id': None,
+                    'num_dummy_chapters_to_generate': None
+                }, csrf_token=csrf_token)
+
+        self.logout()
+
+    def test_dummy_chapter_generation_fail_without_num_dummy_chapters_to_generate( # pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_chapters_to_generate\' must be provided'
+            ' when the action is generate_dummy_chapters.'
+        )
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_chapters',
+                    'story_id': 'story_id', 
+                    'num_dummy_chapters_to_generate': None
                 }, csrf_token=csrf_token)
 
         self.logout()
@@ -471,11 +617,19 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         collection_rights = rights_manager.get_collection_rights('0')
 
         self.assertTrue(collection_rights.community_owned)
+        # TODO(release-scripts#137): Update once project ID is verified on
+        # all servers.
         self.assertEqual(
             observed_log_messages,
             [
+                'Logging project ID for debugging: dev-project-id',
+                'Logging project ID for debugging: dev-project-id',
                 '[ADMIN] %s reloaded collection 0' % self.admin_id,
-                'Collection with id 0 was loaded.'
+                'Logging project ID for debugging: dev-project-id',
+                'Logging project ID for debugging: dev-project-id',
+                'Collection with id 0 was loaded.',
+                'Logging project ID for debugging: dev-project-id',
+                'Logging project ID for debugging: dev-project-id',
             ]
         )
 
@@ -771,9 +925,16 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+            'system@example.com'
+        )]
+    )
     def test_get_handler_includes_all_platform_params(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         param = self._create_dummy_param()
+
         with self.swap(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
@@ -787,6 +948,51 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             param.name)
         self.logout()
 
+    def test_get_handler_includes_all_stories(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+        num_stories = 4
+        created_story_ids = []
+        for i in range(num_stories):
+            url_fragement = ['url-a', 'url-b', 'url-c', 'url-d']
+            story = story_domain.Story.create_default_story(
+                'story_id_%s' % i,
+                'Title %s' % i,
+                'Description %s' % i,
+                'topic', url_fragement[i]
+            )
+            story_services.save_new_story(
+                self.get_user_id_from_email(
+                    self.CURRICULUM_ADMIN_EMAIL
+                ), story
+            )
+            created_story_ids.append('story_id_%s' % i)
+            topic_services.add_canonical_story(
+                self.get_user_id_from_email(
+                    self.CURRICULUM_ADMIN_EMAIL
+                ), 'topic', 'story_id_%s' % i
+            )
+        response = self.get_json('/adminhandler')
+        story_list = response['story_list']
+        returned_story_ids = [story['id'] for story in story_list]
+        self.assertEqual(set(returned_story_ids), set(created_story_ids))
+        self.logout()
+
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+            'system@example.com'
+        )]
+    )
     def test_post_with_rules_changes_updates_platform_params(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -829,6 +1035,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             param.name)
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+            'system@example.com'
+        )]
+    )
     def test_post_rules_changes_correctly_updates_params_returned_by_getter(
         self
     ) -> None:
@@ -875,6 +1087,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             param.name)
         self.logout()
 
+    @test_utils.set_platform_parameters(
+        [(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+            'system@example.com'
+        )]
+    )
     def test_update_parameter_rules_with_unknown_param_name_raises_error(
         self
     ) -> None:
@@ -1093,7 +1311,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_grant_super_admin_privileges(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         grant_super_admin_privileges_stub = self.swap_with_call_counter(
             firebase_auth_services, 'grant_super_admin_privileges')
@@ -1129,7 +1347,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'Only the default system admin can manage super admins')
 
     def test_grant_super_admin_privileges_fails_without_username(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         response = self.put_json(
             '/adminsuperadminhandler', {}, csrf_token=self.get_new_csrf_token(),
@@ -1145,14 +1363,14 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_grant_super_admin_privileges_fails_with_invalid_username(
         self
     ) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         self.put_json(
             '/adminsuperadminhandler', {'username': 'fakeusername'},
             csrf_token=self.get_new_csrf_token(), expected_status_int=404)
 
     def test_revoke_super_admin_privileges(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         revoke_super_admin_privileges_stub = self.swap_with_call_counter(
             firebase_auth_services, 'revoke_super_admin_privileges')
@@ -1186,7 +1404,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'Only the default system admin can manage super admins')
 
     def test_revoke_super_admin_privileges_fails_without_username(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         response = self.delete_json(
             '/adminsuperadminhandler', params={}, expected_status_int=400)
@@ -1201,7 +1419,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges_fails_with_invalid_username(
         self
     ) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         self.delete_json(
             '/adminsuperadminhandler',
@@ -1210,7 +1428,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges_fails_for_default_admin(
         self
     ) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         response = self.delete_json(
             '/adminsuperadminhandler', params={'username': 'testsuper'},
@@ -1338,6 +1556,560 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
                     'num_dummy_exps_to_publish': 3
                 }, csrf_token=csrf_token)
 
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+
+class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
+    """Test the conditions for generation of dummy question suggestions."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.QUESTION_REVIEWER_EMAIL, self.QUESTION_REVIEWER_USERNAME)
+        self.signup(
+            self.QUESTION_ADMIN_EMAIL,
+            self.QUESTION_ADMIN_USERNAME,
+            is_super_admin=True)
+        self.question_reviewer_id = self.get_user_id_from_email(
+            self.QUESTION_REVIEWER_EMAIL)
+        self.add_user_role(
+            self.QUESTION_ADMIN_USERNAME,
+            feconf.ROLE_ID_QUESTION_ADMIN)
+
+    def test_generate_dummy_question_suggestions_(self) -> None:
+        self.login(self.QUESTION_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/contributionrightshandler/submit_question', {
+                'username': 'questionExpert'
+            }, csrf_token=csrf_token)
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_question_suggestions',
+                'skill_id': 'N8daS2n2aoQr',
+                'num_dummy_question_suggestions_generate': 12
+            }, csrf_token=csrf_token)
+
+        generated_question_suggestions = suggestion_services.get_submitted_suggestions( # pylint: disable=line-too-long
+            self.get_user_id_from_email(
+                self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        self.assertEqual(len(generated_question_suggestions), 12)
+        self.logout()
+
+    def test_cannot_generate_dummy_question_suggestions_in_prod_mode_(# pylint: disable=line-too-long
+            self) -> None:
+        self.login(self.QUESTION_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy question suggestion in production.')
+
+        self.post_json(
+            '/contributionrightshandler/submit_question', {
+                'username': 'questionExpert'
+            }, csrf_token=csrf_token)
+
+        with assert_raises_regexp_context_manager, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_question_suggestions',
+                    'skill_id': 'N8daS2n2aoQr',
+                    'num_dummy_question_suggestions_generate': 12
+                }, csrf_token=csrf_token)
+
+        generated_question_suggestions = suggestion_services.get_submitted_suggestions( # pylint: disable=line-too-long
+            self.get_user_id_from_email(
+                self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        self.assertNotEqual(len(generated_question_suggestions), 12)
+        self.logout()
+
+    def test_raises_error_if_not_question_admin_or_question_submitter_(# pylint: disable=line-too-long
+            self) -> None:
+        self.login(
+            self.QUESTION_REVIEWER_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User \'question\' must be a question submitter or question admin'
+                    ' in order to generate question suggestions.')
+
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_question_suggestions',
+                    'skill_id': 'N8daS2n2aoQr',
+                    'num_dummy_question_suggestions_generate': 12
+                }, csrf_token=csrf_token)
+
+        generated_question_suggestions = suggestion_services.get_submitted_suggestions( # pylint: disable=line-too-long
+            self.get_user_id_from_email(
+                self.QUESTION_ADMIN_EMAIL),
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
+        self.assertNotEqual(len(generated_question_suggestions), 12)
+        self.logout()
+
+
+class GenerateDummyStoriesTest(test_utils.GenericTestBase):
+    """Test the conditions for generation of dummy stories."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL,
+            self.CURRICULUM_ADMIN_USERNAME,
+            is_super_admin=True)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME,
+            feconf.ROLE_ID_CURRICULUM_ADMIN)
+
+    def test_generate_dummy_stories(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'url',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_stories',
+                'topic_id': 'topic',
+                'num_dummy_stories_to_generate': 5
+            }, csrf_token=csrf_token)
+
+        generated_stories_count = len(topic.get_all_story_references())
+        self.assertNotEqual(generated_stories_count, 5)
+        self.logout()
+
+    def test_cannot_generate_dummy_stories_in_prod_mode(# pylint: disable=line-too-long
+            self
+        ) -> None:
+        self.login(
+            self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regex = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy stories in production.')
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'url',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        with assert_raises_regex, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_stories',
+                    'topic_id': 'topic', 
+                    'num_dummy_stories_to_generate': 5
+                }, csrf_token=csrf_token)
+
+        generated_stories_count = len(topic.get_all_story_references())
+        self.assertNotEqual(generated_stories_count, 5)
+        self.logout()
+
+    def test_raises_error_if_not_curriculum_admin(# pylint: disable=line-too-long
+            self
+        ) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(user_email, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regex = self.assertRaisesRegex(
+            Exception, 'User \'user1\' must be a curriculum admin'
+            ' in order to generate stories.')
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'url',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        with assert_raises_regex:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_stories',
+                    'topic_id': 'topic', 
+                    'num_dummy_stories_to_generate': 5
+                }, csrf_token=csrf_token)
+
+        generated_stories_count = len(topic.get_all_story_references())
+        self.assertNotEqual(generated_stories_count, 5)
+        self.logout()
+
+
+class GenerateDummyChaptersTest(test_utils.GenericTestBase):
+    """Test the conditions for generation of dummy chapters."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL,
+            self.CURRICULUM_ADMIN_USERNAME,
+            is_super_admin=True)
+        self.add_user_role(
+            self.CURRICULUM_ADMIN_USERNAME,
+            feconf.ROLE_ID_CURRICULUM_ADMIN)
+
+    def test_generate_dummy_chapters(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description',
+            'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), story
+        )
+
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), 'topic', 'story_id'
+        )
+
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 7
+            }, csrf_token=csrf_token)
+
+        generated_chapters_count = len(story.story_contents.nodes)
+        self.assertNotEqual(generated_chapters_count, 7)
+        self.logout()
+
+    def test_cannot_generate_dummy_chapters_in_prod_mode(# pylint: disable=line-too-long
+            self
+        ) -> None:
+        self.login(
+            self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regex = self.assertRaisesRegex(
+            Exception, 'Cannot generate dummy chapters in production.')
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description',
+            'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), story
+        )
+
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), 'topic', 'story_id'
+        )
+
+        with assert_raises_regex, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_chapters',
+                    'story_id': 'story', 
+                    'num_dummy_chapters_to_generate': 7
+                }, csrf_token=csrf_token)
+
+        generated_chapters_count = len(story.story_contents.nodes)
+        self.assertNotEqual(generated_chapters_count, 7)
+        self.logout()
+
+    def test_generate_dummy_chapters_when_story_contents_is_not_none(# pylint: disable=line-too-long
+        self
+    ) -> None:
+        self.login(
+            self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description',
+            'topic', 'storyurl'
+        )
+        story.story_contents.next_node_id = 'node_4'
+
+        def reload_exploration(
+                user_id: str, exploration_id: str
+        ) -> None:
+            if constants.DEV_MODE:
+                logging.info(
+                    '[ADMIN] %s reloaded exploration %s' %
+                    (user_id, exploration_id))
+                exp_services.load_demo(exploration_id)
+                rights_manager.release_ownership_of_exploration(
+                    user_services.get_system_user(), exploration_id)
+            else:
+                raise Exception('Cannot reload an exploration in production.')
+
+        reload_exploration(self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL), '6'
+        )
+        story.add_node('node_4', 'dummy chapter 4')
+        story.update_node_exploration_id('node_4', '6')
+        story_services.save_new_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+                ), story
+        )
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+                ), 'topic', 'story_id'
+        )
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 2
+            }, csrf_token=csrf_token)
+
+        updated_story = story_fetchers.get_story_by_id('story_id')
+        chapter_titles = [
+            node.title for node in updated_story.story_contents.nodes
+        ]
+        self.assertIn('dummy chapter 4', chapter_titles)
+        self.assertIn('dummy chapter 5', chapter_titles)
+        self.assertIn('dummy chapter 6', chapter_titles)
+        self.assertNotEqual(len(story.story_contents.nodes), 3)
+        self.logout()
+
+    def test_raises_error_if_not_curriculum_admin(# pylint: disable=line-too-long
+            self
+        ) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(user_email, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regex = self.assertRaisesRegex(
+            Exception, 'User \'user1\' must be a curriculum admin'
+            ' in order to generate chapters.')
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl',
+            'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), topic
+        )
+
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description',
+            'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), story
+        )
+
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(
+                self.CURRICULUM_ADMIN_EMAIL
+            ), 'topic', 'story_id'
+        )
+
+        with assert_raises_regex:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_chapters',
+                    'story_id': 'story',
+                    'num_dummy_chapters_to_generate': 7
+                }, csrf_token=csrf_token)
+
+        generated_chapters_count = len(story.story_contents.nodes)
+        self.assertNotEqual(generated_chapters_count, 7)
+        self.logout()
+
+
+class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
+    """Checks the conditions for generation of dummy translation
+    opportunities."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(
+            self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+
+    def test_admins_can_generate_dummy_translation_opportunities(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_translation_opportunities',
+                'num_dummy_translation_opportunities_to_generate': 10
+            }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(10)
+        self.assertEqual(len(generated_exps), 10)
+        self.assertEqual(len(published_exps), 10)
+        self.logout()
+
+    def test_admins_can_generate_dummy_translation_opportunities_multiple_times(self) -> None: # pylint: disable=line-too-long
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        for i in range(1, 4):
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': 5
+                }, csrf_token=csrf_token)
+            generated_exps = exp_services.get_all_exploration_summaries()
+            published_exps = (
+                exp_services.get_recently_published_exp_summaries(15))
+            self.assertEqual(len(generated_exps), 5 * i)
+            self.assertEqual(len(published_exps), 5 * i)
+        self.logout()
+
+    def test_handler_raises_error_with_non_int_num_dummy_translation_opportunities_to_generate(self) -> None: # pylint: disable=line-too-long
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_translation_opportunities',
+                'num_dummy_translation_opportunities_to_generate':
+                    'invalid_type'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        error_msg = (
+            'At \'http://localhost/adminhandler\' these errors are happening:\n'
+            'Schema validation for '
+            '\'num_dummy_translation_opportunities_to_generate\' '
+            'failed: Could not convert str to int: invalid_type')
+        self.assertEqual(response['error'], error_msg)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+    def test_without_num_dummy_exps_generate_dummy_translation_opportunites_action_is_not_performed(self) -> None: # pylint: disable=line-too-long
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'The \'num_dummy_translation_opportunities_to_generate\' must be '
+            'provided when the action is generate_dummy_translation_'
+            'opportunities.'
+        )
+        with assert_raises_regexp_context_manager:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': None
+                }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+    def test_cannot_generate_dummy_translation_opportunities_in_production_mode(
+        self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception, 'Cannot load new structures data in production.')
+        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': 5
+                }, csrf_token=csrf_token)
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+    def test_non_admins_cannot_generate_dummy_translation_opportunities(
+        self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        assert_raises_regexp = self.assertRaisesRegex(
+            Exception, 'User does not have enough rights to generate data.')
+        with assert_raises_regexp:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': 1
+                }, csrf_token=csrf_token)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(generated_exps, {})
@@ -2457,22 +3229,36 @@ class SendDummyMailTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
 
-    def test_send_dummy_mail(self) -> None:
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.')
+        ]
+    )
+    def test_can_send_dummy_mail(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
+        generated_response = self.post_json(
+            '/senddummymailtoadminhandler', {},
+            csrf_token=csrf_token, expected_status_int=200)
+        self.assertEqual(generated_response, {})
 
-        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
-            generated_response = self.post_json(
-                '/senddummymailtoadminhandler', {},
-                csrf_token=csrf_token, expected_status_int=200)
-            self.assertEqual(generated_response, {})
-
-        with self.swap(feconf, 'CAN_SEND_EMAILS', False):
-            generated_response = self.post_json(
-                '/senddummymailtoadminhandler', {},
-                csrf_token=csrf_token, expected_status_int=400)
-            self.assertEqual(
-                generated_response['error'], 'This app cannot send emails.')
+    def test_cannot_send_dummy_mail(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        generated_response = self.post_json(
+            '/senddummymailtoadminhandler', {},
+            csrf_token=csrf_token, expected_status_int=400)
+        self.assertEqual(
+            generated_response['error'], 'This app cannot send emails.')
 
 
 class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
@@ -2739,10 +3525,11 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        system_email_address = 'system@example.com'
+        self.signup(system_email_address, self.CURRICULUM_ADMIN_USERNAME)
+        self.login(system_email_address, is_super_admin=True)
         self.admin_user_id = self.get_user_id_from_email(
-            feconf.SYSTEM_EMAIL_ADDRESS)
+            system_email_address)
 
     def test_delete_without_user_id_raises_error(self) -> None:
         self.delete_json(
@@ -2797,9 +3584,10 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_user_id = self.get_user_id_from_email(
-            feconf.SYSTEM_EMAIL_ADDRESS)
+            self.system_email_address)
         self.signup(
             self.BLOG_ADMIN_EMAIL, self.BLOG_ADMIN_USERNAME)
         self.add_user_role(
@@ -2819,7 +3607,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         model.update_timestamps()
         model.put()
 
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.system_email_address, is_super_admin=True)
 
     def test_update_blog_post_without_blog_post_id_raises_error(self) -> None:
         csrf_token = self.get_new_csrf_token()
@@ -2879,7 +3667,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.system_email_address, is_super_admin=True)
 
         self.put_json(
             '/updateblogpostdatahandler',
@@ -2912,7 +3700,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.system_email_address, is_super_admin=True)
 
         response = self.put_json(
             '/updateblogpostdatahandler',
@@ -2925,7 +3713,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
             expected_status_int=500)
 
         error_msg = (
-            'time data \'05/09/20000, 00:00:00:00\' does not match' +
+            'time data \'05/09/20000, 00:00:00:00\' does not match'
             ' format \'%m/%d/%Y, %H:%M:%S:%f\'')
         self.assertEqual(response['error'], error_msg)
 
@@ -2934,7 +3722,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         self.signup(self.BLOG_EDITOR_EMAIL, self.BLOG_EDITOR_USERNAME)
         self.add_user_role(
             self.BLOG_EDITOR_USERNAME, feconf.ROLE_ID_BLOG_POST_EDITOR)
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.system_email_address, is_super_admin=True)
 
         self.put_json(
             '/updateblogpostdatahandler',
@@ -3040,14 +3828,15 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the signup process for self.ADMIN_EMAIL."""
         super().setUp()
-        self.signup(feconf.ADMIN_EMAIL_ADDRESS, 'testsuper')
+        self.admin_email_address = 'testadmin@example.com'
+        self.signup(self.admin_email_address, 'testsuper')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration1 = self.save_new_valid_exploration(
             self.EXP_ID_1, self.editor_id, end_state_name='End')
 
     def test_interactions_by_exploration_id_handler(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         payload = {
             'exp_id': self.EXP_ID_1
@@ -3060,7 +3849,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             sorted(interaction_ids), ['EndExploration', 'TextInput'])
 
     def test_handler_with_invalid_exploration_id_raise_error(self) -> None:
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.admin_email_address, is_super_admin=True)
 
         payload = {
             'exp_id': 'invalid'
@@ -3071,7 +3860,7 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             expected_status_int=404)
 
     def test_handler_with_without_exploration_id_in_payload_raise_error(self) -> None: # pylint: disable=line-too-long
-        self.login(feconf.ADMIN_EMAIL_ADDRESS, is_super_admin=True)
+        self.login(self.admin_email_address, is_super_admin=True)
         response = self.get_json(
             '/interactions', params={},
             expected_status_int=400)
@@ -3079,4 +3868,72 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             response['error'],
             'At \'http://localhost/interactions\' these errors are happening:\n'
             'Missing key in handler args: exp_id.'
+        )
+
+
+class AutomaticVoiceoverAdminControlHandlerTests(test_utils.GenericTestBase):
+    """Tests for admin config for automatic voiceovers."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, 'testsuper')
+        self.voiceover_autogeneration_policy_model = (
+            voiceover_models.VoiceoverAutogenerationPolicyModel(
+                id=voiceover_models.VOICEOVER_AUTOGENERATION_POLICY_ID)
+        )
+        self.voiceover_autogeneration_policy_model.language_codes_mapping = {}
+        (
+            self.voiceover_autogeneration_policy_model.
+            autogenerated_voiceovers_are_enabled
+        ) = True
+        self.voiceover_autogeneration_policy_model.update_timestamps()
+        self.voiceover_autogeneration_policy_model.put()
+
+    def test_handler_should_be_able_to_return_azure_config(self) -> None:
+        response = self.get_json(
+            '/automatic_voiceover_admin_control_handler',
+            expected_status_int=200)
+        self.assertTrue(
+            response['autogenerated_voiceovers_are_enabled'])
+
+    def test_admin_should_be_able_to_update_config(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        voiceover_services.update_admin_config_for_voiceover_autogeneration(
+            False)
+        self.assertFalse(
+            voiceover_services.
+            is_voiceover_autogeneration_using_cloud_service_enabled()
+        )
+
+        self.post_json(
+            '/automatic_voiceover_admin_control_handler', {
+                'autogenerated_voiceovers_are_enabled': True
+            }, csrf_token=csrf_token)
+
+        self.assertTrue(
+            voiceover_services.
+            is_voiceover_autogeneration_using_cloud_service_enabled()
+        )
+        self.logout()
+
+    def test_non_admin_should_not_be_able_to_update_config(self) -> None:
+        csrf_token = self.get_new_csrf_token()
+
+        voiceover_services.update_admin_config_for_voiceover_autogeneration(
+            False)
+        self.assertFalse(
+            voiceover_services.
+            is_voiceover_autogeneration_using_cloud_service_enabled()
+        )
+
+        self.post_json(
+            '/automatic_voiceover_admin_control_handler', {
+                'autogenerated_voiceovers_are_enabled': 'true'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertFalse(
+            voiceover_services.
+            is_voiceover_autogeneration_using_cloud_service_enabled()
         )

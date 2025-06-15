@@ -361,13 +361,7 @@
   <div joyrideStep="translationTabReRecordingOverview" [stepContent]="TranslationTabReRecordingOverview"></div>
   <div joyrideStep="translationTabTutorialComplete" [stepContent]="TranslationTabTutorialComplete"></div>
   <div *ngIf="isVoiceoverModeActive()" id="tutorialTranslationAudioBar" class="oppia-audio-translation-bar">
-    <div *ngIf="!isVoiceoverContributionEnabled()">
-      <p class="voiceover-disabled-text-class">
-        The functionality for adding voiceovers is temporarily disabled due to maintenance. Try again later.
-      </p>
-    </div>
-    <oppia-audio-translation-bar *ngIf="isVoiceoverContributionEnabled()" [isTranslationTabBusy]="isTranslationTabBusy">
-    </oppia-audio-translation-bar>
+    <oppia-voiceover-card></oppia-voiceover-card>
   </div>
   <div *ngIf="!isVoiceoverModeActive()">
     <oppia-state-translation-editor></oppia-state-translation-editor>
@@ -380,8 +374,12 @@
     display: block;
   }
   .voiceover-disabled-text-class {
-    margin-top: revert;
+    max-width: 90%;
+    overflow-wrap: break-word;
+    padding: 5px;
     text-align: center;
+    white-space: normal;
+    word-wrap: break-word;
   }
   .oppia-translation-preview {
     list-style: none;
@@ -427,11 +425,34 @@
     cursor: pointer;
     display: flex;
     margin-bottom: 5px;
-    width: -webkit-calc(100% / 4);
-    width: -moz-calc(100% / 4);
-    width: -o-calc(100% / 4);
-    width: calc(100% / 4);
+    width: -webkit-calc(100% / 5);
+    width: -moz-calc(100% / 5);
+    width: -o-calc(100% / 5);
+    width: calc(100% / 5);
   }
+
+  @media screen and (max-width: 768px) {
+    .oppia-state-translation-page {
+      margin-left: auto;
+    }
+    .oppia-translation-tabs {
+      flex-wrap: wrap;
+      height: 100px;
+    }
+
+    .oppia-translation-tabs li {
+      height: 50px;
+    }
+
+    .oppia-audio-recording-bar {
+      flex-wrap: wrap;
+    }
+
+    .oppia-slider-section {
+      margin-bottom: 5px;
+    }
+  }
+
   .oppia-active-translation-tab div {
     background-color: white;
     border-bottom: 0;
@@ -450,7 +471,8 @@
     border-bottom-width: 2px;
     border-top-width: 3px;
     color: #009688;
-    padding: 10px;
+    font-size: 1.2rem;
+    padding: 10px 10px 20px 2px;
     text-decoration: none;
     width: 100%;
   }
@@ -473,7 +495,8 @@
     padding: 20px 30px 20px 30px;
   }
   .oppia-audio-translation-bar {
-    height: 50px;
+    flex-direction: column;
+    padding: 15px;
   }
   .oppia-rte-editor-focused:focus > p {
     outline: solid 2px #009688;
@@ -493,7 +516,7 @@
   .oppia-rte-editor-focused:focus > oppia-noninteractive-tabs > div {
     outline: solid 2px #009688;
   }
-  .oppia-rte-editor-focused:focus > oppia-noninteractive-collapsible > uib-accordion > div {
+  .oppia-rte-editor-focused:focus > oppia-noninteractive-collapsible > ngb-accordion > div {
     outline: solid 2px #009688;
   }
   .oppia-rte-editor-focused:focus > oppia-noninteractive-image > figure {

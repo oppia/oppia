@@ -180,8 +180,8 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         expected_components: List[html_cleaner.ComponentsDict] = [
             {
                 'customization_args': {
-                    'text-with-value': u'Link"quoted text"\'singlequotes\'',
-                    'url-with-value': u'https://www.example.com'},
+                    'text-with-value': 'Link"quoted text"\'singlequotes\'',
+                    'url-with-value': 'https://www.example.com'},
                 'id': 'oppia-noninteractive-link'
             },
             {
@@ -189,8 +189,8 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
                     'start-with-value': 0,
                     'end-with-value': 0,
                     'video_id-with-value': (
-                        u'https://www.youtube.com/watch?'
-                        u'v=Ntcw0H0hwPU'),
+                        'https://www.youtube.com/watch?'
+                        'v=Ntcw0H0hwPU'),
                     'autoplay-with-value': False
                 },
                 'id': 'oppia-noninteractive-video'
@@ -198,8 +198,8 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             {
                 'customization_args': {
                     'math_content-with-value': {
-                        u'raw_latex': u'\\frac{x}{y}',
-                        u'svg_filename': u''
+                        'raw_latex': '\\frac{x}{y}',
+                        'svg_filename': ''
                     }
                 },
                 'id': 'oppia-noninteractive-math'

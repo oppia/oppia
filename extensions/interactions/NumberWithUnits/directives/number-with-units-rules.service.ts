@@ -17,11 +17,10 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {unit} from 'mathjs';
 
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {UtilsService} from 'services/utils.service';
 import {NumberWithUnitsAnswer} from 'interactions/answer-defs';
 import {NumberWithUnitsRuleInputs} from 'interactions/rule-input-defs';
@@ -31,12 +30,9 @@ import {NumberWithUnitsRuleInputs} from 'interactions/rule-input-defs';
   providedIn: 'root',
 })
 export class NumberWithUnitsRulesService {
-  constructor(
-    private unitsObjectFactory: NumberWithUnitsObjectFactory,
-    private utilsService: UtilsService
-  ) {
+  constructor(private utilsService: UtilsService) {
     try {
-      this.unitsObjectFactory.createCurrencyUnits();
+      NumberWithUnits.createCurrencyUnits();
     } catch (parsingError) {}
   }
 
@@ -45,27 +41,38 @@ export class NumberWithUnitsRulesService {
     inputs: NumberWithUnitsRuleInputs
   ): boolean {
     // Returns true only if input is exactly equal to answer.
-    var answerObject = this.unitsObjectFactory.fromDict(answer);
-    var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
+    var answerObject = NumberWithUnits.fromDict(answer);
+    var inputsObject = NumberWithUnits.fromDict(inputs.f);
+    let numericalValuesAreEqual: boolean;
 
-    var answerString = answerObject.toMathjsCompatibleString();
-    var inputsString = inputsObject.toMathjsCompatibleString();
+    if (answerObject.type !== inputsObject.type) {
+      return false;
+    }
 
-    var answerList = this.unitsObjectFactory
-      .fromRawInputString(answerString)
-      .toDict();
-    var inputsList = this.unitsObjectFactory
-      .fromRawInputString(inputsString)
-      .toDict();
-    return this.utilsService.isEquivalent(answerList, inputsList);
+    if (answerObject.type === 'real') {
+      numericalValuesAreEqual = answerObject.real === inputsObject.real;
+    } else {
+      numericalValuesAreEqual = this.utilsService.isEquivalent(
+        answerObject.fraction,
+        inputsObject.fraction
+      );
+    }
+
+    return (
+      numericalValuesAreEqual &&
+      this.utilsService.isEquivalent(
+        answerObject.getCanonicalRepresentationOfUnits(),
+        inputsObject.getCanonicalRepresentationOfUnits()
+      )
+    );
   }
 
   IsEquivalentTo(
     answer: NumberWithUnitsAnswer,
     inputs: NumberWithUnitsRuleInputs
   ): boolean {
-    var answerObject = this.unitsObjectFactory.fromDict(answer);
-    var inputsObject = this.unitsObjectFactory.fromDict(inputs.f);
+    var answerObject = NumberWithUnits.fromDict(answer);
+    var inputsObject = NumberWithUnits.fromDict(inputs.f);
     if (answerObject.type === 'fraction') {
       answerObject.type = 'real';
       answerObject.real = answerObject.fraction.toFloat();
@@ -76,13 +83,7 @@ export class NumberWithUnitsRulesService {
     }
     var answerString = answerObject.toMathjsCompatibleString();
     var inputsString = inputsObject.toMathjsCompatibleString();
+
     return unit(answerString).equals(unit(inputsString));
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'NumberWithUnitsRulesService',
-    downgradeInjectable(NumberWithUnitsRulesService)
-  );

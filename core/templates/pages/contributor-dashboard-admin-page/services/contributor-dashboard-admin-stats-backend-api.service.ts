@@ -16,7 +16,6 @@
  * @fileoverview Service for fetching contributor admin dashboard stats.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -222,9 +221,9 @@ export class ContributorDashboardAdminStatsBackendApiService {
       language_code: filter.languageCode
         ? filter.languageCode
         : PageConstants.DEFAULT_LANGUAGE_FILTER,
-      ...(filter.lastActivity
+      ...(filter.maxDaysSinceLastActivity
         ? {
-            max_days_since_last_activity: filter.lastActivity,
+            max_days_since_last_activity: filter.maxDaysSinceLastActivity,
           }
         : {}),
     };
@@ -357,19 +356,12 @@ export class ContributorDashboardAdminStatsBackendApiService {
   async fetchTopicChoices(): Promise<TopicChoice[][]> {
     let topicPromises: Promise<TopicChoice[]>[] = [];
     return this.classroomBackendApiService
-      .getAllClassroomIdToClassroomNameDictAsync()
+      .getAllClassroomDisplayInfoDictAsync()
       .then(classResponse => {
-        Object.keys(classResponse).forEach(classroomId =>
-          topicPromises.push(this.fetchTopics(classroomId))
+        classResponse.forEach(classroomMapping =>
+          topicPromises.push(this.fetchTopics(classroomMapping.classroom_id))
         );
         return Promise.all(topicPromises);
       });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ContributorDashboardAdminStatsBackendApiService',
-    downgradeInjectable(ContributorDashboardAdminStatsBackendApiService)
-  );

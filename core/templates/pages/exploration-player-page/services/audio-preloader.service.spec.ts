@@ -20,7 +20,12 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {
+  waitForAsync,
+  TestBed,
+  fakeAsync,
+  flushMicrotasks,
+} from '@angular/core/testing';
 
 import {
   ExplorationBackendDict,
@@ -28,24 +33,48 @@ import {
 } from 'domain/exploration/ExplorationObjectFactory';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {AudioPreloaderService} from 'pages/exploration-player-page/services/audio-preloader.service';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {ContextService} from 'services/context.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {
+  Voiceover,
+  VoiceoverBackendDict,
+} from 'domain/exploration/voiceover.model';
+
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EnableVoiceoverContribution: {
+        isEnabled: true,
+      },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
+    };
+  }
+}
 
 describe('Audio preloader service', () => {
   let httpTestingController: HttpTestingController;
   let interactionAnswer: InteractionAnswer[] = ['Ans1'];
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+      ],
+    }).compileComponents();
     httpTestingController = TestBed.inject(HttpTestingController);
-  });
+  }));
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
   let audioPreloaderService: AudioPreloaderService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let contextService: ContextService;
 
@@ -67,19 +96,6 @@ describe('Audio preloader service', () => {
         content: {
           content_id: 'content',
           html: '<p>State 1 Content</p>',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'en-2.mp3',
-                file_size_bytes: 120000,
-                needs_update: false,
-                duration_secs: 1.2,
-              },
-            },
-            default_outcome: {},
-          },
         },
         interaction: {
           id: 'Continue',
@@ -113,20 +129,8 @@ describe('Audio preloader service', () => {
       'State 3': {
         param_changes: [],
         content: {
-          content_id: 'content',
+          content_id: 'content2',
           html: 'Congratulations, you have finished!',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'en-4.mp3',
-                file_size_bytes: 120000,
-                needs_update: false,
-                duration_secs: 1.2,
-              },
-            },
-          },
         },
         interaction: {
           id: 'EndExploration',
@@ -151,19 +155,6 @@ describe('Audio preloader service', () => {
         content: {
           content_id: 'content',
           html: '<p>State 2 Content</p>',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'en-3.mp3',
-                file_size_bytes: 120000,
-                needs_update: false,
-                duration_secs: 1.2,
-              },
-            },
-            default_outcome: {},
-          },
         },
         interaction: {
           id: 'Continue',
@@ -199,20 +190,6 @@ describe('Audio preloader service', () => {
         content: {
           content_id: 'content',
           html: '<p>Introduction Content</p>',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'en-1.mp3',
-                file_size_bytes: 120000,
-                needs_update: false,
-                duration_secs: 1.2,
-              },
-            },
-            default_outcome: {},
-            feedback_1: {},
-          },
         },
         interaction: {
           id: 'TextInput',
@@ -323,17 +300,10 @@ describe('Audio preloader service', () => {
       edits_allowed: true,
     },
   };
-  let requestUrl1 = '/assetsdevhandler/exploration/1/assets/audio/en-1.mp3';
-  let requestUrl2 = '/assetsdevhandler/exploration/1/assets/audio/en-2.mp3';
-  let requestUrl3 = '/assetsdevhandler/exploration/1/assets/audio/en-3.mp3';
-  let requestUrl4 = '/assetsdevhandler/exploration/1/assets/audio/en-4.mp3';
 
   beforeEach(() => {
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
     audioPreloaderService.setAudioLoadedCallback((_: string): void => {});
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     contextService = TestBed.inject(ContextService);
     spyOn(contextService, 'getExplorationId').and.returnValue('1');
@@ -343,40 +313,78 @@ describe('Audio preloader service', () => {
     const exploration =
       explorationObjectFactory.createFromBackendDict(explorationDict);
     audioPreloaderService.init(exploration);
-    audioTranslationLanguageService.init(['en'], 'en', 'en', false);
+
+    let manualVoiceoverBackendDict1: VoiceoverBackendDict = {
+      filename: 'a.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+
+    let manualVoiceover1 = Voiceover.createFromBackendDict(
+      manualVoiceoverBackendDict1
+    );
+
+    let manualVoiceoverBackendDict2: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+
+    let manualVoiceover2 = Voiceover.createFromBackendDict(
+      manualVoiceoverBackendDict2
+    );
+
+    let manualVoiceoverBackendDict3: VoiceoverBackendDict = {
+      filename: 'c.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+
+    let manualVoiceover3 = Voiceover.createFromBackendDict(
+      manualVoiceoverBackendDict3
+    );
+
+    let manualVoiceoverBackendDict4: VoiceoverBackendDict = {
+      filename: 'd.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+
+    let manualVoiceover4 = Voiceover.createFromBackendDict(
+      manualVoiceoverBackendDict4
+    );
+
+    audioPreloaderService.contentIdsToVoiceovers = {
+      content: [manualVoiceover1],
+      feedback_1: [manualVoiceover2],
+      feedback_2: [manualVoiceover3],
+      default_outcome: [manualVoiceover4],
+    };
+
     audioPreloaderService.kickOffAudioPreloader(
       exploration.getInitialState().name as string
     );
-
     expect(
       audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
-    ).toEqual(['en-1.mp3', 'en-2.mp3', 'en-3.mp3']);
-    expect(audioPreloaderService.isLoadingAudioFile('en-1.mp3')).toBeTrue();
-    expect(audioPreloaderService.isLoadingAudioFile('en-2.mp3')).toBeTrue();
-    expect(audioPreloaderService.isLoadingAudioFile('en-3.mp3')).toBeTrue();
-    expect(audioPreloaderService.isLoadingAudioFile('en-4.mp3')).toBeFalse();
+    ).toEqual(['a.mp3', 'b.mp3', 'c.mp3']);
+
+    let requestUrl1 = '/assetsdevhandler/exploration/1/assets/audio/a.mp3';
+    let requestUrl2 = '/assetsdevhandler/exploration/1/assets/audio/b.mp3';
+    let requestUrl3 = '/assetsdevhandler/exploration/1/assets/audio/c.mp3';
+    let requestUrl4 = '/assetsdevhandler/exploration/1/assets/audio/d.mp3';
 
     httpTestingController.expectOne(requestUrl1).flush(audioBlob);
-    flushMicrotasks();
-
-    expect(
-      audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
-    ).toEqual(['en-2.mp3', 'en-3.mp3', 'en-4.mp3']);
-    expect(audioPreloaderService.isLoadingAudioFile('en-4.mp3')).toBeTrue();
-
     httpTestingController.expectOne(requestUrl2).flush(audioBlob);
-    flushMicrotasks();
-
-    expect(
-      audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
-    ).toEqual(['en-3.mp3', 'en-4.mp3']);
-
     httpTestingController.expectOne(requestUrl3).flush(audioBlob);
     flushMicrotasks();
 
     expect(
       audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
-    ).toEqual(['en-4.mp3']);
+    ).toEqual(['d.mp3']);
 
     httpTestingController.expectOne(requestUrl4).flush(audioBlob);
     flushMicrotasks();
@@ -387,15 +395,9 @@ describe('Audio preloader service', () => {
   }));
 
   it('should return empty audioFiles list if language code is null', () => {
-    spyOn(
-      audioTranslationLanguageService,
-      'getCurrentAudioLanguageCode'
-    ).and.returnValue(null);
-
     const exploration =
       explorationObjectFactory.createFromBackendDict(explorationDict);
     audioPreloaderService.init(exploration);
-    audioTranslationLanguageService.init(['en'], 'en', 'en', false);
     audioPreloaderService.kickOffAudioPreloader(
       exploration.getInitialState().name as string
     );
@@ -403,38 +405,6 @@ describe('Audio preloader service', () => {
     expect(
       audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
     ).toEqual([]);
-  });
-
-  it('should properly restart pre-loading from a new state', () => {
-    const exploration =
-      explorationObjectFactory.createFromBackendDict(explorationDict);
-    audioPreloaderService.init(exploration);
-    audioTranslationLanguageService.init(['en'], 'en', 'en', false);
-    audioPreloaderService.kickOffAudioPreloader(
-      exploration.getInitialState().name as string
-    );
-
-    httpTestingController.expectOne(requestUrl1);
-    httpTestingController.expectOne(requestUrl2);
-    httpTestingController.expectOne(requestUrl3);
-    expect(
-      audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
-    ).toEqual(['en-1.mp3', 'en-2.mp3', 'en-3.mp3']);
-
-    audioPreloaderService.restartAudioPreloader('State 3');
-
-    httpTestingController.expectOne(requestUrl4);
-    expect(
-      audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
-    ).toEqual(['en-4.mp3']);
-
-    audioPreloaderService.restartAudioPreloader('State 2');
-
-    httpTestingController.expectOne(requestUrl3);
-    httpTestingController.expectOne(requestUrl4);
-    expect(
-      audioPreloaderService.getFilenamesOfAudioCurrentlyDownloading()
-    ).toEqual(['en-3.mp3', 'en-4.mp3']);
   });
 
   it('should properly set most recently requested audio filename', () => {
@@ -447,5 +417,13 @@ describe('Audio preloader service', () => {
     expect(
       audioPreloaderService.getMostRecentlyRequestedAudioFilename()
     ).toEqual(filename);
+  });
+
+  it('should be able to restart audio preloader', () => {
+    spyOn(audioPreloaderService, 'kickOffAudioPreloader');
+    audioPreloaderService.restartAudioPreloader('State 1');
+    expect(audioPreloaderService.kickOffAudioPreloader).toHaveBeenCalledWith(
+      'State 1'
+    );
   });
 });

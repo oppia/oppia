@@ -23,7 +23,7 @@
                 </i>
               </span>
             </div>
-            <input id="storyNodeTitle" type="text" class="form-control"
+            <input id="storyNodeTitle" type="text" class="form-control e2e-test-chapter-title-field"
                    [(ngModel)]="editableTitle" [ngModelOptions]="{standalone: true}" (blur)="updateTitle(editableTitle)"
                    placeholder="Enter a title for the chapter." [maxlength]="MAX_CHARS_IN_EXPLORATION_TITLE">
             <span class="oppia-input-box-subtitle">
@@ -168,7 +168,7 @@
             <div>
               <div class="skills-card-item" *ngFor="let skillId of prerequisiteSkillIds">
                 <div class="skill-description-card e2e-test-prerequisite-skill-description-card">
-                  <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ skillIdToSummaryMap[skillId] }}</a>
+                  <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ prerequisiteSkillIdToSummaryMap[skillId] }}</a>
                   <span class="e2e-test-remove-prerequisite-skill" (click)="removePrerequisiteSkillId(skillId)" aria-hidden="true">
                     <i class="fas fa-times md-18"></i>
                   </span>
@@ -184,7 +184,7 @@
             <div>
               <div class="skills-card-item" *ngFor="let skillId of acquiredSkillIds">
                 <div class="skill-description-card e2e-test-acquired-skill-description-card">
-                  <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ skillIdToSummaryMap[skillId] }}</a>
+                  <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ acquiredSkillIdToSummaryMap[skillId] }}</a>
                   <span class="e2e-test-remove-acquired-skill" (click)="removeAcquiredSkillId(skillId)" aria-hidden="true">
                     <i class="fas fa-times md-18"></i>
                   </span>
@@ -221,7 +221,7 @@
               <div>
                 <div class="skills-card-item" *ngFor="let skillId of prerequisiteSkillIds">
                   <div class="skill-description-card">
-                    <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ skillIdToSummaryMap[skillId] }}</a>
+                    <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ prerequisiteSkillIdToSummaryMap[skillId] }}</a>
                     <span class="e2e-test-remove-prerequisite-skill" (click)="removePrerequisiteSkillId(skillId)" aria-hidden="true">
                       <i class="fas fa-times md-18"></i>
                     </span>
@@ -257,7 +257,7 @@
               <div>
                 <div class="skills-card-item" *ngFor="let skillId of acquiredSkillIds">
                   <div class="skill-description-card">
-                    <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ skillIdToSummaryMap[skillId] }}</a>
+                    <a [href]="getSkillEditorUrl(skillId)" target="_blank" rel="noopener">{{ acquiredSkillIdToSummaryMap[skillId] }}</a>
                     <span class="e2e-test-remove-acquired-skill" (click)="removeAcquiredSkillId(skillId)" aria-hidden="true">
                       <i class="fas fa-times md-18"></i>
                     </span>

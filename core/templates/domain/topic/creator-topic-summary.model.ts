@@ -41,7 +41,7 @@ export interface CreatorTopicSummaryBackendDict {
   url_fragment: string;
   // This property is optional because it is only present in the
   // topic summary dict of topic dashboard page.
-  classroom?: string | undefined;
+  classroom?: string | null;
 }
 
 export class CreatorTopicSummary {
@@ -61,7 +61,7 @@ export class CreatorTopicSummary {
     public topicModelLastUpdated: number,
     public canEditTopic: boolean,
     public isPublished: boolean,
-    public classroom: string | undefined,
+    public classroom: string | null,
     public thumbnailFilename: string,
     public thumbnailBgColor: string,
     public urlFragment: string,
@@ -90,7 +90,7 @@ export class CreatorTopicSummary {
       topicSummaryBackendDict.topic_model_last_updated,
       topicSummaryBackendDict.can_edit_topic,
       topicSummaryBackendDict.is_published,
-      topicSummaryBackendDict.classroom,
+      topicSummaryBackendDict.classroom ?? null,
       topicSummaryBackendDict.thumbnail_filename,
       topicSummaryBackendDict.thumbnail_bg_color,
       topicSummaryBackendDict.url_fragment,
@@ -153,7 +153,7 @@ export class CreatorTopicSummary {
     return this.topicModelLastUpdated;
   }
 
-  getClassroom(): string | undefined {
+  getClassroom(): string | null {
     return this.classroom;
   }
 

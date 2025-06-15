@@ -289,9 +289,11 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 'default_value': 1,
             }, {
                 'name': 'catchMisspellings',
-                'description': 'Catch Misspellings (Detect if answer is' +
-                ' misspelled and nudge the learner to correct the' +
-                ' misspelling)',
+                'description': (
+                    'Catch Misspellings (Detect if answer is'
+                    ' misspelled and nudge the learner to correct the'
+                    ' misspelling)'
+                ),
                 'schema': {
                     'type': 'bool'
                 },
@@ -482,22 +484,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             except Exception:
                 pass
 
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir,
-                    '%s-prediction.service.ts' % hyphenated_interaction_id)))
-                interaction_dir_optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    interaction_dir, '%s-prediction.service.spec.ts'
-                    % hyphenated_interaction_id)))
-                interaction_dir_optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
             self.assertEqual(
                 interaction_dir_optional_dirs_and_files_count + 6,
                 len(interaction_dir_contents)
@@ -629,15 +615,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             validation_service_ts_file_content = utils.get_file_contents(
                 validation_service_ts_file)
 
-            self.assertIn(
-                'oppiaInteractive%s' % interaction_id,
-                interaction_ts_file_content)
-            self.assertIn(
-                'oppiaResponse%s' % interaction_id,
-                response_ts_file_content)
-            self.assertIn(
-                'oppiaShortResponse%s' % interaction_id,
-                short_response_ts_file_content)
             self.assertIn(
                 '%sRulesService' % (
                     interaction_id[0] + interaction_id[1:]),

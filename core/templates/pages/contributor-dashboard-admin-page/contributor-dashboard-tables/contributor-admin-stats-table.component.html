@@ -17,7 +17,7 @@
   </div>
   <div class="dashboard-list-header" *ngIf="!loadingMessage && !noDataMessage && isMobileView()">
     <div class="dashboard-list-header-count">
-      <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of many</span>
+      <span>Displaying {{ getDisplayedIndexOfFirstItemOnPage() }} - {{ getIndexOfLastItemOnPage() }} of {{getOverallItemCount()}}</span>
     </div>
     <div class="results-per-page-div">
       <span>Results per page: </span>
@@ -27,7 +27,7 @@
     </div>
   </div>
   <table mat-table
-         [dataSource]="dataSource"
+         [dataSource]="displayStatsForCurrentPage()"
          multiTemplateDataRows
          [class.isMobile]="true"
          class="mat-elevation-z8 e2e-test-stats-table"
@@ -171,7 +171,7 @@
   </table>
   <div class="dashboard-list-footer" *ngIf="!loadingMessage && !noDataMessage && !isMobileView()">
     <div class="dashboard-list-footer-count">
-      <span>Displaying {{ statsPageNumber * itemsPerPage + 1 }} - {{ getUpperLimitValueForPagination() }} of many</span>
+      <span>Displaying {{ getDisplayedIndexOfFirstItemOnPage() }} - {{ getIndexOfLastItemOnPage() }} of {{getOverallItemCount()}}</span>
     </div>
     <div class="dashboard-list-pagination">
       <div>
@@ -179,12 +179,12 @@
         <span class="dashboard-list-pagination-value">
           <span class="dashboard-list-pagination-active">{{ statsPageNumber + 1 }}</span>
         </span>
-        <i class="fa fa-angle-right stats-pagination-arrow" (click)="navigatePage(MOVE_TO_NEXT_PAGE)" *ngIf="more"></i>
+        <i class="fa fa-angle-right stats-pagination-arrow" (click)="navigatePage(MOVE_TO_NEXT_PAGE)" *ngIf="tableCanShowMoreItems"></i>
       </div>
       <div>
         <span>Results per page: </span>
-        <select [(ngModel)]="itemsPerPage" aria-label="Results Per Page" (change)="refreshPagination()">
-          <option *ngFor="let choice of itemsPerPageChoice" [value]="choice" >{{ choice }}</option>
+        <select [value]="itemsPerPage" aria-label="Results Per Page" (change)="onItemsPerPageChange($event.target.value); refreshPagination()">
+          <option *ngFor="let choice of itemsPerPageChoice" [value]="choice">{{ choice }}</option>
         </select>
       </div>
     </div>
@@ -195,7 +195,7 @@
       <span class="dashboard-list-pagination-value">
         <span class="dashboard-list-pagination-active">{{ statsPageNumber + 1 }}</span>
       </span>
-      <i class="fa fa-angle-right stats-pagination-arrow" (click)="navigatePage(MOVE_TO_NEXT_PAGE)" *ngIf="more"></i>
+      <i class="fa fa-angle-right stats-pagination-arrow" (click)="navigatePage(MOVE_TO_NEXT_PAGE)" *ngIf="tableCanShowMoreItems"></i>
     </div>
   </div>
 </div>

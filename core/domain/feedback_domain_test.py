@@ -38,12 +38,12 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         expected_thread_dict: feedback_domain.FeedbackThreadDict = {
             'thread_id': self.THREAD_ID,
-            'status': u'open',
-            'state_name': u'a_state_name',
+            'status': 'open',
+            'state_name': 'a_state_name',
             'summary': 'test summary',
             'original_author_id': self.viewer_id,
             'message_count': 1,
-            'subject': u'a subject',
+            'subject': 'a subject',
             'last_updated_msecs': utils.get_time_in_millisecs(fake_date),
             'last_nonempty_message_text': 'last message',
             'last_nonempty_message_author_id': self.viewer_id,
@@ -63,7 +63,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
-            u'a_state_name', self.viewer_id, u'open', u'a subject',
+            'a_state_name', self.viewer_id, 'open', 'a subject',
             # This value of "5" decides the number of messages.
             'test summary', False, 5, fake_date, fake_date, 'last message',
             self.VIEWER_USERNAME)
@@ -78,7 +78,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
-            u'a_state_name', self.viewer_id, u'open', u'a subject',
+            'a_state_name', self.viewer_id, 'open', 'a subject',
             # This value of "1" decides the number of messages.
             'test summary', False, 1, fake_date, fake_date, 'last message',
             self.VIEWER_USERNAME)
@@ -91,7 +91,7 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
     MESSAGE_ID = 0
     THREAD_ID = 'exploration.exp0.thread0'
-    FULL_MESSAGE_ID = THREAD_ID + '.' + str(MESSAGE_ID)
+    FULL_MESSAGE_ID = '%s.%s' % (THREAD_ID, str(MESSAGE_ID))
 
     def setUp(self) -> None:
         super().setUp()

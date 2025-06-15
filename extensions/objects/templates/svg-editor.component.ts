@@ -25,7 +25,6 @@ import {
   Output,
 } from '@angular/core';
 import {SafeResourceUrl} from '@angular/platform-browser';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AppConstants} from 'app.constants';
 import {fabric} from 'fabric';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
@@ -269,15 +268,10 @@ export class SvgEditorComponent implements OnInit {
   isDiagramCreated(): boolean {
     // This function checks if any shape has been created or not.
     return Boolean(
-      !this.isUserDrawing() &&
-        this.diagramStatus === this.STATUS_EDITING &&
+      this.diagramStatus === this.STATUS_EDITING &&
         this.canvas &&
         this.canvas.getObjects().length > 0
     );
-  }
-
-  isUserDrawing(): boolean {
-    return Boolean(this.canvas && this.drawMode !== this.DRAW_MODE_NONE);
   }
 
   private getTrustedResourceUrlForSvgFileName(svgFileName: string): {
@@ -1215,7 +1209,6 @@ export class SvgEditorComponent implements OnInit {
           ),
           unsafeUrl: reader.result as string,
         };
-        //  $scope.$apply();
       };
       img.src = reader.result as string;
     };
@@ -1721,10 +1714,3 @@ export class SvgEditorComponent implements OnInit {
     fabric.Object.prototype.originY = 'center';
   }
 }
-
-angular.module('oppia').directive(
-  'svgEditor',
-  downgradeComponent({
-    component: SvgEditorComponent,
-  })
-);

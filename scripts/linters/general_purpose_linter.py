@@ -83,10 +83,8 @@ EXCLUDED_PATHS: Final = (
     'core/templates/combined-tests.spec.ts',
     'core/templates/css/oppia-material.css',
     'core/templates/google-analytics.initializer.ts',
-    'extensions/classifiers/proto/*',
     'core/tests/puppeteer-acceptance-tests/build/*',
     '.mypy_cache/*',
-    'docker/patched_wsgi_server.py',
     '%s/*' % js_ts_linter.COMPILED_TYPESCRIPT_TMP_PATH)
 
 GENERATED_FILE_PATHS: Final = (
@@ -193,7 +191,6 @@ BAD_LINE_PATTERNS_HTML_REGEXP: List[BadPatternRegexpDict] = [
         'excluded_files': (),
         'excluded_dirs': (
             'extensions/answer_summarizers/',
-            'extensions/classifiers/',
             'extensions/objects/',
             'extensions/value_generators/')
     },
@@ -205,8 +202,8 @@ BAD_LINE_PATTERNS_HTML_REGEXP: List[BadPatternRegexpDict] = [
     },
     {
         'regexp': re.compile(r'\$parent'),
-        'message': 'Please do not access parent properties ' +
-                   'using $parent. Use the scope object ' +
+        'message': 'Please do not access parent properties '
+                   'using $parent. Use the scope object '
                    'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()

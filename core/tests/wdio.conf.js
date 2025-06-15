@@ -45,28 +45,12 @@ var suites = {
     './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
   ],
 
-  adminPage: [
-    './core/tests/webdriverio_desktop/adminTabFeatures.js'
-  ],
-
   blogDashboard: [
     './core/tests/webdriverio_desktop/blogDashboard.js'
   ],
 
   blog: [
     './core/tests/webdriverio_desktop/blog.js'
-  ],
-
-  checkpointFeatures: [
-    './core/tests/webdriverio_desktop/checkpointFeatures.js'
-  ],
-
-  classroomPage: [
-    './core/tests/webdriverio_desktop/classroomPage.js'
-  ],
-
-  classroomPageFileUploadFeatures: [
-    './core/tests/webdriverio_desktop/classroomPageFileUploadFeatures.js'
   ],
 
   collections: [
@@ -117,14 +101,6 @@ var suites = {
     './core/tests/webdriverio_desktop/extensions.js'
   ],
 
-  featureGating: [
-    './core/tests/webdriverio/featureGatingFlow.js'
-  ],
-
-  feedbackUpdates: [
-    './core/tests/webdriverio_desktop/feedbackUpdates.js'
-  ],
-
   fileUploadExtensions: [
     './core/tests/webdriverio_desktop/fileUploadExtensions.js'
   ],
@@ -137,24 +113,8 @@ var suites = {
     './core/tests/webdriverio/learnerFlow.js'
   ],
 
-  learnerDashboard: [
-    './core/tests/webdriverio_desktop/learnerDashboard.js'
-  ],
-
-  library: [
-    './core/tests/webdriverio/libraryFlow.js'
-  ],
-
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'
-  ],
-
-  playVoiceovers: [
-    './core/tests/webdriverio_desktop/playVoiceovers.js'
-  ],
-
-  preferences: [
-    './core/tests/webdriverio_desktop/preferences.js'
   ],
 
   profileFeatures: [
@@ -187,10 +147,6 @@ var suites = {
 
   topicAndStoryEditorFileUploadFeatures: [
     './core/tests/webdriverio_desktop/topicAndStoryEditorFileUploadFeatures.js'
-  ],
-
-  topicAndStoryViewer: [
-    './core/tests/webdriverio_desktop/topicAndStoryViewer.js'
   ],
 
   users: [
@@ -314,7 +270,9 @@ exports.config = {
   // Options to be passed to Jasmine.
   jasmineOpts: {
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 1200000
+    defaultTimeoutInterval: 1200000,
+    // Option to stop execution of the suite after the first spec failure.
+    stopOnSpecFailure: true,
   },
 
 
@@ -361,9 +319,8 @@ exports.config = {
     * @param {Object} context scope object the test was executed with
     */
   beforeTest: function(test, context) {
-    if (process.env.GITHUB_ACTIONS &&
-      // eslint-disable-next-line eqeqeq
-      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+    if (// eslint-disable-next-line eqeqeq
+    process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       let ffmpegArgs = [
         '-y',
         '-r', '30',
@@ -372,6 +329,9 @@ exports.config = {
         '-i', process.env.DISPLAY,
         '-g', '300',
         '-loglevel', '16',
+        // Use ultrafast preset to reduce overhead,
+        // which is crucial when testing in CI.
+        '-preset', 'ultrafast',
       ];
       const uniqueString = Math.random().toString(36).substring(2, 8);
       var name = uniqueString + '.mp4';
@@ -413,9 +373,8 @@ exports.config = {
    */
   afterTest: async function(
       test, context, { error, result, duration, passed, retries }) {
-    if (process.env.GITHUB_ACTIONS &&
-      // eslint-disable-next-line eqeqeq
-      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+    if (// eslint-disable-next-line eqeqeq
+    process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       ffmpegProcess.kill();
       if (passed === true && !ALL_VIDEOS && fs.existsSync(videoPath)) {
         fs.unlinkSync(videoPath);

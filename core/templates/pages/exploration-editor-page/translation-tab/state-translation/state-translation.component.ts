@@ -17,11 +17,10 @@
  */
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {
   TRANSLATION_DATA_FORMAT_HTML,
   TRANSLATION_DATA_FORMAT_UNICODE,
@@ -43,12 +42,12 @@ import {TranslationTabActiveContentIdService} from '../services/translation-tab-
 import {TranslationTabActiveModeService} from '../services/translation-tab-active-mode.service';
 import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
@@ -141,7 +140,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
     if (
-      !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+      !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
@@ -149,7 +148,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     }
 
     let translationContent =
-      this.entityTranslationsService.languageCodeToEntityTranslations[
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         langCode
       ].getWrittenTranslation(subtitledHtml.contentId);
     if (!translationContent) {
@@ -166,7 +165,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
     if (
-      !this.entityTranslationsService.languageCodeToEntityTranslations.hasOwnProperty(
+      !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
@@ -174,7 +173,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     }
 
     let translationContent =
-      this.entityTranslationsService.languageCodeToEntityTranslations[
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         langCode
       ].getWrittenTranslation(SubtitledUnicode.contentId);
     if (!translationContent) {
@@ -278,7 +277,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     if (!this.translationTabActiveModeService.isVoiceoverModeActive()) {
       let langCode = this.translationLanguageService.getActiveLanguageCode();
       const entityTranslations =
-        this.entityTranslationsService.languageCodeToEntityTranslations[
+        this.entityTranslationsService.languageCodeToLatestEntityTranslations[
           langCode
         ];
       if (entityTranslations) {
@@ -728,9 +727,9 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         'Translation needs update ' +
         'to match text. Please re-translate the content.';
     }
-    this.isDisabled(this.activeTab) || !this.activeTab
+    this.isDisabled(this.activatedTabId) || !this.activatedTabId
       ? this.onTabClick(this.TAB_ID_CONTENT)
-      : this.onTabClick(this.activeTab);
+      : this.onTabClick(this.activatedTabId);
 
     this.updateTranslatedContent();
   }
@@ -776,10 +775,3 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStateTranslation',
-  downgradeComponent({
-    component: StateTranslationComponent,
-  }) as angular.IDirectiveFactory
-);

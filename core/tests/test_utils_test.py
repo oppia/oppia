@@ -28,6 +28,8 @@ from core.constants import constants
 from core.domain import auth_domain
 from core.domain import feature_flag_services
 from core.domain import param_domain
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -51,14 +53,57 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
 
     @test_utils.enable_feature_flags([
         feature_flag_list.FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
-        feature_flag_list.FeatureNames.DIAGNOSTIC_TEST
+        feature_flag_list.FeatureNames.BLOG_PAGES
     ])
     def test_enable_multiple_feature_flags_decorator(self) -> None:
         """Tests if multiple feature flags are enabled."""
         self.assertTrue(feature_flag_services.is_feature_flag_enabled(
             'dummy_feature_flag_for_e2e_tests', None))
         self.assertTrue(feature_flag_services.is_feature_flag_enabled(
-            'diagnostic_test', None))
+            'blog_pages', None))
+
+
+class SetPlatformParametersTests(test_utils.GenericTestBase):
+    """Tests for testing test_utils.set_platform_parameters."""
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
+        ]
+    )
+    def test_set_platform_parameters_decorator(self) -> None:
+        """Tests if platform parameters are set."""
+        self.assertEqual(
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            ),
+            True
+        )
+        self.assertEqual(
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
+            ),
+            'admin'
+        )
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)
+        ]
+    )
+    def test_set_platform_parameters_decorator_with_invalid_param(self) -> None:
+        """Tests if invalid platform parameter raises an error."""
+        with self.assertRaisesRegex(
+            Exception,
+            'The value for the platform parameter dummy_parameter was '
+            'needed in this test, but not specified in the '
+            'set_platform_parameters decorator. Please use this information in '
+            'the decorator.'
+        ):
+            platform_parameter_services.get_platform_parameter_value(
+                'dummy_parameter'
+            )
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
@@ -605,7 +650,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 SwapWithCheckTestClass.functions_with_args()
 
     def test_swap_with_check_on_expected_kwargs(self) -> None:
-        def mock_getenv(key: str, default: str) -> None: # pylint: disable=unused-argument
+        def mock_getenv(
+            key: str, default: str # pylint: disable=unused-argument
+        ) -> None:
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv,
@@ -618,7 +665,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_swap_with_check_on_expected_kwargs_failed_on_wrong_numbers(
         self
     ) -> None:
-        def mock_getenv(key: str, default: str) -> None: # pylint: disable=unused-argument
+        def mock_getenv(
+            key: str, default: str # pylint: disable=unused-argument
+        ) -> None:
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_kwargs=[
@@ -667,6 +716,21 @@ class TestUtilsTests(test_utils.GenericTestBase):
         ):
             with self.assertRaisesRegex(Exception, ''):
                 mock_exception_func()
+
+    def test_invalid_http_method_raises_exception(self) -> None:
+        url = '/mock-url'
+        invalid_http_method = 'INVALID_METHOD'
+        expected_status_int_list = [200]
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid http method %s' % invalid_http_method
+            ):
+            self.get_response_without_checking_for_errors(
+                url=url,
+                expected_status_int_list=expected_status_int_list,
+                http_method=invalid_http_method
+            )
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally

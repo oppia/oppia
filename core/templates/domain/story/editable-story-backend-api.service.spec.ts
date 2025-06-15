@@ -322,7 +322,7 @@ describe('Editable story backend API service', () => {
 
       editableStoryBackendApiService
         .doesStoryWithUrlFragmentExistAsync('url_fragment')
-        .then(successHandler, failHandler);
+        .then(successHandler, error => failHandler(error.statusText));
       let req = httpTestingController.expectOne(
         '/story_url_fragment_handler/url_fragment'
       );

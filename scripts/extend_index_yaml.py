@@ -98,7 +98,7 @@ def main() -> None:
         web_inf_index_xml_dict)
 
     if web_inf_index_yaml_dict is None:
-        return None
+        return
 
     new_kinds = [
         kind for kind in web_inf_index_yaml_dict['indexes']

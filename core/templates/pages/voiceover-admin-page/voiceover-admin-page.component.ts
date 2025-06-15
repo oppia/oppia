@@ -23,12 +23,16 @@ import {
   LanguageAccentToDescription,
   LanguageCodesMapping,
   LanguageAccentMasterList,
+  LanguageAccentCodesToSupportsAutogeneration,
   VoiceArtistIdToLanguageMapping,
   VoiceArtistIdToVoiceArtistName,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
 import {VoiceArtistLanguageMapping} from './voice-artist-language-mapping.model';
 import {AddAccentToVoiceoverLanguageModalComponent} from './modals/add-accent-to-voiceover-language-modal.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {EditVoiceoverRegenerationSupportModalComponent} from './modals/edit-voiceover-regeneration-support-modal.component';
+import {LanguageUtilService} from 'domain/utilities/language-util.service';
 
 interface LanguageAccentCodeToLanguageCode {
   [languageAccentCode: string]: string;
@@ -48,11 +52,14 @@ export class VoiceoverAdminPageComponent implements OnInit {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   constructor(
     private ngbModal: NgbModal,
-    private voiceoverBackendApiService: VoiceoverBackendApiService
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private platformFeatureService: PlatformFeatureService,
+    private languageUtilService: LanguageUtilService
   ) {}
 
   languageAccentCodeToLanguageCode!: LanguageAccentCodeToLanguageCode;
   supportedLanguageAccentCodesToDescriptions!: LanguageAccentToDescription;
+  languageAccentCodesToSupportsAutogeneration!: LanguageAccentCodesToSupportsAutogeneration;
   availableLanguageAccentDescriptionsToCodes!: LanguageAccentDescriptionToCode;
   languageAccentCodesToDescriptionsMasterList!: LanguageAccentToDescription;
   languageCodesMapping!: LanguageCodesMapping;
@@ -63,6 +70,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   voiceArtistIdToLanguageMapping!: VoiceArtistIdToLanguageMapping;
   voiceArtistIdToVoiceArtistName!: VoiceArtistIdToVoiceArtistName;
   languageAccentMasterList!: LanguageAccentMasterList;
+  cloudSupportedLanguageAccentCodes: string[] = [];
   columnsToDisplay: string[] = [
     'voiceArtist',
     'languageCode',
@@ -81,10 +89,13 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.supportedLanguageAccentCodesToDescriptions = {};
         this.languageAccentCodesToDescriptionsMasterList = {};
         this.availableLanguageAccentDescriptionsToCodes = {};
+        this.languageAccentCodesToSupportsAutogeneration = {};
         this.initializeLanguageAccentCodesFields(
           response.languageAccentMasterList
         );
         this.languageAccentMasterList = response.languageAccentMasterList;
+        this.cloudSupportedLanguageAccentCodes =
+          response.autoGeneratableLanguageAccentCodes;
         this.pageIsInitialized = true;
       });
     this.voiceoverBackendApiService
@@ -101,6 +112,11 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.voiceArtistIdToVoiceArtistName =
           response.voiceArtistIdToVoiceArtistName;
       });
+  }
+
+  isLabelingVoiceArtistFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.LabelAccentToVoiceArtist
+      .isEnabled;
   }
 
   addLanguageAccentForVoiceArtist(
@@ -175,6 +191,9 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
         this.supportedLanguageAccentCodesToDescriptions[languageAccentCode] =
           languageAccentDescription;
+
+        this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
+          languageAccentToSupportsAutogeneration[languageAccentCode];
       }
     }
 
@@ -212,11 +231,52 @@ export class VoiceoverAdminPageComponent implements OnInit {
       this.languageCodesMapping[languageCode] = {};
     }
     this.languageCodesMapping[languageCode][languageAccentCodeToAdd] = false;
+    this.languageAccentCodesToSupportsAutogeneration[languageAccentCodeToAdd] =
+      false;
 
     this.languageAccentCodeIsPresent =
       Object.keys(this.supportedLanguageAccentCodesToDescriptions).length !== 0;
     this.removeLanguageAccentDropdown();
     this.saveUpdatedLanguageAccentSupport();
+  }
+
+  isAutogenerationSupportedByCloudService(languageAccentCode: string): boolean {
+    return this.cloudSupportedLanguageAccentCodes.includes(languageAccentCode);
+  }
+
+  updateSupportsAutogenerationField(
+    languageAccentCode: string,
+    supportsAutogeneration: boolean
+  ): void {
+    const languageCode =
+      this.languageAccentCodeToLanguageCode[languageAccentCode];
+    const languageDescription =
+      this.languageUtilService.getAudioLanguageDescription(languageCode);
+    const languageAccentCodeDescription =
+      this.supportedLanguageAccentCodesToDescriptions[languageAccentCode];
+
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      EditVoiceoverRegenerationSupportModalComponent,
+      {backdrop: 'static'}
+    );
+
+    modalRef.componentInstance.languageDescription = languageDescription;
+    modalRef.componentInstance.languageCode = languageCode;
+    modalRef.componentInstance.languageAccentDescription =
+      languageAccentCodeDescription;
+    modalRef.componentInstance.supportsAutogeneration = supportsAutogeneration;
+
+    modalRef.result.then(
+      () => {
+        this.languageCodesMapping[languageCode][languageAccentCode] =
+          supportsAutogeneration;
+        this.saveUpdatedLanguageAccentSupport();
+      },
+      () => {
+        this.languageAccentCodesToSupportsAutogeneration[languageAccentCode] =
+          !supportsAutogeneration;
+      }
+    );
   }
 
   removeLanguageAccentCodeSupport(languageAccentCodeToRemove: string): void {

@@ -66,7 +66,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             self.assertIsInstance(retry, retry_lib.Retry)
             self.assertEqual(
                 parent,
-                u'projects/dev-project-id/locations/us-central1/queues/queue')
+                'projects/dev-project-id/locations/us-central1/queues/queue')
             self.assertEqual(
                 task,
                 {
@@ -115,7 +115,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             self.assertIsInstance(retry, retry_lib.Retry)
             self.assertEqual(
                 parent,
-                u'projects/dev-project-id/locations/us-central1/queues/queue')
+                'projects/dev-project-id/locations/us-central1/queues/queue')
             self.assertEqual(
                 task,
                 {

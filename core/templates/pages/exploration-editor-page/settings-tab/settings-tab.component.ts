@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {NgbModalRef, NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -114,6 +113,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   explorationIsLinkedToStory: boolean = false;
   isSuperAdmin: boolean = false;
+  tagIsInvalid: boolean = false;
   ROLES = [
     {
       name: 'Manager (can edit permissions)',
@@ -186,6 +186,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   add(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
+    let tagRegex = new RegExp(AppConstants.TAG_REGEX);
 
     // Add our explorationTags.
     if (value) {
@@ -194,10 +195,14 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
         (this.explorationTagsService.displayed as []).length < 10
       ) {
         if (
-          (this.explorationTagsService.displayed as string[]).includes(value)
+          (this.explorationTagsService.displayed as string[]).includes(
+            value.toLowerCase()
+          ) ||
+          !value.match(tagRegex)
         ) {
           // Clear the input value.
           event.input.value = '';
+          this.tagIsInvalid = true;
           return;
         }
 
@@ -207,6 +212,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
     // Clear the input value.
     event.input.value = '';
+    this.tagIsInvalid = false;
 
     this.explorationTagsService.displayed = this.explorationTags;
 
@@ -906,10 +912,3 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaSettingsTab',
-  downgradeComponent({
-    component: SettingsTabComponent,
-  }) as angular.IDirectiveFactory
-);

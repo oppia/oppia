@@ -19,7 +19,6 @@
 import {Component, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Input} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AppConstants} from 'app.constants';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
@@ -40,7 +39,7 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   topicTitle!: string;
   thumbnailBgColor!: string;
   openInNewWindow = false;
-  @Input() featureFlag!: boolean;
+  @Input() redesignFeatureFlag!: boolean;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -48,14 +47,17 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
   ) {}
 
   getTopicLink(): string {
-    if (!this.topicSummary.classroom || !this.topicSummary.urlFragment) {
+    if (
+      !this.topicSummary.classroomUrlFragment ||
+      !this.topicSummary.urlFragment
+    ) {
       return '#';
     }
     return this.urlInterpolationService.interpolateUrl(
       ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
       {
         topic_url_fragment: this.topicSummary.urlFragment,
-        classroom_url_fragment: this.topicSummary.classroom,
+        classroom_url_fragment: this.topicSummary.classroomUrlFragment,
       }
     );
   }
@@ -75,10 +77,3 @@ export class LearnerTopicSummaryTileComponent implements OnInit {
     this.totalPublishedNodeCount = this.topicSummary.totalPublishedNodeCount;
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaLearnerTopicSummaryTile',
-    downgradeComponent({component: LearnerTopicSummaryTileComponent})
-  );

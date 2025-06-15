@@ -26,10 +26,7 @@ import {
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Subscription} from 'rxjs';
 import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {ObjectFormValidityChangeEvent} from 'app-events/app-events';
@@ -37,6 +34,7 @@ import {AddAnswerGroupModalComponent} from './add-answer-group-modal.component';
 import {NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockActiveModal {
   close(): void {
@@ -48,13 +46,21 @@ class MockActiveModal {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    ExplorationEditorCanTagMisconceptions: {
+      isEnabled: true,
+    },
+  };
+}
+
 describe('Add Answer Group Modal Component', () => {
   let component: AddAnswerGroupModalComponent;
   let fixture: ComponentFixture<AddAnswerGroupModalComponent>;
-  var outcomeObjectFactory: OutcomeObjectFactory;
   var stateEditorService: StateEditorService;
   var generateContentIdService: GenerateContentIdService;
   var testSubscriptions: Subscription;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   const saveOutcomeDestDetailsSpy = jasmine.createSpy('saveOutcomeDestDetails');
 
@@ -64,11 +70,14 @@ describe('Add Answer Group Modal Component', () => {
       providers: [
         EditorFirstTimeEventsService,
         GenerateContentIdService,
-        OutcomeObjectFactory,
         StateEditorService,
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -79,7 +88,6 @@ describe('Add Answer Group Modal Component', () => {
     fixture = TestBed.createComponent(AddAnswerGroupModalComponent);
     component = fixture.componentInstance;
 
-    outcomeObjectFactory = TestBed.inject(OutcomeObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     generateContentIdService.init(
@@ -163,37 +171,22 @@ describe('Add Answer Group Modal Component', () => {
   });
 
   it('should check if outcome has no feedback with self loop', fakeAsync(() => {
-    var outcome = outcomeObjectFactory.createNew('State Name', '1', '', []);
+    var outcome = Outcome.createNew('State Name', '1', '', []);
     component.stateName = 'State Name';
     tick();
 
     expect(component.isSelfLoopWithNoFeedback(outcome)).toBe(true);
 
-    var outcome2 = outcomeObjectFactory.createNew(
-      'State Name',
-      '1',
-      'Feedback Text',
-      []
-    );
+    var outcome2 = Outcome.createNew('State Name', '1', 'Feedback Text', []);
     tick();
     expect(component.isSelfLoopWithNoFeedback(outcome2)).toBe(false);
   }));
 
   it('should check if outcome feedback exceeds 10000 characters', () => {
-    var outcome1 = outcomeObjectFactory.createNew(
-      'State Name',
-      '1',
-      'a'.repeat(10000),
-      []
-    );
+    var outcome1 = Outcome.createNew('State Name', '1', 'a'.repeat(10000), []);
     expect(component.isFeedbackLengthExceeded(outcome1)).toBe(false);
 
-    var outcome2 = outcomeObjectFactory.createNew(
-      'State Name',
-      '1',
-      'a'.repeat(10001),
-      []
-    );
+    var outcome2 = Outcome.createNew('State Name', '1', 'a'.repeat(10001), []);
     expect(component.isFeedbackLengthExceeded(outcome2)).toBe(true);
   });
 

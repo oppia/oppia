@@ -21,7 +21,6 @@
 // Note that the draft is only saved if localStorage exists and works
 // (i.e. has storage capacity).
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -57,6 +56,8 @@ export class LocalStorageService {
   LAST_SELECTED_TRANSLATION_LANGUAGE_KEY = 'last_selected_translation_lang';
 
   LAST_SELECTED_TRANSLATION_TOPIC_NAME = 'last_selected_translation_topic';
+
+  LAST_SELECTED_LANGUAGE_ACCENT_KEY = 'last_selected_language_accent_key';
 
   HIDE_SIGN_UP_SECTION_PREFERENCE = 'hide_sign_up_section';
 
@@ -154,6 +155,8 @@ export class LocalStorageService {
    */
   updateLastSelectedTranslationLanguageCode(languageCode: string): void {
     if (this.isStorageAvailable()) {
+      this.setLastSelectedLanguageAccentCode('');
+
       // It is possible that storage does not exist or the user does not have
       // permission to access it but this condition is already being checked by
       // calling 'isStorageAvailable()' so the typecast is safe.
@@ -177,6 +180,41 @@ export class LocalStorageService {
         // by calling 'isStorageAvailable()' so the typecast is safe.
         (this.storage as Storage).getItem(
           this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY
+        )
+      );
+    }
+    return null;
+  }
+
+  /**
+   * Save the given language accent code to localStorage along.
+   * @param languageAccentCode
+   */
+  setLastSelectedLanguageAccentCode(languageAccentCode: string): void {
+    if (this.isStorageAvailable()) {
+      // It is possible that storage does not exist or the user does not have
+      // permission to access it but this condition is already being checked by
+      // calling 'isStorageAvailable()' so the typecast is safe.
+      (this.storage as Storage).setItem(
+        this.LAST_SELECTED_LANGUAGE_ACCENT_KEY,
+        languageAccentCode
+      );
+    }
+  }
+
+  /**
+   * Retrieve the local save of the last selected language accent code.
+   * @returns {String} The local save of the last selected language accent for
+   *   voiceover if it exists, else null.
+   */
+  getLastSelectedLanguageAccentCode(): string | null {
+    if (this.isStorageAvailable()) {
+      return (
+        // It is possible that storage does not exist or the user does not have
+        // permission to access it but this condition is already being checked
+        // by calling 'isStorageAvailable()' so the typecast is safe.
+        (this.storage as Storage).getItem(
+          this.LAST_SELECTED_LANGUAGE_ACCENT_KEY
         )
       );
     }
@@ -397,8 +435,23 @@ export class LocalStorageService {
       callbackFn(event);
     });
   }
-}
 
-angular
-  .module('oppia')
-  .factory('LocalStorageService', downgradeInjectable(LocalStorageService));
+  setLastPageViewTime(lastPageViewTimeKey: string): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).setItem(
+        lastPageViewTimeKey,
+        Date.now().toString()
+      );
+    }
+  }
+
+  getLastPageViewTime(lastPageViewTimeKey: string): number | null {
+    if (this.isStorageAvailable()) {
+      const lastPageViewTime = (this.storage as Storage).getItem(
+        lastPageViewTimeKey
+      );
+      return lastPageViewTime !== null ? Number(lastPageViewTime) : null;
+    }
+    return null;
+  }
+}

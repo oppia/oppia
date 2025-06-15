@@ -38,16 +38,18 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {SearchService} from 'services/search.service';
 import {EventToCodes, NavigationService} from 'services/navigation.service';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {I18nService} from 'i18n/i18n.service';
 import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
+import {UrlService} from 'services/contextual/url.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
 import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-thread-summary.model';
+import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 
 import './top-navigation-bar.component.css';
 
@@ -68,8 +70,18 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   @Input() headerText!: string;
   @Input() subheaderText!: string;
 
-  DEFAULT_CLASSROOM_URL_FRAGMENT = AppConstants.DEFAULT_CLASSROOM_URL_FRAGMENT;
-  OPPIA_BLOG_URL = '/blog';
+  impactReports = [
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2023,
+      year: '2023',
+    },
+    {
+      link: AppConstants.IMPACT_REPORT_LINK_2022,
+      year: '2022',
+    },
+  ];
+  PAGES_WITH_BACK_STATE: string[] = ['/blog/'];
+  menuIconIsShown: boolean = false;
   url!: URL;
   currentLanguageCode!: string;
   supportedSiteLanguages!: LanguageInfo[];
@@ -80,6 +92,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
   isTopicManager: boolean = false;
+  pageIsIframed: boolean = false;
   isSuperAdmin: boolean = false;
   isBlogAdmin: boolean = false;
   isBlogPostEditor: boolean = false;
@@ -181,9 +194,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private searchService: SearchService,
     private windowRef: WindowRef,
+    private urlService: UrlService,
     private focusManagerService: FocusManagerService,
     private platformFeatureService: PlatformFeatureService,
-    private learnerGroupBackendApiService: LearnerGroupBackendApiService
+    private learnerGroupBackendApiService: LearnerGroupBackendApiService,
+    private languageBannerService: LanguageBannerService
   ) {}
 
   ngOnInit(): void {
@@ -194,6 +209,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.focusManagerService.setFocus(this.labelForClearingFocus);
     this.userMenuIsShown = this.currentUrl !== this.NAV_MODE_SIGNUP;
     this.inClassroomPage = false;
+    this.pageIsIframed = this.urlService.isIframed();
     this.supportedSiteLanguages = AppConstants.SUPPORTED_SITE_LANGUAGES.map(
       (languageInfo: LanguageInfo) => {
         return languageInfo;
@@ -214,11 +230,17 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
 
-    this.learnerGroupBackendApiService
-      .isLearnerGroupFeatureEnabledAsync()
-      .then(featureIsEnabled => {
-        this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
-      });
+    if (this.currentUrl !== 'signup') {
+      this.learnerGroupBackendApiService
+        .isLearnerGroupFeatureEnabledAsync()
+        .then(featureIsEnabled => {
+          this.LEARNER_GROUPS_FEATURE_IS_ENABLED = featureIsEnabled;
+        });
+    }
+
+    this.menuIconIsShown = !this.PAGES_WITH_BACK_STATE.some(path =>
+      this.urlService.getPathname().includes(path)
+    );
 
     this.FEEDBACK_UPDATES_IN_PROFILE_PIC_DROP_DOWN_IS_ENABLED =
       this.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable();
@@ -380,12 +402,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
-  getOppiaBlogUrl(): string {
-    return this.OPPIA_BLOG_URL;
-  }
-
   changeLanguage(languageCode: string): void {
     this.i18nService.updateUserPreferredLanguage(languageCode);
+    this.languageBannerService.markLanguageBannerAsDismissed();
   }
 
   isLanguageRTL(): boolean {
@@ -467,11 +486,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  navigateToClassroomPage(classroomUrl: string): void {
-    this.siteAnalyticsService.registerClassroomHeaderClickEvent();
-    setTimeout(() => {
-      this.windowRef.nativeWindow.location.href = classroomUrl;
-    }, 150);
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+
+    this.windowRef.nativeWindow.document.body.style.overflowY = 'auto';
   }
 
   /**
@@ -544,8 +562,25 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
+  navigateToAboutPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.ABOUT
+    );
+    this.windowRef.nativeWindow.location.href = '/about';
+  }
+
+  navigateToVolunteerPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.VOLUNTEER
+    );
+    this.windowRef.nativeWindow.location.href = '/volunteer';
+  }
+
+  navigateToTeachPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.TEACH
+    );
+    this.windowRef.nativeWindow.location.href = '/teach';
   }
 
   isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {
@@ -553,10 +588,3 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       .ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled;
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaTopNavigationBar',
-  downgradeComponent({
-    component: TopNavigationBarComponent,
-  }) as angular.IDirectiveFactory
-);

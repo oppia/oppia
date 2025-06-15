@@ -22,8 +22,6 @@ import os
 from core import feconf
 from core import utils
 from core.constants import constants
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
 from core.domain import question_services
 from core.domain import skill_domain
 from core.domain import skill_fetchers
@@ -73,20 +71,11 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             subtopics=[subtopic], next_subtopic_id=2)
 
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
-        math_classroom: classroom_config_domain.Classroom = (
-            classroom_config_domain.Classroom(
-                classroom_id='math_classroom_id',
-                name='math',
-                url_fragment='math',
-                course_details='Course details',
-                topic_list_intro='Topics covered',
-                topic_id_to_prerequisite_topic_ids={
-                    self.topic_id: []
-                }
-            )
+        self.save_new_valid_classroom(
+            topic_id_to_prerequisite_topic_ids={
+                self.topic_id: []
+            }
         )
-        classroom_config_services.update_or_create_classroom_model(
-            math_classroom)
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTests(
@@ -174,16 +163,6 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
             json_response['can_create_skill'], False)
         self.logout()
 
-    def test_topics_and_skills_dashboard_page(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        response = self.get_html_response(
-            feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
-        self.assertIn(
-            b'{"title": "Topics and Skills Dashboard - Oppia"})', response.body)
-
-        self.logout()
-
 
 class CategorizedAndUntriagedSkillsDataHandlerTests(
     BaseTopicsAndSkillsDashboardTests):
@@ -195,7 +174,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
         # Check that logged out users can access the categorized and
         # untriaged skills data.
         json_response = self.get_json(
-            '/topics_and_skills_dashboard/' +
+            '/topics_and_skills_dashboard/'
             'categorized_and_untriaged_skills_data',
             expected_status_int=200)
         self.assertEqual(
@@ -210,7 +189,7 @@ class CategorizedAndUntriagedSkillsDataHandlerTests(
         # untriaged skills data.
         self.login(self.NEW_USER_EMAIL)
         json_response = self.get_json(
-            '/topics_and_skills_dashboard/' +
+            '/topics_and_skills_dashboard/'
             'categorized_and_untriaged_skills_data',
             expected_status_int=200)
         self.assertEqual(

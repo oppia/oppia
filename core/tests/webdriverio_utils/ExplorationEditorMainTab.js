@@ -1047,7 +1047,15 @@ var ExplorationEditorMainTab = function () {
       'Post-tutorial popover takes too long to disappear'
     );
     await action.waitForAutosave();
+    await waitFor.elementToBeClickable(
+      stateNameContainer,
+      'State name container is taking too long to become clickable.'
+    );
     await action.click('State Name Container', stateNameContainer);
+    await waitFor.visibilityOf(
+      stateNameInput,
+      'State Name Input takes too long to appear'
+    );
     await action.clear('State Name input', stateNameInput);
     await action.setValue('State Name input', stateNameInput, name);
 

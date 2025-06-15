@@ -35,7 +35,6 @@ from . import common
 MismatchType = Dict[str, Tuple[Optional[str], Optional[str]]]
 ValidatedMismatchType = Dict[str, Tuple[str, Optional[str]]]
 
-# This is the version that is set in install_prerequisites.sh.
 GIT_DIRECT_URL_REQUIREMENT_PATTERN: Final = (
     # NOTE: Direct URLs to GitHub must specify a specific commit hash in their
     # definition. This helps stabilize the implementation we depend upon.
@@ -432,9 +431,9 @@ def _get_possible_normalized_metadata_directory_names(
             '%s-%s.egg-info' % (
                 library_name.replace('-', '_'), version_string)),
         normalize_directory_name(
-            '%s-%s-py3.8.egg-info' % (library_name, version_string)),
+            '%s-%s-py3.9.egg-info' % (library_name, version_string)),
         normalize_directory_name(
-            '%s-%s-py3.8.egg-info' % (
+            '%s-%s-py3.9.egg-info' % (
                 library_name.replace('-', '_'), version_string))
     }
 
@@ -686,6 +685,6 @@ def main() -> None:
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when install_third_party_libs.py is used as a script.
+# it will only be called when this Python file is used as a script.
 if __name__ == '__main__': # pragma: no cover
     main()

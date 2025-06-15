@@ -504,6 +504,7 @@ states:
     content:
       content_id: content_0
       html: <p>Congratulations, you have finished!</p>
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -516,9 +517,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_0: {}
     solicit_answer_details: false
   %s:
     card_is_checkpoint: true
@@ -526,6 +524,7 @@ states:
     content:
       content_id: content_1
       html: ''
+    inapplicable_skill_misconception_ids: []
     interaction:
       answer_groups:
       - outcome:
@@ -572,13 +571,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        ca_placeholder_5: {}
-        content_1: {}
-        default_outcome_2: {}
-        feedback_3: {}
-        rule_input_4: {}
     solicit_answer_details: false
 states_schema_version: %d
 tags: []

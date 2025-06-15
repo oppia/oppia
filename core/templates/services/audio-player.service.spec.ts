@@ -30,7 +30,6 @@ import {ContextService} from './context.service';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import * as howler from 'howler';
-import {AudioTranslationManagerService} from 'pages/exploration-player-page/services/audio-translation-manager.service';
 import {Subject} from 'rxjs';
 import {Howl} from 'howler';
 
@@ -38,7 +37,6 @@ describe('AudioPlayerService', () => {
   let audioPlayerService: AudioPlayerService;
   let contextService: ContextService;
   let assetsBackendApiService: AssetsBackendApiService;
-  let audioTranslationManagerService: AudioTranslationManagerService;
   let successHandler: jasmine.Spy;
   let failHandler: jasmine.Spy;
 
@@ -51,9 +49,6 @@ describe('AudioPlayerService', () => {
   }));
 
   beforeEach(() => {
-    audioTranslationManagerService = TestBed.inject(
-      AudioTranslationManagerService
-    );
     audioPlayerService = TestBed.inject(AudioPlayerService);
     contextService = TestBed.inject(ContextService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
@@ -157,14 +152,14 @@ describe('AudioPlayerService', () => {
 
     it('should not pause track when audio is not being played', fakeAsync(() => {
       spyOn(audioPlayerService, 'isPlaying').and.returnValue(false);
-      spyOn(audioPlayerService, 'getCurrentTime');
+      spyOn(audioPlayerService, 'getCurrentTimeInSecs');
       let subjectNext = spyOn(Subject.prototype, 'next');
       audioPlayerService.loadAsync('test.mp3');
       flushMicrotasks();
 
       audioPlayerService.pause();
 
-      expect(audioPlayerService.getCurrentTime).not.toHaveBeenCalled();
+      expect(audioPlayerService.getCurrentTimeInSecs).not.toHaveBeenCalled();
       expect(subjectNext).toHaveBeenCalledTimes(1);
     }));
 
@@ -173,13 +168,13 @@ describe('AudioPlayerService', () => {
       fakeAsync(() => {
         spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
         let subjectNext = spyOn(Subject.prototype, 'next');
-        spyOn(audioPlayerService, 'getCurrentTime');
+        spyOn(audioPlayerService, 'getCurrentTimeInSecs');
         audioPlayerService.loadAsync('test.mp3');
         flushMicrotasks();
 
         audioPlayerService.pause();
 
-        expect(audioPlayerService.getCurrentTime).toHaveBeenCalled();
+        expect(audioPlayerService.getCurrentTimeInSecs).toHaveBeenCalled();
         expect(subjectNext).toHaveBeenCalled();
       })
     );
@@ -187,7 +182,6 @@ describe('AudioPlayerService', () => {
     it('should stop playing track when called', fakeAsync(() => {
       spyOn(audioPlayerService, 'setCurrentTime');
       spyOn(console, 'error');
-      spyOn(audioTranslationManagerService, 'clearSecondaryAudioTranslations');
       let subjectNext = spyOn(Subject.prototype, 'next');
       audioPlayerService.loadAsync('test.mp3');
       flushMicrotasks();
@@ -196,9 +190,6 @@ describe('AudioPlayerService', () => {
 
       expect(console.error).toHaveBeenCalledWith('Howl.stop');
       expect(subjectNext).toHaveBeenCalledTimes(2);
-      expect(
-        audioTranslationManagerService.clearSecondaryAudioTranslations
-      ).toHaveBeenCalled();
     }));
 
     it(
@@ -231,7 +222,7 @@ describe('AudioPlayerService', () => {
       audioPlayerService.loadAsync('test.mp3');
       flushMicrotasks();
 
-      expect(audioPlayerService.getCurrentTime()).toBe(10);
+      expect(audioPlayerService.getCurrentTimeInSecs()).toBe(10);
     }));
 
     it('should set the time when user clicks on the track', fakeAsync(() => {
@@ -405,7 +396,7 @@ describe('AudioPlayerService', () => {
     it(
       'should not get the current time of track when no audio is' + ' loaded',
       () => {
-        expect(audioPlayerService.getCurrentTime()).toBe(0);
+        expect(audioPlayerService.getCurrentTimeInSecs()).toBe(0);
       }
     );
 
@@ -416,7 +407,7 @@ describe('AudioPlayerService', () => {
         audioPlayerService.loadAsync('test.mp3');
         flushMicrotasks();
 
-        expect(audioPlayerService.getCurrentTime()).toBe(0);
+        expect(audioPlayerService.getCurrentTimeInSecs()).toBe(0);
       })
     );
 
@@ -460,14 +451,9 @@ describe('AudioPlayerService', () => {
           filename: 'test',
         })
       );
-      spyOn(audioTranslationManagerService, 'clearSecondaryAudioTranslations');
 
       audioPlayerService.loadAsync('test.mp3');
       flushMicrotasks();
-
-      expect(
-        audioTranslationManagerService.clearSecondaryAudioTranslations
-      ).toHaveBeenCalled();
     })
   );
 
@@ -475,7 +461,6 @@ describe('AudioPlayerService', () => {
     spyOn(assetsBackendApiService, 'loadAudio').and.returnValue(
       Promise.reject('Error')
     );
-    spyOn(audioTranslationManagerService, 'clearSecondaryAudioTranslations');
 
     audioPlayerService.loadAsync('test.mp3').then(successHandler, failHandler);
     flushMicrotasks();

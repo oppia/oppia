@@ -17,20 +17,20 @@
  */
 
 let action = require('../webdriverio_utils/action.js');
+let forms = require('../webdriverio_utils/forms.js');
 let users = require('../webdriverio_utils/users.js');
 let general = require('../webdriverio_utils/general.js');
 let waitFor = require('../webdriverio_utils/waitFor.js');
+let workflow = require('../webdriverio_utils/workflow.js');
 
 let ReleaseCoordinatorPage = require('../webdriverio_utils/ReleaseCoordinatorPage.js');
 let AdminPage = require('../webdriverio_utils/AdminPage.js');
-let forms = require('../webdriverio_utils/forms.js');
 let ContributorDashboardPage = require('../webdriverio_utils/ContributorDashboardPage.js');
 let ContributorDashboardAdminPage = require('../webdriverio_utils/ContributorDashboardAdminPage.js');
 let TopicsAndSkillsDashboardPage = require('../webdriverio_utils/TopicsAndSkillsDashboardPage.js');
 let SkillEditorPage = require('../webdriverio_utils/SkillEditorPage.js');
 let ExplorationEditorPage = require('../webdriverio_utils/ExplorationEditorPage.js');
 let StoryEditorPage = require('../webdriverio_utils/StoryEditorPage.js');
-let workflow = require('../webdriverio_utils/workflow.js');
 let TopicEditorPage = require('../webdriverio_utils/TopicEditorPage.js');
 let CreatorDashboardPage = require('../webdriverio_utils/CreatorDashboardPage.js');
 let Constants = require('../webdriverio_utils/WebdriverioConstants.js');
@@ -49,6 +49,7 @@ describe('Contributor Admin Dashboard', function () {
   const ADMIN_EMAIL = 'curricullum@admin.com';
   const USER_EMAILS = ['user0@contributor.com', 'user1@contributor.com'];
   const QUESTION_ADMIN_EMAIL = 'user@contributor.com';
+  const ONE_DAY_IN_MILLIS = 24 * 60 * 60 * 1000;
 
   let releaseCoordinatorPage = null;
   let adminPage = null;
@@ -97,6 +98,7 @@ describe('Contributor Admin Dashboard', function () {
     await adminPage.addLanguageToCoordinator('translation', 'shqip (Albanian)');
     await adminPage.addLanguageToCoordinator('translation', 'العربية (Arabic)');
     await adminPage.addRole('question', 'translation admin');
+    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
     await users.logout();
 
     await users.login(QUESTION_COORDINATOR_EMAIL);
@@ -125,21 +127,13 @@ describe('Contributor Admin Dashboard', function () {
       'Topic description 1',
       false
     );
-    const URL = await browser.getUrl();
-    // Example URL: http://localhost:8181/topic_editor/jT9z3iLnFjsQ#/
-    const TOPIC_ID_URL_PART = URL.split('/')[4];
-    // We have to remove the ending "#".
-    const TOPIC_ID = TOPIC_ID_URL_PART.substring(
-      0,
-      TOPIC_ID_URL_PART.length - 1
-    );
 
     // Add topic to classroom to make it available for question contributions.
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
     await diagnosticTestPage.createNewClassroomConfig('Math', 'math');
-    await diagnosticTestPage.addTopicIdToClassroomConfig(TOPIC_ID, 0);
-
+    await diagnosticTestPage.addTopicToClassroomConfig(TOPIC_NAMES[0]);
+    await diagnosticTestPage.publishClassroom();
     await workflow.createSkillAndAssignTopic(
       SKILL_DESCRIPTIONS[0],
       REVIEW_MATERIALS[0],
@@ -151,30 +145,23 @@ describe('Contributor Admin Dashboard', function () {
       REVIEW_MATERIALS[1]
     );
 
-    await adminPage.get();
-    await adminPage.addRole(QUESTION_ADMIN_USERNAME, 'question admin');
-
-    // Creating an exploration with an image.
+    // Create a simple exploration.
     await creatorDashboardPage.get();
     await workflow.createExploration(true);
-    await explorationEditorMainTab.setContent(async function (richTextEditor) {
-      await richTextEditor.addRteComponent(
-        'Image',
-        'create',
-        ['rectangle', 'bezier', 'piechart', 'svgupload'],
-        'An svg diagram.'
-      );
-    }, true);
+    await explorationEditorMainTab.setContent(
+      await forms.toRichText('Select the right option.'),
+      true
+    );
     await explorationEditorMainTab.setInteraction('EndExploration');
     let explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     await explorationEditorPage.navigateToSettingsTab();
-    let basicSettings = $('.e2e-test-settings-container');
+    let basicSettings = await $('.e2e-test-settings-container');
     await action.click('Basic Settings', basicSettings);
     await explorationEditorSettingsTab.setTitle('exp1');
     await explorationEditorSettingsTab.setCategory('Algebra');
     await explorationEditorSettingsTab.setLanguage('English');
     await explorationEditorSettingsTab.setObjective(
-      'Dummy exploration for testing images'
+      'Dummy exploration for testing'
     );
     await explorationEditorPage.saveChanges('Done!');
     await workflow.publishExploration();
@@ -199,29 +186,27 @@ describe('Contributor Admin Dashboard', function () {
     await storyEditorPage.saveStory('Saving Story');
     await storyEditorPage.publishStory();
 
-    let opportunityActionButtonCss = $(
-      '.e2e-test-opportunity-list-item-button'
-    );
     await contributorDashboardPage.get();
     await waitFor.pageToFullyLoad();
     await contributorDashboardPage.navigateToTranslateTextTab();
     await contributorDashboardTranslateTextTab.changeLanguage(
       'shqip (Albanian)'
     );
-    await contributorDashboardPage.waitForOpportunitiesToLoad();
-    await action.click('Opportunity button', opportunityActionButtonCss);
-    let image = $('.e2e-test-image');
-    await waitFor.visibilityOf(image, 'Test image taking too long to appear.');
-    let images = await $$('.e2e-test-image');
-    expect(images.length).toEqual(1);
-    await contributorDashboardAdminPage.copyElementWithClassName(
-      'image',
-      images[0]
+    let opportunityActionButton = await $(
+      '.e2e-test-opportunity-list-item-button'
     );
+    await contributorDashboardPage.waitForOpportunitiesToLoad();
+    await action.click('Opportunity button', opportunityActionButton);
+    await contributorDashboardPage.setTranslation(
+      await forms.toRichText('Zgjidhni opsionin e duhur.'),
+      true
+    );
+    await users.logout();
 
     // Accept suggestion as user1.
     await users.login(USER_EMAILS[1]);
     await contributorDashboardPage.get();
+    await contributorDashboardPage.waitForAvailableTaskLabelToAppear();
     await contributorDashboardPage.selectTranslationReviewButton();
     await contributorDashboardPage.waitForOpportunitiesToLoad();
     await contributorDashboardPage.selectReviewLanguage('shqip (Albanian)');
@@ -232,11 +217,11 @@ describe('Contributor Admin Dashboard', function () {
     );
 
     await contributorDashboardPage.clickOpportunityActionButton(
-      '[Image]',
+      'Zgjidhni opsionin e duhur.',
       'Topic 0 for contribution / Story Title / Chapter 1'
     );
 
-    await contributorDashboardAdminPage.acceptTranslation();
+    await contributorDashboardPage.clickAcceptTranslationSuggestionButton();
     await users.logout();
 
     await users.login(USER_EMAILS[0]);
@@ -350,4 +335,114 @@ describe('Contributor Admin Dashboard', function () {
     await contributorDashboardAdminPage.expectNoStatsElement();
     await users.logout();
   });
+
+  it(
+    'should be able to filter those translation submitters, who have submitted' +
+      ' translations between a given date range',
+    async function () {
+      /**
+      One translation submission was created previously by the beforeAll block in
+      this describe block for earlier e2e test, so it was created within the last 24
+      hours.
+      **/
+      await users.login(TRANSLATION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToTranslationSubmitterTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+
+      await contributorDashboardAdminPage.switchLanguage('Albanian (shqip)');
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await users.logout();
+    }
+  );
+
+  it(
+    'should be able to filter those translation reviewers, who have reviewed' +
+      ' translations between a given date range',
+    async function () {
+      /**
+      One translation review was created previously by the beforeAll block in this
+      describe block for earlier e2e test, so it was created within the last 24
+      hours.
+      **/
+      await users.login(TRANSLATION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToTranslationReviewerTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+
+      await contributorDashboardAdminPage.switchLanguage('Albanian (shqip)');
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await users.logout();
+    }
+  );
+
+  it(
+    'should be able to filter those question submitters, who have submitted' +
+      ' questiions between a given date range',
+    async function () {
+      /**
+      One question submission was created previously by the beforeAll block in this
+      describe block for earlier e2e test, so it was created within the last 24
+      hours.
+      **/
+      await users.login(QUESTION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToQuestionSubmitterTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await users.logout();
+    }
+  );
+
+  it(
+    'should be able to filter those question reviewers, who have reviewed' +
+      ' questions between a given date range',
+    async function () {
+      /**
+      One question review was created previously by the beforeAll block in this
+      describe block for earlier e2e test, so it was created within the last 24
+      hours.
+      **/
+      await users.login(QUESTION_COORDINATOR_EMAIL);
+      await contributorDashboardAdminPage.get();
+
+      await contributorDashboardAdminPage.navigateToQuestionReviewerTab();
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await contributorDashboardAdminPage.setLastDatePickerValue(
+        new Date(new Date().getTime() - ONE_DAY_IN_MILLIS)
+      );
+      await contributorDashboardAdminPage.waitForLoadingMessageToDisappear();
+      await contributorDashboardAdminPage.expectStatsElementCountToBe(1);
+
+      await users.logout();
+    }
+  );
 });

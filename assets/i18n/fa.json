@@ -1,4 +1,5 @@
 {
+	"I18N_ABOUT_PAGE_CTA_SOFTWARE_TITLE": "نرم‌افزار",
 	"I18N_ABOUT_PAGE_TITLE": "درباره ما - Oppia",
 	"I18N_ACTION_APPLY_TO_TEACH_WITH_OPPIA": "درخواست برای آموزش با Oppia",
 	"I18N_ACTION_BROWSE_EXPLORATIONS": "فهرست تجربیات ما",
@@ -65,6 +66,7 @@
 	"I18N_FOOTER_ABOUT": "درباره",
 	"I18N_FOOTER_ABOUT_ALL_CAPS": "درباره OPPIA",
 	"I18N_FOOTER_AUTHOR_PROFILES": "پروفایل نویسنده ها",
+	"I18N_FOOTER_BLOG": "بلاگ",
 	"I18N_FOOTER_BROWSE_LIBRARY": "فهرست کتابخانه",
 	"I18N_FOOTER_CONTACT_US": "تماس با ما",
 	"I18N_FOOTER_CONTRIBUTE_ALL_CAPS": "مشارکت",
@@ -269,9 +271,7 @@
 	"I18N_TOPIC_VIEWER_LESSONS_UNAVAILABLE": "بعداً زمانی که برای این موضوع درسی وجود داشت، برگردید.",
 	"I18N_TOPIC_VIEWER_QUESTIONS_UNAVAILABLE": "بعداً زمانی که سوالات تمرینی برای این موضوع دردسترس است، برگردید.",
 	"I18N_TOPNAV_ABOUT": "درباره",
-	"I18N_TOPNAV_ABOUT_OPPIA": "درباره Oppia",
 	"I18N_TOPNAV_ADMIN_PAGE": "صفحه مدیر",
-	"I18N_TOPNAV_BLOG": "بلاگ",
 	"I18N_TOPNAV_CLASSROOM_BASIC_MATHS": "ریاضیات پایه",
 	"I18N_TOPNAV_CONTACT_US": "تماس با ما",
 	"I18N_TOPNAV_CREATOR_DASHBOARD": "پیش‌خوان سازنده",
@@ -282,12 +282,13 @@
 	"I18N_TOPNAV_HOME": "خانه",
 	"I18N_TOPNAV_LEARN": "یادگیری",
 	"I18N_TOPNAV_LIBRARY": "کتابخانه",
+	"I18N_TOPNAV_LIBRARY_TEXT": "کتابخانه",
 	"I18N_TOPNAV_LOGOUT": "خروج",
 	"I18N_TOPNAV_MODERATOR_PAGE": "صفحه ناظر",
-	"I18N_TOPNAV_OPPIA_FOUNDATION": "بنیاد Oppia",
 	"I18N_TOPNAV_PREFERENCES": "ترجیحات",
 	"I18N_TOPNAV_SIGN_IN": "ورود",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "آموزش با Oppia",
 	"I18N_VOLUNTEER_PAGE_BREADCRUMB": "داوطلب",
+	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE": "نرم‌افزار",
 	"I18N_YES": "بله"
 }

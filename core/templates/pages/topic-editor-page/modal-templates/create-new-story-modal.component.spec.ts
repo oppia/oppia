@@ -28,6 +28,8 @@ import {
   ImagesData,
 } from 'services/image-local-storage.service';
 import {CreateNewStoryModalComponent} from './create-new-story-modal.component';
+import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
+import {By} from '@angular/platform-browser';
 
 class MockActiveModal {
   close(): void {
@@ -48,7 +50,7 @@ describe('Create New Story Modal Component', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      declarations: [CreateNewStoryModalComponent],
+      declarations: [CreateNewStoryModalComponent, UrlFragmentEditorComponent],
       providers: [
         EditableStoryBackendApiService,
         {
@@ -94,6 +96,24 @@ describe('Create New Story Modal Component', () => {
     expect(component.storyUrlFragmentExists).toBeTrue();
   });
 
+  it('should not update story url with wrong framgent', () => {
+    component.story.urlFragment = 'not empty';
+    spyOn(
+      storyEditorStateService,
+      'updateExistenceOfStoryUrlFragment'
+    ).and.callFake((urlFragment, successCallback, errorCallback) => {
+      errorCallback();
+    });
+    spyOn(storyEditorStateService, 'getStoryWithUrlFragmentExists');
+    component.onStoryUrlFragmentChange();
+    expect(
+      storyEditorStateService.updateExistenceOfStoryUrlFragment
+    ).toHaveBeenCalled();
+    expect(
+      storyEditorStateService.getStoryWithUrlFragmentExists
+    ).not.toHaveBeenCalled();
+  });
+
   it('should not update story url fragment existence for empty url fragment', () => {
     spyOn(storyEditorStateService, 'updateExistenceOfStoryUrlFragment');
     component.story.urlFragment = '';
@@ -125,5 +145,23 @@ describe('Create New Story Modal Component', () => {
 
     component.story.title = '';
     expect(component.isValid()).toBe(false);
+  });
+
+  it('should call onUrlFragmentChange when urlFragmentChange event is emitted', () => {
+    spyOn(component, 'onUrlFragmentChange');
+    const childComponent = fixture.debugElement.query(
+      By.directive(UrlFragmentEditorComponent)
+    );
+    const testFragment = 'test-story-url-fragment';
+    childComponent.triggerEventHandler('urlFragmentChange', testFragment);
+    expect(component.onUrlFragmentChange).toHaveBeenCalledWith(testFragment);
+  });
+
+  it('should update story.urlFragment and call onStoryUrlFragmentChange', () => {
+    spyOn(component, 'onStoryUrlFragmentChange');
+    const newUrlFragment = 'updated-story-url';
+    component.onUrlFragmentChange(newUrlFragment);
+    expect(component.story.urlFragment).toBe(newUrlFragment);
+    expect(component.onStoryUrlFragmentChange).toHaveBeenCalled();
   });
 });

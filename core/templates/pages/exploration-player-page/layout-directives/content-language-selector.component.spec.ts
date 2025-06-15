@@ -16,7 +16,15 @@
  * @fileoverview Unit tests for the CkEditor copy toolbar component.
  */
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {
+  async,
+  ComponentFixture,
+  discardPeriodicTasks,
+  fakeAsync,
+  flush,
+  TestBed,
+  tick,
+} from '@angular/core/testing';
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
@@ -35,10 +43,17 @@ import {
   // eslint-disable-next-line max-len
 } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {AudioPreloaderService} from '../services/audio-preloader.service';
+import {VoiceoverPlayerService} from '../services/voiceover-player.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {ExplorationObjectFactory} from 'domain/exploration/ExplorationObjectFactory';
+import {AutomaticVoiceoverHighlightService} from '../../../services/automatic-voiceover-highlight-service';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;
@@ -75,14 +90,33 @@ class MockWindowRef {
   };
 }
 
+class MockPlatformFeatureService {
+  get status(): object {
+    return {
+      EnableVoiceoverContribution: {
+        isEnabled: true,
+      },
+      AddVoiceoverWithAccent: {
+        isEnabled: false,
+      },
+    };
+  }
+}
+
 describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
   let windowRef: MockWindowRef;
   let playerTranscriptService: PlayerTranscriptService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let interactionObjectFactory: InteractionObjectFactory;
+  let entityVoiceoversService: EntityVoiceoversService;
+  let voiceoverBackendApiService: VoiceoverBackendApiService;
+  let audioPreloaderService: AudioPreloaderService;
+  let voiceoverPlayerService: VoiceoverPlayerService;
+  let playerPositionService: PlayerPositionService;
+  let explorationObjectFactory: ExplorationObjectFactory;
+  let automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -105,6 +139,10 @@ describe('Content language selector component', () => {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService,
         },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
       ],
     })
       .overrideModule(BrowserDynamicTestingModule, {
@@ -118,11 +156,17 @@ describe('Content language selector component', () => {
     );
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    audioTranslationLanguageService = TestBed.get(
-      AudioTranslationLanguageService
-    );
+    entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
+    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
+    audioPreloaderService = TestBed.inject(AudioPreloaderService);
+    voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     windowRef = TestBed.inject(WindowRef);
+    automaticVoiceoverHighlightService = TestBed.inject(
+      AutomaticVoiceoverHighlightService
+    );
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
@@ -140,8 +184,71 @@ describe('Content language selector component', () => {
     }
   );
 
-  it('should correcly initialize newLanguageCode', () => {
+  it('should correcly initialize newLanguageCode', fakeAsync(() => {
+    entityVoiceoversService.entityType = 'exploration';
+    entityVoiceoversService.entityId = 'exploration_id_1';
+    entityVoiceoversService.entityVersion = 1;
+    entityVoiceoversService.languageCode = 'en';
+    spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
+      Promise.resolve()
+    );
+
+    let response = {
+      languageAccentMasterList: {
+        en: {
+          'en-US': 'English (United States)',
+        },
+      },
+      languageCodesMapping: {
+        en: {
+          'en-US': true,
+        },
+      },
+    };
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchVoiceoverAdminDataAsync'
+    ).and.returnValue(Promise.resolve(response));
+    spyOn(audioPreloaderService, 'kickOffAudioPreloader');
+    spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue('Hola');
+
+    const explorationDict = {
+      title: 'My Title',
+      init_state_name: 'Introduction',
+      language_code: 'en',
+      auto_tts_enabled: false,
+      states: {},
+      param_specs: {},
+      param_changes: [],
+      draft_changes: [],
+      is_version_of_draft_valid: true,
+      version: 1,
+      draft_change_list_id: 0,
+      next_content_id_index: 4,
+      exploration_metadata: {
+        title: 'Exploration',
+        category: 'Algebra',
+        objective: 'To learn',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        states_schema_version: 50,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
+        edits_allowed: true,
+      },
+    };
+    audioPreloaderService.exploration =
+      explorationObjectFactory.createFromBackendDict(explorationDict);
+
     component.ngOnInit();
+    flush();
+    discardPeriodicTasks();
+
     expect(component.newLanguageCode).toBe('fr');
 
     windowRef.nativeWindow.location.href =
@@ -150,14 +257,22 @@ describe('Content language selector component', () => {
       '/explore/wZiXFx1iV5bz?initialContentLanguageCode=en';
 
     component.ngOnInit();
+    flush();
+    discardPeriodicTasks();
 
     expect(component.newLanguageCode).toBe('en');
-  });
+  }));
 
   it('should correctly select an option when refresh is not needed', () => {
     const setCurrentContentLanguageCodeSpy = spyOn(
       contentTranslationLanguageService,
       'setCurrentContentLanguageCode'
+    );
+    spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
+      Promise.resolve()
+    );
+    spyOn(entityVoiceoversService, 'getLanguageAccentCodes').and.returnValue(
+      []
     );
 
     const card = StateCard.createNewCard(
@@ -217,8 +332,7 @@ describe('Content language selector component', () => {
         },
       }),
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
@@ -232,10 +346,22 @@ describe('Content language selector component', () => {
   it(
     'should correctly open the refresh required modal when refresh is ' +
       'needed',
-    () => {
+    fakeAsync(() => {
       const setCurrentContentLanguageCodeSpy = spyOn(
         contentTranslationLanguageService,
         'setCurrentContentLanguageCode'
+      );
+      spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
+        Promise.resolve()
+      );
+      spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
+      spyOn(
+        automaticVoiceoverHighlightService,
+        'setAutomatedVoiceoversAudioOffsets'
+      );
+      spyOn(
+        automaticVoiceoverHighlightService,
+        'getSentencesToHighlightForTimeRanges'
       );
 
       const card = StateCard.createNewCard(
@@ -295,8 +421,7 @@ describe('Content language selector component', () => {
           },
         }),
         RecordedVoiceovers.createEmpty(),
-        'content',
-        audioTranslationLanguageService
+        'content'
       );
       card.addInputResponsePair({
         learnerInput: '',
@@ -306,7 +431,8 @@ describe('Content language selector component', () => {
       spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
       component.onSelectLanguage('fr');
+      tick(1000);
       expect(setCurrentContentLanguageCodeSpy).not.toHaveBeenCalled();
-    }
+    })
   );
 });

@@ -1,0 +1,3 @@
+core/templates/pages/android-page/android-page.module.ts
+core/templates/pages/classrooms-page/classrooms-page.module.ts
+core/templates/pages/teach-page/teach-page.module.ts

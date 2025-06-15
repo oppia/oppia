@@ -34,7 +34,7 @@
                *ngIf="displayArea === 'progressTab'"
                [ngStyle]="{'background': 'linear-gradient(to right, #205D86 ' + getBackgroundForProgress(i) + '%,white ' + getBackgroundForProgress(i) + '%)'}">
             <span class="subtopic-mastery"
-                  [ngStyle]="{'right': subtopicMasteryPosition(i) + 'px', 'color': masteryTextColor(i)}">
+                  [ngStyle]="{'color': masteryTextColor(i)}">
               {{subtopicMasteryArray[i]}}%
             </span>
           </div>
@@ -43,7 +43,7 @@
       <mat-card-actions class="card-actions">
         <div class="fx-row fx-main-center fx-cross-center full-width">
           <button mat-raised-button
-                  [disabled]="isStartButtonDisabled() && questionsStatusCallIsComplete"
+                  [disabled]="startButtonIsDisabled && questionsStatusCallIsComplete"
                   [ngClass]="{'practice-button-background-status-pending': !questionsStatusCallIsComplete, 'practice-button-background-status-complete': questionsStatusCallIsComplete}"
                   (click)="checkSiteLanguageBeforeBeginningPracticeSession()"
                   class="practice-session-button e2e-test-practice-start-button" >

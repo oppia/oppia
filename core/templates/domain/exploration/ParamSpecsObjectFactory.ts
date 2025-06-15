@@ -19,7 +19,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {
   ParamSpecBackendDict,
@@ -138,10 +137,3 @@ export class ParamSpecsObjectFactory {
     return new ParamSpecs(paramDict, this.paramSpecObjectFactory);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ParamSpecsObjectFactory',
-    downgradeInjectable(ParamSpecsObjectFactory)
-  );

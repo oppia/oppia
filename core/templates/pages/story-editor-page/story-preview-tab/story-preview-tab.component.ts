@@ -17,7 +17,6 @@
  */
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {StoryNode} from 'domain/story/story-node.model';
 import {StoryContents} from 'domain/story/story-contents-object.model';
 import {Story} from 'domain/story/story.model';
@@ -122,9 +121,3 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-angular
-  .module('oppia')
-  .directive(
-    'oppiaStoryPreviewTab',
-    downgradeComponent({component: StoryPreviewTabComponent})
-  );

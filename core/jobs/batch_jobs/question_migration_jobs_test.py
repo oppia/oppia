@@ -26,8 +26,7 @@ from core.jobs.batch_jobs import question_migration_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Type
-from typing_extensions import Final
+from typing import Final, Type
 
 MYPY = True
 if MYPY:
@@ -673,7 +672,8 @@ class MigrateQuestionJobTests(job_test_utils.JobTestBase):
         'solicit_answer_details': False,
         'card_is_checkpoint': False,
         'linked_skill_id': None,
-        'classifier_model_id': None
+        'classifier_model_id': None,
+        'inapplicable_skill_misconception_ids': []
     }
 
     def test_empty_storage(self) -> None:
@@ -1049,7 +1049,8 @@ class AuditQuestionMigrationJobTests(job_test_utils.JobTestBase):
         'solicit_answer_details': False,
         'card_is_checkpoint': False,
         'linked_skill_id': None,
-        'classifier_model_id': None
+        'classifier_model_id': None,
+        'inapplicable_skill_misconception_ids': []
     }
 
     def test_empty_storage(self) -> None:

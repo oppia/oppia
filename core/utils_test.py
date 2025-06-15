@@ -22,7 +22,6 @@ import base64
 import copy
 import datetime
 import os
-import sys
 import time
 import urllib
 
@@ -97,7 +96,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(parsed_str, 'Hola!')
 
         parsed_str = utils.to_ascii(
-            u'Klüft skräms inför på fédéral électoral große')
+            'Klüft skräms inför på fédéral électoral große')
         self.assertEqual(
             parsed_str, 'Kluft skrams infor pa federal electoral groe')
 
@@ -126,36 +125,6 @@ class UtilsTests(test_utils.GenericTestBase):
             'while parsing a flow node\n'
             'expected the node content, but found \'<stream end>\'\n'):
             utils.dict_from_yaml('{')
-
-    def test_recursively_remove_key_for_empty_dict(self) -> None:
-        """Test recursively_remove_key method for an empty dict."""
-        d: Dict[str, str] = {}
-        utils.recursively_remove_key(d, 'a')
-        self.assertEqual(d, {})
-
-    def test_recursively_remove_key_for_single_key_dict(self) -> None:
-        """Test recursively_remove_key method for single key dict."""
-        d = {'a': 'b'}
-        utils.recursively_remove_key(d, 'a')
-        self.assertEqual(d, {})
-
-    def test_recursively_remove_key_for_multi_key_dict(self) -> None:
-        """Test recursively_remove_key method for multi key dict."""
-        d = {'a': 'b', 'c': 'd'}
-        utils.recursively_remove_key(d, 'a')
-        self.assertEqual(d, {'c': 'd'})
-
-    def test_recursively_remove_key_for_dict_with_value_dict(self) -> None:
-        """Test recursively_remove_key method for dict with a value dict."""
-        d = {'a': 'b', 'c': {'a': 'b'}}
-        utils.recursively_remove_key(d, 'a')
-        self.assertEqual(d, {'c': {}})
-
-    def test_recursively_remove_key_for_list(self) -> None:
-        """Test recursively_remove_key method for list."""
-        l = ['a', 'b', {'c': 'd'}]
-        utils.recursively_remove_key(l, 'c')
-        self.assertEqual(l, ['a', 'b', {}])
 
     def test_camelcase_to_hyphenated(self) -> None:
         """Test camelcase_to_hyphenated method."""
@@ -608,7 +577,9 @@ class UtilsTests(test_utils.GenericTestBase):
             self.get_static_asset_filepath(), 'assets', 'favicon.ico')
 
         with self.assertRaisesRegex(
-            Exception, 'The given string does not represent a png image.'):
+            Exception,
+            'The given binary string does not represent a png image.'
+        ):
             utils.convert_png_to_data_url(favicon_filepath)
 
     def test_get_exploration_components_from_dir_with_invalid_path_raises_error(
@@ -692,10 +663,10 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertFalse(utils.is_user_id_valid('a' * 36))
 
     def test_is_pseudonymous_id(self) -> None:
-        self.assertTrue(utils.is_pseudonymous_id('pid_' + 'a' * 32))
-        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 32))
-        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 31 + 'A'))
-        self.assertFalse(utils.is_pseudonymous_id('uid_' + 'a' * 31))
+        self.assertTrue(utils.is_pseudonymous_id('pid_%s' % ('a' * 32)))
+        self.assertFalse(utils.is_pseudonymous_id('uid_%s' % ('a' * 32)))
+        self.assertFalse(utils.is_pseudonymous_id('uid_%s%s' % ('a' * 31, 'A')))
+        self.assertFalse(utils.is_pseudonymous_id('uid_%s' % ('a' * 31)))
         self.assertFalse(utils.is_pseudonymous_id('a' * 36))
 
     def test_snake_case_to_camel_case(self) -> None:
@@ -781,9 +752,8 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_convert_millisecs_time_to_datetime_object(self) -> None:
         msecs = 1690761600000
-        dt = utils.convert_millisecs_time_to_datetime_object(
-            msecs + 1000.0 * time.timezone)
-        dt2 = datetime.datetime(2023, 7, 31)
+        dt = utils.convert_millisecs_time_to_datetime_object(msecs)
+        dt2 = datetime.datetime(2023, 7, 31, 0, 0, tzinfo=datetime.timezone.utc)
         self.assertEqual(dt, dt2)
 
     def test_grouper(self) -> None:
@@ -880,6 +850,14 @@ class UtilsTests(test_utils.GenericTestBase):
             AssertionError, 'Time cannot be negative'):
             utils.get_human_readable_time_string(-1.42)
 
+    def test_get_number_of_days_since_date(self) -> None:
+        self.assertEqual(
+            90,
+            utils.get_number_of_days_since_date(
+                datetime.date.today() - datetime.timedelta(days=90)
+            )
+        )
+
     def test_generate_new_session_id(self) -> None:
         test_string = utils.generate_new_session_id()
         self.assertEqual(24, len(test_string))
@@ -932,16 +910,6 @@ class UtilsTests(test_utils.GenericTestBase):
             '("GSOC" OR "Math")')
         self.assertEqual(filter_values_list.sort(), ['GSOC', 'Math'].sort())
 
-    def test_compress_and_decompress_zlib(self) -> None:
-        byte_instance = b'a' * 26
-        byte_compressed = utils.compress_to_zlib(byte_instance)
-        self.assertLess(
-            sys.getsizeof(byte_compressed),
-            sys.getsizeof(byte_instance))
-        self.assertEqual(
-            utils.decompress_from_zlib(byte_compressed),
-            byte_instance)
-
     def test_compute_list_difference(self) -> None:
         self.assertEqual(utils.compute_list_difference(
                 ['-1', '-2', '-3', '-4', '-5'],
@@ -981,7 +949,8 @@ class UtilsTests(test_utils.GenericTestBase):
     ) -> None:
         file_contents_png, _ = self._get_png_and_webp_image()
         with self.assertRaisesRegex(
-            Exception, 'The given string does not represent a webp image.'
+            Exception,
+            'The given binary string does not represent a webp image.'
         ):
             utils.convert_image_binary_to_data_url(
                 file_contents_png, 'webp')

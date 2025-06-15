@@ -22,10 +22,25 @@ import {Route, RouterModule} from '@angular/router';
 import {AppConstants} from 'app.constants';
 import {IsLoggedInGuard} from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
 import {IsNewLessonPlayerGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
+import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/normalize-url-case.guard';
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
 const routes: Route[] = [
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MAINTENANCE.ROUTE,
+    loadChildren: () =>
+      import('pages/maintenance-page/maintenance-page.module').then(
+        m => m.MaintenancePageModule
+      ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SUBTOPIC_VIEWER.ROUTE,
+    loadChildren: () =>
+      import('pages/subtopic-viewer-page/subtopic-viewer-page.module').then(
+        m => m.SubtopicViewerPageModule
+      ),
+  },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.ROUTE,
     loadChildren: () =>
@@ -41,10 +56,42 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_EDITOR.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/exploration-editor-page/exploration-editor-page.module'
+      ).then(m => m.ExplorationEditorPageModule),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.STORY_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/story-editor-page/story-editor-page.module').then(
+        m => m.StoryEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD
+      .ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/contributor-dashboard-page/contributor-dashboard-page.module'
+      ).then(m => m.ContributorDashboardPageModule),
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
     loadChildren: () =>
       import('pages/moderator-page/moderator-page.module').then(
         m => m.ModeratorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_DASHBOARD.ROUTE,
+    loadChildren: () =>
+      import('pages/blog-dashboard-page/blog-dashboard-page.module').then(
+        m => m.BlogDashboardPageModule
       ),
     canActivate: [IsLoggedInGuard],
   },
@@ -57,12 +104,26 @@ const routes: Route[] = [
     canActivate: [IsLoggedInGuard],
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_DASHBOARD.ROUTE,
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CREATOR_DASHBOARD.ROUTE,
     loadChildren: () =>
-      import('pages/blog-dashboard-page/blog-dashboard-page.module').then(
-        m => m.BlogDashboardPageModule
+      import('pages/creator-dashboard-page/creator-dashboard-page.module').then(
+        m => m.CreatorDashboardPageModule
       ),
     canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_VIEWER.ROUTE,
+    loadChildren: () =>
+      import('pages/topic-viewer-page/topic-viewer-page.module').then(
+        m => m.TopicViewerPageModule
+      ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.PRACTICE_SESSION.ROUTE,
+    loadChildren: () =>
+      import('pages/practice-session-page/practice-session-page.module').then(
+        m => m.PracticeSessionPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EMAIL_DASHBOARD.ROUTE,
@@ -86,6 +147,23 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/classroom-page/classroom-page.module').then(
         m => m.ClassroomPageModule
+      ),
+    canActivate: [NormalizeUrlCaseGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.TOPIC_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/topic-editor-page/topic-editor-page.module').then(
+        m => m.TopicEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOMS.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import('pages/classrooms-page/classrooms-page.module').then(
+        m => m.ClassroomsPageModule
       ),
   },
   {
@@ -137,13 +215,6 @@ const routes: Route[] = [
       import('pages/about-page/about-page.module').then(m => m.AboutPageModule),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ABOUT_FOUNDATION.ROUTE,
-    loadChildren: () =>
-      import('pages/about-foundation-page/about-foundation-page.module').then(
-        m => m.AboutFoundationPageModule
-      ),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
       .CONTRIBUTOR_DASHBOARD_ADMIN.ROUTE,
     loadChildren: () =>
@@ -187,6 +258,7 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DELETE_ACCOUNT.ROUTE,
     pathMatch: 'full',
+    canActivate: [IsLoggedInGuard],
     loadChildren: () =>
       import('pages/delete-account-page/delete-account-page.module').then(
         m => m.DeleteAccountPageModule
@@ -212,6 +284,7 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FEEDBACK_UPDATES.ROUTE,
     pathMatch: 'full',
+    canActivate: [IsLoggedInGuard],
     loadChildren: () =>
       import('pages/feedback-updates-page/feedback-updates-page.module').then(
         m => m.FeedbackUpdatesPageModule
@@ -409,6 +482,16 @@ const routes: Route[] = [
       ),
   },
   {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND
+      .TOPICS_AND_SKILLS_DASHBOARD.ROUTE,
+    loadChildren: () =>
+      import(
+        // eslint-disable-next-line max-len
+        'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.module'
+      ).then(m => m.TopicsAndSkillsDashboardPageModule),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.VOICEOVER_ADMIN.ROUTE,
     loadChildren: () =>
       import('pages/voiceover-admin-page/voiceover-admin-page.module').then(
@@ -422,6 +505,22 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/collection-player-page/collection-player-page.module').then(
         m => m.CollectionPlayerPageModule
+      ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SKILL_EDITOR.ROUTE,
+    loadChildren: () =>
+      import('pages/skill-editor-page/skill-editor-page.module').then(
+        m => m.SkillEditorPageModule
+      ),
+    canActivate: [IsLoggedInGuard],
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.REVIEW_TEST.ROUTE,
+    pathMatch: 'full',
+    loadChildren: () =>
+      import('pages/review-test-page/review-test-page.module').then(
+        m => m.ReviewTestPageModule
       ),
   },
 ];
@@ -453,6 +552,13 @@ for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
 
 // Error routes.
 routes.push(
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE,
+    loadChildren: () =>
+      import(
+        'pages/error-pages/error-iframed-page/error-iframed-page.module'
+      ).then(m => m.ErrorIframedPageModule),
+  },
   // Route to register all the custom error pages on oppia.
   {
     path: `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/:status_code`,

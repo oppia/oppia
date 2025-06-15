@@ -26,6 +26,7 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DonationBoxModalComponent} from './donation-box/donation-box-modal.component';
 import {ThanksForDonatingModalComponent} from './thanks-for-donating-modal.component';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 class MockWindowRef {
   _window = {
@@ -55,6 +56,7 @@ describe('Donate page', () => {
   let windowRef: MockWindowRef;
   let ngbModal: NgbModal;
   let urlInterpolationService: UrlInterpolationService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
 
   beforeEach(() => {
     windowRef = new MockWindowRef();
@@ -63,6 +65,7 @@ describe('Donate page', () => {
       providers: [
         UrlInterpolationService,
         {provide: WindowRef, useValue: windowRef},
+        I18nLanguageCodeService,
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     }).compileComponents();
@@ -73,6 +76,7 @@ describe('Donate page', () => {
     component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     spyOn(ngbModal, 'open');
   });
 
@@ -116,15 +120,31 @@ describe('Donate page', () => {
     });
   });
 
-  it('should change learner tile in carousel', () => {
-    fixture.detectChanges();
-    const randomVal = Math.floor(Math.random() * 5);
-    const allTiles = fixture.debugElement.componentInstance.tiles.toArray();
-    const nativeElem = allTiles[randomVal].nativeElement;
-    spyOn(nativeElem, 'scrollIntoView').and.callThrough();
+  it('should move the correct testimonials carousel to the previous slide', () => {
+    component.learnerCarousel = jasmine.createSpyObj('NgbCarousel', ['prev']);
 
-    component.nextTile(randomVal);
-    expect(component.tileShown).toEqual(randomVal);
-    expect(nativeElem.scrollIntoView).toHaveBeenCalled();
+    component.moveLearnerCarouselToPreviousSlide();
+    expect(component.learnerCarousel.prev).toHaveBeenCalled();
+  });
+
+  it('should move the correct testimonials carousel to the next slide', () => {
+    component.learnerCarousel = jasmine.createSpyObj('NgbCarousel', ['next']);
+
+    component.moveLearnerCarouselToNextSlide();
+    expect(component.learnerCarousel.next).toHaveBeenCalled();
+  });
+
+  it('should get the correct RTL status if the current language is RTL', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    expect(component.isLanguageRTL()).toBeTrue();
+  });
+
+  it('should get the correct RTL status if the current language is not RTL', () => {
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      false
+    );
+    expect(component.isLanguageRTL()).toBeFalse();
   });
 });

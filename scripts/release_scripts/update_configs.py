@@ -102,7 +102,7 @@ def apply_changes_based_on_config(
         local_lines[local_line_numbers[index]] = config_line
 
     with utils.open_file(local_filepath, 'w') as writable_local_file:
-        writable_local_file.write('\n'.join(local_lines) + '\n')
+        writable_local_file.write('%s\n' % '\n'.join(local_lines))
 
 
 def update_app_yaml(
@@ -189,6 +189,7 @@ def update_analytics_constants_based_on_config(
 
     Raises:
         Exception. No GA_ANALYTICS_ID key found.
+        Exception. No GTM_ANALYTICS_ID key found.
         Exception. No SITE_NAME_FOR_ANALYTICS key found.
         Exception. No CAN_SEND_ANALYTICS_EVENTS key found.
     """
@@ -201,6 +202,15 @@ def update_analytics_constants_based_on_config(
             'Error: No GA_ANALYTICS_ID key found.'
         )
     ga_analytics_id = ga_analytics_searched_key.group(1)
+
+    gtm_analytics_searched_key = re.search(
+        r'"GTM_ANALYTICS_ID": "(.*)"', config_file_contents)
+    if gtm_analytics_searched_key is None:
+        raise Exception(
+            'Error: No GTM_ANALYTICS_ID key found.'
+        )
+    gtm_analytics_id = gtm_analytics_searched_key.group(1)
+
     site_name_for_analytics_searched_key = re.search(
         r'"SITE_NAME_FOR_ANALYTICS": "(.*)"', config_file_contents)
     if site_name_for_analytics_searched_key is None:
@@ -208,6 +218,7 @@ def update_analytics_constants_based_on_config(
             'Error: No SITE_NAME_FOR_ANALYTICS key found.'
         )
     site_name_for_analytics = site_name_for_analytics_searched_key.group(1)
+
     can_send_analytics_events_searched_key = re.search(
         r'"CAN_SEND_ANALYTICS_EVENTS": (true|false)',
         config_file_contents)
@@ -216,10 +227,15 @@ def update_analytics_constants_based_on_config(
             'Error: No CAN_SEND_ANALYTICS_EVENTS key found.'
         )
     can_send_analytics_events = can_send_analytics_events_searched_key.group(1)
+
     common.inplace_replace_file(
         release_analytics_constants_path,
         '"GA_ANALYTICS_ID": ""',
         '"GA_ANALYTICS_ID": "%s"' % ga_analytics_id)
+    common.inplace_replace_file(
+        release_analytics_constants_path,
+        '"GTM_ANALYTICS_ID": ""',
+        '"GTM_ANALYTICS_ID": "%s"' % gtm_analytics_id)
     common.inplace_replace_file(
         release_analytics_constants_path,
         '"SITE_NAME_FOR_ANALYTICS": ""',

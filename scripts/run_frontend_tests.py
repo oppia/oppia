@@ -21,16 +21,13 @@ import os
 import subprocess
 import sys
 
-# TODO(#15567): This can be removed after Literal in utils.py is loaded
-# from typing instead of typing_extensions, this will be possible after
-# we migrate to Python 3.8.
-from scripts import common  # isort:skip pylint: disable=wrong-import-position, unused-import
+from scripts import common
+from scripts import git_changes_utils
+from typing import Optional, Sequence, Set
 
-from typing import Optional, Sequence  # isort:skip
-
-from . import build  # isort:skip
-from . import check_frontend_test_coverage  # isort:skip
-from . import install_third_party_libs  # isort:skip
+from . import build
+from . import check_frontend_test_coverage
+from . import install_third_party_libs
 
 # These is a relative path from the oppia/ folder. They are relative because the
 # dtslint command prepends the current working directory to the path, even if
@@ -74,7 +71,24 @@ _PARSER.add_argument(
 )
 _PARSER.add_argument(
     '--download_combined_frontend_spec_file',
-    help='optional; if specifided, downloads the combined frontend file',
+    help='optional; if specified, downloads the combined frontend file',
+    action='store_true'
+)
+_PARSER.add_argument(
+    '--run_on_changed_files_in_branch',
+    help='optional; if specified, runs the frontend karma tests on the '
+    'files that were changed in the current branch.',
+    action='store_true'
+)
+_PARSER.add_argument(
+    '--specs_to_run',
+    help='optional; if specified, runs the specified test specs. This '
+    'should be a comma-separated list of spec file paths.',
+)
+_PARSER.add_argument(
+    '--allow_no_spec',
+    help='optional; if specified, exits with status code 0 if no specs are '
+    'found to run.',
     action='store_true'
 )
 
@@ -108,6 +122,35 @@ def run_dtslint_type_tests() -> None:
         sys.exit('The dtslint (type tests) failed.')
 
 
+def get_file_spec(file_path: str) -> str | None:
+    """Returns the spec file path for a given file path.
+
+    Args:
+        file_path: str. The path of the file.
+
+    Returns:
+        str | None. The path of the spec file if it exists, otherwise None.
+        If the file is not a TypeScript or JavaScript file, None is returned.
+    """
+    if (
+        file_path.endswith(('.spec.ts', '.spec.js', 'Spec.ts', 'Spec.js')) and
+        os.path.exists(file_path)
+    ):
+        return file_path
+
+    if file_path.endswith(('.ts', '.js')):
+        spec_file_path = '%s.spec%s' % (file_path[:-3], file_path[-3:])
+        if os.path.exists(spec_file_path):
+            return spec_file_path
+
+        spec_file_path = file_path.replace('.ts', 'Spec.ts').replace(
+            '.js', 'Spec.js')
+        if os.path.exists(spec_file_path):
+            return spec_file_path
+
+    return None
+
+
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -130,9 +173,59 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         'Running test in development environment'])
 
     cmd = [
-            common.NODE_BIN_PATH, '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+        common.NODE_BIN_PATH, '--max-old-space-size=4096',
+        os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+        'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+
+    specs_to_run: Set[str] = set()
+    if parsed_args.specs_to_run:
+        for spec in parsed_args.specs_to_run.split(','):
+            spec_file = get_file_spec(spec.strip())
+            if spec_file:
+                specs_to_run.add(spec_file)
+            elif not parsed_args.allow_no_spec:
+                raise ValueError(
+                    'No spec file found for the file: %s' % spec
+                )
+
+    if parsed_args.run_on_changed_files_in_branch:
+        remote = git_changes_utils.get_local_git_repository_remote_name()
+        if not remote:
+            sys.exit('Error: No remote repository found.')
+        refs = git_changes_utils.get_refs()
+        collected_files = git_changes_utils.get_changed_files(
+            refs, remote)
+        for _, (_, acmrt_files) in collected_files.items():
+            if not acmrt_files:
+                continue
+
+            files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(
+                acmrt_files)
+            for file_path in files_to_run:
+                spec_file = get_file_spec(file_path)
+                if spec_file:
+                    specs_to_run.add(spec_file)
+        staged_files = git_changes_utils.get_staged_acmrt_files()
+        staged_files_to_run = git_changes_utils.get_js_or_ts_files_from_diff(
+            staged_files)
+        for file_path in staged_files_to_run:
+            spec_file = get_file_spec(file_path)
+            if spec_file:
+                specs_to_run.add(spec_file)
+
+    if (
+        (parsed_args.specs_to_run or
+        parsed_args.run_on_changed_files_in_branch) and
+        not specs_to_run
+    ):
+        print('No valid specs found to run.')
+        exit_code = 0 if parsed_args.allow_no_spec else 1
+        sys.exit(exit_code)
+
+    if specs_to_run:
+        print('Running the following specs:', specs_to_run)
+        cmd.append('--specs_to_run=%s' % ','.join(sorted(specs_to_run)))
+
     if parsed_args.run_minified_tests:
         print('Running test in production environment')
 
@@ -176,8 +269,10 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 parsed_args.download_combined_frontend_spec_file):
                 download_task = subprocess.Popen(
                     ['wget',
-                    'http://localhost:9876/base/core/templates/' +
-                    'combined-tests.spec.js',
+                    (
+                        'http://localhost:9876/base/core/templates/'
+                        'combined-tests.spec.js'
+                    ),
                     '-P',
                     os.path.join('../karma_coverage_reports')])
                 # Wait for the wget command to download the
@@ -218,7 +313,14 @@ def main(args: Optional[Sequence[str]] = None) -> None:
                 'The frontend tests failed. Please fix it before running the'
                 ' test coverage check.')
         else:
-            check_frontend_test_coverage.main()
+            check_frontend_test_coverage_args = []
+            if len(specs_to_run) > 0:
+                check_frontend_test_coverage_args.append(
+                    '--files_to_check=%s' % ','.join(sorted(specs_to_run))
+                )
+            check_frontend_test_coverage.main(
+                check_frontend_test_coverage_args
+            )
     elif task.returncode:
         sys.exit(task.returncode)
 

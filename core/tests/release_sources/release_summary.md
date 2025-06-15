@@ -8,9 +8,7 @@ This indicates that a migration may be needed
 
 ### Changed setup scripts:
 
-- scripts/install_third_party.sh
-- scripts/setup.sh
-- scripts/install_third_party.py
+- scripts/install_third_party_libs.py
 
 ### Changed storage models:
 

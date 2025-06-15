@@ -534,13 +534,15 @@ def validate_prerequisite_skills_in_story_contents(
                         topic_relevant_skill_ids
                     ).issubset(simulated_skill_ids)):
                 raise utils.ValidationError(
-                    'The skills with ids ' +
-                    ' '.join(
-                        set(topic_relevant_skill_ids) -
-                        set(simulated_skill_ids)) +
-                    ' were specified as prerequisites for Chapter %s,'
+                    'The skills with ids %s' 
+                    ' were specified as prerequisites for Chapter %s,' 
                     ' but were not taught in any chapter before it.'
-                    % destination_node.title)
+                    % (' '.join(
+                        set(topic_relevant_skill_ids) -
+                        set(simulated_skill_ids)),
+                        destination_node.title
+                    )
+                )
             nodes_queue.append(node_id)
 
 
@@ -1072,7 +1074,7 @@ def get_chapter_notifications_stories_list() -> List[
                     if node.is_node_behind_schedule():
                         overdue_chapters.append(node.title)
 
-                if len(upcoming_chapters) or len(overdue_chapters):
+                if upcoming_chapters or overdue_chapters:
                     story_timeliness = story_domain.StoryPublicationTimeliness(
                         story.id, story.title, topic_model.name,
                         overdue_chapters, upcoming_chapters)

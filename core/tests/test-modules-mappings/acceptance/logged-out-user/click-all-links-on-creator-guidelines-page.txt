@@ -1,0 +1,3 @@
+core/templates/pages/creator-dashboard-page/creator-dashboard-page.module.ts
+core/templates/pages/library-page/library-page.module.ts
+core/templates/pages/participation-playbook/playbook.module.ts

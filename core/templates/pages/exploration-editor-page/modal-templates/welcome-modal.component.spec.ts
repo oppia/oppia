@@ -88,7 +88,7 @@ describe('Welcome Modal Component', () => {
     component.welcomeHeading = welcomeModalRef;
     expect(component.explorationId).toBe(explorationId);
     expect(component.editorWelcomeImgUrl).toBe(
-      '/assets/images/general/editor_welcome.svg'
+      '/assets/copyrighted-images/general/editor_welcome.svg'
     );
     expect(siteAnalyticsServiceSpy).toHaveBeenCalled();
   });

@@ -11,5 +11,5 @@ git+git://github.com/oppia/dependency5@v3.2.1#egg=dependency5
 # Developers: Please do not add to this auto-generated file. If
 # you want to add, remove, upgrade, or downgrade libraries,
 # please change the `requirements.in` file and run the script
-# `scripts/install_third_party` again to see your changes
+# `scripts/install_third_party_libs` again to see your changes
 # reflected in this file.

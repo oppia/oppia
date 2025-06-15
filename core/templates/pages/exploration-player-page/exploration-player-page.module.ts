@@ -30,7 +30,6 @@ import {LearnerViewInfoComponent} from './layout-directives/learner-view-info.co
 import {MaterialModule} from 'modules/material.module';
 import {RefresherExplorationConfirmationModal} from './modals/refresher-exploration-confirmation-modal.component';
 import {ExplorationPlayerPageComponent} from './exploration-player-page.component';
-import {ExplorationPlayerPageRoutingModule} from './exploration-player-page-routing.module';
 import {ExplorationPlayerPageRootComponent} from './exploration-player-page-root.component';
 import {ProgressReminderModalComponent} from './templates/progress-reminder-modal.component';
 import {HintAndSolutionModalService} from './services/hint-and-solution-modal.service';
@@ -41,11 +40,12 @@ import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
+import {RouterModule} from '@angular/router';
+import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.guard';
 
 @NgModule({
   imports: [
     CommonModule,
-    ExplorationPlayerPageRoutingModule,
     InteractionExtensionsModule,
     MatButtonModule,
     NgbModalModule,
@@ -55,6 +55,13 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
     SharedComponentsModule,
     ToastrModule,
     ToastrModule.forRoot(toastrConfig),
+    RouterModule.forChild([
+      {
+        path: '',
+        component: ExplorationPlayerPageRootComponent,
+        canActivate: [ExplorationPlayerPageAuthGuard],
+      },
+    ]),
   ],
   declarations: [
     ExplorationPlayerPageComponent,

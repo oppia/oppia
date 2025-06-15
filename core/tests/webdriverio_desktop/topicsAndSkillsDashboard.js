@@ -68,12 +68,6 @@ describe('Topics and skills dashboard functionality', function () {
       false
     );
 
-    var url = await browser.getUrl();
-    var topicId = url.split('/')[4].slice(0, -1);
-    await browser.url('/classroom-admin/');
-    await waitFor.pageToFullyLoad();
-    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
-
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword(TOPIC_NAME);
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
@@ -158,33 +152,32 @@ describe('Topics and skills dashboard functionality', function () {
     );
 
     await topicsAndSkillsDashboardPage.get();
-    let topicsCount = await topicsAndSkillsDashboardPage.getTopicsCount();
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword(
       TOPIC_ALPHA + '\n' + TOPIC_BETA
     );
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
 
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword('alp');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
 
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword('be');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
 
     await topicsAndSkillsDashboardPage.filterTopicsByClassroom('math');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
 
     await topicsAndSkillsDashboardPage.filterTopicsByKeyword('gamma');
     await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
     await topicsAndSkillsDashboardPage.resetTopicFilters();
-    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(topicsCount);
+    await topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(2);
   });
 
   it('should move skill to a topic', async function () {
@@ -196,11 +189,10 @@ describe('Topics and skills dashboard functionality', function () {
       'Topic 2 description',
       false
     );
-    var url = await browser.getUrl();
-    var topicId = url.split('/')[4].slice(0, -1);
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
-    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
+    await diagnosticTestPage.addTopicToClassroomConfig(TOPIC_NAME);
+    await diagnosticTestPage.publishClassroom();
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
@@ -229,11 +221,9 @@ describe('Topics and skills dashboard functionality', function () {
       false
     );
 
-    var url = await browser.getUrl();
-    var topicId = url.split('/')[4].slice(0, -1);
     await browser.url('/classroom-admin/');
     await waitFor.pageToFullyLoad();
-    await diagnosticTestPage.addTopicIdToClassroomConfig(topicId, 0);
+    await diagnosticTestPage.addTopicToClassroomConfig(TOPIC_NAME);
 
     await topicsAndSkillsDashboardPage.get();
     await topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(

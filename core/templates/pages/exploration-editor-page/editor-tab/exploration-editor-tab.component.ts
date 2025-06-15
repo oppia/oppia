@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import {JoyrideService} from 'ngx-joyride';
 import cloneDeep from 'lodash/cloneDeep';
@@ -30,8 +29,8 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {RouterService} from '../services/router.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {InteractionData} from 'interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
@@ -47,6 +46,9 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {VersionHistoryService} from '../services/version-history.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {ContextService} from 'services/context.service';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
 
 @Component({
   selector: 'oppia-exploration-editor-tab',
@@ -56,6 +58,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   @Input() explorationIsLinkedToStory: boolean;
 
   directiveSubscriptions = new Subscription();
+  misconceptionsBySkill: MisconceptionSkillMap;
   TabName: string;
   interactionIsShown: boolean;
   _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
@@ -96,7 +99,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private joyride: JoyrideService,
     private versionHistoryService: VersionHistoryService,
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
-    private contextService: ContextService
+    private contextService: ContextService,
+    private skillBackendApiService: SkillBackendApiService,
+    private alertsService: AlertsService
   ) {}
 
   startTutorial(): void {
@@ -349,6 +354,23 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     ];
   }
 
+  populateMisconceptionsForState(skillId: string): void {
+    this.misconceptionsBySkill = {};
+    this.skillBackendApiService.fetchSkillAsync(skillId).then(
+      skillResponse => {
+        this.misconceptionsBySkill[skillResponse.skill.getId()] =
+          skillResponse.skill.getMisconceptions();
+        this.stateEditorService.setMisconceptionsBySkill(
+          this.misconceptionsBySkill
+        );
+        this.stateEditorService.onUpdateMisconceptions.emit();
+      },
+      error => {
+        this.alertsService.addWarning(error);
+      }
+    );
+  }
+
   initStateEditor(): void {
     this.stateName = this.stateEditorService.getActiveStateName();
     this.stateEditorService.setStateNames(
@@ -357,6 +379,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     this.stateEditorService.setInQuestionMode(false);
 
     let stateData = this.explorationStatesService.getState(this.stateName);
+    if (stateData && stateData.linkedSkillId) {
+      this.populateMisconceptionsForState(stateData.linkedSkillId);
+    }
 
     if (this.stateName && stateData) {
       // This.stateEditorService.checkEventListenerRegistrationStatus()
@@ -456,6 +481,22 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     );
 
     this.stateEditorService.setLinkedSkillId(cloneDeep(displayedValue));
+    if (this.stateEditorService.getLinkedSkillId()) {
+      this.populateMisconceptionsForState(
+        this.stateEditorService.getLinkedSkillId()
+      );
+    }
+    this.stateEditorService.onChangeLinkedSkillId.emit();
+  }
+
+  saveInapplicableSkillMisconceptionIds(displayedValue: string[]): void {
+    this.stateEditorService.setInapplicableSkillMisconceptionIds(
+      cloneDeep(displayedValue)
+    );
+    this.explorationStatesService.saveInapplicableSkillMisconceptionIds(
+      this.stateEditorService.getActiveStateName(),
+      displayedValue
+    );
   }
 
   ngOnInit(): void {
@@ -491,10 +532,3 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaExplorationEditorTab',
-  downgradeComponent({
-    component: ExplorationEditorTabComponent,
-  }) as angular.IDirectiveFactory
-);

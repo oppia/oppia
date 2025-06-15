@@ -17,7 +17,6 @@
  */
 
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Subscription} from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
@@ -26,7 +25,7 @@ import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/servic
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {UserService} from 'services/user.service';
 import {AppConstants} from 'app.constants';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 interface DestinationChoice {
   id: string;
@@ -232,10 +231,3 @@ export class OutcomeDestinationEditorComponent implements OnInit {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaOutcomeDestinationEditor',
-  downgradeComponent({
-    component: OutcomeDestinationEditorComponent,
-  }) as angular.IDirectiveFactory
-);

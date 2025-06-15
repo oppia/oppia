@@ -37,7 +37,7 @@ class BaseVisualizationTests(test_utils.GenericTestBase):
         sorted_tiles_obj = models.SortedTiles(
             'AnswerFrequencies',
             {
-                'header': u'\u00e4',
+                'header': '\u00e4',
                 'use_percentages': True
             }, True)
         sorted_tiles_obj.validate()

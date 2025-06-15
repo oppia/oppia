@@ -1,0 +1,1 @@
+core/templates/pages/release-coordinator-page/release-coordinator-page.module.ts

@@ -21,7 +21,9 @@
                 class="new-post-button e2e-test-create-blog-post-button"
                 (click)="createNewBlogPost()">
           <mat-icon class="new-post-icon position-absolute">+</mat-icon>
-          <span class="d-flex pl-3">{{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase }}</span>
+          <span class="d-flex pl-3">
+            {{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase }}
+          </span>
         </button>
       </mat-card-title>
       <mat-card-subtitle class="mt-2">
@@ -49,24 +51,36 @@
                   class="mx-2 my-2 create-new-blog-post-button e2e-test-create-blog-post-button"
                   (click)="createNewBlogPost()"
                   aria-label="New blog post button.">
-                  {{ 'I18N_BLOG_DASHBOARD_CREATE_NEW_BLOG_POST_BUTTON' | translate | uppercase }}
+            {{ 'I18N_BLOG_DASHBOARD_CREATE_NEW_BLOG_POST_BUTTON' | translate | uppercase }}
           </button>
         </blockquote>
       </div>
-      <mat-tab-group class="e2e-test-mat-tabs" *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
+      <mat-tab-group class="e2e-test-mat-tabs"
+                     *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
         <mat-tab>
           <ng-template mat-tab-label>
             {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase }} ({{ blogDashboardData.numOfDraftBlogPosts }})
           </ng-template>
           <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
-            <button mat-icon-button (click)="activeView = 'gridView'" class="e2e-test-tiles-view-button">
-              <i [ngClass]="{'view-active': activeView === 'gridView'}" class="fas fa-border-all blog-dashboard-grid-list-icon"></i>
+            <button mat-icon-button
+                    (click)="activeView = 'gridView'"
+                    class="e2e-test-tiles-view-button"
+                    aria-label="Switch to tiles view">
+              <i [ngClass]="{'view-active': activeView === 'gridView'}"
+                 class="fas fa-border-all blog-dashboard-grid-list-icon">
+              </i>
             </button>
-            <button mat-icon-button (click)="activeView = 'listView'" class="e2e-test-list-view-button">
-              <i [ngClass]="{'view-active': activeView === 'listView'}" class="fas fa-list blog-dashboard-grid-list-icon"></i>
+            <button mat-icon-button
+                    (click)="activeView = 'listView'"
+                    class="e2e-test-list-view-button"
+                    aria-label="Switch to list view">
+              <i [ngClass]="{'view-active': activeView === 'listView'}"
+                 class="fas fa-list blog-dashboard-grid-list-icon">
+              </i>
             </button>
           </div>
-          <div class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table" *ngIf="activeView === 'gridView'">
+          <div class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table"
+               *ngIf="activeView === 'gridView'">
             <div *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="false"
@@ -76,7 +90,8 @@
               </oppia-blog-dashboard-tile>
             </div>
           </div>
-          <mat-list class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table" *ngIf="activeView === 'listView'">
+          <mat-list class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table"
+                    *ngIf="activeView === 'listView'">
             <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts; last as last">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="false"
@@ -91,14 +106,23 @@
             {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase }} ({{ blogDashboardData.numOfPublishedBlogPosts }})
           </ng-template>
           <div class="justify-content-end d-flex" *ngIf="!windowIsNarrow">
-            <button mat-icon-button (click)="activeView = 'gridView'" class="e2e-test-tiles-view-button">
-              <i [ngClass]="{'view-active': activeView === 'gridView'}" class="fas fa-border-all blog-dashboard-grid-list-icon"></i>
+            <button mat-icon-button
+                    (click)="activeView = 'gridView'"
+                    class="e2e-test-tiles-view-button">
+              <i [ngClass]="{'view-active': activeView === 'gridView'}"
+                 class="fas fa-border-all blog-dashboard-grid-list-icon">
+              </i>
             </button>
-            <button mat-icon-button (click)="activeView = 'listView'" class="e2e-test-list-view-button">
-              <i [ngClass]="{'view-active': activeView === 'listView'}" class="fas fa-list blog-dashboard-grid-list-icon"></i>
+            <button mat-icon-button
+                    (click)="activeView = 'listView'"
+                    class="e2e-test-list-view-button">
+              <i [ngClass]="{'view-active': activeView === 'listView'}"
+                 class="fas fa-list blog-dashboard-grid-list-icon">
+              </i>
             </button>
           </div>
-          <div class="blog-dashboard-tiles-container e2e-test-published-blog-post-table" *ngIf="activeView === 'gridView'">
+          <div class="blog-dashboard-tiles-container e2e-test-published-blog-post-table"
+               *ngIf="activeView === 'gridView'">
             <div *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="true"
@@ -109,7 +133,8 @@
               </oppia-blog-dashboard-tile>
             </div>
           </div>
-          <mat-list class="blog-dashboard-tiles-container e2e-test-published-blog-post-table" *ngIf="activeView === 'listView'">
+          <mat-list class="blog-dashboard-tiles-container e2e-test-published-blog-post-table"
+                    *ngIf="activeView === 'listView'">
             <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts; last as last">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
                                          [blogPostIsPublished]="false"
@@ -293,53 +318,53 @@
     margin: 3.75vw 3.438vw;
   }
 
-  @media(max-width: 870px) {
-    .blog-dashboard-card {
-      margin: 20px;
-      width: unset;
-    }
-
-    .new-post-button {
-      margin-bottom: unset;
-    }
-
-    :host /deep/ .mat-tab-label {
-      font-family: 'Roboto', Arial, sans-serif;
-      font-size: 1.1rem;
-    }
+@media(max-width: 870px) {
+  .blog-dashboard-card {
+    margin: 20px;
+    width: unset;
   }
 
-  @media(max-width: 620px) {
-    .blog-dashboard-card-title {
-      color: #333;
-      font-family: 'Roboto', Arial, sans-serif;
-      font-size: 1.6rem;
-      font-weight: 400;
-      text-align: left;
-    }
-
-    .new-post-button {
-      font-size: 14px;
-      margin-bottom: unset;
-      padding-left: 0;
-      padding-right: 0;
-      width: 96px;
-    }
-
-    .blog-author-bio-container {
-      font-size: 14px;
-      line-height: 16px;
-    }
-
-    :host /deep/ .mat-card-header-text {
-      margin-right: 0;
-    }
+  .new-post-button {
+    margin-bottom: unset;
   }
 
-  @media(max-width: 880px) {
-    .mat-card.oppia-page-card {
-      padding-left: 10px;
-      padding-right: 10px;
-    }
+  :host /deep/ .mat-tab-label {
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.1rem;
   }
+}
+
+@media(max-width: 620px) {
+  .blog-dashboard-card-title {
+    color: #333;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 1.6rem;
+    font-weight: 400;
+    text-align: left;
+  }
+
+  .new-post-button {
+    font-size: 14px;
+    margin-bottom: unset;
+    padding-left: 0;
+    padding-right: 0;
+    width: 96px;
+  }
+
+  .blog-author-bio-container {
+    font-size: 14px;
+    line-height: 16px;
+  }
+
+  :host /deep/ .mat-card-header-text {
+    margin-right: 0;
+  }
+}
+
+@media(max-width: 880px) {
+  .mat-card.oppia-page-card {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
 </style>

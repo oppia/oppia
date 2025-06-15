@@ -34,6 +34,8 @@ from core.platform.datastore import (
 from core.platform.email import dev_mode_email_services as email_services
 from core.platform.search import elastic_search_services as search_services
 from core.platform.secrets import cloud_secrets_services as secrets_services
+from core.platform.speech_synthesis import (
+    dev_mode_speech_synthesis_services as speech_synthesis_services)
 from core.platform.storage import dev_mode_storage_services as storage_services
 from core.platform.taskqueue import (
     dev_mode_taskqueue_services as platform_taskqueue_services)
@@ -50,7 +52,6 @@ from core.storage.base_model import gae_models as base_models
 from core.storage.beam_job import gae_models as beam_job_models
 from core.storage.blog import gae_models as blog_models
 from core.storage.blog_statistics import gae_models as blog_stats_models
-from core.storage.classifier import gae_models as classifier_models
 from core.storage.classroom import gae_models as classroom_models
 from core.storage.collection import gae_models as collection_models
 from core.storage.config import gae_models as config_models
@@ -84,7 +85,6 @@ __all__ = [
     'blog_models',
     'blog_stats_models',
     'bulk_email_services',
-    'classifier_models',
     'classroom_models',
     'collection_models',
     'config_models',
@@ -106,6 +106,7 @@ __all__ = [
     'secrets_services',
     'skill_models',
     'stats_models',
+    'speech_synthesis_services',
     'story_models',
     'storage_services',
     'subtopic_models',

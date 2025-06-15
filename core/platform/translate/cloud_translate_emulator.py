@@ -36,23 +36,22 @@ class CloudTranslateEmulator:
     """
 
     PREGENERATED_TRANSLATIONS = {
-        (u'en', u'pt', u'hello world'): u'Ol\xe1 Mundo',
-        (u'en', u'pt', u'CONTINUE'): u'PROSSEGUIR',
-        (u'en', u'es', u'Please continue.'): u'Por favor continua.',
-        (u'en', u'fr', u'CONTINUE'): u'CONTINUEZ',
-        (u'en', u'fr', u'Please continue.'):
-            u'Continuez s&#39;il vous pla\xeet.',
-        (u'en', u'es', u'CONTINUE'): u'SEGUIR',
-        (u'en', u'zh', u'hello world'): u'\u4f60\u597d\u4e16\u754c',
-        (u'en', u'es', u'Correct!'): u'\xa1Correcto!',
-        (u'en', u'zh', u'Correct!'): u'\u6b63\u786e\u7684\uff01',
-        (u'en', u'zh', u'CONTINUE'): u'\u7ee7\u7eed',
-        (u'en', u'zh', u'Please continue.'): u'\u8bf7\u7ee7\u7eed\u3002',
-        (u'en', u'fr', u'Correct!'): u'Correct!',
-        (u'en', u'pt', u'Correct!'): u'Correto!',
-        (u'en', u'es', u'hello world'): u'Hola Mundo',
-        (u'en', u'pt', u'Please continue.'): u'Por favor continue.',
-        (u'en', u'fr', u'hello world'): u'Bonjour le monde'
+        ('en', 'pt', 'hello world'): 'Ol\xe1 Mundo',
+        ('en', 'pt', 'CONTINUE'): 'PROSSEGUIR',
+        ('en', 'es', 'Please continue.'): 'Por favor continua.',
+        ('en', 'fr', 'CONTINUE'): 'CONTINUEZ',
+        ('en', 'fr', 'Please continue.'): 'Continuez s&#39;il vous pla\xeet.',
+        ('en', 'es', 'CONTINUE'): 'SEGUIR',
+        ('en', 'zh', 'hello world'): '\u4f60\u597d\u4e16\u754c',
+        ('en', 'es', 'Correct!'): '\xa1Correcto!',
+        ('en', 'zh', 'Correct!'): '\u6b63\u786e\u7684\uff01',
+        ('en', 'zh', 'CONTINUE'): '\u7ee7\u7eed',
+        ('en', 'zh', 'Please continue.'): '\u8bf7\u7ee7\u7eed\u3002',
+        ('en', 'fr', 'Correct!'): 'Correct!',
+        ('en', 'pt', 'Correct!'): 'Correto!',
+        ('en', 'es', 'hello world'): 'Hola Mundo',
+        ('en', 'pt', 'Please continue.'): 'Por favor continue.',
+        ('en', 'fr', 'hello world'): 'Bonjour le monde'
     }
 
     DEFAULT_RESPONSE = (

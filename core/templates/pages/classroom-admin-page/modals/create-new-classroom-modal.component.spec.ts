@@ -31,7 +31,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {CreateNewClassroomModalComponent} from './create-new-classroom-modal.component';
 import {ClassroomBackendApiService} from '../../../domain/classroom/classroom-backend-api.service';
 
-describe('Create new topic modal', () => {
+describe('Create new classroom modal', () => {
   let fixture: ComponentFixture<CreateNewClassroomModalComponent>;
   let componentInstance: CreateNewClassroomModalComponent;
   let ngbActiveModal: NgbActiveModal;
@@ -98,12 +98,8 @@ describe('Create new topic modal', () => {
     spyOn(ngbActiveModal, 'close');
     spyOn(
       classroomBackendApiService,
-      'updateClassroomDataAsync'
-    ).and.returnValue(Promise.resolve());
-
-    spyOn(classroomBackendApiService, 'getNewClassroomIdAsync').and.returnValue(
-      Promise.resolve('newClassroomId')
-    );
+      'createNewClassroomAsync'
+    ).and.returnValue(Promise.resolve({new_classroom_id: 'newClassroomId'}));
 
     componentInstance.existingClassroomNames = ['math', 'chemistry'];
     componentInstance.ngOnInit();
@@ -117,9 +113,6 @@ describe('Create new topic modal', () => {
       classroom_id: 'newClassroomId',
       name: 'physics',
       url_fragment: 'physics',
-      course_details: '',
-      topic_list_intro: '',
-      topic_id_to_prerequisite_topic_ids: {},
     };
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith(expectedDefaultClassroom);

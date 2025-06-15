@@ -17,7 +17,6 @@
  * questions list in editors.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
@@ -78,11 +77,11 @@ export class QuestionsListService {
     );
   }
 
-  getQuestionSummariesAsync(
+  async getQuestionSummariesAsync(
     skillId: string,
     fetchMore: boolean,
     resetHistory: boolean
-  ): void {
+  ): Promise<void> {
     if (resetHistory) {
       this._questionSummariesForOneSkill = [];
       this._nextOffsetForQuestions = 0;
@@ -101,7 +100,7 @@ export class QuestionsListService {
       this._moreQuestionsAvailable === true &&
       fetchMore
     ) {
-      this.questionBackendApiService
+      return this.questionBackendApiService
         .fetchQuestionSummariesAsync(skillId, this._nextOffsetForQuestions)
         .then(response => {
           let questionSummaries = response.questionSummaries.map(summary => {
@@ -156,7 +155,3 @@ export class QuestionsListService {
     return this._questionSummartiesInitializedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('QuestionsListService', downgradeInjectable(QuestionsListService));

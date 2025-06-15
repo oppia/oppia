@@ -18,7 +18,6 @@
 
 import {PlatformLocation} from '@angular/common';
 import {Injectable, EventEmitter, NgZone} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ExplorationInitStateNameService} from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
@@ -71,7 +70,12 @@ export class RouterService {
 
     this.location.onPopState(() => {
       if (window.location.hash === '') {
-        window.history.go(-1);
+        // We use setTimeout() here so that window.history.go(-1)
+        // can go back one page and set the hash before being
+        // interrupted by the next call in the stack.
+        setTimeout(() => {
+          window.history.go(-1);
+        });
       }
     });
   }
@@ -145,7 +149,7 @@ export class RouterService {
         }
       });
     } else if (newPath === this.TABS.HISTORY.path) {
-      // TODO(sll): Do this on-hover rather than on-click.
+      // TODO(#20449): Do this on-hover rather than on-click.
       this.refreshVersionHistoryEventEmitter.emit({
         forceRefresh: false,
       });
@@ -268,13 +272,10 @@ export class RouterService {
     if (this._activeTabName === this.TABS.MAIN.name) {
       $('.oppia-editor-cards-container').fadeOut(() => {
         this._actuallyNavigate(this.SLUG_GUI, stateName);
-        // We need to use $apply to update all our bindings. However we
-        // can't directly use $apply, as there is already another $apply in
-        // progress, the one which angular itself has called at the start.
-        // So we use $applyAsync to ensure that this $apply is called just
-        // after the previous $apply is finished executing. Refer to this
-        // link for more information -
-        // http://blog.theodybrothers.com/2015/08/getting-inside-angular-scopeapplyasync.html
+        // In Angular 2+, we use NgZone to manage change detection. Here, we
+        // use runOutsideAngular to avoid triggering Angular's change detection
+        // during the fadeOut animation. After the animation completes, we use
+        // run to re-enter Angular's zone and trigger change detection.
 
         setTimeout(() => {
           $('.oppia-editor-cards-container').fadeIn();
@@ -345,7 +346,3 @@ export class RouterService {
     return this.refreshVersionHistoryEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('RouterService', downgradeInjectable(RouterService));

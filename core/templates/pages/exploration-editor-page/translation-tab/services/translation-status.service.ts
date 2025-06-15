@@ -18,19 +18,18 @@
  */
 
 import {Injectable, OnInit} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTabActiveModeService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-mode.service';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {AppConstants} from 'app.constants';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 interface AvailabilityStatus {
   available: boolean;
@@ -61,9 +60,10 @@ export class TranslationStatusService implements OnInit {
     private explorationStatesService: ExplorationStatesService,
     private translationLanguageService: TranslationLanguageService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
-    private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private entityTranslationsService: EntityTranslationsService,
-    private stateEditorService: StateEditorService
+    private stateEditorService: StateEditorService,
+    private platformFeatureService: PlatformFeatureService,
+    private entityVoiceoversService: EntityVoiceoversService
   ) {}
 
   ngOnInit(): void {
@@ -76,25 +76,39 @@ export class TranslationStatusService implements OnInit {
     this.explorationVoiceoverContentNotAvailableCount = 0;
   }
 
-  _getVoiceOverStatus(
-    recordedVoiceovers: RecordedVoiceovers,
-    contentId: string
-  ): AvailabilityStatus {
+  _getEntityVoiceoverStatus(contentId: string): AvailabilityStatus {
     let availabilityStatus = {
       available: false,
       needsUpdate: false,
     };
-    let availableLanguages = recordedVoiceovers.getLanguageCodes(contentId);
+    let entityVoiceovers =
+      this.entityVoiceoversService.getActiveEntityVoiceovers();
 
-    if (availableLanguages.indexOf(this.langCode) !== -1) {
-      availabilityStatus.available = true;
-      let audioTranslation = recordedVoiceovers.getVoiceover(
-        contentId,
-        this.langCode
-      );
-      availabilityStatus.needsUpdate = audioTranslation.needsUpdate;
+    if (entityVoiceovers === undefined) {
+      return availabilityStatus;
     }
+
+    let manualVoiceover = entityVoiceovers.getManualVoiceover(contentId);
+    let automaticVoiceover = entityVoiceovers.getAutomaticVoiceover(contentId);
+
+    // Manual voiceovers is given higher priority than automatic voiceovers.
+    if (manualVoiceover) {
+      availabilityStatus.available = true;
+      availabilityStatus.needsUpdate = manualVoiceover.needsUpdate;
+    } else if (
+      automaticVoiceover &&
+      this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+    ) {
+      availabilityStatus.available = true;
+      availabilityStatus.needsUpdate = automaticVoiceover.needsUpdate;
+    }
+
     return availabilityStatus;
+  }
+
+  isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
+    return this.platformFeatureService.status
+      .AutomaticVoiceoverRegenerationFromExp.isEnabled;
   }
 
   _getTranslationStatus(contentId: string): AvailabilityStatus {
@@ -117,17 +131,11 @@ export class TranslationStatusService implements OnInit {
     return availabilityStatus;
   }
 
-  _getContentAvailabilityStatus(
-    stateName: string,
-    contentId: string
-  ): AvailabilityStatus {
+  _getContentAvailabilityStatus(contentId: string): AvailabilityStatus {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this._getTranslationStatus(contentId);
     } else {
-      this.langCode = this.translationLanguageService.getActiveLanguageCode();
-      let recordedVoiceovers =
-        this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
-      return this._getVoiceOverStatus(recordedVoiceovers, contentId);
+      return this._getEntityVoiceoverStatus(contentId);
     }
   }
 
@@ -137,8 +145,7 @@ export class TranslationStatusService implements OnInit {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return this._getTranslationStatus(contentId);
     } else {
-      let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
-      return this._getVoiceOverStatus(recordedVoiceovers, contentId);
+      return this._getEntityVoiceoverStatus(contentId);
     }
   }
 
@@ -155,9 +162,9 @@ export class TranslationStatusService implements OnInit {
         let stateNeedsUpdate = false;
         let noTranslationCount = 0;
         let noVoiceoverCount = 0;
-        let recordedVoiceovers =
-          this.explorationStatesService.getRecordedVoiceoversMemento(stateName);
-        let allContentIds = recordedVoiceovers.getAllContentIds();
+
+        let allContentIds =
+          this.explorationStatesService.getAllContentIdsByStateName(stateName);
         let interactionId =
           this.explorationStatesService.getInteractionIdMemento(stateName);
         // This is used to prevent users from adding unwanted hints audio, as
@@ -204,10 +211,8 @@ export class TranslationStatusService implements OnInit {
         }
 
         allContentIds.forEach(contentId => {
-          let availabilityStatus = this._getContentAvailabilityStatus(
-            stateName,
-            contentId
-          );
+          let availabilityStatus =
+            this._getContentAvailabilityStatus(contentId);
           if (!availabilityStatus.available) {
             noTranslationCount++;
             if (
@@ -230,10 +235,44 @@ export class TranslationStatusService implements OnInit {
             }
           }
         });
+
         this.explorationTranslationContentNotAvailableCount +=
           noTranslationCount;
         this.explorationVoiceoverContentNotAvailableCount += noVoiceoverCount;
-        if (noTranslationCount === 0 && !stateNeedsUpdate) {
+
+        let activeEntityVoiceovers =
+          this.entityVoiceoversService.getActiveEntityVoiceovers();
+
+        let voiceoverContentIds: string[] = [];
+        if (activeEntityVoiceovers) {
+          voiceoverContentIds = Object.keys(
+            activeEntityVoiceovers.voiceoversMapping
+          );
+        }
+
+        // If Automatic voiceover regeneration is not enabled, then we need to
+        // check for only manual voiceovers.
+        if (
+          activeEntityVoiceovers &&
+          !this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()
+        ) {
+          voiceoverContentIds = [];
+          for (let contentId in activeEntityVoiceovers.voiceoversMapping) {
+            const manualVoiceover =
+              activeEntityVoiceovers.getManualVoiceover(contentId);
+            if (manualVoiceover) {
+              voiceoverContentIds.push(contentId);
+            }
+          }
+        }
+
+        if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+          this.stateWiseStatusColor[stateName] =
+            this.getStateGraphColorInVoiceoverMode(
+              allContentIds,
+              voiceoverContentIds
+            );
+        } else if (noTranslationCount === 0 && !stateNeedsUpdate) {
           this.stateWiseStatusColor[stateName] =
             this.ALL_ASSETS_AVAILABLE_COLOR;
         } else if (
@@ -247,6 +286,27 @@ export class TranslationStatusService implements OnInit {
         }
       });
     }
+  }
+
+  getStateGraphColorInVoiceoverMode(
+    stateContentIdsNeedingVoiceover: string[],
+    explorationContentIdsWithVoiceover: string[]
+  ): string {
+    let color = this.NO_ASSETS_AVAILABLE_COLOR;
+    let allContentsHaveVoiceover: boolean = true;
+    for (let contentId of stateContentIdsNeedingVoiceover) {
+      if (explorationContentIdsWithVoiceover.indexOf(contentId) !== -1) {
+        color = this.FEW_ASSETS_AVAILABLE_COLOR;
+      } else {
+        allContentsHaveVoiceover = false;
+      }
+    }
+
+    if (allContentsHaveVoiceover) {
+      color = this.ALL_ASSETS_AVAILABLE_COLOR;
+    }
+
+    return color;
   }
 
   _getContentIdListRelatedToComponent(
@@ -290,8 +350,11 @@ export class TranslationStatusService implements OnInit {
   }
 
   _getAvailableContentIds(): string[] {
-    let recordedVoiceovers = this.stateRecordedVoiceoversService.displayed;
-    return recordedVoiceovers.getAllContentIds();
+    let stateName = this.stateEditorService.getActiveStateName();
+    let contentIds = this.explorationStatesService.getAllContentIdsByStateName(
+      stateName as string
+    ) as string[];
+    return contentIds;
   }
 
   _getActiveStateComponentNeedsUpdateStatus(componentName: string): boolean {
@@ -348,7 +411,7 @@ export class TranslationStatusService implements OnInit {
   refresh(): void {
     this.langCode = this.translationLanguageService.getActiveLanguageCode();
     this.entityTranslation =
-      this.entityTranslationsService.languageCodeToEntityTranslations[
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         this.langCode
       ];
     this._computeAllStatesStatus();
@@ -387,10 +450,3 @@ export class TranslationStatusService implements OnInit {
     return this._getActiveStateContentIdNeedsUpdateStatus(contentId);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TranslationStatusService',
-    downgradeInjectable(TranslationStatusService)
-  );

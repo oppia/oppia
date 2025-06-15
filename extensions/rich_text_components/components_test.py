@@ -148,16 +148,16 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         """Tests collapsible component validation."""
         valid_items: List[Dict[str, Dict[str, str]]] = [{
             'math_content-with-value': {
-                u'raw_latex': u'123456',
-                u'svg_filename': (
-                    u'mathImg_20201216_331234_r3ir43lmfd_height_2d456_width_6d1'
+                'raw_latex': '123456',
+                'svg_filename': (
+                    'mathImg_20201216_331234_r3ir43lmfd_height_2d456_width_6d1'
                     '24_vertical_0d231.svg')
             }
         }, {
             'math_content-with-value': {
-                u'raw_latex': u'\\frac{x}{y}',
-                u'svg_filename': (
-                    u'mathImg_20200216_133832_imzlvnf23a_height_4d123_width_23d'
+                'raw_latex': '\\frac{x}{y}',
+                'svg_filename': (
+                    'mathImg_20200216_133832_imzlvnf23a_height_4d123_width_23d'
                     '122_vertical_2d123.svg')
             }
         }]
@@ -172,27 +172,27 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
              'url-with-value'),
             ({
                 'math_content-with-value': {
-                    u'raw_latex': True,
-                    u'svg_filename': False
+                    'raw_latex': True,
+                    'svg_filename': False
                 }
             }, 'Expected unicode string, received True'),
             ({
                 'math_content-with-value': {
-                    u'raw_latex': 123,
-                    u'svg_filename': 11
+                    'raw_latex': 123,
+                    'svg_filename': 11
                 }
             }, 'Expected unicode string, received 123'),
             ({
                 'math_content-with-value': {
-                    u'raw_latex': 'x^2',
-                    u'svg_filename': 'img.svg'
+                    'raw_latex': 'x^2',
+                    'svg_filename': 'img.svg'
                 }
             }, 'Invalid svg_filename attribute in math component: img.svg'),
             ({
                 'math_content-with-value': {
-                    u'raw_latex': 'x^3',
-                    u'svg_filename': (
-                        u'invalid_2020761338_imzlvnf23a_height_4d123_width_23d'
+                    'raw_latex': 'x^3',
+                    'svg_filename': (
+                        'invalid_2020761338_imzlvnf23a_height_4d123_width_23d'
                         '122_vertical_2d123.svg')
                 }
             }, (
@@ -201,9 +201,9 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
                 '.svg')),
             ({
                 'math_content-with-value': {
-                    u'raw_latex': 'x^3',
-                    u'svg_filename': (
-                        u'mathImg_20207361338_imzlvnf23a_invalid_4d123_width_2'
+                    'raw_latex': 'x^3',
+                    'svg_filename': (
+                        'mathImg_20207361338_imzlvnf23a_invalid_4d123_width_2'
                         '3d122_vertical_2d123.svg')
                 }
             }, (

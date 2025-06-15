@@ -17,19 +17,18 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import nerdamer from 'nerdamer';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {AlgebraicExpressionInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import {AlgebraicExpressionInputRulesService} from './algebraic-expression-input-rules.service';
 import {MathInteractionsService} from 'services/math-interactions.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {AppConstants} from 'app.constants';
 import {NumericExpressionInputRulesService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-rules.service';
 
@@ -40,7 +39,7 @@ export class AlgebraicExpressionInputValidationService {
   private supportedFunctionNames = AppConstants.SUPPORTED_FUNCTION_NAMES;
 
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -54,8 +53,7 @@ export class AlgebraicExpressionInputValidationService {
         type: AppConstants.WARNING_TYPES.ERROR,
         message:
           'The number of custom letters cannot be more than ' +
-          allowedLettersLimit +
-          '.',
+          allowedLettersLimit,
       });
     }
 
@@ -153,7 +151,7 @@ export class AlgebraicExpressionInputValidationService {
                 (i + 1) +
                 ' will never be matched because it ' +
                 "is preceded by an 'IsEquivalentTo' answer " +
-                'with a matching input.',
+                'with a matching input',
             });
           } else if (
             currentRuleType === 'MatchesExactlyWith' &&
@@ -173,7 +171,7 @@ export class AlgebraicExpressionInputValidationService {
                 (i + 1) +
                 ' will never be matched because it ' +
                 "is preceded by a 'MatchesExactlyWith' answer " +
-                'with a matching input.',
+                'with a matching input',
             });
           }
         }
@@ -211,10 +209,3 @@ export class AlgebraicExpressionInputValidationService {
     return warningsList;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'AlgebraicExpressionInputValidationService',
-    downgradeInjectable(AlgebraicExpressionInputValidationService)
-  );

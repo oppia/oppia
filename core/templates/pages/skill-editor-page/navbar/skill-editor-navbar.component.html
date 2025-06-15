@@ -60,12 +60,12 @@
           </div>
           <div class="skill-nav-dropdown-option"
                (click)="selectQuestionsTab()">
-            <i class="fas fa-book-open navbar-tab-icon"></i>
+            <i class="fas fa-book-open navbar-tab-icon e2e-test-mobile-questions-tab"></i>
             <span>Questions</span>
           </div>
           <div class="skill-nav-dropdown-option"
                (click)="selectPreviewTab()">
-            <i class="fas fa-play navbar-tab-icon"></i>
+            <i class="fas fa-play navbar-tab-icon e2e-test-mobile-preview-tab"></i>
             <span>Preview</span>
           </div>
         </div>
@@ -76,7 +76,7 @@
           </div>
           <div class="skill-nav-dropdown-icon"
                (click)="toggleNavigationOptions()">
-            <i class="fa fa-caret-down"></i>
+            <i class="fa fa-caret-down e2e-test-mobile-skill-nav-dropdown-icon"></i>
           </div>
         </div>
       </div>
@@ -85,7 +85,7 @@
              *ngIf="showSkillEditOptions">
           <div class="skill-nav-dropdown-option"
                (click)="saveChanges()">
-            <i class="fas fa-save navbar-tab-icon"></i>
+            <i class="fas fa-save navbar-tab-icon e2e-test-mobile-save-skill-changes"></i>
             <span>Save Changes</span>
           </div>
         </div>
@@ -97,7 +97,7 @@
               ({{getChangeListCount()}})
             </span>
           </div>
-          <div class="skill-nav-dropdown-icon"
+          <div class="skill-nav-dropdown-icon e2e-test-mobile-toggle-skill-nav-dropdown-icon"
                (click)="toggleSkillEditOptions()">
             <i class="fa fa-caret-down"></i>
           </div>
@@ -211,6 +211,8 @@
       width: 20%;
     }
      .skill-nav-dropdown-text {
+      display: flex;
+      flex-direction: column;
       padding: 5px 10px;
     }
      .save-options-dropdown {

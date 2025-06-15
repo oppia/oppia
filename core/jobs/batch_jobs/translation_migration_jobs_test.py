@@ -28,8 +28,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Sequence
-from typing_extensions import Final
+from typing import Final, Sequence
 
 MYPY = False
 if MYPY:

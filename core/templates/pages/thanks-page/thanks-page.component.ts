@@ -17,7 +17,6 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
@@ -29,13 +28,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 export class ThanksPageComponent {
   constructor(private urlInterpolationService: UrlInterpolationService) {}
 
-  getStaticImageUrl(imagePath: string): string {
-    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  getStaticCopyrightedImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticCopyrightedImageUrl(imagePath);
   }
 }
-angular
-  .module('oppia')
-  .directive(
-    'thanksPage',
-    downgradeComponent({component: ThanksPageComponent})
-  );

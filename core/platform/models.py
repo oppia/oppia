@@ -118,10 +118,6 @@ class _Gae(Platform):
                 from core.storage.blog_statistics import (
                     gae_models as blog_stats_models)
                 returned_models.append(blog_stats_models)
-            elif name == Names.CLASSIFIER:
-                from core.storage.classifier import (
-                    gae_models as classifier_models)
-                returned_models.append(classifier_models)
             elif name == Names.CLASSROOM:
                 from core.storage.classroom import (
                     gae_models as classroom_models)
@@ -277,6 +273,21 @@ class _Gae(Platform):
         """
         from core.platform.app_identity import gae_app_identity_services
         return gae_app_identity_services
+
+    @classmethod
+    def import_speech_synthesis_services(cls) -> ModuleType:
+        """Imports and returns the speech synthesis services module.
+
+        Returns:
+            module. The speech synthesis services module based on the current
+            environment.
+        """
+        # TODO(#22301): Modify the following code to invoke the Cloud service
+        # based on the environment. Refer to the issue for implementation
+        # details.
+        from core.platform.speech_synthesis import (
+            dev_mode_speech_synthesis_services)
+        return dev_mode_speech_synthesis_services
 
     @classmethod
     def import_email_services(cls) -> ModuleType:
@@ -506,6 +517,15 @@ class Registry:
             module. The app_identity_services module.
         """
         return cls._get().import_app_identity_services()
+
+    @classmethod
+    def import_speech_synthesis_services(cls) -> ModuleType:
+        """Imports and returns speech synthesis services module.
+
+        Returns:
+            module. The speech synthesis services module.
+        """
+        return cls._get().import_speech_synthesis_services()
 
     @classmethod
     def import_email_services(cls) -> ModuleType:

@@ -24,7 +24,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   AnswerChoice,
   StateEditorService,
@@ -40,8 +39,9 @@ import {AlertsService} from 'services/alerts.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
 import {ExternalSaveService} from 'services/external-save.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface TaggedMisconception {
   skillId: string;
@@ -74,6 +74,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   activeRuleIndex: number;
   answerChoices: AnswerChoice[];
   editAnswerGroupForm: object;
+  tagMisconceptionsFeatureFlagIsEnabled: boolean = false;
 
   constructor(
     private stateEditorService: StateEditorService,
@@ -81,7 +82,8 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     private stateInteractionIdService: StateInteractionIdService,
     private alertsService: AlertsService,
     private trainingDataEditorPanelService: TrainingDataEditorPanelService,
-    private externalSaveService: ExternalSaveService
+    private externalSaveService: ExternalSaveService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   sendOnSaveTaggedMisconception(event: TaggedMisconception): void {
@@ -341,7 +343,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
   }
 
   isMLEnabled(): boolean {
-    return AppConstants.ENABLE_ML_CLASSIFIERS;
+    return AppConstants.ENABLE_TRAINING_DATA_UI;
   }
 
   /**
@@ -414,16 +416,11 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     this.activeRuleIndex = this.responsesService.getActiveRuleIndex();
     this.editAnswerGroupForm = {};
     this.answerChoices = this.getAnswerChoices();
+    this.tagMisconceptionsFeatureFlagIsEnabled =
+      this.platformFeatureService.status.ExplorationEditorCanTagMisconceptions.isEnabled;
   }
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaAnswerGroupEditor',
-  downgradeComponent({
-    component: AnswerGroupEditor,
-  }) as angular.IDirectiveFactory
-);

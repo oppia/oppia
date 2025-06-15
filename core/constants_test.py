@@ -153,28 +153,28 @@ class ConstantsTests(test_utils.GenericTestBase):
         """
         # TODO(#11737): Remove this once language constants are consolidated.
         rtl_content_languages = [
-            language[u'code']
+            language['code']
             for language
             in constants.constants.SUPPORTED_CONTENT_LANGUAGES
-            if language[u'direction'] == 'rtl'
+            if language['direction'] == 'rtl'
         ]
         ltr_content_languages = [
-            language[u'code']
+            language['code']
             for language
             in constants.constants.SUPPORTED_CONTENT_LANGUAGES
-            if language[u'direction'] == 'ltr'
+            if language['direction'] == 'ltr'
         ]
         rtl_audio_languages = [
-            language[u'id']
+            language['id']
             for language
             in constants.constants.SUPPORTED_AUDIO_LANGUAGES
-            if language[u'direction'] == 'rtl'
+            if language['direction'] == 'rtl'
         ]
         ltr_audio_languages = [
-            language[u'id']
+            language['id']
             for language
             in constants.constants.SUPPORTED_AUDIO_LANGUAGES
-            if language[u'direction'] == 'ltr'
+            if language['direction'] == 'ltr'
         ]
         conflicts = list(
             set(rtl_content_languages) & set(ltr_audio_languages)

@@ -220,7 +220,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     """Test the story domain object."""
 
     STORY_ID: Final = 'story_id'
-    NODE_ID_1: Final = story_domain.NODE_ID_PREFIX + '1'
+    NODE_ID_1: Final = '%s1' % story_domain.NODE_ID_PREFIX
     NODE_ID_2: Final = 'node_2'
     SKILL_ID_1: Final = 'skill_id_1'
     SKILL_ID_2: Final = 'skill_id_2'
@@ -717,7 +717,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_story_node_update_planned_publication_date(self) -> None:
         self.story.story_contents.nodes[0].planned_publication_date = None
-        current_time = datetime.datetime.now()
+        current_time = datetime.datetime.now(datetime.timezone.utc)
         current_time_msecs = utils.get_time_in_millisecs(current_time)
         self.story.update_node_planned_publication_date(
             'node_1', current_time_msecs)
@@ -727,7 +727,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_story_node_update_last_modified(self) -> None:
         self.story.story_contents.nodes[0].last_modified = None
-        current_time = datetime.datetime.now()
+        current_time = datetime.datetime.now(datetime.timezone.utc)
         current_time_msecs = utils.get_time_in_millisecs(current_time)
         self.story.update_node_last_modified('node_1', current_time_msecs)
         self.assertEqual(
@@ -735,7 +735,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_story_node_update_first_publication_date(self) -> None:
         self.story.story_contents.nodes[0].first_publication_date = None
-        current_time = datetime.datetime.now()
+        current_time = datetime.datetime.now(datetime.timezone.utc)
         current_time_msecs = utils.get_time_in_millisecs(current_time)
         self.story.update_node_first_publication_date(
             'node_1', current_time_msecs)
@@ -2013,16 +2013,18 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
-            Exception, 'Expected from_index value to be a number, '
-                       'received None'):
+            Exception,
+            'Expected from_index value to be a number, received None'
+        ):
             self.story.rearrange_node_in_story(None, 2)  # type: ignore[arg-type]
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
-            Exception, 'Expected from_index value to be a number, '
-                       'received a'):
+            Exception,
+            'Expected from_index value to be a number, received a'
+        ):
             self.story.rearrange_node_in_story('a', 2)  # type: ignore[arg-type]
 
     def test_rearrange_node_in_story_fail_with_invalid_to_index_value(
@@ -2032,16 +2034,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
-            Exception, 'Expected to_index value to be a number, '
-                       'received None'):
+            Exception,
+            'Expected to_index value to be a number, received None'
+        ):
             self.story.rearrange_node_in_story(1, None)  # type: ignore[arg-type]
 
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
         with self.assertRaisesRegex(
-            Exception, 'Expected to_index value to be a number, '
-                       'received a'):
+            Exception, 'Expected to_index value to be a number, received a'
+        ):
             self.story.rearrange_node_in_story(1, 'a')  # type: ignore[arg-type]
 
     def test_rearrange_canonical_story_fail_with_out_of_bound_indexes(
@@ -2116,8 +2119,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self
     ) -> None:
         with self.assertRaisesRegex(
-            Exception, 'Expected from_index and to_index values to be '
-                       'different.'):
+            Exception,
+            'Expected from_index and to_index values to be different.'
+        ):
             self.story.rearrange_node_in_story(1, 1)
 
     def test_rearrange_node_in_story(self) -> None:

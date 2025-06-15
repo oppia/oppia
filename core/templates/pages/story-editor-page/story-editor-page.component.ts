@@ -37,7 +37,6 @@ import {StoryEditorStalenessDetectionService} from './services/story-editor-stal
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {UrlService} from 'services/contextual/url.service';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {Story} from 'domain/story/story.model';
 
 @Component({
@@ -359,10 +358,3 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaStoryEditorPage',
-  downgradeComponent({
-    component: StoryEditorPageComponent,
-  })
-);

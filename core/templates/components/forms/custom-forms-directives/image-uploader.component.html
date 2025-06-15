@@ -1,236 +1,59 @@
-<div class="image-uploader-drop-area"
-     [ngClass]="{'image-uploader-is-active': backgroundWhileUploading, 'image-uploader-is-narrow': blogDashboardPageService.imageUploaderIsNarrow}"
-     #dropArea>
-  <div class="image-uploader-text" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_DRAG_IMAGE_HERE' | translate }}</div>
-  <span *ngIf="errorMessage"
-        class="image-uploader-error-message e2e-test-upload-error">
-    <i class="fas fa-exclamation-triangle"></i>
-    {{ errorMessage }}
-  </span>
-  <span class="image-uploader-license-warning" *ngIf="!isBlogPostThumbnailUploader" tabindex="0">
-    Before uploading, please ensure that your image:<br>
-    <ul class="image-upload-instructions">
-      <li>Is in .svg, .png or .jpg format</li>
-      <li>Has a size smaller than 100 KB</li>
-      <li>Has no watermarks and is compatible with the <a tabindex="0" class="license-term-link" href="/license" [smartRouterLink]="'/' + licenseUrl" target="_blank" rel="noopener">license terms</a> of the site</li>
-    </ul>
-  </span>
-  <label for="image-file-input" class="image-uploader-upload-label-button" *ngIf="!isBlogPostThumbnailUploader">{{ 'I18N_DIRECTIVES_UPLOAD_A_FILE' | translate }}</label>
-  <!-- The onclick="this.imageInputRef.nativeElement.value=null" attribute resets the value of the input so that uploading the same image twice in a row works. This fix is only needed for chrome. Reference: stackoverflow.com/q/12030686 -->
-  <input type="file" id="image-file-input" (click)="this.imageInputRef.nativeElement.value = null"
-         (change)="handleFile()"
-         class="image-uploader-file-input e2e-test-photo-upload-input"
-         accept=".jpg,.jpeg,.png,.svg"
-         [ngClass]="fileInputClassName" #imageInput>
-  <label *ngIf="isBlogPostThumbnailUploader"
-         class="blog-post-thumbnail-uploader d-flex flex-column flex-grow-1 text-center justify-content-center position-relative"
-         [ngClass]="{'blog-post-narrow-thumbnail-uploader': isWindowNarrow, 'image-uploader-is-narrow': blogDashboardPageService.imageUploaderIsNarrow, 'uploader-with-error-message': errorMessage}"
-         for="image-file-input">
-    <i class="fas fa-image image-uploader-no-thumbnail-icon"
-       [ngClass]="{'d-none': blogDashboardPageService.imageUploaderIsNarrow}">
-    </i>
-    <span *ngIf="!blogDashboardPageService.imageUploaderIsNarrow"
-          class="font-weight-light">
-      {{ 'I18N_BLOG_POST_THUMBNAIL_PICTURE_DRAG' | translate }}
-    </span>
-    <span *ngIf="blogDashboardPageService.imageUploaderIsNarrow"
-          class="font-weight-light">
-      {{ 'I18N_BLOG_POST_EDITOR_EDIT_THUMBNAIL_TEXT' | translate }}
-    </span>
-  </label>
+<div class="image-editor e2e-test-thumbnail-editor form-group">
+  <div>
+    <div class="oppia-editable-section float-left edit-btn-container" [attr.title]="'Change ' + imageUploaderParameters.imageName"
+      [ngStyle]="{background: imageBgColor}">
+      <div tabindex="0" class="oppia-click-to-start-editing e2e-test-photo-button" (click)="showImageUploaderModal()"
+           role="button" aria-label="upload or edit image" (keydown.enter)="showImageUploaderModal()">
+      </div>
+      <i class="fas fa-pen oppia-editor-edit-icon oppia-pencil-icon" [hidden]="imageUploaderParameters.disabled"
+        [ngStyle]="{'right.px': !isImageInPortraitMode() ? -20 : 8}" (click)="showImageUploaderModal()">
+      </i>
+      <img [hidden]="hidePlaceholder" [src]="placeholderImageUrl" align="center" alt=""
+           [ngClass]="{'oppia-image-placeholder-landscape': !isImageInPortraitMode(), 'oppia-image-placeholder-portrait': isImageInPortraitMode()}"
+           class="e2e-test-custom-photo"
+        >
+
+      <oppia-thumbnail-display *ngIf="editableImageDataUrl" [imgSrc]="editableImageDataUrl"
+        [aspectRatio]="imageUploaderParameters.aspectRatio" [classes]="['img-thumbnail', 'e2e-test-custom-photo']" [background]="imageBgColor">
+      </oppia-thumbnail-display>
+    </div>
+  </div>
 </div>
+
 <style>
-  .image-uploader-license-warning {
-    background-color: rgba(225, 250, 89, 0.41);
-    border: 1px solid rgba(200, 230, 59, 0.41);
-    border-radius: 6px;
-    bottom: 8px;
-    font-size: 12px;
-    font-style: italic;
-    left: 8px;
-    padding: 4px 6px;
-    position: absolute;
-    text-align: left;
+  .oppia-image-placeholder-landscape {
+    max-height: 180px;
+    max-width: 320px;
   }
 
-  .image-uploader-drop-area {
-    background: #eee;
-    color: black;
-    font-size: 16px;
-    height: 260px;
-    padding-top: 74px;
-    position: relative;
-    text-align: center;
-    width: 100%;
+  .oppia-image-placeholder-portrait {
+    max-height: 180px;
+    max-width: 180px;
   }
 
-  .image-uploader-drop-area:hover {
-    background: #bbb;
-    cursor: pointer;
-  }
-
-  .image-uploader-text {
-    display: block;
-    font-size: 16px;
-    line-height: 28px;
-    margin-bottom: 12px;
-    text-align: center;
-    width: 100%;
-  }
-
-  .image-uploader-is-active {
-    background-color: #bbb;
-  }
-
-  .image-uploader-file-input {
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    position: absolute;
-    width: 0.1px;
-    z-index: -1;
-  }
-
-  .license-term-link {
-    color: #0859aa;
-    text-decoration: underline;
-    text-decoration-color: #0859aa;
-  }
-
-  label.image-uploader-upload-label-button {
-    background: grey;
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #f2f2f2), color-stop(1, #bfbfbf));
-    background-image: -o-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
-    background-image: -moz-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
-    background-image: -webkit-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
-    background-image: -ms-linear-gradient(bottom, #f2f2f2 0%, #bfbfbf 100%);
-    background-image: linear-gradient(to bottom, #f2f2f2 0%, #bfbfbf 100%);
-    border: solid #707070 1px;
-    border-radius: 2px;
-    bottom: 6px;
-    cursor: pointer;
-    display: inline;
-    font-size: 16px;
-    font-weight: normal;
-    padding: 4px 8px;
-    position: absolute;
-    right: 8px;
-    text-align: center;
-  }
-
-  label.image-uploader-upload-label-button:hover {
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #eaf6fd), color-stop(1, #a7d8f5));
-    background-image: -o-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
-    background-image: -moz-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
-    background-image: -webkit-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
-    background-image: -ms-linear-gradient(bottom, #eaf6fd 0%, #a7d8f5 100%);
-    background-image: linear-gradient(to bottom, #eaf6fd 0%, #a7d8f5 100%);
-    border: #3c7fb1 solid 1px;
-    cursor: pointer;
-  }
-
-  label.image-uploader-upload-label-button:active {
-    background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #e5f4fc), color-stop(0.5, #c4e5f6), color-stop(0.51, #98d0ef), color-stop(1, #68b3db));
-    background-image: -o-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
-    background-image: -moz-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
-    background-image: -webkit-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
-    background-image: -ms-linear-gradient(bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
-    background-image: linear-gradient(to bottom, #e5f4fc 0%, #c4e5f6 50%, #98d0ef 51%, #68b3db 100%);
-    border: solid #2c628b 1px;
-    padding: 4px 8px;
-  }
-
-  .image-uploader-error-message {
-    color: red;
-    display: inline-block;
-    font-size: 16;
-    padding: 4px;
-  }
-
-  .image-uploader-error-message i {
-    font-size: 16px;
-    margin-right: 4px;
-  }
-
-  .blog-post-thumbnail-uploader {
-    cursor: pointer;
+  .image-editor {
     height: 200px;
-    width: 100%;
   }
 
-  .mat-icon {
-    font-size: 48px;
-    height: 48px;
-    width: 48px;
+  .oppia-editable-section {
+    border-radius: 0.25rem;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
   }
 
-  .uploader-with-error-message {
-    height: 135px
+  .img-image {
+    border: none;
+    max-height: 100%;
+    max-width: 100%;
   }
 
-  .image-uploader-no-thumbnail-icon {
-    font-size: 30px;
+  .oppia-pencil-icon {
+    top: 8px;
   }
 
-  .image-upload-instructions {
-    display: flex;
-    flex-direction: column;
-    margin-top: 4px;
-    padding-left: 18px;
-    width: 100%;
-  }
-
-  @media(max-width:768px) {
-    .blog-post-thumbnail-uploader {
-      height: 80px;
-      width: 100%;
-    }
-
-    .mat-icon {
-      font-size: 30px;
-      height: 30px;
-      width: 30px;
-    }
-
-    .font-weight-light {
-      font-size: 12px;
-      font-weight: 300 !important;
-    }
-
-    .image-uploader-license-warning {
-      bottom: 50px;
-    }
-
-    .blog-post-narrow-thumbnail-uploader {
-      height: 40px;
-    }
-
-    .image-uploader-drop-area {
-      padding-top: 8px;
-      text-align: left;
-    }
-
-    label.image-uploader-upload-label-button {
-      left: 8px;
-      right: auto;
-    }
-
-    .blog-post-thumbnail-uploader.image-uploader-is-narrow,
-    .image-uploader-drop-area.image-uploader-is-narrow {
-      height: 35px
-    }
-
-    .image-uploader-error-message {
-      font-size: 10px;
-    }
-
-    .image-uploader-error-message i {
-      font-size: 10px;
-    }
-
-    .image-uploader-is-narrow.uploader-with-error-message {
-      height: unset;
-      margin-top: -5px;
-    }
+  .edit-btn-container {
+    min-height: 2rem;
+    min-width: 2rem;
   }
 </style>

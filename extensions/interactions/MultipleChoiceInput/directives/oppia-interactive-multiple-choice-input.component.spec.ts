@@ -24,7 +24,6 @@ import {InteractiveMultipleChoiceInputComponent} from './oppia-interactive-multi
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {TranslateModule} from '@ngx-translate/core';
 import {InteractionAnswer} from 'interactions/answer-defs';
@@ -100,7 +99,6 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     let contentId: string = 'content_id';
     let interaction = {} as Interaction;
     let recordedVoiceovers = new RecordedVoiceovers({});
-    let audioTranslation = {} as AudioTranslationLanguageService;
     displayedCard = new StateCard(
       'test_name',
       'content',
@@ -108,8 +106,7 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
       interaction,
       [],
       recordedVoiceovers,
-      contentId,
-      audioTranslation
+      contentId
     );
 
     component.choicesWithValue =
@@ -342,5 +339,21 @@ describe('InteractiveMultipleChoiceInputComponent', () => {
     expect(component.errorMessageI18nKey).toEqual(
       'I18N_INTERACTIONS_ITEM_SELECTION_NO_RESPONSE'
     );
+  });
+
+  it('should call submitAnswer when Enter key is pressed', () => {
+    component.answer = 1;
+    spyOn(component, 'submitAnswer');
+    spyOn(currentInteractionService, 'onSubmit').and.callThrough();
+    spyOn(currentInteractionService, 'showNoResponseError');
+    const event = new KeyboardEvent('keydown', {key: 'Enter'});
+
+    component.handleEnterKey(event);
+
+    expect(component.submitAnswer).toHaveBeenCalled();
+    expect(currentInteractionService.onSubmit).not.toHaveBeenCalled();
+    expect(
+      currentInteractionService.showNoResponseError
+    ).not.toHaveBeenCalled();
   });
 });

@@ -24,6 +24,8 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {VoiceoverBackendApiService} from '../../domain/voiceover/voiceover-backend-api.service';
 import {VoiceoverDomainConstants} from './voiceover-domain.constants';
+import {EntityVoiceovers} from './entity-voiceovers.model';
+import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
 
 describe('Voiceover backend API service', function () {
   let voiceoverBackendApiService: VoiceoverBackendApiService;
@@ -69,11 +71,13 @@ describe('Voiceover backend API service', function () {
     let voiceoverAdminDataResponse = {
       languageAccentMasterList: languageAccentMasterList,
       languageCodesMapping: languageCodesMapping,
+      autoGeneratableLanguageAccentCodes: ['en-US', 'hi-IN'],
     };
 
     req.flush({
       language_accent_master_list: languageAccentMasterList,
       language_codes_mapping: languageCodesMapping,
+      autogeneratable_language_accent_codes: ['en-US', 'hi-IN'],
     });
 
     flushMicrotasks();
@@ -334,6 +338,193 @@ describe('Voiceover backend API service', function () {
       '/get_sample_voiceovers/voiceArtistId/languageCode'
     );
     expect(req.request.method).toEqual('GET');
+
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should be able to get entity voiceovers by language code', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    voiceoverBackendApiService
+      .fetchEntityVoiceoversByLanguageCodeAsync('exploration', 'exp_1', 1, 'en')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/entity_voiceovers_bulk_handler/exploration/exp_1/1/en'
+    );
+
+    expect(req.request.method).toEqual('GET');
+
+    let manualVoiceover: VoiceoverBackendDict = {
+      filename: 'a.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+    let contentIdToVoiceoversMapping = {
+      content0: {
+        manual: manualVoiceover,
+      },
+    };
+    let entityVoiceoversDict = {
+      entity_id: 'exp_1',
+      entity_type: 'exploration',
+      entity_version: 1,
+      language_accent_code: 'en-US',
+      voiceovers_mapping: contentIdToVoiceoversMapping,
+      automated_voiceovers_audio_offsets_msecs: {
+        content0: [
+          {token: 'This', audio_offset_msecs: 0.0},
+          {token: 'is', audio_offset_msecs: 100.0},
+          {token: 'a', audio_offset_msecs: 200.0},
+          {token: 'text', audio_offset_msecs: 300.0},
+        ],
+      },
+    };
+
+    let entityVoiceoversList = [entityVoiceoversDict];
+
+    req.flush({
+      entity_voiceovers_list: entityVoiceoversList,
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith([
+      EntityVoiceovers.createFromBackendDict(entityVoiceoversDict),
+    ]);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should able to handle error callback while getting entity voiceovers', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    voiceoverBackendApiService
+      .fetchEntityVoiceoversByLanguageCodeAsync('exploration', 'exp_1', 1, 'en')
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/entity_voiceovers_bulk_handler/exploration/exp_1/1/en'
+    );
+
+    expect(req.request.method).toEqual('GET');
+
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should be able to regenerate automatic voiceover', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let explorationId: string = 'exp_id';
+    let explorationVersion: number = 1;
+    let stateName: string = 'Introduction';
+    let contentId: string = 'content_id_0';
+    let languageAccentCode: string = 'en-US';
+
+    voiceoverBackendApiService
+      .generateAutotmaticVoiceoverAsync(
+        explorationId,
+        explorationVersion,
+        stateName,
+        contentId,
+        languageAccentCode
+      )
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/regenerate_automatic_voiceover/' + explorationId
+    );
+
+    let payload = {
+      exploration_version: explorationVersion,
+      state_name: stateName,
+      content_id: contentId,
+      language_accent_code: languageAccentCode,
+    };
+
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
+
+    req.flush({
+      filename: 'filename.mp3',
+      duration_secs: 10.0,
+      file_size_bytes: 200000,
+      needs_update: false,
+      sentence_tokens_with_durations: [
+        {token: 'This', audio_offset_msecs: 0.0},
+        {token: 'is', audio_offset_msecs: 100.0},
+        {token: 'a', audio_offset_msecs: 200.0},
+        {token: 'text', audio_offset_msecs: 300.0},
+      ],
+    });
+    flushMicrotasks();
+
+    let expectedResponse = {
+      filename: 'filename.mp3',
+      durationSecs: 10.0,
+      fileSizeBytes: 200000,
+      needsUpdate: false,
+      sentenceTokenWithDurations: [
+        {token: 'This', audioOffsetMsecs: 0.0},
+        {token: 'is', audioOffsetMsecs: 100.0},
+        {token: 'a', audioOffsetMsecs: 200.0},
+        {token: 'text', audioOffsetMsecs: 300.0},
+      ],
+    };
+
+    expect(successHandler).toHaveBeenCalledWith(expectedResponse);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should able to handle error callback while generating voiceovers', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let explorationId: string = 'exp_id';
+    let explorationVersion: number = 1;
+    let stateName: string = 'Introduction';
+    let contentId: string = 'content_id_0';
+    let languageAccentCode: string = 'en-US';
+
+    voiceoverBackendApiService
+      .generateAutotmaticVoiceoverAsync(
+        explorationId,
+        explorationVersion,
+        stateName,
+        contentId,
+        languageAccentCode
+      )
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/regenerate_automatic_voiceover/' + explorationId
+    );
+    let payload = {
+      exploration_version: explorationVersion,
+      state_name: stateName,
+      content_id: contentId,
+      language_accent_code: languageAccentCode,
+    };
+
+    expect(req.request.method).toEqual('PUT');
+    expect(req.request.body).toEqual(payload);
 
     req.flush('Invalid request', {
       status: 400,

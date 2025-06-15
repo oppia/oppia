@@ -27,7 +27,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_services
 from core.domain import html_validation_service
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_services
@@ -826,7 +826,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.fake_date)
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
-        expected_outcome_list = [u'new suggestion content']
+        expected_outcome_list = ['new suggestion content']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_convert_html_in_suggestion_change(self) -> None:
@@ -897,7 +897,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.fake_date)
 
         actual_outcome_list = suggestion.get_target_entity_html_strings()
-        expected_outcome_list = [u'Old content.']
+        expected_outcome_list = ['Old content.']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_get_target_entity_html_with_none_old_value(self) -> None:
@@ -1079,7 +1079,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         }
         with self.assertRaisesRegex(
             utils.ValidationError,
-            'The new change_cmd content_html must be equal to <p>This is a ' +
+            'The new change_cmd content_html must be equal to <p>This is a '
             'content.</p>'
         ):
             suggestion.pre_update_validate(
@@ -1719,7 +1719,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         actual_outcome_list = suggestion.get_all_html_content_strings()
 
         expected_outcome_list = [
-            u'<p>This is translated html.</p>', u'<p>This is a content.</p>']
+            '<p>This is translated html.</p>', '<p>This is a content.</p>']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_get_all_html_content_strings_for_content_lists(self) -> None:
@@ -2581,7 +2581,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         actual_outcome_list = suggestion.get_all_html_content_strings()
         expected_outcome_list = [
-            u'', u'', u'<p>This is a hint.</p>', u'<p>This is a solution.</p>']
+            '', '', '<p>This is a hint.</p>', '<p>This is a solution.</p>']
         self.assertEqual(expected_outcome_list, actual_outcome_list)
 
     def test_convert_html_in_suggestion_change(self) -> None:
@@ -2881,16 +2881,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 'id': 'ImageClickInput', 'solution': None
             },
             'param_changes': [],
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'content_0': {},
-                    'default_outcome_1': {},
-                    'feedback_2': {},
-                    'hint_3': {}
-                }
-            },
             'solicit_answer_details': False,
             'card_is_checkpoint': False,
+            'inapplicable_skill_misconception_ids': []
         }
         suggestion_dict: suggestion_registry.BaseSuggestionDict = {
             'suggestion_id': 'skill1.thread1',
@@ -2943,9 +2936,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             suggestion_models.STATUS_ACCEPTED)
 
     def test_contructor_updates_state_shema_in_change_cmd(self) -> None:
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'skill_id')
+        score_category = '%s%sskill_id' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER)
         change: TestChangeDictType = {
             'cmd': (
                 question_domain
@@ -2979,9 +2972,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
     def test_contructor_raise_exception_for_invalid_state_shema_version(
         self
     ) -> None:
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'skill_id')
+        score_category = '%s%sskill_id' % (
+            suggestion_models.SCORE_TYPE_QUESTION,
+            suggestion_models.SCORE_CATEGORY_DELIMITER)
         change: TestChangeDictType = {
             'cmd': (
                 question_domain
@@ -3287,6 +3280,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             stats.are_translation_reviewers_needed_for_lang_code(
                 self.sample_language_code))
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_translation_reviewers_are_needed_if_num_suggestions_past_max(
         self
     ) -> None:
@@ -3295,19 +3291,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 2)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 1)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = (
-                stats.are_translation_reviewers_needed_for_lang_code(
-                    self.sample_language_code))
+        reviewers_are_needed = (
+            stats.are_translation_reviewers_needed_for_lang_code(
+                self.sample_language_code))
 
         self.assertTrue(reviewers_are_needed)
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_translation_reviewers_not_needed_if_num_suggestions_eqs_max(
         self
     ) -> None:
@@ -3316,19 +3309,16 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 2)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = (
-                stats.are_translation_reviewers_needed_for_lang_code(
-                    self.sample_language_code))
+        reviewers_are_needed = (
+            stats.are_translation_reviewers_needed_for_lang_code(
+                self.sample_language_code))
 
         self.assertFalse(reviewers_are_needed)
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_translation_reviewers_not_needed_if_num_suggestions_less_max(
         self
     ) -> None:
@@ -3337,16 +3327,10 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.sample_language_code, 1)
         stats.set_translation_reviewer_count_for_language_code(
             self.sample_language_code, 2)
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = (
-                stats.are_translation_reviewers_needed_for_lang_code(
-                    self.sample_language_code))
+        reviewers_are_needed = (
+            stats.are_translation_reviewers_needed_for_lang_code(
+                self.sample_language_code))
 
         self.assertFalse(reviewers_are_needed)
 
@@ -3379,54 +3363,45 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(stats.are_question_reviewers_needed())
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_question_reviewers_are_needed_if_num_suggestions_past_max(
         self
     ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 1
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = stats.are_question_reviewers_needed()
+        reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertTrue(reviewers_are_needed)
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_question_reviewers_not_needed_if_num_suggestions_eqs_max(
         self
     ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 2
         stats.question_reviewer_count = 2
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = stats.are_question_reviewers_needed()
+        reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertFalse(reviewers_are_needed)
 
+    @test_utils.set_platform_parameters([
+        (platform_parameter_list.ParamName.MAX_NUMBER_OF_SUGGESTIONS_PER_REVIEWER, 1) # pylint: disable=line-too-long
+    ])
     def test_question_reviewers_not_needed_if_num_suggestions_less_max(
         self
     ) -> None:
         stats = suggestion_services.get_community_contribution_stats()
         stats.question_suggestion_count = 1
         stats.question_reviewer_count = 2
-        swap_platform_parameter_value = self.swap_to_always_return(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            1
-        )
 
-        with swap_platform_parameter_value:
-            reviewers_are_needed = stats.are_question_reviewers_needed()
+        reviewers_are_needed = stats.are_question_reviewers_needed()
 
         self.assertFalse(reviewers_are_needed)
 
@@ -4052,8 +4027,9 @@ class TranslationSubmitterTotalContributionStatsUnitTests(
                 self.REJECTED_TRANSLATION_WORD_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
+            'last_contributed_in_days': (
+                utils.get_number_of_days_since_date(
+                    self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.TranslationSubmitterTotalContributionStats( # pylint: disable=line-too-long
@@ -4140,8 +4116,9 @@ class TranslationReviewerTotalContributionStatsUnitTests(
                 self.REJECTED_TRANSLATIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
+            'last_contributed_in_days': (
+                utils.get_number_of_days_since_date(
+                    self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.TranslationReviewerTotalContributionStats( # pylint: disable=line-too-long
@@ -4227,8 +4204,9 @@ class QuestionSubmitterTotalContributionStatsUnitTests(
                 self.REJECTED_QUESTIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
+            'last_contributed_in_days': (
+                utils.get_number_of_days_since_date(
+                    self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.QuestionSubmitterTotalContributionStats( # pylint: disable=line-too-long
@@ -4306,8 +4284,9 @@ class QuestionReviewerTotalContributionStatsUnitTests(
                 self.REJECTED_QUESTIONS_COUNT),
             'first_contribution_date': (
                 self.FIRST_CONTRIBUTION_DATE.strftime('%b %d, %Y')),
-            'last_contributed_in_days': int(
-                (datetime.date.today() - self.LAST_CONTRIBUTION_DATE).days)
+            'last_contributed_in_days': (
+                utils.get_number_of_days_since_date(
+                self.LAST_CONTRIBUTION_DATE))
         }
 
         actual_stats = suggestion_registry.QuestionReviewerTotalContributionStats( # pylint: disable=line-too-long

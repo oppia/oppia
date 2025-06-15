@@ -25,7 +25,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {State} from 'domain/state/StateObjectFactory';
@@ -158,7 +158,7 @@ describe('State Editor Component', () => {
     component.ngOnInit();
 
     expect(component.oppiaBlackImgUrl).toBe(
-      '/assets/images/avatar/oppia_avatar_100px.svg'
+      '/assets/copyrighted-images/avatar/oppia_avatar_100px.svg'
     );
     expect(component.currentStateIsTerminal).toBe(false);
     expect(component.conceptCardIsShown).toBe(true);
@@ -203,12 +203,6 @@ describe('State Editor Component', () => {
     let onStateEditorInitializedEmitter = new EventEmitter();
     let stateData = {
       content: {},
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       interaction: {
         id: null,
         answer_groups: [],

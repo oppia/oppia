@@ -55,24 +55,19 @@ export class CreateNewClassroomModalComponent extends ConfirmOrCancelModal {
     this.newClassroomCreationInProgress = true;
     this.classroomUrlFragmentIsDuplicate = false;
 
-    this.classroomBackendApiService
-      .getNewClassroomIdAsync()
-      .then(classroomId => {
-        const defaultClassroomDict = {
-          classroom_id: classroomId,
-          name: this.tempClassroom.getClassroomName(),
-          url_fragment: this.tempClassroom.getClassroomUrlFragment(),
-          course_details: '',
-          topic_list_intro: '',
-          topic_id_to_prerequisite_topic_ids: {},
-        };
+    this.classroomBackendApiService;
+    const name = this.tempClassroom.getClassroomName();
+    const urlFragment = this.tempClassroom.getClassroomUrlFragment();
 
-        this.classroomBackendApiService
-          .updateClassroomDataAsync(classroomId, defaultClassroomDict)
-          .then(() => {
-            this.ngbActiveModal.close(defaultClassroomDict);
-            this.newClassroomCreationInProgress = false;
-          });
+    this.classroomBackendApiService
+      .createNewClassroomAsync(name, urlFragment)
+      .then(res => {
+        this.ngbActiveModal.close({
+          classroom_id: res.new_classroom_id,
+          name: name,
+          url_fragment: urlFragment,
+        });
+        this.newClassroomCreationInProgress = false;
       });
   }
 }

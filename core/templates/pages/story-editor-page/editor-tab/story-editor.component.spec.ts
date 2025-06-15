@@ -39,6 +39,7 @@ import {DeleteChapterModalComponent} from '../modal-templates/delete-chapter-mod
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {StoryNode} from 'domain/story/story-node.model';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
+import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 
 class MockNgbModalRef {
   componentInstance: {
@@ -83,6 +84,7 @@ describe('Story Editor Component having three story nodes', () => {
         StoryEditorComponent,
         NewChapterTitleModalComponent,
         DeleteChapterModalComponent,
+        UrlFragmentEditorComponent,
       ],
       providers: [
         WindowDimensionsService,
@@ -592,6 +594,25 @@ describe('Story Editor Component having three story nodes', () => {
     expect(component.storyUrlFragmentExists).toEqual(false);
   });
 
+  it(
+    'should not call the getStoryWithUrlFragmentExists if url fragment' +
+      'is not correct',
+    () => {
+      let storyUrlFragmentSpy = spyOn(
+        storyUpdateService,
+        'setStoryUrlFragment'
+      );
+      spyOn(
+        storyEditorStateService,
+        'updateExistenceOfStoryUrlFragment'
+      ).and.callFake((newUrlFragment, successCallback, errorCallback) =>
+        errorCallback()
+      );
+      component.updateStoryUrlFragment('story-url fragment');
+      expect(storyUrlFragmentSpy).not.toHaveBeenCalled();
+    }
+  );
+
   it('should update the existence of story url fragment', () => {
     let storyUpdateSpy = spyOn(
       storyEditorStateService,
@@ -759,5 +780,15 @@ describe('Story Editor Component having three story nodes', () => {
     expect(selectChapterSpy).toHaveBeenCalled();
     expect(chaptersAreBeingPublishedSpy).toHaveBeenCalledWith(true);
     expect(newChapterPublicationIsDisabledSpy).toHaveBeenCalledWith(true);
+  });
+
+  it('should update editableUrlFragment and call updateStoryUrlFragment', () => {
+    spyOn(component, 'updateStoryUrlFragment');
+    const newUrlFragment = 'new-story-url';
+    component.onStoryEditorUrlFragmentChange(newUrlFragment);
+    expect(component.editableUrlFragment).toBe(newUrlFragment);
+    expect(component.updateStoryUrlFragment).toHaveBeenCalledWith(
+      newUrlFragment
+    );
   });
 });
