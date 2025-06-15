@@ -27,7 +27,7 @@ import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {
   ReadOnlyTopicBackendDict,
-  ReadOnlyTopicObjectFactory,
+  ReadOnlyTopic,
 } from 'domain/topic_viewer/read-only-topic-object.factory';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
@@ -47,7 +47,7 @@ class MockUrlService {
 
 let component: StoryViewerNavbarBreadcrumbComponent;
 let fixture: ComponentFixture<StoryViewerNavbarBreadcrumbComponent>;
-let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
+let readOnlyTopic: ReadOnlyTopic;
 let topicViewerBackendApiService: TopicViewerBackendApiService;
 let i18nLanguageCodeService: I18nLanguageCodeService;
 let urlService: UrlService;
@@ -83,7 +83,7 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
   }));
 
   beforeEach(() => {
-    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
+    readOnlyTopic = TestBed.inject(ReadOnlyTopic);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     urlService = TestBed.inject(UrlService);
@@ -92,7 +92,7 @@ describe('Subtopic viewer navbar breadcrumb component', () => {
     fixture.detectChanges();
 
     spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
-      readOnlyTopicObjectFactory.createFromBackendDict({
+      readOnlyTopic.createFromBackendDict({
         subtopics: [],
         skill_descriptions: {},
         uncategorized_skill_ids: [],
