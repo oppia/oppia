@@ -38,7 +38,7 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {
@@ -103,7 +103,7 @@ export class ExplorationEngineService {
     private audioPreloaderService: AudioPreloaderService,
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private numberAttemptsService: NumberAttemptsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private entityTranslationsService: EntityTranslationsService,
     private explorationModeService: ExplorationModeService,
@@ -146,10 +146,10 @@ export class ExplorationEngineService {
     }
 
     if (explorationContext) {
-      this._explorationId = this.contextService.getExplorationId();
+      this._explorationId = this.pageContextService.getExplorationId();
       this.version = this.urlService.getExplorationVersionFromUrl();
-      this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
-      this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
+      this._editorPreviewMode = this.pageContextService.isInExplorationEditorPage();
+      this._questionPlayerMode = this.pageContextService.isInQuestionPlayerMode();
       if (
         !this._questionPlayerMode &&
         !(
@@ -348,7 +348,7 @@ export class ExplorationEngineService {
     callback: (sateCard: StateCard, str: string) => void
   ): void {
     this.explorationModeService.setExplorationMode();
-    let explorationId = this.contextService.getExplorationId();
+    let explorationId = this.pageContextService.getExplorationId();
     Promise.all([
       this.editableExplorationBackendApiService.fetchApplyDraftExplorationAsync(
         explorationId
@@ -375,7 +375,7 @@ export class ExplorationEngineService {
   private initExplorationPlayer(
     callback: (stateCard: StateCard, str: string) => void
   ): void {
-    let explorationId = this.contextService.getExplorationId();
+    let explorationId = this.pageContextService.getExplorationId();
     let explorationDataPromise = this.version
       ? this.readOnlyExplorationBackendApiService.loadExplorationAsync(
           explorationId,
@@ -429,7 +429,7 @@ export class ExplorationEngineService {
     arePretestsAvailable: boolean,
     callback: (stateCard: StateCard, str: string) => void
   ): void {
-    let explorationId = this.contextService.getExplorationId();
+    let explorationId = this.pageContextService.getExplorationId();
     // For some cases, version is set only after
     // ReadOnlyExplorationBackendApiService.loadExploration() has completed.
     // Use returnDict.version for non-null version value.

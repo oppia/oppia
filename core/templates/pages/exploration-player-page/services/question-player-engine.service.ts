@@ -29,7 +29,7 @@ import {
 } from 'pages/exploration-player-page/services/answer-classification.service';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import cloneDeep from 'lodash/cloneDeep';
@@ -61,7 +61,7 @@ export class QuestionPlayerEngineService {
   constructor(
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private explorationModeService: ExplorationModeService,
     private questionBackendApiService: QuestionBackendApiService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
@@ -108,7 +108,7 @@ export class QuestionPlayerEngineService {
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
     errorCallback: () => void
   ): void {
-    this.contextService.setCustomEntityContext(
+    this.pageContextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.QUESTION,
       this.questions[0].getId()
     );
@@ -214,7 +214,7 @@ export class QuestionPlayerEngineService {
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
     errorCallback?: () => void
   ): void {
-    this.contextService.setQuestionPlayerIsOpen();
+    this.pageContextService.setQuestionPlayerIsOpen();
     this.setAnswerIsBeingProcessed(false);
     let currentIndex = questionObjects.length;
     let randomIndex;
@@ -241,7 +241,7 @@ export class QuestionPlayerEngineService {
 
   recordNewCardAdded(): void {
     this.currentIndex = this.nextIndex;
-    this.contextService.setCustomEntityContext(
+    this.pageContextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.QUESTION,
       this.getCurrentQuestionId()
     );

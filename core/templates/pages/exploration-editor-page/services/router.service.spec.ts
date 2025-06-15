@@ -28,7 +28,7 @@ import {
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import $ from 'jquery';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/context.service';
 import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
 import {ExplorationStatesService} from './exploration-states.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -78,7 +78,7 @@ describe('Router Service', () => {
         StateEditorService,
         TranslationLanguageService,
         {
-          provide: ContextService,
+          provide: PageContextService,
           useClass: MockContextService,
         },
         {

@@ -18,7 +18,7 @@
 
 import {Injectable} from '@angular/core';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CheckpointProgressService} from './checkpoint-progress.service';
 import {ExplorationModeService} from './exploration-mode.service';
 
@@ -29,7 +29,7 @@ export class ProgressUrlService {
   uniqueProgressUrlId: string | null = null;
   constructor(
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private checkpointProgressService: CheckpointProgressService,
     private explorationModeService: ExplorationModeService
   ) {}
@@ -41,7 +41,7 @@ export class ProgressUrlService {
    * @returns {Promise<void>} A promise that resolves when the unique progress URL ID is set.
    */
   async setUniqueProgressUrlId(): Promise<void> {
-    let explorationId = this.contextService.getExplorationId();
+    let explorationId = this.pageContextService.getExplorationId();
     let lastCompletedCheckpoint =
       this.checkpointProgressService.getLastCompletedCheckpoint();
     let version = this.explorationModeService.getExplorationVersion();

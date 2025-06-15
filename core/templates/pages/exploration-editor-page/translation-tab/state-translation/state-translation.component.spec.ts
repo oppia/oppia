@@ -44,7 +44,7 @@ import {TextInputRulesService} from 'interactions/TextInput/directives/text-inpu
 import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ExplorationImprovementsTaskRegistryService} from 'services/exploration-improvements-task-registry.service';
@@ -267,7 +267,7 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
@@ -898,7 +898,7 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
@@ -1378,7 +1378,7 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
@@ -2022,7 +2022,7 @@ describe('State translation component', () => {
         ExplorationHtmlFormatterService,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,

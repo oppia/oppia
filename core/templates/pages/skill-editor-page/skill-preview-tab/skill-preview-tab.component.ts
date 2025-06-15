@@ -28,7 +28,7 @@ import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
@@ -43,7 +43,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     private urlService: UrlService,
     private skillEditorStateService: SkillEditorStateService,
     private questionBackendApiService: QuestionBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private currentInteractionService: CurrentInteractionService,
     private conversationFlowService: ConversationFlowService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
@@ -179,6 +179,6 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.contextService.clearQuestionPlayerIsOpen();
+    this.pageContextService.clearQuestionPlayerIsOpen();
   }
 }

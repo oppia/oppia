@@ -29,7 +29,7 @@
 import {Injectable} from '@angular/core';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {DiagnosticTestPlayerEngineService} from './diagnostic-test-player-engine.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
@@ -60,7 +60,7 @@ export class ExplorationModeService {
     private questionPlayerEngineService: QuestionPlayerEngineService,
     private diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private urlService: UrlService
   ) {
     this.init();
@@ -84,13 +84,13 @@ export class ExplorationModeService {
     }
 
     if (explorationContext) {
-      if (this.contextService.isInExplorationEditorPage()) {
+      if (this.pageContextService.isInExplorationEditorPage()) {
         this.currentMode = EXPLORATION_MODE.EDITOR_PREVIEW;
-      } else if (this.contextService.isInQuestionPlayerMode()) {
+      } else if (this.pageContextService.isInQuestionPlayerMode()) {
         this.currentMode = EXPLORATION_MODE.QUESTION_PLAYER;
       }
 
-      let explorationId = this.contextService.getExplorationId();
+      let explorationId = this.pageContextService.getExplorationId();
       this.version = this.urlService.getExplorationVersionFromUrl();
       const pathSegment = this.urlService
         .getPathname()
