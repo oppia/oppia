@@ -119,7 +119,7 @@ describe('Add Study Guide Section Modal Component', () => {
     expect(component.tmpSectionContentHtml).toEqual(con);
   });
 
-  fit('should check if section content length is exceeded', () => {
+  it('should check if section content length is exceeded', () => {
     component.tmpSectionContentHtml = 'short content';
     let computeHtmlLengthSpy = spyOn(htmlLengthService, 'computeHtmlLength');
     computeHtmlLengthSpy.and.returnValue(500);
