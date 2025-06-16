@@ -202,5 +202,5 @@ export default function isElementClickable(
     element.scrollIntoView({block: 'center', inline: 'center'});
   }
 
-  return clickable == isClickable(element);
+  return isClickable(element) === clickable;
 }

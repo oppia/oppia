@@ -531,7 +531,7 @@ export class SuperAdmin extends BaseUser {
     await this.expectActionStatusMessageToBe(
       'Dummy explorations generated successfully.'
     );
-    showMessage(`Successfully generated and published the dummy explorations.`);
+    showMessage('Successfully generated and published the dummy explorations.');
   }
 
   /**

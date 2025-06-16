@@ -19,7 +19,6 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {add} from 'lodash';
 
 const contributorDashboardUrl = testConstants.URLs.ContributorDashboard;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;

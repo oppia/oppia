@@ -915,13 +915,13 @@ export class BaseUser {
    * Returns text in nested element
    * @param {string} selector - The selector of the element to get text from.
    */
-  async getTextContent(selector: string) {
+  async getTextContent(selector: string): Promise<string> {
     const element = await this.page.$(selector);
     const text = await this.page.evaluate(
       (el: Element) => el.textContent,
       element
     );
-    return text?.trim();
+    return text?.trim() ?? '';
   }
 
   /**
@@ -929,7 +929,10 @@ export class BaseUser {
    * @param {string} selector - The selector of the element to get text from.
    * @param {string} textContent - The expected text content.
    */
-  async expectTextContentToMatch(selector: string, textContent: string) {
+  async expectTextContentToMatch(
+    selector: string,
+    textContent: string
+  ): Promise<void> {
     const currentTextContent = await this.getTextContent(selector);
     if (currentTextContent !== textContent) {
       throw new Error(
@@ -954,8 +957,8 @@ export class BaseUser {
    * @param {string} progressMessage - The processing message to wait for completion
    */
   private async waitForActionProgressStatusComplete(progressMessage: string) {
-    const maxWaitTime = 10000; // 10 seconds
-    const pollInterval = 500; // 500ms
+    const maxWaitTime = 10000; // 10 seconds.
+    const pollInterval = 500; // 500ms.
     const startTime = Date.now();
 
     while (Date.now() - startTime < maxWaitTime) {
@@ -964,16 +967,16 @@ export class BaseUser {
         el => el.textContent?.trim()
       );
 
-      // If the current message doesn't contain the processing message, we're done
+      // If the current message doesn't contain the processing message, we're done.
       if (!currentMessage?.includes(progressMessage)) {
         return;
       }
 
-      // Wait before checking again
+      // Wait before checking again.
       await new Promise(resolve => setTimeout(resolve, pollInterval));
     }
 
-    // If we get here, processing didn't complete within the timeout
+    // If we get here, processing didn't complete within the timeout.
     throw new Error(
       `Progress message "${progressMessage}" did not disappear within ${maxWaitTime}ms`
     );
@@ -988,8 +991,8 @@ export class BaseUser {
   async expectActionStatusMessageToBe(
     statusMessage: string,
     progressMessage?: string
-  ) {
-    // If progressMessage is provided, wait for it to disappear
+  ): Promise<void> {
+    // If progressMessage is provided, wait for it to disappear.
     if (progressMessage) {
       await this.waitForActionProgressStatusComplete(progressMessage);
     }
