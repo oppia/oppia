@@ -33,6 +33,12 @@ class MockActiveModal {
   }
 }
 
+class MockHtmlLengthService {
+  computeHtmlLength(html: string, calculationType: string): number {
+    return html.length;
+  }
+}
+
 describe('Add Study Guide Section Modal Component', () => {
   let component: AddStudyGuideSectionModalComponent;
   let fixture: ComponentFixture<AddStudyGuideSectionModalComponent>;
@@ -40,6 +46,8 @@ describe('Add Study Guide Section Modal Component', () => {
   let htmlLengthService: HtmlLengthService;
 
   beforeEach(waitForAsync(() => {
+    htmlLengthService = new MockHtmlLengthService();
+
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [AddStudyGuideSectionModalComponent],
@@ -48,6 +56,10 @@ describe('Add Study Guide Section Modal Component', () => {
         {
           provide: NgbActiveModal,
           useClass: MockActiveModal,
+        },
+        {
+          provide: HtmlLengthService,
+          useValue: htmlLengthService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -105,5 +117,17 @@ describe('Add Study Guide Section Modal Component', () => {
     component.updateLocalContent(con);
 
     expect(component.tmpSectionContentHtml).toEqual(con);
+  });
+
+  fit('should check if section content length is exceeded', () => {
+    component.tmpSectionContentHtml = 'short content';
+    let computeHtmlLengthSpy = spyOn(htmlLengthService, 'computeHtmlLength');
+    computeHtmlLengthSpy.and.returnValue(500);
+    let isExceeded = component.isSectionContentLengthExceeded();
+    expect(isExceeded).toBe(false);
+
+    computeHtmlLengthSpy.and.returnValue(1500);
+    isExceeded = component.isSectionContentLengthExceeded();
+    expect(isExceeded).toBe(true);
   });
 });
