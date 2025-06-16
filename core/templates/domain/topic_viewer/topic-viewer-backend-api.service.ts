@@ -49,13 +49,12 @@ export class TopicViewerBackendApiService {
         classroom_url_fragment: classroomUrlFragment,
       }
     );
-    var readOnlyTopic = new ReadOnlyTopic();
     this.http
       .get<ReadOnlyTopicBackendDict>(topicDataUrl)
       .toPromise()
       .then(
         response => {
-          let readOnlyTopic = readOnlyTopic.createFromBackendDict(response);
+          let readOnlyTopic = ReadOnlyTopic.createFromBackendDict(response);
           if (successCallback) {
             successCallback(readOnlyTopic);
           }

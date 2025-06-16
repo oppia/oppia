@@ -33,17 +33,13 @@ describe('Topic viewer backend API service', () => {
   let httpTestingController: HttpTestingController;
   let sampleDataResultsObjects: ReadOnlyTopic;
   let sampleDataResults: ReadOnlyTopicBackendDict;
-  let readOnlyTopic: ReadOnlyTopic;
 
   beforeEach(() => {
-    readOnlyTopic = new ReadOnlyTopic();
-
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
-    readOnlyTopic = TestBed.inject(ReadOnlyTopic);
 
     let nodeDict = {
       id: 'node_1',

@@ -54,7 +54,6 @@ describe('Lesson player header component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
   let topicViewerBackendApiService: TopicViewerBackendApiService;
-  let readOnlyTopic: ReadOnlyTopic;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let mobileMenuService: MobileMenuService;
 
@@ -70,7 +69,6 @@ describe('Lesson player header component', () => {
         UrlInterpolationService,
         UrlService,
         TopicViewerBackendApiService,
-        ReadOnlyTopic,
         MobileMenuService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -89,12 +87,11 @@ describe('Lesson player header component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    readOnlyTopic = TestBed.inject(ReadOnlyTopic);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     mobileMenuService = TestBed.inject(MobileMenuService);
 
     spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
-      readOnlyTopic.createFromBackendDict({
+      ReadOnlyTopic.createFromBackendDict({
         subtopics: [],
         skill_descriptions: {},
         uncategorized_skill_ids: [],
