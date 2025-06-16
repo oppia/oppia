@@ -68,17 +68,17 @@
         <div>
           <h4>Heading*</h4>
           <input class="form-control oppia-new-subtopic-editable-field e2e-test-new-subtopic-study-guide-section-heading-field required"
-                label="Enter heading of the section"       
-                placeholder="Enter heading of the section"
-                [(ngModel)]="sectionHeadingPlaintext" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
+                 label="Enter heading of the section"
+                 placeholder="Enter heading of the section"
+                 [(ngModel)]="sectionHeadingPlaintext" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
         </div>
         <div class="section-content-box">
           <h4>Content*</h4>
           <div class="description-editor e2e-test-subtopic-study-guide-section-content-editor oppia-editor-card-body" >
             <schema-based-editor [schema]="getSchema()"
-                                  class="e2e-test-create-subtopic-page-content-rich-text-editor"
-                                  [localValue]="sectionContentHtml"
-                                  (localValueChange)="localContentValueChange($event)">
+                                 class="e2e-test-create-subtopic-page-content-rich-text-editor"
+                                 [localValue]="sectionContentHtml"
+                                 (localValueChange)="localContentValueChange($event)">
             </schema-based-editor>
           </div>
           <div *ngIf="isSectionContentLengthExceeded()" class="oppia-length-validation-error">

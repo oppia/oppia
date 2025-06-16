@@ -29,10 +29,10 @@
           (submit)="saveSection()">
       <div class="oppia-rule-details-header">
         <strong>Section Heading</strong>
-        <schema-based-editor  class="e2e-test-study-guide-section-heading-plaintext-editor"
-                              [schema]="getHeadingSchema()"
-                              [localValue]="container.sectionHeadingPlaintext"
-                              (localValueChange)="this.updateLocalHeading($event)">
+        <schema-based-editor class="e2e-test-study-guide-section-heading-plaintext-editor"
+                             [schema]="getHeadingSchema()"
+                             [localValue]="container.sectionHeadingPlaintext"
+                             (localValueChange)="this.updateLocalHeading($event)">
         </schema-based-editor>
       </div>
     </form>
