@@ -60,6 +60,7 @@ import {State} from 'domain/state/StateObjectFactory';
 import {InteractionRulesService} from '../../services/answer-classification.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ExplorationInitializationService} from '../../services/exploration-initialization.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {AppConstants} from 'app.constants';
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
@@ -83,6 +84,7 @@ import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {DiagnosticTestPlayerEngineService} from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
+import {CurrentEngineService} from 'pages/exploration-player-page/services/current-engine.service';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -196,6 +198,7 @@ export class ConversationSkinComponent {
     private explorationModeService: ExplorationModeService,
     private fatigueDetectionService: FatigueDetectionService,
     private focusManagerService: FocusManagerService,
+    private explorationInitializationService: ExplorationInitializationService,
     private guestCollectionProgressService: GuestCollectionProgressService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
     private conceptCardManagerService: ConceptCardManagerService,
@@ -220,6 +223,7 @@ export class ConversationSkinComponent {
     private progressUrlService: ProgressUrlService,
     private urlService: UrlService,
     private userService: UserService,
+    private currentEngineService: CurrentEngineService,
     private diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService,
     private windowDimensionsService: WindowDimensionsService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
@@ -269,7 +273,8 @@ export class ConversationSkinComponent {
     }
 
     this.explorationId = this.explorationEngineService.getExplorationId();
-    this.isInPreviewMode = this.explorationModeService.isInExplorationEditorPreviewMode();
+    this.isInPreviewMode =
+      this.explorationModeService.isInExplorationEditorPreviewMode();
     this.isIframed = this.urlService.isIframed();
     this.loaderService.showLoadingScreen('Loading');
 
@@ -349,7 +354,7 @@ export class ConversationSkinComponent {
           // the end of the exploration.
           if (!this._editorPreviewMode && this.nextCard.isTerminal()) {
             const currentEngineService =
-              this.explorationModeService.getCurrentEngineService();
+              this.currentEngineService.getCurrentEngineService();
             this.statsReportingService.recordExplorationCompleted(
               newStateName,
               this.learnerParamsService.getAllParams(),
@@ -1190,18 +1195,20 @@ export class ConversationSkinComponent {
     this.recommendedExplorationSummaries = [];
     this.playerPositionService.init(this._navigateToDisplayedCard.bind(this));
     if (this.questionPlayerConfig) {
+      this.explorationModeService.setQuestionPlayerMode();
       this.questionPlayerEngineService.initQuestionPlayer(
         this.questionPlayerConfig,
         this._initializeDirectiveComponents.bind(this),
         this.showQuestionAreNotAvailable
       );
     } else if (this.diagnosticTestTopicTrackerModel) {
+      this.explorationModeService.setDiagnosticTestPlayerMode();
       this.diagnosticTestPlayerEngineService.init(
         this.diagnosticTestTopicTrackerModel,
         this._initializeDirectiveComponents.bind(this)
       );
     } else {
-      this.explorationEngineService.initializePlayer(
+      this.explorationInitializationService.initializePlayer(
         this._initializeDirectiveComponents.bind(this)
       );
     }
@@ -1270,7 +1277,7 @@ export class ConversationSkinComponent {
     let timeAtServerCall = new Date().getTime();
     this.playerPositionService.recordAnswerSubmission();
     let currentEngineService =
-      this.explorationModeService.getCurrentEngineService();
+      this.currentEngineService.getCurrentEngineService();
     this.answerIsCorrect = currentEngineService.submitAnswer(
       answer,
       interactionRulesService,
@@ -1584,6 +1591,7 @@ export class ConversationSkinComponent {
     }
     if (this.moveToExploration) {
       this.moveToExploration = false;
+      this.explorationModeService.setExplorationModeFromUrl();
       this.explorationEngineService.moveToExploration(
         this._initializeDirectiveComponents.bind(this)
       );

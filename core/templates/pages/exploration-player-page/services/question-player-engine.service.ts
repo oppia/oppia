@@ -37,7 +37,6 @@ import {
   Question,
   QuestionBackendDict,
 } from 'domain/question/QuestionObjectFactory';
-import {ExplorationModeService} from './exploration-mode.service';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 
@@ -62,7 +61,6 @@ export class QuestionPlayerEngineService {
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
     private pageContextService: PageContextService,
-    private explorationModeService: ExplorationModeService,
     private questionBackendApiService: QuestionBackendApiService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
@@ -173,7 +171,6 @@ export class QuestionPlayerEngineService {
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
     errorCallback: () => void
   ): void {
-    this.explorationModeService.setQuestionPlayerMode();
     this.playerTranscriptService.init();
     this.questionBackendApiService
       .fetchQuestionsAsync(

@@ -23,7 +23,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {PlayerTranscriptService} from './player-transcript.service';
-import {ExplorationModeService} from './exploration-mode.service';
+import {CurrentEngineService} from './current-engine.service';
 
 @Injectable({
   providedIn: 'root',
@@ -42,7 +42,7 @@ export class ConversationFlowService {
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private playerTranscriptService: PlayerTranscriptService,
-    private explorationModeService: ExplorationModeService
+    private currentEngineService: CurrentEngineService
   ) {}
 
   addNewCard(newCard: StateCard): void {
@@ -63,13 +63,13 @@ export class ConversationFlowService {
 
   recordNewCardAdded(): void {
     let currentEngineService =
-      this.explorationModeService.getCurrentEngineService();
+      this.currentEngineService.getCurrentEngineService();
     return currentEngineService.recordNewCardAdded();
   }
 
   getLanguageCode(): string {
     let currentEngineService =
-      this.explorationModeService.getCurrentEngineService();
+      this.currentEngineService.getCurrentEngineService();
     return currentEngineService.getLanguageCode();
   }
 

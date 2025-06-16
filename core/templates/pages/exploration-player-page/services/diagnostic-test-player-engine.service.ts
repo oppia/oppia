@@ -39,7 +39,6 @@ import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {DiagnosticTestPlayerStatusService} from 'pages/diagnostic-test-player-page/diagnostic-test-player-status.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {ExplorationModeService} from './exploration-mode.service';
 
 @Injectable({
   providedIn: 'root',
@@ -62,7 +61,6 @@ export class DiagnosticTestPlayerEngineService {
     private answerClassificationService: AnswerClassificationService,
     private pageContextService: PageContextService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
-    private explorationModeService: ExplorationModeService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
     private questionBackendApiService: QuestionBackendApiService,
@@ -76,7 +74,6 @@ export class DiagnosticTestPlayerEngineService {
     diagnosticTestTopicTrackerModel: DiagnosticTestTopicTrackerModel,
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void
   ): void {
-    this.explorationModeService.setDiagnosticTestPlayerMode();
     this._diagnosticTestTopicTrackerModel = diagnosticTestTopicTrackerModel;
     this._initialCopyOfTopicTrackerModel = cloneDeep(
       diagnosticTestTopicTrackerModel

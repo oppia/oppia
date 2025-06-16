@@ -35,6 +35,9 @@ export class CheckpointProgressService {
   }
 
   getLastCompletedCheckpoint(): string {
+    if (!this.lastCompletedCheckpoint) {
+      throw new Error('Last completed checkpoint is not set.');
+    }
     return this.lastCompletedCheckpoint;
   }
 }

@@ -448,6 +448,7 @@ import {LanguageBannerService} from 'components/language-banner/language-banner.
 import { ExplorationModeService } from 'pages/exploration-player-page/services/exploration-mode.service';
 import { CheckpointProgressService } from 'pages/exploration-player-page/services/checkpoint-progress.service';
 import { ProgressUrlService } from 'pages/exploration-player-page/services/progress-url.service';
+import { ExplorationInitializationService } from 'pages/exploration-player-page/services/exploration-initialization.service';
 
 
 export const angularServices: [string, Type<{}>][] = [
@@ -566,6 +567,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationCategoryService', ExplorationCategoryService],
   ['ExplorationCreationBackendApiService',
     ExplorationCreationBackendApiService],
+  ['ExplorationInitializationService',
+    ExplorationInitializationService],
   ['ExplorationCreationService',
     ExplorationCreationService],
   ['ExplorationEditsAllowedBackendApiService',

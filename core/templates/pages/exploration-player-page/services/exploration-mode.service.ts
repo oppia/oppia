@@ -17,19 +17,15 @@
  *
  * This service identifies the context in which an exploration or question is being played.
  * It differentiates between various modes such as exploration, editor preview, question player,
- * pretest, diagnostic test, and story chapter modes. Depending on the current mode, it assigns
- * the appropriate engine service for handling state and interaction logic./
+ * pretest, diagnostic test, and story chapter modes.
  */
 
 import {Injectable} from '@angular/core';
-import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {PageContextService} from 'services/page-context.service';
-import {DiagnosticTestPlayerEngineService} from './diagnostic-test-player-engine.service';
-import {ExplorationEngineService} from './exploration-engine.service';
-import {QuestionPlayerEngineService} from './question-player-engine.service';
+import {CurrentEngineService} from './current-engine.service';
 
-enum EXPLORATION_MODE {
+export enum EXPLORATION_MODE {
   DIAGNOSTIC_TEST_PLAYER = 'diagnostic_test_player',
   EXPLORATION = 'exploration',
   EDITOR_PREVIEW = 'editor_preview',
@@ -44,23 +40,16 @@ enum EXPLORATION_MODE {
 })
 export class ExplorationModeService {
   currentMode!: EXPLORATION_MODE;
-  currentEngineService!:
-    | ExplorationEngineService
-    | QuestionPlayerEngineService
-    | DiagnosticTestPlayerEngineService;
 
   constructor(
-    private explorationEngineService: ExplorationEngineService,
-    private questionPlayerEngineService: QuestionPlayerEngineService,
-    private diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService,
-    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private pageContextService: PageContextService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private currentEngineService: CurrentEngineService
   ) {
     this.init();
   }
 
-  private init(): void {
+  init(): void {
     let pathnameArray = this.urlService.getPathname().split('/');
     let explorationContext = false;
 
@@ -90,36 +79,40 @@ export class ExplorationModeService {
     return this.currentMode;
   }
 
-  getCurrentEngineService():
-    | ExplorationEngineService
-    | QuestionPlayerEngineService
-    | DiagnosticTestPlayerEngineService {
-    return this.currentEngineService;
-  }
-
   setExplorationMode(): void {
     this.currentMode = EXPLORATION_MODE.EXPLORATION;
-    this.currentEngineService = this.explorationEngineService;
+    this.currentEngineService.setExplorationEngineService();
   }
 
   setPretestMode(): void {
     this.currentMode = EXPLORATION_MODE.PRETEST;
-    this.currentEngineService = this.questionPlayerEngineService;
+    this.currentEngineService.setQuestionPlayerEngineService();
   }
 
   setQuestionPlayerMode(): void {
     this.currentMode = EXPLORATION_MODE.QUESTION_PLAYER;
-    this.currentEngineService = this.questionPlayerEngineService;
+    this.currentEngineService.setQuestionPlayerEngineService();
   }
 
   setDiagnosticTestPlayerMode(): void {
     this.currentMode = EXPLORATION_MODE.DIAGNOSTIC_TEST_PLAYER;
-    this.currentEngineService = this.diagnosticTestPlayerEngineService;
+    this.currentEngineService.setDiagnosticTestPlayerEngineService();
   }
 
   setStoryChapterMode(): void {
     this.currentMode = EXPLORATION_MODE.STORY_CHAPTER;
-    this.currentEngineService = this.explorationEngineService;
+    this.currentEngineService.setExplorationEngineService();
+  }
+
+  setExplorationModeFromUrl(): void {
+    if (
+      this.urlService.getUrlParams().hasOwnProperty('story_url_fragment') &&
+      this.urlService.getUrlParams().hasOwnProperty('node_id')
+    ) {
+      this.setStoryChapterMode();
+    } else {
+      this.setExplorationMode();
+    }
   }
 
   isInQuestionMode(): boolean {
@@ -155,8 +148,6 @@ export class ExplorationModeService {
       this.currentMode === EXPLORATION_MODE.STORY_CHAPTER
     ) {
       return false;
-    } else {
-      throw new Error('Invalid mode received: ' + this.currentMode + '.');
     }
   }
 
