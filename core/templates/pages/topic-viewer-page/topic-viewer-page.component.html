@@ -63,7 +63,7 @@
         </div>
       </mat-card>
     </div>
-    <div *ngIf="activeTab === 'subtopics'">
+    <div *ngIf="activeTab === 'subtopics'" class="e2e-test-topic-viewer-revision-tab">
       <subtopics-list [classroomUrlFragment]="classroomUrlFragment"
                       [subtopicsList]="subtopics"
                       [topicId]="topicId"
