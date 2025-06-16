@@ -1470,10 +1470,6 @@ export class TopicManager extends BaseUser {
       console.error(error.stack);
       throw error;
     }
-    // await this.expectTextContentToMatch(
-    //   `${itemsPerPageDropdown} option`,
-    //   itemsPerPage.toString()
-    // );
     const paginationValue = await this.page.$eval(
       itemsPerPageDropdown,
       el => (el as HTMLSelectElement).value
@@ -2288,7 +2284,7 @@ export class TopicManager extends BaseUser {
     await this.clickOn(' Prerequisite Skills ');
     await this.clickOn('Rubrics');
 
-    // Post Check: As aim of function is to open all mobile dropdowns, we are checking number of mobile collapsible cards
+    // Post Check: As aim of function is to open all mobile dropdowns, we are checking number of mobile collapsible cards.
     const mobileCollapsibleCards = await this.page.$$(
       skillEditorCollapsibleCardSelector
     );
@@ -2669,8 +2665,6 @@ export class TopicManager extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
-
-    await this.isElementVisible(storyEditorContainerSelector);
   }
 
   /**

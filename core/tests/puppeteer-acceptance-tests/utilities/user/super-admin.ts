@@ -1027,7 +1027,8 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(regenerateTopicSummariesButton);
 
     await this.expectActionStatusMessageToBe(
-      'Successfully regenerated all topic summaries.'
+      'Successfully regenerated all topic summaries.',
+      'Regenerating all topic summaries'
     );
   }
 
