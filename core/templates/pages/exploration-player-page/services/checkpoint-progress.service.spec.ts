@@ -16,10 +16,10 @@
  * @fileoverview Unit tests for the CheckpointProgressService.
  */
 
-import { TestBed, waitForAsync } from '@angular/core/testing';
-import { CheckpointProgressService } from './checkpoint-progress.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import {TestBed, waitForAsync} from '@angular/core/testing';
+import {CheckpointProgressService} from './checkpoint-progress.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TranslateModule} from '@ngx-translate/core';
 
 describe('CheckpointProgressService', () => {
   let checkpointProgressService: CheckpointProgressService;
@@ -42,10 +42,14 @@ describe('CheckpointProgressService', () => {
   it('should set and get last completed checkpoint correctly', () => {
     const checkpointStateName = 'checkpoint_1';
     checkpointProgressService.setLastCompletedCheckpoint(checkpointStateName);
-    expect(checkpointProgressService.getLastCompletedCheckpoint()).toBe(checkpointStateName);
+    expect(checkpointProgressService.getLastCompletedCheckpoint()).toBe(
+      checkpointStateName
+    );
   });
 
   it('should return undefined if last completed checkpoint is not set', () => {
-    expect(() => checkpointProgressService.getLastCompletedCheckpoint()).toThrowError();
+    expect(() =>
+      checkpointProgressService.getLastCompletedCheckpoint()
+    ).toThrowError();
   });
 });

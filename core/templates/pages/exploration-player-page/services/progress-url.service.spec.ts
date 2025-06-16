@@ -16,14 +16,14 @@
  * @fileoverview Unit tests for the ProgressUrlService.
  */
 
-import { fakeAsync, TestBed, tick, waitForAsync } from '@angular/core/testing';
-import { ProgressUrlService } from './progress-url.service';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { PageContextService } from 'services/page-context.service';
-import { CheckpointProgressService } from './checkpoint-progress.service';
-import { ExplorationEngineService } from './exploration-engine.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { TranslateModule } from '@ngx-translate/core';
+import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
+import {ProgressUrlService} from './progress-url.service';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
+import {CheckpointProgressService} from './checkpoint-progress.service';
+import {ExplorationEngineService} from './exploration-engine.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {TranslateModule} from '@ngx-translate/core';
 
 describe('ProgressUrlService', () => {
   let progressUrlService: ProgressUrlService;
@@ -40,14 +40,16 @@ describe('ProgressUrlService', () => {
         EditableExplorationBackendApiService,
         PageContextService,
         CheckpointProgressService,
-        ExplorationEngineService
+        ExplorationEngineService,
       ],
     }).compileComponents();
   }));
-  
+
   beforeEach(() => {
     progressUrlService = TestBed.inject(ProgressUrlService);
-    editableExplorationBackendApiService = TestBed.inject(EditableExplorationBackendApiService);
+    editableExplorationBackendApiService = TestBed.inject(
+      EditableExplorationBackendApiService
+    );
     pageContextService = TestBed.inject(PageContextService);
     checkpointProgressService = TestBed.inject(CheckpointProgressService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
@@ -57,28 +59,45 @@ describe('ProgressUrlService', () => {
     expect(progressUrlService).toBeTruthy();
   });
 
-it('should set unique progress URL ID correctly', fakeAsync(() => {
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exploration_id');
-    spyOn(checkpointProgressService, 'getLastCompletedCheckpoint').and.returnValue('checkpoint_id');
+  it('should set unique progress URL ID correctly', fakeAsync(() => {
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'exploration_id'
+    );
+    spyOn(
+      checkpointProgressService,
+      'getLastCompletedCheckpoint'
+    ).and.returnValue('checkpoint_id');
     spyOn(explorationEngineService, 'getExplorationVersion').and.returnValue(1);
-    spyOn(editableExplorationBackendApiService, 'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner'
-    ).and.returnValue(Promise.resolve({ unique_progress_url_id: 'unique_progress_url_id' }));
+    spyOn(
+      editableExplorationBackendApiService,
+      'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner'
+    ).and.returnValue(
+      Promise.resolve({unique_progress_url_id: 'unique_progress_url_id'})
+    );
 
     progressUrlService.setUniqueProgressUrlId();
     tick(100);
 
-    expect(progressUrlService.uniqueProgressUrlId).toBe('unique_progress_url_id');
-    expect(editableExplorationBackendApiService.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner).toHaveBeenCalledWith('exploration_id', 1, 'checkpoint_id');
-}));
+    expect(progressUrlService.uniqueProgressUrlId).toBe(
+      'unique_progress_url_id'
+    );
+    expect(
+      editableExplorationBackendApiService.recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner
+    ).toHaveBeenCalledWith('exploration_id', 1, 'checkpoint_id');
+  }));
 
-it('should throw an error when getting unique progress URL ID if not set', () => {
-    expect(() => progressUrlService.getUniqueProgressUrlId()).toThrowError('Unique progress URL ID is not set. Please set it before retrieving.');
-});
+  it('should throw an error when getting unique progress URL ID if not set', () => {
+    expect(() => progressUrlService.getUniqueProgressUrlId()).toThrowError(
+      'Unique progress URL ID is not set. Please set it before retrieving.'
+    );
+  });
 
-it('should return the unique progress URL ID when it is set', () => {
+  it('should return the unique progress URL ID when it is set', () => {
     const uniqueProgressUrlId = 'unique_progress_url_id';
     progressUrlService.uniqueProgressUrlId = uniqueProgressUrlId;
 
-    expect(progressUrlService.getUniqueProgressUrlId()).toBe(uniqueProgressUrlId);
-});
+    expect(progressUrlService.getUniqueProgressUrlId()).toBe(
+      uniqueProgressUrlId
+    );
+  });
 });

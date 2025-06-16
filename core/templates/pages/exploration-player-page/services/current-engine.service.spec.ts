@@ -18,11 +18,11 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, waitForAsync} from '@angular/core/testing';
-import { CurrentEngineService } from './current-engine.service';
-import { ExplorationEngineService } from './exploration-engine.service';
-import { QuestionPlayerEngineService } from './question-player-engine.service';
-import { DiagnosticTestPlayerEngineService } from './diagnostic-test-player-engine.service';
-import { TranslateModule } from '@ngx-translate/core';
+import {CurrentEngineService} from './current-engine.service';
+import {ExplorationEngineService} from './exploration-engine.service';
+import {QuestionPlayerEngineService} from './question-player-engine.service';
+import {DiagnosticTestPlayerEngineService} from './diagnostic-test-player-engine.service';
+import {TranslateModule} from '@ngx-translate/core';
 
 describe('CurrentEngineService', () => {
   let currentEngineService: CurrentEngineService;
@@ -46,7 +46,9 @@ describe('CurrentEngineService', () => {
     currentEngineService = TestBed.inject(CurrentEngineService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
-    diagnosticTestPlayerEngineService = TestBed.inject(DiagnosticTestPlayerEngineService);
+    diagnosticTestPlayerEngineService = TestBed.inject(
+      DiagnosticTestPlayerEngineService
+    );
   });
 
   it('should be created', () => {
@@ -55,16 +57,22 @@ describe('CurrentEngineService', () => {
 
   it('should set currentEngineService to ExplorationEngineService', () => {
     currentEngineService.setExplorationEngineService();
-    expect(currentEngineService.getCurrentEngineService()).toBe(explorationEngineService);
+    expect(currentEngineService.getCurrentEngineService()).toBe(
+      explorationEngineService
+    );
   });
 
   it('should set currentEngineService to QuestionPlayerEngineService', () => {
     currentEngineService.setQuestionPlayerEngineService();
-    expect(currentEngineService.getCurrentEngineService()).toBe(questionPlayerEngineService);
+    expect(currentEngineService.getCurrentEngineService()).toBe(
+      questionPlayerEngineService
+    );
   });
 
   it('should set currentEngineService to DiagnosticTestPlayerEngineService', () => {
     currentEngineService.setDiagnosticTestPlayerEngineService();
-    expect(currentEngineService.getCurrentEngineService()).toBe(diagnosticTestPlayerEngineService);
+    expect(currentEngineService.getCurrentEngineService()).toBe(
+      diagnosticTestPlayerEngineService
+    );
   });
 });

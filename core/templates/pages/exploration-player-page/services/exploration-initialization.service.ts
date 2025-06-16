@@ -16,7 +16,7 @@
  * @fileoverview Temporary service to initialize the exploration player
  * and question player. This service is used to initialize the exploration
  * player and question player with the necessary data and features.
- * 
+ *
  * It has been created to avoid circular dependencies between
  * ExplorationEngineService and ExplorationModeService.
  */
@@ -24,22 +24,21 @@
 import {Injectable} from '@angular/core';
 import {UrlService} from 'services/contextual/url.service';
 import {PageContextService} from 'services/page-context.service';
-import { FetchExplorationBackendResponse } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { ExplorationEngineService } from './exploration-engine.service';
-import { QuestionPlayerEngineService } from './question-player-engine.service';
-import { ExplorationFeaturesService } from './exploration-features.service';
-import { ExplorationFeatures } from 'domain/exploration/exploration-features.model';
-import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { PretestQuestionBackendApiService } from 'domain/pretest/pretest-question-backend-api.service';
-import { ExplorationFeaturesBackendApiService } from 'domain/exploration/exploration-features-backend-api.service';
-import { StatsReportingService } from './stats-reporting.service';
-import { PlaythroughService } from './playthrough.service';
-import { NumberAttemptsService } from './number-attempts.service';
-import { PlayerTranscriptService } from './player-transcript.service';
-import { ExplorationModeService } from './exploration-mode.service';
-
+import {FetchExplorationBackendResponse} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {ExplorationEngineService} from './exploration-engine.service';
+import {QuestionPlayerEngineService} from './question-player-engine.service';
+import {ExplorationFeaturesService} from './exploration-features.service';
+import {ExplorationFeatures} from 'domain/exploration/exploration-features.model';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {PretestQuestionBackendApiService} from 'domain/pretest/pretest-question-backend-api.service';
+import {ExplorationFeaturesBackendApiService} from 'domain/exploration/exploration-features-backend-api.service';
+import {StatsReportingService} from './stats-reporting.service';
+import {PlaythroughService} from './playthrough.service';
+import {NumberAttemptsService} from './number-attempts.service';
+import {PlayerTranscriptService} from './player-transcript.service';
+import {ExplorationModeService} from './exploration-mode.service';
 
 @Injectable({
   providedIn: 'root',
@@ -59,7 +58,7 @@ export class ExplorationInitializationService {
     private playthroughService: PlaythroughService,
     private numberAttemptsService: NumberAttemptsService,
     private playerTranscriptService: PlayerTranscriptService,
-    private explorationModeService: ExplorationModeService,
+    private explorationModeService: ExplorationModeService
   ) {}
 
   private initExplorationPreviewPlayer(
@@ -85,12 +84,20 @@ export class ExplorationInitializationService {
         },
         featuresData
       );
-      this.explorationEngineService.init(explorationData, null, null, null, null, [], callback);
+      this.explorationEngineService.init(
+        explorationData,
+        null,
+        null,
+        null,
+        null,
+        [],
+        callback
+      );
       this.numberAttemptsService.reset();
     });
   }
 
- private initExplorationPlayer(
+  private initExplorationPlayer(
     callback: (stateCard: StateCard, str: string) => void
   ): void {
     let explorationId = this.pageContextService.getExplorationId();
@@ -154,7 +161,6 @@ export class ExplorationInitializationService {
     }
   }
 
-  
   private initializeExplorationServices(
     returnDict: FetchExplorationBackendResponse,
     arePretestsAvailable: boolean,
