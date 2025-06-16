@@ -38,7 +38,7 @@ import {BehaviorSubject} from 'rxjs';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {PageContextService} from '../../../../services/page-context.service';
+import {PageContextService} from '../../../../services/context.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {

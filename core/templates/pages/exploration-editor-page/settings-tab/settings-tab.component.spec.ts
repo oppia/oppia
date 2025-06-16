@@ -35,7 +35,7 @@ import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationEditsAllowedBackendApiService} from '../services/exploration-edits-allowed-backend-api.service';
 import {EditabilityService} from 'services/editability.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {UserService} from 'services/user.service';
 import {ExplorationCategoryService} from '../services/exploration-category.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';

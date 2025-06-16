@@ -28,7 +28,7 @@ import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NoninteractiveSkillreview} from './oppia-noninteractive-skillreview.component';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {SimpleChanges} from '@angular/core';
 
 describe('NoninteractiveSkillreview', () => {

@@ -25,7 +25,7 @@ import {
 } from '@angular/core/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {EditabilityService} from 'services/editability.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {SolutionExplanationEditor} from './solution-explanation-editor.component';
 import {ExternalSaveService} from 'services/external-save.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';

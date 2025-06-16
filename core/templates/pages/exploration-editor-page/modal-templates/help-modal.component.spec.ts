@@ -20,7 +20,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {HelpModalComponent} from './help-modal.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 describe('Exploration Player Suggestion Modal Controller', function () {

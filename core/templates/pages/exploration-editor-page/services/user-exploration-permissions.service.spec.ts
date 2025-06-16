@@ -23,7 +23,7 @@ import {
 } from '@angular/common/http/testing';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 

@@ -25,7 +25,7 @@ import {
   tick,
 } from '@angular/core/testing';
 import {HintEditorComponent} from './hint-editor.component';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {Hint} from 'domain/exploration/hint-object.model';

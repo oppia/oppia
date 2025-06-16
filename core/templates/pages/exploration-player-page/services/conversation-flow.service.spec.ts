@@ -69,17 +69,13 @@ describe('Conversation flow service', () => {
       ContentTranslationManagerService
     );
     conversationFlowService = TestBed.inject(ConversationFlowService);
-    conversationFlowService = TestBed.inject(
-      ConversationFlowService
-    );
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
   }));
 
   it('should handle adding new cards to transcript', () => {
     spyOn(playerTranscriptService, 'addNewCard');
-    spyOn(conversationFlowService, 'getLanguageCode').and.returnValue(
-      'en'
-    );
+    spyOn(conversationFlowService, 'getLanguageCode').and.returnValue('en');
     spyOn(
       contentTranslationLanguageService,
       'getCurrentContentLanguageCode'

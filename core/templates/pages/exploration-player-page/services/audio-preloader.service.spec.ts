@@ -33,7 +33,7 @@ import {
 } from '../../../domain/exploration/ExplorationObjectFactory';
 import {InteractionAnswer} from '../../../../../extensions/interactions/answer-defs';
 import {AudioPreloaderService} from './audio-preloader.service';
-import {PageContextService} from '../../../services/page-context.service';
+import {PageContextService} from '../../../services/context.service';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {
   Voiceover,

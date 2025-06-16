@@ -35,7 +35,7 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from '../services/change-list.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {FormsModule} from '@angular/forms';

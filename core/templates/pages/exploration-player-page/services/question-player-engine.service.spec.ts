@@ -29,7 +29,7 @@ import {StateCard} from '../../../domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from '../../../services/alerts.service';
-import {PageContextService} from '../../../services/page-context.service';
+import {PageContextService} from '../../../services/context.service';
 import {FocusManagerService} from '../../../services/stateful/focus-manager.service';
 import {
   AnswerClassificationService,

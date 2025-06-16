@@ -22,7 +22,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {CreateNewTopicModalComponent} from './create-new-topic-modal.component';

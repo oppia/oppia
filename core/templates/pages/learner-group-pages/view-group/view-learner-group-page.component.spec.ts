@@ -30,7 +30,7 @@ import {LearnerGroupPagesConstants} from '../learner-group-pages.constants';
 import {LearnerGroupData} from 'domain/learner_group/learner-group.model';
 import {TranslateService} from '@ngx-translate/core';
 import {ViewLearnerGroupPageComponent} from './view-learner-group-page.component';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {LearnerGroupUserProgress} from 'domain/learner_group/learner-group-user-progress.model';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {LoaderService} from 'services/loader.service';

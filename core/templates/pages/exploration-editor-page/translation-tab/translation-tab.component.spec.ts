@@ -27,7 +27,7 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {LoaderService} from 'services/loader.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';

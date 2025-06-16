@@ -30,7 +30,7 @@ import {MockTranslateService} from 'components/forms/schema-based-editors/integr
 import {CheckpointCelebrationModalComponent} from './checkpoint-celebration-modal.component';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
@@ -244,9 +244,7 @@ describe('Checkpoint celebration modal component', function () {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    explorationModeService = TestBed.inject(
-      ExplorationModeService
-    );
+    explorationModeService = TestBed.inject(ExplorationModeService);
     fixture = TestBed.createComponent(CheckpointCelebrationModalComponent);
     component = fixture.componentInstance;
 
@@ -445,10 +443,7 @@ describe('Checkpoint celebration modal component', function () {
     spyOn(checkpointCelebrationUtilityService, 'setIsOnCheckpointedState');
     spyOn(component, 'triggerStandardMessage');
     spyOn(component, 'triggerMiniMessage');
-    spyOn(
-      explorationModeService,
-      'isInStoryChapterMode'
-    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
     component.currentStateName = 'Introduction';
     component.mostRecentlyReachedCheckpointStateName =
       'MostRecentlyReachedCheckpointStateName';
@@ -527,10 +522,9 @@ describe('Checkpoint celebration modal component', function () {
     component.currentStateName = 'Introduction';
     component.mostRecentlyReachedCheckpointStateName =
       'MostRecentlyReachedCheckpointStateName';
-    spyOn(
-      explorationModeService,
-      'isInStoryChapterMode'
-    ).and.returnValue(false);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+      false
+    );
     spyOn(checkpointCelebrationUtilityService, 'getCheckpointMessage');
 
     component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');

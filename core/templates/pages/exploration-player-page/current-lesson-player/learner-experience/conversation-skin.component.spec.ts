@@ -79,7 +79,7 @@ import {
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 import {CurrentInteractionService} from '../../services/current-interaction.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import { ExplorationModeService } from '../../services/exploration-mode.service';
+import {ExplorationModeService} from '../../services/exploration-mode.service';
 import {ExplorationRecommendationsService} from '../../services/exploration-recommendations.service';
 import {FatigueDetectionService} from '../../services/fatigue-detection.service';
 import {HintsAndSolutionManagerService} from '../../services/hints-and-solution-manager.service';
@@ -492,9 +492,7 @@ describe('Conversation skin component', () => {
       EditableExplorationBackendApiService
     );
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    explorationModeService = TestBed.inject(
-      ExplorationModeService
-    );
+    explorationModeService = TestBed.inject(ExplorationModeService);
     explorationRecommendationsService = TestBed.inject(
       ExplorationRecommendationsService
     );
@@ -602,20 +600,19 @@ describe('Conversation skin component', () => {
     spyOn(explorationEngineService, 'isInPreviewMode').and.returnValue(
       isInPreviewMode
     );
-    spyOn(
-      explorationModeService,
-      'getCurrentEngineService'
-    ).and.returnValue(explorationEngineService);
+    spyOn(explorationModeService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
+    );
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       'oppia_avatar_url'
     );
-    spyOn(
-      explorationModeService,
-      'isInQuestionPlayerMode'
-    ).and.returnValues(true, false);
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValues(
+      true,
+      false
+    );
     spyOn(componentInstance, 'initializePage');
     spyOn(
       collectionPlayerBackendApiService,
@@ -776,10 +773,10 @@ describe('Conversation skin component', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       'oppia_avatar_url'
     );
-    spyOn(
-      explorationModeService,
-      'isInQuestionPlayerMode'
-    ).and.returnValues(true, false);
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValues(
+      true,
+      false
+    );
     spyOn(componentInstance, 'initializePage');
     spyOn(
       collectionPlayerBackendApiService,
@@ -911,10 +908,10 @@ describe('Conversation skin component', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       'oppia_avatar_url'
     );
-    spyOn(
-      explorationModeService,
-      'isInQuestionPlayerMode'
-    ).and.returnValues(true, false);
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValues(
+      true,
+      false
+    );
     spyOn(componentInstance, 'initializePage');
     spyOn(
       collectionPlayerBackendApiService,
@@ -1056,10 +1053,10 @@ describe('Conversation skin component', () => {
       spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
         'oppia_avatar_url'
       );
-      spyOn(
-        explorationModeService,
-        'isInQuestionPlayerMode'
-      ).and.returnValues(true, false);
+      spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValues(
+        true,
+        false
+      );
       spyOn(componentInstance, 'initializePage');
       spyOn(
         collectionPlayerBackendApiService,
@@ -1451,16 +1448,14 @@ describe('Conversation skin component', () => {
         'en',
         'pq'
       );
-      spyOn(
-        questionPlayerEngineService,
-        'initQuestionPlayer'
-      ).and.callFake((config, callb, questionAreAvailable) => {
-        callb(displayedCard, 'label');
-      });
-      spyOn(
-        explorationModeService,
-        'isInQuestionPlayerMode'
-      ).and.returnValue(false);
+      spyOn(questionPlayerEngineService, 'initQuestionPlayer').and.callFake(
+        (config, callb, questionAreAvailable) => {
+          callb(displayedCard, 'label');
+        }
+      );
+      spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+        false
+      );
       spyOn(componentInstance, 'adjustPageHeight');
       spyOn(playerPositionService.onNewCardOpened, 'emit');
       spyOn(playerPositionService, 'setDisplayedCardIndex');
@@ -1570,9 +1565,7 @@ describe('Conversation skin component', () => {
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(componentInstance, 'scrollToTop');
     spyOn(playerPositionService.onNewCardOpened, 'emit');
-    spyOn(conversationFlowService, 'getLanguageCode').and.returnValue(
-      'en'
-    );
+    spyOn(conversationFlowService, 'getLanguageCode').and.returnValue('en');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
     spyOn(contentTranslationManagerService, 'displayTranslations');
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
@@ -1580,10 +1573,7 @@ describe('Conversation skin component', () => {
     spyOn(playerPositionService, 'setDisplayedCardIndex');
     spyOn(playerPositionService, 'changeCurrentQuestion');
     spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue(['123']);
-    spyOn(
-      explorationModeService,
-      'isInStoryChapterMode'
-    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
     spyOn(urlService, 'getUrlParams').and.returnValue({
       topic_url_fragment: 'topicUrlFragment',
       classroom_url_fragment: 'classroomUrlFragment',
@@ -1835,12 +1825,11 @@ describe('Conversation skin component', () => {
       'en',
       'pq'
     );
-    spyOn(
-      questionPlayerEngineService,
-      'initQuestionPlayer'
-    ).and.callFake((config, callb, questionAreAvailable) => {
-      callb(displayedCard, 'label');
-    });
+    spyOn(questionPlayerEngineService, 'initQuestionPlayer').and.callFake(
+      (config, callb, questionAreAvailable) => {
+        callb(displayedCard, 'label');
+      }
+    );
     spyOn(componentInstance, 'adjustPageHeight');
     spyOn(playerPositionService.onNewCardOpened, 'emit');
     componentInstance.isIframed = true;
@@ -1864,11 +1853,9 @@ describe('Conversation skin component', () => {
     spyOn(autogeneratedAudioPlayerService, 'cancel');
     spyOn(playerTranscriptService, 'isLastCard').and.returnValues(true, false);
     spyOn(componentInstance, 'getContentFocusLabel');
-    spyOn(explorationEngineService, 'initializePlayer').and.callFake(
-      callb => {
-        callb(displayedCard, 'label');
-      }
-    );
+    spyOn(explorationEngineService, 'initializePlayer').and.callFake(callb => {
+      callb(displayedCard, 'label');
+    });
 
     componentInstance._nextFocusLabel = 'focus_label';
     componentInstance.initializePage();
@@ -1890,9 +1877,7 @@ describe('Conversation skin component', () => {
     tick(100);
 
     expect(playerPositionService.init).toHaveBeenCalled();
-    expect(
-      diagnosticTestPlayerEngineService.init
-    ).toHaveBeenCalled();
+    expect(diagnosticTestPlayerEngineService.init).toHaveBeenCalled();
   }));
 
   it('should register analytics when user visit using iframe', () => {
@@ -2156,9 +2141,7 @@ describe('Conversation skin component', () => {
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(componentInstance, 'scrollToTop');
     spyOn(playerPositionService.onNewCardOpened, 'emit');
-    spyOn(conversationFlowService, 'getLanguageCode').and.returnValue(
-      'en'
-    );
+    spyOn(conversationFlowService, 'getLanguageCode').and.returnValue('en');
     spyOn(conversationFlowService, 'addNewCard');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
@@ -2166,10 +2149,7 @@ describe('Conversation skin component', () => {
     spyOn(playerPositionService, 'setDisplayedCardIndex');
     spyOn(playerPositionService, 'changeCurrentQuestion');
     spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue(['123']);
-    spyOn(
-      explorationModeService,
-      'isInStoryChapterMode'
-    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
     spyOn(urlService, 'getUrlParams').and.returnValue({
       topic_url_fragment: 'topicUrlFragment',
       classroom_url_fragment: 'classroomUrlFragment',
@@ -2347,10 +2327,7 @@ describe('Conversation skin component', () => {
       explorationEngineService,
       'getAuthorRecommendedExpIdsByStateName'
     ).and.returnValue([]);
-    spyOn(
-      explorationModeService,
-      'isInStoryChapterMode'
-    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
     spyOn(userService, 'setReturnUrl');
     spyOn(urlService, 'getUrlParams').and.returnValue({
       topic_url_fragment: 'topicUrlFragment',
@@ -2446,13 +2423,10 @@ describe('Conversation skin component', () => {
     tick(200);
 
     spyOn(playerPositionService, 'recordAnswerSubmission');
-    spyOn(
-      explorationModeService,
-      'getCurrentEngineService'
-    ).and.returnValue(explorationEngineService);
-    spyOn(conversationFlowService, 'getLanguageCode').and.returnValue(
-      'en'
+    spyOn(explorationModeService, 'getCurrentEngineService').and.returnValue(
+      explorationEngineService
     );
+    spyOn(conversationFlowService, 'getLanguageCode').and.returnValue('en');
 
     let callback = (
       answer: string,
@@ -2617,10 +2591,9 @@ describe('Conversation skin component', () => {
     spyOn(learnerParamsService, 'getAllParams');
     spyOn(statsReportingService, 'recordStateCompleted');
     spyOn(statsReportingService, 'recordExplorationActuallyStarted');
-    spyOn(
-      explorationModeService,
-      'isInQuestionPlayerMode'
-    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      true
+    );
     spyOn(componentInstance, 'showUpcomingCard');
     spyOn(fatigueDetectionService, 'reset');
     spyOn(numberAttemptsService, 'reset');
@@ -2729,10 +2702,9 @@ describe('Conversation skin component', () => {
       explorationEngineService,
       'getAuthorRecommendedExpIdsByStateName'
     ).and.returnValue([]);
-    spyOn(
-      explorationModeService,
-      'isInStoryChapterMode'
-    ).and.returnValue(false);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+      false
+    );
     spyOn(
       explorationRecommendationsService,
       'getRecommendedSummaryDicts'
@@ -2862,10 +2834,10 @@ describe('Conversation skin component', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       'oppia_avatar_url'
     );
-    spyOn(
-      explorationModeService,
-      'isInQuestionPlayerMode'
-    ).and.returnValues(true, false);
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValues(
+      true,
+      false
+    );
     spyOn(componentInstance, 'initializePage');
     spyOn(
       collectionPlayerBackendApiService,
@@ -2982,9 +2954,10 @@ describe('Conversation skin component', () => {
     let callback = (successCallback: (nextCard: StateCard) => void) => {
       successCallback(sampleCard);
     };
-    spyOn(diagnosticTestPlayerEngineService, 'skipCurrentQuestion').and.callFake(
-      callback
-    );
+    spyOn(
+      diagnosticTestPlayerEngineService,
+      'skipCurrentQuestion'
+    ).and.callFake(callback);
     spyOn(componentInstance, 'showPendingCard');
 
     componentInstance.skipCurrentQuestion();

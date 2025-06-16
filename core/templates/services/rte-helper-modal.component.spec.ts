@@ -27,7 +27,7 @@ import {AppConstants} from 'app.constants';
 import {RteHelperModalComponent} from './rte-helper-modal.component';
 import {ExternalRteSaveService} from './external-rte-save.service';
 import {AlertsService} from './alerts.service';
-import {PageContextService} from './page-context.service';
+import {PageContextService} from './context.service';
 import {ImageLocalStorageService} from './image-local-storage.service';
 import {AssetsBackendApiService} from './assets-backend-api.service';
 import {ImageUploadHelperService} from './image-upload-helper.service';

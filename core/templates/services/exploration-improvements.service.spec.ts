@@ -19,7 +19,7 @@
 import {AnswerStats} from 'domain/exploration/answer-stats.model';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {
   ExplorationImprovementsBackendApiService,
   ExplorationImprovementsResponse,

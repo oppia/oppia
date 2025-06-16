@@ -28,7 +28,7 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {of} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';

@@ -35,7 +35,7 @@ import {
 } from '../../../../domain/topic_viewer/read-only-topic-object.factory';
 import {TopicViewerBackendApiService} from '../../../../domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
-import {PageContextService} from '../../../../services/page-context.service';
+import {PageContextService} from '../../../../services/context.service';
 import {UrlService} from '../../../../services/contextual/url.service';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {SiteAnalyticsService} from '../../../../services/site-analytics.service';

@@ -33,7 +33,7 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {AlertsService} from 'services/alerts.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';

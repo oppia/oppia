@@ -35,7 +35,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
 import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
@@ -183,9 +183,7 @@ describe('Preview Tab Component', () => {
     explorationInitStateNameService = TestBed.inject(
       ExplorationInitStateNameService
     );
-    conversationFlowService = TestBed.inject(
-      ConversationFlowService
-    );
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     explorationParamChangesService = TestBed.inject(
       ExplorationParamChangesService
     );

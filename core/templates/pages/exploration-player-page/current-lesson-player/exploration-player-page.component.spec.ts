@@ -27,7 +27,7 @@ import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
 } from '../../../domain/exploration/read-only-exploration-backend-api.service';
-import {PageContextService} from '../../../services/page-context.service';
+import {PageContextService} from '../../../services/context.service';
 import {MetaTagCustomizationService} from '../../../services/contextual/meta-tag-customization.service';
 import {MockTranslatePipe} from '../../../tests/unit-test-utils';
 import {KeyboardShortcutService} from '../../../services/keyboard-shortcut.service';

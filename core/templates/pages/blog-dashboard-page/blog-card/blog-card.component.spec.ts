@@ -27,7 +27,7 @@ import {
   BlogPostSummary,
 } from 'domain/blog/blog-post-summary.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
 

@@ -153,9 +153,7 @@ describe('Question Player Component', () => {
     preventPageUnloadEventService = TestBed.inject(
       PreventPageUnloadEventService
     );
-    questionPlayerEngineService = TestBed.inject(
-      QuestionPlayerEngineService
-    );
+    questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     questionPlayerStateService = TestBed.inject(QuestionPlayerStateService);
     userService = TestBed.inject(UserService);
     windowRef = TestBed.inject(WindowRef);

@@ -19,7 +19,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {OppiaInteractiveContinue} from './oppia-interactive-continue.component';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {ContinueRulesService} from './continue-rules.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';

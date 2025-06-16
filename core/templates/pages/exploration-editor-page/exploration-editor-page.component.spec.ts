@@ -36,7 +36,7 @@ import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import {AlertsService} from 'services/alerts.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {EditabilityService} from 'services/editability.service';
 import {
   ExplorationFeatures,

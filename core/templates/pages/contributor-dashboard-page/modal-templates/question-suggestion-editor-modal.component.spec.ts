@@ -22,7 +22,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {QuestionSuggestionEditorModalComponent} from './question-suggestion-editor-modal.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';

@@ -28,7 +28,7 @@ import {
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import $ from 'jquery';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
 import {ExplorationStatesService} from './exploration-states.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';

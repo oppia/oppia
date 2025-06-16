@@ -35,7 +35,7 @@ import {TrainingModalService} from '../../training-panel/training-modal.service'
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {AlertsService} from 'services/alerts.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ResponsesService} from '../../services/responses.service';
 import {

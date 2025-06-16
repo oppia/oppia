@@ -229,9 +229,7 @@ describe('Skill Preview Tab Component', () => {
     urlService = TestBed.inject(UrlService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
-    conversationFlowService = TestBed.inject(
-      ConversationFlowService
-    );
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     questionPlayerEngineService =

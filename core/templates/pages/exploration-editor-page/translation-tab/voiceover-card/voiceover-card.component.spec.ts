@@ -28,7 +28,7 @@ import {
 import {NO_ERRORS_SCHEMA, Pipe, EventEmitter} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AudioPlayerService} from 'services/audio-player.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';

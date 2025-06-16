@@ -21,7 +21,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateHintsService} from 'components/state-editor/state-editor-properties-services/state-hints.service';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {AddHintModalComponent} from './add-hint-modal.component';
 

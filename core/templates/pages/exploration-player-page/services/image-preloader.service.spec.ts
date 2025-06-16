@@ -30,7 +30,7 @@ import {
 import {ImagePreloaderService} from './image-preloader.service';
 import {AssetsBackendApiService} from '../../../services/assets-backend-api.service';
 import {EntityTranslationsService} from '../../../services/entity-translations.services';
-import {PageContextService} from '../../../services/page-context.service';
+import {PageContextService} from '../../../services/context.service';
 import {SvgSanitizerService} from '../../../services/svg-sanitizer.service';
 
 describe('Image preloader service', () => {

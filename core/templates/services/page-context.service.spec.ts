@@ -19,7 +19,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {BlogPostPageService} from 'pages/blog-post-page/services/blog-post-page.service';
 
@@ -51,7 +51,7 @@ class MockWindowRef {
   }
 }
 
-describe('Context service', () => {
+describe('PageContext service', () => {
   let ecs: PageContextService;
   let urlService: UrlService;
   let windowRef: MockWindowRef;

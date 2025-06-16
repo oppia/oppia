@@ -36,7 +36,7 @@ import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.m
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AutomaticVoiceoverHighlightService} from '../../core/templates/services/automatic-voiceover-highlight-service';
 import {EntityVoiceoversService} from '../../core/templates/services/entity-voiceovers.services';
-import {PageContextService} from '../../core/templates/services/page-context.service';
+import {PageContextService} from '../../core/templates/services/context.service';
 import {TranslationTabActiveContentIdService} from '../../core/templates/pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 import {VoiceoverPlayerService} from '../../core/templates/pages/exploration-player-page/services/voiceover-player.service';
 import {LocalStorageService} from '../../core/templates/services/local-storage.service';

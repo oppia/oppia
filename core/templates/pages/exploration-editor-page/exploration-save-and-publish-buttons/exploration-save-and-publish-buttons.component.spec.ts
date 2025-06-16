@@ -43,7 +43,7 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {ExplorationSavePromptModalComponent} from '../modal-templates/exploration-save-prompt-modal.component';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 
 describe('Exploration save and publish buttons component', () => {
   let component: ExplorationSaveAndPublishButtonsComponent;

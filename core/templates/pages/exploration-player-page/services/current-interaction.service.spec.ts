@@ -27,7 +27,7 @@ import {UrlService} from '../../../services/contextual/url.service';
 import {PlayerPositionService} from './player-position.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StateCard} from '../../../domain/state_card/state-card.model';
-import {PageContextService} from '../../../services/page-context.service';
+import {PageContextService} from '../../../services/context.service';
 import {InteractionRulesService} from './answer-classification.service';
 import {Interaction} from '../../../domain/exploration/InteractionObjectFactory';
 import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';

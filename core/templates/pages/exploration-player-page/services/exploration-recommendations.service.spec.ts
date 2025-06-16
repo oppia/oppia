@@ -22,7 +22,7 @@ import {async, TestBed} from '@angular/core/testing';
 import {ExplorationRecommendationsBackendApiService} from '../../../domain/recommendations/exploration-recommendations-backend-api.service';
 import {LearnerExplorationSummary} from '../../../domain/summary/learner-exploration-summary.model';
 import {ExplorationRecommendationsService} from './exploration-recommendations.service';
-import {PageContextService} from '../../../services/page-context.service';
+import {PageContextService} from '../../../services/context.service';
 import {UrlService} from '../../../services/contextual/url.service';
 import {ServicesConstants} from '../../../services/services.constants';
 

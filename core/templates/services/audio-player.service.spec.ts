@@ -26,7 +26,7 @@ import {
 } from '@angular/core/testing';
 import {AudioPlayerService} from './audio-player.service';
 import {AssetsBackendApiService} from './assets-backend-api.service';
-import {PageContextService} from './page-context.service';
+import {PageContextService} from './context.service';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import * as howler from 'howler';

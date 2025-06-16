@@ -39,7 +39,7 @@ import {TranslationTabActiveModeService} from '../services/translation-tab-activ
 import {TranslatorOverviewComponent} from './translator-overview.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ChangeListService} from '../../services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';

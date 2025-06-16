@@ -232,9 +232,7 @@ describe('Lesson Information card modal component', () => {
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    progressUrlService = TestBed.inject(
-      ProgressUrlService
-    );
+    progressUrlService = TestBed.inject(ProgressUrlService);
     checkpointCelebrationUtilityService = TestBed.inject(
       CheckpointCelebrationUtilityService
     );
@@ -359,10 +357,7 @@ describe('Lesson Information card modal component', () => {
     'should correctly set logged-out progress learner URL ' +
       'when unique progress URL ID exists',
     fakeAsync(() => {
-      spyOn(
-        progressUrlService,
-        'isInStoryChapterMode'
-      ).and.returnValue(true);
+      spyOn(progressUrlService, 'isInStoryChapterMode').and.returnValue(true);
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         ''
       );
@@ -374,10 +369,9 @@ describe('Lesson Information card modal component', () => {
       spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
         ''
       );
-      spyOn(
-        progressUrlService,
-        'getUniqueProgressUrlId'
-      ).and.returnValue('abcdef');
+      spyOn(progressUrlService, 'getUniqueProgressUrlId').and.returnValue(
+        'abcdef'
+      );
 
       componentInstance.ngOnInit();
 
@@ -479,14 +473,12 @@ describe('Lesson Information card modal component', () => {
   });
 
   it('should save logged-out learner progress correctly', fakeAsync(() => {
-    spyOn(
-      progressUrlService,
-      'setUniqueProgressUrlId'
-    ).and.returnValue(Promise.resolve());
-    spyOn(
-      progressUrlService,
-      'getUniqueProgressUrlId'
-    ).and.returnValue('abcdef');
+    spyOn(progressUrlService, 'setUniqueProgressUrlId').and.returnValue(
+      Promise.resolve()
+    );
+    spyOn(progressUrlService, 'getUniqueProgressUrlId').and.returnValue(
+      'abcdef'
+    );
     spyOn(urlService, 'getOrigin').and.returnValue('https://oppia.org');
 
     componentInstance.saveLoggedOutProgress();

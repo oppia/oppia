@@ -113,9 +113,7 @@ describe('Ratings and recommendations component', () => {
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
-    explorationModeService = TestBed.inject(
-      ExplorationModeService
-    );
+    explorationModeService = TestBed.inject(ExplorationModeService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     localStorageService = TestBed.inject(LocalStorageService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
@@ -178,10 +176,9 @@ describe('Ratings and recommendations component', () => {
           callb(userRating);
         }
       );
-      spyOn(
-        explorationModeService,
-        'isInStoryChapterMode'
-      ).and.returnValue(true);
+      spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+        true
+      );
       spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
         'dummy_story_viewer_page_url'
       );
@@ -244,9 +241,7 @@ describe('Ratings and recommendations component', () => {
       mockOnRatingUpdated.emit();
       tick(1000);
 
-      expect(
-        explorationModeService.isInStoryChapterMode
-      ).toHaveBeenCalled();
+      expect(explorationModeService.isInStoryChapterMode).toHaveBeenCalled();
       expect(componentInstance.inStoryMode).toBe(true);
       expect(componentInstance.storyId).toBe('story_id');
       expect(componentInstance.nextStoryNode).toBe(readOnlyStoryNode2);
@@ -274,10 +269,9 @@ describe('Ratings and recommendations component', () => {
       expect(componentInstance.inStoryMode).toBe(undefined);
       expect(componentInstance.storyViewerUrl).toBe(undefined);
 
-      spyOn(
-        explorationModeService,
-        'isInStoryChapterMode'
-      ).and.returnValue(false);
+      spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+        false
+      );
       spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
         'dummy_story_viewer_page_url'
       );
@@ -285,9 +279,7 @@ describe('Ratings and recommendations component', () => {
       componentInstance.ngOnInit();
       tick();
 
-      expect(
-        explorationModeService.isInStoryChapterMode
-      ).toHaveBeenCalled();
+      expect(explorationModeService.isInStoryChapterMode).toHaveBeenCalled();
       expect(componentInstance.inStoryMode).toBe(false);
       expect(urlInterpolationService.interpolateUrl).not.toHaveBeenCalled();
       expect(componentInstance.storyViewerUrl).toBe(undefined);

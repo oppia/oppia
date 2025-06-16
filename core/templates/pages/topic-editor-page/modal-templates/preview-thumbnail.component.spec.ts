@@ -21,7 +21,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {ThumbnailDisplayComponent} from 'components/forms/custom-forms-directives/thumbnail-display.component';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {PreviewThumbnailComponent} from './preview-thumbnail.component';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 
 describe('Preview Thumbnail Component', function () {
   let componentInstance: PreviewThumbnailComponent;

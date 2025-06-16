@@ -39,7 +39,7 @@ import {
   TranslationOpportunity,
 } from 'pages/contributor-dashboard-page/modal-templates/translation-modal.component';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {
   ImageLocalStorageService,

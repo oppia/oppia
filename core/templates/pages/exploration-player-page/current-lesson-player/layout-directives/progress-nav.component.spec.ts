@@ -106,9 +106,7 @@ describe('Progress nav component', () => {
     componentInstance = fixture.componentInstance;
     urlService = TestBed.inject(UrlService);
     playerPositionService = TestBed.inject(PlayerPositionService);
-    explorationModeService = TestBed.inject(
-      ExplorationModeService
-    );
+    explorationModeService = TestBed.inject(ExplorationModeService);
     focusManagerService = TestBed.inject(FocusManagerService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
@@ -167,9 +165,7 @@ describe('Progress nav component', () => {
       displayedCardIndex
     );
     spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
-    spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(
-      true
-    );
+    spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(true);
     spyOn(focusManagerService, 'setFocusWithoutScroll');
 
     componentInstance.displayedCard = mockDisplayedCard;

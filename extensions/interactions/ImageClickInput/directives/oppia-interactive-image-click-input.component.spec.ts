@@ -27,7 +27,7 @@ import {InteractiveImageClickInput} from './oppia-interactive-image-click-input.
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {ImageClickAnswer} from 'interactions/answer-defs';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {EventEmitter} from '@angular/core';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';

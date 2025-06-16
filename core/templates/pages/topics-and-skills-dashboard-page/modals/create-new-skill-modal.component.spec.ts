@@ -25,7 +25,7 @@ import {SkillCreationService} from 'components/entity-creation-services/skill-cr
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {PageContextService} from 'services/page-context.service';
+import {PageContextService} from 'services/context.service';
 import {CreateNewSkillModalComponent} from './create-new-skill-modal.component';
 
 describe('Create new skill modal', () => {

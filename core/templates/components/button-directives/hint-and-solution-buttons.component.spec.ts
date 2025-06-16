@@ -138,9 +138,7 @@ describe('HintAndSolutionButtonsComponent', () => {
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     hintAndSolutionModalService = TestBed.inject(HintAndSolutionModalService);
-    explorationModeService = TestBed.inject(
-      ExplorationModeService
-    );
+    explorationModeService = TestBed.inject(ExplorationModeService);
     statsReportingService = TestBed.inject(StatsReportingService);
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
@@ -433,9 +431,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         hintsAndSolutionManagerService,
         'isSolutionConsumed'
       ).and.returnValue(true);
-      spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(
-        false
-      );
+      spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(false);
       spyOn(statsReportingService, 'recordSolutionHit');
       spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
         'state1'
@@ -460,9 +456,7 @@ describe('HintAndSolutionButtonsComponent', () => {
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
       true
     );
-    spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(
-      false
-    );
+    spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(false);
     spyOn(statsReportingService, 'recordSolutionHit');
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'state1'
