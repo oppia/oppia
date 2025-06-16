@@ -27,10 +27,7 @@ import {
 } from 'domain/exploration/ExplorationObjectFactory';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
-import {
-  FetchExplorationBackendResponse,
-  ReadOnlyExplorationBackendApiService,
-} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
@@ -41,10 +38,7 @@ import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {
-  ExplorationFeatures,
-  ExplorationFeaturesBackendApiService,
-} from 'services/exploration-features-backend-api.service';
+import {ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {
@@ -63,12 +57,6 @@ import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import isEqual from 'lodash/isEqual';
-import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {ExplorationFeaturesService} from 'services/exploration-features.service';
-import {NumberAttemptsService} from './number-attempts.service';
-import {PretestQuestionBackendApiService} from 'domain/question/pretest-question-backend-api.service';
-import {PlaythroughService} from 'services/playthrough.service';
-import {QuestionPlayerEngineService} from './question-player-engine.service';
 
 @Injectable({
   providedIn: 'root',
@@ -99,26 +87,20 @@ export class ExplorationEngineService {
     private answerClassificationService: AnswerClassificationService,
     private audioPreloaderService: AudioPreloaderService,
     private contentTranslationLanguageService: ContentTranslationLanguageService,
-    private numberAttemptsService: NumberAttemptsService,
     private pageContextService: PageContextService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private entityTranslationsService: EntityTranslationsService,
-    private playthroughService: PlaythroughService,
-    private pretestQuestionBackendApiService: PretestQuestionBackendApiService,
     private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private explorationObjectFactory: ExplorationObjectFactory,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
-    private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private imagePreloaderService: ImagePreloaderService,
     private learnerParamsService: LearnerParamsService,
     private playerTranscriptService: PlayerTranscriptService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
     private translateService: TranslateService,
-    private questionPlayerEngineService: QuestionPlayerEngineService,
-    private explorationFeaturesService: ExplorationFeaturesService,
     private urlService: UrlService
   ) {
     this.setExplorationProperties();

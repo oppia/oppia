@@ -28,14 +28,16 @@ import {FetchExplorationBackendResponse} from 'domain/exploration/read-only-expl
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
-import {ExplorationFeaturesService} from './exploration-features.service';
-import {ExplorationFeatures} from 'domain/exploration/exploration-features.model';
+import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {PretestQuestionBackendApiService} from 'domain/pretest/pretest-question-backend-api.service';
-import {ExplorationFeaturesBackendApiService} from 'domain/exploration/exploration-features-backend-api.service';
+import {PretestQuestionBackendApiService} from '../../../domain/question/pretest-question-backend-api.service';
+import {
+  ExplorationFeatures,
+  ExplorationFeaturesBackendApiService,
+} from 'services/exploration-features-backend-api.service';
 import {StatsReportingService} from './stats-reporting.service';
-import {PlaythroughService} from './playthrough.service';
+import {PlaythroughService} from 'services/playthrough.service';
 import {NumberAttemptsService} from './number-attempts.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {ExplorationModeService} from './exploration-mode.service';
