@@ -58,7 +58,7 @@ class MockNgbModal {
   }
 }
 
-class MockContextservice {
+class MockPageContextService {
   getExplorationId() {
     return 'exp1';
   }
@@ -142,7 +142,7 @@ describe('Translation tab component', () => {
         },
         {
           provide: PageContextService,
-          useClass: MockContextservice,
+          useClass: MockPageContextService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],

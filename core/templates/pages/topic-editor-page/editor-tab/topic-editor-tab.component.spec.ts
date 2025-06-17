@@ -61,7 +61,7 @@ class MockNgbModal {
   }
 }
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId() {
     return 'explorationId';
   }
@@ -144,7 +144,7 @@ describe('Topic editor tab directive', () => {
         },
         {
           provide: PageContextService,
-          useClass: MockContextService,
+          useClass: MockPageContextService,
         },
         {
           provide: ImageUploadHelperService,

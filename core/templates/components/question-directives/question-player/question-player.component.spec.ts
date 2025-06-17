@@ -61,7 +61,7 @@ describe('Question Player Component', () => {
   let userService: UserService;
   let windowRef: WindowRef;
   let playerPositionServiceEmitter = new EventEmitter();
-  let explorationPlayerStateServiceEmitter = new EventEmitter();
+  let questionPlayerEngineServiceEmitter = new EventEmitter();
   let questionPlayerStateServiceEmitter = new EventEmitter();
   let urlService: UrlService;
   let userInfo = new UserInfo(
@@ -92,8 +92,8 @@ describe('Question Player Component', () => {
     onCurrentQuestionChange = playerPositionServiceEmitter;
   }
 
-  class MockExplorationPlayerStateService {
-    onTotalQuestionsReceived = explorationPlayerStateServiceEmitter;
+  class MockQuestionPlayerEngineService {
+    onTotalQuestionsReceived = questionPlayerEngineServiceEmitter;
   }
 
   class MockQuestionPlayerStateService {
@@ -126,7 +126,7 @@ describe('Question Player Component', () => {
         },
         {
           provide: QuestionPlayerEngineService,
-          useClass: MockExplorationPlayerStateService,
+          useClass: MockQuestionPlayerEngineService,
         },
         {
           provide: QuestionPlayerStateService,
@@ -195,7 +195,7 @@ describe('Question Player Component', () => {
     tick();
 
     playerPositionServiceEmitter.emit(1);
-    explorationPlayerStateServiceEmitter.emit(10);
+    questionPlayerEngineServiceEmitter.emit(10);
     questionPlayerStateServiceEmitter.emit('result');
     tick();
 
@@ -228,7 +228,7 @@ describe('Question Player Component', () => {
 
     expect(component.totalQuestions).toBe(0);
 
-    explorationPlayerStateServiceEmitter.emit(3);
+    questionPlayerEngineServiceEmitter.emit(3);
     tick();
     questionPlayerStateServiceEmitter.emit('new uri');
     tick();

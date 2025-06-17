@@ -41,7 +41,7 @@ class MockRouter {
   }
 }
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId(): string {
     return 'expId123';
   }
@@ -62,7 +62,7 @@ describe('ExplorationEditorPageAuthGuard', () => {
           useClass: MockAccessValidationBackendApiService,
         },
         {provide: Router, useClass: MockRouter},
-        {provide: PageContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         Location,
       ],
     });

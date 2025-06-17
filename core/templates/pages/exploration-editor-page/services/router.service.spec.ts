@@ -36,7 +36,7 @@ import {ExplorationInitStateNameService} from './exploration-init-state-name.ser
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId() {
     return 'expID';
   }
@@ -79,7 +79,7 @@ describe('Router Service', () => {
         TranslationLanguageService,
         {
           provide: PageContextService,
-          useClass: MockContextService,
+          useClass: MockPageContextService,
         },
         {
           provide: ExplorationInitStateNameService,

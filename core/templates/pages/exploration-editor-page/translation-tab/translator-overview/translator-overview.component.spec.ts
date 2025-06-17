@@ -60,7 +60,7 @@ class MockNgbModal {
   }
 }
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId() {
     return 'expId';
   }
@@ -118,7 +118,7 @@ describe('Translator Overview component', () => {
         },
         {
           provide: PageContextService,
-          useClass: MockContextService,
+          useClass: MockPageContextService,
         },
         {
           provide: PlatformFeatureService,

@@ -32,7 +32,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {PageTitleService} from 'services/page-title.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId() {
     return 'explorationId';
   }
@@ -70,7 +70,7 @@ describe('Topic editor page', () => {
         UrlService,
         {
           provide: PageContextService,
-          useClass: MockContextService,
+          useClass: MockPageContextService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
