@@ -102,7 +102,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SERIAL_CHAPTER_LAUNCH_LEARNER_VIEW,
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP
 ]
@@ -118,7 +117,8 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
-    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST
+    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -157,7 +157,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD.value: (
         (
             'This flag is to show redesigned learner dashboard.',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.SHOW_TRANSLATION_SIZE.value: (
