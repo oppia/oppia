@@ -207,7 +207,7 @@ describe('Question Suggestion Editor Modal Component', () => {
       version: 3,
       all_questions_merged: false,
     };
-    skill = skill.createFromBackendDict(skillDict);
+    skill = Skill.createFromBackendDict(skillDict);
     component.skill = skill;
     question = questionObjectFactory.createFromBackendDict({
       id: skill.getId(),

@@ -29,7 +29,7 @@ import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-ed
 import {ContextService} from 'services/context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {TopicsAndSkillsDashboardPageConstants} from '../topics-and-skills-dashboard-page.constants';
-import { ValidatorsService } from 'services/validators.service';
+import {ValidatorsService} from 'services/validators.service';
 
 @Component({
   selector: 'oppia-create-new-skill-modal',

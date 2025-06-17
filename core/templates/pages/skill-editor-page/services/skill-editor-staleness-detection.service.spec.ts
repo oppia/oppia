@@ -128,7 +128,7 @@ describe('Skill editor staleness detection service', () => {
   });
 
   it('should show stale tab info modal and change the favicon', () => {
-    let skill = skill.createFromBackendDict(skillDict);
+    let skill = Skill.createFromBackendDict(skillDict);
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(skill);
     let skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
       'skill',
@@ -170,7 +170,7 @@ describe('Skill editor staleness detection service', () => {
     'should open or close presence of unsaved changes info modal ' +
       'depending on the presence of unsaved changes on some other tab',
     () => {
-      let skill = skill.createFromBackendDict(skillDict);
+      let skill = Skill.createFromBackendDict(skillDict);
       spyOn(skillEditorStateService, 'getSkill').and.returnValue(skill);
       let skillEditorBrowserTabsInfo = EntityEditorBrowserTabsInfo.create(
         'skill',

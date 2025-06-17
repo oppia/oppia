@@ -69,7 +69,7 @@ describe('Skill question tab component', () => {
       },
     };
 
-    sampleSkill = skill.createFromBackendDict({
+    sampleSkill = Skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1],

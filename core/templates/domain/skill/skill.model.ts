@@ -234,7 +234,7 @@ export class Skill {
       next_misconception_id: this._nextMisconceptionId,
       superseding_skill_id: this._supersedingSkillId,
       all_questions_merged: this._allQuestionsMerged,
-      prerequisite_skill_ids: this._prerequisiteSkillIds
+      prerequisite_skill_ids: this._prerequisiteSkillIds,
     };
   }
 
@@ -252,7 +252,6 @@ export class Skill {
     return issues;
   }
 
-
   static createFromBackendDict(skillBackendDict: SkillBackendDict): Skill {
     return new Skill(
       skillBackendDict.id,
@@ -260,12 +259,8 @@ export class Skill {
       Skill.generateMisconceptionsFromBackendDict(
         skillBackendDict.misconceptions
       ),
-      Skill.generateRubricsFromBackendDict(
-        skillBackendDict.rubrics
-      ),
-      ConceptCard.createFromBackendDict(
-        skillBackendDict.skill_contents
-      ),
+      Skill.generateRubricsFromBackendDict(skillBackendDict.rubrics),
+      ConceptCard.createFromBackendDict(skillBackendDict.skill_contents),
       skillBackendDict.language_code,
       skillBackendDict.version,
       skillBackendDict.next_misconception_id,

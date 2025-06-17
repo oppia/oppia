@@ -125,7 +125,7 @@ describe('Skill editor main tab Component', () => {
       },
     };
 
-    sampleSkill = skill.createFromBackendDict({
+    sampleSkill = Skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1],

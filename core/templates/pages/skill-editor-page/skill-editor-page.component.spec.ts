@@ -172,7 +172,7 @@ describe('Skill editor page', () => {
       superseding_skill_id: '2',
       next_misconception_id: 3,
     };
-    skill = skill.createFromBackendDict(skillDict);
+    skill = Skill.createFromBackendDict(skillDict);
     spyOn(skillEditorStateService, 'getSkill').and.returnValue(skill);
     localStorageService.removeOpenedEntityEditorBrowserTabsInfo(
       EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS

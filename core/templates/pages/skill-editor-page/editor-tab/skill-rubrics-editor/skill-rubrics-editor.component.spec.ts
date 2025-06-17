@@ -81,7 +81,7 @@ describe('Skill Rubrics Editor Component', () => {
       },
     };
 
-    sampleSkill = skill.createFromBackendDict({
+    sampleSkill = Skill.createFromBackendDict({
       id: '1',
       description: 'test description',
       misconceptions: [],

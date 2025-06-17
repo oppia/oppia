@@ -135,7 +135,7 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
           voiceovers_mapping: {},
         },
       };
-      skill = skill.createFromBackendDict({
+      skill = Skill.createFromBackendDict({
         id: skillId,
         description: 'Skill 1 description',
         misconceptions: [misconceptionDict1],

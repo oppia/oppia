@@ -227,7 +227,7 @@ describe('Questions List Component', () => {
 
     questionStateData = question.getStateData();
 
-    skill = skill.createFromBackendDict({
+    skill = Skill.createFromBackendDict({
       id: 'skillId1',
       description: 'test description 1',
       misconceptions: [
@@ -429,7 +429,7 @@ describe('Questions List Component', () => {
   });
 
   it('should populate misconceptions when a question is created', fakeAsync(() => {
-    const skill = skill.createFromBackendDict({
+    const skill = Skill.createFromBackendDict({
       id: 'skillId1',
       description: 'test description 1',
       misconceptions: [

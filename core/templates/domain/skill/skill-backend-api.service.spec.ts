@@ -100,9 +100,7 @@ describe('Skill backend API service', () => {
 
   it('should fetch all skills', fakeAsync(() => {
     const skills: SkillBackendDict[] = [];
-    skills.push(
-      skill.createFromBackendDict(skillBackendDict).toBackendDict()
-    );
+    skills.push(skill.createFromBackendDict(skillBackendDict).toBackendDict());
     skillBackendApiService
       .fetchAllSkills()
       .toPromise()
@@ -117,7 +115,7 @@ describe('Skill backend API service', () => {
   }));
 
   it('should succesfully fetch an existing skill from the backend.', fakeAsync(() => {
-    skill = skill.createFromBackendDict(skillBackendDict);
+    skill = Skill.createFromBackendDict(skillBackendDict);
     const assignedSkillTopicData = {
       topic: 'skillId',
     };
@@ -185,7 +183,7 @@ describe('Skill backend API service', () => {
   }));
 
   it('should make a request to update the skill in the backend.', fakeAsync(() => {
-    skill = skill.createFromBackendDict(skillBackendDict);
+    skill = Skill.createFromBackendDict(skillBackendDict);
     const backendResponse = {
       skill: skillBackendDict,
     };
@@ -356,7 +354,7 @@ describe('Skill backend API service', () => {
   );
 
   it('should succesfully fetch multiple existing skills from the backend.', fakeAsync(() => {
-    skill = skill.createFromBackendDict(skillBackendDict);
+    skill = Skill.createFromBackendDict(skillBackendDict);
     const backendResponse = {
       skills: [skillBackendDict, skillBackendDict],
     };

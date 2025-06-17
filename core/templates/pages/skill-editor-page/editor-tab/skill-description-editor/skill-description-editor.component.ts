@@ -29,7 +29,7 @@ import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-ed
 import {Skill} from 'domain/skill/skill.model';
 import {AppConstants} from 'app.constants';
 import {SkillRights} from 'domain/skill/skill-rights.model';
-import { ValidatorsService } from 'services/validators.service';
+import {ValidatorsService} from 'services/validators.service';
 
 @Component({
   selector: 'oppia-skill-description-editor',
