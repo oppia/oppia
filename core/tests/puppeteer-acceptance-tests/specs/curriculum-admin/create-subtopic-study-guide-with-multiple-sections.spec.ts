@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for Creating, Updating and Deleting Subtopic Study Guide Sections by a Curriculum Admin.
+ * @fileoverview Acceptance Test for Creating, Updating and Deleting Subtopic Study Guides with multiple sections by a Curriculum Admin.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -62,7 +62,17 @@ describe('Curriculum Admin', function () {
       '1234567',
       'Addition and Subtraction'
     );
+    await curriculumAdmin.expectScreenshotToMatch(
+      'subtopicWithSingleSection',
+      __dirname
+    );
+    await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
     await curriculumAdmin.checkAddSectionModalShowsLengthError();
+    await curriculumAdmin.expectScreenshotToMatch(
+      'sectionContentLengthError',
+      __dirname
+    );
+    await curriculumAdmin.clearContentFieldAndCloseAddSectionModal();
     await curriculumAdmin.addSubtopicStudyGuideSection(
       'Section heading',
       'Section content',

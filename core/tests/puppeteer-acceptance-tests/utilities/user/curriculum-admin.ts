@@ -102,6 +102,8 @@ const subtopicStudyGuideHeadingField =
 const subtopicStudyGuideContentField =
   '.e2e-test-create-subtopic-page-content-rich-text-editor';
 const showSectionsList = '.e2e-test-show-study-guide-sections-list';
+const showSubtopicsList = '.e2e-test-show-subtopics-list';
+const firstSubtopicTile = '.e2e-test-subtopic';
 const firstStudyGuideSectionTile = '.e2e-test-study-guide-section-0';
 const addStudyGuideSectionButton = '.e2e-test-add-study-guide-section';
 const addStudyGuideSectionModalHeading =
@@ -520,6 +522,7 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Save a topic as a curriculum admin.
+   * @param {string} topicName - The name of the Topic whose draft is to be saved.
    */
   async saveTopicDraft(topicName: string): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
@@ -560,6 +563,9 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Create a subtopic as a curriculum admin.
+   * @param {string} title - The title of the Subtopic.
+   * @param {string} urlFragment - The url fragment of the Subtopic.
+   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
    */
   async createSubtopicForTopic(
     title: string,
@@ -597,7 +603,12 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Create a subtopic as a curriculum admin.
+   * Create a subtopic with study guides as a curriculum admin.
+   * @param {string} title - The title of the Subtopic.
+   * @param {string} urlFragment - The url fragment of the Subtopic.
+   * @param {string} heading - The heading of the initial Subtopic Study Guide Section.
+   * @param {string} content - The content of the initial Subtopic Study Guide Section.
+   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
    */
   async createSubtopicWithStudyGuideForTopic(
     title: string,
@@ -637,14 +648,15 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(firstStudyGuideSectionTile, {
       visible: true,
     });
-    await this.expectScreenshotToMatch('subtopicWithSingleSection', __dirname);
-    await this.saveTopicDraft(topicName);
     showMessage(`Subtopic ${title} is created.`);
   }
 
   /**
    * Add a section to the subtopic study guide. Make sure you are
    * on the subtopic editor tab for this to work.
+   * @param {string} sectionHeading - The heading of the Section to be added.
+   * @param {string} sectionContent - The content of the Section to be added.
+   * @param {number} currentNumberOfSections - The number of the Sections currently in the Study Guide.
    */
   async addSubtopicStudyGuideSection(
     sectionHeading: string,
@@ -675,6 +687,14 @@ export class CurriculumAdmin extends BaseUser {
    * tab for this to work.
    */
   async checkAddSectionModalShowsLengthError(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(showSubtopicsList);
+      await this.clickOn(firstSubtopicTile);
+      await this.clickOn(showSectionsList);
+    }
+    await this.page.waitForSelector(addStudyGuideSectionButton, {
+      visible: true,
+    });
     await this.clickOn(addStudyGuideSectionButton);
     await this.type(addStudyGuideSectionModalHeading, 'Section Heading');
     await this.clickOn(addStudyGuideSectionModalContent);
@@ -686,7 +706,12 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(addStudyGuideSectionContentLength, {
       visible: true,
     });
-    await this.expectScreenshotToMatch('sectionContentLengthError', __dirname);
+  }
+
+  /**
+   * Clears the content of the Add Section Modal and closes it.
+   */
+  async clearContentFieldAndCloseAddSectionModal(): Promise<void> {
     await this.clearAllTextFrom(richTextAreaField);
     await this.page.waitForSelector(addStudyGuideSectionContentLength, {
       hidden: true,
@@ -697,6 +722,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Clicks on a Study Guide Section Tile to expand it.
    * Indexes start from 0.
+   * @param {number} index - The index of the Section to be expanded.
    */
   async expandStudyGuideSectionTile(index: number): Promise<void> {
     await this.clickOn(`.e2e-test-study-guide-section-${index}`);
@@ -737,6 +763,7 @@ export class CurriculumAdmin extends BaseUser {
   /**
    * Deletes a Section of the subtopic study guide.
    * Indexes start from 0.
+   * @param {number} index - The index of the Section to be deleted.
    */
   async deleteStudyGuideSection(index: number): Promise<void> {
     await this.clickOn(
