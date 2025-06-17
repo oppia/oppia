@@ -79,8 +79,8 @@ export class OppiaFooterComponent {
     return this.subscriptionProcessing;
   }
 
-  isAlreadySubscribed(email: string | null): boolean {
-    return this.emailsSubscribed.has(email ?? '');
+  isAlreadySubscribed(email: string): boolean {
+    return this.emailsSubscribed.has(email);
   }
 
   clearNewsletterWarning(): void {
@@ -90,11 +90,11 @@ export class OppiaFooterComponent {
   subscribeToMailingList(): void {
     // Convert null or empty string to null for consistency.
     const userName = this.name ? String(this.name) : null;
-    if (this.isAlreadySubscribed(this.emailAddress)) {
+    if (this.isAlreadySubscribed(String(this.emailAddress))) {
       this.emailDuplicated = true;
     } else {
       this.subscriptionProcessing = true;
-      this.emailsSubscribed.add(this.emailAddress ?? '');
+      this.emailsSubscribed.add(String(this.emailAddress));
       this.mailingListBackendApiService
         .subscribeUserToMailingList(
           String(this.emailAddress),
