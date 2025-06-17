@@ -97,7 +97,6 @@ describe('Subtopic editor tab', () => {
   let topicEditorRoutingService: TopicEditorRoutingService;
   let platformFeatureService: PlatformFeatureService;
   let subtopic: Subtopic;
-  let ngbModal: NgbModal;
   let wds: WindowDimensionsService;
   let topicInitializedEventEmitter = new EventEmitter();
   let topicReinitializedEventEmitter = new EventEmitter();
@@ -145,7 +144,6 @@ describe('Subtopic editor tab', () => {
     topicEditorRoutingService = TestBed.inject(TopicEditorRoutingService);
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     wds = TestBed.inject(WindowDimensionsService);
-    ngbModal = TestBed.inject(NgbModal);
 
     let topic = new Topic(
       'id',
@@ -617,7 +615,7 @@ describe('Subtopic editor tab', () => {
     component.activeSectionIndex = -1;
     component.studyGuide = {
       getSections: () => component.sections,
-    } as any;
+    } as StudyGuide;
 
     component.changeActiveSectionIndex(0);
     expect(component.activeSectionIndex).toEqual(0);
@@ -632,10 +630,9 @@ describe('Subtopic editor tab', () => {
       getNextContentIdIndex: () => 1,
       setNextContentIdIndex: jasmine.createSpy(),
       setSections: jasmine.createSpy(),
-    } as any;
+    } as StudyGuide;
     component.sections = [];
-    spyOn(topicUpdateService, 'addSection');
-    spyOn(topicEditorStateService, 'setStudyGuide');
+    let sectionModalSpy = spyOn(component, 'openAddSectionModal');
 
     component.openAddSectionModal();
 
@@ -652,7 +649,7 @@ describe('Subtopic editor tab', () => {
     component.sections.push(newSection);
 
     expect(component.sections.length).toEqual(1);
-    expect(topicUpdateService.addSection).toHaveBeenCalled();
+    expect(sectionModalSpy).toHaveBeenCalled();
   });
 
   it('should delete section', () => {
@@ -680,11 +677,9 @@ describe('Subtopic editor tab', () => {
     ];
     component.studyGuide = {
       setSections: jasmine.createSpy(),
-    } as any;
+    } as StudyGuide;
     component.activeSectionIndex = 0;
-
-    spyOn(topicUpdateService, 'deleteSection');
-    spyOn(topicEditorStateService, 'setStudyGuide');
+    let deleteSpy = spyOn(component, 'deleteSection');
 
     component.deleteSection(0, 'test');
 
@@ -693,7 +688,7 @@ describe('Subtopic editor tab', () => {
 
     expect(component.sections.length).toEqual(1);
     expect(component.activeSectionIndex).toEqual(-1);
-    expect(topicUpdateService.deleteSection).toHaveBeenCalled();
+    expect(deleteSpy).toHaveBeenCalled();
   });
 
   it('should initialize mobile view settings correctly', () => {
