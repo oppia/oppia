@@ -152,7 +152,7 @@ export class ConversationSkinComponent {
   questionSessionCompleted: boolean;
   moveToExploration: boolean;
   upcomingInteractionInstructions;
-  visitedStateNames: string[] = [];
+  visitedCheckpointStateNames: string[] = [];
   completedStateNames: string[] = [];
   prevSessionStatesProgress: string[] = [];
   mostRecentlyReachedCheckpoint: string;
@@ -481,8 +481,8 @@ export class ConversationSkinComponent {
             this.explorationPlayerStateService.setLastCompletedCheckpoint(
               firstStateName
             );
+            this.visitedCheckpointStateNames.push(firstStateName);
           });
-        this.visitedStateNames.push(firstStateName);
       }
     });
   }
@@ -789,6 +789,9 @@ export class ConversationSkinComponent {
         for (let i = 0; i < this.prevSessionStatesProgress.length; i++) {
           // Set state name of a previously completed state.
           let stateName = this.prevSessionStatesProgress[i];
+          let stateData =
+            this.explorationEngineService.getStateFromStateName(stateName);
+
           // Skip the card if it has already been added to transcript.
           if (
             !this.playerTranscriptService.hasEncounteredStateBefore(stateName)
@@ -798,11 +801,17 @@ export class ConversationSkinComponent {
             this._addNewCard(stateCard);
           }
 
+          if (
+            !this.visitedCheckpointStateNames.includes(stateName) &&
+            stateData.cardIsCheckpoint
+          ) {
+            this.visitedCheckpointStateNames.push(stateName);
+          }
+
           if (this.mostRecentlyReachedCheckpoint === stateName) {
             break;
           }
 
-          this.visitedStateNames.push(stateName);
           indexToRedirectTo += 1;
         }
 
@@ -846,7 +855,7 @@ export class ConversationSkinComponent {
       let currentStateName = currentState.name;
       if (
         currentState.cardIsCheckpoint &&
-        !this.visitedStateNames.includes(currentStateName) &&
+        !this.visitedCheckpointStateNames.includes(currentStateName) &&
         !this.prevSessionStatesProgress.includes(currentStateName)
       ) {
         this.readOnlyExplorationBackendApiService
@@ -863,7 +872,7 @@ export class ConversationSkinComponent {
               this.explorationPlayerStateService.getUniqueProgressUrlId()
             );
           });
-        this.visitedStateNames.push(currentStateName);
+        this.visitedCheckpointStateNames.push(currentStateName);
       }
     }
 

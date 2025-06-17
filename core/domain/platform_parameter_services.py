@@ -96,7 +96,7 @@ def get_server_mode() -> platform_parameter_domain.ServerMode:
     # TODO(release-scripts#137): Remove once project ID is verified on all
     # servers.
     logging.info('Logging project ID for debugging: %s' % (
-        os.environ['GOOGLE_CLOUD_PROJECT']))
+        os.environ.get('GOOGLE_CLOUD_PROJECT', 'no-project-id-specified')))
     return (
         platform_parameter_domain.ServerMode.DEV
         if constants.DEV_MODE
