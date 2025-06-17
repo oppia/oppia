@@ -1074,7 +1074,13 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(model.retries, 0)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
+        ]
     )
     def test_email_is_not_sent_recipient_has_muted_emails_globally(
         self
@@ -1127,7 +1133,19 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_emails_are_sent_for_registered_user(self) -> None:
@@ -1195,7 +1213,19 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_email_is_sent_for_reply_on_feedback(self) -> None:
@@ -1226,7 +1256,19 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_email_is_sent_for_changing_status_of_thread(self) -> None:
@@ -1261,7 +1303,19 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_email_is_sent_for_each_feedback_message(self) -> None:
@@ -1314,7 +1368,19 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_emails_are_sent(self) -> None:
@@ -1376,7 +1442,19 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_correct_emails_are_sent_for_multiple_feedback(self) -> None:
@@ -1441,7 +1519,13 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
             self.assertEqual(messages[0].body, expected_email_text_body)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
+        ]
     )
     def test_that_emails_are_not_sent_if_already_seen(self) -> None:
         with self.can_send_feedback_email_ctx:
@@ -1485,7 +1569,19 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_emails_are_sent_for_feedback_message(self) -> None:
@@ -1538,7 +1634,19 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_emails_are_sent_for_status_change(self) -> None:
@@ -1591,7 +1699,19 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'Oppia'),
-            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER)
+            (platform_parameter_list.ParamName.EMAIL_FOOTER, FOOTER),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.NOREPLY_EMAIL_ADDRESS,
+                'noreply@example.com'
+            )
         ]
     )
     def test_that_emails_are_sent_for_both_status_change_and_message(
