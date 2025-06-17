@@ -75,8 +75,8 @@ describe('Add Study Guide Section Modal Component', () => {
   });
 
   it('should initialize properties after component is initialized', () => {
-    expect(component.tmpSectionHeadingPlaintext).toEqual('');
-    expect(component.tmpSectionContentHtml).toBe('');
+    expect(component.tempSectionHeadingPlaintext).toEqual('');
+    expect(component.tempSectionContentHtml).toBe('');
   });
 
   it('should close modal when saving section', () => {
@@ -101,26 +101,26 @@ describe('Add Study Guide Section Modal Component', () => {
     );
   });
 
-  it('should update tmpSectionHeadingPlaintext', () => {
-    component.tmpSectionHeadingPlaintext = 'heading';
+  it('should update tempSectionHeadingPlaintext', () => {
+    component.tempSectionHeadingPlaintext = 'heading';
 
     let heading = 'new heading';
     component.updateLocalHeading(heading);
 
-    expect(component.tmpSectionHeadingPlaintext).toEqual(heading);
+    expect(component.tempSectionHeadingPlaintext).toEqual(heading);
   });
 
-  it('should update tmpSectionContentHtml', () => {
-    component.tmpSectionContentHtml = 'con';
+  it('should update tempSectionContentHtml', () => {
+    component.tempSectionContentHtml = 'con';
 
     let con = 'new con';
     component.updateLocalContent(con);
 
-    expect(component.tmpSectionContentHtml).toEqual(con);
+    expect(component.tempSectionContentHtml).toEqual(con);
   });
 
   it('should check if section content length is exceeded', () => {
-    component.tmpSectionContentHtml = 'short content';
+    component.tempSectionContentHtml = 'short content';
     let computeHtmlLengthSpy = spyOn(htmlLengthService, 'computeHtmlLength');
     computeHtmlLengthSpy.and.returnValue(500);
     let isExceeded = component.isSectionContentLengthExceeded();

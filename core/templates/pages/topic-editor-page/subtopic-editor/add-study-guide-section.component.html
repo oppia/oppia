@@ -10,7 +10,7 @@
         <strong>Heading</strong>
         <schema-based-editor class="e2e-test-add-study-guide-section-modal-heading-field"
                              [schema]="getHeadingSchema()"
-                             [localValue]="tmpSectionHeadingPlaintext"
+                             [localValue]="tempSectionHeadingPlaintext"
                              (localValueChange)="this.updateLocalHeading($event)">
         </schema-based-editor>
       </div>
@@ -18,7 +18,7 @@
         <strong>Content</strong>
         <schema-based-editor class="e2e-test-add-study-guide-section-modal-content-field"
                              [schema]="getContentSchema()"
-                             [localValue]="tmpSectionContentHtml"
+                             [localValue]="tempSectionContentHtml"
                              (localValueChange)="this.updateLocalContent($event)">
         </schema-based-editor>
       </div>
@@ -33,7 +33,7 @@
   <button class="btn btn-secondary e2e-test-add-study-guide-section-modal-cancel-button" (click)="cancel()" type="button">Cancel</button>
   <button class="btn btn-success e2e-test-add-study-guide-section-modal-save-button"
           (click)="saveSection()"
-          [disabled]="!(tmpSectionHeadingPlaintext && tmpSectionContentHtml) || isSectionContentLengthExceeded()">
+          [disabled]="!(tempSectionHeadingPlaintext && tempSectionContentHtml) || isSectionContentLengthExceeded()">
   Save
   </button>
 </div>

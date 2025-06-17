@@ -17,7 +17,6 @@
  */
 
 import {ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
-import cloneDeep from 'lodash/cloneDeep';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
@@ -49,8 +48,8 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   @Input() isEditable!: boolean;
   @Input() section!: StudyGuideSection;
   container!: Container;
-  tmpSectionHeadingPlaintext!: string;
-  tmpSectionContentHtml!: string;
+  tempSectionHeadingPlaintext!: string;
+  tempSectionContentHtml!: string;
   // Below properties are null when the editor is closed.
   sectionHeadingBackup!: string | null;
   sectionContentBackup!: string | null;
@@ -113,16 +112,14 @@ export class StudyGuideSectionEditorComponent implements OnInit {
 
   openHeadingEditor(): void {
     if (this.isEditable) {
-      this.sectionHeadingBackup = cloneDeep(
-        this.container.sectionHeadingPlaintext
-      );
+      this.sectionHeadingBackup = this.container.sectionHeadingPlaintext;
       this.headingEditorIsOpen = true;
     }
   }
 
   openContentEditor(): void {
     if (this.isEditable) {
-      this.sectionContentBackup = cloneDeep(this.container.sectionContentHtml);
+      this.sectionContentBackup = this.container.sectionContentHtml;
       this.contentEditorIsOpen = true;
     }
   }
@@ -156,9 +153,7 @@ export class StudyGuideSectionEditorComponent implements OnInit {
     if (this.sectionHeadingBackup === null) {
       return;
     }
-    this.container.sectionHeadingPlaintext = cloneDeep(
-      this.sectionHeadingBackup
-    );
+    this.container.sectionHeadingPlaintext = this.sectionHeadingBackup;
     this.sectionHeadingBackup = null;
     this.headingEditorIsOpen = false;
   }
@@ -167,7 +162,7 @@ export class StudyGuideSectionEditorComponent implements OnInit {
     if (this.sectionContentBackup === null) {
       return;
     }
-    this.container.sectionContentHtml = cloneDeep(this.sectionContentBackup);
+    this.container.sectionContentHtml = this.sectionContentBackup;
     this.sectionContentBackup = null;
     this.contentEditorIsOpen = false;
   }

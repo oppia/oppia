@@ -38,8 +38,8 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  tmpSectionHeadingPlaintext: string = '';
-  tmpSectionContentHtml: string = '';
+  tempSectionHeadingPlaintext: string = '';
+  tempSectionContentHtml: string = '';
   SECTION_FORM_CONTENT_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {},
@@ -65,21 +65,21 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
   }
 
   updateLocalHeading($event: string): void {
-    if (this.tmpSectionHeadingPlaintext !== $event) {
-      this.tmpSectionHeadingPlaintext = $event;
+    if (this.tempSectionHeadingPlaintext !== $event) {
+      this.tempSectionHeadingPlaintext = $event;
     }
   }
 
   updateLocalContent($event: string): void {
-    if (this.tmpSectionContentHtml !== $event) {
-      this.tmpSectionContentHtml = $event;
+    if (this.tempSectionContentHtml !== $event) {
+      this.tempSectionContentHtml = $event;
     }
   }
 
   isSectionContentLengthExceeded(): boolean {
     return Boolean(
       this.htmlLengthService.computeHtmlLength(
-        this.tmpSectionContentHtml,
+        this.tempSectionContentHtml,
         CALCULATION_TYPE_CHARACTER
       ) > AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT
     );
@@ -87,8 +87,8 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
 
   saveSection(): void {
     this.ngbActiveModal.close({
-      sectionHeadingPlaintext: this.tmpSectionHeadingPlaintext,
-      sectionContentHtml: this.tmpSectionContentHtml,
+      sectionHeadingPlaintext: this.tempSectionHeadingPlaintext,
+      sectionContentHtml: this.tempSectionContentHtml,
     });
   }
 }

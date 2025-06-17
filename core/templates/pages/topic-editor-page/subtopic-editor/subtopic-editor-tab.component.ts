@@ -151,14 +151,10 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic;
       if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
         var sections = this.studyGuide.getSections();
-        if (sections) {
-          this.sections = sections;
-        }
+        this.sections = sections;
       } else {
         var pageContents = this.subtopicPage.getPageContents();
-        if (pageContents) {
-          this.htmlData = pageContents.getHtml();
-        }
+        this.htmlData = pageContents.getHtml();
       }
       this.uncategorizedSkillSummaries =
         this.topic.getUncategorizedSkillSummaries();
