@@ -58,7 +58,8 @@ class MockActiveModal {
 }
 
 class MockTopicEditorStateService {
-  private topicReinitializedEventEmitter: EventEmitter<void> = new EventEmitter();
+  private topicReinitializedEventEmitter: EventEmitter<void> =
+    new EventEmitter();
 
   getTopic() {
     return new Topic(
@@ -101,8 +102,8 @@ class MockTopicEditorStateService {
 class MockPlatformFeatureService {
   status = {
     ShowRestructuredStudyGuides: {
-      isEnabled: false
-    }
+      isEnabled: false,
+    },
   };
 }
 
@@ -348,11 +349,15 @@ describe('create new subtopic modal', function () {
 
   it('should check if url fragment is valid', () => {
     component.editableUrlFragment = 'valid-url-fragment';
-    spyOn(subtopicValidationService, 'isUrlFragmentValid').and.returnValue(true);
+    spyOn(subtopicValidationService, 'isUrlFragmentValid').and.returnValue(
+      true
+    );
 
     let isValid = component.isUrlFragmentValid();
     expect(isValid).toBe(true);
-    expect(subtopicValidationService.isUrlFragmentValid).toHaveBeenCalledWith('valid-url-fragment');
+    expect(subtopicValidationService.isUrlFragmentValid).toHaveBeenCalledWith(
+      'valid-url-fragment'
+    );
   });
 
   it('should check if restructured study guides feature is enabled', () => {
@@ -370,8 +375,13 @@ describe('create new subtopic modal', function () {
 
     component.cancel();
 
-    expect(topicEditorStateService.deleteSubtopicPage).toHaveBeenCalledWith('1', 1);
-    expect(topicEditorStateService.onTopicReinitialized.emit).toHaveBeenCalled();
+    expect(topicEditorStateService.deleteSubtopicPage).toHaveBeenCalledWith(
+      '1',
+      1
+    );
+    expect(
+      topicEditorStateService.onTopicReinitialized.emit
+    ).toHaveBeenCalled();
     expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
   }));
 
@@ -404,7 +414,9 @@ describe('create new subtopic modal', function () {
     component.editableUrlFragment = 'test-url';
     component.htmlData = 'test html data';
 
-    spyOn(subtopicValidationService, 'checkValidSubtopicName').and.returnValue(true);
+    spyOn(subtopicValidationService, 'checkValidSubtopicName').and.returnValue(
+      true
+    );
     spyOn(topicUpdateService, 'addSubtopic');
     spyOn(topicUpdateService, 'setSubtopicTitle');
     spyOn(topicUpdateService, 'setSubtopicThumbnailFilename');
@@ -418,13 +430,19 @@ describe('create new subtopic modal', function () {
     component.save();
 
     expect(topicUpdateService.addSubtopic).toHaveBeenCalledWith(
-      topic, 'Test Subtopic', 'test-url'
+      topic,
+      'Test Subtopic',
+      'test-url'
     );
     expect(topicUpdateService.setSubtopicTitle).toHaveBeenCalledWith(
-      topic, 123, 'Test Subtopic'
+      topic,
+      123,
+      'Test Subtopic'
     );
     expect(topicUpdateService.setSubtopicUrlFragment).toHaveBeenCalledWith(
-      topic, 123, 'test-url'
+      topic,
+      123,
+      'test-url'
     );
     expect(SubtopicPage.createDefault).toHaveBeenCalledWith('1', 123);
     expect(topicEditorStateService.setSubtopicPage).toHaveBeenCalled();
@@ -439,7 +457,9 @@ describe('create new subtopic modal', function () {
     component.sectionHeadingPlaintext = 'Test Heading';
     component.sectionContentHtml = 'Test Content';
 
-    spyOn(subtopicValidationService, 'checkValidSubtopicName').and.returnValue(true);
+    spyOn(subtopicValidationService, 'checkValidSubtopicName').and.returnValue(
+      true
+    );
     spyOn(topicUpdateService, 'addSubtopic');
     spyOn(topicUpdateService, 'setSubtopicTitle');
     spyOn(topicUpdateService, 'setSubtopicThumbnailFilename');
@@ -453,17 +473,27 @@ describe('create new subtopic modal', function () {
     component.save();
 
     expect(topicUpdateService.addSubtopic).toHaveBeenCalledWith(
-      topic, 'Test Subtopic', 'test-url'
+      topic,
+      'Test Subtopic',
+      'test-url'
     );
     expect(topicUpdateService.setSubtopicTitle).toHaveBeenCalledWith(
-      topic, 123, 'Test Subtopic'
+      topic,
+      123,
+      'Test Subtopic'
     );
     expect(topicUpdateService.setSubtopicUrlFragment).toHaveBeenCalledWith(
-      topic, 123, 'test-url'
+      topic,
+      123,
+      'test-url'
     );
     expect(StudyGuide.createDefault).toHaveBeenCalledWith('1', 123);
     expect(topicUpdateService.updateSection).toHaveBeenCalledWith(
-      jasmine.any(Object), 0, 'Test Heading', 'Test Content', 123
+      jasmine.any(Object),
+      0,
+      'Test Heading',
+      'Test Content',
+      123
     );
     expect(topicEditorStateService.setStudyGuide).toHaveBeenCalled();
     expect(ngbActiveModal.close).toHaveBeenCalledWith(123);
@@ -474,11 +504,16 @@ describe('create new subtopic modal', function () {
       ' when "Create Subtopic" button clicked',
     () => {
       spyOn(ngbActiveModal, 'close');
-      spyOn(subtopicValidationService, 'checkValidSubtopicName').and.returnValue(false);
+      spyOn(
+        subtopicValidationService,
+        'checkValidSubtopicName'
+      ).and.returnValue(false);
 
       component.save();
 
-      expect(component.errorMsg).toBe('A subtopic with this title already exists');
+      expect(component.errorMsg).toBe(
+        'A subtopic with this title already exists'
+      );
       expect(ngbActiveModal.close).not.toHaveBeenCalled();
     }
   );
@@ -503,7 +538,9 @@ describe('create new subtopic modal', function () {
     component.addSubtopic();
 
     expect(topicUpdateService.addSubtopic).toHaveBeenCalledWith(
-      topic, 'Test Title', 'test-fragment'
+      topic,
+      'Test Title',
+      'test-fragment'
     );
   });
 
@@ -517,11 +554,13 @@ describe('create new subtopic modal', function () {
 
     component.addSubtopic();
 
-    expect(topicUpdateService.setSubtopicThumbnailFilename).toHaveBeenCalledWith(
-      topic, 123, 'test-image.jpg'
-    );
+    expect(
+      topicUpdateService.setSubtopicThumbnailFilename
+    ).toHaveBeenCalledWith(topic, 123, 'test-image.jpg');
     expect(topicUpdateService.setSubtopicThumbnailBgColor).toHaveBeenCalledWith(
-      topic, 123, '#FF0000'
+      topic,
+      123,
+      '#FF0000'
     );
   });
 });
