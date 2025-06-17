@@ -22,7 +22,12 @@ import {Subtopic} from 'domain/topic/subtopic.model';
 import {StudyGuide} from 'domain/topic/study-guide.model';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
 import {SubtopicEditorTabComponent} from './subtopic-editor-tab.component';
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  TestBed,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
@@ -33,7 +38,7 @@ import {QuestionBackendApiService} from 'domain/question/question-backend-api.se
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {CdkDragDrop} from '@angular/cdk/drag-drop';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
@@ -76,21 +81,15 @@ class MockPlatformFeatureService {
   };
 }
 
-class MockNgbModal {
-  open() {
-    return {
-      result: Promise.resolve({
-        sectionHeadingPlaintext: 'Test Section',
-        sectionContentHtml: '<p>Test content</p>',
-      }),
-    };
-  }
+class MockNgbModalRef {
+  componentInstance = {};
 }
 
 describe('Subtopic editor tab', () => {
   let component: SubtopicEditorTabComponent;
   let fixture: ComponentFixture<SubtopicEditorTabComponent>;
   let skillSummary: ShortSkillSummary;
+  let ngbModal: NgbModal;
   let topicEditorStateService: TopicEditorStateService;
   let topicUpdateService: TopicUpdateService;
   let subtopicValidationService: SubtopicValidationService;
@@ -126,10 +125,6 @@ describe('Subtopic editor tab', () => {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService,
         },
-        {
-          provide: NgbModal,
-          useClass: MockNgbModal,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -137,6 +132,7 @@ describe('Subtopic editor tab', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(SubtopicEditorTabComponent);
+    ngbModal = TestBed.inject(NgbModal);
     component = fixture.componentInstance;
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
     topicUpdateService = TestBed.inject(TopicUpdateService);
@@ -174,6 +170,10 @@ describe('Subtopic editor tab', () => {
     let subtopicPage = SubtopicPage.createDefault('asd2r42', 1);
     let studyGuide = StudyGuide.createDefault('study_guide_id', 1);
     topic._id = 'sndsjfn42';
+
+    component.studyGuide = studyGuide;
+    component.sections = studyGuide.getSections();
+    component.subtopicId = 1;
 
     spyOnProperty(topicEditorStateService, 'onTopicInitialized').and.callFake(
       () => {
@@ -624,72 +624,93 @@ describe('Subtopic editor tab', () => {
     expect(component.activeSectionIndex).toEqual(-1);
   });
 
-  it('should open add section modal and add new section', async () => {
-    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
-    component.studyGuide = {
-      getNextContentIdIndex: () => 1,
-      setNextContentIdIndex: jasmine.createSpy(),
-      setSections: jasmine.createSpy(),
-    } as StudyGuide;
-    component.sections = [];
-    let sectionModalSpy = spyOn(component, 'openAddSectionModal');
+  it(
+    'should open delete study guide section modal when ' +
+      'clicking on delete button',
+    fakeAsync(() => {
+      let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: new MockNgbModalRef(),
+        result: Promise.resolve(),
+      } as NgbModalRef);
+      let deleteSectionSpy = spyOn(
+        topicUpdateService,
+        'deleteSection'
+      ).and.callThrough();
 
-    component.openAddSectionModal();
+      component.ngOnInit();
+      component.deleteSection(0, '');
+      tick();
 
-    const newSection = {
-      heading: {
-        content_id: 'section_heading_1',
-        unicode_str: 'Test Section',
-      },
-      content: {
-        content_id: 'section_content_2',
-        html: '<p>Test content</p>',
-      },
-    };
-    component.sections.push(newSection);
+      expect(modalSpy).toHaveBeenCalled();
+      expect(deleteSectionSpy).toHaveBeenCalled();
+    })
+  );
 
-    expect(component.sections.length).toEqual(1);
-    expect(sectionModalSpy).toHaveBeenCalled();
-  });
+  it(
+    'should close delete section modal when ' + 'clicking on cancel button',
+    fakeAsync(() => {
+      let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: new MockNgbModalRef(),
+        result: Promise.reject(),
+      } as NgbModalRef);
+      let deleteSectionSpy = spyOn(
+        topicUpdateService,
+        'deleteSection'
+      ).and.callThrough();
 
-  it('should delete section', () => {
-    component.sections = [
-      {
-        heading: {
-          content_id: 'section_heading_0',
-          unicode_str: 'Section 1',
-        },
-        content: {
-          content_id: 'section_content_1',
-          html: 'Section 1 content',
-        },
-      },
-      {
-        heading: {
-          content_id: 'section_heading_2',
-          unicode_str: 'Section 2',
-        },
-        content: {
-          content_id: 'section_content_3',
-          html: 'Section 2 content',
-        },
-      },
-    ];
-    component.studyGuide = {
-      setSections: jasmine.createSpy(),
-    } as StudyGuide;
-    component.activeSectionIndex = 0;
-    let deleteSpy = spyOn(component, 'deleteSection');
+      component.ngOnInit();
+      component.deleteSection(0, '');
+      tick();
 
-    component.deleteSection(0, 'test');
+      expect(modalSpy).toHaveBeenCalled();
+      expect(deleteSectionSpy).not.toHaveBeenCalled();
+    })
+  );
 
-    component.sections.splice(0, 1);
-    component.activeSectionIndex = -1;
+  it(
+    'should open add section modal when ' + 'clicking on add button',
+    fakeAsync(() => {
+      let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: new MockNgbModalRef(),
+        result: Promise.resolve({
+          sectionHeadingPlaintext: 'heading',
+          sectionContentHtml: 'content',
+        }),
+      } as NgbModalRef);
+      let addSectionSpy = spyOn(
+        topicUpdateService,
+        'addSection'
+      ).and.callThrough();
 
-    expect(component.sections.length).toEqual(1);
-    expect(component.activeSectionIndex).toEqual(-1);
-    expect(deleteSpy).toHaveBeenCalled();
-  });
+      component.ngOnInit();
+      component.openAddSectionModal();
+      tick();
+
+      expect(modalSpy).toHaveBeenCalled();
+      expect(addSectionSpy).toHaveBeenCalled();
+    })
+  );
+
+  it(
+    'should close add section modal when ' + 'clicking on cancel button',
+    fakeAsync(() => {
+      let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: new MockNgbModalRef(),
+        result: Promise.reject(),
+      } as NgbModalRef);
+      let addSectionSpy = spyOn(
+        topicUpdateService,
+        'addSection'
+      ).and.callThrough();
+
+      component.ngOnInit();
+      component.openAddSectionModal();
+      tick();
+
+      expect(modalSpy).toHaveBeenCalled();
+      expect(addSectionSpy).not.toHaveBeenCalled();
+    })
+  );
 
   it('should initialize mobile view settings correctly', () => {
     spyOn(wds, 'isWindowNarrow').and.returnValue(true);

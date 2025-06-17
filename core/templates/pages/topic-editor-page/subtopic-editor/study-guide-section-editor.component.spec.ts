@@ -191,6 +191,22 @@ describe('Study Guide Section editor component', () => {
       },
       1
     );
+
+    component.saveSection(false);
+
+    expect(sectionUpdateSpy).toHaveBeenCalledWith(
+      sampleStudyGuide,
+      2,
+      {
+        content_id: 'section_heading_0',
+        unicode_str: 'heading',
+      },
+      {
+        content_id: 'section_content_1',
+        html: 'content',
+      },
+      1
+    );
   });
 
   it('should get schema', () => {

@@ -25,6 +25,7 @@ import {
 
 describe('StudyGuideSection object factory', () => {
   let studyGuideSectionBackendDict: StudyGuideSectionBackendDict;
+  let sampleStudyGuideSection: StudyGuideSection;
 
   beforeEach(() => {
     studyGuideSectionBackendDict = {
@@ -37,6 +38,10 @@ describe('StudyGuideSection object factory', () => {
         html: '<p>section content 1</p>',
       },
     };
+
+    sampleStudyGuideSection = StudyGuideSection.createFromBackendDict(
+      studyGuideSectionBackendDict
+    );
   });
 
   it('should create a new study guide section from a backend dictionary', () => {
@@ -60,6 +65,54 @@ describe('StudyGuideSection object factory', () => {
     );
     expect(studyGuideSection.toBackendDict()).toEqual(
       studyGuideSectionBackendDict
+    );
+  });
+
+  it('should set and get heading', () => {
+    let newHeading = SubtitledUnicode.createDefault(
+      'new heading',
+      'new_heading_id'
+    );
+
+    sampleStudyGuideSection.setHeading(newHeading);
+
+    expect(sampleStudyGuideSection.getHeading()).toEqual(newHeading);
+  });
+
+  it('should get heading text', () => {
+    expect(sampleStudyGuideSection.getHeadingText()).toBe('section heading');
+  });
+
+  it('should set heading plaintext', () => {
+    sampleStudyGuideSection.setHeadingPlaintext('updated heading text');
+
+    expect(sampleStudyGuideSection.getHeadingText()).toBe(
+      'updated heading text'
+    );
+  });
+
+  it('should set and get content', () => {
+    let newContent = SubtitledHtml.createDefault(
+      '<p>new content</p>',
+      'new_content_id'
+    );
+
+    sampleStudyGuideSection.setContent(newContent);
+
+    expect(sampleStudyGuideSection.getContent()).toEqual(newContent);
+  });
+
+  it('should get content HTML', () => {
+    expect(sampleStudyGuideSection.getContentHtml()).toBe(
+      '<p>section content 1</p>'
+    );
+  });
+
+  it('should set content HTML', () => {
+    sampleStudyGuideSection.setContentHtml('<div>updated content</div>');
+
+    expect(sampleStudyGuideSection.getContentHtml()).toBe(
+      '<div>updated content</div>'
     );
   });
 });

@@ -43,6 +43,14 @@ describe('Study Guide Model', () => {
     }
   );
 
+  it('should update id and next content id', () => {
+    var studyGuide = StudyGuide.createDefault('topic_id', 2);
+    studyGuide.setId('topic_id-3');
+    expect(studyGuide.getId()).toBe('topic_id-3');
+    studyGuide.setNextContentIdIndex(3);
+    expect(studyGuide.getNextContentIdIndex()).toEqual(3);
+  });
+
   it('should be able to copy from another study guide', () => {
     var firstStudyGuide = StudyGuide.createFromBackendDict({
       id: 'topic_id-1',
