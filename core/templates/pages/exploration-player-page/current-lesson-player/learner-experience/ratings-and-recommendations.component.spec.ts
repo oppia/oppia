@@ -35,7 +35,7 @@ import {UserService} from '../../../../services/user.service';
 import {LearnerViewRatingService} from '../../services/learner-view-rating.service';
 import {MockLimitToPipe} from '../templates/lesson-information-card-modal.component.spec';
 import {RatingsAndRecommendationsComponent} from './ratings-and-recommendations.component';
-import {ExplorationModeService} from '../../../../services/exploration-mode.service';
+import {ExplorationModeService} from '../../services/exploration-mode.service';
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {AssetsBackendApiService} from '../../../../services/assets-backend-api.service';
