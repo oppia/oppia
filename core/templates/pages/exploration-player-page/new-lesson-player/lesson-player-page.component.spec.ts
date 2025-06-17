@@ -27,7 +27,7 @@ import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
 } from 'domain/exploration/read-only-exploration-backend-api.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
 import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {PageTitleService} from 'services/page-title.service';

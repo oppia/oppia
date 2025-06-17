@@ -34,7 +34,7 @@ import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFacto
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslationStatusService} from '../services/translation-status.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';

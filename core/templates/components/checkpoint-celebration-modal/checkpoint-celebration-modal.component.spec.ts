@@ -30,7 +30,7 @@ import {MockTranslateService} from 'components/forms/schema-based-editors/integr
 import {CheckpointCelebrationModalComponent} from './checkpoint-celebration-modal.component';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';

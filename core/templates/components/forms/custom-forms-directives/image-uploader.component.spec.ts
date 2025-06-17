@@ -25,7 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {ImageUploaderModalComponent} from './image-uploader-modal.component';

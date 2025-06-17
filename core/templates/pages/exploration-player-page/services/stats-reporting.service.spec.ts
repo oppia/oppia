@@ -28,7 +28,7 @@ import {
   AggregatedStats,
   StatsReportingBackendApiService,
 } from '../../../domain/exploration/stats-reporting-backend-api.service';
-import {PageContextService} from '../../../services/context.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {UrlService} from '../../../services/contextual/url.service';
 import {MessengerService} from '../../../services/messenger.service';
 import {PlaythroughService} from '../../../services/playthrough.service';

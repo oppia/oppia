@@ -17,7 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {TestBed, waitForAsync} from '@angular/core/testing';
+import {TestBed, tick, waitForAsync} from '@angular/core/testing';
 import {
   ExplorationModeService,
   EXPLORATION_MODE,
@@ -172,6 +172,12 @@ describe('ExplorationModeService', () => {
 
     explorationModeService.setStoryChapterMode();
     expect(explorationModeService.isPresentingIsolatedQuestions()).toBeFalse();
+
+    explorationModeService.currentMode = EXPLORATION_MODE.EDITOR_PREVIEW;
+    expect(() => {
+      explorationModeService.isPresentingIsolatedQuestions();
+      tick(10);
+    }).toThrowError('Invalid mode received: editor_preview.');
   });
 
   it('should check if in diagnostic test player mode', () => {

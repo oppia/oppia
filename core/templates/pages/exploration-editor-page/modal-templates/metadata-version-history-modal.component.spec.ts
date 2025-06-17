@@ -25,7 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';

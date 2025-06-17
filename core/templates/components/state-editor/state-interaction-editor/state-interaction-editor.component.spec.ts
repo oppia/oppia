@@ -37,7 +37,7 @@ import {CustomizeInteractionModalComponent} from 'pages/exploration-editor-page/
 import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
 import {StateContentService} from '../state-editor-properties-services/state-content.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {StateCustomizationArgsService} from '../state-editor-properties-services/state-customization-args.service';
 import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';

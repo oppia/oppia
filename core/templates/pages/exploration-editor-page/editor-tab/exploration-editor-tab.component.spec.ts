@@ -66,7 +66,7 @@ import {
   StateObjectFactory,
 } from 'domain/state/StateObjectFactory';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationNextContentIdIndexService} from '../services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from '../services/version-history.service';

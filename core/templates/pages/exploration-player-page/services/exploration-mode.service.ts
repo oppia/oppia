@@ -148,6 +148,8 @@ export class ExplorationModeService {
       this.currentMode === EXPLORATION_MODE.STORY_CHAPTER
     ) {
       return false;
+    } else {
+      throw new Error('Invalid mode received: ' + this.currentMode + '.');
     }
   }
 

@@ -27,7 +27,7 @@ import {FormsModule} from '@angular/forms';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {AppConstants} from 'app.constants';
 
 describe('SkillSelectorEditorComponent', () => {

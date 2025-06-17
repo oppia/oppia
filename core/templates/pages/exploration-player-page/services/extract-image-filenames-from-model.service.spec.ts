@@ -19,7 +19,7 @@
 import {TestBed} from '@angular/core/testing';
 
 import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {PageContextService} from '../../../services/context.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,

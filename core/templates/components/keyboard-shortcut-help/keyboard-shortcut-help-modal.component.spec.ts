@@ -25,7 +25,7 @@ import {
 import {By} from '@angular/platform-browser';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlService} from 'services/contextual/url.service';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 import {KeyboardShortcutHelpModalComponent} from './keyboard-shortcut-help-modal.component';
 

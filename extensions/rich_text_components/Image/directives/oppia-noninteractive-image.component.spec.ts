@@ -25,7 +25,7 @@ import {
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NoninteractiveImage} from './oppia-noninteractive-image.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {PageContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {AppConstants} from 'app.constants';
