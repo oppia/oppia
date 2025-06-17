@@ -61,12 +61,7 @@ export class ProgressUrlService {
    *
    * @returns {string} The unique progress URL ID.
    */
-  getUniqueProgressUrlId(): string {
-    if (!this.uniqueProgressUrlId) {
-      throw new Error(
-        'Unique progress URL ID is not set. Please set it before retrieving.'
-      );
-    }
+  getUniqueProgressUrlId(): string | null {
     return this.uniqueProgressUrlId;
   }
 }

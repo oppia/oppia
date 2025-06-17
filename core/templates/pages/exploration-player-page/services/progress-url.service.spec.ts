@@ -86,12 +86,6 @@ describe('ProgressUrlService', () => {
     ).toHaveBeenCalledWith('exploration_id', 1, 'checkpoint_id');
   }));
 
-  it('should throw an error when getting unique progress URL ID if not set', () => {
-    expect(() => progressUrlService.getUniqueProgressUrlId()).toThrowError(
-      'Unique progress URL ID is not set. Please set it before retrieving.'
-    );
-  });
-
   it('should return the unique progress URL ID when it is set', () => {
     const uniqueProgressUrlId = 'unique_progress_url_id';
     progressUrlService.uniqueProgressUrlId = uniqueProgressUrlId;
