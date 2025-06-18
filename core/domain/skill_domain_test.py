@@ -279,8 +279,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.validate()
         self.assertEqual(versioned_misconceptions['schema_version'], 4)
         versioned_misconceptions['misconceptions'][0]['feedback'] = (
-            '<span>'
-            'feedback&nbsp;</span>'
+            '<span>feedback&nbsp;</span>'
         )
         self.skill.update_misconceptions_from_model(
             versioned_misconceptions,
@@ -371,11 +370,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_find_prerequisite_skill_id_index(self) -> None:
         # Disabling pylint protected access because this is a test.
         self.assertEqual(
-            self.skill._find_prerequisite_skill_id_index('skill_id_2'), # pylint: disable=protected-access
+            self.skill._find_prerequisite_skill_id_index( # pylint: disable=protected-access
+                'skill_id_2'
+            ),
             0
         )
         self.assertEqual(
-            self.skill._find_prerequisite_skill_id_index('skill_id_3'), # pylint: disable=protected-access
+            self.skill._find_prerequisite_skill_id_index( # pylint: disable=protected-access
+                'skill_id_3'
+            ),
             None
         )
 

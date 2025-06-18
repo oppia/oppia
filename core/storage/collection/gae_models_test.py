@@ -79,8 +79,14 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
         snapshot_dict['nodes'] = ['node0', 'node1']
         snapshot_dict = collection_model.convert_to_valid_dict(snapshot_dict)
         collection_model = collection_models.CollectionModel(**snapshot_dict)
-        self.assertNotIn('nodes', collection_model._properties) # pylint: disable=protected-access
-        self.assertNotIn('nodes', collection_model._values) # pylint: disable=protected-access
+        self.assertNotIn(
+            'nodes', 
+            collection_model._properties # pylint: disable=protected-access
+        )
+        self.assertNotIn(
+            'nodes', 
+            collection_model._values # pylint: disable=protected-access
+        )
 
 
 class CollectionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
@@ -347,11 +353,13 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         collection_rights_model = collection_models.CollectionRightsModel(
             **snapshot_dict)
         self.assertNotIn(
-            'translator_ids',
-            collection_rights_model._properties) # pylint: disable=protected-access
+            'translator_ids', 
+            collection_rights_model._properties # pylint: disable=protected-access
+        )
         self.assertNotIn(
-            'translator_ids',
-            collection_rights_model._values) # pylint: disable=protected-access
+            'translator_ids', 
+            collection_rights_model._values # pylint: disable=protected-access
+        )
 
 
 class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):

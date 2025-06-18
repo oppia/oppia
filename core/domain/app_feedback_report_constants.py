@@ -86,7 +86,7 @@ class EntryPoint(enum.Enum):
 
     NAVIGATION_DRAWER = 'navigation_drawer'
     LESSON_PLAYER = 'lesson_player'
-    REVISION_CARD = 'revision_card'
+    STUDY_GUIDE = 'study_guide'
     CRASH = 'crash'
 
 
@@ -125,7 +125,7 @@ FilterFieldNames = app_feedback_report_models.FilterFieldNames
 
 ANDROID_ENTRY_POINT = [
     EntryPoint.NAVIGATION_DRAWER, EntryPoint.LESSON_PLAYER,
-    EntryPoint.REVISION_CARD, EntryPoint.CRASH]
+    EntryPoint.STUDY_GUIDE, EntryPoint.CRASH]
 ALLOWED_REPORT_TYPES = [
     ReportType.SUGGESTION, ReportType.ISSUE, ReportType.CRASH]
 ALLOWED_CATEGORIES = [

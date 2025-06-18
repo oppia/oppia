@@ -113,6 +113,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-classroom-progress-in-learner-dashboard.spec.ts"
     },
     {
+      "name": "logged-in-user/manage-exploration-progress-in-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-exploration-progress-in-learner-dashboard.spec.ts"
+    },
+    {
       "name": "logged-in-user/deny-access-to-pages-without-additional-roles",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
     },
@@ -167,6 +171,10 @@
     {
       "name": "logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers.spec.ts"
+    },
+    {
+      "name": "logged-out-user/generate-and-play-automated-voiceovers",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/generate-and-play-automated-voiceovers.spec.ts"
     },
     {
       "name": "logged-out-user/play-through-lesson-while-getting-feedback-and-hints",

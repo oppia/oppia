@@ -336,5 +336,16 @@ describe('Solution object factory', () => {
           'This is the new explanation to the answer.'
       );
     });
+
+    it('should get content ID to html dict', () => {
+      const newExplanation = new SubtitledHtml(
+        'This is the new explanation to the answer',
+        'solution'
+      );
+      solution.setExplanation(newExplanation);
+      expect(solution.getContentIdToHtml()).toEqual({
+        solution: newExplanation.html,
+      });
+    });
   });
 });

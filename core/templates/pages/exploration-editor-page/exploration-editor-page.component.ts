@@ -254,11 +254,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       );
       this.contextService.setExplorationVersion(explorationData.version);
 
+      const languageCode =
+        this.entityVoiceoversService.languageCode ||
+        explorationData.language_code;
       this.entityVoiceoversService.init(
         this.explorationId,
         'exploration',
         explorationData.version,
-        explorationData.language_code
+        languageCode
       );
 
       this.explorationTitleService.init(explorationData.title);

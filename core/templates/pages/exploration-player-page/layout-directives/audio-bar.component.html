@@ -12,10 +12,10 @@
             </span>
           </a>
           <a (click)="onPlayButtonClicked()" (keydown.enter)="onPlayButtonClicked()"
-             [ngbTooltip]="!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : ''"
+             [ngbTooltip]="!isAudioAvailableInCurrentLanguageAccent() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:selectedLanguageAccentDescription}) : ''"
              placement="right">
             <i class="fas oppia-audio-controls-button-icon" tabindex="0" aria-label="Press enter to Listen to the Lesson"
-               [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle e2e-test-play-circle': !isAudioPlaying(), 'fa-pause-circle e2e-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}">
+               [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle e2e-test-play-circle': !isAudioPlaying(), 'fa-pause-circle e2e-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguageAccent() || audioIsLoading}">
             </i>
           </a>
           <a (click)="onForwardButtonClicked()">
@@ -41,23 +41,15 @@
                 class="audio-controls-message">
             {{ 'I18N_PLAYER_AUDIO_LOADING_AUDIO' | translate }}
           </span>
-          <span *ngIf="isAudioAvailableInCurrentLanguage() && doesCurrentAudioTranslationNeedUpdate()"
+          <span *ngIf="isAudioAvailableInCurrentLanguageAccent() && doesCurrentAudioTranslationNeedUpdate()"
                 class="audio-controls-message">
             {{ 'I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT' | translate }}
           </span>
           <!--Filler space for message-->
           <span class="audio-controls-message">&zwnj;</span>
         </div>
-        <div class="oppia-audio-header-select"
-             *ngIf="!isVoiceoverContributionWithAccentEnabled()">
-          <select class="audio-language-select e2e-test-audio-lang-select"
-                  [(ngModel)]="selectedLanguage.value"
-                  (change)="onNewLanguageSelected()">
-            <option *ngFor="let opt of languagesInExploration" [value]="opt.value">{{ opt.displayed }}</option>
-          </select>
-        </div>
-        <div class="oppia-audio-header-select"
-             *ngIf="isVoiceoverContributionWithAccentEnabled() && languageAccentDecriptions.length > 0">
+
+        <div class="oppia-audio-header-select">
           <select class="audio-language-select e2e-test-audio-lang-select"
                   [(ngModel)]="selectedLanguageAccentDescription"
                   (change)="updateSelectedLanguageAccent()">

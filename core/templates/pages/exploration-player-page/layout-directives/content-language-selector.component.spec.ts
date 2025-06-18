@@ -23,6 +23,7 @@ import {
   fakeAsync,
   flush,
   TestBed,
+  tick,
 } from '@angular/core/testing';
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
@@ -42,7 +43,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -53,6 +53,7 @@ import {AudioPreloaderService} from '../services/audio-preloader.service';
 import {VoiceoverPlayerService} from '../services/voiceover-player.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {ExplorationObjectFactory} from 'domain/exploration/ExplorationObjectFactory';
+import {AutomaticVoiceoverHighlightService} from '../../../services/automatic-voiceover-highlight-service';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;
@@ -108,7 +109,6 @@ describe('Content language selector component', () => {
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
   let windowRef: MockWindowRef;
   let playerTranscriptService: PlayerTranscriptService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   let interactionObjectFactory: InteractionObjectFactory;
   let entityVoiceoversService: EntityVoiceoversService;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
@@ -116,6 +116,7 @@ describe('Content language selector component', () => {
   let voiceoverPlayerService: VoiceoverPlayerService;
   let playerPositionService: PlayerPositionService;
   let explorationObjectFactory: ExplorationObjectFactory;
+  let automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -155,9 +156,6 @@ describe('Content language selector component', () => {
     );
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
-    audioTranslationLanguageService = TestBed.get(
-      AudioTranslationLanguageService
-    );
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     fixture = TestBed.createComponent(ContentLanguageSelectorComponent);
@@ -166,6 +164,9 @@ describe('Content language selector component', () => {
     playerPositionService = TestBed.inject(PlayerPositionService);
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     windowRef = TestBed.inject(WindowRef);
+    automaticVoiceoverHighlightService = TestBed.inject(
+      AutomaticVoiceoverHighlightService
+    );
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
@@ -184,10 +185,6 @@ describe('Content language selector component', () => {
   );
 
   it('should correcly initialize newLanguageCode', fakeAsync(() => {
-    spyOn(
-      component,
-      'isVoiceoverContributionWithAccentEnabled'
-    ).and.returnValue(true);
     entityVoiceoversService.entityType = 'exploration';
     entityVoiceoversService.entityId = 'exploration_id_1';
     entityVoiceoversService.entityVersion = 1;
@@ -214,7 +211,6 @@ describe('Content language selector component', () => {
     ).and.returnValue(Promise.resolve(response));
     spyOn(audioPreloaderService, 'kickOffAudioPreloader');
     spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
-    spyOn(audioTranslationLanguageService, 'setCurrentAudioLanguageCode');
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue('Hola');
 
     const explorationDict = {
@@ -272,10 +268,6 @@ describe('Content language selector component', () => {
       contentTranslationLanguageService,
       'setCurrentContentLanguageCode'
     );
-    spyOn(
-      component,
-      'isVoiceoverContributionWithAccentEnabled'
-    ).and.returnValue(true);
     spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
       Promise.resolve()
     );
@@ -340,8 +332,7 @@ describe('Content language selector component', () => {
         },
       }),
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
     spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
@@ -355,10 +346,22 @@ describe('Content language selector component', () => {
   it(
     'should correctly open the refresh required modal when refresh is ' +
       'needed',
-    () => {
+    fakeAsync(() => {
       const setCurrentContentLanguageCodeSpy = spyOn(
         contentTranslationLanguageService,
         'setCurrentContentLanguageCode'
+      );
+      spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
+        Promise.resolve()
+      );
+      spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
+      spyOn(
+        automaticVoiceoverHighlightService,
+        'setAutomatedVoiceoversAudioOffsets'
+      );
+      spyOn(
+        automaticVoiceoverHighlightService,
+        'getSentencesToHighlightForTimeRanges'
       );
 
       const card = StateCard.createNewCard(
@@ -418,8 +421,7 @@ describe('Content language selector component', () => {
           },
         }),
         RecordedVoiceovers.createEmpty(),
-        'content',
-        audioTranslationLanguageService
+        'content'
       );
       card.addInputResponsePair({
         learnerInput: '',
@@ -429,7 +431,8 @@ describe('Content language selector component', () => {
       spyOn(playerTranscriptService, 'getCard').and.returnValue(card);
 
       component.onSelectLanguage('fr');
+      tick(1000);
       expect(setCurrentContentLanguageCodeSpy).not.toHaveBeenCalled();
-    }
+    })
   );
 });

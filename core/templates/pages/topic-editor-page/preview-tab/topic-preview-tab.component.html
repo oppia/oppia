@@ -13,7 +13,7 @@
                  [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
           </div>
           <div class="topic-preview-text">
-            Lessons
+            Learn
           </div>
         </div>
         <div class="topic-preview-navbar-tab"
@@ -34,7 +34,7 @@
                  [src]="getStaticImageUrl('/icons/review_icon_24px.svg')">
           </div>
           <div class="topic-preview-text">
-            Revision
+            Study
           </div>
         </div>
       </div>
@@ -61,7 +61,8 @@
     <div *ngIf="activeTab === 'practice'">
       <practice-tab [subtopicsList]="subtopics"
                     [topicName]="topicName"
-                    [previewMode]="true">
+                    [topicUrlFragment]="topicUrlFragment"
+                    [classroomUrlFragment]="classroomUrlFragment">
       </practice-tab>
     </div>
   </div>
@@ -108,11 +109,11 @@
     margin-top: 4px;
     text-transform: uppercase;
   }
-  .topic-preview-container md-card {
+  .topic-preview-container mat-card {
     box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 0 rgba(0,0,0,0.24);
     margin-top: 0;
   }
-  .topic-preview-parent .topic-preview-container md-card {
+  .topic-preview-parent .topic-preview-container mat-card {
     box-shadow: none;
   }
   @media screen and (max-width: 1000px) {

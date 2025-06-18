@@ -74,7 +74,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    if (this.urlService.getPathname().endsWith('revision')) {
+    if (this.urlService.getPathname().endsWith('studyguide')) {
       this.activeTab = 'subtopics';
     } else if (this.urlService.getPathname().endsWith('practice')) {
       this.activeTab = 'practice';
@@ -176,7 +176,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
     } else if (newActiveTabName === 'practice') {
       this.setUrlAccordingToActiveTab('practice');
     } else {
-      this.setUrlAccordingToActiveTab('revision');
+      this.setUrlAccordingToActiveTab('studyguide');
     }
     this.activeTab = newActiveTabName;
   }
@@ -193,7 +193,7 @@ export class TopicViewerPageComponent implements OnInit, OnDestroy {
       this.windowRef.nativeWindow.history.pushState(
         {},
         '',
-        getCurrentLocation.replace('revision', newTabName)
+        getCurrentLocation.replace('studyguide', newTabName)
       );
     } else {
       this.windowRef.nativeWindow.history.pushState(
