@@ -51,8 +51,8 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   tempSectionHeadingPlaintext!: string;
   tempSectionContentHtml!: string;
   // Below properties are null when the editor is closed.
-  sectionHeadingBackup!: string | null;
-  sectionContentBackup!: string | null;
+  originalSectionHeading!: string | null;
+  originalSectionContent!: string | null;
   headingEditorIsOpen: boolean = false;
   contentEditorIsOpen: boolean = false;
   STUDY_GUIDE_SECTION_HEADING_FORM_SCHEMA: HtmlFormSchema = {
@@ -112,14 +112,14 @@ export class StudyGuideSectionEditorComponent implements OnInit {
 
   openHeadingEditor(): void {
     if (this.isEditable) {
-      this.sectionHeadingBackup = this.container.sectionHeadingPlaintext;
+      this.originalSectionHeading = this.container.sectionHeadingPlaintext;
       this.headingEditorIsOpen = true;
     }
   }
 
   openContentEditor(): void {
     if (this.isEditable) {
-      this.sectionContentBackup = this.container.sectionContentHtml;
+      this.originalSectionContent = this.container.sectionContentHtml;
       this.contentEditorIsOpen = true;
     }
   }
@@ -131,10 +131,10 @@ export class StudyGuideSectionEditorComponent implements OnInit {
       this.contentEditorIsOpen = false;
     }
     let contentHasChanged =
-      this.sectionHeadingBackup !== this.container.sectionHeadingPlaintext ||
-      this.sectionContentBackup !== this.container.sectionContentHtml;
-    this.sectionHeadingBackup = null;
-    this.sectionContentBackup = null;
+      this.originalSectionHeading !== this.container.sectionHeadingPlaintext ||
+      this.originalSectionContent !== this.container.sectionContentHtml;
+    this.originalSectionHeading = null;
+    this.originalSectionContent = null;
 
     if (contentHasChanged) {
       let studyGuide = this.topicEditorStateService.getStudyGuide();
@@ -150,20 +150,20 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   }
 
   cancelEditHeading(): void {
-    if (this.sectionHeadingBackup === null) {
+    if (this.originalSectionHeading === null) {
       return;
     }
-    this.container.sectionHeadingPlaintext = this.sectionHeadingBackup;
-    this.sectionHeadingBackup = null;
+    this.container.sectionHeadingPlaintext = this.originalSectionHeading;
+    this.originalSectionHeading = null;
     this.headingEditorIsOpen = false;
   }
 
   cancelEditContent(): void {
-    if (this.sectionContentBackup === null) {
+    if (this.originalSectionContent === null) {
       return;
     }
-    this.container.sectionContentHtml = this.sectionContentBackup;
-    this.sectionContentBackup = null;
+    this.container.sectionContentHtml = this.originalSectionContent;
+    this.originalSectionContent = null;
     this.contentEditorIsOpen = false;
   }
 }
