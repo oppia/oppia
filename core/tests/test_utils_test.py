@@ -650,7 +650,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 SwapWithCheckTestClass.functions_with_args()
 
     def test_swap_with_check_on_expected_kwargs(self) -> None:
-        def mock_getenv(key: str, default: str) -> None: # pylint: disable=unused-argument
+        def mock_getenv(
+            key: str, default: str # pylint: disable=unused-argument
+        ) -> None:
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv,
@@ -663,7 +665,9 @@ class TestUtilsTests(test_utils.GenericTestBase):
     def test_swap_with_check_on_expected_kwargs_failed_on_wrong_numbers(
         self
     ) -> None:
-        def mock_getenv(key: str, default: str) -> None: # pylint: disable=unused-argument
+        def mock_getenv(
+            key: str, default: str # pylint: disable=unused-argument
+        ) -> None:
             return
         getenv_swap = self.swap_with_checks(
             os, 'getenv', mock_getenv, expected_kwargs=[

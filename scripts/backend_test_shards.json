@@ -403,6 +403,7 @@
         "scripts.check_backend_test_times_test",
         "core.domain.voiceover_regeneration_services_test",
         "core.platform.speech_synthesis.azure_speech_synthesis_services_test",
-        "core.platform.speech_synthesis.dev_mode_speech_synthesis_services_test"
+        "core.platform.speech_synthesis.dev_mode_speech_synthesis_services_test",
+        "core.jobs.batch_jobs.populate_study_guide_models_jobs_test"
     ]
 }

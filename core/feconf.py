@@ -518,12 +518,16 @@ OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 
 # This flag is used for distinguishing the prod/test environments for feature
 # gating.
-ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
+ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(
+    os.environ.get('GOOGLE_CLOUD_PROJECT', 'dev-project-id') == 'oppiaserver')
 
-# NOTE TO RELEASE COORDINATORS: Replace these GCS bucket paths with real prod
-# buckets. It's OK for them to be the same.
+# TODO(release-scripts#137): Update once release scripts are updated to remove
+# config updates to these fields.
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
+
+DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
+DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
 OPPIA_VERSION = '3.4.6'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
