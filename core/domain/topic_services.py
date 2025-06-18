@@ -213,9 +213,6 @@ def apply_change_list(
     modified_subtopic_pages_list: List[
         Optional[subtopic_page_domain.SubtopicPage]
     ] = []
-    modified_study_guides_list: List[
-        Optional[study_guide_domain.StudyGuide]
-    ] = []
     modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage] = {}
     modified_study_guides: Dict[str, study_guide_domain.StudyGuide] = {}
     modified_subtopic_change_cmds: Dict[
@@ -227,8 +224,10 @@ def apply_change_list(
 
     def _ensure_study_guide_exists(subtopic_id: int) -> Optional[str]:
         """Ensures a study guide exists for the given subtopic_id.
+
         Args:
             subtopic_id: int. The ID of the subtopic.
+
         Returns:
             str or None. The study guide ID if it exists or was created,
             None if it doesn't exist and couldn't be created.
@@ -797,7 +796,8 @@ def apply_change_list(
                             update_study_guide_sections_heading_cmd.subtopic_id
                         ))
 
-                        # Only update study guide if it exists or can be fetched.
+                        # Only update study guide if it exists or can be
+                        # fetched.
                         existing_study_guide_id = _ensure_study_guide_exists(
                             update_study_guide_sections_heading_cmd.subtopic_id
                         )
@@ -823,7 +823,10 @@ def apply_change_list(
                                 modified_study_guides[study_guide_id]
                                 .update_section_heading
                             )(
-                                update_study_guide_sections_heading_cmd.new_value,
+                                (
+                                    update_study_guide_sections_heading_cmd
+                                    .new_value
+                                ),
                                 'section_heading_0',
                             )
                 if (update_subtopic_property_cmd.property_name ==

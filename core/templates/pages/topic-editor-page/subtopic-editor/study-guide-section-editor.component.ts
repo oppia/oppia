@@ -50,9 +50,9 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   container!: Container;
   tempSectionHeadingPlaintext!: string;
   tempSectionContentHtml!: string;
-  // Below properties are null when the editor is closed.
-  originalSectionHeading!: string | null;
-  originalSectionContent!: string | null;
+  // Below properties are empty strings when the editor is closed.
+  originalSectionHeading!: string;
+  originalSectionContent!: string;
   headingEditorIsOpen: boolean = false;
   contentEditorIsOpen: boolean = false;
   STUDY_GUIDE_SECTION_HEADING_FORM_SCHEMA: HtmlFormSchema = {
@@ -133,8 +133,8 @@ export class StudyGuideSectionEditorComponent implements OnInit {
     let contentHasChanged =
       this.originalSectionHeading !== this.container.sectionHeadingPlaintext ||
       this.originalSectionContent !== this.container.sectionContentHtml;
-    this.originalSectionHeading = null;
-    this.originalSectionContent = null;
+    this.originalSectionHeading = '';
+    this.originalSectionContent = '';
 
     if (contentHasChanged) {
       let studyGuide = this.topicEditorStateService.getStudyGuide();
@@ -150,20 +150,20 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   }
 
   cancelEditHeading(): void {
-    if (this.originalSectionHeading === null) {
+    if (this.originalSectionHeading === '') {
       return;
     }
     this.container.sectionHeadingPlaintext = this.originalSectionHeading;
-    this.originalSectionHeading = null;
+    this.originalSectionHeading = '';
     this.headingEditorIsOpen = false;
   }
 
   cancelEditContent(): void {
-    if (this.originalSectionContent === null) {
+    if (this.originalSectionContent === '') {
       return;
     }
     this.container.sectionContentHtml = this.originalSectionContent;
-    this.originalSectionContent = null;
+    this.originalSectionContent = '';
     this.contentEditorIsOpen = false;
   }
 }
