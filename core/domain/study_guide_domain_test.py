@@ -197,8 +197,14 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         self.study_guide.update_sections(new_sections)
         self.assertEqual(len(self.study_guide.sections), 2)
         new_section = self.study_guide.sections[-1]
-        self.assertEqual(new_section.heading.unicode_str, 'added section heading')
-        self.assertEqual(new_section.content.html, '<p>added section content</p>')
+        self.assertEqual(
+            new_section.heading.unicode_str,
+            'added section heading'
+        )
+        self.assertEqual(
+            new_section.content.html,
+            '<p>added section content</p>'
+        )
 
         # Updating a section.
         section_to_update = (
@@ -215,10 +221,16 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         self.study_guide.update_sections(new_sections)
         self.assertEqual(len(self.study_guide.sections), 2)
         new_section = self.study_guide.sections[-1]
-        self.assertEqual(new_section.heading.unicode_str, 'updated added section heading')
-        self.assertEqual(new_section.content.html, '<p>added section content</p>')
+        self.assertEqual(
+            new_section.heading.unicode_str,
+            'updated added section heading'
+        )
+        self.assertEqual(
+            new_section.content.html,
+            '<p>added section content</p>'
+        )
 
-        # Deleting a section.
+        # Deleting a section in the middle.
         section_to_update = (
             study_guide_domain.StudyGuideSection
             .create_study_guide_section
@@ -232,8 +244,61 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         self.study_guide.update_sections(new_sections)
         self.assertEqual(len(self.study_guide.sections), 1)
         new_section = self.study_guide.sections[0]
-        self.assertEqual(new_section.heading.unicode_str, 'updated added section heading')
-        self.assertEqual(new_section.content.html, '<p>added section content</p>')
+        self.assertEqual(
+            new_section.heading.unicode_str,
+            'updated added section heading'
+        )
+        self.assertEqual(
+            new_section.content.html,
+            '<p>added section content</p>'
+        )
+
+        # Adding a section.
+        section_to_add = (
+            study_guide_domain.StudyGuideSection
+            .create_study_guide_section
+        )(
+            'section_heading_4',
+            'another section heading',
+            'section_content_5',
+            '<p>another section content</p>'
+        )
+        old_section = self.study_guide.sections[0]
+        new_sections = [old_section, section_to_add]
+        self.study_guide.update_sections(new_sections)
+        self.assertEqual(len(self.study_guide.sections), 2)
+        new_section = self.study_guide.sections[-1]
+        self.assertEqual(
+            new_section.heading.unicode_str,
+            'another section heading'
+        )
+        self.assertEqual(
+            new_section.content.html,
+            '<p>another section content</p>'
+        )
+
+        # Deleting a section in the end.
+        section_to_update = (
+            study_guide_domain.StudyGuideSection
+            .create_study_guide_section
+        )(
+            'section_heading_2',
+            'updated added section heading',
+            'section_content_3',
+            '<p>added section content</p>'
+        )
+        new_sections = [section_to_update]
+        self.study_guide.update_sections(new_sections)
+        self.assertEqual(len(self.study_guide.sections), 1)
+        new_section = self.study_guide.sections[0]
+        self.assertEqual(
+            new_section.heading.unicode_str,
+            'updated added section heading'
+        )
+        self.assertEqual(
+            new_section.content.html,
+            '<p>added section content</p>'
+        )
 
     def test_add_section(self) -> None:
         """Test adding a new section to the study guide."""

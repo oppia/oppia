@@ -662,6 +662,7 @@ describe('Topic editor state service', () => {
     expect(topicEditorStateService.getCanonicalStorySummaries()).toBeDefined();
     expect(topicEditorStateService.onStorySummariesInitialized).toBeDefined();
     expect(topicEditorStateService.onSubtopicPageLoaded).toBeDefined();
+    expect(topicEditorStateService.onStudyGuideLoaded).toBeDefined();
     expect(topicEditorStateService.isSavingTopic()).toBeDefined();
     expect(topicEditorStateService.onTopicInitialized).toBeDefined();
     expect(topicEditorStateService.onTopicReinitialized).toBeDefined();
