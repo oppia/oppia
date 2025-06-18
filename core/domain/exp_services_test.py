@@ -4536,7 +4536,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
     def test_get_last_updated_by_human_ms(self) -> None:
         original_timestamp = datetime.datetime.now(
-        datetime.timezone.utc).replace(tzinfo=None).timestamp() * 1000
+            datetime.timezone.utc).replace(tzinfo=None).timestamp() * 1000
 
         self.save_new_valid_exploration(
             self.EXP_0_ID, self.owner_id, end_state_name='End')
