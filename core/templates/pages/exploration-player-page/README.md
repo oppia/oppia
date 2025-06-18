@@ -9,7 +9,7 @@ This directory contains the components and services related to **both** the curr
 
 2. `/new-lesson-player`
 
-   - Contains all components necessary for the **new Lesson Player experience**.
+   - Contains files and components used in the **new Lesson Player experience**.
    - 💡 This is the modernized, modular implementation intended to replace the current player.
 
 3. `/services`
