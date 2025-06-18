@@ -213,6 +213,9 @@ def apply_change_list(
     modified_subtopic_pages_list: List[
         Optional[subtopic_page_domain.SubtopicPage]
     ] = []
+    modified_study_guides_list: List[
+        Optional[study_guide_domain.StudyGuide]
+    ] = []
     modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage] = {}
     modified_study_guides: Dict[str, study_guide_domain.StudyGuide] = {}
     modified_subtopic_change_cmds: Dict[

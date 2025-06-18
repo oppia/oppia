@@ -509,7 +509,7 @@ class StudyGuide:
                 ):
                     old_section.heading.unicode_str = (
                         new_section.heading.unicode_str)
-                elif (
+                if (
                     new_section.content.html != (
                         old_section.content.html)
                 ):
