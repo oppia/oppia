@@ -34,6 +34,7 @@ from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import study_guide_domain
+from core.domain import study_guide_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
@@ -904,6 +905,55 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': 'New Description'
             })
 
+    def test_update_subtopic_property_without_study_guide(self) -> None:
+        # We create a topic and subtopic in this way so as to not create a
+        # study guide.
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_1 = topic_domain.Topic.create_default_topic(
+                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
+                'fragm')
+        topic_1.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
+        topic_1.update_meta_tag_content('dummy-meta')
+        subtopic_page = (
+                subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                    1, topic_id_1))
+        topic_services.save_new_topic(self.user_id, topic_1)
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Dummy Subtopic Title',
+                'url_fragment': 'dummy-fragment'
+            })]
+        )
+
+        # Check that study guide does not exist.
+        with self.assertRaisesRegex(
+            Exception,
+            'Entity for class StudyGuideModel with id %s not found' % (
+                f'{topic_id_1}-1'
+            )
+        ):
+            study_guide_services.get_study_guide_by_id(topic_id_1, 1)
+
+        # Test whether a subtopic without corresponding study guide
+        # already existing in datastore can be edited.
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': 'title',
+            'subtopic_id': 1,
+            'old_value': 'Dummy Subtopic Title',
+            'new_value': 'New Title'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, topic_id_1, changelist,
+            'Update title of subtopic.')
+        topic = topic_fetchers.get_topic_by_id(topic_id_1)
+
+        self.assertEqual(len(topic.subtopics), 1)
+        self.assertEqual(topic.subtopics[0].title, 'New Title')
+
     def test_update_subtopic_property(self) -> None:
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
@@ -1232,6 +1282,99 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.name, 'New Name')
         self.assertEqual(topic_summary.version, 4)
 
+    def test_simultaneous_subtopic_and_subtopic_page_changes(self) -> None:
+        # Change the subtopic title first and then the subtopic page contents.
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': 'title',
+            'subtopic_id': 1,
+            'old_value': 'Title',
+            'new_value': 'New Title'
+        }),
+        subtopic_page_domain.SubtopicPageChange({
+            'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+            'property_name': (
+                subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
+            'old_value': '',
+            'subtopic_id': 1,
+            'new_value': {
+                'html': '<p>New Value</p>',
+                'content_id': 'content'
+            }
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Update title and content of subtopic.')
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics), 1)
+        self.assertEqual(topic.subtopics[0].title, 'New Title')
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, 1)
+        self.assertEqual(
+            subtopic_page.page_contents.subtitled_html.html,
+            '<p>New Value</p>')
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 1
+        )
+        study_guide_section = study_guide.sections[0]
+        self.assertEqual(
+            study_guide_section.heading.unicode_str,
+            'New Title'
+        )
+        self.assertEqual(
+            study_guide_section.content.html,
+            '<p>New Value</p>'
+        )
+
+        # Change the subtopic page contents first and then the subtopic title.
+        changelist = [
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                'property_name': (
+                    (
+                        subtopic_page_domain
+                        .SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML
+                    )
+                ),
+                'old_value': '<p>New Value</p>',
+                'subtopic_id': 1,
+                'new_value': {
+                    'html': '<p>Another New Value</p>',
+                    'content_id': 'content'
+                }
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+                'property_name': 'title',
+                'subtopic_id': 1,
+                'old_value': 'New Title',
+                'new_value': 'Another New Title'
+            })
+        ]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Again update title and content of subtopic.')
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(len(topic.subtopics), 1)
+        self.assertEqual(topic.subtopics[0].title, 'Another New Title')
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, 1)
+        self.assertEqual(
+            subtopic_page.page_contents.subtitled_html.html,
+            '<p>Another New Value</p>')
+        study_guide = study_guide_services.get_study_guide_by_id(
+            self.TOPIC_ID, 1
+        )
+        study_guide_section = study_guide.sections[0]
+        self.assertEqual(
+            study_guide_section.heading.unicode_str,
+            'Another New Title'
+        )
+        self.assertEqual(
+            study_guide_section.content.html,
+            '<p>Another New Value</p>'
+        )
+
     def test_update_topic_and_subtopic_page(self) -> None:
         changelist: List[Union[
             topic_domain.TopicChange,
@@ -1447,6 +1590,60 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 2, strict=False)
         self.assertIsNotNone(subtopic_page)
+
+    def test_update_subtopic_page_without_study_guide(self) -> None:
+        # We create a topic and subtopic in this way so as to not create a
+        # study guide.
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        topic_1 = topic_domain.Topic.create_default_topic(
+                topic_id_1, 'Dummy Topic 1', 'dummy-topic-one', 'description',
+                'fragm')
+        topic_1.add_subtopic(1, 'Dummy Subtopic Title', 'dummysubtopic')
+        topic_1.update_meta_tag_content('dummy-meta')
+        subtopic_page = (
+                subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                    1, topic_id_1))
+        topic_services.save_new_topic(self.user_id, topic_1)
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Dummy Subtopic Title',
+                'url_fragment': 'dummy-fragment'
+            })]
+        )
+
+        # Check that study guide does not exist.
+        with self.assertRaisesRegex(
+            Exception,
+            'Entity for class StudyGuideModel with id %s not found' % (
+                f'{topic_id_1}-1'
+            )
+        ):
+            study_guide_services.get_study_guide_by_id(topic_id_1, 1)
+
+        # Test whether a subtopic page without corresponding study guide
+        # already existing in datastore can be edited.
+        changelist = [subtopic_page_domain.SubtopicPageChange({
+            'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+            'property_name': (
+                subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML),
+            'old_value': '',
+            'subtopic_id': 1,
+            'new_value': {
+                'html': '<p>New Value</p>',
+                'content_id': 'content'
+            }
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, topic_id_1, changelist,
+            'Updated html data')
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            topic_id_1, 1)
+        self.assertEqual(
+            subtopic_page.page_contents.subtitled_html.html,
+            '<p>New Value</p>')
 
     def test_update_topic_schema(self) -> None:
         orig_topic_dict = (
