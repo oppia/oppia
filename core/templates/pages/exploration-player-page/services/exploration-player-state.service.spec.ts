@@ -226,7 +226,7 @@ describe('Exploration Player State Service', () => {
     inapplicable_skill_misconception_ids: [],
   };
 
-  class MockContextService {
+  class MockPageContextService {
     isInExplorationEditorPage(): boolean {
       return false;
     }
@@ -264,7 +264,7 @@ describe('Exploration Player State Service', () => {
         StatsReportingService,
         {
           provide: PageContextService,
-          useClass: MockContextService,
+          useClass: MockPageContextService,
         },
         UrlService,
         {

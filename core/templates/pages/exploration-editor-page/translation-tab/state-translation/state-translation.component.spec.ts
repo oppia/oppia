@@ -247,7 +247,7 @@ describe('State translation component', () => {
 
   let refreshStateTranslationEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -267,7 +267,7 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: PageContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
@@ -878,7 +878,7 @@ describe('State translation component', () => {
   let refreshStateTranslationEmitter = new EventEmitter();
   let showTranslationTabBusyModalEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -898,7 +898,7 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: PageContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
@@ -1358,7 +1358,7 @@ describe('State translation component', () => {
 
   let refreshStateTranslationEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -1378,7 +1378,7 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: PageContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
@@ -2001,7 +2001,7 @@ describe('State translation component', () => {
 
   let refreshStateTranslationEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -2022,7 +2022,7 @@ describe('State translation component', () => {
         ExplorationHtmlFormatterService,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: PageContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,

@@ -74,7 +74,7 @@ class MockUrlService {
   }
 }
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId() {
     return 'expId';
   }
@@ -93,7 +93,7 @@ describe('Attribution Guide Component', function () {
         {provide: AttributionService, useClass: MockAttributionService},
         {provide: BrowserCheckerService, useClass: MockBrowserCheckerService},
         {provide: UrlService, useClass: MockUrlService},
-        {provide: PageContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         WindowDimensionsService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
