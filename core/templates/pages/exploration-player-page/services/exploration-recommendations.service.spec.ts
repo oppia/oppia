@@ -22,14 +22,14 @@ import {async, TestBed} from '@angular/core/testing';
 import {ExplorationRecommendationsBackendApiService} from '../../../domain/recommendations/exploration-recommendations-backend-api.service';
 import {LearnerExplorationSummary} from '../../../domain/summary/learner-exploration-summary.model';
 import {ExplorationRecommendationsService} from './exploration-recommendations.service';
-import {ContextService} from '../../../services/context.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {UrlService} from '../../../services/contextual/url.service';
 import {ServicesConstants} from '../../../services/services.constants';
 
 describe('Exploration Recommendations Service', () => {
   let expRecsService: ExplorationRecommendationsService;
   let urlService: UrlService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
 
   const STORY_ID = '1';
   const COLLECTION_ID = '2';
@@ -45,7 +45,7 @@ describe('Exploration Recommendations Service', () => {
 
   beforeEach(() => {
     urlService = TestBed.inject(UrlService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
 
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
       COLLECTION_ID
@@ -56,12 +56,14 @@ describe('Exploration Recommendations Service', () => {
       node_id: NODE_ID,
     });
 
-    spyOn(contextService, 'getExplorationId').and.returnValue(EXPLORATION_ID);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      EXPLORATION_ID
+    );
   });
 
   describe('when used in the editor page', () => {
     beforeEach(() => {
-      spyOn(contextService, 'getPageContext').and.returnValue(
+      spyOn(pageContextService, 'getPageContext').and.returnValue(
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR
       );
     });
@@ -73,7 +75,7 @@ describe('Exploration Recommendations Service', () => {
 
     describe('in the Preview tab', () => {
       beforeEach(() => {
-        spyOn(contextService, 'getEditorTabContext').and.returnValue(
+        spyOn(pageContextService, 'getEditorTabContext').and.returnValue(
           ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW
         );
       });
@@ -88,7 +90,7 @@ describe('Exploration Recommendations Service', () => {
 
   describe('when used outside of the editor', () => {
     beforeEach(() => {
-      spyOn(contextService, 'getPageContext').and.returnValue(
+      spyOn(pageContextService, 'getPageContext').and.returnValue(
         ServicesConstants.PAGE_CONTEXT.OTHER
       );
     });
@@ -142,7 +144,7 @@ describe('Exploration Recommendations Service', () => {
 
     describe('when used in other page context', () => {
       beforeEach(() => {
-        spyOn(contextService, 'getPageContext').and.returnValue(
+        spyOn(pageContextService, 'getPageContext').and.returnValue(
           ServicesConstants.PAGE_CONTEXT.OTHER
         );
         expRecsService = TestBed.inject(ExplorationRecommendationsService);
@@ -175,7 +177,7 @@ describe('Exploration Recommendations Service', () => {
 
     describe('when used in the editor', () => {
       beforeEach(() => {
-        spyOn(contextService, 'getPageContext').and.returnValue(
+        spyOn(pageContextService, 'getPageContext').and.returnValue(
           ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR
         );
         expRecsService = TestBed.inject(ExplorationRecommendationsService);

@@ -21,7 +21,7 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {VersionHistoryService} from '../services/version-history.service';
@@ -65,7 +65,7 @@ export class MetadataVersionHistoryModalComponent
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private versionHistoryService: VersionHistoryService,
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
     private historyTabYamlConversionService: HistoryTabYamlConversionService
@@ -186,7 +186,7 @@ export class MetadataVersionHistoryModalComponent
     if (diffData.oldVersionNumber !== null) {
       this.versionHistoryBackendApiService
         .fetchMetadataVersionHistoryAsync(
-          this.contextService.getExplorationId(),
+          this.pageContextService.getExplorationId(),
           diffData.oldVersionNumber
         )
         .then(response => {
