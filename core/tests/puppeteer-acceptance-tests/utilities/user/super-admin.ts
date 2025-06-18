@@ -1045,7 +1045,8 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(rollbackExplorationButton);
 
     await this.expectActionStatusMessageToBe(
-      'Exploration rolledback to version:'
+      'Exploration rolledback to version:',
+      'Rollingback exploration'
     );
   }
 
