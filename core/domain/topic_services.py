@@ -49,7 +49,7 @@ from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple, cast
+from typing import Dict, List, Optional, Sequence, Tuple, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -264,6 +264,13 @@ def apply_change_list(
             change.cmd ==
             study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY
         ):
+            # Remove union and StudyGuideChange once the study
+            # guide logic when updating a subtopic page is 
+            # removed from line 337.
+            update_study_guide_property_cmd: Union[
+                study_guide_domain.UpdateStudyGuidePropertyCmd,
+                study_guide_domain.StudyGuideChange
+            ]
             # Here we use cast because we are narrowing down the type from
             # TopicChange to a specific change command.
             update_study_guide_property_cmd = cast(
@@ -284,6 +291,7 @@ def apply_change_list(
                 )
                 modified_study_guide_change_cmds[study_guide_id].append(
                     update_study_guide_property_cmd)
+        # Remove this entire if block once study guides become standard.
         if (change.cmd ==
                 subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
             # Here we use cast because we are narrowing down the type from
@@ -315,7 +323,7 @@ def apply_change_list(
                     )
                 ):
                     # Only update study guide if it exists.
-                    study_guide_id = _ensure_study_guide_exists(
+                    study_guide_id: Optional[str] = _ensure_study_guide_exists(
                         update_subtopic_page_property_cmd.subtopic_id
                     )
                     if study_guide_id is not None:

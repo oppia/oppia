@@ -860,7 +860,7 @@ class TopicEditorTests(
                         },
                         'content': {
                             'content_id': 'section_content_1',
-                            'html': 'content'
+                            'html': '<p>New Data</p>'
                         }
                     }
                 ],

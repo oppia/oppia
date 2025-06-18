@@ -146,7 +146,7 @@ describe('Study Guide Section editor component', () => {
     expect(component.headingEditorIsOpen).toBe(false);
 
     component.headingEditorIsOpen = true;
-    component.originalSectionHeading = null;
+    component.originalSectionHeading = '';
     component.cancelEditHeading();
 
     expect(component.headingEditorIsOpen).toBe(true);
@@ -164,7 +164,7 @@ describe('Study Guide Section editor component', () => {
     expect(component.contentEditorIsOpen).toBe(false);
 
     component.contentEditorIsOpen = true;
-    component.originalSectionContent = null;
+    component.originalSectionContent = '';
     component.cancelEditContent();
 
     expect(component.contentEditorIsOpen).toBe(true);
