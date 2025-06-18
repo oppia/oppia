@@ -46,6 +46,7 @@ import {RatingComputationService} from '../../../../components/ratings/rating-co
 import {CheckpointCelebrationUtilityService} from '../../services/checkpoint-celebration-utility.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {StateCard} from '../../../../domain/state_card/state-card.model';
+import {ExplorationModeService} from '../../services/exploration-mode.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
@@ -144,6 +145,7 @@ describe('Lesson Information card modal component', () => {
   let ngbActiveModal: NgbActiveModal;
   let playerTranscriptService: PlayerTranscriptService;
   let explorationEngineService: ExplorationEngineService;
+  let explorationModeService: ExplorationModeService;
 
   let expId = 'expId';
   let expTitle = 'Exploration Title';
@@ -236,6 +238,7 @@ describe('Lesson Information card modal component', () => {
     checkpointCelebrationUtilityService = TestBed.inject(
       CheckpointCelebrationUtilityService
     );
+    explorationModeService = TestBed.inject(ExplorationModeService);
 
     spyOn(
       i18nLanguageCodeService,
@@ -357,7 +360,9 @@ describe('Lesson Information card modal component', () => {
     'should correctly set logged-out progress learner URL ' +
       'when unique progress URL ID exists',
     fakeAsync(() => {
-      spyOn(progressUrlService, 'isInStoryChapterMode').and.returnValue(true);
+      spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+        true
+      );
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         ''
       );
