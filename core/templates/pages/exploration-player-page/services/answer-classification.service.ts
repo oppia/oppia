@@ -21,7 +21,7 @@ import {Injectable} from '@angular/core';
 import {AlertsService} from 'services/alerts.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {InteractionAnswer, TextInputAnswer} from 'interactions/answer-defs';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {InteractionSpecsService} from 'services/interaction-specs.service';

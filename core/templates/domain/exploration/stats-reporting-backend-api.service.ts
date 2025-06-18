@@ -20,7 +20,7 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
 import {ContextService} from 'services/context.service';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 interface SessionStateStats {

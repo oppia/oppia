@@ -36,7 +36,7 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {TrainingDataService} from '../../training-panel/training-data.service';
 import {TrainingModalService} from '../../training-panel/training-modal.service';
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {LoggerService} from 'services/contextual/logger.service';
 import {State} from 'domain/state/StateObjectFactory';
 import {InteractionAnswer} from 'interactions/answer-defs';
