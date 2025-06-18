@@ -213,6 +213,9 @@ def apply_change_list(
     modified_subtopic_pages_list: List[
         Optional[subtopic_page_domain.SubtopicPage]
     ] = []
+    modified_study_guides_list: List[
+        Optional[study_guide_domain.StudyGuide]
+    ] = []
     modified_subtopic_pages: Dict[str, subtopic_page_domain.SubtopicPage] = {}
     modified_study_guides: Dict[str, study_guide_domain.StudyGuide] = {}
     modified_subtopic_change_cmds: Dict[
@@ -360,6 +363,18 @@ def apply_change_list(
         # Ruling out the possibility of None for mypy type checking.
         assert subtopic_page is not None
         modified_subtopic_pages[subtopic_page.id] = subtopic_page
+    if feature_flag_services.is_feature_flag_enabled(
+                    feature_flag_list.FeatureNames
+                    .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                    None
+                ):
+        modified_study_guides_list = (
+            study_guide_services.get_study_guides_with_ids(
+                topic_id, existing_study_guide_ids_to_be_modified))
+        for study_guide in modified_study_guides_list:
+            # Ruling out the possibility of None for mypy type checking.
+            assert study_guide is not None
+            modified_study_guides[study_guide.id] = study_guide
 
     try:
         for change in change_list:
