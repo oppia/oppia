@@ -1068,7 +1068,8 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(updateUserNameButtonSelector);
 
     await this.expectActionStatusMessageToBe(
-      `Successfully renamed ${oldUserName} to ${newUserName}!`
+      `Successfully renamed ${oldUserName} to ${newUserName}!`,
+      'Updating username'
     );
   }
 
@@ -1080,7 +1081,8 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(getPendingDeletionRequestsCountButton);
 
     await this.expectActionStatusMessageToBe(
-      'The number of users that are being deleted is:'
+      'The number of users that are being deleted is:',
+      'Getting the number of users that are being deleted'
     );
   }
 
@@ -1101,7 +1103,8 @@ export class SuperAdmin extends BaseUser {
     await this.clickOn(getInteractionsButton);
 
     await this.expectActionStatusMessageToBe(
-      'Successfully fetched interactionIds in exploration.'
+      'Successfully fetched interactionIds in exploration.',
+      'Retrieving interactions in exploration'
     );
   }
 
@@ -1117,7 +1120,10 @@ export class SuperAdmin extends BaseUser {
     await this.page.waitForSelector(grantSuperAdminButtonSelector);
     await this.clickOn(grantSuperAdminButtonSelector);
 
-    await this.expectActionStatusMessageToBe('Success!');
+    await this.expectActionStatusMessageToBe(
+      'Success!',
+      'Communicating with Firebase server'
+    );
   }
 
   /**
@@ -1132,7 +1138,10 @@ export class SuperAdmin extends BaseUser {
     await this.page.waitForSelector(revokeSuperAdminButton);
     await this.clickOn(revokeSuperAdminButton);
 
-    await this.expectActionStatusMessageToBe('Success!');
+    await this.expectActionStatusMessageToBe(
+      'Success!',
+      'Communicating with Firebase server'
+    );
   }
 
   /**
