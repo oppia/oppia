@@ -75,12 +75,12 @@ describe('Exploration Editor', function () {
       [ROLES.VOICEOVER_ADMIN]
     );
 
-    await UserFactory.enableVoiceoverAutogenerationUsingCloudService();
-
     await voiceoverAdmin.addSupportedLanguageAccentPair(
       'English (United States)'
     );
     await voiceoverAdmin.enableAutogenerationForLanguageAccentPair('en-US');
+
+    await UserFactory.enableVoiceoverAutogenerationUsingCloudService();
 
     // Enable the feature flag.
     await releaseCoordinator.enableFeatureFlag(
