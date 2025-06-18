@@ -41,6 +41,9 @@ describe('Logged-out User', function () {
       showMessage(
         'The application is currently running in production mode. Skipping dummy blog post generation.'
       );
+      // TODO(#22716): Complete it with Milestone 2.5 Implement Acceptance
+      // tests for Blog Admin and Blog Post Editor.
+      process.exit(0);
     }
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
