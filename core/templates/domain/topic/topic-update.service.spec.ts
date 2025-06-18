@@ -1368,7 +1368,7 @@ describe('Topic update service', function () {
     });
   });
 
-  it('should update a study guide section', () => {
+  it('should update a study guide section and undo the changes', () => {
     var oldSections = _sampleStudyGuide.getSections();
     expect(oldSections[0].toBackendDict()).toEqual({
       heading: {
@@ -1396,6 +1396,18 @@ describe('Topic update service', function () {
       content: {
         content_id: 'section_content_1',
         html: 'updated content',
+      },
+    });
+    undoRedoService.undoChange(_sampleStudyGuide);
+    var oldSections = _sampleStudyGuide.getSections();
+    expect(oldSections[0].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'heading 1',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: '<p>content 1</p>',
       },
     });
   });

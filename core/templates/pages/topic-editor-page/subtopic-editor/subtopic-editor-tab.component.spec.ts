@@ -525,22 +525,27 @@ describe('Subtopic editor tab', () => {
     expect(component.htmlData).toEqual('test html');
   });
 
-  it('should handle study guide loaded event', () => {
-    let mockStudyGuide = {
-      getSections: () => [{title: 'Test Section'}],
-    } as StudyGuide;
-    (topicEditorStateService.getStudyGuide as jasmine.Spy).and.returnValue(
-      mockStudyGuide
-    );
-
-    component.sections = [];
-
-    studyGuideLoadedEventEmitter.emit();
-
-    component.sections = mockStudyGuide.getSections();
-
-    expect(component.sections).toEqual([{title: 'Test Section'}]);
-  });
+  it(
+    'should subscribe to onStudyGuideLoaded when restructured' +
+      ' study guides feature is enabled',
+    () => {
+      spyOn(
+        component,
+        'isShowRestructuredStudyGuidesFeatureEnabled'
+      ).and.returnValue(true);
+      let newStudyGuide = StudyGuide.createDefault('new_study_guide_id', 2);
+      let mockSections = [];
+      spyOn(newStudyGuide, 'getSections').and.returnValue(mockSections);
+      (topicEditorStateService.getStudyGuide as jasmine.Spy).and.returnValue(
+        newStudyGuide
+      );
+      component.ngOnInit();
+      studyGuideLoadedEventEmitter.emit();
+      expect(component.studyGuide).toBe(newStudyGuide);
+      expect(component.sections).toBe(mockSections);
+      expect(topicEditorStateService.getStudyGuide).toHaveBeenCalled();
+    }
+  );
 
   it('should hide the html data input on canceling', () => {
     component.schemaEditorIsShown = true;
