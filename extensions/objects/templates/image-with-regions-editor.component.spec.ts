@@ -26,7 +26,7 @@ import {
 import {ImageWithRegionsEditorComponent} from './image-with-regions-editor.component';
 import {NO_ERRORS_SCHEMA, SimpleChange} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ImageWithRegionsResetConfirmationModalComponent} from './image-with-regions-reset-confirmation.component';
 import {AppConstants} from 'app.constants';
@@ -39,7 +39,7 @@ describe('ImageWithRegionsEditorComponent', () => {
   let component: ImageWithRegionsEditorComponent;
   let ngbModal: NgbModal;
   let fixture: ComponentFixture<ImageWithRegionsEditorComponent>;
-  let contextService: ContextService;
+  let PageContextService: PageContextService;
   let imageLocalStorageService: ImageLocalStorageService;
   let assetsBackendApiService: AssetsBackendApiService;
   let svgSanitizerService: SvgSanitizerService;
@@ -74,7 +74,7 @@ describe('ImageWithRegionsEditorComponent', () => {
       imports: [HttpClientTestingModule],
       declarations: [ImageWithRegionsEditorComponent],
       providers: [
-        ContextService,
+        PageContextService,
         {
           provide: WindowRef,
           useClass: MockWindowRef,
@@ -86,7 +86,7 @@ describe('ImageWithRegionsEditorComponent', () => {
 
   beforeEach(() => {
     ngbModal = TestBed.inject(NgbModal);
-    contextService = TestBed.inject(ContextService);
+    PageContextService = TestBed.inject(PageContextService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
@@ -129,10 +129,10 @@ describe('ImageWithRegionsEditorComponent', () => {
   it('should initialize editor when ngOnChanges is run with a new value only', fakeAsync(() => {
     expect(component.editorIsInitialized).toBe(false);
     spyOn(component, 'imageValueChanged').and.callThrough();
-    spyOn(contextService, 'getEntityType').and.returnValue(
+    spyOn(PageContextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION
     );
-    spyOn(contextService, 'getEntityId').and.returnValue('skill_1');
+    spyOn(PageContextService, 'getEntityId').and.returnValue('skill_1');
     component.ngOnChanges({});
     expect(component.editorIsInitialized).toBe(false);
     component.ngOnChanges({
@@ -157,11 +157,11 @@ describe('ImageWithRegionsEditorComponent', () => {
   it('should initialize component when interaction editor is opened.', () => {
     spyOn(component, 'initializeEditor').and.callThrough();
     spyOn(component, 'imageValueChanged').and.callThrough();
-    spyOn(contextService, 'getEntityType').and.returnValue(
+    spyOn(PageContextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION
     );
-    spyOn(contextService, 'getEntityId').and.returnValue('skill_1');
-    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
+    spyOn(PageContextService, 'getEntityId').and.returnValue('skill_1');
+    spyOn(PageContextService, 'getExplorationId').and.returnValue('exploration_id');
     spyOn(component.valueChanged, 'emit');
     spyOn(component, 'getPreviewUrl');
 
@@ -213,10 +213,10 @@ describe('ImageWithRegionsEditorComponent', () => {
     () => {
       spyOn(component, 'initializeEditor').and.callThrough();
       spyOn(component, 'imageValueChanged').and.callThrough();
-      spyOn(contextService, 'getEntityType').and.returnValue(
+      spyOn(PageContextService, 'getEntityType').and.returnValue(
         AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS
       );
-      spyOn(contextService, 'getEntityId').and.returnValue('skill_1');
+      spyOn(PageContextService, 'getEntityId').and.returnValue('skill_1');
       spyOn(component.valueChanged, 'emit');
 
       component.ngOnInit();
@@ -268,11 +268,11 @@ describe('ImageWithRegionsEditorComponent', () => {
     () => {
       spyOn(component, 'initializeEditor').and.callThrough();
       spyOn(component, 'imageValueChanged').and.callThrough();
-      spyOn(contextService, 'getEntityType').and.returnValue(
+      spyOn(PageContextService, 'getEntityType').and.returnValue(
         AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS
       );
-      spyOn(contextService, 'getEntityId').and.returnValue('skill_1');
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(PageContextService, 'getEntityId').and.returnValue('skill_1');
+      spyOn(PageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(component.valueChanged, 'emit');
@@ -798,10 +798,10 @@ describe('ImageWithRegionsEditorComponent', () => {
     component.movedOutOfRegion = true;
     component.xDirection = 1;
     component.yDirection = 1;
-    spyOn(contextService, 'getEntityType').and.returnValue(
+    spyOn(PageContextService, 'getEntityType').and.returnValue(
       AppConstants.ENTITY_TYPE.EXPLORATION
     );
-    spyOn(contextService, 'getExplorationId').and.returnValue('exploration_id');
+    spyOn(PageContextService, 'getExplorationId').and.returnValue('exploration_id');
 
     component.onSvgMouseUp();
 
@@ -1460,11 +1460,11 @@ describe('ImageWithRegionsEditorComponent', () => {
   it(
     'should get the preview URL when the image save destination is ' + 'server',
     () => {
-      spyOn(contextService, 'getEntityId').and.returnValue('exp_id');
-      spyOn(contextService, 'getEntityType').and.returnValue(
+      spyOn(PageContextService, 'getEntityId').and.returnValue('exp_id');
+      spyOn(PageContextService, 'getEntityType').and.returnValue(
         AppConstants.ENTITY_TYPE.EXPLORATION
       );
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(PageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
       spyOn(assetsBackendApiService, 'getImageUrlForPreview');
@@ -1479,10 +1479,10 @@ describe('ImageWithRegionsEditorComponent', () => {
     'should get the preview URL when the image save destination is ' +
       'local storage and image is non SVG',
     () => {
-      spyOn(contextService, 'getEntityType').and.returnValue(
+      spyOn(PageContextService, 'getEntityType').and.returnValue(
         AppConstants.ENTITY_TYPE.QUESTION
       );
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(PageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);
@@ -1503,10 +1503,10 @@ describe('ImageWithRegionsEditorComponent', () => {
     'should get the preview URL when the image save destination is ' +
       'local storage and image is an SVG',
     () => {
-      spyOn(contextService, 'getEntityType').and.returnValue(
+      spyOn(PageContextService, 'getEntityType').and.returnValue(
         AppConstants.ENTITY_TYPE.QUESTION
       );
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(PageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
       spyOn(imageLocalStorageService, 'isInStorage').and.returnValue(true);

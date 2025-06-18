@@ -19,7 +19,7 @@
 import {TestBed, async, ComponentFixture} from '@angular/core/testing';
 
 import {AttributionGuideComponent} from './attribution-guide.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {UrlService} from 'services/contextual/url.service';
 import {AttributionService} from 'services/attribution.service';
@@ -93,7 +93,7 @@ describe('Attribution Guide Component', function () {
         {provide: AttributionService, useClass: MockAttributionService},
         {provide: BrowserCheckerService, useClass: MockBrowserCheckerService},
         {provide: UrlService, useClass: MockUrlService},
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockContextService},
         WindowDimensionsService,
       ],
       schemas: [NO_ERRORS_SCHEMA],

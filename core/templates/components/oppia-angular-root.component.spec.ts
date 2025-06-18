@@ -138,23 +138,23 @@ describe('OppiaAngularRootComponent', function () {
     expect(component.direction).toEqual(newDirection);
   });
 
-  it('should set OppiaAngularRootComponent.contextService if not set', () => {
-    OppiaAngularRootComponent.contextService = undefined;
-    expect(OppiaAngularRootComponent.contextService).toBeUndefined();
+  it('should set OppiaAngularRootComponent.PageContextService if not set', () => {
+    OppiaAngularRootComponent.PageContextService = undefined;
+    expect(OppiaAngularRootComponent.PageContextService).toBeUndefined();
 
     component.ngAfterViewInit();
 
-    expect(OppiaAngularRootComponent.contextService).toBe(
-      // Disabled dot-notation as contextService is a private property
+    expect(OppiaAngularRootComponent.PageContextService).toBe(
+      // Disabled dot-notation as PageContextService is a private property
       // and hence cannot be accessed without this syntax.
       // eslint-disable-next-line dot-notation
-      component['contextService'] // Accessing the private property directly for testing.
+      component['PageContextService'] // Accessing the private property directly for testing.
     );
 
-    const previousContextService = OppiaAngularRootComponent.contextService;
+    const previousContextService = OppiaAngularRootComponent.PageContextService;
 
     component.ngAfterViewInit();
-    expect(OppiaAngularRootComponent.contextService).toBe(
+    expect(OppiaAngularRootComponent.PageContextService).toBe(
       previousContextService
     );
   });

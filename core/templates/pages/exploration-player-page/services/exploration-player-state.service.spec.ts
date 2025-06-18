@@ -34,7 +34,7 @@ import {
   QuestionObjectFactory,
 } from '../../../domain/question/QuestionObjectFactory';
 import {DiagnosticTestTopicTrackerModel} from '../../../pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
-import {ContextService} from '../../../services/context.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {UrlService} from '../../../services/contextual/url.service';
 import {
   ExplorationFeatures,
@@ -263,7 +263,7 @@ describe('Exploration Player State Service', () => {
         PlayerTranscriptService,
         StatsReportingService,
         {
-          provide: ContextService,
+          provide: PageContextService,
           useClass: MockContextService,
         },
         UrlService,
