@@ -284,7 +284,7 @@ def apply_change_list(
             ):
                 existing_study_guide_ids_to_be_modified.append(
                     update_study_guide_property_cmd.subtopic_id)
-                study_guide_id: Optional[str] = (
+                study_guide_id = (
                     study_guide_domain.StudyGuide.get_study_guide_id(
                         topic_id, update_study_guide_property_cmd.subtopic_id
                     )
@@ -323,10 +323,11 @@ def apply_change_list(
                     )
                 ):
                     # Only update study guide if it exists.
-                    study_guide_id = _ensure_study_guide_exists(
+                    potential_study_guide_id: Optional[str] = (
+                        _ensure_study_guide_exists)(
                         update_subtopic_page_property_cmd.subtopic_id
                     )
-                    if study_guide_id is not None:
+                    if potential_study_guide_id is not None:
                         # Here we use cast because we are sure that the
                         # new_value is subtitled html as written
                         # translations and recorded voiceovers are
@@ -360,7 +361,9 @@ def apply_change_list(
                         # we start using study guides exclusively.
                         existing_study_guide_ids_to_be_modified.append(
                             update_subtopic_page_property_cmd.subtopic_id)
-                        modified_study_guide_change_cmds[study_guide_id].append(
+                        modified_study_guide_change_cmds[
+                            potential_study_guide_id
+                        ].append(
                             update_study_guide_property_cmd
                         )
 
