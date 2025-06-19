@@ -26,12 +26,12 @@ import {
   Exploration,
   ExplorationBackendDict,
   ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
-import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {EntityTranslationsService} from 'services/entity-translations.services';
-import {ContextService} from 'services/context.service';
-import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+} from '../../../domain/exploration/ExplorationObjectFactory';
+import {ImagePreloaderService} from './image-preloader.service';
+import {AssetsBackendApiService} from '../../../services/assets-backend-api.service';
+import {EntityTranslationsService} from '../../../services/entity-translations.services';
+import {ContextService} from '../../../services/context.service';
+import {SvgSanitizerService} from '../../../services/svg-sanitizer.service';
 
 describe('Image preloader service', () => {
   let httpTestingController: HttpTestingController;

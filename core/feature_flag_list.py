@@ -66,6 +66,8 @@ class FeatureNames(enum.Enum):
         'show_voiceover_tab_for_non_curated_explorations')
     SHOW_RESTRUCTURED_STUDY_GUIDES = (
         'show_restructured_study_guides')
+    ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS = (
+        'enable_translation_opps_with_new_opp_models')
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -91,6 +93,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
+    FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -285,6 +288,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             '(the actual content displayed by the study guides will be the '
             'same, just the user interface will be different).',
             feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (
+        (
+            'This flag enables the new translation opportunity structure to '
+            'the contributor dashboard.',
+            feature_flag_domain.ServerMode.DEV
         )
     )
 }
