@@ -265,7 +265,7 @@ def apply_change_list(
             study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY
         ):
             # Remove union and StudyGuideChange once the study
-            # guide logic when updating a subtopic page is 
+            # guide logic when updating a subtopic page is
             # removed from line 337.
             update_study_guide_property_cmd: Union[
                 study_guide_domain.UpdateStudyGuidePropertyCmd,
@@ -284,7 +284,7 @@ def apply_change_list(
             ):
                 existing_study_guide_ids_to_be_modified.append(
                     update_study_guide_property_cmd.subtopic_id)
-                study_guide_id = (
+                study_guide_id: Optional[str] = (
                     study_guide_domain.StudyGuide.get_study_guide_id(
                         topic_id, update_study_guide_property_cmd.subtopic_id
                     )
@@ -323,7 +323,7 @@ def apply_change_list(
                     )
                 ):
                     # Only update study guide if it exists.
-                    study_guide_id: Optional[str] = _ensure_study_guide_exists(
+                    study_guide_id = _ensure_study_guide_exists(
                         update_subtopic_page_property_cmd.subtopic_id
                     )
                     if study_guide_id is not None:
