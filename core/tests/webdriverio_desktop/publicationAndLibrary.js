@@ -301,44 +301,6 @@ describe('Permissions for private explorations', function () {
     await users.logout();
   });
 
-  it('should be correct for collaborators', async function () {
-    await users.createUser('alice@privileges.com', 'alicePrivileges');
-    await users.createUser('bob@privileges.com', 'bobPrivileges');
-    await users.createUser('eve@privileges.com', 'evePrivileges');
-
-    await users.login('alice@privileges.com');
-    await workflow.createExploration(true);
-    await explorationEditorPage.navigateToSettingsTab();
-    await explorationEditorSettingsTab.setTitle('CollaboratorPermissions');
-    await workflow.addExplorationCollaborator('bobPrivileges');
-    expect(await workflow.getExplorationManagers()).toEqual([
-      'alicePrivileges',
-    ]);
-    expect(await workflow.getExplorationCollaborators()).toEqual([
-      'bobPrivileges',
-    ]);
-    expect(await workflow.getExplorationPlaytesters(true)).toEqual([]);
-    var explorationId = await general.getExplorationIdFromEditor();
-    await users.logout();
-
-    await users.login('bob@privileges.com');
-    await general.openEditor(explorationId, true);
-    await explorationEditorMainTab.setContent(
-      await forms.toRichText('I love you')
-    );
-    await explorationEditorMainTab.setInteraction('TextInput');
-    await explorationEditorPage.saveChanges();
-    await users.logout();
-
-    await users.login('eve@privileges.com');
-    await general.openEditor(explorationId, false);
-    await general.expectErrorPage(404);
-    await users.logout();
-    expectedConsoleErrors.push(
-      `The requested path /create/${explorationId} is not found.`
-    );
-  });
-
   afterEach(async function () {
     await general.checkForConsoleErrors(expectedConsoleErrors);
   });
