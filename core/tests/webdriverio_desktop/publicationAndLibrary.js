@@ -278,7 +278,6 @@ describe('Permissions for private explorations', function () {
 
   beforeEach(function () {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-    explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     expectedConsoleErrors = [
       'Failed to load resource: the server responded with a status of 404',
