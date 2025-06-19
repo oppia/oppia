@@ -80,7 +80,6 @@ export class ExplorationEngineService {
   // Param changes to be used ONLY in editor preview mode.
   manualParamChanges: ParamChange[];
   initStateName: string;
-  version: number;
 
   constructor(
     private alertsService: AlertsService,
@@ -125,7 +124,8 @@ export class ExplorationEngineService {
 
     if (explorationContext) {
       this._explorationId = this.pageContextService.getExplorationId();
-      this.version = this.urlService.getExplorationVersionFromUrl();
+      let version = this.urlService.getExplorationVersionFromUrl();
+      this.pageContextService.setExplorationVersion(version);
 
       const pathSegment = this.urlService
         .getPathname()
@@ -137,15 +137,15 @@ export class ExplorationEngineService {
         pathSegment !== 'skill_editor'
       ) {
         this.readOnlyExplorationBackendApiService
-          .loadExplorationAsync(this._explorationId, this.version)
+          .loadExplorationAsync(this._explorationId, version)
           .then(exploration => {
-            this.version = exploration.version;
+            this.pageContextService.setExplorationVersion(exploration.version);
           });
       }
-      this.pageContextService.setExplorationVersion(this.version);
     } else {
       this._explorationId = 'test_id';
-      this.version = 1;
+      let version = 1;
+      this.pageContextService.setExplorationVersion(version);
     }
   }
 
@@ -403,7 +403,7 @@ export class ExplorationEngineService {
       this._loadInitialState(successCallback);
     } else {
       this.visitedStateNames.push(this.exploration.getInitialState().name);
-      this.version = explorationVersion;
+      this.pageContextService.setExplorationVersion(explorationVersion);
       this.initParams([]);
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(
@@ -420,7 +420,7 @@ export class ExplorationEngineService {
     this.entityTranslationsService.init(
       this._explorationId,
       'exploration',
-      this.version
+      this.pageContextService.getExplorationVersion()
     );
     this.contentTranslationManagerService.setOriginalTranscript(
       this.exploration.getLanguageCode()
@@ -460,10 +460,6 @@ export class ExplorationEngineService {
 
   getExplorationTitle(): string {
     return this.exploration.title;
-  }
-
-  getExplorationVersion(): number {
-    return this.version;
   }
 
   getAuthorRecommendedExpIdsByStateName(stateName: string): string[] {

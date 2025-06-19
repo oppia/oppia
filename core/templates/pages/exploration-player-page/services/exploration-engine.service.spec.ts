@@ -1053,7 +1053,7 @@ describe('Exploration engine service ', () => {
       );
 
       // Here 1 is default value, this is being initialized in the constructor.
-      expect(explorationEngineService.getExplorationVersion()).toBe(1);
+      expect(pageContextService.getExplorationVersion()).toBe(1);
 
       explorationEngineService.init(
         explorationDict,
@@ -1065,8 +1065,7 @@ describe('Exploration engine service ', () => {
         initSuccessCb
       );
 
-      const explorationVersion =
-        explorationEngineService.getExplorationVersion();
+      const explorationVersion = pageContextService.getExplorationVersion();
       expect(explorationVersion).toBe(2);
     }
   );
