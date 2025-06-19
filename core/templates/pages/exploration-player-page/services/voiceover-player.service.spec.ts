@@ -19,14 +19,14 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
-import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
+import {EntityVoiceovers} from '../../../domain/voiceover/entity-voiceovers.model';
 import {EntityVoiceoversService} from '../../../services/entity-voiceovers.services';
 import {
   Voiceover,
   VoiceoverBackendDict,
-} from 'domain/exploration/voiceover.model';
+} from '../../../domain/exploration/voiceover.model';
 import {VoiceoverPlayerService} from './voiceover-player.service';
-import {AppConstants} from 'app.constants';
+import {AppConstants} from '../../../app.constants';
 
 describe('Voiceover player service', () => {
   let entityVoiceoversService: EntityVoiceoversService;

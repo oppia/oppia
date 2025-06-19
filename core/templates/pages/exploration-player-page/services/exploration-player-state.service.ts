@@ -40,7 +40,7 @@ import {
 } from 'services/exploration-features-backend-api.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {PlaythroughService} from 'services/playthrough.service';
-import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
+import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {NumberAttemptsService} from './number-attempts.service';
 import {PlayerTranscriptService} from './player-transcript.service';

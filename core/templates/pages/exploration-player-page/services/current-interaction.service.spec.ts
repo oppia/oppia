@@ -22,15 +22,15 @@ import {
   CurrentInteractionService,
   OnSubmitFn,
   ValidityCheckFn,
-} from 'pages/exploration-player-page/services/current-interaction.service';
-import {UrlService} from 'services/contextual/url.service';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
-import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {ContextService} from 'services/context.service';
+} from './current-interaction.service';
+import {UrlService} from '../../../services/contextual/url.service';
+import {PlayerPositionService} from './player-position.service';
+import {PlayerTranscriptService} from './player-transcript.service';
+import {StateCard} from '../../../domain/state_card/state-card.model';
+import {ContextService} from '../../../services/context.service';
 import {InteractionRulesService} from './answer-classification.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {Interaction} from '../../../domain/exploration/InteractionObjectFactory';
+import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService;
