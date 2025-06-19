@@ -25,6 +25,7 @@ import {
   tick,
   waitForAsync,
   flush,
+  flushMicrotasks,
 } from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
@@ -92,6 +93,7 @@ import {PlayerTranscriptService} from '../../services/player-transcript.service'
 import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
 import {RefresherExplorationConfirmationModalService} from '../../services/refresher-exploration-confirmation-modal.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
+import {ExplorationInitializationService} from '../../services/exploration-initialization.service';
 import {ConversationSkinComponent} from './conversation-skin.component';
 import {LearnerDashboardBackendApiService} from '../../../../domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {EditableExplorationBackendApiService} from '../../../../domain/exploration/editable-exploration-backend-api.service';
@@ -100,6 +102,7 @@ import {ConceptCardManagerService} from '../../services/concept-card-manager.ser
 import {SolutionObjectFactory} from '../../../../domain/exploration/SolutionObjectFactory';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
+import {CurrentEngineService} from '../../services/current-engine.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -134,6 +137,7 @@ describe('Conversation skin component', () => {
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
   let fatigueDetectionService: FatigueDetectionService;
   let focusManagerService: FocusManagerService;
+  let explorationInitializationService: ExplorationInitializationService;
   let guestCollectionProgressService: GuestCollectionProgressService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -158,6 +162,7 @@ describe('Conversation skin component', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService;
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
+  let currentEngineService: CurrentEngineService;
   let userService: UserService;
   let windowDimensionsService: WindowDimensionsService;
   let windowRef: WindowRef;
@@ -514,6 +519,10 @@ describe('Conversation skin component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerAnswerInfoService = TestBed.inject(LearnerAnswerInfoService);
+    explorationInitializationService = TestBed.inject(
+      ExplorationInitializationService
+    );
+    currentEngineService = TestBed.inject(CurrentEngineService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
     loaderService = TestBed.inject(LoaderService);
     localStorageService = TestBed.inject(LocalStorageService);
@@ -566,7 +575,6 @@ describe('Conversation skin component', () => {
   it('should initialize component', fakeAsync(() => {
     let collectionId = 'id';
     let expId = 'exp_id';
-    let isInPreviewMode = false;
     let isIframed = true;
     let collectionSummary = {
       is_admin: true,
@@ -597,10 +605,7 @@ describe('Conversation skin component', () => {
       Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
     );
     spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
-    spyOn(explorationEngineService, 'isInPreviewMode').and.returnValue(
-      isInPreviewMode
-    );
-    spyOn(explorationModeService, 'getCurrentEngineService').and.returnValue(
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
       explorationEngineService
     );
     spyOn(explorationEngineService, 'getLanguageCode').and.returnValue('en');
@@ -726,7 +731,6 @@ describe('Conversation skin component', () => {
   it('should initialize component as logged in user', fakeAsync(() => {
     let collectionId = 'id';
     let expId = 'exp_id';
-    let isInPreviewMode = false;
     let isIframed = false;
     let collectionSummary = {
       is_admin: true,
@@ -765,9 +769,6 @@ describe('Conversation skin component', () => {
       })
     );
     spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
-    spyOn(explorationEngineService, 'isInPreviewMode').and.returnValue(
-      isInPreviewMode
-    );
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
@@ -868,7 +869,6 @@ describe('Conversation skin component', () => {
   it('should initialize component as logged out user', fakeAsync(() => {
     let collectionId = 'id';
     let expId = 'exp_id';
-    let isInPreviewMode = false;
     let isIframed = false;
     let collectionSummary = {
       is_admin: true,
@@ -900,9 +900,6 @@ describe('Conversation skin component', () => {
       Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
     );
     spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
-    spyOn(explorationEngineService, 'isInPreviewMode').and.returnValue(
-      isInPreviewMode
-    );
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
@@ -1013,7 +1010,6 @@ describe('Conversation skin component', () => {
     fakeAsync(() => {
       let collectionId = 'id';
       let expId = 'exp_id';
-      let isInPreviewMode = false;
       let isIframed = false;
       let collectionSummary = {
         is_admin: true,
@@ -1044,9 +1040,6 @@ describe('Conversation skin component', () => {
       );
       spyOn(explorationEngineService, 'getExplorationId').and.returnValue(
         expId
-      );
-      spyOn(explorationEngineService, 'isInPreviewMode').and.returnValue(
-        isInPreviewMode
       );
       spyOn(urlService, 'isIframed').and.returnValue(isIframed);
       spyOn(loaderService, 'showLoadingScreen');
@@ -1165,6 +1158,8 @@ describe('Conversation skin component', () => {
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       true
     );
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+
     spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
       'collection_id'
     );
@@ -1176,11 +1171,15 @@ describe('Conversation skin component', () => {
     spyOn(
       collectionPlayerBackendApiService,
       'fetchCollectionSummariesAsync'
-    ).and.returnValue(Promise.reject());
+    ).and.returnValue(
+      Promise.reject(
+        'There was an error while fetching the collection summary.'
+      )
+    );
     spyOn(alertsService, 'addWarning');
 
     componentInstance.ngOnInit();
-    tick();
+    flushMicrotasks();
 
     expect(pageContextService.isInExplorationEditorPage).toHaveBeenCalled();
     expect(urlService.getCollectionIdFromExplorationUrl).toHaveBeenCalled();
@@ -1188,7 +1187,7 @@ describe('Conversation skin component', () => {
       collectionPlayerBackendApiService.fetchCollectionSummariesAsync
     ).toHaveBeenCalled();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'There was an error while fetching the collection ' + 'summary.'
+      'There was an error while fetching the collection summary.'
     );
   }));
 
@@ -1548,7 +1547,6 @@ describe('Conversation skin component', () => {
       spyOn(explorationEngineService, 'getExplorationId').and.returnValue(
         'expl_1'
       );
-      spyOn(explorationEngineService, 'isInPreviewMode').and.returnValue(false);
       spyOn(urlService, 'isIframed').and.returnValue(false);
 
       componentInstance.ngOnInit();
@@ -1853,9 +1851,11 @@ describe('Conversation skin component', () => {
     spyOn(autogeneratedAudioPlayerService, 'cancel');
     spyOn(playerTranscriptService, 'isLastCard').and.returnValues(true, false);
     spyOn(componentInstance, 'getContentFocusLabel');
-    spyOn(explorationEngineService, 'initializePlayer').and.callFake(callb => {
-      callb(displayedCard, 'label');
-    });
+    spyOn(explorationInitializationService, 'initializePlayer').and.callFake(
+      callb => {
+        callb(displayedCard, 'label');
+      }
+    );
 
     componentInstance._nextFocusLabel = 'focus_label';
     componentInstance.initializePage();
@@ -2280,6 +2280,12 @@ describe('Conversation skin component', () => {
     componentInstance.questionSessionCompleted = true;
     spyOn(questionPlayerStateService.onQuestionSessionCompleted, 'emit');
     spyOn(questionPlayerStateService, 'getQuestionPlayerStateData');
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      topic_url_fragment: 'topicUrlFragment',
+      classroom_url_fragment: 'classroomUrlFragment',
+      story_url_fragment: 'storyUrlFragment',
+      node_id: 'nodeId',
+    });
 
     componentInstance.showUpcomingCard();
 
@@ -2329,12 +2335,6 @@ describe('Conversation skin component', () => {
     ).and.returnValue([]);
     spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
     spyOn(userService, 'setReturnUrl');
-    spyOn(urlService, 'getUrlParams').and.returnValue({
-      topic_url_fragment: 'topicUrlFragment',
-      classroom_url_fragment: 'classroomUrlFragment',
-      story_url_fragment: 'storyUrlFragment',
-      node_id: 'nodeId',
-    });
 
     componentInstance.isLoggedIn = false;
 
@@ -2423,7 +2423,7 @@ describe('Conversation skin component', () => {
     tick(200);
 
     spyOn(playerPositionService, 'recordAnswerSubmission');
-    spyOn(explorationModeService, 'getCurrentEngineService').and.returnValue(
+    spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
       explorationEngineService
     );
     spyOn(conversationFlowService, 'getLanguageCode').and.returnValue('en');
@@ -2796,7 +2796,6 @@ describe('Conversation skin component', () => {
   it('should be able to set appropriate flags for the diagnostic test', fakeAsync(() => {
     let collectionId = 'id';
     let expId = 'exp_id';
-    let isInPreviewMode = false;
     let isIframed = true;
     let collectionSummary = {
       is_admin: true,
@@ -2826,9 +2825,6 @@ describe('Conversation skin component', () => {
       Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
     );
     spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
-    spyOn(explorationEngineService, 'isInPreviewMode').and.returnValue(
-      isInPreviewMode
-    );
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(

@@ -425,7 +425,6 @@ describe('Exploration engine service ', () => {
         false
       );
 
-      expect(explorationEngineService.isInPreviewMode()).toBe(false);
       expect(() => {
         explorationEngineService.getExplorationTitle();
       }).toThrowError("Cannot read properties of undefined (reading 'title')");
@@ -466,7 +465,6 @@ describe('Exploration engine service ', () => {
       // function to manually trigger and tests different edge cases.
       explorationEngineService.setExplorationProperties();
 
-      expect(explorationEngineService.isInPreviewMode()).toBe(true);
       expect(() => {
         explorationEngineService.getExplorationTitle();
       }).toThrowError("Cannot read properties of undefined (reading 'title')");
@@ -1331,7 +1329,7 @@ describe('Exploration engine service ', () => {
         paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
 
       // Checking if we are currently in exploration editor preview mode.
-      expect(explorationEngineService.isInPreviewMode()).toBe(false);
+      expect(pageContextService.isInExplorationEditorPage()).toBe(false);
       expect(() => {
         explorationEngineService.initSettingsFromEditor('Start', [
           paramChanges,

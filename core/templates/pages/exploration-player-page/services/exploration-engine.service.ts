@@ -133,7 +133,7 @@ export class ExplorationEngineService {
         .replace(/"/g, "'");
 
       if (
-        this.pageContextService.isInQuestionPlayerMode() &&
+        !this.pageContextService.isInQuestionPlayerMode() &&
         pathSegment !== 'skill_editor'
       ) {
         this.readOnlyExplorationBackendApiService

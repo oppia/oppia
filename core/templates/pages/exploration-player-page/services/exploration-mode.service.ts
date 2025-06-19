@@ -122,7 +122,7 @@ export class ExplorationModeService {
     );
   }
 
-  isInExplorationEditorPreviewMode(): boolean {
+  isInExplorationPreviewMode(): boolean {
     return this.currentMode === EXPLORATION_MODE.EDITOR_PREVIEW;
   }
 

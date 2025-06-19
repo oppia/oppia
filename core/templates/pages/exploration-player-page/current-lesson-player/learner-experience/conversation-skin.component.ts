@@ -274,7 +274,7 @@ export class ConversationSkinComponent {
 
     this.explorationId = this.explorationEngineService.getExplorationId();
     this.isInPreviewMode =
-      this.explorationModeService.isInExplorationEditorPreviewMode();
+      this.explorationModeService.isInExplorationPreviewMode();
     this.isIframed = this.urlService.isIframed();
     this.loaderService.showLoadingScreen('Loading');
 
@@ -445,16 +445,14 @@ export class ConversationSkinComponent {
       if (this.collectionId) {
         this.collectionPlayerBackendApiService
           .fetchCollectionSummariesAsync(this.collectionId)
-          .then(
-            response => {
-              this.collectionSummary = response.summaries[0];
-            },
-            () => {
-              this.alertsService.addWarning(
-                'There was an error while fetching the collection ' + 'summary.'
-              );
-            }
-          );
+          .then(response => {
+            this.collectionSummary = response.summaries[0];
+          })
+          .catch(() => {
+            this.alertsService.addWarning(
+              'There was an error while fetching the collection summary.'
+            );
+          });
       }
 
       this.fetchCompletedChaptersCount();
