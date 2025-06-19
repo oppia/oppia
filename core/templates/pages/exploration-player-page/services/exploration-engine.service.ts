@@ -142,6 +142,7 @@ export class ExplorationEngineService {
             this.version = exploration.version;
           });
       }
+      this.pageContextService.setExplorationVersion(this.version);
     } else {
       this._explorationId = 'test_id';
       this.version = 1;
