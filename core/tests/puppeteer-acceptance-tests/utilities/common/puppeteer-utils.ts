@@ -956,7 +956,7 @@ export class BaseUser {
    * Helper method to wait for a action progress message to disappear
    * @param {string} progressMessage - The processing message to wait for completion
    */
-  private async waitForActionProgressStatusComplete(progressMessage: string) {
+  private async waitForProgressMessageDisappear(progressMessage: string) {
     const maxWaitTime = 10000; // 10 seconds.
     const pollInterval = 500; // 500ms.
     const startTime = Date.now();
@@ -994,7 +994,7 @@ export class BaseUser {
   ): Promise<void> {
     // If progressMessage is provided, wait for it to disappear.
     if (progressMessage) {
-      await this.waitForActionProgressStatusComplete(progressMessage);
+      await this.waitForProgressMessageDisappear(progressMessage);
     }
 
     const actualStatusMessage = await this.page.$eval(
