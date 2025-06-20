@@ -19,23 +19,25 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed, fakeAsync, tick, waitForAsync} from '@angular/core/testing';
 import {ExplorationInitializationService} from './exploration-initialization.service';
-import {PageContextService} from 'services/page-context.service';
-import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
-import {ExplorationFeaturesService} from 'services/exploration-features.service';
+import {PageContextService} from '../../../services/page-context.service';
+import {EditableExplorationBackendApiService} from '../../../domain/exploration/editable-exploration-backend-api.service';
+import {ExplorationFeaturesBackendApiService} from '../../../services/exploration-features-backend-api.service';
+import {ExplorationFeaturesService} from '../../../services/exploration-features.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {NumberAttemptsService} from './number-attempts.service';
 import {PlayerTranscriptService} from './player-transcript.service';
-import {UrlService} from 'services/contextual/url.service';
+import {UrlService} from '../../../services/contextual/url.service';
 import {ExplorationModeService} from './exploration-mode.service';
 import {StatsReportingService} from './stats-reporting.service';
-import {PlaythroughService} from 'services/playthrough.service';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
-import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {PretestQuestionBackendApiService} from 'domain/question/pretest-question-backend-api.service';
+import {PlaythroughService} from '../../../services/playthrough.service';
+import {
+  QuestionObjectFactory,
+  QuestionBackendDict,
+} from '../../../domain/question/QuestionObjectFactory';
+import {ReadOnlyExplorationBackendApiService} from '../../../domain/exploration/read-only-exploration-backend-api.service';
+import {PretestQuestionBackendApiService} from '../../../domain/question/pretest-question-backend-api.service';
 import {CurrentEngineService} from './current-engine.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
-import {QuestionBackendDict} from 'domain/question/QuestionBackendDict';
 
 class MockQuestion {
   constructor(private backendDict: QuestionBackendDict) {}
