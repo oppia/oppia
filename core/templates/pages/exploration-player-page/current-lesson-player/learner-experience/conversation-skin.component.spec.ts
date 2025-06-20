@@ -2255,6 +2255,34 @@ describe('Conversation skin component', () => {
     flush();
   }));
 
+  it('should smoothly scroll to the target Y position with easeOutQuart', fakeAsync(() => {
+    const scrollToSpy = spyOn(window, 'scrollTo');
+    let currentTime = 0;
+    spyOn(performance, 'now').and.callFake(() => currentTime);
+
+    const targetY = 500;
+    const duration = 400;
+
+    (
+      componentInstance as unknown as {
+        smoothScrollTo: (
+          targetY: number,
+          duration: number,
+          easing?: string
+        ) => void;
+      }
+    ).smoothScrollTo(targetY, duration, 'easeOutQuart');
+
+    for (let i = 0; i <= 5; i++) {
+      currentTime += 80;
+      tick(80);
+    }
+
+    expect(scrollToSpy.calls.mostRecent().args).toEqual([0, targetY]);
+
+    flush();
+  }));
+
   it('should scroll to bottom using smoothScrollTo', fakeAsync(() => {
     const tutorCard = document.createElement('div');
     tutorCard.className = 'conversation-skin-main-tutor-card';
