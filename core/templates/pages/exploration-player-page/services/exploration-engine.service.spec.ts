@@ -20,32 +20,32 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter} from '@angular/core';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
+import {InteractionObjectFactory} from '../../../domain/exploration/InteractionObjectFactory';
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
-import {Outcome} from 'domain/exploration/outcome.model';
+} from '../../../domain/exploration/ExplorationObjectFactory';
+import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   ParamChangeBackendDict,
   ParamChangeObjectFactory,
-} from 'domain/exploration/ParamChangeObjectFactory';
+} from '../../../domain/exploration/ParamChangeObjectFactory';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
-} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
-import {UrlService} from 'services/contextual/url.service';
+} from '../../../domain/exploration/read-only-exploration-backend-api.service';
+import {StateCard} from '../../../domain/state_card/state-card.model';
+import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
+import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
+import {AlertsService} from '../../../services/alerts.service';
+import {ContextService} from '../../../services/context.service';
+import {UrlService} from '../../../services/contextual/url.service';
 import {
   ExplorationFeatures,
   ExplorationFeaturesBackendApiService,
-} from 'services/exploration-features-backend-api.service';
+} from '../../../services/exploration-features-backend-api.service';
 import {
   AnswerClassificationService,
   InteractionRulesService,
