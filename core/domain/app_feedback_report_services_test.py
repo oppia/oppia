@@ -1216,6 +1216,16 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             app_feedback_report_services.reassign_ticket(
                 self.android_report_obj, None)
 
+    def test_scrub_web_report_raises_exception(self) -> None:
+        mock_web_report_obj = self.android_report_obj
+        mock_web_report_obj.platform = self.PLATFORM_WEB
+
+        with self.assertRaisesRegex(
+            utils.InvalidInputException,
+            'Web report domain objects have not been defined.'):
+            app_feedback_report_services.scrub_single_app_feedback_report(
+                mock_web_report_obj, self.user_id)
+
     def test_scrub_android_report_removes_info(self) -> None:
         app_feedback_report_services.scrub_single_app_feedback_report(
             self.android_report_obj, self.user_id)
