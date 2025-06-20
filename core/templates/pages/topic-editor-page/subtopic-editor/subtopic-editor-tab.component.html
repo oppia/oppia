@@ -184,8 +184,8 @@
                       [ngClass]="{'active': activeSectionIndex === index}"
                       class="oppia-rule-block oppia-prevent-selection">
                     <button (click)="changeActiveSectionIndex(index)"
-                       class="oppia-rule-tab e2e-test-study-guide-section-{{ index }} oppia-study-guide-section-preview-list"
-                       [ngClass]="{'oppia-rule-tab-active': activeSectionIndex === index}">
+                            class="oppia-rule-tab e2e-test-study-guide-section-{{ index }} oppia-study-guide-section-preview-list"
+                            [ngClass]="{'oppia-rule-tab-active': activeSectionIndex === index}">
                       <oppia-summary-list-header [index]="index"
                                                  [disableSorting]="true"
                                                  [summary]="section.getHeadingText()"
