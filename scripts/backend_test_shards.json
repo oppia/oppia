@@ -363,6 +363,7 @@
         "core.platform.email.dev_mode_email_services_test",
         "core.jobs.types.blog_validation_errors_test",
         "core.jobs.batch_jobs.blog_validation_jobs_test",
+        "core.jobs.batch_jobs.datastore_audit.base_validation_jobs_test",
         "core.jobs.transforms.validation.blog_validation_test",
         "core.jobs.transforms.validation.skill_validation_test",
         "core.jobs.batch_jobs.user_validation_jobs_test",
