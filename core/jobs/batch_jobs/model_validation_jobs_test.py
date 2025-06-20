@@ -104,19 +104,18 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
         ])
 
     def test_reports_error_when_id_property_target_does_not_exist(self) -> None:
-        self.put_multi([
-            # UserEmailPreferencesModel.id -> UserSettingsModel.id.
-            self.create_model(
-                user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID),
-            # UserSettingsModel missing.
-        ])
+        model = self.create_model(
+            user_models.UserEmailPreferencesModel, id=self.VALID_USER_ID)
+        # UserEmailPreferencesModel.id -> UserSettingsModel.id.
+        # UserSettingsModel missing.
+        self.put_multi([model])
 
         self.assert_job_output_is([
             base_validation_errors.ModelRelationshipError(
                 model_property.ModelProperty(
                     user_models.UserEmailPreferencesModel,
                     user_models.UserEmailPreferencesModel.id),
-                self.VALID_USER_ID, 'UserSettingsModel', self.VALID_USER_ID),
+                model, 'UserSettingsModel', self.VALID_USER_ID),
         ])
 
     def test_empty_when_id_property_target_exists(self) -> None:
@@ -148,13 +147,14 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
     def test_reports_missing_id_property_target_even_if_sibling_property_is_valid(  # pylint: disable=line-too-long
         self
     ) -> None:
+        auth_details_model = self.create_model(
+            auth_models.UserAuthDetailsModel, id=self.VALID_USER_ID,
+            # Value is not None, so UserIdentifiersModel must exist.
+            gae_id='abc',
+            # Value is None, so missing UserIdByFirebaseAuthIdModel is OK.
+            firebase_auth_id=None)
         self.put_multi([
-            self.create_model(
-                auth_models.UserAuthDetailsModel, id=self.VALID_USER_ID,
-                # Value is not None, so UserIdentifiersModel must exist.
-                gae_id='abc',
-                # Value is None, so missing UserIdByFirebaseAuthIdModel is OK.
-                firebase_auth_id=None),
+            auth_details_model,
             self.create_model(
                 auth_models.UserIdentifiersModel, user_id=self.VALID_USER_ID,
                 # Should be gae_id='abc', so error will occur.
@@ -166,5 +166,5 @@ class AuditAllStorageModelsJobTests(job_test_utils.JobTestBase):
                 model_property.ModelProperty(
                     auth_models.UserAuthDetailsModel,
                     auth_models.UserAuthDetailsModel.gae_id),
-                self.VALID_USER_ID, 'UserIdentifiersModel', 'abc'),
+                auth_details_model, 'UserIdentifiersModel', 'abc'),
         ])
