@@ -491,23 +491,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to close editor navigation dropdown. Can be done by clicking
-   * on the dropdown toggle.
-   */
-  async closeEditorNavigationDropdownOnMobile(): Promise<void> {
-    try {
-      await this.page.waitForSelector(dropdownToggleIcon, {
-        visible: true,
-        timeout: 5000,
-      });
-      await this.clickOn(dropdownToggleIcon);
-      showMessage('Editor navigation closed successfully.');
-    } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
-    }
-  }
-
-  /**
    * Function to dismiss translation tab welcome modal.
    */
   async dismissTranslationTabWelcomeModal(): Promise<void> {

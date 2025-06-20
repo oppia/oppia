@@ -2227,33 +2227,103 @@ describe('Conversation skin component', () => {
     expect(explorationPlayerStateService.recordNewCardAdded).toHaveBeenCalled();
   }));
 
-  it('should scroll to bottom', fakeAsync(() => {
-    componentInstance.scrollToBottom();
-    tick(200);
+  it('should scroll to bottom using smoothScrollTo', fakeAsync(() => {
+    const tutorCard = document.createElement('div');
+    tutorCard.className = 'conversation-skin-main-tutor-card';
+    document.body.appendChild(tutorCard);
 
-    spyOn(window, '$').and.returnValue({
-      offset: () => {
-        return {top: 10};
+    spyOn(tutorCard, 'getBoundingClientRect').and.returnValue({
+      top: 1000,
+      height: 200,
+      bottom: 1200,
+      left: 0,
+      right: 0,
+      width: 0,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
+
+    spyOnProperty(window, 'scrollY', 'get').and.returnValue(0);
+    spyOnProperty(window, 'innerHeight', 'get').and.returnValue(600);
+
+    spyOn(document, 'querySelector').and.callFake((selector: string) => {
+      if (selector === '.conversation-skin-main-tutor-card') {
+        return tutorCard;
+      }
+      return null;
+    });
+
+    const smoothScrollSpy = spyOn(
+      componentInstance as unknown as {
+        smoothScrollTo: (
+          targetY: number,
+          duration: number,
+          easing?: string
+        ) => void;
       },
-      outerHeight: () => 10,
-      scrollTop: () => 0,
-      height: () => 0,
-      animate: () => {},
-    } as unknown as JQLite);
+      'smoothScrollTo'
+    );
 
     componentInstance.scrollToBottom();
-    tick(200);
-    expect(window.$).toHaveBeenCalled();
+
+    tick(100);
+
+    const expectedScrollY = 1000 + 200 - 600 + 12;
+    expect(smoothScrollSpy).toHaveBeenCalledWith(
+      expectedScrollY,
+      componentInstance.TIME_SCROLL_MSEC,
+      'easeOutQuad'
+    );
+
+    document.body.removeChild(tutorCard);
+    flush();
   }));
 
-  it('should scroll to top', fakeAsync(() => {
-    let animateSpy = jasmine.createSpy('jquery spy');
-    spyOn(window, '$').and.returnValue({
-      animate: animateSpy,
-    } as unknown as JQLite);
+  it('should scroll to top using smoothScrollTo', fakeAsync(() => {
+    const smoothScrollSpy = spyOn(
+      componentInstance as unknown as {
+        smoothScrollTo: (
+          targetY: number,
+          duration: number,
+          easing?: string
+        ) => void;
+      },
+      'smoothScrollTo'
+    );
+
     componentInstance.scrollToTop();
-    tick(1000);
-    expect(animateSpy).toHaveBeenCalled();
+    tick(0);
+
+    expect(smoothScrollSpy).toHaveBeenCalledWith(0, 800, 'easeOutQuart');
+
+    flush();
+  }));
+
+  it('should smoothly scroll to target position', fakeAsync(() => {
+    const scrollToSpy = spyOn(window, 'scrollTo');
+
+    let startTime = 0;
+    spyOn(performance, 'now').and.callFake(() => startTime);
+
+    (
+      componentInstance as unknown as {
+        smoothScrollTo: (
+          targetY: number,
+          duration: number,
+          easing?: string
+        ) => void;
+      }
+    ).smoothScrollTo(300, 400, 'easeOutQuad');
+
+    for (let i = 0; i <= 5; i++) {
+      startTime += 80;
+      tick(80);
+    }
+
+    expect(scrollToSpy.calls.mostRecent().args[1]).toBe(300);
+
+    flush();
   }));
 
   it('should show upcoming card', () => {

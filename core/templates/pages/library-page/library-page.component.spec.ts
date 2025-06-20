@@ -659,7 +659,7 @@ describe('Library Page Component', () => {
 
   it('should scroll carousel', () => {
     componentInstance.libraryGroups = [];
-    let activityDicts: ActivityDict[] = [];
+    const activityDicts: ActivityDict[] = [];
 
     for (let i = 0; i < 5; i++) {
       activityDicts.push({
@@ -689,21 +689,12 @@ describe('Library Page Component', () => {
       });
     }
 
-    spyOn(window, '$').and.returnValue({
-      animate: (
-        options: string[],
-        arg2: {
-          duration: number;
-          queue: boolean;
-          start: () => void;
-          complete: () => void;
-        }
-      ) => {
-        arg2.start();
-        arg2.complete();
-      },
-      scrollLeft: () => {},
-    } as JQLite);
+    spyOnProperty(HTMLElement.prototype, 'scrollLeft', 'get').and.returnValue(
+      0
+    );
+    spyOn(window, 'requestAnimationFrame').and.callFake(callback =>
+      callback(0)
+    );
 
     componentInstance.scroll(3, false);
     componentInstance.scroll(3, true);
@@ -719,8 +710,8 @@ describe('Library Page Component', () => {
 
   it('should not scroll if all tiles are already showing', () => {
     componentInstance.libraryGroups = [];
-    let activityDicts = [];
-    let summaryDicts: ActivityDict[] = [];
+    const activityDicts: ActivityDict[] = [];
+    const summaryDicts: ActivityDict[] = [];
 
     for (let i = 0; i < 3; i++) {
       activityDicts.push({
@@ -750,21 +741,12 @@ describe('Library Page Component', () => {
       });
     }
 
-    spyOn(window, '$').and.returnValue({
-      animate: (
-        options: string[],
-        arg2: {
-          duration: number;
-          queue: boolean;
-          start: () => void;
-          complete: () => void;
-        }
-      ) => {
-        arg2.start();
-        arg2.complete();
-      },
-      scrollLeft: () => {},
-    } as JQLite);
+    spyOnProperty(HTMLElement.prototype, 'scrollLeft', 'get').and.returnValue(
+      0
+    );
+    spyOn(window, 'requestAnimationFrame').and.callFake(callback =>
+      callback(0)
+    );
 
     componentInstance.tileDisplayCount = 5;
     componentInstance.scroll(1, false);
