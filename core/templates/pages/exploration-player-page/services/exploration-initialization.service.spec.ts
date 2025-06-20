@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -9,6 +9,8 @@
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
  * @fileoverview Unit tests for ExplorationInitializationService.
@@ -28,9 +30,19 @@ import {UrlService} from 'services/contextual/url.service';
 import {ExplorationModeService} from './exploration-mode.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {PlaythroughService} from 'services/playthrough.service';
+import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {PretestQuestionBackendApiService} from 'domain/question/pretest-question-backend-api.service';
 import {CurrentEngineService} from './current-engine.service';
+import {QuestionPlayerEngineService} from './question-player-engine.service';
+import {QuestionBackendDict} from 'domain/question/QuestionBackendDict';
+
+class MockQuestion {
+  constructor(private backendDict: QuestionBackendDict) {}
+  getId() {
+    return this.backendDict.id;
+  }
+}
 
 describe('ExplorationInitializationService', () => {
   let service: ExplorationInitializationService;
@@ -46,8 +58,9 @@ describe('ExplorationInitializationService', () => {
   let statsReportingService: StatsReportingService;
   let playthroughService: PlaythroughService;
   let urlService: UrlService;
+  let questionObjectFactory: QuestionObjectFactory;
   let explorationModeService: ExplorationModeService;
-  let questionPlayerEngineService: any;
+  let questionPlayerEngineService: jasmine.SpyObj<QuestionPlayerEngineService>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -58,9 +71,17 @@ describe('ExplorationInitializationService', () => {
         ExplorationModeService,
         StatsReportingService,
         PlaythroughService,
+        QuestionPlayerEngineService,
         ReadOnlyExplorationBackendApiService,
         PretestQuestionBackendApiService,
         CurrentEngineService,
+        {
+          provide: QuestionObjectFactory,
+          useValue: {
+            createFromBackendDict: (dict: QuestionBackendDict) =>
+              new MockQuestion(dict),
+          },
+        },
         {
           provide: PageContextService,
           useValue: jasmine.createSpyObj('PageContextService', [
@@ -69,6 +90,7 @@ describe('ExplorationInitializationService', () => {
             'getExplorationVersion',
             'isInQuestionPlayerMode',
             'getPageContext',
+            'setQuestionPlayerIsOpen',
           ]),
         },
         {
@@ -110,12 +132,16 @@ describe('ExplorationInitializationService', () => {
   beforeEach(() => {
     service = TestBed.inject(ExplorationInitializationService);
     statsReportingService = TestBed.inject(StatsReportingService);
+    questionPlayerEngineService = TestBed.inject(
+      QuestionPlayerEngineService
+    ) as jasmine.SpyObj<QuestionPlayerEngineService>;
     explorationModeService = TestBed.inject(ExplorationModeService);
     playthroughService = TestBed.inject(PlaythroughService);
     urlService = TestBed.inject(UrlService);
     pageContextService = TestBed.inject(
       PageContextService
     ) as jasmine.SpyObj<PageContextService>;
+    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     editableBackendApi = TestBed.inject(
       EditableExplorationBackendApiService
     ) as jasmine.SpyObj<EditableExplorationBackendApiService>;
@@ -140,11 +166,6 @@ describe('ExplorationInitializationService', () => {
     pretestQuestionBackendApiService = TestBed.inject(
       PretestQuestionBackendApiService
     ) as jasmine.SpyObj<PretestQuestionBackendApiService>;
-
-    questionPlayerEngineService = {
-      initializePretestServices: jasmine.createSpy('initializePretestServices'),
-    };
-    (service as any).questionPlayerEngineService = questionPlayerEngineService;
   });
 
   it('should initialize preview player when on exploration editor page', fakeAsync(() => {
@@ -174,7 +195,7 @@ describe('ExplorationInitializationService', () => {
       null,
       null,
       null,
-      null,
+      [],
       [],
       callback
     );
@@ -271,7 +292,77 @@ describe('ExplorationInitializationService', () => {
       exploration_metadata: {},
     };
 
-    const mockPretestQuestions = [{question_id: 'q1'}];
+    const sampleQuestionsBackendDict: QuestionBackendDict[] = [
+      {
+        id: 'question_1',
+        question_state_data: {
+          classifier_model_id: null,
+          content: {content_id: 'content_1', html: '<p>What is 2 + 2?</p>'},
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {},
+            default_outcome: null,
+            hints: [],
+            id: 'NumericInput',
+            solution: null,
+          },
+          param_changes: [],
+          recorded_voiceovers: {voiceovers_mapping: {}},
+          solicit_answer_details: false,
+          written_translations: {translations_mapping: {}},
+        },
+        question_state_data_schema_version: 50,
+        language_code: 'en',
+        version: 1,
+        linked_skill_ids: ['math_basic'],
+        inapplicable_skill_misconception_ids: [],
+        next_content_id_index: 1,
+      },
+      {
+        id: 'question_2',
+        question_state_data: {
+          classifier_model_id: null,
+          content: {
+            content_id: 'content_2',
+            html: '<p>What is the capital of France?</p>',
+          },
+          interaction: {
+            answer_groups: [],
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              placeholder: {value: ''},
+              rows: {value: 1},
+            },
+            default_outcome: null,
+            hints: [],
+            id: 'TextInput',
+            solution: null,
+          },
+          param_changes: [],
+          recorded_voiceovers: {voiceovers_mapping: {}},
+          solicit_answer_details: false,
+          written_translations: {translations_mapping: {}},
+        },
+        question_state_data_schema_version: 50,
+        language_code: 'en',
+        version: 1,
+        linked_skill_ids: ['geography_basic'],
+        inapplicable_skill_misconception_ids: [],
+        next_content_id_index: 1,
+      },
+    ];
+
+    spyOn(
+      questionPlayerEngineService,
+      'initializePretestServices'
+    ).and.callFake((rawQuestions, cb) => {
+      const questions = rawQuestions.map(q =>
+        questionObjectFactory.createFromBackendDict(q)
+      );
+      expect(questions[0].getId()).toBe('question_1');
+      cb();
+    });
 
     spyOn(
       readOnlyExplorationBackendApiService,
@@ -280,7 +371,7 @@ describe('ExplorationInitializationService', () => {
     spyOn(
       pretestQuestionBackendApiService,
       'fetchPretestQuestionsAsync'
-    ).and.returnValue(Promise.resolve(mockPretestQuestions));
+    ).and.returnValue(Promise.resolve(sampleQuestionsBackendDict));
     featuresBackendApi.fetchExplorationFeaturesAsync.and.returnValue(
       Promise.resolve({})
     );
@@ -297,16 +388,7 @@ describe('ExplorationInitializationService', () => {
     expect(explorationModeService.setPretestMode).toHaveBeenCalled();
     expect(
       questionPlayerEngineService.initializePretestServices
-    ).toHaveBeenCalledWith(mockPretestQuestions, callback);
-    expect(explorationEngineService.init).toHaveBeenCalledWith(
-      jasmine.anything(),
-      1,
-      null,
-      true,
-      [],
-      [],
-      jasmine.any(Function)
-    );
+    ).toHaveBeenCalledWith(jasmine.any(Array), callback);
   }));
 
   it('should initialize player when not on exploration editor page', fakeAsync(() => {

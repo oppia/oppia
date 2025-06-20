@@ -30,7 +30,6 @@ describe('ProgressUrlService', () => {
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let pageContextService: PageContextService;
   let checkpointProgressService: CheckpointProgressService;
-  let explorationEngineService: ExplorationEngineService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -52,7 +51,6 @@ describe('ProgressUrlService', () => {
     );
     pageContextService = TestBed.inject(PageContextService);
     checkpointProgressService = TestBed.inject(CheckpointProgressService);
-    explorationEngineService = TestBed.inject(ExplorationEngineService);
   });
 
   it('should be created', () => {

@@ -508,24 +508,6 @@ describe('Question player engine service', () => {
       multipleQuestionsObjects[0]._id
     );
   });
-  //   spyOn(questionPlayerEngineService, 'init');
-  //   let questions = [questionBackendDict];
-  //   let questionObjects = [questionObject];
-  //   let successCallback = () => {};
-  //   let errorCallback = () => {};
-
-  //   explorationPlayerStateService.initializeQuestionPlayerServices(
-  //     questions,
-  //     successCallback,
-  //     errorCallback
-  //   );
-
-  //   expect(questionPlayerEngineService.init).toHaveBeenCalledWith(
-  //     questionObjects,
-  //     successCallback,
-  //     errorCallback
-  //   );
-  // });
 
   it('should init question player', fakeAsync(() => {
     spyOn(questionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
