@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {
   trigger,
   state,
@@ -413,10 +412,3 @@ export class FeedbackUpdatesPageComponent implements OnInit, OnDestroy {
     return decodeURIComponent(base64ImageData);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaFeedbackUpdatesPage',
-  downgradeComponent({
-    component: FeedbackUpdatesPageComponent,
-  }) as angular.IDirectiveFactory
-);

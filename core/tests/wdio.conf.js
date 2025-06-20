@@ -329,6 +329,9 @@ exports.config = {
         '-i', process.env.DISPLAY,
         '-g', '300',
         '-loglevel', '16',
+        // Use ultrafast preset to reduce overhead,
+        // which is crucial when testing in CI.
+        '-preset', 'ultrafast',
       ];
       const uniqueString = Math.random().toString(36).substring(2, 8);
       var name = uniqueString + '.mp4';

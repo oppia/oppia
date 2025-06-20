@@ -41,7 +41,6 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 export interface TabContent {
@@ -82,10 +81,3 @@ export class NoninteractiveTabs implements OnInit, OnChanges {
     }
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaNoninteractiveTabs',
-  downgradeComponent({
-    component: NoninteractiveTabs,
-  }) as angular.IDirectiveFactory
-);

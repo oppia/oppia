@@ -27,7 +27,6 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 interface NonnegativeIntSchema {
   type: string;
@@ -83,9 +82,3 @@ export class NonnegativeIntEditorComponent implements OnInit {
     this.changeDetectorRef.detectChanges();
   }
 }
-angular.module('oppia').directive(
-  'nonnegativeIntEditor',
-  downgradeComponent({
-    component: NonnegativeIntEditorComponent,
-  }) as angular.IDirectiveFactory
-);

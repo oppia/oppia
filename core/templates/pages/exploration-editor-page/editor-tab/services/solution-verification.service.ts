@@ -17,7 +17,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {
   StateEditorService,
@@ -63,9 +62,3 @@ export class SolutionVerificationService {
     return stateName !== result.outcome.dest;
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'SolutionVerificationService',
-    downgradeInjectable(SolutionVerificationService)
-  );

@@ -16,19 +16,14 @@
  * @fileoverview Service to get and set active content id in translation tab.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EventEmitter} from '@angular/core';
 import {Injectable} from '@angular/core';
-
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TranslationTabActiveContentIdService {
-  constructor(
-    private _stateRecordedVoiceoversService: StateRecordedVoiceoversService
-  ) {}
+  constructor() {}
 
   // 'activeContentId' and 'activeDataFormat' will be 'null' if active content
   // has not been set.
@@ -45,12 +40,6 @@ export class TranslationTabActiveContentIdService {
   }
 
   setActiveContent(contentId: string, dataFormat: string): void {
-    const displayStateRecordedVoiceovers =
-      this._stateRecordedVoiceoversService.displayed;
-    let allContentIds = displayStateRecordedVoiceovers.getAllContentIds();
-    if (allContentIds.indexOf(contentId) === -1) {
-      throw new Error('Invalid active content id: ' + contentId);
-    }
     this.activeContentId = contentId;
     this.activeDataFormat = dataFormat;
     this._activeContentIdChangedEventEmitter.emit(dataFormat);
@@ -60,10 +49,3 @@ export class TranslationTabActiveContentIdService {
     return this._activeContentIdChangedEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'TranslationTabActiveContentIdService',
-    downgradeInjectable(TranslationTabActiveContentIdService)
-  );

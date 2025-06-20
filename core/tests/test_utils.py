@@ -225,12 +225,6 @@ def get_filepath_from_filename(filename: str, rootdir: str) -> Optional[str]:
     Raises:
         Exception. Multiple files found with given file name.
     """
-    # This is required since error files are served according to error status
-    # code. The file served is error-page.mainpage.html but it is compiled and
-    # stored as error-page-{status_code}.mainpage.html.  So, we need to swap the
-    # name here to obtain the correct filepath.
-    if filename.startswith('error-page'):
-        filename = 'error-page.mainpage.html'
     matches = list(itertools.chain.from_iterable(
         (os.path.join(subdir, f) for f in filenames if f == filename)
         for subdir, _, filenames in os.walk(rootdir)))
@@ -349,7 +343,9 @@ def swap_is_feature_flag_enabled_function(
     """
     def mock_is_feature_flag_enabled(
         feature_flag_name: str,
-        feature_flag: Optional[feature_flag_domain.FeatureFlag] = None, # pylint: disable=unused-argument
+        feature_flag: Optional[ # pylint: disable=unused-argument
+            feature_flag_domain.FeatureFlag
+        ] = None,
         user_id: Optional[str] = None # pylint: disable=unused-argument
     ) -> bool:
         """Mocks is_feature_flag_enabled function to return True if the
@@ -2448,10 +2444,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_0: {}
-        default_outcome_1: {}
     solicit_answer_details: false
   New state:
     card_is_checkpoint: false
@@ -2479,10 +2471,6 @@ states:
       solution: null
     linked_skill_id: null
     param_changes: []
-    recorded_voiceovers:
-      voiceovers_mapping:
-        content_2: {}
-        default_outcome_3: {}
     solicit_answer_details: false
 states_schema_version: %d
 tags: []
@@ -2515,23 +2503,24 @@ version: 1
 
         with contextlib.ExitStack() as stack:
             stack.callback(AuthServicesStub.install_stub(self))
+            es_client = elastic_search_services.ES.get_client()
             stack.enter_context(self.swap(
-                elastic_search_services.ES.indices, 'create',
+                es_client.indices, 'create',
                 es_stub.mock_create_index))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'index',
+                es_client, 'index',
                 es_stub.mock_index))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'exists',
+                es_client, 'exists',
                 es_stub.mock_exists))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'delete',
+                es_client, 'delete',
                 es_stub.mock_delete))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'delete_by_query',
+                es_client, 'delete_by_query',
                 es_stub.mock_delete_by_query))
             stack.enter_context(self.swap(
-                elastic_search_services.ES, 'search',
+                es_client, 'search',
                 es_stub.mock_search))
             stack.enter_context(self.swap(
                 memory_cache_services, 'flush_caches',
@@ -4195,6 +4184,7 @@ version: 1
         topic_id_to_prerequisite_topic_ids: Optional[
             Dict[str, List[str]]] = None,
         is_published: bool = True,
+        diagnostic_test_is_enabled: bool = False,
         thumbnail_data: Optional[
             classroom_config_domain.ImageData
         ] = None,
@@ -4216,6 +4206,8 @@ version: 1
             topic_id_to_prerequisite_topic_ids: Dict[str, List[str]]. A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
+            diagnostic_test_is_enabled: bool. Whether this classroom
+                is published or not.
             thumbnail_data: Optional[ImageData]. Image data object for
                 thumbnail.
             banner_data: Optional[ImageData]. Image data object for banner.
@@ -4242,6 +4234,8 @@ version: 1
                 else {}
             ),
             is_published=is_published,
+            diagnostic_test_is_enabled=(
+                diagnostic_test_is_enabled),
             thumbnail_data=(
                 thumbnail_data
                 if thumbnail_data is not None

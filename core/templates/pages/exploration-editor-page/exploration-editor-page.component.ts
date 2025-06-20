@@ -254,11 +254,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       );
       this.contextService.setExplorationVersion(explorationData.version);
 
+      const languageCode =
+        this.entityVoiceoversService.languageCode ||
+        explorationData.language_code;
       this.entityVoiceoversService.init(
         this.explorationId,
         'exploration',
         explorationData.version,
-        explorationData.language_code
+        languageCode
       );
 
       this.explorationTitleService.init(explorationData.title);
@@ -455,6 +458,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       this.stateEditorRefreshService.onRefreshStateEditor.emit();
       this.explorationEditorPageHasInitialized = true;
     });
+  }
+
+  isVoiceoverTabEnabled(): boolean {
+    if (this.contextService.isExplorationLinkedToStory()) {
+      return true;
+    }
+    return this.platformFeatureService.status
+      .ShowVoiceoverTabForNonCuratedExplorations.isEnabled;
   }
 
   populateEntityTranslationsWithDraftChanges(
@@ -790,7 +801,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.areExplorationWarningsVisible = false;
 
     // The initExplorationPage function is written separately since it
-    // is also called in $scope.$on when some external events are
+    // is also called in directiveSubscriptions when some external events are
     // triggered.
     this.initExplorationPage();
     this.improvementsTabIsEnabled = false;

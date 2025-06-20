@@ -16,7 +16,6 @@
  * @fileoverview Service to change the rights of skills in the backend.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
@@ -126,10 +125,3 @@ export class SkillRightsBackendApiService {
     this.skillRightsCache[skillId] = cloneDeep(skillRights);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'SkillRightsBackendApiService',
-    downgradeInjectable(SkillRightsBackendApiService)
-  );

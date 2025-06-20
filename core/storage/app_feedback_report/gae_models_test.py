@@ -454,7 +454,9 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             base_models.MODEL_ASSOCIATION_TO_USER.MULTIPLE_INSTANCES_PER_USER)
 
     def _mock_query_filters_returns_empty_list(
-        self, projection: bool, distinct: bool  # pylint: disable=unused-argument
+        self,
+        projection: bool, # pylint: disable=unused-argument
+        distinct: bool  # pylint: disable=unused-argument
     ) -> List[str]:
         """Mock the model query to test for an invalid filter field. Named
         parameters 'projection' and 'distinct' are required to mock the

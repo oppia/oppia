@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {merge} from 'd3-array';
 import {ExplorationImprovementsConfig} from 'domain/improvements/exploration-improvements-config.model';
 import {HighBounceRateTask} from 'domain/improvements/high-bounce-rate-task.model';
@@ -195,10 +194,3 @@ export class ExplorationImprovementsService {
     );
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationImprovementsService',
-    downgradeInjectable(ExplorationImprovementsService)
-  );

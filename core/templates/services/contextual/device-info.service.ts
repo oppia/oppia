@@ -15,7 +15,7 @@
 /**
  * @fileoverview Service to check if user is on a mobile device.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
+
 import {Injectable} from '@angular/core';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -47,7 +47,3 @@ export class DeviceInfoService {
     return 'ontouchstart' in this.window.nativeWindow;
   }
 }
-
-angular
-  .module('oppia')
-  .factory('DeviceInfoService', downgradeInjectable(DeviceInfoService));

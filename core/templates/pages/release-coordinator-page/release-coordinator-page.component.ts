@@ -25,7 +25,6 @@ import {
   ElementRef,
 } from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
@@ -452,10 +451,3 @@ export class ReleaseCoordinatorPageComponent implements OnInit {
     this.fetchUserGroupData();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaReleaseCoordinatorPage',
-    downgradeComponent({component: ReleaseCoordinatorPageComponent})
-  );

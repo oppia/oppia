@@ -18,7 +18,6 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 
@@ -229,10 +228,3 @@ export class ReleaseCoordinatorBackendApiService {
     });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ReleaseCoordinatorBackendApiService',
-    downgradeInjectable(ReleaseCoordinatorBackendApiService)
-  );

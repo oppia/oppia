@@ -17,7 +17,6 @@
  */
 
 import {Component, Input, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {UrlService} from 'services/contextual/url.service';
@@ -70,10 +69,3 @@ export class QuestionPlayerConceptCardModalComponent
     );
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaQuestionPlayerConceptCardModal',
-  downgradeComponent({
-    component: QuestionPlayerConceptCardModalComponent,
-  }) as angular.IDirectiveFactory
-);

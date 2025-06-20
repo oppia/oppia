@@ -26,7 +26,7 @@ import {
 } from '@angular/core/testing';
 import {InteractiveNumberWithUnitsComponent} from './oppia-interactive-number-with-units.component';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateModule} from '@ngx-translate/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
@@ -39,7 +39,6 @@ describe('Number with units interaction component', () => {
   let component: InteractiveNumberWithUnitsComponent;
   let fixture: ComponentFixture<InteractiveNumberWithUnitsComponent>;
   let currentInteractionService: CurrentInteractionService;
-  let numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory;
   let ngbModal: NgbModal;
 
   let mockCurrentInteractionService = {
@@ -50,6 +49,7 @@ describe('Number with units interaction component', () => {
     ) => {},
     showNoResponseError: (): boolean => false,
     updateCurrentAnswer: (answer: InteractionAnswer) => {},
+    updateAnswerIsValid: (answer: boolean) => {},
     registerCurrentInteraction: (
       submitAnswerFn: Function,
       validateExpressionFn: Function
@@ -75,7 +75,6 @@ describe('Number with units interaction component', () => {
           provide: CurrentInteractionService,
           useValue: mockCurrentInteractionService,
         },
-        NumberWithUnitsObjectFactory,
         NgbModal,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -84,20 +83,19 @@ describe('Number with units interaction component', () => {
 
   beforeEach(() => {
     currentInteractionService = TestBed.inject(CurrentInteractionService);
-    numberWithUnitsObjectFactory = TestBed.inject(NumberWithUnitsObjectFactory);
     ngbModal = TestBed.inject(NgbModal);
     fixture = TestBed.createComponent(InteractiveNumberWithUnitsComponent);
     component = fixture.componentInstance;
   });
 
   it('should initialise component when user adds or plays interaction', () => {
-    spyOn(numberWithUnitsObjectFactory, 'createCurrencyUnits');
+    spyOn(NumberWithUnits, 'createCurrencyUnits');
     spyOn(currentInteractionService, 'registerCurrentInteraction');
 
     component.ngOnInit();
 
     expect(component.answer).toBe('');
-    expect(numberWithUnitsObjectFactory.createCurrencyUnits).toHaveBeenCalled();
+    expect(NumberWithUnits.createCurrencyUnits).toHaveBeenCalled();
     expect(
       currentInteractionService.registerCurrentInteraction
     ).toHaveBeenCalled();
@@ -125,27 +123,6 @@ describe('Number with units interaction component', () => {
     expect(
       currentInteractionService.updateCurrentAnswer
     ).toHaveBeenCalledOnceWith('24 km');
-  }));
-
-  it('should display warning when the answer format is incorrect', fakeAsync(() => {
-    spyOn(currentInteractionService, 'updateCurrentAnswer');
-
-    // PreChecks.
-    expect(component.errorMessageI18nKey).toBe('');
-    expect(component.isValid).toBeTrue();
-
-    // Test: Incorrect answer.
-    component.answer = '24 k';
-
-    component.answerValueChanged();
-    tick(150);
-
-    // PostChecks: Error message as the Unit is incorrect.
-    expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
-    expect(component.isValid).toBeFalse();
-    expect(
-      currentInteractionService.updateCurrentAnswer
-    ).toHaveBeenCalledOnceWith('24 k');
   }));
 
   it("should close help modal when user clicks the 'close' button", () => {
@@ -202,12 +179,16 @@ describe('Number with units interaction component', () => {
   it('should show error when user submits answer in incorrect format', () => {
     component.answer = '24 k';
     spyOn(currentInteractionService, 'showNoResponseError');
+    spyOn(currentInteractionService, 'updateAnswerIsValid');
 
     expect(component.errorMessageI18nKey).toBe('');
 
     component.submitAnswer();
 
     expect(component.errorMessageI18nKey).toBe('Unit "k" not found.');
+    expect(currentInteractionService.updateAnswerIsValid).toHaveBeenCalledWith(
+      false
+    );
     expect(
       currentInteractionService.showNoResponseError
     ).not.toHaveBeenCalled();
@@ -218,12 +199,16 @@ describe('Number with units interaction component', () => {
     spyOn(currentInteractionService, 'showNoResponseError').and.returnValue(
       true
     );
+    spyOn(currentInteractionService, 'updateAnswerIsValid');
     expect(component.errorMessageI18nKey).toBe('');
 
     component.submitAnswer();
 
     expect(component.errorMessageI18nKey).toBe(
       'I18N_INTERACTIONS_INPUT_NO_RESPONSE'
+    );
+    expect(currentInteractionService.updateAnswerIsValid).toHaveBeenCalledWith(
+      false
     );
     expect(currentInteractionService.showNoResponseError).toHaveBeenCalledTimes(
       1
@@ -233,7 +218,7 @@ describe('Number with units interaction component', () => {
   it('should submit answer if answer is correct', () => {
     component.answer = '24 km';
     spyOn(currentInteractionService, 'showNoResponseError');
-    spyOn(numberWithUnitsObjectFactory, 'fromRawInputString');
+    spyOn(NumberWithUnits, 'fromRawInputString');
     spyOn(currentInteractionService, 'onSubmit');
 
     component.submitAnswer();
@@ -242,16 +227,14 @@ describe('Number with units interaction component', () => {
     expect(
       currentInteractionService.showNoResponseError
     ).not.toHaveBeenCalled();
-    expect(numberWithUnitsObjectFactory.fromRawInputString).toHaveBeenCalled();
+    expect(NumberWithUnits.fromRawInputString).toHaveBeenCalled();
     expect(currentInteractionService.onSubmit).toHaveBeenCalled();
   });
 
   it('should throw uncaught errors that are not Error type', waitForAsync(() => {
-    spyOn(numberWithUnitsObjectFactory, 'fromRawInputString').and.callFake(
-      () => {
-        throw TypeError;
-      }
-    );
+    spyOn(NumberWithUnits, 'fromRawInputString').and.callFake(() => {
+      throw TypeError;
+    });
 
     expect(() => {
       component.submitAnswer();

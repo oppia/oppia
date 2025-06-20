@@ -16,7 +16,7 @@
  * @fileoverview Factory for creating new frontend instances of Interaction
  * domain objects.
  */
-import {downgradeInjectable} from '@angular/upgrade/static';
+import {} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
@@ -24,14 +24,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import {
   AnswerGroup,
   AnswerGroupBackendDict,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+} from 'domain/exploration/answer-group.model';
 import {HintBackendDict, Hint} from 'domain/exploration/hint-object.model';
-import {
-  OutcomeBackendDict,
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
 import {
   SolutionBackendDict,
   Solution,
@@ -72,10 +67,7 @@ import {
   TextInputCustomizationArgsBackendDict,
   NumericExpressionInputCustomizationArgsBackendDict,
 } from 'interactions/customization-args-defs';
-import {
-  SubtitledUnicodeObjectFactory,
-  SubtitledUnicode,
-} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 
@@ -105,6 +97,7 @@ export class Interaction extends BaseTranslatableObject {
   solution: Solution | null;
   currentAnswer: InteractionAnswer | null = null;
   submitClicked = false;
+  answerIsValid = false;
   constructor(
     answerGroups: AnswerGroup[],
     confirmedUnclassifiedAnswers: readonly InteractionAnswer[],
@@ -144,14 +137,32 @@ export class Interaction extends BaseTranslatableObject {
     return translatableObjects;
   }
 
-  getContentIdToHtml(): {[contentId: string]: string} {
-    let contentIdToHtml = {};
-    let answerGroupsContentIdToHtml = {};
-    let outcomeContentIdToHtml = {};
+  getContentIdToContents(): {[contentId: string]: string} {
+    let contentIdToHtml: {[contentId: string]: string} = {};
+    let answerGroupsContentIdToHtml: {[contentId: string]: string} = {};
+    let outcomeContentIdToHtml: {[contentId: string]: string} = {};
+    let solutionContentIdToHtml: {[contentId: string]: string} = {};
+    let htmlContentToHtml: {[contentId: string]: string} = {};
+    let customizationArgsContentIdToContents: {[contentId: string]: string} =
+      {};
+
+    const subtitledContents = Interaction.getCustomizationArgContents(
+      this.customizationArgs
+    );
+
+    for (let subtitledContent of subtitledContents) {
+      const contentId = subtitledContent.contentId || '';
+
+      if (subtitledContent instanceof SubtitledHtml) {
+        customizationArgsContentIdToContents[contentId] = subtitledContent.html;
+      } else if (subtitledContent instanceof SubtitledUnicode) {
+        customizationArgsContentIdToContents[contentId] =
+          subtitledContent.unicode;
+      }
+    }
 
     for (let answerGroup of this.answerGroups) {
       Object.assign(
-        answerGroupsContentIdToHtml,
         answerGroupsContentIdToHtml,
         answerGroup.getContentIdToHtml()
       );
@@ -161,15 +172,26 @@ export class Interaction extends BaseTranslatableObject {
       outcomeContentIdToHtml = this.defaultOutcome.getContentIdToHtml();
     }
 
+    for (let hint of this.hints) {
+      Object.assign(htmlContentToHtml, hint.getContentIdToHtml());
+    }
+
+    if (this.solution) {
+      solutionContentIdToHtml = this.solution.getContentIdToHtml();
+    }
+
     return Object.assign(
       contentIdToHtml,
+      customizationArgsContentIdToContents,
       answerGroupsContentIdToHtml,
-      outcomeContentIdToHtml
+      outcomeContentIdToHtml,
+      htmlContentToHtml,
+      solutionContentIdToHtml
     );
   }
 
   getContentIdForMatchingHtml(contentHtml: string): string | undefined {
-    let contentIdToHtml = this.getContentIdToHtml();
+    let contentIdToHtml = this.getContentIdToContents();
     for (let contentId in contentIdToHtml) {
       let retrievedHtml = contentIdToHtml[contentId];
 
@@ -308,12 +330,7 @@ export class Interaction extends BaseTranslatableObject {
   providedIn: 'root',
 })
 export class InteractionObjectFactory {
-  constructor(
-    private answerGroupFactory: AnswerGroupObjectFactory,
-    private solutionFactory: SolutionObjectFactory,
-    private outcomeFactory: OutcomeObjectFactory,
-    private subtitledUnicodeFactory: SubtitledUnicodeObjectFactory
-  ) {}
+  constructor(private solutionFactory: SolutionObjectFactory) {}
 
   _createFromContinueCustomizationArgsBackendDict(
     caBackendDict: ContinueCustomizationArgsBackendDict
@@ -321,9 +338,7 @@ export class InteractionObjectFactory {
     const {buttonText} = caBackendDict;
     return {
       buttonText: {
-        value: this.subtitledUnicodeFactory.createFromBackendDict(
-          buttonText.value
-        ),
+        value: SubtitledUnicode.createFromBackendDict(buttonText.value),
       },
     };
   }
@@ -356,9 +371,7 @@ export class InteractionObjectFactory {
       allowImproperFraction,
       allowNonzeroIntegerPart,
       customPlaceholder: {
-        value: this.subtitledUnicodeFactory.createFromBackendDict(
-          customPlaceholder.value
-        ),
+        value: SubtitledUnicode.createFromBackendDict(customPlaceholder.value),
       },
     };
   }
@@ -399,9 +412,7 @@ export class InteractionObjectFactory {
     const {buttonText} = caBackendDict;
     return {
       buttonText: {
-        value: this.subtitledUnicodeFactory.createFromBackendDict(
-          buttonText.value
-        ),
+        value: SubtitledUnicode.createFromBackendDict(buttonText.value),
       },
     };
   }
@@ -413,9 +424,7 @@ export class InteractionObjectFactory {
     return {
       rows,
       placeholder: {
-        value: this.subtitledUnicodeFactory.createFromBackendDict(
-          placeholder.value
-        ),
+        value: SubtitledUnicode.createFromBackendDict(placeholder.value),
       },
       catchMisspellings: {
         value: false,
@@ -430,9 +439,7 @@ export class InteractionObjectFactory {
     return {
       useFractionForDivision,
       placeholder: {
-        value: this.subtitledUnicodeFactory.createFromBackendDict(
-          placeholder.value
-        ),
+        value: SubtitledUnicode.createFromBackendDict(placeholder.value),
       },
     };
   }
@@ -444,9 +451,7 @@ export class InteractionObjectFactory {
     return {
       numberOfTerms,
       placeholder: {
-        value: this.subtitledUnicodeFactory.createFromBackendDict(
-          placeholder.value
-        ),
+        value: SubtitledUnicode.createFromBackendDict(placeholder.value),
       },
     };
   }
@@ -562,7 +567,7 @@ export class InteractionObjectFactory {
     interactionId: string
   ): AnswerGroup[] {
     return answerGroupBackendDicts.map(answerGroupBackendDict => {
-      return this.answerGroupFactory.createFromBackendDict(
+      return AnswerGroup.createFromBackendDict(
         answerGroupBackendDict,
         interactionId
       );
@@ -580,7 +585,7 @@ export class InteractionObjectFactory {
   createOutcomeFromBackendDict(
     outcomeBackendDict: OutcomeBackendDict
   ): Outcome {
-    return this.outcomeFactory.createFromBackendDict(outcomeBackendDict);
+    return Outcome.createFromBackendDict(outcomeBackendDict);
   }
 
   createSolutionFromBackendDict(
@@ -589,10 +594,3 @@ export class InteractionObjectFactory {
     return this.solutionFactory.createFromBackendDict(solutionBackendDict);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'InteractionObjectFactory',
-    downgradeInjectable(InteractionObjectFactory)
-  );

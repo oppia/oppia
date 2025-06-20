@@ -30,7 +30,6 @@ export interface SkillBackendDict {
   version: number;
 }
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {
@@ -38,10 +37,9 @@ import {
   ConceptCardBackendDict,
 } from 'domain/skill/concept-card.model';
 import {
-  MisconceptionObjectFactory,
   Misconception,
   MisconceptionBackendDict,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {Rubric, RubricBackendDict} from 'domain/skill/rubric.model';
 import {ValidatorsService} from 'services/validators.service';
 import {AppConstants} from 'app.constants';
@@ -262,10 +260,7 @@ export class Skill {
   providedIn: 'root',
 })
 export class SkillObjectFactory {
-  constructor(
-    private misconceptionObjectFactory: MisconceptionObjectFactory,
-    private validatorService: ValidatorsService
-  ) {}
+  constructor(private validatorService: ValidatorsService) {}
 
   hasValidDescription(description: string): boolean {
     var allowDescriptionToBeBlank = false;
@@ -298,9 +293,7 @@ export class SkillObjectFactory {
     misconceptionsBackendDicts: MisconceptionBackendDict[]
   ): Misconception[] {
     return misconceptionsBackendDicts.map(misconceptionsBackendDict => {
-      return this.misconceptionObjectFactory.createFromBackendDict(
-        misconceptionsBackendDict
-      );
+      return Misconception.createFromBackendDict(misconceptionsBackendDict);
     });
   }
 
@@ -312,6 +305,3 @@ export class SkillObjectFactory {
     });
   }
 }
-angular
-  .module('oppia')
-  .factory('SkillObjectFactory', downgradeInjectable(SkillObjectFactory));

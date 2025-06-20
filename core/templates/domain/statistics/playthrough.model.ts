@@ -158,7 +158,7 @@ export class Playthrough {
       default:
         throw new Error(
           'Backend dict does not match any known issue type: ' +
-            angular.toJson(playthroughBackendDict)
+            JSON.stringify(playthroughBackendDict)
         );
     }
   }

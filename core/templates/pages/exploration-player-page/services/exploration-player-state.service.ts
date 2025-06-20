@@ -18,7 +18,6 @@
  */
 
 import {Injectable, EventEmitter} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {
   FetchExplorationBackendResponse,
@@ -41,7 +40,7 @@ import {
 } from 'services/exploration-features-backend-api.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {PlaythroughService} from 'services/playthrough.service';
-import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
+import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {NumberAttemptsService} from './number-attempts.service';
 import {PlayerTranscriptService} from './player-transcript.service';
@@ -531,10 +530,3 @@ export class ExplorationPlayerStateService {
     return this._playerProgressModalShownEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationPlayerStateService',
-    downgradeInjectable(ExplorationPlayerStateService)
-  );

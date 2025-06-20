@@ -16,16 +16,15 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {
   Warning,
-  baseInteractionValidationService,
+  BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
 import {MultipleChoiceInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 
@@ -34,7 +33,7 @@ import {AppConstants} from 'app.constants';
 })
 export class MultipleChoiceInputValidationService {
   constructor(
-    private baseInteractionValidationServiceInstance: baseInteractionValidationService
+    private baseInteractionValidationServiceInstance: BaseInteractionValidationService
   ) {}
 
   getCustomizationArgsWarnings(
@@ -151,7 +150,7 @@ export class MultipleChoiceInputValidationService {
           type: AppConstants.WARNING_TYPES.ERROR,
           message:
             'Please add something for Oppia to say in the ' +
-            '"All other answers" response.',
+            '"All other answers" response',
         });
       }
     }
@@ -159,9 +158,3 @@ export class MultipleChoiceInputValidationService {
     return warningsList;
   }
 }
-angular
-  .module('oppia')
-  .factory(
-    'MultipleChoiceInputValidationService',
-    downgradeInjectable(MultipleChoiceInputValidationService)
-  );

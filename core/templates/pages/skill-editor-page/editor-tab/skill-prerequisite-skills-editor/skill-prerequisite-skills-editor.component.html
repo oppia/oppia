@@ -15,7 +15,7 @@
         </i>
       </div>
       <div *ngIf="prerequisiteSkillsAreShown" class="oppia-mobile-collapsible-card-content">
-        <div class="skill-id md-card"  *ngFor="let skillId of skill.getPrerequisiteSkillIds(); index as i">
+        <div class="skill-id mat-card"  *ngFor="let skillId of skill.getPrerequisiteSkillIds(); index as i">
           <div class="skill-description-card">
             <span class="remove-skill-icon" (click)="removeSkillId(skillId)" aria-hidden="true">
               <i class="material-icons md-18">&#xE14C;</i>
@@ -29,7 +29,7 @@
   </div>
 </div>
 <style>
-  .md-card {
+  .mat-card {
     border: 1px solid #74737375;
   }
 

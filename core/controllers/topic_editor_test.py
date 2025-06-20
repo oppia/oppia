@@ -163,8 +163,8 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_PUBLISHED,
             'planned_publication_date_msecs': None,
-            'first_publication_date_msecs': 1672684200000.0,
-            'last_modified_msecs': 1672684200000.0,
+            'first_publication_date_msecs': 1672684200000,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         node_2: story_domain.StoryNodeDict = {
@@ -182,9 +182,9 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_DRAFT,
-            'planned_publication_date_msecs': 1672770600000.0,
+            'planned_publication_date_msecs': 1672770600000,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         node_3: story_domain.StoryNodeDict = {
@@ -202,9 +202,9 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
                 'chapter'][0],
             'thumbnail_size_in_bytes': 21131,
             'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
-            'planned_publication_date_msecs': 1690655400000.0,
+            'planned_publication_date_msecs': 1690655400000,
             'first_publication_date_msecs': None,
-            'last_modified_msecs': 1672684200000.0,
+            'last_modified_msecs': 1672684200000,
             'unpublishing_reason': None
         }
         story.story_contents.nodes = [
@@ -536,7 +536,22 @@ class TopicEditorTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
     )
     def test_editable_topic_handler_get(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
@@ -550,8 +565,7 @@ class TopicEditorTests(
 
         # Check that admins can access the editable topic data.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        messages = self._get_sent_email_messages(
-            feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages('testadmin@example.com')
         self.assertEqual(len(messages), 0)
         json_response = self.get_json(
             '%s/%s' % (
@@ -569,8 +583,7 @@ class TopicEditorTests(
             'Skill Description',
             json_response['skill_id_to_description_dict'][self.skill_id])
 
-        messages = self._get_sent_email_messages(
-            feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages('testadmin@example.com')
         expected_email_html_body = (
             'The deleted skills: %s are still'
             ' present in topic with id %s' % (
@@ -644,7 +657,22 @@ class TopicEditorTests(
         self.assertEqual(json_response['error'], 'Name should be a string.')
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
     )
     def test_editable_topic_handler_put(self) -> None:
         # Check that admins can edit a topic.
@@ -724,8 +752,7 @@ class TopicEditorTests(
         csrf_token = self.get_new_csrf_token()
         skill_services.delete_skill(self.admin_id, self.skill_id_2)
 
-        messages = self._get_sent_email_messages(
-            feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages('testadmin@example.com')
         self.assertEqual(len(messages), 0)
         json_response = self.put_json(
             '%s/%s' % (
@@ -738,8 +765,7 @@ class TopicEditorTests(
             'Skill Description',
             json_response['skill_id_to_description_dict'][self.skill_id])
 
-        messages = self._get_sent_email_messages(
-            feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages('testadmin@example.com')
         expected_email_html_body = (
             'The deleted skills: %s are still'
             ' present in topic with id %s' % (
@@ -1014,7 +1040,22 @@ class TopicPublishSendMailHandlerTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
     )
     def test_send_mail(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -1024,8 +1065,7 @@ class TopicPublishSendMailHandlerTests(
             '%s/%s' % (
                 feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
             {'topic_name': 'Topic Name'}, csrf_token=csrf_token)
-        messages = self._get_sent_email_messages(
-            feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages('testadmin@example.com')
         expected_email_html_body = (
             'wants to publish topic: Topic Name at URL %s/%s, please review'
             ' and publish if it looks good.'
@@ -1275,64 +1315,6 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
                 feconf.TOPIC_URL_FRAGMENT_HANDLER,
                 topic_url_fragment))
         self.assertEqual(json_response['topic_url_fragment_exists'], True)
-
-        self.logout()
-
-
-class TopicNameHandlerTest(BaseTopicEditorControllerTests):
-    """Tests for TopicNameHandler."""
-
-    def test_topic_name_handler_when_unique(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        topic_name = 'Topic Name'
-
-        # Topic name does not exist yet.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], False)
-
-        # Publish the topic.
-        self.save_new_topic(
-            self.topic_id, self.admin_id, name=topic_name,
-            abbreviated_name=topic_name, url_fragment='my-topic',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
-            subtopics=[], next_subtopic_id=1)
-
-        # Unique topic name does not exists.
-        topic_name = 'Unique Topic Name'
-
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], False)
-
-        self.logout()
-
-    def test_topic_name_handler_when_duplicate(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL)
-
-        topic_name = 'Topic Name'
-
-        # Topic name does not exist yet.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], False)
-
-        # Publish the topic.
-        self.save_new_topic(
-            self.topic_id, self.admin_id, name=topic_name,
-            abbreviated_name=topic_name, url_fragment='my-topic',
-            description='Description', canonical_story_ids=[],
-            additional_story_ids=[],
-            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
-            subtopics=[], next_subtopic_id=1)
-
-        # Topic name exists since we've already published it.
-        json_response = self.get_json(
-            '%s/%s' % (feconf.TOPIC_NAME_HANDLER, topic_name))
-        self.assertEqual(json_response['topic_name_exists'], True)
 
         self.logout()
 

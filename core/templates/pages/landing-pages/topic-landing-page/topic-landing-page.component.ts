@@ -19,7 +19,6 @@
 require('base-components/base-content.component.ts');
 
 import {Component, OnInit, OnDestroy} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -193,10 +192,3 @@ export class TopicLandingPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'topicLandingPage',
-    downgradeComponent({component: TopicLandingPageComponent})
-  );

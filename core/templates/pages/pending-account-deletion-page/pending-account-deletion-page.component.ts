@@ -17,17 +17,9 @@
  */
 
 import {Component} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 
 @Component({
   selector: 'oppia-pending-account-deletion-page',
   templateUrl: './pending-account-deletion-page.component.html',
 })
 export class PendingAccountDeletionPageComponent {}
-
-angular
-  .module('oppia')
-  .directive(
-    'oppiaPendingAccountDeletionPage',
-    downgradeComponent({component: PendingAccountDeletionPageComponent})
-  );

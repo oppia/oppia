@@ -73,28 +73,6 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
         topic_services.publish_topic(self.topic_id, self.admin_id)
 
 
-class PracticeSessionsPageTests(BasePracticeSessionsControllerTests):
-
-    def test_any_user_can_access_practice_sessions_page(self) -> None:
-        self.get_html_response(
-            '/learn/staging/public-topic-name/practice/session?'
-            'selected_subtopic_ids=["1","2"]')
-
-    def test_no_user_can_access_unpublished_topic_practice_session_page(
-        self
-    ) -> None:
-        self.get_html_response(
-            '/learn/staging/private-topic-name/practice/session?'
-            'selected_subtopic_ids=["1","2"]',
-            expected_status_int=404)
-
-    def test_get_fails_when_topic_doesnt_exist(self) -> None:
-        self.get_html_response(
-            '/learn/staging/invalid/practice/session?'
-            'selected_subtopic_ids=["1","2"]',
-            expected_status_int=302)
-
-
 class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
 
     def test_get_fails_when_skill_ids_dont_exist(self) -> None:

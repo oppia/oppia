@@ -67,8 +67,10 @@ export default {
     FeedbackUpdates: 'http://localhost:8181/feedback-updates',
     GetStarted: 'http://localhost:8181/get-started',
     Home: 'http://localhost:8181/',
-    ImpactReportUrl:
+    ImpactReport2022Url:
       'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
+    ImpactReport2023Url:
+      'https://drive.google.com/file/d/1lPu2g3HXpMDrKJu-Nssh67ynxpWxxfw9/view',
     LearnerDashboard: 'http://localhost:8181/learner-dashboard',
     Login: 'http://localhost:8181/login',
     Logout: 'http://localhost:8181/logout',
@@ -86,6 +88,7 @@ export default {
     PendingAccountDeletion: 'http://localhost:8181/pending-account-deletion',
     PrivacyPolicy: 'http://localhost:8181/privacy-policy',
     ReleaseCoordinator: 'http://localhost:8181/release-coordinator',
+    VoiceoverAdmin: 'http://localhost:8181/voiceover-admin',
     splash: 'http://localhost:8181/splash',
     Teach: 'http://localhost:8181/teach',
     Terms: 'http://localhost:8181/terms',
@@ -122,6 +125,7 @@ export default {
       'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
     LessonCreatorLinkedInUrl:
       'https://www.linkedin.com/in/rita-santos-guimaraes-prof-matematica/',
+    ReadBlogLink: 'https://medium.com/oppia-org',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
@@ -235,4 +239,13 @@ export default {
     'Art and Design',
   ],
   DEFAULT_SPEC_TIMEOUT_MSECS: 300000,
+  // The video recording path below is relative to the oppia/ folder's
+  // root path.
+  TEST_VIDEO_DIR: path.resolve(
+    '../oppia_full_stack_test_video_recordings/acceptance'
+  ),
+  TEST_SCREENSHOT_DIR: path.resolve(
+    '../oppia_full_stack_test_failure_screenshots/acceptance'
+  ),
+  TEST_DOWNLOAD_DIR: path.resolve('../oppia_acceptance_test_downloads'),
 };

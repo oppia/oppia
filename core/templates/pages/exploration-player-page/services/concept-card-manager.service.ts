@@ -17,10 +17,9 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {StateCard} from 'domain/state_card/state-card.model';
 
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 
@@ -175,10 +174,3 @@ export class ConceptCardManagerService {
     return this._learnerReallyStuckEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ConceptCardManagerService',
-    downgradeInjectable(ConceptCardManagerService)
-  );

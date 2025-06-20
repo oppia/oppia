@@ -19,8 +19,8 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 
-import {ContentTranslationLanguageService} from 'pages/exploration-player-page/services/content-translation-language.service';
-import {UrlService} from 'services/contextual/url.service';
+import {ContentTranslationLanguageService} from './content-translation-language.service';
+import {UrlService} from '../../../services/contextual/url.service';
 
 describe('Content translation language service', () => {
   let ctls: ContentTranslationLanguageService;

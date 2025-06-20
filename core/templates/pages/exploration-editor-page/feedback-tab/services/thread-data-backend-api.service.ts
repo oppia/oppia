@@ -19,7 +19,6 @@
 
 import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {AppConstants} from 'app.constants';
 import {
@@ -315,10 +314,3 @@ export class ThreadDataBackendApiService {
       });
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ThreadDataBackendApiService',
-    downgradeInjectable(ThreadDataBackendApiService)
-  );

@@ -17,12 +17,11 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 
 @Injectable({
@@ -297,10 +296,3 @@ export class HintsAndSolutionManagerService {
     return this._learnerReallyStuckEventEmitter;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'HintsAndSolutionManagerService',
-    downgradeInjectable(HintsAndSolutionManagerService)
-  );

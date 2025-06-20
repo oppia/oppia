@@ -17,7 +17,6 @@
  */
 
 import {Component, OnInit} from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import firebase from 'firebase/app';
 
 import {AlertsService} from 'services/alerts.service';
@@ -63,10 +62,3 @@ export class LogoutPageComponent implements OnInit {
     setTimeout(() => this.redirect(), 3000);
   }
 }
-
-angular
-  .module('oppia')
-  .directive(
-    'logoutPage',
-    downgradeComponent({component: LogoutPageComponent})
-  );

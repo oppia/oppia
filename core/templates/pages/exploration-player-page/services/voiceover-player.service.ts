@@ -18,7 +18,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 
 import {Voiceover} from 'domain/exploration/voiceover.model';
 import {
@@ -53,12 +52,24 @@ export class VoiceoverPlayerService {
         this.entityVoiceoversService.getActiveEntityVoiceovers();
       let voiceoverTypeToVoiceovers =
         activeEntityVoiceover.voiceoversMapping[contentId];
-      this.activeVoiceover = voiceoverTypeToVoiceovers.manual;
+
+      let manualVoiceover = voiceoverTypeToVoiceovers.manual;
+      let automaticVoiceover = voiceoverTypeToVoiceovers.auto;
+
+      if (manualVoiceover?.needsUpdate === false) {
+        this.activeVoiceover = manualVoiceover;
+      } else if (automaticVoiceover?.needsUpdate === false) {
+        this.activeVoiceover = automaticVoiceover;
+      }
     } catch (e: unknown) {
       this.activeVoiceover = undefined;
     }
 
     this._activeVoiceoverChangedEventEmitter.emit();
+  }
+
+  getActiveContentId(): string {
+    return this.activeContentId;
   }
 
   setActiveComponentName(componentName: string): void {
@@ -109,10 +120,3 @@ export class VoiceoverPlayerService {
     return this.languageAccentDescriptions;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'VoiceoverPlayerService',
-    downgradeInjectable(VoiceoverPlayerService)
-  );

@@ -18,21 +18,21 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {ContextService} from 'services/context.service';
+import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {ContextService} from '../../../services/context.service';
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
+} from '../../../domain/exploration/ExplorationObjectFactory';
 import {
   ExtractImageFilenamesFromModelService,
   // eslint-disable-next-line max-len
-} from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
+} from './extract-image-filenames-from-model.service';
 
 import {
   SkillBackendDict,
   SkillObjectFactory,
-} from 'domain/skill/SkillObjectFactory';
+} from '../../../domain/skill/SkillObjectFactory';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Extracting Image file names in the state service', () => {
@@ -70,12 +70,6 @@ describe('Extracting Image file names in the state service', () => {
           content: {
             content_id: 'content',
             html: '',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-            },
           },
           interaction: {
             id: 'Continue',
@@ -115,12 +109,6 @@ describe('Extracting Image file names in the state service', () => {
             content_id: 'content',
             html: 'Congratulations, you have finished!',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-            },
-          },
           interaction: {
             id: 'EndExploration',
             default_outcome: null,
@@ -145,14 +133,6 @@ describe('Extracting Image file names in the state service', () => {
           content: {
             content_id: 'content',
             html: 'Multiple Choice',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-            },
           },
           interaction: {
             id: 'MultipleChoiceInput',
@@ -255,14 +235,6 @@ describe('Extracting Image file names in the state service', () => {
               '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
               'quot;s4Content.png&amp;quot;">' +
               '</oppia-noninteractive-image></p>',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-            },
           },
           interaction: {
             id: 'ItemSelectionInput',
@@ -381,17 +353,6 @@ describe('Extracting Image file names in the state service', () => {
           content: {
             content_id: 'content',
             html: '',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-              feedback_3: {},
-              feedback_4: {},
-              feedback_5: {},
-            },
           },
           interaction: {
             id: 'ImageClickInput',
@@ -601,16 +562,6 @@ describe('Extracting Image file names in the state service', () => {
             content_id: 'content',
             html: '<p>Text Input Content</p>',
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-              hint_1: {},
-              solution: {},
-            },
-          },
           interaction: {
             id: 'TextInput',
             default_outcome: {
@@ -757,14 +708,6 @@ describe('Extracting Image file names in the state service', () => {
               'amp;quot;\\&amp;quot;&amp;gt;&amp;lt;/' +
               'oppia-noninteractive-image&amp;gt;&amp;quot;}]">' +
               '</oppia-noninteractive-tabs></p>',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-              feedback_2: {},
-            },
           },
           interaction: {
             id: 'ItemSelectionInput',

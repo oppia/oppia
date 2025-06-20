@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Guard that redirects user to 401 error page
- * if the user is not a valid facilitator.
+ * @fileoverview Auth Guard for the topic viewer page.
  */
 import {Location} from '@angular/common';
 import {Injectable} from '@angular/core';

@@ -17,7 +17,6 @@
  * on the type of response received as a result of the autosaving request.
  */
 
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {Injectable} from '@angular/core';
 
 import {LocalStorageService} from 'services/local-storage.service';
@@ -110,10 +109,3 @@ export class AutosaveInfoModalsService {
     this._isModalOpen = true;
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'AutosaveInfoModalsService',
-    downgradeInjectable(AutosaveInfoModalsService)
-  );

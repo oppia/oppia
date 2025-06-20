@@ -22,16 +22,15 @@ import {
   CurrentInteractionService,
   OnSubmitFn,
   ValidityCheckFn,
-} from 'pages/exploration-player-page/services/current-interaction.service';
-import {UrlService} from 'services/contextual/url.service';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
-import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {ContextService} from 'services/context.service';
+} from './current-interaction.service';
+import {UrlService} from '../../../services/contextual/url.service';
+import {PlayerPositionService} from './player-position.service';
+import {PlayerTranscriptService} from './player-transcript.service';
+import {StateCard} from '../../../domain/state_card/state-card.model';
+import {ContextService} from '../../../services/context.service';
 import {InteractionRulesService} from './answer-classification.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {AudioTranslationLanguageService} from './audio-translation-language.service';
+import {Interaction} from '../../../domain/exploration/InteractionObjectFactory';
+import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Current Interaction Service', () => {
   let urlService: UrlService;
@@ -41,7 +40,6 @@ describe('Current Interaction Service', () => {
   let playerTranscriptService: PlayerTranscriptService;
   let playerPositionService: PlayerPositionService;
   let interactionRulesService: InteractionRulesService;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
   const displayedCard = new StateCard(
     '',
     '',
@@ -49,8 +47,7 @@ describe('Current Interaction Service', () => {
     {} as Interaction,
     [],
     {} as RecordedVoiceovers,
-    '',
-    {} as AudioTranslationLanguageService
+    ''
   );
 
   // This mock is required since ContextService is used in
@@ -163,8 +160,7 @@ describe('Current Interaction Service', () => {
         '<oppia-text-input-html></oppia-text-input-html>',
         interaction,
         recordedVoiceovers,
-        '',
-        audioTranslationLanguageService
+        ''
       )
     );
     spyOn(contextService, 'getExplorationId').and.returnValue('abc');
@@ -228,5 +224,31 @@ describe('Current Interaction Service', () => {
     spyOn(displayedCard, 'showNoResponseError').and.returnValue(true);
 
     expect(currentInteractionService.showNoResponseError()).toBeTrue();
+  });
+  it('should update answer validity using updateAnswerIsValid', () => {
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(displayedCard, 'updateAnswerIsValid');
+
+    currentInteractionService.updateAnswerIsValid(true);
+    expect(displayedCard.updateAnswerIsValid).toHaveBeenCalledWith(true);
+
+    currentInteractionService.updateAnswerIsValid(false);
+    expect(displayedCard.updateAnswerIsValid).toHaveBeenCalledWith(false);
+  });
+
+  it('should check invalid response error visibility', () => {
+    spyOn(currentInteractionService, 'getDisplayedCard').and.returnValue(
+      displayedCard
+    );
+    spyOn(displayedCard, 'showInvalidResponseError').and.returnValues(
+      true,
+      false
+    );
+
+    expect(currentInteractionService.showInvalidResponseError()).toBeTrue();
+    expect(currentInteractionService.showInvalidResponseError()).toBeFalse();
+    expect(displayedCard.showInvalidResponseError).toHaveBeenCalledTimes(2);
   });
 });

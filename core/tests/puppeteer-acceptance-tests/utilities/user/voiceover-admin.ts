@@ -21,6 +21,7 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const baseURL = testConstants.URLs.BaseURL;
+const voiceoverAdminURL = testConstants.URLs.VoiceoverAdmin;
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
@@ -45,6 +46,19 @@ const mobileVoiceoverArtistsHeader =
 const voiceArtistSettingsDropdown =
   'h3.e2e-test-voice-artists-settings-container';
 
+const languageAccentOptionSelector =
+  '.e2e-test-language-accent-selector-option';
+const addNewLanguageAccentButtonSelector =
+  '.e2e-test-add-new-language-accent-button';
+const languageAccentDropdownSelector =
+  '.e2e-test-language-accent-dropdown-selector';
+const enableAutogenerationConfirmationButtonSelector =
+  '.e2e-test-autogeneration-confirmation';
+const enableAutogenerationSelectorTemplate = (languageAccentCode: string) =>
+  `.e2e-test-${languageAccentCode}-supports-autogeneration-select`;
+const enableAutogenerationOptionSelector =
+  '.e2e-test-autogeneration-option-selector';
+
 export class VoiceoverAdmin extends BaseUser {
   /**
    * Function to navigate to exploration settings tab.
@@ -60,6 +74,13 @@ export class VoiceoverAdmin extends BaseUser {
     }
 
     showMessage('Navigation to settings tab is successful.');
+  }
+
+  /**
+   * Navigate to the voiceover admin page.
+   */
+  async navigateToVoiceoverAdminPage(): Promise<void> {
+    await this.goto(voiceoverAdminURL);
   }
 
   /**
@@ -246,6 +267,80 @@ export class VoiceoverAdmin extends BaseUser {
         `Confirmed: Voiceover artist '${artistUsername}' is still not listed.`
       );
     }
+  }
+
+  /**
+   * Function to register supported language and accent combinations for Oppia voiceovers.
+   * @param languageAccentDescription - The language-accent to add.
+   */
+  async addSupportedLanguageAccentPair(
+    languageAccentDescription: string
+  ): Promise<void> {
+    await this.navigateToVoiceoverAdminPage();
+    await this.waitForPageToFullyLoad();
+
+    await this.page.waitForSelector(addNewLanguageAccentButtonSelector);
+    await this.clickOn(addNewLanguageAccentButtonSelector);
+
+    await this.page.waitForSelector(languageAccentDropdownSelector);
+    await this.clickOn(languageAccentDropdownSelector);
+
+    await this.page.waitForSelector(languageAccentOptionSelector);
+    const languageOptions = await this.page.$$(languageAccentOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === languageAccentDescription) {
+        await option.click();
+        break;
+      }
+    }
+  }
+
+  /**
+   * Function to register supported language and accent combinations for Oppia voiceovers.
+   * @param languageAccentCode - The language-accent code to enable autogeneration for.
+   */
+  async enableAutogenerationForLanguageAccentPair(
+    languageAccentCode: string
+  ): Promise<void> {
+    const enableAutogenerationSelector =
+      enableAutogenerationSelectorTemplate(languageAccentCode);
+    await this.page.waitForSelector(enableAutogenerationSelector);
+    await this.clickOn(enableAutogenerationSelector);
+
+    await this.page.waitForSelector(enableAutogenerationOptionSelector);
+    const options = await this.page.$$(enableAutogenerationOptionSelector);
+    for (const option of options) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === 'Yes') {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.page.waitForSelector(
+      enableAutogenerationConfirmationButtonSelector,
+      {
+        visible: true,
+        timeout: 5000,
+      }
+    );
+    await this.clickOn(enableAutogenerationConfirmationButtonSelector);
+    await this.page.waitForSelector(
+      enableAutogenerationConfirmationButtonSelector,
+      {
+        hidden: true,
+      }
+    );
+
+    showMessage(
+      `Autogeneration enabled for language-accent pair: ${languageAccentCode}`
+    );
   }
 }
 

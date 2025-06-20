@@ -17,7 +17,6 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
@@ -29,11 +28,7 @@ import {
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {
-  BindableVoiceovers,
-  RecordedVoiceovers,
-} from 'domain/exploration/recorded-voiceovers.model';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -51,7 +46,6 @@ import {
   InteractionRulesService,
 } from './answer-classification.service';
 import {AudioPreloaderService} from './audio-preloader.service';
-import {AudioTranslationLanguageService} from './audio-translation-language.service';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {ImagePreloaderService} from './image-preloader.service';
@@ -61,7 +55,8 @@ import {
 } from './learner-params.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
-import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
+import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
+import isEqual from 'lodash/isEqual';
 
 @Injectable({
   providedIn: 'root',
@@ -93,7 +88,6 @@ export class ExplorationEngineService {
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
     private audioPreloaderService: AudioPreloaderService,
-    private audioTranslationLanguageService: AudioTranslationLanguageService,
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private contextService: ContextService,
     private contentTranslationManagerService: ContentTranslationManagerService,
@@ -174,7 +168,7 @@ export class ExplorationEngineService {
     const shouldCheckForMisspelling =
       oldInteractionId === AppConstants.INTERACTION_NAMES.TEXT_INPUT &&
       oldInteractionArgs.catchMisspellings &&
-      angular.equals(outcome, defaultOutcome);
+      isEqual(outcome, defaultOutcome);
 
     if (shouldCheckForMisspelling) {
       const answerIsOnlyMisspelled =
@@ -197,10 +191,9 @@ export class ExplorationEngineService {
   }
 
   private _getRandomSuffix(): string {
-    // This is a bit of a hack. When a refresh to a $scope variable
-    // happens,
-    // AngularJS compares the new value of the variable to its previous
-    // value. If they are the same, then the variable is not updated.
+    // This is a bit of a hack. When a refresh to a component property
+    // happens, Angular compares the new value of the property to its previous
+    // value. If they are the same, then the property is not updated.
     // Appending a random suffix makes the new value different from the
     // previous one, and thus indirectly forces a refresh.
     let randomSuffix = '';
@@ -315,9 +308,7 @@ export class ExplorationEngineService {
       questionHtml,
       interactionHtml,
       interaction,
-      initialState.recordedVoiceovers,
-      initialState.content.contentId,
-      this.audioTranslationLanguageService
+      initialState.content.contentId
     );
     successCallback(initialCard, nextFocusLabel);
   }
@@ -409,12 +400,6 @@ export class ExplorationEngineService {
       this.exploration.setInitialStateName(this.initStateName);
       this.visitedStateNames = [this.exploration.getInitialState().name];
       this.initParams(this.manualParamChanges);
-      this.audioTranslationLanguageService.init(
-        this.exploration.getAllVoiceoverLanguageCodes(),
-        null,
-        this.exploration.getLanguageCode(),
-        explorationDict.auto_tts_enabled
-      );
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(this.initStateName);
       this._loadInitialState(successCallback);
@@ -422,12 +407,6 @@ export class ExplorationEngineService {
       this.visitedStateNames.push(this.exploration.getInitialState().name);
       this.version = explorationVersion;
       this.initParams([]);
-      this.audioTranslationLanguageService.init(
-        this.exploration.getAllVoiceoverLanguageCodes(),
-        preferredAudioLanguage,
-        this.exploration.getLanguageCode(),
-        autoTtsEnabled
-      );
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(
         this.exploration.getInitialState().name
@@ -508,7 +487,6 @@ export class ExplorationEngineService {
       nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      feedbackAudioTranslations: BindableVoiceovers,
       refresherExplorationId: string,
       missingPrerequisiteSkillId: string,
       remainOnCurrentCard: boolean,
@@ -526,7 +504,6 @@ export class ExplorationEngineService {
     this.answerIsBeingProcessed = true;
     let oldStateName: string = this.playerTranscriptService.getLastStateName();
     let oldState: State = this.exploration.getState(oldStateName);
-    let recordedVoiceovers: RecordedVoiceovers = oldState.recordedVoiceovers;
     let oldStateCard: StateCard = this.playerTranscriptService.getLastCard();
     let classificationResult: AnswerClassificationResult =
       this.answerClassificationService.getMatchingClassificationResult(
@@ -591,9 +568,6 @@ export class ExplorationEngineService {
       classificationResult.outcome,
       [oldParams]
     );
-    let feedbackContentId: string = outcome.feedback.contentId;
-    let feedbackAudioTranslations: BindableVoiceovers =
-      recordedVoiceovers.getBindableVoiceovers(feedbackContentId);
     if (feedbackHtml === null) {
       this.answerIsBeingProcessed = false;
       this.alertsService.addWarning('Feedback content should not be empty.');
@@ -655,9 +629,7 @@ export class ExplorationEngineService {
       questionHtml,
       nextInteractionHtml,
       this.exploration.getInteraction(this.nextStateName),
-      this.exploration.getState(this.nextStateName).recordedVoiceovers,
-      this.exploration.getState(this.nextStateName).content.contentId,
-      this.audioTranslationLanguageService
+      this.exploration.getState(this.nextStateName).content.contentId
     );
 
     const nextCardIfReallyStuck = this._getNextCardIfReallyStuck(
@@ -670,7 +642,6 @@ export class ExplorationEngineService {
       nextCard,
       refreshInteraction,
       feedbackHtml,
-      feedbackAudioTranslations,
       refresherExplorationId,
       missingPrerequisiteSkillId,
       onSameCard,
@@ -726,9 +697,7 @@ export class ExplorationEngineService {
       questionHtmlIfStuck,
       nextInteractionIfStuckHtml,
       this.exploration.getInteraction(this.nextStateIfStuckName),
-      this.exploration.getState(this.nextStateIfStuckName).recordedVoiceovers,
-      this.exploration.getState(this.nextStateIfStuckName).content.contentId,
-      this.audioTranslationLanguageService
+      this.exploration.getState(this.nextStateIfStuckName).content.contentId
     );
   }
 
@@ -763,9 +732,7 @@ export class ExplorationEngineService {
       contentHtml,
       interactionHtml,
       this.exploration.getInteraction(stateName),
-      this.exploration.getState(stateName).recordedVoiceovers,
-      this.exploration.getState(stateName).content.contentId,
-      this.audioTranslationLanguageService
+      this.exploration.getState(stateName).content.contentId
     );
   }
 
@@ -841,10 +808,3 @@ export class ExplorationEngineService {
     return shortestPathToStateInReverse.reverse();
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'ExplorationEngineService',
-    downgradeInjectable(ExplorationEngineService)
-  );

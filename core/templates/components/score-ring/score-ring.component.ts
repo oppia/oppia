@@ -25,7 +25,6 @@ import {
   ElementRef,
   SimpleChanges,
 } from '@angular/core';
-import {downgradeComponent} from '@angular/upgrade/static';
 import {QuestionPlayerConstants} from '../question-directives/question-player/question-player.constants';
 
 @Component({
@@ -97,10 +96,3 @@ export class ScoreRingComponent implements AfterViewInit, OnChanges {
     this.setScore(this.score);
   }
 }
-
-angular.module('oppia').directive(
-  'oppiaScoreRing',
-  downgradeComponent({
-    component: ScoreRingComponent,
-  }) as angular.IDirectiveFactory
-);

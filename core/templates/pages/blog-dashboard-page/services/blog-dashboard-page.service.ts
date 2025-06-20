@@ -17,7 +17,6 @@
  */
 
 import {Injectable, EventEmitter} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {AlertsService} from 'services/alerts.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -165,10 +164,3 @@ export class BlogDashboardPageService {
     }
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'BlogDashboardPageService',
-    downgradeInjectable(BlogDashboardPageService)
-  );
