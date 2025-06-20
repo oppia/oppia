@@ -37,6 +37,7 @@ import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 
 import './subtopic-viewer-page.component.css';
+import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',
@@ -51,6 +52,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   classroomUrlFragment!: string;
   subtopicUrlFragment!: string;
   pageContents!: SubtopicPageContents;
+  sections!: StudyGuideSection[];
   subtopicTitle!: string;
   subtopicTitleTranslationKey!: string;
   parentTopicTitle!: string;
