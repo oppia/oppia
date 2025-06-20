@@ -446,6 +446,30 @@ describe('Exploration engine service ', () => {
   );
 
   it(
+    'should throw error when initialized in exploration' +
+      ' player page and version is not set',
+    () => {
+      const initSuccessCb = jasmine.createSpy('success');
+
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
+
+      expect(() => {
+        explorationEngineService.init(
+          explorationDict,
+          null,
+          null,
+          true,
+          ['en'],
+          [],
+          initSuccessCb
+        );
+      }).toThrowError('Exploration version is not set.');
+    }
+  );
+
+  it(
     'should load exploration when initialized in ' + 'exploration editor page',
     () => {
       let initSuccessCb = jasmine.createSpy('success');
