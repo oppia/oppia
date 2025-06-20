@@ -36,6 +36,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {
   Question,
   QuestionBackendDict,
+  QuestionObjectFactory,
 } from 'domain/question/QuestionObjectFactory';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {PlayerTranscriptService} from './player-transcript.service';
@@ -65,7 +66,8 @@ export class QuestionPlayerEngineService {
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
-    private playerTranscriptService: PlayerTranscriptService
+    private playerTranscriptService: PlayerTranscriptService,
+    private questionObjectFactory: QuestionObjectFactory
   ) {}
 
   // Evaluate feedback.

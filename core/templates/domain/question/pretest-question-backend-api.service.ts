@@ -47,7 +47,7 @@ export class PretestQuestionBackendApiService {
 
   _fetchPretestQuestions(
     explorationId: string,
-    storyUrlFragment: string,
+    storyUrlFragment: string | null,
     successCallback: (value: Question[]) => void,
     errorCallback: (reason: string) => void
   ): void {
@@ -94,7 +94,7 @@ export class PretestQuestionBackendApiService {
 
   async fetchPretestQuestionsAsync(
     explorationId: string,
-    storyUrlFragment: string
+    storyUrlFragment: string | null
   ): Promise<Question[]> {
     return new Promise((resolve, reject) => {
       this._fetchPretestQuestions(

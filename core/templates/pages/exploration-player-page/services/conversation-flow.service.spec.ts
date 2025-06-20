@@ -28,12 +28,16 @@ import {PlayerTranscriptService} from './player-transcript.service';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {Interaction} from '../../../domain/exploration/InteractionObjectFactory';
+import {ExplorationModeService} from './exploration-mode.service';
+import {ExplorationEngineService} from './exploration-engine.service';
 
 describe('Conversation flow service', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let contentTranslationManagerService: ContentTranslationManagerService;
   let conversationFlowService: ConversationFlowService;
   let playerTranscriptService: PlayerTranscriptService;
+  let explorationModeService: ExplorationModeService;
+  let explorationEngineService: ExplorationEngineService;
 
   let createCard = function (interactionType: string): StateCard {
     return new StateCard(
@@ -69,6 +73,8 @@ describe('Conversation flow service', () => {
       ContentTranslationManagerService
     );
     conversationFlowService = TestBed.inject(ConversationFlowService);
+    explorationModeService = TestBed.inject(ExplorationModeService);
+    explorationEngineService = TestBed.inject(ExplorationEngineService);
     conversationFlowService = TestBed.inject(ConversationFlowService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
   }));
@@ -110,5 +116,28 @@ describe('Conversation flow service', () => {
         supplementaryImageInputCard
       )
     ).toBeTrue();
+  });
+
+  it('should record new card added', () => {
+    spyOn(explorationEngineService, 'recordNewCardAdded');
+    spyOn(conversationFlowService, 'recordNewCardAdded').and.callThrough();
+    explorationModeService.setExplorationMode();
+    conversationFlowService.recordNewCardAdded();
+    expect(conversationFlowService.recordNewCardAdded).toHaveBeenCalled();
+  });
+
+  it('should test getters', () => {
+    expect(conversationFlowService.onPlayerStateChange).toBeDefined();
+    expect(conversationFlowService.onOppiaFeedbackAvailable).toBeDefined();
+    expect(conversationFlowService.onShowProgressModal).toBeDefined();
+  });
+
+  it('should get language code', () => {
+    let languageCode: string = 'test_lang_code';
+    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue(
+      languageCode
+    );
+    explorationModeService.setExplorationMode();
+    expect(conversationFlowService.getLanguageCode()).toEqual(languageCode);
   });
 });

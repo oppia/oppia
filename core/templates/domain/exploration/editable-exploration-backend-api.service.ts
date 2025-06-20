@@ -190,7 +190,7 @@ export class EditableExplorationBackendApiService {
 
   async recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
     explorationId: string,
-    mostRecentlyReachedCheckpointExpVersion: number,
+    mostRecentlyReachedCheckpointExpVersion: number | null,
     mostRecentlyReachedCheckpointStateName: string
   ): Promise<{unique_progress_url_id: string}> {
     const requestUrl =

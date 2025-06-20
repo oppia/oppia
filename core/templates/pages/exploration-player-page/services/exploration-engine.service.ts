@@ -384,7 +384,7 @@ export class ExplorationEngineService {
    */
   init(
     explorationDict: ExplorationBackendDict,
-    explorationVersion: number,
+    explorationVersion: number | null,
     preferredAudioLanguage: string | null,
     autoTtsEnabled: boolean,
     preferredContentLanguageCodes: string[],

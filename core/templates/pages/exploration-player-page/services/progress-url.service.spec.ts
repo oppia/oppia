@@ -67,7 +67,7 @@ describe('ProgressUrlService', () => {
       checkpointProgressService,
       'getLastCompletedCheckpoint'
     ).and.returnValue('checkpoint_id');
-    spyOn(explorationEngineService, 'getExplorationVersion').and.returnValue(1);
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
     spyOn(
       editableExplorationBackendApiService,
       'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner'
