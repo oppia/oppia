@@ -18,8 +18,8 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {FeedbackThreadObjectFactory} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
-import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
+import {FeedbackThreadObjectFactory} from '../feedback_thread/FeedbackThreadObjectFactory';
+import {ThreadMessage} from '../feedback_message/ThreadMessage.model';
 
 describe('FeedbackThreadObjectFactory', () => {
   let feedbackThreadObjectFactory: FeedbackThreadObjectFactory;

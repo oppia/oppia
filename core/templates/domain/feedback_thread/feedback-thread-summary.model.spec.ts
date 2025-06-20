@@ -16,7 +16,7 @@
  * @fileoverview Tests for FeedbackThreadSummary model.
  */
 
-import {FeedbackThreadSummary} from 'domain/feedback_thread/feedback-thread-summary.model';
+import {FeedbackThreadSummary} from '../feedback_thread/feedback-thread-summary.model';
 
 describe('Feedback thread model', () => {
   it(
