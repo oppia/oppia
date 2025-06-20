@@ -363,7 +363,7 @@ describe('Router Service', () => {
 
     service._activeTabName = service.TABS.MAIN.name;
 
-    // Create a fake container
+    // Create a fake container.
     const container = document.createElement('div');
     container.className = 'oppia-editor-cards-container';
     container.style.opacity = '1';
