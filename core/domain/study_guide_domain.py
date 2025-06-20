@@ -160,8 +160,8 @@ class UpdateStudyGuidePropertySectionsHeadingCmd(StudyGuideChange):
 
     subtopic_id: int
     property_name: Literal['sections_heading']
-    new_value: state_domain.SubtitledUnicodeDict
-    old_value: state_domain.SubtitledUnicodeDict
+    new_value: str
+    old_value: str
 
 
 class UpdateStudyGuidePropertySectionsContentCmd(StudyGuideChange):
@@ -454,7 +454,7 @@ class StudyGuide:
             sections,
             feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION,
             content_id_generator.next_content_id_index,
-            constants.DEFAULT_LANGUAGE_CODE, 1)
+            constants.DEFAULT_LANGUAGE_CODE, 0)
 
     def get_subtopic_id_from_study_guide_id(self) -> int:
         """Returns the subtopic_id from the study_guide_id

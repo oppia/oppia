@@ -24,7 +24,7 @@ import {
 } from 'domain/question/QuestionObjectFactory';
 import {Skill} from 'domain/skill/SkillObjectFactory';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';

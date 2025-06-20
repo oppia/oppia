@@ -20,8 +20,9 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
 from core.domain import email_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.platform import models
 
 import requests
@@ -84,9 +85,9 @@ def send_email_to_recipients(
 
     Raises:
         Exception. The mailgun api key is not stored in
-            feconf.MAILGUN_API_KEY.
+            MAILGUN_API_KEY cloud secret.
         Exception. The mailgun domain name is not stored in
-            feconf.MAILGUN_DOMAIN_NAME.
+            MAILGUN_DOMAIN_NAME platform param.
 
     Returns:
         bool. Whether the emails are sent successfully.
@@ -102,7 +103,10 @@ def send_email_to_recipients(
             'Mailgun API key is not available. '
             'Here is the email that failed sending: %s' % email_msg)
 
-    if not feconf.MAILGUN_DOMAIN_NAME:
+    mailgun_domain_name = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME.value))
+    if not mailgun_domain_name:
         email_msg = email_services.convert_email_to_loggable_string(
             sender_email, recipient_emails, subject, plaintext_body, html_body,
             bcc, reply_to, recipient_variables
@@ -110,6 +114,7 @@ def send_email_to_recipients(
         raise Exception(
             'Mailgun domain name is not set. '
             'Here is the email that failed sending: %s' % email_msg)
+    assert isinstance(mailgun_domain_name, str)
 
     # To send bulk emails we pass list of recipients in 'to' paarameter of
     # post data. Maximum limit of recipients per request is 1000.
@@ -120,7 +125,9 @@ def send_email_to_recipients(
         recipient_emails[i:i + 1000]
         for i in range(0, len(recipient_emails), 1000)]
     for email_list in recipient_email_lists:
-        data = {
+        data: Dict[
+            str, Union[str, List[str], Dict[str, Dict[str, Union[str, float]]]]
+        ] = {
             'from': sender_email,
             'subject': subject,
             'text': plaintext_body,
@@ -139,10 +146,10 @@ def send_email_to_recipients(
         # sending individual emails).
         data['recipient_variables'] = recipient_variables or {}
         server = 'https://api.mailgun.net/v3/%s/messages' % (
-            feconf.MAILGUN_DOMAIN_NAME
+            mailgun_domain_name
         )
 
-       # Adding attachments to the email.
+        # Adding attachments to the email.
         files = [(
             'attachment',
             (attachment['filename'], open(attachment['path'], 'rb')))
