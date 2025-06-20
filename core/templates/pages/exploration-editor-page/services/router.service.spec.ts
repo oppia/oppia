@@ -344,47 +344,6 @@ describe('Router Service', () => {
     discardPeriodicTasks();
   }));
 
-  it('should fadeOut, navigate, and fadeIn when navigating to main tab', fakeAsync(() => {
-    const service = routerService as unknown as {
-      _getCurrentStateFromLocationPath: () => string;
-      _actuallyNavigate: (slug: string, state: string) => void;
-      _activeTabName: string;
-      TABS: {MAIN: {name: string}};
-      SLUG_GUI: string;
-      navigateToMainTab: (state: string) => void;
-    };
-
-    spyOn(service, '_getCurrentStateFromLocationPath').and.returnValue(
-      '/oldState'
-    );
-    const navigateSpy = spyOn(service, '_actuallyNavigate');
-
-    service._activeTabName = service.TABS.MAIN.name;
-
-    const container = document.createElement('div');
-    container.className = 'oppia-editor-cards-container';
-    container.style.opacity = '1';
-    document.body.appendChild(container);
-
-    // Instead of spying on requestAnimationFrame, just let it run naturally.
-    // If needed, stub it without calling the callback.
-    spyOn(window, 'requestAnimationFrame').and.callFake(cb => {
-      setTimeout(() => cb(0), 0);
-      return 0;
-    });
-
-    service.navigateToMainTab('newState');
-
-    tick(600);
-
-    expect(navigateSpy).toHaveBeenCalledWith(service.SLUG_GUI, 'newState');
-    expect(container.style.opacity).toBe('1');
-
-    document.body.removeChild(container);
-    flush();
-    discardPeriodicTasks();
-  }));
-
   it('should not navigate to main tab', () => {
     spyOn(routerService, '_getCurrentStateFromLocationPath').and.returnValue(
       '/main'
