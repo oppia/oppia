@@ -195,9 +195,9 @@ export class QuestionPlayerEngineService {
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
     errorCallback: () => void
   ): void {
-    let questionObjects = questionDicts.map(function (questionDict) {
+    let questionObjects = questionDicts.map(questionDict => {
       return this.questionObjectFactory.createFromBackendDict(questionDict);
-    }, this);
+    });
     this.init(questionObjects, successCallback, errorCallback);
   }
 

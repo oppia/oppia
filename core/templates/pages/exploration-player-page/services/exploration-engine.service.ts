@@ -386,7 +386,7 @@ export class ExplorationEngineService {
     explorationDict: ExplorationBackendDict,
     explorationVersion: number | null,
     preferredAudioLanguage: string | null,
-    autoTtsEnabled: boolean,
+    autoTtsEnabled: boolean | null,
     preferredContentLanguageCodes: string[],
     displayableLanguageCodes: string[],
     successCallback: (stateCard: StateCard, label: string) => void
@@ -417,10 +417,15 @@ export class ExplorationEngineService {
       this._loadInitialState(successCallback);
     }
 
+    const version = this.pageContextService.getExplorationVersion();
+    if (!version) {
+      throw new Error('Exploration version is not set.');
+    }
+
     this.entityTranslationsService.init(
       this._explorationId,
       'exploration',
-      this.pageContextService.getExplorationVersion()
+      version
     );
     this.contentTranslationManagerService.setOriginalTranscript(
       this.exploration.getLanguageCode()
