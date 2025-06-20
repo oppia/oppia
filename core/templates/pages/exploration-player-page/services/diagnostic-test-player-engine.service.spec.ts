@@ -18,25 +18,25 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
-import {DiagnosticTestQuestionsModel} from 'domain/question/diagnostic-test-questions.model';
-import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {DiagnosticTestQuestionsModel} from '../../../domain/question/diagnostic-test-questions.model';
+import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service';
 import {
   Question,
   QuestionObjectFactory,
   QuestionBackendDict,
-} from 'domain/question/QuestionObjectFactory';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
-import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
+} from '../../../domain/question/QuestionObjectFactory';
+import {StateObjectFactory} from '../../../domain/state/StateObjectFactory';
+import {DiagnosticTestTopicTrackerModel} from '../../../pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {DiagnosticTestPlayerEngineService} from './diagnostic-test-player-engine.service';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {Outcome} from 'domain/exploration/outcome.model';
+import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
+import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
+import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   AnswerClassificationService,
   InteractionRulesService,
 } from './answer-classification.service';
-import {AlertsService} from 'services/alerts.service';
-import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
+import {AlertsService} from '../../../services/alerts.service';
+import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
 
 describe('Diagnostic test engine service', () => {
   let diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService;
