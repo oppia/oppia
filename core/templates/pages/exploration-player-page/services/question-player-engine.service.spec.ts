@@ -18,19 +18,19 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
-import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {Outcome} from 'domain/exploration/outcome.model';
+import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
+import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   Question,
   QuestionBackendDict,
   QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
+} from '../../../domain/question/QuestionObjectFactory';
+import {StateCard} from '../../../domain/state_card/state-card.model';
+import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
+import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
+import {AlertsService} from '../../../services/alerts.service';
+import {ContextService} from '../../../services/context.service';
+import {FocusManagerService} from '../../../services/stateful/focus-manager.service';
 import {
   AnswerClassificationService,
   InteractionRulesService,

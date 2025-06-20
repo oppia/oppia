@@ -55,7 +55,7 @@ import {
 } from './learner-params.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
-import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
+import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import isEqual from 'lodash/isEqual';
 
 @Injectable({

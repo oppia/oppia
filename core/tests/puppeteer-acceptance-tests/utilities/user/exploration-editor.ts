@@ -255,6 +255,9 @@ const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
+const regenerateAutomaticVoiceoverButton = '.e2e-test-regenerate-voiceover';
+const voiceoverConfirmationModalButton =
+  '.e2e-test-voiceover-regeneration-confirm';
 
 enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
@@ -2413,6 +2416,76 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(addManualVoiceoverButton);
     await this.uploadFile(voiceoverFilePath);
     await this.clickOn(saveUploadedAudioButton);
+    await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Function to add a voiceover for specific content of the current card.
+   * @param {string} language - Language for which the voiceover has to be added.
+   * @param {string} languageAccent - Language accent for which the voiceover has to be added.
+   * @param {string} contentType - Type of the content such as "Interaction" or "Hint".
+   */
+  async regenerateVoiceoverForContent(
+    language: string,
+    languageAccent: string,
+    contentType: string
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    const activeContentType = await this.page.$eval(activeTranslationTab, el =>
+      el.textContent?.trim()
+    );
+    if (!activeContentType?.includes(contentType)) {
+      showMessage(
+        `Switching content type from ${activeContentType} to ${contentType}`
+      );
+      await this.clickOn(contentType);
+    }
+
+    await this.clickOn(voiceoverLanguageSelector);
+    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+    const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === language) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.clickOn(voiceoverLanguageAccentSelector);
+    await this.page.waitForSelector(voiceoverLanguageAccentOptionSelector);
+    const languageAccentOptions = await this.page.$$(
+      voiceoverLanguageAccentOptionSelector
+    );
+
+    for (const option of languageAccentOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === languageAccent) {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.clickOn(regenerateAutomaticVoiceoverButton);
+
+    await this.page.waitForSelector(voiceoverConfirmationModalButton, {
+      visible: true,
+      timeout: 5000,
+    });
+
+    await this.clickOn(voiceoverConfirmationModalButton);
+
+    await this.page.waitForSelector(voiceoverConfirmationModalButton, {
+      hidden: true,
+    });
+
+    showMessage('Voiceover has been successfully regenerated.');
     await this.waitForNetworkIdle();
   }
 
