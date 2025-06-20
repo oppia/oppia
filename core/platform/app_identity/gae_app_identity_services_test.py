@@ -19,14 +19,13 @@
 from __future__ import annotations
 import os
 
-from core.domain import platform_parameter_list
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
 
 
 class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
     def test_get_application_id(self) -> None:
-        def mock_get(key, _):
+        def mock_get(key: str, _: str) -> str:
             assert key == 'GOOGLE_CLOUD_PROJECT'
             return 'some_id'
         with self.swap(os.environ, 'get', mock_get):
@@ -34,7 +33,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
                 gae_app_identity_services.get_application_id(), 'some_id')
 
     def test_get_default_application_id(self) -> None:
-        def mock_get(key, default):
+        def mock_get(key: str, default: str) -> str:
             assert key == 'GOOGLE_CLOUD_PROJECT'
             return default
         with self.swap(os.environ, 'get', mock_get):
@@ -43,7 +42,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
                 'dev-project-id')
 
     def test_get_application_id_throws_error(self) -> None:
-        def mock_get(key, _):
+        def mock_get(key: str, _: str) -> str:
             assert key == 'GOOGLE_CLOUD_PROJECT'
             return ''
         with self.swap(os.environ, 'get', mock_get):
@@ -53,7 +52,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
                 gae_app_identity_services.get_application_id()
 
     def test_get_default_gcs_bucket_name(self) -> None:
-        def mock_get(key, _):
+        def mock_get(key: str, _: str) -> str:
             assert key == 'GOOGLE_CLOUD_PROJECT'
             return 'some_id'
         with self.swap(os.environ, 'get', mock_get):
