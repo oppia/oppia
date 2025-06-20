@@ -183,7 +183,7 @@
                   <li *ngFor="let section of sections; let index = index"
                       [ngClass]="{'active': activeSectionIndex === index}"
                       class="oppia-rule-block oppia-prevent-selection">
-                    <a (click)="changeActiveSectionIndex(index)"
+                    <button (click)="changeActiveSectionIndex(index)"
                        class="oppia-rule-tab e2e-test-study-guide-section-{{ index }} oppia-study-guide-section-preview-list"
                        [ngClass]="{'oppia-rule-tab-active': activeSectionIndex === index}">
                       <oppia-summary-list-header [index]="index"
@@ -194,7 +194,7 @@
                                                  [isDeleteAvailable]="sections.length > 1"
                                                  (summaryDelete)="deleteSection($event.index, $event.event)">
                       </oppia-summary-list-header>
-                    </a>
+                    </button>
                     <div *ngIf="activeSectionIndex === index" class="oppia-editor-card-section e2e-test-study-guide-section-{{ index }}-expanded">
                       <oppia-study-guide-section-editor [section]="section"
                                                         [index]="index"
@@ -608,6 +608,32 @@
   .oppia-study-guide-section-preview > li {
     display: block;
     position: relative;
+  }
+  .nav-pills > li > button.oppia-rule-tab {
+    background: rgba(0,0,0,0.05);
+    border-bottom: 1px solid #f0f0f0;
+    border-radius: 0;
+    color: #444;
+    padding: 7px 15px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+  }
+  .nav-pills > li > button.oppia-rule-tab-disabled {
+    cursor: default;
+  }
+  .nav-pills > li:hover > button.oppia-rule-tab {
+    background: rgba(0,0,0,0.1);
+  }
+  .nav-pills > li:hover > button.oppia-rule-tab-disabled {
+    background: rgba(0,0,0,0.05);
+  }
+  .nav-pills > li.active > button.oppia-rule-tab-active {
+    background: rgba(5,140,166,0.1);
+    border-right: 0;
+    color: #333;
   }
   @media screen and (max-width: 768px) {
     .oppia-study-guide-sections-header i {

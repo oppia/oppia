@@ -188,6 +188,8 @@ export class TopicEditorStateService {
     this._cachedSubtopicPages.length = 0;
     // Reset the study guides list after setting new topic.
     this._cachedStudyGuides.length = 0;
+    // We need this if block as without it, the subtopic
+    // editor page does not load as expected.
     if (this._topicIsInitialized) {
       this._topicIsInitialized = true;
       this._topicReinitializedEventEmitter.emit();
