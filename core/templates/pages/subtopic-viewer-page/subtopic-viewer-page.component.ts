@@ -38,6 +38,7 @@ import {PageTitleService} from 'services/page-title.service';
 
 import './subtopic-viewer-page.component.css';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',
@@ -73,7 +74,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     private topicViewerBackendApiService: TopicViewerBackendApiService,
     private urlService: UrlService,
     private windowDimensionsService: WindowDimensionsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   checkMobileView(): boolean {
@@ -98,6 +100,11 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     this.pageTitleService.setDocumentTitle(translatedTitle);
   }
 
+  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.ShowRestructuredStudyGuides
+      .isEnabled;
+  }
+
   ngOnInit(): void {
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.classroomUrlFragment =
@@ -114,7 +121,11 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       )
       .then(
         subtopicDataObject => {
-          this.pageContents = subtopicDataObject.getPageContents();
+          if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+            this.sections = subtopicDataObject.getSections();
+          } else {
+            this.pageContents = subtopicDataObject.getPageContents();
+          }
           this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
           this.parentTopicId = subtopicDataObject.getParentTopicId();
           this.contextService.setCustomEntityContext(
