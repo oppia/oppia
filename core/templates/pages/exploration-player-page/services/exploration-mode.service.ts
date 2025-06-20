@@ -122,10 +122,6 @@ export class ExplorationModeService {
     );
   }
 
-  isInExplorationPreviewMode(): boolean {
-    return this.currentMode === EXPLORATION_MODE.EDITOR_PREVIEW;
-  }
-
   isInQuestionPlayerMode(): boolean {
     return this.currentMode === EXPLORATION_MODE.QUESTION_PLAYER;
   }

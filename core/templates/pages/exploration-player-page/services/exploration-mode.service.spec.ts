@@ -134,17 +134,6 @@ describe('ExplorationModeService', () => {
     expect(explorationModeService.isInQuestionMode()).toBeFalse();
   });
 
-  it('should check if in exploration editor preview mode', () => {
-    explorationModeService.currentMode = EXPLORATION_MODE.EDITOR_PREVIEW;
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-      true
-    );
-    expect(explorationModeService.isInExplorationPreviewMode()).toBeTrue();
-
-    explorationModeService.setQuestionPlayerMode();
-    expect(explorationModeService.isInExplorationPreviewMode()).toBeFalse();
-  });
-
   it('should check if in question player mode', () => {
     explorationModeService.setQuestionPlayerMode();
     expect(explorationModeService.isInQuestionPlayerMode()).toBeTrue();
