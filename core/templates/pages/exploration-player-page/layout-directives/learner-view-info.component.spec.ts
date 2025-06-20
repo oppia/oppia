@@ -28,19 +28,19 @@ import {
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
-} from 'domain/exploration/read-only-exploration-backend-api.service';
+} from '../../../../domain/exploration/read-only-exploration-backend-api.service';
 import {
   ReadOnlyTopicBackendDict,
   ReadOnlyTopic,
-} from '../../../domain/topic_viewer/read-only-topic.model';
-import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ContextService} from 'services/context.service';
-import {UrlService} from 'services/contextual/url.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {StatsReportingService} from '../services/stats-reporting.service';
+} from '../../../../domain/topic_viewer/read-only-topic-object.factory';
+import {TopicViewerBackendApiService} from '../../../../domain/topic_viewer/topic-viewer-backend-api.service';
+import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
+import {ContextService} from '../../../../services/context.service';
+import {UrlService} from '../../../../services/contextual/url.service';
+import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
+import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
+import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
+import {StatsReportingService} from '../../services/stats-reporting.service';
 import {LearnerViewInfoComponent} from './learner-view-info.component';
 
 describe('Learner view info component', () => {
@@ -67,6 +67,7 @@ describe('Learner view info component', () => {
         UrlInterpolationService,
         UrlService,
         TopicViewerBackendApiService,
+        ReadOnlyTopic,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
