@@ -40,7 +40,7 @@
           </oppia-rte-output-display>
         </div>
       </div>
-      <button class="btn btn-next-actions btn-practice-section">
+      <button (click)="openPracticeMenu()" class="btn btn-next-actions btn-practice-section">
         <p class="text-practice-section-fixed">
           <i class="material-icons">edit_square</i>
           Go to practice section
@@ -49,14 +49,14 @@
       </button>
     </div>
   </div>
-  <div class="next-actions-section">
+  <div *ngIf="subtopicSummaryIsShown" class="next-actions-section">
     <h4 class="next-actions-title">Here is what you can do next!</h4>
-    <div class="next-actions-buttons">
-      <button class="btn btn-next-actions btn-study-guide-menu">
+    <div class="next-actions-buttons-container">
+      <button (click)="openStudyGuideMenu()" class="btn btn-next-actions btn-study-guide-menu">
         <i class="material-icons icon-study-guide-menu">exit_to_app</i>
         Go to revision menu
       </button>
-      <button *ngIf="nextSubtopic" class="btn btn-next-actions btn-next-study-guide">
+      <button (click)="openStudyGuide()" *ngIf="nextSubtopic" class="btn btn-next-actions btn-next-study-guide">
         <p class="text-next-study-guide-fixed">
           <i class="material-icons icon-next-study-guide">arrow_forward</i>
           Next revision card
@@ -67,7 +67,7 @@
   </div>
 </div>
 
-  <div *ngIf="subtopicSummaryIsShown"
+  <div *ngIf="subtopicSummaryIsShown && !isShowRestructuredStudyGuidesFeatureEnabled()"
        class="oppia-subtopic-viewer-next-subtopic-summary pb-4"
        [ngClass]="{'justify-content-start': prevSubtopic, 'justify-content-end': nextSubtopic}">
     <div class="next-subtopic-section">
@@ -147,14 +147,18 @@
   }
 
   .next-actions-section {
-    margin-top: 10px;
+    margin: 10px;
     align-items: center;
     display: flex;
     flex-direction: column;
   }
 
+  .next-actions-buttons-container {
+    margin-bottom: 10px;
+  }
+
   .btn-next-actions {
-    width: 180px;
+    width: 170px;
     height: 60px;
     border-radius: 4px;
     padding: 8px;
@@ -226,6 +230,9 @@
     
     .card-content {
       padding: 15px;
+    }
+    .next-actions-section {
+      margin: 10px 0px;
     }
   }
 </style>

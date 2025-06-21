@@ -39,6 +39,10 @@ import {PageTitleService} from 'services/page-title.service';
 import './subtopic-viewer-page.component.css';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 
 @Component({
   selector: 'oppia-subtopic-viewer-page',
@@ -73,6 +77,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     private subtopicViewerBackendApiService: SubtopicViewerBackendApiService,
     private topicViewerBackendApiService: TopicViewerBackendApiService,
     private urlService: UrlService,
+    private urlInterpolationService: UrlInterpolationService,
+    private windowRef: WindowRef,
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
     private platformFeatureService: PlatformFeatureService
@@ -205,6 +211,58 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
         this.parentTopicTitleTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+    );
+  }
+
+  openStudyGuide(): void {
+    // This component is being used in the topic editor as well and
+    // we want to disable the linking in this case.
+    const urlFragment = this.nextSubtopic.getUrlFragment();
+    if (!this.classroomUrlFragment || !this.topicUrlFragment || !urlFragment) {
+      return;
+    }
+    this.windowRef.nativeWindow.open(
+      this.urlInterpolationService.interpolateUrl(
+        TopicViewerDomainConstants.SUBTOPIC_VIEWER_URL_TEMPLATE,
+        {
+          classroom_url_fragment: this.classroomUrlFragment,
+          topic_url_fragment: this.topicUrlFragment,
+          subtopic_url_fragment: urlFragment,
+        }
+      ),
+      '_self'
+    );
+  }
+
+  openStudyGuideMenu(): void {
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return;
+    }
+    this.windowRef.nativeWindow.open(
+      this.urlInterpolationService.interpolateUrl(
+        ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE,
+        {
+          classroom_url_fragment: this.classroomUrlFragment,
+          topic_url_fragment: this.topicUrlFragment,
+        }
+      ),
+      '_self'
+    );
+  }
+
+  openPracticeMenu(): void {
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return;
+    }
+    this.windowRef.nativeWindow.open(
+      this.urlInterpolationService.interpolateUrl(
+        ClassroomDomainConstants.TOPIC_VIEWER_PRACTICE_URL_TEMPLATE,
+        {
+          classroom_url_fragment: this.classroomUrlFragment,
+          topic_url_fragment: this.topicUrlFragment,
+        }
+      ),
+      '_self'
     );
   }
 }
