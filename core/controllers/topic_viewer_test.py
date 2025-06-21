@@ -176,18 +176,32 @@ class TopicPageDataHandlerTests(
         self.assertDictContainsSubset(expected_dict, json_response)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com'
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+            (
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID,
+                'dev-project-id'
+            )
+        ]
     )
     def test_get_with_user_logged_in(self) -> None:
         skill_services.delete_skill(self.admin_id, self.skill_id_1)
         self.login(self.NEW_USER_EMAIL)
-        messages = self._get_sent_email_messages(
-            feconf.ADMIN_EMAIL_ADDRESS)
+        admin_email_address = 'testadmin@example.com'
+        messages = self._get_sent_email_messages(admin_email_address)
         self.assertEqual(len(messages), 0)
         json_response = self.get_json(
             '%s/staging/%s' % (feconf.TOPIC_DATA_HANDLER, 'public'))
-        messages = self._get_sent_email_messages(
-            feconf.ADMIN_EMAIL_ADDRESS)
+        messages = self._get_sent_email_messages(admin_email_address)
         expected_email_html_body = (
             'The deleted skills: %s are still'
             ' present in topic with id %s' % (
