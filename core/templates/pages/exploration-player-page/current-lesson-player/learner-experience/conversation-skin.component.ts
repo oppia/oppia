@@ -122,7 +122,6 @@ export class ConversationSkinComponent {
   hasFullyLoaded = false;
   recommendedExplorationSummaries: LearnerExplorationSummary[] = [];
   answerIsCorrect = false;
-  nextCard;
   alertMessage = {};
   pendingCardWasSeenBefore: boolean = false;
   OPPIA_AVATAR_IMAGE_URL: string;
@@ -346,9 +345,10 @@ export class ConversationSkinComponent {
           if (!this._editorPreviewMode) {
             this.imagePreloaderService.onStateChange(newStateName);
           }
+          let nextCard = this.conversationFlowService.getNextStateCard();
           // Ensure the transition to a terminal state properly logs
           // the end of the exploration.
-          if (!this._editorPreviewMode && this.nextCard.isTerminal()) {
+          if (!this._editorPreviewMode && nextCard.isTerminal()) {
             const currentEngineService =
               this.currentEngineService.getCurrentEngineService();
             this.statsReportingService.recordExplorationCompleted(
@@ -954,7 +954,9 @@ export class ConversationSkinComponent {
 
   triggerRedirectionToStuckState(): void {
     // Redirect the learner.
-    this.nextCard = this.conversationFlowService.getNextCardIfStuck();
+    this.conversationFlowService.setNextStateCard(
+      this.conversationFlowService.getNextCardIfStuck()
+    );
     this.showInteraction = false;
     this.showPendingCard();
   }
@@ -963,12 +965,15 @@ export class ConversationSkinComponent {
     this.loaderService.hideLoadingScreen();
   }
 
-  private _initializeDirectiveComponents(initialCard, focusLabel): void {
+  private _initializeDirectiveComponents(
+    initialCard: StateCard,
+    focusLabel
+  ): void {
     this._addNewCard(initialCard);
-    this.nextCard = initialCard;
+    this.conversationFlowService.setNextStateCard(initialCard);
     if (!this.explorationModeService.isInDiagnosticTestPlayerMode()) {
       this.conversationFlowService.onPlayerStateChange.emit(
-        this.nextCard.getStateName()
+        initialCard.getStateName()
       );
     }
 
@@ -1015,7 +1020,7 @@ export class ConversationSkinComponent {
 
   skipCurrentQuestion(): void {
     this.diagnosticTestPlayerEngineService.skipCurrentQuestion(nextCard => {
-      this.nextCard = nextCard;
+      this.conversationFlowService.setNextStateCard(nextCard);
       this.showPendingCard();
     });
   }
@@ -1125,7 +1130,7 @@ export class ConversationSkinComponent {
         nextCardIfReallyStuck,
         focusLabel
       ) => {
-        this.nextCard = nextCard;
+        this.conversationFlowService.setNextStateCard(nextCard);
         this.conversationFlowService.setNextCardIfStuck(nextCardIfReallyStuck);
         if (
           !this._editorPreviewMode &&
@@ -1208,7 +1213,7 @@ export class ConversationSkinComponent {
               refresherExplorationId
             );
           } else {
-            this.moveToNewCard(feedbackHtml, isFinalQuestion, nextCard);
+            this.moveToNewCard(feedbackHtml, isFinalQuestion);
           }
           this.answerIsBeingProcessed = false;
         }, millisecsLeftToWait);
@@ -1296,11 +1301,7 @@ export class ConversationSkinComponent {
     this.scrollToBottom();
   }
 
-  private moveToNewCard(
-    feedbackHtml: string | null,
-    isFinalQuestion: boolean,
-    nextCard: StateCard
-  ) {
+  private moveToNewCard(feedbackHtml: string | null, isFinalQuestion: boolean) {
     // There is a new card. If there is no feedback, move on
     // immediately. Otherwise, give the learner a chance to read
     // the feedback, and display a 'Continue' button.
@@ -1329,12 +1330,13 @@ export class ConversationSkinComponent {
     this.fatigueDetectionService.reset();
     this.numberAttemptsService.reset();
 
-    let _isNextInteractionInline = this.nextCard.isInteractionInline();
+    let nextCard = this.conversationFlowService.getNextStateCard();
+    let _isNextInteractionInline = nextCard.isInteractionInline();
     this.upcomingInlineInteractionHtml = _isNextInteractionInline
-      ? this.nextCard.getInteractionHtml()
+      ? nextCard.getInteractionHtml()
       : '';
     this.upcomingInteractionInstructions =
-      this.nextCard.getInteractionInstructions();
+      nextCard.getInteractionInstructions();
 
     if (feedbackHtml) {
       if (
@@ -1373,7 +1375,8 @@ export class ConversationSkinComponent {
 
     setTimeout(
       () => {
-        this._addNewCard(this.nextCard);
+        let nextCard = this.conversationFlowService.getNextStateCard();
+        this._addNewCard(nextCard);
 
         this.upcomingInlineInteractionHtml = null;
         this.upcomingInteractionInstructions = null;
@@ -1399,7 +1402,8 @@ export class ConversationSkinComponent {
         TIME_PADDING_MSEC
     );
 
-    this.playerPositionService.onNewCardOpened.emit(this.nextCard);
+    let nextCard = this.conversationFlowService.getNextStateCard();
+    this.playerPositionService.onNewCardOpened.emit(nextCard);
   }
 
   showUpcomingCard(): void {
@@ -1428,9 +1432,10 @@ export class ConversationSkinComponent {
       );
       return;
     }
+    let nextCard = this.conversationFlowService.getNextStateCard();
     if (
       this.displayedCard.isCompleted() &&
-      this.nextCard.getStateName() === this.displayedCard.getStateName() &&
+      nextCard.getStateName() === this.displayedCard.getStateName() &&
       this.conceptCard
     ) {
       this.conversationFlowService.recordNewCardAdded();
@@ -1448,7 +1453,7 @@ export class ConversationSkinComponent {
     if (this.isLearnAgainButton()) {
       const indexOfRevisionCard =
         this.playerTranscriptService.findIndexOfLatestStateWithName(
-          this.nextCard.getStateName()
+          nextCard.getStateName()
         );
       if (indexOfRevisionCard !== null) {
         this.displayedCard.markAsNotCompleted();

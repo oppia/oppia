@@ -37,6 +37,7 @@ export class ConversationFlowService {
   nextCardIfStuck: StateCard | null;
   solutionForState: Solution | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
+  nextStateCard: StateCard | null = null;
   private _playerStateChangeEventEmitter: EventEmitter<string> =
     new EventEmitter<string>();
 
@@ -93,6 +94,104 @@ export class ConversationFlowService {
   }
 
   /**
+   * Triggers the stuck learner logic, based on either a delayed timer
+   * (e.g., 150 seconds of inactivity) or immediately if not delayed.
+   *
+   * This method is responsible for determining whether the "Continue"
+   * button should be shown to help the learner move forward if they are stuck.
+   *
+   * --- Trigger Conditions ---
+   * • When a new card is opened:
+   *    – Starts a 150-second timer.
+   *    – If hints are available but not fully consumed, and the learner
+   *      hasn't answered the question, the "Continue" button is shown
+   *      after the timeout.
+   *
+   * • After all hints are consumed:
+   *    – Timer is reset and restarted for 150 seconds.
+   *    – If the question remains unanswered after timeout, the
+   *      "Continue" button is shown.
+   *
+   * @param {boolean} isDelayed - Whether to wait before performing
+   *   the stuck check (typically true for inactivity-based triggers).
+   * @param {() => void} onShowContinueToReviseButton - Callback to display
+   *   the "Continue" button when the learner is deemed stuck.
+   */
+  triggerIfLearnerStuckAction(
+    isDelayed: boolean,
+    onShowContinueToReviseButton: () => void
+  ): void {
+    if (this.responseTimeout) {
+      clearTimeout(this.responseTimeout);
+      this.responseTimeout = null;
+    }
+
+    if (isDelayed) {
+      this.responseTimeout = setTimeout(() => {
+        this._performStuckCheck(onShowContinueToReviseButton);
+      }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
+    } else {
+      this._performStuckCheck(onShowContinueToReviseButton);
+    }
+  }
+
+  /**
+   * Performs the stuck check logic. If the learner is stuck on the card and
+   * a stuck state card (`nextCardIfStuck`) exists, shows a redirection message
+   * and invokes the callback to display the revision button.
+   *
+   * Alternatively, if the learner has reached the maximum number of incorrect
+   * attempts, the solution is revealed (if available).
+   *
+   * @param {() => void} onShowContinueToReviseButton - Callback to show
+   *   the "Continue to revise" button.
+   */
+  private _performStuckCheck(onShowContinueToReviseButton: () => void): void {
+    const numberOfIncorrectSubmissions =
+      this.playerTranscriptService.getNumberOfIncorrectSubmissions();
+
+    if (
+      this.nextCardIfStuck &&
+      this.nextCardIfStuck !== this._getCurrentCard()
+    ) {
+      this.playerTranscriptService.addNewResponseToExistingFeedback(
+        this.translateService.instant('I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
+      );
+      onShowContinueToReviseButton();
+    } else if (
+      this.solutionForState !== null &&
+      numberOfIncorrectSubmissions >=
+        ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION
+    ) {
+      this.hintsAndSolutionManagerService.releaseSolution();
+    }
+  }
+
+  /**
+   * Returns the currently displayed state card based on the
+   * learner's current position in the transcript.
+   *
+   * @returns {StateCard} The currently displayed exploration card.
+   */
+  private _getCurrentCard(): StateCard {
+    let index = this.playerPositionService.getDisplayedCardIndex();
+    let displayedCard = this.playerTranscriptService.getCard(index);
+    return displayedCard;
+  }
+
+  get onPlayerStateChange(): EventEmitter<string> {
+    return this._playerStateChangeEventEmitter;
+  }
+
+  get onOppiaFeedbackAvailable(): EventEmitter<void> {
+    return this._oppiaFeedbackAvailableEventEmitter;
+  }
+
+  get onShowProgressModal(): EventEmitter<boolean> {
+    return this._playerProgressModalShownEventEmitter;
+  }
+
+  /**
    * Retrieves the next card to be displayed if the user is stuck.
    * This card will be shown when the user is unable to progress further.
    *
@@ -130,60 +229,21 @@ export class ConversationFlowService {
     return this.solutionForState;
   }
 
-  triggerIfLearnerStuckAction(
-    isDelayed: boolean,
-    onShowContinueToReviseButton: () => void
-  ): void {
-    if (this.responseTimeout) {
-      clearTimeout(this.responseTimeout);
-      this.responseTimeout = null;
-    }
-
-    if (isDelayed) {
-      this.responseTimeout = setTimeout(() => {
-        this._performStuckCheck(onShowContinueToReviseButton);
-      }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
-    } else {
-      this._performStuckCheck(onShowContinueToReviseButton);
-    }
+  /**
+   * Retrieves the next state card to be displayed.
+   *
+   * @returns {StateCard | null} The next state card, or null if none is set.
+   */
+  getNextStateCard(): StateCard | null {
+    return this.nextStateCard;
   }
 
-  private _performStuckCheck(onShowContinueToReviseButton: () => void): void {
-    const numberOfIncorrectSubmissions =
-      this.playerTranscriptService.getNumberOfIncorrectSubmissions();
-
-    if (
-      this.nextCardIfStuck &&
-      this.nextCardIfStuck !== this._getCurrentCard()
-    ) {
-      this.playerTranscriptService.addNewResponseToExistingFeedback(
-        this.translateService.instant('I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
-      );
-      onShowContinueToReviseButton();
-    } else if (
-      this.solutionForState !== null &&
-      numberOfIncorrectSubmissions >=
-        ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION
-    ) {
-      this.hintsAndSolutionManagerService.releaseSolution();
-    }
-  }
-
-  private _getCurrentCard(): StateCard {
-    let index = this.playerPositionService.getDisplayedCardIndex();
-    let displayedCard = this.playerTranscriptService.getCard(index);
-    return displayedCard;
-  }
-
-  get onPlayerStateChange(): EventEmitter<string> {
-    return this._playerStateChangeEventEmitter;
-  }
-
-  get onOppiaFeedbackAvailable(): EventEmitter<void> {
-    return this._oppiaFeedbackAvailableEventEmitter;
-  }
-
-  get onShowProgressModal(): EventEmitter<boolean> {
-    return this._playerProgressModalShownEventEmitter;
+  /**
+   * Sets the next state card to be displayed.
+   *
+   * @param {StateCard | null} card - The next state card to set, or null if none.
+   */
+  setNextStateCard(card: StateCard | null): void {
+    this.nextStateCard = card;
   }
 }
