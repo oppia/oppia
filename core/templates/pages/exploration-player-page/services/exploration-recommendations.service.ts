@@ -85,19 +85,22 @@ export class ExplorationRecommendationsService {
   }
 
   /**
-   * Constructs and returns a URL to the recommended exploration,
-   * including any necessary contextual parameters such as collection ID,
-   * story URL fragments, and parent exploration IDs.
+   * Generates a navigable URL to a recommended exploration, including
+   * optional context parameters like collection ID, topic, classroom, and story.
    *
-   * The link supports multiple contexts in which a learner might encounter
-   * a recommended exploration, such as from a collection, a story chapter,
-   * or a topic/classroom page.
+   * This method is typically used to construct the link to the next
+   * recommended exploration in the learner view, preserving context
+   * from the current exploration if available.
    *
-   * @param recommendedExplorationSummaries - The backend dict representing the
-   *     recommended exploration, including its ID, parent explorations,
-   *     and next node ID if part of a story.
-   * @returns A fully constructed exploration URL with appropriate query parameters.
-   *          Returns '#' if the exploration ID is not available.
+   * @param {LearnerExplorationSummary[]} recommendedExplorationSummaries
+   *   An array of recommended exploration summaries. The method uses the
+   *   first element (index 0) to get the exploration ID and related metadata.
+   *
+   * @returns {string} A complete exploration URL with appropriate query
+   *   parameters, or `'#'` if no valid exploration ID is found.
+   *
+   * Example Output:
+   *   "/explore/exp123?topic_url_fragment=fractions&classroom_url_fragment=math&story_url_fragment=story-fractions&node_id=node_3"
    */
   getExplorationLink(
     recommendedExplorationSummaries: LearnerExplorationSummary[]
@@ -109,28 +112,11 @@ export class ExplorationRecommendationsService {
       } else {
         let result = '/explore/' + recommendedExplorationSummaries[0].id;
         let urlParams = this.urlService.getUrlParams();
-        let parentExplorationIds =
-          recommendedExplorationSummaries[0].parentExplorationIds;
-
         let collectionIdToAdd = collectionId;
         let storyUrlFragmentToAdd = null;
         let topicUrlFragment = null;
         let classroomUrlFragment = null;
-        // Replace the collection ID with the one in the URL if it
-        // exists in urlParams.
-        if (parentExplorationIds && urlParams.hasOwnProperty('collection_id')) {
-          collectionIdToAdd = urlParams.collection_id;
-        } else if (
-          this.urlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
-          recommendedExplorationSummaries[0].nextNodeId
-        ) {
-          storyUrlFragmentToAdd =
-            this.urlService.getStoryUrlFragmentFromLearnerUrl();
-          topicUrlFragment =
-            this.urlService.getTopicUrlFragmentFromLearnerUrl();
-          classroomUrlFragment =
-            this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-        } else if (
+        if (
           urlParams.hasOwnProperty('story_url_fragment') &&
           urlParams.hasOwnProperty('node_id') &&
           urlParams.hasOwnProperty('topic_url_fragment') &&
@@ -148,15 +134,7 @@ export class ExplorationRecommendationsService {
             collectionIdToAdd
           );
         }
-        if (parentExplorationIds) {
-          for (let i = 0; i < parentExplorationIds.length - 1; i++) {
-            result = this.urlService.addField(
-              result,
-              'parent',
-              parentExplorationIds[i]
-            );
-          }
-        }
+
         if (storyUrlFragmentToAdd && this.recommendedStoryNodeId) {
           result = this.urlService.addField(
             result,

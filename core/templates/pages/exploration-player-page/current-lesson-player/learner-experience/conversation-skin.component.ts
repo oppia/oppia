@@ -31,7 +31,6 @@ import {ExplorationEngineService} from '../../services/exploration-engine.servic
 import {ExplorationRecommendationsService} from '../../services/exploration-recommendations.service';
 import {FatigueDetectionService} from '../../services/fatigue-detection.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {GuestCollectionProgressService} from 'domain/collection/guest-collection-progress.service';
 import {HintsAndSolutionManagerService} from '../../services/hints-and-solution-manager.service';
 import {
   I18nLanguageCodeService,
@@ -80,7 +79,6 @@ import {ProgressUrlService} from 'pages/exploration-player-page/services/progres
 import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 import {TranslateService} from '@ngx-translate/core';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {DiagnosticTestPlayerEngineService} from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
@@ -219,7 +217,6 @@ export class ConversationSkinComponent {
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private checkpointProgressService: CheckpointProgressService,
-    private translateService: TranslateService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
     private conversationFlowService: ConversationFlowService,
     private voiceoverPlayerService: VoiceoverPlayerService
