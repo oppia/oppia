@@ -347,11 +347,16 @@ def delete_classroom(classroom_id: str) -> None:
         classroom_id: str. ID of the classroom which is to be deleted.
     """
     classrooms = get_all_classrooms()
+    index_to_delete = None
 
     for classroom in classrooms:
         if classroom.classroom_id == classroom_id:
             index_to_delete = classroom.index
             break
+
+    if index_to_delete is None:
+        raise Exception(
+            'Classroom with id %s does not exist.' % classroom_id)
 
     for classroom in classrooms:
         if classroom.index > index_to_delete:
