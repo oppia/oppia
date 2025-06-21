@@ -156,7 +156,6 @@ export class ConversationSkinComponent {
   moveToExploration: boolean;
   upcomingInteractionInstructions;
   visitedCheckpointStateNames: string[] = [];
-  completedStateNames: string[] = [];
   prevSessionStatesProgress: string[] = [];
   mostRecentlyReachedCheckpoint: string;
   numberOfIncorrectSubmissions: number = 0;
@@ -597,20 +596,6 @@ export class ConversationSkinComponent {
       return false;
     }
     return this.pendingCardWasSeenBefore && !this.answerIsCorrect;
-  }
-
-  private _getRandomSuffix(): string {
-    // This is a bit of a hack. When a refresh to a component property
-    // happens, Angular compares the new value of the property to its previous
-    // value. If they are the same, then the property is not updated.
-    // Appending a random suffix makes the new value different from the
-    // previous one, and thus indirectly forces a refresh.
-    let randomSuffix = '';
-    let N = Math.round(Math.random() * 1000);
-    for (let i = 0; i < N; i++) {
-      randomSuffix += ' ';
-    }
-    return randomSuffix;
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -1434,7 +1419,8 @@ export class ConversationSkinComponent {
       // same type.
       this._nextFocusLabel = this.focusManagerService.generateFocusLabel();
       this.playerTranscriptService.updateLatestInteractionHtml(
-        this.displayedCard.getInteractionHtml() + this._getRandomSuffix()
+        this.displayedCard.getInteractionHtml() +
+          this.explorationEngineService.getRandomSuffix()
       );
     }
 
