@@ -21,14 +21,14 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {TestBed, waitForAsync} from '@angular/core/testing';
 
 import {ConversationFlowService} from './conversation-flow.service';
-import {StateCard} from 'domain/state_card/state-card.model';
+import {StateCard} from '../../../domain/state_card/state-card.model';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {ExplorationPlayerStateService} from './exploration-player-state.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {Interaction} from '../../../domain/exploration/InteractionObjectFactory';
 
 describe('Conversation flow service', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;

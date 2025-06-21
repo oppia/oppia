@@ -27,14 +27,14 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {
   AggregatedStats,
   StatsReportingBackendApiService,
-} from 'domain/exploration/stats-reporting-backend-api.service';
-import {ContextService} from 'services/context.service';
-import {UrlService} from 'services/contextual/url.service';
-import {MessengerService} from 'services/messenger.service';
-import {PlaythroughService} from 'services/playthrough.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
+} from '../../../domain/exploration/stats-reporting-backend-api.service';
+import {ContextService} from '../../../services/context.service';
+import {UrlService} from '../../../services/contextual/url.service';
+import {MessengerService} from '../../../services/messenger.service';
+import {PlaythroughService} from '../../../services/playthrough.service';
+import {SiteAnalyticsService} from '../../../services/site-analytics.service';
 import {StatsReportingService} from './stats-reporting.service';
-import {Stopwatch} from 'domain/utilities/stopwatch.model';
+import {Stopwatch} from '../../../domain/utilities/stopwatch.model';
 
 describe('Stats reporting service ', () => {
   let contextService: ContextService;
