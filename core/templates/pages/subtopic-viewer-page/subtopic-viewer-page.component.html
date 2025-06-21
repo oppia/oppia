@@ -40,9 +40,9 @@
           </oppia-rte-output-display>
         </div>
       </div>
-      <button class="btn btn-practice-section">
+      <button class="btn btn-next-actions btn-practice-section">
         <p class="text-practice-section-fixed">
-          <i class="material-icons">edit</i>
+          <i class="material-icons">edit_square</i>
           Go to practice section
         </p>
         <span class="practice-button-subtitle">Practice learned skills</span>
@@ -100,6 +100,9 @@
     width: 70%;
   }
   .content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     background-color: #fff;
     border-radius: 5px;
     padding: 30px 35px;
@@ -176,6 +179,8 @@
   }
 
   .btn-practice-section {
+    width: 200px;
+    align-self: center;
     color: #008098;
     border-radius: 4px;
     border-width: 1px;
