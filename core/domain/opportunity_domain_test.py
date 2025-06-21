@@ -372,3 +372,155 @@ class PinnedOpportunityDomainTest(test_utils.GenericTestBase):
             'topic_id': 'topic_id_1',
             'opportunity_id': 'opportunity_id1'
         })
+
+
+class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
+    """Tests for the TranslationOpportunity domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.mock_supported_audio_languages = [
+            {'id': 'en'},
+            {'id': 'hi'},
+            {'id': 'hi-en'}
+        ]
+        self.mock_supported_audio_languages_context = self.swap(
+            constants, 'SUPPORTED_AUDIO_LANGUAGES',
+            self.mock_supported_audio_languages)
+
+        self.valid_translation_opportunity_dict: (
+            opportunity_domain.TranslationOpportunityDict
+        ) = {
+            'topic_ids': ['topic_1'],
+            'entity_id': 'exploration_1',
+            'content_count': 5,
+            'incomplete_translation_language_codes': ['en', 'hi'],
+            'translation_counts': {'en': 2, 'hi': 1},
+            'entity_type': 'exploration'
+        }
+
+        with self.mock_supported_audio_languages_context:
+            self.valid_translation_opportunity = (
+                opportunity_domain.TranslationOpportunity.from_dict(
+                    self.valid_translation_opportunity_dict))
+
+    def test_to_and_from_dict_works_correctly(self) -> None:
+        with self.mock_supported_audio_languages_context:
+            opportunity = (
+                opportunity_domain.TranslationOpportunity.from_dict(
+                    self.valid_translation_opportunity_dict))
+
+        self.assertIsInstance(opportunity, opportunity_domain.TranslationOpportunity)
+        self.assertEqual(opportunity.to_dict(), self.valid_translation_opportunity_dict)
+
+    def test_negative_content_count_fails_validation_check(self) -> None:
+        self.valid_translation_opportunity.content_count = -1
+        self._assert_validation_error(
+            self.valid_translation_opportunity,
+            'Expected content_count to be a non-negative integer, received -1'
+        )
+
+    def test_invalid_entity_type_fails_validation(self) -> None:
+        self.valid_translation_opportunity.entity_type = 'invalid_entity'
+        self._assert_validation_error(
+            self.valid_translation_opportunity,
+            'Invalid entity_type: invalid_entity'
+        )
+
+    def test_invalid_language_code_in_incomplete_list_fails_validation(self) -> None:
+        self.valid_translation_opportunity.incomplete_translation_language_codes = ['xyz']
+        self._assert_validation_error(
+            self.valid_translation_opportunity,
+            'Invalid language_code in incomplete_translation_language_codes: xyz'
+        )
+
+    def test_invalid_language_code_in_translation_counts_fails_validation(self) -> None:
+        self.valid_translation_opportunity.translation_counts = {'bad-lang': 1}
+        self._assert_validation_error(
+            self.valid_translation_opportunity,
+            'Invalid language_code in translation_counts: bad-lang'
+        )
+
+    def test_negative_translation_count_fails_validation(self) -> None:
+        self.valid_translation_opportunity.translation_counts = {'en': -3}
+        self._assert_validation_error(
+            self.valid_translation_opportunity,
+            'Expected translation count for language_code en to be '
+            'non-negative, received -3'
+        )
+
+    def test_translation_count_exceeds_content_count_fails_validation(self) -> None:
+        self.valid_translation_opportunity.translation_counts = {'en': 10}
+        self._assert_validation_error(
+            self.valid_translation_opportunity,
+            'Expected translation count for language_code en to be '
+            r'less than or equal to content_count\(5\), received 10'
+        )
+
+
+class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
+    """Tests for the TranslationOpportunityCardInfo domain object."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.mock_supported_audio_languages = [
+            {'id': 'en'},
+            {'id': 'hi'},
+            {'id': 'hi-en'}
+        ]
+        self.mock_supported_audio_languages_context = self.swap(
+            constants, 'SUPPORTED_AUDIO_LANGUAGES',
+            self.mock_supported_audio_languages)
+
+        self.valid_card_info_dict: opportunity_domain.TranslationOpportunityCardInfoDict = {
+            'topic_ids': ['topic_1'],
+            'entity_id': 'exploration_1',
+            'content_count': 5,
+            'incomplete_translation_language_codes': ['en'],
+            'translation_counts': {'en': 3},
+            'entity_type': 'exploration',
+            'topic_name': 'Fractions',
+            'entity_description': 'Introduction to Fractions',
+            'is_pinned': True,
+            'currently_available_to_learners': True
+        }
+
+        with self.mock_supported_audio_languages_context:
+            self.valid_card_info = (
+                opportunity_domain.TranslationOpportunityCardInfo.from_dict(
+                    self.valid_card_info_dict))
+
+    def test_to_and_from_dict_works_correctly(self) -> None:
+        with self.mock_supported_audio_languages_context:
+            card_info = opportunity_domain.TranslationOpportunityCardInfo.from_dict(
+                self.valid_card_info_dict)
+
+        self.assertIsInstance(
+            card_info, opportunity_domain.TranslationOpportunityCardInfo)
+
+        self.assertEqual(
+            card_info.to_dict(),
+            self.valid_card_info_dict
+        )
+
+    def test_inherited_validation_works_correctly(self) -> None:
+        with self.mock_supported_audio_languages_context:
+            # This should pass silently (no validation error).
+            opportunity_domain.TranslationOpportunityCardInfo.from_dict(
+                self.valid_card_info_dict)
+
+            # Now set an invalid value.
+            invalid_card_info_dict = self.valid_card_info_dict.copy()
+            invalid_card_info_dict['content_count'] = -2
+
+            invalid_card_info = (
+                opportunity_domain.TranslationOpportunityCardInfo.from_dict.__func__(
+                    opportunity_domain.TranslationOpportunityCardInfo,
+                    invalid_card_info_dict
+                )
+            )
+
+            self._assert_validation_error(
+                invalid_card_info,
+                'Expected content_count to be a non-negative integer, received -2'
+            )
