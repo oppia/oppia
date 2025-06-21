@@ -10,7 +10,7 @@
   </div>
 </div>
 
-<div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()">
+<div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container">
   <p class="content-title">{{ editableTitle }}</p>
   <div class="content-box">
     <div class="content">
@@ -80,6 +80,18 @@
     padding: 20px;
   }
 
+  .oppia-subtopic-viewer-container {
+    margin-top: 32px;
+  }
+
+  .oppia-subtopic-viewer-container {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 40px;
+    position: relative;
+    text-align: left;
+  }
+
   @media screen and (max-width: 1100px) {
     .content-box {
       width: 100%;
@@ -112,4 +124,10 @@
       padding: 15px;
     }
   }
+
+  @media screen and (max-width: 600px) {
+  .oppia-subtopic-viewer-container {
+    padding-top: 80px;
+  }
+}
 </style>

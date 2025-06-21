@@ -1,5 +1,5 @@
 <background-banner></background-banner>
-<div class="oppia-subtopic-viewer-container">
+<div *ngIf="!isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container">
   <div class="oppia-subtopic-viewer-container-card" tabindex="0">
     <div class="oppia-topic-title">
       <span *ngIf="!isHackyTopicTitleTranslationDisplayed()">
@@ -17,26 +17,55 @@
         {{ subtopicTitleTranslationKey | translate }}
       </span>
     </div>
-    <div *ngIf="!isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-page-contents-viewer">
+    <div class="oppia-page-contents-viewer">
       <div>
         <oppia-rte-output-display *ngIf="pageContents" [rteString]="pageContents.getHtml()">
         </oppia-rte-output-display>
       </div>
     </div>
-    <div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="content-box">
-      <div class="content">
-        <div class="card" *ngFor="let section of sections">
-          <div class="card-header">
-            <h3 class="card-title">{{ section.heading.unicode }}</h3>
-          </div>
-          <div class="card-content">
-            <oppia-rte-output-display [rteString]="section.content.html">
-            </oppia-rte-output-display>
-          </div>
+  </div>
+</div>
+
+<div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container">
+  <p *ngIf="!isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitle }}</p>
+  <p *ngIf="isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitleTranslationKey | translate }}</p>
+  <div class="content-box">
+    <div class="content">
+      <div class="card" *ngFor="let section of sections">
+        <div class="card-header">
+          <h3 class="card-title">{{ section.heading.unicode }}</h3>
+        </div>
+        <div class="card-content">
+          <oppia-rte-output-display [rteString]="section.content.html">
+          </oppia-rte-output-display>
         </div>
       </div>
+      <button class="btn btn-practice-section">
+        <p class="text-practice-section-fixed">
+          <i class="material-icons">edit</i>
+          Go to practice section
+        </p>
+        <span class="practice-button-subtitle">Practice learned skills</span>
+      </button>
     </div>
   </div>
+  <div class="next-actions-section">
+    <h4 class="next-actions-title">Here is what you can do next!</h4>
+    <div class="next-actions-buttons">
+      <button class="btn btn-next-actions btn-study-guide-menu">
+        <i class="material-icons icon-study-guide-menu">exit_to_app</i>
+        Go to revision menu
+      </button>
+      <button *ngIf="nextSubtopic" class="btn btn-next-actions btn-next-study-guide">
+        <p class="text-next-study-guide-fixed">
+          <i class="material-icons icon-next-study-guide">arrow_forward</i>
+          Next revision card
+        </p>
+        <span class="revision-subtitle">"{{ nextSubtopic.getTitle() }}"</span>
+      </button>
+    </div>
+  </div>
+</div>
 
   <div *ngIf="subtopicSummaryIsShown"
        class="oppia-subtopic-viewer-next-subtopic-summary pb-4"
@@ -76,6 +105,18 @@
     padding: 30px 35px;
     width: 65%;
   }
+  .content-title {
+    text-align: center;
+    color: #00645c;
+    display: block;
+    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-size: 30px;
+    margin-bottom: 15px;
+  }
+  .html-content {
+    background-color: #ecf5fc;
+    padding: 15px 25px;
+  }
   
   .card {
     background-color: #fff;
@@ -100,6 +141,54 @@
   .card-content {
     border: none !important;
     padding: 20px;
+  }
+
+  .next-actions-section {
+    margin-top: 10px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .btn-next-actions {
+    width: 180px;
+    height: 60px;
+    border-radius: 4px;
+    padding: 8px;
+    gap: 5px;
+    box-shadow: 0px 0px 10px 0px #00000026;
+  }
+
+  .btn-next-study-guide {
+    margin-left: 5px;
+    background-color: #0D48A1;
+    color: #fff;
+  }
+  .text-next-study-guide-fixed {
+    font-weight: 500;
+    margin: 0 !important;
+  }
+
+  .btn-study-guide-menu {
+    margin-right: 5px;
+    background-color: #E8F1F0;
+    border: 1px solid #00645C;
+  }
+
+  .btn-practice-section {
+    color: #008098;
+    border-radius: 4px;
+    border-width: 1px;
+    gap: 16px;
+    padding-right: 16px;
+    padding-left: 16px;
+    background-color: #F4FAFB;
+    border: 1px solid #008098;
+    box-shadow: 0px 0px 10px 0px #00000026;
+  }
+  .text-practice-section-fixed {
+    font-weight: 500;
+    margin: 0 !important;
   }
 
   @media screen and (max-width: 1100px) {

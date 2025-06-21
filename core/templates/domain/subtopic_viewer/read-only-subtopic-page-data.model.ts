@@ -103,9 +103,17 @@ export class ReadOnlySubtopicPageData {
     let prevSubtopic = subtopicDataBackendDict.prev_subtopic_dict
       ? Subtopic.create(subtopicDataBackendDict.prev_subtopic_dict, {})
       : null;
-    let sections = subtopicDataBackendDict.sections.map(section =>
-      StudyGuideSection.createFromBackendDict(section)
-    );
+    let sections = [];
+    let pageContents: SubtopicPageContents;
+    if (subtopicDataBackendDict.sections) {
+      sections = subtopicDataBackendDict.sections.map(section =>
+        StudyGuideSection.createFromBackendDict(section)
+      );
+    } else {
+      SubtopicPageContents.createFromBackendDict(
+        subtopicDataBackendDict.page_contents
+      );
+    }
     return new ReadOnlySubtopicPageData(
       subtopicDataBackendDict.topic_id,
       subtopicDataBackendDict.topic_name,
@@ -113,9 +121,7 @@ export class ReadOnlySubtopicPageData {
       nextSubtopic,
       prevSubtopic,
       sections,
-      SubtopicPageContents.createFromBackendDict(
-        subtopicDataBackendDict.page_contents
-      )
+      pageContents
     );
   }
 }
