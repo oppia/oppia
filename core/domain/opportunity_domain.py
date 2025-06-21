@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core import utils
 from core.constants import constants
 
@@ -448,9 +449,7 @@ class TranslationOpportunity:
                 'Expected content_count to be a non-negative integer, '
                 'received %s' % self.content_count)
 
-        if self.entity_type not in [
-            'exploration', 'skill', 'topic', 'story', 'classroom'
-        ]:
+        if self.entity_type not in feconf.TRANSLATABLE_ENTITY_TYPES:
             raise utils.ValidationError(
                 'Invalid entity_type: %s' % self.entity_type)
 
