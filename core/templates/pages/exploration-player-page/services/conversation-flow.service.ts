@@ -24,11 +24,19 @@ import {ContentTranslationLanguageService} from './content-translation-language.
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {CurrentEngineService} from './current-engine.service';
+import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
+import {TranslateService} from '@ngx-translate/core';
+import {HintsAndSolutionManagerService} from './hints-and-solution-manager.service';
+import {PlayerPositionService} from './player-position.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ConversationFlowService {
+  nextCardIfStuck: StateCard | null;
+  solutionForState: Solution | null = null;
+  responseTimeout: NodeJS.Timeout | null = null;
   private _playerStateChangeEventEmitter: EventEmitter<string> =
     new EventEmitter<string>();
 
@@ -42,7 +50,10 @@ export class ConversationFlowService {
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private playerTranscriptService: PlayerTranscriptService,
-    private currentEngineService: CurrentEngineService
+    private playerPositionService: PlayerPositionService,
+    private currentEngineService: CurrentEngineService,
+    private translateService: TranslateService,
+    private hintsAndSolutionManagerService: HintsAndSolutionManagerService
   ) {}
 
   addNewCard(newCard: StateCard): void {
@@ -61,16 +72,107 @@ export class ConversationFlowService {
     return !card.isInteractionInline();
   }
 
+  /**
+   * Records the addition of a new card in the current engine service.
+   */
   recordNewCardAdded(): void {
     let currentEngineService =
       this.currentEngineService.getCurrentEngineService();
     return currentEngineService.recordNewCardAdded();
   }
 
+  /**
+   * Retrieves the language code of the exploration from the current engine service.
+   *
+   * @returns {string} The language code of the exploration.
+   */
   getLanguageCode(): string {
     let currentEngineService =
       this.currentEngineService.getCurrentEngineService();
     return currentEngineService.getLanguageCode();
+  }
+
+  /**
+   * Retrieves the next card to be displayed if the user is stuck.
+   * This card will be shown when the user is unable to progress further.
+   *
+   * @returns {StateCard | null} The next card if stuck, or null if none is set.
+   */
+  getNextCardIfStuck(): StateCard | null {
+    return this.nextCardIfStuck;
+  }
+
+  /**
+   * Sets the next card to be displayed if the user is stuck.
+   * This card will be shown when the user is unable to progress further.
+   *
+   * @param {StateCard | null} card - The card to set as the next card if stuck.
+   */
+  setNextCardIfStuck(card: StateCard | null): void {
+    this.nextCardIfStuck = card;
+  }
+
+  /**
+   * Sets the solution for the current state.
+   *
+   * @param {Solution | null} solution - The solution to set for the current state.
+   */
+  setSolutionForState(solution: Solution | null): void {
+    this.solutionForState = solution;
+  }
+
+  /**
+   * Retrieves the solution for the current state.
+   *
+   * @returns {Solution | null} The solution for the current state, or null if none is set.
+   */
+  getSolutionForState(): Solution | null {
+    return this.solutionForState;
+  }
+
+  triggerIfLearnerStuckAction(
+    isDelayed: boolean,
+    onShowContinueToReviseButton: () => void
+  ): void {
+    if (this.responseTimeout) {
+      clearTimeout(this.responseTimeout);
+      this.responseTimeout = null;
+    }
+
+    if (isDelayed) {
+      this.responseTimeout = setTimeout(() => {
+        this._performStuckCheck(onShowContinueToReviseButton);
+      }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
+    } else {
+      this._performStuckCheck(onShowContinueToReviseButton);
+    }
+  }
+
+  private _performStuckCheck(onShowContinueToReviseButton: () => void): void {
+    const numberOfIncorrectSubmissions =
+      this.playerTranscriptService.getNumberOfIncorrectSubmissions();
+
+    if (
+      this.nextCardIfStuck &&
+      this.nextCardIfStuck !== this._getCurrentCard()
+    ) {
+      this.playerTranscriptService.addNewResponseToExistingFeedback(
+        this.translateService.instant('I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
+      );
+      onShowContinueToReviseButton();
+    } else if (
+      this.solutionForState !== null &&
+      numberOfIncorrectSubmissions >=
+        ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION
+    ) {
+      this.hintsAndSolutionManagerService.releaseSolution();
+    }
+  }
+
+  private _getCurrentCard(): StateCard {
+    let index = this.playerPositionService.getDisplayedCardIndex();
+    let displayedCard = this.playerTranscriptService.getCard(index);
+    return displayedCard;
   }
 
   get onPlayerStateChange(): EventEmitter<string> {

@@ -67,10 +67,7 @@ import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domai
 import {StoryViewerDomainConstants} from 'domain/story_viewer/story-viewer-domain.constants';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {CollectionPlayerBackendApiService} from 'pages/collection-player-page/services/collection-player-backend-api.service';
-import {
-  ExplorationSummaryBackendApiService,
-  ExplorationSummaryBackendDict,
-} from 'domain/summary/exploration-summary-backend-api.service';
+import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -128,13 +125,11 @@ export class ConversationSkinComponent {
   recommendedExplorationSummaries: LearnerExplorationSummary[] = [];
   answerIsCorrect = false;
   nextCard;
-  nextCardIfStuck: StateCard | null;
   alertMessage = {};
   pendingCardWasSeenBefore: boolean = false;
   OPPIA_AVATAR_IMAGE_URL: string;
   displayedCard: StateCard;
   upcomingInlineInteractionHtml;
-  responseTimeout: NodeJS.Timeout | null = null;
   correctnessFooterIsShown: boolean = true;
 
   // If the exploration is iframed, send data to its parent about
@@ -155,7 +150,6 @@ export class ConversationSkinComponent {
   visitedCheckpointStateNames: string[] = [];
   prevSessionStatesProgress: string[] = [];
   mostRecentlyReachedCheckpoint: string;
-  numberOfIncorrectSubmissions: number = 0;
   showProgressClearanceMessage: boolean = false;
 
   // 'completedChaptersCount' is fetched via a HTTP request.
@@ -164,9 +158,7 @@ export class ConversationSkinComponent {
   chapterIsCompletedForTheFirstTime: boolean = false;
   pidInUrl: string;
   submitButtonIsDisabled = true;
-  solutionForState: Solution | null = null;
   isLearnerReallyStuck: boolean = false;
-  continueToReviseStateButtonIsVisible: boolean = false;
   showInteraction: boolean = true;
 
   // The fields are used to customize the component for the diagnostic player,
@@ -177,6 +169,9 @@ export class ConversationSkinComponent {
   navigationThroughCardHistoryIsEnabled: boolean = true;
   checkpointCelebrationModalIsEnabled: boolean = true;
   skipButtonIsShown: boolean = false;
+
+  // Finalized state for the component.
+  continueToReviseStateButtonIsVisible: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -195,7 +190,6 @@ export class ConversationSkinComponent {
     private fatigueDetectionService: FatigueDetectionService,
     private focusManagerService: FocusManagerService,
     private explorationInitializationService: ExplorationInitializationService,
-    private guestCollectionProgressService: GuestCollectionProgressService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
     private conceptCardManagerService: ConceptCardManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -307,31 +301,41 @@ export class ConversationSkinComponent {
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
         (newCard: StateCard) => {
-          this.solutionForState = newCard.getSolution();
-          this.numberOfIncorrectSubmissions = 0;
-          this.nextCardIfStuck = null;
+          this.conversationFlowService.setSolutionForState(
+            newCard.getSolution()
+          );
+          this.playerTranscriptService.resetNumberOfIncorrectSubmissions();
+          this.conversationFlowService.setNextCardIfStuck(null);
           this.continueToReviseStateButtonIsVisible = false;
-          this.triggerIfLearnerStuckAction();
+          this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
+            this.continueToReviseStateButtonIsVisible = true;
+          });
         }
       )
     );
 
     this.directiveSubscriptions.add(
       this.hintsAndSolutionManagerService.onLearnerReallyStuck.subscribe(() => {
-        this.triggerIfLearnerStuckActionDirectly();
+        this.conversationFlowService.triggerIfLearnerStuckAction(false, () => {
+          this.continueToReviseStateButtonIsVisible = true;
+        });
       })
     );
 
     this.directiveSubscriptions.add(
       this.hintsAndSolutionManagerService.onHintsExhausted.subscribe(() => {
-        this.triggerIfLearnerStuckAction();
+        this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
+          this.continueToReviseStateButtonIsVisible = true;
+        });
       })
     );
 
     this.directiveSubscriptions.add(
       this.conceptCardManagerService.onLearnerGetsReallyStuck.subscribe(() => {
         this.isLearnerReallyStuck = true;
-        this.triggerIfLearnerStuckActionDirectly();
+        this.conversationFlowService.triggerIfLearnerStuckAction(false, () => {
+          this.continueToReviseStateButtonIsVisible = true;
+        });
       })
     );
 
@@ -359,20 +363,6 @@ export class ConversationSkinComponent {
               String(this.playerTranscriptService.getNumCards()),
               currentEngineService.getLanguageCode()
             );
-
-            // If the user is a guest, has completed this exploration
-            // within the context of a collection, and the collection is
-            // allowlisted, record their temporary progress.
-
-            if (
-              this.doesCollectionAllowsGuestProgress(collectionId) &&
-              !this.isLoggedIn
-            ) {
-              this.guestCollectionProgressService.recordExplorationCompletedInCollection(
-                collectionId,
-                this.explorationId
-              );
-            }
 
             // For single state explorations, when the exploration
             // reachesthe terminal state and explorationActuallyStarted
@@ -486,15 +476,6 @@ export class ConversationSkinComponent {
           });
       }
     });
-  }
-
-  doesCollectionAllowsGuestProgress(collectionId: string | never): boolean {
-    let allowedCollectionIds =
-      AppConstants.ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS;
-    return (
-      (allowedCollectionIds as readonly []).indexOf(collectionId as never) !==
-      -1
-    );
   }
 
   isSubmitButtonDisabled(): boolean {
@@ -974,59 +955,9 @@ export class ConversationSkinComponent {
     }
   }
 
-  triggerIfLearnerStuckAction(): void {
-    if (this.responseTimeout) {
-      clearTimeout(this.responseTimeout);
-      this.responseTimeout = null;
-    }
-    this.responseTimeout = setTimeout(() => {
-      if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
-        // Let the learner know about the redirection to a state
-        // for clearing concepts.
-        this.playerTranscriptService.addNewResponseToExistingFeedback(
-          this.translateService.instant(
-            'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'
-          )
-        );
-        // Enable visibility of ContinueToRevise button.
-        this.continueToReviseStateButtonIsVisible = true;
-      } else if (
-        this.solutionForState !== null &&
-        this.numberOfIncorrectSubmissions >=
-          ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION
-      ) {
-        // Release solution if no separate state for addressing
-        // the stuck learner exists and the solution exists.
-        this.hintsAndSolutionManagerService.releaseSolution();
-      }
-    }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
-  }
-
-  triggerIfLearnerStuckActionDirectly(): void {
-    if (this.responseTimeout) {
-      clearTimeout(this.responseTimeout);
-      this.responseTimeout = null;
-    }
-    // Directly trigger action for the really stuck learner.
-    if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
-      this.playerTranscriptService.addNewResponseToExistingFeedback(
-        this.translateService.instant('I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
-      );
-      // Enable visibility of ContinueToRevise button.
-      this.continueToReviseStateButtonIsVisible = true;
-    } else if (
-      this.solutionForState !== null &&
-      this.numberOfIncorrectSubmissions >=
-        ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION
-    ) {
-      // Release solution if it exists.
-      this.hintsAndSolutionManagerService.releaseSolution();
-    }
-  }
-
   triggerRedirectionToStuckState(): void {
     // Redirect the learner.
-    this.nextCard = this.nextCardIfStuck;
+    this.nextCard = this.conversationFlowService.getNextCardIfStuck();
     this.showInteraction = false;
     this.showPendingCard();
   }
@@ -1198,7 +1129,7 @@ export class ConversationSkinComponent {
         focusLabel
       ) => {
         this.nextCard = nextCard;
-        this.nextCardIfStuck = nextCardIfReallyStuck;
+        this.conversationFlowService.setNextCardIfStuck(nextCardIfReallyStuck);
         if (
           !this._editorPreviewMode &&
           !this.explorationModeService.isPresentingIsolatedQuestions()
@@ -1305,7 +1236,7 @@ export class ConversationSkinComponent {
     refreshInteraction: boolean,
     refresherExplorationId: string | null
   ) {
-    this.numberOfIncorrectSubmissions++;
+    this.playerTranscriptService.incrementNumberOfIncorrectSubmissions();
     this.hintsAndSolutionManagerService.recordWrongAnswer();
     this.conceptCardManagerService.recordWrongAnswer();
     this.playerTranscriptService.addNewResponse(feedbackHtml);

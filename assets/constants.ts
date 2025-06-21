@@ -6144,8 +6144,6 @@ export default {
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 
-  "ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
-
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
   "MAX_CURRENT_GOALS_COUNT": 5,
