@@ -67,7 +67,10 @@ import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domai
 import {StoryViewerDomainConstants} from 'domain/story_viewer/story-viewer-domain.constants';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {CollectionPlayerBackendApiService} from 'pages/collection-player-page/services/collection-player-backend-api.service';
-import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
+import {
+  ExplorationSummaryBackendApiService,
+  ExplorationSummaryBackendDict,
+} from 'domain/summary/exploration-summary-backend-api.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
@@ -92,6 +95,10 @@ const TIME_FADEOUT_MSEC = 100;
 const TIME_HEIGHT_CHANGE_MSEC = 500;
 const TIME_FADEIN_MSEC = 100;
 const TIME_NUM_CARDS_CHANGE_MSEC = 500;
+const ALERT_MESSAGE_TIMEOUT = 6000;
+const TIME_PADDING_MSEC = 250;
+const TIME_SCROLL_MSEC = 600;
+const MIN_CARD_LOADING_DELAY_MSEC = 950;
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -103,30 +110,22 @@ export class ConversationSkinComponent {
   @Input() diagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
 
-  TIME_PADDING_MSEC = 250;
-  TIME_SCROLL_MSEC = 600;
-  MIN_CARD_LOADING_DELAY_MSEC = 950;
-
   hasInteractedAtLeastOnce: boolean = false;
   _nextFocusLabel = null;
   _editorPreviewMode;
   explorationActuallyStarted: boolean = false;
 
-  CONTINUE_BUTTON_FOCUS_LABEL =
-    ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL;
-
   isLoggedIn: boolean;
   voiceoversAreLoaded: boolean = false;
-  storyNodeIdToAdd: string;
+
   inStoryMode: boolean = false;
-  collectionId: string;
   collectionTitle: string;
   answerIsBeingProcessed: boolean = false;
   explorationId: string;
   isInPreviewMode: boolean;
   isIframed: boolean;
   hasFullyLoaded = false;
-  recommendedExplorationSummaries = [];
+  recommendedExplorationSummaries: LearnerExplorationSummary[] = [];
   answerIsCorrect = false;
   nextCard;
   nextCardIfStuck: StateCard | null;
@@ -137,8 +136,6 @@ export class ConversationSkinComponent {
   upcomingInlineInteractionHtml;
   responseTimeout: NodeJS.Timeout | null = null;
   correctnessFooterIsShown: boolean = true;
-  DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
-    AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 
   // If the exploration is iframed, send data to its parent about
   // its height so that the parent can be resized as necessary.
@@ -160,7 +157,7 @@ export class ConversationSkinComponent {
   mostRecentlyReachedCheckpoint: string;
   numberOfIncorrectSubmissions: number = 0;
   showProgressClearanceMessage: boolean = false;
-  alertMessageTimeout = 6000;
+
   // 'completedChaptersCount' is fetched via a HTTP request.
   // Until the response is received, it remains undefined.
   completedChaptersCount: number | undefined;
@@ -244,12 +241,12 @@ export class ConversationSkinComponent {
     this._editorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
 
-    this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+    let collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     this.pidInUrl = this.urlService.getPidFromUrl();
 
-    if (this.collectionId) {
+    if (collectionId) {
       this.readOnlyCollectionBackendApiService
-        .loadCollectionAsync(this.collectionId)
+        .loadCollectionAsync(collectionId)
         .then(collection => {
           this.collectionTitle = collection.getTitle();
         });
@@ -368,11 +365,11 @@ export class ConversationSkinComponent {
             // allowlisted, record their temporary progress.
 
             if (
-              this.doesCollectionAllowsGuestProgress(this.collectionId) &&
+              this.doesCollectionAllowsGuestProgress(collectionId) &&
               !this.isLoggedIn
             ) {
               this.guestCollectionProgressService.recordExplorationCompletedInCollection(
-                this.collectionId,
+                collectionId,
                 this.explorationId
               );
             }
@@ -440,9 +437,9 @@ export class ConversationSkinComponent {
 
       this.collectionSummary = null;
 
-      if (this.collectionId) {
+      if (collectionId) {
         this.collectionPlayerBackendApiService
-          .fetchCollectionSummariesAsync(this.collectionId)
+          .fetchCollectionSummariesAsync(collectionId)
           .then(response => {
             this.collectionSummary = response.summaries[0];
           })
@@ -634,88 +631,9 @@ export class ConversationSkinComponent {
   }
 
   getExplorationLink(): string {
-    if (
-      this.recommendedExplorationSummaries &&
-      this.recommendedExplorationSummaries[0]
-    ) {
-      if (!this.recommendedExplorationSummaries[0].id) {
-        return '#';
-      } else {
-        let result = '/explore/' + this.recommendedExplorationSummaries[0].id;
-        let urlParams = this.urlService.getUrlParams();
-        let parentExplorationIds =
-          this.recommendedExplorationSummaries[0].parentExplorationIds;
-
-        let collectionIdToAdd = this.collectionId;
-        let storyUrlFragmentToAdd = null;
-        let topicUrlFragment = null;
-        let classroomUrlFragment = null;
-        // Replace the collection ID with the one in the URL if it
-        // exists in urlParams.
-        if (parentExplorationIds && urlParams.hasOwnProperty('collection_id')) {
-          collectionIdToAdd = urlParams.collection_id;
-        } else if (
-          this.urlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
-          this.recommendedExplorationSummaries[0].nextNodeId
-        ) {
-          storyUrlFragmentToAdd =
-            this.urlService.getStoryUrlFragmentFromLearnerUrl();
-          topicUrlFragment =
-            this.urlService.getTopicUrlFragmentFromLearnerUrl();
-          classroomUrlFragment =
-            this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-        } else if (
-          urlParams.hasOwnProperty('story_url_fragment') &&
-          urlParams.hasOwnProperty('node_id') &&
-          urlParams.hasOwnProperty('topic_url_fragment') &&
-          urlParams.hasOwnProperty('classroom_url_fragment')
-        ) {
-          topicUrlFragment = urlParams.topic_url_fragment;
-          classroomUrlFragment = urlParams.classroom_url_fragment;
-          storyUrlFragmentToAdd = urlParams.story_url_fragment;
-        }
-
-        if (collectionIdToAdd) {
-          result = this.urlService.addField(
-            result,
-            'collection_id',
-            collectionIdToAdd
-          );
-        }
-        if (parentExplorationIds) {
-          for (let i = 0; i < parentExplorationIds.length - 1; i++) {
-            result = this.urlService.addField(
-              result,
-              'parent',
-              parentExplorationIds[i]
-            );
-          }
-        }
-        if (storyUrlFragmentToAdd && this.storyNodeIdToAdd) {
-          result = this.urlService.addField(
-            result,
-            'topic_url_fragment',
-            topicUrlFragment
-          );
-          result = this.urlService.addField(
-            result,
-            'classroom_url_fragment',
-            classroomUrlFragment
-          );
-          result = this.urlService.addField(
-            result,
-            'story_url_fragment',
-            storyUrlFragmentToAdd
-          );
-          result = this.urlService.addField(
-            result,
-            'node_id',
-            this.storyNodeIdToAdd
-          );
-        }
-        return result;
-      }
-    }
+    return this.explorationRecommendationsService.getExplorationLink(
+      this.recommendedExplorationSummaries
+    );
   }
 
   reloadExploration(): void {
@@ -819,7 +737,7 @@ export class ConversationSkinComponent {
             if (alertInfoElement) {
               alertInfoElement.remove();
             }
-          }, this.alertMessageTimeout);
+          }, ALERT_MESSAGE_TIMEOUT);
         }
 
         // Move to most recently reached checkpoint card.
@@ -975,7 +893,9 @@ export class ConversationSkinComponent {
             let nextStoryNode: LearnerExplorationSummary[] = [];
             for (let i = 0; i < res.nodes.length; i++) {
               if (res.nodes[i].id === nodeId && i + 1 < res.nodes.length) {
-                this.storyNodeIdToAdd = res.nodes[i].destinationNodeIds[0];
+                this.explorationRecommendationsService.setRecommendedStoryNodeId(
+                  res.nodes[i].destinationNodeIds[0]
+                );
                 nextStoryNode.push(res.nodes[i + 1].explorationSummary);
                 break;
               }
@@ -1049,7 +969,7 @@ export class ConversationSkinComponent {
           if (alertInfoElement) {
             alertInfoElement.remove();
           }
-        }, this.alertMessageTimeout);
+        }, ALERT_MESSAGE_TIMEOUT);
       }
     }
   }
@@ -1337,7 +1257,7 @@ export class ConversationSkinComponent {
           millisecsLeftToWait = 1.0;
         } else {
           millisecsLeftToWait = Math.max(
-            this.MIN_CARD_LOADING_DELAY_MSEC -
+            MIN_CARD_LOADING_DELAY_MSEC -
               (new Date().getTime() - timeAtServerCall),
             1.0
           );
@@ -1548,7 +1468,7 @@ export class ConversationSkinComponent {
       0.1 * TIME_FADEOUT_MSEC +
         TIME_HEIGHT_CHANGE_MSEC +
         TIME_FADEIN_MSEC +
-        this.TIME_PADDING_MSEC
+        TIME_PADDING_MSEC
     );
 
     this.playerPositionService.onNewCardOpened.emit(this.nextCard);
@@ -1638,7 +1558,7 @@ export class ConversationSkinComponent {
             scrollTop: tutorCardBottom - $(window).height() + 12,
           },
           {
-            duration: this.TIME_SCROLL_MSEC,
+            duration: TIME_SCROLL_MSEC,
             easing: 'easeOutQuad',
           }
         );
@@ -1718,7 +1638,7 @@ export class ConversationSkinComponent {
           doneCallback();
         }
       },
-      TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC + this.TIME_PADDING_MSEC
+      TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC + TIME_PADDING_MSEC
     );
   }
 

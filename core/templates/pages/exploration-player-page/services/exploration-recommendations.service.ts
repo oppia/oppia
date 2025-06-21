@@ -31,6 +31,7 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 })
 export class ExplorationRecommendationsService {
   isIframed: boolean = false;
+  recommendedStoryNodeId: string;
   isInEditorPage: boolean = false;
   isInEditorPreviewMode: boolean = false;
   // This property is initialized using Angular lifecycle hooks
@@ -81,5 +82,117 @@ export class ExplorationRecommendationsService {
       .then(expSummaries => {
         successCallback(expSummaries);
       });
+  }
+
+  /**
+   * Constructs and returns a URL to the recommended exploration,
+   * including any necessary contextual parameters such as collection ID,
+   * story URL fragments, and parent exploration IDs.
+   *
+   * The link supports multiple contexts in which a learner might encounter
+   * a recommended exploration, such as from a collection, a story chapter,
+   * or a topic/classroom page.
+   *
+   * @param recommendedExplorationSummaries - The backend dict representing the
+   *     recommended exploration, including its ID, parent explorations,
+   *     and next node ID if part of a story.
+   * @returns A fully constructed exploration URL with appropriate query parameters.
+   *          Returns '#' if the exploration ID is not available.
+   */
+  getExplorationLink(
+    recommendedExplorationSummaries: LearnerExplorationSummary[]
+  ): string {
+    let collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+    if (recommendedExplorationSummaries && recommendedExplorationSummaries[0]) {
+      if (!recommendedExplorationSummaries[0].id) {
+        return '#';
+      } else {
+        let result = '/explore/' + recommendedExplorationSummaries[0].id;
+        let urlParams = this.urlService.getUrlParams();
+        let parentExplorationIds =
+          recommendedExplorationSummaries[0].parentExplorationIds;
+
+        let collectionIdToAdd = collectionId;
+        let storyUrlFragmentToAdd = null;
+        let topicUrlFragment = null;
+        let classroomUrlFragment = null;
+        // Replace the collection ID with the one in the URL if it
+        // exists in urlParams.
+        if (parentExplorationIds && urlParams.hasOwnProperty('collection_id')) {
+          collectionIdToAdd = urlParams.collection_id;
+        } else if (
+          this.urlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
+          recommendedExplorationSummaries[0].nextNodeId
+        ) {
+          storyUrlFragmentToAdd =
+            this.urlService.getStoryUrlFragmentFromLearnerUrl();
+          topicUrlFragment =
+            this.urlService.getTopicUrlFragmentFromLearnerUrl();
+          classroomUrlFragment =
+            this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+        } else if (
+          urlParams.hasOwnProperty('story_url_fragment') &&
+          urlParams.hasOwnProperty('node_id') &&
+          urlParams.hasOwnProperty('topic_url_fragment') &&
+          urlParams.hasOwnProperty('classroom_url_fragment')
+        ) {
+          topicUrlFragment = urlParams.topic_url_fragment;
+          classroomUrlFragment = urlParams.classroom_url_fragment;
+          storyUrlFragmentToAdd = urlParams.story_url_fragment;
+        }
+
+        if (collectionIdToAdd) {
+          result = this.urlService.addField(
+            result,
+            'collection_id',
+            collectionIdToAdd
+          );
+        }
+        if (parentExplorationIds) {
+          for (let i = 0; i < parentExplorationIds.length - 1; i++) {
+            result = this.urlService.addField(
+              result,
+              'parent',
+              parentExplorationIds[i]
+            );
+          }
+        }
+        if (storyUrlFragmentToAdd && this.recommendedStoryNodeId) {
+          result = this.urlService.addField(
+            result,
+            'topic_url_fragment',
+            topicUrlFragment
+          );
+          result = this.urlService.addField(
+            result,
+            'classroom_url_fragment',
+            classroomUrlFragment
+          );
+          result = this.urlService.addField(
+            result,
+            'story_url_fragment',
+            storyUrlFragmentToAdd
+          );
+          result = this.urlService.addField(
+            result,
+            'node_id',
+            this.recommendedStoryNodeId
+          );
+        }
+        return result;
+      }
+    }
+  }
+
+  /**
+   * Sets the recommended story node ID for the exploration recommendations.
+   *
+   * This ID is used to construct the URL for the recommended exploration
+   * when the learner is navigating through a story.
+   *
+   * @param recommendedStoryNodeId - The ID of the recommended story node.
+   */
+  setRecommendedStoryNodeId(recommendedStoryNodeId: string): void {
+    this.recommendedStoryNodeId = recommendedStoryNodeId;
   }
 }
