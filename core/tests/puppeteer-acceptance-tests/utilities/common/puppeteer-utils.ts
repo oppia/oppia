@@ -863,7 +863,9 @@ export class BaseUser {
       if (typeof newPage !== 'undefined') {
         await newPage.close();
       }
-      throw new Error('To download ss');
+      if (dirName === '/prod-mobile-screenshots') {
+        throw new Error('To download ss');
+      }
     } catch (error) {
       if (__dirname.startsWith('/home/runner')) {
         throw new Error(
