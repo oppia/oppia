@@ -31,7 +31,7 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 })
 export class ExplorationRecommendationsService {
   isIframed: boolean = false;
-  recommendedStoryNodeId: string;
+  recommendedStoryNodeId!: string;
   isInEditorPage: boolean = false;
   isInEditorPreviewMode: boolean = false;
   // This property is initialized using Angular lifecycle hooks
@@ -105,61 +105,73 @@ export class ExplorationRecommendationsService {
   getExplorationLink(
     recommendedExplorationSummaries: LearnerExplorationSummary[]
   ): string {
-    let collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+    const collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+
     if (recommendedExplorationSummaries && recommendedExplorationSummaries[0]) {
-      if (!recommendedExplorationSummaries[0].id) {
+      const explorationId = recommendedExplorationSummaries[0].id;
+      if (!explorationId) {
         return '#';
-      } else {
-        let result = '/explore/' + recommendedExplorationSummaries[0].id;
-        let urlParams = this.urlService.getUrlParams();
-        let collectionIdToAdd = collectionId;
-        let storyUrlFragmentToAdd = null;
-        let topicUrlFragment = null;
-        let classroomUrlFragment = null;
-        if (
-          urlParams.hasOwnProperty('story_url_fragment') &&
-          urlParams.hasOwnProperty('node_id') &&
-          urlParams.hasOwnProperty('topic_url_fragment') &&
-          urlParams.hasOwnProperty('classroom_url_fragment')
-        ) {
-          topicUrlFragment = urlParams.topic_url_fragment;
-          classroomUrlFragment = urlParams.classroom_url_fragment;
-          storyUrlFragmentToAdd = urlParams.story_url_fragment;
-        }
-
-        if (collectionIdToAdd) {
-          result = this.urlService.addField(
-            result,
-            'collection_id',
-            collectionIdToAdd
-          );
-        }
-
-        if (storyUrlFragmentToAdd && this.recommendedStoryNodeId) {
-          result = this.urlService.addField(
-            result,
-            'topic_url_fragment',
-            topicUrlFragment
-          );
-          result = this.urlService.addField(
-            result,
-            'classroom_url_fragment',
-            classroomUrlFragment
-          );
-          result = this.urlService.addField(
-            result,
-            'story_url_fragment',
-            storyUrlFragmentToAdd
-          );
-          result = this.urlService.addField(
-            result,
-            'node_id',
-            this.recommendedStoryNodeId
-          );
-        }
-        return result;
       }
+
+      let result = '/explore/' + explorationId;
+      const urlParams = this.urlService.getUrlParams();
+
+      let collectionIdToAdd = collectionId;
+      let storyUrlFragmentToAdd: string | null = null;
+      let topicUrlFragment: string | null = null;
+      let classroomUrlFragment: string | null = null;
+
+      if (
+        urlParams.hasOwnProperty('story_url_fragment') &&
+        urlParams.hasOwnProperty('node_id') &&
+        urlParams.hasOwnProperty('topic_url_fragment') &&
+        urlParams.hasOwnProperty('classroom_url_fragment')
+      ) {
+        topicUrlFragment = urlParams.topic_url_fragment;
+        classroomUrlFragment = urlParams.classroom_url_fragment;
+        storyUrlFragmentToAdd = urlParams.story_url_fragment;
+      }
+
+      if (collectionIdToAdd) {
+        result = this.urlService.addField(
+          result,
+          'collection_id',
+          collectionIdToAdd
+        );
+      }
+
+      if (
+        classroomUrlFragment &&
+        topicUrlFragment &&
+        storyUrlFragmentToAdd &&
+        this.recommendedStoryNodeId
+      ) {
+        result = this.urlService.addField(
+          result,
+          'topic_url_fragment',
+          topicUrlFragment
+        );
+        result = this.urlService.addField(
+          result,
+          'classroom_url_fragment',
+          classroomUrlFragment
+        );
+        result = this.urlService.addField(
+          result,
+          'story_url_fragment',
+          storyUrlFragmentToAdd
+        );
+        result = this.urlService.addField(
+          result,
+          'node_id',
+          this.recommendedStoryNodeId
+        );
+      }
+
+      return result;
     }
+
+    return '#';
   }
 
   /**

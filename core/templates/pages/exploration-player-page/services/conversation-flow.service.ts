@@ -37,7 +37,7 @@ import {ConceptCardManagerService} from './concept-card-manager.service';
   providedIn: 'root',
 })
 export class ConversationFlowService {
-  nextCardIfStuck: StateCard | null;
+  nextCardIfStuck!: StateCard | null;
   solutionForState: Solution | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
   nextStateCard: StateCard | null = null;
