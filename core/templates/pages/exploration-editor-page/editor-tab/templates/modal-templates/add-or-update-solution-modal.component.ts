@@ -20,7 +20,7 @@ import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {InteractionAnswer} from 'interactions/answer-defs';
@@ -87,13 +87,13 @@ export class AddOrUpdateSolutionModalComponent
     type: 'html',
     ui_config: {
       hide_complex_extensions:
-        this.contextService.getEntityType() === 'question',
+        this.pageContextService.getEntityType() === 'question',
     },
   };
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private currentInteractionService: CurrentInteractionService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private generateContentIdService: GenerateContentIdService,
