@@ -19,30 +19,30 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {ExplorationBackendDict} from 'domain/exploration/ExplorationObjectFactory';
+import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {EditableExplorationBackendApiService} from '../../../domain/exploration/editable-exploration-backend-api.service';
+import {ExplorationBackendDict} from '../../../domain/exploration/ExplorationObjectFactory';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
-} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {PretestQuestionBackendApiService} from 'domain/question/pretest-question-backend-api.service';
-import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+} from '../../../domain/exploration/read-only-exploration-backend-api.service';
+import {PretestQuestionBackendApiService} from '../../../domain/question/pretest-question-backend-api.service';
+import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service';
 import {
   Question,
   QuestionBackendDict,
   QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
-import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
-import {ContextService} from 'services/context.service';
-import {UrlService} from 'services/contextual/url.service';
+} from '../../../domain/question/QuestionObjectFactory';
+import {DiagnosticTestTopicTrackerModel} from '../../../pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
+import {ContextService} from '../../../services/context.service';
+import {UrlService} from '../../../services/contextual/url.service';
 import {
   ExplorationFeatures,
   ExplorationFeaturesBackendApiService,
-} from 'services/exploration-features-backend-api.service';
-import {ExplorationFeaturesService} from 'services/exploration-features.service';
-import {PlaythroughService} from 'services/playthrough.service';
-import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
+} from '../../../services/exploration-features-backend-api.service';
+import {ExplorationFeaturesService} from '../../../services/exploration-features.service';
+import {PlaythroughService} from '../../../services/playthrough.service';
+import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import {DiagnosticTestPlayerEngineService} from './diagnostic-test-player-engine.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {ExplorationPlayerStateService} from './exploration-player-state.service';

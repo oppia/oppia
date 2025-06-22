@@ -19,8 +19,8 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
-import {FlagExplorationModalResult} from '../modals/flag-exploration-modal.component';
+import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
+import {FlagExplorationModalResult} from '../current-lesson-player/modals/flag-exploration-modal.component';
 
 @Injectable({
   providedIn: 'root',

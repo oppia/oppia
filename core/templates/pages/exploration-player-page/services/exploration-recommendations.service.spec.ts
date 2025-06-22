@@ -19,12 +19,12 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {async, TestBed} from '@angular/core/testing';
 
-import {ExplorationRecommendationsBackendApiService} from 'domain/recommendations/exploration-recommendations-backend-api.service';
-import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
-import {ExplorationRecommendationsService} from 'pages/exploration-player-page/services/exploration-recommendations.service';
-import {ContextService} from 'services/context.service';
-import {UrlService} from 'services/contextual/url.service';
-import {ServicesConstants} from 'services/services.constants';
+import {ExplorationRecommendationsBackendApiService} from '../../../domain/recommendations/exploration-recommendations-backend-api.service';
+import {LearnerExplorationSummary} from '../../../domain/summary/learner-exploration-summary.model';
+import {ExplorationRecommendationsService} from './exploration-recommendations.service';
+import {ContextService} from '../../../services/context.service';
+import {UrlService} from '../../../services/contextual/url.service';
+import {ServicesConstants} from '../../../services/services.constants';
 
 describe('Exploration Recommendations Service', () => {
   let expRecsService: ExplorationRecommendationsService;

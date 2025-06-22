@@ -18,16 +18,16 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {ContextService} from 'services/context.service';
+import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {ContextService} from '../../../services/context.service';
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
+} from '../../../domain/exploration/ExplorationObjectFactory';
 import {
   ExtractImageFilenamesFromModelService,
   // eslint-disable-next-line max-len
-} from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
+} from './extract-image-filenames-from-model.service';
 
 import {SkillBackendDict, Skill} from 'domain/skill/skill.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
