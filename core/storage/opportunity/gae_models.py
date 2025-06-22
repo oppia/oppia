@@ -283,17 +283,17 @@ class TranslationOpportunityModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        '''This model does not contain user-specific data.'''
+        """This model does not contain user-specific data."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
-        '''This model is not associated with any user.'''
+        """This model is not associated with any user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        '''This model does not contain user-specific data.'''
+        """This model does not contain user-specific data."""
         return dict(super(cls, cls).get_export_policy(), **{
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -305,7 +305,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
         })
 
     def _pre_put_hook(self) -> None:
-        '''Validates model properties before saving.'''
+        """Validates model properties before saving."""
         super()._pre_put_hook()
 
         # Check if entity_type is valid.
@@ -333,7 +333,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
         entity_type: str,
         entity_id: str
     ) -> str:
-        '''Generates a unique ID for a translation opportunity.
+        """Generates a unique ID for a translation opportunity.
 
         Args:
             entity_type: str. The type of the entity (e.g., 'exploration').
@@ -341,7 +341,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
 
         Returns:
             str. A unique string ID in the form: {entity_type}.{entity_id}.
-        '''
+        """
         return f'{entity_type}.{entity_id}'
 
     @classmethod
@@ -354,7 +354,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
         incomplete_translation_language_codes: Sequence[str],
         translation_counts: Dict[str, int]
     ) -> TranslationOpportunityModel:
-        '''Creates and returns a new TranslationOpportunityModel instance.
+        """Creates and returns a new TranslationOpportunityModel instance.
 
         Args:
             entity_type: str. The type of the entity.
@@ -368,7 +368,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
 
         Returns:
             TranslationOpportunityModel. A newly created model instance.
-        '''
+        """
         return cls(
             id=cls._generate_id(entity_type, entity_id),
             entity_type=entity_type,
