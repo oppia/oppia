@@ -43,15 +43,22 @@ export class ProgressUrlService {
     let lastCompletedCheckpoint =
       this.checkpointProgressService.getLastCompletedCheckpoint();
     let version = this.pageContextService.getExplorationVersion();
-    await this.editableExplorationBackendApiService
-      .recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
-        explorationId,
-        version,
-        lastCompletedCheckpoint
-      )
-      .then(response => {
-        this.uniqueProgressUrlId = response.unique_progress_url_id;
-      });
+
+    if (version) {
+      await this.editableExplorationBackendApiService
+        .recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
+          explorationId,
+          version,
+          lastCompletedCheckpoint
+        )
+        .then(response => {
+          this.uniqueProgressUrlId = response.unique_progress_url_id;
+        });
+    } else {
+      throw new Error(
+        'Exploration version is not available. Cannot set unique progress URL ID.'
+      );
+    }
   }
 
   /**

@@ -41,6 +41,7 @@ import {PlaythroughService} from 'services/playthrough.service';
 import {NumberAttemptsService} from './number-attempts.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {ExplorationModeService} from './exploration-mode.service';
+import {Question} from 'domain/question/QuestionObjectFactory';
 
 @Injectable({
   providedIn: 'root',
@@ -99,9 +100,9 @@ export class ExplorationInitializationService {
     });
   }
 
-  private initExplorationPlayer(
+  private async initExplorationPlayer(
     callback: (stateCard: StateCard, str: string) => void
-  ): void {
+  ): Promise<void> {
     let explorationId = this.pageContextService.getExplorationId();
     let version = this.pageContextService.getExplorationVersion();
     let explorationDataPromise = version
@@ -113,19 +114,22 @@ export class ExplorationInitializationService {
           explorationId
         );
     let storyUrlFragment = this.urlService.getStoryUrlFragmentFromLearnerUrl();
+    let pretestQuestionsData: Question[] = [];
+    if (storyUrlFragment) {
+      pretestQuestionsData =
+        await this.pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
+          explorationId,
+          storyUrlFragment
+        );
+    }
     Promise.all([
       explorationDataPromise,
-      this.pretestQuestionBackendApiService.fetchPretestQuestionsAsync(
-        explorationId,
-        storyUrlFragment
-      ),
       this.explorationFeaturesBackendApiService.fetchExplorationFeaturesAsync(
         explorationId
       ),
     ]).then(combinedData => {
       let explorationData: FetchExplorationBackendResponse = combinedData[0];
-      let pretestQuestionsData = combinedData[1];
-      let featuresData = combinedData[2];
+      let featuresData = combinedData[1];
       this.explorationFeaturesService.init(
         {
           ...explorationData.exploration,
@@ -172,12 +176,13 @@ export class ExplorationInitializationService {
     // For some cases, version is set only after
     // ReadOnlyExplorationBackendApiService.loadExploration() has completed.
     // Use returnDict.version for non-null version value.
+    let collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     this.statsReportingService.initSession(
       explorationId,
       returnDict.exploration.title,
       returnDict.version,
       returnDict.session_id,
-      this.urlService.getCollectionIdFromExplorationUrl()
+      collectionId
     );
     this.playthroughService.initSession(
       explorationId,

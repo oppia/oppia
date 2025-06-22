@@ -60,7 +60,6 @@ describe('ExplorationInitializationService', () => {
   let statsReportingService: StatsReportingService;
   let playthroughService: PlaythroughService;
   let urlService: UrlService;
-  let questionObjectFactory: QuestionObjectFactory;
   let explorationModeService: ExplorationModeService;
   let questionPlayerEngineService: jasmine.SpyObj<QuestionPlayerEngineService>;
 
@@ -143,7 +142,6 @@ describe('ExplorationInitializationService', () => {
     pageContextService = TestBed.inject(
       PageContextService
     ) as jasmine.SpyObj<PageContextService>;
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     editableBackendApi = TestBed.inject(
       EditableExplorationBackendApiService
     ) as jasmine.SpyObj<EditableExplorationBackendApiService>;
@@ -273,6 +271,11 @@ describe('ExplorationInitializationService', () => {
     pageContextService.getExplorationId.and.returnValue('exp123');
     pageContextService.getExplorationVersion.and.returnValue(null);
 
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      'math'
+    );
+    spyOn(urlService, 'getUrlParams').and.returnValue({});
+
     const mockExplorationData = {
       exploration: {
         title: 'Pretest Exploration',
@@ -321,59 +324,18 @@ describe('ExplorationInitializationService', () => {
         inapplicable_skill_misconception_ids: [],
         next_content_id_index: 1,
       },
-      {
-        id: 'question_2',
-        question_state_data: {
-          classifier_model_id: null,
-          content: {
-            content_id: 'content_2',
-            html: '<p>What is the capital of France?</p>',
-          },
-          interaction: {
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {
-              placeholder: {value: ''},
-              rows: {value: 1},
-            },
-            default_outcome: null,
-            hints: [],
-            id: 'TextInput',
-            solution: null,
-          },
-          param_changes: [],
-          recorded_voiceovers: {voiceovers_mapping: {}},
-          solicit_answer_details: false,
-          written_translations: {translations_mapping: {}},
-        },
-        question_state_data_schema_version: 50,
-        language_code: 'en',
-        version: 1,
-        linked_skill_ids: ['geography_basic'],
-        inapplicable_skill_misconception_ids: [],
-        next_content_id_index: 1,
-      },
     ];
-
-    spyOn(
-      questionPlayerEngineService,
-      'initializePretestServices'
-    ).and.callFake((rawQuestions, cb) => {
-      const questions = rawQuestions.map(q =>
-        questionObjectFactory.createFromBackendDict(q)
-      );
-      expect(questions[0].getId()).toBe('question_1');
-      cb();
-    });
 
     spyOn(
       readOnlyExplorationBackendApiService,
       'loadLatestExplorationAsync'
     ).and.returnValue(Promise.resolve(mockExplorationData));
+
     spyOn(
       pretestQuestionBackendApiService,
       'fetchPretestQuestionsAsync'
     ).and.returnValue(Promise.resolve(sampleQuestionsBackendDict));
+
     featuresBackendApi.fetchExplorationFeaturesAsync.and.returnValue(
       Promise.resolve({})
     );
@@ -381,6 +343,7 @@ describe('ExplorationInitializationService', () => {
     spyOn(statsReportingService, 'initSession');
     spyOn(playthroughService, 'initSession');
     spyOn(explorationModeService, 'setPretestMode');
+    spyOn(questionPlayerEngineService, 'initializePretestServices');
 
     const callback = jasmine.createSpy('callback');
     service.initializePlayer(callback);
@@ -397,6 +360,10 @@ describe('ExplorationInitializationService', () => {
     pageContextService.isInExplorationEditorPage.and.returnValue(false);
     pageContextService.getExplorationId.and.returnValue('exp123');
     pageContextService.getExplorationVersion.and.returnValue(null);
+
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+      'col_123'
+    );
 
     const mockExplorationData = {
       exploration: {
@@ -445,6 +412,15 @@ describe('ExplorationInitializationService', () => {
       mockExplorationData.exploration,
       {}
     );
+
+    expect(statsReportingService.initSession).toHaveBeenCalledWith(
+      'exp123',
+      'Test Exploration',
+      1,
+      'session_123',
+      'col_123'
+    );
+
     expect(explorationEngineService.init).toHaveBeenCalledWith(
       jasmine.objectContaining({
         title: 'Test Exploration',
