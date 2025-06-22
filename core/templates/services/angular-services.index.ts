@@ -271,7 +271,7 @@ import { ComputeGraphService } from 'services/compute-graph.service';
 import { ClassroomsPageAuthGuard } from '../pages/classrooms-page/classrooms-page-auth.guard';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
-import { ContextService } from 'services/context.service';
+import { PageContextService } from 'services/page-context.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -512,7 +512,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ConstructTranslationIdsService', ConstructTranslationIdsService],
   ['ContentTranslationLanguageService', ContentTranslationLanguageService],
   ['ContentTranslationManagerService', ContentTranslationManagerService],
-  ['ContextService', ContextService],
+  ['PageContextService', PageContextService],
   ['ContinueRulesService', ContinueRulesService],
   ['ContinueValidationService', ContinueValidationService],
   ['ContributionAndReviewService', ContributionAndReviewService],

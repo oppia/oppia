@@ -42,7 +42,7 @@ import {
   ThreadDataBackendApiService,
   ThreadMessages,
 } from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {Question} from 'domain/question/QuestionObjectFactory';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import cloneDeep from 'lodash/cloneDeep';
@@ -73,7 +73,7 @@ describe('Question Suggestion Review Modal component', () => {
   let suggestionModalService: SuggestionModalService;
   let skillBackendApiService: SkillBackendApiService;
   let skillObjectFactory: SkillObjectFactory;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let cancelSuggestionSpy: jasmine.Spy;
   let threadDataBackendApiService: ThreadDataBackendApiService;
   const authorName = 'Username 1';
@@ -333,7 +333,7 @@ describe('Question Suggestion Review Modal component', () => {
           provide: NgbActiveModal,
           useClass: MockActiveModal,
         },
-        ContextService,
+        PageContextService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -360,7 +360,7 @@ describe('Question Suggestion Review Modal component', () => {
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     spyOn(
       siteAnalyticsService,
       'registerContributorDashboardViewSuggestionForReview'
@@ -483,7 +483,7 @@ describe('Question Suggestion Review Modal component', () => {
     it(
       'should open edit question modal when clicking on' + ' edit button',
       fakeAsync(() => {
-        spyOn(contextService, 'resetImageSaveDestination').and.stub();
+        spyOn(pageContextService, 'resetImageSaveDestination').and.stub();
         class MockNgbModalRef {
           componentInstance = {
             suggestionId: suggestionId,
@@ -506,7 +506,7 @@ describe('Question Suggestion Review Modal component', () => {
         component.edit();
         tick();
 
-        expect(contextService.resetImageSaveDestination).toHaveBeenCalled();
+        expect(pageContextService.resetImageSaveDestination).toHaveBeenCalled();
         expect(ngbModal.open).toHaveBeenCalled();
       })
     );

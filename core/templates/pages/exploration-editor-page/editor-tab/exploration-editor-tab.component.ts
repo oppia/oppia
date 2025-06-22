@@ -45,7 +45,7 @@ import {ExplorationNextContentIdIndexService} from '../services/exploration-next
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {VersionHistoryService} from '../services/version-history.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
@@ -99,7 +99,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private joyride: JoyrideService,
     private versionHistoryService: VersionHistoryService,
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private skillBackendApiService: SkillBackendApiService,
     private alertsService: AlertsService
   ) {}
@@ -419,7 +419,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       if (this.versionHistoryService.getLatestVersionOfExploration() !== null) {
         this.versionHistoryBackendApiService
           .fetchStateVersionHistoryAsync(
-            this.contextService.getExplorationId(),
+            this.pageContextService.getExplorationId(),
             stateData.name,
             this.versionHistoryService.getLatestVersionOfExploration()
           )

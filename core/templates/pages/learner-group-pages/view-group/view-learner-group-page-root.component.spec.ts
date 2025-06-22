@@ -29,7 +29,7 @@ import {TranslateService} from '@ngx-translate/core';
 
 import {AppConstants} from 'app.constants';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {MetaTagCustomizationService} from 'services/contextual/meta-tag-customization.service';
 import {LoaderService} from 'services/loader.service';
 import {PageHeadService} from 'services/page-head.service';
@@ -51,7 +51,7 @@ describe('View Learner Group Page Root', () => {
   let accessValidationBackendApiService: AccessValidationBackendApiService;
   let loaderService: LoaderService;
   let translateService: TranslateService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -78,9 +78,9 @@ describe('View Learner Group Page Root', () => {
       AccessValidationBackendApiService
     );
     translateService = TestBed.inject(TranslateService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
 
-    spyOn(contextService, 'getLearnerGroupId').and.returnValue('groupId');
+    spyOn(pageContextService, 'getLearnerGroupId').and.returnValue('groupId');
   });
 
   it('should successfully instantiate the component', () => {
