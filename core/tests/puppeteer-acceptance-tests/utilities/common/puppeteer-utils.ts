@@ -781,14 +781,15 @@ export class BaseUser {
          */
         customDiffDir: __dirname.startsWith('/home/runner')
           ? path.join(
-              '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots',
+              '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/prod-mobile-screenshots',
               path.basename(dirName)
             )
-          : path.join(testPath, dirName, 'diff-snapshots'),
+          : path.join(testPath, dirName, 'prod-mobile-screenshots'),
       });
       if (typeof newPage !== 'undefined') {
         await newPage.close();
       }
+      throw new Error('To download ss');
     } catch (error) {
       if (__dirname.startsWith('/home/runner')) {
         throw new Error(
