@@ -586,13 +586,10 @@ export class ExplorationEditor extends BaseUser {
 
     // Change tab based on interaction.
     // Add more conditional tab changes here.
-    switch (INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd]) {
-      case 'PROGRAMMING':
-        await this.clickOn(programmingInteractionsButton);
-        break;
-
-      default:
-        break;
+    if (
+      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'PROGRAMMING'
+    ) {
+      await this.clickOn(programmingInteractionsButton);
     }
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
@@ -870,7 +867,7 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOn(categoryDropdown);
     await this.clickOn(category);
-    this.expectSelectedCategoryToBe(category);
+    await this.expectSelectedCategoryToBe(category);
   }
 
   /**
