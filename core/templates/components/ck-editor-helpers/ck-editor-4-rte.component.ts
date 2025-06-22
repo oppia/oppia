@@ -523,50 +523,61 @@ export class CkEditor4RteComponent
         return;
       }
 
-      // TODO(#12882): Remove the use of jQuery.
-      var elt = $('<div>' + ck.getData() + '</div>');
-      var textElt = elt[0].childNodes;
-      for (var i = textElt.length; i > 0; i--) {
-        for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(ck.getData(), 'text/html');
+      const wrapperDiv = doc.body;
+      const textElt = wrapperDiv.childNodes;
+
+      for (let i = textElt.length; i > 0; i--) {
+        const parent = textElt[i - 1] as HTMLElement;
+
+        for (let j = parent.childNodes.length; j > 0; j--) {
+          const child = parent.childNodes[j - 1];
+
           if (
-            textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
-            (textElt[i - 1].childNodes[j - 1].nodeName === '#text' &&
-              textElt[i - 1].childNodes[j - 1].nodeValue.trim() === '')
+            child.nodeName === 'BR' ||
+            (child.nodeName === '#text' && child.nodeValue?.trim() === '')
           ) {
-            textElt[i - 1].childNodes[j - 1].remove();
+            parent.removeChild(child);
           } else {
             break;
           }
         }
-        if (textElt[i - 1].childNodes.length === 0) {
+
+        if (parent.childNodes.length === 0) {
           if (
-            textElt[i - 1].nodeName === 'BR' ||
-            (textElt[i - 1].nodeName === '#text' &&
-              textElt[i - 1].nodeValue.trim() === '') ||
-            textElt[i - 1].nodeName === 'P'
+            parent.nodeName === 'BR' ||
+            (parent.nodeName === '#text' && parent.nodeValue?.trim() === '') ||
+            parent.nodeName === 'P'
           ) {
-            textElt[i - 1].remove();
+            wrapperDiv.removeChild(parent);
             continue;
           }
         } else {
           break;
         }
       }
-      let html = elt.html();
+
+      const serializer = new XMLSerializer();
+      let html = Array.from(wrapperDiv.childNodes)
+        .map(node => serializer.serializeToString(node))
+        .join('');
+
       this.value = html;
-      // Refer to the note at the top of the file for the reason behind replace.
+
       html = html.replace(
         /<oppia-noninteractive-ckeditor-/g,
         '<oppia-noninteractive-'
       );
-      // Refer to the note at the top of the file for the reason behind replace.
       html = html.replace(
         /<\/oppia-noninteractive-ckeditor-/g,
         '</oppia-noninteractive-'
       );
+
       this.valueChange.emit(html);
       this.currentValue = html;
     });
+
     ck.setData(this.value);
     this.ck = ck;
     this.ckEditorCopyContentService.bindPasteHandler(ck);

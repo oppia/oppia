@@ -98,18 +98,26 @@ export class AttributionGuideComponent implements OnInit {
   }
 
   copyAttribution(className: string): void {
-    const codeDiv = document.getElementsByClassName(className)[0];
+    const codeDiv = document.getElementsByClassName(
+      className
+    )[0] as HTMLElement;
+    if (!codeDiv) {
+      return;
+    }
+
     const range = document.createRange();
-    range.setStartBefore((codeDiv as HTMLDivElement).firstChild as Node);
-    range.setEndAfter((codeDiv as HTMLDivElement).lastChild as Node);
-    // 'getSelection()' will not return 'null' since it is not called on an
-    // undisplayed <iframe>. That is why we can use '?'.
+    range.setStartBefore(codeDiv.firstChild as Node);
+    range.setEndAfter(codeDiv.lastChild as Node);
+
     const selection = window.getSelection();
     selection?.removeAllRanges();
     selection?.addRange(range);
+
     document.execCommand('copy');
     selection?.removeAllRanges();
-    $(codeDiv).tooltip('show');
-    setTimeout(() => $(codeDiv).tooltip('hide'), 1000);
+
+    codeDiv.setAttribute('title', 'Copied!');
+    codeDiv.dispatchEvent(new Event('mouseenter'));
+    setTimeout(() => codeDiv.removeAttribute('title'), 1000);
   }
 }

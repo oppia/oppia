@@ -131,51 +131,33 @@ export class LibraryPageComponent {
   }
 
   initCarousels(): void {
-    if (this.libraryWindowIsNarrow) {
+    if (this.libraryWindowIsNarrow || !this.libraryGroups) {
       return;
     }
 
-    // This prevents unnecessary execution of this method immediately
-    // after a window resize event is fired.
-    if (!this.libraryGroups) {
-      return;
-    }
+    const width = window.innerWidth || 0;
+    const windowWidth = width * 0.85;
 
-    // The number 0 here is just to make sure that the type of width is number,
-    // it is never assigned as the width will never be undefined.
-    let width = $(window).width() || 0;
-
-    let windowWidth = width * 0.85;
-    // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to
-    // compensate for padding and margins. 20 is just an arbitrary
-    // number.
     this.tileDisplayCount = Math.min(
       Math.floor(windowWidth / (AppConstants.LIBRARY_TILE_WIDTH_PX + 20)),
       this.MAX_NUM_TILES_PER_ROW
     );
 
-    let maxWidth =
+    const maxWidth =
       this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX + 'px';
-    let carouselElem = this.el.nativeElement.querySelector(
+
+    const carouselElem = this.el.nativeElement.querySelector(
       '.oppia-library-carousel'
     );
-
     if (carouselElem) {
       this.renderer.setStyle(carouselElem, 'max-width', maxWidth);
     }
 
-    // The following determines whether to enable left scroll after
-    // resize.
     for (let i = 0; i < this.libraryGroups.length; i++) {
-      let carouselJQuerySelector =
-        '.oppia-library-carousel-tiles:eq(n)'.replace('n', String(i));
-      // The number 0 here is just to make sure that the type of width is
-      // number, it is never assigned as the selector will never be undefined.
-      let carouselScrollPositionPx =
-        $(carouselJQuerySelector).scrollLeft() || 0;
-      let index = Math.ceil(
-        carouselScrollPositionPx / AppConstants.LIBRARY_TILE_WIDTH_PX
-      );
+      const selector = `.oppia-library-carousel-tiles:nth-of-type(${i + 1})`;
+      const carouselElem = document.querySelector(selector) as HTMLElement;
+      const scrollLeft = carouselElem?.scrollLeft || 0;
+      const index = Math.ceil(scrollLeft / AppConstants.LIBRARY_TILE_WIDTH_PX);
       this.leftmostCardIndices[i] = index;
     }
   }
@@ -184,18 +166,16 @@ export class LibraryPageComponent {
     if (this.isAnyCarouselCurrentlyScrolling) {
       return;
     }
-    let carouselJQuerySelector = '.oppia-library-carousel-tiles:eq(n)'.replace(
-      'n',
-      ind.toString()
-    );
 
-    let direction = isLeftScroll ? -1 : 1;
-    // The number 0 here is just to make sure that the type of width is
-    // number, it is never assigned as the selector will never be undefined.
-    let carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft() || 0;
+    const selector = `.oppia-library-carousel-tiles:nth-of-type(${ind + 1})`;
+    const carouselElem = document.querySelector(selector) as HTMLElement;
+    if (!carouselElem) {
+      return;
+    }
 
-    // Prevent scrolling if there more carousel pixed widths than
-    // there are tile widths.
+    const direction = isLeftScroll ? -1 : 1;
+    let scrollLeft = carouselElem.scrollLeft || 0;
+
     if (
       this.libraryGroups[ind].activity_summary_dicts.length <=
       this.tileDisplayCount
@@ -203,7 +183,7 @@ export class LibraryPageComponent {
       return;
     }
 
-    carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
+    scrollLeft = Math.max(0, scrollLeft);
 
     if (isLeftScroll) {
       this.leftmostCardIndices[ind] = Math.max(
@@ -219,25 +199,34 @@ export class LibraryPageComponent {
       );
     }
 
-    let newScrollPositionPx =
-      carouselScrollPositionPx +
+    const newScrollPositionPx =
+      scrollLeft +
       this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction;
 
-    $(carouselJQuerySelector).animate(
-      {
-        scrollLeft: newScrollPositionPx,
-      },
-      {
-        duration: 800,
-        queue: false,
-        start: () => {
-          this.isAnyCarouselCurrentlyScrolling = true;
-        },
-        complete: () => {
-          this.isAnyCarouselCurrentlyScrolling = false;
-        },
+    const duration = 800;
+    const start = carouselElem.scrollLeft;
+    const distance = newScrollPositionPx - start;
+    const startTime = performance.now();
+
+    const animateScroll = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease =
+        progress < 0.5
+          ? 2 * progress * progress
+          : -1 + (4 - 2 * progress) * progress;
+
+      carouselElem.scrollLeft = start + distance * ease;
+
+      if (progress < 1) {
+        requestAnimationFrame(animateScroll);
+      } else {
+        this.isAnyCarouselCurrentlyScrolling = false;
       }
-    );
+    };
+
+    this.isAnyCarouselCurrentlyScrolling = true;
+    requestAnimationFrame(animateScroll);
   }
 
   // The carousels do not work when the width is 1 card long, so we need

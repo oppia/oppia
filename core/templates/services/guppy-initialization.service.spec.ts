@@ -22,16 +22,15 @@ import {GuppyInitializationService} from 'services/guppy-initialization.service'
 
 declare global {
   interface Window {
-    Guppy: Guppy;
+    Guppy: typeof MockGuppy;
   }
 }
 
 class MockGuppy {
-  constructor(id: string, config: Object) {}
-
   engine = {
     end: () => {},
   };
+  constructor(id: string, config: object) {}
 
   render(): void {}
   import_text(): void {}
@@ -39,50 +38,57 @@ class MockGuppy {
     return 'Dummy value';
   }
 
-  configure(name: string, val: Object): void {}
+  configure(name: string, val: object): void {}
+
   static event(name: string, handler: Function): void {
     handler({focused: true});
   }
 
-  static configure(name: string, val: Object): void {}
+  static configure(name: string, val: object): void {}
   static remove_global_symbol(symbol: string): void {}
-  static add_global_symbol(name: string, symbol: Object): void {}
+  static add_global_symbol(name: string, symbol: object): void {}
 }
 
 describe('GuppyInitializationService', () => {
   let guppyInitializationService: GuppyInitializationService;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({});
     guppyInitializationService = TestBed.inject(GuppyInitializationService);
-    window.Guppy = MockGuppy as unknown as Guppy;
+    window.Guppy = MockGuppy;
   });
 
-  it('should assign a random id to the guppy divs', function () {
-    let mockDocument = document.createElement('div');
-    mockDocument.classList.add('guppy-div-creator', 'guppy_active');
-    angular.element(document).find('body').append(mockDocument.outerHTML);
+  it('should assign a random id to the guppy divs', () => {
+    const mockDiv = document.createElement('div');
+    mockDiv.classList.add('guppy-div-creator', 'guppy_active');
+    document.body.appendChild(mockDiv);
 
     guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x=y');
 
-    let guppyDivs = document.querySelectorAll('.guppy-div-creator');
-    for (let i = 0; i < guppyDivs.length; i++) {
-      expect(guppyDivs[i].getAttribute('id')).toMatch(/guppy_[0-9]{1,8}/);
-    }
+    const guppyDivs = document.querySelectorAll('.guppy-div-creator');
+    guppyDivs.forEach(div => {
+      const id = div.getAttribute('id');
+      expect(id).toMatch(/guppy_[0-9]{1,8}/);
+    });
+
+    document.body.removeChild(mockDiv);
   });
 
-  it('should find active guppy div', function () {
-    let mockDocument = document.createElement('div');
-    mockDocument.classList.add('guppy-div-creator', 'guppy_active');
-    angular.element(document).find('body').append(mockDocument.outerHTML);
+  it('should find active guppy div', () => {
+    const mockDiv = document.createElement('div');
+    mockDiv.classList.add('guppy-div-creator', 'guppy_active');
+    document.body.appendChild(mockDiv);
 
     guppyInitializationService.init('guppy-div-creator', 'placeholder', 'x');
 
-    expect(guppyInitializationService.findActiveGuppyObject()).not.toBe(
-      undefined
-    );
+    expect(
+      guppyInitializationService.findActiveGuppyObject()
+    ).not.toBeUndefined();
+
+    document.body.removeChild(mockDiv);
   });
 
-  it('should correctly change and get the value of showOSK var', function () {
+  it('should correctly change and get the value of showOSK var', () => {
     guppyInitializationService.setShowOSK(true);
     expect(guppyInitializationService.getShowOSK()).toBeTrue();
     guppyInitializationService.setShowOSK(false);
