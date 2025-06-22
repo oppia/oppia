@@ -25,7 +25,7 @@ import {PlayerPositionService} from 'pages/exploration-player-page/services/play
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
 import {StatsReportingService} from 'pages/exploration-player-page/services/stats-reporting.service';
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
 
@@ -55,7 +55,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private urlService: UrlService,
     private explorationPlayerStateService: ExplorationPlayerStateService,
     private hintAndSolutionModalService: HintAndSolutionModalService,
@@ -67,7 +67,8 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
+    this._editorPreviewMode =
+      this.pageContextService.isInExplorationEditorPage();
     this.iframed = this.urlService.isIframed();
     this.resetLocalHintsArray();
     this.directiveSubscriptions.add(

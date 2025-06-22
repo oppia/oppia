@@ -19,7 +19,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
@@ -49,7 +49,7 @@ type StatsReportingUrlsKey =
 })
 export class StatsReportingBackendApiService {
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
@@ -82,7 +82,7 @@ export class StatsReportingBackendApiService {
           '\nThe event being recorded: ' +
           urlIdentifier +
           '\nExploration ID: ' +
-          this.contextService.getExplorationId();
+          this.pageContextService.getExplorationId();
         if (currentStateName) {
           additionalInfo += '\nCurrent State name: ' + currentStateName;
         }

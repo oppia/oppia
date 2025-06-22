@@ -36,7 +36,7 @@ import {AudioBarStatusService} from '../../../../services/audio-bar-status.servi
 import {AudioPlayerService} from '../../../../services/audio-player.service';
 import {AudioPreloaderService} from '../../services/audio-preloader.service';
 import {PlayerPositionService} from '../../services/player-position.service';
-import {ContextService} from '../../../../services/context.service';
+import {PageContextService} from '../../../../services/page-context.service';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';
@@ -52,7 +52,7 @@ describe('Audio Bar Component', () => {
   let audioPlayerService: AudioPlayerService;
   let audioPreloaderService: AudioPreloaderService;
   let playerPositionService: PlayerPositionService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let voiceoverPlayerService: VoiceoverPlayerService;
   let entityVoiceoversService: EntityVoiceoversService;
@@ -74,7 +74,7 @@ describe('Audio Bar Component', () => {
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
     playerPositionService = TestBed.inject(PlayerPositionService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
@@ -91,7 +91,7 @@ describe('Audio Bar Component', () => {
   beforeEach(() => {
     spyOn(audioBarStatusService, 'markAudioBarExpanded').and.callThrough();
     spyOn(audioBarStatusService, 'markAudioBarCollapsed').and.callThrough();
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
   });
 
   afterEach(() => {

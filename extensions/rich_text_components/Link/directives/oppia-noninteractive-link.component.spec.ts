@@ -19,14 +19,14 @@
 import {SimpleChanges} from '@angular/core';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NoninteractiveLink} from './oppia-noninteractive-link.component';
 
 describe('NoninteractiveLink', () => {
   let component: NoninteractiveLink;
   let fixture: ComponentFixture<NoninteractiveLink>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let htmlEscaperService: HtmlEscaperService;
 
   let mockHtmlEscaperService = {
@@ -51,7 +51,7 @@ describe('NoninteractiveLink', () => {
 
   beforeEach(() => {
     htmlEscaperService = TestBed.inject(HtmlEscaperService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     fixture = TestBed.createComponent(NoninteractiveLink);
     component = fixture.componentInstance;
     component.urlWithValue = 'https://www.oppia.org/';
@@ -59,7 +59,9 @@ describe('NoninteractiveLink', () => {
   });
 
   it('should initilise when user inserts link to the rich text editor', () => {
-    spyOn(contextService, 'isInExplorationEditorMode').and.returnValue(true);
+    spyOn(pageContextService, 'isInExplorationEditorMode').and.returnValue(
+      true
+    );
     component.ngOnInit();
 
     expect(component.url).toBe('https://www.oppia.org/');

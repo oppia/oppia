@@ -35,7 +35,7 @@ import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationEditsAllowedBackendApiService} from '../services/exploration-edits-allowed-backend-api.service';
 import {EditabilityService} from 'services/editability.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UserService} from 'services/user.service';
 import {ExplorationCategoryService} from '../services/exploration-category.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
@@ -75,7 +75,7 @@ describe('Settings Tab Component', () => {
   let alertsService: AlertsService;
   let changeListService: ChangeListService;
   let explorationDataService: ExplorationDataService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let explorationCategoryService: ExplorationCategoryService;
   let explorationInitStateNameService: ExplorationInitStateNameService;
@@ -207,7 +207,7 @@ describe('Settings Tab Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     explorationDataService = TestBed.inject(ExplorationDataService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     settingTabBackendApiService = TestBed.inject(SettingTabBackendApiService);
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService
@@ -237,7 +237,9 @@ describe('Settings Tab Component', () => {
       explorationTagsService,
       'onExplorationPropertyChanged'
     ).and.returnValue(mockExplorationTagsServiceonPropertyChanged);
-    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     spyOn(
       userExplorationPermissionsService,
       'getPermissionsAsync'
