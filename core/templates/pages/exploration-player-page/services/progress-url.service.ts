@@ -40,14 +40,14 @@ export class ProgressUrlService {
    */
   async setUniqueProgressUrlId(): Promise<void> {
     let explorationId = this.pageContextService.getExplorationId();
-    let lastCompletedCheckpoint =
-      this.checkpointProgressService.getLastCompletedCheckpoint();
+    let mostRecentlyReachedCheckpoint =
+      this.checkpointProgressService.getMostRecentlyReachedCheckpoint();
     let version = this.pageContextService.getExplorationVersion();
     await this.editableExplorationBackendApiService
       .recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
         explorationId,
         version,
-        lastCompletedCheckpoint
+        mostRecentlyReachedCheckpoint
       )
       .then(response => {
         this.uniqueProgressUrlId = response.unique_progress_url_id;

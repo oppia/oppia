@@ -29,6 +29,9 @@ import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-p
 import {TranslateService} from '@ngx-translate/core';
 import {HintsAndSolutionManagerService} from './hints-and-solution-manager.service';
 import {PlayerPositionService} from './player-position.service';
+import {StatsReportingService} from './stats-reporting.service';
+import {PageContextService} from 'services/page-context.service';
+import {ConceptCardManagerService} from './concept-card-manager.service';
 
 @Injectable({
   providedIn: 'root',
@@ -52,7 +55,10 @@ export class ConversationFlowService {
     private contentTranslationManagerService: ContentTranslationManagerService,
     private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
+    private pageContextService: PageContextService,
+    private conceptCardManagerService: ConceptCardManagerService,
     private currentEngineService: CurrentEngineService,
+    private statsReportingService: StatsReportingService,
     private translateService: TranslateService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService
   ) {}
@@ -91,6 +97,26 @@ export class ConversationFlowService {
     let currentEngineService =
       this.currentEngineService.getCurrentEngineService();
     return currentEngineService.getLanguageCode();
+  }
+
+  /**
+   * Records that the learner is leaving the current exploration to view
+   * a refresher exploration, for analytics and progress tracking purposes.
+   *
+   * This event is only recorded when the learner is in the learner view,
+   * not in the exploration editor preview mode.
+   *
+   * @param {string} refresherExpId - The ID of the refresher exploration
+   *   the learner is navigating to.
+   */
+  recordLeaveForRefresherExp(refresherExpId: string): void {
+    let editorPreviewMode = this.pageContextService.isInExplorationEditorPage();
+    if (!editorPreviewMode) {
+      this.statsReportingService.recordLeaveForRefresherExp(
+        this.playerPositionService.getCurrentStateName(),
+        refresherExpId
+      );
+    }
   }
 
   /**
@@ -177,6 +203,19 @@ export class ConversationFlowService {
     let index = this.playerPositionService.getDisplayedCardIndex();
     let displayedCard = this.playerTranscriptService.getCard(index);
     return displayedCard;
+  }
+
+  recordIncorrectAnswer(): void {
+    this.playerTranscriptService.incrementNumberOfIncorrectSubmissions();
+    this.hintsAndSolutionManagerService.recordWrongAnswer();
+    this.conceptCardManagerService.recordWrongAnswer();
+  }
+
+  emitHelpCard(helpCardHtml: string, hasContinueButton: boolean): void {
+    this.playerPositionService.onHelpCardAvailable.emit({
+      helpCardHtml,
+      hasContinueButton,
+    });
   }
 
   get onPlayerStateChange(): EventEmitter<string> {

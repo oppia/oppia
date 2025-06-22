@@ -78,7 +78,6 @@ import {ProgressUrlService} from 'pages/exploration-player-page/services/progres
 
 import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
-import {TranslateService} from '@ngx-translate/core';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {DiagnosticTestPlayerEngineService} from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
@@ -146,7 +145,6 @@ export class ConversationSkinComponent {
   upcomingInteractionInstructions;
   visitedCheckpointStateNames: string[] = [];
   prevSessionStatesProgress: string[] = [];
-  mostRecentlyReachedCheckpoint: string;
   showProgressClearanceMessage: boolean = false;
 
   // 'completedChaptersCount' is fetched via a HTTP request.
@@ -454,11 +452,16 @@ export class ConversationSkinComponent {
           .then(response => {
             expVersion = response.version;
             firstStateName = response.exploration.init_state_name;
-            this.mostRecentlyReachedCheckpoint =
+            let mostRecentlyReachedCheckpoint =
               response.most_recently_reached_checkpoint_state_name;
+
+            if (!mostRecentlyReachedCheckpoint) {
+              mostRecentlyReachedCheckpoint = firstStateName;
+            }
+
             // If the exploration is freshly started, mark the first state
             // as the most recently reached checkpoint.
-            if (!this.mostRecentlyReachedCheckpoint && this.isLoggedIn) {
+            if (!mostRecentlyReachedCheckpoint && this.isLoggedIn) {
               this.editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
                 this.explorationId,
                 expVersion,
@@ -466,8 +469,8 @@ export class ConversationSkinComponent {
                 true
               );
             }
-            this.checkpointProgressService.setLastCompletedCheckpoint(
-              firstStateName
+            this.checkpointProgressService.setMostRecentlyReachedCheckpoint(
+              mostRecentlyReachedCheckpoint
             );
             this.visitedCheckpointStateNames.push(firstStateName);
           });
@@ -646,28 +649,25 @@ export class ConversationSkinComponent {
     );
   }
 
-  private _recordLeaveForRefresherExp(refresherExpId): void {
-    if (!this._editorPreviewMode) {
-      this.statsReportingService.recordLeaveForRefresherExp(
-        this.playerPositionService.getCurrentStateName(),
-        refresherExpId
-      );
-    }
-  }
-
   private _navigateToMostRecentlyReachedCheckpoint() {
     let states: StateObjectsBackendDict;
     this.readOnlyExplorationBackendApiService
       .loadLatestExplorationAsync(this.explorationId, this.pidInUrl)
       .then(response => {
         states = response.exploration.states;
-        this.mostRecentlyReachedCheckpoint =
+
+        let mostRecentlyReachedCheckpoint =
+          this.checkpointProgressService.getMostRecentlyReachedCheckpoint() ||
           response.most_recently_reached_checkpoint_state_name;
+
+        this.checkpointProgressService.setMostRecentlyReachedCheckpoint(
+          mostRecentlyReachedCheckpoint
+        );
 
         this.prevSessionStatesProgress =
           this.explorationEngineService.getShortestPathToState(
             states,
-            this.mostRecentlyReachedCheckpoint
+            mostRecentlyReachedCheckpoint
           );
 
         let indexToRedirectTo = 0;
@@ -694,7 +694,7 @@ export class ConversationSkinComponent {
             this.visitedCheckpointStateNames.push(stateName);
           }
 
-          if (this.mostRecentlyReachedCheckpoint === stateName) {
+          if (mostRecentlyReachedCheckpoint === stateName) {
             break;
           }
 
@@ -747,7 +747,7 @@ export class ConversationSkinComponent {
         this.readOnlyExplorationBackendApiService
           .loadLatestExplorationAsync(this.explorationId)
           .then(response => {
-            this.checkpointProgressService.setLastCompletedCheckpoint(
+            this.checkpointProgressService.setMostRecentlyReachedCheckpoint(
               currentStateName
             );
             this.editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
@@ -1212,6 +1212,7 @@ export class ConversationSkinComponent {
               refreshInteraction,
               refresherExplorationId
             );
+            this.scrollToBottom();
           } else {
             this.moveToNewCard(feedbackHtml, isFinalQuestion);
           }
@@ -1238,20 +1239,13 @@ export class ConversationSkinComponent {
     refreshInteraction: boolean,
     refresherExplorationId: string | null
   ) {
-    this.playerTranscriptService.incrementNumberOfIncorrectSubmissions();
-    this.hintsAndSolutionManagerService.recordWrongAnswer();
-    this.conceptCardManagerService.recordWrongAnswer();
+    this.conversationFlowService.recordIncorrectAnswer();
     this.playerTranscriptService.addNewResponse(feedbackHtml);
-    let helpCardAvailable = false;
-    if (feedbackHtml && !this.displayedCard.isInteractionInline()) {
-      helpCardAvailable = true;
-    }
+    let helpCardAvailable =
+      feedbackHtml && !this.displayedCard.isInteractionInline();
 
     if (helpCardAvailable) {
-      this.playerPositionService.onHelpCardAvailable.emit({
-        helpCardHtml: feedbackHtml,
-        hasContinueButton: false,
-      });
+      this.conversationFlowService.emitHelpCard(feedbackHtml, false);
     }
     if (missingPrerequisiteSkillId) {
       this.displayedCard.markAsCompleted();
@@ -1260,10 +1254,7 @@ export class ConversationSkinComponent {
         .then(conceptCardObject => {
           this.conceptCard = conceptCardObject[0];
           if (helpCardAvailable) {
-            this.playerPositionService.onHelpCardAvailable.emit({
-              helpCardHtml: feedbackHtml,
-              hasContinueButton: true,
-            });
+            this.conversationFlowService.emitHelpCard(feedbackHtml, true);
           }
         });
     }
@@ -1282,9 +1273,11 @@ export class ConversationSkinComponent {
     if (refresherExplorationId) {
       // TODO(bhenning): Add tests to verify the event is
       // properly recorded.
-      let confirmRedirection = () => {
+      const confirmRedirection = () => {
         this.redirectToRefresherExplorationConfirmed = true;
-        this._recordLeaveForRefresherExp(refresherExplorationId);
+        this.conversationFlowService.recordLeaveForRefresherExp(
+          refresherExplorationId
+        );
       };
       this.explorationSummaryBackendApiService
         .loadPublicExplorationSummariesAsync([refresherExplorationId])
@@ -1298,7 +1291,6 @@ export class ConversationSkinComponent {
         });
     }
     this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
-    this.scrollToBottom();
   }
 
   private moveToNewCard(feedbackHtml: string | null, isFinalQuestion: boolean) {
