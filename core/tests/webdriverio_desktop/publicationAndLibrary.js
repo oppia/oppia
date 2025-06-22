@@ -272,7 +272,6 @@ describe('Library index page', function () {
 
 describe('Permissions for private explorations', function () {
   var explorationEditorPage = null;
-  var explorationEditorMainTab = null;
   var explorationEditorSettingsTab = null;
   var expectedConsoleErrors = null;
 
