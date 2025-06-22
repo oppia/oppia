@@ -20,7 +20,7 @@ import {ApplicationRef, Injectable} from '@angular/core';
 
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
 import {HumanReadableContributorsSummary} from 'domain/summary/creator-exploration-summary.model';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Injectable({
   providedIn: 'root',
@@ -31,14 +31,14 @@ export class AttributionService {
   explorationTitle: string = '';
   constructor(
     private applicationRef: ApplicationRef,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService
   ) {}
 
   init(): void {
     this.explorationSummaryBackendApiService
       .loadPublicAndPrivateExplorationSummariesAsync([
-        this.contextService.getExplorationId(),
+        this.pageContextService.getExplorationId(),
       ])
       .then(
         responseObject => {
@@ -63,7 +63,7 @@ export class AttributionService {
   }
 
   isGenerateAttributionAllowed(): boolean {
-    return this.contextService.isInExplorationPlayerPage();
+    return this.pageContextService.isInExplorationPlayerPage();
   }
 
   showAttributionModal(): void {

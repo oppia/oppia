@@ -19,7 +19,7 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {OppiaInteractiveContinue} from './oppia-interactive-continue.component';
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {ContinueRulesService} from './continue-rules.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
@@ -34,7 +34,7 @@ class MockI18nLanguageCodeService {
 describe('OppiaInteractiveContinue', () => {
   let component: OppiaInteractiveContinue;
   let fixture: ComponentFixture<OppiaInteractiveContinue>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
 
   class mockInteractionAttributesExtractorService {
     getValuesFromAttributes(
@@ -96,7 +96,7 @@ describe('OppiaInteractiveContinue', () => {
     beforeEach(() => {
       // The component needs to be created twice since each time a different
       // mockCurrentInteractionService is used.
-      contextService = TestBed.get(ContextService);
+      pageContextService = TestBed.get(PageContextService);
       fixture = TestBed.createComponent(OppiaInteractiveContinue);
       component = fixture.componentInstance;
       component.buttonTextWithValue = 'Continue';
@@ -155,7 +155,7 @@ describe('OppiaInteractiveContinue', () => {
     beforeEach(() => {
       // The component needs to be created twice since each time a different
       // mockCurrentInteractionService is used.
-      contextService = TestBed.get(ContextService);
+      pageContextService = TestBed.get(PageContextService);
       fixture = TestBed.createComponent(OppiaInteractiveContinue);
       component = fixture.componentInstance;
       component.buttonTextWithValue = 'Continue button';
@@ -173,7 +173,9 @@ describe('OppiaInteractiveContinue', () => {
     );
 
     it('should set isInEditorMode to true when in exploration editor', () => {
-      spyOn(contextService, 'isInExplorationEditorMode').and.returnValue(true);
+      spyOn(pageContextService, 'isInExplorationEditorMode').and.returnValue(
+        true
+      );
       expect(component.isInEditorMode).toBe(false);
 
       component.ngOnInit();

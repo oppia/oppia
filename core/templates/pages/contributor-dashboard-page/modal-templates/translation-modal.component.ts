@@ -27,7 +27,7 @@ import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {AlertsService} from 'services/alerts.service';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {
@@ -171,7 +171,7 @@ export class TranslationModalComponent {
     public readonly activeModal: NgbActiveModal,
     private readonly alertsService: AlertsService,
     private readonly ckEditorCopyContentService: CkEditorCopyContentService,
-    private readonly contextService: ContextService,
+    private readonly pageContextService: PageContextService,
     private readonly imageLocalStorageService: ImageLocalStorageService,
     private readonly ngbModal: NgbModal,
     private readonly siteAnalyticsService: SiteAnalyticsService,
@@ -197,14 +197,14 @@ export class TranslationModalComponent {
     this.heading = this.opportunity
       ? this.opportunity.heading
       : this.modifyTranslationOpportunity.heading;
-    this.contextService.setImageSaveDestinationToLocalStorage();
+    this.pageContextService.setImageSaveDestinationToLocalStorage();
     this.languageDescription =
       this.translationLanguageService.getActiveLanguageDescription();
 
     if (!this.modifyTranslationOpportunity) {
       // We need to set the context here so that the rte fetches
       // images for the given ENTITY_TYPE and targetId.
-      this.contextService.setCustomEntityContext(
+      this.pageContextService.setCustomEntityContext(
         AppConstants.ENTITY_TYPE.EXPLORATION,
         this.opportunity.id
       );
@@ -550,7 +550,7 @@ export class TranslationModalComponent {
           }
         },
         (errorReason: string) => {
-          this.contextService.resetImageSaveDestination();
+          this.pageContextService.resetImageSaveDestination();
           this.alertsService.clearWarnings();
           this.alertsService.addWarning(errorReason);
           this.close();
@@ -558,7 +558,7 @@ export class TranslationModalComponent {
       );
     }
     if (!this.moreAvailable) {
-      this.contextService.resetImageSaveDestination();
+      this.pageContextService.resetImageSaveDestination();
       this.close();
     }
   }
