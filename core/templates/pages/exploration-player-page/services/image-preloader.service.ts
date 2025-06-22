@@ -24,7 +24,7 @@ import {Exploration} from 'domain/exploration/ExplorationObjectFactory';
 import {ExtractImageFilenamesFromModelService} from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {SvgSanitizerService} from 'services/svg-sanitizer.service';
 
 interface ImageCallback {
@@ -47,7 +47,7 @@ export class ImagePreloaderService {
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private computeGraphService: ComputeGraphService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private ExtractImageFilenamesFromModelService: ExtractImageFilenamesFromModelService,
     private svgSanitizerService: SvgSanitizerService
   ) {}
@@ -258,14 +258,18 @@ export class ImagePreloaderService {
     filename: string
   ): Promise<string | SafeResourceUrl | null> {
     return new Promise((resolve, reject) => {
-      let entityType = this.contextService.getEntityType();
+      let entityType = this.pageContextService.getEntityType();
       if (
         entityType &&
         (this.assetsBackendApiService.isCached(filename) ||
           this.isInFailedDownload(filename))
       ) {
         this.assetsBackendApiService
-          .loadImage(entityType, this.contextService.getEntityId(), filename)
+          .loadImage(
+            entityType,
+            this.pageContextService.getEntityId(),
+            filename
+          )
           .then(loadedImageFile => {
             if (this.isInFailedDownload(loadedImageFile.filename)) {
               this.removeFromFailedDownload(loadedImageFile.filename);
@@ -353,7 +357,7 @@ export class ImagePreloaderService {
     this.assetsBackendApiService
       .loadImage(
         AppConstants.ENTITY_TYPE.EXPLORATION,
-        this.contextService.getExplorationId(),
+        this.pageContextService.getExplorationId(),
         imageFilename
       )
       .then(

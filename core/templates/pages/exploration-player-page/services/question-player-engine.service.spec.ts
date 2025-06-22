@@ -29,7 +29,7 @@ import {StateCard} from '../../../domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
 import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
 import {AlertsService} from '../../../services/alerts.service';
-import {ContextService} from '../../../services/context.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {FocusManagerService} from '../../../services/stateful/focus-manager.service';
 import {
   AnswerClassificationService,
@@ -40,7 +40,7 @@ import {QuestionPlayerEngineService} from './question-player-engine.service';
 describe('Question player engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let expressionInterpolationService: ExpressionInterpolationService;
   let focusManagerService: FocusManagerService;
   let multipleQuestionsBackendDict: QuestionBackendDict[];
@@ -377,7 +377,7 @@ describe('Question player engine service ', () => {
 
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     expressionInterpolationService = TestBed.inject(
       ExpressionInterpolationService
     );
@@ -400,8 +400,8 @@ describe('Question player engine service ', () => {
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen');
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     expect(questionPlayerEngineService.getQuestionCount()).toBe(0);
 
@@ -418,7 +418,7 @@ describe('Question player engine service ', () => {
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
 
-    expect(contextService.isInQuestionPlayerMode()).toBe(false);
+    expect(pageContextService.isInQuestionPlayerMode()).toBe(false);
 
     questionPlayerEngineService.init(
       multipleQuestionsObjects,
@@ -426,7 +426,7 @@ describe('Question player engine service ', () => {
       initErrorCb
     );
 
-    expect(contextService.isInQuestionPlayerMode()).toBe(true);
+    expect(pageContextService.isInQuestionPlayerMode()).toBe(true);
   });
 
   it(
@@ -444,8 +444,8 @@ describe('Question player engine service ', () => {
         'default_outcome'
       );
 
-      spyOn(contextService, 'setQuestionPlayerIsOpen');
-      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+      spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'
@@ -477,8 +477,8 @@ describe('Question player engine service ', () => {
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen');
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     expect(() => {
       questionPlayerEngineService.getCurrentQuestionId();
@@ -499,8 +499,8 @@ describe('Question player engine service ', () => {
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen');
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     questionPlayerEngineService.init(
       multipleQuestionsObjects,
@@ -527,8 +527,8 @@ describe('Question player engine service ', () => {
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen');
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     questionPlayerEngineService.init(
       multipleQuestionsObjects,
@@ -558,8 +558,8 @@ describe('Question player engine service ', () => {
         'default_outcome'
       );
 
-      spyOn(contextService, 'setQuestionPlayerIsOpen');
-      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+      spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'
@@ -835,8 +835,8 @@ describe('Question player engine service ', () => {
       );
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
-      spyOn(contextService, 'setQuestionPlayerIsOpen');
-      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+      spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'

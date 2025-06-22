@@ -20,7 +20,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationSavePromptModalComponent} from './exploration-save-prompt-modal.component';
 
 class MockActiveModal {
@@ -37,7 +37,7 @@ describe('Exploration Save Prompt Modal Component', () => {
   let component: ExplorationSavePromptModalComponent;
   let fixture: ComponentFixture<ExplorationSavePromptModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -48,7 +48,7 @@ describe('Exploration Save Prompt Modal Component', () => {
           provide: NgbActiveModal,
           useClass: MockActiveModal,
         },
-        ContextService,
+        PageContextService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -60,9 +60,11 @@ describe('Exploration Save Prompt Modal Component', () => {
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
 
-    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'explorationId'
+    );
     fixture.detectChanges();
   });
 

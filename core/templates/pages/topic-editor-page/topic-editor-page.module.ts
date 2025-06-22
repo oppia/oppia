@@ -46,7 +46,7 @@ import {TopicPlayerViewerCommonModule} from 'pages/topic-viewer-page/topic-viewe
 import {StoryCreationBackendApiService} from 'components/entity-creation-services/story-creation-backend-api.service';
 import {EntityCreationService} from './services/entity-creation.service';
 import {CreateNewSkillModalService} from './services/create-new-skill-modal.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
@@ -138,7 +138,7 @@ import {RteHelperService} from 'services/rte-helper.service';
     EntityCreationService,
     CreateNewSkillModalService,
     SubtopicValidationService,
-    ContextService,
+    PageContextService,
     FocusManagerService,
     ImageUploadHelperService,
     PageTitleService,
