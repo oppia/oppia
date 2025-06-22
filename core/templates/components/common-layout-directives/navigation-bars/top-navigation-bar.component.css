@@ -162,7 +162,7 @@
   min-width: 300px;
 }
 .oppia-top-navigation-bar .two-columns {
-  min-width: 855px;
+  min-width: 890px;
 }
 .oppia-top-navigation-bar .three-columns {
   min-width: 1200px;
@@ -208,7 +208,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 32px;
-  width: 861px;
+  width: 890x;
 }
 
 
@@ -540,10 +540,10 @@
   }
 
   .oppia-top-navigation-bar .two-columns {
-    min-width: 855px;
+    min-width: 890px;
   }
   .oppia-top-navigation-bar .three-columns {
-    min-width: 855px;
+    min-width: 890px;
   }
 }
 
