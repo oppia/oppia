@@ -23,6 +23,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import feature_flag_services
 from core.domain import study_guide_services
+from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_fetchers
 
@@ -82,7 +83,9 @@ class SubtopicPageDataHandler(
                     prev_subtopic_dict = topic.subtopics[index - 1].to_dict()
                 break
         study_guide_sections_dicts_list = []
-        subtopic_page_contents_dict = {}
+        subtopic_page_contents_dict: (
+            subtopic_page_domain.SubtopicPageContentsDict
+        ) = {}
         if feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames
             .SHOW_RESTRUCTURED_STUDY_GUIDES.value, None

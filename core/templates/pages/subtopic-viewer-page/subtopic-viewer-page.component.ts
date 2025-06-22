@@ -56,8 +56,10 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   topicUrlFragment!: string;
   classroomUrlFragment!: string;
   subtopicUrlFragment!: string;
-  pageContents!: SubtopicPageContents;
-  sections!: StudyGuideSection[];
+  // Remove pageContents once study guides become standard.
+  pageContents!: SubtopicPageContents | null;
+  // Remove '| null' once study guides become standard.
+  sections: StudyGuideSection[] | null;
   subtopicTitle!: string;
   subtopicTitleTranslationKey!: string;
   parentTopicTitle!: string;

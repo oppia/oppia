@@ -55,7 +55,7 @@ export class ReadOnlySubtopicPageData {
     nextSubtopic: Subtopic | null,
     prevSubtopic: Subtopic | null,
     sections: StudyGuideSection[] | null,
-    pageContents?: SubtopicPageContents | null
+    pageContents: SubtopicPageContents | null
   ) {
     this.parentTopicId = parentTopicId;
     this.parentTopicName = parentTopicName;
@@ -103,16 +103,18 @@ export class ReadOnlySubtopicPageData {
     let prevSubtopic = subtopicDataBackendDict.prev_subtopic_dict
       ? Subtopic.create(subtopicDataBackendDict.prev_subtopic_dict, {})
       : null;
-    let sections = [];
-    let pageContents: SubtopicPageContents;
+    let sections: StudyGuideSection[] = [];
+    let pageContents: SubtopicPageContents = null;
     if (subtopicDataBackendDict.sections) {
       sections = subtopicDataBackendDict.sections.map(section =>
         StudyGuideSection.createFromBackendDict(section)
       );
-    } else {
+    } else if (subtopicDataBackendDict.page_contents) {
       SubtopicPageContents.createFromBackendDict(
         subtopicDataBackendDict.page_contents
       );
+    } else {
+      throw new Error('Neither sections nor page_contents provided.');
     }
     return new ReadOnlySubtopicPageData(
       subtopicDataBackendDict.topic_id,
