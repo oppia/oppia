@@ -22,11 +22,17 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {Topic} from 'domain/topic/topic-object.model';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
 import {SubtopicValidationService} from 'pages/topic-editor-page/services/subtopic-validation.service';
+import {StudyGuide} from 'domain/topic/study-guide.model';
+import {
+  CALCULATION_TYPE_CHARACTER,
+  HtmlLengthService,
+} from 'services/html-length.service';
 
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
@@ -44,6 +50,8 @@ export class CreateNewSubtopicModalComponent
   topic!: Topic;
   SUBTOPIC_PAGE_SCHEMA!: object;
   htmlData!: string;
+  sectionHeadingPlaintext!: string;
+  sectionContentHtml!: string;
   schemaEditorIsShown!: boolean;
   editableThumbnailFilename!: string;
   editableThumbnailBgColor!: string;
@@ -55,8 +63,10 @@ export class CreateNewSubtopicModalComponent
   errorMsg!: string | null;
   subtopicUrlFragmentExists!: boolean;
   subtopicPage!: SubtopicPage;
+  studyGuide!: StudyGuide;
   MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
   MAX_CHARS_IN_SUBTOPIC_TITLE!: number;
+  MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING!: number;
   generatedUrlPrefix!: string;
 
   constructor(
@@ -64,6 +74,8 @@ export class CreateNewSubtopicModalComponent
     private subtopicValidationService: SubtopicValidationService,
     private topicUpdateService: TopicUpdateService,
     private topicEditorStateService: TopicEditorStateService,
+    private platformFeatureService: PlatformFeatureService,
+    private htmlLengthService: HtmlLengthService,
     private windowRef: WindowRef
   ) {
     super(ngbActiveModal);
@@ -81,6 +93,8 @@ export class CreateNewSubtopicModalComponent
       },
     };
     this.htmlData = '';
+    this.sectionHeadingPlaintext = '';
+    this.sectionContentHtml = '';
     this.schemaEditorIsShown = false;
     this.editableThumbnailFilename = '';
     this.editableThumbnailBgColor = '';
@@ -90,6 +104,8 @@ export class CreateNewSubtopicModalComponent
     this.MAX_CHARS_IN_SUBTOPIC_TITLE = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
     this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT =
       AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT;
+    this.MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING =
+      AppConstants.MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING;
     this.subtopicTitle = '';
     this.errorMsg = null;
     this.subtopicUrlFragmentExists = false;
@@ -136,14 +152,34 @@ export class CreateNewSubtopicModalComponent
     this.errorMsg = null;
   }
 
-  isSubtopicValid(): boolean {
+  isSectionContentLengthExceeded(): boolean {
     return Boolean(
-      this.editableThumbnailFilename &&
-        this.subtopicTitle &&
-        this.htmlData &&
-        this.editableUrlFragment &&
-        this.isUrlFragmentValid()
+      this.htmlLengthService.computeHtmlLength(
+        this.sectionContentHtml,
+        CALCULATION_TYPE_CHARACTER
+      ) > AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT
     );
+  }
+
+  isSubtopicValid(): boolean {
+    if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+      return Boolean(
+        this.editableThumbnailFilename &&
+          this.subtopicTitle &&
+          this.sectionHeadingPlaintext &&
+          this.sectionContentHtml &&
+          this.editableUrlFragment &&
+          this.isUrlFragmentValid()
+      );
+    } else {
+      return Boolean(
+        this.editableThumbnailFilename &&
+          this.subtopicTitle &&
+          this.htmlData &&
+          this.editableUrlFragment &&
+          this.isUrlFragmentValid()
+      );
+    }
   }
 
   cancel(): void {
@@ -159,6 +195,11 @@ export class CreateNewSubtopicModalComponent
     return this.subtopicValidationService.isUrlFragmentValid(
       this.editableUrlFragment.trim()
     );
+  }
+
+  isShowRestructuredStudyGuidesFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.ShowRestructuredStudyGuides
+      .isEnabled;
   }
 
   checkSubtopicExistence(): void {
@@ -194,22 +235,43 @@ export class CreateNewSubtopicModalComponent
       this.editableUrlFragment
     );
 
-    this.subtopicPage = SubtopicPage.createDefault(
-      this.topic.getId(),
-      this.subtopicId
-    );
+    if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
+      this.studyGuide = StudyGuide.createDefault(
+        this.topic.getId(),
+        this.subtopicId
+      );
 
-    let subtitledHtml = cloneDeep(
-      this.subtopicPage.getPageContents().getSubtitledHtml()
-    );
-    subtitledHtml.html = this.htmlData;
-    this.topicUpdateService.setSubtopicPageContentsHtml(
-      this.subtopicPage,
-      this.subtopicId,
-      subtitledHtml
-    );
-    this.subtopicPage.getPageContents().setHtml(this.htmlData);
-    this.topicEditorStateService.setSubtopicPage(this.subtopicPage);
+      let sections = cloneDeep(this.studyGuide.getSections());
+      let section = sections[0];
+      section.setHeadingPlaintext(this.sectionHeadingPlaintext);
+      section.setContentHtml(this.sectionContentHtml);
+      this.topicUpdateService.updateSection(
+        this.studyGuide,
+        0,
+        this.sectionHeadingPlaintext,
+        this.sectionContentHtml,
+        this.subtopicId
+      );
+      this.studyGuide.setSections([section]);
+      this.topicEditorStateService.setStudyGuide(this.studyGuide);
+    } else {
+      this.subtopicPage = SubtopicPage.createDefault(
+        this.topic.getId(),
+        this.subtopicId
+      );
+
+      let subtitledHtml = cloneDeep(
+        this.subtopicPage.getPageContents().getSubtitledHtml()
+      );
+      subtitledHtml.html = this.htmlData;
+      this.topicUpdateService.setSubtopicPageContentsHtml(
+        this.subtopicPage,
+        this.subtopicId,
+        subtitledHtml
+      );
+      this.subtopicPage.getPageContents().setHtml(this.htmlData);
+      this.topicEditorStateService.setSubtopicPage(this.subtopicPage);
+    }
     this.topicUpdateService.setSubtopicTitle(
       this.topic,
       this.subtopicId,
@@ -220,5 +282,8 @@ export class CreateNewSubtopicModalComponent
 
   localValueChange(event: string): void {
     this.htmlData = event;
+  }
+  localContentValueChange(event: string): void {
+    this.sectionContentHtml = event;
   }
 }
