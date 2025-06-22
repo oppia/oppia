@@ -104,13 +104,14 @@ export class ReadOnlySubtopicPageData {
       ? Subtopic.create(subtopicDataBackendDict.prev_subtopic_dict, {})
       : null;
     let sections: StudyGuideSection[] = [];
-    let pageContents: SubtopicPageContents = null;
+    let pageContents: SubtopicPageContents =
+      SubtopicPageContents.createDefault();
     if (subtopicDataBackendDict.sections) {
       sections = subtopicDataBackendDict.sections.map(section =>
         StudyGuideSection.createFromBackendDict(section)
       );
     } else if (subtopicDataBackendDict.page_contents) {
-      SubtopicPageContents.createFromBackendDict(
+      pageContents = SubtopicPageContents.createFromBackendDict(
         subtopicDataBackendDict.page_contents
       );
     } else {

@@ -114,6 +114,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.sections = null;
+    this.pageContents = null;
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.classroomUrlFragment =
       this.urlService.getClassroomUrlFragmentFromLearnerUrl();

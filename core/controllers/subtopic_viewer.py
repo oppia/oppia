@@ -85,7 +85,7 @@ class SubtopicPageDataHandler(
         study_guide_sections_dicts_list = []
         subtopic_page_contents_dict: (
             subtopic_page_domain.SubtopicPageContentsDict
-        ) = {}
+        ) = None
         if feature_flag_services.is_feature_flag_enabled(
             feature_flag_list.FeatureNames
             .SHOW_RESTRUCTURED_STUDY_GUIDES.value, None
