@@ -32,7 +32,7 @@ import {State} from 'domain/state/StateObjectFactory';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
 import {QuestionsOpportunitiesSelectDifficultyModalComponent} from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {QuestionSuggestionBackendApiService} from 'pages/contributor-dashboard-page/services/question-suggestion-backend-api.service';
@@ -68,7 +68,7 @@ export class QuestionSuggestionEditorModalComponent
     private questionUndoRedoService: QuestionUndoRedoService,
     private questionSuggestionBackendApiService: QuestionSuggestionBackendApiService,
     private alertsService: AlertsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private siteAnalyticsService: SiteAnalyticsService,
     private ngbModal: NgbModal,
@@ -89,7 +89,7 @@ export class QuestionSuggestionEditorModalComponent
           () => {
             this.ngbActiveModal.dismiss('cancel');
             this.imageLocalStorageService.flushStoredImagesData();
-            this.contextService.resetImageSaveDestination();
+            this.pageContextService.resetImageSaveDestination();
           },
           () => {
             // Note to developers:
@@ -99,7 +99,7 @@ export class QuestionSuggestionEditorModalComponent
         );
     } else {
       this.imageLocalStorageService.flushStoredImagesData();
-      this.contextService.resetImageSaveDestination();
+      this.pageContextService.resetImageSaveDestination();
       this.ngbActiveModal.dismiss('cancel');
     }
   }
@@ -156,7 +156,7 @@ export class QuestionSuggestionEditorModalComponent
     );
     const imagesData = this.imageLocalStorageService.getStoredImagesData();
     this.imageLocalStorageService.flushStoredImagesData();
-    this.contextService.resetImageSaveDestination();
+    this.pageContextService.resetImageSaveDestination();
     if (this.isEditing) {
       const questionDict = this.question.toBackendDict(false);
       this.contributionAndReviewService.updateQuestionSuggestionAsync(
@@ -208,7 +208,7 @@ export class QuestionSuggestionEditorModalComponent
     this.misconceptionsBySkill = {};
     this.misconceptionsBySkill[this.skill.getId()] =
       this.skill.getMisconceptions();
-    this.contextService.setCustomEntityContext(
+    this.pageContextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.QUESTION_SUGGESTIONS,
       this.skill.getId()
     );

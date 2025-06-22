@@ -34,7 +34,7 @@ import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 export type SuggestionAndFeedbackThread = FeedbackThread | SuggestionThread;
 
@@ -67,7 +67,7 @@ export class ThreadDataBackendApiService {
 
   constructor(
     private alertsService: AlertsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
@@ -86,7 +86,7 @@ export class ThreadDataBackendApiService {
     return this.urlInterpolationService.interpolateUrl(
       '/suggestionactionhandler/exploration/<exploration_id>/<thread_id>',
       {
-        exploration_id: this.contextService.getExplorationId(),
+        exploration_id: this.pageContextService.getExplorationId(),
         thread_id: threadId,
       }
     );
@@ -105,7 +105,7 @@ export class ThreadDataBackendApiService {
     return this.urlInterpolationService.interpolateUrl(
       '/threadlisthandler/<exploration_id>',
       {
-        exploration_id: this.contextService.getExplorationId(),
+        exploration_id: this.pageContextService.getExplorationId(),
       }
     );
   }

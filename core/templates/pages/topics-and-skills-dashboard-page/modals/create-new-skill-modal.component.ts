@@ -26,7 +26,7 @@ import {
 } from 'domain/exploration/subtitled-html.model';
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {TopicsAndSkillsDashboardPageConstants} from '../topics-and-skills-dashboard-page.constants';
 import {ValidatorsService} from 'services/validators.service';
@@ -57,7 +57,7 @@ export class CreateNewSkillModalComponent {
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
@@ -66,7 +66,7 @@ export class CreateNewSkillModalComponent {
   ) {}
 
   ngOnInit(): void {
-    this.contextService.setImageSaveDestinationToLocalStorage();
+    this.pageContextService.setImageSaveDestinationToLocalStorage();
   }
 
   hasValidDescription(description: string): boolean {

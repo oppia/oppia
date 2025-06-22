@@ -35,7 +35,7 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
@@ -89,7 +89,7 @@ export class ExplorationEngineService {
     private answerClassificationService: AnswerClassificationService,
     private audioPreloaderService: AudioPreloaderService,
     private contentTranslationLanguageService: ContentTranslationLanguageService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private entityTranslationsService: EntityTranslationsService,
     private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
@@ -126,10 +126,12 @@ export class ExplorationEngineService {
     }
 
     if (explorationContext) {
-      this._explorationId = this.contextService.getExplorationId();
+      this._explorationId = this.pageContextService.getExplorationId();
       this.version = this.urlService.getExplorationVersionFromUrl();
-      this._editorPreviewMode = this.contextService.isInExplorationEditorPage();
-      this._questionPlayerMode = this.contextService.isInQuestionPlayerMode();
+      this._editorPreviewMode =
+        this.pageContextService.isInExplorationEditorPage();
+      this._questionPlayerMode =
+        this.pageContextService.isInQuestionPlayerMode();
       if (
         !this._questionPlayerMode &&
         !(

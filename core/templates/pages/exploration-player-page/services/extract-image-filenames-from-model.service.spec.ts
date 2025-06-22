@@ -19,7 +19,7 @@
 import {TestBed} from '@angular/core/testing';
 
 import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {ContextService} from '../../../services/context.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
@@ -36,7 +36,7 @@ describe('Extracting Image file names in the state service', () => {
   let eifms: ExtractImageFilenamesFromModelService;
   let eof: ExplorationObjectFactory;
   let sof: Skill;
-  let ecs: ContextService;
+  let ecs: PageContextService;
   let explorationDict: ExplorationBackendDict;
   let ImageFilenamesInExploration: {[x: string]: string[]};
   let skillDict: SkillBackendDict;
@@ -47,7 +47,7 @@ describe('Extracting Image file names in the state service', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     eof = TestBed.inject(ExplorationObjectFactory);
-    ecs = TestBed.inject(ContextService);
+    ecs = TestBed.inject(PageContextService);
     eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
     sof = TestBed.inject(Skill);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');

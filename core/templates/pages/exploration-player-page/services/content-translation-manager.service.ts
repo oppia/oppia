@@ -25,7 +25,7 @@ import {ExtensionTagAssemblerService} from 'services/extension-tag-assembler.ser
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImagePreloaderService} from './image-preloader.service';
 
 @Injectable({
@@ -47,7 +47,7 @@ export class ContentTranslationManagerService {
     private playerTranscriptService: PlayerTranscriptService,
     private extensionTagAssemblerService: ExtensionTagAssemblerService,
     private entityTranslationsService: EntityTranslationsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private imagePreloaderService: ImagePreloaderService
   ) {}
 
@@ -84,7 +84,7 @@ export class ContentTranslationManagerService {
         .getEntityTranslationsAsync(languageCode)
         .then(entityTranslations => {
           // Image preloading is disabled in the exploration editor preview mode.
-          if (!this.contextService.isInExplorationEditorPage()) {
+          if (!this.pageContextService.isInExplorationEditorPage()) {
             this.imagePreloaderService.restartImagePreloader(
               this.playerTranscriptService.getCard(0).getStateName()
             );

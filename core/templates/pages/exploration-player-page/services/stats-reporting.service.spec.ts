@@ -28,7 +28,7 @@ import {
   AggregatedStats,
   StatsReportingBackendApiService,
 } from '../../../domain/exploration/stats-reporting-backend-api.service';
-import {ContextService} from '../../../services/context.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {UrlService} from '../../../services/contextual/url.service';
 import {MessengerService} from '../../../services/messenger.service';
 import {PlaythroughService} from '../../../services/playthrough.service';
@@ -37,7 +37,7 @@ import {StatsReportingService} from './stats-reporting.service';
 import {Stopwatch} from '../../../domain/utilities/stopwatch.model';
 
 describe('Stats reporting service ', () => {
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let messengerService: MessengerService;
   let playthroughService: PlaythroughService;
   let siteAnalyticsService: SiteAnalyticsService;
@@ -56,7 +56,7 @@ describe('Stats reporting service ', () => {
       imports: [HttpClientTestingModule],
     });
 
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     statsReportingService = TestBed.inject(StatsReportingService);
     statsReportingBackendApiService = TestBed.inject(
       StatsReportingBackendApiService
@@ -80,8 +80,10 @@ describe('Stats reporting service ', () => {
     spyOn(playthroughService, 'recordExplorationStartAction').and.callThrough();
     spyOn(playthroughService, 'recordExplorationQuitAction').and.callThrough();
     spyOn(playthroughService, 'storePlaythrough').and.callThrough();
-    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      true
+    );
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
     statsReportingService.stateStopwatch = Stopwatch.create();
   });
 

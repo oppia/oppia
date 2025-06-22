@@ -17,14 +17,14 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationPropertyService} from './exploration-property.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ExplorationLanguageCodeService} from './exploration-language-code.service';
 
 describe('Exploration Language Code Service', () => {
   let elcs: ExplorationLanguageCodeService;
-  let cs: ContextService;
+  let cs: PageContextService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -33,7 +33,7 @@ describe('Exploration Language Code Service', () => {
     });
 
     elcs = TestBed.inject(ExplorationLanguageCodeService);
-    cs = TestBed.inject(ContextService);
+    cs = TestBed.inject(PageContextService);
   });
 
   it('should test the child object properties', () => {

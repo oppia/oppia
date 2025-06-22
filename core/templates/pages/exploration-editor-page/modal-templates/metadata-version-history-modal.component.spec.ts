@@ -25,7 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
@@ -44,7 +44,7 @@ describe('Metadata version history modal', () => {
   let historyTabYamlConversionService: HistoryTabYamlConversionService;
   let versionHistoryService: VersionHistoryService;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let explorationMetadata: ExplorationMetadata;
   let paramSpecObjectFactory: ParamSpecObjectFactory;
 
@@ -54,7 +54,7 @@ describe('Metadata version history modal', () => {
       declarations: [MetadataVersionHistoryModalComponent],
       providers: [
         NgbActiveModal,
-        ContextService,
+        PageContextService,
         VersionHistoryService,
         VersionHistoryBackendApiService,
         HistoryTabYamlConversionService,
@@ -73,7 +73,7 @@ describe('Metadata version history modal', () => {
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
 
     explorationMetadata = new ExplorationMetadata(
@@ -263,7 +263,7 @@ describe('Metadata version history modal', () => {
       versionHistoryService,
       'insertMetadataVersionHistoryData'
     ).and.callThrough();
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
     spyOn(versionHistoryService, 'getBackwardMetadataDiffData').and.returnValue(
       {
         oldMetadata: explorationMetadata,
@@ -303,7 +303,7 @@ describe('Metadata version history modal', () => {
       versionHistoryService,
       'shouldFetchNewMetadataVersionHistory'
     ).and.returnValue(true);
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
     spyOn(versionHistoryService, 'getBackwardMetadataDiffData').and.returnValue(
       {
         oldMetadata: explorationMetadata,
