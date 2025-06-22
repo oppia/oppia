@@ -26,7 +26,7 @@ import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {
@@ -72,7 +72,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   constructor(
     private alertsService: AlertsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
@@ -139,7 +139,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
           }
           this.subtopicTitle = subtopicDataObject.getSubtopicTitle();
           this.parentTopicId = subtopicDataObject.getParentTopicId();
-          this.contextService.setCustomEntityContext(
+          this.pageContextService.setCustomEntityContext(
             AppConstants.ENTITY_TYPE.TOPIC,
             this.parentTopicId
           );
@@ -200,7 +200,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-    this.contextService.removeCustomEntityContext();
+    this.pageContextService.removeCustomEntityContext();
   }
 
   isHackySubtopicTitleTranslationDisplayed(): boolean {

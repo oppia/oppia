@@ -644,6 +644,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(modalDiv, {hidden: true});
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(showSectionsList);
+      await this.scrollToBottomOfPage();
     }
     await this.page.waitForSelector(firstStudyGuideSectionTile, {
       visible: true,
@@ -669,6 +670,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.type(richTextAreaField, sectionContent);
     await this.clickOn(addStudyGuideSectionModalSaveButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
     await this.page.waitForSelector(
       `.e2e-test-study-guide-section-${currentNumberOfSections}`,
       {
@@ -755,6 +759,9 @@ export class CurriculumAdmin extends BaseUser {
    */
   async openSectionContentEditor(): Promise<void> {
     await this.clickOn(editStudyGuideSectionContentIcon);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
     await this.page.waitForSelector(editStudyGuideSectionContentEditor, {
       visible: true,
     });
