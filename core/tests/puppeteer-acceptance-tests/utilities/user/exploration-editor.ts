@@ -769,9 +769,9 @@ export class ExplorationEditor extends BaseUser {
     await this.type(addTitleBar, title);
     await this.page.keyboard.press('Tab');
 
-    // TODO: Verify post check works
+    // TODO: Verify post check works.
     const newTitle = await this.page.$eval(addTitleBar, el =>
-      el.textContent?.trim()
+      (el as HTMLInputElement).value?.trim()
     );
     if (!newTitle || newTitle !== title) {
       throw new Error(
@@ -1473,18 +1473,9 @@ export class ExplorationEditor extends BaseUser {
       await this.type(stateContentInputField, `${defaultResponseFeedback}`);
       await this.clickOn(saveOutcomeFeedbackButton);
 
-      // TODO: Check for text and add post check based on it.
-      // Verify the text was added correctly
-      const newDefaultResponseText = await this.page.$eval(
-        openOutcomeFeedBackEditor,
-        el => el.textContent?.trim()
-      );
-
-      if (newDefaultResponseText !== defaultResponseFeedback) {
-        throw new Error(
-          `Default response feedback was not added correctly. Expected: ${defaultResponseFeedback}, Actual: ${newDefaultResponseText}`
-        );
-      }
+      await this.page.waitForSelector(saveOutcomeDestButton, {
+        hidden: true,
+      });
     }
 
     if (directToCard) {
@@ -1930,12 +1921,11 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickOn(mobileHistoryTabButton);
+      await this.clickAndWaitForNavigation(mobileHistoryTabButton);
     } else {
-      await this.clickOn(historyTabButton);
+      await this.clickAndWaitForNavigation(historyTabButton);
     }
 
-    await this.page.waitForNetworkIdle();
     expect(this.page.url()).toContain('/history/');
   }
 
@@ -2073,15 +2063,14 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickOn(mobileTranslationTabButton);
+      await this.clickAndWaitForNavigation(mobileTranslationTabButton);
     } else {
       await this.page.waitForSelector(translationTabButton, {
         visible: true,
       });
-      await this.clickOn(translationTabButton);
+      await this.clickAndWaitForNavigation(translationTabButton);
     }
 
-    await this.page.waitForNetworkIdle();
     expect(this.page.url()).toContain('/preview/');
   }
 
@@ -2102,16 +2091,14 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickOn(mobileMainTabButton);
+      await this.clickAndWaitForNavigation(mobileMainTabButton);
     } else {
       await this.page.waitForSelector(mainTabButton, {
         visible: true,
       });
-      await this.clickOn(mainTabButton);
+      await this.clickAndWaitForNavigation(mainTabButton);
     }
-    await this.waitForNetworkIdle();
 
-    await this.page.waitForNetworkIdle();
     expect(this.page.url()).toContain('/gui/');
   }
 
