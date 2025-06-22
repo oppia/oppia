@@ -22,7 +22,7 @@ import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {Subscription} from 'rxjs';
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
@@ -43,7 +43,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
 
   constructor(
     private bottomNavbarStatusService: BottomNavbarStatusService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private loaderService: LoaderService,
     private pageTitleService: PageTitleService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
@@ -60,7 +60,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   }
 
   getEntityType(): string {
-    return this.contextService.getEntityType();
+    return this.pageContextService.getEntityType();
   }
 
   setDocumentTitle(): void {

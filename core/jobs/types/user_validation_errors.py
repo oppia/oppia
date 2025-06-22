@@ -31,7 +31,7 @@ if MYPY: # pragma: no cover
     [models.Names.BASE_MODEL, models.Names.USER])
 
 
-class ModelIncorrectKeyError(base_validation_errors.BaseAuditError):
+class ModelIncorrectKeyError(base_validation_errors.BaseValidationError):
     """Error class for incorrect key in PendingDeletionRequestModel."""
 
     def __init__(
@@ -44,7 +44,7 @@ class ModelIncorrectKeyError(base_validation_errors.BaseAuditError):
 
 
 class DraftChangeListLastUpdatedNoneError(
-    base_validation_errors.BaseAuditError
+    base_validation_errors.BaseValidationError
 ):
     """Error class for models with draft change list but draft change list
     last_updated is None.
@@ -59,7 +59,7 @@ class DraftChangeListLastUpdatedNoneError(
 
 
 class DraftChangeListLastUpdatedInvalidError(
-    base_validation_errors.BaseAuditError
+    base_validation_errors.BaseValidationError
 ):
     """Error class for models with invalid draft change list last_updated."""
 
@@ -72,7 +72,7 @@ class DraftChangeListLastUpdatedInvalidError(
 
 
 class ArchivedModelNotMarkedDeletedError(
-    base_validation_errors.BaseAuditError
+    base_validation_errors.BaseValidationError
 ):
     """Error class for models which are archived but not deleted."""
 

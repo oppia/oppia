@@ -33,7 +33,7 @@ import {State} from 'domain/state/StateObjectFactory';
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {QuestionSuggestionEditorModalComponent} from './question-suggestion-editor-modal.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ContributionOpportunitiesService} from 'pages/contributor-dashboard-page/services/contribution-opportunities.service';
 import {ParamDict} from 'services/suggestion-modal.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -143,7 +143,7 @@ export class QuestionSuggestionReviewModalComponent
   isLastItem: boolean = true;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private contributionOpportunitiesService: ContributionOpportunitiesService,
     private ngbActiveModal: NgbActiveModal,
     private ngbModal: NgbModal,
@@ -205,7 +205,7 @@ export class QuestionSuggestionReviewModalComponent
           });
         },
         () => {
-          this.contextService.resetImageSaveDestination();
+          this.pageContextService.resetImageSaveDestination();
           this.editSuggestionEmitter.emit({
             suggestionId: this.suggestionId,
             suggestion: this.suggestion,

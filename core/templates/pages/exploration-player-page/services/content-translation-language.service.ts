@@ -22,7 +22,7 @@ import {Injectable} from '@angular/core';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
 import {UrlService} from 'services/contextual/url.service';
 
-import {INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM} from 'pages/exploration-player-page/switch-content-language-refresh-required-modal.component';
+import {INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM} from 'pages/exploration-player-page/current-lesson-player/modals/switch-content-language-refresh-required-modal.component';
 
 export interface ExplorationLanguageInfo {
   /**
