@@ -145,7 +145,7 @@ export class StatsReportingService {
     newExplorationTitle: string,
     newExplorationVersion: number,
     newSessionId: string,
-    collectionId: string | null = null
+    collectionId: string | null
   ): void {
     this.explorationId = newExplorationId;
     this.explorationTitle = newExplorationTitle;

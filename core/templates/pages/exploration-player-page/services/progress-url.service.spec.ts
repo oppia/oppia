@@ -57,6 +57,21 @@ describe('ProgressUrlService', () => {
     expect(progressUrlService).toBeTruthy();
   });
 
+  it('should throw error if exploration version is not available', async () => {
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp123');
+    spyOn(
+      checkpointProgressService,
+      'getLastCompletedCheckpoint'
+    ).and.returnValue('checkpoint_id');
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(null);
+
+    await expectAsync(
+      progressUrlService.setUniqueProgressUrlId()
+    ).toBeRejectedWithError(
+      'Exploration version is not available. Cannot set unique progress URL ID.'
+    );
+  });
+
   it('should set unique progress URL ID correctly', fakeAsync(() => {
     spyOn(pageContextService, 'getExplorationId').and.returnValue(
       'exploration_id'
