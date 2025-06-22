@@ -27,7 +27,7 @@ import {
   SolutionObjectFactory,
 } from 'domain/exploration/SolutionObjectFactory';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {AddOrUpdateSolutionModalComponent} from './add-or-update-solution-modal.component';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
@@ -47,7 +47,7 @@ class MockActiveModal {
 describe('Add Or Update Solution Modal Component', () => {
   let component: AddOrUpdateSolutionModalComponent;
   let fixture: ComponentFixture<AddOrUpdateSolutionModalComponent>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let currentInteractionService: CurrentInteractionService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let ngbActiveModal: NgbActiveModal;
@@ -63,7 +63,7 @@ describe('Add Or Update Solution Modal Component', () => {
     TestBed.configureTestingModule({
       declarations: [AddOrUpdateSolutionModalComponent],
       providers: [
-        ContextService,
+        PageContextService,
         CurrentInteractionService,
         ChangeDetectorRef,
         ExplorationHtmlFormatterService,
@@ -99,9 +99,9 @@ describe('Add Or Update Solution Modal Component', () => {
   describe('when solution is valid', () => {
     beforeEach(() => {
       ngbActiveModal = TestBed.inject(NgbActiveModal);
-      contextService = TestBed.inject(ContextService);
+      pageContextService = TestBed.inject(PageContextService);
 
-      spyOn(contextService, 'getEntityType').and.returnValue('question');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('question');
       spyOn(
         explorationHtmlFormatterService,
         'getInteractionHtml'
@@ -215,9 +215,9 @@ describe('Add Or Update Solution Modal Component', () => {
   describe('when solution is not valid', () => {
     beforeEach(() => {
       ngbActiveModal = TestBed.inject(NgbActiveModal);
-      contextService = TestBed.inject(ContextService);
+      pageContextService = TestBed.inject(PageContextService);
 
-      spyOn(contextService, 'getEntityType').and.returnValue('question');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('question');
       spyOn(
         explorationHtmlFormatterService,
         'getInteractionHtml'

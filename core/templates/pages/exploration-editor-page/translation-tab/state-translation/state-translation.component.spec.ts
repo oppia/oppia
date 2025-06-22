@@ -44,7 +44,7 @@ import {TextInputRulesService} from 'interactions/TextInput/directives/text-inpu
 import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ExplorationImprovementsTaskRegistryService} from 'services/exploration-improvements-task-registry.service';
@@ -247,7 +247,7 @@ describe('State translation component', () => {
 
   let refreshStateTranslationEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -267,7 +267,7 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
@@ -878,7 +878,7 @@ describe('State translation component', () => {
   let refreshStateTranslationEmitter = new EventEmitter();
   let showTranslationTabBusyModalEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -898,7 +898,7 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
@@ -1358,7 +1358,7 @@ describe('State translation component', () => {
 
   let refreshStateTranslationEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -1378,7 +1378,7 @@ describe('State translation component', () => {
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,
@@ -2001,7 +2001,7 @@ describe('State translation component', () => {
 
   let refreshStateTranslationEmitter = new EventEmitter();
 
-  class MockContextService {
+  class MockPageContextService {
     getExplorationId() {
       return 'expId';
     }
@@ -2022,7 +2022,7 @@ describe('State translation component', () => {
         ExplorationHtmlFormatterService,
         ConvertToPlainTextPipe,
         AngularNameService,
-        {provide: ContextService, useClass: MockContextService},
+        {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
         ContinueRulesService,
         ExplorationImprovementsTaskRegistryService,

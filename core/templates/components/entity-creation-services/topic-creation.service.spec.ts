@@ -28,14 +28,14 @@ import {NewlyCreatedTopic} from 'domain/topics_and_skills_dashboard/newly-create
 import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {TopicCreationService} from './topic-creation.service';
 
 describe('Topic creation service', () => {
   let topicCreationService: TopicCreationService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let ngbModal: NgbModal;
   let alertsService: AlertsService;
   let imageLocalStorageService: ImageLocalStorageService;
@@ -65,7 +65,7 @@ describe('Topic creation service', () => {
           useClass: MockWindowRef,
         },
         AlertsService,
-        ContextService,
+        PageContextService,
         ImageLocalStorageService,
         TopicCreationBackendApiService,
         TopicsAndSkillsDashboardBackendApiService,
@@ -76,7 +76,7 @@ describe('Topic creation service', () => {
 
   beforeEach(() => {
     topicCreationService = TestBed.inject(TopicCreationService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     ngbModal = TestBed.inject(NgbModal);
     alertsService = TestBed.inject(AlertsService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
@@ -91,7 +91,7 @@ describe('Topic creation service', () => {
 
   it('should create new topic', fakeAsync(() => {
     topicCreationService.topicCreationInProgress = false;
-    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.resolve(
         new NewlyCreatedTopic('valid', 'valid', 'valid', 'valid')
@@ -110,13 +110,13 @@ describe('Topic creation service', () => {
       topicsAndSkillsDashboardBackendApiService.onTopicsAndSkillsDashboardReinitialized,
       'emit'
     );
-    spyOn(contextService, 'resetImageSaveDestination');
+    spyOn(pageContextService, 'resetImageSaveDestination');
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('');
     topicCreationService.createNewTopic();
     tick();
     tick();
     expect(
-      contextService.setImageSaveDestinationToLocalStorage
+      pageContextService.setImageSaveDestinationToLocalStorage
     ).toHaveBeenCalled();
     expect(ngbModal.open).toHaveBeenCalled();
     expect(alertsService.clearWarnings).toHaveBeenCalled();
@@ -124,22 +124,22 @@ describe('Topic creation service', () => {
     expect(imageLocalStorageService.getThumbnailBgColor).toHaveBeenCalled();
     expect(imageLocalStorageService.flushStoredImagesData).toHaveBeenCalled();
     expect(topicCreationBackendApiService.createTopicAsync).toHaveBeenCalled();
-    expect(contextService.resetImageSaveDestination).toHaveBeenCalled();
+    expect(pageContextService.resetImageSaveDestination).toHaveBeenCalled();
     expect(urlInterpolationService.interpolateUrl).toHaveBeenCalled();
   }));
 
   it('should not create topic if creation is already in process', () => {
     topicCreationService.topicCreationInProgress = true;
-    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
     topicCreationService.createNewTopic();
     expect(
-      contextService.setImageSaveDestinationToLocalStorage
+      pageContextService.setImageSaveDestinationToLocalStorage
     ).not.toHaveBeenCalled();
   });
 
   it('should throw error if topic fields are empty', fakeAsync(() => {
     topicCreationService.topicCreationInProgress = false;
-    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
     spyOn(ngbModal, 'open').and.returnValue({
       result: {
         then: (successCallback: (arg1: {}) => void, errorCallback) => {
@@ -156,14 +156,14 @@ describe('Topic creation service', () => {
       tick();
     }).toThrowError('Topic fields cannot be empty');
     expect(
-      contextService.setImageSaveDestinationToLocalStorage
+      pageContextService.setImageSaveDestinationToLocalStorage
     ).toHaveBeenCalled();
     expect(ngbModal.open).toHaveBeenCalled();
   }));
 
   it('should throw error if new topic is invalid', fakeAsync(() => {
     topicCreationService.topicCreationInProgress = false;
-    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
     spyOn(ngbModal, 'open').and.returnValue({
       result: {
         then: (successCallback: (arg1: {}) => void, errorCallback) => {
@@ -187,7 +187,7 @@ describe('Topic creation service', () => {
   it('should handle error if topic creation fails', fakeAsync(() => {
     let error = 'promise rejected';
     topicCreationService.topicCreationInProgress = false;
-    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.resolve(
         new NewlyCreatedTopic('valid', 'valid', 'valid', 'valid')
@@ -212,7 +212,7 @@ describe('Topic creation service', () => {
 
   it('should do nothing when user cancels the topic creation modal', fakeAsync(() => {
     topicCreationService.topicCreationInProgress = false;
-    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
     spyOn(ngbModal, 'open').and.returnValue({
       result: Promise.reject(),
     } as NgbModalRef);
@@ -220,7 +220,7 @@ describe('Topic creation service', () => {
     topicCreationService.createNewTopic();
     tick();
     expect(
-      contextService.setImageSaveDestinationToLocalStorage
+      pageContextService.setImageSaveDestinationToLocalStorage
     ).toHaveBeenCalled();
     expect(ngbModal.open).toHaveBeenCalled();
   }));

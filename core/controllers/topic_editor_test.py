@@ -28,6 +28,7 @@ from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import study_guide_domain
 from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
@@ -532,6 +533,157 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
         self.logout()
 
 
+class StudyGuideEditorTests(BaseTopicEditorControllerTests):
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SHOW_RESTRUCTURED_STUDY_GUIDES
+    ])
+    def setUp(self) -> None:
+        super().setUp()
+        changelist = [topic_domain.TopicChange({
+            'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+            'subtopic_id': 1,
+            'property_name': 'sections',
+            'new_value': [
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': 'section heading'
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': 'content'
+                    }
+                }
+            ],
+            'old_value': [
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': ''
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': ''
+                    }
+                }
+            ]
+        }), topic_domain.TopicChange({
+            'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+            'subtopic_id': 1,
+            'property_name': 'sections',
+            'new_value': [
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': 'section heading'
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': '<p>section content</p>'
+                    }
+                }
+            ],
+            'old_value': [
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': 'section heading'
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': 'content'
+                    }
+                }
+            ]
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.admin_id, self.topic_id, changelist, 'Updated study guide.')
+
+    def test_get_can_not_access_handler_with_invalid_topic_id(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, topic_fetchers.get_new_topic_id()),
+            expected_status_int=404)
+
+        self.logout()
+
+    def test_editable_study_guide_get(self) -> None:
+        # Check that non-admins and non-topic managers cannot access the
+        # editable study guide data.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 1), expected_status_int=401)
+        self.logout()
+
+        # Check that topic managers not assigned to this topic can
+        # access its study guides.
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 1))
+        self.assertEqual([
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': 'section heading'
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': '<p>section content</p>'
+                    }
+                }
+            ], json_response['study_guide']['sections'])
+        self.logout()
+
+        # Check that topic managers can access the study guide.
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 1))
+        self.assertEqual([
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': 'section heading'
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': '<p>section content</p>'
+                    }
+                }
+            ], json_response['study_guide']['sections'])
+        self.logout()
+
+        # Check that admins can access the editable study guide data.
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 1))
+        self.assertEqual([
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': 'section heading'
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': '<p>section content</p>'
+                    }
+                }
+            ], json_response['study_guide']['sections'])
+        self.logout()
+
+
 class TopicEditorTests(
         BaseTopicEditorControllerTests, test_utils.EmailTestBase):
 
@@ -697,6 +849,34 @@ class TopicEditorTests(
                     'content_id': 'content'
                 }
             }, {
+                'cmd': 'update_study_guide_property',
+                'subtopic_id': 1,
+                'property_name': 'sections',
+                'new_value': [
+                    {
+                        'heading': {
+                            'content_id': 'section_heading_0',
+                            'unicode_str': 'new heading'
+                        },
+                        'content': {
+                            'content_id': 'section_content_1',
+                            'html': '<p>New Data</p>'
+                        }
+                    }
+                ],
+                'old_value': [
+                    {
+                        'heading': {
+                            'content_id': 'section_heading_0',
+                            'unicode_str': ''
+                        },
+                        'content': {
+                            'content_id': 'section_content_1',
+                            'html': ''
+                        }
+                    }
+                ]
+            }, {
                 'cmd': 'update_subtopic_property',
                 'property_name': 'url_fragment',
                 'new_value': 'subtopic-one',
@@ -821,6 +1001,24 @@ class TopicEditorTests(
                 }
             }
         }, json_response['subtopic_page']['page_contents'])
+
+        # Test if the corresponding study guides were created.
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 1))
+        self.assertEqual([
+                {
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': 'new heading'
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': '<p>New Data</p>'
+                    }
+                }
+            ], json_response['study_guide']['sections'])
         self.logout()
 
         # Test that any topic manager cannot edit the topic.
@@ -920,6 +1118,34 @@ class TopicEditorTests(
                     'html': '<p>New Data</p>',
                     'content_id': 'content'
                 }
+            }, {
+                'cmd': 'update_study_guide_property',
+                'subtopic_id': 1,
+                'property_name': 'sections',
+                'new_value': [
+                    {
+                        'heading': {
+                            'content_id': 'section_heading_0',
+                            'unicode_str': 'new heading'
+                        },
+                        'content': {
+                            'content_id': 'section_content_1',
+                            'html': 'content'
+                        }
+                    }
+                ],
+                'old_value': [
+                    {
+                        'heading': {
+                            'content_id': 'section_heading_0',
+                            'unicode_str': ''
+                        },
+                        'content': {
+                            'content_id': 'section_content_1',
+                            'html': ''
+                        }
+                    }
+                ]
             }, {
                 'cmd': 'update_subtopic_property',
                 'property_name': 'url_fragment',
