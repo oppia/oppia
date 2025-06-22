@@ -109,7 +109,6 @@ describe('Curriculum Admin', function () {
     );
     await curriculumAdmin.deleteStudyGuideSection(1);
     await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
-    await curriculumAdmin.downloadScreenshot('hello', __dirname);
   });
 
   afterAll(async function () {
