@@ -319,13 +319,15 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self) -> None:
         self.assertEqual(
-            opportunity_models.TranslationOpportunityModel.get_deletion_policy(),
+            opportunity_models.TranslationOpportunityModel
+                .get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE
         )
 
     def test_get_model_association_to_user(self) -> None:
         self.assertEqual(
-            opportunity_models.TranslationOpportunityModel.get_model_association_to_user(),
+            opportunity_models.TranslationOpportunityModel
+                .get_model_association_to_user(),
             base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
         )
 
@@ -338,7 +340,8 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'incomplete_translation_language_codes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'incomplete_translation_language_codes': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
             'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE
         }
         self.assertEqual(
@@ -411,7 +414,8 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             Exception, 'Invalid translation count for fr: -1'):
             model.put()
 
-    def test_validation_fails_for_translation_count_exceeding_content(self) -> None:
+    def test_validation_fails_for_translation_count_exceeding_content(
+        self) -> None:
         model = opportunity_models.TranslationOpportunityModel(
             id='exploration.expbad2',
             entity_type='exploration',
