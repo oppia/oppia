@@ -27,7 +27,7 @@ import {
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {AddAudioTranslationModalComponent} from './add-audio-translation-modal.component';
 
 class MockActiveModal {
@@ -45,7 +45,7 @@ describe('Add Audio Translation Modal component', () => {
   let fixture: ComponentFixture<AddAudioTranslationModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let assetsBackendApiService: AssetsBackendApiService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
 
   let audioFile = new File([], '');
   let generatedFilename = 'new_audio_file.mp3';
@@ -71,7 +71,7 @@ describe('Add Audio Translation Modal component', () => {
     component = fixture.componentInstance;
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
 
     spyOn(ngbActiveModal, 'close');
@@ -98,7 +98,7 @@ describe('Add Audio Translation Modal component', () => {
     };
     component.updateUploadedFile(file as Blob);
 
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
 
     let response = {
       filename: 'filename',
@@ -128,7 +128,7 @@ describe('Add Audio Translation Modal component', () => {
     };
     component.updateUploadedFile(file as Blob);
 
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(assetsBackendApiService, 'saveAudio').and.returnValue(
       Promise.reject({})
     );

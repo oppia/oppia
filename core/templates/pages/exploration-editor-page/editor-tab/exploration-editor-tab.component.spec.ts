@@ -66,7 +66,7 @@ import {
   StateObjectFactory,
 } from 'domain/state/StateObjectFactory';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationNextContentIdIndexService} from '../services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from '../services/version-history.service';
@@ -95,7 +95,7 @@ describe('Exploration editor tab component', () => {
   let stateEditorService: StateEditorService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let focusManagerService: FocusManagerService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   var generateContentIdService: GenerateContentIdService;
   var explorationNextContentIdIndexService: ExplorationNextContentIdIndexService;
   let mockRefreshStateEditorEventEmitter = null;
@@ -229,7 +229,7 @@ describe('Exploration editor tab component', () => {
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService
     );
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     explorationNextContentIdIndexService = TestBed.inject(
       ExplorationNextContentIdIndexService
     );
@@ -243,7 +243,9 @@ describe('Exploration editor tab component', () => {
     alertsService = TestBed.inject(AlertsService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
-    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'explorationId'
+    );
     spyOn(
       stateEditorService,
       'checkEventListenerRegistrationStatus'

@@ -19,7 +19,7 @@
 import {Component, OnInit} from '@angular/core';
 import {MobileMenuService} from '../../services/mobile-menu.service';
 import './player-sidebar.component.css';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {
   I18nLanguageCodeService,
   TranslationKeyType,
@@ -44,7 +44,7 @@ export class PlayerSidebarComponent implements OnInit {
 
   constructor(
     private mobileMenuService: MobileMenuService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private urlService: UrlService
@@ -71,7 +71,7 @@ export class PlayerSidebarComponent implements OnInit {
     }
 
     this.explorationId = explorationContext
-      ? this.contextService.getExplorationId()
+      ? this.pageContextService.getExplorationId()
       : 'test_id';
     this.expDescription = 'Loading...';
     this.readOnlyExplorationBackendApiService

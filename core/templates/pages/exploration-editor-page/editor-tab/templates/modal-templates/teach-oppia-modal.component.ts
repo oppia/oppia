@@ -31,7 +31,7 @@ import {
   InteractionRulesService,
 } from 'pages/exploration-player-page/services/answer-classification.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {TrainingDataService} from '../../training-panel/training-data.service';
 import {TrainingModalService} from '../../training-panel/training-modal.service';
@@ -77,7 +77,7 @@ export class TeachOppiaModalComponent
     private alertsService: AlertsService,
     private angularNameService: AngularNameService,
     private answerClassificationService: AnswerClassificationService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private explorationStatesService: ExplorationStatesService,
     private injector: Injector,
@@ -236,7 +236,7 @@ export class TeachOppiaModalComponent
       )
     );
 
-    this._explorationId = this.contextService.getExplorationId();
+    this._explorationId = this.pageContextService.getExplorationId();
     let stateName = this.stateEditorService.getActiveStateName();
     if (stateName) {
       this._stateName = stateName;

@@ -20,21 +20,21 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {HelpModalComponent} from './help-modal.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 describe('Exploration Player Suggestion Modal Controller', function () {
   let component: HelpModalComponent;
   let fixture: ComponentFixture<HelpModalComponent>;
   let siteAnalyticsService: SiteAnalyticsService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let ngbActiveModal: NgbActiveModal;
   let explorationId = 'exp1';
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [HelpModalComponent],
-      providers: [SiteAnalyticsService, ContextService, NgbActiveModal],
+      providers: [SiteAnalyticsService, PageContextService, NgbActiveModal],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -43,10 +43,12 @@ describe('Exploration Player Suggestion Modal Controller', function () {
     fixture = TestBed.createComponent(HelpModalComponent);
     component = fixture.componentInstance;
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
 
-    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
   });
 
   it('should begin editor tutorial when closing the modal', function () {

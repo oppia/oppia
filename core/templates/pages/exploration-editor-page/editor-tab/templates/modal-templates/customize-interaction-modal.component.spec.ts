@@ -44,7 +44,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {AppConstants} from 'app.constants';
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -123,7 +123,7 @@ class MockStateEditorService {
 
 describe('Customize Interaction Modal Component', () => {
   let component: CustomizeInteractionModalComponent;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let changeDetectorRef: ChangeDetectorRef;
   let fixture: ComponentFixture<CustomizeInteractionModalComponent>;
   let generateContentIdService: GenerateContentIdService;
@@ -148,7 +148,7 @@ describe('Customize Interaction Modal Component', () => {
         InteractionDetailsCacheService,
         NgbModal,
         RatioExpressionInputValidationService,
-        ContextService,
+        PageContextService,
         {
           provide: INTERACTION_SPECS,
           useValue: MockInteractionState,
@@ -175,7 +175,7 @@ describe('Customize Interaction Modal Component', () => {
     component = fixture.componentInstance;
 
     changeDetectorRef = TestBed.inject(ChangeDetectorRef);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     interactionDetailsCacheService = TestBed.inject(
       InteractionDetailsCacheService
     );
@@ -437,7 +437,9 @@ describe('Customize Interaction Modal Component', () => {
       ' question mode and linked to story',
     fakeAsync(() => {
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
-      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+        true
+      );
       jasmine
         .createSpy('stateCustomizationArgsService.savedMemento.hasOwnProperty')
         .and.returnValue(false);
@@ -463,7 +465,7 @@ describe('Customize Interaction Modal Component', () => {
       ' question mode and not linked to story',
     fakeAsync(() => {
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
-      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(
+      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
         false
       );
 
