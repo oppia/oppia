@@ -48,6 +48,11 @@ import {
 import {LoaderService} from 'services/loader.service';
 import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {
+  StudyGuide,
+  StudyGuideBackendDict,
+} from 'domain/topic/study-guide.model';
+import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 
 interface GroupedSkillSummaryDict {
   current: SkillSummaryBackendDict[];
@@ -64,12 +69,19 @@ export class TopicEditorStateService {
   private _topic!: Topic;
   private _topicRights!: TopicRights;
   private _subtopicPage!: SubtopicPage;
+  private _studyGuide!: StudyGuide;
   // The array that caches all the subtopic pages loaded by the user.
   private _cachedSubtopicPages: SubtopicPage[] = [];
+  // The array that caches all the study guides loaded by the user.
+  private _cachedStudyGuides: StudyGuide[] = [];
   // The array that stores all the ids of the subtopic pages that were not
   // loaded from the backend i.e those that correspond to newly created
   // subtopics (and not loaded from the backend).
   private _newSubtopicPageIds: string[] = [];
+  // The array that stores all the ids of the study guides that were not
+  // loaded from the backend i.e those that correspond to newly created
+  // subtopics (and not loaded from the backend).
+  private _newStudyGuideIds: string[] = [];
   private _topicIsInitialized: boolean = false;
   private _topicIsLoading: boolean = false;
   private _topicIsBeingSaved: boolean = false;
@@ -93,6 +105,9 @@ export class TopicEditorStateService {
     new EventEmitter();
 
   private _subtopicPageLoadedEventEmitter: EventEmitter<void> =
+    new EventEmitter();
+
+  private __studyGuideLoadedEventEmitter: EventEmitter<void> =
     new EventEmitter();
 
   private _topicInitializedEventEmitter: EventEmitter<void> =
@@ -119,8 +134,13 @@ export class TopicEditorStateService {
       SubtopicPageContents.createDefault(),
       'en'
     );
+    let sections: StudyGuideSection[] = [
+      StudyGuideSection.createDefault('section_heading_0', 'section_content_1'),
+    ];
+    this._studyGuide = new StudyGuide('id', 'topic_id', sections, 2, 'en');
   }
 
+  // Rename this to _getStudyGuideId once Subtopic Pages are deprecated.
   private _getSubtopicPageId(topicId: string, subtopicId: number): string {
     if (topicId !== null && subtopicId !== null) {
       return topicId.toString() + '-' + subtopicId.toString();
@@ -156,10 +176,21 @@ export class TopicEditorStateService {
     return parseInt(subtopicPageId.slice(13));
   }
 
+  private _getSubtopicIdFromStudyGuideId(studyGuideId: string): number {
+    // The study guide id consists of the topic id of length 12, a hyphen
+    // and a subtopic id (which is a number).
+    return parseInt(studyGuideId.slice(13));
+  }
+
   private _setTopic(topic: Topic): void {
     this._topic = topic.createCopyFromTopic();
     // Reset the subtopic pages list after setting new topic.
     this._cachedSubtopicPages.length = 0;
+    // Reset the study guides list after setting new topic.
+    this._cachedStudyGuides.length = 0;
+    // We need this if block as without it, the subtopic
+    // editor page does not load as expected. Might be worth
+    // looking into if we can remove it.
     if (this._topicIsInitialized) {
       this._topicIsInitialized = true;
       this._topicReinitializedEventEmitter.emit();
@@ -176,6 +207,13 @@ export class TopicEditorStateService {
       }
     }
     return null;
+  }
+
+  private _getStudyGuideIndex(studyGuideId: string): number | null {
+    const index = this._cachedStudyGuides.findIndex(
+      guide => guide.getId() === studyGuideId
+    );
+    return index !== -1 ? index : null;
   }
 
   private _updateClassroomUrlFragment(
@@ -223,11 +261,25 @@ export class TopicEditorStateService {
     this._subtopicPageLoadedEventEmitter.emit();
   }
 
+  private _setStudyGuide(studyGuide: StudyGuide): void {
+    this._studyGuide.copyFromStudyGuide(studyGuide);
+    this._cachedStudyGuides.push(cloneDeep(studyGuide));
+    this.__studyGuideLoadedEventEmitter.emit();
+  }
+
   private _updateSubtopicPage(
     newBackendSubtopicPageObject: SubtopicPageBackendDict
   ): void {
     this._setSubtopicPage(
       SubtopicPage.createFromBackendDict(newBackendSubtopicPageObject)
+    );
+  }
+
+  private _updateStudyGuide(
+    newBackendStudyGuideObject: StudyGuideBackendDict
+  ): void {
+    this._setStudyGuide(
+      StudyGuide.createFromBackendDict(newBackendStudyGuideObject)
     );
   }
 
@@ -381,6 +433,34 @@ export class TopicEditorStateService {
   }
 
   /**
+   * Loads, or reloads, the study guide stored by this service given a
+   * specified topic ID and subtopic ID.
+   */
+  loadStudyGuide(topicId: string, subtopicId: number): void {
+    let studyGuideId = this._getSubtopicPageId(topicId, subtopicId);
+    let pageIndex = this._getStudyGuideIndex(studyGuideId);
+    if (pageIndex !== null) {
+      this._studyGuide = cloneDeep(this._cachedStudyGuides[pageIndex]);
+      this.__studyGuideLoadedEventEmitter.emit();
+      return;
+    }
+    this.loaderService.showLoadingScreen('Loading Subtopic Editor');
+    this.editableTopicBackendApiService
+      .fetchStudyGuideAsync(topicId, subtopicId)
+      .then(
+        newBackendStudyGuideObject => {
+          this._updateStudyGuide(newBackendStudyGuideObject);
+          this.loaderService.hideLoadingScreen();
+        },
+        error => {
+          this.alertsService.addWarning(
+            error || 'There was an error when loading the topic.'
+          );
+        }
+      );
+  }
+
+  /**
    * Returns whether this service is currently attempting to load the
    * topic maintained by this service.
    */
@@ -435,8 +515,24 @@ export class TopicEditorStateService {
     return this._subtopicPage;
   }
 
+  /**
+   * Returns the current study guide to be shared among the topic
+   * editor. Please note any changes to this study guide will be
+   * propogated to all bindings to it. This study guide object will be
+   * retained for the lifetime of the editor. This function never returns
+   * null, though it may return an empty study guide object if the topic
+   * has not yet been loaded for this editor instance.
+   */
+  getStudyGuide(): StudyGuide {
+    return this._studyGuide;
+  }
+
   getCachedSubtopicPages(): SubtopicPage[] {
     return this._cachedSubtopicPages;
+  }
+
+  getCachedStudyGuides(): StudyGuide[] {
+    return this._cachedStudyGuides;
   }
 
   /**
@@ -474,6 +570,21 @@ export class TopicEditorStateService {
     } else {
       this._setSubtopicPage(subtopicPage);
       this._newSubtopicPageIds.push(subtopicPage.getId());
+    }
+  }
+
+  /**
+   * Sets the updated study guide object in the correct position in the
+   * _cachedStudyGuides list.
+   */
+  setStudyGuide(studyGuide: StudyGuide): void {
+    let pageIndex = this._getStudyGuideIndex(studyGuide.getId());
+    if (pageIndex !== null) {
+      this._cachedStudyGuides[pageIndex] = cloneDeep(studyGuide);
+      this._studyGuide.copyFromStudyGuide(studyGuide);
+    } else {
+      this._setStudyGuide(studyGuide);
+      this._newStudyGuideIds.push(studyGuide.getId());
     }
   }
 
@@ -540,6 +651,55 @@ export class TopicEditorStateService {
         if (newSubtopicId > subtopicId) {
           newSubtopicId--;
           this._newSubtopicPageIds[i] = this._getSubtopicPageId(
+            topicId,
+            newSubtopicId
+          );
+        }
+      }
+    }
+  }
+
+  deleteStudyGuide(topicId: string, subtopicId: number): void {
+    let studyGuideId = this._getSubtopicPageId(topicId, subtopicId);
+    let index = this._getStudyGuideIndex(studyGuideId);
+    let newIndex = this._newStudyGuideIds.indexOf(studyGuideId);
+    // If index is null, that means the corresponding study guide was
+    // never loaded from the backend and not that the study guide doesn't
+    // exist at all. So, not required to throw an error here.
+    // Also, since newStudyGuideIds will only have the ids of a subset of
+    // the pages in the _studyGuides array, the former need not be edited
+    // either, in this case.
+    if (index === null) {
+      if (newIndex === -1) {
+        return;
+      }
+    } else {
+      this._cachedStudyGuides.splice(index, 1);
+    }
+    // If the deleted study guide corresponded to a newly created
+    // subtopic, then the 'subtopicId' part of the id of all subsequent
+    // study guide should be decremented to make it in sync with the
+    // their corresponding subtopic ids.
+    if (newIndex !== -1) {
+      this._newStudyGuideIds.splice(newIndex, 1);
+      for (let i = 0; i < this._cachedStudyGuides.length; i++) {
+        let newSubtopicId = this._getSubtopicIdFromStudyGuideId(
+          this._cachedStudyGuides[i].getId()
+        );
+        if (newSubtopicId > subtopicId) {
+          newSubtopicId--;
+          this._cachedStudyGuides[i].setId(
+            this._getSubtopicPageId(topicId, newSubtopicId)
+          );
+        }
+      }
+      for (let i = 0; i < this._newStudyGuideIds.length; i++) {
+        let newSubtopicId = this._getSubtopicIdFromStudyGuideId(
+          this._newStudyGuideIds[i]
+        );
+        if (newSubtopicId > subtopicId) {
+          newSubtopicId--;
+          this._newStudyGuideIds[i] = this._getSubtopicPageId(
             topicId,
             newSubtopicId
           );
@@ -761,5 +921,8 @@ export class TopicEditorStateService {
 
   get onSubtopicPageLoaded(): EventEmitter<void> {
     return this._subtopicPageLoadedEventEmitter;
+  }
+  get onStudyGuideLoaded(): EventEmitter<void> {
+    return this.__studyGuideLoadedEventEmitter;
   }
 }

@@ -987,6 +987,11 @@ URLS = [
         feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableSubtopicPageDataHandler),
     get_redirect_route(
+        r'%s/<topic_id>/<subtopic_id>' %
+        feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX,
+        topic_editor.EditableStudyGuideDataHandler
+    ),
+    get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_RIGHTS_URL_PREFIX,
         topic_editor.TopicRightsHandler),
     get_redirect_route(

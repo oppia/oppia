@@ -1004,6 +1004,7 @@ UPDATE_QUESTION_SUGGESTION_URL_PREFIX = (
 USER_GROUPS_HANDLER_URL = '/user_groups_handler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
+STUDY_GUIDE_EDITOR_DATA_URL_PREFIX = '/study_guide_editor_handler/data'
 TOPIC_VIEWER_URL_PREFIX = (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>')
 TOPIC_DATA_HANDLER = '/topic_data_handler'
