@@ -20,9 +20,9 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter} from '@angular/core';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
+import {InteractionObjectFactory} from '../../../domain/exploration/InteractionObjectFactory';
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
@@ -33,17 +33,17 @@ import {ParamChange} from 'domain/exploration/param-change.model';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
-} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
-import {UrlService} from 'services/contextual/url.service';
+} from '../../../domain/exploration/read-only-exploration-backend-api.service';
+import {StateCard} from '../../../domain/state_card/state-card.model';
+import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
+import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
+import {AlertsService} from '../../../services/alerts.service';
+import {PageContextService} from '../../../services/page-context.service';
+import {UrlService} from '../../../services/contextual/url.service';
 import {
   ExplorationFeatures,
   ExplorationFeaturesBackendApiService,
-} from 'services/exploration-features-backend-api.service';
+} from '../../../services/exploration-features-backend-api.service';
 import {
   AnswerClassificationService,
   InteractionRulesService,
@@ -60,7 +60,7 @@ describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let audioPreloaderService: AudioPreloaderService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
   let explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService;
@@ -361,7 +361,7 @@ describe('Exploration engine service ', () => {
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     contentTranslationLanguageService = TestBed.inject(
       ContentTranslationLanguageService
     );
@@ -388,7 +388,9 @@ describe('Exploration engine service ', () => {
   });
 
   beforeEach(() => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'explorationId'
+    );
     spyOn(urlService, 'getExplorationVersionFromUrl').and.returnValue(2);
     spyOn(contentTranslationLanguageService, 'init').and.returnValue(null);
     spyOn(imagePreloaderService, 'init').and.returnValue(null);
@@ -416,7 +418,9 @@ describe('Exploration engine service ', () => {
     () => {
       let initSuccessCb = jasmine.createSpy('success');
       // Setting exploration player page.
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       expect(explorationEngineService.isInPreviewMode()).toBe(false);
       expect(() => {
@@ -445,9 +449,13 @@ describe('Exploration engine service ', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
       // Setting exploration editor page.
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(true);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        true
+      );
       spyOn(urlService, 'getPathname').and.returnValue('/create/in/path/name');
-      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(false);
+      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(
+        false
+      );
 
       // Since the constructor will be automatically called in unit tests, it
       // is hard to test or spy on the constructor. So, we have created a
@@ -510,7 +518,7 @@ describe('Exploration engine service ', () => {
           'content_id'
         );
 
-        spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(
+        spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
           false
         );
         spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
@@ -578,7 +586,7 @@ describe('Exploration engine service ', () => {
           'content_id'
         );
 
-        spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(
+        spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
           false
         );
         spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
@@ -645,7 +653,7 @@ describe('Exploration engine service ', () => {
           'content_id'
         );
 
-        spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(
+        spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
           false
         );
         spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
@@ -714,7 +722,9 @@ describe('Exploration engine service ', () => {
         'content_id'
       );
 
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
@@ -782,7 +792,9 @@ describe('Exploration engine service ', () => {
         'content_id'
       );
 
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
@@ -898,7 +910,9 @@ describe('Exploration engine service ', () => {
         'content_id'
       );
 
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
@@ -960,7 +974,9 @@ describe('Exploration engine service ', () => {
     fakeAsync(() => {
       let initSuccessCb = jasmine.createSpy('success');
 
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
       spyOn(
         explorationFeaturesBackendApiService,
         'fetchExplorationFeaturesAsync'
@@ -1001,7 +1017,9 @@ describe('Exploration engine service ', () => {
     () => {
       let initSuccessCb = jasmine.createSpy('success');
 
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       expect(() => {
         explorationEngineService.getExplorationTitle();
@@ -1028,7 +1046,9 @@ describe('Exploration engine service ', () => {
     () => {
       let initSuccessCb = jasmine.createSpy('success');
 
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       // Here 1 is default value, this is being initialized in the constructor.
       expect(explorationEngineService.getExplorationVersion()).toBe(1);
@@ -1055,7 +1075,9 @@ describe('Exploration engine service ', () => {
     () => {
       let initSuccessCb = jasmine.createSpy('success');
 
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       expect(() => {
         explorationEngineService.getAuthorRecommendedExpIdsByStateName('Start');
@@ -1122,7 +1144,9 @@ describe('Exploration engine service ', () => {
         'content_id'
       );
 
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
       spyOn(playerTranscriptService, 'getLastStateName').and.returnValue(
         'Start'
       );
@@ -1157,7 +1181,9 @@ describe('Exploration engine service ', () => {
 
   it('should load initial state when moved to new exploration', () => {
     let moveToExplorationCb = jasmine.createSpy('success');
-    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
 
     explorationEngineService.exploration =
       explorationObjectFactory.createFromBackendDict(explorationDict);
@@ -1179,7 +1205,9 @@ describe('Exploration engine service ', () => {
     () => {
       let initSuccessCb = jasmine.createSpy('success');
 
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       expect(() => {
         explorationEngineService.isCurrentStateInitial();
@@ -1203,7 +1231,9 @@ describe('Exploration engine service ', () => {
 
   it("should return current state when calling 'getState'", () => {
     let initSuccessCb = jasmine.createSpy('success');
-    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
     let lastStateNameSpy = spyOn(playerTranscriptService, 'getLastStateName');
 
     expect(() => {
@@ -1243,7 +1273,9 @@ describe('Exploration engine service ', () => {
 
   it("should return language code when calling 'getLanguageCode'", () => {
     let initSuccessCb = jasmine.createSpy('success');
-    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
 
     expect(() => {
       explorationEngineService.getLanguageCode();
@@ -1306,7 +1338,9 @@ describe('Exploration engine service ', () => {
 
   it("should return state when calling 'getStateFromStateName'", () => {
     let initSuccessCb = jasmine.createSpy('success');
-    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
 
     expect(() => {
       explorationEngineService.getStateFromStateName('Start');
@@ -1335,7 +1369,9 @@ describe('Exploration engine service ', () => {
 
   it("should return state card when calling 'getStateCardByName'", () => {
     let initSuccessCb = jasmine.createSpy('success');
-    spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
 
     expect(() => {
       explorationEngineService.getStateCardByName('Start');
@@ -1369,7 +1405,9 @@ describe('Exploration engine service ', () => {
       "'getShortestPathToState'",
     () => {
       let initSuccessCb = jasmine.createSpy('success');
-      spyOn(contextService, 'isInExplorationEditorPage').and.returnValue(false);
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
 
       explorationEngineService.init(
         explorationDict,

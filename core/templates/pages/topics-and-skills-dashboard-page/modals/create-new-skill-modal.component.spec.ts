@@ -25,13 +25,13 @@ import {SkillCreationService} from 'components/entity-creation-services/skill-cr
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CreateNewSkillModalComponent} from './create-new-skill-modal.component';
 
 describe('Create new skill modal', () => {
   let fixture: ComponentFixture<CreateNewSkillModalComponent>;
   let componentInstance: CreateNewSkillModalComponent;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let skillObjectFactory: SkillObjectFactory;
   let testObj: SubtitledHtml = SubtitledHtml.createDefault(
     'test_html',
@@ -53,7 +53,7 @@ describe('Create new skill modal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateNewSkillModalComponent);
     componentInstance = fixture.componentInstance;
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
@@ -65,10 +65,10 @@ describe('Create new skill modal', () => {
   });
 
   it('should initialize', () => {
-    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
     componentInstance.ngOnInit();
     expect(
-      contextService.setImageSaveDestinationToLocalStorage
+      pageContextService.setImageSaveDestinationToLocalStorage
     ).toHaveBeenCalled();
   });
 

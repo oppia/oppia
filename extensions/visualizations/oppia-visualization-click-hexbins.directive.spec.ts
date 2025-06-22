@@ -27,7 +27,7 @@ import {
 } from '@angular/core/testing';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {
   Hexbin,
   OppiaVisualizationClickHexbinsComponent,
@@ -52,7 +52,7 @@ describe('Oppia click hexbins visualization', function () {
       declarations: [OppiaVisualizationClickHexbinsComponent],
       providers: [
         AssetsBackendApiService,
-        ContextService,
+        PageContextService,
         ImagePreloaderService,
       ],
       schemas: [NO_ERRORS_SCHEMA],

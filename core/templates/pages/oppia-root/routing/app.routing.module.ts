@@ -228,7 +228,7 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_PLAYER.ROUTE,
     loadChildren: () =>
       import(
-        'pages/exploration-player-page/exploration-player-page.module'
+        'pages/exploration-player-page/current-lesson-player/exploration-player-page.module'
       ).then(m => m.ExplorationPlayerPageModule),
   },
   {
@@ -236,7 +236,7 @@ const routes: Route[] = [
       .ROUTE,
     loadChildren: () =>
       import(
-        'pages/exploration-player-page/exploration-player-page.module'
+        'pages/exploration-player-page/current-lesson-player/exploration-player-page.module'
       ).then(m => m.ExplorationPlayerPageModule),
   },
   {

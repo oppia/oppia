@@ -32,7 +32,7 @@ import {
 } from 'pages/exploration-player-page/services/learner-params.service';
 import {NumberAttemptsService} from 'pages/exploration-player-page/services/number-attempts.service';
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
@@ -57,7 +57,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
   voiceoversAreLoaded: boolean = false;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private explorationDataService: ExplorationDataService,
     private explorationEngineService: ExplorationEngineService,
@@ -147,7 +147,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     const initStateNameForPreview =
       this.explorationInitStateNameService.savedMemento;
     setTimeout(() => {
-      const explorationId = this.contextService.getExplorationId();
+      const explorationId = this.pageContextService.getExplorationId();
 
       this.editableExplorationBackendApiService
         .fetchApplyDraftExplorationAsync(explorationId)
@@ -247,7 +247,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         }
 
         this.entityVoiceoversService.init(
-          this.contextService.getExplorationId(),
+          this.pageContextService.getExplorationId(),
           'exploration',
           explorationData.version as number,
           explorationData.language_code

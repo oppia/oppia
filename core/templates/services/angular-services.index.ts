@@ -270,7 +270,7 @@ import { ComputeGraphService } from 'services/compute-graph.service';
 import { ClassroomsPageAuthGuard } from '../pages/classrooms-page/classrooms-page-auth.guard';
 import { InternetConnectivityService } from 'services/internet-connectivity.service';
 import { ConstructTranslationIdsService } from 'services/construct-translation-ids.service';
-import { ContextService } from 'services/context.service';
+import { PageContextService } from 'services/page-context.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from 'services/contextual/document-attribute-customization.service';
 import { LoggerService } from 'services/contextual/logger.service';
@@ -430,14 +430,14 @@ import { ModeratorAuthGuard } from 'pages/moderator-page/moderator-auth.guard';
 import { ClassroomAdminAuthGuard } from 'pages/classroom-admin-page/classroom-admin-auth.guard';
 import { VoiceoverBackendApiService } from
   'domain/voiceover/voiceover-backend-api.service';
-import { ExplorationPlayerPageAuthGuard } from 'pages/exploration-player-page/exploration-player-page-auth.guard';
+import { ExplorationPlayerPageAuthGuard } from 'pages/exploration-player-page/current-lesson-player/exploration-player-page-auth.guard';
 import { TopicEditorAuthGuard } from 'pages/topic-editor-page/topic-editor-auth.guard';
 import { TopicsAndSkillsDashboardAuthGuard } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-auth.guard';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
 import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
 import { SkillEditorAccessGuard } from 'pages/skill-editor-page/skill-editor-access.guard';
-import { MobileMenuService } from 'pages/exploration-player-page/new-lesson-player/new-lesson-player-services/mobile-menu.service';
+import { MobileMenuService } from 'pages/exploration-player-page/services/mobile-menu.service';
 import { CollectionEditorPageAuthGuard } from 'pages/collection-editor-page/collection-editor-page-auth.guard';
 import { VoiceoverAdminAuthGuard } from 'pages/voiceover-admin-page/voiceover-admin-page-auth.guard';
 import { SubtopicViewerAuthGuard } from 'pages/subtopic-viewer-page/subtopic-viewer-auth.guard';
@@ -511,7 +511,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ConstructTranslationIdsService', ConstructTranslationIdsService],
   ['ContentTranslationLanguageService', ContentTranslationLanguageService],
   ['ContentTranslationManagerService', ContentTranslationManagerService],
-  ['ContextService', ContextService],
+  ['PageContextService', PageContextService],
   ['ContinueRulesService', ContinueRulesService],
   ['ContinueValidationService', ContinueValidationService],
   ['ContributionAndReviewService', ContributionAndReviewService],
