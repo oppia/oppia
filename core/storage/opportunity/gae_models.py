@@ -266,7 +266,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
     entity_type.entity_id
     """
 
-    # The type of the entity (e.g., "exploration", "skill", etc.)
+    # The type of the entity (e.g., 'exploration', 'skill', etc.)
     entity_type = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the entity.
     entity_id = datastore_services.StringProperty(required=True, indexed=True)
@@ -278,57 +278,62 @@ class TranslationOpportunityModel(base_models.BaseModel):
     incomplete_translation_language_codes = datastore_services.StringProperty(
         repeated=True, indexed=True)
     # Dict mapping language codes to number of completed translations.
-    translation_counts = datastore_services.JsonProperty(required=True, indexed=True)
+    translation_counts = datastore_services.JsonProperty(
+        required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """This model does not contain user-specific data."""
+        '''This model does not contain user-specific data.'''
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """This model is not associated with any user."""
+        '''This model is not associated with any user.'''
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """This model does not contain user-specific data."""
+        '''This model does not contain user-specific data.'''
         return dict(super(cls, cls).get_export_policy(), **{
             'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'topic_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'incomplete_translation_language_codes': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'incomplete_translation_language_codes':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE,
         })
 
     def _pre_put_hook(self) -> None:
-        """Validates model properties before saving."""
+        '''Validates model properties before saving.'''
         super()._pre_put_hook()
 
         # Check if entity_type is valid.
-        valid_entity_types = {"exploration", "skill", "topic", "story", "classroom"}
+        valid_entity_types = {
+            'exploration', 'skill', 'topic', 'story', 'classroom'
+        }
         if self.entity_type not in valid_entity_types:
-            raise Exception(f"Invalid entity_type: {self.entity_type}")
+            raise Exception(f'Invalid entity_type: {self.entity_type}')
 
         # Ensure counts are valid
         if self.content_count < 0:
-            raise Exception("content_count cannot be negative.")
+            raise Exception('content_count cannot be negative.')
 
         for lang_code, count in self.translation_counts.items():
             if not isinstance(count, int) or count < 0:
-                raise Exception(f"Invalid translation count for {lang_code}: {count}")
+                raise Exception(
+                    f'Invalid translation count for {lang_code}: {count}')
             if count > self.content_count:
                 raise Exception(
-                    f"Translation count for {lang_code} ({count}) exceeds content_count ({self.content_count})"
-                )
+                    f'Translation count for {lang_code} ({count}) exceeds '
+                    f'content_count ({self.content_count})')
 
     @staticmethod
     def _generate_id(
         entity_type: str,
         entity_id: str
     ) -> str:
-        """Generates a unique ID for a translation opportunity.
+        '''Generates a unique ID for a translation opportunity.
 
         Args:
             entity_type: str. The type of the entity (e.g., 'exploration').
@@ -336,7 +341,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
 
         Returns:
             str. A unique string ID in the form: {entity_type}.{entity_id}.
-        """
+        '''
         return f'{entity_type}.{entity_id}'
 
     @classmethod
@@ -349,26 +354,28 @@ class TranslationOpportunityModel(base_models.BaseModel):
         incomplete_translation_language_codes: Sequence[str],
         translation_counts: Dict[str, int]
     ) -> TranslationOpportunityModel:
-        """Creates and returns a new TranslationOpportunityModel instance.
+        '''Creates and returns a new TranslationOpportunityModel instance.
 
         Args:
             entity_type: str. The type of the entity.
             entity_id: str. The ID of the entity.
             topic_ids: list(str). Related topic IDs.
             content_count: int. Total number of translatable content items.
-            incomplete_translation_language_codes: list(str). Languages with incomplete translation.
-            translation_counts: dict(str, int). Map of language codes to completed translation counts.
+            incomplete_translation_language_codes: list(str). Languages with
+                incomplete translation.
+            translation_counts: dict(str, int). Map of language codes to
+                completed translation counts.
 
         Returns:
             TranslationOpportunityModel. A newly created model instance.
-        """
+        '''
         return cls(
             id=cls._generate_id(entity_type, entity_id),
             entity_type=entity_type,
             entity_id=entity_id,
             topic_ids=list(topic_ids),
             content_count=content_count,
-            incomplete_translation_language_codes=list(incomplete_translation_language_codes),
+            incomplete_translation_language_codes=
+                list(incomplete_translation_language_codes),
             translation_counts=translation_counts
         )
-

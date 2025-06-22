@@ -357,14 +357,17 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
         )
         model.put()
 
-        retrieved = opportunity_models.TranslationOpportunityModel.get_by_id('exploration.exp123')
+        retrieved = opportunity_models.TranslationOpportunityModel.get_by_id(
+            'exploration.exp123')
         assert retrieved is not None
         self.assertEqual(retrieved.entity_type, 'exploration')
         self.assertEqual(retrieved.entity_id, 'exp123')
         self.assertEqual(retrieved.topic_ids, ['topic1', 'topic2'])
         self.assertEqual(retrieved.content_count, 10)
-        self.assertEqual(retrieved.incomplete_translation_language_codes, ['fr', 'de'])
-        self.assertEqual(retrieved.translation_counts, {'fr': 5, 'de': 3})
+        self.assertEqual(
+            retrieved.incomplete_translation_language_codes, ['fr', 'de'])
+        self.assertEqual(
+            retrieved.translation_counts, {'fr': 5, 'de': 3})
 
     def test_validation_fails_for_invalid_entity_type(self) -> None:
         model = opportunity_models.TranslationOpportunityModel(
@@ -376,7 +379,8 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             incomplete_translation_language_codes=[],
             translation_counts={}
         )
-        with self.assertRaisesRegex(Exception, 'Invalid entity_type: invalid_type'):
+        with self.assertRaisesRegex(
+            Exception, 'Invalid entity_type: invalid_type'):
             model.put()
 
     def test_validation_fails_for_negative_content_count(self) -> None:
@@ -389,7 +393,8 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             incomplete_translation_language_codes=[],
             translation_counts={}
         )
-        with self.assertRaisesRegex(Exception, 'content_count cannot be negative'):
+        with self.assertRaisesRegex(
+            Exception, 'content_count cannot be negative'):
             model.put()
 
     def test_validation_fails_for_invalid_translation_counts(self) -> None:
@@ -402,7 +407,8 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
             incomplete_translation_language_codes=[],
             translation_counts={'fr': -1}
         )
-        with self.assertRaisesRegex(Exception, 'Invalid translation count for fr: -1'):
+        with self.assertRaisesRegex(
+            Exception, 'Invalid translation count for fr: -1'):
             model.put()
 
     def test_validation_fails_for_translation_count_exceeding_content(self) -> None:
@@ -417,6 +423,6 @@ class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
         )
         with self.assertRaisesRegex(
             Exception,
-            'Translation count for fr \(5\) exceeds content_count \(3\)'
+            r'Translation count for fr \(5\) exceeds content_count \(3\)'
         ):
             model.put()
