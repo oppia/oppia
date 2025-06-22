@@ -273,7 +273,8 @@ class TranslationOpportunityModel(base_models.BaseModel):
     # A list of topic IDs that are related to this opportunity.
     topic_ids = datastore_services.StringProperty(repeated=True, indexed=True)
     # The total number of contents available for translation.
-    content_count = datastore_services.IntegerProperty(required=True, indexed=True)
+    content_count = datastore_services.IntegerProperty(
+        required=True, indexed=True)
     # List of language codes in which the entity translation is incomplete.
     incomplete_translation_language_codes = datastore_services.StringProperty(
         repeated=True, indexed=True)
@@ -287,7 +288,8 @@ class TranslationOpportunityModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user() -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user(
+        ) -> base_models.MODEL_ASSOCIATION_TO_USER:
         """This model is not associated with any user."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
@@ -315,7 +317,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
         if self.entity_type not in valid_entity_types:
             raise Exception(f'Invalid entity_type: {self.entity_type}')
 
-        # Ensure counts are valid
+        # Ensure counts are valid.
         if self.content_count < 0:
             raise Exception('content_count cannot be negative.')
 
@@ -375,7 +377,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
             entity_id=entity_id,
             topic_ids=list(topic_ids),
             content_count=content_count,
-            incomplete_translation_language_codes=
-                list(incomplete_translation_language_codes),
+            incomplete_translation_language_codes=list(
+                incomplete_translation_language_codes),
             translation_counts=translation_counts
         )
