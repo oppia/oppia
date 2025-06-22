@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the services and controllers of the
- *   editor page.
+ * @fileoverview Unit tests for the PageContextService.
  */
 
 import {TestBed} from '@angular/core/testing';
