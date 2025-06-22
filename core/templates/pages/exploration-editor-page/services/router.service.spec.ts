@@ -28,7 +28,7 @@ import {
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import $ from 'jquery';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
 import {ExplorationStatesService} from './exploration-states.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -36,7 +36,7 @@ import {ExplorationInitStateNameService} from './exploration-init-state-name.ser
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId() {
     return 'expID';
   }
@@ -78,8 +78,8 @@ describe('Router Service', () => {
         StateEditorService,
         TranslationLanguageService,
         {
-          provide: ContextService,
-          useClass: MockContextService,
+          provide: PageContextService,
+          useClass: MockPageContextService,
         },
         {
           provide: ExplorationInitStateNameService,

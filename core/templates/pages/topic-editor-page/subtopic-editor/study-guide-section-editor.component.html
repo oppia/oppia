@@ -1,0 +1,125 @@
+<div class="h-100">
+  <!-- Heading Editor -->
+  <div *ngIf="!headingEditorIsOpen"
+       class="h-100">
+    <div class="oppia-readonly-rule-tile"
+         [ngClass]="{'oppia-editable-section': isEditable}">
+      <div class="oppia-rule-preview">
+        <div class="oppia-click-to-start-editing e2e-test-section-heading-edit-icon"
+             (click)="openHeadingEditor()"
+             aria-label="Edit section heading"
+             role="button"
+             tabindex="0">
+          <i *ngIf="isEditable"
+             class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
+             title="Edit Study Guide Section">
+          </i>
+        </div>
+
+        <strong>Section Heading</strong>
+        <oppia-rte-output-display class="e2e-test-study-guide-section-heading-field heading-and-content-display"
+                                  [rteString]="container.sectionHeadingPlaintext">
+        </oppia-rte-output-display>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isEditable && headingEditorIsOpen">
+    <form class="form-inline"
+          (submit)="saveSection()">
+      <div class="oppia-rule-details-header">
+        <strong>Section Heading</strong>
+        <schema-based-editor class="e2e-test-study-guide-section-heading-plaintext-editor"
+                             [schema]="getHeadingSchema()"
+                             [localValue]="container.sectionHeadingPlaintext"
+                             (localValueChange)="this.updateLocalHeading($event)">
+        </schema-based-editor>
+      </div>
+    </form>
+
+    <div class="oppia-rule-save-cancel-buttons">
+      <div class="modal-footer">
+        <button type="reset"
+                class="btn btn-secondary"
+                (click)="cancelEditHeading()">
+          Cancel
+        </button>
+        <button type="submit"
+                class="btn btn-success"
+                [disabled]="!container.sectionHeadingPlaintext"
+                (click)="saveSection(true)">
+          Save
+        </button>
+      </div>
+      <div class="oppia-clear"></div>
+    </div>
+  </div>
+
+  <!-- Content Editor -->
+  <div *ngIf="!contentEditorIsOpen"
+       class="h-100 section-content-part">
+    <div class="oppia-readonly-rule-tile"
+         [ngClass]="{'oppia-editable-section': isEditable}">
+      <div class="oppia-rule-preview">
+        <div class="oppia-click-to-start-editing e2e-test-section-content-edit-icon"
+             (click)="openContentEditor()"
+             aria-label="Edit section content"
+             role="button"
+             tabindex="0">
+          <i *ngIf="isEditable"
+             class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
+             title="Edit Study Guide Section">
+          </i>
+        </div>
+
+        <strong>Section Content</strong>
+        <oppia-rte-output-display class="e2e-test-study-guide-section-content-field heading-and-content-display"
+                                  [rteString]="container.sectionContentHtml">
+        </oppia-rte-output-display>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isEditable && contentEditorIsOpen" class="section-content-part">
+    <form class="form-inline"
+          (submit)="saveSection()">
+      <div class="oppia-rule-details-header">
+        <strong>Section Content</strong>
+        <schema-based-editor class="e2e-test-study-guide-section-content-rich-text-editor"
+                             [schema]="getContentSchema()"
+                             [localValue]="container.sectionContentHtml"
+                             (localValueChange)="this.updateLocalContent($event)">
+        </schema-based-editor>
+      </div>
+    </form>
+
+    <div *ngIf="isSectionContentLengthExceeded()" class="oppia-length-validation-error">
+      The content length is too long. Please use at most 1000 characters.
+    </div>
+
+    <div class="oppia-rule-save-cancel-buttons">
+      <div class="modal-footer">
+        <button type="reset"
+                class="btn btn-secondary"
+                (click)="cancelEditContent()">
+          Cancel
+        </button>
+        <button type="submit"
+                class="btn btn-success"
+                [disabled]="!container.sectionContentHtml || isSectionContentLengthExceeded()"
+                (click)="saveSection(false)">
+          Save
+        </button>
+      </div>
+      <div class="oppia-clear"></div>
+    </div>
+  </div>
+</div>
+<style>
+  .section-content-part {
+    margin-top: 2.5vh;
+  }
+  .heading-and-content-display {
+    display: block;
+  }
+</style>

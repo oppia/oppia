@@ -37,6 +37,8 @@ from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import study_guide_domain
+from core.domain import study_guide_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -365,6 +367,56 @@ class EditableSubtopicPageDataHandler(
         self.render_json(self.values)
 
 
+class EditableStudyGuideDataHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """The data handler for study guides."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'topic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        },
+        'subtopic_id': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.ENTITY_ID_REGEX
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_view_any_topic_editor
+    def get(self, topic_id: str, subtopic_id: int) -> None:
+        """Retrieves the details of a specific subtopic.
+
+        Args:
+            topic_id: str. The ID of the topic.
+            subtopic_id: str. The ID of the subtopic.
+        """
+        study_guide = study_guide_services.get_study_guide_by_id(
+            topic_id, subtopic_id, strict=False)
+
+        if study_guide is None:
+            raise self.NotFoundException(
+                'The study guide with the given id doesn\'t exist.')
+
+        self.values.update({
+            'study_guide': study_guide.to_dict()
+        })
+
+        self.render_json(self.values)
+
+
 class EditableTopicDataHandlerNormalizedPayloadDict(TypedDict):
     """Dict representation of EditableTopicDataHandler's
     normalized_payload dictionary.
@@ -563,6 +615,7 @@ class EditableTopicDataHandler(
             'topic_and_subtopic_page_change_dicts']
         topic_and_subtopic_page_change_list: List[
             Union[
+                study_guide_domain.StudyGuideChange,
                 subtopic_page_domain.SubtopicPageChange,
                 topic_domain.TopicChange
             ]
@@ -572,6 +625,10 @@ class EditableTopicDataHandler(
                     subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 topic_and_subtopic_page_change_list.append(
                     subtopic_page_domain.SubtopicPageChange(change.to_dict()))
+            elif change.cmd == (
+                    study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY):
+                topic_and_subtopic_page_change_list.append(
+                    study_guide_domain.StudyGuideChange(change.to_dict()))
             else:
                 topic_and_subtopic_page_change_list.append(change)
         try:
