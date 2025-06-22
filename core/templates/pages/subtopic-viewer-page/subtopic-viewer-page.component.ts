@@ -270,4 +270,20 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       '_self'
     );
   }
+
+  backToTopic(): void {
+    if (!this.classroomUrlFragment || !this.topicUrlFragment) {
+      return;
+    }
+    this.windowRef.nativeWindow.open(
+      this.urlInterpolationService.interpolateUrl(
+        ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
+        {
+          classroom_url_fragment: this.classroomUrlFragment,
+          topic_url_fragment: this.topicUrlFragment,
+        }
+      ),
+      '_self'
+    );
+  }
 }
