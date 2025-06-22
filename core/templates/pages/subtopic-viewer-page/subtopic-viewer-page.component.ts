@@ -84,7 +84,10 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
     private windowDimensionsService: WindowDimensionsService,
     private translateService: TranslateService,
     private platformFeatureService: PlatformFeatureService
-  ) {}
+  ) {
+    this.sections = null;
+    this.pageContents = null;
+  }
 
   checkMobileView(): boolean {
     return this.windowDimensionsService.getWidth() < 500;
@@ -114,8 +117,6 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.sections = null;
-    this.pageContents = null;
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.classroomUrlFragment =
       this.urlService.getClassroomUrlFragmentFromLearnerUrl();
