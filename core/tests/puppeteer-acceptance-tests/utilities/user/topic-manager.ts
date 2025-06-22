@@ -231,6 +231,9 @@ const mobileCollapsibleCardHeaderSelector =
   '.oppia-mobile-collapsible-card-header';
 const mobileStoryDropdown = '.e2e-test-story-dropdown';
 const confirmDeleteChapterButton = '.e2e-test-confirm-delete-chapter-button';
+const misconceptionNotesTextarea = '.e2e-test-notes-textarea .e2e-test-rte';
+const misconceptionFeedbackTextarea =
+  '.e2e-test-feedback-textarea .e2e-test-rte';
 
 export class TopicManager extends BaseUser {
   /**
@@ -1776,9 +1779,11 @@ export class TopicManager extends BaseUser {
     }
     await this.clickOn(addButtonSelector);
     await this.type(nameFieldSelector, misconceptionName);
-    await this.type(rteSelector, notes);
-    const rteElements = await this.page.$$(rteSelector);
-    await rteElements[1].type(feedback);
+    await this.clickOn(misconceptionNotesTextarea);
+    await this.type(misconceptionNotesTextarea, notes);
+    await this.clickOn(misconceptionFeedbackTextarea);
+    await this.type(misconceptionFeedbackTextarea, feedback);
+
     if (optional) {
       await this.clickOn(optionalMisconceptionToggle);
     }
