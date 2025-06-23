@@ -20,9 +20,9 @@ starting an exploration.
 
 from __future__ import annotations
 
-from extensions.actions import base
-
 from typing import List
+
+from extensions.actions import base
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -32,11 +32,13 @@ if MYPY:  # pragma: no cover
 class ExplorationStart(base.BaseLearnerActionSpec):
     """Learner action that's recorded when a learner starts an exploration."""
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'state_name',
-        'description': 'Initial state name',
-        'schema': {
-            'type': 'unicode',
-        },
-        'default_value': ''
-    }]
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'state_name',
+            'description': 'Initial state name',
+            'schema': {
+                'type': 'unicode',
+            },
+            'default_value': '',
+        }
+    ]

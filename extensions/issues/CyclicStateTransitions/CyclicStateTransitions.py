@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
-from extensions.issues import base
-
 from typing import List
+
+from extensions.issues import base
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -32,14 +32,16 @@ class CyclicStateTransitions(base.BaseExplorationIssueSpec):
     cyclic manner multiple times.
     """
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'state_names',
-        'description': 'List of state names',
-        'schema': {
-            'type': 'list',
-            'items': {
-                'type': 'unicode',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'state_names',
+            'description': 'List of state names',
+            'schema': {
+                'type': 'list',
+                'items': {
+                    'type': 'unicode',
+                },
             },
-        },
-        'default_value': []
-    }]
+            'default_value': [],
+        }
+    ]
