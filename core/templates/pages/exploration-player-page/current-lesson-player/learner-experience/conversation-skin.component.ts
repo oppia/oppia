@@ -455,19 +455,18 @@ export class ConversationSkinComponent {
             let mostRecentlyReachedCheckpoint =
               response.most_recently_reached_checkpoint_state_name;
 
-            if (!mostRecentlyReachedCheckpoint) {
-              mostRecentlyReachedCheckpoint = firstStateName;
-            }
-
             // If the exploration is freshly started, mark the first state
             // as the most recently reached checkpoint.
-            if (!mostRecentlyReachedCheckpoint && this.isLoggedIn) {
-              this.editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
-                this.explorationId,
-                expVersion,
-                firstStateName,
-                true
-              );
+            if (!mostRecentlyReachedCheckpoint) {
+              mostRecentlyReachedCheckpoint = firstStateName;
+              if (this.isLoggedIn) {
+                this.editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
+                  this.explorationId,
+                  expVersion,
+                  firstStateName,
+                  true
+                );
+              }
             }
             this.checkpointProgressService.setMostRecentlyReachedCheckpoint(
               mostRecentlyReachedCheckpoint
