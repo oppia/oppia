@@ -170,3 +170,156 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
             self.assert_pcoll_equal(
                 filepath_p_collec,
                 ['dummy_folder/dummy_subfolder'])
+
+
+class IsFileTests(job_test_utils.PipelinedTestBase):
+    """Tests to check gcs_io.IsFile."""
+
+    def setUp(self) -> None:
+        self.bucket = app_identity_services.get_gcs_resource_bucket_name()
+        super().setUp()
+
+    def _create_file(self, path: str) -> None:
+        """Create a file.
+
+        Args:
+            path: str. Path to the file to create.
+        """
+        storage_services.commit(
+            self.bucket, path, b'data', 'image/png')
+
+    def test_returns_true_if_files_present(self) -> None:
+        self._create_file('file1.png')
+        self._create_file('file2.png')
+
+        output = (
+            self.pipeline
+            | beam.Create([('a', 'file1.png'), ('b', 'file2.png')])
+            | gcs_io.IsFile()
+        )
+
+        self.assert_pcoll_equal(
+            output,
+            [('a', True), ('b', True)]
+        )
+
+    def test_returns_false_if_files_absent(self) -> None:
+        self._create_file('file1.png')
+        self._create_file('file2.png')
+
+        output = (
+            self.pipeline
+            | beam.Create([('a', 'file3.png'), ('b', 'file4.png')])
+            | gcs_io.IsFile()
+        )
+
+        self.assert_pcoll_equal(
+            output,
+            [('a', False), ('b', False)]
+        )
+
+    def test_returns_mixed_if_files_mixed(self) -> None:
+        self._create_file('file1.png')
+        self._create_file('file2.png')
+
+        output = (
+            self.pipeline
+            | beam.Create([('a', 'file1.png'), ('b', 'file4.png')])
+            | gcs_io.IsFile()
+        )
+
+        self.assert_pcoll_equal(
+            output,
+            [('a', True), ('b', False)]
+        )
+
+    def test_returns_false_if_no_files(self) -> None:
+        output = (
+            self.pipeline
+            | beam.Create([('a', 'file1.png'), ('b', 'file4.png')])
+            | gcs_io.IsFile()
+        )
+
+        self.assert_pcoll_equal(
+            output,
+            [('a', False), ('b', False)]
+        )
+
+
+class CopyFileTests(job_test_utils.PipelinedTestBase):
+    """Tests to check gcs_io.CopyFile."""
+
+    def setUp(self) -> None:
+        self.bucket = app_identity_services.get_gcs_resource_bucket_name()
+        super().setUp()
+
+    def _create_file(self, path: str) -> None:
+        """Create a file.
+
+        Args:
+            path: str. Path to the file to create.
+        """
+        storage_services.commit(
+            self.bucket, path, b'data', 'image/png')
+
+    def test_copy_file_succeeds_if_empty_destination(self) -> None:
+        self._create_file('dir/src.png')
+        self.assertTrue(storage_services.isfile(self.bucket, 'dir/src.png'))
+        self.assertFalse(storage_services.isfile(self.bucket, 'dir/dst.png'))
+
+        output = (
+            self.pipeline
+            | beam.Create([('dir/src.png', 'dir/dst.png')])
+            | gcs_io.CopyFile()
+        )
+
+        self.assert_pcoll_equal(
+            output,
+            [result.Ok(('dir/src.png', 'dir/dst.png', 'Copied'))]
+        )
+
+        self.assertTrue(storage_services.isfile(self.bucket, 'dir/src.png'))
+        self.assertTrue(storage_services.isfile(self.bucket, 'dir/dst.png'))
+
+    def test_copy_file_succeeds_if_destination_exists(self) -> None:
+        self._create_file('dir/src.png')
+        self._create_file('dir/dst.png')
+        self.assertTrue(storage_services.isfile(self.bucket, 'dir/src.png'))
+        self.assertTrue(storage_services.isfile(self.bucket, 'dir/dst.png'))
+
+        output = (
+            self.pipeline
+            | beam.Create([('dir/src.png', 'dir/dst.png')])
+            | gcs_io.CopyFile()
+        )
+
+        self.assert_pcoll_equal(
+            output,
+            [result.Ok(('dir/src.png', 'dir/dst.png', 'Copied'))]
+        )
+
+        self.assertTrue(storage_services.isfile(self.bucket, 'dir/src.png'))
+        self.assertTrue(storage_services.isfile(self.bucket, 'dir/dst.png'))
+
+    def test_copy_file_fails_if_source_missing(self) -> None:
+        self.assertFalse(storage_services.isfile(self.bucket, 'dir/src.png'))
+        self.assertFalse(storage_services.isfile(self.bucket, 'dir/dst.png'))
+
+        output = (
+            self.pipeline
+            | beam.Create([('dir/src.png', 'dir/dst.png')])
+            | gcs_io.CopyFile()
+        )
+
+        err_msg = (
+            'Copy failed because of this error: (\'Source asset does not '
+            'exist at dir/src.png.\', \'dir/src.png\')'
+        )
+
+        self.assert_pcoll_equal(
+            output,
+            [result.Err(('dir/src.png', 'dir/dst.png', err_msg))]
+        )
+
+        self.assertFalse(storage_services.isfile(self.bucket, 'dir/src.png'))
+        self.assertFalse(storage_services.isfile(self.bucket, 'dir/dst.png'))
