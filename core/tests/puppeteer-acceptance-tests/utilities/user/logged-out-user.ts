@@ -3583,6 +3583,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnNextStudyGuideButton(): Promise<void> {
     await this.clickOn(goToNextStudyGuideButton);
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -3590,6 +3591,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnStudyGuideMenuButton(): Promise<void> {
     await this.clickOn(goToStudyGuideMenuButton);
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -3597,6 +3599,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnPracticeButton(): Promise<void> {
     await this.clickOn(goToPracticeSectionButton);
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -3604,6 +3607,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnBackToTopicButton(): Promise<void> {
     await this.clickOn(goBackToTopicButton);
+    await this.waitForPageToFullyLoad();
   }
 
   /**
