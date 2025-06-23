@@ -48,7 +48,7 @@
       </div>
       <button (click)="openPracticeMenu()" class="btn btn-next-actions btn-practice-section">
         <p class="text-practice-section-fixed">
-          <i class="material-icons">edit_square</i>
+          <img [src]="getStaticImageUrl('/icons/practice-button-edit.png')" alt="Practice button icon" width="15px" height="15px">
           {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE' | translate }}
         </p>
         <span class="practice-button-subtitle">{{ 'I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE_BUTTON_DESCRIPTION' | translate }}</span>
@@ -56,16 +56,16 @@
     </div>
   </div>
   <div *ngIf="subtopicSummaryIsShown" class="next-actions-section">
-    <h4 class="next-actions-title">{{ I18N_SUBTOPIC_VIEWER_SUBTOPIC_VIEWER_NEXT_ACTIONS_HEADING | translate }}</h4>
+    <h4 class="next-actions-title">{{ I18N_SUBTOPIC_VIEWER_NEXT_ACTIONS_HEADING | translate }}</h4>
     <div class="next-actions-buttons-container">
       <button (click)="openStudyGuideMenu()" class="btn btn-next-actions btn-study-guide-menu">
         <i class="material-icons icon-study-guide-menu">exit_to_app</i>
-        {{ 'I18N_SUBTOPIC_VIEWER_SUBTOPIC_VIEWER_GO_TO_STUDY_GUIDE_MENU_BUTTON' | translate }}
+        {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_STUDY_GUIDE_MENU_BUTTON' | translate }}
       </button>
       <button (click)="openStudyGuide()" *ngIf="nextSubtopic" class="btn btn-next-actions btn-next-study-guide">
         <p class="text-next-study-guide-fixed">
           <i class="material-icons icon-next-study-guide">arrow_forward</i>
-          {{ 'I18N_SUBTOPIC_VIEWER_SUBTOPIC_VIEWER_GO_TO_NEXT_STUDY_GUIDE_BUTTON' | translate }}
+          {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_NEXT_STUDY_GUIDE_BUTTON' | translate }}
         </p>
         <span class="revision-subtitle">"{{ nextSubtopic.getTitle() }}"</span>
       </button>
@@ -116,8 +116,9 @@
   .content-title {
     color: #00645c;
     display: block;
-    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-family: Capriola;
     font-size: 30px;
+    font-weight: 400;
     margin-bottom: 15px;
     text-align: center;
   }
@@ -139,8 +140,8 @@
 
   .card-title {
     color: #fff;
-    font-family: Capriola, Roboto, Arial, sans-serif;
-    font-size: 15px;
+    font-family: Roboto;
+    font-size: 20px;
     font-weight: 300;
     margin: 0;
     text-align: center;
@@ -174,7 +175,7 @@
     gap: 5px;
     height: 60px;
     padding: 8px;
-    width: 170px;
+    width: 180px;
   }
 
   .btn-next-study-guide {
@@ -190,16 +191,24 @@
   .btn-study-guide-menu {
     background-color: #e8f1f0;
     border: 1px solid #00645c;
+    color: #00645C;
     margin-right: 5px;
   }
 
   .btn-back-to-topic {
     color: #003c34;
     display: none;
-    font-family: Capriola, Roboto, Arial, sans-serif;
-    font-size: 15px;
-    margin-bottom: 15px;
+    font-family: Capriola;
+    font-size: 16px;
+    margin-bottom: 30px;
     text-align: center;
+  }
+
+  .next-actions-title {
+    color: #333333;
+    font-family: Capriola;
+    font-size: 20px;
+    font-weight: 400;
   }
 
   .btn-practice-section {
@@ -235,6 +244,10 @@
       margin-left: 1%;
       margin-top: 40px;
     }
+    .btn-next-study-guide,
+    .btn-study-guide-menu {
+      width: 160px;
+    }
     .content,
     .content-box {
       width: 100%;
@@ -245,6 +258,10 @@
 
     .card-header {
       padding: 12px 15px;
+    }
+
+    .content-title {
+      font-size: 18.2px;
     }
 
     .card-title {

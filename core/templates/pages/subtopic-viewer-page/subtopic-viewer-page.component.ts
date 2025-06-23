@@ -286,4 +286,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
       '_self'
     );
   }
+
+  getStaticImageUrl(imagePath: string): string {
+    return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
 }
