@@ -92,6 +92,7 @@ const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 const currentCardNameSelector = 'strong.e2e-test-state-name-text';
 
 const previewTabButton = '.e2e-test-preview-tab';
+const previewTabContainer = '.e2e-test-preview-tab-container';
 const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
@@ -256,6 +257,8 @@ const tagFilterDropdownSelector = '.e2e-test-tag-filter-selection-dropdown';
 const languageDropdownValueSelector =
   'mat-select.e2e-test-exploration-language-select .mat-select-value';
 
+const mainTabContainerSelector = '.e2e-test-exploration-main-tab';
+const historyTabContentContainerSelector = '.e2e-test-exploration-history-tab';
 const historyTableIndex = '.history-table-index';
 const historyListOptions = '.e2e-test-history-list-options';
 const downloadExplorationButton =
@@ -1910,8 +1913,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(previewTabButton);
     }
 
-    await this.page.waitForNetworkIdle();
-    expect(this.page.url()).toContain('/preview/');
+    await this.isElementVisible(previewTabContainer);
   }
 
   /**
@@ -1921,12 +1923,12 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickAndWaitForNavigation(mobileHistoryTabButton);
+      await this.clickOn(mobileHistoryTabButton);
     } else {
-      await this.clickAndWaitForNavigation(historyTabButton);
+      await this.clickOn(historyTabButton);
     }
 
-    expect(this.page.url()).toContain('/history/');
+    await this.isElementVisible(historyTabContentContainerSelector);
   }
 
   /**
@@ -2071,7 +2073,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickAndWaitForNavigation(translationTabButton);
     }
 
-    expect(this.page.url()).toContain('/preview/');
+    await this.isElementVisible(previewTabContainer);
   }
 
   /**
@@ -2091,15 +2093,15 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickAndWaitForNavigation(mobileMainTabButton);
+      await this.clickOn(mobileMainTabButton);
     } else {
       await this.page.waitForSelector(mainTabButton, {
         visible: true,
       });
-      await this.clickAndWaitForNavigation(mainTabButton);
+      await this.clickOn(mainTabButton);
     }
 
-    expect(this.page.url()).toContain('/gui/');
+    await this.isElementVisible(mainTabContainerSelector);
   }
 
   /**
