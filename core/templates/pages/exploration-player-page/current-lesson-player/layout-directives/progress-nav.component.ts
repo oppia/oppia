@@ -71,7 +71,6 @@ export class ProgressNavComponent {
   @Input() showContinueToReviseButton!: boolean;
   @Input() navigationThroughCardHistoryIsEnabled!: boolean;
   @Input() skipButtonIsShown!: boolean;
-  displayedCardIndex!: number;
   hasPrevious!: boolean;
   hasNext!: boolean;
   conceptCardIsBeingShown!: boolean;
@@ -93,7 +92,6 @@ export class ProgressNavComponent {
   @Output() skipQuestion: EventEmitter<void> = new EventEmitter();
 
   directiveSubscriptions = new Subscription();
-  transcriptLength: number = 0;
   interactionIsInline: boolean = true;
   CONTINUE_BUTTON_FOCUS_LABEL: string =
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL;
@@ -155,13 +153,9 @@ export class ProgressNavComponent {
   }
 
   updateDisplayedCardInfo(): void {
-    this.transcriptLength = this.playerTranscriptService.getNumCards();
-    this.displayedCardIndex =
-      this.playerPositionService.getDisplayedCardIndex();
-    this.hasPrevious = this.displayedCardIndex > 0;
-    this.hasNext = !this.playerTranscriptService.isLastCard(
-      this.displayedCardIndex
-    );
+    let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
+    this.hasPrevious = displayedCardIndex > 0;
+    this.hasNext = !this.playerTranscriptService.isLastCard(displayedCardIndex);
     this.explorationModeService.isInQuestionMode();
 
     this.conceptCardIsBeingShown =
@@ -209,15 +203,11 @@ export class ProgressNavComponent {
   }
 
   moveForwardByOneCard(): void {
-    this.conversationFlowService.validateIndexAndChangeCard(
-      this.displayedCardIndex + 1
-    );
+    this.conversationFlowService.moveForwardByOneCard();
   }
 
   moveBackwardByOneCard(): void {
-    this.conversationFlowService.validateIndexAndChangeCard(
-      this.displayedCardIndex - 1
-    );
+    this.conversationFlowService.moveBackwardByOneCard();
   }
 
   // Returns whether the screen is wide enough to fit two

@@ -32,7 +32,6 @@ import {PlayerPositionService} from './player-position.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {PageContextService} from 'services/page-context.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
-import {ExplorationEngineService} from './exploration-engine.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 @Injectable({
@@ -62,7 +61,6 @@ export class ConversationFlowService {
     private conceptCardManagerService: ConceptCardManagerService,
     private currentEngineService: CurrentEngineService,
     private statsReportingService: StatsReportingService,
-    private explorationEngineService: ExplorationEngineService,
     private translateService: TranslateService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService
   ) {}
@@ -198,6 +196,34 @@ export class ConversationFlowService {
   }
 
   /**
+   * Moves the displayed card forward by one position in the previously seen cards.
+   *
+   * This method should only be used when navigating through cards the user
+   * has already seen, not for progressing to new or unseen cards.
+   *
+   * Retrieves the current displayed card index from the player position service,
+   * increments it by one, and updates the displayed card accordingly.
+   */
+  moveForwardByOneCard(): void {
+    let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
+    this.validateIndexAndChangeCard(displayedCardIndex + 1);
+  }
+
+  /**
+   * Moves the displayed card backward by one position in the previously seen cards.
+   *
+   * This method should only be used when navigating through cards the user
+   * has already seen, not for progressing to new or unseen cards.
+   *
+   * Retrieves the current displayed card index from the player position service,
+   * decrements it by one, and updates the displayed card accordingly.
+   */
+  moveBackwardByOneCard(): void {
+    let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
+    this.validateIndexAndChangeCard(displayedCardIndex - 1);
+  }
+
+  /**
    * Returns the currently displayed state card based on the
    * learner's current position in the transcript.
    *
@@ -209,12 +235,29 @@ export class ConversationFlowService {
     return displayedCard;
   }
 
+  /**
+   * Records that the user has submitted an incorrect answer.
+   *
+   * This method updates multiple services to reflect the incorrect submission:
+   * - Increments the count of incorrect submissions in the transcript.
+   * - Notifies the hints and solution manager for potential hint logic.
+   * - Notifies the concept card manager, possibly for tracking misconceptions.
+   */
   recordIncorrectAnswer(): void {
     this.playerTranscriptService.incrementNumberOfIncorrectSubmissions();
     this.hintsAndSolutionManagerService.recordWrongAnswer();
     this.conceptCardManagerService.recordWrongAnswer();
   }
 
+  /**
+   * Emits a help card to be displayed to the user.
+   *
+   * This method notifies the system that a help card is available,
+   * providing its HTML content and whether it includes a "Continue" button.
+   *
+   * @param helpCardHtml - The HTML content of the help card.
+   * @param hasContinueButton - Whether the help card includes a continue button.
+   */
   emitHelpCard(helpCardHtml: string, hasContinueButton: boolean): void {
     this.playerPositionService.onHelpCardAvailable.emit({
       helpCardHtml,
@@ -222,6 +265,15 @@ export class ConversationFlowService {
     });
   }
 
+  /**
+   * Changes the currently displayed card to the specified index.
+   *
+   * This method records the navigation action, updates the displayed card index,
+   * notifies the state editor (if in editor mode), and sets the corresponding
+   * question based on the index.
+   *
+   * @param index - The index of the card to be displayed.
+   */
   changeCard(index: number): void {
     this.playerPositionService.recordNavigationButtonClick();
     this.playerPositionService.setDisplayedCardIndex(index);
@@ -231,25 +283,24 @@ export class ConversationFlowService {
     this.playerPositionService.changeCurrentQuestion(index);
   }
 
-  validateIndexAndChangeCard(index: number): void {
+  /**
+   * Validates the given index before changing to the corresponding card.
+   *
+   * Ensures that the target index is within the bounds of the player transcript.
+   * If valid, it proceeds to change the card. Otherwise, it throws an error.
+   *
+   * This method is used to safely navigate through previously seen cards only.
+   *
+   * @param index - The index of the card to validate and display.
+   * @throws Will throw an error if the index is out of bounds.
+   */
+  private validateIndexAndChangeCard(index: number): void {
     let transcriptLength = this.playerTranscriptService.getNumCards();
     if (index >= 0 && index < transcriptLength) {
       this.changeCard(index);
     } else {
       throw new Error('Target card index out of bounds.');
     }
-  }
-
-  get onPlayerStateChange(): EventEmitter<string> {
-    return this._playerStateChangeEventEmitter;
-  }
-
-  get onOppiaFeedbackAvailable(): EventEmitter<void> {
-    return this._oppiaFeedbackAvailableEventEmitter;
-  }
-
-  get onShowProgressModal(): EventEmitter<boolean> {
-    return this._playerProgressModalShownEventEmitter;
   }
 
   /**
@@ -306,5 +357,17 @@ export class ConversationFlowService {
    */
   setNextStateCard(card: StateCard | null): void {
     this.nextStateCard = card;
+  }
+
+  get onPlayerStateChange(): EventEmitter<string> {
+    return this._playerStateChangeEventEmitter;
+  }
+
+  get onOppiaFeedbackAvailable(): EventEmitter<void> {
+    return this._oppiaFeedbackAvailableEventEmitter;
+  }
+
+  get onShowProgressModal(): EventEmitter<boolean> {
+    return this._playerProgressModalShownEventEmitter;
   }
 }
