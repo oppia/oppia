@@ -88,7 +88,7 @@ describe('Logged-in User', function () {
         __dirname
       );
       await loggedInUser1.clickOnNextStudyGuideButton();
-      await loggedInUser1.expectStudyGuideToHaveContent('Adding Numbers', [
+      await loggedInUser1.expectStudyGuideToHaveContent('Subtracting Numbers', [
         ['Common Mistakes', 'Some common mistakes students make are...'],
       ]);
       await loggedInUser1.clickOnStudyGuideMenuButton();
