@@ -42,6 +42,7 @@ import {ContentTranslationManagerService} from '../../services/content-translati
 
 import './progress-nav.component.css';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 
 @Component({
   selector: 'oppia-progress-nav',
@@ -89,8 +90,6 @@ export class ProgressNavComponent {
   @Output() clickContinueToReviseButton: EventEmitter<void> =
     new EventEmitter();
 
-  @Output() changeCard: EventEmitter<number> = new EventEmitter();
-
   @Output() skipQuestion: EventEmitter<void> = new EventEmitter();
 
   directiveSubscriptions = new Subscription();
@@ -110,6 +109,7 @@ export class ProgressNavComponent {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
+    private conversationFlowService: ConversationFlowService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService,
     private contentTranslationManagerService: ContentTranslationManagerService
@@ -208,12 +208,16 @@ export class ProgressNavComponent {
     }
   }
 
-  validateIndexAndChangeCard(index: number): void {
-    if (index >= 0 && index < this.transcriptLength) {
-      this.changeCard.emit(index);
-    } else {
-      throw new Error('Target card index out of bounds.');
-    }
+  moveForwardByOneCard(): void {
+    this.conversationFlowService.validateIndexAndChangeCard(
+      this.displayedCardIndex + 1
+    );
+  }
+
+  moveBackwardByOneCard(): void {
+    this.conversationFlowService.validateIndexAndChangeCard(
+      this.displayedCardIndex - 1
+    );
   }
 
   // Returns whether the screen is wide enough to fit two

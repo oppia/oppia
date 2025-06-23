@@ -499,15 +499,6 @@ export class ConversationSkinComponent {
     }
   }
 
-  changeCard(index: number): void {
-    this.playerPositionService.recordNavigationButtonClick();
-    this.playerPositionService.setDisplayedCardIndex(index);
-    this.explorationEngineService.onUpdateActiveStateIfInEditor.emit(
-      this.playerPositionService.getCurrentStateName()
-    );
-    this.playerPositionService.changeCurrentQuestion(index);
-  }
-
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
@@ -718,7 +709,7 @@ export class ConversationSkinComponent {
         }
 
         // Move to most recently reached checkpoint card.
-        this.changeCard(indexToRedirectTo);
+        this.conversationFlowService.changeCard(indexToRedirectTo);
         this.playerPositionService.onLoadedMostRecentCheckpoint.emit();
       });
   }
@@ -1480,7 +1471,7 @@ export class ConversationSkinComponent {
         );
       if (indexOfRevisionCard !== null) {
         this.displayedCard.markAsNotCompleted();
-        this.changeCard(indexOfRevisionCard);
+        this.conversationFlowService.changeCard(indexOfRevisionCard);
         return;
       }
     }

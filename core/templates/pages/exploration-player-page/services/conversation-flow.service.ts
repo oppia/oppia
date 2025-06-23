@@ -32,6 +32,8 @@ import {PlayerPositionService} from './player-position.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {PageContextService} from 'services/page-context.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
+import {ExplorationEngineService} from './exploration-engine.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 @Injectable({
   providedIn: 'root',
@@ -55,10 +57,12 @@ export class ConversationFlowService {
     private contentTranslationManagerService: ContentTranslationManagerService,
     private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
+    private stateEditorService: StateEditorService,
     private pageContextService: PageContextService,
     private conceptCardManagerService: ConceptCardManagerService,
     private currentEngineService: CurrentEngineService,
     private statsReportingService: StatsReportingService,
+    private explorationEngineService: ExplorationEngineService,
     private translateService: TranslateService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService
   ) {}
@@ -216,6 +220,24 @@ export class ConversationFlowService {
       helpCardHtml,
       hasContinueButton,
     });
+  }
+
+  changeCard(index: number): void {
+    this.playerPositionService.recordNavigationButtonClick();
+    this.playerPositionService.setDisplayedCardIndex(index);
+    this.stateEditorService.onUpdateActiveStateIfInEditor.emit(
+      this.playerPositionService.getCurrentStateName()
+    );
+    this.playerPositionService.changeCurrentQuestion(index);
+  }
+
+  validateIndexAndChangeCard(index: number): void {
+    let transcriptLength = this.playerTranscriptService.getNumCards();
+    if (index >= 0 && index < transcriptLength) {
+      this.changeCard(index);
+    } else {
+      throw new Error('Target card index out of bounds.');
+    }
   }
 
   get onPlayerStateChange(): EventEmitter<string> {
