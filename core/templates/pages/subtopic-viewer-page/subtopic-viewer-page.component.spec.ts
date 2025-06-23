@@ -31,7 +31,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {ReadOnlySubtopicPageData} from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 import {SubtopicViewerPageComponent} from './subtopic-viewer-page.component';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {LoaderService} from 'services/loader.service';
 import {SubtopicViewerBackendApiService} from 'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -52,7 +52,7 @@ describe('Subtopic viewer page', function () {
   let component: SubtopicViewerPageComponent;
   let fixture: ComponentFixture<SubtopicViewerPageComponent>;
   let pageTitleService: PageTitleService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let alertsService: AlertsService;
   let windowDimensionsService: WindowDimensionsService;
   let subtopicViewerBackendApiService: SubtopicViewerBackendApiService;
@@ -137,7 +137,7 @@ describe('Subtopic viewer page', function () {
       declarations: [SubtopicViewerPageComponent, MockTranslatePipe],
       providers: [
         AlertsService,
-        ContextService,
+        PageContextService,
         LoaderService,
         PageTitleService,
         SubtopicViewerBackendApiService,
@@ -156,7 +156,7 @@ describe('Subtopic viewer page', function () {
     fixture = TestBed.createComponent(SubtopicViewerPageComponent);
     component = fixture.componentInstance;
     pageTitleService = TestBed.inject(PageTitleService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     alertsService = TestBed.inject(AlertsService);
@@ -178,8 +178,8 @@ describe('Subtopic viewer page', function () {
       'next subtopic card',
     fakeAsync(() => {
       spyOn(component, 'subscribeToOnLangChange');
-      spyOn(contextService, 'setCustomEntityContext');
-      spyOn(contextService, 'removeCustomEntityContext');
+      spyOn(pageContextService, 'setCustomEntityContext');
+      spyOn(pageContextService, 'removeCustomEntityContext');
       spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
         'topic-url'
       );
@@ -250,11 +250,11 @@ describe('Subtopic viewer page', function () {
         component.isHackyTopicTitleTranslationDisplayed();
       expect(hackySubtopicTitleTranslationIsDisplayed).toBe(true);
       expect(hackyTopicTitleTranslationIsDisplayed).toBe(true);
-      expect(contextService.setCustomEntityContext).toHaveBeenCalled();
+      expect(pageContextService.setCustomEntityContext).toHaveBeenCalled();
       expect(component.subscribeToOnLangChange).toHaveBeenCalled();
 
       component.ngOnDestroy();
-      expect(contextService.removeCustomEntityContext).toHaveBeenCalled();
+      expect(pageContextService.removeCustomEntityContext).toHaveBeenCalled();
     })
   );
 

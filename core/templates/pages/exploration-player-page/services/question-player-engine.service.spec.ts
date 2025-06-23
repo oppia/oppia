@@ -17,30 +17,31 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {TestBed} from '@angular/core/testing';
-import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
-import {Outcome} from 'domain/exploration/outcome.model';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
+import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   Question,
   QuestionBackendDict,
   QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
+} from '../../../domain/question/QuestionObjectFactory';
+import {StateCard} from '../../../domain/state_card/state-card.model';
+import {ExpressionInterpolationService} from '../../../expressions/expression-interpolation.service';
+import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
+import {AlertsService} from '../../../services/alerts.service';
+import {PageContextService} from '../../../services/page-context.service';
+import {FocusManagerService} from '../../../services/stateful/focus-manager.service';
 import {
   AnswerClassificationService,
   InteractionRulesService,
 } from './answer-classification.service';
+import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service.ts';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 
-describe('Question player engine service ', () => {
+describe('Question player engine service', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let expressionInterpolationService: ExpressionInterpolationService;
   let focusManagerService: FocusManagerService;
   let multipleQuestionsBackendDict: QuestionBackendDict[];
@@ -49,6 +50,7 @@ describe('Question player engine service ', () => {
   let singleQuestionBackendDict: QuestionBackendDict;
   let singleQuestionObject: Question;
   let multipleQuestionsObjects: Question[];
+  let questionBackendApiService: QuestionBackendApiService;
   let textInputService: InteractionRulesService;
 
   beforeEach(() => {
@@ -373,14 +375,26 @@ describe('Question player engine service ', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        QuestionPlayerEngineService,
+        QuestionObjectFactory,
+        QuestionBackendApiService,
+        ExpressionInterpolationService,
+        FocusManagerService,
+        AlertsService,
+        AnswerClassificationService,
+        PageContextService,
+        TextInputRulesService,
+      ],
     });
 
     alertsService = TestBed.inject(AlertsService);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     expressionInterpolationService = TestBed.inject(
       ExpressionInterpolationService
     );
+    questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     focusManagerService = TestBed.inject(FocusManagerService);
@@ -400,8 +414,8 @@ describe('Question player engine service ', () => {
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen');
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     expect(questionPlayerEngineService.getQuestionCount()).toBe(0);
 
@@ -418,7 +432,7 @@ describe('Question player engine service ', () => {
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
 
-    expect(contextService.isInQuestionPlayerMode()).toBe(false);
+    expect(pageContextService.isInQuestionPlayerMode()).toBe(false);
 
     questionPlayerEngineService.init(
       multipleQuestionsObjects,
@@ -426,7 +440,7 @@ describe('Question player engine service ', () => {
       initErrorCb
     );
 
-    expect(contextService.isInQuestionPlayerMode()).toBe(true);
+    expect(pageContextService.isInQuestionPlayerMode()).toBe(true);
   });
 
   it(
@@ -444,8 +458,8 @@ describe('Question player engine service ', () => {
         'default_outcome'
       );
 
-      spyOn(contextService, 'setQuestionPlayerIsOpen');
-      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+      spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'
@@ -477,8 +491,8 @@ describe('Question player engine service ', () => {
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen');
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     expect(() => {
       questionPlayerEngineService.getCurrentQuestionId();
@@ -495,12 +509,43 @@ describe('Question player engine service ', () => {
     );
   });
 
+  it('should init question player', fakeAsync(() => {
+    spyOn(questionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
+      Promise.resolve([singleQuestionBackendDict])
+    );
+    spyOn(questionObjectFactory, 'createFromBackendDict').and.returnValue(
+      singleQuestionObject
+    );
+    spyOn(questionPlayerEngineService.onTotalQuestionsReceived, 'emit');
+
+    let successCallback = () => {};
+    let errorCallback = () => {};
+    questionPlayerEngineService.initQuestionPlayer(
+      {
+        skillList: [],
+        questionCount: 1,
+        questionsSortedByDifficulty: true,
+      },
+      successCallback,
+      errorCallback
+    );
+    tick(100);
+
+    expect(
+      questionPlayerEngineService.onTotalQuestionsReceived.emit
+    ).toHaveBeenCalled();
+  }));
+
+  it('should test onTotalQuestionsReceived getter', () => {
+    expect(questionPlayerEngineService.onTotalQuestionsReceived).toBeDefined();
+  });
+
   it('should return number of questions', () => {
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen');
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     questionPlayerEngineService.init(
       multipleQuestionsObjects,
@@ -527,8 +572,8 @@ describe('Question player engine service ', () => {
     let initSuccessCb = jasmine.createSpy('success');
     let initErrorCb = jasmine.createSpy('fail');
 
-    spyOn(contextService, 'setQuestionPlayerIsOpen');
-    spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+    spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+    spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
 
     questionPlayerEngineService.init(
       multipleQuestionsObjects,
@@ -558,8 +603,8 @@ describe('Question player engine service ', () => {
         'default_outcome'
       );
 
-      spyOn(contextService, 'setQuestionPlayerIsOpen');
-      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+      spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'
@@ -720,6 +765,18 @@ describe('Question player engine service ', () => {
       }
     );
 
+    it('should initialize pretest services', () => {
+      spyOn(questionPlayerEngineService, 'init');
+      let pretestQuestionObjects: Question[] = [];
+      let callback = () => {};
+
+      questionPlayerEngineService.initializePretestServices(
+        pretestQuestionObjects,
+        callback
+      );
+      expect(questionPlayerEngineService.init).toHaveBeenCalled();
+    });
+
     it(
       'should show warning message if the feedback ' + 'content is empty',
       () => {
@@ -835,8 +892,8 @@ describe('Question player engine service ', () => {
       );
       answerClassificationResult.outcome.labelledAsCorrect = true;
 
-      spyOn(contextService, 'setQuestionPlayerIsOpen');
-      spyOn(contextService, 'isInQuestionPlayerMode').and.returnValue(true);
+      spyOn(pageContextService, 'setQuestionPlayerIsOpen');
+      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'

@@ -24,7 +24,7 @@ import {AppConstants} from 'app.constants';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import {LoaderService} from 'services/loader.service';
 import {PageHeadService} from 'services/page-head.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-view-learner-group-page-root',
@@ -39,7 +39,7 @@ export class ViewLearnerGroupPageRootComponent implements OnDestroy {
     private accessValidationBackendApiService: AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private translateService: TranslateService
   ) {}
 
@@ -60,7 +60,7 @@ export class ViewLearnerGroupPageRootComponent implements OnDestroy {
       })
     );
 
-    let learnerGroupId = this.contextService.getLearnerGroupId();
+    let learnerGroupId = this.pageContextService.getLearnerGroupId();
     this.loaderService.showLoadingScreen('Loading');
     this.accessValidationBackendApiService
       .doesLearnerGroupExist(learnerGroupId)

@@ -25,7 +25,7 @@ import {
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {NoninteractiveImage} from './oppia-noninteractive-image.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
 import {AppConstants} from 'app.constants';
@@ -36,7 +36,7 @@ import {SimpleChanges} from '@angular/core';
 describe('NoninteractiveImage', () => {
   let component: NoninteractiveImage;
   let fixture: ComponentFixture<NoninteractiveImage>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let imageLocalStorageService: ImageLocalStorageService;
   let imagePreloaderService: ImagePreloaderService;
   let svgSanitizerService: SvgSanitizerService;
@@ -110,7 +110,7 @@ describe('NoninteractiveImage', () => {
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     fixture = TestBed.createComponent(NoninteractiveImage);
     component = fixture.componentInstance;
 
@@ -122,9 +122,9 @@ describe('NoninteractiveImage', () => {
 
   it('should initialise component when exploration loads', fakeAsync(() => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(true);
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     spyOn(imagePreloaderService, 'getImageUrlAsync').and.resolveTo(dataUrlSvg);
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_id');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
 
     component.ngOnInit();
     tick();
@@ -150,7 +150,7 @@ describe('NoninteractiveImage', () => {
 
   it('should fetch svg image from local storage when component is initialised', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
     spyOn(svgSanitizerService, 'getTrustedSvgResourceUrl').and.callFake(
@@ -168,7 +168,7 @@ describe('NoninteractiveImage', () => {
 
   it('should fetch png image from local storage when component is initialised', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
     spyOn(imageLocalStorageService, 'getRawImageData').and.returnValue(
@@ -184,14 +184,14 @@ describe('NoninteractiveImage', () => {
 
   it('should load image from server when image is not present in local storage', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_SERVER
     );
     spyOn(assetsBackendApiService, 'getImageUrlForPreview').and.returnValue(
       dataUrlPng
     );
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-    spyOn(contextService, 'getEntityId').and.returnValue('expId');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
 
     component.ngOnInit();
 
@@ -207,11 +207,11 @@ describe('NoninteractiveImage', () => {
       spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(
         false
       );
-      spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
         AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
-      spyOn(contextService, 'getEntityId').and.returnValue('expId');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
       spyOn(assetsBackendApiService, 'getImageUrlForPreview').and.callFake(
         () => {
           throw new Error('Error thown');
@@ -263,7 +263,7 @@ describe('NoninteractiveImage', () => {
 
   it('should update values when user makes changes', () => {
     spyOn(imagePreloaderService, 'inExplorationPlayer').and.returnValue(false);
-    spyOn(contextService, 'getImageSaveDestination').and.returnValue(
+    spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
       AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
     );
     let changes: SimpleChanges = {
@@ -329,10 +329,10 @@ describe('NoninteractiveImage', () => {
   });
 
   it('should show alt text images when altTextIsDisplayed property is true', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
     spyOn(imagePreloaderService, 'getImageUrlAsync').and.resolveTo(dataUrlSvg);
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_id');
-    spyOn(contextService, 'getEntityId').and.returnValue('expId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+    spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
 
     component.altTextIsDisplayed = true;
     component.imageAltText = 'This is alt text';
@@ -348,12 +348,12 @@ describe('NoninteractiveImage', () => {
     'should not show alt text images when altTextIsDisplayed property is' +
       'false',
     () => {
-      spyOn(contextService, 'getEntityType').and.returnValue('exploration');
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       spyOn(imagePreloaderService, 'getImageUrlAsync').and.resolveTo(
         dataUrlSvg
       );
-      spyOn(contextService, 'getExplorationId').and.returnValue('exp_id');
-      spyOn(contextService, 'getEntityId').and.returnValue('expId');
+      spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+      spyOn(pageContextService, 'getEntityId').and.returnValue('expId');
 
       component.altTextIsDisplayed = false;
       component.imageAltText = 'This is alt text';

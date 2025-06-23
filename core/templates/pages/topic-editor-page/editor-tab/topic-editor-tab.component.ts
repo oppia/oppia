@@ -30,7 +30,7 @@ import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {StorySummary} from 'domain/story/story-summary.model';
@@ -104,7 +104,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   generatedUrlPrefix: string;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private entityCreationService: EntityCreationService,
     private focusManagerService: FocusManagerService,
     private imageUploadHelperService: ImageUploadHelperService,
@@ -184,8 +184,8 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.editableThumbnailDataUrl =
       this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
         this.topic.getThumbnailFilename(),
-        this.contextService.getEntityType(),
-        this.contextService.getEntityId()
+        this.pageContextService.getEntityType(),
+        this.pageContextService.getEntityId()
       );
     this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}`;
   }

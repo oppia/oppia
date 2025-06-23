@@ -211,6 +211,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'blog-editor/try-to-publish-a-duplicate-blog-post-and-get-blocked',
     'curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill',
     'curriculum-admin/create-edit-and-delete-classroom',
+    'curriculum-admin/create-subtopic-study-guide-with-multiple-sections',
     'exploration-editor/create-exploration-and-change-basic-settings',
     'exploration-editor/manage-exploration-misconceptions',
     'exploration-editor/modify-translations-through-modal',

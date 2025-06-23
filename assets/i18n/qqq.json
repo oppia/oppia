@@ -750,6 +750,7 @@
 	"I18N_FOOTER_NEWSLETTER_EMAIL": "Text label that appears on the email input field in the newsletter subscription form.",
 	"I18N_FOOTER_NEWSLETTER_HEADING": "Text that appears on the heading of the newsletter subscription form.",
 	"I18N_FOOTER_NEWSLETTER_TEXT": "Be a part of the Oppia community! Our bi-weekly newsletter keeps you informed on new features, lessons and how Oppia is making a worldwide impact.",
+	"I18N_FOOTER_NEWSLETTER_WARNING": "Text that appears under the email input field in the newsletter subscription form when user tries to subcribe with an already used email address.",
 	"I18N_FOOTER_OPPIA_FOUNDATION": "Text shown in the footer. - Link to the Oppia Foundation website. See I18N_ABOUT_PAGE_TITLE.",
 	"I18N_FOOTER_OPPIA_MISSION": "Text that appears on the footer of the page that describes the mission of Oppia.",
 	"I18N_FOOTER_OPPIA_MISSION_DONATE_VOLUNTEER": "Text that appears below the oppia mission in the footer that links to donate and volunteer.",

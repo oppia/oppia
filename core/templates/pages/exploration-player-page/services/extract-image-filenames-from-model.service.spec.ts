@@ -18,28 +18,28 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {ContextService} from 'services/context.service';
+import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {PageContextService} from '../../../services/page-context.service';
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
-} from 'domain/exploration/ExplorationObjectFactory';
+} from '../../../domain/exploration/ExplorationObjectFactory';
 import {
   ExtractImageFilenamesFromModelService,
   // eslint-disable-next-line max-len
-} from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
+} from './extract-image-filenames-from-model.service';
 
 import {
   SkillBackendDict,
   SkillObjectFactory,
-} from 'domain/skill/SkillObjectFactory';
+} from '../../../domain/skill/SkillObjectFactory';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Extracting Image file names in the state service', () => {
   let eifms: ExtractImageFilenamesFromModelService;
   let eof: ExplorationObjectFactory;
   let sof: SkillObjectFactory;
-  let ecs: ContextService;
+  let ecs: PageContextService;
   let explorationDict: ExplorationBackendDict;
   let ImageFilenamesInExploration: {[x: string]: string[]};
   let skillDict: SkillBackendDict;
@@ -50,7 +50,7 @@ describe('Extracting Image file names in the state service', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     eof = TestBed.inject(ExplorationObjectFactory);
-    ecs = TestBed.inject(ContextService);
+    ecs = TestBed.inject(PageContextService);
     eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
     sof = TestBed.inject(SkillObjectFactory);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
