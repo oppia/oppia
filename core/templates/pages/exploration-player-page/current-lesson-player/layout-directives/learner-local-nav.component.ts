@@ -29,6 +29,7 @@ import {
   FlagExplorationModalComponent,
   FlagExplorationModalResult,
 } from '../modals/flag-exploration-modal.component';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {LearnerLocalNavBackendApiService} from '../../services/learner-local-nav-backend-api.service';
 
@@ -53,7 +54,8 @@ export class LearnerLocalNavComponent implements OnInit {
     private loaderService: LoaderService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private userService: UserService,
-    private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService
+    private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService,
+    private pageContextService: PageContextService
   ) {}
 
   showFlagExplorationModal(): void {
@@ -103,7 +105,7 @@ export class LearnerLocalNavComponent implements OnInit {
 
   ngOnInit(): void {
     this.explorationId = this.explorationEngineService.getExplorationId();
-    let version = this.explorationEngineService.getExplorationVersion();
+    let version = this.pageContextService.getExplorationVersion();
     if (version) {
       this.readOnlyExplorationBackendApiService
         .loadExplorationAsync(this.explorationId, version)

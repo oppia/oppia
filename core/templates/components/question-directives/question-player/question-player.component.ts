@@ -28,7 +28,6 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {QuestionPlayerConceptCardModalComponent} from './question-player-concept-card-modal.component';
@@ -38,6 +37,7 @@ import {UserService} from 'services/user.service';
 import {QuestionPlayerStateService} from './services/question-player-state.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
+import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlService} from 'services/contextual/url.service';
 
@@ -113,7 +113,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
   constructor(
     private pageContextService: PageContextService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private questionPlayerEngineService: QuestionPlayerEngineService,
     private location: Location,
     private ngbModal: NgbModal,
     private playerPositionService: PlayerPositionService,
@@ -553,7 +553,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       );
 
       this.componentSubscription.add(
-        this.explorationPlayerStateService.onTotalQuestionsReceived.subscribe(
+        this.questionPlayerEngineService.onTotalQuestionsReceived.subscribe(
           result => this.updateTotalQuestions(result)
         )
       );
