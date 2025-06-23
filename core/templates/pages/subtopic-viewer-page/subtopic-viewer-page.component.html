@@ -27,7 +27,7 @@
 </div>
 
 <div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container new-subtopic-viewer-container">
-  <button (click)="backToTopic()" *ngIf="nextSubtopic" class="btn btn-back-to-topic">
+  <button (click)="backToTopic()" class="btn btn-back-to-topic">
     <p class="text-next-study-guide-fixed">
       <i class="material-icons icon-next-study-guide">arrow_back</i>
       {{ 'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC' | translate }} '{{ parentTopicTitle }}'
@@ -55,7 +55,7 @@
       </button>
     </div>
   </div>
-  <div *ngIf="subtopicSummaryIsShown" class="next-actions-section">
+  <div class="next-actions-section">
     <h4 class="next-actions-title">{{ I18N_SUBTOPIC_VIEWER_NEXT_ACTIONS_HEADING | translate }}</h4>
     <div class="next-actions-buttons-container">
       <button (click)="openStudyGuideMenu()" class="btn btn-next-actions btn-study-guide-menu">
@@ -116,7 +116,7 @@
   .content-title {
     color: #00645c;
     display: block;
-    font-family: Capriola;
+    font-family: Capriola, Arial, sans-serif;
     font-size: 30px;
     font-weight: 400;
     margin-bottom: 15px;
@@ -140,7 +140,7 @@
 
   .card-title {
     color: #fff;
-    font-family: Roboto;
+    font-family: Roboto, Arial, sans-serif;
     font-size: 20px;
     font-weight: 300;
     margin: 0;
@@ -191,22 +191,22 @@
   .btn-study-guide-menu {
     background-color: #e8f1f0;
     border: 1px solid #00645c;
-    color: #00645C;
+    color: #00645c;
     margin-right: 5px;
   }
 
   .btn-back-to-topic {
     color: #003c34;
     display: none;
-    font-family: Capriola;
+    font-family: Capriola, Arial, sans-serif;
     font-size: 16px;
     margin-bottom: 30px;
     text-align: center;
   }
 
   .next-actions-title {
-    color: #333333;
-    font-family: Capriola;
+    color: #333;
+    font-family: Capriola, Arial, sans-serif;
     font-size: 20px;
     font-weight: 400;
   }

@@ -26,7 +26,6 @@ from core import feconf
 from core.constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import feature_flag_services
 from core.controllers import incoming_app_feedback_report
 from core.domain import blog_services
 from core.domain import exp_domain
@@ -5628,7 +5627,8 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         feature_flag_list.FeatureNames
         .SHOW_RESTRUCTURED_STUDY_GUIDES
     ])
-    def test_can_access_subtopic_when_topic_is_published_with_flag(self) -> None:
+    def test_can_access_subtopic_when_topic_is_published_with_flag(
+        self) -> None:
         topic_services.publish_topic(self.topic_id_2, self.admin_id)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
