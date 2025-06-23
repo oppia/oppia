@@ -55,22 +55,20 @@ class RedisClient:
         )
         self._is_client_initialized = True
 
-    def get_oppia_redis_client(self) -> Optional[redis.StrictRedis[str]]:
+    def get_oppia_redis_client(self) -> redis.StrictRedis[str]:
         """Initializes redis model and obtains oppia redis client.
 
         Returns:
-            redis.StrictRedis[str] or None. The oppia redis client if redishost
-            is setup, else None.
+            redis.StrictRedis[str]. The oppia redis client.
         """
         self._initialize_client()
         return self._oppia_redis_client
 
-    def get_cloud_ndb_redis_client(self) -> Optional[redis.StrictRedis[str]]:
+    def get_cloud_ndb_redis_client(self) -> redis.StrictRedis[str]:
         """Initializes redis model and obtains cloud ndb redis client.
 
         Returns:
-            redis.StrictRedis[str] or None. The cloud ndb redis client if
-            redishost is setup, else None.
+            redis.StrictRedis[str]. The cloud ndb redis client.
         """
         self._initialize_client()
         return self._cloud_ndb_redis_client
@@ -90,26 +88,20 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
         keys stored as values.
     """
     oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
-    if oppia_redis_client:
-        redis_full_profile = oppia_redis_client.memory_stats()
-        memory_stats = caching_domain.MemoryCacheStats(
-            redis_full_profile['total.allocated'],
-            redis_full_profile['peak.allocated'],
-            redis_full_profile['keys.count']
-        )
-
-        return memory_stats
-    return caching_domain.MemoryCacheStats(0, 0, 0)
+    redis_full_profile = oppia_redis_client.memory_stats()
+    return caching_domain.MemoryCacheStats(
+        redis_full_profile['total.allocated'],
+        redis_full_profile['peak.allocated'],
+        redis_full_profile['keys.count']
+    )
 
 
 def flush_caches() -> None:
     """Wipes the Redis caches clean."""
     oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
-    if oppia_redis_client:
-        oppia_redis_client.flushdb()
+    oppia_redis_client.flushdb()
     cloud_ndb_redis_client = REDIS_CLIENT.get_cloud_ndb_redis_client()
-    if cloud_ndb_redis_client:
-        cloud_ndb_redis_client.flushdb()
+    cloud_ndb_redis_client.flushdb()
 
 
 def get_multi(keys: List[str]) -> List[Optional[str]]:
@@ -124,9 +116,7 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
     """
     assert isinstance(keys, list)
     oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
-    if oppia_redis_client:
-        return oppia_redis_client.mget(keys)
-    return []
+    return oppia_redis_client.mget(keys)
 
 
 def set_multi(key_value_mapping: Dict[str, str]) -> bool:
@@ -142,9 +132,7 @@ def set_multi(key_value_mapping: Dict[str, str]) -> bool:
     """
     assert isinstance(key_value_mapping, dict)
     oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
-    if oppia_redis_client:
-        return oppia_redis_client.mset(key_value_mapping)
-    return False
+    return oppia_redis_client.mset(key_value_mapping)
 
 
 def delete_multi(keys: List[str]) -> int:
@@ -159,6 +147,4 @@ def delete_multi(keys: List[str]) -> int:
     for key in keys:
         assert isinstance(key, str)
     oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
-    if oppia_redis_client:
-        return oppia_redis_client.delete(*keys)
-    return 0
+    return oppia_redis_client.delete(*keys)
