@@ -640,6 +640,7 @@ describe('Conversation skin component', () => {
     );
     spyOn(statsReportingService, 'recordMaybeLeaveEvent');
     spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
+    spyOn(conversationFlowService, 'setNextStateCard').and.callThrough();
     spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
     spyOn(messengerService, 'sendMessage');
     spyOn(
@@ -655,6 +656,11 @@ describe('Conversation skin component', () => {
       'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner'
     ).and.returnValue(
       Promise.resolve({unique_progress_url_id: uniqueProgressIdResponse})
+    );
+    spyOn(conversationFlowService, 'triggerIfLearnerStuckAction').and.callFake(
+      (isStuck: boolean, callback: () => void) => {
+        callback();
+      }
     );
 
     let mockOnHintConsumed = new EventEmitter();
@@ -706,8 +712,10 @@ describe('Conversation skin component', () => {
     componentInstance.isLoggedIn = false;
     componentInstance.hasInteractedAtLeastOnce = true;
     componentInstance.displayedCard = displayedCard;
+    componentInstance.explorationActuallyStarted = false;
 
     componentInstance.ngOnInit();
+    tick();
     windowRef.nativeWindow.onresize(null);
 
     mockOnNewCardOpened.emit(conversationFlowService.getNextStateCard());
@@ -720,6 +728,7 @@ describe('Conversation skin component', () => {
     mockOnPlayerStateChange.emit(newStateName);
     tick(100);
 
+    expect(componentInstance.continueToReviseStateButtonIsVisible).toBeTrue();
     componentInstance.redirectToRefresherExplorationConfirmed = true;
 
     spyOn(alertsService, 'addWarning');
