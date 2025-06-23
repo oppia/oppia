@@ -24,17 +24,17 @@ import {
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
-import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
-import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
+import {InteractionObjectFactory} from '../../../domain/exploration/InteractionObjectFactory';
+import {SubtitledUnicode} from '../../../domain/exploration/subtitled-unicode.model.ts';
+import {StateCard} from '../../../domain/state_card/state-card.model';
+import {ContentTranslationManagerService} from './content-translation-manager.service';
+import {PlayerTranscriptService} from './player-transcript.service';
+import {InteractionSpecsConstants} from '../../../pages/interaction-specs.constants';
+import {ExplorationHtmlFormatterService} from '../../../services/exploration-html-formatter.service';
+import {EntityTranslationBackendApiService} from '../../../pages/exploration-editor-page/services/entity-translation-backend-api.service';
+import {EntityTranslation} from '../../../domain/translation/EntityTranslationObjectFactory';
+import {TranslatedContent} from '../../../domain/exploration/TranslatedContentObjectFactory';
+import {ImagePreloaderService} from './image-preloader.service';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;

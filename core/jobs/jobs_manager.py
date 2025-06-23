@@ -25,6 +25,8 @@ import pprint
 from core import feconf
 from core.domain import beam_job_services
 from core.domain import caching_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.jobs import base_jobs
 from core.jobs import job_options
 from core.jobs.io import cache_io
@@ -182,8 +184,12 @@ def refresh_state_of_beam_job_run_model(
         return
 
     try:
+        oppia_project_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+        assert isinstance(oppia_project_id, str)
         job = dataflow.JobsV1Beta3Client().get_job(dataflow.GetJobRequest(
-            job_id=job_id, project_id=feconf.OPPIA_PROJECT_ID,
+            job_id=job_id, project_id=oppia_project_id,
             location=feconf.GOOGLE_APP_ENGINE_REGION))
 
     except Exception as e:
@@ -230,8 +236,12 @@ def cancel_job(beam_job_run_model: beam_job_models.BeamJobRunModel) -> None:
         raise ValueError('dataflow_job_id must not be None')
 
     try:
+        oppia_project_id = (
+            platform_parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
+        assert isinstance(oppia_project_id, str)
         dataflow.JobsV1Beta3Client().update_job(dataflow.UpdateJobRequest(
-            job_id=job_id, project_id=feconf.OPPIA_PROJECT_ID,
+            job_id=job_id, project_id=oppia_project_id,
             location=feconf.GOOGLE_APP_ENGINE_REGION,
             job=dataflow.Job(
                 requested_state=dataflow.JobState.JOB_STATE_CANCELLED)))

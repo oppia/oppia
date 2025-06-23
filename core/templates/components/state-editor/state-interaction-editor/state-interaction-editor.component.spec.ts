@@ -37,7 +37,7 @@ import {CustomizeInteractionModalComponent} from 'pages/exploration-editor-page/
 import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
 import {StateContentService} from '../state-editor-properties-services/state-content.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {StateCustomizationArgsService} from '../state-editor-properties-services/state-customization-args.service';
 import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
@@ -87,7 +87,7 @@ class MockNgbModal {
 
 describe('State Interaction component', () => {
   let component: StateInteractionEditorComponent;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let editabilityService: EditabilityService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let fixture: ComponentFixture<StateInteractionEditorComponent>;
@@ -107,7 +107,7 @@ describe('State Interaction component', () => {
       imports: [HttpClientTestingModule],
       declarations: [StateInteractionEditorComponent],
       providers: [
-        ContextService,
+        PageContextService,
         CustomizeInteractionModalComponent,
         EditabilityService,
         ExplorationHtmlFormatterService,
@@ -132,7 +132,7 @@ describe('State Interaction component', () => {
     fixture = TestBed.createComponent(StateInteractionEditorComponent);
     component = fixture.componentInstance;
 
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     editabilityService = TestBed.inject(EditabilityService);
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
@@ -292,7 +292,9 @@ describe('State Interaction component', () => {
       } as NgbModalRef;
     });
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
-    spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+      true
+    );
     spyOn(stateEditorService.onHandleCustomArgsUpdate, 'emit').and.stub();
 
     component.openInteractionCustomizerModal();
@@ -395,7 +397,9 @@ describe('State Interaction component', () => {
     spyOn(interactionDetailsCacheService, 'set').and.stub();
     spyOn(stateContentService, 'saveDisplayedValue').and.stub();
     spyOn(editabilityService, 'isEditable').and.returnValue(true);
-    spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+      true
+    );
     spyOn(stateEditorService.onHandleCustomArgsUpdate, 'emit').and.stub();
     spyOn(component.onSaveInteractionData, 'emit').and.stub();
 

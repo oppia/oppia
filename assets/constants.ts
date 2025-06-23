@@ -6242,6 +6242,10 @@ export default {
   "MAX_CHARS_IN_TOPIC_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
+  "MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING": 200,
+  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 1000,
+  "DEFAULT_SECTION_HEADING_CONTENT_ID": "section_heading_0",
+  "DEFAULT_SECTION_CONTENT_CONTENT_ID": "section_content_1",
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
@@ -6259,8 +6263,8 @@ export default {
   // 'story URL fragment'.
   "MAX_CHARS_IN_STORY_URL_FRAGMENT": 30,
   // This represents the maximum number of characters in the URL fragment for
-  // subtopic in the revision page URL. E.g.
-  // in /learn/math/fractions/revision/place-values, 'place-values' is the
+  // subtopic in the study guide page URL. E.g.
+  // in /learn/math/fractions/studyguide/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
   // This is same as base_models.ID_Length.
@@ -6663,7 +6667,7 @@ export default {
       ]
     },
     "SUBTOPIC_VIEWER": {
-      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/revision/:subtopic_url_fragment",
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/studyguide/:subtopic_url_fragment",
       "TITLE": "Oppia",
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [

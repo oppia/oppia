@@ -142,11 +142,11 @@ class AppFeedbackReportModel(base_models.BaseModel):
         required=True, indexed=True)
     # The entry point location that the user is accessing the feedback report
     # from on both web & Android devices. Possible entry points include:
-    # navigation_drawer, lesson_player, revision_card, or crash.
+    # navigation_drawer, lesson_player, study_guide, or crash.
     entry_point = datastore_services.StringProperty(required=True, indexed=True)
     # Additional topic / story / exploration IDs that may be collected depending
     # on the entry_point used to send the report; a lesson player entry point
-    # will have topic_id, story_id, and exploration_id, while revision cards
+    # will have topic_id, story_id, and exploration_id, while study guides
     # will have topic_id and subtopic_id.
     entry_point_topic_id = datastore_services.StringProperty(
         required=False, indexed=True)

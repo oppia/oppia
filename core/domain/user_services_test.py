@@ -573,7 +573,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert admin_settings is not None
         self.assertEqual(admin_settings.user_id, user_id)
-        self.assertEqual(admin_settings.email, feconf.SYSTEM_EMAIL_ADDRESS)
+        self.assertEqual(admin_settings.email, 'system@example.com')
         self.assertEqual(admin_settings.roles, roles)
         self.assertFalse(admin_settings.banned)
         self.assertEqual(admin_settings.username, 'admin')
@@ -722,7 +722,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                     'email@example.com', 'Android'))
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
+        ]
     )
     def test_set_and_get_user_email_preferences(self) -> None:
         auth_id = 'someUser'
@@ -810,7 +816,13 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_subscription_email)
 
     @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com'
+            )
+        ]
     )
     def test_get_and_set_user_email_preferences_with_error(self) -> None:
         auth_id = 'someUser'

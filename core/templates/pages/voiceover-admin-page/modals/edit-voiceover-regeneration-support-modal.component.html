@@ -53,7 +53,7 @@
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success" (click)="update()" [disabled]="!languageCodePresentInConstants">
+  <button class="btn btn-success e2e-test-autogeneration-confirmation" (click)="update()" [disabled]="!languageCodePresentInConstants">
     <span *ngIf="supportsAutogeneration">Turn on autogeneration</span>
     <span *ngIf="!supportsAutogeneration">Turn off autogeneration</span>
   </button>

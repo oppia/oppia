@@ -347,7 +347,9 @@ class ValidateModelDomainObjectInstances(
             ModelDomainObjectValidateError. Error for domain object validation.
         """
         try:
-            domain_object = self._get_model_domain_object_instance(entity)  # pylint: disable=assignment-from-none
+            domain_object = self._get_model_domain_object_instance( # pylint: disable=assignment-from-none
+                entity
+            )
             validation_type = self._get_domain_object_validation_type(entity)
             if domain_object is None:
                 return
