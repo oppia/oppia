@@ -57,26 +57,6 @@ describe('Logged-in User', function () {
       'Skill 1'
     );
 
-    await curriculumAdmin.createSubtopicWithStudyGuideForTopic(
-      'Subtracting Numbers',
-      'subtract-nos',
-      'Common Mistakes',
-      'Some common mistakes students make are...',
-      'Addition and Subtraction'
-    );
-    await curriculumAdmin.createSkillForTopic(
-      'Skill 2',
-      'Addition and Subtraction'
-    );
-    await curriculumAdmin.createQuestionsForSkill('Skill 2', 3);
-    await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
-      'Skill 2',
-      'Subtracting Numbers',
-      'Addition and Subtraction'
-    );
-
-    await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
-
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',

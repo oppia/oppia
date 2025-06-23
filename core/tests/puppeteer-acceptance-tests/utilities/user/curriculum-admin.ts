@@ -1905,6 +1905,23 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.addSkillToDiagnosticTest(skillName, topicName);
 
+    await this.createSubtopicWithStudyGuideForTopic(
+      'Subtracting Numbers',
+      'subtract-nos',
+      'Common Mistakes',
+      'Some common mistakes students make are...',
+      topicName
+    );
+    await this.saveTopicDraft(topicName);
+
+    await this.createSkillForTopic('Skill 2', topicName);
+    await this.createQuestionsForSkill('Skill 2', 3);
+    await this.assignSkillToSubtopicInTopicEditor(
+      'Skill 2',
+      'Subtracting Numbers',
+      topicName
+    );
+
     await this.publishDraftTopic(topicName);
   }
 
