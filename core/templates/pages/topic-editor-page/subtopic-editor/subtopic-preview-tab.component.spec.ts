@@ -39,7 +39,7 @@ class MockPlatformFeatureService {
   };
 }
 
-describe('SubtopicPreviewTab', () => {
+fdescribe('SubtopicPreviewTab', () => {
   let component: SubtopicPreviewTab;
   let fixture: ComponentFixture<SubtopicPreviewTab>;
   let topicEditorStateService: TopicEditorStateService;

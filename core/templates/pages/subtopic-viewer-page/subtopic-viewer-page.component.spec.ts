@@ -528,6 +528,15 @@ describe('Subtopic viewer page', function () {
     );
   });
 
+  it('should not open study guide menu when required fragments are missing', () => {
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = 'algebra';
+
+    component.openStudyGuideMenu();
+
+    expect(windowRef.nativeWindow.open).not.toHaveBeenCalled();
+  });
+
   it('should open practice menu when openPracticeMenu is called', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'algebra';
@@ -544,6 +553,15 @@ describe('Subtopic viewer page', function () {
     );
   });
 
+  it('should not open practice menu when required fragments are missing', () => {
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = 'algebra';
+
+    component.openPracticeMenu();
+
+    expect(windowRef.nativeWindow.open).not.toHaveBeenCalled();
+  });
+
   it('should navigate back to topic when backToTopic is called', () => {
     component.classroomUrlFragment = 'math';
     component.topicUrlFragment = 'algebra';
@@ -558,6 +576,15 @@ describe('Subtopic viewer page', function () {
       '/topic-viewer',
       '_self'
     );
+  });
+
+  it('should not navigate back to topic when required fragments are missing', () => {
+    component.classroomUrlFragment = '';
+    component.topicUrlFragment = 'algebra';
+
+    component.backToTopic();
+
+    expect(windowRef.nativeWindow.open).not.toHaveBeenCalled();
   });
 
   it('should get static image URL', () => {
