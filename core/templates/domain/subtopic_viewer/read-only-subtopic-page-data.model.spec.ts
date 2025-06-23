@@ -20,7 +20,7 @@ import {SubtopicPageContents} from 'domain/topic/subtopic-page-contents.model';
 
 import {ReadOnlySubtopicPageData} from 'domain/subtopic_viewer/read-only-subtopic-page-data.model';
 
-fdescribe('Subtopic data object factory', () => {
+describe('Subtopic data object factory', () => {
   describe('subtopic data object factory', () => {
     var _sampleSubtopicDataWithPageContents: ReadOnlySubtopicPageData;
 
