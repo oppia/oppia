@@ -37,7 +37,7 @@ import {
   ImagePreloaderService,
 } from 'pages/exploration-player-page/services/image-preloader.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 import './oppia-visualization-click-hexbins.directive.css';
 
@@ -81,7 +81,7 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private imagePreloaderService: ImagePreloaderService
   ) {}
 
@@ -126,8 +126,8 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
       this.imagePath
     );
     const imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-      this.contextService.getEntityType(),
-      this.contextService.getEntityId(),
+      this.pageContextService.getEntityType(),
+      this.pageContextService.getEntityId(),
       this.imagePath
     );
 

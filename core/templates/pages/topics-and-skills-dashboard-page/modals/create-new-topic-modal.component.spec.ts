@@ -22,7 +22,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {CreateNewTopicModalComponent} from './create-new-topic-modal.component';
@@ -32,7 +32,7 @@ import {By} from '@angular/platform-browser';
 describe('Create new topic modal', () => {
   let fixture: ComponentFixture<CreateNewTopicModalComponent>;
   let componentInstance: CreateNewTopicModalComponent;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let ngbActiveModal: NgbActiveModal;
   let imageLocalStorageService: ImageLocalStorageService;
   let topicEditorStateService: TopicEditorStateService;
@@ -65,7 +65,7 @@ describe('Create new topic modal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateNewTopicModalComponent);
     componentInstance = fixture.componentInstance;
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
@@ -76,10 +76,10 @@ describe('Create new topic modal', () => {
   });
 
   it('should intialize', () => {
-    spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
     componentInstance.ngOnInit();
     expect(
-      contextService.setImageSaveDestinationToLocalStorage
+      pageContextService.setImageSaveDestinationToLocalStorage
     ).toHaveBeenCalled();
   });
 
