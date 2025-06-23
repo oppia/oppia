@@ -57,6 +57,16 @@ describe('Logged-in User', function () {
       'Skill 1'
     );
 
+    await curriculumAdmin.createSubtopicWithStudyGuideForTopic(
+      'Subtracting Numbers',
+      'subtract-nos',
+      'Common Mistakes',
+      'Some common mistakes students make are...',
+      'Addition and Subtraction'
+    );
+
+    await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
+
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
@@ -87,6 +97,18 @@ describe('Logged-in User', function () {
         'finalSubtopicViewerView',
         __dirname
       );
+      await loggedInUser1.clickOnNextStudyGuideButton();
+      await loggedInUser1.expectStudyGuideToHaveContent('Adding Numbers', [
+        ['Common Mistakes', 'Some common mistakes students make are...'],
+      ]);
+      await loggedInUser1.clickOnStudyGuideMenuButton();
+      await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
+      await loggedInUser1.clickOnPracticeButton();
+      await loggedInUser1.expectToBeOnPage('practice');
+      await loggedInUser1.navigateToStudyTab();
+      await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
+      await loggedInUser1.clickOnBackToTopicButton();
+      await loggedInUser1.expectToBeOnPage('story');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

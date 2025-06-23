@@ -486,7 +486,7 @@ describe('Subtopic viewer page', function () {
     component.topicUrlFragment = 'algebra';
     component.nextSubtopic = {
       getUrlFragment: () => 'linear-equations',
-    } as any;
+    };
 
     spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
       '/test-url'
@@ -505,7 +505,7 @@ describe('Subtopic viewer page', function () {
     component.topicUrlFragment = 'algebra';
     component.nextSubtopic = {
       getUrlFragment: () => 'linear-equations',
-    } as any;
+    };
 
     component.openStudyGuide();
 

@@ -315,6 +315,10 @@ const topicPageLessonTabSelector = '.e2e-test-study-tab-link';
 const subTopicTitleInLessTabSelector = '.subtopic-title';
 const reviewCardTitleSelector = '.oppia-subtopic-title';
 const studyGuideTitleSelector = '.e2e-test-subtopic-title';
+const goBackToTopicButton = '.e2e-test-go-back-to-topic-button';
+const goToPracticeSectionButton = '.e2e-test-go-to-practice-section-button';
+const goToNextStudyGuideButton = '.e2e-test-go-to-next-study-guide-button';
+const goToStudyGuideMenuButton = '.e2e-test-go-to-study-guide-menu-button';
 const topicNameSelector = '.e2e-test-topic-name';
 const loginPromptContainer = '.story-viewer-login-container';
 const NavbarBackButton = '.oppia-navbar-back-button';
@@ -3579,6 +3583,25 @@ export class LoggedOutUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Click on the next study guide button
+   */
+  async clickOnNextStudyGuideButton(): Promise<void> {
+    await this.clickOn(goToNextStudyGuideButton);
+  }
+
+  async clickOnStudyGuideMenuButton(): Promise<void> {
+    await this.clickOn(goToStudyGuideMenuButton);
+  }
+
+  async clickOnPracticeButton(): Promise<void> {
+    await this.clickOn(goToPracticeSectionButton);
+  }
+
+  async clickOnBackToTopicButton(): Promise<void> {
+    await this.clickOn(goBackToTopicButton);
   }
 
   /**

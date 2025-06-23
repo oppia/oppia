@@ -27,7 +27,7 @@
 </div>
 
 <div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container new-subtopic-viewer-container">
-  <button (click)="backToTopic()" class="btn btn-back-to-topic">
+  <button (click)="backToTopic()" class="btn e2e-test-go-back-to-topic-button btn-back-to-topic">
     <p class="text-next-study-guide-fixed">
       <i class="material-icons icon-next-study-guide">arrow_back</i>
       {{ 'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC' | translate }} '{{ parentTopicTitle }}'
@@ -46,7 +46,7 @@
           </oppia-rte-output-display>
         </div>
       </div>
-      <button (click)="openPracticeMenu()" class="btn btn-next-actions btn-practice-section">
+      <button (click)="openPracticeMenu()" class="btn btn-next-actions e2e-test-go-to-practice-section-button btn-practice-section">
         <p class="text-practice-section-fixed">
           <img [src]="getStaticImageUrl('/icons/practice-button-edit.png')" alt="Practice button icon" width="15px" height="15px">
           {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE' | translate }}
@@ -58,11 +58,11 @@
   <div class="next-actions-section">
     <h4 class="next-actions-title">{{ I18N_SUBTOPIC_VIEWER_NEXT_ACTIONS_HEADING | translate }}</h4>
     <div class="next-actions-buttons-container">
-      <button (click)="openStudyGuideMenu()" class="btn btn-next-actions btn-study-guide-menu">
+      <button (click)="openStudyGuideMenu()" class="btn btn-next-actions e2e-test-go-to-study-guide-menu-button btn-study-guide-menu">
         <i class="material-icons icon-study-guide-menu">exit_to_app</i>
         {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_STUDY_GUIDE_MENU_BUTTON' | translate }}
       </button>
-      <button (click)="openStudyGuide()" *ngIf="nextSubtopic" class="btn btn-next-actions btn-next-study-guide">
+      <button (click)="openStudyGuide()" *ngIf="nextSubtopic" class="btn btn-next-actions e2e-test-go-to-next-study-guide-button btn-next-study-guide">
         <p class="text-next-study-guide-fixed">
           <i class="material-icons icon-next-study-guide">arrow_forward</i>
           {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_NEXT_STUDY_GUIDE_BUTTON' | translate }}
@@ -197,7 +197,7 @@
 
   .btn-back-to-topic {
     color: #003c34;
-    display: none;
+    display: block;
     font-family: Capriola, Arial, sans-serif;
     font-size: 16px;
     margin-bottom: 30px;
@@ -232,9 +232,6 @@
   @media screen and (max-width: 1100px) {
     .content-box {
       width: 100%;
-    }
-    .btn-back-to-topic {
-      display: block;
     }
   }
 
