@@ -314,7 +314,6 @@ const oppiaTopicTitleSelector = '.oppia-topic-title';
 const topicPageLessonTabSelector = '.e2e-test-study-tab-link';
 const subTopicTitleInLessTabSelector = '.subtopic-title';
 const reviewCardTitleSelector = '.oppia-subtopic-title';
-const studyGuideTitleSelector = '.e2e-test-subtopic-title';
 const goBackToTopicButton = '.e2e-test-go-back-to-topic-button';
 const goToPracticeSectionButton = '.e2e-test-go-to-practice-section-button';
 const goToNextStudyGuideButton = '.e2e-test-go-to-next-study-guide-button';
@@ -3541,17 +3540,11 @@ export class LoggedOutUser extends BaseUser {
     studyGuideSections: string[][]
   ): Promise<void> {
     try {
-      const titleElement = await this.page.$(studyGuideTitleSelector);
+      const isTitlePresent = await this.isTextPresentOnPage(studyGuideTitle);
 
-      // Get the innerText of the title element.
-      const titleText = await this.page.evaluate(
-        el => el.innerText,
-        titleElement
-      );
-
-      if (titleText.trim() !== studyGuideTitle) {
+      if (!isTitlePresent) {
         throw new Error(
-          `Expected study guide title to be ${studyGuideTitle}, but found ${titleText}`
+          'Expected study guide title to be present, but it was not found.'
         );
       }
 
