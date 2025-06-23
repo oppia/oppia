@@ -17,34 +17,45 @@
 """Tests for core.platform.app_identity.gae_app_identity_services."""
 
 from __future__ import annotations
+import os
 
-from core.domain import platform_parameter_list
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils
 
 
 class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
-
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.OPPIA_PROJECT_ID, 'some_id')]
-    )
     def test_get_application_id(self) -> None:
-        self.assertEqual(
-            gae_app_identity_services.get_application_id(), 'some_id')
+        def mock_get(key: str, _: str) -> str:
+            assert key == 'GOOGLE_CLOUD_PROJECT'
+            return 'some_id'
+        with self.swap(os.environ, 'get', mock_get):
+            self.assertEqual(
+                gae_app_identity_services.get_application_id(), 'some_id')
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.OPPIA_PROJECT_ID, '')]
-    )
+    def test_get_default_application_id(self) -> None:
+        def mock_get(key: str, default: str) -> str:
+            assert key == 'GOOGLE_CLOUD_PROJECT'
+            return default
+        with self.swap(os.environ, 'get', mock_get):
+            self.assertEqual(
+                gae_app_identity_services.get_application_id(),
+                'dev-project-id')
+
     def test_get_application_id_throws_error(self) -> None:
-        with self.assertRaisesRegex(
-            ValueError, 'Value None for application id is invalid.'
-        ):
-            gae_app_identity_services.get_application_id()
+        def mock_get(key: str, _: str) -> str:
+            assert key == 'GOOGLE_CLOUD_PROJECT'
+            return ''
+        with self.swap(os.environ, 'get', mock_get):
+            with self.assertRaisesRegex(
+                ValueError, 'Value "" for application id is invalid.'
+            ):
+                gae_app_identity_services.get_application_id()
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.OPPIA_PROJECT_ID, 'some_id')]
-    )
     def test_get_default_gcs_bucket_name(self) -> None:
-        self.assertEqual(
-            gae_app_identity_services.get_gcs_resource_bucket_name(),
-            'some_id-resources')
+        def mock_get(key: str, _: str) -> str:
+            assert key == 'GOOGLE_CLOUD_PROJECT'
+            return 'some_id'
+        with self.swap(os.environ, 'get', mock_get):
+            self.assertEqual(
+                gae_app_identity_services.get_gcs_resource_bucket_name(),
+                'some_id-resources')
