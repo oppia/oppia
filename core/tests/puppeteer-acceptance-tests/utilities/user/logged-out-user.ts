@@ -3586,20 +3586,29 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Click on the next study guide button
+   * Click on the next study guide button.
    */
   async clickOnNextStudyGuideButton(): Promise<void> {
     await this.clickOn(goToNextStudyGuideButton);
   }
 
+  /**
+   * Click on the study guide menu button.
+   */
   async clickOnStudyGuideMenuButton(): Promise<void> {
     await this.clickOn(goToStudyGuideMenuButton);
   }
 
+  /**
+   * Click on the practice button
+   */
   async clickOnPracticeButton(): Promise<void> {
     await this.clickOn(goToPracticeSectionButton);
   }
 
+  /**
+   * Click on the back to topic button
+   */
   async clickOnBackToTopicButton(): Promise<void> {
     await this.clickOn(goBackToTopicButton);
   }

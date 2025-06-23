@@ -109,6 +109,7 @@ describe('Logged-in User', function () {
       await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
       await loggedInUser1.clickOnBackToTopicButton();
       await loggedInUser1.expectToBeOnPage('story');
+      await loggedInUser1.downloadScreenshot('hello', __dirname);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
