@@ -171,7 +171,7 @@ export class PageContextService {
     this.explorationIsLinkedToStory = true;
   }
 
-  setExplorationVersion(explorationVersion: number): void {
+  setExplorationVersion(explorationVersion: number | null): void {
     this.explorationVersion = explorationVersion;
   }
 

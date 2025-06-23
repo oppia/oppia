@@ -425,7 +425,6 @@ describe('Exploration engine service ', () => {
         false
       );
 
-      expect(explorationEngineService.isInPreviewMode()).toBe(false);
       expect(() => {
         explorationEngineService.getExplorationTitle();
       }).toThrowError("Cannot read properties of undefined (reading 'title')");
@@ -443,6 +442,30 @@ describe('Exploration engine service ', () => {
       const explorationTitle = explorationEngineService.getExplorationTitle();
       expect(explorationTitle).toBe('My Exploration Title');
       expect(initSuccessCb).toHaveBeenCalled();
+    }
+  );
+
+  it(
+    'should throw error when initialized in exploration' +
+      ' player page and version is not set',
+    () => {
+      const initSuccessCb = jasmine.createSpy('success');
+
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        false
+      );
+
+      expect(() => {
+        explorationEngineService.init(
+          explorationDict,
+          null,
+          null,
+          true,
+          ['en'],
+          [],
+          initSuccessCb
+        );
+      }).toThrowError('Exploration version is not set.');
     }
   );
 
@@ -466,7 +489,6 @@ describe('Exploration engine service ', () => {
       // function to manually trigger and tests different edge cases.
       explorationEngineService.setExplorationProperties();
 
-      expect(explorationEngineService.isInPreviewMode()).toBe(true);
       expect(() => {
         explorationEngineService.getExplorationTitle();
       }).toThrowError("Cannot read properties of undefined (reading 'title')");
@@ -1055,7 +1077,7 @@ describe('Exploration engine service ', () => {
       );
 
       // Here 1 is default value, this is being initialized in the constructor.
-      expect(explorationEngineService.getExplorationVersion()).toBe(1);
+      expect(pageContextService.getExplorationVersion()).toBe(1);
 
       explorationEngineService.init(
         explorationDict,
@@ -1067,8 +1089,7 @@ describe('Exploration engine service ', () => {
         initSuccessCb
       );
 
-      const explorationVersion =
-        explorationEngineService.getExplorationVersion();
+      const explorationVersion = pageContextService.getExplorationVersion();
       expect(explorationVersion).toBe(2);
     }
   );
@@ -1331,7 +1352,7 @@ describe('Exploration engine service ', () => {
         paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
 
       // Checking if we are currently in exploration editor preview mode.
-      expect(explorationEngineService.isInPreviewMode()).toBe(false);
+      expect(pageContextService.isInExplorationEditorPage()).toBe(false);
       expect(() => {
         explorationEngineService.initSettingsFromEditor('Start', [
           paramChanges,
