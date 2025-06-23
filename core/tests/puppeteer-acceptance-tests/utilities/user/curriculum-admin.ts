@@ -1915,7 +1915,6 @@ export class CurriculumAdmin extends BaseUser {
     await this.saveTopicDraft(topicName);
 
     await this.createSkillForTopic('Skill 2', topicName);
-    await this.createQuestionsForSkill('Skill 2', 3);
     await this.assignSkillToSubtopicInTopicEditor(
       'Skill 2',
       'Subtracting Numbers',
