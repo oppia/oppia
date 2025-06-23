@@ -36,7 +36,7 @@ import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 
 import './checkpoint-celebration-modal.component.css';
 
@@ -93,7 +93,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
-    private explorationPlayerStateService: ExplorationPlayerStateService
+    private explorationModeService: ExplorationModeService
   ) {}
 
   ngOnInit(): void {
@@ -183,7 +183,7 @@ export class CheckpointCelebrationModalComponent implements OnInit, OnDestroy {
     if (
       newStateName === this.currentStateName ||
       newStateName === this.mostRecentlyReachedCheckpointStateName ||
-      !this.explorationPlayerStateService.isInStoryChapterMode()
+      !this.explorationModeService.isInStoryChapterMode()
     ) {
       return;
     }
