@@ -62,6 +62,7 @@ class RedisClient:
             redis.StrictRedis[str]. The oppia redis client.
         """
         self._initialize_client()
+        assert self._oppia_redis_client is not None
         return self._oppia_redis_client
 
     def get_cloud_ndb_redis_client(self) -> redis.StrictRedis[str]:
@@ -71,6 +72,7 @@ class RedisClient:
             redis.StrictRedis[str]. The cloud ndb redis client.
         """
         self._initialize_client()
+        assert self._cloud_ndb_redis_client is not None
         return self._cloud_ndb_redis_client
 
 
