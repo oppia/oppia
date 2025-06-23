@@ -34,7 +34,7 @@
                                        (urlFragmentChange)="onUrlFragmentChange($event)">
         </url-fragment-editor-component>
       </div>
-      <div class="create-new-subtopic-input-field create-new-subtopic-content">
+      <div *ngIf="!isShowRestructuredStudyGuidesFeatureEnabled()" class="create-new-subtopic-input-field create-new-subtopic-content">
         <div>
           <strong>Explanation of the subtopic*</strong>
         </div>
@@ -56,6 +56,37 @@
         </div>
       </div>
 
+      <div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="create-new-subtopic-input-field create-new-subtopic-content">
+        <h3>
+          Section of the study guide*
+        </h3>
+        <p class="oppia-input-box-subtitle">
+          <em>
+            A section of the study guide. More sections can be added using the study guide editor after clicking on the create Study Guide Button.
+          </em>
+        </p>
+        <div>
+          <h4>Heading*</h4>
+          <input class="form-control oppia-new-subtopic-editable-field e2e-test-new-subtopic-study-guide-section-heading-field required"
+                 label="Enter heading of the section"
+                 placeholder="Enter heading of the section"
+                 [(ngModel)]="sectionHeadingPlaintext" (change)="resetErrorMsg()" maxlength="{{MAX_CHARS_IN_SUBTOPIC_TITLE}}" autofocus>
+        </div>
+        <div class="section-content-box">
+          <h4>Content*</h4>
+          <div class="description-editor e2e-test-subtopic-study-guide-section-content-editor oppia-editor-card-body" >
+            <schema-based-editor [schema]="getSchema()"
+                                 class="e2e-test-create-subtopic-page-content-rich-text-editor"
+                                 [localValue]="sectionContentHtml"
+                                 (localValueChange)="localContentValueChange($event)">
+            </schema-based-editor>
+          </div>
+          <div *ngIf="isSectionContentLengthExceeded()" class="oppia-length-validation-error">
+            The content length is too long. Please use at most 1000 characters.
+          </div>
+        </div>
+      </div>
+
       <div class="thumbnail-editor e2e-test-subtopic-thumbnail e2e-test-photo-button create-new-subtopic-input-field">
         <strong>Thumbnail Image*</strong>
         <oppia-thumbnail-uploader (updateFilename)="updateSubtopicThumbnailFilename($event)"
@@ -73,7 +104,7 @@
   <div class="modal-footer">
     <button class="btn btn-secondary" (click)="cancel()" type="button">Cancel</button>
     <button class="btn btn-success e2e-test-confirm-subtopic-creation-button"
-            type="submit" [disabled]="!isSubtopicValid() || subtopicUrlFragmentExists" (click)="save()">
+            type="submit" [disabled]="!isSubtopicValid() || subtopicUrlFragmentExists || (isShowRestructuredStudyGuidesFeatureEnabled() && isSectionContentLengthExceeded())" (click)="save()">
       Create Subtopic
     </button>
   </div>
@@ -99,6 +130,12 @@
   }
   .oppia-create-new-subtopic-container .oppia-new-subtopic-editable-field {
     font-size: 12px;
+  }
+  .section-content-box h4 {
+    margin: 10px 0 5px;
+  }
+  .section-content-box .description-editor {
+    margin-top: 0;
   }
   @media screen and (max-width: 768px) {
     .create-new-subtopic .modal-dialog {

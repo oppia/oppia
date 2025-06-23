@@ -71,7 +71,7 @@
                                            (urlFragmentChange)="onSubtopicUrlFragmentChange($event)">
             </url-fragment-editor-component>
           </div>
-          <div class="subtopic-html" tabindex="0">
+          <div *ngIf="!isShowRestructuredStudyGuidesFeatureEnabled()" class="subtopic-html" tabindex="0">
             <div (click)="showSchemaEditor()"
                  class="e2e-test-edit-html-content"
                  role="button"
@@ -154,6 +154,62 @@
                                      [thumbnailBgColor]="editableThumbnailBgColor"
                                      [bgColor]="'#2F6687'">
             </oppia-preview-thumbnail>
+          </div>
+        </div>
+      </mat-card>
+      <mat-card *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-editor-card-with-avatar oppia-mobile-collapsible-card">
+        <div class="oppia-editor-card-body">
+          <div class="oppia-editor-card-section study-guide-section-content">
+            <div class="oppia-study-guide-sections-header oppia-mobile-collapsible-card-header"
+                 (click)="toggleSectionsList()"
+                 role="button"
+                 tabindex="0">
+              <strong class="heading-text">Sections</strong>
+              <i class="fa fa-caret-down e2e-test-show-study-guide-sections-list"
+                 *ngIf="!sectionsListIsShown"
+                 [attr.aria-hidden]="true">
+              </i>
+              <i class="fa fa-caret-up"
+                 *ngIf="sectionsListIsShown"
+                 [attr.aria-hidden]="true">
+              </i>
+            </div>
+            <div *ngIf="sectionsListIsShown" class="oppia-mobile-collapsible-card-content">
+              <p class="study-guide-section-subtitle">
+                Sections of the Study Guide.
+              </p>
+              <div>
+                <ul class="oppia-study-guide-section-preview oppia-option-list nav-stacked nav-pills study-guide-sections-list">
+                  <li *ngFor="let section of sections; let index = index"
+                      [ngClass]="{'active': activeSectionIndex === index}"
+                      class="oppia-rule-block oppia-prevent-selection">
+                    <button (click)="changeActiveSectionIndex(index)"
+                            class="oppia-rule-tab e2e-test-study-guide-section-{{ index }} oppia-study-guide-section-preview-list"
+                            [ngClass]="{'oppia-rule-tab-active': activeSectionIndex === index}">
+                      <oppia-summary-list-header [index]="index"
+                                                 [disableSorting]="true"
+                                                 [summary]="section.getHeadingText()"
+                                                 [shortSummary]="section.getHeadingText()"
+                                                 [isActive]="index === activeSectionIndex"
+                                                 [isDeleteAvailable]="sections.length > 1"
+                                                 (summaryDelete)="deleteSection($event.index, $event.event)">
+                      </oppia-summary-list-header>
+                    </button>
+                    <div *ngIf="activeSectionIndex === index" class="oppia-editor-card-section e2e-test-study-guide-section-{{ index }}-expanded">
+                      <oppia-study-guide-section-editor [section]="section"
+                                                        [index]="index"
+                                                        [isEditable]="isEditable">
+                      </oppia-study-guide-section-editor>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <button type="button"
+                      class="btn btn-add-study-guide-section skill-editor-add-btn e2e-test-add-study-guide-section"
+                      (click)="openAddSectionModal()">
+                + ADD SECTION
+              </button>
+            </div>
           </div>
         </div>
       </mat-card>
@@ -502,6 +558,93 @@
     }
     .skill-option-box {
       right: 30px;
+    }
+  }
+  .study-guide-section-subtitle {
+    color: #595959;
+    font-size: 13px;
+    font-style: italic;
+    padding-bottom: 12px;
+  }
+  .heading-text {
+    font-size: 16px;
+  }
+  .study-guide-sections-list {
+    position: relative;
+  }
+  .btn-add-study-guide-section {
+    background-color: #058ca6;
+    color: #fff;
+  }
+  .btn-show-preview {
+    border-top: 1px solid #c1c1c1;
+    color: #00645d;
+    font-size: 14px;
+    padding: 10px 0;
+  }
+  .oppia-rule-block:last-child {
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 10px;
+  }
+  .oppia-study-guide-sections-header {
+    display: flex;
+    justify-content: space-between;
+  }
+  .oppia-study-guide-sections-header i {
+    display: none;
+  }
+  .oppia-study-guide-section-preview-list {
+    display: block;
+  }
+  .oppia-study-guide-section-preview {
+    list-style: none;
+    margin-bottom: 0;
+    padding-left: 0;
+    padding-right: 0;
+    position: relative;
+    vertical-align: top;
+    width: 100%;
+  }
+  .oppia-study-guide-section-preview > li {
+    display: block;
+    position: relative;
+  }
+  .nav-pills > li > button.oppia-rule-tab {
+    background: rgba(0,0,0,0.05);
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+    border-radius: 0;
+    color: #444;
+    cursor: pointer;
+    outline: none;
+    padding: 7px 15px;
+    text-align: left;
+    width: 100%;
+  }
+  .nav-pills > li > button.oppia-rule-tab-disabled {
+    cursor: default;
+  }
+  .nav-pills > li:hover > button.oppia-rule-tab {
+    background: rgba(0,0,0,0.1);
+  }
+  .nav-pills > li:hover > button.oppia-rule-tab-disabled {
+    background: rgba(0,0,0,0.05);
+  }
+  .nav-pills > li.active > button.oppia-rule-tab-active {
+    background: rgba(5,140,166,0.1);
+    border-right: 0;
+    color: #333;
+  }
+  @media screen and (max-width: 768px) {
+    .oppia-study-guide-sections-header i {
+      display: block;
+    }
+    .study-guide-section-content {
+      padding: 0;
+    }
+    .mat-card {
+      box-shadow: none;
+      padding: 0;
     }
   }
 </style>

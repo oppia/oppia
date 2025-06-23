@@ -38,7 +38,7 @@ import {
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UserService} from 'services/user.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
@@ -83,7 +83,7 @@ describe('Contributions and review component', () => {
   let fixture: ComponentFixture<ContributionsAndReview>;
   let ngbModal: NgbModal = null;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
-  var contextService: ContextService;
+  var pageContextService: PageContextService;
   var contributionAndReviewService: ContributionAndReviewService;
   var contributionOpportunitiesService: ContributionOpportunitiesService;
   var skillBackendApiService: SkillBackendApiService;
@@ -134,7 +134,7 @@ describe('Contributions and review component', () => {
           provide: MatSnackBarRef,
           useClass: MockMatSnackBarRef,
         },
-        ContextService,
+        PageContextService,
         ContributionAndReviewService,
         ContributionOpportunitiesService,
         SkillBackendApiService,
@@ -167,7 +167,7 @@ describe('Contributions and review component', () => {
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     userService = TestBed.inject(UserService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     contributionOpportunitiesService = TestBed.inject(
       ContributionOpportunitiesService
@@ -191,7 +191,7 @@ describe('Contributions and review component', () => {
       contributionOpportunitiesService.reloadOpportunitiesEventEmitter,
       'subscribe'
     ).and.callThrough();
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve({
         isLoggedIn: () => true,
@@ -738,7 +738,7 @@ describe('Contributions and review component', () => {
         next_content_id_index: 1,
         inapplicable_skill_misconception_ids: ['abc-2'],
       });
-      spyOn(contextService, 'setCustomEntityContext').and.stub();
+      spyOn(pageContextService, 'setCustomEntityContext').and.stub();
 
       component.contributions = {
         suggestion_id: {

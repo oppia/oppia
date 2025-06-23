@@ -29,7 +29,7 @@ import {
 } from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
@@ -204,7 +204,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
     private readonly changeDetectorRef: ChangeDetectorRef,
     public activeModal: NgbActiveModal,
     private alertsService: AlertsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private contributionAndReviewService: ContributionAndReviewService,
     private contributionOpportunitiesService: ContributionOpportunitiesService,
     private languageUtilService: LanguageUtilService,
@@ -281,7 +281,7 @@ export class TranslationSuggestionReviewModalComponent implements OnInit {
       return;
     }
     this.activeSuggestion = this.activeContribution.suggestion;
-    this.contextService.setCustomEntityContext(
+    this.pageContextService.setCustomEntityContext(
       AppConstants.IMAGE_CONTEXT.EXPLORATION_SUGGESTIONS,
       this.activeSuggestion.target_id
     );
