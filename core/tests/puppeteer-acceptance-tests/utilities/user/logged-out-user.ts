@@ -314,6 +314,7 @@ const oppiaTopicTitleSelector = '.oppia-topic-title';
 const topicPageLessonTabSelector = '.e2e-test-study-tab-link';
 const subTopicTitleInLessTabSelector = '.subtopic-title';
 const reviewCardTitleSelector = '.oppia-subtopic-title';
+const studyGuideTitleSelector = '.e2e-test-subtopic-title';
 const topicNameSelector = '.e2e-test-topic-name';
 const loginPromptContainer = '.story-viewer-login-container';
 const NavbarBackButton = '.oppia-navbar-back-button';
@@ -3519,6 +3520,61 @@ export class LoggedOutUser extends BaseUser {
     } catch (error) {
       const newError = new Error(
         `Failed to verify content of review card: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Verifies if the review card has the expected title and description.
+   * @param {string} studyGuideTitle - The expected title of the study guide.
+   * @param {string[][]} studyGuideSections - The expected sections of the study guide.
+   * It is a list of sections. Sections are a list of strings having length of 2 - heading and content.
+   */
+  async expectStudyGuideToHaveContent(
+    studyGuideTitle: string,
+    studyGuideSections: string[][]
+  ): Promise<void> {
+    try {
+      const titleElement = await this.page.$(studyGuideTitleSelector);
+
+      // Get the innerText of the title element.
+      const titleText = await this.page.evaluate(
+        el => el.innerText,
+        titleElement
+      );
+
+      if (titleText.trim() !== studyGuideTitle) {
+        throw new Error(
+          `Expected study guide title to be ${studyGuideTitle}, but found ${titleText}`
+        );
+      }
+
+      for (var i = 0; i < studyGuideSections.length; i++) {
+        for (var j = 0; j < 2; j++) {
+          const isHeadingPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
+          );
+          if (!isHeadingPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} heading to be present on the page, but it was not found`
+            );
+          }
+          j++;
+          const isContentPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
+          );
+          if (!isContentPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} content to be present on the page, but it was not found`
+            );
+          }
+        }
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify asections of study guide: ${error}`
       );
       newError.stack = error.stack;
       throw newError;

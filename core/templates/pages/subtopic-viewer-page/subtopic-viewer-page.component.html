@@ -33,7 +33,7 @@
       {{ 'I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC' | translate }} '{{ parentTopicTitle }}'
     </p>
   </button>
-  <p *ngIf="!isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitle }}</p>
+  <p *ngIf="!isHackySubtopicTitleTranslationDisplayed()" class="e2e-test-subtopic-title content-title">{{ subtopicTitle }}</p>
   <p *ngIf="isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitleTranslationKey | translate }}</p>
   <div class="content-box">
     <div class="content">
