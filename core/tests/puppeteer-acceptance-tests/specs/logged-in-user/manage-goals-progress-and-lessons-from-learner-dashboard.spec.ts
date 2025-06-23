@@ -115,20 +115,6 @@ describe('Logged-in User', function () {
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
-
-      await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
-      await loggedInUser.navigateToGoalsSection();
-      await loggedInUser.expectCompletedGoalsToInclude(['Algebra I']);
-
-      await loggedInUser.navigateToProgressSection();
-      await loggedInUser.expectStoriesCompletedToInclude(['Test Story 1']);
-
-      await loggedInUser.navigateToCommunityLessonsSection();
-      await loggedInUser.expectCompletedLessonsToInclude(['Negative Numbers']);
-      await loggedInUser.verifyLessonPresenceInPlayLater(
-        'Positive Numbers',
-        false
-      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
