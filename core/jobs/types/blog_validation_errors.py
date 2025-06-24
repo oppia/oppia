@@ -31,7 +31,7 @@ if MYPY: # pragma: no cover
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 
-class DuplicateBlogTitleError(base_validation_errors.BaseAuditError):
+class DuplicateBlogTitleError(base_validation_errors.BaseValidationError):
     """Error class for blog posts with duplicate titles."""
 
     def __init__(
@@ -45,7 +45,7 @@ class DuplicateBlogTitleError(base_validation_errors.BaseAuditError):
         super().__init__(message, model)
 
 
-class DuplicateBlogUrlError(base_validation_errors.BaseAuditError):
+class DuplicateBlogUrlError(base_validation_errors.BaseValidationError):
     """Error class for blog posts with duplicate urls."""
 
     def __init__(
@@ -60,7 +60,7 @@ class DuplicateBlogUrlError(base_validation_errors.BaseAuditError):
 
 
 class InconsistentLastUpdatedTimestampsError(
-    base_validation_errors.BaseAuditError
+    base_validation_errors.BaseValidationError
 ):
     """Error class for models with inconsistent timestamps."""
 
@@ -77,7 +77,7 @@ class InconsistentLastUpdatedTimestampsError(
 
 
 class InconsistentPublishLastUpdatedTimestampsError(
-        base_validation_errors.BaseAuditError):
+        base_validation_errors.BaseValidationError):
     """Error class for models with inconsistent timestamps."""
 
     def __init__(
@@ -93,7 +93,7 @@ class InconsistentPublishLastUpdatedTimestampsError(
 
 
 class ModelMutatedDuringJobErrorForLastUpdated(
-    base_validation_errors.BaseAuditError
+    base_validation_errors.BaseValidationError
 ):
     """Error class for models mutated during a job."""
 
@@ -111,7 +111,7 @@ class ModelMutatedDuringJobErrorForLastUpdated(
 
 
 class ModelMutatedDuringJobErrorForPublishedOn(
-    base_validation_errors.BaseAuditError
+    base_validation_errors.BaseValidationError
 ):
     """Error class for models mutated during a job."""
 
@@ -128,7 +128,7 @@ class ModelMutatedDuringJobErrorForPublishedOn(
         super().__init__(message, model)
 
 
-class DuplicateBlogAuthorModelError(base_validation_errors.BaseAuditError):
+class DuplicateBlogAuthorModelError(base_validation_errors.BaseValidationError):
     """Error class for blog author detail models with duplicate author ids."""
 
     def __init__(

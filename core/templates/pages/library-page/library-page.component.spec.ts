@@ -29,6 +29,7 @@ import {
   TestBed,
   tick,
   waitForAsync,
+  flush,
 } from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
@@ -659,7 +660,7 @@ describe('Library Page Component', () => {
 
   it('should scroll carousel', () => {
     componentInstance.libraryGroups = [];
-    let activityDicts: ActivityDict[] = [];
+    const activityDicts: ActivityDict[] = [];
 
     for (let i = 0; i < 5; i++) {
       activityDicts.push({
@@ -689,21 +690,12 @@ describe('Library Page Component', () => {
       });
     }
 
-    spyOn(window, '$').and.returnValue({
-      animate: (
-        options: string[],
-        arg2: {
-          duration: number;
-          queue: boolean;
-          start: () => void;
-          complete: () => void;
-        }
-      ) => {
-        arg2.start();
-        arg2.complete();
-      },
-      scrollLeft: () => {},
-    } as JQLite);
+    spyOnProperty(HTMLElement.prototype, 'scrollLeft', 'get').and.returnValue(
+      0
+    );
+    spyOn(window, 'requestAnimationFrame').and.callFake(callback =>
+      callback(0)
+    );
 
     componentInstance.scroll(3, false);
     componentInstance.scroll(3, true);
@@ -719,8 +711,8 @@ describe('Library Page Component', () => {
 
   it('should not scroll if all tiles are already showing', () => {
     componentInstance.libraryGroups = [];
-    let activityDicts = [];
-    let summaryDicts: ActivityDict[] = [];
+    const activityDicts: ActivityDict[] = [];
+    const summaryDicts: ActivityDict[] = [];
 
     for (let i = 0; i < 3; i++) {
       activityDicts.push({
@@ -750,21 +742,12 @@ describe('Library Page Component', () => {
       });
     }
 
-    spyOn(window, '$').and.returnValue({
-      animate: (
-        options: string[],
-        arg2: {
-          duration: number;
-          queue: boolean;
-          start: () => void;
-          complete: () => void;
-        }
-      ) => {
-        arg2.start();
-        arg2.complete();
-      },
-      scrollLeft: () => {},
-    } as JQLite);
+    spyOnProperty(HTMLElement.prototype, 'scrollLeft', 'get').and.returnValue(
+      0
+    );
+    spyOn(window, 'requestAnimationFrame').and.callFake(callback =>
+      callback(0)
+    );
 
     componentInstance.tileDisplayCount = 5;
     componentInstance.scroll(1, false);
@@ -912,5 +895,49 @@ describe('Library Page Component', () => {
     expect(rendererSetStyleSpy).toHaveBeenCalledTimes(1);
 
     AppConstants.LIBRARY_TILE_WIDTH_PX = originalLibraryTileWidth;
+  }));
+
+  it('should scroll the carousel to the right smoothly', fakeAsync(() => {
+    const ind = 0;
+    const isLeftScroll = false;
+
+    const mockCarouselElement = document.createElement('div');
+    mockCarouselElement.className = 'oppia-library-carousel-tiles';
+    mockCarouselElement.scrollLeft = 0;
+
+    spyOn(document, 'querySelectorAll').and.returnValue([
+      mockCarouselElement,
+    ] as unknown as NodeListOf<HTMLElement>);
+
+    componentInstance.tileDisplayCount = 2;
+    componentInstance.leftmostCardIndices = [0];
+    componentInstance.libraryGroups = [
+      {
+        activity_summary_dicts: new Array(10),
+        categories: [],
+        header_i18n_id: '',
+        has_full_results_page: false,
+        full_results_url: '',
+        protractor_id: '',
+      },
+    ];
+
+    let currentTime = 0;
+    spyOn(performance, 'now').and.callFake(() => currentTime);
+
+    componentInstance.scroll(ind, isLeftScroll);
+
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBeTrue();
+
+    for (let i = 0; i <= 5; i++) {
+      currentTime += 160;
+      tick(160);
+    }
+
+    expect(componentInstance.isAnyCarouselCurrentlyScrolling).toBeFalse();
+
+    expect(componentInstance.leftmostCardIndices[ind]).toBe(2);
+
+    flush();
   }));
 });

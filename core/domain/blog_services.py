@@ -422,7 +422,8 @@ def get_published_blog_post_summaries_by_user_id(
         blog_models.BlogPostSummaryModel.query(
             blog_models.BlogPostSummaryModel.author_id == user_id
         ).filter(
-            blog_models.BlogPostSummaryModel.published_on != None  # pylint: disable=singleton-comparison, inequality-with-none, line-too-long
+            blog_models.BlogPostSummaryModel.published_on # pylint: disable=singleton-comparison, inequality-with-none
+            != None
         ).order(
             -blog_models.BlogPostSummaryModel.published_on
         ).fetch(
@@ -829,7 +830,8 @@ def get_published_blog_post_summaries(
     # query().
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
-            blog_models.BlogPostSummaryModel.published_on != None  # pylint: disable=singleton-comparison, inequality-with-none, line-too-long
+            blog_models.BlogPostSummaryModel.published_on # pylint: disable=singleton-comparison, inequality-with-none
+            != None
         ).order(
             -blog_models.BlogPostSummaryModel.published_on
         ).fetch(
@@ -853,7 +855,8 @@ def get_total_number_of_published_blog_post_summaries() -> int:
         int. Total number of published BlogPostSummaries.
     """
     return blog_models.BlogPostRightsModel.query(
-        blog_models.BlogPostRightsModel.blog_post_is_published == True  # pylint: disable=singleton-comparison
+        blog_models.BlogPostRightsModel.blog_post_is_published # pylint: disable=singleton-comparison
+        == True
     ).count()
 
 

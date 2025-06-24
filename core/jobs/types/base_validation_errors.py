@@ -26,7 +26,7 @@ from core.jobs.types import job_run_result
 from core.jobs.types import model_property
 from core.platform import models
 
-from typing import Mapping, Optional, Union
+from typing import Mapping, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -35,24 +35,16 @@ if MYPY: # pragma: no cover
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 
 
-class BaseAuditError(job_run_result.JobRunResult):
-    """Base class for model audit errors."""
+class BaseValidationError(job_run_result.JobRunResult):
+    """Base class for model validation errors."""
 
-    def __init__(
-        self,
-        message: str,
-        model_or_kind: Union[base_models.BaseModel, str],
-        model_id: Optional[str] = None
-    ) -> None:
+    # TODO(#22338): Re-structure to remove passing model as a param.
+    def __init__(self, message: str, model: base_models.BaseModel) -> None:
         """Initializes a new audit error.
 
         Args:
             message: str. The message describing the error.
-            model_or_kind: Model|str. If model_id is not provided, then this
-                is a model (type: BaseModel).
-                Otherwise, this is a model's kind (type: str).
-            model_id: str|None. The model's ID, or None when model_or_kind is
-                a model.
+            model: base_model.BaseModel. The model for which error is found.
 
         Raises:
             TypeError. When the input message is not a string.
@@ -64,32 +56,19 @@ class BaseAuditError(job_run_result.JobRunResult):
         if not message:
             raise ValueError('message must be a non-empty string')
 
-        if (
-            model_id is None and (
-            isinstance(model_or_kind, base_models.BaseModel))
-        ):
-            model_id = job_utils.get_model_id(model_or_kind)
-            model_kind = job_utils.get_model_kind(model_or_kind)
-        elif isinstance(model_or_kind, str):
-            model_kind = model_or_kind
+        model_id = job_utils.get_model_id(model)
+        assert model_id is not None, 'Model ID should not be none'
 
-        if model_id:
-            error_message = '%s in %s(id=%s): %s' % (
-                self.__class__.__name__,
-                model_kind,
-                utils.quoted(model_id),
-                message
-            )
-        else:
-            error_message = '%s in %s: %s' % (
-                self.__class__.__name__,
-                model_kind,
-                message
-            )
+        error_message = '%s in %s(id=%s): %s' % (
+            self.__class__.__name__,
+            job_utils.get_model_kind(model),
+            utils.quoted(model_id),
+            message
+        )
         super().__init__(stderr=error_message)
 
 
-class InconsistentTimestampsError(BaseAuditError):
+class InconsistentTimestampsError(BaseValidationError):
     """Error class for models with inconsistent timestamps."""
 
     def __init__(self, model: base_models.BaseModel) -> None:
@@ -98,7 +77,7 @@ class InconsistentTimestampsError(BaseAuditError):
         super().__init__(message, model)
 
 
-class InvalidCommitStatusError(BaseAuditError):
+class InvalidCommitStatusError(BaseValidationError):
     """Error class for commit models with inconsistent status values."""
 
     def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
@@ -106,7 +85,7 @@ class InvalidCommitStatusError(BaseAuditError):
         super().__init__(message, model)
 
 
-class InvalidPublicCommitStatusError(BaseAuditError):
+class InvalidPublicCommitStatusError(BaseValidationError):
     """Error class for commit models with inconsistent public status values."""
 
     def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
@@ -116,7 +95,7 @@ class InvalidPublicCommitStatusError(BaseAuditError):
         super().__init__(message, model)
 
 
-class InvalidPrivateCommitStatusError(BaseAuditError):
+class InvalidPrivateCommitStatusError(BaseValidationError):
     """Error class for commit models with inconsistent private status values."""
 
     def __init__(self, model: base_models.BaseCommitLogEntryModel) -> None:
@@ -126,7 +105,7 @@ class InvalidPrivateCommitStatusError(BaseAuditError):
         super().__init__(message, model)
 
 
-class ModelMutatedDuringJobError(BaseAuditError):
+class ModelMutatedDuringJobError(BaseValidationError):
     """Error class for models mutated during a job."""
 
     def __init__(self, model: base_models.BaseModel) -> None:
@@ -136,7 +115,7 @@ class ModelMutatedDuringJobError(BaseAuditError):
         super().__init__(message, model)
 
 
-class ModelIdRegexError(BaseAuditError):
+class ModelIdRegexError(BaseValidationError):
     """Error class for models with ids that fail to match a regex pattern."""
 
     def __init__(
@@ -147,7 +126,7 @@ class ModelIdRegexError(BaseAuditError):
         super().__init__(message, model)
 
 
-class ModelDomainObjectValidateError(BaseAuditError):
+class ModelDomainObjectValidateError(BaseValidationError):
     """Error class for domain object validation errors."""
 
     def __init__(
@@ -158,7 +137,7 @@ class ModelDomainObjectValidateError(BaseAuditError):
         super().__init__(message, model)
 
 
-class ModelExpiredError(BaseAuditError):
+class ModelExpiredError(BaseValidationError):
     """Error class for expired models."""
 
     def __init__(self, model: base_models.BaseModel) -> None:
@@ -167,7 +146,7 @@ class ModelExpiredError(BaseAuditError):
         super().__init__(message, model)
 
 
-class InvalidCommitTypeError(BaseAuditError):
+class InvalidCommitTypeError(BaseValidationError):
     """Error class for commit_type validation errors."""
 
     def __init__(
@@ -181,13 +160,13 @@ class InvalidCommitTypeError(BaseAuditError):
         super().__init__(message, model)
 
 
-class ModelRelationshipError(BaseAuditError):
+class ModelRelationshipError(BaseValidationError):
     """Error class for models with invalid relationships."""
 
     def __init__(
         self,
         id_property: model_property.ModelProperty,
-        model_id: Optional[str],
+        model: base_models.BaseModel,
         target_kind: str,
         target_id: str
     ) -> None:
@@ -196,7 +175,7 @@ class ModelRelationshipError(BaseAuditError):
         Args:
             id_property: ModelProperty. The property referring to the ID of the
                 target model.
-            model_id: str|None. The ID of the model with problematic ID
+            model: base_model.BaseModel. The the model with problematic ID
                 property.
             target_kind: str. The kind of model the property refers to.
             target_id: str. The ID of the specific model that the property
@@ -208,11 +187,10 @@ class ModelRelationshipError(BaseAuditError):
             '%s=%s should correspond to the ID of an existing %s, but no such '
             'model exists' % (
                 id_property, utils.quoted(target_id), target_kind))
-        super().__init__(
-            message, id_property.model_kind, model_id=model_id)
+        super().__init__(message, model)
 
 
-class CommitCmdsNoneError(BaseAuditError):
+class CommitCmdsNoneError(BaseValidationError):
     """Error class for None Commit Cmds."""
 
     def __init__(
@@ -228,7 +206,7 @@ class CommitCmdsNoneError(BaseAuditError):
         super().__init__(message, model)
 
 
-class CommitCmdsValidateError(BaseAuditError):
+class CommitCmdsValidateError(BaseValidationError):
     """Error class for wrong commit cmmds."""
 
     def __init__(
