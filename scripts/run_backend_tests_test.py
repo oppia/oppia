@@ -660,7 +660,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         executed_tasks = []
         test_targets = (
-            'scripts.test_file_test, scripts.another_test_file_test'
+            'scripts.test_file_test,scripts.another_test_file_test'
         )
 
         def mock_execute(
