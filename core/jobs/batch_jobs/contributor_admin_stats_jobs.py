@@ -41,9 +41,10 @@ if MYPY: # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import opportunity_models
     from mypy_imports import suggestion_models
+    from mypy_imports import topic_models
 
-(opportunity_models, suggestion_models, ) = models.Registry.import_models([
-    models.Names.OPPORTUNITY, models.Names.SUGGESTION
+(opportunity_models, suggestion_models, topic_models) = models.Registry.import_models([
+    models.Names.OPPORTUNITY, models.Names.SUGGESTION, models.Names.TOPIC
 ])
 
 datastore_services = models.Registry.import_datastore_services()
@@ -1243,3 +1244,374 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
             return None
         else:
             return (logged_suggestions_count, debug_logs)
+
+
+class ValidateTranslationContributionStatsJob(BaseJob):
+    """Validation job for verifying translation total contribution stats for
+    all contributors.
+    """
+
+    DATASTORE_UPDATES_ALLOWED = False
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Validates the total translation and question contribution stats.
+
+        Returns:
+            PCollection. A PCollection of 'SUCCESS x' results, where x is
+            the number of verified total contribution stats.
+            Also returns error logs for invalid stats models.
+        """
+
+        translation_submitter_total_stats_models = (
+            self.pipeline
+            | 'Get all non-deleted TranslationSubmitterTotalContributionStatsModel' >>  # pylint: disable=line-too-long
+                ndb_io.GetModels(
+                suggestion_models.TranslationSubmitterTotalContributionStatsModel
+                    .get_all(
+                        include_deleted=False))
+        )
+        question_submitter_total_stats_models = (
+            self.pipeline
+            | 'Get all non-deleted QuestionSubmitterTotalContributionStatsModel' >>  # pylint: disable=line-too-long
+                ndb_io.GetModels(
+                suggestion_models.QuestionSubmitterTotalContributionStatsModel
+                    .get_all(
+                        include_deleted=False))
+        )
+
+        translation_validaion_results = (
+            translation_submitter_total_stats_models
+            | 'Validate TranslationSubmitterTotalContributionStatsModel' >> beam.Map(
+                GenerateContributorAdminStatsJob._validate_translation_submitter_total_stats_models
+            )
+        )
+        success_translation_validaition_count_results = (
+            translation_validaion_results
+            | 'Filter translation validation ok results' >> beam.Filter(
+                lambda res: res.is_ok())
+            | 'Unpack translation validaiton ok result' >> beam.Map(
+                lambda res: res.unwrap())
+            | 'Create translation validation success job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'Valid Translation Submitter Models'
+                ))
+        )
+        error_translation_validaition = (
+            translation_validaion_results
+            | 'Filter translation validation err results' >> beam.Filter(
+                lambda res: res.is_err())
+        )
+        error_translation_validaition_count_results = (
+            error_translation_validaition
+            | 'Count translation validation err results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'Invalid Translation Submitter Models'
+                ))
+        )
+        error_translation_validaition_logs = (
+            error_translation_validaition
+            | 'Transform translation validation err to job run result' >> (
+                job_result_transforms.ResultsToJobRunResults())
+        )
+
+        question_validaion_results = (
+            question_submitter_total_stats_models
+            | 'Validate QuestionSubmitterTotalContributionStatsModel' >> beam.Map(
+                GenerateContributorAdminStatsJob._validate_question_submitter_total_stats_models
+            )
+        )
+        success_question_validaition_count_results = (
+            question_validaion_results
+            | 'Filter question validation ok results' >> beam.Filter(
+                lambda res: res.is_ok())
+            | 'Unpack question validaiton ok result' >> beam.Map(
+                lambda res: res.unwrap())
+            | 'Create question validation success job run result' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'Valid Question Submitter Models'
+                ))
+        )
+        error_question_validaition = (
+            question_validaion_results
+            | 'Filter question validation err results' >> beam.Filter(
+                lambda res: res.is_err())
+        )
+        error_question_validaition_count_results = (
+            error_question_validaition
+            | 'Count question validation err results' >> (
+                job_result_transforms.CountObjectsToJobRunResult(
+                    'Invalid Question Submitter Models'
+                ))
+        )
+        error_question_validaition_logs = (
+            error_question_validaition
+            | 'Transform question validation err to job run result' >> (
+                job_result_transforms.ResultsToJobRunResults())
+        )
+        
+        return (
+            (
+                success_translation_validaition_count_results,
+                error_translation_validaition_count_results,
+                error_translation_validaition_logs,
+                success_question_validaition_count_results,
+                error_question_validaition_count_results,
+                error_question_validaition_logs
+            )
+            | 'Merge job run results' >> beam.Flatten()
+        )
+
+    @staticmethod
+    def _validate_translation_submitter_total_stats_models(total) -> (
+        result.Result[str]):
+        contributor_id = total.contributor_id
+        language_code = total.language_code
+        error_logs = ''
+
+        # Fetch and shortlist valid contribution records
+        contributions = suggestion_models.TranslationContributionStatsModel
+            .get_all(
+                contributor_user_id=contributor_id,
+                language_code=language_code
+            )
+        valid_contributions = [
+            c for c in contributions if topic_models.TopicModel.get_by_id(
+                c.topic_id).exists()]
+
+        # Fetch related general suggestions
+        suggestions = suggestion_models.GeneralSuggestionModel.get_all(
+            suggestion_type='translate_content',
+            author_id=contributor_id,
+            language_code=language_code
+        ).order_by('created_on')
+
+        # Validate topic_ids list
+        contribution_topic_ids = {c.topic_id for c in valid_contributions}
+        if not contribution_topic_ids.issubset(set(
+            total.topic_ids_with_translation_submissions)):
+            missing = contribution_topic_ids - set(
+                total.topic_ids_with_translation_submissions)
+            error_logs += (
+                f'-> missing topic_ids {missing} in total stats\n'
+            )
+
+        # Validate aggregated counts
+        fields = [
+            'submitted_translations_count',
+            'submitted_translation_word_count',
+            'accepted_translations_count',
+            'accepted_translations_without_reviewer_edits_count',
+            'accepted_translation_word_count',
+            'rejected_translations_count',
+            'rejected_translation_word_count'
+        ]
+        for field in fields:
+            total_value = getattr(total, field)
+            aggregated = sum(getattr(c, field) for c in valid_contributions)
+            if aggregated != total_value:
+                error_logs += (
+                    f'-> field {field} aggregated {aggregated} != total '
+                    f'{total_value}\n'
+                )
+
+        # Validate first and last contribution dates
+        dates = [(
+            c.contribution_dates or [None, None]) for c in valid_contributions]
+        if dates:
+            first_date = min(d[0] for d in dates if d[0])
+            last_date = max(d[1] for d in dates if d[1])
+            if first_date != total.first_contribution_date:
+                error_logs += (
+                    f'-> first contribution '
+                    f'{first_date} != {total.first_contribution_date}\n'
+                )
+            if last_date != total.last_contribution_date:
+                error_logs += (
+                    f'-> last contribution '
+                    f'{last_date} != {total.last_contribution_date}\n'
+                )
+
+        # Validate recent outcomes and performance
+        recent_review_outcomes = []
+        counts = {
+            'accepted': 0,
+            'accepted_with_edits': 0,
+            'rejected': 0
+        }
+        for v in suggestions:
+            if (v.status == 'accepted' and v.edited_by_reviewer is False):
+                recent_review_outcomes.append('accepted')
+            elif (v.status == 'accepted' and v.edited_by_reviewer is True):
+                recent_review_outcomes.append('accepted_with_edits')
+            elif v.status == 'rejected':
+                recent_review_outcomes.append('rejected')
+
+        if len(recent_review_outcomes) > 100:
+            recent_review_outcomes = recent_review_outcomes[-100:]
+
+        for outcome in recent_review_outcomes:
+            counts[outcome] += 1
+
+        if recent_review_outcomes != total.recent_review_outcomes:
+            error_log += (
+                f'-> recent outcomes '
+                f'{recent_review_outcomes} != {total.recent_review_outcomes}\n'
+            )
+        # Weights of recent_performance as documented in
+        # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
+        recent_performance = (
+            (counts['accepted'] + counts['accepted_with_edits'])
+            - (2 * (counts['rejected']))
+            )
+        if recent_performance != total.recent_performance:
+            error_log += (
+                f'-> recent performance '
+                f'{recent_performance} != {total.recent_performance}\n'
+            )
+
+        # Validate overall accuracy
+        if total.submitted_translations_count:
+            accuracy = ((total.accepted_translations_count) / (
+                total.submitted_translations_count)) * 100
+            if round(accuracy, 2) != total.overall_accuracy:
+                error_log += (
+                    f'-> accuracy '
+                    f'{round(accuracy,2)} != {total.overall_accuracy}\n'
+                )
+
+        if len(error_logs) == 0:
+            return result.Ok(total.id)
+        else:
+            return result.Err(
+                '\nValidation failed for '
+                'TranslationSubmitterTotalContributionStatsModel '
+                f'{total.id}:\n{error_logs}'
+            )
+
+    @staticmethod
+    def _validate_question_submitter_total_stats_models(total) -> (
+        result.Result[str]):
+        contributor_id = total.contributor_id
+        error_logs = ''
+
+        # Fetch and shortlist valid contribution records
+        contributions = suggestion_models.QuestionContributionStatsModel
+            .get_all(
+                contributor_user_id=contributor_id
+            )
+        valid_contributions = [
+            c for c in contributions if topic_models.TopicModel.get_by_id(
+                c.topic_id).exists()]
+
+        # Fetch related general suggestions
+        suggestions = suggestion_models.GeneralSuggestionModel.get_all(
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            author_id=contributor_id
+        ).order_by('created_on')
+
+        # Validate topic_ids list
+        contribution_topic_ids = {c.topic_id for c in valid_contributions}
+        if not contribution_topic_ids.issubset(set(
+            total.topic_ids_with_question_submissions)):
+            missing = contribution_topic_ids - set(
+                total.topic_ids_with_question_submissions)
+            error_logs += (
+                f'-> missing topic_ids {missing} in total stats\n'
+            )
+
+        # Validate aggregated counts
+        fields = [
+            'submitted_questions_count',
+            'accepted_questions_count',
+            'accepted_questions_without_reviewer_edits_count'
+        ]
+        for field in fields:
+            total_value = getattr(total, field)
+            aggregated = sum(getattr(c, field) for c in valid_contributions)
+            if aggregated != total_value:
+                error_logs += (
+                    f'-> field {field} aggregated {aggregated} != total '
+                    f'{total_value}\n'
+                )
+        rejected_questions_count = [
+            s.status for s in suggestions if s.status == 'rejected']
+        if len(rejected_questions_count) != total.rejected_questions_count:
+            error_logs += (
+                f'-> field rejected_questions_count '
+                f'{len(rejected_questions_count)} != total '
+                f'{total.rejected_questions_count}\n'
+            )
+
+        # Validate first and last contribution dates
+        if len(valid_contributions):
+            first_date = min([
+                c.first_contribution_date for c in valid_contributions])
+            last_date = max([
+                c.last_contribution_date for c in valid_contributions])
+            if first_date != total.first_contribution_date:
+                error_logs += (
+                    f'-> first contribution '
+                    f'{first_date} != {total.first_contribution_date}\n'
+                )
+            if last_date != total.last_contribution_date:
+                error_logs += (
+                    f'-> last contribution '
+                    f'{last_date} != {total.last_contribution_date}\n'
+                )
+
+        # Validate recent outcomes and performance
+        recent_review_outcomes = []
+        counts = {
+            'accepted': 0,
+            'accepted_with_edits': 0,
+            'rejected': 0
+        }
+        for v in suggestions:
+            if (v.status == 'accepted' and v.edited_by_reviewer is False):
+                recent_review_outcomes.append('accepted')
+            elif (v.status == 'accepted' and v.edited_by_reviewer is True):
+                recent_review_outcomes.append('accepted_with_edits')
+            elif v.status == 'rejected':
+                recent_review_outcomes.append('rejected')
+
+        if len(recent_review_outcomes) > 100:
+            recent_review_outcomes = recent_review_outcomes[-100:]
+
+        for outcome in recent_review_outcomes:
+            counts[outcome] += 1
+
+        if recent_review_outcomes != total.recent_review_outcomes:
+            error_log += (
+                f'-> recent outcomes '
+                f'{recent_review_outcomes} != {total.recent_review_outcomes}\n'
+            )
+        # Weights of recent_performance as documented in
+        # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
+        recent_performance = (
+            (counts['accepted'] + counts['accepted_with_edits'])
+            - (2 * (counts['rejected']))
+            )
+        if recent_performance != total.recent_performance:
+            error_log += (
+                f'-> recent performance '
+                f'{recent_performance} != {total.recent_performance}\n'
+            )
+
+        # Validate overall accuracy
+        if total.submitted_questions_count:
+            accuracy = ((total.accepted_questions_count) / (
+                total.submitted_questions_count)) * 100
+            if round(accuracy, 2) != total.overall_accuracy:
+                error_log += (
+                    f'-> accuracy {round(accuracy,2)} != '
+                    f'{total.overall_accuracy}\n'
+                )
+        
+        if len(error_logs) == 0:
+            return result.Ok(total.id)
+        else:
+            return result.Err(
+                '\nValidation failed for '
+                'QuestionSubmitterTotalContributionStatsModel '
+                f'{total.id}:\n{error_logs}'
+            )
