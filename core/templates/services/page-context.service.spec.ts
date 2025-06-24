@@ -13,13 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the services and controllers of the
- *   editor page.
+ * @fileoverview Unit tests for the PageContextService.
  */
 
 import {TestBed} from '@angular/core/testing';
 
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {BlogPostPageService} from 'pages/blog-post-page/services/blog-post-page.service';
 
@@ -51,15 +50,15 @@ class MockWindowRef {
   }
 }
 
-describe('Context service', () => {
-  let ecs: ContextService;
+describe('PageContext service', () => {
+  let ecs: PageContextService;
   let urlService: UrlService;
   let windowRef: MockWindowRef;
   let blogPostPageService: BlogPostPageService;
 
   describe('behavior in the exploration learner view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.get(PageContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
       spyOn(urlService, 'getHash').and.returnValue('');
@@ -106,7 +105,7 @@ describe('Context service', () => {
 
   describe('behavior in the exploration learner embed view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.get(PageContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue(
         '/embed/exploration/123'
@@ -143,7 +142,7 @@ describe('Context service', () => {
 
   describe('behavior in the exploration editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.get(PageContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/create/123');
       spyOn(urlService, 'getHash').and.returnValue('#/gui');
@@ -179,7 +178,7 @@ describe('Context service', () => {
 
   describe('behavior in the topic editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.inject(ContextService);
+      ecs = TestBed.inject(PageContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -237,7 +236,7 @@ describe('Context service', () => {
 
   describe('behavior in question editor modal', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.get(PageContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -273,7 +272,7 @@ describe('Context service', () => {
 
   describe('behavior in the story editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.inject(ContextService);
+      ecs = TestBed.inject(PageContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -313,7 +312,7 @@ describe('Context service', () => {
 
   describe('behavior in the skill editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.inject(ContextService);
+      ecs = TestBed.inject(PageContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -354,7 +353,7 @@ describe('Context service', () => {
 
   describe('behavior in the blog dashboard page', () => {
     beforeEach(() => {
-      ecs = TestBed.inject(ContextService);
+      ecs = TestBed.inject(PageContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -404,7 +403,7 @@ describe('Context service', () => {
 
   describe('behavior in the blog home pages', () => {
     beforeEach(() => {
-      ecs = TestBed.inject(ContextService);
+      ecs = TestBed.inject(PageContextService);
       urlService = TestBed.get(UrlService);
       blogPostPageService = TestBed.get(BlogPostPageService);
       ecs.removeCustomEntityContext();
@@ -438,7 +437,7 @@ describe('Context service', () => {
           {provide: WindowRef, useValue: windowRef},
         ],
       });
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.get(PageContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -467,7 +466,7 @@ describe('Context service', () => {
 
   describe('behavior in the learner group viewer page', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.get(PageContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue(
         '/learner-group/groupId'
@@ -482,7 +481,7 @@ describe('Context service', () => {
 
   describe('behavior in different pages', () => {
     beforeEach(() => {
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.get(PageContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });
@@ -530,7 +529,7 @@ describe('Context service', () => {
 
   describe('behavior in other pages', () => {
     beforeEach(() => {
-      ecs = TestBed.inject(ContextService);
+      ecs = TestBed.inject(PageContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/about');
       ecs.removeCustomEntityContext();
@@ -538,14 +537,14 @@ describe('Context service', () => {
 
     it('should throw an error when trying to retrieve the exploration id', () => {
       expect(() => ecs.getExplorationId()).toThrowError(
-        'ContextService should not be used outside the ' +
+        'PageContextService should not be used outside the ' +
           'context of an exploration or a question.'
       );
     });
 
     it('should throw an error when trying to retrieve the learner group id', () => {
       expect(() => ecs.getLearnerGroupId()).toThrowError(
-        'ContextService should not be used outside the ' +
+        'PageContextService should not be used outside the ' +
           'context of a learner group.'
       );
     });
@@ -576,7 +575,7 @@ describe('Context service', () => {
       expect(ecs.getEntityId()).toBe('100');
       expect(ecs.getEntityType()).toBe('other');
       ecs.removeCustomEntityContext();
-      expect(ContextService.customEntityContext).toBeNull();
+      expect(PageContextService.customEntityContext).toBeNull();
     });
   });
 
@@ -589,7 +588,7 @@ describe('Context service', () => {
           {provide: WindowRef, useValue: windowRef},
         ],
       });
-      ecs = TestBed.get(ContextService);
+      ecs = TestBed.get(PageContextService);
       urlService = TestBed.get(UrlService);
       ecs.removeCustomEntityContext();
     });

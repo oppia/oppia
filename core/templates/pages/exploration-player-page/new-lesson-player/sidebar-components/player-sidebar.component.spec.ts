@@ -38,7 +38,7 @@ import {BehaviorSubject} from 'rxjs';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {ContextService} from '../../../../services/context.service';
+import {PageContextService} from '../../../../services/page-context.service';
 
 @Pipe({name: 'truncateAndCapitalize'})
 class MockTruncteAndCapitalizePipe {
@@ -51,7 +51,7 @@ describe('PlayerSidebarComponent', () => {
   let component: PlayerSidebarComponent;
   let fixture: ComponentFixture<PlayerSidebarComponent>;
   let mockMobileMenuService: Partial<MobileMenuService>;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let urlService: UrlService;
@@ -71,7 +71,7 @@ describe('PlayerSidebarComponent', () => {
       ],
       providers: [
         ReadOnlyExplorationBackendApiService,
-        ContextService,
+        PageContextService,
         I18nLanguageCodeService,
         UrlService,
         {
@@ -90,7 +90,7 @@ describe('PlayerSidebarComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PlayerSidebarComponent);
     component = fixture.componentInstance;
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
     );
@@ -104,7 +104,9 @@ describe('PlayerSidebarComponent', () => {
     let explorationObjective = 'Exploration Objective';
 
     spyOn(urlService, 'getPathname').and.returnValue('/lesson/');
-    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     spyOn(
       readOnlyExplorationBackendApiService,
       'fetchExplorationAsync'
@@ -127,7 +129,7 @@ describe('PlayerSidebarComponent', () => {
     expect(urlService.getPathname).toHaveBeenCalled();
     expect(urlService.getExplorationVersionFromUrl).toHaveBeenCalled();
     expect(urlService.getPidFromUrl).toHaveBeenCalled();
-    expect(contextService.getExplorationId).toHaveBeenCalled();
+    expect(pageContextService.getExplorationId).toHaveBeenCalled();
     expect(
       readOnlyExplorationBackendApiService.fetchExplorationAsync
     ).toHaveBeenCalled();

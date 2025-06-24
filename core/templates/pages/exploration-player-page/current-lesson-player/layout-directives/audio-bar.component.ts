@@ -28,7 +28,7 @@ import {Subscription} from 'rxjs';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AudioBarStatusService} from 'services/audio-bar-status.service';
 import {AudioPlayerService} from 'services/audio-player.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {AudioPreloaderService} from '../../services/audio-preloader.service';
 import {PlayerPositionService} from '../../services/player-position.service';
@@ -63,7 +63,7 @@ export class AudioBarComponent {
     private audioBarStatusService: AudioBarStatusService,
     private audioPlayerService: AudioPlayerService,
     private audioPreloaderService: AudioPreloaderService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private playerPositionService: PlayerPositionService,
     private I18nLanguageCodeService: I18nLanguageCodeService,
     private siteAnalyticsService: SiteAnalyticsService,
@@ -73,7 +73,7 @@ export class AudioBarComponent {
     private cdRef: ChangeDetectorRef
   ) {
     this.explorationPlayerModeIsActive =
-      this.contextService.isInExplorationPlayerPage();
+      this.pageContextService.isInExplorationPlayerPage();
   }
 
   ngOnInit(): void {
@@ -246,7 +246,7 @@ export class AudioBarComponent {
     }
 
     this.siteAnalyticsService.registerStartAudioPlayedEvent(
-      this.contextService.getExplorationId(),
+      this.pageContextService.getExplorationId(),
       this.playerPositionService.getDisplayedCardIndex()
     );
   }

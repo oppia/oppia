@@ -98,7 +98,7 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AutosaveInfoModalsService} from './services/autosave-info-modals.service';
 import {ChangeListService} from './services/change-list.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {EditorFirstTimeEventsService} from './services/editor-first-time-events.service';
 import {EditabilityService} from 'services/editability.service';
@@ -323,7 +323,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     AutosaveInfoModalsService,
     ChangeListService,
     ComputeGraphService,
-    ContextService,
+    PageContextService,
     CurrentInteractionService,
     EditorFirstTimeEventsService,
     EditabilityService,

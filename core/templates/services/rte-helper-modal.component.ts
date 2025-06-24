@@ -23,7 +23,7 @@ import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {AlertsService} from 'services/alerts.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -129,7 +129,7 @@ export class RteHelperModalComponent {
     private alertsService: AlertsService,
     private fb: FormBuilder,
     private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imageUploadHelperService: ImageUploadHelperService
   ) {}
@@ -368,7 +368,7 @@ export class RteHelperModalComponent {
 
       let maxAllowedFileSize;
       if (
-        this.contextService.getEntityType() ===
+        this.pageContextService.getEntityType() ===
         AppConstants.ENTITY_TYPE.BLOG_POST
       ) {
         const ONE_MB_IN_BYTES = 1 * 1024 * 1024;
@@ -389,7 +389,7 @@ export class RteHelperModalComponent {
         return;
       }
       if (
-        this.contextService.getImageSaveDestination() ===
+        this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
         this.imageLocalStorageService.saveImage(svgFileName, svgFile);
@@ -406,8 +406,8 @@ export class RteHelperModalComponent {
         .saveMathExpressionImage(
           resampledFile,
           svgFileName,
-          this.contextService.getEntityType(),
-          this.contextService.getEntityId()
+          this.pageContextService.getEntityType(),
+          this.pageContextService.getEntityId()
         )
         .then(
           response => {

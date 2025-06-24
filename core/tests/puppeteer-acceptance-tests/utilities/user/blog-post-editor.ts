@@ -74,7 +74,7 @@ export class BlogPostEditor extends BaseUser {
   ): Promise<void> {
     await this.addUserBioInBlogDashboard();
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
-    await this.updateTitleTo(draftBlogPostTitle);
+    await this.updateBlogPostTitle(draftBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content');
     await this.saveTheChanges();
     await this.saveTheDraftBlogPost();
@@ -158,7 +158,7 @@ export class BlogPostEditor extends BaseUser {
     await this.uploadBlogPostThumbnailImage();
     await this.expectPublishButtonToBeDisabled();
 
-    await this.updateTitleTo(newBlogPostTitle);
+    await this.updateBlogPostTitle(newBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content');
     await this.selectTags('News', 'International');
     const blogId = (await this.page.url().split('/').pop()) as string;
@@ -180,7 +180,7 @@ export class BlogPostEditor extends BaseUser {
   /**
    * This function updates the title of the blog post.
    */
-  async updateTitleTo(newBlogPostTitle: string): Promise<void> {
+  async updateBlogPostTitle(newBlogPostTitle: string): Promise<void> {
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
   }
@@ -234,7 +234,7 @@ export class BlogPostEditor extends BaseUser {
     await this.uploadBlogPostThumbnailImage();
     await this.expectPublishButtonToBeDisabled();
 
-    await this.updateTitleTo(newBlogPostTitle);
+    await this.updateBlogPostTitle(newBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content - duplicate');
     await this.selectTags('News', 'International');
     await this.saveTheChanges();

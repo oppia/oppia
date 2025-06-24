@@ -26,7 +26,7 @@ import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory'
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {
   I18nLanguageCodeService,
@@ -57,7 +57,7 @@ export class LearnerViewInfoComponent {
   directiveSubscriptions: Subscription = new Subscription();
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
     private statsReportingService: StatsReportingService,
@@ -85,7 +85,7 @@ export class LearnerViewInfoComponent {
     }
 
     this.explorationId = explorationContext
-      ? this.contextService.getExplorationId()
+      ? this.pageContextService.getExplorationId()
       : 'test_id';
 
     this.explorationTitle = 'Loading...';
