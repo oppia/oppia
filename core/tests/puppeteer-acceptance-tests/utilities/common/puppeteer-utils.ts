@@ -511,8 +511,15 @@ export class BaseUser {
   /**
    * This function navigates to the given URL.
    */
-  async goto(url: string): Promise<void> {
+  async goto(url: string, verifyURL: boolean = true): Promise<void> {
     await this.page.goto(url, {waitUntil: ['networkidle0', 'load']});
+
+    if (verifyURL && this.page.url() !== url) {
+      // If the URL is not the expected one, throw an error.
+      throw new Error(
+        `Failed to navigate to ${url}. Current URL is ${this.page.url()}.`
+      );
+    }
   }
 
   /**
