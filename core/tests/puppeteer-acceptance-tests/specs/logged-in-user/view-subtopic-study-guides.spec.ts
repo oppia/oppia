@@ -51,7 +51,7 @@ describe('Logged-in User', function () {
       'show_restructured_study_guides'
     );
 
-    await curriculumAdmin.createAndPublishTopicWithStudyGuides(
+    await curriculumAdmin.createAndPublishTopicWithSubtopicsAndStudyGuides(
       'Addition and Subtraction',
       'Adding Numbers',
       'Skill 1'
@@ -74,7 +74,6 @@ describe('Logged-in User', function () {
   it(
     'should be able to view the updated study guides',
     async function () {
-      await loggedInUser1.navigateToLearnerDashboard();
       await loggedInUser1.navigateToClassroomPage('math');
       await loggedInUser1.selectAndOpenTopic('Addition and Subtraction');
       await loggedInUser1.navigateToStudyTab();
@@ -99,7 +98,6 @@ describe('Logged-in User', function () {
       await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
       await loggedInUser1.clickOnBackToTopicButton();
       await loggedInUser1.expectToBeOnPage('story');
-      await loggedInUser1.downloadScreenshot('hello', __dirname);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

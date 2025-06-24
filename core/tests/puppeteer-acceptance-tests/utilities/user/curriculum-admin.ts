@@ -1873,7 +1873,7 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} subtopicName - The name of the subtopic.
    * @param {string} skillName - The name of the skill.
    */
-  async createAndPublishTopicWithStudyGuides(
+  async createAndPublishTopicWithSubtopicsAndStudyGuides(
     topicName: string,
     subtopicName: string,
     skillName: string
