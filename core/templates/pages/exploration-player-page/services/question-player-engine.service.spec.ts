@@ -17,7 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {TestBed} from '@angular/core/testing';
+import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
 import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
@@ -35,9 +35,10 @@ import {
   AnswerClassificationService,
   InteractionRulesService,
 } from './answer-classification.service';
+import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service.ts';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
 
-describe('Question player engine service ', () => {
+describe('Question player engine service', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let pageContextService: PageContextService;
@@ -49,6 +50,7 @@ describe('Question player engine service ', () => {
   let singleQuestionBackendDict: QuestionBackendDict;
   let singleQuestionObject: Question;
   let multipleQuestionsObjects: Question[];
+  let questionBackendApiService: QuestionBackendApiService;
   let textInputService: InteractionRulesService;
 
   beforeEach(() => {
@@ -373,6 +375,17 @@ describe('Question player engine service ', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        QuestionPlayerEngineService,
+        QuestionObjectFactory,
+        QuestionBackendApiService,
+        ExpressionInterpolationService,
+        FocusManagerService,
+        AlertsService,
+        AnswerClassificationService,
+        PageContextService,
+        TextInputRulesService,
+      ],
     });
 
     alertsService = TestBed.inject(AlertsService);
@@ -381,6 +394,7 @@ describe('Question player engine service ', () => {
     expressionInterpolationService = TestBed.inject(
       ExpressionInterpolationService
     );
+    questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     focusManagerService = TestBed.inject(FocusManagerService);
@@ -493,6 +507,37 @@ describe('Question player engine service ', () => {
     expect(questionPlayerEngineService.getCurrentQuestionId()).toBe(
       multipleQuestionsObjects[0]._id
     );
+  });
+
+  it('should init question player', fakeAsync(() => {
+    spyOn(questionBackendApiService, 'fetchQuestionsAsync').and.returnValue(
+      Promise.resolve([singleQuestionBackendDict])
+    );
+    spyOn(questionObjectFactory, 'createFromBackendDict').and.returnValue(
+      singleQuestionObject
+    );
+    spyOn(questionPlayerEngineService.onTotalQuestionsReceived, 'emit');
+
+    let successCallback = () => {};
+    let errorCallback = () => {};
+    questionPlayerEngineService.initQuestionPlayer(
+      {
+        skillList: [],
+        questionCount: 1,
+        questionsSortedByDifficulty: true,
+      },
+      successCallback,
+      errorCallback
+    );
+    tick(100);
+
+    expect(
+      questionPlayerEngineService.onTotalQuestionsReceived.emit
+    ).toHaveBeenCalled();
+  }));
+
+  it('should test onTotalQuestionsReceived getter', () => {
+    expect(questionPlayerEngineService.onTotalQuestionsReceived).toBeDefined();
   });
 
   it('should return number of questions', () => {
@@ -719,6 +764,18 @@ describe('Question player engine service ', () => {
         expect(submitAnswerSuccessCb).not.toHaveBeenCalled();
       }
     );
+
+    it('should initialize pretest services', () => {
+      spyOn(questionPlayerEngineService, 'init');
+      let pretestQuestionObjects: Question[] = [];
+      let callback = () => {};
+
+      questionPlayerEngineService.initializePretestServices(
+        pretestQuestionObjects,
+        callback
+      );
+      expect(questionPlayerEngineService.init).toHaveBeenCalled();
+    });
 
     it(
       'should show warning message if the feedback ' + 'content is empty',

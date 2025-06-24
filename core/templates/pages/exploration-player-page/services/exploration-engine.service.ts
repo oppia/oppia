@@ -62,9 +62,7 @@ import isEqual from 'lodash/isEqual';
   providedIn: 'root',
 })
 export class ExplorationEngineService {
-  private _explorationId: string;
-  private _editorPreviewMode: boolean;
-  private _questionPlayerMode: boolean;
+  private _explorationId!: string;
   private _updateActiveStateIfInEditorEventEmitter: EventEmitter<string> =
     new EventEmitter();
 
@@ -82,7 +80,6 @@ export class ExplorationEngineService {
   // Param changes to be used ONLY in editor preview mode.
   manualParamChanges: ParamChange[];
   initStateName: string;
-  version: number;
 
   constructor(
     private alertsService: AlertsService,
@@ -127,29 +124,28 @@ export class ExplorationEngineService {
 
     if (explorationContext) {
       this._explorationId = this.pageContextService.getExplorationId();
-      this.version = this.urlService.getExplorationVersionFromUrl();
-      this._editorPreviewMode =
-        this.pageContextService.isInExplorationEditorPage();
-      this._questionPlayerMode =
-        this.pageContextService.isInQuestionPlayerMode();
+      let version = this.urlService.getExplorationVersionFromUrl();
+      this.pageContextService.setExplorationVersion(version);
+
+      const pathSegment = this.urlService
+        .getPathname()
+        .split('/')[1]
+        .replace(/"/g, "'");
+
       if (
-        !this._questionPlayerMode &&
-        !(
-          'skill_editor' ===
-          this.urlService.getPathname().split('/')[1].replace(/"/g, "'")
-        )
+        !this.pageContextService.isInQuestionPlayerMode() &&
+        pathSegment !== 'skill_editor'
       ) {
         this.readOnlyExplorationBackendApiService
-          .loadExplorationAsync(this._explorationId, this.version)
+          .loadExplorationAsync(this._explorationId, version)
           .then(exploration => {
-            this.version = exploration.version;
+            this.pageContextService.setExplorationVersion(exploration.version);
           });
       }
     } else {
       this._explorationId = 'test_id';
-      this.version = 1;
-      this._editorPreviewMode = false;
-      this._questionPlayerMode = false;
+      let version = 1;
+      this.pageContextService.setExplorationVersion(version);
     }
   }
 
@@ -298,7 +294,7 @@ export class ExplorationEngineService {
       return;
     }
 
-    if (!this._editorPreviewMode) {
+    if (!this.pageContextService.isInExplorationEditorPage()) {
       this.statsReportingService.recordExplorationStarted(
         this.exploration.initStateName,
         newParams
@@ -364,7 +360,7 @@ export class ExplorationEngineService {
     activeStateNameFromPreviewTab: string,
     manualParamChangesToInit: ParamChange[]
   ): void {
-    if (this._editorPreviewMode) {
+    if (this.pageContextService.isInExplorationEditorPage()) {
       this.manualParamChanges = manualParamChangesToInit;
       this.initStateName = activeStateNameFromPreviewTab;
     } else {
@@ -388,9 +384,9 @@ export class ExplorationEngineService {
    */
   init(
     explorationDict: ExplorationBackendDict,
-    explorationVersion: number,
+    explorationVersion: number | null,
     preferredAudioLanguage: string | null,
-    autoTtsEnabled: boolean,
+    autoTtsEnabled: boolean | null,
     preferredContentLanguageCodes: string[],
     displayableLanguageCodes: string[],
     successCallback: (stateCard: StateCard, label: string) => void
@@ -398,7 +394,7 @@ export class ExplorationEngineService {
     this.exploration =
       this.explorationObjectFactory.createFromBackendDict(explorationDict);
     this.answerIsBeingProcessed = false;
-    if (this._editorPreviewMode) {
+    if (this.pageContextService.isInExplorationEditorPage()) {
       this.exploration.setInitialStateName(this.initStateName);
       this.visitedStateNames = [this.exploration.getInitialState().name];
       this.initParams(this.manualParamChanges);
@@ -407,7 +403,7 @@ export class ExplorationEngineService {
       this._loadInitialState(successCallback);
     } else {
       this.visitedStateNames.push(this.exploration.getInitialState().name);
-      this.version = explorationVersion;
+      this.pageContextService.setExplorationVersion(explorationVersion);
       this.initParams([]);
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(
@@ -421,10 +417,15 @@ export class ExplorationEngineService {
       this._loadInitialState(successCallback);
     }
 
+    const version = this.pageContextService.getExplorationVersion();
+    if (!version) {
+      throw new Error('Exploration version is not set.');
+    }
+
     this.entityTranslationsService.init(
       this._explorationId,
       'exploration',
-      this.version
+      version
     );
     this.contentTranslationManagerService.setOriginalTranscript(
       this.exploration.getLanguageCode()
@@ -466,20 +467,12 @@ export class ExplorationEngineService {
     return this.exploration.title;
   }
 
-  getExplorationVersion(): number {
-    return this.version;
-  }
-
   getAuthorRecommendedExpIdsByStateName(stateName: string): string[] {
     return this.exploration.getAuthorRecommendedExpIds(stateName);
   }
 
   getLanguageCode(): string {
     return this.exploration.getLanguageCode();
-  }
-
-  isInPreviewMode(): boolean {
-    return !!this._editorPreviewMode;
   }
 
   submitAnswer(
@@ -523,7 +516,7 @@ export class ExplorationEngineService {
     let outcome = {...classificationResult.outcome};
     let newStateName: string = outcome.dest;
 
-    if (!this._editorPreviewMode) {
+    if (!this.pageContextService.isInExplorationEditorPage()) {
       let feedbackIsUseful: boolean =
         this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
           oldStateName,
