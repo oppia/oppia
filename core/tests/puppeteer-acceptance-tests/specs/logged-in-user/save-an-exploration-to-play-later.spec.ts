@@ -57,13 +57,13 @@ describe('Logged-in User', function () {
       await loggedInUser.navigateToCommunityLibraryPage();
 
       // Add a lesson to 'play later'.
-      await loggedInUser.addLessonToPlayLater('Negative Numbers');
+      await loggedInUser.addLessonToPlayLater('Negative Numbers', true);
       await loggedInUser.expectToolTipMessage(
         "Successfully added to your 'Play Later' list."
       );
 
       // Add a lesson to 'play later'.
-      await loggedInUser.addLessonToPlayLater('Positive Numbers');
+      await loggedInUser.addLessonToPlayLater('Positive Numbers', true);
       await loggedInUser.expectToolTipMessage(
         "Successfully added to your 'Play Later' list."
       );
