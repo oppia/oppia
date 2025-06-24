@@ -1533,6 +1533,38 @@ export class ConversationSkinComponent {
     this.currentInteractionService.clearPresubmitHooks();
   }
 
+  private smoothScrollTo(
+    targetY: number,
+    duration: number,
+    easingName: string = 'easeOutQuad'
+  ): void {
+    const startY = window.scrollY;
+    const difference = targetY - startY;
+    const startTime = performance.now();
+
+    const easingFunctions = {
+      easeOutQuad: (t: number): number => t * (2 - t),
+      easeOutQuart: (t: number): number => 1 - Math.pow(1 - t, 4),
+    };
+
+    const easingFunction =
+      easingFunctions[easingName] || easingFunctions.easeOutQuad;
+
+    const step = (currentTime: number) => {
+      const elapsedTime = currentTime - startTime;
+
+      if (elapsedTime < duration) {
+        const progress = elapsedTime / duration;
+        window.scrollTo(0, startY + difference * easingFunction(progress));
+        requestAnimationFrame(step);
+      } else {
+        window.scrollTo(0, targetY);
+      }
+    };
+
+    requestAnimationFrame(step);
+  }
+
   showPendingCard(): void {
     this.startCardChangeAnimation = true;
     this.conversationFlowService.recordNewCardAdded();
@@ -1640,21 +1672,24 @@ export class ConversationSkinComponent {
 
   scrollToBottom(): void {
     setTimeout(() => {
-      let tutorCard = $('.conversation-skin-main-tutor-card');
+      const tutorCard = document.querySelector(
+        '.conversation-skin-main-tutor-card'
+      );
 
-      if (tutorCard && tutorCard.length === 0) {
+      if (!tutorCard) {
         return;
       }
-      let tutorCardBottom = tutorCard.offset().top + tutorCard.outerHeight();
-      if ($(window).scrollTop() + $(window).height() < tutorCardBottom) {
-        $('html, body').animate(
-          {
-            scrollTop: tutorCardBottom - $(window).height() + 12,
-          },
-          {
-            duration: this.TIME_SCROLL_MSEC,
-            easing: 'easeOutQuad',
-          }
+      const tutorCardRect = tutorCard.getBoundingClientRect();
+      const tutorCardBottom =
+        tutorCardRect.top + window.scrollY + tutorCardRect.height;
+      const windowBottom = window.scrollY + window.innerHeight;
+
+      if (windowBottom < tutorCardBottom) {
+        const targetScrollY = tutorCardBottom - window.innerHeight + 12;
+        this.smoothScrollTo(
+          targetScrollY,
+          this.TIME_SCROLL_MSEC,
+          'easeOutQuad'
         );
       }
     }, 100);
@@ -1662,14 +1697,7 @@ export class ConversationSkinComponent {
 
   scrollToTop(): void {
     setTimeout(() => {
-      $('html, body').animate(
-        {
-          scrollTop: 0,
-        },
-        800,
-        'easeOutQuart'
-      );
-      return false;
+      this.smoothScrollTo(0, 800, 'easeOutQuart');
     });
   }
 
