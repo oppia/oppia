@@ -312,3 +312,121 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, str))
+
+
+class TranslationOpportunityModelUnitTest(test_utils.GenericTestBase):
+    """Tests for the TranslationOpportunityModel class."""
+
+    def test_get_deletion_policy(self) -> None:
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel
+                .get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE
+        )
+
+    def test_get_model_association_to_user(self) -> None:
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel
+                .get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+        )
+
+    def test_get_export_policy(self) -> None:
+        expected_export_policy = {
+            'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'entity_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'topic_ids': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'content_count': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'incomplete_translation_language_codes': (
+                base_models.EXPORT_POLICY.NOT_APPLICABLE),
+            'translation_counts': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        }
+        self.assertEqual(
+            opportunity_models.TranslationOpportunityModel.get_export_policy(),
+            expected_export_policy
+        )
+
+    def test_create_and_retrieve_model(self) -> None:
+        model = opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type='exploration',
+            entity_id='exp123',
+            topic_ids=['topic1', 'topic2'],
+            content_count=10,
+            incomplete_translation_language_codes=['fr', 'de'],
+            translation_counts={'fr': 5, 'de': 3}
+        )
+        model.put()
+
+        retrieved = opportunity_models.TranslationOpportunityModel.get_by_id(
+            'exploration.exp123')
+        assert retrieved is not None
+        self.assertEqual(retrieved.entity_type, 'exploration')
+        self.assertEqual(retrieved.entity_id, 'exp123')
+        self.assertEqual(retrieved.topic_ids, ['topic1', 'topic2'])
+        self.assertEqual(retrieved.content_count, 10)
+        self.assertEqual(
+            retrieved.incomplete_translation_language_codes, ['fr', 'de'])
+        self.assertEqual(
+            retrieved.translation_counts, {'fr': 5, 'de': 3})
+
+    def test_validation_fails_for_invalid_entity_type(self) -> None:
+        model = opportunity_models.TranslationOpportunityModel(
+            id='invalid.123',
+            entity_type='invalid_type',
+            entity_id='123',
+            topic_ids=[],
+            content_count=5,
+            incomplete_translation_language_codes=[],
+            translation_counts={}
+        )
+        with self.assertRaisesRegex(
+            Exception, 'Invalid entity_type: invalid_type'):
+            model.put()
+
+    def test_validation_fails_for_negative_content_count(self) -> None:
+        model = opportunity_models.TranslationOpportunityModel(
+            id='exploration.badcontent',
+            entity_type='exploration',
+            entity_id='badcontent',
+            topic_ids=[],
+            content_count=-1,
+            incomplete_translation_language_codes=[],
+            translation_counts={}
+        )
+        with self.assertRaisesRegex(
+            Exception, 'content_count cannot be negative'):
+            model.put()
+
+    def test_validation_fails_for_invalid_translation_counts(self) -> None:
+        model = opportunity_models.TranslationOpportunityModel(
+            id='exploration.expbad',
+            entity_type='exploration',
+            entity_id='expbad',
+            topic_ids=[],
+            content_count=5,
+            incomplete_translation_language_codes=[],
+            translation_counts={'fr': -1}
+        )
+        with self.assertRaisesRegex(
+            Exception, 'Invalid translation count for fr: -1'):
+            model.put()
+
+    def test_validation_fails_for_translation_count_exceeding_content(
+        self) -> None:
+        model = opportunity_models.TranslationOpportunityModel(
+            id='exploration.expbad2',
+            entity_type='exploration',
+            entity_id='expbad2',
+            topic_ids=[],
+            content_count=3,
+            incomplete_translation_language_codes=[],
+            translation_counts={'fr': 5}
+        )
+        with self.assertRaisesRegex(
+            Exception,
+            r'Translation count for fr \(5\) exceeds content_count \(3\)'
+        ):
+            model.put()
