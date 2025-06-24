@@ -143,7 +143,6 @@ export class ConversationSkinComponent {
   questionSessionCompleted: boolean;
   moveToExploration: boolean;
   upcomingInteractionInstructions;
-  visitedCheckpointStateNames: string[] = [];
   prevSessionStatesProgress: string[] = [];
   showProgressClearanceMessage: boolean = false;
 
@@ -471,7 +470,9 @@ export class ConversationSkinComponent {
             this.checkpointProgressService.setMostRecentlyReachedCheckpoint(
               mostRecentlyReachedCheckpoint
             );
-            this.visitedCheckpointStateNames.push(firstStateName);
+            this.checkpointProgressService.setVisitedCheckpointStateNames(
+              firstStateName
+            );
           });
       }
     });
@@ -678,10 +679,14 @@ export class ConversationSkinComponent {
           }
 
           if (
-            !this.visitedCheckpointStateNames.includes(stateName) &&
+            !this.checkpointProgressService.checkIfCheckpointIsVisited(
+              stateName
+            ) &&
             stateData.cardIsCheckpoint
           ) {
-            this.visitedCheckpointStateNames.push(stateName);
+            this.checkpointProgressService.setVisitedCheckpointStateNames(
+              stateName
+            );
           }
 
           if (mostRecentlyReachedCheckpoint === stateName) {
@@ -731,7 +736,9 @@ export class ConversationSkinComponent {
       let currentStateName = currentState.name;
       if (
         currentState.cardIsCheckpoint &&
-        !this.visitedCheckpointStateNames.includes(currentStateName) &&
+        !this.checkpointProgressService.checkIfCheckpointIsVisited(
+          currentStateName
+        ) &&
         !this.prevSessionStatesProgress.includes(currentStateName)
       ) {
         this.readOnlyExplorationBackendApiService
@@ -748,7 +755,9 @@ export class ConversationSkinComponent {
               this.progressUrlService.getUniqueProgressUrlId()
             );
           });
-        this.visitedCheckpointStateNames.push(currentStateName);
+        this.checkpointProgressService.setVisitedCheckpointStateNames(
+          currentStateName
+        );
       }
     }
 
