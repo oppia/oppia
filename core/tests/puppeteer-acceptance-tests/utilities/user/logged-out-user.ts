@@ -507,8 +507,10 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the community library page.
    */
-  async navigateToCommunityLibraryPage(): Promise<void> {
-    await this.goto(communityLibraryUrl);
+  async navigateToCommunityLibraryPage(
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(communityLibraryUrl, verifyURL);
   }
 
   /**
@@ -556,18 +558,18 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the classrooms page.
    */
-  async navigateToClassroomsPage(): Promise<void> {
+  async navigateToClassroomsPage(verifyURL: boolean = true): Promise<void> {
     if (this.page.url() === classroomsPageUrl) {
       await this.page.reload();
     }
-    await this.goto(classroomsPageUrl);
+    await this.goto(classroomsPageUrl, verifyURL);
   }
 
   /**
    * Navigates to the splash page.
    */
-  async navigateToSplashPage(): Promise<void> {
-    await this.goto(splashPageUrl);
+  async navigateToSplashPage(verifyURL: boolean = true): Promise<void> {
+    await this.goto(splashPageUrl, verifyURL);
   }
 
   /**
@@ -2933,29 +2935,31 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the Creator Dashboard.
    */
-  async navigateToCreatorDashboard(): Promise<void> {
-    await this.goto(creatorDashboardUrl);
+  async navigateToCreatorDashboard(verifyURL: boolean = true): Promise<void> {
+    await this.goto(creatorDashboardUrl, verifyURL);
   }
 
   /**
    * Function to navigate to the Moderator Page.
    */
-  async navigateToModeratorPage(): Promise<void> {
-    await this.goto(moderatorPageUrl);
+  async navigateToModeratorPage(verifyURL: boolean = true): Promise<void> {
+    await this.goto(moderatorPageUrl, verifyURL);
   }
 
   /**
    * Function to navigate to the Preferences Page.
    */
-  async navigateToPreferencesPage(): Promise<void> {
-    await this.goto(preferencesPageUrl);
+  async navigateToPreferencesPage(verifyURL: boolean = true): Promise<void> {
+    await this.goto(preferencesPageUrl, verifyURL);
   }
 
   /**
    * Function to navigate to the Topics and Skills Dashboard Page.
    */
-  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
-    await this.goto(topicsAndSkillsDashboardUrl);
+  async navigateToTopicsAndSkillsDashboardPage(
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(topicsAndSkillsDashboardUrl, verifyURL);
   }
 
   /**
@@ -2969,8 +2973,8 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the Learner Dashboard.
    */
-  async navigateToLearnerDashboard(): Promise<void> {
-    await this.goto(learnerDashboardUrl);
+  async navigateToLearnerDashboard(verifyURL: boolean = true): Promise<void> {
+    await this.goto(learnerDashboardUrl, verifyURL);
   }
 
   /**
@@ -4268,8 +4272,11 @@ export class LoggedOutUser extends BaseUser {
    * Starts an exploration with a progress URL.
    * @param {string} progressUrl - The URL to navigate to.
    */
-  async startExplorationUsingProgressUrl(progressUrl: string): Promise<void> {
-    await this.goto(progressUrl);
+  async startExplorationUsingProgressUrl(
+    progressUrl: string,
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(progressUrl, verifyURL);
   }
 
   /**
