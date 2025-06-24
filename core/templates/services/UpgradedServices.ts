@@ -112,7 +112,6 @@ import {
 import {ExpressionSyntaxTreeService} from 'expressions/expression-syntax-tree.service';
 import {ExtensionTagAssemblerService} from 'services/extension-tag-assembler.service';
 import {ExternalSaveService} from 'services/external-save.service';
-import {FeedbackThreadObjectFactory} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {FractionInputRulesService} from 'interactions/FractionInput/directives/fraction-input-rules.service';
 import {FractionInputValidationService} from 'interactions/FractionInput/directives/fraction-input-validation.service';
@@ -526,8 +525,6 @@ export class UpgradedServices {
       new ExpressionSyntaxTreeService(
         upgradedServices['ExpressionParserService']
       );
-    upgradedServices['FeedbackThreadObjectFactory'] =
-      new FeedbackThreadObjectFactory();
     upgradedServices['FractionInputRulesService'] =
       new FractionInputRulesService(upgradedServices['UtilsService']);
     upgradedServices['FractionInputValidationService'] =
@@ -859,13 +856,11 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['UserService']
       );
-    upgradedServices['CreatorDashboardBackendApiService'] =
-      new CreatorDashboardBackendApiService(
-        upgradedServices['HttpClient'],
-        upgradedServices['FeedbackThreadObjectFactory'],
-        upgradedServices['SuggestionsService'],
-        upgradedServices['LoggerService']
-      );
+   upgradedServices['CreatorDashboardBackendApiService'] = new CreatorDashboardBackendApiService(
+      upgradedServices['HttpClient'],
+      upgradedServices['SuggestionsService'],
+      upgradedServices['LoggerService']
+    );
     upgradedServices['CurrentInteractionService'] =
       new CurrentInteractionService(
         upgradedServices['ContextService'],
