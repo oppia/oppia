@@ -844,30 +844,6 @@ export class BaseUser {
     }
 
     try {
-      if (dirName === '/prod-desktop-screenshots') {
-        expect(await currentPage.screenshot()).toMatchImageSnapshot({
-          failureThreshold: failureTrigger,
-          failureThresholdType: 'percent',
-          customSnapshotIdentifier: imageName,
-          customSnapshotsDir: path.join(testPath, dirName),
-          /*
-           * The following checks if the tests are running on CI. If it is, the folder diff-snapshots will be uploaded as
-           * artifacts in the github workflow.
-           */
-          customDiffDir: __dirname.startsWith('/home/runner')
-            ? path.join(
-                '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/specs/logged-in-user/prod-desktop-screenshots',
-                path.basename(dirName)
-              )
-            : path.join(testPath, dirName, 'prod-desktop-screenshots'),
-        });
-        if (typeof newPage !== 'undefined') {
-          await newPage.close();
-        }
-        if (dirName === '/prod-desktop-screenshots') {
-          throw new Error('To download ss');
-        }
-      }
       if (dirName === '/prod-mobile-screenshots') {
         expect(await currentPage.screenshot()).toMatchImageSnapshot({
           failureThreshold: failureTrigger,
