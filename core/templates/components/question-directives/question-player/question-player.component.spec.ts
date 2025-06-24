@@ -26,7 +26,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
@@ -56,12 +56,12 @@ describe('Question Player Component', () => {
   let ngbModal: NgbModal;
   let playerPositionService: PlayerPositionService;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let questionPlayerEngineService: QuestionPlayerEngineService;
   let questionPlayerStateService: QuestionPlayerStateService;
   let userService: UserService;
   let windowRef: WindowRef;
   let playerPositionServiceEmitter = new EventEmitter();
-  let explorationPlayerStateServiceEmitter = new EventEmitter();
+  let questionPlayerEngineServiceEmitter = new EventEmitter();
   let questionPlayerStateServiceEmitter = new EventEmitter();
   let urlService: UrlService;
   let userInfo = new UserInfo(
@@ -92,8 +92,8 @@ describe('Question Player Component', () => {
     onCurrentQuestionChange = playerPositionServiceEmitter;
   }
 
-  class MockExplorationPlayerStateService {
-    onTotalQuestionsReceived = explorationPlayerStateServiceEmitter;
+  class MockQuestionPlayerEngineService {
+    onTotalQuestionsReceived = questionPlayerEngineServiceEmitter;
   }
 
   class MockQuestionPlayerStateService {
@@ -125,8 +125,8 @@ describe('Question Player Component', () => {
           useClass: MockPlayerPositionService,
         },
         {
-          provide: ExplorationPlayerStateService,
-          useClass: MockExplorationPlayerStateService,
+          provide: QuestionPlayerEngineService,
+          useClass: MockQuestionPlayerEngineService,
         },
         {
           provide: QuestionPlayerStateService,
@@ -153,9 +153,7 @@ describe('Question Player Component', () => {
     preventPageUnloadEventService = TestBed.inject(
       PreventPageUnloadEventService
     );
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
-    );
+    questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     questionPlayerStateService = TestBed.inject(QuestionPlayerStateService);
     userService = TestBed.inject(UserService);
     windowRef = TestBed.inject(WindowRef);
@@ -190,14 +188,14 @@ describe('Question Player Component', () => {
 
   it('should add subscriptions on initialization', fakeAsync(() => {
     spyOn(playerPositionService.onCurrentQuestionChange, 'subscribe');
-    spyOn(explorationPlayerStateService.onTotalQuestionsReceived, 'subscribe');
+    spyOn(questionPlayerEngineService.onTotalQuestionsReceived, 'subscribe');
     spyOn(questionPlayerStateService.onQuestionSessionCompleted, 'subscribe');
 
     component.ngOnInit();
     tick();
 
     playerPositionServiceEmitter.emit(1);
-    explorationPlayerStateServiceEmitter.emit(10);
+    questionPlayerEngineServiceEmitter.emit(10);
     questionPlayerStateServiceEmitter.emit('result');
     tick();
 
@@ -205,7 +203,7 @@ describe('Question Player Component', () => {
       playerPositionService.onCurrentQuestionChange.subscribe
     ).toHaveBeenCalled();
     expect(
-      explorationPlayerStateService.onTotalQuestionsReceived.subscribe
+      questionPlayerEngineService.onTotalQuestionsReceived.subscribe
     ).toHaveBeenCalled();
     expect(
       questionPlayerStateService.onQuestionSessionCompleted.subscribe
@@ -230,7 +228,7 @@ describe('Question Player Component', () => {
 
     expect(component.totalQuestions).toBe(0);
 
-    explorationPlayerStateServiceEmitter.emit(3);
+    questionPlayerEngineServiceEmitter.emit(3);
     tick();
     questionPlayerStateServiceEmitter.emit('new uri');
     tick();

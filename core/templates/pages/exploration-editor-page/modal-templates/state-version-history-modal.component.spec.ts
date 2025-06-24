@@ -25,7 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
@@ -46,7 +46,7 @@ describe('State version history modal', () => {
   let historyTabYamlConversionService: HistoryTabYamlConversionService;
   let versionHistoryService: VersionHistoryService;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let stateObject: StateBackendDict;
 
   beforeEach(waitForAsync(() => {
@@ -55,7 +55,7 @@ describe('State version history modal', () => {
       declarations: [StateVersionHistoryModalComponent],
       providers: [
         NgbActiveModal,
-        ContextService,
+        PageContextService,
         VersionHistoryService,
         VersionHistoryBackendApiService,
         HistoryTabYamlConversionService,
@@ -75,7 +75,7 @@ describe('State version history modal', () => {
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
 
     stateObject = {
       classifier_model_id: null,
@@ -361,7 +361,7 @@ describe('State version history modal', () => {
       versionHistoryService,
       'insertStateVersionHistoryData'
     ).and.callThrough();
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
     const stateData = stateObjectFactory.createFromBackendDict(
       'State',
       stateObject
@@ -442,7 +442,7 @@ describe('State version history modal', () => {
       versionHistoryService,
       'shouldFetchNewStateVersionHistory'
     ).and.returnValue(true);
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
     const stateData = stateObjectFactory.createFromBackendDict(
       'State',
       stateObject

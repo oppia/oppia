@@ -19,7 +19,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {StateCard} from 'domain/state_card/state-card.model';
 
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 

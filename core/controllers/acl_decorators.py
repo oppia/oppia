@@ -34,6 +34,8 @@ from core.domain import classroom_config_services
 from core.domain import email_manager
 from core.domain import feature_flag_services
 from core.domain import feedback_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -1346,7 +1348,7 @@ def can_delete_any_user(
         self: _SelfBaseHandlerType, **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and is a primary admin e.g. user with
-        email address equal to feconf.SYSTEM_EMAIL_ADDRESS.
+        email address equal to SYSTEM_EMAIL_ADDRESS.
 
         Args:
             **kwargs: *. Keyword arguments.
@@ -1363,7 +1365,9 @@ def can_delete_any_user(
             raise self.NotLoggedInException
 
         email = user_services.get_email_from_user_id(self.user_id)
-        if email != feconf.SYSTEM_EMAIL_ADDRESS:
+        if email != platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        ):
             raise self.UnauthorizedUserException(
                 '%s cannot delete any user.' % self.user_id)
 

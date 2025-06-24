@@ -28,20 +28,20 @@ import {
 } from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {
   ExplorationParams,
   LearnerParamsService,
 } from 'pages/exploration-player-page/services/learner-params.service';
 import {NumberAttemptsService} from 'pages/exploration-player-page/services/number-attempts.service';
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
 import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
 import {ExplorationStatesService} from '../services/exploration-states.service';
 import {GraphDataService} from '../services/graph-data.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {ParameterMetadataService} from '../services/parameter-metadata.service';
 import {RouterService} from '../services/router.service';
 import {PreviewSetParametersModalComponent} from './templates/preview-set-parameters-modal.component';
@@ -63,14 +63,13 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
   voiceoversAreLoaded: boolean = false;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private explorationDataService: ExplorationDataService,
     private explorationEngineService: ExplorationEngineService,
     private explorationFeaturesService: ExplorationFeaturesService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private explorationParamChangesService: ExplorationParamChangesService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
     private explorationStatesService: ExplorationStatesService,
     private graphDataService: GraphDataService,
     private learnerParamsService: LearnerParamsService,
@@ -81,7 +80,8 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
     private paramChangesObjectFactory: ParamChangesObjectFactory,
-    private entityVoiceoversService: EntityVoiceoversService
+    private entityVoiceoversService: EntityVoiceoversService,
+    private conversationFlowService: ConversationFlowService
   ) {}
 
   getManualParamChanges(
@@ -156,7 +156,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     const initStateNameForPreview =
       this.explorationInitStateNameService.savedMemento;
     setTimeout(() => {
-      const explorationId = this.contextService.getExplorationId();
+      const explorationId = this.pageContextService.getExplorationId();
 
       this.editableExplorationBackendApiService
         .fetchApplyDraftExplorationAsync(explorationId)
@@ -190,7 +190,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     );
 
     this.directiveSubscriptions.add(
-      this.explorationPlayerStateService.onPlayerStateChange.subscribe(() => {
+      this.conversationFlowService.onPlayerStateChange.subscribe(() => {
         this.allParams = this.learnerParamsService.getAllParams();
       })
     );
@@ -256,7 +256,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         }
 
         this.entityVoiceoversService.init(
-          this.contextService.getExplorationId(),
+          this.pageContextService.getExplorationId(),
           'exploration',
           explorationData.version as number,
           explorationData.language_code

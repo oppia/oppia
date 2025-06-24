@@ -31,7 +31,7 @@ import {
   InteractionRulesService,
 } from 'pages/exploration-player-page/services/answer-classification.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {DiagnosticTestCurrentTopicStatusModel} from 'pages/diagnostic-test-player-page/diagnostic-test-current-topic-status.model';
@@ -59,7 +59,7 @@ export class DiagnosticTestPlayerEngineService {
   constructor(
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
@@ -417,7 +417,7 @@ export class DiagnosticTestPlayerEngineService {
   }
 
   recordNewCardAdded(): void {
-    this.contextService.setCustomEntityContext(
+    this.pageContextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.QUESTION,
       this._currentQuestion.getId() as string
     );
