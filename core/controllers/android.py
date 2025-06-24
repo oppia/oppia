@@ -102,6 +102,8 @@ class _ActivityDataResponseDictRequiredFields(TypedDict):
         story_domain.StoryDict,
         skill_domain.SkillDict,
         subtopic_page_domain.SubtopicPageDict,
+        study_guide_domain.StudyGuideAndroidDict,
+        study_guide_domain.StudyGuideDict,
         classroom_config_domain.ClassroomDict,
         topic_domain.TopicDict,
         Dict[str, feconf.TranslatedContentDict],
@@ -235,7 +237,9 @@ class AndroidActivityHandler(base.BaseHandler[
                         subtopic_page.to_dict() if subtopic_page is not None
                         else None)
                 })
-        elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_OLD:
+        elif activity_type == (
+            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_OLD
+        ):
             for activity_data in activities_data:
                 topic_id, study_guide_id = activity_data['id'].split('-')
                 study_guide = study_guide_services.get_study_guide_by_id(
@@ -249,10 +253,13 @@ class AndroidActivityHandler(base.BaseHandler[
                     'version': activity_data.get('version'),
                     'payload': (
                         study_guide
-                        .to_subtopic_page_dict_for_android() if study_guide is not None
-                        else None)
+                        .to_subtopic_page_dict_for_android()
+                        if study_guide is not None else None
+                    )
                 })
-        elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_NEW:
+        elif activity_type == (
+            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_NEW
+        ):
             for activity_data in activities_data:
                 topic_id, study_guide_id = activity_data['id'].split('-')
                 study_guide = study_guide_services.get_study_guide_by_id(

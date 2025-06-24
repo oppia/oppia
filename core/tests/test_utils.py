@@ -3831,12 +3831,12 @@ version: 1
         subtopic_page_services.save_subtopic_page(
             owner_id, subtopic_page, 'Create new subtopic', subtopic_changes)
         return subtopic_page
-    
+
     def save_new_study_guide(
         self, subtopic_id: int, owner_id: str, topic_id: str
     ) -> study_guide_domain.StudyGuide:
         """Creates an Oppia study guide and saves it.
-        
+
         Args:
             subtopic_id: int. ID of the subtopic for which the study guide is
                 to be created.
