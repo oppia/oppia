@@ -351,7 +351,6 @@ import { DeleteAccountBackendApiService } from 'pages/delete-account-page/servic
 import { CollectionLinearizerService } from 'pages/collection-editor-page/services/collection-linearizer.service';
 import { ExplorationParamSpecsService } from 'pages/exploration-editor-page/services/exploration-param-specs.service';
 import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
-import { ExplorationPlayerStateService } from 'pages/exploration-player-page/services/exploration-player-state.service';
 import { RefresherExplorationConfirmationModalService } from 'pages/exploration-player-page/services/refresher-exploration-confirmation-modal.service';
 import { TopicEditorRoutingService } from 'pages/topic-editor-page/services/topic-editor-routing.service';
 import { SubtopicValidationService } from 'pages/topic-editor-page/services/subtopic-validation.service';
@@ -446,6 +445,10 @@ import { ExplorationEditorPageAuthGuard } from 'pages/exploration-editor-page/ex
 import { StoryEditorPageAuthGuard } from 'pages/story-editor-page/story-editor-page-auth.guard';
 import { BlogDashboardPageAuthGuard } from 'pages/blog-dashboard-page/blog-dashboard-page-auth.guard';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
+import { ExplorationModeService } from 'pages/exploration-player-page/services/exploration-mode.service';
+import { CheckpointProgressService } from 'pages/exploration-player-page/services/checkpoint-progress.service';
+import { ProgressUrlService } from 'pages/exploration-player-page/services/progress-url.service';
+import { ExplorationInitializationService } from 'pages/exploration-player-page/services/exploration-initialization.service';
 
 
 export const angularServices: [string, Type<{}>][] = [
@@ -564,6 +567,8 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationCategoryService', ExplorationCategoryService],
   ['ExplorationCreationBackendApiService',
     ExplorationCreationBackendApiService],
+  ['ExplorationInitializationService',
+    ExplorationInitializationService],
   ['ExplorationCreationService',
     ExplorationCreationService],
   ['ExplorationEditsAllowedBackendApiService',
@@ -585,6 +590,7 @@ export const angularServices: [string, Type<{}>][] = [
     ExplorationImprovementsBackendApiService],
   ['ExplorationImprovementsTaskRegistryService',
     ExplorationImprovementsTaskRegistryService],
+  ['ExplorationModeService', ExplorationModeService],
   ['ExplorationPlayerPageAuthGuard', ExplorationPlayerPageAuthGuard],
   ['ExplorationImprovementsService', ExplorationImprovementsService],
   ['ExplorationInitStateNameService', ExplorationInitStateNameService],
@@ -594,7 +600,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ExplorationObjectiveService', ExplorationObjectiveService],
   ['ExplorationPermissionsBackendApiService',
     ExplorationPermissionsBackendApiService],
-  ['ExplorationPlayerStateService', ExplorationPlayerStateService],
   ['ExplorationParamChangesService', ExplorationParamChangesService],
   ['ExplorationRecommendationsBackendApiService',
     ExplorationRecommendationsBackendApiService],
@@ -738,6 +743,9 @@ export const angularServices: [string, Type<{}>][] = [
   ['PlaythroughIssuesService', PlaythroughIssuesService],
   ['PlayerPositionService', PlayerPositionService],
   ['PlayerTranscriptService', PlayerTranscriptService],
+  ['ExplorationModeService', ExplorationModeService],
+  ['CheckpointProgressService', CheckpointProgressService],
+  ['ProgressUrlService', ProgressUrlService],
   ['PlaythroughBackendApiService', PlaythroughBackendApiService],
   ['PlaythroughIssuesBackendApiService', PlaythroughIssuesBackendApiService],
   ['PopulateRuleContentIdsService', PopulateRuleContentIdsService],

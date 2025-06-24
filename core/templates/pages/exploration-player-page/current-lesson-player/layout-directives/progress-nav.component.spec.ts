@@ -34,7 +34,7 @@ import {FocusManagerService} from '../../../../services/stateful/focus-manager.s
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
+import {ExplorationModeService} from '../../services/exploration-mode.service';
 import {
   HelpCardEventResponse,
   PlayerPositionService,
@@ -53,7 +53,7 @@ describe('Progress nav component', () => {
 
   let urlService: UrlService;
   let playerPositionService: PlayerPositionService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let explorationModeService: ExplorationModeService;
   let focusManagerService: FocusManagerService;
   let playerTranscriptService: PlayerTranscriptService;
   let windowDimensionsService: WindowDimensionsService;
@@ -85,7 +85,7 @@ describe('Progress nav component', () => {
       declarations: [ProgressNavComponent, MockTranslatePipe],
       providers: [
         ExplorationEngineService,
-        ExplorationPlayerStateService,
+        ExplorationModeService,
         FocusManagerService,
         PlayerPositionService,
         PlayerTranscriptService,
@@ -106,9 +106,7 @@ describe('Progress nav component', () => {
     componentInstance = fixture.componentInstance;
     urlService = TestBed.inject(UrlService);
     playerPositionService = TestBed.inject(PlayerPositionService);
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
-    );
+    explorationModeService = TestBed.inject(ExplorationModeService);
     focusManagerService = TestBed.inject(FocusManagerService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
@@ -167,9 +165,7 @@ describe('Progress nav component', () => {
       displayedCardIndex
     );
     spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
-    spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValue(
-      true
-    );
+    spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(true);
     spyOn(focusManagerService, 'setFocusWithoutScroll');
 
     componentInstance.displayedCard = mockDisplayedCard;

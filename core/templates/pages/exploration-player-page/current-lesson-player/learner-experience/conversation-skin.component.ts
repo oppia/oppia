@@ -28,7 +28,6 @@ import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-ap
 import {PageContextService} from 'services/page-context.service';
 import {CurrentInteractionService} from '../../services/current-interaction.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
 import {ExplorationRecommendationsService} from '../../services/exploration-recommendations.service';
 import {FatigueDetectionService} from '../../services/fatigue-detection.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -61,6 +60,7 @@ import {State} from 'domain/state/StateObjectFactory';
 import {InteractionRulesService} from '../../services/answer-classification.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ExplorationInitializationService} from '../../services/exploration-initialization.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {AppConstants} from 'app.constants';
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
@@ -72,16 +72,19 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
+import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
+import {ProgressUrlService} from 'pages/exploration-player-page/services/progress-url.service';
 
 import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 import {TranslateService} from '@ngx-translate/core';
 import {Solution} from 'domain/exploration/SolutionObjectFactory';
-import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
+import {DiagnosticTestPlayerEngineService} from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
+import {CurrentEngineService} from 'pages/exploration-player-page/services/current-engine.service';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
@@ -190,11 +193,12 @@ export class ConversationSkinComponent {
     private pageContextService: PageContextService,
     private currentInteractionService: CurrentInteractionService,
     private explorationEngineService: ExplorationEngineService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
     private explorationRecommendationsService: ExplorationRecommendationsService,
     private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
+    private explorationModeService: ExplorationModeService,
     private fatigueDetectionService: FatigueDetectionService,
     private focusManagerService: FocusManagerService,
+    private explorationInitializationService: ExplorationInitializationService,
     private guestCollectionProgressService: GuestCollectionProgressService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
     private conceptCardManagerService: ConceptCardManagerService,
@@ -216,16 +220,18 @@ export class ConversationSkinComponent {
     private statsReportingService: StatsReportingService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
+    private progressUrlService: ProgressUrlService,
     private urlService: UrlService,
     private userService: UserService,
+    private currentEngineService: CurrentEngineService,
+    private diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService,
     private windowDimensionsService: WindowDimensionsService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
-    private platformFeatureService: PlatformFeatureService,
+    private checkpointProgressService: CheckpointProgressService,
     private translateService: TranslateService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
     private conversationFlowService: ConversationFlowService,
-    private entityVoiceoversService: EntityVoiceoversService,
     private voiceoverPlayerService: VoiceoverPlayerService
   ) {}
 
@@ -267,7 +273,7 @@ export class ConversationSkinComponent {
     }
 
     this.explorationId = this.explorationEngineService.getExplorationId();
-    this.isInPreviewMode = this.explorationEngineService.isInPreviewMode();
+    this.isInPreviewMode = this.pageContextService.isInExplorationEditorPage();
     this.isIframed = this.urlService.isIframed();
     this.loaderService.showLoadingScreen('Loading');
 
@@ -276,7 +282,7 @@ export class ConversationSkinComponent {
         '/avatar/oppia_avatar_100px.svg'
       );
 
-    if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+    if (this.explorationModeService.isInQuestionPlayerMode()) {
       this.directiveSubscriptions.add(
         this.hintsAndSolutionManagerService.onHintConsumed.subscribe(() => {
           this.questionPlayerStateService.hintUsed(
@@ -297,7 +303,7 @@ export class ConversationSkinComponent {
     }
 
     this.directiveSubscriptions.add(
-      this.explorationPlayerStateService.onShowProgressModal.subscribe(() => {
+      this.conversationFlowService.onShowProgressModal.subscribe(() => {
         this.hasFullyLoaded = true;
       })
     );
@@ -334,7 +340,7 @@ export class ConversationSkinComponent {
     );
 
     this.directiveSubscriptions.add(
-      this.explorationPlayerStateService.onPlayerStateChange.subscribe(
+      this.conversationFlowService.onPlayerStateChange.subscribe(
         newStateName => {
           if (!newStateName) {
             return;
@@ -347,7 +353,7 @@ export class ConversationSkinComponent {
           // the end of the exploration.
           if (!this._editorPreviewMode && this.nextCard.isTerminal()) {
             const currentEngineService =
-              this.explorationPlayerStateService.getCurrentEngineService();
+              this.currentEngineService.getCurrentEngineService();
             this.statsReportingService.recordExplorationCompleted(
               newStateName,
               this.learnerParamsService.getAllParams(),
@@ -399,7 +405,7 @@ export class ConversationSkinComponent {
           this.hasInteractedAtLeastOnce &&
           !this.isInPreviewMode &&
           !this.displayedCard.isTerminal() &&
-          !this.explorationPlayerStateService.isInQuestionMode()
+          !this.explorationModeService.isInQuestionMode()
         ) {
           this.statsReportingService.recordMaybeLeaveEvent(
             this.playerTranscriptService.getLastStateName(),
@@ -438,16 +444,14 @@ export class ConversationSkinComponent {
       if (this.collectionId) {
         this.collectionPlayerBackendApiService
           .fetchCollectionSummariesAsync(this.collectionId)
-          .then(
-            response => {
-              this.collectionSummary = response.summaries[0];
-            },
-            () => {
-              this.alertsService.addWarning(
-                'There was an error while fetching the collection ' + 'summary.'
-              );
-            }
-          );
+          .then(response => {
+            this.collectionSummary = response.summaries[0];
+          })
+          .catch(() => {
+            this.alertsService.addWarning(
+              'There was an error while fetching the collection summary.'
+            );
+          });
       }
 
       this.fetchCompletedChaptersCount();
@@ -456,15 +460,17 @@ export class ConversationSkinComponent {
       if (
         !this.isIframed &&
         !this._editorPreviewMode &&
-        !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
-        !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+        !this.explorationModeService.isInQuestionPlayerMode() &&
+        !this.explorationModeService.isInDiagnosticTestPlayerMode()
       ) {
+        // For the first state which is always a checkpoint.
+        let firstStateName: string;
+        let expVersion: number;
         this.readOnlyExplorationBackendApiService
           .loadLatestExplorationAsync(this.explorationId, this.pidInUrl)
           .then(response => {
-            // For the first state which is always a checkpoint.
-            let expVersion: number = response.version;
-            let firstStateName: string = response.exploration.init_state_name;
+            expVersion = response.version;
+            firstStateName = response.exploration.init_state_name;
             this.mostRecentlyReachedCheckpoint =
               response.most_recently_reached_checkpoint_state_name;
             // If the exploration is freshly started, mark the first state
@@ -477,7 +483,7 @@ export class ConversationSkinComponent {
                 true
               );
             }
-            this.explorationPlayerStateService.setLastCompletedCheckpoint(
+            this.checkpointProgressService.setLastCompletedCheckpoint(
               firstStateName
             );
             this.visitedCheckpointStateNames.push(firstStateName);
@@ -575,7 +581,7 @@ export class ConversationSkinComponent {
   isLearnAgainButton(): boolean {
     let conceptCardIsBeingShown =
       this.displayedCard.getStateName() === null &&
-      !this.explorationPlayerStateService.isInQuestionMode();
+      !this.explorationModeService.isInQuestionMode();
     if (conceptCardIsBeingShown) {
       return false;
     }
@@ -747,7 +753,7 @@ export class ConversationSkinComponent {
   isSupplementalNavShown(): boolean {
     if (
       this.displayedCard.getStateName() === null &&
-      !this.explorationPlayerStateService.isInQuestionMode()
+      !this.explorationModeService.isInQuestionMode()
     ) {
       return false;
     }
@@ -847,8 +853,8 @@ export class ConversationSkinComponent {
       index > 0 &&
       !this.isIframed &&
       !this._editorPreviewMode &&
-      !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
-      !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+      !this.explorationModeService.isInQuestionPlayerMode() &&
+      !this.explorationModeService.isInDiagnosticTestPlayerMode()
     ) {
       let currentState = this.explorationEngineService.getState();
       let currentStateName = currentState.name;
@@ -860,7 +866,7 @@ export class ConversationSkinComponent {
         this.readOnlyExplorationBackendApiService
           .loadLatestExplorationAsync(this.explorationId)
           .then(response => {
-            this.explorationPlayerStateService.setLastCompletedCheckpoint(
+            this.checkpointProgressService.setLastCompletedCheckpoint(
               currentStateName
             );
             this.editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
@@ -868,7 +874,7 @@ export class ConversationSkinComponent {
               response.version,
               currentStateName,
               this.isLoggedIn,
-              this.explorationPlayerStateService.getUniqueProgressUrlId()
+              this.progressUrlService.getUniqueProgressUrlId()
             );
           });
         this.visitedCheckpointStateNames.push(currentStateName);
@@ -963,7 +969,7 @@ export class ConversationSkinComponent {
         includeAutogeneratedRecommendations = true;
       }
 
-      if (this.explorationPlayerStateService.isInStoryChapterMode()) {
+      if (this.explorationModeService.isInStoryChapterMode()) {
         recommendedExplorationIds = [];
         includeAutogeneratedRecommendations = false;
         let topicUrlFragment =
@@ -1127,8 +1133,8 @@ export class ConversationSkinComponent {
   private _initializeDirectiveComponents(initialCard, focusLabel): void {
     this._addNewCard(initialCard);
     this.nextCard = initialCard;
-    if (!this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()) {
-      this.explorationPlayerStateService.onPlayerStateChange.emit(
+    if (!this.explorationModeService.isInDiagnosticTestPlayerMode()) {
+      this.conversationFlowService.onPlayerStateChange.emit(
         this.nextCard.getStateName()
       );
     }
@@ -1139,8 +1145,8 @@ export class ConversationSkinComponent {
     if (
       !this.isIframed &&
       !this._editorPreviewMode &&
-      !this.explorationPlayerStateService.isInQuestionPlayerMode() &&
-      !this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
+      !this.explorationModeService.isInQuestionPlayerMode() &&
+      !this.explorationModeService.isInDiagnosticTestPlayerMode()
     ) {
       // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();
@@ -1175,7 +1181,7 @@ export class ConversationSkinComponent {
   }
 
   skipCurrentQuestion(): void {
-    this.explorationPlayerStateService.skipCurrentQuestion(nextCard => {
+    this.diagnosticTestPlayerEngineService.skipCurrentQuestion(nextCard => {
       this.nextCard = nextCard;
       this.showPendingCard();
     });
@@ -1186,18 +1192,20 @@ export class ConversationSkinComponent {
     this.recommendedExplorationSummaries = [];
     this.playerPositionService.init(this._navigateToDisplayedCard.bind(this));
     if (this.questionPlayerConfig) {
-      this.explorationPlayerStateService.initializeQuestionPlayer(
+      this.explorationModeService.setQuestionPlayerMode();
+      this.questionPlayerEngineService.initQuestionPlayer(
         this.questionPlayerConfig,
         this._initializeDirectiveComponents.bind(this),
         this.showQuestionAreNotAvailable
       );
     } else if (this.diagnosticTestTopicTrackerModel) {
-      this.explorationPlayerStateService.initializeDiagnosticPlayer(
+      this.explorationModeService.setDiagnosticTestPlayerMode();
+      this.diagnosticTestPlayerEngineService.init(
         this.diagnosticTestTopicTrackerModel,
         this._initializeDirectiveComponents.bind(this)
       );
     } else {
-      this.explorationPlayerStateService.initializePlayer(
+      this.explorationInitializationService.initializePlayer(
         this._initializeDirectiveComponents.bind(this)
       );
     }
@@ -1222,14 +1230,14 @@ export class ConversationSkinComponent {
       this.fatigueDetectionService.recordSubmissionTimestamp();
       if (this.fatigueDetectionService.isSubmittingTooFast()) {
         this.fatigueDetectionService.displayTakeBreakMessage();
-        this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
+        this.conversationFlowService.onOppiaFeedbackAvailable.emit();
         return;
       }
     }
 
     if (
       !this.isInPreviewMode &&
-      !this.explorationPlayerStateService.isPresentingIsolatedQuestions() &&
+      !this.explorationModeService.isPresentingIsolatedQuestions() &&
       AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE
     ) {
       this.initLearnerAnswerInfoService(
@@ -1266,7 +1274,7 @@ export class ConversationSkinComponent {
     let timeAtServerCall = new Date().getTime();
     this.playerPositionService.recordAnswerSubmission();
     let currentEngineService =
-      this.explorationPlayerStateService.getCurrentEngineService();
+      this.currentEngineService.getCurrentEngineService();
     this.answerIsCorrect = currentEngineService.submitAnswer(
       answer,
       interactionRulesService,
@@ -1288,7 +1296,7 @@ export class ConversationSkinComponent {
         this.nextCardIfStuck = nextCardIfReallyStuck;
         if (
           !this._editorPreviewMode &&
-          !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
+          !this.explorationModeService.isPresentingIsolatedQuestions()
         ) {
           let oldStateName = this.playerPositionService.getCurrentStateName();
           if (!remainOnCurrentCard) {
@@ -1320,15 +1328,11 @@ export class ConversationSkinComponent {
           }
         }
 
-        if (
-          !this.explorationPlayerStateService.isPresentingIsolatedQuestions()
-        ) {
-          this.explorationPlayerStateService.onPlayerStateChange.emit(
+        if (!this.explorationModeService.isPresentingIsolatedQuestions()) {
+          this.conversationFlowService.onPlayerStateChange.emit(
             nextCard.getStateName()
           );
-        } else if (
-          this.explorationPlayerStateService.isInQuestionPlayerMode()
-        ) {
+        } else if (this.explorationModeService.isInQuestionPlayerMode()) {
           this.questionPlayerStateService.answerSubmitted(
             this.questionPlayerEngineService.getCurrentQuestion(),
             !remainOnCurrentCard,
@@ -1341,9 +1345,7 @@ export class ConversationSkinComponent {
           // Do not wait if the interaction is supplemental -- there's
           // already a delay bringing in the help card.
           millisecsLeftToWait = 1.0;
-        } else if (
-          this.explorationPlayerStateService.isInDiagnosticTestPlayerMode()
-        ) {
+        } else if (this.explorationModeService.isInDiagnosticTestPlayerMode()) {
           // Do not wait if the player mode is the diagnostic test. Since no
           // feedback will be presented after attempting a question so delaying
           // is not required.
@@ -1357,7 +1359,7 @@ export class ConversationSkinComponent {
         }
 
         setTimeout(() => {
-          this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
+          this.conversationFlowService.onOppiaFeedbackAvailable.emit();
           this.setActiveVoiceover(feedbackHtml);
           this.voiceoverPlayerService.setActiveComponentName(
             AppConstants.COMPONENT_NAME_FEEDBACK
@@ -1471,7 +1473,7 @@ export class ConversationSkinComponent {
     this.pendingCardWasSeenBefore = false;
     this.displayedCard.markAsCompleted();
     if (isFinalQuestion) {
-      if (this.explorationPlayerStateService.isInQuestionPlayerMode()) {
+      if (this.explorationModeService.isInQuestionPlayerMode()) {
         // We will redirect to the results page here.
         this.questionSessionCompleted = true;
       }
@@ -1531,9 +1533,41 @@ export class ConversationSkinComponent {
     this.currentInteractionService.clearPresubmitHooks();
   }
 
+  private smoothScrollTo(
+    targetY: number,
+    duration: number,
+    easingName: string = 'easeOutQuad'
+  ): void {
+    const startY = window.scrollY;
+    const difference = targetY - startY;
+    const startTime = performance.now();
+
+    const easingFunctions = {
+      easeOutQuad: (t: number): number => t * (2 - t),
+      easeOutQuart: (t: number): number => 1 - Math.pow(1 - t, 4),
+    };
+
+    const easingFunction =
+      easingFunctions[easingName] || easingFunctions.easeOutQuad;
+
+    const step = (currentTime: number) => {
+      const elapsedTime = currentTime - startTime;
+
+      if (elapsedTime < duration) {
+        const progress = elapsedTime / duration;
+        window.scrollTo(0, startY + difference * easingFunction(progress));
+        requestAnimationFrame(step);
+      } else {
+        window.scrollTo(0, targetY);
+      }
+    };
+
+    requestAnimationFrame(step);
+  }
+
   showPendingCard(): void {
     this.startCardChangeAnimation = true;
-    this.explorationPlayerStateService.recordNewCardAdded();
+    this.conversationFlowService.recordNewCardAdded();
 
     setTimeout(
       () => {
@@ -1570,7 +1604,7 @@ export class ConversationSkinComponent {
     let currentIndex = this.playerPositionService.getDisplayedCardIndex();
     let conceptCardIsBeingShown =
       this.displayedCard.getStateName() === null &&
-      !this.explorationPlayerStateService.isInQuestionMode();
+      !this.explorationModeService.isInQuestionMode();
     if (
       conceptCardIsBeingShown &&
       this.playerTranscriptService.isLastCard(currentIndex)
@@ -1586,7 +1620,8 @@ export class ConversationSkinComponent {
     }
     if (this.moveToExploration) {
       this.moveToExploration = false;
-      this.explorationPlayerStateService.moveToExploration(
+      this.explorationModeService.setExplorationModeFromUrl();
+      this.explorationEngineService.moveToExploration(
         this._initializeDirectiveComponents.bind(this)
       );
       return;
@@ -1596,7 +1631,7 @@ export class ConversationSkinComponent {
       this.nextCard.getStateName() === this.displayedCard.getStateName() &&
       this.conceptCard
     ) {
-      this.explorationPlayerStateService.recordNewCardAdded();
+      this.conversationFlowService.recordNewCardAdded();
       this._addNewCard(
         StateCard.createNewCard(
           null,
@@ -1637,21 +1672,24 @@ export class ConversationSkinComponent {
 
   scrollToBottom(): void {
     setTimeout(() => {
-      let tutorCard = $('.conversation-skin-main-tutor-card');
+      const tutorCard = document.querySelector(
+        '.conversation-skin-main-tutor-card'
+      );
 
-      if (tutorCard && tutorCard.length === 0) {
+      if (!tutorCard) {
         return;
       }
-      let tutorCardBottom = tutorCard.offset().top + tutorCard.outerHeight();
-      if ($(window).scrollTop() + $(window).height() < tutorCardBottom) {
-        $('html, body').animate(
-          {
-            scrollTop: tutorCardBottom - $(window).height() + 12,
-          },
-          {
-            duration: this.TIME_SCROLL_MSEC,
-            easing: 'easeOutQuad',
-          }
+      const tutorCardRect = tutorCard.getBoundingClientRect();
+      const tutorCardBottom =
+        tutorCardRect.top + window.scrollY + tutorCardRect.height;
+      const windowBottom = window.scrollY + window.innerHeight;
+
+      if (windowBottom < tutorCardBottom) {
+        const targetScrollY = tutorCardBottom - window.innerHeight + 12;
+        this.smoothScrollTo(
+          targetScrollY,
+          this.TIME_SCROLL_MSEC,
+          'easeOutQuad'
         );
       }
     }, 100);
@@ -1659,14 +1697,7 @@ export class ConversationSkinComponent {
 
   scrollToTop(): void {
     setTimeout(() => {
-      $('html, body').animate(
-        {
-          scrollTop: 0,
-        },
-        800,
-        'easeOutQuart'
-      );
-      return false;
+      this.smoothScrollTo(0, 800, 'easeOutQuart');
     });
   }
 

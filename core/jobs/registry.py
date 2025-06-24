@@ -57,13 +57,13 @@ from core.jobs.batch_jobs import opportunity_management_jobs         # pylint: d
 from core.jobs.batch_jobs import question_migration_jobs             # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import skill_migration_jobs                # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import story_migration_jobs                # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import subtopic_migration_jobs                # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import subtopic_migration_jobs             # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import topic_migration_jobs                # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import (                                    # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     suggestion_edit_state_content_deletion_jobs)
 from core.jobs.batch_jobs import suggestion_stats_computation_jobs   # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import suggestion_migration_jobs   # pylint: disable=unused-import  # isort: skip
-from core.jobs.batch_jobs import translation_migration_jobs         # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import suggestion_migration_jobs           # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import translation_migration_jobs          # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import user_stats_computation_jobs         # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import math_interactions_audit_jobs        # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
@@ -79,6 +79,8 @@ from core.jobs.batch_jobs import (                                   # pylint: d
     audit_topic_related_models_relation_jobs)
 from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
     reject_invalid_suggestion_and_delete_invalid_translation_jobs)
+from core.jobs.batch_jobs import (                                   # pylint: disable=unused-import  # isort: skip
+    missing_translation_images_repair_jobs)
 from core.jobs.batch_jobs import user_bios_change_jobs               # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import (skill_inspection_jobs)             # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import delete_voiceover_models_data_job    # pylint: disable=unused-import  # isort: skip
