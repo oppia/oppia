@@ -1894,5 +1894,6 @@
     "I18N_WARNING_MODAL_DESCRIPTION": "This will show the full solution. Are you sure?",
     "I18N_WARNING_MODAL_TITLE": "Warning!",
     "I18N_WORKED_EXAMPLE": "Worked Example",
-    "I18N_YES": "Yes"
+    "I18N_YES": "Yes",
+    "I18N_TOPNAV_BLOG": "Blog"
 }

@@ -172,50 +172,56 @@
                   [innerHTML]="'I18N_TOPNAV_ABOUT' | translate">
             </span>
           </a>
-          <ul ngbDropdownMenu
-              class="dropdown-menu dropdown-menu oppia-navbar-dropdown about-dropdown-menu"
-              (mouseover)="openSubmenu($event, 'aboutMenu')"
-              (mouseleave)="closeSubmenuIfNotMobile($event)">
-            <li class="nav-item">
-              <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
-                 class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-about-link about-link"
-                 (click)="navigateToAboutPage()">
-                <span class="link">
-                  {{'I18N_TOPNAV_ABOUT' | translate}}
-                </span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-teach-button"
-                 (click)="navigateToTeachPage()"
-                 (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
-                 rel="noopener">
-                <span class="link">
-                  {{'I18N_TOPNAV_TEACH' | translate}}
-                </span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <span class="link dropdown-item nav-link oppia-navbar-tab-content about-link">
-                {{'I18N_TOPNAV_IMPACT_REPORT' | translate}}
+    <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown about-dropdown-menu"
+      (mouseover)="openSubmenu($event, 'aboutMenu')" (mouseleave)="closeSubmenuIfNotMobile($event)">
+    
+      <li class="nav-item">
+        <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
+          class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-about-link about-link"
+          (click)="navigateToAboutPage()">
+          <span class="link">
+            {{ 'I18N_TOPNAV_ABOUT' | translate }}
+          </span>
+        </a>
+      </li>
+    
+      <li class="nav-item">
+        <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
+          class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-blog-link blog-link"
+          (click)="navigateToBlogPage()">
+          <span class="link">
+            {{ 'I18N_TOPNAV_BLOG' | translate }}
+          </span>
+        </a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-teach-button"
+          (click)="navigateToTeachPage()" (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
+          rel="noopener">
+          <span class="link">
+            {{ 'I18N_TOPNAV_TEACH' | translate }}
+          </span>
+        </a>
+      </li>
+    
+      <li class="nav-item">
+        <span class="link dropdown-item nav-link oppia-navbar-tab-content about-link">
+          {{ 'I18N_TOPNAV_IMPACT_REPORT' | translate }}
+        </span>
+        <ul class="oppia-navbar-impactreport-tab-content">
+          <li *ngFor="let report of impactReports">
+            <a class="dropdown-item nav-link oppia-navbar-tab-content about-link oppia-navbar-impactreport-submenu-tab-content oppia-impact-report-btn e2e-test-navbar-impact-report-button"
+              [href]="report.link" target="_blank" (blur)="aboutDropdown.close()" rel="noopener">
+              <span class="link">
+                {{ report.year }}
               </span>
-              <ul class="oppia-navbar-impactreport-tab-content">
-                <li *ngFor="let report of impactReports">
-                  <a class="dropdown-item nav-link oppia-navbar-tab-content about-link oppia-navbar-impactreport-submenu-tab-content oppia-impact-report-btn e2e-test-navbar-impact-report-button"
-                     [href]="report.link"
-                     target="_blank"
-                     (blur)="aboutDropdown.close()"
-                     rel="noopener">
-                    <span class="link">
-                      {{ report.year }}
-                    </span>
-                    <i class="fas fa-external-link-alt launch-icon"></i>
-                  </a>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
+              <i class="fas fa-external-link-alt launch-icon"></i>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
         <li [ngClass]="{'open': activeMenuName === 'getInvolvedMenu'}"
             ngbDropdown
             #getInvolvedDropdown="ngbDropdown"

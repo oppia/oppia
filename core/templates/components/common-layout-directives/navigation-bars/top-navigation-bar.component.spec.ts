@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for TopNavigationBarComponent.
  */
 
-import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EventEmitter, NO_ERRORS_SCHEMA } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -26,31 +26,31 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {DeviceInfoService} from 'services/contextual/device-info.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {EventToCodes, NavigationService} from 'services/navigation.service';
-import {SearchService} from 'services/search.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {UserService} from 'services/user.service';
-import {AlertsService} from 'services/alerts.service';
-import {MockI18nService, MockTranslatePipe} from 'tests/unit-test-utils';
-import {TopNavigationBarComponent} from './top-navigation-bar.component';
-import {SidebarStatusService} from 'services/sidebar-status.service';
-import {UserInfo} from 'domain/user/user-info.model';
-import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
-import {FeedbackThreadSummary} from 'domain/feedback_thread/feedback-thread-summary.model';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {I18nService} from 'i18n/i18n.service';
-import {CookieService, CookieModule} from 'ngx-cookie';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
-import {AppConstants} from 'app.constants';
-import {NavbarAndFooterGATrackingPages} from 'app.constants';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {UrlService} from 'services/contextual/url.service';
+import { By } from '@angular/platform-browser';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { EventToCodes, NavigationService } from 'services/navigation.service';
+import { SearchService } from 'services/search.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserService } from 'services/user.service';
+import { AlertsService } from 'services/alerts.service';
+import { MockI18nService, MockTranslatePipe } from 'tests/unit-test-utils';
+import { TopNavigationBarComponent } from './top-navigation-bar.component';
+import { SidebarStatusService } from 'services/sidebar-status.service';
+import { UserInfo } from 'domain/user/user-info.model';
+import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
+import { FeedbackThreadSummary } from 'domain/feedback_thread/feedback-thread-summary.model';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { I18nService } from 'i18n/i18n.service';
+import { CookieService, CookieModule } from 'ngx-cookie';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { AppConstants } from 'app.constants';
+import { NavbarAndFooterGATrackingPages } from 'app.constants';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { UrlService } from 'services/contextual/url.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -65,22 +65,22 @@ class MockWindowRef {
     location: {
       pathname: '/learn/math',
       href: '',
-      reload: () => {},
+      reload: () => { },
       toString: () => {
         return 'http://localhost:8181/?lang=es';
       },
     },
     localStorage: {
       last_uploaded_audio_lang: 'en',
-      removeItem: (name: string) => {},
+      removeItem: (name: string) => { },
     },
     sessionStorage: {
       last_uploaded_audio_lang: 'en',
-      removeItem: (name: string) => {},
+      removeItem: (name: string) => { },
     },
-    gtag: () => {},
+    gtag: () => { },
     history: {
-      pushState(data: object, title: string, url?: string | null) {},
+      pushState(data: object, title: string, url?: string | null) { },
     },
     document: {
       body: {
@@ -245,7 +245,7 @@ describe('TopNavigationBarComponent', () => {
 
   it(
     'should try displaying the hidden navbar elements if resized' +
-      ' window is larger',
+    ' window is larger',
     fakeAsync(() => {
       let donateElement = 'I18N_TOPNAV_DONATE';
       spyOn(component, 'truncateNavbar').and.stub();
@@ -265,6 +265,22 @@ describe('TopNavigationBarComponent', () => {
     })
   );
 
+  it('should navigate to blog page and register analytics event', () => {
+    // Arrange
+    spyOn(component['siteAnalyticsService'], 'registerClickNavbarButtonEvent');
+    const mockWindow = { location: { href: '' } };
+    component['windowRef'].nativeWindow = mockWindow;
+
+    // Act
+    component.navigateToBlogPage();
+
+    // Assert
+    expect(component['siteAnalyticsService'].registerClickNavbarButtonEvent)
+      .toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.BLOG);
+    expect(mockWindow.location.href).toBe('/blog');
+  });
+
+
   it("should show Oppia's logos", () => {
     expect(component.getStaticImageUrl('/logo/288x128_logo_white.webp')).toBe(
       '/assets/images/logo/288x128_logo_white.webp'
@@ -277,7 +293,7 @@ describe('TopNavigationBarComponent', () => {
 
   it(
     'should fetch login URL and redirect user to login page when user' +
-      " clicks on 'Sign In'",
+    " clicks on 'Sign In'",
     fakeAsync(() => {
       spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/login/url');
 
@@ -308,7 +324,7 @@ describe('TopNavigationBarComponent', () => {
 
   it(
     'should register start login event when user is being redirected to' +
-      ' the login page',
+    ' the login page',
     fakeAsync(() => {
       spyOn(userService, 'getLoginUrlAsync').and.resolveTo('/login/url');
       spyOn(siteAnalyticsService, 'registerStartLoginEvent');
@@ -353,7 +369,7 @@ describe('TopNavigationBarComponent', () => {
 
   it(
     'should close submenu when user moves the mouse away' +
-      ' from the menu button',
+    ' from the menu button',
     () => {
       let mouseleaveEvent = new KeyboardEvent('mouseleave');
       spyOn(navigationService, 'closeSubmenu');
@@ -564,7 +580,7 @@ describe('TopNavigationBarComponent', () => {
 
   it(
     'should change the language when user clicks on new language' +
-      ' from dropdown',
+    ' from dropdown',
     () => {
       let langCode = 'hi';
       spyOn(i18nService, 'updateUserPreferredLanguage');
@@ -768,7 +784,7 @@ describe('TopNavigationBarComponent', () => {
     spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(
       jasmine
         .createSpy('getBoundingClientRect')
-        .and.returnValue({top: 1, height: 100, left: 0, width: 200, right: 202})
+        .and.returnValue({ top: 1, height: 100, left: 0, width: 200, right: 202 })
     );
 
     expect(component.getDropdownOffset('.dummy', 0)).toBe(0);
@@ -824,7 +840,7 @@ describe('TopNavigationBarComponent', () => {
 
   it(
     'should return correct value for show feedback updates' +
-      'in profile pic drop down menu feature flag',
+    'in profile pic drop down menu feature flag',
     () => {
       expect(
         component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
