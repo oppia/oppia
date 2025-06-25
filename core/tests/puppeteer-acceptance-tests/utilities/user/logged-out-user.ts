@@ -4735,6 +4735,14 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if text content of any element with given selector matches the
+   * given value.
+   * @param selector - The CSS selector to find the elements.
+   * @param value - The expected text content value.
+   * @returns {Promise<void>} - A promise that resolves when the text content
+   * is checked.
+   */
   async expectAnyElementWithSelectorToHaveTextContent(
     selector: string,
     value: string
@@ -4837,6 +4845,11 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  /**
+   * Checks if given subheading is available in about page.
+   * @param subheading - The expected subheading.
+   * @returns {Promise<void>} - A promise that resolves when the subheading is checked.
+   */
   async expectSubheadingInAboutUsPageToContain(
     subheading: string
   ): Promise<void> {
@@ -4854,6 +4867,11 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if given goal listed in any section of about page.
+   * @param sectionGoal - The expected section goal.
+   * @returns {Promise<void>} - A promise that resolves when the subheading is checked.
+   */
   async expectSectionGoalsInAboutPageToContain(
     sectionGoal: string
   ): Promise<void> {
@@ -4863,14 +4881,25 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  /**
+   * Checks if explore button is visible in about page.
+   */
   async expectExploreLessonsButtonInAboutPageToBePresent(): Promise<void> {
     await this.isElementVisible(exploreLessonsButtonInAboutUsPageSelector);
   }
 
+  /**
+   * Checks if android app button is visible in about page.
+   */
   async expectAndroidAppButtonInAboutPageToBePresent(): Promise<void> {
     await this.isElementVisible(androidAppButtonInAboutUsPageSelector);
   }
 
+  /**
+   * Checks for number of partnership stories.
+   * @param n - The expected number of story boards.
+   * @returns {Promise<void>} - A promise that resolves when the number of story boards is checked.
+   */
   async expectPartnershipStoryBoardsToBe(n: number): Promise<void> {
     const storyBoards = await this.page.$$eval(
       partnershipStoryBoardSelector,
@@ -4884,6 +4913,11 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks for number of impact stats listed.
+   * @param n - The expected number of impact stats.
+   * @returns {Promise<void>} - A promise that resolves when the number of impact stats is checked.
+   */
   async expectImpactStatsTitlesToBe(n: number): Promise<void> {
     const impactStats = await this.page.$$eval(
       impactStatsTitleSelector,
@@ -4897,6 +4931,10 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks for number of impact histogram shown.
+   * @param n - The expected number of histograms.
+   */
   async expectImpactChartsToBe(n: number): Promise<void> {
     const impactCharts = await this.page.$$eval(
       impactChartContainerSelector,
@@ -4910,14 +4948,24 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if "Our Impact" section is visible in donation page.
+   */
   async expectOurImpactSectionInDonationPageToBePresent(): Promise<void> {
     await this.isElementVisible(ourNetworkSectionSelector);
   }
 
+  /**
+   * Checks if "Our Learners" section is visible in donation page.
+   */
   async expectOurLearnersSectionInDonationPageToBePresent(): Promise<void> {
     await this.isElementVisible(ourLearnersSectionSelector);
   }
 
+  /**
+   * Matches donation page heading with given heading.
+   * @param heading - The expected heading.
+   */
   async expectDonationPageHeadingToBe(heading: string): Promise<void> {
     await this.expectTextContentInElementWithSelectorToBe(
       donationHeadingSelector,
@@ -4925,6 +4973,9 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  /**
+   * Verifies that the "Ready to make an impact?" text is present on the page.
+   */
   async expectReadyToMakeAnImpactToBePresent(): Promise<void> {
     await this.expectTextContentInElementWithSelectorToBe(
       readyToMakeDonationSelector,
@@ -4932,10 +4983,18 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  /**
+   * Checks that the "View Report" button on the About page is visible.
+   */
   async expectViewReportButtonInAboutPageToBeVisible(): Promise<void> {
     await this.isElementVisible(impactReportButtonInAboutPage);
   }
 
+  /**
+   * Validates that a given subheading text appears on the Parents and Teachers page.
+   *
+   * @param subheading - The expected subheading text to be found.
+   */
   async subheadingInParentsAndTeachersPageToContain(
     subheading: string
   ): Promise<void> {
@@ -4945,6 +5004,10 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  /**
+   * Clicks the Play Store image on the Android page and verifies that it navigates
+   * to the correct Google Play Store URL for the Oppia Android app.
+   */
   async clickOnPlayStoreImageInAndroidPageAndVerifyNavigation(): Promise<void> {
     await this.isElementVisible(redirectToPlayStoreImageSelector);
 
@@ -4955,6 +5018,11 @@ export class LoggedOutUser extends BaseUser {
     expect(pageURL).toContain('org.oppia.android');
   }
 
+  /**
+   * Ensures that the heading on the Volunteer page contains the specified text.
+   *
+   * @param heading - The expected heading text to be validated.
+   */
   async expectVolunteerPageHeadingToContain(heading: string): Promise<void> {
     await this.expectAnyElementWithSelectorToHaveTextContent(
       volunteerPageHeadingSelector,
