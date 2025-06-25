@@ -110,7 +110,8 @@ export class ReadOnlySubtopicPageData {
       sections = subtopicDataBackendDict.sections.map(section =>
         StudyGuideSection.createFromBackendDict(section)
       );
-    } else if (subtopicDataBackendDict.page_contents) {
+    }
+    if (subtopicDataBackendDict.page_contents) {
       pageContents = SubtopicPageContents.createFromBackendDict(
         subtopicDataBackendDict.page_contents
       );
