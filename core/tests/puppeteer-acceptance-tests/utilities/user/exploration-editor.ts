@@ -3152,7 +3152,9 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(feedbackTabBackButtonSelector);
-    // Add post check
+    // TODO(#22716): Add post check when this function is actually used or
+    // before closing the issue #22716.
+    // Add post check.
   }
 
   /**

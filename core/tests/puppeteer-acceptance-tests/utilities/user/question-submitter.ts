@@ -522,12 +522,18 @@ export class QuestionSubmitter extends BaseUser {
       await this.type(stateContentInputField, `${defaultResponseFeedback}`);
       await this.clickOn(saveOutcomeFeedbackButton);
 
-      // TODO: Check for text and add post check based on it.
-      // Verify the text was added correctly
+      // Check for text and add post check based on it.
+      // TODO: Verify the text was added correctly.
       const newDefaultResponseText = await this.page.$eval(
         openOutcomeFeedBackEditor,
         el => el.textContent?.trim()
       );
+
+      if (newDefaultResponseText !== defaultResponseFeedback) {
+        throw new Error(
+          `Error updating default response. Found ${newDefaultResponseText}, expected ${defaultResponseFeedback}`
+        );
+      }
 
       showMessage(`Default response feedback: ${newDefaultResponseText}`);
     }
