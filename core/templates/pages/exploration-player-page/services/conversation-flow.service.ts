@@ -260,8 +260,8 @@ export class ConversationFlowService {
    */
   emitHelpCard(helpCardHtml: string, hasContinueButton: boolean): void {
     this.playerPositionService.onHelpCardAvailable.emit({
-      helpCardHtml,
-      hasContinueButton,
+      helpCardHtml: helpCardHtml,
+      hasContinueButton: hasContinueButton,
     });
   }
 

@@ -1091,11 +1091,10 @@ export class ConversationSkinComponent {
           this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion()
         );
         this.answerIsBeingProcessed = false;
-        this.playerPositionService.onHelpCardAvailable.emit({
-          helpCardHtml:
-            this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion(),
-          hasContinueButton: false,
-        });
+        this.conversationFlowService.emitHelpCard(
+          this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion(),
+          false
+        );
       }, 100);
       return;
     }
