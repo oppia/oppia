@@ -59,7 +59,7 @@ def managed_process(
             by the function's logging logic to improve readability.
         shell: bool. Whether the command should be run inside of its own shell.
             WARNING: Executing shell commands that incorporate unsanitized input
-            from an untrusted source makes a program vulnerable to import json
+            from an untrusted source makes a program vulnerable to
             [shell injection](https://w.wiki/_Ac2), a serious security flaw
             which can result in arbitrary command execution. For this reason,
             the use of `shell=True` is **strongly discouraged** in cases where
@@ -759,10 +759,10 @@ def managed_acceptance_tests_server(
     """
     available_suites = {}
     with open(
-        common.ACCEPTANCE_TEST_CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
+        common.ACCEPTANCE_TEST_CONFIG_FILE_PATH, 'r', encoding='utf-8'
+    ) as f:
         filedata = json.load(f)
-        for suite_type in filedata:
-            suites = filedata[suite_type]
+        for suites in filedata.values():
             for suite in suites:
                 available_suites[suite['name']] = suite['module']
     if suite_name not in available_suites:
