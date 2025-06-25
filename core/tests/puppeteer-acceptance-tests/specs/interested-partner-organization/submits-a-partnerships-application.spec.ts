@@ -70,16 +70,16 @@ describe('Interested Partner Organization', function () {
       'Frequently asked questions'
     );
 
-    // Download Brochure
+    // Download Brochure.
     await partherOrganizationUser.clickDownloadBrochureButtonInPartnershipsPage();
 
-    // Special foundation video
+    // Special foundation video.
     await partherOrganizationUser.expectYouTubeVideoInPartnershipPageToBePlayabe();
 
-    // Read More stories
+    // Read More stories.
     await partherOrganizationUser.clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation();
 
-    // Learner stories crousal
+    // Learner stories crousal.
     await partherOrganizationUser.clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation();
   });
 
