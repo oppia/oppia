@@ -38,7 +38,21 @@ describe('Interested Volunteer', function () {
       'volunteerPage',
       __dirname
     );
-    // TODO: Checks
+
+    // Check for various headings and sections.
+    await interestedVolunteer.expectVolunteerPageHeadingToContain(
+      'Meet our volunteers'
+    );
+    await this.expectVolunteerPageHeadingToContain(
+      'Volunteer to make a difference'
+    );
+
+    // Apply to become a volunteer at top of the page.
+    await this.clickApplyToVolunteerAtTheTopOfVolunteerPage();
+
+    // Check for Expectations Tab.
+    await this.navigateToVolunteerPage();
+    await interestedVolunteer.expectVolunteerExpectationsTabsToBeFunctionalInVolunteerPage();
 
     // Open Volunteer Form.
     await interestedVolunteer.clickApplyToVolunteerAtTheBottomOfVolunteerPage();

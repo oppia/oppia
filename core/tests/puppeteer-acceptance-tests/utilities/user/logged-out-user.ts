@@ -458,6 +458,9 @@ const ourNetworkSectionSelector = '.e2e-test-donate-highlights';
 const donationHeadingSelector = '.e2e-test-donate-heading';
 const readyToMakeDonationSelector = '.e2e-test-ready-to-donate-title';
 
+// Volunteer Page.
+const volunteerPageHeadingSelector = '.e2e-test-volunteer-page-headings';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -5084,6 +5087,13 @@ export class LoggedOutUser extends BaseUser {
     const pageURL = this.page.url();
     expect(pageURL).toContain('play.google.com');
     expect(pageURL).toContain('org.oppia.android');
+  }
+
+  async expectVolunteerPageHeadingToContain(heading: string): Promise<void> {
+    await this.expectAnyElementWithSelectorToHaveTextContent(
+      volunteerPageHeadingSelector,
+      heading
+    );
   }
 }
 
