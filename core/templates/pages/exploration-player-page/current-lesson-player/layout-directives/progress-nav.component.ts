@@ -43,6 +43,7 @@ import {ContentTranslationManagerService} from '../../services/content-translati
 import './progress-nav.component.css';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-progress-nav',
@@ -70,7 +71,7 @@ export class ProgressNavComponent {
   @Input() submitButtonIsShown!: boolean;
   @Input() showContinueToReviseButton!: boolean;
   @Input() navigationThroughCardHistoryIsEnabled!: boolean;
-  @Input() skipButtonIsShown!: boolean;
+  skipButtonIsShown: boolean = false;
   hasPrevious!: boolean;
   hasNext!: boolean;
   conceptCardIsBeingShown!: boolean;
@@ -107,6 +108,7 @@ export class ProgressNavComponent {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
+    private pageContextService: PageContextService,
     private conversationFlowService: ConversationFlowService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService,
@@ -122,6 +124,8 @@ export class ProgressNavComponent {
 
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
+    this.skipButtonIsShown =
+      this.pageContextService.isInDiagnosticTestPlayerPage();
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(helpCard => {

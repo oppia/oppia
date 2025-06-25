@@ -117,7 +117,6 @@ export class TutorCardComponent {
   @ViewChild('confetti') confettiComponent!: EndChapterConfettiComponent;
   @Input() displayedCard!: StateCard;
   @Input() displayedCardWasCompletedInPrevSession!: boolean;
-  @Input() startCardChangeAnimation!: boolean;
   @Input() avatarImageIsShown!: boolean;
   @Input() shouldHideInteraction!: boolean;
   @Input() userIsLoggedIn!: boolean;

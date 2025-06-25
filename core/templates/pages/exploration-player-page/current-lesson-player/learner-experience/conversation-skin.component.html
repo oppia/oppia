@@ -11,7 +11,6 @@
                         [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
                         [avatarImageIsShown]="true"
                         [shouldHideInteraction]="continueToReviseStateButtonIsVisible || !showInteraction"
-                        [startCardChangeAnimation]="startCardChangeAnimation"
                         [userIsLoggedIn]="isLoggedIn"
                         [collectionSummary]="collectionSummary"
                         [questionPlayerConfig]="questionPlayerConfig"
@@ -46,7 +45,6 @@
                             (clickContinueButton)="showUpcomingCard()"
                             (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
                             [navigationThroughCardHistoryIsEnabled]="navigationThroughCardHistoryIsEnabled"
-                            [skipButtonIsShown]="skipButtonIsShown"
                             (skipQuestion)="skipCurrentQuestion()">
         </oppia-progress-nav>
       </div>

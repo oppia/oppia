@@ -119,18 +119,15 @@ export class ConversationSkinComponent {
   hasFullyLoaded = false;
   recommendedExplorationSummaries: LearnerExplorationSummary[] = [];
   answerIsCorrect = false;
-  alertMessage = {};
   pendingCardWasSeenBefore: boolean = false;
   OPPIA_AVATAR_IMAGE_URL: string;
   displayedCard: StateCard;
-  upcomingInlineInteractionHtml;
   correctnessFooterIsShown: boolean = true;
 
   // If the exploration is iframed, send data to its parent about
   // its height so that the parent can be resized as necessary.
   lastRequestedHeight: number = 0;
   lastRequestedScroll: boolean = false;
-  startCardChangeAnimation: boolean;
   collectionSummary;
   redirectToRefresherExplorationConfirmed;
   isAnimatingToTwoCards: boolean;
@@ -140,7 +137,6 @@ export class ConversationSkinComponent {
   conceptCard: ConceptCard;
   questionSessionCompleted: boolean;
   moveToExploration: boolean;
-  upcomingInteractionInstructions;
   prevSessionStatesProgress: string[] = [];
   showProgressClearanceMessage: boolean = false;
 
@@ -160,7 +156,6 @@ export class ConversationSkinComponent {
   inputOutputHistoryIsShown: boolean = true;
   navigationThroughCardHistoryIsEnabled: boolean = true;
   checkpointCelebrationModalIsEnabled: boolean = true;
-  skipButtonIsShown: boolean = false;
 
   // Finalized state for the component.
   continueToReviseStateButtonIsVisible: boolean = false;
@@ -246,7 +241,6 @@ export class ConversationSkinComponent {
       this.inputOutputHistoryIsShown = false;
       this.navigationThroughCardHistoryIsEnabled = false;
       this.checkpointCelebrationModalIsEnabled = false;
-      this.skipButtonIsShown = true;
       this.correctnessFooterIsShown = false;
     }
 
@@ -415,7 +409,6 @@ export class ConversationSkinComponent {
       this.currentInteractionService.setOnSubmitFn(
         this.submitAnswer.bind(this)
       );
-      this.startCardChangeAnimation = false;
       this.initializePage();
 
       this.collectionSummary = null;
@@ -1321,12 +1314,6 @@ export class ConversationSkinComponent {
     this.numberAttemptsService.reset();
 
     let nextCard = this.conversationFlowService.getNextStateCard();
-    let _isNextInteractionInline = nextCard.isInteractionInline();
-    this.upcomingInlineInteractionHtml = _isNextInteractionInline
-      ? nextCard.getInteractionHtml()
-      : '';
-    this.upcomingInteractionInstructions =
-      nextCard.getInteractionInstructions();
 
     if (feedbackHtml) {
       if (
@@ -1392,16 +1379,12 @@ export class ConversationSkinComponent {
   }
 
   showPendingCard(): void {
-    this.startCardChangeAnimation = true;
     this.conversationFlowService.recordNewCardAdded();
 
     setTimeout(
       () => {
         let nextCard = this.conversationFlowService.getNextStateCard();
         this._addNewCard(nextCard);
-
-        this.upcomingInlineInteractionHtml = null;
-        this.upcomingInteractionInstructions = null;
       },
       0.1 * TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC
     );
@@ -1412,16 +1395,6 @@ export class ConversationSkinComponent {
         this.scrollToTop();
       },
       0.1 * TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + 0.5 * TIME_FADEIN_MSEC
-    );
-
-    setTimeout(
-      () => {
-        this.startCardChangeAnimation = false;
-      },
-      0.1 * TIME_FADEOUT_MSEC +
-        TIME_HEIGHT_CHANGE_MSEC +
-        TIME_FADEIN_MSEC +
-        TIME_PADDING_MSEC
     );
 
     let nextCard = this.conversationFlowService.getNextStateCard();
