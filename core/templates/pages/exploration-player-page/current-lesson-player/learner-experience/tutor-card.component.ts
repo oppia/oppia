@@ -127,7 +127,6 @@ export class TutorCardComponent {
   @Input() isRefresherExploration!: boolean;
   @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
   @Input() parentExplorationIds!: string[];
-  @Input() inStoryMode!: boolean;
   @Input() nextLessonLink!: string;
   @Input() completedChaptersCount!: number;
   @Input() milestoneMessageIsToBeDisplayed!: boolean;
@@ -141,6 +140,7 @@ export class TutorCardComponent {
   interactionIsActive!: boolean;
   waitingForOppiaFeedback: boolean = false;
   interactionInstructions!: string | null;
+  inStoryMode!: boolean;
   isIframed!: boolean;
   getCanAskLearnerForAnswerInfo!: () => boolean;
   OPPIA_AVATAR_IMAGE_URL!: string;
@@ -211,6 +211,7 @@ export class TutorCardComponent {
   }
 
   ngOnInit(): void {
+    this.inStoryMode = this.explorationModeService.isInStoryChapterMode();
     this._editorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
     this.getUserInfoAsync();

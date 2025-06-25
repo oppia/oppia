@@ -111,8 +111,6 @@ export class ConversationSkinComponent {
 
   isLoggedIn: boolean;
   voiceoversAreLoaded: boolean = false;
-
-  inStoryMode: boolean = false;
   collectionTitle: string;
   answerIsBeingProcessed: boolean = false;
   explorationId: string;
@@ -166,6 +164,7 @@ export class ConversationSkinComponent {
 
   // Finalized state for the component.
   continueToReviseStateButtonIsVisible: boolean = false;
+  inStoryMode: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
