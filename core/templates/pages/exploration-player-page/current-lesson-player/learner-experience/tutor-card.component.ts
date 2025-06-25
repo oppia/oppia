@@ -129,10 +129,9 @@ export class TutorCardComponent {
   @Input() nextLessonLink!: string;
   @Input() completedChaptersCount!: number;
   @Input() milestoneMessageIsToBeDisplayed!: boolean;
-  @Input() feedbackIsEnabled!: boolean;
-  @Input() learnerCanOnlyAttemptQuestionOnce!: boolean;
-  @Input() inputOutputHistoryIsShown!: boolean;
-  @Input() checkpointCelebrationModalIsEnabled!: boolean;
+  feedbackIsEnabled: boolean = true;
+  inputOutputHistoryIsShown: boolean = false;
+  checkpointCelebrationModalIsEnabled: boolean = false;
   private _editorPreviewMode!: boolean;
   lastAnswer!: {answerDetails: string} | string | null;
   conceptCardIsBeingShown!: boolean;
@@ -213,6 +212,12 @@ export class TutorCardComponent {
     this.inStoryMode = this.explorationModeService.isInStoryChapterMode();
     this._editorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
+    this.inputOutputHistoryIsShown =
+      this.pageContextService.isInDiagnosticTestPlayerPage();
+    this.feedbackIsEnabled =
+      !this.pageContextService.isInDiagnosticTestPlayerPage();
+    this.checkpointCelebrationModalIsEnabled =
+      this.pageContextService.isInExplorationPlayerPage();
     this.getUserInfoAsync();
     this.isIframed = this.urlService.isIframed();
     this.getCanAskLearnerForAnswerInfo =

@@ -149,14 +149,6 @@ export class ConversationSkinComponent {
   isLearnerReallyStuck: boolean = false;
   showInteraction: boolean = true;
 
-  // The fields are used to customize the component for the diagnostic player,
-  // question player, and exploration player page.
-  feedbackIsEnabled: boolean = true;
-  learnerCanOnlyAttemptQuestionOnce: boolean = false;
-  inputOutputHistoryIsShown: boolean = true;
-  navigationThroughCardHistoryIsEnabled: boolean = true;
-  checkpointCelebrationModalIsEnabled: boolean = true;
-
   // Finalized state for the component.
   continueToReviseStateButtonIsVisible: boolean = false;
   inStoryMode: boolean = false;
@@ -221,6 +213,8 @@ export class ConversationSkinComponent {
   ngOnInit(): void {
     this._editorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
+    this.correctnessFooterIsShown =
+      !this.pageContextService.isInDiagnosticTestPlayerPage();
 
     let collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     this.pidInUrl = this.urlService.getPidFromUrl();
@@ -233,19 +227,6 @@ export class ConversationSkinComponent {
         });
     } else {
       this.collectionTitle = null;
-    }
-
-    if (this.diagnosticTestTopicTrackerModel) {
-      this.feedbackIsEnabled = false;
-      this.learnerCanOnlyAttemptQuestionOnce = true;
-      this.inputOutputHistoryIsShown = false;
-      this.navigationThroughCardHistoryIsEnabled = false;
-      this.checkpointCelebrationModalIsEnabled = false;
-      this.correctnessFooterIsShown = false;
-    }
-
-    if (!this.pageContextService.isInExplorationPlayerPage()) {
-      this.checkpointCelebrationModalIsEnabled = false;
     }
 
     this.explorationId = this.explorationEngineService.getExplorationId();

@@ -70,7 +70,7 @@ export class ProgressNavComponent {
   @Input() displayedCard!: StateCard;
   @Input() submitButtonIsShown!: boolean;
   @Input() showContinueToReviseButton!: boolean;
-  @Input() navigationThroughCardHistoryIsEnabled!: boolean;
+  navigationThroughCardHistoryIsEnabled: boolean = true;
   skipButtonIsShown: boolean = false;
   hasPrevious!: boolean;
   hasNext!: boolean;
@@ -124,6 +124,8 @@ export class ProgressNavComponent {
 
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
+    this.navigationThroughCardHistoryIsEnabled =
+      !this.pageContextService.isInDiagnosticTestPlayerPage();
     this.skipButtonIsShown =
       this.pageContextService.isInDiagnosticTestPlayerPage();
 

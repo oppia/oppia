@@ -20,11 +20,7 @@
                         [parentExplorationIds]="parentExplorationIds"
                         [nextLessonLink]="getExplorationLink()"
                         [completedChaptersCount]="completedChaptersCount"
-                        [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime"
-                        [feedbackIsEnabled]="feedbackIsEnabled"
-                        [learnerCanOnlyAttemptQuestionOnce]="learnerCanOnlyAttemptQuestionOnce"
-                        [inputOutputHistoryIsShown]="inputOutputHistoryIsShown"
-                        [checkpointCelebrationModalIsEnabled]="checkpointCelebrationModalIsEnabled">
+                        [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
@@ -44,7 +40,6 @@
                             [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
                             (clickContinueButton)="showUpcomingCard()"
                             (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
-                            [navigationThroughCardHistoryIsEnabled]="navigationThroughCardHistoryIsEnabled"
                             (skipQuestion)="skipCurrentQuestion()">
         </oppia-progress-nav>
       </div>
