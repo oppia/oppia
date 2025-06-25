@@ -67,8 +67,7 @@ describe('StorySummaryTileComponent', () => {
   it('should get status of Serial Chapter Launch Feature flag', () => {
     expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(false);
 
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
-      true;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
     expect(component.isSerialChapterFeatureFlagEnabled()).toEqual(true);
   });
 

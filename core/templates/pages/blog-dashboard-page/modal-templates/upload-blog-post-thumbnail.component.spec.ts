@@ -176,7 +176,7 @@ describe('Upload Blog Post Thumbnail Component', () => {
 
   it('should cancel', () => {
     spyOn(componentInstance.cancelThumbnailUpload, 'emit');
-    (componentInstance.uploadedImage = true), componentInstance.cancel();
+    ((componentInstance.uploadedImage = true), componentInstance.cancel());
 
     expect(componentInstance.uploadedImage).toEqual(null);
     expect(componentInstance.cancelThumbnailUpload.emit).toHaveBeenCalled();

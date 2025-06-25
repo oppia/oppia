@@ -127,8 +127,7 @@ describe('Topics and skills dashboard page component', () => {
     type TopicStatusOptionsKeys =
       keyof typeof TopicsAndSkillsDashboardPageConstants.TOPIC_STATUS_OPTIONS;
 
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
-      false;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
 
     let topicSortOptions: string[] = [];
     for (let key in TopicsAndSkillsDashboardPageConstants.TOPIC_SORT_OPTIONS) {
@@ -152,8 +151,7 @@ describe('Topics and skills dashboard page component', () => {
     expect(componentInstance.sortOptions).toEqual(topicSortOptions);
     expect(componentInstance.statusOptions).toEqual(topicStatusOptions);
 
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
-      true;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
 
     topicSortOptions = [];
     for (let key in TopicsAndSkillsDashboardPageConstants.TOPIC_SORTING_OPTIONS) {

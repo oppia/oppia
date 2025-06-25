@@ -137,8 +137,7 @@ describe('Topic and Skill dashboard page service', () => {
       total_chapter_counts_for_each_story: [5, 4],
       published_chapter_counts_for_each_story: [3, 4],
     });
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
-      false;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
     let topicsArray = [topic1, topic2, topic3];
     let filterOptions = TopicsAndSkillsDashboardFilter.createDefault();
     let filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
@@ -157,8 +156,7 @@ describe('Topic and Skill dashboard page service', () => {
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);
     expect(filteredArray).toEqual([topic2]);
 
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
-      true;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
 
     filterOptions.status = ETopicStatusOptions.FullyPublished;
     filteredArray = tsds.getFilteredTopics(topicsArray, filterOptions);

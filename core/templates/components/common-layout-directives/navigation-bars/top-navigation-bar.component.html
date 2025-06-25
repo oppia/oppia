@@ -174,7 +174,6 @@
           </a>
     <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown about-dropdown-menu"
       (mouseover)="openSubmenu($event, 'aboutMenu')" (mouseleave)="closeSubmenuIfNotMobile($event)">
-    
       <li class="nav-item">
         <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
           class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-about-link about-link"
@@ -184,7 +183,6 @@
           </span>
         </a>
       </li>
-    
       <li class="nav-item">
         <a (keydown)="onMenuKeypress($event, 'aboutMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})"
           class="dropdown-item nav-link oppia-navbar-tab-content e2e-test-blog-link blog-link"
@@ -194,7 +192,6 @@
           </span>
         </a>
       </li>
-    
       <li class="nav-item">
         <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-teach-button"
           (click)="navigateToTeachPage()" (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
@@ -204,7 +201,6 @@
           </span>
         </a>
       </li>
-    
       <li class="nav-item">
         <span class="link dropdown-item nav-link oppia-navbar-tab-content about-link">
           {{ 'I18N_TOPNAV_IMPACT_REPORT' | translate }}

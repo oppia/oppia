@@ -805,8 +805,7 @@ describe('Story update service', () => {
   });
 
   it('should set a story node last modified', () => {
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
-      true;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
     expect(
       _sampleStory.getStoryContents().getNodes()[0].getLastModifiedMsecs()
     ).toBe(40);

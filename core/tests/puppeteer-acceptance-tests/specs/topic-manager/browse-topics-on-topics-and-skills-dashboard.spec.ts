@@ -53,7 +53,7 @@ describe('Topic Manager', function () {
   it(
     'should be able to filter topics, sort them, use the paginator, and open an existing topic.',
     async function () {
-      await topicManager.navigateToTopicAndSkillsDashboardPage(),
+      (await topicManager.navigateToTopicAndSkillsDashboardPage(),
         await topicManager.filterTopicsByStatus('Not Published'),
         await topicManager.expectFilteredTopics(['Addition', 'Subtraction']),
         await topicManager.filterTopicsByStatus('Published'),
@@ -69,7 +69,7 @@ describe('Topic Manager', function () {
           'Subtraction',
         ]),
         await topicManager.adjustPaginatorToShowItemsPerPage(15),
-        await topicManager.checkIfTopicPageChangesAfterClickingNext(false);
+        await topicManager.checkIfTopicPageChangesAfterClickingNext(false));
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

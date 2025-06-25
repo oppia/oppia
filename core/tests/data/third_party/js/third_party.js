@@ -8219,13 +8219,13 @@ angular
         var t = e.preferredLanguage();
         angular.isString(t) ? e.use(t) : a.put(n, e.use());
       };
-    (t.displayName = 'fallbackFromIncorrectStorageValue'),
+    ((t.displayName = 'fallbackFromIncorrectStorageValue'),
       a
         ? a.get(n)
           ? e.use(a.get(n)).catch(t)
           : t()
         : angular.isString(e.preferredLanguage()) &&
-          e.use(e.preferredLanguage());
+          e.use(e.preferredLanguage()));
   }
   function e(t, r, e, i) {
     'use strict';
@@ -8277,18 +8277,18 @@ angular
               n[0] = n[0].toLowerCase();
               break;
             case 2:
-              (n[0] = n[0].toLowerCase()),
+              ((n[0] = n[0].toLowerCase()),
                 4 === n[1].length
                   ? (n[1] =
                       n[1].charAt(0).toUpperCase() +
                       n[1].slice(1).toLowerCase())
-                  : (n[1] = n[1].toUpperCase());
+                  : (n[1] = n[1].toUpperCase()));
               break;
             case 3:
-              (n[0] = n[0].toLowerCase()),
+              ((n[0] = n[0].toLowerCase()),
                 (n[1] =
                   n[1].charAt(0).toUpperCase() + n[1].slice(1).toLowerCase()),
-                (n[2] = n[2].toUpperCase());
+                (n[2] = n[2].toUpperCase()));
               break;
             default:
               return e;
@@ -8314,7 +8314,7 @@ angular
     o.displayName = 'angular-translate/service: getFirstBrowserLanguage';
     var rt = function () {
       var t = o() || '';
-      return s[a] && (t = s[a](t)), t;
+      return (s[a] && (t = s[a](t)), t);
     };
     rt.displayName = 'angular-translate/service: getLocale';
     var it = function (t, e) {
@@ -8354,16 +8354,16 @@ angular
         if (t && !e) {
           if (angular.isString(t)) return q[t];
         } else
-          angular.isObject(q[t]) || (q[t] = {}), angular.extend(q[t], ut(e));
+          (angular.isObject(q[t]) || (q[t] = {}), angular.extend(q[t], ut(e)));
         return this;
       };
-    (this.translations = lt),
+    ((this.translations = lt),
       (this.cloakClassName = function (t) {
         return t ? ((Q = t), this) : Q;
       }),
       (this.nestedObjectDelimeter = function (t) {
         return t ? ((Z = t), this) : Z;
-      });
+      }));
     var ut = function (t, e, n, a) {
       var r, i, s;
       for (r in (e || (e = []), n || (n = {}), t))
@@ -8376,26 +8376,26 @@ angular
               (n[i] = s)));
       return n;
     };
-    (ut.displayName = 'flatObject'),
+    ((ut.displayName = 'flatObject'),
       (this.addInterpolation = function (t) {
-        return J.push(t), this;
+        return (J.push(t), this);
       }),
       (this.useMessageFormatInterpolation = function () {
         return this.useInterpolation('$translateMessageFormatInterpolation');
       }),
       (this.useInterpolation = function (t) {
-        return (R = t), this;
+        return ((R = t), this);
       }),
       (this.useSanitizeValueStrategy = function (t) {
-        return e.useStrategy(t), this;
+        return (e.useStrategy(t), this);
       }),
       (this.preferredLanguage = function (t) {
         return t ? (ct(t), this) : z;
-      });
+      }));
     var ct = function (t) {
-      return t && (z = t), z;
+      return (t && (z = t), z);
     };
-    (this.translationNotFoundIndicator = function (t) {
+    ((this.translationNotFoundIndicator = function (t) {
       return (
         this.translationNotFoundIndicatorLeft(t),
         this.translationNotFoundIndicatorRight(t),
@@ -8409,8 +8409,8 @@ angular
         return t ? ((M = t), this) : M;
       }),
       (this.fallbackLanguage = function (t) {
-        return ft(t), this;
-      });
+        return (ft(t), this);
+      }));
     var ft = function (t) {
       return t
         ? (angular.isString(t)
@@ -8422,7 +8422,7 @@ angular
           ? T[0]
           : T;
     };
-    (this.use = function (t) {
+    ((this.use = function (t) {
       if (t) {
         if (!q[t] && !D)
           throw new Error(
@@ -8430,17 +8430,17 @@ angular
               t +
               "'"
           );
-        return (F = t), this;
+        return ((F = t), this);
       }
       return F;
     }),
       (this.resolveClientLocale = function () {
         return rt();
-      });
+      }));
     var gt = function (t) {
       return t ? ((B = t), this) : n ? n + B : B;
     };
-    (this.storageKey = gt),
+    ((this.storageKey = gt),
       (this.useUrlLoader = function (t, e) {
         return this.useLoader(
           '$translateUrlLoader',
@@ -8451,7 +8451,7 @@ angular
         return this.useLoader('$translateStaticFilesLoader', t);
       }),
       (this.useLoader = function (t, e) {
-        return (D = t), (K = e || {}), this;
+        return ((D = t), (K = e || {}), this);
       }),
       (this.useLocalStorage = function () {
         return this.useStorage('$translateLocalStorage');
@@ -8460,7 +8460,7 @@ angular
         return this.useStorage('$translateCookieStorage');
       }),
       (this.useStorage = function (t) {
-        return (_ = t), this;
+        return ((_ = t), this);
       }),
       (this.storagePrefix = function (t) {
         return t ? ((n = t), this) : t;
@@ -8471,13 +8471,13 @@ angular
         );
       }),
       (this.useMissingTranslationHandler = function (t) {
-        return (V = t), this;
+        return ((V = t), this);
       }),
       (this.usePostCompiling = function (t) {
-        return (W = !!t), this;
+        return ((W = !!t), this);
       }),
       (this.forceAsyncReload = function (t) {
-        return (X = !!t), this;
+        return ((X = !!t), this);
       }),
       (this.uniformLanguageTag = function (t) {
         return (
@@ -8488,7 +8488,7 @@ angular
       }),
       (this.determinePreferredLanguage = function (t) {
         var e = t && angular.isFunction(t) ? t() : rt();
-        return (z = (Y.length && ot(e)) || e), this;
+        return ((z = (Y.length && ot(e)) || e), this);
       }),
       (this.registerAvailableLanguageKeys = function (t, e) {
         return t ? ((Y = t), e && (c = e), this) : Y;
@@ -8512,10 +8512,10 @@ angular
         return void 0 === t ? at : ((at = t), this);
       }),
       (this.postProcess = function (t) {
-        return (G = t || void 0), this;
+        return ((G = t || void 0), this);
       }),
       (this.keepContent = function (t) {
-        return (et = !!t), this;
+        return ((et = !!t), this);
       }),
       (this.$get = [
         '$log',
@@ -8541,9 +8541,9 @@ angular
                       n = function (e) {
                         var n = m.defer(),
                           t = function (t) {
-                            (a[e] = t), n.resolve([e, t]);
+                            ((a[e] = t), n.resolve([e, t]));
                           };
-                        return j(e, s, o, l, u, c).then(t, t), n.promise;
+                        return (j(e, s, o, l, u, c).then(t, t), n.promise);
                       },
                       r = 0,
                       i = t.length;
@@ -8564,41 +8564,43 @@ angular
                   var e = i.get(B);
                   if (((t = f[e]), T && T.length)) {
                     var n = it(T, e);
-                    ($ = 0 === n ? 1 : 0), it(T, z) < 0 && T.push(z);
+                    (($ = 0 === n ? 1 : 0), it(T, z) < 0 && T.push(z));
                   }
                 }
                 return t;
               })();
               if (n) {
                 var r = function () {
-                  u || (a = F), h(t, s, o, l, a, c).then(e.resolve, e.reject);
+                  (u || (a = F), h(t, s, o, l, a, c).then(e.resolve, e.reject));
                 };
-                (r.displayName = 'promiseResolved'),
-                  n.finally(r).catch(angular.noop);
+                ((r.displayName = 'promiseResolved'),
+                  n.finally(r).catch(angular.noop));
               } else h(t, s, o, l, a, c).then(e.resolve, e.reject);
               return e.promise;
             },
             w = function (t) {
               return (
-                U && (t = [U, t].join(' ')), M && (t = [t, M].join(' ')), t
+                U && (t = [U, t].join(' ')),
+                M && (t = [t, M].join(' ')),
+                t
               );
             },
             l = function (t) {
-              (F = t),
+              ((F = t),
                 _ && i.put(j.storageKey(), F),
                 s.$emit('$translateChangeSuccess', {language: t}),
-                b.setLocale(F);
+                b.setLocale(F));
               var e = function (t, e) {
                 L[e].setLocale(F);
               };
-              (e.displayName = 'eachInterpolatorLocaleSetter'),
+              ((e.displayName = 'eachInterpolatorLocaleSetter'),
                 angular.forEach(L, e),
-                s.$emit('$translateChangeEnd', {language: t});
+                s.$emit('$translateChangeEnd', {language: t}));
             },
             u = function (n) {
               if (!n) throw 'No language key specified for loading.';
               var a = m.defer();
-              s.$emit('$translateLoadingStart', {language: n}), (S = !0);
+              (s.$emit('$translateLoadingStart', {language: n}), (S = !0));
               var t = H;
               'string' == typeof t && (t = o.get(t));
               var e = angular.extend({}, K, {
@@ -8607,7 +8609,7 @@ angular
                 }),
                 r = function (t) {
                   var e = {};
-                  s.$emit('$translateLoadingSuccess', {language: n}),
+                  (s.$emit('$translateLoadingSuccess', {language: n}),
                     angular.isArray(t)
                       ? angular.forEach(t, function (t) {
                           angular.extend(e, ut(t));
@@ -8615,13 +8617,13 @@ angular
                       : angular.extend(e, ut(t)),
                     (S = !1),
                     a.resolve({key: n, table: e}),
-                    s.$emit('$translateLoadingEnd', {language: n});
+                    s.$emit('$translateLoadingEnd', {language: n}));
                 };
               r.displayName = 'onLoaderSuccess';
               var i = function (t) {
-                s.$emit('$translateLoadingError', {language: t}),
+                (s.$emit('$translateLoadingError', {language: t}),
                   a.reject(t),
-                  s.$emit('$translateLoadingEnd', {language: t});
+                  s.$emit('$translateLoadingEnd', {language: t}));
               };
               return (
                 (i.displayName = 'onLoaderError'),
@@ -8636,10 +8638,10 @@ angular
           if (J.length) {
             var e = function (t) {
               var e = o.get(t);
-              e.setLocale(z || F), (L[e.getInterpolationIdentifier()] = e);
+              (e.setLocale(z || F), (L[e.getInterpolationIdentifier()] = e));
             };
-            (e.displayName = 'interpolationFactoryAdder'),
-              angular.forEach(J, e);
+            ((e.displayName = 'interpolationFactoryAdder'),
+              angular.forEach(J, e));
           }
           var c = function (a, r, i, s, o) {
               var l = m.defer(),
@@ -8654,7 +8656,7 @@ angular
                       c(a, e.substr(2), i, s, o).then(l.resolve, l.reject);
                     else {
                       var n = s.interpolate(t[r], i, 'service', o, r);
-                      (n = O(r, t[r], n, i, a)), l.resolve(n);
+                      ((n = O(r, t[r], n, i, a)), l.resolve(n));
                     }
                     s.setLocale(F);
                   } else l.reject();
@@ -8667,10 +8669,10 @@ angular
                     e.resolve(q[t]);
                   else if (f[t]) {
                     var n = function (t) {
-                      lt(t.key, t.table), e.resolve(t.table);
+                      (lt(t.key, t.table), e.resolve(t.table));
                     };
-                    (n.displayName = 'translationTableResolver'),
-                      f[t].then(n, e.reject);
+                    ((n.displayName = 'translationTableResolver'),
+                      f[t].then(n, e.reject));
                   } else e.reject();
                   return e.promise;
                 })(a).then(t, l.reject),
@@ -8750,11 +8752,11 @@ angular
                   j(h.substr(2), e, n, a, r, i).then(f.resolve, f.reject);
                 else {
                   var d = p.interpolate(h, e, 'service', i, t);
-                  (d = O(t, h, d, e, r)), f.resolve(d);
+                  ((d = O(t, h, d, e, r)), f.resolve(d));
                 }
               } else {
                 var v;
-                V && !S && (v = C(t, e, a)),
+                (V && !S && (v = C(t, e, a)),
                   r && T && T.length
                     ? ((s = t),
                       (o = e),
@@ -8775,7 +8777,7 @@ angular
                         : f.resolve(v)
                       : a
                         ? f.resolve(a)
-                        : f.reject(w(t));
+                        : f.reject(w(t)));
               }
               return f.promise;
             },
@@ -8796,13 +8798,13 @@ angular
                     (i = O(t, l, i, e, a, r)));
               } else {
                 var u;
-                V && !S && (u = C(t, e, r)),
+                (V && !S && (u = C(t, e, r)),
                   (i =
                     a && T && T.length
                       ? p(($ = 0) < y ? y : $, t, e, o, r)
                       : V && !S && u
                         ? u
-                        : w(t));
+                        : w(t)));
               }
               return i;
             },
@@ -8817,11 +8819,11 @@ angular
                 !D ||
                 f[t] ||
                 (f[t] = u(t).then(function (t) {
-                  return lt(t.key, t.table), t;
+                  return (lt(t.key, t.table), t);
                 }));
             };
-          (j.preferredLanguage = function (t) {
-            return t && ct(t), z;
+          ((j.preferredLanguage = function (t) {
+            return (t && ct(t), z);
           }),
             (j.cloakClassName = function () {
               return Q;
@@ -8855,8 +8857,8 @@ angular
             (j.use = function (e) {
               if (!e) return F;
               var n = m.defer();
-              n.promise.then(null, angular.noop),
-                s.$emit('$translateChangeStart', {language: e});
+              (n.promise.then(null, angular.noop),
+                s.$emit('$translateChangeStart', {language: e}));
               var t = ot(e);
               return 0 < Y.length && !t
                 ? m.reject(e)
@@ -8866,7 +8868,11 @@ angular
                     ? f[e]
                       ? f[e].then(
                           function (t) {
-                            return I === t.key && l(t.key), n.resolve(t.key), t;
+                            return (
+                              I === t.key && l(t.key),
+                              n.resolve(t.key),
+                              t
+                            );
                           },
                           function (t) {
                             return !F && T && 0 < T.length && T[0] !== t
@@ -8896,7 +8902,7 @@ angular
                       f[e]
                         .finally(function () {
                           var t;
-                          I === (t = e) && (I = void 0), (f[t] = void 0);
+                          (I === (t = e) && (I = void 0), (f[t] = void 0));
                         })
                         .catch(angular.noop)),
                   n.promise);
@@ -8928,7 +8934,7 @@ angular
                 var t = u(e);
                 return (
                   (f[e] = t).then(function (t) {
-                    (q[e] = {}), lt(e, t.table), (n[e] = !0);
+                    ((q[e] = {}), lt(e, t.table), (n[e] = !0));
                   }, angular.noop),
                   t
                 );
@@ -8948,8 +8954,8 @@ angular
                 q[t] ? a(t).then(e.resolve, e.reject) : e.reject();
               else {
                 var r = (T && T.slice()) || [];
-                F && -1 === r.indexOf(F) && r.push(F),
-                  m.all(r.map(a)).then(e.resolve, e.reject);
+                (F && -1 === r.indexOf(F) && r.push(F),
+                  m.all(r.map(a)).then(e.resolve, e.reject));
               }
               return e.promise;
             }),
@@ -8966,9 +8972,9 @@ angular
               var u,
                 c,
                 f = [];
-              z && f.push(z),
+              (z && f.push(z),
                 i && f.push(i),
-                T && T.length && (f = f.concat(T));
+                T && T.length && (f = f.concat(T)));
               for (var g = 0, p = f.length; g < p; g++) {
                 var h = f[g];
                 if (
@@ -9000,9 +9006,9 @@ angular
             }),
             (j.isReady = function () {
               return tt;
-            });
+            }));
           var n = m.defer();
-          n.promise.then(function () {
+          (n.promise.then(function () {
             tt = !0;
           }),
             (j.onReady = function (t) {
@@ -9018,12 +9024,12 @@ angular
             }),
             (j.getTranslationTable = function (t) {
               return (t = t || j.use()) && q[t] ? angular.copy(q[t]) : null;
-            });
+            }));
           var a = s.$on('$translateReady', function () {
-              n.resolve(), a(), (a = null);
+              (n.resolve(), a(), (a = null));
             }),
             r = s.$on('$translateChangeEnd', function () {
-              n.resolve(), r(), (r = null);
+              (n.resolve(), r(), (r = null));
             });
           if (D) {
             if (
@@ -9049,7 +9055,7 @@ angular
           } else s.$emit('$translateReady', {language: j.use()});
           return j;
         },
-      ]);
+      ]));
   }
   function n(s, o) {
     'use strict';
@@ -9062,7 +9068,7 @@ angular
         return 'default';
       }),
       (t.useSanitizeValueStrategy = function (t) {
-        return o.useStrategy(t), this;
+        return (o.useStrategy(t), this);
       }),
       (t.interpolate = function (t, e, n, a, r) {
         var i;
@@ -9099,13 +9105,13 @@ angular
           y = '^(.*)(' + L.startSymbol() + '.*' + L.endSymbol() + ')(.*)',
           b = '^(.*)' + L.startSymbol() + '(.*)' + L.endSymbol() + '(.*)';
         return function (r, l, u) {
-          (r.interpolateParams = {}),
+          ((r.interpolateParams = {}),
             (r.preText = ''),
             (r.postText = ''),
             (r.translateNamespace = (function t(e) {
               if (e.translateNamespace) return e.translateNamespace;
               if (e.$parent) return t(e.$parent);
-            })(r));
+            })(r)));
           var i = {},
             s = function (t) {
               if (
@@ -9118,15 +9124,15 @@ angular
                   }.apply(l.text()),
                   n = e.match(y);
                 if (angular.isArray(n)) {
-                  (r.preText = n[1]),
+                  ((r.preText = n[1]),
                     (r.postText = n[3]),
-                    (i.translate = L(n[2])(r.$parent));
+                    (i.translate = L(n[2])(r.$parent)));
                   var a = e.match(b);
                   angular.isArray(a) &&
                     a[2] &&
                     a[2].length &&
                     (s._unwatchOld = r.$watch(a[2], function (t) {
-                      (i.translate = t), c();
+                      ((i.translate = t), c());
                     }));
                 } else i.translate = e || void 0;
               } else i.translate = t;
@@ -9134,7 +9140,7 @@ angular
             },
             t = function (e) {
               u.$observe(e, function (t) {
-                (i[e] = t), c();
+                ((i[e] = t), c());
               });
             };
           !(function (t, e, n) {
@@ -9151,8 +9157,8 @@ angular
           })(r.interpolateParams, u, h);
           var e = !0;
           for (var n in (u.$observe('translate', function (t) {
-            void 0 === t ? s('') : ('' === t && e) || ((i.translate = t), c()),
-              (e = !1);
+            (void 0 === t ? s('') : ('' === t && e) || ((i.translate = t), c()),
+              (e = !1));
           }),
           u))
             u.hasOwnProperty(n) &&
@@ -9161,11 +9167,11 @@ angular
               t(n);
           if (
             (u.$observe('translateDefault', function (t) {
-              (r.defaultText = t), c();
+              ((r.defaultText = t), c());
             }),
             m &&
               u.$observe('translateSanitizeStrategy', function (t) {
-                (r.sanitizeStrategy = w(t)(r.$parent)), c();
+                ((r.sanitizeStrategy = w(t)(r.$parent)), c());
               }),
             d &&
               u.$observe('translateValues', function (t) {
@@ -9230,22 +9236,22 @@ angular
                 ((r && !i) || s) && j(l.contents())(e);
               } else {
                 var o = u.$attr[a];
-                'data-' === o.substr(0, 5) && (o = o.substr(5)),
+                ('data-' === o.substr(0, 5) && (o = o.substr(5)),
                   (o = o.substr(15)),
-                  l.attr(o, t);
+                  l.attr(o, t));
               }
             };
-          (d || $ || u.translateDefault) &&
+          ((d || $ || u.translateDefault) &&
             r.$watch('interpolateParams', c, !0),
-            r.$on('translateLanguageChanged', c);
+            r.$on('translateLanguageChanged', c));
           var p = C.$on('$translateChangeSuccess', c);
-          l.text().length
+          (l.text().length
             ? u.translate
               ? s(u.translate)
               : s('')
             : u.translate && s(u.translate),
             c(),
-            r.$on('$destroy', p);
+            r.$on('$destroy', p));
         };
       },
     };
@@ -9261,7 +9267,7 @@ angular
           o,
           l = {},
           t = function () {
-            angular.forEach(i, function (t, e) {
+            (angular.forEach(i, function (t, e) {
               t &&
                 ((l[e] = !0),
                 n.translateNamespace &&
@@ -9285,9 +9291,9 @@ angular
             }),
               angular.forEach(l, function (t, e) {
                 i[e] || (a.removeAttr(e), delete l[e]);
-              });
+              }));
           };
-        f(
+        (f(
           n,
           r.translateAttr,
           function (t) {
@@ -9312,9 +9318,9 @@ angular
             t
           ),
           r.translateValues && n.$watch(r.translateValues, t, !0),
-          n.$on('translateLanguageChanged', t);
+          n.$on('translateLanguageChanged', t));
         var e = c.$on('$translateChangeSuccess', t);
-        t(), n.$on('$destroy', e);
+        (t(), n.$on('$destroy', e));
       },
     };
   }
@@ -9326,7 +9332,7 @@ angular
         : t.$watch(
             e,
             function (t) {
-              n(t), a();
+              (n(t), a());
             },
             !0
           ),
@@ -9367,13 +9373,13 @@ angular
       compile: function () {
         return {
           pre: function (t, e, n) {
-            (t.translateNamespace = (function t(e) {
+            ((t.translateNamespace = (function t(e) {
               if (e.translateNamespace) return e.translateNamespace;
               if (e.$parent) return t(e.$parent);
             })(t)),
               t.translateNamespace && '.' === n.translateNamespace.charAt(0)
                 ? (t.translateNamespace += n.translateNamespace)
-                : (t.translateNamespace = n.translateNamespace);
+                : (t.translateNamespace = n.translateNamespace));
           },
         };
       },
@@ -9386,12 +9392,12 @@ angular
       scope: !0,
       compile: function () {
         return function (e, t, n) {
-          n.$observe('translateLanguage', function (t) {
+          (n.$observe('translateLanguage', function (t) {
             e.translateLanguage = t;
           }),
             e.$watch('translateLanguage', function () {
               e.$broadcast('translateLanguageChanged');
-            });
+            }));
         };
       },
     };
@@ -9408,7 +9414,7 @@ angular
       }
       return s.instant(t, e, n, a);
     };
-    return s.statefulFilter() && (t.$stateful = !0), t;
+    return (s.statefulFilter() && (t.$stateful = !0), t);
   }
   function u(t) {
     'use strict';
@@ -9446,18 +9452,18 @@ angular
           p = null,
           h = !1,
           d = !1;
-        ((g = {
+        (((g = {
           sanitize: function (t, e) {
-            return 'text' === e && (t = i(t)), t;
+            return ('text' === e && (t = i(t)), t);
           },
           escape: function (t, e) {
-            return 'text' === e && (t = r(t)), t;
+            return ('text' === e && (t = r(t)), t);
           },
           sanitizeParameters: function (t, e) {
-            return 'params' === e && (t = o(t, i)), t;
+            return ('params' === e && (t = o(t, i)), t);
           },
           escapeParameters: function (t, e) {
-            return 'params' === e && (t = o(t, r)), t;
+            return ('params' === e && (t = o(t, r)), t);
           },
           sce: function (t, e, n) {
             return (
@@ -9468,17 +9474,17 @@ angular
             );
           },
           sceParameters: function (t, e) {
-            return 'params' === e && (t = o(t, s)), t;
+            return ('params' === e && (t = o(t, s)), t);
           },
         }).escaped = g.escapeParameters),
           (this.addStrategy = function (t, e) {
-            return (g[t] = e), this;
+            return ((g[t] = e), this);
           }),
           (this.removeStrategy = function (t) {
-            return delete g[t], this;
+            return (delete g[t], this);
           }),
           (this.useStrategy = function (t) {
-            return (h = !0), (p = t), this;
+            return ((h = !0), (p = t), this);
           }),
           (this.$get = [
             '$injector',
@@ -9534,12 +9540,12 @@ angular
                               f[g[e]] = u.get(g[e]);
                             } catch (t) {
                               throw (
-                                ((f[g[e]] = function () {}),
+                                (f[g[e]] = function () {}),
                                 new Error(
                                   "pascalprecht.translate.$translateSanitization: Unknown sanitization strategy: '" +
                                     e +
                                     "'"
-                                ))
+                                )
                               );
                             }
                           r = f[g[e]](r, i, s);
@@ -9551,10 +9557,10 @@ angular
                 }
               );
             },
-          ]);
+          ]));
         var r = function (t) {
             var e = angular.element('<div></div>');
-            return e.text(t), e.html();
+            return (e.text(t), e.html());
           },
           i = function (t) {
             if (!n)
@@ -9808,12 +9814,12 @@ angular
     r = 'application/json',
     t = 'Text',
     d = ['move', 'copy', 'link'];
-  e.directive('dndDraggable', [
+  (e.directive('dndDraggable', [
     '$parse',
     '$timeout',
     function (e, i) {
       return function (l, f, c) {
-        f.attr('draggable', 'true'),
+        (f.attr('draggable', 'true'),
           c.dndDisableIf &&
             l.$watch(c.dndDisableIf, function (e) {
               f.attr('draggable', !e);
@@ -9821,11 +9827,11 @@ angular
           f.on('dragstart', function (s) {
             if (((s = s.originalEvent || s), 'false' == f.attr('draggable')))
               return !0;
-            (o.isDragging = !0),
+            ((o.isDragging = !0),
               (o.itemType = c.dndType && l.$eval(c.dndType).toLowerCase()),
               (o.dropEffect = 'none'),
               (o.effectAllowed = c.dndEffectAllowed || d[0]),
-              (s.dataTransfer.effectAllowed = o.effectAllowed);
+              (s.dataTransfer.effectAllowed = o.effectAllowed));
             var g = l.$eval(c.dndDraggable),
               u = a + (o.itemType ? '-' + o.itemType : '');
             try {
@@ -9836,8 +9842,8 @@ angular
                 s.dataTransfer.setData(r, v);
               } catch (p) {
                 var D = n(d, o.effectAllowed);
-                (s.dataTransfer.effectAllowed = D[0]),
-                  s.dataTransfer.setData(t, v);
+                ((s.dataTransfer.effectAllowed = D[0]),
+                  s.dataTransfer.setData(t, v));
               }
             }
             if (
@@ -9859,7 +9865,7 @@ angular
             s.stopPropagation();
           }),
           f.on('dragend', function (n) {
-            (n = n.originalEvent || n),
+            ((n = n.originalEvent || n),
               l.$apply(function () {
                 var a = o.dropEffect,
                   r = {
@@ -9868,8 +9874,8 @@ angular
                     move: 'dndMoved',
                     none: 'dndCanceled',
                   };
-                e(c[r[a]])(l, {event: n}),
-                  e(c.dndDragend)(l, {event: n, dropEffect: a});
+                (e(c[r[a]])(l, {event: n}),
+                  e(c.dndDragend)(l, {event: n, dropEffect: a}));
               }),
               (o.isDragging = !1),
               (o.callback = void 0),
@@ -9878,7 +9884,7 @@ angular
               n.stopPropagation(),
               i(function () {
                 f.removeClass('dndDraggingSource');
-              }, 0);
+              }, 0));
           }),
           f.on('click', function (n) {
             c.dndSelected &&
@@ -9890,7 +9896,7 @@ angular
           }),
           f.on('selectstart', function () {
             this.dragDrop && this.dragDrop();
-          });
+          }));
       };
     },
   ]),
@@ -9937,7 +9943,7 @@ angular
             );
           }
           function p() {
-            return T.remove(), l.removeClass('dndDragover'), !0;
+            return (T.remove(), l.removeClass('dndDragover'), !0);
           }
           function v(n, a, r, t, d, l) {
             return e(n)(i, {
@@ -9968,7 +9974,7 @@ angular
           var h = T[0],
             m = l[0],
             E = {};
-          l.on('dragenter', function (e) {
+          (l.on('dragenter', function (e) {
             e = e.originalEvent || e;
             var n = f.dndAllowedTypes && i.$eval(f.dndAllowedTypes);
             E = {
@@ -10046,33 +10052,33 @@ angular
               e = e.originalEvent || e;
               var n = document.elementFromPoint(e.clientX, e.clientY);
               m.contains(n) && !e._dndPhShown ? (e._dndPhShown = !0) : p();
-            });
+            }));
         };
       },
     ]),
     e.directive('dndNodrag', function () {
       return function (e, n, a) {
-        n.attr('draggable', 'true'),
+        (n.attr('draggable', 'true'),
           n.on('dragstart', function (e) {
-            (e = e.originalEvent || e),
+            ((e = e.originalEvent || e),
               e._dndHandle ||
                 ((e.dataTransfer.types && e.dataTransfer.types.length) ||
                   e.preventDefault(),
-                e.stopPropagation());
+                e.stopPropagation()));
           }),
           n.on('dragend', function (e) {
-            (e = e.originalEvent || e), e._dndHandle || e.stopPropagation();
-          });
+            ((e = e.originalEvent || e), e._dndHandle || e.stopPropagation());
+          }));
       };
     }),
     e.directive('dndHandle', function () {
       return function (e, n, a) {
-        n.attr('draggable', 'true'),
+        (n.attr('draggable', 'true'),
           n.on('dragstart dragend', function (e) {
-            (e = e.originalEvent || e), (e._dndHandle = !0);
-          });
+            ((e = e.originalEvent || e), (e._dndHandle = !0));
+          }));
       };
-    });
+    }));
   var o = {};
 })(angular.module('dndLists', []));
 /*!
@@ -16889,10 +16895,10 @@ angular
         return 'messageformat';
       }),
       (a.useSanitizeValueStrategy = function (t) {
-        return u.useStrategy(t), this;
+        return (u.useStrategy(t), this);
       }),
       (a.interpolate = function (t, e, n, a) {
-        (e = e || {}), (e = u.sanitize(e, 'params', a));
+        ((e = e || {}), (e = u.sanitize(e, 'params', a)));
         var r = c.get('mf:' + t);
         if (!r) {
           for (var i in e)
@@ -16900,7 +16906,7 @@ angular
               var o = parseInt(e[i], 10);
               angular.isNumber(o) && '' + o === e[i] && (e[i] = o);
             }
-          (r = f.compile(t)), c.put('mf:' + t, r);
+          ((r = f.compile(t)), c.put('mf:' + t, r));
         }
         var s = r(e);
         return u.sanitize(s, 'text', a);
@@ -16918,7 +16924,7 @@ angular
       .provider('$translateMessageFormatInterpolation', function () {
         'use strict';
         var a;
-        (this.messageFormatConfigurer = function (t) {
+        ((this.messageFormatConfigurer = function (t) {
           a = t;
         }),
           (this.$get = [
@@ -16928,13 +16934,13 @@ angular
             function (t, e, n) {
               return i(t, e, n, a);
             },
-          ]);
+          ]));
       }),
     (i.displayName = '$translateMessageFormatInterpolation'),
     'pascalprecht.translate'
   );
 });
-!(function () {
+(!(function () {
   'use strict';
   function t(t, e, s, n, o, r, a) {
     function i() {
@@ -16974,13 +16980,13 @@ angular
         ((i.deleting = !0),
         (i.isOpened = !1),
         t.leave(i.el).then(function () {
-          i.scope.options.onHidden && i.scope.options.onHidden(!!s, i),
-            i.scope.$destroy();
+          (i.scope.options.onHidden && i.scope.options.onHidden(!!s, i),
+            i.scope.$destroy());
           var t = w.indexOf(i);
-          delete B[i.scope.message], w.splice(t, 1);
+          (delete B[i.scope.message], w.splice(t, 1));
           var e = r.maxOpened;
-          e && w.length >= e && w[e - 1].open.resolve(),
-            o() && (C.remove(), (C = null), (x = a.defer()));
+          (e && w.length >= e && w[e - 1].open.resolve(),
+            o() && (C.remove(), (C = null), (x = a.defer())));
         }));
     }
     function m(t, e, s, n) {
@@ -16994,10 +17000,10 @@ angular
     }
     function v(e) {
       if (C) return x.promise;
-      (C = angular.element('<div></div>')),
+      ((C = angular.element('<div></div>')),
         C.attr('id', e.containerId),
         C.addClass(e.positionClass),
-        C.css({'pointer-events': 'auto'});
+        C.css({'pointer-events': 'auto'}));
       var s = angular.element(document.querySelector(e.target));
       if (!s || !s.length) throw "Target for toasts doesn't exist";
       return (
@@ -17019,7 +17025,7 @@ angular
               }
             : void 0;
         }
-        s.allowHtml
+        (s.allowHtml
           ? ((t.scope.allowHtml = !0),
             (t.scope.title = o.trustAsHtml(e.title)),
             (t.scope.message = o.trustAsHtml(e.message)))
@@ -17039,7 +17045,7 @@ angular
             titleClass: s.titleClass,
             toastClass: s.toastClass,
           }),
-          s.closeButton && (t.scope.options.closeHtml = s.closeHtml);
+          s.closeButton && (t.scope.options.closeHtml = s.closeHtml));
       }
       function l() {
         function t(t) {
@@ -17133,7 +17139,7 @@ angular
       };
     return $;
   }
-  angular.module('toastr', []).factory('toastr', t),
+  (angular.module('toastr', []).factory('toastr', t),
     (t.$inject = [
       '$animate',
       '$injector',
@@ -17142,7 +17148,7 @@ angular
       '$sce',
       'toastrConfig',
       '$q',
-    ]);
+    ]));
 })(),
   (function () {
     'use strict';
@@ -17189,19 +17195,19 @@ angular
           e.css('width', t + '%');
         }
         var r, a, i;
-        (n.progressBar = t),
+        ((n.progressBar = t),
           (t.start = function (t) {
-            r && clearInterval(r),
+            (r && clearInterval(r),
               (a = parseFloat(t)),
               (i = new Date().getTime() + a),
-              (r = setInterval(o, 10));
+              (r = setInterval(o, 10)));
           }),
           (t.stop = function () {
             r && clearInterval(r);
           }),
           t.$on('$destroy', function () {
             clearInterval(r);
-          });
+          }));
       }
       return {
         replace: !0,
@@ -17212,19 +17218,19 @@ angular
         link: e,
       };
     }
-    angular.module('toastr').directive('progressBar', t),
-      (t.$inject = ['toastrConfig']);
+    (angular.module('toastr').directive('progressBar', t),
+      (t.$inject = ['toastrConfig']));
   })(),
   (function () {
     'use strict';
     function t() {
-      (this.progressBar = null),
+      ((this.progressBar = null),
         (this.startProgressBar = function (t) {
           this.progressBar && this.progressBar.start(t);
         }),
         (this.stopProgressBar = function () {
           this.progressBar && this.progressBar.stop();
-        });
+        }));
     }
     angular.module('toastr').controller('ToastController', t);
   })(),
@@ -17237,7 +17243,7 @@ angular
             a.startProgressBar(t),
             e(
               function () {
-                a.stopProgressBar(), n.remove(s.toastId);
+                (a.stopProgressBar(), n.remove(s.toastId));
               },
               t,
               1
@@ -17245,7 +17251,7 @@ angular
           );
         }
         function l() {
-          (s.progressBar = !1), a.stopProgressBar();
+          ((s.progressBar = !1), a.stopProgressBar());
         }
         function c() {
           return s.options.closeHtml;
@@ -17260,25 +17266,25 @@ angular
         ) {
           var p = angular.element(s.options.closeHtml),
             g = t.get('$compile');
-          p.addClass('toast-close-button'),
+          (p.addClass('toast-close-button'),
             p.attr('ng-click', 'close(true, $event)'),
             g(p)(s),
-            o.prepend(p);
+            o.prepend(p));
         }
-        (s.init = function () {
-          s.options.timeOut && (u = i(s.options.timeOut)),
-            s.options.onShown && s.options.onShown();
+        ((s.init = function () {
+          (s.options.timeOut && (u = i(s.options.timeOut)),
+            s.options.onShown && s.options.onShown());
         }),
           o.on('mouseenter', function () {
-            l(), u && e.cancel(u);
+            (l(), u && e.cancel(u));
           }),
           (s.tapToast = function () {
-            angular.isFunction(s.options.onTap) && s.options.onTap(),
-              s.options.tapToDismiss && s.close(!0);
+            (angular.isFunction(s.options.onTap) && s.options.onTap(),
+              s.options.tapToDismiss && s.close(!0));
           }),
           (s.close = function (t, e) {
-            e && angular.isFunction(e.stopPropagation) && e.stopPropagation(),
-              n.remove(s.toastId, t);
+            (e && angular.isFunction(e.stopPropagation) && e.stopPropagation(),
+              n.remove(s.toastId, t));
           }),
           o.on('mouseleave', function () {
             (0 !== s.options.timeOut || 0 !== s.options.extendedTimeOut) &&
@@ -17286,7 +17292,7 @@ angular
                 s.progressBar = s.options.progressBar;
               }),
               (u = i(s.options.extendedTimeOut)));
-          });
+          }));
       }
       return {
         replace: !0,
@@ -17297,22 +17303,22 @@ angular
         link: o,
       };
     }
-    angular.module('toastr').directive('toast', t),
-      (t.$inject = ['$injector', '$interval', 'toastrConfig', 'toastr']);
+    (angular.module('toastr').directive('toast', t),
+      (t.$inject = ['$injector', '$interval', 'toastrConfig', 'toastr']));
   })(),
   angular.module('toastr').run([
     '$templateCache',
     function (t) {
-      t.put(
+      (t.put(
         'directives/progressbar/progressbar.html',
         '<div class="toast-progress"></div>\n'
       ),
         t.put(
           'directives/toast/toast.html',
           '<div class="{{toastClass}} {{toastType}}" ng-click="tapToast()">\n  <div ng-switch on="allowHtml">\n    <div ng-switch-default ng-if="title" class="{{titleClass}}" aria-label="{{title}}">{{title}}</div>\n    <div ng-switch-default class="{{messageClass}}" aria-label="{{message}}">{{message}}</div>\n    <div ng-switch-when="true" ng-if="title" class="{{titleClass}}" ng-bind-html="title"></div>\n    <div ng-switch-when="true" class="{{messageClass}}" ng-bind-html="message"></div>\n  </div>\n  <progress-bar ng-if="progressBar"></progress-bar>\n</div>\n'
-        );
+        ));
     },
-  ]); /*!
+  ])); /*!
  * Bootstrap v3.3.4 (http://getbootstrap.com)
  * Copyright 2011-2015 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
@@ -19884,14 +19890,14 @@ if (typeof jQuery === 'undefined') {
   function t() {
     'use strict';
     function a(t, e, r) {
-      (this.name = t),
+      ((this.name = t),
         (this.isActive = !0),
         (this.tables = {}),
         (this.priority = e || 0),
         (this.langPromises = {}),
-        (this.urlTemplate = r);
+        (this.urlTemplate = r));
     }
-    (a.prototype.parseUrl = function (t, e) {
+    ((a.prototype.parseUrl = function (t, e) {
       return angular.isFunction(t)
         ? t(this.name, e)
         : t.replace(/\{part\}/g, this.name).replace(/\{lang\}/g, e);
@@ -19901,7 +19907,7 @@ if (typeof jQuery === 'undefined') {
           s = this.langPromises[e],
           l = t.defer(),
           u = function (t) {
-            (o.tables[e] = t), l.resolve(t);
+            ((o.tables[e] = t), l.resolve(t));
           },
           c = function () {
             l.reject(o.name);
@@ -19928,7 +19934,7 @@ if (typeof jQuery === 'undefined') {
               (this.langPromises[e] = l.promise)),
           l.promise
         );
-      });
+      }));
     var n = {};
     function i(t) {
       return Object.prototype.hasOwnProperty.call(n, t);
@@ -19953,10 +19959,10 @@ if (typeof jQuery === 'undefined') {
         t
       );
     }
-    (this.addPart = function (t, e, r) {
+    ((this.addPart = function (t, e, r) {
       if (!f(t))
         throw new TypeError("Couldn't add part, part name has to be a string!");
-      return i(t) || (n[t] = new a(t, e, r)), (n[t].isActive = !0), this;
+      return (i(t) || (n[t] = new a(t, e, r)), (n[t].isActive = !0), this);
     }),
       (this.setPart = function (t, e, r) {
         if (!f(t))
@@ -19982,7 +19988,7 @@ if (typeof jQuery === 'undefined') {
           throw new TypeError(
             "Couldn't delete part, first arg has to be string."
           );
-        return i(t) && (n[t].isActive = !1), this;
+        return (i(t) && (n[t].isActive = !1), this);
       }),
       (this.isPartAvailable = t),
       (this.$get = [
@@ -20012,8 +20018,8 @@ if (typeof jQuery === 'undefined') {
             var a = [],
               t = d();
             angular.forEach(t, function (t) {
-              a.push(t.getTable(r.key, l, u, r.$http, r.urlTemplate, e)),
-                (t.urlTemplate = t.urlTemplate || r.urlTemplate);
+              (a.push(t.getTable(r.key, l, u, r.$http, r.urlTemplate, e)),
+                (t.urlTemplate = t.urlTemplate || r.urlTemplate));
             });
             var n = !1,
               i = o.$on('$translatePartialLoaderStructureChanged', function () {
@@ -20023,7 +20029,7 @@ if (typeof jQuery === 'undefined') {
               function () {
                 if ((i(), n)) {
                   if (!r.__retries)
-                    return (r.__retries = (r.__retries || 0) + 1), p(r);
+                    return ((r.__retries = (r.__retries || 0) + 1), p(r));
                   c.warn(
                     'The partial loader has detected a multiple structure change (with addPort/removePart) while loading translations. You should consider using promises of $translate.use(lang) and $translate.refresh(). Also parts should be added/removed right before an explicit refresh if possible.'
                   );
@@ -20044,7 +20050,7 @@ if (typeof jQuery === 'undefined') {
                 );
               },
               function () {
-                return i(), l.reject(r.key);
+                return (i(), l.reject(r.key));
               }
             );
           };
@@ -20078,12 +20084,12 @@ if (typeof jQuery === 'undefined') {
                 var e = n[r].isActive;
                 if (t) {
                   var a = s.get('$translate').loaderCache();
-                  'string' == typeof a && (a = s.get(a)),
+                  ('string' == typeof a && (a = s.get(a)),
                     'object' == typeof a &&
                       angular.forEach(n[r].tables, function (t, e) {
                         a.remove(n[r].parseUrl(n[r].urlTemplate, e));
                       }),
-                    delete n[r];
+                    delete n[r]);
                 } else n[r].isActive = !1;
                 e && o.$emit('$translatePartialLoaderStructureChanged', r);
               }
@@ -20107,7 +20113,7 @@ if (typeof jQuery === 'undefined') {
             p
           );
         },
-      ]);
+      ]));
   }
   return (
     angular
@@ -62158,9 +62164,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return t;
   }
   function g(t, n, e) {
-    (t = +t),
+    ((t = +t),
       (n = +n),
-      (e = (i = arguments.length) < 2 ? ((n = t), (t = 0), 1) : i < 3 ? 1 : +e);
+      (e =
+        (i = arguments.length) < 2 ? ((n = t), (t = 0), 1) : i < 3 ? 1 : +e));
     for (
       var r = -1, i = 0 | Math.max(0, Math.ceil((n - t) / e)), o = new Array(i);
       ++r < i;
@@ -62202,7 +62209,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
 
       )
         o[u] = (t - u) / a;
-    return r && o.reverse(), o;
+    return (r && o.reverse(), o);
   }
   function x(t, n, e) {
     var r = (n - t) / Math.max(0, e),
@@ -62341,7 +62348,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         M = x.enter().append('g').attr('class', 'tick'),
         N = x.select('line'),
         A = x.select('text');
-      (m = m.merge(
+      ((m = m.merge(
         m
           .enter()
           .insert('path', '.tick')
@@ -62401,14 +62408,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           .attr('text-anchor', t === R ? 'start' : t === q ? 'end' : 'middle'),
         b.each(function () {
           this.__axis = _;
-        });
+        }));
     }
     return (
       (l.scale = function (t) {
         return arguments.length ? ((n = t), l) : n;
       }),
       (l.ticks = function () {
-        return (e = C.call(arguments)), l;
+        return ((e = C.call(arguments)), l);
       }),
       (l.tickArguments = function (t) {
         return arguments.length
@@ -62457,10 +62464,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function X(t, n, e) {
     for (var r = 0, i = t.length; r < i; ++r)
       if (t[r].name === n) {
-        (t[r] = F), (t = t.slice(0, r).concat(t.slice(r + 1)));
+        ((t[r] = F), (t = t.slice(0, r).concat(t.slice(r + 1))));
         break;
       }
-    return null != e && t.push({name: n, value: e}), t;
+    return (null != e && t.push({name: n, value: e}), t);
   }
   j.prototype = I.prototype = {
     constructor: j,
@@ -62579,11 +62586,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return new Array(t.length);
   }
   function et(t, n) {
-    (this.ownerDocument = t.ownerDocument),
+    ((this.ownerDocument = t.ownerDocument),
       (this.namespaceURI = t.namespaceURI),
       (this._next = null),
       (this._parent = t),
-      (this.__data__ = n);
+      (this.__data__ = n));
   }
   et.prototype = {
     constructor: et,
@@ -62647,7 +62654,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return t.classList || new lt(t);
   }
   function lt(t) {
-    (this._node = t), (this._names = ft(t.getAttribute('class') || ''));
+    ((this._node = t), (this._names = ft(t.getAttribute('class') || '')));
   }
   function ht(t, n) {
     for (var e = st(t), r = -1, i = n.length; ++r < i; ) e.add(n[r]);
@@ -62727,10 +62734,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       var n = this.__on;
       if (n) {
         for (var e, r = 0, i = -1, o = n.length; r < o; ++r)
-          (e = n[r]),
+          ((e = n[r]),
             (t.type && e.type !== t.type) || e.name !== t.name
               ? (n[++i] = e)
-              : this.removeEventListener(e.type, e.listener, e.capture);
+              : this.removeEventListener(e.type, e.listener, e.capture));
         ++i ? (n.length = i) : delete this.__on;
       }
     };
@@ -62749,14 +62756,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               this.addEventListener(u.type, (u.listener = f), (u.capture = e)),
               void (u.value = n)
             );
-      this.addEventListener(t.type, f, e),
+      (this.addEventListener(t.type, f, e),
         (u = {type: t.type, name: t.name, value: n, listener: f, capture: e}),
-        c ? c.push(u) : (this.__on = [u]);
+        c ? c.push(u) : (this.__on = [u]));
     };
   }
   function St(n, e, r, i) {
     var o = t.event;
-    (n.sourceEvent = t.event), (t.event = n);
+    ((n.sourceEvent = t.event), (t.event = n));
     try {
       return e.apply(r, i);
     } finally {
@@ -62766,17 +62773,17 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function kt(t, n, e) {
     var r = ut(t),
       i = r.CustomEvent;
-    'function' == typeof i
+    ('function' == typeof i
       ? (i = new i(n, e))
       : ((i = r.document.createEvent('Event')),
         e
           ? (i.initEvent(n, e.bubbles, e.cancelable), (i.detail = e.detail))
           : i.initEvent(n, !1, !1)),
-      t.dispatchEvent(i);
+      t.dispatchEvent(i));
   }
   var Et = [null];
   function Ct(t, n) {
-    (this._groups = t), (this._parents = n);
+    ((this._groups = t), (this._parents = n));
   }
   function Pt() {
     return new Ct([[document.documentElement]], Et);
@@ -62869,7 +62876,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             _._next = b || null;
           }
       }
-      return ((u = new Ct(u, i))._enter = c), (u._exit = f), u;
+      return (((u = new Ct(u, i))._enter = c), (u._exit = f), u);
     },
     enter: function () {
       return new Ct(this._enter || this._groups.map(nt), this._parents);
@@ -62946,7 +62953,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     },
     call: function () {
       var t = arguments[0];
-      return (arguments[0] = this), t.apply(null, arguments), this;
+      return ((arguments[0] = this), t.apply(null, arguments), this);
     },
     nodes: function () {
       var t = new Array(this.size()),
@@ -63254,7 +63261,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   }
   function Ot(t) {
     var n = Lt();
-    return n.changedTouches && (n = n.changedTouches[0]), Ut(t, n);
+    return (n.changedTouches && (n = n.changedTouches[0]), Ut(t, n));
   }
   function Bt(t, n, e) {
     arguments.length < 3 && ((e = n), (n = Lt().changedTouches));
@@ -63266,7 +63273,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     t.event.stopImmediatePropagation();
   }
   function Ft() {
-    t.event.preventDefault(), t.event.stopImmediatePropagation();
+    (t.event.preventDefault(), t.event.stopImmediatePropagation());
   }
   function It(t) {
     var n = t.document.documentElement,
@@ -63279,14 +63286,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function jt(t, n) {
     var e = t.document.documentElement,
       r = zt(t).on('dragstart.drag', null);
-    n &&
+    (n &&
       (r.on('click.drag', Ft, !0),
       setTimeout(function () {
         r.on('click.drag', null);
       }, 0)),
       'onselectstart' in e
         ? r.on('selectstart.drag', null)
-        : ((e.style.MozUserSelect = e.__noselect), delete e.__noselect);
+        : ((e.style.MozUserSelect = e.__noselect), delete e.__noselect));
   }
   function Ht(t) {
     return function () {
@@ -63294,7 +63301,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     };
   }
   function Xt(t, n, e, r, i, o, a, u, c, f) {
-    (this.target = t),
+    ((this.target = t),
       (this.type = n),
       (this.subject = e),
       (this.identifier = r),
@@ -63303,7 +63310,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       (this.y = a),
       (this.dx = u),
       (this.dy = c),
-      (this._ = f);
+      (this._ = f));
   }
   function Gt() {
     return !t.event.button;
@@ -63318,7 +63325,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return 'ontouchstart' in this;
   }
   function Zt(t, n, e) {
-    (t.prototype = n.prototype = e), (e.constructor = t);
+    ((t.prototype = n.prototype = e), (e.constructor = t));
   }
   function Qt(t, n) {
     var e = Object.create(t.prototype);
@@ -63326,7 +63333,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return e;
   }
   function Jt() {}
-  (qt.prototype = Dt.prototype =
+  ((qt.prototype = Dt.prototype =
     {
       constructor: qt,
       get: function (t) {
@@ -63346,7 +63353,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     (Xt.prototype.on = function () {
       var t = this._.on.apply(this._, arguments);
       return t === this._ ? this : t;
-    });
+    }));
   var Kt = '\\s*([+-]?\\d+)\\s*',
     tn = '\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)\\s*',
     nn = '\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)%\\s*',
@@ -63554,7 +63561,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return new yn((t >> 16) & 255, (t >> 8) & 255, 255 & t, 1);
   }
   function pn(t, n, e, r) {
-    return r <= 0 && (t = n = e = NaN), new yn(t, n, e, r);
+    return (r <= 0 && (t = n = e = NaN), new yn(t, n, e, r));
   }
   function vn(t) {
     return (
@@ -63566,7 +63573,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return 1 === arguments.length ? vn(t) : new yn(t, n, e, null == r ? 1 : r);
   }
   function yn(t, n, e, r) {
-    (this.r = +t), (this.g = +n), (this.b = +e), (this.opacity = +r);
+    ((this.r = +t), (this.g = +n), (this.b = +e), (this.opacity = +r));
   }
   function _n(t) {
     return (
@@ -63615,7 +63622,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       : new xn(t, n, e, null == r ? 1 : r);
   }
   function xn(t, n, e, r) {
-    (this.h = +t), (this.s = +n), (this.l = +e), (this.opacity = +r);
+    ((this.h = +t), (this.s = +n), (this.l = +e), (this.opacity = +r));
   }
   function wn(t, n, e) {
     return (
@@ -63629,7 +63636,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             : n)
     );
   }
-  Zt(Jt, hn, {
+  (Zt(Jt, hn, {
     displayable: function () {
       return this.rgb().displayable();
     },
@@ -63729,7 +63736,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           );
         },
       })
-    );
+    ));
   var Mn = Math.PI / 180,
     Nn = 180 / Math.PI,
     An = 0.96422,
@@ -63765,7 +63772,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return 1 === arguments.length ? zn(t) : new Dn(t, n, e, null == r ? 1 : r);
   }
   function Dn(t, n, e, r) {
-    (this.l = +t), (this.a = +n), (this.b = +e), (this.opacity = +r);
+    ((this.l = +t), (this.a = +n), (this.b = +e), (this.opacity = +r));
   }
   function qn(t) {
     return t > Pn ? Math.pow(t, 1 / 3) : t / Cn + kn;
@@ -63799,9 +63806,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return 1 === arguments.length ? Bn(t) : new Fn(t, n, e, null == r ? 1 : r);
   }
   function Fn(t, n, e, r) {
-    (this.h = +t), (this.c = +n), (this.l = +e), (this.opacity = +r);
+    ((this.h = +t), (this.c = +n), (this.l = +e), (this.opacity = +r));
   }
-  Zt(
+  (Zt(
     Dn,
     Rn,
     Qt(Jt, {
@@ -63862,7 +63869,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           return zn(this).rgb();
         },
       })
-    );
+    ));
   var In = -0.14861,
     jn = 1.78277,
     Hn = -0.29227,
@@ -63889,7 +63896,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       : new Qn(t, n, e, null == r ? 1 : r);
   }
   function Qn(t, n, e, r) {
-    (this.h = +t), (this.s = +n), (this.l = +e), (this.opacity = +r);
+    ((this.h = +t), (this.s = +n), (this.l = +e), (this.opacity = +r));
   }
   function Jn(t, n, e, r, i) {
     var o = t * t,
@@ -64002,11 +64009,15 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         a = oe(t.opacity, n.opacity);
       return function (n) {
         return (
-          (t.r = r(n)), (t.g = i(n)), (t.b = o(n)), (t.opacity = a(n)), t + ''
+          (t.r = r(n)),
+          (t.g = i(n)),
+          (t.b = o(n)),
+          (t.opacity = a(n)),
+          t + ''
         );
       };
     }
-    return (r.gamma = t), r;
+    return ((r.gamma = t), r);
   })(1);
   function ue(t) {
     return function (n) {
@@ -64017,14 +64028,17 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         a = new Array(i),
         u = new Array(i);
       for (e = 0; e < i; ++e)
-        (r = gn(n[e])), (o[e] = r.r || 0), (a[e] = r.g || 0), (u[e] = r.b || 0);
+        ((r = gn(n[e])),
+          (o[e] = r.r || 0),
+          (a[e] = r.g || 0),
+          (u[e] = r.b || 0));
       return (
         (o = t(o)),
         (a = t(a)),
         (u = t(u)),
         (r.opacity = 1),
         function (t) {
-          return (r.r = o(t)), (r.g = a(t)), (r.b = u(t)), r + '';
+          return ((r.r = o(t)), (r.g = a(t)), (r.b = u(t)), r + '');
         }
       );
     };
@@ -64049,7 +64063,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return (
       (n -= t = +t),
       function (r) {
-        return e.setTime(t + n * r), e;
+        return (e.setTime(t + n * r), e);
       }
     );
   }
@@ -64085,14 +64099,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       u = [],
       c = [];
     for (t += '', n += ''; (e = pe.exec(t)) && (r = ve.exec(n)); )
-      (i = r.index) > o &&
+      ((i = r.index) > o &&
         ((i = n.slice(o, i)), u[a] ? (u[a] += i) : (u[++a] = i)),
         (e = e[0]) === (r = r[0])
           ? u[a]
             ? (u[a] += r)
             : (u[++a] = r)
           : ((u[++a] = null), c.push({i: a, x: he(e, r)})),
-        (o = ve.lastIndex);
+        (o = ve.lastIndex));
     return (
       o < n.length && ((i = n.slice(o)), u[a] ? (u[a] += i) : (u[++a] = i)),
       u.length < 2
@@ -64281,17 +64295,17 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       l = c - o,
       h = s * s + l * l;
     if (h < ze)
-      (r = Math.log(f / a) / Ee),
+      ((r = Math.log(f / a) / Ee),
         (e = function (t) {
           return [i + t * s, o + t * l, a * Math.exp(Ee * t * r)];
-        });
+        }));
     else {
       var d = Math.sqrt(h),
         p = (f * f - a * a + Pe * h) / (2 * a * Ce * d),
         v = (f * f - a * a - Pe * h) / (2 * f * Ce * d),
         g = Math.log(Math.sqrt(p * p + 1) - p),
         y = Math.log(Math.sqrt(v * v + 1) - v);
-      (r = (y - g) / Ee),
+      ((r = (y - g) / Ee),
         (e = function (t) {
           var n,
             e = t * r,
@@ -64303,9 +64317,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   return ((t = Math.exp(t)) - 1 / t) / 2;
                 })(g));
           return [i + c * s, o + c * l, (a * u) / Re(Ee * e + g)];
-        });
+        }));
     }
-    return (e.duration = 1e3 * r), e;
+    return ((e.duration = 1e3 * r), e);
   }
   function qe(t) {
     return function (n, e) {
@@ -64315,7 +64329,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         a = oe(n.opacity, e.opacity);
       return function (t) {
         return (
-          (n.h = r(t)), (n.s = i(t)), (n.l = o(t)), (n.opacity = a(t)), n + ''
+          (n.h = r(t)),
+          (n.s = i(t)),
+          (n.l = o(t)),
+          (n.opacity = a(t)),
+          n + ''
         );
       };
     };
@@ -64330,7 +64348,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         a = oe(n.opacity, e.opacity);
       return function (t) {
         return (
-          (n.h = r(t)), (n.c = i(t)), (n.l = o(t)), (n.opacity = a(t)), n + ''
+          (n.h = r(t)),
+          (n.c = i(t)),
+          (n.l = o(t)),
+          (n.opacity = a(t)),
+          n + ''
         );
       };
     };
@@ -64354,7 +64376,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           );
         };
       }
-      return (e = +e), (r.gamma = n), r;
+      return ((e = +e), (r.gamma = n), r);
     })(1);
   }
   var Ie = Fe(re),
@@ -64386,20 +64408,20 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   }
   function ir(t, n, e) {
     var r = new rr();
-    return r.restart(t, n, e), r;
+    return (r.restart(t, n, e), r);
   }
   function or() {
-    nr(), ++Ge;
+    (nr(), ++Ge);
     for (var t, n = He; n; )
-      (t = Qe - n._time) >= 0 && n._call.call(null, t), (n = n._next);
+      ((t = Qe - n._time) >= 0 && n._call.call(null, t), (n = n._next));
     --Ge;
   }
   function ar() {
-    (Qe = (Ze = Ke.now()) + Je), (Ge = Ve = 0);
+    ((Qe = (Ze = Ke.now()) + Je), (Ge = Ve = 0));
     try {
       or();
     } finally {
-      (Ge = 0),
+      ((Ge = 0),
         (function () {
           var t,
             n,
@@ -64411,9 +64433,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               : ((n = e._next),
                 (e._next = null),
                 (e = t ? (t._next = n) : (He = n)));
-          (Xe = t), cr(r);
+          ((Xe = t), cr(r));
         })(),
-        (Qe = 0);
+        (Qe = 0));
     }
   }
   function ur() {
@@ -64437,7 +64459,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       (n = null == n ? 0 : +n),
       r.restart(
         function (e) {
-          r.stop(), t(e + n);
+          (r.stop(), t(e + n));
         },
         n,
         e
@@ -64450,13 +64472,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     restart: function (t, n, e) {
       if ('function' != typeof t)
         throw new TypeError('callback is not a function');
-      (e = (null == e ? nr() : +e) + (null == n ? 0 : +n)),
+      ((e = (null == e ? nr() : +e) + (null == n ? 0 : +n)),
         this._next ||
           Xe === this ||
           (Xe ? (Xe._next = this) : (He = this), (Xe = this)),
         (this._call = t),
         (this._time = e),
-        cr();
+        cr());
     },
     stop: function () {
       this._call && ((this._call = null), (this._time = 1 / 0), cr());
@@ -64534,16 +64556,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         for (var r in ((e.state = _r), e.timer.stop(), delete i[n], i)) return;
         delete t.__transition;
       }
-      (i[n] = e),
+      ((i[n] = e),
         (e.timer = ir(
           function (t) {
-            (e.state = dr),
+            ((e.state = dr),
               e.timer.restart(o, e.delay, e.time),
-              e.delay <= t && o(t - e.delay);
+              e.delay <= t && o(t - e.delay));
           },
           0,
           e.time
-        ));
+        )));
     })(t, e, {
       name: n,
       index: r,
@@ -64629,7 +64651,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   }
   var kr = 0;
   function Er(t, n, e, r) {
-    (this._groups = t), (this._parents = n), (this._name = e), (this._id = r);
+    ((this._groups = t), (this._parents = n), (this._name = e), (this._id = r));
   }
   function Cr(t) {
     return Pt().transition(t);
@@ -64688,7 +64710,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               ++v
             )
               (h = d[v]) && br(h, n, e, v, d, p);
-            o.push(d), a.push(c);
+            (o.push(d), a.push(c));
           }
       return new Er(o, a, n, e);
     },
@@ -64776,7 +64798,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                     .split(/^|\s+/)
                     .every(function (t) {
                       var n = t.indexOf('.');
-                      return n >= 0 && (t = t.slice(0, n)), !t || 'start' === t;
+                      return (
+                        n >= 0 && (t = t.slice(0, n)),
+                        !t || 'start' === t
+                      );
                     });
                 })(n)
                   ? mr
@@ -64784,7 +64809,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               return function () {
                 var a = o(this, t),
                   u = a.on;
-                u !== r && (i = (r = u).copy()).on(n, e), (a.on = i);
+                (u !== r && (i = (r = u).copy()).on(n, e), (a.on = i));
               };
             })(e, t, n)
           );
@@ -64885,7 +64910,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   e
                 );
               }
-              return (i._value = n), i;
+              return ((i._value = n), i);
             }
           : function (t, n) {
               var e, r;
@@ -64903,7 +64928,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   e
                 );
               }
-              return (i._value = n), i;
+              return ((i._value = n), i);
             })(r, n)
       );
     },
@@ -64957,8 +64982,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   var c = xr(this, t),
                     f = c.on,
                     s = null == c.value[a] ? o || (o = Sr(n)) : void 0;
-                  (f === e && i === s) || (r = (e = f).copy()).on(u, (i = s)),
-                    (c.on = r);
+                  ((f === e && i === s) || (r = (e = f).copy()).on(u, (i = s)),
+                    (c.on = r));
                 };
               })(this._id, t)
             )
@@ -64999,7 +65024,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               r
             );
           }
-          return (o._value = n), o;
+          return ((o._value = n), o);
         })(t, n, null == e ? '' : e)
       );
     },
@@ -65154,11 +65179,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         e.each(function () {
           var e = xr(this, r),
             i = e.on;
-          i !== t &&
+          (i !== t &&
             ((n = (t = i).copy())._.cancel.push(u),
             n._.interrupt.push(u),
             n._.end.push(c)),
-            (e.on = n);
+            (e.on = n));
         });
       });
     },
@@ -65167,19 +65192,19 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       function e(t) {
         return Math.pow(t, n);
       }
-      return (n = +n), (e.exponent = t), e;
+      return ((n = +n), (e.exponent = t), e);
     })(3),
     Lr = (function t(n) {
       function e(t) {
         return 1 - Math.pow(1 - t, n);
       }
-      return (n = +n), (e.exponent = t), e;
+      return ((n = +n), (e.exponent = t), e);
     })(3),
     Ur = (function t(n) {
       function e(t) {
         return ((t *= 2) <= 1 ? Math.pow(t, n) : 2 - Math.pow(2 - t, n)) / 2;
       }
-      return (n = +n), (e.exponent = t), e;
+      return ((n = +n), (e.exponent = t), e);
     })(3),
     Or = Math.PI,
     Br = Or / 2;
@@ -65223,13 +65248,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       function e(t) {
         return t * t * ((n + 1) * t - n);
       }
-      return (n = +n), (e.overshoot = t), e;
+      return ((n = +n), (e.overshoot = t), e);
     })(1.70158),
     ni = (function t(n) {
       function e(t) {
         return --t * t * ((n + 1) * t + n) + 1;
       }
-      return (n = +n), (e.overshoot = t), e;
+      return ((n = +n), (e.overshoot = t), e);
     })(1.70158),
     ei = (function t(n) {
       function e(t) {
@@ -65239,7 +65264,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             : (t -= 2) * t * ((n + 1) * t + n) + 2) / 2
         );
       }
-      return (n = +n), (e.overshoot = t), e;
+      return ((n = +n), (e.overshoot = t), e);
     })(1.70158),
     ri = 2 * Math.PI,
     ii = (function t(n, e) {
@@ -65294,10 +65319,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     ui = {time: null, delay: 0, duration: 250, ease: Dr};
   function ci(t, n) {
     for (var e; !(e = t.__transition) || !(e = e[n]); )
-      if (!(t = t.parentNode)) return (ui.time = nr()), ui;
+      if (!(t = t.parentNode)) return ((ui.time = nr()), ui);
     return e;
   }
-  (Pt.prototype.interrupt = function (t) {
+  ((Pt.prototype.interrupt = function (t) {
     return this.each(function () {
       Mr(this, t);
     });
@@ -65311,7 +65336,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         for (var a, u = r[o], c = u.length, f = 0; f < c; ++f)
           (a = u[f]) && br(a, t, n, f, u, e || ci(a, n));
       return new Er(r, this._parents, t, n);
-    });
+    }));
   var fi = [null];
   function si(t) {
     return function () {
@@ -65319,13 +65344,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     };
   }
   function li(t, n, e) {
-    (this.target = t), (this.type = n), (this.selection = e);
+    ((this.target = t), (this.type = n), (this.selection = e));
   }
   function hi() {
     t.event.stopImmediatePropagation();
   }
   function di() {
-    t.event.preventDefault(), t.event.stopImmediatePropagation();
+    (t.event.preventDefault(), t.event.stopImmediatePropagation());
   }
   var pi = {name: 'drag'},
     vi = {name: 'space'},
@@ -65440,7 +65465,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         .property('__brush', h)
         .selectAll('.overlay')
         .data([Ti('overlay')]);
-      e
+      (e
         .enter()
         .append('rect')
         .attr('class', 'overlay')
@@ -65465,11 +65490,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           .attr('fill', '#777')
           .attr('fill-opacity', 0.3)
           .attr('stroke', '#fff')
-          .attr('shape-rendering', 'crispEdges');
+          .attr('shape-rendering', 'crispEdges'));
       var r = t.selectAll('.handle').data(n.handles, function (t) {
         return t.type;
       });
-      r.exit().remove(),
+      (r.exit().remove(),
         r
           .enter()
           .append('rect')
@@ -65484,7 +65509,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           .attr('fill', 'none')
           .attr('pointer-events', 'all')
           .style('-webkit-tap-highlight-color', 'rgba(0,0,0,0)')
-          .on('mousedown.brush touchstart.brush', l);
+          .on('mousedown.brush touchstart.brush', l));
     }
     function c() {
       var t = zt(this),
@@ -65530,10 +65555,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       return t.__brush.emitter || new s(t, n);
     }
     function s(t, n) {
-      (this.that = t),
+      ((this.that = t),
         (this.args = n),
         (this.state = t.__brush),
-        (this.active = 0);
+        (this.active = 0));
     }
     function l() {
       if (t.event.touches) {
@@ -65574,7 +65599,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           z = Ot(b),
           R = z,
           D = f(b, arguments).beforestart();
-        'overlay' === m
+        ('overlay' === m
           ? (N.selection = T =
               [
                 [(r = n === bi ? S : z[0]), (a = n === _i ? k : z[1])],
@@ -65584,7 +65609,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           (o = r),
           (u = a),
           (l = s),
-          (d = h);
+          (d = h));
         var q = zt(b).attr('pointer-events', 'none'),
           L = q.selectAll('.overlay').attr('cursor', xi[m]);
         if (t.event.touches)
@@ -65661,35 +65686,35 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             .on('mouseup.brush', Y, !0);
           It(t.event.view);
         }
-        hi(), Mr(b), c.call(b), D.start();
+        (hi(), Mr(b), c.call(b), D.start());
       }
       function O() {
         var t = Ot(b);
-        !P ||
+        (!P ||
           y ||
           _ ||
           (Math.abs(t[0] - R[0]) > Math.abs(t[1] - R[1]) ? (_ = !0) : (y = !0)),
           (R = t),
           (g = !0),
           di(),
-          B();
+          B());
       }
       function B() {
         var t;
         switch (((p = R[0] - z[0]), (v = R[1] - z[1]), x)) {
           case vi:
           case pi:
-            w &&
+            (w &&
               ((p = Math.max(S - r, Math.min(E - s, p))),
               (o = r + p),
               (l = s + p)),
               M &&
                 ((v = Math.max(k - a, Math.min(C - h, v))),
                 (u = a + v),
-                (d = h + v));
+                (d = h + v)));
             break;
           case gi:
-            w < 0
+            (w < 0
               ? ((p = Math.max(S - r, Math.min(E - r, p))),
                 (o = r + p),
                 (l = s))
@@ -65704,17 +65729,17 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 : M > 0 &&
                   ((v = Math.max(k - h, Math.min(C - h, v))),
                   (u = a),
-                  (d = h + v));
+                  (d = h + v)));
             break;
           case yi:
-            w &&
+            (w &&
               ((o = Math.max(S, Math.min(E, r - p * w))),
               (l = Math.max(S, Math.min(E, s + p * w)))),
               M &&
                 ((u = Math.max(k, Math.min(C, a - v * M))),
-                (d = Math.max(k, Math.min(C, h + v * M))));
+                (d = Math.max(k, Math.min(C, h + v * M)))));
         }
-        l < o &&
+        (l < o &&
           ((w *= -1),
           (t = r),
           (r = s),
@@ -65741,32 +65766,32 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               [l, d],
             ]),
             c.call(b),
-            D.brush());
+            D.brush()));
       }
       function Y() {
         if ((hi(), t.event.touches)) {
           if (t.event.touches.length) return;
-          e && clearTimeout(e),
+          (e && clearTimeout(e),
             (e = setTimeout(function () {
               e = null;
             }, 500)),
-            q.on('touchmove.brush touchend.brush touchcancel.brush', null);
+            q.on('touchmove.brush touchend.brush touchcancel.brush', null));
         } else
-          jt(t.event.view, g),
+          (jt(t.event.view, g),
             U.on(
               'keydown.brush keyup.brush mousemove.brush mouseup.brush',
               null
-            );
-        q.attr('pointer-events', 'all'),
+            ));
+        (q.attr('pointer-events', 'all'),
           L.attr('cursor', xi.overlay),
           N.selection && (T = N.selection),
           Ci(T) && ((N.selection = null), c.call(b)),
-          D.end();
+          D.end());
       }
     }
     function h() {
       var t = this.__brush || {selection: null};
-      return (t.extent = r.apply(this, arguments)), (t.dim = n), t;
+      return ((t.extent = r.apply(this, arguments)), (t.dim = n), t);
     }
     return (
       (u.move = function (t, e) {
@@ -65789,9 +65814,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   ),
                   u = ye(o, a);
                 function s(n) {
-                  (r.selection = 1 === n && Ci(a) ? null : u(n)),
+                  ((r.selection = 1 === n && Ci(a) ? null : u(n)),
                     c.call(t),
-                    i.brush();
+                    i.brush());
                 }
                 return o && a ? s : s(1);
               })
@@ -65803,10 +65828,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   r.extent
                 ),
                 o = f(this, t).beforestart();
-              Mr(this),
+              (Mr(this),
                 (r.selection = null == i || Ci(i) ? null : i),
                 c.call(this),
-                o.start().brush().end();
+                o.start().brush().end());
             });
       }),
       (s.prototype = {
@@ -65819,11 +65844,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         },
         start: function () {
           return (
-            this.starting && ((this.starting = !1), this.emit('start')), this
+            this.starting && ((this.starting = !1), this.emit('start')),
+            this
           );
         },
         brush: function () {
-          return this.emit('brush'), this;
+          return (this.emit('brush'), this);
         },
         end: function () {
           return (
@@ -65882,7 +65908,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     Fi = 2 * Yi,
     Ii = Fi - 1e-6;
   function ji() {
-    (this._x0 = this._y0 = this._x1 = this._y1 = null), (this._ = '');
+    ((this._x0 = this._y0 = this._x1 = this._y1 = null), (this._ = ''));
   }
   function Hi() {
     return new ji();
@@ -65935,7 +65961,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         (this._y1 = +o);
     },
     arcTo: function (t, n, e, r, i) {
-      (t = +t), (n = +n), (e = +e), (r = +r), (i = +i);
+      ((t = +t), (n = +n), (e = +e), (r = +r), (i = +i));
       var o = this._x1,
         a = this._y1,
         u = e - t,
@@ -65957,7 +65983,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             _ = i * Math.tan((Yi - Math.acos((p + l - v) / (2 * g * y))) / 2),
             b = _ / y,
             m = _ / g;
-          Math.abs(b - 1) > 1e-6 &&
+          (Math.abs(b - 1) > 1e-6 &&
             (this._ += 'L' + (t + b * f) + ',' + (n + b * s)),
             (this._ +=
               'A' +
@@ -65969,12 +65995,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               ',' +
               (this._x1 = t + m * u) +
               ',' +
-              (this._y1 = n + m * c));
+              (this._y1 = n + m * c)));
         } else this._ += 'L' + (this._x1 = t) + ',' + (this._y1 = n);
       else;
     },
     arc: function (t, n, e, r, i, o) {
-      (t = +t), (n = +n);
+      ((t = +t), (n = +n));
       var a = (e = +e) * Math.cos(r),
         u = e * Math.sin(r),
         c = t + a,
@@ -65982,7 +66008,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         s = 1 ^ o,
         l = o ? r - i : i - r;
       if (e < 0) throw new Error('negative radius: ' + e);
-      null === this._x1
+      (null === this._x1
         ? (this._ += 'M' + c + ',' + f)
         : (Math.abs(this._x1 - c) > 1e-6 || Math.abs(this._y1 - f) > 1e-6) &&
           (this._ += 'L' + c + ',' + f),
@@ -66023,7 +66049,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 ',' +
                 (this._x1 = t + e * Math.cos(i)) +
                 ',' +
-                (this._y1 = n + e * Math.sin(i))));
+                (this._y1 = n + e * Math.sin(i)))));
     },
     rect: function (t, n, e, r) {
       this._ +=
@@ -66081,7 +66107,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       return this['$' + t];
     },
     set: function (t, n) {
-      return (this['$' + t] = n), this;
+      return ((this['$' + t] = n), this);
     },
     remove: function (t) {
       var n = '$' + t;
@@ -66138,7 +66164,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     constructor: eo,
     has: ro.has,
     add: function (t) {
-      return (this['$' + (t += '')] = t), this;
+      return ((this['$' + (t += '')] = t), this);
     },
     remove: ro.remove,
     clear: ro.clear,
@@ -66299,8 +66325,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         var r = s(t),
           i = r[0],
           a = r[1];
-        (n = w(i, a, n)),
-          (n = g(Math.floor(i / n) * n, Math.floor(a / n) * n, n));
+        ((n = w(i, a, n)),
+          (n = g(Math.floor(i / n) * n, Math.floor(a / n) * n, n)));
       }
       return n.map(function (n) {
         return o(t, n);
@@ -66319,9 +66345,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             l,
             h = new Array(),
             d = new Array();
-          (o = u = -1), (f = e[0] >= r), ho[f << 1].forEach(p);
+          ((o = u = -1), (f = e[0] >= r), ho[f << 1].forEach(p));
           for (; ++o < t - 1; )
-            (c = f), (f = e[o + 1] >= r), ho[c | (f << 1)].forEach(p);
+            ((c = f), (f = e[o + 1] >= r), ho[c | (f << 1)].forEach(p));
           ho[f << 0].forEach(p);
           for (; ++u < n - 1; ) {
             for (
@@ -66332,18 +66358,18 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               ++o < t - 1;
 
             )
-              (c = f),
+              ((c = f),
                 (f = e[u * t + t + o + 1] >= r),
                 (l = s),
                 (s = e[u * t + o + 1] >= r),
-                ho[c | (f << 1) | (s << 2) | (l << 3)].forEach(p);
+                ho[c | (f << 1) | (s << 2) | (l << 3)].forEach(p));
             ho[f | (s << 3)].forEach(p);
           }
-          (o = -1), (s = e[u * t] >= r), ho[s << 2].forEach(p);
+          ((o = -1), (s = e[u * t] >= r), ho[s << 2].forEach(p));
           for (; ++o < t - 1; )
-            (l = s),
+            ((l = s),
               (s = e[u * t + o + 1] >= r),
-              ho[(s << 2) | (l << 3)].forEach(p);
+              ho[(s << 2) | (l << 3)].forEach(p));
           function p(t) {
             var n,
               e,
@@ -66383,7 +66409,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           }
           ho[s << 3].forEach(p);
         })(e, i, function (t) {
-          r(t, e, i),
+          (r(t, e, i),
             (function (t) {
               for (
                 var n = 0,
@@ -66396,7 +66422,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               return r;
             })(t) > 0
               ? o.push([t])
-              : u.push(t);
+              : u.push(t));
         }),
         u.forEach(function (t) {
           for (var n, e = 0, r = o.length; e < r; ++e)
@@ -66416,14 +66442,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           c = 0 | a,
           f = 0 | u,
           s = r[f * t + c];
-        a > 0 &&
+        (a > 0 &&
           a < t &&
           c === a &&
           ((o = r[f * t + c - 1]), (e[0] = a + (i - o) / (s - o) - 0.5)),
           u > 0 &&
             u < n &&
             f === u &&
-            ((o = r[(f - 1) * t + c]), (e[1] = u + (i - o) / (s - o) - 0.5));
+            ((o = r[(f - 1) * t + c]), (e[1] = u + (i - o) / (s - o) - 0.5)));
       });
     }
     return (
@@ -66433,7 +66459,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         var r = Math.ceil(e[0]),
           o = Math.ceil(e[1]);
         if (!(r > 0 && o > 0)) throw new Error('invalid size');
-        return (t = r), (n = o), i;
+        return ((t = r), (n = o), i);
       }),
       (i.thresholds = function (t) {
         return arguments.length
@@ -66455,18 +66481,18 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function vo(t, n, e) {
     for (var r = t.width, i = t.height, o = 1 + (e << 1), a = 0; a < i; ++a)
       for (var u = 0, c = 0; u < r + e; ++u)
-        u < r && (c += t.data[u + a * r]),
+        (u < r && (c += t.data[u + a * r]),
           u >= e &&
             (u >= o && (c -= t.data[u - o + a * r]),
-            (n.data[u - e + a * r] = c / Math.min(u + 1, r - 1 + o - u, o)));
+            (n.data[u - e + a * r] = c / Math.min(u + 1, r - 1 + o - u, o))));
   }
   function go(t, n, e) {
     for (var r = t.width, i = t.height, o = 1 + (e << 1), a = 0; a < r; ++a)
       for (var u = 0, c = 0; u < i + e; ++u)
-        u < i && (c += t.data[a + u * r]),
+        (u < i && (c += t.data[a + u * r]),
           u >= e &&
             (u >= o && (c -= t.data[a + (u - o) * r]),
-            (n.data[a + (u - e) * r] = c / Math.min(u + 1, i - 1 + o - u, o)));
+            (n.data[a + (u - e) * r] = c / Math.min(u + 1, i - 1 + o - u, o))));
   }
   function yo(t) {
     return t[0];
@@ -66555,7 +66581,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         f = !1;
       function s() {
         if (c) return xo;
-        if (f) return (f = !1), mo;
+        if (f) return ((f = !1), mo);
         var n,
           r,
           i = a;
@@ -66576,18 +66602,18 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         }
         for (; a < o; ) {
           if ((r = t.charCodeAt((n = a++))) === Mo) f = !0;
-          else if (r === No) (f = !0), t.charCodeAt(a) === Mo && ++a;
+          else if (r === No) ((f = !0), t.charCodeAt(a) === Mo && ++a);
           else if (r !== e) continue;
           return t.slice(i, n);
         }
-        return (c = !0), t.slice(i, o);
+        return ((c = !0), t.slice(i, o));
       }
       for (
         t.charCodeAt(o - 1) === Mo && --o, t.charCodeAt(o - 1) === No && --o;
         (r = s()) !== xo;
 
       ) {
-        for (var l = []; r !== mo && r !== xo; ) l.push(r), (r = s());
+        for (var l = []; r !== mo && r !== xo; ) (l.push(r), (r = s()));
         (n && null == (l = n(l, u++))) || i.push(l);
       }
       return i;
@@ -66619,7 +66645,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           i,
           o = r(t, function (t, r) {
             if (e) return e(t, r - 1);
-            (i = t),
+            ((i = t),
               (e = n
                 ? (function (t, n) {
                     var e = Ao(t);
@@ -66627,9 +66653,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                       return n(e(r), i, t);
                     };
                   })(t, n)
-                : Ao(t));
+                : Ao(t)));
           });
-        return (o.columns = i || []), o;
+        return ((o.columns = i || []), o);
       },
       parseRows: r,
       format: function (n, e) {
@@ -66639,7 +66665,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         );
       },
       formatBody: function (t, n) {
-        return null == n && (n = To(t)), i(t, n).join('\n');
+        return (null == n && (n = To(t)), i(t, n).join('\n'));
       },
       formatRows: function (t) {
         return t.map(o).join('\n');
@@ -66726,7 +66752,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       g = t._y0,
       y = t._x1,
       _ = t._y1;
-    if (!d) return (t._root = p), t;
+    if (!d) return ((t._root = p), t);
     for (; d.length; )
       if (
         ((f = n >= (o = (v + y) / 2)) ? (v = o) : (y = o),
@@ -66734,22 +66760,26 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         (i = d),
         !(d = d[(l = (s << 1) | f)]))
       )
-        return (i[l] = p), t;
+        return ((i[l] = p), t);
     if (
       ((u = +t._x.call(null, d.data)),
       (c = +t._y.call(null, d.data)),
       n === u && e === c)
     )
-      return (p.next = d), i ? (i[l] = p) : (t._root = p), t;
+      return ((p.next = d), i ? (i[l] = p) : (t._root = p), t);
     do {
-      (i = i ? (i[l] = new Array(4)) : (t._root = new Array(4))),
+      ((i = i ? (i[l] = new Array(4)) : (t._root = new Array(4))),
         (f = n >= (o = (v + y) / 2)) ? (v = o) : (y = o),
-        (s = e >= (a = (g + _) / 2)) ? (g = a) : (_ = a);
+        (s = e >= (a = (g + _) / 2)) ? (g = a) : (_ = a));
     } while ((l = (s << 1) | f) == (h = ((c >= a) << 1) | (u >= o)));
-    return (i[h] = d), (i[l] = p), t;
+    return ((i[h] = d), (i[l] = p), t);
   }
   function ra(t, n, e, r, i) {
-    (this.node = t), (this.x0 = n), (this.y0 = e), (this.x1 = r), (this.y1 = i);
+    ((this.node = t),
+      (this.x0 = n),
+      (this.y0 = e),
+      (this.x1 = r),
+      (this.y1 = i));
   }
   function ia(t) {
     return t[0];
@@ -66762,13 +66792,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return null == t ? r : r.addAll(t);
   }
   function ua(t, n, e, r, i, o) {
-    (this._x = t),
+    ((this._x = t),
       (this._y = n),
       (this._x0 = e),
       (this._y0 = r),
       (this._x1 = i),
       (this._y1 = o),
-      (this._root = void 0);
+      (this._root = void 0));
   }
   function ca(t) {
     for (var n = {data: t.data}, e = n; (t = t.next); )
@@ -66796,13 +66826,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function va(t) {
     return t.y;
   }
-  (fa.copy = function () {
+  ((fa.copy = function () {
     var t,
       n,
       e = new ua(this._x, this._y, this._x0, this._y0, this._x1, this._y1),
       r = this._root;
     if (!r) return e;
-    if (!r.length) return (e._root = ca(r)), e;
+    if (!r.length) return ((e._root = ca(r)), e);
     for (t = [{source: r, target: (e._root = new Array(4))}]; (r = t.pop()); )
       for (var i = 0; i < 4; ++i)
         (n = r.source[i]) &&
@@ -66849,7 +66879,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         i = this._x1,
         o = this._y1;
       if (isNaN(e))
-        (i = (e = Math.floor(t)) + 1), (o = (r = Math.floor(n)) + 1);
+        ((i = (e = Math.floor(t)) + 1), (o = (r = Math.floor(n)) + 1));
       else {
         for (
           var a, u, c = i - e, f = this._root;
@@ -66864,21 +66894,25 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             u)
           ) {
             case 0:
-              (i = e + c), (o = r + c);
+              ((i = e + c), (o = r + c));
               break;
             case 1:
-              (e = i - c), (o = r + c);
+              ((e = i - c), (o = r + c));
               break;
             case 2:
-              (i = e + c), (r = o - c);
+              ((i = e + c), (r = o - c));
               break;
             case 3:
-              (e = i - c), (r = o - c);
+              ((e = i - c), (r = o - c));
           }
         this._root && this._root.length && (this._root = f);
       }
       return (
-        (this._x0 = e), (this._y0 = r), (this._x1 = i), (this._y1 = o), this
+        (this._x0 = e),
+        (this._y0 = r),
+        (this._x1 = i),
+        (this._y1 = o),
+        this
       );
     }),
     (fa.data = function () {
@@ -66937,7 +66971,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           if (v.length) {
             var g = (i + a) / 2,
               y = (o + u) / 2;
-            p.push(
+            (p.push(
               new ra(v[3], g, y, a, u),
               new ra(v[2], i, y, g, u),
               new ra(v[1], g, o, a, y),
@@ -66946,14 +66980,18 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               (f = ((n >= y) << 1) | (t >= g)) &&
                 ((c = p[p.length - 1]),
                 (p[p.length - 1] = p[p.length - 1 - f]),
-                (p[p.length - 1 - f] = c));
+                (p[p.length - 1 - f] = c)));
           } else {
             var _ = t - +this._x.call(null, v.data),
               b = n - +this._y.call(null, v.data),
               m = _ * _ + b * b;
             if (m < e) {
               var x = Math.sqrt((e = m));
-              (s = t - x), (l = n - x), (h = t + x), (d = n + x), (r = v.data);
+              ((s = t - x),
+                (l = n - x),
+                (h = t + x),
+                (d = n + x),
+                (r = v.data));
             }
           }
       return r;
@@ -67049,10 +67087,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         ) {
           var f = (r + o) / 2,
             s = (i + a) / 2;
-          (e = c[3]) && u.push(new ra(e, f, s, o, a)),
+          ((e = c[3]) && u.push(new ra(e, f, s, o, a)),
             (e = c[2]) && u.push(new ra(e, r, s, f, a)),
             (e = c[1]) && u.push(new ra(e, f, i, o, s)),
-            (e = c[0]) && u.push(new ra(e, r, i, f, s));
+            (e = c[0]) && u.push(new ra(e, r, i, f, s)));
         }
       return this;
     }),
@@ -67075,10 +67113,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             f = n.y1,
             s = (a + c) / 2,
             l = (u + f) / 2;
-          (o = i[0]) && e.push(new ra(o, a, u, s, l)),
+          ((o = i[0]) && e.push(new ra(o, a, u, s, l)),
             (o = i[1]) && e.push(new ra(o, s, u, c, l)),
             (o = i[2]) && e.push(new ra(o, a, l, s, f)),
-            (o = i[3]) && e.push(new ra(o, s, l, c, f));
+            (o = i[3]) && e.push(new ra(o, s, l, c, f)));
         }
         r.push(n);
       }
@@ -67090,7 +67128,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     }),
     (fa.y = function (t) {
       return arguments.length ? ((this._y = t), this) : this._y;
-    });
+    }));
   var ga = 10,
     ya = Math.PI * (3 - Math.sqrt(5));
   function _a(t, n) {
@@ -67115,7 +67153,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function Ma(t) {
     if (!(n = xa.exec(t))) throw new Error('invalid format: ' + t);
     var n;
-    (this.fill = n[1] || ' '),
+    ((this.fill = n[1] || ' '),
       (this.align = n[2] || '>'),
       (this.sign = n[3] || '-'),
       (this.symbol = n[4] || ''),
@@ -67124,7 +67162,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       (this.comma = !!n[7]),
       (this.precision = n[8] && +n[8].slice(1)),
       (this.trim = !!n[9]),
-      (this.type = n[10] || '');
+      (this.type = n[10] || ''));
   }
   function Na(t, n) {
     var e = _a(t, n);
@@ -67137,7 +67175,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         ? r.slice(0, i + 1) + '.' + r.slice(i + 1)
         : r + new Array(i - r.length + 2).join('0');
   }
-  (wa.prototype = Ma.prototype),
+  ((wa.prototype = Ma.prototype),
     (Ma.prototype.toString = function () {
       return (
         this.fill +
@@ -67151,7 +67189,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         (this.trim ? '~' : '') +
         this.type
       );
-    });
+    }));
   var Aa = {
     '%': function (t, n) {
       return (100 * t).toFixed(n);
@@ -67272,10 +67310,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         d = t.precision,
         p = t.trim,
         v = t.type;
-      'n' === v
+      ('n' === v
         ? ((h = !0), (v = 'g'))
         : Aa[v] || (null == d && (d = 12), (p = !0), (v = 'g')),
-        (s || ('0' === n && '=' === e)) && ((s = !0), (n = '0'), (e = '='));
+        (s || ('0' === n && '=' === e)) && ((s = !0), (n = '0'), (e = '=')));
       var g =
           '$' === f
             ? i[0]
@@ -67291,7 +67329,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           f,
           m = g,
           x = y;
-        if ('c' === v) (x = _(t) + x), (t = '');
+        if ('c' === v) ((x = _(t) + x), (t = ''));
         else {
           var w = (t = +t) < 0;
           if (
@@ -67304,7 +67342,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                       i = n = r;
                       break;
                     case '0':
-                      0 === i && (i = r), (n = r);
+                      (0 === i && (i = r), (n = r));
                       break;
                     default:
                       if (i > 0) {
@@ -67326,8 +67364,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           )
             for (i = -1, u = t.length; ++i < u; )
               if (48 > (f = t.charCodeAt(i)) || f > 57) {
-                (x = (46 === f ? o + t.slice(i + 1) : t.slice(i)) + x),
-                  (t = t.slice(0, i));
+                ((x = (46 === f ? o + t.slice(i + 1) : t.slice(i)) + x),
+                  (t = t.slice(0, i)));
                 break;
               }
         }
@@ -67399,7 +67437,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   }
   function Ra(t, n) {
     return (
-      (t = Math.abs(t)), (n = Math.abs(n) - t), Math.max(0, ba(n) - ba(t)) + 1
+      (t = Math.abs(t)),
+      (n = Math.abs(n) - t),
+      Math.max(0, ba(n) - ba(t)) + 1
     );
   }
   function Da() {
@@ -67408,21 +67448,21 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function qa() {
     this.reset();
   }
-  Ca({decimal: '.', thousands: ',', grouping: [3], currency: ['$', '']}),
+  (Ca({decimal: '.', thousands: ',', grouping: [3], currency: ['$', '']}),
     (qa.prototype = {
       constructor: qa,
       reset: function () {
         this.s = this.t = 0;
       },
       add: function (t) {
-        Ua(La, t, this.t),
+        (Ua(La, t, this.t),
           Ua(this, La.s, this.s),
-          this.s ? (this.t += La.t) : (this.s = La.t);
+          this.s ? (this.t += La.t) : (this.s = La.t));
       },
       valueOf: function () {
         return this.s;
       },
-    });
+    }));
   var La = new qa();
   function Ua(t, n, e) {
     var r = (t.s = n + e),
@@ -67481,11 +67521,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         n.sphere();
       },
       Point: function (t, n) {
-        (t = t.coordinates), n.point(t[0], t[1], t[2]);
+        ((t = t.coordinates), n.point(t[0], t[1], t[2]));
       },
       MultiPoint: function (t, n) {
         for (var e = t.coordinates, r = -1, i = e.length; ++r < i; )
-          (t = e[r]), n.point(t[0], t[1], t[2]);
+          ((t = e[r]), n.point(t[0], t[1], t[2]));
       },
       LineString: function (t, n) {
         lu(t.coordinates, n, 0);
@@ -67509,7 +67549,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     var r,
       i = -1,
       o = t.length - e;
-    for (n.lineStart(); ++i < o; ) (r = t[i]), n.point(r[0], r[1], r[2]);
+    for (n.lineStart(); ++i < o; ) ((r = t[i]), n.point(r[0], r[1], r[2]));
     n.lineEnd();
   }
   function hu(t, n) {
@@ -67533,12 +67573,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       lineStart: uu,
       lineEnd: uu,
       polygonStart: function () {
-        bu.reset(), (xu.lineStart = wu), (xu.lineEnd = Mu);
+        (bu.reset(), (xu.lineStart = wu), (xu.lineEnd = Mu));
       },
       polygonEnd: function () {
         var t = +bu;
-        mu.add(t < 0 ? ja + t : t),
-          (this.lineStart = this.lineEnd = this.point = uu);
+        (mu.add(t < 0 ? ja + t : t),
+          (this.lineStart = this.lineEnd = this.point = uu));
       },
       sphere: function () {
         mu.add(ja);
@@ -67551,12 +67591,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     Au(pu, vu);
   }
   function Nu(t, n) {
-    (xu.point = Au),
+    ((xu.point = Au),
       (pu = t),
       (vu = n),
       (gu = t *= Xa),
       (yu = Wa((n = (n *= Xa) / 2 + Ia))),
-      (_u = tu(n));
+      (_u = tu(n)));
   }
   function Au(t, n) {
     var e = (t *= Xa) - gu,
@@ -67567,7 +67607,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       u = _u * a,
       c = yu * o + u * Wa(i),
       f = u * r * tu(i);
-    bu.add($a(f, c)), (gu = t), (yu = o), (_u = a);
+    (bu.add($a(f, c)), (gu = t), (yu = o), (_u = a));
   }
   function Tu(t) {
     return [$a(t[1], t[0]), ou(t[2])];
@@ -67589,14 +67629,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     ];
   }
   function Cu(t, n) {
-    (t[0] += n[0]), (t[1] += n[1]), (t[2] += n[2]);
+    ((t[0] += n[0]), (t[1] += n[1]), (t[2] += n[2]));
   }
   function Pu(t, n) {
     return [t[0] * n, t[1] * n, t[2] * n];
   }
   function zu(t) {
     var n = eu(t[0] * t[0] + t[1] * t[1] + t[2] * t[2]);
-    (t[0] /= n), (t[1] /= n), (t[2] /= n);
+    ((t[0] /= n), (t[1] /= n), (t[2] /= n));
   }
   var Ru,
     Du,
@@ -67630,14 +67670,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       lineStart: fc,
       lineEnd: sc,
       polygonStart: function () {
-        (ac.point = lc),
+        ((ac.point = lc),
           (ac.lineStart = hc),
           (ac.lineEnd = dc),
           oc.reset(),
-          xu.polygonStart();
+          xu.polygonStart());
       },
       polygonEnd: function () {
-        xu.polygonEnd(),
+        (xu.polygonEnd(),
           (ac.point = uc),
           (ac.lineStart = fc),
           (ac.lineEnd = sc),
@@ -67647,26 +67687,26 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               ? (Lu = 90)
               : oc < -Oa && (Du = -90),
           (Iu[0] = Ru),
-          (Iu[1] = qu);
+          (Iu[1] = qu));
       },
     };
   function uc(t, n) {
-    Fu.push((Iu = [(Ru = t), (qu = t)])),
+    (Fu.push((Iu = [(Ru = t), (qu = t)])),
       n < Du && (Du = n),
-      n > Lu && (Lu = n);
+      n > Lu && (Lu = n));
   }
   function cc(t, n) {
     var e = Su([t * Xa, n * Xa]);
     if (Yu) {
       var r = Eu(Yu, e),
         i = Eu([r[1], -r[0], 0], r);
-      zu(i), (i = Tu(i));
+      (zu(i), (i = Tu(i)));
       var o,
         a = t - Uu,
         u = a > 0 ? 1 : -1,
         c = i[0] * Ha * u,
         f = Ga(a) > 180;
-      f ^ (u * Uu < c && c < u * t)
+      (f ^ (u * Uu < c && c < u * t)
         ? (o = i[1] * Ha) > Lu && (Lu = o)
         : f ^ (u * Uu < (c = ((c + 360) % 360) - 180) && c < u * t)
           ? (o = -i[1] * Ha) < Du && (Du = o)
@@ -67679,33 +67719,33 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             ? (t < Ru && (Ru = t), t > qu && (qu = t))
             : t > Uu
               ? pc(Ru, t) > pc(Ru, qu) && (qu = t)
-              : pc(t, qu) > pc(Ru, qu) && (Ru = t);
+              : pc(t, qu) > pc(Ru, qu) && (Ru = t));
     } else Fu.push((Iu = [(Ru = t), (qu = t)]));
-    n < Du && (Du = n), n > Lu && (Lu = n), (Yu = e), (Uu = t);
+    (n < Du && (Du = n), n > Lu && (Lu = n), (Yu = e), (Uu = t));
   }
   function fc() {
     ac.point = cc;
   }
   function sc() {
-    (Iu[0] = Ru), (Iu[1] = qu), (ac.point = uc), (Yu = null);
+    ((Iu[0] = Ru), (Iu[1] = qu), (ac.point = uc), (Yu = null));
   }
   function lc(t, n) {
     if (Yu) {
       var e = t - Uu;
       oc.add(Ga(e) > 180 ? e + (e > 0 ? 360 : -360) : e);
-    } else (Ou = t), (Bu = n);
-    xu.point(t, n), cc(t, n);
+    } else ((Ou = t), (Bu = n));
+    (xu.point(t, n), cc(t, n));
   }
   function hc() {
     xu.lineStart();
   }
   function dc() {
-    lc(Ou, Bu),
+    (lc(Ou, Bu),
       xu.lineEnd(),
       Ga(oc) > Oa && (Ru = -(qu = 180)),
       (Iu[0] = Ru),
       (Iu[1] = qu),
-      (Yu = null);
+      (Yu = null));
   }
   function pc(t, n) {
     return (n -= t) < 0 ? n + 360 : n;
@@ -67722,10 +67762,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     lineStart: mc,
     lineEnd: Mc,
     polygonStart: function () {
-      (yc.lineStart = Nc), (yc.lineEnd = Ac);
+      ((yc.lineStart = Nc), (yc.lineEnd = Ac));
     },
     polygonEnd: function () {
-      (yc.lineStart = mc), (yc.lineEnd = Mc);
+      ((yc.lineStart = mc), (yc.lineEnd = Mc));
     },
   };
   function _c(t, n) {
@@ -67734,7 +67774,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     bc(e * Wa(t), e * tu(t), tu(n));
   }
   function bc(t, n, e) {
-    (Xu += (t - Xu) / ++ju), (Gu += (n - Gu) / ju), (Vu += (e - Vu) / ju);
+    ((Xu += (t - Xu) / ++ju), (Gu += (n - Gu) / ju), (Vu += (e - Vu) / ju));
   }
   function mc() {
     yc.point = xc;
@@ -67742,11 +67782,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function xc(t, n) {
     t *= Xa;
     var e = Wa((n *= Xa));
-    (ec = e * Wa(t)),
+    ((ec = e * Wa(t)),
       (rc = e * tu(t)),
       (ic = tu(n)),
       (yc.point = wc),
-      bc(ec, rc, ic);
+      bc(ec, rc, ic));
   }
   function wc(t, n) {
     t *= Xa;
@@ -67762,11 +67802,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         ),
         ec * r + rc * i + ic * o
       );
-    (Hu += a),
+    ((Hu += a),
       ($u += a * (ec + (ec = r))),
       (Wu += a * (rc + (rc = i))),
       (Zu += a * (ic + (ic = o))),
-      bc(ec, rc, ic);
+      bc(ec, rc, ic));
   }
   function Mc() {
     yc.point = _c;
@@ -67775,12 +67815,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     yc.point = Tc;
   }
   function Ac() {
-    Sc(tc, nc), (yc.point = _c);
+    (Sc(tc, nc), (yc.point = _c));
   }
   function Tc(t, n) {
-    (tc = t), (nc = n), (t *= Xa), (n *= Xa), (yc.point = Sc);
+    ((tc = t), (nc = n), (t *= Xa), (n *= Xa), (yc.point = Sc));
     var e = Wa(n);
-    (ec = e * Wa(t)), (rc = e * tu(t)), (ic = tu(n)), bc(ec, rc, ic);
+    ((ec = e * Wa(t)), (rc = e * tu(t)), (ic = tu(n)), bc(ec, rc, ic));
   }
   function Sc(t, n) {
     t *= Xa;
@@ -67794,14 +67834,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       f = eu(a * a + u * u + c * c),
       s = ou(f),
       l = f && -s / f;
-    (Qu += l * a),
+    ((Qu += l * a),
       (Ju += l * u),
       (Ku += l * c),
       (Hu += s),
       ($u += s * (ec + (ec = r))),
       (Wu += s * (rc + (rc = i))),
       (Zu += s * (ic + (ic = o))),
-      bc(ec, rc, ic);
+      bc(ec, rc, ic));
   }
   function kc(t) {
     return function () {
@@ -67810,7 +67850,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   }
   function Ec(t, n) {
     function e(e, r) {
-      return (e = t(e, r)), n(e[0], e[1]);
+      return ((e = t(e, r)), n(e[0], e[1]));
     }
     return (
       t.invert &&
@@ -67840,7 +67880,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   }
   function Rc(t) {
     var n = zc(t);
-    return (n.invert = zc(-t)), n;
+    return ((n.invert = zc(-t)), n);
   }
   function Dc(t, n) {
     var e = Wa(t),
@@ -67869,12 +67909,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   }
   function qc(t) {
     function n(n) {
-      return ((n = t(n[0] * Xa, n[1] * Xa))[0] *= Ha), (n[1] *= Ha), n;
+      return (((n = t(n[0] * Xa, n[1] * Xa))[0] *= Ha), (n[1] *= Ha), n);
     }
     return (
       (t = Pc(t[0] * Xa, t[1] * Xa, t.length > 2 ? t[2] * Xa : 0)),
       (n.invert = function (n) {
-        return ((n = t.invert(n[0] * Xa, n[1] * Xa))[0] *= Ha), (n[1] *= Ha), n;
+        return (
+          ((n = t.invert(n[0] * Xa, n[1] * Xa))[0] *= Ha),
+          (n[1] *= Ha),
+          n
+        );
       }),
       n
     );
@@ -67890,11 +67934,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           (o = Uc(a, o)),
           (r > 0 ? i < o : i > o) && (i += r * ja));
       for (var f, s = i; r > 0 ? s > o : s < o; s -= c)
-        (f = Tu([a, -u * Wa(s), -u * tu(s)])), t.point(f[0], f[1]);
+        ((f = Tu([a, -u * Wa(s), -u * tu(s)])), t.point(f[0], f[1]));
     }
   }
   function Uc(t, n) {
-    ((n = Su(n))[0] -= t), zu(n);
+    (((n = Su(n))[0] -= t), zu(n));
     var e = iu(-n[1]);
     return ((-n[2] < 0 ? -e : e) + ja - Oa) % ja;
   }
@@ -67914,7 +67958,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       },
       result: function () {
         var e = n;
-        return (n = []), (t = null), e;
+        return ((n = []), (t = null), e);
       },
     };
   }
@@ -67922,12 +67966,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return Ga(t[0] - n[0]) < Oa && Ga(t[1] - n[1]) < Oa;
   }
   function Yc(t, n, e, r) {
-    (this.x = t),
+    ((this.x = t),
       (this.z = n),
       (this.o = e),
       (this.e = r),
       (this.v = !1),
-      (this.n = this.p = null);
+      (this.n = this.p = null));
   }
   function Fc(t, n, e, r, i) {
     var o,
@@ -67945,10 +67989,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             for (i.lineStart(), o = 0; o < n; ++o) i.point((r = t[o])[0], r[1]);
             i.lineEnd();
           } else
-            u.push((e = new Yc(r, t, null, !0))),
+            (u.push((e = new Yc(r, t, null, !0))),
               c.push((e.o = new Yc(r, null, e, !1))),
               u.push((e = new Yc(a, t, null, !1))),
-              c.push((e.o = new Yc(a, null, e, !0)));
+              c.push((e.o = new Yc(a, null, e, !0))));
         }
       }),
       u.length)
@@ -67957,7 +68001,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         c[o].e = e = !e;
       for (var f, s, l = u[0]; ; ) {
         for (var h = l, d = !0; h.v; ) if ((h = h.n) === l) return;
-        (f = h.z), i.lineStart();
+        ((f = h.z), i.lineStart());
         do {
           if (((h.v = h.o.v = !0), h.e)) {
             if (d)
@@ -67972,7 +68016,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             else r(h.x, h.p.x, -1, i);
             h = h.p;
           }
-          (f = (h = h.o).z), (d = !d);
+          ((f = (h = h.o).z), (d = !d));
         } while (!h.v);
         i.lineEnd();
       }
@@ -67981,8 +68025,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function Ic(t) {
     if ((n = t.length)) {
       for (var n, e, r = 0, i = t[0]; ++r < n; )
-        (i.n = e = t[r]), (e.p = i), (i = e);
-      (i.n = e = t[0]), (e.p = i);
+        ((i.n = e = t[r]), (e.p = i), (i = e));
+      ((i.n = e = t[0]), (e.p = i));
     }
   }
   Cc.invert = Cc;
@@ -67994,7 +68038,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       o = [tu(e), -Wa(e), 0],
       a = 0,
       u = 0;
-    jc.reset(), 1 === i ? (r = Fa + Oa) : -1 === i && (r = -Fa - Oa);
+    (jc.reset(), 1 === i ? (r = Fa + Oa) : -1 === i && (r = -Fa - Oa));
     for (var c = 0, f = t.length; c < f; ++c)
       if ((l = (s = t[c]).length))
         for (
@@ -68049,16 +68093,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           lineStart: v,
           lineEnd: g,
           polygonStart: function () {
-            (h.point = y),
+            ((h.point = y),
               (h.lineStart = _),
               (h.lineEnd = b),
               (a = []),
-              (o = []);
+              (o = []));
           },
           polygonEnd: function () {
-            (h.point = d), (h.lineStart = v), (h.lineEnd = g), (a = T(a));
+            ((h.point = d), (h.lineStart = v), (h.lineEnd = g), (a = T(a)));
             var t = Hc(o, r);
-            a.length
+            (a.length
               ? (l || (i.polygonStart(), (l = !0)), Fc(a, Vc, t, e, i))
               : t &&
                 (l || (i.polygonStart(), (l = !0)),
@@ -68066,14 +68110,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 e(null, null, 1, i),
                 i.lineEnd()),
               l && (i.polygonEnd(), (l = !1)),
-              (a = o = null);
+              (a = o = null));
           },
           sphere: function () {
-            i.polygonStart(),
+            (i.polygonStart(),
               i.lineStart(),
               e(null, null, 1, i),
               i.lineEnd(),
-              i.polygonEnd();
+              i.polygonEnd());
           },
         };
       function d(n, e) {
@@ -68083,19 +68127,19 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         c.point(t, n);
       }
       function v() {
-        (h.point = p), c.lineStart();
+        ((h.point = p), c.lineStart());
       }
       function g() {
-        (h.point = d), c.lineEnd();
+        ((h.point = d), c.lineEnd());
       }
       function y(t, n) {
-        u.push([t, n]), s.point(t, n);
+        (u.push([t, n]), s.point(t, n));
       }
       function _() {
-        s.lineStart(), (u = []);
+        (s.lineStart(), (u = []));
       }
       function b() {
-        y(u[0][0], u[0][1]), s.lineEnd();
+        (y(u[0][0], u[0][1]), s.lineEnd());
         var t,
           n,
           e,
@@ -68115,8 +68159,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               i.lineEnd();
             }
           } else
-            d > 1 && 2 & c && h.push(h.pop().concat(h.shift())),
-              a.push(h.filter(Gc));
+            (d > 1 && 2 & c && h.push(h.pop().concat(h.shift())),
+              a.push(h.filter(Gc)));
       }
       return h;
     };
@@ -68141,12 +68185,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         i = NaN;
       return {
         lineStart: function () {
-          t.lineStart(), (n = 1);
+          (t.lineStart(), (n = 1));
         },
         point: function (o, a) {
           var u = o > 0 ? Ya : -Ya,
             c = Ga(o - e);
-          Ga(c - Ya) < Oa
+          (Ga(c - Ya) < Oa
             ? (t.point(e, (r = (r + a) / 2 > 0 ? Fa : -Fa)),
               t.point(i, r),
               t.lineEnd(),
@@ -68176,10 +68220,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               t.point(u, r),
               (n = 0)),
             t.point((e = o), (r = a)),
-            (i = u);
+            (i = u));
         },
         lineEnd: function () {
-          t.lineEnd(), (e = r = NaN);
+          (t.lineEnd(), (e = r = NaN));
         },
         clean: function () {
           return 2 - n;
@@ -68189,7 +68233,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     function (t, n, e, r) {
       var i;
       if (null == t)
-        (i = e * Fa),
+        ((i = e * Fa),
           r.point(-Ya, i),
           r.point(0, i),
           r.point(Ya, i),
@@ -68198,10 +68242,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           r.point(0, -i),
           r.point(-Ya, -i),
           r.point(-Ya, 0),
-          r.point(-Ya, i);
+          r.point(-Ya, i));
       else if (Ga(t[0] - n[0]) > Oa) {
         var o = t[0] < n[0] ? Ya : -Ya;
-        (i = (e * o) / 2), r.point(-o, i), r.point(0, i), r.point(o, i);
+        ((i = (e * o) / 2), r.point(-o, i), r.point(0, i), r.point(o, i));
       } else r.point(n[0], n[1]);
     },
     [-Ya, -Fa]
@@ -68251,7 +68295,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             : (N > Ya) ^ (m <= _[0] && _[0] <= x))
         ) {
           var T = Pu(d, (-p + y) / v);
-          return Cu(T, h), [_, Tu(T)];
+          return (Cu(T, h), [_, Tu(T)]);
         }
       }
     }
@@ -68270,7 +68314,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         var n, e, c, f, s;
         return {
           lineStart: function () {
-            (f = c = !1), (s = 1);
+            ((f = c = !1), (s = 1));
           },
           point: function (l, h) {
             var d,
@@ -68284,11 +68328,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 ((p[0] += Oa), (p[1] += Oa), (v = o(p[0], p[1]))),
               v !== c)
             )
-              (s = 0),
+              ((s = 0),
                 v
                   ? (t.lineStart(), (d = a(p, n)), t.point(d[0], d[1]))
                   : ((d = a(n, p)), t.point(d[0], d[1]), t.lineEnd()),
-                (n = d);
+                (n = d));
             else if (i && n && r ^ v) {
               var y;
               g & e ||
@@ -68304,13 +68348,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                     t.lineStart(),
                     t.point(y[0][0], y[0][1])));
             }
-            !v || (n && Bc(n, p)) || t.point(p[0], p[1]),
+            (!v || (n && Bc(n, p)) || t.point(p[0], p[1]),
               (n = p),
               (c = v),
-              (e = g);
+              (e = g));
           },
           lineEnd: function () {
-            c && t.lineEnd(), (n = null);
+            (c && t.lineEnd(), (n = null));
           },
           clean: function () {
             return s | ((f && c) << 1);
@@ -68392,15 +68436,15 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         x = {
           point: w,
           lineStart: function () {
-            (x.point = M), f && f.push((s = []));
-            (y = !0), (g = !1), (p = v = NaN);
+            ((x.point = M), f && f.push((s = [])));
+            ((y = !0), (g = !1), (p = v = NaN));
           },
           lineEnd: function () {
             c && (M(l, h), d && g && m.rejoin(), c.push(m.result()));
-            (x.point = w), g && b.lineEnd();
+            ((x.point = w), g && b.lineEnd());
           },
           polygonStart: function () {
-            (b = m), (c = []), (f = []), (_ = !0);
+            ((b = m), (c = []), (f = []), (_ = !0));
           },
           polygonEnd: function () {
             var n = (function () {
@@ -68417,7 +68461,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                     c < s;
                     ++c
                   )
-                    (o = h),
+                    ((o = h),
                       (a = d),
                       (l = u[c]),
                       (h = l[0]),
@@ -68426,7 +68470,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                         ? d > r && (h - o) * (r - a) > (d - a) * (t - o) && ++n
                         : d <= r &&
                           (h - o) * (r - a) < (d - a) * (t - o) &&
-                          --n;
+                          --n);
                 return n;
               })(),
               e = _ && n,
@@ -68436,7 +68480,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               e && (a.lineStart(), o(null, null, 1, a), a.lineEnd()),
               i && Fc(c, u, n, o, a),
               a.polygonEnd());
-            (b = a), (c = f = s = null);
+            ((b = a), (c = f = s = null));
           },
         };
       function w(t, n) {
@@ -68445,11 +68489,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       function M(o, a) {
         var u = i(o, a);
         if ((f && s.push([o, a]), y))
-          (l = o),
+          ((l = o),
             (h = a),
             (d = u),
             (y = !1),
-            u && (b.lineStart(), b.point(o, a));
+            u && (b.lineStart(), b.point(o, a)));
         else if (u && g) b.point(o, a);
         else {
           var c = [
@@ -68516,7 +68560,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               u || b.lineEnd(),
               (_ = !1));
         }
-        (p = o), (v = a), (g = u);
+        ((p = o), (v = a), (g = u));
       }
       return x;
     };
@@ -68529,7 +68573,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       sphere: uu,
       point: uu,
       lineStart: function () {
-        (rf.point = af), (rf.lineEnd = of);
+        ((rf.point = af), (rf.lineEnd = of));
       },
       lineEnd: uu,
       polygonStart: uu,
@@ -68539,7 +68583,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     rf.point = rf.lineEnd = uu;
   }
   function af(t, n) {
-    (Kc = t *= Xa), (tf = tu((n *= Xa))), (nf = Wa(n)), (rf.point = uf);
+    ((Kc = t *= Xa), (tf = tu((n *= Xa))), (nf = Wa(n)), (rf.point = uf));
   }
   function uf(t, n) {
     t *= Xa;
@@ -68550,15 +68594,15 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       a = r * tu(i),
       u = nf * e - tf * r * o,
       c = tf * e + nf * r * o;
-    ef.add($a(eu(a * a + u * u), c)), (Kc = t), (tf = e), (nf = r);
+    (ef.add($a(eu(a * a + u * u), c)), (Kc = t), (tf = e), (nf = r));
   }
   function cf(t) {
-    return ef.reset(), du(t, rf), +ef;
+    return (ef.reset(), du(t, rf), +ef);
   }
   var ff = [null, null],
     sf = {type: 'LineString', coordinates: ff};
   function lf(t, n) {
-    return (ff[0] = t), (ff[1] = n), cf(sf);
+    return ((ff[0] = t), (ff[1] = n), cf(sf));
   }
   var hf = {
       Feature: function (t, n) {
@@ -68618,7 +68662,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return !!Hc(t.map(_f), bf(n));
   }
   function _f(t) {
-    return (t = t.map(bf)).pop(), t;
+    return ((t = t.map(bf)).pop(), t);
   }
   function bf(t) {
     return [t[0] * Xa, t[1] * Xa];
@@ -68772,24 +68816,26 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       lineStart: uu,
       lineEnd: uu,
       polygonStart: function () {
-        (Cf.lineStart = Pf), (Cf.lineEnd = Df);
+        ((Cf.lineStart = Pf), (Cf.lineEnd = Df));
       },
       polygonEnd: function () {
-        (Cf.lineStart = Cf.lineEnd = Cf.point = uu), kf.add(Ga(Ef)), Ef.reset();
+        ((Cf.lineStart = Cf.lineEnd = Cf.point = uu),
+          kf.add(Ga(Ef)),
+          Ef.reset());
       },
       result: function () {
         var t = kf / 2;
-        return kf.reset(), t;
+        return (kf.reset(), t);
       },
     };
   function Pf() {
     Cf.point = zf;
   }
   function zf(t, n) {
-    (Cf.point = Rf), (Nf = Tf = t), (Af = Sf = n);
+    ((Cf.point = Rf), (Nf = Tf = t), (Af = Sf = n));
   }
   function Rf(t, n) {
-    Ef.add(Sf * t - Tf * n), (Tf = t), (Sf = n);
+    (Ef.add(Sf * t - Tf * n), (Tf = t), (Sf = n));
   }
   function Df() {
     Rf(Nf, Af);
@@ -68814,7 +68860,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           [qf, Lf],
           [Uf, Of],
         ];
-        return (Uf = Of = -(Lf = qf = 1 / 0)), t;
+        return ((Uf = Of = -(Lf = qf = 1 / 0)), t);
       },
     };
   var Yf,
@@ -68835,10 +68881,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       lineStart: ns,
       lineEnd: is,
       polygonStart: function () {
-        (Kf.lineStart = os), (Kf.lineEnd = as);
+        ((Kf.lineStart = os), (Kf.lineEnd = as));
       },
       polygonEnd: function () {
-        (Kf.point = ts), (Kf.lineStart = ns), (Kf.lineEnd = is);
+        ((Kf.point = ts), (Kf.lineStart = ns), (Kf.lineEnd = is));
       },
       result: function () {
         var t = Jf
@@ -68848,26 +68894,26 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             : Gf
               ? [Hf / Gf, Xf / Gf]
               : [NaN, NaN];
-        return (Hf = Xf = Gf = Vf = $f = Wf = Zf = Qf = Jf = 0), t;
+        return ((Hf = Xf = Gf = Vf = $f = Wf = Zf = Qf = Jf = 0), t);
       },
     };
   function ts(t, n) {
-    (Hf += t), (Xf += n), ++Gf;
+    ((Hf += t), (Xf += n), ++Gf);
   }
   function ns() {
     Kf.point = es;
   }
   function es(t, n) {
-    (Kf.point = rs), ts((If = t), (jf = n));
+    ((Kf.point = rs), ts((If = t), (jf = n)));
   }
   function rs(t, n) {
     var e = t - If,
       r = n - jf,
       i = eu(e * e + r * r);
-    (Vf += (i * (If + t)) / 2),
+    ((Vf += (i * (If + t)) / 2),
       ($f += (i * (jf + n)) / 2),
       (Wf += i),
-      ts((If = t), (jf = n));
+      ts((If = t), (jf = n)));
   }
   function is() {
     Kf.point = ts;
@@ -68879,19 +68925,19 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     cs(Yf, Ff);
   }
   function us(t, n) {
-    (Kf.point = cs), ts((Yf = If = t), (Ff = jf = n));
+    ((Kf.point = cs), ts((Yf = If = t), (Ff = jf = n)));
   }
   function cs(t, n) {
     var e = t - If,
       r = n - jf,
       i = eu(e * e + r * r);
-    (Vf += (i * (If + t)) / 2),
+    ((Vf += (i * (If + t)) / 2),
       ($f += (i * (jf + n)) / 2),
       (Wf += i),
       (Zf += (i = jf * t - If * n) * (If + t)),
       (Qf += i * (jf + n)),
       (Jf += 3 * i),
-      ts((If = t), (jf = n));
+      ts((If = t), (jf = n)));
   }
   function fs(t) {
     this._context = t;
@@ -68899,7 +68945,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   fs.prototype = {
     _radius: 4.5,
     pointRadius: function (t) {
-      return (this._radius = t), this;
+      return ((this._radius = t), this);
     },
     polygonStart: function () {
       this._line = 0;
@@ -68911,19 +68957,19 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       this._point = 0;
     },
     lineEnd: function () {
-      0 === this._line && this._context.closePath(), (this._point = NaN);
+      (0 === this._line && this._context.closePath(), (this._point = NaN));
     },
     point: function (t, n) {
       switch (this._point) {
         case 0:
-          this._context.moveTo(t, n), (this._point = 1);
+          (this._context.moveTo(t, n), (this._point = 1));
           break;
         case 1:
           this._context.lineTo(t, n);
           break;
         default:
-          this._context.moveTo(t + this._radius, n),
-            this._context.arc(t, n, this._radius, 0, ja);
+          (this._context.moveTo(t + this._radius, n),
+            this._context.arc(t, n, this._radius, 0, ja));
       }
     },
     result: uu,
@@ -68940,7 +68986,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         gs.point = ys;
       },
       lineEnd: function () {
-        ss && _s(ls, hs), (gs.point = uu);
+        (ss && _s(ls, hs), (gs.point = uu));
       },
       polygonStart: function () {
         ss = !0;
@@ -68950,14 +68996,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       },
       result: function () {
         var t = +vs;
-        return vs.reset(), t;
+        return (vs.reset(), t);
       },
     };
   function ys(t, n) {
-    (gs.point = _s), (ls = ds = t), (hs = ps = n);
+    ((gs.point = _s), (ls = ds = t), (hs = ps = n));
   }
   function _s(t, n) {
-    (ds -= t), (ps -= n), vs.add(eu(ds * ds + ps * ps)), (ds = t), (ps = n);
+    ((ds -= t), (ps -= n), vs.add(eu(ds * ds + ps * ps)), (ds = t), (ps = n));
   }
   function bs() {
     this._string = [];
@@ -68985,7 +69031,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return function (n) {
       var e = new ws();
       for (var r in t) e[r] = t[r];
-      return (e.stream = n), e;
+      return ((e.stream = n), e);
     };
   }
   function ws() {}
@@ -69043,7 +69089,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       e
     );
   }
-  (bs.prototype = {
+  ((bs.prototype = {
     _radius: 4.5,
     _circle: ms(4.5),
     pointRadius: function (t) {
@@ -69063,25 +69109,25 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       this._point = 0;
     },
     lineEnd: function () {
-      0 === this._line && this._string.push('Z'), (this._point = NaN);
+      (0 === this._line && this._string.push('Z'), (this._point = NaN));
     },
     point: function (t, n) {
       switch (this._point) {
         case 0:
-          this._string.push('M', t, ',', n), (this._point = 1);
+          (this._string.push('M', t, ',', n), (this._point = 1));
           break;
         case 1:
           this._string.push('L', t, ',', n);
           break;
         default:
-          null == this._circle && (this._circle = ms(this._radius)),
-            this._string.push('M', t, ',', n, this._circle);
+          (null == this._circle && (this._circle = ms(this._radius)),
+            this._string.push('M', t, ',', n, this._circle));
       }
     },
     result: function () {
       if (this._string.length) {
         var t = this._string.join('');
-        return (this._string = []), t;
+        return ((this._string = []), t);
       }
       return null;
     },
@@ -69106,7 +69152,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       polygonEnd: function () {
         this.stream.polygonEnd();
       },
-    });
+    }));
   var ks = 16,
     Es = Wa(30 * Xa);
   function Cs(t, n) {
@@ -69156,22 +69202,22 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 lineStart: y,
                 lineEnd: b,
                 polygonStart: function () {
-                  n.polygonStart(), (v.lineStart = m);
+                  (n.polygonStart(), (v.lineStart = m));
                 },
                 polygonEnd: function () {
-                  n.polygonEnd(), (v.lineStart = y);
+                  (n.polygonEnd(), (v.lineStart = y));
                 },
               };
             function g(e, r) {
-              (e = t(e, r)), n.point(e[0], e[1]);
+              ((e = t(e, r)), n.point(e[0], e[1]));
             }
             function y() {
-              (s = NaN), (v.point = _), n.lineStart();
+              ((s = NaN), (v.point = _), n.lineStart());
             }
             function _(r, i) {
               var o = Su([r, i]),
                 a = t(r, i);
-              e(
+              (e(
                 s,
                 l,
                 f,
@@ -69187,27 +69233,27 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 ks,
                 n
               ),
-                n.point(s, l);
+                n.point(s, l));
             }
             function b() {
-              (v.point = g), n.lineEnd();
+              ((v.point = g), n.lineEnd());
             }
             function m() {
-              y(), (v.point = x), (v.lineEnd = w);
+              (y(), (v.point = x), (v.lineEnd = w));
             }
             function x(t, n) {
-              _((r = t), n),
+              (_((r = t), n),
                 (i = s),
                 (o = l),
                 (a = h),
                 (u = d),
                 (c = p),
-                (v.point = _);
+                (v.point = _));
             }
             function w() {
-              e(s, l, f, h, d, p, i, o, r, a, u, c, ks, n),
+              (e(s, l, f, h, d, p, i, o, r, a, u, c, ks, n),
                 (v.lineEnd = b),
-                b();
+                b());
             }
             return v;
           };
@@ -69215,7 +69261,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       : (function (t) {
           return xs({
             point: function (n, e) {
-              (n = t(n, e)), this.stream.point(n[0], n[1]);
+              ((n = t(n, e)), this.stream.point(n[0], n[1]));
             },
           });
         })(t);
@@ -69298,11 +69344,15 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               }
         )(l, h - t[0], d - t[1], b);
       return (
-        (e = Pc(g, y, _)), (u = Ec(n, r)), (c = Ec(e, u)), (a = Cs(u, N)), k()
+        (e = Pc(g, y, _)),
+        (u = Ec(n, r)),
+        (c = Ec(e, u)),
+        (a = Cs(u, N)),
+        k()
       );
     }
     function k() {
-      return (f = s = null), A;
+      return ((f = s = null), A);
     }
     return (
       (A.stream = function (t) {
@@ -69387,7 +69437,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         return Ss(A, t, n);
       }),
       function () {
-        return (n = t.apply(this, arguments)), (A.invert = n.invert && T), S();
+        return (
+          (n = t.apply(this, arguments)),
+          (A.invert = n.invert && T),
+          S()
+        );
       }
     );
   }
@@ -69580,13 +69634,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       o
     );
   }
-  (Is.invert = Ys(function (t) {
+  ((Is.invert = Ys(function (t) {
     return t;
   })),
     (js.invert = function (t, n) {
       return [t, 2 * Va(Qa(n)) - Fa];
     }),
-    (Vs.invert = Vs);
+    (Vs.invert = Vs));
   var Ws = 1.340264,
     Zs = -0.081106,
     Qs = 893e-6,
@@ -69668,9 +69722,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     for (null == n && (n = hl); (e = f.pop()); )
       if ((c && (e.value = +e.data.value), (i = n(e.data)) && (a = i.length)))
         for (e.children = new Array(a), o = a - 1; o >= 0; --o)
-          f.push((r = e.children[o] = new vl(i[o]))),
+          (f.push((r = e.children[o] = new vl(i[o]))),
             (r.parent = e),
-            (r.depth = e.depth + 1);
+            (r.depth = e.depth + 1));
     return u.eachBefore(pl);
   }
   function hl(t) {
@@ -69686,9 +69740,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     } while ((t = t.parent) && t.height < ++n);
   }
   function vl(t) {
-    (this.data = t), (this.depth = this.height = 0), (this.parent = null);
+    ((this.data = t), (this.depth = this.height = 0), (this.parent = null));
   }
-  (tl.invert = function (t, n) {
+  ((tl.invert = function (t, n) {
     for (
       var e, r = n, i = r * r, o = i * i * i, a = 0;
       a < 12 &&
@@ -69797,15 +69851,15 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   r = n.ancestors(),
                   i = null;
                 for (t = e.pop(), n = r.pop(); t === n; )
-                  (i = t), (t = e.pop()), (n = r.pop());
+                  ((i = t), (t = e.pop()), (n = r.pop()));
                 return i;
               })(n, t),
               r = [n];
             n !== e;
 
           )
-            (n = n.parent), r.push(n);
-          for (var i = r.length; t !== e; ) r.splice(i, 0, t), (t = t.parent);
+            ((n = n.parent), r.push(n));
+          for (var i = r.length; t !== e; ) (r.splice(i, 0, t), (t = t.parent));
           return r;
         },
         ancestors: function () {
@@ -69843,7 +69897,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         copy: function () {
           return ll(this).eachBefore(dl);
         },
-      });
+      }));
   var gl = Array.prototype.slice;
   function yl(t) {
     for (
@@ -69852,17 +69906,17 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         r = 0,
         i = (t = (function (t) {
           for (var n, e, r = t.length; r; )
-            (e = (Math.random() * r--) | 0),
+            ((e = (Math.random() * r--) | 0),
               (n = t[r]),
               (t[r] = t[e]),
-              (t[e] = n);
+              (t[e] = n));
           return t;
         })(gl.call(t))).length,
         o = [];
       r < i;
 
     )
-      (n = t[r]), e && ml(e, n) ? ++r : ((e = wl((o = _l(o, n)))), (r = 0));
+      ((n = t[r]), e && ml(e, n) ? ++r : ((e = wl((o = _l(o, n)))), (r = 0)));
     return e;
   }
   function _l(t, n) {
@@ -69993,7 +70047,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return i * i + o * o;
   }
   function kl(t) {
-    (this._ = t), (this.next = null), (this.previous = null);
+    ((this._ = t), (this.next = null), (this.previous = null));
   }
   function El(t) {
     if (!(i = t.length)) return 0;
@@ -70001,33 +70055,33 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     if ((((n = t[0]).x = 0), (n.y = 0), !(i > 1))) return n.r;
     if (((e = t[1]), (n.x = -e.r), (e.x = n.r), (e.y = 0), !(i > 2)))
       return n.r + e.r;
-    Al(e, n, (r = t[2])),
+    (Al(e, n, (r = t[2])),
       (n = new kl(n)),
       (e = new kl(e)),
       (r = new kl(r)),
       (n.next = r.previous = e),
       (e.next = n.previous = r),
-      (r.next = e.previous = n);
+      (r.next = e.previous = n));
     t: for (u = 3; u < i; ++u) {
-      Al(n._, e._, (r = t[u])),
+      (Al(n._, e._, (r = t[u])),
         (r = new kl(r)),
         (c = e.next),
         (f = n.previous),
         (s = e._.r),
-        (l = n._.r);
+        (l = n._.r));
       do {
         if (s <= l) {
           if (Tl(c._, r._)) {
-            (e = c), (n.next = e), (e.previous = n), --u;
+            ((e = c), (n.next = e), (e.previous = n), --u);
             continue t;
           }
-          (s += c._.r), (c = c.next);
+          ((s += c._.r), (c = c.next));
         } else {
           if (Tl(f._, r._)) {
-            ((n = f).next = e), (e.previous = n), --u;
+            (((n = f).next = e), (e.previous = n), --u);
             continue t;
           }
-          (l += f._.r), (f = f.previous);
+          ((l += f._.r), (f = f.previous));
         }
       } while (c !== f.next);
       for (
@@ -70039,7 +70093,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       e = n.next;
     }
     for (n = [e._], r = e; (r = r.next) !== e; ) n.push(r._);
-    for (r = yl(n), u = 0; u < i; ++u) ((n = t[u]).x -= r.x), (n.y -= r.y);
+    for (r = yl(n), u = 0; u < i; ++u) (((n = t[u]).x -= r.x), (n.y -= r.y));
     return r.r;
   }
   function Cl(t) {
@@ -70079,14 +70133,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function Ll(t) {
     return function (n) {
       var e = n.parent;
-      (n.r *= t), e && ((n.x = e.x + t * n.x), (n.y = e.y + t * n.y));
+      ((n.r *= t), e && ((n.x = e.x + t * n.x), (n.y = e.y + t * n.y)));
     };
   }
   function Ul(t) {
-    (t.x0 = Math.round(t.x0)),
+    ((t.x0 = Math.round(t.x0)),
       (t.y0 = Math.round(t.y0)),
       (t.x1 = Math.round(t.x1)),
-      (t.y1 = Math.round(t.y1));
+      (t.y1 = Math.round(t.y1)));
   }
   function Ol(t, n, e, r, i) {
     for (
@@ -70098,7 +70152,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       ++u < c;
 
     )
-      ((o = a[u]).y0 = e), (o.y1 = i), (o.x0 = n), (o.x1 = n += o.value * f);
+      (((o = a[u]).y0 = e), (o.y1 = i), (o.x0 = n), (o.x1 = n += o.value * f));
   }
   var Bl = '$',
     Yl = {depth: -1},
@@ -70122,13 +70176,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   }
   function Vl(t, n, e) {
     var r = e / (n.i - t.i);
-    (n.c -= r), (n.s += e), (t.c += r), (n.z += e), (n.m += e);
+    ((n.c -= r), (n.s += e), (t.c += r), (n.z += e), (n.m += e));
   }
   function $l(t, n, e) {
     return t.a.parent === n.parent ? t.a : e;
   }
   function Wl(t, n) {
-    (this._ = t),
+    ((this._ = t),
       (this.parent = null),
       (this.children = null),
       (this.A = null),
@@ -70138,7 +70192,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       (this.c = 0),
       (this.s = 0),
       (this.t = null),
-      (this.i = n);
+      (this.i = n));
   }
   function Zl(t, n, e, r, i) {
     for (
@@ -70150,7 +70204,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       ++u < c;
 
     )
-      ((o = a[u]).x0 = n), (o.x1 = r), (o.y0 = e), (o.y1 = e += o.value * f);
+      (((o = a[u]).x0 = n), (o.x1 = r), (o.y0 = e), (o.y1 = e += o.value * f));
   }
   Wl.prototype = Object.create(vl.prototype);
   var Ql = (1 + Math.sqrt(5)) / 2;
@@ -70176,7 +70230,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       b < x;
 
     ) {
-      (c = i - e), (f = o - r);
+      ((c = i - e), (f = o - r));
       do {
         s = _[m++].value;
       } while (!s && m < x);
@@ -70199,12 +70253,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         }
         p = d;
       }
-      y.push((a = {value: s, dice: c < f, children: _.slice(b, m)})),
+      (y.push((a = {value: s, dice: c < f, children: _.slice(b, m)})),
         a.dice
           ? Ol(a, e, r, i, w ? (r += (f * s) / w) : o)
           : Zl(a, e, r, w ? (e += (c * s) / w) : i, o),
         (w -= s),
-        (b = m);
+        (b = m));
     }
     return y;
   }
@@ -70229,12 +70283,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             ++f
           )
             u.value += c[f].value;
-          u.dice
+          (u.dice
             ? Ol(u, e, r, i, (r += ((o - r) * u.value) / d))
             : Zl(u, e, r, (e += ((i - e) * u.value) / d), o),
-            (d -= u.value);
+            (d -= u.value));
         }
-      else (t._squarify = a = Jl(n, t, e, r, i, o)), (a.ratio = n);
+      else ((t._squarify = a = Jl(n, t, e, r, i, o)), (a.ratio = n));
     }
     return (
       (e.ratio = function (n) {
@@ -70276,7 +70330,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           }
         );
       }
-      return (e.source = t), e;
+      return ((e.source = t), e);
     })(rh),
     oh = (function t(n) {
       function e(t, e) {
@@ -70286,16 +70340,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           (e = null == e ? 1 : +e),
           function () {
             var o;
-            if (null != r) (o = r), (r = null);
+            if (null != r) ((o = r), (r = null));
             else
               do {
-                (r = 2 * n() - 1), (o = 2 * n() - 1), (i = r * r + o * o);
+                ((r = 2 * n() - 1), (o = 2 * n() - 1), (i = r * r + o * o));
               } while (!i || i > 1);
             return t + e * o * Math.sqrt((-2 * Math.log(i)) / i);
           }
         );
       }
-      return (e.source = t), e;
+      return ((e.source = t), e);
     })(rh),
     ah = (function t(n) {
       function e() {
@@ -70304,7 +70358,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           return Math.exp(t());
         };
       }
-      return (e.source = t), e;
+      return ((e.source = t), e);
     })(rh),
     uh = (function t(n) {
       function e(t) {
@@ -70313,7 +70367,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           return e;
         };
       }
-      return (e.source = t), e;
+      return ((e.source = t), e);
     })(rh),
     ch = (function t(n) {
       function e(t) {
@@ -70322,7 +70376,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           return e() / t;
         };
       }
-      return (e.source = t), e;
+      return ((e.source = t), e);
     })(rh),
     fh = (function t(n) {
       function e(t) {
@@ -70330,7 +70384,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           return -Math.log(1 - n()) / t;
         };
       }
-      return (e.source = t), e;
+      return ((e.source = t), e);
     })(rh);
   function sh(t, n) {
     switch (arguments.length) {
@@ -70377,7 +70431,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return (
       (i.domain = function (e) {
         if (!arguments.length) return n.slice();
-        (n = []), (t = Qi());
+        ((n = []), (t = Qi()));
         for (var r, o, a = -1, u = e.length; ++a < u; )
           t.has((o = (r = e[a]) + '')) || t.set(o, n.push(r));
         return i;
@@ -70411,11 +70465,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         s = o[1] < o[0],
         l = o[s - 0],
         h = o[1 - s];
-      (t = (h - l) / Math.max(1, e - u + 2 * c)),
+      ((t = (h - l) / Math.max(1, e - u + 2 * c)),
         a && (t = Math.floor(t)),
         (l += (h - l - t * (e - u)) * f),
         (n = t * (1 - u)),
-        a && ((l = Math.round(l)), (n = Math.round(n)));
+        a && ((l = Math.round(l)), (n = Math.round(n))));
       var d = g(e).map(function (n) {
         return l + t * n;
       });
@@ -70430,7 +70484,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         return arguments.length ? ((o = [+t[0], +t[1]]), s()) : o.slice();
       }),
       (e.rangeRound = function (t) {
-        return (o = [+t[0], +t[1]]), (a = !0), s();
+        return ((o = [+t[0], +t[1]]), (a = !0), s());
       }),
       (e.bandwidth = function () {
         return n;
@@ -70510,7 +70564,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       ++u < r;
 
     )
-      (o[u] = xh(t[u], t[u + 1])), (a[u] = e(n[u], n[u + 1]));
+      ((o[u] = xh(t[u], t[u + 1])), (a[u] = e(n[u], n[u + 1])));
     return function (n) {
       var e = i(t, n, 1, r) - 1;
       return a[e](o[e](n));
@@ -70537,7 +70591,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       f = mh;
     function s() {
       return (
-        (r = Math.min(a.length, u.length) > 2 ? Nh : Mh), (i = o = null), l
+        (r = Math.min(a.length, u.length) > 2 ? Nh : Mh),
+        (i = o = null),
+        l
       );
     }
     function l(n) {
@@ -70556,7 +70612,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         return arguments.length ? ((u = ph.call(t)), s()) : u.slice();
       }),
       (l.rangeRound = function (t) {
-        return (u = ph.call(t)), (c = _e), s();
+        return ((u = ph.call(t)), (c = _e), s());
       }),
       (l.clamp = function (t) {
         return arguments.length ? ((f = t ? wh(a) : mh), l) : f !== mh;
@@ -70568,7 +70624,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         return arguments.length ? ((e = t), l) : e;
       }),
       function (e, r) {
-        return (t = e), (n = r), s();
+        return ((t = e), (n = r), s());
       }
     );
   }
@@ -70762,7 +70818,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         var u = Math.max(1, (a * n) / i.ticks().length);
         return function (t) {
           var n = t / r(Math.round(e(t)));
-          return n * a < a - 0.5 && (n *= a), n <= u ? o(t) : '';
+          return (n * a < a - 0.5 && (n *= a), n <= u ? o(t) : '');
         };
       }),
       (i.nice = function () {
@@ -70841,12 +70897,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     Vh = new Date();
   function $h(t, n, e, r) {
     function i(n) {
-      return t((n = new Date(+n))), n;
+      return (t((n = new Date(+n))), n);
     }
     return (
       (i.floor = i),
       (i.ceil = function (e) {
-        return t((e = new Date(e - 1))), n(e, 1), t(e), e;
+        return (t((e = new Date(e - 1))), n(e, 1), t(e), e);
       }),
       (i.round = function (t) {
         var n = i(t),
@@ -70854,7 +70910,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         return t - n < e - t ? n : e;
       }),
       (i.offset = function (t, e) {
-        return n((t = new Date(+t)), null == e ? 1 : Math.floor(e)), t;
+        return (n((t = new Date(+t)), null == e ? 1 : Math.floor(e)), t);
       }),
       (i.range = function (e, r, o) {
         var a,
@@ -70866,7 +70922,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         )
           return u;
         do {
-          u.push((a = new Date(+e))), n(e, o), t(e);
+          (u.push((a = new Date(+e))), n(e, o), t(e));
         } while (a < e && e < r);
         return u;
       }),
@@ -70885,7 +70941,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       e &&
         ((i.count = function (n, r) {
           return (
-            Gh.setTime(+n), Vh.setTime(+r), t(Gh), t(Vh), Math.floor(e(Gh, Vh))
+            Gh.setTime(+n),
+            Vh.setTime(+r),
+            t(Gh),
+            t(Vh),
+            Math.floor(e(Gh, Vh))
           );
         }),
         (i.every = function (t) {
@@ -71008,8 +71068,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function ud(t) {
     return $h(
       function (n) {
-        n.setDate(n.getDate() - ((n.getDay() + 7 - t) % 7)),
-          n.setHours(0, 0, 0, 0);
+        (n.setDate(n.getDate() - ((n.getDay() + 7 - t) % 7)),
+          n.setHours(0, 0, 0, 0));
       },
       function (t, n) {
         t.setDate(t.getDate() + 7 * n);
@@ -71037,7 +71097,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     xd = pd.range,
     wd = $h(
       function (t) {
-        t.setDate(1), t.setHours(0, 0, 0, 0);
+        (t.setDate(1), t.setHours(0, 0, 0, 0));
       },
       function (t, n) {
         t.setMonth(t.getMonth() + n);
@@ -71054,7 +71114,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     Md = wd.range,
     Nd = $h(
       function (t) {
-        t.setMonth(0, 1), t.setHours(0, 0, 0, 0);
+        (t.setMonth(0, 1), t.setHours(0, 0, 0, 0));
       },
       function (t, n) {
         t.setFullYear(t.getFullYear() + n);
@@ -71070,9 +71130,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return isFinite((t = Math.floor(t))) && t > 0
       ? $h(
           function (n) {
-            n.setFullYear(Math.floor(n.getFullYear() / t) * t),
+            (n.setFullYear(Math.floor(n.getFullYear() / t) * t),
               n.setMonth(0, 1),
-              n.setHours(0, 0, 0, 0);
+              n.setHours(0, 0, 0, 0));
           },
           function (n, e) {
             n.setFullYear(n.getFullYear() + e * t);
@@ -71129,8 +71189,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function zd(t) {
     return $h(
       function (n) {
-        n.setUTCDate(n.getUTCDate() - ((n.getUTCDay() + 7 - t) % 7)),
-          n.setUTCHours(0, 0, 0, 0);
+        (n.setUTCDate(n.getUTCDate() - ((n.getUTCDay() + 7 - t) % 7)),
+          n.setUTCHours(0, 0, 0, 0));
       },
       function (t, n) {
         t.setUTCDate(t.getUTCDate() + 7 * n);
@@ -71156,7 +71216,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     Gd = Bd.range,
     Vd = $h(
       function (t) {
-        t.setUTCDate(1), t.setUTCHours(0, 0, 0, 0);
+        (t.setUTCDate(1), t.setUTCHours(0, 0, 0, 0));
       },
       function (t, n) {
         t.setUTCMonth(t.getUTCMonth() + n);
@@ -71175,7 +71235,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     $d = Vd.range,
     Wd = $h(
       function (t) {
-        t.setUTCMonth(0, 1), t.setUTCHours(0, 0, 0, 0);
+        (t.setUTCMonth(0, 1), t.setUTCHours(0, 0, 0, 0));
       },
       function (t, n) {
         t.setUTCFullYear(t.getUTCFullYear() + n);
@@ -71191,9 +71251,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return isFinite((t = Math.floor(t))) && t > 0
       ? $h(
           function (n) {
-            n.setUTCFullYear(Math.floor(n.getUTCFullYear() / t) * t),
+            (n.setUTCFullYear(Math.floor(n.getUTCFullYear() / t) * t),
               n.setUTCMonth(0, 1),
-              n.setUTCHours(0, 0, 0, 0);
+              n.setUTCHours(0, 0, 0, 0));
           },
           function (n, e) {
             n.setUTCFullYear(n.getUTCFullYear() + e * t);
@@ -71205,14 +71265,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function Qd(t) {
     if (0 <= t.y && t.y < 100) {
       var n = new Date(-1, t.m, t.d, t.H, t.M, t.S, t.L);
-      return n.setFullYear(t.y), n;
+      return (n.setFullYear(t.y), n);
     }
     return new Date(t.y, t.m, t.d, t.H, t.M, t.S, t.L);
   }
   function Jd(t) {
     if (0 <= t.y && t.y < 100) {
       var n = new Date(Date.UTC(-1, t.m, t.d, t.H, t.M, t.S, t.L));
-      return n.setUTCFullYear(t.y), n;
+      return (n.setUTCFullYear(t.y), n);
     }
     return new Date(Date.UTC(t.y, t.m, t.d, t.H, t.M, t.S, t.L));
   }
@@ -71390,7 +71450,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             (o = n[r]) && (r = o(e, i)),
             a.push(r),
             (c = u + 1));
-        return a.push(t.slice(c, u)), a.join('');
+        return (a.push(t.slice(c, u)), a.join(''));
       };
     }
     function M(t, n) {
@@ -71402,7 +71462,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         if ('Q' in o) return new Date(o.Q);
         if (('p' in o && (o.H = (o.H % 12) + 12 * o.p), 'V' in o)) {
           if (o.V < 1 || o.V > 53) return null;
-          'w' in o || (o.w = 1),
+          ('w' in o || (o.w = 1),
             'Z' in o
               ? ((i = (r = Jd(Kd(o.y))).getUTCDay()),
                 (r = i > 4 || 0 === i ? Dd.ceil(r) : Dd(r)),
@@ -71415,7 +71475,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 (r = od.offset(r, 7 * (o.V - 1))),
                 (o.y = r.getFullYear()),
                 (o.m = r.getMonth()),
-                (o.d = r.getDate() + ((o.w + 6) % 7)));
+                (o.d = r.getDate() + ((o.w + 6) % 7))));
         } else
           ('W' in o || 'U' in o) &&
             ('w' in o || (o.w = 'u' in o ? o.u % 7 : 'W' in o ? 1 : 0),
@@ -71932,7 +71992,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       }),
       function (i) {
         return (
-          (r = i), (t = i(o)), (n = i(a)), (e = t === n ? 0 : 1 / (n - t)), f
+          (r = i),
+          (t = i(o)),
+          (n = i(a)),
+          (e = t === n ? 0 : 1 / (n - t)),
+          f
         );
       }
     );
@@ -72508,10 +72572,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         s = a.length,
         l = !1;
       for (null == r && (o = i((f = Hi()))), u = 0; u <= s; ++u)
-        !(u < s && e((c = a[u]), u, a)) === l &&
+        (!(u < s && e((c = a[u]), u, a)) === l &&
           ((l = !l) ? o.lineStart() : o.lineEnd()),
-          l && o.point(+t(c, u, a), +n(c, u, a));
-      if (f) return (o = null), f + '' || null;
+          l && o.point(+t(c, u, a), +n(c, u, a)));
+      if (f) return ((o = null), f + '' || null);
     }
     return (
       (a.x = function (n) {
@@ -72561,18 +72625,18 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         y = new Array(p);
       for (null == o && (u = a((d = Hi()))), f = 0; f <= p; ++f) {
         if (!(f < p && i((h = c[f]), f, c)) === v)
-          if ((v = !v)) (s = f), u.areaStart(), u.lineStart();
+          if ((v = !v)) ((s = f), u.areaStart(), u.lineStart());
           else {
             for (u.lineEnd(), u.lineStart(), l = f - 1; l >= s; --l)
               u.point(g[l], y[l]);
-            u.lineEnd(), u.areaEnd();
+            (u.lineEnd(), u.areaEnd());
           }
         v &&
           ((g[f] = +t(h, f, c)),
           (y[f] = +e(h, f, c)),
           u.point(n ? +n(h, f, c) : g[f], r ? +r(h, f, c) : y[f]));
       }
-      if (d) return (u = null), d + '' || null;
+      if (d) return ((u = null), d + '' || null);
     }
     function f() {
       return wy().defined(i).curve(a).context(o);
@@ -72651,17 +72715,17 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       this._point = 0;
     },
     lineEnd: function () {
-      (this._line || (0 !== this._line && 1 === this._point)) &&
+      ((this._line || (0 !== this._line && 1 === this._point)) &&
         this._context.closePath(),
-        (this._line = 1 - this._line);
+        (this._line = 1 - this._line));
     },
     point: function (t, n) {
       switch (((t = +t), (n = +n), this._point)) {
         case 0:
-          (this._point = 1),
+          ((this._point = 1),
             this._line
               ? this._context.lineTo(t, n)
-              : this._context.moveTo(t, n);
+              : this._context.moveTo(t, n));
           break;
         case 1:
           this._point = 2;
@@ -72678,7 +72742,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     function n(n) {
       return new Sy(t(n));
     }
-    return (n._curve = t), n;
+    return ((n._curve = t), n);
   }
   function Ey(t) {
     var n = t.curve;
@@ -72787,7 +72851,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         ),
         a)
       )
-        return (o = null), a + '' || null;
+        return ((o = null), a + '' || null);
     }
     return (
       (a.source = function (t) {
@@ -72813,28 +72877,28 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     );
   }
   function Uy(t, n, e, r, i) {
-    t.moveTo(n, e), t.bezierCurveTo((n = (n + r) / 2), e, n, i, r, i);
+    (t.moveTo(n, e), t.bezierCurveTo((n = (n + r) / 2), e, n, i, r, i));
   }
   function Oy(t, n, e, r, i) {
-    t.moveTo(n, e), t.bezierCurveTo(n, (e = (e + i) / 2), r, e, r, i);
+    (t.moveTo(n, e), t.bezierCurveTo(n, (e = (e + i) / 2), r, e, r, i));
   }
   function By(t, n, e, r, i) {
     var o = zy(n, e),
       a = zy(n, (e = (e + i) / 2)),
       u = zy(r, e),
       c = zy(r, i);
-    t.moveTo(o[0], o[1]), t.bezierCurveTo(a[0], a[1], u[0], u[1], c[0], c[1]);
+    (t.moveTo(o[0], o[1]), t.bezierCurveTo(a[0], a[1], u[0], u[1], c[0], c[1]));
   }
   var Yy = {
       draw: function (t, n) {
         var e = Math.sqrt(n / cy);
-        t.moveTo(e, 0), t.arc(0, 0, e, 0, sy);
+        (t.moveTo(e, 0), t.arc(0, 0, e, 0, sy));
       },
     },
     Fy = {
       draw: function (t, n) {
         var e = Math.sqrt(n / 5) / 2;
-        t.moveTo(-3 * e, -e),
+        (t.moveTo(-3 * e, -e),
           t.lineTo(-e, -e),
           t.lineTo(-e, -3 * e),
           t.lineTo(e, -3 * e),
@@ -72846,7 +72910,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           t.lineTo(-e, 3 * e),
           t.lineTo(-e, e),
           t.lineTo(-3 * e, e),
-          t.closePath();
+          t.closePath());
       },
     },
     Iy = Math.sqrt(1 / 3),
@@ -72855,11 +72919,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       draw: function (t, n) {
         var e = Math.sqrt(n / jy),
           r = e * Iy;
-        t.moveTo(0, -e),
+        (t.moveTo(0, -e),
           t.lineTo(r, 0),
           t.lineTo(0, e),
           t.lineTo(-r, 0),
-          t.closePath();
+          t.closePath());
       },
     },
     Xy = Math.sin(cy / 10) / Math.sin((7 * cy) / 10),
@@ -72870,12 +72934,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         var e = Math.sqrt(0.8908130915292852 * n),
           r = Gy * e,
           i = Vy * e;
-        t.moveTo(0, -e), t.lineTo(r, i);
+        (t.moveTo(0, -e), t.lineTo(r, i));
         for (var o = 1; o < 5; ++o) {
           var a = (sy * o) / 5,
             u = Math.cos(a),
             c = Math.sin(a);
-          t.lineTo(c * e, -u * e), t.lineTo(u * r - c * i, c * r + u * i);
+          (t.lineTo(c * e, -u * e), t.lineTo(u * r - c * i, c * r + u * i));
         }
         t.closePath();
       },
@@ -72891,10 +72955,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     Qy = {
       draw: function (t, n) {
         var e = -Math.sqrt(n / (3 * Zy));
-        t.moveTo(0, 2 * e),
+        (t.moveTo(0, 2 * e),
           t.lineTo(-Zy * e, -e),
           t.lineTo(Zy * e, -e),
-          t.closePath();
+          t.closePath());
       },
     },
     Jy = Math.sqrt(3) / 2,
@@ -72909,7 +72973,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           a = e * Ky + e,
           u = -o,
           c = a;
-        t.moveTo(r, i),
+        (t.moveTo(r, i),
           t.lineTo(o, a),
           t.lineTo(u, c),
           t.lineTo(-0.5 * r - Jy * i, Jy * r + -0.5 * i),
@@ -72918,7 +72982,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           t.lineTo(-0.5 * r + Jy * i, -0.5 * i - Jy * r),
           t.lineTo(-0.5 * o + Jy * a, -0.5 * a - Jy * o),
           t.lineTo(-0.5 * u + Jy * c, -0.5 * c - Jy * u),
-          t.closePath();
+          t.closePath());
       },
     },
     e_ = [Yy, Fy, Hy, Wy, $y, Qy, n_];
@@ -72943,9 +73007,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     this._context = t;
   }
   function c_(t, n) {
-    (this._basis = new o_(t)), (this._beta = n);
+    ((this._basis = new o_(t)), (this._beta = n));
   }
-  (o_.prototype = {
+  ((o_.prototype = {
     areaStart: function () {
       this._line = 0;
     },
@@ -72953,7 +73017,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       this._line = NaN;
     },
     lineStart: function () {
-      (this._x0 = this._x1 = this._y0 = this._y1 = NaN), (this._point = 0);
+      ((this._x0 = this._x1 = this._y0 = this._y1 = NaN), (this._point = 0));
     },
     lineEnd: function () {
       switch (this._point) {
@@ -72962,41 +73026,41 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         case 2:
           this._context.lineTo(this._x1, this._y1);
       }
-      (this._line || (0 !== this._line && 1 === this._point)) &&
+      ((this._line || (0 !== this._line && 1 === this._point)) &&
         this._context.closePath(),
-        (this._line = 1 - this._line);
+        (this._line = 1 - this._line));
     },
     point: function (t, n) {
       switch (((t = +t), (n = +n), this._point)) {
         case 0:
-          (this._point = 1),
+          ((this._point = 1),
             this._line
               ? this._context.lineTo(t, n)
-              : this._context.moveTo(t, n);
+              : this._context.moveTo(t, n));
           break;
         case 1:
           this._point = 2;
           break;
         case 2:
-          (this._point = 3),
+          ((this._point = 3),
             this._context.lineTo(
               (5 * this._x0 + this._x1) / 6,
               (5 * this._y0 + this._y1) / 6
-            );
+            ));
         default:
           i_(this, t, n);
       }
-      (this._x0 = this._x1),
+      ((this._x0 = this._x1),
         (this._x1 = t),
         (this._y0 = this._y1),
-        (this._y1 = n);
+        (this._y1 = n));
     },
   }),
     (a_.prototype = {
       areaStart: r_,
       areaEnd: r_,
       lineStart: function () {
-        (this._x0 =
+        ((this._x0 =
           this._x1 =
           this._x2 =
           this._x3 =
@@ -73007,15 +73071,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           this._y3 =
           this._y4 =
             NaN),
-          (this._point = 0);
+          (this._point = 0));
       },
       lineEnd: function () {
         switch (this._point) {
           case 1:
-            this._context.moveTo(this._x2, this._y2), this._context.closePath();
+            (this._context.moveTo(this._x2, this._y2),
+              this._context.closePath());
             break;
           case 2:
-            this._context.moveTo(
+            (this._context.moveTo(
               (this._x2 + 2 * this._x3) / 3,
               (this._y2 + 2 * this._y3) / 3
             ),
@@ -73023,38 +73088,38 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 (this._x3 + 2 * this._x2) / 3,
                 (this._y3 + 2 * this._y2) / 3
               ),
-              this._context.closePath();
+              this._context.closePath());
             break;
           case 3:
-            this.point(this._x2, this._y2),
+            (this.point(this._x2, this._y2),
               this.point(this._x3, this._y3),
-              this.point(this._x4, this._y4);
+              this.point(this._x4, this._y4));
         }
       },
       point: function (t, n) {
         switch (((t = +t), (n = +n), this._point)) {
           case 0:
-            (this._point = 1), (this._x2 = t), (this._y2 = n);
+            ((this._point = 1), (this._x2 = t), (this._y2 = n));
             break;
           case 1:
-            (this._point = 2), (this._x3 = t), (this._y3 = n);
+            ((this._point = 2), (this._x3 = t), (this._y3 = n));
             break;
           case 2:
-            (this._point = 3),
+            ((this._point = 3),
               (this._x4 = t),
               (this._y4 = n),
               this._context.moveTo(
                 (this._x0 + 4 * this._x1 + t) / 6,
                 (this._y0 + 4 * this._y1 + n) / 6
-              );
+              ));
             break;
           default:
             i_(this, t, n);
         }
-        (this._x0 = this._x1),
+        ((this._x0 = this._x1),
           (this._x1 = t),
           (this._y0 = this._y1),
-          (this._y1 = n);
+          (this._y1 = n));
       },
     }),
     (u_.prototype = {
@@ -73065,12 +73130,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         this._line = NaN;
       },
       lineStart: function () {
-        (this._x0 = this._x1 = this._y0 = this._y1 = NaN), (this._point = 0);
+        ((this._x0 = this._x1 = this._y0 = this._y1 = NaN), (this._point = 0));
       },
       lineEnd: function () {
-        (this._line || (0 !== this._line && 3 === this._point)) &&
+        ((this._line || (0 !== this._line && 3 === this._point)) &&
           this._context.closePath(),
-          (this._line = 1 - this._line);
+          (this._line = 1 - this._line));
       },
       point: function (t, n) {
         switch (((t = +t), (n = +n), this._point)) {
@@ -73093,15 +73158,15 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           default:
             i_(this, t, n);
         }
-        (this._x0 = this._x1),
+        ((this._x0 = this._x1),
           (this._x1 = t),
           (this._y0 = this._y1),
-          (this._y1 = n);
+          (this._y1 = n));
       },
     }),
     (c_.prototype = {
       lineStart: function () {
-        (this._x = []), (this._y = []), this._basis.lineStart();
+        ((this._x = []), (this._y = []), this._basis.lineStart());
       },
       lineEnd: function () {
         var t = this._x,
@@ -73113,17 +73178,17 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             ++c <= e;
 
           )
-            (r = c / e),
+            ((r = c / e),
               this._basis.point(
                 this._beta * t[c] + (1 - this._beta) * (i + r * a),
                 this._beta * n[c] + (1 - this._beta) * (o + r * u)
-              );
-        (this._x = this._y = null), this._basis.lineEnd();
+              ));
+        ((this._x = this._y = null), this._basis.lineEnd());
       },
       point: function (t, n) {
-        this._x.push(+t), this._y.push(+n);
+        (this._x.push(+t), this._y.push(+n));
       },
-    });
+    }));
   var f_ = (function t(n) {
     function e(t) {
       return 1 === n ? new o_(t) : new c_(t, n);
@@ -73146,7 +73211,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     );
   }
   function l_(t, n) {
-    (this._context = t), (this._k = (1 - n) / 6);
+    ((this._context = t), (this._k = (1 - n) / 6));
   }
   l_.prototype = {
     areaStart: function () {
@@ -73156,8 +73221,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       this._line = NaN;
     },
     lineStart: function () {
-      (this._x0 = this._x1 = this._x2 = this._y0 = this._y1 = this._y2 = NaN),
-        (this._point = 0);
+      ((this._x0 = this._x1 = this._x2 = this._y0 = this._y1 = this._y2 = NaN),
+        (this._point = 0));
     },
     lineEnd: function () {
       switch (this._point) {
@@ -73167,32 +73232,32 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         case 3:
           s_(this, this._x1, this._y1);
       }
-      (this._line || (0 !== this._line && 1 === this._point)) &&
+      ((this._line || (0 !== this._line && 1 === this._point)) &&
         this._context.closePath(),
-        (this._line = 1 - this._line);
+        (this._line = 1 - this._line));
     },
     point: function (t, n) {
       switch (((t = +t), (n = +n), this._point)) {
         case 0:
-          (this._point = 1),
+          ((this._point = 1),
             this._line
               ? this._context.lineTo(t, n)
-              : this._context.moveTo(t, n);
+              : this._context.moveTo(t, n));
           break;
         case 1:
-          (this._point = 2), (this._x1 = t), (this._y1 = n);
+          ((this._point = 2), (this._x1 = t), (this._y1 = n));
           break;
         case 2:
           this._point = 3;
         default:
           s_(this, t, n);
       }
-      (this._x0 = this._x1),
+      ((this._x0 = this._x1),
         (this._x1 = this._x2),
         (this._x2 = t),
         (this._y0 = this._y1),
         (this._y1 = this._y2),
-        (this._y2 = n);
+        (this._y2 = n));
     },
   };
   var h_ = (function t(n) {
@@ -73207,13 +73272,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     );
   })(0);
   function d_(t, n) {
-    (this._context = t), (this._k = (1 - n) / 6);
+    ((this._context = t), (this._k = (1 - n) / 6));
   }
   d_.prototype = {
     areaStart: r_,
     areaEnd: r_,
     lineStart: function () {
-      (this._x0 =
+      ((this._x0 =
         this._x1 =
         this._x2 =
         this._x3 =
@@ -73226,43 +73291,43 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         this._y4 =
         this._y5 =
           NaN),
-        (this._point = 0);
+        (this._point = 0));
     },
     lineEnd: function () {
       switch (this._point) {
         case 1:
-          this._context.moveTo(this._x3, this._y3), this._context.closePath();
+          (this._context.moveTo(this._x3, this._y3), this._context.closePath());
           break;
         case 2:
-          this._context.lineTo(this._x3, this._y3), this._context.closePath();
+          (this._context.lineTo(this._x3, this._y3), this._context.closePath());
           break;
         case 3:
-          this.point(this._x3, this._y3),
+          (this.point(this._x3, this._y3),
             this.point(this._x4, this._y4),
-            this.point(this._x5, this._y5);
+            this.point(this._x5, this._y5));
       }
     },
     point: function (t, n) {
       switch (((t = +t), (n = +n), this._point)) {
         case 0:
-          (this._point = 1), (this._x3 = t), (this._y3 = n);
+          ((this._point = 1), (this._x3 = t), (this._y3 = n));
           break;
         case 1:
-          (this._point = 2),
-            this._context.moveTo((this._x4 = t), (this._y4 = n));
+          ((this._point = 2),
+            this._context.moveTo((this._x4 = t), (this._y4 = n)));
           break;
         case 2:
-          (this._point = 3), (this._x5 = t), (this._y5 = n);
+          ((this._point = 3), (this._x5 = t), (this._y5 = n));
           break;
         default:
           s_(this, t, n);
       }
-      (this._x0 = this._x1),
+      ((this._x0 = this._x1),
         (this._x1 = this._x2),
         (this._x2 = t),
         (this._y0 = this._y1),
         (this._y1 = this._y2),
-        (this._y2 = n);
+        (this._y2 = n));
     },
   };
   var p_ = (function t(n) {
@@ -73277,7 +73342,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     );
   })(0);
   function v_(t, n) {
-    (this._context = t), (this._k = (1 - n) / 6);
+    ((this._context = t), (this._k = (1 - n) / 6));
   }
   v_.prototype = {
     areaStart: function () {
@@ -73287,13 +73352,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       this._line = NaN;
     },
     lineStart: function () {
-      (this._x0 = this._x1 = this._x2 = this._y0 = this._y1 = this._y2 = NaN),
-        (this._point = 0);
+      ((this._x0 = this._x1 = this._x2 = this._y0 = this._y1 = this._y2 = NaN),
+        (this._point = 0));
     },
     lineEnd: function () {
-      (this._line || (0 !== this._line && 3 === this._point)) &&
+      ((this._line || (0 !== this._line && 3 === this._point)) &&
         this._context.closePath(),
-        (this._line = 1 - this._line);
+        (this._line = 1 - this._line));
     },
     point: function (t, n) {
       switch (((t = +t), (n = +n), this._point)) {
@@ -73304,22 +73369,22 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           this._point = 2;
           break;
         case 2:
-          (this._point = 3),
+          ((this._point = 3),
             this._line
               ? this._context.lineTo(this._x2, this._y2)
-              : this._context.moveTo(this._x2, this._y2);
+              : this._context.moveTo(this._x2, this._y2));
           break;
         case 3:
           this._point = 4;
         default:
           s_(this, t, n);
       }
-      (this._x0 = this._x1),
+      ((this._x0 = this._x1),
         (this._x1 = this._x2),
         (this._x2 = t),
         (this._y0 = this._y1),
         (this._y1 = this._y2),
-        (this._y2 = n);
+        (this._y2 = n));
     },
   };
   var g_ = (function t(n) {
@@ -73341,19 +73406,19 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     if (t._l01_a > uy) {
       var u = 2 * t._l01_2a + 3 * t._l01_a * t._l12_a + t._l12_2a,
         c = 3 * t._l01_a * (t._l01_a + t._l12_a);
-      (r = (r * u - t._x0 * t._l12_2a + t._x2 * t._l01_2a) / c),
-        (i = (i * u - t._y0 * t._l12_2a + t._y2 * t._l01_2a) / c);
+      ((r = (r * u - t._x0 * t._l12_2a + t._x2 * t._l01_2a) / c),
+        (i = (i * u - t._y0 * t._l12_2a + t._y2 * t._l01_2a) / c));
     }
     if (t._l23_a > uy) {
       var f = 2 * t._l23_2a + 3 * t._l23_a * t._l12_a + t._l12_2a,
         s = 3 * t._l23_a * (t._l23_a + t._l12_a);
-      (o = (o * f + t._x1 * t._l23_2a - n * t._l12_2a) / s),
-        (a = (a * f + t._y1 * t._l23_2a - e * t._l12_2a) / s);
+      ((o = (o * f + t._x1 * t._l23_2a - n * t._l12_2a) / s),
+        (a = (a * f + t._y1 * t._l23_2a - e * t._l12_2a) / s));
     }
     t._context.bezierCurveTo(r, i, o, a, t._x2, t._y2);
   }
   function __(t, n) {
-    (this._context = t), (this._alpha = n);
+    ((this._context = t), (this._alpha = n));
   }
   __.prototype = {
     areaStart: function () {
@@ -73363,7 +73428,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       this._line = NaN;
     },
     lineStart: function () {
-      (this._x0 = this._x1 = this._x2 = this._y0 = this._y1 = this._y2 = NaN),
+      ((this._x0 = this._x1 = this._x2 = this._y0 = this._y1 = this._y2 = NaN),
         (this._l01_a =
           this._l12_a =
           this._l23_a =
@@ -73371,7 +73436,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           this._l12_2a =
           this._l23_2a =
           this._point =
-            0);
+            0));
     },
     lineEnd: function () {
       switch (this._point) {
@@ -73381,9 +73446,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         case 3:
           this.point(this._x2, this._y2);
       }
-      (this._line || (0 !== this._line && 1 === this._point)) &&
+      ((this._line || (0 !== this._line && 1 === this._point)) &&
         this._context.closePath(),
-        (this._line = 1 - this._line);
+        (this._line = 1 - this._line));
     },
     point: function (t, n) {
       if (((t = +t), (n = +n), this._point)) {
@@ -73395,10 +73460,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       }
       switch (this._point) {
         case 0:
-          (this._point = 1),
+          ((this._point = 1),
             this._line
               ? this._context.lineTo(t, n)
-              : this._context.moveTo(t, n);
+              : this._context.moveTo(t, n));
           break;
         case 1:
           this._point = 2;
@@ -73408,7 +73473,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         default:
           y_(this, t, n);
       }
-      (this._l01_a = this._l12_a),
+      ((this._l01_a = this._l12_a),
         (this._l12_a = this._l23_a),
         (this._l01_2a = this._l12_2a),
         (this._l12_2a = this._l23_2a),
@@ -73417,7 +73482,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         (this._x2 = t),
         (this._y0 = this._y1),
         (this._y1 = this._y2),
-        (this._y2 = n);
+        (this._y2 = n));
     },
   };
   var b_ = (function t(n) {
@@ -73432,13 +73497,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     );
   })(0.5);
   function m_(t, n) {
-    (this._context = t), (this._alpha = n);
+    ((this._context = t), (this._alpha = n));
   }
   m_.prototype = {
     areaStart: r_,
     areaEnd: r_,
     lineStart: function () {
-      (this._x0 =
+      ((this._x0 =
         this._x1 =
         this._x2 =
         this._x3 =
@@ -73458,20 +73523,20 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           this._l12_2a =
           this._l23_2a =
           this._point =
-            0);
+            0));
     },
     lineEnd: function () {
       switch (this._point) {
         case 1:
-          this._context.moveTo(this._x3, this._y3), this._context.closePath();
+          (this._context.moveTo(this._x3, this._y3), this._context.closePath());
           break;
         case 2:
-          this._context.lineTo(this._x3, this._y3), this._context.closePath();
+          (this._context.lineTo(this._x3, this._y3), this._context.closePath());
           break;
         case 3:
-          this.point(this._x3, this._y3),
+          (this.point(this._x3, this._y3),
             this.point(this._x4, this._y4),
-            this.point(this._x5, this._y5);
+            this.point(this._x5, this._y5));
       }
     },
     point: function (t, n) {
@@ -73484,19 +73549,19 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       }
       switch (this._point) {
         case 0:
-          (this._point = 1), (this._x3 = t), (this._y3 = n);
+          ((this._point = 1), (this._x3 = t), (this._y3 = n));
           break;
         case 1:
-          (this._point = 2),
-            this._context.moveTo((this._x4 = t), (this._y4 = n));
+          ((this._point = 2),
+            this._context.moveTo((this._x4 = t), (this._y4 = n)));
           break;
         case 2:
-          (this._point = 3), (this._x5 = t), (this._y5 = n);
+          ((this._point = 3), (this._x5 = t), (this._y5 = n));
           break;
         default:
           y_(this, t, n);
       }
-      (this._l01_a = this._l12_a),
+      ((this._l01_a = this._l12_a),
         (this._l12_a = this._l23_a),
         (this._l01_2a = this._l12_2a),
         (this._l12_2a = this._l23_2a),
@@ -73505,7 +73570,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         (this._x2 = t),
         (this._y0 = this._y1),
         (this._y1 = this._y2),
-        (this._y2 = n);
+        (this._y2 = n));
     },
   };
   var x_ = (function t(n) {
@@ -73520,7 +73585,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     );
   })(0.5);
   function w_(t, n) {
-    (this._context = t), (this._alpha = n);
+    ((this._context = t), (this._alpha = n));
   }
   w_.prototype = {
     areaStart: function () {
@@ -73530,7 +73595,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       this._line = NaN;
     },
     lineStart: function () {
-      (this._x0 = this._x1 = this._x2 = this._y0 = this._y1 = this._y2 = NaN),
+      ((this._x0 = this._x1 = this._x2 = this._y0 = this._y1 = this._y2 = NaN),
         (this._l01_a =
           this._l12_a =
           this._l23_a =
@@ -73538,12 +73603,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           this._l12_2a =
           this._l23_2a =
           this._point =
-            0);
+            0));
     },
     lineEnd: function () {
-      (this._line || (0 !== this._line && 3 === this._point)) &&
+      ((this._line || (0 !== this._line && 3 === this._point)) &&
         this._context.closePath(),
-        (this._line = 1 - this._line);
+        (this._line = 1 - this._line));
     },
     point: function (t, n) {
       if (((t = +t), (n = +n), this._point)) {
@@ -73561,17 +73626,17 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           this._point = 2;
           break;
         case 2:
-          (this._point = 3),
+          ((this._point = 3),
             this._line
               ? this._context.lineTo(this._x2, this._y2)
-              : this._context.moveTo(this._x2, this._y2);
+              : this._context.moveTo(this._x2, this._y2));
           break;
         case 3:
           this._point = 4;
         default:
           y_(this, t, n);
       }
-      (this._l01_a = this._l12_a),
+      ((this._l01_a = this._l12_a),
         (this._l12_a = this._l23_a),
         (this._l01_2a = this._l12_2a),
         (this._l12_2a = this._l23_2a),
@@ -73580,7 +73645,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         (this._x2 = t),
         (this._y0 = this._y1),
         (this._y1 = this._y2),
-        (this._y2 = n);
+        (this._y2 = n));
     },
   };
   var M_ = (function t(n) {
@@ -73643,13 +73708,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       o = new Array(r),
       a = new Array(r);
     for (i[0] = 0, o[0] = 2, a[0] = t[0] + 2 * t[1], n = 1; n < r - 1; ++n)
-      (i[n] = 1), (o[n] = 4), (a[n] = 4 * t[n] + 2 * t[n + 1]);
+      ((i[n] = 1), (o[n] = 4), (a[n] = 4 * t[n] + 2 * t[n + 1]));
     for (
       i[r - 1] = 2, o[r - 1] = 7, a[r - 1] = 8 * t[r - 1] + t[r], n = 1;
       n < r;
       ++n
     )
-      (e = i[n] / o[n - 1]), (o[n] -= e), (a[n] -= e * a[n - 1]);
+      ((e = i[n] / o[n - 1]), (o[n] -= e), (a[n] -= e * a[n - 1]));
     for (i[r - 1] = a[r - 1] / o[r - 1], n = r - 2; n >= 0; --n)
       i[n] = (a[n] - i[n + 1]) / o[n];
     for (o[r - 1] = (t[r] + i[r - 1]) / 2, n = 0; n < r - 1; ++n)
@@ -73657,7 +73722,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     return [i, o];
   }
   function D_(t, n) {
-    (this._context = t), (this._t = n);
+    ((this._context = t), (this._t = n));
   }
   function q_(t, n) {
     if ((i = t.length) > 1)
@@ -73715,23 +73780,23 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     var e = n,
       r = n.R,
       i = e.U;
-    i ? (i.L === e ? (i.L = r) : (i.R = r)) : (t._ = r),
+    (i ? (i.L === e ? (i.L = r) : (i.R = r)) : (t._ = r),
       (r.U = i),
       (e.U = r),
       (e.R = r.L),
       e.R && (e.R.U = e),
-      (r.L = e);
+      (r.L = e));
   }
   function $_(t, n) {
     var e = n,
       r = n.L,
       i = e.U;
-    i ? (i.L === e ? (i.L = r) : (i.R = r)) : (t._ = r),
+    (i ? (i.L === e ? (i.L = r) : (i.R = r)) : (t._ = r),
       (r.U = i),
       (e.U = r),
       (e.L = r.R),
       e.L && (e.L.U = e),
-      (r.R = e);
+      (r.R = e));
   }
   function W_(t) {
     for (; t.L; ) t = t.L;
@@ -73752,7 +73817,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   }
   function Q_(t, n, e) {
     var r = [n, e];
-    return (r.left = t), r;
+    return ((r.left = t), r);
   }
   function J_(t, n, e, r) {
     t[0] || t[1]
@@ -73864,7 +73929,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       } else c = [r, a * r + u];
       o = [n, a * n + u];
     }
-    return (t[0] = c), (t[1] = o), !0;
+    return ((t[0] = c), (t[1] = o), !0);
   }
   function nb(t, n) {
     var e = t.site,
@@ -73884,7 +73949,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   function rb(t, n) {
     return n[+(n.left === t.site)];
   }
-  (N_.prototype = {
+  ((N_.prototype = {
     areaStart: r_,
     areaEnd: r_,
     lineStart: function () {
@@ -73894,11 +73959,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       this._point && this._context.closePath();
     },
     point: function (t, n) {
-      (t = +t),
+      ((t = +t),
         (n = +n),
         this._point
           ? this._context.lineTo(t, n)
-          : ((this._point = 1), this._context.moveTo(t, n));
+          : ((this._point = 1), this._context.moveTo(t, n)));
     },
   }),
     (E_.prototype = {
@@ -73909,8 +73974,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         this._line = NaN;
       },
       lineStart: function () {
-        (this._x0 = this._x1 = this._y0 = this._y1 = this._t0 = NaN),
-          (this._point = 0);
+        ((this._x0 = this._x1 = this._y0 = this._y1 = this._t0 = NaN),
+          (this._point = 0));
       },
       lineEnd: function () {
         switch (this._point) {
@@ -73920,34 +73985,34 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           case 3:
             k_(this, this._t0, S_(this, this._t0));
         }
-        (this._line || (0 !== this._line && 1 === this._point)) &&
+        ((this._line || (0 !== this._line && 1 === this._point)) &&
           this._context.closePath(),
-          (this._line = 1 - this._line);
+          (this._line = 1 - this._line));
       },
       point: function (t, n) {
         var e = NaN;
         if (((n = +n), (t = +t) !== this._x1 || n !== this._y1)) {
           switch (this._point) {
             case 0:
-              (this._point = 1),
+              ((this._point = 1),
                 this._line
                   ? this._context.lineTo(t, n)
-                  : this._context.moveTo(t, n);
+                  : this._context.moveTo(t, n));
               break;
             case 1:
               this._point = 2;
               break;
             case 2:
-              (this._point = 3), k_(this, S_(this, (e = T_(this, t, n))), e);
+              ((this._point = 3), k_(this, S_(this, (e = T_(this, t, n))), e));
               break;
             default:
               k_(this, this._t0, (e = T_(this, t, n)));
           }
-          (this._x0 = this._x1),
+          ((this._x0 = this._x1),
             (this._x1 = t),
             (this._y0 = this._y1),
             (this._y1 = n),
-            (this._t0 = e);
+            (this._t0 = e));
         }
       },
     }),
@@ -73976,7 +74041,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         this._line = NaN;
       },
       lineStart: function () {
-        (this._x = []), (this._y = []);
+        ((this._x = []), (this._y = []));
       },
       lineEnd: function () {
         var t = this._x,
@@ -74000,13 +74065,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 t[a],
                 n[a]
               );
-        (this._line || (0 !== this._line && 1 === e)) &&
+        ((this._line || (0 !== this._line && 1 === e)) &&
           this._context.closePath(),
           (this._line = 1 - this._line),
-          (this._x = this._y = null);
+          (this._x = this._y = null));
       },
       point: function (t, n) {
-        this._x.push(+t), this._y.push(+n);
+        (this._x.push(+t), this._y.push(+n));
       },
     }),
     (D_.prototype = {
@@ -74017,37 +74082,37 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         this._line = NaN;
       },
       lineStart: function () {
-        (this._x = this._y = NaN), (this._point = 0);
+        ((this._x = this._y = NaN), (this._point = 0));
       },
       lineEnd: function () {
-        0 < this._t &&
+        (0 < this._t &&
           this._t < 1 &&
           2 === this._point &&
           this._context.lineTo(this._x, this._y),
           (this._line || (0 !== this._line && 1 === this._point)) &&
             this._context.closePath(),
           this._line >= 0 &&
-            ((this._t = 1 - this._t), (this._line = 1 - this._line));
+            ((this._t = 1 - this._t), (this._line = 1 - this._line)));
       },
       point: function (t, n) {
         switch (((t = +t), (n = +n), this._point)) {
           case 0:
-            (this._point = 1),
+            ((this._point = 1),
               this._line
                 ? this._context.lineTo(t, n)
-                : this._context.moveTo(t, n);
+                : this._context.moveTo(t, n));
             break;
           case 1:
             this._point = 2;
           default:
             if (this._t <= 0)
-              this._context.lineTo(this._x, n), this._context.lineTo(t, n);
+              (this._context.lineTo(this._x, n), this._context.lineTo(t, n));
             else {
               var e = this._x * (1 - this._t) + t * this._t;
-              this._context.lineTo(e, this._y), this._context.lineTo(e, n);
+              (this._context.lineTo(e, this._y), this._context.lineTo(e, n));
             }
         }
-        (this._x = t), (this._y = n);
+        ((this._x = t), (this._y = n));
       },
     }),
     (X_.prototype = {
@@ -74069,7 +74134,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               (e = t))
             : ((n.P = n.N = null), (this._ = n), (e = null));
         for (n.L = n.R = null, n.U = e, n.C = !0, t = n; e && e.C; )
-          e === (r = e.U).L
+          (e === (r = e.U).L
             ? (i = r.R) && i.C
               ? ((e.C = i.C = !1), (r.C = !0), (t = r))
               : (t === e.R && (V_(this, e), (e = (t = e).U)),
@@ -74082,11 +74147,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 (e.C = !1),
                 (r.C = !0),
                 V_(this, r)),
-            (e = t.U);
+            (e = t.U));
         this._.C = !1;
       },
       remove: function (t) {
-        t.N && (t.N.P = t.P), t.P && (t.P.N = t.N), (t.N = t.P = null);
+        (t.N && (t.N.P = t.P), t.P && (t.P.N = t.N), (t.N = t.P = null));
         var n,
           e,
           r,
@@ -74123,12 +74188,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                     ((n.C = !1), (i.C = !0), V_(this, i), (n = i.R)),
                   (n.L && n.L.C) || (n.R && n.R.C))
                 ) {
-                  (n.R && n.R.C) ||
+                  ((n.R && n.R.C) ||
                     ((n.L.C = !1), (n.C = !0), $_(this, n), (n = i.R)),
                     (n.C = i.C),
                     (i.C = n.R.C = !1),
                     V_(this, i),
-                    (t = this._);
+                    (t = this._));
                   break;
                 }
               } else if (
@@ -74136,24 +74201,24 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   ((n.C = !1), (i.C = !0), $_(this, i), (n = i.L)),
                 (n.L && n.L.C) || (n.R && n.R.C))
               ) {
-                (n.L && n.L.C) ||
+                ((n.L && n.L.C) ||
                   ((n.R.C = !1), (n.C = !0), V_(this, n), (n = i.L)),
                   (n.C = i.C),
                   (i.C = n.L.C = !1),
                   $_(this, i),
-                  (t = this._);
+                  (t = this._));
                 break;
               }
-              (n.C = !0), (t = i), (i = i.U);
+              ((n.C = !0), (t = i), (i = i.U));
             } while (!t.C);
             t && (t.C = !1);
           }
       },
-    });
+    }));
   var ib,
     ob = [];
   function ab() {
-    G_(this), (this.x = this.y = this.arc = this.site = this.cy = null);
+    (G_(this), (this.x = this.y = this.arc = this.site = this.cy = null));
   }
   function ub(t) {
     var n = t.P,
@@ -74176,11 +74241,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             v = (l * d - f * p) / h,
             g = (c * p - s * d) / h,
             y = ob.pop() || new ab();
-          (y.arc = t),
+          ((y.arc = t),
             (y.site = i),
             (y.x = v + a),
             (y.y = (y.cy = g + u) + Math.sqrt(v * v + g * g)),
-            (t.circle = y);
+            (t.circle = y));
           for (var _ = null, b = bb._; b; )
             if (y.y < b.y || (y.y === b.y && y.x <= b.x)) {
               if (!b.L) {
@@ -74195,7 +74260,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               }
               b = b.R;
             }
-          bb.insert(_, y), _ || (ib = y);
+          (bb.insert(_, y), _ || (ib = y));
         }
       }
     }
@@ -74207,14 +74272,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
   }
   var fb = [];
   function sb() {
-    G_(this), (this.edge = this.site = this.circle = null);
+    (G_(this), (this.edge = this.site = this.circle = null));
   }
   function lb(t) {
     var n = fb.pop() || new sb();
-    return (n.site = t), n;
+    return ((n.site = t), n);
   }
   function hb(t) {
-    cb(t), yb.remove(t), fb.push(t), G_(t);
+    (cb(t), yb.remove(t), fb.push(t), G_(t));
   }
   function db(t) {
     var n = t.circle,
@@ -74232,8 +74297,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       Math.abs(r - c.circle.cy) < xb;
 
     )
-      (o = c.P), u.unshift(c), hb(c), (c = o);
-    u.unshift(c), cb(c);
+      ((o = c.P), u.unshift(c), hb(c), (c = o));
+    (u.unshift(c), cb(c));
     for (
       var f = a;
       f.circle &&
@@ -74241,16 +74306,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       Math.abs(r - f.circle.cy) < xb;
 
     )
-      (a = f.N), u.push(f), hb(f), (f = a);
-    u.push(f), cb(f);
+      ((a = f.N), u.push(f), hb(f), (f = a));
+    (u.push(f), cb(f));
     var s,
       l = u.length;
     for (s = 1; s < l; ++s)
-      (f = u[s]), (c = u[s - 1]), J_(f.edge, c.site, f.site, i);
-    (c = u[0]),
+      ((f = u[s]), (c = u[s - 1]), J_(f.edge, c.site, f.site, i));
+    ((c = u[0]),
       ((f = u[l - 1]).edge = Z_(c.site, f.site, null, i)),
       ub(c),
-      ub(f);
+      ub(f));
   }
   function pb(t) {
     for (var n, e, r, i, o = t[0], a = t[1], u = yb._; u; )
@@ -74285,7 +74350,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           void ub(e)
         );
       if (e) {
-        cb(n), cb(e);
+        (cb(n), cb(e));
         var f = n.site,
           s = f[0],
           l = f[1],
@@ -74298,11 +74363,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           _ = h * h + d * d,
           b = v * v + g * g,
           m = [(g * _ - d * b) / y + s, (h * b - v * _) / y + l];
-        J_(e.edge, f, p, m),
+        (J_(e.edge, f, p, m),
           (c.edge = Z_(f, t, null, m)),
           (e.edge = Z_(t, p, null, m)),
           ub(n),
-          ub(e);
+          ub(e));
       } else c.edge = Z_(n.site, c.site);
     }
   }
@@ -74352,8 +74417,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       o = t.sort(Mb).pop();
     for (mb = [], _b = new Array(t.length), yb = new X_(), bb = new X_(); ; )
       if (((i = ib), o && (!i || o[1] < i.y || (o[1] === i.y && o[0] < i.x))))
-        (o[0] === e && o[1] === r) || (pb(o), (e = o[0]), (r = o[1])),
-          (o = t.pop());
+        ((o[0] === e && o[1] === r) || (pb(o), (e = o[0]), (r = o[1])),
+          (o = t.pop()));
       else {
         if (!i) break;
         db(i.arc);
@@ -74364,7 +74429,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           if ((t = _b[i]) && (r = (n = t.halfedges).length)) {
             var a = new Array(r),
               u = new Array(r);
-            for (e = 0; e < r; ++e) (a[e] = e), (u[e] = nb(t, mb[n[e]]));
+            for (e = 0; e < r; ++e) ((a[e] = e), (u[e] = nb(t, mb[n[e]])));
             for (
               a.sort(function (t, n) {
                 return u[n] - u[t];
@@ -74383,7 +74448,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         u = +n[0][1],
         c = +n[1][0],
         f = +n[1][1];
-      !(function (t, n, e, r) {
+      (!(function (t, n, e, r) {
         for (var i, o = mb.length; o--; )
           (tb((i = mb[o]), t, n, e, r) &&
             K_(i, t, n, e, r) &&
@@ -74411,7 +74476,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               for (a = o.site, u = (c = o.halfedges).length; u--; )
                 mb[c[u]] || c.splice(u, 1);
               for (u = 0, f = c.length; u < f; )
-                (p = (d = rb(o, mb[c[u]]))[0]),
+                ((p = (d = rb(o, mb[c[u]]))[0]),
                   (v = d[1]),
                   (l = (s = eb(o, mb[c[++u % f]]))[0]),
                   (h = s[1]),
@@ -74435,7 +74500,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                         )
                       ) - 1
                     ),
-                    ++f);
+                    ++f));
               f && (y = !1);
             }
           if (y) {
@@ -74462,9 +74527,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           }
           for (i = 0; i < g; ++i)
             (o = _b[i]) && (o.halfedges.length || delete _b[i]);
-        })(a, u, c, f);
+        })(a, u, c, f));
     }
-    (this.edges = mb), (this.cells = _b), (yb = bb = mb = _b = null);
+    ((this.edges = mb), (this.cells = _b), (yb = bb = mb = _b = null));
   }
   function Ab(t) {
     return function () {
@@ -74472,12 +74537,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     };
   }
   function Tb(t, n, e) {
-    (this.target = t), (this.type = n), (this.transform = e);
+    ((this.target = t), (this.type = n), (this.transform = e));
   }
   function Sb(t, n, e) {
-    (this.k = t), (this.x = n), (this.y = e);
+    ((this.k = t), (this.x = n), (this.y = e));
   }
-  (Nb.prototype = {
+  ((Nb.prototype = {
     constructor: Nb,
     polygons: function () {
       var t = this.edges;
@@ -74485,7 +74550,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         var e = n.halfedges.map(function (e) {
           return eb(n, t[e]);
         });
-        return (e.data = n.site.data), e;
+        return ((e.data = n.site.data), e);
       });
     },
     triangles: function () {
@@ -74508,7 +74573,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               ++l < o;
 
             )
-              (a = d),
+              ((a = d),
                 (d = (h = n[i[l]]).left === s ? h.right : h.left),
                 a &&
                   d &&
@@ -74519,7 +74584,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   ((u = s)[0] - f[0]) * (c[1] - u[1]) -
                     (u[0] - c[0]) * (f[1] - u[1]) <
                     0) &&
-                  t.push([s.data, a.data, d.data]);
+                  t.push([s.data, a.data, d.data]));
         }),
         t
       );
@@ -74544,7 +74609,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         f = n - i.site[1],
         s = c * c + f * f;
       do {
-        (i = o.cells[(r = a)]),
+        ((i = o.cells[(r = a)]),
           (a = null),
           i.halfedges.forEach(function (e) {
             var r = o.edges[e],
@@ -74555,9 +74620,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 l = c * c + f * f;
               l < s && ((s = l), (a = u.index));
             }
-          });
+          }));
       } while (null !== a);
-      return (o._found = r), null == e || s <= e * e ? i.site : null;
+      return ((o._found = r), null == e || s <= e * e ? i.site : null);
     },
   }),
     (Sb.prototype = {
@@ -74601,7 +74666,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       toString: function () {
         return 'translate(' + this.x + ',' + this.y + ') scale(' + this.k + ')';
       },
-    });
+    }));
   var kb = new Sb(1, 0, 0);
   function Eb(t) {
     return t.__zoom || kb;
@@ -74610,7 +74675,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     t.event.stopImmediatePropagation();
   }
   function Pb() {
-    t.event.preventDefault(), t.event.stopImmediatePropagation();
+    (t.event.preventDefault(), t.event.stopImmediatePropagation());
   }
   function zb() {
     return !t.event.button;
@@ -74649,7 +74714,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       a > o ? (o + a) / 2 : Math.min(0, o) || Math.max(0, a)
     );
   }
-  (Eb.prototype = Sb.prototype),
+  ((Eb.prototype = Sb.prototype),
     (t.version = '5.9.2'),
     (t.bisect = i),
     (t.bisectRight = i),
@@ -74689,13 +74754,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           h = e(c, s, l);
         Array.isArray(h) ||
           ((h = w(s, l, h)), (h = g(Math.ceil(s / h) * h, l, h)));
-        for (var d = h.length; h[0] <= s; ) h.shift(), --d;
-        for (; h[d - 1] > l; ) h.pop(), --d;
+        for (var d = h.length; h[0] <= s; ) (h.shift(), --d);
+        for (; h[d - 1] > l; ) (h.pop(), --d);
         var p,
           v = new Array(d + 1);
         for (o = 0; o <= d; ++o)
-          ((p = v[o] = []).x0 = o > 0 ? h[o - 1] : s),
-            (p.x1 = o < d ? h[o] : l);
+          (((p = v[o] = []).x0 = o > 0 ? h[o - 1] : s),
+            (p.x1 = o < d ? h[o] : l));
         for (o = 0; o < u; ++o)
           s <= (a = c[o]) && a <= l && v[i(h, a, 0, d)].push(r[o]);
         return v;
@@ -74793,10 +74858,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         o;
 
       )
-        (i = (Math.random() * o--) | 0),
+        ((i = (Math.random() * o--) | 0),
           (r = t[o + n]),
           (t[o + n] = t[i + n]),
-          (t[i + n] = r);
+          (t[i + n] = r));
       return t;
     }),
     (t.sum = function (t, n) {
@@ -74862,7 +74927,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           _ = new Array(l * l);
         for (o = 0, f = -1; ++f < l; ) {
           for (a = 0, s = -1; ++s < l; ) a += i[f][s];
-          h.push(a), p.push(g(l)), (o += a);
+          (h.push(a), p.push(g(l)), (o += a));
         }
         for (
           n &&
@@ -74895,8 +74960,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               value: x,
             };
           }
-          (y[b] = {index: b, startAngle: u, endAngle: a, value: h[b]}),
-            (a += c);
+          ((y[b] = {index: b, startAngle: u, endAngle: a, value: h[b]}),
+            (a += c));
         }
         for (f = -1; ++f < l; )
           for (s = f - 1; ++s < l; ) {
@@ -74970,7 +75035,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           o.closePath(),
           a)
         )
-          return (o = null), a + '' || null;
+          return ((o = null), a + '' || null);
       }
       return (
         (a.radius = function (t) {
@@ -75007,7 +75072,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         r = [],
         i = [];
       function o(e, i, a, u) {
-        if (i >= r.length) return null != t && e.sort(t), null != n ? n(e) : e;
+        if (i >= r.length)
+          return (null != t && e.sort(t), null != n ? n(e) : e);
         for (
           var c, f, s, l = -1, h = e.length, d = r[i++], p = Qi(), v = a();
           ++l < h;
@@ -75049,16 +75115,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           })(o(t, 0, to, no), 0);
         },
         key: function (t) {
-          return r.push(t), e;
+          return (r.push(t), e);
         },
         sortKeys: function (t) {
-          return (i[r.length - 1] = t), e;
+          return ((i[r.length - 1] = t), e);
         },
         sortValues: function (n) {
-          return (t = n), e;
+          return ((t = n), e);
         },
         rollup: function (t) {
-          return (n = t), e;
+          return ((n = t), e);
         },
       });
     }),
@@ -75109,7 +75175,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       function l(r) {
         var i = new Float32Array(c * f),
           l = new Float32Array(c * f);
-        r.forEach(function (r, o, s) {
+        (r.forEach(function (r, o, s) {
           var l = (+t(r, o, s) + u) >> a,
             h = (+n(r, o, s) + u) >> a,
             d = +e(r, o, s);
@@ -75144,16 +75210,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             {width: c, height: f, data: l},
             {width: c, height: f, data: i},
             o >> a
-          );
+          ));
         var d = s(i);
         if (!Array.isArray(d)) {
           var p = A(i);
-          (d = w(0, p, d)), (d = g(0, Math.floor(p / d) * d, d)).shift();
+          ((d = w(0, p, d)), (d = g(0, Math.floor(p / d) * d, d)).shift());
         }
         return po().thresholds(d).size([c, f])(i).map(h);
       }
       function h(t) {
-        return (t.value *= Math.pow(2, -2 * a)), t.coordinates.forEach(d), t;
+        return ((t.value *= Math.pow(2, -2 * a)), t.coordinates.forEach(d), t);
       }
       function d(t) {
         t.forEach(p);
@@ -75162,10 +75228,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         t.forEach(v);
       }
       function v(t) {
-        (t[0] = t[0] * Math.pow(2, a) - u), (t[1] = t[1] * Math.pow(2, a) - u);
+        ((t[0] = t[0] * Math.pow(2, a) - u),
+          (t[1] = t[1] * Math.pow(2, a) - u));
       }
       function y() {
-        return (c = (r + 2 * (u = 3 * o)) >> a), (f = (i + 2 * u) >> a), l;
+        return ((c = (r + 2 * (u = 3 * o)) >> a), (f = (i + 2 * u) >> a), l);
       }
       return (
         (l.x = function (n) {
@@ -75188,12 +75255,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           var n = Math.ceil(t[0]),
             e = Math.ceil(t[1]);
           if (!(n >= 0 || n >= 0)) throw new Error('invalid size');
-          return (r = n), (i = e), y();
+          return ((r = n), (i = e), y());
         }),
         (l.cellSize = function (t) {
           if (!arguments.length) return 1 << a;
           if (!((t = +t) >= 1)) throw new Error('invalid cell size');
-          return (a = Math.floor(Math.log(t) / Math.LN2)), y();
+          return ((a = Math.floor(Math.log(t) / Math.LN2)), y());
         }),
         (l.thresholds = function (t) {
           return arguments.length
@@ -75209,7 +75276,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         (l.bandwidth = function (t) {
           if (!arguments.length) return Math.sqrt(o * (o + 1));
           if (!((t = +t) >= 0)) throw new Error('invalid bandwidth');
-          return (o = Math.round((Math.sqrt(4 * t * t + 1) - 1) / 2)), y();
+          return ((o = Math.round((Math.sqrt(4 * t * t + 1) - 1) / 2)), y());
         }),
         l
       );
@@ -75261,10 +75328,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         f.mouse('drag');
       }
       function g() {
-        zt(t.event.view).on('mousemove.drag mouseup.drag', null),
+        (zt(t.event.view).on('mousemove.drag mouseup.drag', null),
           jt(t.event.view, r),
           Ft(),
-          f.mouse('end');
+          f.mouse('end'));
       }
       function y() {
         if (o.apply(this, arguments)) {
@@ -75323,12 +75390,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               g = p;
             switch (u) {
               case 'start':
-                (f[n] = t), (s = l++);
+                ((f[n] = t), (s = l++));
                 break;
               case 'end':
-                delete f[n], --l;
+                (delete f[n], --l);
               case 'drag':
-                (p = r(e, n)), (s = l);
+                ((p = r(e, n)), (s = l));
             }
             St(
               new Xt(
@@ -75499,11 +75566,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       return new Promise(function (e, r) {
         var i = new Image();
         for (var o in n) i[o] = n[o];
-        (i.onerror = r),
+        ((i.onerror = r),
           (i.onload = function () {
             e(i);
           }),
-          (i.src = t);
+          (i.src = t));
       });
     }),
     (t.json = function (t, n) {
@@ -75521,9 +75588,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           o = e.length,
           a = 0,
           u = 0;
-        for (r = 0; r < o; ++r) (a += (i = e[r]).x), (u += i.y);
+        for (r = 0; r < o; ++r) ((a += (i = e[r]).x), (u += i.y));
         for (a = a / o - t, u = u / o - n, r = 0; r < o; ++r)
-          ((i = e[r]).x -= a), (i.y -= u);
+          (((i = e[r]).x -= a), (i.y -= u));
       }
       return (
         null == t && (t = 0),
@@ -75548,12 +75615,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       function o() {
         for (var t, o, u, c, f, s, l, h = n.length, d = 0; d < i; ++d)
           for (o = aa(n, sa, la).visitAfter(a), t = 0; t < h; ++t)
-            (u = n[t]),
+            ((u = n[t]),
               (s = e[u.index]),
               (l = s * s),
               (c = u.x + u.vx),
               (f = u.y + u.vy),
-              o.visit(p);
+              o.visit(p));
         function p(t, n, e, i, o) {
           var a = t.data,
             h = t.r,
@@ -75585,13 +75652,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             i,
             o = n.length;
           for (e = new Array(o), r = 0; r < o; ++r)
-            (i = n[r]), (e[i.index] = +t(i, r, n));
+            ((i = n[r]), (e[i.index] = +t(i, r, n)));
         }
       }
       return (
         'function' != typeof t && (t = ta(null == t ? 1 : +t)),
         (o.initialize = function (t) {
-          (n = t), u();
+          ((n = t), u());
         }),
         (o.iterations = function (t) {
           return arguments.length ? ((i = +t), o) : i;
@@ -75622,7 +75689,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       function s(r) {
         for (var i = 0, a = t.length; i < f; ++i)
           for (var u, c, s, l, h, d, p, v = 0; v < a; ++v)
-            (c = (u = t[v]).source),
+            ((c = (u = t[v]).source),
               (l = (s = u.target).x + s.vx - c.x - c.vx || na()),
               (h = s.y + s.vy - c.y - c.vy || na()),
               (l *= d =
@@ -75631,7 +75698,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               (s.vx -= l * (p = o[v])),
               (s.vy -= h * p),
               (c.vx += l * (p = 1 - p)),
-              (c.vy += h * p);
+              (c.vy += h * p));
       }
       function l() {
         if (r) {
@@ -75641,16 +75708,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             s = t.length,
             l = Qi(r, a);
           for (u = 0, i = new Array(f); u < s; ++u)
-            ((c = t[u]).index = u),
+            (((c = t[u]).index = u),
               'object' != typeof c.source && (c.source = da(l, c.source)),
               'object' != typeof c.target && (c.target = da(l, c.target)),
               (i[c.source.index] = (i[c.source.index] || 0) + 1),
-              (i[c.target.index] = (i[c.target.index] || 0) + 1);
+              (i[c.target.index] = (i[c.target.index] || 0) + 1));
           for (u = 0, o = new Array(s); u < s; ++u)
-            (c = t[u]),
+            ((c = t[u]),
               (o[u] =
-                i[c.source.index] / (i[c.source.index] + i[c.target.index]));
-          (n = new Array(s)), h(), (e = new Array(s)), d();
+                i[c.source.index] / (i[c.source.index] + i[c.target.index])));
+          ((n = new Array(s)), h(), (e = new Array(s)), d());
         }
       }
       function h() {
@@ -75662,7 +75729,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       return (
         null == t && (t = []),
         (s.initialize = function (t) {
-          (r = t), l();
+          ((r = t), l());
         }),
         (s.links = function (n) {
           return arguments.length ? ((t = n), l(), s) : t;
@@ -75699,7 +75766,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         var i,
           o = t.length,
           a = aa(t, pa, va).visitAfter(s);
-        for (e = r, i = 0; i < o; ++i) (n = t[i]), a.visit(l);
+        for (e = r, i = 0; i < o; ++i) ((n = t[i]), a.visit(l));
       }
       function f() {
         if (t) {
@@ -75707,7 +75774,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             e,
             o = t.length;
           for (r = new Array(o), n = 0; n < o; ++n)
-            (e = t[n]), (r[e.index] = +i(e, n, t));
+            ((e = t[n]), (r[e.index] = +i(e, n, t)));
         }
       }
       function s(t) {
@@ -75723,9 +75790,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             (n = t[a]) &&
               (e = Math.abs(n.value)) &&
               ((u += n.value), (c += e), (i += e * n.x), (o += e * n.y));
-          (t.x = i / c), (t.y = o / c);
+          ((t.x = i / c), (t.y = o / c));
         } else {
-          ((n = t).x = n.data.x), (n.y = n.data.y);
+          (((n = t).x = n.data.x), (n.y = n.data.y));
           do {
             u += r[n.data.index];
           } while ((n = n.next));
@@ -75763,7 +75830,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       }
       return (
         (c.initialize = function (n) {
-          (t = n), f();
+          ((t = n), f());
         }),
         (c.strength = function (t) {
           return arguments.length
@@ -75794,7 +75861,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             s = c.y - e || 1e-6,
             l = Math.sqrt(f * f + s * s),
             h = ((o[a] - l) * i[a] * t) / l;
-          (c.vx += f * h), (c.vy += s * h);
+          ((c.vx += f * h), (c.vy += s * h));
         }
       }
       function c() {
@@ -75802,7 +75869,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           var n,
             e = r.length;
           for (i = new Array(e), o = new Array(e), n = 0; n < e; ++n)
-            (o[n] = +t(r[n], n, r)), (i[n] = isNaN(o[n]) ? 0 : +a(r[n], n, r));
+            ((o[n] = +t(r[n], n, r)),
+              (i[n] = isNaN(o[n]) ? 0 : +a(r[n], n, r)));
         }
       }
       return (
@@ -75810,7 +75878,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         null == n && (n = 0),
         null == e && (e = 0),
         (u.initialize = function (t) {
-          (r = t), c();
+          ((r = t), c());
         }),
         (u.strength = function (t) {
           return arguments.length
@@ -75842,7 +75910,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         c = ir(s),
         f = I('tick', 'end');
       function s() {
-        l(), f.call('tick', n), e < r && (c.stop(), f.call('end', n));
+        (l(), f.call('tick', n), e < r && (c.stop(), f.call('end', n)));
       }
       function l(r) {
         var c,
@@ -75859,10 +75927,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             c < s;
             ++c
           )
-            null == (f = t[c]).fx
+            (null == (f = t[c]).fx
               ? (f.x += f.vx *= a)
               : ((f.x = f.fx), (f.vx = 0)),
-              null == f.fy ? (f.y += f.vy *= a) : ((f.y = f.fy), (f.vy = 0));
+              null == f.fy ? (f.y += f.vy *= a) : ((f.y = f.fy), (f.vy = 0)));
         return n;
       }
       function h() {
@@ -75875,13 +75943,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           ) {
             var i = ga * Math.sqrt(e),
               o = e * ya;
-            (n.x = i * Math.cos(o)), (n.y = i * Math.sin(o));
+            ((n.x = i * Math.cos(o)), (n.y = i * Math.sin(o)));
           }
           (isNaN(n.vx) || isNaN(n.vy)) && (n.vx = n.vy = 0);
         }
       }
       function d(n) {
-        return n.initialize && n.initialize(t), n;
+        return (n.initialize && n.initialize(t), n);
       }
       return (
         null == t && (t = []),
@@ -75889,10 +75957,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         (n = {
           tick: l,
           restart: function () {
-            return c.restart(s), n;
+            return (c.restart(s), n);
           },
           stop: function () {
-            return c.stop(), n;
+            return (c.stop(), n);
           },
           nodes: function (e) {
             return arguments.length ? ((t = e), h(), u.each(d), n) : t;
@@ -75956,7 +76024,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       return (
         'function' != typeof t && (t = ta(null == t ? 0 : +t)),
         (o.initialize = function (t) {
-          (n = t), a();
+          ((n = t), a());
         }),
         (o.strength = function (t) {
           return arguments.length
@@ -75991,7 +76059,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       return (
         'function' != typeof t && (t = ta(null == t ? 0 : +t)),
         (o.initialize = function (t) {
-          (n = t), a();
+          ((n = t), a());
         }),
         (o.strength = function (t) {
           return arguments.length
@@ -76013,7 +76081,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     (t.precisionPrefix = za),
     (t.precisionRound = Ra),
     (t.geoArea = function (t) {
-      return mu.reset(), du(t, xu), 2 * mu;
+      return (mu.reset(), du(t, xu), 2 * mu);
     }),
     (t.geoBounds = function (t) {
       var n, e, r, i, o, a, u;
@@ -76026,8 +76094,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               pc(i[0], r[1]) > pc(r[0], r[1]) && (r[0] = i[0]))
             : o.push((r = i));
         for (a = -1 / 0, n = 0, r = o[(e = o.length - 1)]; n <= e; r = i, ++n)
-          (i = o[n]),
-            (u = pc(r[1], i[0])) > a && ((a = u), (Ru = i[0]), (qu = r[1]));
+          ((i = o[n]),
+            (u = pc(r[1], i[0])) > a && ((a = u), (Ru = i[0]), (qu = r[1])));
       }
       return (
         (Fu = Iu = null),
@@ -76043,7 +76111,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       );
     }),
     (t.geoCentroid = function (t) {
-      (ju = Hu = Xu = Gu = Vu = $u = Wu = Zu = Qu = Ju = Ku = 0), du(t, yc);
+      ((ju = Hu = Xu = Gu = Vu = $u = Wu = Zu = Qu = Ju = Ku = 0), du(t, yc));
       var n = Qu,
         e = Ju,
         r = Ku,
@@ -76065,7 +76133,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         i = kc(6),
         o = {
           point: function (e, r) {
-            t.push((e = n(e, r))), (e[0] *= Ha), (e[1] *= Ha);
+            (t.push((e = n(e, r))), (e[0] *= Ha), (e[1] *= Ha));
           },
         };
       function a() {
@@ -76165,7 +76233,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           : function () {
               return [e * Ha, r * Ha];
             };
-      return (g.distance = p), g;
+      return ((g.distance = p), g);
     }),
     (t.geoLength = cf),
     (t.geoPath = function (t, n) {
@@ -76182,16 +76250,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       }
       return (
         (o.area = function (t) {
-          return du(t, e(Cf)), Cf.result();
+          return (du(t, e(Cf)), Cf.result());
         }),
         (o.measure = function (t) {
-          return du(t, e(gs)), gs.result();
+          return (du(t, e(gs)), gs.result());
         }),
         (o.bounds = function (t) {
-          return du(t, e(Bf)), Bf.result();
+          return (du(t, e(Bf)), Bf.result());
         }),
         (o.centroid = function (t) {
-          return du(t, e(Kf)), Kf.result();
+          return (du(t, e(Kf)), Kf.result());
         }),
         (o.projection = function (n) {
           return arguments.length
@@ -76239,7 +76307,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         );
       }
       function l() {
-        return (t = n = null), s;
+        return ((t = n = null), s);
       }
       return (
         (s.invert = function (t) {
@@ -76386,7 +76454,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         h = null,
         d = Mf;
       function p() {
-        return (r = i = null), o;
+        return ((r = i = null), o);
       }
       return (o = {
         stream: function (t) {
@@ -76522,11 +76590,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         return i.eachAfter(
           r
             ? function (t) {
-                (t.x = (t.x - i.x) * n), (t.y = (i.y - t.y) * e);
+                ((t.x = (t.x - i.x) * n), (t.y = (i.y - t.y) * e));
               }
             : function (t) {
-                (t.x = ((t.x - f) / (s - f)) * n),
-                  (t.y = (1 - (i.y ? t.y / i.y : 1)) * e);
+                ((t.x = ((t.x - f) / (s - f)) * n),
+                  (t.y = (1 - (i.y ? t.y / i.y : 1)) * e));
               }
         );
       }
@@ -76590,7 +76658,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       );
     }),
     (t.packSiblings = function (t) {
-      return El(t), t;
+      return (El(t), t);
     }),
     (t.packEnclose = yl),
     (t.partition = function () {
@@ -76619,12 +76687,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   o = r.y0,
                   a = r.x1 - e,
                   u = r.y1 - e;
-                a < i && (i = a = (i + a) / 2),
+                (a < i && (i = a = (i + a) / 2),
                   u < o && (o = u = (o + u) / 2),
                   (r.x0 = i),
                   (r.y0 = o),
                   (r.x1 = a),
-                  (r.y1 = u);
+                  (r.y1 = u));
               };
             })(n, o)
           ),
@@ -76660,17 +76728,17 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           l = new Array(s),
           h = {};
         for (i = 0; i < s; ++i)
-          (r = e[i]),
+          ((r = e[i]),
             (u = l[i] = new vl(r)),
             null != (c = t(r, i, e)) &&
               (c += '') &&
-              (h[(f = Bl + (u.id = c))] = f in h ? Fl : u);
+              (h[(f = Bl + (u.id = c))] = f in h ? Fl : u));
         for (i = 0; i < s; ++i)
           if (((u = l[i]), null != (c = n(e[i], i, e)) && (c += ''))) {
             if (!(a = h[Bl + c])) throw new Error('missing: ' + c);
             if (a === Fl) throw new Error('ambiguous: ' + c);
-            a.children ? a.children.push(u) : (a.children = [u]),
-              (u.parent = a);
+            (a.children ? a.children.push(u) : (a.children = [u]),
+              (u.parent = a));
           } else {
             if (o) throw new Error('multiple roots');
             o = u;
@@ -76680,7 +76748,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           ((o.parent = Yl),
           o
             .eachBefore(function (t) {
-              (t.depth = t.parent.depth + 1), --s;
+              ((t.depth = t.parent.depth + 1), --s);
             })
             .eachBefore(pl),
           (o.parent = null),
@@ -76713,8 +76781,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 i >= 0;
                 --i
               )
-                u.push((e = n.children[i] = new Wl(r[i], i))), (e.parent = n);
-          return ((a.parent = new Wl(null, 0)).children = [a]), a;
+                (u.push((e = n.children[i] = new Wl(r[i], i))), (e.parent = n));
+          return (((a.parent = new Wl(null, 0)).children = [a]), a);
         })(i);
         if ((c.eachAfter(o), (c.parent.m = -c.z), c.eachBefore(a), r))
           i.eachBefore(u);
@@ -76723,16 +76791,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             s = i,
             l = i;
           i.eachBefore(function (t) {
-            t.x < f.x && (f = t),
+            (t.x < f.x && (f = t),
               t.x > s.x && (s = t),
-              t.depth > l.depth && (l = t);
+              t.depth > l.depth && (l = t));
           });
           var h = f === s ? 1 : t(f, s) / 2,
             d = h - f.x,
             p = n / (s.x + h + d),
             v = e / (l.depth || 1);
           i.eachBefore(function (t) {
-            (t.x = (t.x + d) * p), (t.y = t.depth * v);
+            ((t.x = (t.x + d) * p), (t.y = t.depth * v));
           });
         }
         return i;
@@ -76744,7 +76812,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         if (e) {
           !(function (t) {
             for (var n, e = 0, r = 0, i = t.children, o = i.length; --o >= 0; )
-              ((n = i[o]).z += e), (n.m += e), (e += n.s + (r += n.c));
+              (((n = i[o]).z += e), (n.m += e), (e += n.s + (r += n.c)));
           })(n);
           var o = (e[0].z + e[e.length - 1].z) / 2;
           i ? ((n.z = i.z + t(n._, i._)), (n.m = n.z - o)) : (n.z = o);
@@ -76764,25 +76832,25 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               (u = Gl(u)), (o = Xl(o)), u && o;
 
             )
-              (c = Xl(c)),
+              ((c = Xl(c)),
                 ((a = Gl(a)).a = n),
                 (i = u.z + l - o.z - f + t(u._, o._)) > 0 &&
                   (Vl($l(u, n, r), n, i), (f += i), (s += i)),
                 (l += u.m),
                 (f += o.m),
                 (h += c.m),
-                (s += a.m);
-            u && !Gl(a) && ((a.t = u), (a.m += l - s)),
-              o && !Xl(c) && ((c.t = o), (c.m += f - h), (r = n));
+                (s += a.m));
+            (u && !Gl(a) && ((a.t = u), (a.m += l - s)),
+              o && !Xl(c) && ((c.t = o), (c.m += f - h), (r = n)));
           }
           return r;
         })(n, i, n.parent.A || r[0]);
       }
       function a(t) {
-        (t._.x = t.z + t.parent.m), (t.m += t.parent.m);
+        ((t._.x = t.z + t.parent.m), (t.m += t.parent.m));
       }
       function u(t) {
-        (t.x *= n), (t.y = t.depth * e);
+        ((t.x *= n), (t.y = t.depth * e));
       }
       return (
         (i.separation = function (n) {
@@ -76833,7 +76901,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           s = n.y0 + e,
           l = n.x1 - e,
           h = n.y1 - e;
-        l < r && (r = l = (r + l) / 2),
+        (l < r && (r = l = (r + l) / 2),
           h < s && (s = h = (s + h) / 2),
           (n.x0 = r),
           (n.y0 = s),
@@ -76845,7 +76913,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             (s += a(n) - e),
             (l -= u(n) - e) < r && (r = l = (r + l) / 2),
             (h -= c(n) - e) < s && (s = h = (s + h) / 2),
-            t(n, r, s, l, h));
+            t(n, r, s, l, h)));
       }
       return (
         (s.round = function (t) {
@@ -76905,7 +76973,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       !(function t(n, e, r, i, o, a, c) {
         if (n >= e - 1) {
           var s = u[n];
-          return (s.x0 = i), (s.y0 = o), (s.x1 = a), void (s.y1 = c);
+          return ((s.x0 = i), (s.y0 = o), (s.x1 = a), void (s.y1 = c));
         }
         for (var l = f[n], h = r / 2 + l, d = n + 1, p = e - 1; d < p; ) {
           var v = (d + p) >>> 1;
@@ -76916,10 +76984,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           y = r - g;
         if (a - i > c - o) {
           var _ = (i * y + a * g) / r;
-          t(n, d, g, i, o, _, c), t(d, e, y, _, o, a, c);
+          (t(n, d, g, i, o, _, c), t(d, e, y, _, o, a, c));
         } else {
           var b = (o * y + c * g) / r;
-          t(n, d, g, i, o, a, b), t(d, e, y, i, b, a, c);
+          (t(n, d, g, i, o, a, b), t(d, e, y, i, b, a, c));
         }
       })(0, c, t.value, n, e, r, i);
     }),
@@ -76967,7 +77035,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         o = oe(t.opacity, n.opacity);
       return function (n) {
         return (
-          (t.l = e(n)), (t.a = r(n)), (t.b = i(n)), (t.opacity = o(n)), t + ''
+          (t.l = e(n)),
+          (t.a = r(n)),
+          (t.b = i(n)),
+          (t.opacity = o(n)),
+          t + ''
         );
       };
     }),
@@ -76994,7 +77066,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     (t.path = Hi),
     (t.polygonArea = function (t) {
       for (var n, e = -1, r = t.length, i = t[r - 1], o = 0; ++e < r; )
-        (n = i), (i = t[e]), (o += n[1] * i[0] - n[0] * i[1]);
+        ((n = i), (i = t[e]), (o += n[1] * i[0] - n[0] * i[1]));
       return o / 2;
     }),
     (t.polygonCentroid = function (t) {
@@ -77003,11 +77075,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         ++r < i;
 
       )
-        (n = u),
+        ((n = u),
           (u = t[r]),
           (c += e = n[0] * u[1] - u[0] * n[1]),
           (o += (n[0] + u[0]) * e),
-          (a += (n[1] + u[1]) * e);
+          (a += (n[1] + u[1]) * e));
       return [o / (c *= 3), a / c];
     }),
     (t.polygonHull = function (t) {
@@ -77042,12 +77114,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         l < i;
         ++l
       )
-        (e = (o = t[l])[0]),
+        ((e = (o = t[l])[0]),
           (r = o[1]) > u != f > u &&
             a < ((c - e) * (u - r)) / (f - r) + e &&
             (s = !s),
           (c = e),
-          (f = r);
+          (f = r));
       return s;
     }),
     (t.polygonLength = function (t) {
@@ -77056,11 +77128,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         ++r < i;
 
       )
-        (n = a),
+        ((n = a),
           (e = u),
           (n -= a = (o = t[r])[0]),
           (e -= u = o[1]),
-          (c += Math.sqrt(n * n + e * e));
+          (c += Math.sqrt(n * n + e * e)));
       return c;
     }),
     (t.quadtree = aa),
@@ -77167,7 +77239,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           r = [];
           for (var e, i = 0, o = t.length; i < o; ++i)
             null == (e = t[i]) || isNaN((e = +e)) || r.push(e);
-          return r.sort(n), u();
+          return (r.sort(n), u());
         }),
         (c.range = function (t) {
           return arguments.length ? ((o = ph.call(t)), u()) : o.slice();
@@ -77324,7 +77396,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           e = [];
           for (var r, i = 0, a = t.length; i < a; ++i)
             null == (r = t[i]) || isNaN((r = +r)) || e.push(r);
-          return e.sort(n), o;
+          return (e.sort(n), o);
         }),
         (o.interpolator = function (t) {
           return arguments.length ? ((r = t), o) : r;
@@ -77507,10 +77579,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           g = p > d;
         if ((u || (u = c = Hi()), h < l && ((f = h), (h = l), (l = f)), h > uy))
           if (v > sy - uy)
-            u.moveTo(h * ey(d), h * oy(d)),
+            (u.moveTo(h * ey(d), h * oy(d)),
               u.arc(0, 0, h, d, p, !g),
               l > uy &&
-                (u.moveTo(l * ey(p), l * oy(p)), u.arc(0, 0, l, p, d, g));
+                (u.moveTo(l * ey(p), l * oy(p)), u.arc(0, 0, l, p, d, g)));
           else {
             var y,
               _,
@@ -77528,12 +77600,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             if (T > uy) {
               var C = ly((T / l) * oy(A)),
                 P = ly((T / h) * oy(A));
-              (M -= 2 * C) > uy
+              ((M -= 2 * C) > uy
                 ? ((x += C *= g ? 1 : -1), (w -= C))
                 : ((M = 0), (x = w = (d + p) / 2)),
                 (N -= 2 * P) > uy
                   ? ((b += P *= g ? 1 : -1), (m -= P))
-                  : ((N = 0), (b = m = (d + p) / 2));
+                  : ((N = 0), (b = m = (d + p) / 2)));
             }
             var z = h * ey(b),
               R = h * oy(b),
@@ -77576,10 +77648,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                           : Math.acos(s)) / 2
                     ),
                   G = ay(L[0] * L[0] + L[1] * L[1]);
-                (k = iy(S, (l - G) / (X - 1))), (E = iy(S, (h - G) / (X + 1)));
+                ((k = iy(S, (l - G) / (X - 1))),
+                  (E = iy(S, (h - G) / (X + 1))));
               }
             }
-            N > uy
+            (N > uy
               ? E > uy
                 ? ((y = yy(B, Y, z, R, h, E, g)),
                   (_ = yy(U, O, D, q, h, E, g)),
@@ -77658,10 +77731,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                           !g
                         )))
                   : u.arc(0, 0, l, w, x, g)
-                : u.lineTo(D, q);
+                : u.lineTo(D, q));
           }
         else u.moveTo(0, 0);
-        if ((u.closePath(), c)) return (u = null), c + '' || null;
+        if ((u.closePath(), c)) return ((u = null), c + '' || null);
       }
       return (
         (c.centroid = function () {
@@ -77751,7 +77824,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           u < h;
           ++u, g = s
         )
-          (c = p[u]),
+          ((c = p[u]),
             (s = g + ((l = v[c]) > 0 ? l * f : 0) + b),
             (v[c] = {
               data: a[c],
@@ -77760,7 +77833,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               startAngle: g,
               endAngle: s,
               padAngle: _,
-            });
+            }));
         return v;
       }
       return (
@@ -77806,7 +77879,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     }),
     (t.linkRadial = function () {
       var t = Ly(By);
-      return (t.angle = t.x), delete t.x, (t.radius = t.y), delete t.y, t;
+      return ((t.angle = t.x), delete t.x, (t.radius = t.y), delete t.y, t);
     }),
     (t.symbol = function () {
       var t = Kg(Yy),
@@ -77819,7 +77892,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           t.apply(this, arguments).draw(e, +n.apply(this, arguments)),
           r)
         )
-          return (e = null), r + '' || null;
+          return ((e = null), r + '' || null);
       }
       return (
         (r.type = function (n) {
@@ -77898,11 +77971,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           s = new Array(f);
         for (o = 0; o < f; ++o) {
           for (var l, h = u[o], d = (s[o] = new Array(c)), p = 0; p < c; ++p)
-            (d[p] = l = [0, +r(i[p], h, p, i)]), (l.data = i[p]);
+            ((d[p] = l = [0, +r(i[p], h, p, i)]), (l.data = i[p]));
           d.key = h;
         }
         for (o = 0, a = n(s); o < f; ++o) s[a[o]].index = o;
-        return e(s, a), s;
+        return (e(s, a), s);
       }
       return (
         (i.keys = function (n) {
@@ -77972,11 +78045,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               var p = t[n[d]];
               h += (p[a][1] || 0) - (p[a - 1][1] || 0);
             }
-            (c += l), (f += h * l);
+            ((c += l), (f += h * l));
           }
-          (e[a - 1][1] += e[a - 1][0] = o), c && (o -= f / c);
+          ((e[a - 1][1] += e[a - 1][0] = o), c && (o -= f / c));
         }
-        (e[a - 1][1] += e[a - 1][0] = o), q_(t, n);
+        ((e[a - 1][1] += e[a - 1][0] = o), q_(t, n));
       }
     }),
     (t.stackOrderAppearance = O_),
@@ -77995,7 +78068,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         c = [],
         f = [];
       for (n = 0; n < r; ++n)
-        (e = o[n]), a < u ? ((a += i[e]), c.push(e)) : ((u += i[e]), f.push(e));
+        ((e = o[n]),
+          a < u ? ((a += i[e]), c.push(e)) : ((u += i[e]), f.push(e)));
       return f.reverse().concat(c);
     }),
     (t.stackOrderNone = L_),
@@ -78080,7 +78154,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           (e = null == e ? nr() : +e),
           r.restart(
             function o(a) {
-              (a += i), r.restart(o, (i += n), e), t(a);
+              ((a += i), r.restart(o, (i += n), e), t(a));
             },
             n,
             e
@@ -78110,7 +78184,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               Math.round(t(e, i, r) / xb) * xb,
               Math.round(n(e, i, r) / xb) * xb,
             ];
-            return (o.index = i), (o.data = e), o;
+            return ((o.index = i), (o.data = e), o);
           }),
           e
         );
@@ -78243,11 +78317,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         return new M(t, n);
       }
       function M(t, n) {
-        (this.that = t),
+        ((this.that = t),
           (this.args = n),
           (this.index = -1),
           (this.active = 0),
-          (this.extent = i.apply(t, n));
+          (this.extent = i.apply(t, n)));
       }
       function N() {
         if (r.apply(this, arguments)) {
@@ -78259,18 +78333,21 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             ),
             i = Ot(this);
           if (t.wheel)
-            (t.mouse[0][0] === i[0] && t.mouse[0][1] === i[1]) ||
+            ((t.mouse[0][0] === i[0] && t.mouse[0][1] === i[1]) ||
               (t.mouse[1] = n.invert((t.mouse[0] = i))),
-              clearTimeout(t.wheel);
+              clearTimeout(t.wheel));
           else {
             if (n.k === e) return;
-            (t.mouse = [i, n.invert(i)]), Mr(this), t.start();
+            ((t.mouse = [i, n.invert(i)]), Mr(this), t.start());
           }
-          Pb(),
+          (Pb(),
             (t.wheel = setTimeout(function () {
-              (t.wheel = null), t.end();
+              ((t.wheel = null), t.end());
             }, v)),
-            t.zoom('mouse', o(b(_(n, e), t.mouse[0], t.mouse[1]), t.extent, f));
+            t.zoom(
+              'mouse',
+              o(b(_(n, e), t.mouse[0], t.mouse[1]), t.extent, f)
+            ));
         }
       }
       function A() {
@@ -78299,21 +78376,21 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               .on(
                 'mouseup.zoom',
                 function () {
-                  i.on('mousemove.zoom mouseup.zoom', null),
+                  (i.on('mousemove.zoom mouseup.zoom', null),
                     jt(t.event.view, n.moved),
                     Pb(),
-                    n.end();
+                    n.end());
                 },
                 !0
               ),
             a = Ot(this),
             u = t.event.clientX,
             c = t.event.clientY;
-          It(t.event.view),
+          (It(t.event.view),
             Cb(),
             (n.mouse = [a, this.__zoom.invert(a)]),
             Mr(this),
-            n.start();
+            n.start());
         }
       }
       function T() {
@@ -78323,10 +78400,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             a = n.invert(e),
             u = n.k * (t.event.shiftKey ? 0.5 : 2),
             c = o(b(_(n, u), e, a), i.apply(this, arguments), f);
-          Pb(),
+          (Pb(),
             s > 0
               ? zt(this).transition().duration(s).call(x, c, e)
-              : zt(this).call(y.transform, c);
+              : zt(this).call(y.transform, c));
         }
       }
       function S() {
@@ -78339,14 +78416,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             c = t.event.changedTouches,
             f = c.length;
           for (Cb(), i = 0; i < f; ++i)
-            (a = [
+            ((a = [
               (a = Bt(this, c, (o = c[i]).identifier)),
               this.__zoom.invert(a),
               o.identifier,
             ]),
               u.touch0
                 ? u.touch1 || (u.touch1 = a)
-                : ((u.touch0 = a), (e = !0));
+                : ((u.touch0 = a), (e = !0)));
           if (n && ((n = clearTimeout(n)), !u.touch1))
             return (
               u.end(),
@@ -78371,10 +78448,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           c = t.event.changedTouches,
           s = c.length;
         for (Pb(), n && (n = clearTimeout(n)), e = 0; e < s; ++e)
-          (i = Bt(this, c, (r = c[e]).identifier)),
+          ((i = Bt(this, c, (r = c[e]).identifier)),
             u.touch0 && u.touch0[2] === r.identifier
               ? (u.touch0[0] = i)
-              : u.touch1 && u.touch1[2] === r.identifier && (u.touch1[0] = i);
+              : u.touch1 && u.touch1[2] === r.identifier && (u.touch1[0] = i));
         if (((r = u.that.__zoom), u.touch1)) {
           var l = u.touch0[0],
             h = u.touch0[1],
@@ -78382,12 +78459,12 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             p = u.touch1[1],
             v = (v = d[0] - l[0]) * v + (v = d[1] - l[1]) * v,
             g = (g = p[0] - h[0]) * g + (g = p[1] - h[1]) * g;
-          (r = _(r, Math.sqrt(v / g))),
+          ((r = _(r, Math.sqrt(v / g))),
             (i = [(l[0] + d[0]) / 2, (l[1] + d[1]) / 2]),
-            (a = [(h[0] + p[0]) / 2, (h[1] + p[1]) / 2]);
+            (a = [(h[0] + p[0]) / 2, (h[1] + p[1]) / 2]));
         } else {
           if (!u.touch0) return;
-          (i = u.touch0[0]), (a = u.touch0[1]);
+          ((i = u.touch0[0]), (a = u.touch0[1]));
         }
         u.zoom('touch', o(b(r, i, a), u.extent, f));
       }
@@ -78407,17 +78484,17 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           n < a;
           ++n
         )
-          (r = o[n]),
+          ((r = o[n]),
             i.touch0 && i.touch0[2] === r.identifier
               ? delete i.touch0
-              : i.touch1 && i.touch1[2] === r.identifier && delete i.touch1;
-        i.touch1 && !i.touch0 && ((i.touch0 = i.touch1), delete i.touch1),
-          i.touch0 ? (i.touch0[1] = this.__zoom.invert(i.touch0[0])) : i.end();
+              : i.touch1 && i.touch1[2] === r.identifier && delete i.touch1);
+        (i.touch1 && !i.touch0 && ((i.touch0 = i.touch1), delete i.touch1),
+          i.touch0 ? (i.touch0[1] = this.__zoom.invert(i.touch0[0])) : i.end());
       }
       return (
         (y.transform = function (t, n) {
           var e = t.selection ? t.selection() : t;
-          e.property('__zoom', Db),
+          (e.property('__zoom', Db),
             t !== e
               ? x(t, n)
               : e.interrupt().each(function () {
@@ -78428,7 +78505,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                       'function' == typeof n ? n.apply(this, arguments) : n
                     )
                     .end();
-                });
+                }));
         }),
         (y.scaleBy = function (t, n) {
           y.scaleTo(t, function () {
@@ -78582,7 +78659,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
     }),
     (t.zoomTransform = Eb),
     (t.zoomIdentity = kb),
-    Object.defineProperty(t, '__esModule', {value: !0});
+    Object.defineProperty(t, '__esModule', {value: !0}));
 });
 /*! Hammer.JS - v2.0.7 - 2016-04-22
  * http://hammerjs.github.io/
@@ -149496,11 +149573,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
 /*! ngImgCrop v0.3.2 License: MIT */ !(function () {
   'use strict';
   var e = angular.module('ngImgCrop', []);
-  e.factory('cropAreaCircle', [
+  (e.factory('cropAreaCircle', [
     'cropArea',
     function (e) {
       var t = function () {
-        e.apply(this, arguments),
+        (e.apply(this, arguments),
           (this._boxResizeBaseSize = 20),
           (this._boxResizeNormalRatio = 0.9),
           (this._boxResizeHoverRatio = 1.2),
@@ -149518,7 +149595,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           (this._boxResizeIsHover = !1),
           (this._areaIsHover = !1),
           (this._boxResizeIsDragging = !1),
-          (this._areaIsDragging = !1);
+          (this._areaIsDragging = !1));
       };
       return (
         (t.prototype = new e()),
@@ -149555,7 +149632,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           e.arc(t[0], t[1], i / 2, 0, 2 * Math.PI);
         }),
         (t.prototype.draw = function () {
-          e.prototype.draw.apply(this, arguments),
+          (e.prototype.draw.apply(this, arguments),
             this._cropCanvas.drawIconMove(
               [this._x, this._y],
               this._areaIsHover
@@ -149568,7 +149645,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               this._boxResizeIsHover
                 ? this._boxResizeHoverRatio
                 : this._boxResizeNormalRatio
-            );
+            ));
         }),
         (t.prototype.processMouseMove = function (e, t) {
           var i = 'default',
@@ -149578,16 +149655,16 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             (this._areaIsHover = !1),
             this._areaIsDragging)
           )
-            (this._x = e - this._posDragStartX),
+            ((this._x = e - this._posDragStartX),
               (this._y = t - this._posDragStartY),
               (this._areaIsHover = !0),
               (i = 'move'),
               (r = !0),
-              this._events.trigger('area-move');
+              this._events.trigger('area-move'));
           else if (this._boxResizeIsDragging) {
             i = 'nesw-resize';
             var s, o, a;
-            (o = e - this._posResizeStartX),
+            ((o = e - this._posResizeStartX),
               (a = this._posResizeStartY - t),
               (s =
                 o > a
@@ -149596,7 +149673,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               (this._size = Math.max(this._minSize, s)),
               (this._boxResizeIsHover = !0),
               (r = !0),
-              this._events.trigger('area-resize');
+              this._events.trigger('area-resize'));
           } else
             this._isCoordWithinBoxResize([e, t])
               ? ((i = 'nesw-resize'),
@@ -149631,7 +149708,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               this._events.trigger('area-move-start'));
         }),
         (t.prototype.processMouseUp = function () {
-          this._areaIsDragging &&
+          (this._areaIsDragging &&
             ((this._areaIsDragging = !1),
             this._events.trigger('area-move-end')),
             this._boxResizeIsDragging &&
@@ -149640,7 +149717,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             (this._areaIsHover = !1),
             (this._boxResizeIsHover = !1),
             (this._posDragStartX = 0),
-            (this._posDragStartY = 0);
+            (this._posDragStartY = 0));
         }),
         t
       );
@@ -149650,7 +149727,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       'cropArea',
       function (e) {
         var t = function () {
-          e.apply(this, arguments),
+          (e.apply(this, arguments),
             (this._resizeCtrlBaseRadius = 10),
             (this._resizeCtrlNormalRatio = 0.75),
             (this._resizeCtrlHoverRatio = 1),
@@ -149668,7 +149745,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             (this._resizeCtrlIsHover = -1),
             (this._areaIsHover = !1),
             (this._resizeCtrlIsDragging = -1),
-            (this._areaIsDragging = !1);
+            (this._areaIsDragging = !1));
         };
         return (
           (t.prototype = new e()),
@@ -149723,13 +149800,13 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             e.rect(t[0] - r, t[1] - r, i, i);
           }),
           (t.prototype.draw = function () {
-            e.prototype.draw.apply(this, arguments),
+            (e.prototype.draw.apply(this, arguments),
               this._cropCanvas.drawIconMove(
                 [this._x, this._y],
                 this._areaIsHover
                   ? this._iconMoveHoverRatio
                   : this._iconMoveNormalRatio
-              );
+              ));
             for (
               var t = this._calcSquareCorners(), i = 0, r = t.length;
               r > i;
@@ -149753,26 +149830,26 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               (this._areaIsHover = !1),
               this._areaIsDragging)
             )
-              (this._x = e - this._posDragStartX),
+              ((this._x = e - this._posDragStartX),
                 (this._y = t - this._posDragStartY),
                 (this._areaIsHover = !0),
                 (i = 'move'),
                 (r = !0),
-                this._events.trigger('area-move');
+                this._events.trigger('area-move'));
             else if (this._resizeCtrlIsDragging > -1) {
               var s, o;
               switch (this._resizeCtrlIsDragging) {
                 case 0:
-                  (s = -1), (o = -1), (i = 'nwse-resize');
+                  ((s = -1), (o = -1), (i = 'nwse-resize'));
                   break;
                 case 1:
-                  (s = 1), (o = -1), (i = 'nesw-resize');
+                  ((s = 1), (o = -1), (i = 'nesw-resize'));
                   break;
                 case 2:
-                  (s = -1), (o = 1), (i = 'nesw-resize');
+                  ((s = -1), (o = 1), (i = 'nesw-resize'));
                   break;
                 case 3:
-                  (s = 1), (o = 1), (i = 'nwse-resize');
+                  ((s = 1), (o = 1), (i = 'nwse-resize'));
               }
               var a,
                 n = (e - this._posResizeStartX) * s,
@@ -149784,11 +149861,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               var c = this._size;
               this._size = Math.max(this._minSize, a);
               var l = (this._size - c) / 2;
-              (this._x += l * s),
+              ((this._x += l * s),
                 (this._y += l * o),
                 (this._resizeCtrlIsHover = this._resizeCtrlIsDragging),
                 (r = !0),
-                this._events.trigger('area-resize');
+                this._events.trigger('area-resize'));
             } else {
               var u = this._isCoordWithinResizeCtrl([e, t]);
               if (u > -1) {
@@ -149805,9 +149882,9 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   case 3:
                     i = 'nwse-resize';
                 }
-                (this._areaIsHover = !1),
+                ((this._areaIsHover = !1),
                   (this._resizeCtrlIsHover = u),
-                  (r = !0);
+                  (r = !0));
               } else
                 this._isCoordWithinArea([e, t]) &&
                   ((i = 'move'), (this._areaIsHover = !0), (r = !0));
@@ -149839,7 +149916,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 this._events.trigger('area-move-start'));
           }),
           (t.prototype.processMouseUp = function () {
-            this._areaIsDragging &&
+            (this._areaIsDragging &&
               ((this._areaIsDragging = !1),
               this._events.trigger('area-move-end')),
               this._resizeCtrlIsDragging > -1 &&
@@ -149848,7 +149925,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               (this._areaIsHover = !1),
               (this._resizeCtrlIsHover = -1),
               (this._posDragStartX = 0),
-              (this._posDragStartY = 0);
+              (this._posDragStartY = 0));
           }),
           t
         );
@@ -149858,14 +149935,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       'cropCanvas',
       function (e) {
         var t = function (t, i) {
-          (this._ctx = t),
+          ((this._ctx = t),
             (this._events = i),
             (this._minSize = 80),
             (this._cropCanvas = new e(t)),
             (this._image = new Image()),
             (this._x = 0),
             (this._y = 0),
-            (this._size = 200);
+            (this._size = 200));
         };
         return (
           (t.prototype.getImage = function () {
@@ -149878,37 +149955,38 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             return this._x;
           }),
           (t.prototype.setX = function (e) {
-            (this._x = e), this._dontDragOutside();
+            ((this._x = e), this._dontDragOutside());
           }),
           (t.prototype.getY = function () {
             return this._y;
           }),
           (t.prototype.setY = function (e) {
-            (this._y = e), this._dontDragOutside();
+            ((this._y = e), this._dontDragOutside());
           }),
           (t.prototype.getSize = function () {
             return this._size;
           }),
           (t.prototype.setSize = function (e) {
-            (this._size = Math.max(this._minSize, e)), this._dontDragOutside();
+            ((this._size = Math.max(this._minSize, e)),
+              this._dontDragOutside());
           }),
           (t.prototype.getMinSize = function () {
             return this._minSize;
           }),
           (t.prototype.setMinSize = function (e) {
-            (this._minSize = e),
+            ((this._minSize = e),
               (this._size = Math.max(this._minSize, this._size)),
-              this._dontDragOutside();
+              this._dontDragOutside());
           }),
           (t.prototype._dontDragOutside = function () {
             var e = this._ctx.canvas.height,
               t = this._ctx.canvas.width;
-            this._size > t && (this._size = t),
+            (this._size > t && (this._size = t),
               this._size > e && (this._size = e),
               this._x < this._size / 2 && (this._x = this._size / 2),
               this._x > t - this._size / 2 && (this._x = t - this._size / 2),
               this._y < this._size / 2 && (this._y = this._size / 2),
-              this._y > e - this._size / 2 && (this._y = e - this._size / 2);
+              this._y > e - this._size / 2 && (this._y = e - this._size / 2));
           }),
           (t.prototype._drawArea = function () {}),
           (t.prototype.draw = function () {
@@ -150014,23 +150092,23 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               return [i * e[0] + t[0], i * e[1] + t[1]];
             },
             u = function (e, t, i, r) {
-              c.save(), (c.fillStyle = t), c.beginPath();
+              (c.save(), (c.fillStyle = t), c.beginPath());
               var s,
                 o = l(e[0], i, r);
               c.moveTo(o[0], o[1]);
               for (var a in e)
                 a > 0 && ((s = l(e[a], i, r)), c.lineTo(s[0], s[1]));
-              c.lineTo(o[0], o[1]), c.fill(), c.closePath(), c.restore();
+              (c.lineTo(o[0], o[1]), c.fill(), c.closePath(), c.restore());
             };
-          (this.drawIconMove = function (e, t) {
-            u(s, h.moveIconFill, e, t),
+          ((this.drawIconMove = function (e, t) {
+            (u(s, h.moveIconFill, e, t),
               u(o, h.moveIconFill, e, t),
               u(a, h.moveIconFill, e, t),
-              u(n, h.moveIconFill, e, t);
+              u(n, h.moveIconFill, e, t));
           }),
             (this.drawIconResizeCircle = function (e, t, i) {
               var r = t * i;
-              c.save(),
+              (c.save(),
                 (c.strokeStyle = h.resizeCircleStroke),
                 (c.lineWidth = 2),
                 (c.fillStyle = h.resizeCircleFill),
@@ -150039,34 +150117,34 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 c.fill(),
                 c.stroke(),
                 c.closePath(),
-                c.restore();
+                c.restore());
             }),
             (this.drawIconResizeBoxBase = function (e, t, i) {
               var r = t * i;
-              c.save(),
+              (c.save(),
                 (c.strokeStyle = h.resizeBoxStroke),
                 (c.lineWidth = 2),
                 (c.fillStyle = h.resizeBoxFill),
                 c.fillRect(e[0] - r / 2, e[1] - r / 2, r, r),
                 c.strokeRect(e[0] - r / 2, e[1] - r / 2, r, r),
-                c.restore();
+                c.restore());
             }),
             (this.drawIconResizeBoxNESW = function (e, r, s) {
-              this.drawIconResizeBoxBase(e, r, s),
+              (this.drawIconResizeBoxBase(e, r, s),
                 u(t, h.resizeBoxArrowFill, e, s),
-                u(i, h.resizeBoxArrowFill, e, s);
+                u(i, h.resizeBoxArrowFill, e, s));
             }),
             (this.drawIconResizeBoxNWSE = function (t, i, s) {
-              this.drawIconResizeBoxBase(t, i, s),
+              (this.drawIconResizeBoxBase(t, i, s),
                 u(e, h.resizeBoxArrowFill, t, s),
-                u(r, h.resizeBoxArrowFill, t, s);
+                u(r, h.resizeBoxArrowFill, t, s));
             }),
             (this.drawCropArea = function (e, t, i, r) {
               var s = e.width / c.canvas.width,
                 o = e.height / c.canvas.height,
                 a = t[0] - i / 2,
                 n = t[1] - i / 2;
-              c.save(),
+              (c.save(),
                 (c.strokeStyle = h.areaOutline),
                 (c.lineWidth = 2),
                 c.beginPath(),
@@ -150078,8 +150156,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 r(c, t, i),
                 c.stroke(),
                 c.clip(),
-                c.restore();
-            });
+                c.restore());
+            }));
         };
       },
     ]),
@@ -150089,8 +150167,8 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           return !!e.exifdata;
         }
         function t(e, t) {
-          (t = t || e.match(/^data\:([^\;]+)\;base64,/im)[1] || ''),
-            (e = e.replace(/^data\:([^\;]+)\;base64,/gim, ''));
+          ((t = t || e.match(/^data\:([^\;]+)\;base64,/im)[1] || ''),
+            (e = e.replace(/^data\:([^\;]+)\;base64,/gim, '')));
           for (
             var i = atob(e),
               r = i.length,
@@ -150105,18 +150183,18 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         }
         function i(e, t) {
           var i = new XMLHttpRequest();
-          i.open('GET', e, !0),
+          (i.open('GET', e, !0),
             (i.responseType = 'blob'),
             (i.onload = function () {
               (200 == this.status || 0 === this.status) && t(this.response);
             }),
-            i.send();
+            i.send());
         }
         function r(e, r) {
           function a(t) {
             var i = s(t),
               a = o(t);
-            (e.exifdata = i || {}), (e.iptcdata = a || {}), r && r.call(e);
+            ((e.exifdata = i || {}), (e.iptcdata = a || {}), r && r.call(e));
           }
           if (e.src)
             if (/^data\:/i.test(e.src)) {
@@ -150124,34 +150202,34 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
               a(n);
             } else if (/^blob\:/i.test(e.src)) {
               var h = new FileReader();
-              (h.onload = function (e) {
+              ((h.onload = function (e) {
                 a(e.target.result);
               }),
                 i(e.src, function (e) {
                   h.readAsArrayBuffer(e);
-                });
+                }));
             } else {
               var c = new XMLHttpRequest();
-              (c.onload = function () {
+              ((c.onload = function () {
                 if (200 != this.status && 0 !== this.status)
                   throw 'Could not load image';
-                a(c.response), (c = null);
+                (a(c.response), (c = null));
               }),
                 c.open('GET', e.src, !0),
                 (c.responseType = 'arraybuffer'),
-                c.send(null);
+                c.send(null));
             }
           else if (
             window.FileReader &&
             (e instanceof window.Blob || e instanceof window.File)
           ) {
             var h = new FileReader();
-            (h.onload = function (e) {
-              u &&
+            ((h.onload = function (e) {
+              (u &&
                 console.log('Got file of length ' + e.target.result.byteLength),
-                a(e.target.result);
+                a(e.target.result));
             }),
-              h.readAsArrayBuffer(e);
+              h.readAsArrayBuffer(e));
           }
         }
         function s(e) {
@@ -150160,7 +150238,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             (u && console.log('Got file of length ' + e.byteLength),
             255 != t.getUint8(0) || 216 != t.getUint8(1))
           )
-            return u && console.log('Not a valid JPEG'), !1;
+            return (u && console.log('Not a valid JPEG'), !1);
           for (var i, r = 2, s = e.byteLength; s > r; ) {
             if (255 != t.getUint8(r))
               return (
@@ -150187,7 +150265,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             (u && console.log('Got file of length ' + e.byteLength),
             255 != t.getUint8(0) || 216 != t.getUint8(1))
           )
-            return u && console.log('Not a valid JPEG'), !1;
+            return (u && console.log('Not a valid JPEG'), !1);
           for (
             var i = 2,
               r = e.byteLength,
@@ -150206,7 +150284,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           ) {
             if (s(t, i)) {
               var o = t.getUint8(i + 7);
-              o % 2 !== 0 && (o += 1), 0 === o && (o = 4);
+              (o % 2 !== 0 && (o += 1), 0 === o && (o = 4));
               var n = i + 8 + o,
                 h = t.getUint16(i + 6 + o);
               return a(e, n, h);
@@ -150220,7 +150298,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             t + i > u;
 
           )
-            28 === h.getUint8(u) &&
+            (28 === h.getUint8(u) &&
               2 === h.getUint8(u + 1) &&
               ((a = h.getUint8(u + 2)),
               a in _ &&
@@ -150233,7 +150311,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                     ? l[s].push(r)
                     : (l[s] = [l[s], r])
                   : (l[s] = r))),
-              u++;
+              u++);
           return l;
         }
         function n(e, t, i, r, s) {
@@ -150243,10 +150321,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             c = e.getUint16(i, !s),
             l = {};
           for (n = 0; c > n; n++)
-            (o = i + 12 * n + 2),
+            ((o = i + 12 * n + 2),
               (a = r[e.getUint16(o, !s)]),
               !a && u && console.log('Unknown tag: ' + e.getUint16(o, !s)),
-              (l[a] = h(e, o, t, i, s));
+              (l[a] = h(e, o, t, i, s)));
           return l;
         }
         function h(e, t, i, r, s) {
@@ -150267,7 +150345,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 a[h] = e.getUint8(o + h);
               return a;
             case 2:
-              return (o = d > 4 ? f : t + 8), c(e, o, d - 1);
+              return ((o = d > 4 ? f : t + 8), c(e, o, d - 1));
             case 3:
               if (1 == d) return e.getUint16(t + 8, !s);
               for (o = d > 2 ? f : t + 8, a = [], h = 0; d > h; h++)
@@ -150288,11 +150366,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   n
                 );
               for (a = [], h = 0; d > h; h++)
-                (l = e.getUint32(f + 8 * h, !s)),
+                ((l = e.getUint32(f + 8 * h, !s)),
                   (u = e.getUint32(f + 4 + 8 * h, !s)),
                   (a[h] = new Number(l / u)),
                   (a[h].numerator = l),
-                  (a[h].denominator = u);
+                  (a[h].denominator = u));
               return a;
             case 9:
               if (1 == d) return e.getInt32(t + 8, !s);
@@ -150313,7 +150391,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         }
         function l(e, t) {
           if ('Exif' != c(e, t, 4))
-            return u && console.log('Not valid EXIF data! ' + c(e, t, 4)), !1;
+            return (u && console.log('Not valid EXIF data! ' + c(e, t, 4)), !1);
           var i,
             r,
             s,
@@ -150330,7 +150408,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             i = !0;
           }
           if (42 != e.getUint16(h + 2, !i))
-            return u && console.log('Not valid TIFF data! (no 0x002A)'), !1;
+            return (u && console.log('Not valid TIFF data! (no 0x002A)'), !1);
           var l = e.getUint32(h + 4, !i);
           if (8 > l)
             return (
@@ -150652,7 +150730,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             116: 'copyright',
             15: 'category',
           };
-        (this.getData = function (t, i) {
+        ((this.getData = function (t, i) {
           return (t instanceof Image || t instanceof HTMLImageElement) &&
             !t.complete
             ? !1
@@ -150693,7 +150771,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
           }),
           (this.readFromBinaryFile = function (e) {
             return s(e);
-          });
+          }));
       },
     ]),
     e.factory('cropHost', [
@@ -150716,14 +150794,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
         };
         return function (o, a, n) {
           function h() {
-            c.clearRect(0, 0, c.canvas.width, c.canvas.height),
+            (c.clearRect(0, 0, c.canvas.width, c.canvas.height),
               null !== l &&
                 (c.drawImage(l, 0, 0, c.canvas.width, c.canvas.height),
                 c.save(),
                 (c.fillStyle = 'rgba(0, 0, 0, 0.65)'),
                 c.fillRect(0, 0, c.canvas.width, c.canvas.height),
                 c.restore(),
-                u.draw());
+                u.draw()));
           }
           var c = null,
             l = null,
@@ -150739,7 +150817,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 var e = [l.width, l.height],
                   t = l.width / l.height,
                   i = e;
-                i[0] > d[0]
+                (i[0] > d[0]
                   ? ((i[0] = d[0]), (i[1] = i[0] / t))
                   : i[0] < g[0] && ((i[0] = g[0]), (i[1] = i[0] / t)),
                   i[1] > d[1]
@@ -150756,7 +150834,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   u.setY(c.canvas.height / 2),
                   u.setSize(
                     Math.min(200, c.canvas.width / 2, c.canvas.height / 2)
-                  );
+                  ));
               } else
                 o.prop('width', 0).prop('height', 0).css({'margin-top': 0});
               h();
@@ -150771,11 +150849,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 var t,
                   i,
                   r = s(c.canvas);
-                'touchmove' === e.type
+                ('touchmove' === e.type
                   ? ((t = v(e)[0].pageX), (i = v(e)[0].pageY))
                   : ((t = e.pageX), (i = e.pageY)),
                   u.processMouseMove(t - r.left, i - r.top),
-                  h();
+                  h());
               }
             },
             z = function (e) {
@@ -150783,11 +150861,11 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 var t,
                   i,
                   r = s(c.canvas);
-                'touchstart' === e.type
+                ('touchstart' === e.type
                   ? ((t = v(e)[0].pageX), (i = v(e)[0].pageY))
                   : ((t = e.pageX), (i = e.pageY)),
                   u.processMouseDown(t - r.left, i - r.top),
-                  h();
+                  h());
               }
             },
             I = function (e) {
@@ -150795,14 +150873,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 var t,
                   i,
                   r = s(c.canvas);
-                'touchend' === e.type
+                ('touchend' === e.type
                   ? ((t = v(e)[0].pageX), (i = v(e)[0].pageY))
                   : ((t = e.pageX), (i = e.pageY)),
                   u.processMouseUp(t - r.left, i - r.top),
-                  h();
+                  h());
               }
             };
-          (this.getResultImageDataURI = function () {
+          ((this.getResultImageDataURI = function () {
             var e, t;
             return (
               (t = angular.element('<canvas></canvas>')[0]),
@@ -150827,10 +150905,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             (this.setNewImageSource = function (e) {
               if (((l = null), m(), n.trigger('image-updated'), e)) {
                 var t = new Image();
-                'http' === e.substring(0, 4).toLowerCase() &&
+                ('http' === e.substring(0, 4).toLowerCase() &&
                   (t.crossOrigin = 'anonymous'),
                   (t.onload = function () {
-                    n.trigger('load-done'),
+                    (n.trigger('load-done'),
                       r.getData(t, function () {
                         var e = r.getTag(t, 'Orientation');
                         if ([3, 6, 8].indexOf(e) > -1) {
@@ -150843,35 +150921,35 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                             u = 0;
                           switch (e) {
                             case 3:
-                              (h = -t.width), (c = -t.height), (u = 180);
+                              ((h = -t.width), (c = -t.height), (u = 180));
                               break;
                             case 6:
-                              (o = t.height),
+                              ((o = t.height),
                                 (a = t.width),
                                 (c = -t.height),
-                                (u = 90);
+                                (u = 90));
                               break;
                             case 8:
-                              (o = t.height),
+                              ((o = t.height),
                                 (a = t.width),
                                 (h = -t.width),
-                                (u = 270);
+                                (u = 270));
                           }
-                          (i.width = o),
+                          ((i.width = o),
                             (i.height = a),
                             s.rotate((u * Math.PI) / 180),
                             s.drawImage(t, h, c),
                             (l = new Image()),
-                            (l.src = i.toDataURL('image/png'));
+                            (l.src = i.toDataURL('image/png')));
                         } else l = t;
-                        m(), n.trigger('image-updated');
-                      });
+                        (m(), n.trigger('image-updated'));
+                      }));
                   }),
                   (t.onerror = function () {
                     n.trigger('load-error');
                   }),
                   n.trigger('load-start'),
-                  (t.src = e);
+                  (t.src = e));
               }
             }),
             (this.setMaxDimensions = function (e, t) {
@@ -150881,7 +150959,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   s = [l.width, l.height],
                   a = l.width / l.height,
                   n = s;
-                n[0] > d[0]
+                (n[0] > d[0]
                   ? ((n[0] = d[0]), (n[1] = n[0] / a))
                   : n[0] < g[0] && ((n[0] = g[0]), (n[1] = n[0] / a)),
                   n[1] > d[1]
@@ -150893,28 +150971,28 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                     .css({
                       'margin-left': -n[0] / 2 + 'px',
                       'margin-top': -n[1] / 2 + 'px',
-                    });
+                    }));
                 var f = c.canvas.width / i,
                   p = c.canvas.height / r,
                   _ = Math.min(f, p);
-                u.setX(u.getX() * f),
+                (u.setX(u.getX() * f),
                   u.setY(u.getY() * p),
-                  u.setSize(u.getSize() * _);
+                  u.setSize(u.getSize() * _));
               } else
                 o.prop('width', 0).prop('height', 0).css({'margin-top': 0});
               h();
             }),
             (this.setAreaMinSize = function (e) {
-              (e = parseInt(e, 10)), isNaN(e) || (u.setMinSize(e), h());
+              ((e = parseInt(e, 10)), isNaN(e) || (u.setMinSize(e), h()));
             }),
             (this.setResultImageSize = function (e) {
-              (e = parseInt(e, 10)), isNaN(e) || (f = e);
+              ((e = parseInt(e, 10)), isNaN(e) || (f = e));
             }),
             (this.setResultImageFormat = function (e) {
               p = e;
             }),
             (this.setResultImageQuality = function (e) {
-              (e = parseFloat(e)), !isNaN(e) && e >= 0 && 1 >= e && (_ = e);
+              ((e = parseFloat(e)), !isNaN(e) && e >= 0 && 1 >= e && (_ = e));
             }),
             (this.setAreaType = function (e) {
               var r = u.getSize(),
@@ -150922,14 +151000,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 o = u.getX(),
                 a = u.getY(),
                 g = t;
-              'square' === e && (g = i),
+              ('square' === e && (g = i),
                 (u = new g(c, n)),
                 u.setMinSize(s),
                 u.setSize(r),
                 u.setX(o),
                 u.setY(a),
                 null !== l && u.setImage(l),
-                h();
+                h());
             }),
             (c = o[0].getContext('2d')),
             (u = new t(c, n)),
@@ -150940,14 +151018,14 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
             o.on('touchstart', z),
             e.on('touchend', I),
             (this.destroy = function () {
-              e.off('mousemove', S),
+              (e.off('mousemove', S),
                 o.off('mousedown', z),
                 e.off('mouseup', S),
                 e.off('touchmove', S),
                 o.off('touchstart', z),
                 e.off('touchend', S),
-                o.remove();
-            });
+                o.remove());
+            }));
         };
       },
     ]),
@@ -150955,10 +151033,10 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
       function () {
         return function () {
           var e = {};
-          (this.on = function (t, i) {
+          ((this.on = function (t, i) {
             return (
               t.split(' ').forEach(function (t) {
-                e[t] || (e[t] = []), e[t].push(i);
+                (e[t] || (e[t] = []), e[t].push(i));
               }),
               this
             );
@@ -150970,7 +151048,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 }),
                 this
               );
-            });
+            }));
         };
       },
     ]),
@@ -151022,7 +151100,7 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                   });
                 };
               };
-            o
+            (o
               .on(
                 'load-start',
                 h(function (e) {
@@ -151057,39 +151135,39 @@ window.ngMaterial = {version: {full: '1.1.19'}}; // https://d3js.org v5.9.2 Copy
                 a.setNewImageSource(i.image);
               }),
               i.$watch('areaType', function () {
-                a.setAreaType(i.areaType), n(i);
+                (a.setAreaType(i.areaType), n(i));
               }),
               i.$watch('areaMinSize', function () {
-                a.setAreaMinSize(i.areaMinSize), n(i);
+                (a.setAreaMinSize(i.areaMinSize), n(i));
               }),
               i.$watch('resultImageSize', function () {
-                a.setResultImageSize(i.resultImageSize), n(i);
+                (a.setResultImageSize(i.resultImageSize), n(i));
               }),
               i.$watch('resultImageFormat', function () {
-                a.setResultImageFormat(i.resultImageFormat), n(i);
+                (a.setResultImageFormat(i.resultImageFormat), n(i));
               }),
               i.$watch('resultImageQuality', function () {
-                a.setResultImageQuality(i.resultImageQuality), n(i);
+                (a.setResultImageQuality(i.resultImageQuality), n(i));
               }),
               i.$watch(
                 function () {
                   return [r[0].clientWidth, r[0].clientHeight];
                 },
                 function (e) {
-                  a.setMaxDimensions(e[0], e[1]), n(i);
+                  (a.setMaxDimensions(e[0], e[1]), n(i));
                 },
                 !0
               ),
               i.$on('$destroy', function () {
                 a.destroy();
-              });
+              }));
           },
         };
       },
-    ]);
+    ]));
 })(); /* ng-infinite-scroll - v1.0.0 - 2013-02-23 */
 var mod;
-(mod = angular.module('infinite-scroll', [])),
+((mod = angular.module('infinite-scroll', [])),
   mod.directive('infiniteScroll', [
     '$rootScope',
     '$window',
@@ -151109,7 +151187,7 @@ var mod;
             (r = !1),
             null != o.infiniteScrollDisabled &&
               t.$watch(o.infiniteScrollDisabled, function (i) {
-                return (a = !i), a && r ? ((r = !1), c()) : void 0;
+                return ((a = !i), a && r ? ((r = !1), c()) : void 0);
               }),
             (c = function () {
               var e, c, u, d;
@@ -151142,7 +151220,7 @@ var mod;
         },
       };
     },
-  ]); /*!
+  ])); /*!
  * Select2 4.0.3
  * https://select2.github.io
  *
@@ -168305,8 +168383,8 @@ angular
           return 0;
         }
         for (i = childNodes.length - 1; i >= 0; i--) {
-          (childNode = childNodes[i]),
-            (childDepth = 1 + countSubTreeDepth(childNode));
+          ((childNode = childNodes[i]),
+            (childDepth = 1 + countSubTreeDepth(childNode)));
           thisLevelDepth = Math.max(thisLevelDepth, childDepth);
         }
         return thisLevelDepth;
@@ -171501,13 +171579,13 @@ angular
           scrollTo = function (self, direction, value) {
             var elem, method, preserve, prop, _ref;
             elem = self[0];
-            (_ref = {
+            ((_ref = {
               top: ['scrollTop', 'pageYOffset', 'scrollLeft'],
               left: ['scrollLeft', 'pageXOffset', 'scrollTop'],
             }[direction]),
               (method = _ref[0]),
               (prop = _ref[1]),
-              (preserve = _ref[2]);
+              (preserve = _ref[2]));
             if (isWindow(elem)) {
               if (angular.isDefined(value)) {
                 return elem.scrollTo(self[preserve].call(self), value);
@@ -171590,13 +171668,13 @@ angular
                 margin: 0,
               };
             }
-            (_ref = {
+            ((_ref = {
               width: [elem.offsetWidth, 'Left', 'Right'],
               height: [elem.offsetHeight, 'Top', 'Bottom'],
             }[measure]),
               (base = _ref[0]),
               (dirA = _ref[1]),
-              (dirB = _ref[2]);
+              (dirB = _ref[2]));
             computedStyle = getStyle(elem);
             paddingA = convertToPx(elem, computedStyle['padding' + dirA]) || 0;
             paddingB = convertToPx(elem, computedStyle['padding' + dirB]) || 0;
@@ -172782,7 +172860,7 @@ angular.module('ui.utils', [
     function r(n) {
       if (t[n]) return t[n].exports;
       var i = (t[n] = {i: n, l: !1, exports: {}});
-      return e[n].call(i.exports, i, i.exports, r), (i.l = !0), i.exports;
+      return (e[n].call(i.exports, i, i.exports, r), (i.l = !0), i.exports);
     }
     return (
       (r.m = e),
@@ -172791,10 +172869,10 @@ angular.module('ui.utils', [
         r.o(e, t) || Object.defineProperty(e, t, {enumerable: !0, get: n});
       }),
       (r.r = function (e) {
-        'undefined' != typeof Symbol &&
+        ('undefined' != typeof Symbol &&
           Symbol.toStringTag &&
           Object.defineProperty(e, Symbol.toStringTag, {value: 'Module'}),
-          Object.defineProperty(e, '__esModule', {value: !0});
+          Object.defineProperty(e, '__esModule', {value: !0}));
       }),
       (r.t = function (e, t) {
         if ((1 & t && (e = r(e)), 8 & t)) return e;
@@ -172824,7 +172902,7 @@ angular.module('ui.utils', [
             : function () {
                 return e;
               };
-        return r.d(t, 'a', t), t;
+        return (r.d(t, 'a', t), t);
       }),
       (r.o = function (e, t) {
         return Object.prototype.hasOwnProperty.call(e, t);
@@ -172835,7 +172913,7 @@ angular.module('ui.utils', [
   })([
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}),
+      (Object.defineProperty(t, '__esModule', {value: !0}),
         Object.defineProperty(t, 'ajax', {
           enumerable: !0,
           get: function () {
@@ -172901,7 +172979,7 @@ angular.module('ui.utils', [
           get: function () {
             return d.default;
           },
-        });
+        }));
       var n = p(r(5)),
         i = p(r(6)),
         a = p(r(7)),
@@ -172922,20 +173000,21 @@ angular.module('ui.utils', [
       function n(e, t) {
         for (var r = 0; r < t.length; r++) {
           var n = t[r];
-          (n.enumerable = n.enumerable || !1),
+          ((n.enumerable = n.enumerable || !1),
             (n.configurable = !0),
             'value' in n && (n.writable = !0),
-            Object.defineProperty(e, n.key, n);
+            Object.defineProperty(e, n.key, n));
         }
       }
-      Object.defineProperty(t, '__esModule', {value: !0}), (t.default = void 0);
+      (Object.defineProperty(t, '__esModule', {value: !0}),
+        (t.default = void 0));
       var i = (function () {
         function e() {
-          !(function (e, t) {
+          (!(function (e, t) {
             if (!(e instanceof t))
               throw new TypeError('Cannot call a class as a function');
           })(this, e),
-            (this.handlers = null);
+            (this.handlers = null));
         }
         var t, r, i;
         return (
@@ -172991,10 +173070,10 @@ angular.module('ui.utils', [
                     s++
                   )
                     a[s] = arguments[s];
-                  t.apply(r, a),
+                  (t.apply(r, a),
                     setTimeout(function () {
                       r.un(e, n);
-                    }, 0);
+                    }, 0));
                 });
               },
             },
@@ -173023,11 +173102,12 @@ angular.module('ui.utils', [
           e
         );
       })();
-      (t.default = i), (e.exports = t.default);
+      ((t.default = i), (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}), (t.default = void 0);
+      (Object.defineProperty(t, '__esModule', {value: !0}),
+        (t.default = void 0));
       var n = (
         window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
@@ -173038,11 +173118,12 @@ angular.module('ui.utils', [
           return setTimeout(e, 1e3 / 60);
         }
       ).bind(window);
-      (t.default = n), (e.exports = t.default);
+      ((t.default = n), (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}), (t.default = void 0);
+      (Object.defineProperty(t, '__esModule', {value: !0}),
+        (t.default = void 0));
       var n = (function (e) {
         if (e && e.__esModule) return e;
         var t = {};
@@ -173055,7 +173136,7 @@ angular.module('ui.utils', [
                   : {};
               n.get || n.set ? Object.defineProperty(t, r, n) : (t[r] = e[r]);
             }
-        return (t.default = e), t;
+        return ((t.default = e), t);
       })(r(0));
       function i(e) {
         return (i =
@@ -173106,20 +173187,20 @@ angular.module('ui.utils', [
       function u(e, t) {
         for (var r = 0; r < t.length; r++) {
           var n = t[r];
-          (n.enumerable = n.enumerable || !1),
+          ((n.enumerable = n.enumerable || !1),
             (n.configurable = !0),
             'value' in n && (n.writable = !0),
-            Object.defineProperty(e, n.key, n);
+            Object.defineProperty(e, n.key, n));
         }
       }
       function l(e, t, r) {
-        return t && u(e.prototype, t), r && u(e, r), e;
+        return (t && u(e.prototype, t), r && u(e, r), e);
       }
       function c(e, t) {
         return (c =
           Object.setPrototypeOf ||
           function (e, t) {
-            return (e.__proto__ = t), e;
+            return ((e.__proto__ = t), e);
           })(e, t);
       }
       var h = 'playing',
@@ -173162,7 +173243,7 @@ angular.module('ui.utils', [
                 }),
                 a(r, d, {
                   init: function () {
-                    this.removeOnAudioProcess(), this.fireEvent('finish');
+                    (this.removeOnAudioProcess(), this.fireEvent('finish'));
                   },
                   getPlayedPercents: function () {
                     return 1;
@@ -173205,10 +173286,10 @@ angular.module('ui.utils', [
                 throw new TypeError(
                   'Super expression must either be null or a function'
                 );
-              (e.prototype = Object.create(t && t.prototype, {
+              ((e.prototype = Object.create(t && t.prototype, {
                 constructor: {value: e, writable: !0, configurable: !0},
               })),
-                t && c(e, t);
+                t && c(e, t));
             })(t, n.Observer),
             l(t, [
               {
@@ -173246,12 +173327,12 @@ angular.module('ui.utils', [
               {
                 key: 'init',
                 value: function () {
-                  this.createVolumeNode(),
+                  (this.createVolumeNode(),
                     this.createScriptNode(),
                     this.createAnalyserNode(),
                     this.setState(f),
                     this.setPlaybackRate(this.params.audioRate),
-                    this.setLength(0);
+                    this.setLength(0));
                 },
               },
               {
@@ -173287,22 +173368,22 @@ angular.module('ui.utils', [
               {
                 key: 'setFilters',
                 value: function (e) {
-                  this.disconnectFilters(),
+                  (this.disconnectFilters(),
                     e &&
                       e.length &&
                       ((this.filters = e),
                       this.analyser.disconnect(),
                       e
                         .reduce(function (e, t) {
-                          return e.connect(t), t;
+                          return (e.connect(t), t);
                         }, this.analyser)
-                        .connect(this.gainNode));
+                        .connect(this.gainNode)));
                 },
               },
               {
                 key: 'createScriptNode',
                 value: function () {
-                  this.params.audioScriptProcessor
+                  (this.params.audioScriptProcessor
                     ? (this.scriptNode = this.params.audioScriptProcessor)
                     : this.ac.createScriptProcessor
                       ? (this.scriptNode = this.ac.createScriptProcessor(
@@ -173311,7 +173392,7 @@ angular.module('ui.utils', [
                       : (this.scriptNode = this.ac.createJavaScriptNode(
                           t.scriptBufferSize
                         )),
-                    this.scriptNode.connect(this.ac.destination);
+                    this.scriptNode.connect(this.ac.destination));
                 },
               },
               {
@@ -173338,17 +173419,17 @@ angular.module('ui.utils', [
               {
                 key: 'createAnalyserNode',
                 value: function () {
-                  (this.analyser = this.ac.createAnalyser()),
-                    this.analyser.connect(this.gainNode);
+                  ((this.analyser = this.ac.createAnalyser()),
+                    this.analyser.connect(this.gainNode));
                 },
               },
               {
                 key: 'createVolumeNode',
                 value: function () {
-                  this.ac.createGain
+                  (this.ac.createGain
                     ? (this.gainNode = this.ac.createGain())
                     : (this.gainNode = this.ac.createGainNode()),
-                    this.gainNode.connect(this.ac.destination);
+                    this.gainNode.connect(this.ac.destination));
                 },
               },
               {
@@ -173387,7 +173468,7 @@ angular.module('ui.utils', [
               {
                 key: 'decodeArrayBuffer',
                 value: function (e, t, r) {
-                  this.offlineAc ||
+                  (this.offlineAc ||
                     (this.offlineAc = this.getOfflineAudioContext(
                       this.ac && this.ac.sampleRate ? this.ac.sampleRate : 44100
                     )),
@@ -173397,13 +173478,13 @@ angular.module('ui.utils', [
                         return t(e);
                       },
                       r
-                    );
+                    ));
                 },
               },
               {
                 key: 'setPeaks',
                 value: function (e, t) {
-                  null != t && (this.explicitDuration = t), (this.peaks = e);
+                  (null != t && (this.explicitDuration = t), (this.peaks = e));
                 },
               },
               {
@@ -173413,15 +173494,15 @@ angular.module('ui.utils', [
                     !this.mergedPeaks ||
                     e != 2 * this.mergedPeaks.length - 1 + 2
                   ) {
-                    (this.splitPeaks = []), (this.mergedPeaks = []);
+                    ((this.splitPeaks = []), (this.mergedPeaks = []));
                     var t,
                       r = this.buffer ? this.buffer.numberOfChannels : 1;
                     for (t = 0; t < r; t++)
-                      (this.splitPeaks[t] = []),
+                      ((this.splitPeaks[t] = []),
                         (this.splitPeaks[t][2 * (e - 1)] = 0),
-                        (this.splitPeaks[t][2 * (e - 1) + 1] = 0);
-                    (this.mergedPeaks[2 * (e - 1)] = 0),
-                      (this.mergedPeaks[2 * (e - 1) + 1] = 0);
+                        (this.splitPeaks[t][2 * (e - 1) + 1] = 0));
+                    ((this.mergedPeaks[2 * (e - 1)] = 0),
+                      (this.mergedPeaks[2 * (e - 1) + 1] = 0));
                   }
                 },
               },
@@ -173459,14 +173540,14 @@ angular.module('ui.utils', [
                         v = void 0;
                       for (v = h; v < f; v += s) {
                         var y = l[v];
-                        y > p && (p = y), y < d && (d = y);
+                        (y > p && (p = y), y < d && (d = y));
                       }
-                      (u[2 * c] = p),
+                      ((u[2 * c] = p),
                         (u[2 * c + 1] = d),
                         (0 == i || p > this.mergedPeaks[2 * c]) &&
                           (this.mergedPeaks[2 * c] = p),
                         (0 == i || d < this.mergedPeaks[2 * c + 1]) &&
-                          (this.mergedPeaks[2 * c + 1] = d);
+                          (this.mergedPeaks[2 * c + 1] = d));
                     }
                   }
                   return this.params.splitChannels
@@ -173489,7 +173570,7 @@ angular.module('ui.utils', [
               {
                 key: 'destroy',
                 value: function () {
-                  this.isPaused() || this.pause(),
+                  (this.isPaused() || this.pause(),
                     this.unAll(),
                     (this.buffer = null),
                     this.disconnectFilters(),
@@ -173505,22 +173586,22 @@ angular.module('ui.utils', [
                       this.params.audioContext
                         ? (this.params.audioContext = null)
                         : (window.WaveSurferAudioContext = null),
-                      (window.WaveSurferOfflineAudioContext = null));
+                      (window.WaveSurferOfflineAudioContext = null)));
                 },
               },
               {
                 key: 'load',
                 value: function (e) {
-                  (this.startPosition = 0),
+                  ((this.startPosition = 0),
                     (this.lastPlay = this.ac.currentTime),
                     (this.buffer = e),
-                    this.createSource();
+                    this.createSource());
                 },
               },
               {
                 key: 'createSource',
                 value: function () {
-                  this.disconnectSource(),
+                  (this.disconnectSource(),
                     (this.source = this.ac.createBufferSource()),
                     (this.source.start =
                       this.source.start || this.source.noteGrainOn),
@@ -173531,7 +173612,7 @@ angular.module('ui.utils', [
                       this.ac.currentTime
                     ),
                     (this.source.buffer = this.buffer),
-                    this.source.connect(this.analyser);
+                    this.source.connect(this.analyser));
                 },
               },
               {
@@ -173581,7 +173662,7 @@ angular.module('ui.utils', [
                   if (this.buffer) {
                     this.createSource();
                     var r = this.seekTo(e, t);
-                    (e = r.start),
+                    ((e = r.start),
                       (t = r.end),
                       (this.scheduledPause = t),
                       this.source.start(0, e, t - e),
@@ -173589,18 +173670,18 @@ angular.module('ui.utils', [
                         this.ac.resume &&
                         this.ac.resume(),
                       this.setState(h),
-                      this.fireEvent('play');
+                      this.fireEvent('play'));
                   }
                 },
               },
               {
                 key: 'pause',
                 value: function () {
-                  (this.scheduledPause = null),
+                  ((this.scheduledPause = null),
                     (this.startPosition += this.getPlayedTime()),
                     this.source && this.source.stop(0),
                     this.setState(f),
-                    this.fireEvent('pause');
+                    this.fireEvent('pause'));
                 },
               },
               {
@@ -173618,21 +173699,22 @@ angular.module('ui.utils', [
               {
                 key: 'setPlaybackRate',
                 value: function (e) {
-                  (e = e || 1),
+                  ((e = e || 1),
                     this.isPaused()
                       ? (this.playbackRate = e)
-                      : (this.pause(), (this.playbackRate = e), this.play());
+                      : (this.pause(), (this.playbackRate = e), this.play()));
                 },
               },
             ]),
             t
           );
         })();
-      (t.default = p), (p.scriptBufferSize = 256), (e.exports = t.default);
+      ((t.default = p), (p.scriptBufferSize = 256), (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}), (t.default = void 0);
+      (Object.defineProperty(t, '__esModule', {value: !0}),
+        (t.default = void 0));
       var n = (function (e) {
           if (e && e.__esModule) return e;
           var t = {};
@@ -173645,7 +173727,7 @@ angular.module('ui.utils', [
                     : {};
                 n.get || n.set ? Object.defineProperty(t, r, n) : (t[r] = e[r]);
               }
-          return (t.default = e), t;
+          return ((t.default = e), t);
         })(r(0)),
         i = u(r(14)),
         a = u(r(3)),
@@ -173690,7 +173772,7 @@ angular.module('ui.utils', [
         return (d =
           Object.setPrototypeOf ||
           function (e, t) {
-            return (e.__proto__ = t), e;
+            return ((e.__proto__ = t), e);
           })(e, t);
       }
       function p(e, t) {
@@ -173700,14 +173782,14 @@ angular.module('ui.utils', [
       function v(e, t) {
         for (var r = 0; r < t.length; r++) {
           var n = t[r];
-          (n.enumerable = n.enumerable || !1),
+          ((n.enumerable = n.enumerable || !1),
             (n.configurable = !0),
             'value' in n && (n.writable = !0),
-            Object.defineProperty(e, n.key, n);
+            Object.defineProperty(e, n.key, n));
         }
       }
       function y(e, t, r) {
-        return t && v(e.prototype, t), r && v(e, r), e;
+        return (t && v(e.prototype, t), r && v(e, r), e);
       }
       var m = (function (e) {
         function t(e) {
@@ -173797,11 +173879,11 @@ angular.module('ui.utils', [
             'function' != typeof r.params.renderer)
           )
             throw new Error('Renderer parameter is invalid');
-          (r.Drawer = r.params.renderer),
+          ((r.Drawer = r.params.renderer),
             (r.Backend = r.backends[r.params.backend]),
             (r.initialisedPluginList = {}),
             (r.isDestroyed = !1),
-            (r.isReady = !1);
+            (r.isReady = !1));
           var o = 0;
           return (
             (r._onResize = n.debounce(
@@ -173822,10 +173904,10 @@ angular.module('ui.utils', [
               throw new TypeError(
                 'Super expression must either be null or a function'
               );
-            (e.prototype = Object.create(t && t.prototype, {
+            ((e.prototype = Object.create(t && t.prototype, {
               constructor: {value: e, writable: !0, configurable: !0},
             })),
-              t && d(e, t);
+              t && d(e, t));
           })(t, n.Observer),
           y(t, null, [
             {
@@ -173951,7 +174033,7 @@ angular.module('ui.utils', [
               key: 'createDrawer',
               value: function () {
                 var e = this;
-                (this.drawer = new this.Drawer(this.container, this.params)),
+                ((this.drawer = new this.Drawer(this.container, this.params)),
                   this.drawer.init(),
                   this.fireEvent('drawer-created', this.drawer),
                   !1 !== this.params.responsive &&
@@ -173962,8 +174044,8 @@ angular.module('ui.utils', [
                       !0
                     )),
                   this.drawer.on('redraw', function () {
-                    e.drawBuffer(),
-                      e.drawer.progress(e.backend.getPlayedPercents());
+                    (e.drawBuffer(),
+                      e.drawer.progress(e.backend.getPlayedPercents()));
                   }),
                   this.drawer.on('click', function (t, r) {
                     setTimeout(function () {
@@ -173971,16 +174053,16 @@ angular.module('ui.utils', [
                     }, 0);
                   }),
                   this.drawer.on('scroll', function (t) {
-                    e.params.partialRender && e.drawBuffer(),
-                      e.fireEvent('scroll', t);
-                  });
+                    (e.params.partialRender && e.drawBuffer(),
+                      e.fireEvent('scroll', t));
+                  }));
               },
             },
             {
               key: 'createBackend',
               value: function () {
                 var e = this;
-                this.backend && this.backend.destroy(),
+                (this.backend && this.backend.destroy(),
                   'AudioElement' == this.params.backend &&
                     (this.params.backend = 'MediaElement'),
                   'WebAudio' != this.params.backend ||
@@ -173990,8 +174072,8 @@ angular.module('ui.utils', [
                   this.backend.init(),
                   this.fireEvent('backend-created', this.backend),
                   this.backend.on('finish', function () {
-                    e.drawer.progress(e.backend.getPlayedPercents()),
-                      e.fireEvent('finish');
+                    (e.drawer.progress(e.backend.getPlayedPercents()),
+                      e.fireEvent('finish'));
                   }),
                   this.backend.on('play', function () {
                     return e.fireEvent('play');
@@ -174000,9 +174082,9 @@ angular.module('ui.utils', [
                     return e.fireEvent('pause');
                   }),
                   this.backend.on('audioprocess', function (t) {
-                    e.drawer.progress(e.backend.getPlayedPercents()),
-                      e.fireEvent('audioprocess', t);
-                  });
+                    (e.drawer.progress(e.backend.getPlayedPercents()),
+                      e.fireEvent('audioprocess', t));
+                  }));
               },
             },
             {
@@ -174078,14 +174160,14 @@ angular.module('ui.utils', [
               value: function (e) {
                 var t = this.getDuration() || 1,
                   r = this.getCurrentTime() || 0;
-                (r = Math.max(0, Math.min(t, r + (e || 0)))),
-                  this.seekAndCenter(r / t);
+                ((r = Math.max(0, Math.min(t, r + (e || 0)))),
+                  this.seekAndCenter(r / t));
               },
             },
             {
               key: 'seekAndCenter',
               value: function (e) {
-                this.seekTo(e), this.drawer.recenter(e);
+                (this.seekTo(e), this.drawer.recenter(e));
               },
             },
             {
@@ -174102,18 +174184,18 @@ angular.module('ui.utils', [
                 var r = this.backend.isPaused();
                 r || this.backend.pause();
                 var n = this.params.scrollParent;
-                (this.params.scrollParent = !1),
+                ((this.params.scrollParent = !1),
                   this.backend.seekTo(e * this.getDuration()),
                   this.drawer.progress(e),
                   r || this.backend.play(),
                   (this.params.scrollParent = n),
-                  this.fireEvent('seek', e);
+                  this.fireEvent('seek', e));
               },
             },
             {
               key: 'stop',
               value: function () {
-                this.pause(), this.seekTo(0), this.drawer.progress(0);
+                (this.pause(), this.seekTo(0), this.drawer.progress(0));
               },
             },
             {
@@ -174125,7 +174207,7 @@ angular.module('ui.utils', [
             {
               key: 'setVolume',
               value: function (e) {
-                this.backend.setVolume(e), this.fireEvent('volume', e);
+                (this.backend.setVolume(e), this.fireEvent('volume', e));
               },
             },
             {
@@ -174189,8 +174271,8 @@ angular.module('ui.utils', [
             {
               key: 'toggleScroll',
               value: function () {
-                (this.params.scrollParent = !this.params.scrollParent),
-                  this.drawBuffer();
+                ((this.params.scrollParent = !this.params.scrollParent),
+                  this.drawBuffer());
               },
             },
             {
@@ -174208,7 +174290,7 @@ angular.module('ui.utils', [
             {
               key: 'setWaveColor',
               value: function (e) {
-                (this.params.waveColor = e), this.drawBuffer();
+                ((this.params.waveColor = e), this.drawBuffer());
               },
             },
             {
@@ -174220,7 +174302,7 @@ angular.module('ui.utils', [
             {
               key: 'setProgressColor',
               value: function (e) {
-                (this.params.progressColor = e), this.drawBuffer();
+                ((this.params.progressColor = e), this.drawBuffer());
               },
             },
             {
@@ -174232,10 +174314,10 @@ angular.module('ui.utils', [
             {
               key: 'setBackgroundColor',
               value: function (e) {
-                (this.params.backgroundColor = e),
+                ((this.params.backgroundColor = e),
                   n.style(this.container, {
                     background: this.params.backgroundColor,
-                  });
+                  }));
               },
             },
             {
@@ -174247,7 +174329,7 @@ angular.module('ui.utils', [
             {
               key: 'setCursorColor',
               value: function (e) {
-                (this.params.cursorColor = e), this.drawer.updateCursor();
+                ((this.params.cursorColor = e), this.drawer.updateCursor());
               },
             },
             {
@@ -174259,9 +174341,9 @@ angular.module('ui.utils', [
             {
               key: 'setHeight',
               value: function (e) {
-                (this.params.height = e),
+                ((this.params.height = e),
                   this.drawer.setHeight(e * this.params.pixelRatio),
-                  this.drawBuffer();
+                  this.drawBuffer());
               },
             },
             {
@@ -174286,18 +174368,18 @@ angular.module('ui.utils', [
                   var s,
                     o = this.peakCache.addRangeToPeakCache(n, i, a);
                   for (s = 0; s < o.length; s++)
-                    (e = this.backend.getPeaks(n, o[s][0], o[s][1])),
-                      this.drawer.drawPeaks(e, n, o[s][0], o[s][1]);
+                    ((e = this.backend.getPeaks(n, o[s][0], o[s][1])),
+                      this.drawer.drawPeaks(e, n, o[s][0], o[s][1]));
                 } else
-                  (e = this.backend.getPeaks(n, i, a)),
-                    this.drawer.drawPeaks(e, n, i, a);
+                  ((e = this.backend.getPeaks(n, i, a)),
+                    this.drawer.drawPeaks(e, n, i, a));
                 this.fireEvent('redraw', e, n);
               },
             },
             {
               key: 'zoom',
               value: function (e) {
-                e
+                (e
                   ? ((this.params.minPxPerSec = e),
                     (this.params.scrollParent = !0))
                   : ((this.params.minPxPerSec = this.defaultParams.minPxPerSec),
@@ -174307,7 +174389,7 @@ angular.module('ui.utils', [
                   this.drawer.recenter(
                     this.getCurrentTime() / this.getDuration()
                   ),
-                  this.fireEvent('zoom', e);
+                  this.fireEvent('zoom', e));
               },
             },
             {
@@ -174322,10 +174404,10 @@ angular.module('ui.utils', [
             {
               key: 'loadDecodedBuffer',
               value: function (e) {
-                this.backend.load(e),
+                (this.backend.load(e),
                   this.drawBuffer(),
                   this.fireEvent('ready'),
-                  (this.isReady = !0);
+                  (this.isReady = !0));
               },
             },
             {
@@ -174333,7 +174415,7 @@ angular.module('ui.utils', [
               value: function (e) {
                 var t = this,
                   r = new FileReader();
-                r.addEventListener('progress', function (e) {
+                (r.addEventListener('progress', function (e) {
                   return t.onProgress(e);
                 }),
                   r.addEventListener('load', function (e) {
@@ -174343,7 +174425,7 @@ angular.module('ui.utils', [
                     return t.fireEvent('error', 'Error reading file');
                   }),
                   r.readAsArrayBuffer(e),
-                  this.empty();
+                  this.empty());
               },
             },
             {
@@ -174389,9 +174471,9 @@ angular.module('ui.utils', [
                     );
                   };
                 if (!t) return i();
-                this.backend.setPeaks(t, r),
+                (this.backend.setPeaks(t, r),
                   this.drawBuffer(),
-                  this.tmpEvents.push(this.once('interaction', i));
+                  this.tmpEvents.push(this.once('interaction', i)));
               },
             },
             {
@@ -174403,11 +174485,11 @@ angular.module('ui.utils', [
                   this.backend.load(a, this.mediaContainer, t, r);
                 else {
                   var s = e;
-                  this.backend.loadElt(s, t), (a = s.src);
+                  (this.backend.loadElt(s, t), (a = s.src));
                 }
-                this.tmpEvents.push(
+                (this.tmpEvents.push(
                   this.backend.once('canplay', function () {
-                    i.drawBuffer(), i.fireEvent('ready'), (i.isReady = !0);
+                    (i.drawBuffer(), i.fireEvent('ready'), (i.isReady = !0));
                   }),
                   this.backend.once('error', function (e) {
                     return i.fireEvent('error', e);
@@ -174418,19 +174500,19 @@ angular.module('ui.utils', [
                     !this.backend.supportsWebAudio() ||
                     this.getArrayBuffer(a, function (e) {
                       i.decodeArrayBuffer(e, function (e) {
-                        (i.backend.buffer = e),
+                        ((i.backend.buffer = e),
                           i.backend.setPeaks(null),
                           i.drawBuffer(),
-                          i.fireEvent('waveform-ready');
+                          i.fireEvent('waveform-ready'));
                       });
-                    });
+                    }));
               },
             },
             {
               key: 'decodeArrayBuffer',
               value: function (e, t) {
                 var r = this;
-                (this.arraybuffer = e),
+                ((this.arraybuffer = e),
                   this.backend.decodeArrayBuffer(
                     e,
                     function (n) {
@@ -174441,7 +174523,7 @@ angular.module('ui.utils', [
                     function () {
                       return r.fireEvent('error', 'Error decoding audiobuffer');
                     }
-                  );
+                  ));
               },
             },
             {
@@ -174460,11 +174542,14 @@ angular.module('ui.utils', [
                       r.onProgress(e);
                     }),
                     i.on('success', function (e, n) {
-                      t(e), (r.currentAjax = null);
+                      (t(e), (r.currentAjax = null));
                     }),
                     i.on('error', function (e) {
-                      r.fireEvent('error', 'XHR error: ' + e.target.statusText),
-                        (r.currentAjax = null);
+                      (r.fireEvent(
+                        'error',
+                        'XHR error: ' + e.target.statusText
+                      ),
+                        (r.currentAjax = null));
                     })
                   ),
                   i
@@ -174475,16 +174560,16 @@ angular.module('ui.utils', [
               key: 'onProgress',
               value: function (e) {
                 var t;
-                (t = e.lengthComputable
+                ((t = e.lengthComputable
                   ? e.loaded / e.total
                   : e.loaded / (e.loaded + 1e6)),
-                  this.fireEvent('loading', Math.round(100 * t), e.target);
+                  this.fireEvent('loading', Math.round(100 * t), e.target));
               },
             },
             {
               key: 'exportPCM',
               value: function (e, t, r, n) {
-                (e = e || 1024), (n = n || 0), (t = t || 1e4), (r = r || !1);
+                ((e = e || 1024), (n = n || 0), (t = t || 1e4), (r = r || !1));
                 var i = this.backend.getPeaks(e, n),
                   a = [].map.call(i, function (e) {
                     return Math.round(e * t) / t;
@@ -174528,20 +174613,20 @@ angular.module('ui.utils', [
             {
               key: 'empty',
               value: function () {
-                this.backend.isPaused() ||
+                (this.backend.isPaused() ||
                   (this.stop(), this.backend.disconnectSource()),
                   (this.isReady = !1),
                   this.cancelAjax(),
                   this.clearTmpEvents(),
                   this.drawer.progress(0),
                   this.drawer.setWidth(0),
-                  this.drawer.drawPeaks({length: this.drawer.getWidth()}, 0);
+                  this.drawer.drawPeaks({length: this.drawer.getWidth()}, 0));
               },
             },
             {
               key: 'destroy',
               value: function () {
-                this.destroyAllPlugins(),
+                (this.destroyAllPlugins(),
                   this.fireEvent('destroy'),
                   this.cancelAjax(),
                   this.clearTmpEvents(),
@@ -174557,44 +174642,44 @@ angular.module('ui.utils', [
                   this.drawer.destroy(),
                   (this.isDestroyed = !0),
                   (this.isReady = !1),
-                  (this.arraybuffer = null);
+                  (this.arraybuffer = null));
               },
             },
           ]),
           t
         );
       })();
-      (t.default = m),
+      ((t.default = m),
         (m.VERSION = '2.2.1'),
         (m.util = n),
-        (e.exports = t.default);
+        (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}),
+      (Object.defineProperty(t, '__esModule', {value: !0}),
         (t.default = function (e) {
           var t = new i.default(),
             r = new XMLHttpRequest(),
             n = !1;
-          r.open(e.method || 'GET', e.url, !0),
+          (r.open(e.method || 'GET', e.url, !0),
             (r.responseType = e.responseType || 'json'),
             e.xhr &&
               (e.xhr.requestHeaders &&
                 e.xhr.requestHeaders.forEach(function (e) {
                   r.setRequestHeader(e.key, e.value);
                 }),
-              e.xhr.withCredentials && (r.withCredentials = !0));
+              e.xhr.withCredentials && (r.withCredentials = !0)));
           return (
             r.addEventListener('progress', function (e) {
-              t.fireEvent('progress', e),
-                e.lengthComputable && e.loaded == e.total && (n = !0);
+              (t.fireEvent('progress', e),
+                e.lengthComputable && e.loaded == e.total && (n = !0));
             }),
             r.addEventListener('load', function (e) {
-              n || t.fireEvent('progress', e),
+              (n || t.fireEvent('progress', e),
                 t.fireEvent('load', e),
                 200 == r.status || 206 == r.status
                   ? t.fireEvent('success', r.response, e)
-                  : t.fireEvent('error', e);
+                  : t.fireEvent('error', e));
             }),
             r.addEventListener('error', function (e) {
               return t.fireEvent('error', e);
@@ -174603,22 +174688,22 @@ angular.module('ui.utils', [
             (t.xhr = r),
             t
           );
-        });
+        }));
       var n,
         i = (n = r(1)) && n.__esModule ? n : {default: n};
       e.exports = t.default;
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}),
+      (Object.defineProperty(t, '__esModule', {value: !0}),
         (t.default = function () {
           return 'wavesurfer_' + Math.random().toString(32).substring(2);
         }),
-        (e.exports = t.default);
+        (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}),
+      (Object.defineProperty(t, '__esModule', {value: !0}),
         (t.default = function (e) {
           var t = -1 / 0;
           return (
@@ -174628,11 +174713,11 @@ angular.module('ui.utils', [
             t
           );
         }),
-        (e.exports = t.default);
+        (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}),
+      (Object.defineProperty(t, '__esModule', {value: !0}),
         (t.default = function (e) {
           var t = Number(1 / 0);
           return (
@@ -174642,11 +174727,11 @@ angular.module('ui.utils', [
             t
           );
         }),
-        (e.exports = t.default);
+        (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}),
+      (Object.defineProperty(t, '__esModule', {value: !0}),
         (t.default = function (e) {
           for (
             var t = arguments.length, r = new Array(t > 1 ? t - 1 : 0), n = 1;
@@ -174663,11 +174748,11 @@ angular.module('ui.utils', [
             e
           );
         }),
-        (e.exports = t.default);
+        (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}),
+      (Object.defineProperty(t, '__esModule', {value: !0}),
         (t.default = function (e, t) {
           return (
             Object.keys(t).forEach(function (r) {
@@ -174676,11 +174761,11 @@ angular.module('ui.utils', [
             e
           );
         }),
-        (e.exports = t.default);
+        (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}),
+      (Object.defineProperty(t, '__esModule', {value: !0}),
         (t.default = function (e) {
           return function () {
             for (var t = arguments.length, r = new Array(t), n = 0; n < t; n++)
@@ -174689,7 +174774,7 @@ angular.module('ui.utils', [
               return e.apply(void 0, r);
             });
           };
-        });
+        }));
       var n,
         i = (n = r(2)) && n.__esModule ? n : {default: n};
       e.exports = t.default;
@@ -174705,7 +174790,7 @@ angular.module('ui.utils', [
         }
         null == t && (t = 100);
         var l = function () {
-          (a = this), (i = arguments), (s = Date.now());
+          ((a = this), (i = arguments), (s = Date.now()));
           var l = r && !n;
           return (
             n || (n = setTimeout(u, t)),
@@ -174727,22 +174812,24 @@ angular.module('ui.utils', [
           l
         );
       }
-      (r.debounce = r), (e.exports = r);
+      ((r.debounce = r), (e.exports = r));
     },
     function (e, t, r) {
       'use strict';
       function n(e) {
-        e.stopPropagation(), document.body.removeEventListener('click', n, !0);
+        (e.stopPropagation(),
+          document.body.removeEventListener('click', n, !0));
       }
-      Object.defineProperty(t, '__esModule', {value: !0}),
+      (Object.defineProperty(t, '__esModule', {value: !0}),
         (t.default = function (e) {
           document.body.addEventListener('click', n, !0);
         }),
-        (e.exports = t.default);
+        (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}), (t.default = void 0);
+      (Object.defineProperty(t, '__esModule', {value: !0}),
+        (t.default = void 0));
       var n,
         i = (n = r(15)) && n.__esModule ? n : {default: n},
         a = (function (e) {
@@ -174757,7 +174844,7 @@ angular.module('ui.utils', [
                     : {};
                 n.get || n.set ? Object.defineProperty(t, r, n) : (t[r] = e[r]);
               }
-          return (t.default = e), t;
+          return ((t.default = e), t);
         })(r(0));
       function s(e) {
         return (s =
@@ -174777,10 +174864,10 @@ angular.module('ui.utils', [
       function o(e, t) {
         for (var r = 0; r < t.length; r++) {
           var n = t[r];
-          (n.enumerable = n.enumerable || !1),
+          ((n.enumerable = n.enumerable || !1),
             (n.configurable = !0),
             'value' in n && (n.writable = !0),
-            Object.defineProperty(e, n.key, n);
+            Object.defineProperty(e, n.key, n));
         }
       }
       function u(e, t) {
@@ -174805,7 +174892,7 @@ angular.module('ui.utils', [
         return (c =
           Object.setPrototypeOf ||
           function (e, t) {
-            return (e.__proto__ = t), e;
+            return ((e.__proto__ = t), e);
           })(e, t);
       }
       var h = (function (e) {
@@ -174835,23 +174922,23 @@ angular.module('ui.utils', [
               throw new TypeError(
                 'Super expression must either be null or a function'
               );
-            (e.prototype = Object.create(t && t.prototype, {
+            ((e.prototype = Object.create(t && t.prototype, {
               constructor: {value: e, writable: !0, configurable: !0},
             })),
-              t && c(e, t);
+              t && c(e, t));
           })(t, i.default),
           (r = t),
           (n = [
             {
               key: 'init',
               value: function () {
-                this.createWrapper(), this.createElements();
+                (this.createWrapper(), this.createElements());
               },
             },
             {
               key: 'createElements',
               value: function () {
-                (this.progressWave = this.wrapper.appendChild(
+                ((this.progressWave = this.wrapper.appendChild(
                   this.style(document.createElement('wave'), {
                     position: 'absolute',
                     zIndex: 3,
@@ -174867,7 +174954,7 @@ angular.module('ui.utils', [
                   })
                 )),
                   this.addCanvas(),
-                  this.updateCursor();
+                  this.updateCursor());
               },
             },
             {
@@ -174894,10 +174981,10 @@ angular.module('ui.utils', [
                 this.canvases.forEach(function (t, r) {
                   var n =
                     e.maxCanvasWidth + 2 * Math.ceil(e.params.pixelRatio / 2);
-                  r == e.canvases.length - 1 &&
+                  (r == e.canvases.length - 1 &&
                     (n = e.width - e.maxCanvasWidth * (e.canvases.length - 1)),
                     e.updateDimensions(t, n, e.height),
-                    e.clearWaveForEntry(t);
+                    e.clearWaveForEntry(t));
                 });
               },
             },
@@ -174906,7 +174993,7 @@ angular.module('ui.utils', [
               value: function () {
                 var e = {},
                   t = this.maxCanvasElementWidth * this.canvases.length;
-                (e.wave = this.wrapper.appendChild(
+                ((e.wave = this.wrapper.appendChild(
                   this.style(document.createElement('canvas'), {
                     position: 'absolute',
                     zIndex: 2,
@@ -174929,16 +175016,16 @@ angular.module('ui.utils', [
                       })
                     )),
                     (e.progressCtx = e.progress.getContext('2d'))),
-                  this.canvases.push(e);
+                  this.canvases.push(e));
               },
             },
             {
               key: 'removeCanvas',
               value: function () {
                 var e = this.canvases.pop();
-                e.wave.parentElement.removeChild(e.wave),
+                (e.wave.parentElement.removeChild(e.wave),
                   this.hasProgressCanvas &&
-                    e.progress.parentElement.removeChild(e.progress);
+                    e.progress.parentElement.removeChild(e.progress));
               },
             },
             {
@@ -174946,7 +175033,7 @@ angular.module('ui.utils', [
               value: function (e, t, r) {
                 var n = Math.round(t / this.params.pixelRatio),
                   i = Math.round(this.width / this.params.pixelRatio);
-                (e.start = e.waveCtx.canvas.offsetLeft / i || 0),
+                ((e.start = e.waveCtx.canvas.offsetLeft / i || 0),
                   (e.end = e.start + n / i),
                   (e.waveCtx.canvas.width = t),
                   (e.waveCtx.canvas.height = r),
@@ -174955,7 +175042,7 @@ angular.module('ui.utils', [
                   this.hasProgressCanvas &&
                     ((e.progressCtx.canvas.width = t),
                     (e.progressCtx.canvas.height = r),
-                    this.style(e.progressCtx.canvas, {width: n + 'px'}));
+                    this.style(e.progressCtx.canvas, {width: n + 'px'})));
               },
             },
             {
@@ -174970,7 +175057,7 @@ angular.module('ui.utils', [
             {
               key: 'clearWaveForEntry',
               value: function (e) {
-                e.waveCtx.clearRect(
+                (e.waveCtx.clearRect(
                   0,
                   0,
                   e.waveCtx.canvas.width,
@@ -174982,7 +175069,7 @@ angular.module('ui.utils', [
                       0,
                       e.progressCtx.canvas.width,
                       e.progressCtx.canvas.height
-                    );
+                    ));
               },
             },
             {
@@ -175039,11 +175126,11 @@ angular.module('ui.utils', [
                       c = [],
                       h = u.length;
                     for (l = 0; l < h; l++)
-                      (c[2 * l] = u[l]), (c[2 * l + 1] = -u[l]);
+                      ((c[2 * l] = u[l]), (c[2 * l + 1] = -u[l]));
                     u = c;
                   }
-                  void 0 !== r && i.drawLine(u, t, o, s, r, n),
-                    i.fillRect(0, o + s - i.halfPixel, i.width, i.halfPixel);
+                  (void 0 !== r && i.drawLine(u, t, o, s, r, n),
+                    i.fillRect(0, o + s - i.halfPixel, i.width, i.halfPixel));
                 });
               },
             },
@@ -175052,9 +175139,9 @@ angular.module('ui.utils', [
               value: function (e, t, r, n, i, a) {
                 var s = this;
                 this.canvases.forEach(function (o) {
-                  s.setFillStyles(o),
+                  (s.setFillStyles(o),
                     s.drawLineToContext(o, o.waveCtx, e, t, r, n, i, a),
-                    s.drawLineToContext(o, o.progressCtx, e, t, r, n, i, a);
+                    s.drawLineToContext(o, o.progressCtx, e, t, r, n, i, a));
                 });
               },
             },
@@ -175091,12 +175178,12 @@ angular.module('ui.utils', [
                       k = Math.round(g / y);
                     t.lineTo((l - h) * p + this.halfPixel, v - k);
                   }
-                  t.lineTo(
+                  (t.lineTo(
                     (f - h) * p,
                     v - Math.round((r[2 * f + 1] || 0) / y)
                   ),
                     t.closePath(),
-                    t.fill();
+                    t.fill());
                 }
               },
             },
@@ -175188,9 +175275,9 @@ angular.module('ui.utils', [
             {
               key: 'setFillStyles',
               value: function (e) {
-                (e.waveCtx.fillStyle = this.params.waveColor),
+                ((e.waveCtx.fillStyle = this.params.waveColor),
                   this.hasProgressCanvas &&
-                    (e.progressCtx.fillStyle = this.params.progressColor);
+                    (e.progressCtx.fillStyle = this.params.progressColor));
               },
             },
             {
@@ -175213,11 +175300,12 @@ angular.module('ui.utils', [
           t
         );
       })();
-      (t.default = h), (e.exports = t.default);
+      ((t.default = h), (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}), (t.default = void 0);
+      (Object.defineProperty(t, '__esModule', {value: !0}),
+        (t.default = void 0));
       var n = (function (e) {
         if (e && e.__esModule) return e;
         var t = {};
@@ -175230,7 +175318,7 @@ angular.module('ui.utils', [
                   : {};
               n.get || n.set ? Object.defineProperty(t, r, n) : (t[r] = e[r]);
             }
-        return (t.default = e), t;
+        return ((t.default = e), t);
       })(r(0));
       function i(e) {
         return (i =
@@ -175250,10 +175338,10 @@ angular.module('ui.utils', [
       function a(e, t) {
         for (var r = 0; r < t.length; r++) {
           var n = t[r];
-          (n.enumerable = n.enumerable || !1),
+          ((n.enumerable = n.enumerable || !1),
             (n.configurable = !0),
             'value' in n && (n.writable = !0),
-            Object.defineProperty(e, n.key, n);
+            Object.defineProperty(e, n.key, n));
         }
       }
       function s(e, t) {
@@ -175278,7 +175366,7 @@ angular.module('ui.utils', [
         return (u =
           Object.setPrototypeOf ||
           function (e, t) {
-            return (e.__proto__ = t), e;
+            return ((e.__proto__ = t), e);
           })(e, t);
       }
       var l = (function (e) {
@@ -175305,10 +175393,10 @@ angular.module('ui.utils', [
               throw new TypeError(
                 'Super expression must either be null or a function'
               );
-            (e.prototype = Object.create(t && t.prototype, {
+            ((e.prototype = Object.create(t && t.prototype, {
               constructor: {value: e, writable: !0, configurable: !0},
             })),
-              t && u(e, t);
+              t && u(e, t));
           })(t, n.Observer),
           (r = t),
           (i = [
@@ -175321,7 +175409,7 @@ angular.module('ui.utils', [
             {
               key: 'createWrapper',
               value: function () {
-                (this.wrapper = this.container.appendChild(
+                ((this.wrapper = this.container.appendChild(
                   document.createElement('wave')
                 )),
                   this.style(this.wrapper, {
@@ -175337,7 +175425,7 @@ angular.module('ui.utils', [
                       overflowX: this.params.hideScrollbar ? 'hidden' : 'auto',
                       overflowY: 'hidden',
                     }),
-                  this.setupWrapperEvents();
+                  this.setupWrapperEvents());
               },
             },
             {
@@ -175366,7 +175454,7 @@ angular.module('ui.utils', [
               key: 'setupWrapperEvents',
               value: function () {
                 var e = this;
-                this.wrapper.addEventListener('click', function (t) {
+                (this.wrapper.addEventListener('click', function (t) {
                   var r = e.wrapper.offsetHeight - e.wrapper.clientHeight;
                   if (0 != r) {
                     var n = e.wrapper.getBoundingClientRect();
@@ -175377,16 +175465,16 @@ angular.module('ui.utils', [
                 }),
                   this.wrapper.addEventListener('scroll', function (t) {
                     return e.fireEvent('scroll', t);
-                  });
+                  }));
               },
             },
             {
               key: 'drawPeaks',
               value: function (e, t, r, n) {
-                this.setWidth(t) || this.clearWave(),
+                (this.setWidth(t) || this.clearWave(),
                   this.params.barWidth
                     ? this.drawBars(e, 0, r, n)
-                    : this.drawWave(e, 0, r, n);
+                    : this.drawWave(e, 0, r, n));
               },
             },
             {
@@ -175494,11 +175582,11 @@ angular.module('ui.utils', [
             {
               key: 'destroy',
               value: function () {
-                this.unAll(),
+                (this.unAll(),
                   this.wrapper &&
                     (this.wrapper.parentNode == this.container &&
                       this.container.removeChild(this.wrapper),
-                    (this.wrapper = null));
+                    (this.wrapper = null)));
               },
             },
             {key: 'updateCursor', value: function () {}},
@@ -175512,11 +175600,12 @@ angular.module('ui.utils', [
           t
         );
       })();
-      (t.default = l), (e.exports = t.default);
+      ((t.default = l), (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
-      Object.defineProperty(t, '__esModule', {value: !0}), (t.default = void 0);
+      (Object.defineProperty(t, '__esModule', {value: !0}),
+        (t.default = void 0));
       var n,
         i = (n = r(3)) && n.__esModule ? n : {default: n};
       !(function (e) {
@@ -175551,10 +175640,10 @@ angular.module('ui.utils', [
       function s(e, t) {
         for (var r = 0; r < t.length; r++) {
           var n = t[r];
-          (n.enumerable = n.enumerable || !1),
+          ((n.enumerable = n.enumerable || !1),
             (n.configurable = !0),
             'value' in n && (n.writable = !0),
-            Object.defineProperty(e, n.key, n);
+            Object.defineProperty(e, n.key, n));
         }
       }
       function o(e, t) {
@@ -175599,7 +175688,7 @@ angular.module('ui.utils', [
         return (c =
           Object.setPrototypeOf ||
           function (e, t) {
-            return (e.__proto__ = t), e;
+            return ((e.__proto__ = t), e);
           })(e, t);
       }
       var h = (function (e) {
@@ -175637,24 +175726,25 @@ angular.module('ui.utils', [
               throw new TypeError(
                 'Super expression must either be null or a function'
               );
-            (e.prototype = Object.create(t && t.prototype, {
+            ((e.prototype = Object.create(t && t.prototype, {
               constructor: {value: e, writable: !0, configurable: !0},
             })),
-              t && c(e, t);
+              t && c(e, t));
           })(t, i.default),
           (r = t),
           (n = [
             {
               key: 'init',
               value: function () {
-                this.setPlaybackRate(this.params.audioRate), this.createTimer();
+                (this.setPlaybackRate(this.params.audioRate),
+                  this.createTimer());
               },
             },
             {
               key: 'createTimer',
               value: function () {
                 var e = this;
-                this.on('play', function t() {
+                (this.on('play', function t() {
                   e.isPaused() ||
                     (e.fireEvent('audioprocess', e.getCurrentTime()),
                     (
@@ -175664,35 +175754,35 @@ angular.module('ui.utils', [
                 }),
                   this.on('pause', function () {
                     e.fireEvent('audioprocess', e.getCurrentTime());
-                  });
+                  }));
               },
             },
             {
               key: 'load',
               value: function (e, t, r, n) {
                 var i = document.createElement(this.mediaType);
-                (i.controls = this.params.mediaControls),
+                ((i.controls = this.params.mediaControls),
                   (i.autoplay = this.params.autoplay || !1),
                   (i.preload = null == n ? 'auto' : n),
                   (i.src = e),
-                  (i.style.width = '100%');
+                  (i.style.width = '100%'));
                 var a = t.querySelector(this.mediaType);
-                a && t.removeChild(a), t.appendChild(i), this._load(i, r);
+                (a && t.removeChild(a), t.appendChild(i), this._load(i, r));
               },
             },
             {
               key: 'loadElt',
               value: function (e, t) {
-                (e.controls = this.params.mediaControls),
+                ((e.controls = this.params.mediaControls),
                   (e.autoplay = this.params.autoplay || !1),
-                  this._load(e, t);
+                  this._load(e, t));
               },
             },
             {
               key: '_load',
               value: function (e, t) {
                 var r = this;
-                'function' == typeof e.load && e.load(),
+                ('function' == typeof e.load && e.load(),
                   e.addEventListener('error', function () {
                     r.fireEvent('error', 'Error loading media element');
                   }),
@@ -175713,7 +175803,7 @@ angular.module('ui.utils', [
                   (this.onPlayEnd = null),
                   (this.buffer = null),
                   this.setPlaybackRate(this.playbackRate),
-                  this.setVolume(this.volume);
+                  this.setVolume(this.volume));
               },
             },
             {
@@ -175727,7 +175817,7 @@ angular.module('ui.utils', [
               value: function () {
                 if (this.explicitDuration) return this.explicitDuration;
                 var e = (this.buffer || this.media).duration;
-                return e >= 1 / 0 && (e = this.media.seekable.end(0)), e;
+                return (e >= 1 / 0 && (e = this.media.seekable.end(0)), e);
               },
             },
             {
@@ -175751,14 +175841,15 @@ angular.module('ui.utils', [
             {
               key: 'setPlaybackRate',
               value: function (e) {
-                (this.playbackRate = e || 1),
-                  (this.media.playbackRate = this.playbackRate);
+                ((this.playbackRate = e || 1),
+                  (this.media.playbackRate = this.playbackRate));
               },
             },
             {
               key: 'seekTo',
               value: function (e) {
-                null != e && (this.media.currentTime = e), this.clearPlayEnd();
+                (null != e && (this.media.currentTime = e),
+                  this.clearPlayEnd());
               },
             },
             {
@@ -175766,7 +175857,7 @@ angular.module('ui.utils', [
               value: function (e, t) {
                 this.seekTo(e);
                 var r = this.media.play();
-                return t && this.setPlayEnd(t), r;
+                return (t && this.setPlayEnd(t), r);
               },
             },
             {
@@ -175774,7 +175865,9 @@ angular.module('ui.utils', [
               value: function () {
                 var e;
                 return (
-                  this.media && (e = this.media.pause()), this.clearPlayEnd(), e
+                  this.media && (e = this.media.pause()),
+                  this.clearPlayEnd(),
+                  e
                 );
               },
             },
@@ -175782,10 +175875,10 @@ angular.module('ui.utils', [
               key: 'setPlayEnd',
               value: function (e) {
                 var t = this;
-                (this._onPlayEnd = function (r) {
+                ((this._onPlayEnd = function (r) {
                   r >= e && (t.pause(), t.seekTo(e));
                 }),
-                  this.on('audioprocess', this._onPlayEnd);
+                  this.on('audioprocess', this._onPlayEnd));
               },
             },
             {
@@ -175825,19 +175918,19 @@ angular.module('ui.utils', [
             {
               key: 'setVolume',
               value: function (e) {
-                (this.volume = e), (this.media.volume = this.volume);
+                ((this.volume = e), (this.media.volume = this.volume));
               },
             },
             {
               key: 'destroy',
               value: function () {
-                this.pause(),
+                (this.pause(),
                   this.unAll(),
                   this.params.removeMediaElementOnDestroy &&
                     this.media &&
                     this.media.parentNode &&
                     this.media.parentNode.removeChild(this.media),
-                  (this.media = null);
+                  (this.media = null));
               },
             },
           ]) && s(r.prototype, n),
@@ -175845,27 +175938,28 @@ angular.module('ui.utils', [
           t
         );
       })();
-      (t.default = h), (e.exports = t.default);
+      ((t.default = h), (e.exports = t.default));
     },
     function (e, t, r) {
       'use strict';
       function n(e, t) {
         for (var r = 0; r < t.length; r++) {
           var n = t[r];
-          (n.enumerable = n.enumerable || !1),
+          ((n.enumerable = n.enumerable || !1),
             (n.configurable = !0),
             'value' in n && (n.writable = !0),
-            Object.defineProperty(e, n.key, n);
+            Object.defineProperty(e, n.key, n));
         }
       }
-      Object.defineProperty(t, '__esModule', {value: !0}), (t.default = void 0);
+      (Object.defineProperty(t, '__esModule', {value: !0}),
+        (t.default = void 0));
       var i = (function () {
         function e() {
-          !(function (e, t) {
+          (!(function (e, t) {
             if (!(e instanceof t))
               throw new TypeError('Cannot call a class as a function');
           })(this, e),
-            this.clearPeakCache();
+            this.clearPeakCache());
         }
         var t, r, i;
         return (
@@ -175874,7 +175968,7 @@ angular.module('ui.utils', [
             {
               key: 'clearPeakCache',
               value: function () {
-                (this.peakCacheRanges = []), (this.peakCacheLength = -1);
+                ((this.peakCacheRanges = []), (this.peakCacheLength = -1));
               },
             },
             {
@@ -175895,8 +175989,8 @@ angular.module('ui.utils', [
                   this.peakCacheRanges[i] <= r;
 
                 )
-                  n.push(this.peakCacheRanges[i]), i++;
-                i % 2 == 0 && n.push(r),
+                  (n.push(this.peakCacheRanges[i]), i++);
+                (i % 2 == 0 && n.push(r),
                   (n = n.filter(function (e, t, r) {
                     return 0 == t
                       ? e != r[t + 1]
@@ -175915,7 +176009,7 @@ angular.module('ui.utils', [
                         : t == r.length - 1
                           ? e != r[t - 1]
                           : e != r[t - 1] && e != r[t + 1];
-                    }));
+                    })));
                 var a = [];
                 for (i = 0; i < n.length; i += 2) a.push([n[i], n[i + 1]]);
                 return a;
@@ -175939,7 +176033,7 @@ angular.module('ui.utils', [
           e
         );
       })();
-      (t.default = i), (e.exports = t.default);
+      ((t.default = i), (e.exports = t.default));
     },
   ]);
 });
