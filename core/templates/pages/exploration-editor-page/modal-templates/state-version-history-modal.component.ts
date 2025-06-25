@@ -21,7 +21,7 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {State} from 'domain/state/StateObjectFactory';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {HistoryTabYamlConversionService} from '../services/history-tab-yaml-conversion.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {VersionHistoryService} from '../services/version-history.service';
@@ -67,7 +67,7 @@ export class StateVersionHistoryModalComponent
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private versionHistoryService: VersionHistoryService,
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
     private historyTabYamlConversionService: HistoryTabYamlConversionService
@@ -244,7 +244,7 @@ export class StateVersionHistoryModalComponent
     if (diffData.oldVersionNumber !== null) {
       this.versionHistoryBackendApiService
         .fetchStateVersionHistoryAsync(
-          this.contextService.getExplorationId(),
+          this.pageContextService.getExplorationId(),
           diffData.oldState.name,
           diffData.oldVersionNumber
         )

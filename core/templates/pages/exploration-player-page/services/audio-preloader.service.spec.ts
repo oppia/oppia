@@ -33,7 +33,7 @@ import {
 } from '../../../domain/exploration/ExplorationObjectFactory';
 import {InteractionAnswer} from '../../../../../extensions/interactions/answer-defs';
 import {AudioPreloaderService} from './audio-preloader.service';
-import {ContextService} from '../../../services/context.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {
   Voiceover,
@@ -76,7 +76,7 @@ describe('Audio preloader service', () => {
 
   let audioPreloaderService: AudioPreloaderService;
   let explorationObjectFactory: ExplorationObjectFactory;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
 
   const audioBlob = new Blob(['audio data'], {type: 'audiotype'});
 
@@ -305,8 +305,8 @@ describe('Audio preloader service', () => {
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
     audioPreloaderService.setAudioLoadedCallback((_: string): void => {});
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
-    contextService = TestBed.inject(ContextService);
-    spyOn(contextService, 'getExplorationId').and.returnValue('1');
+    pageContextService = TestBed.inject(PageContextService);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('1');
   });
 
   it('should maintain the correct number of download requests in queue', fakeAsync(() => {

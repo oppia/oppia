@@ -8,7 +8,7 @@
               [removable]="removable"
               tabindex="-1"
               (removed)="remove(subjectInterest)">
-      <span tabindex="0" [attr.aria-label]=" subjectInterest+ '. selected'">{{ subjectInterest }}</span>
+      <span class="e2e-test-subject-interest-chip" tabindex="0" [attr.aria-label]=" subjectInterest+ '. selected'">{{ subjectInterest }}</span>
       <button class="oppia-cancel-button" tabindex="0" matChipRemove aria-label=". Remove" *ngIf="removable">
         <mat-icon class="oppia-cancel-button-text">cancel</mat-icon>
       </button>

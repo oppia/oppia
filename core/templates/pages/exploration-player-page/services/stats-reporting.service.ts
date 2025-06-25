@@ -18,7 +18,7 @@
 
 import {Injectable, NgZone} from '@angular/core';
 
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {MessengerService} from 'services/messenger.service';
 import {PlaythroughService} from 'services/playthrough.service';
@@ -35,7 +35,7 @@ import {ServicesConstants} from 'services/services.constants';
 })
 export class StatsReportingService {
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private messengerService: MessengerService,
     private playthroughService: PlaythroughService,
     private siteAnalyticsService: SiteAnalyticsService,
@@ -43,8 +43,9 @@ export class StatsReportingService {
     private urlService: UrlService,
     private ngZone: NgZone
   ) {
-    this.editorPreviewMode = this.contextService.isInExplorationEditorPage();
-    this.questionPlayerMode = this.contextService.isInQuestionPlayerMode();
+    this.editorPreviewMode =
+      this.pageContextService.isInExplorationEditorPage();
+    this.questionPlayerMode = this.pageContextService.isInQuestionPlayerMode();
     this.refreshAggregatedStats();
   }
 
@@ -56,7 +57,7 @@ export class StatsReportingService {
   explorationVersion!: number;
   sessionId!: string;
   stateStopwatch!: Stopwatch;
-  optionalCollectionId!: string;
+  optionalCollectionId!: string | null;
   currentStateName!: string;
   nextExpId!: string;
   previousStateName!: string;
@@ -144,7 +145,7 @@ export class StatsReportingService {
     newExplorationTitle: string,
     newExplorationVersion: number,
     newSessionId: string,
-    collectionId: string
+    collectionId: string | null
   ): void {
     this.explorationId = newExplorationId;
     this.explorationTitle = newExplorationTitle;

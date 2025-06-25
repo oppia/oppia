@@ -27,10 +27,8 @@ import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
 import {LearnerViewRatingService} from '../../services/learner-view-rating.service';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
@@ -38,6 +36,7 @@ import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory'
 import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AppConstants} from 'app.constants';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 interface ResultActionButton {
@@ -95,19 +94,17 @@ export class RatingsAndRecommendationsComponent {
     private urlService: UrlService,
     private userService: UserService,
     private windowRef: WindowRef,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
     private urlInterpolationService: UrlInterpolationService,
-    private platformFeatureService: PlatformFeatureService,
     private localStorageService: LocalStorageService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private topicViewerBackendApiService: TopicViewerBackendApiService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private siteAnalyticsService: SiteAnalyticsService,
+    private explorationModeService: ExplorationModeService
   ) {}
 
   ngOnInit(): void {
-    this.inStoryMode =
-      this.explorationPlayerStateService.isInStoryChapterMode();
+    this.inStoryMode = this.explorationModeService.isInStoryChapterMode();
     if (this.inStoryMode) {
       let topicUrlFragment = this.urlService.getUrlParams().topic_url_fragment;
       let storyUrlFragment = this.urlService.getUrlParams().story_url_fragment;
