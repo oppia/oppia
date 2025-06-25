@@ -37,7 +37,7 @@ describe('Logged-out User in Partnerships page', function () {
   it(
     'should open the Blog page when the "Read More Stories" button is clicked.',
     async function () {
-      await loggedOutUser.clickReadMoreStoriesButtonInPartnershipsPage();
+      await loggedOutUser.clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

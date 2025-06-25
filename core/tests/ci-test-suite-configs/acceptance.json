@@ -1,6 +1,22 @@
 {
   "suites": [
     {
+      "name": "interested-partner-organization/submits-a-partnerships-application",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/submits-a-partnerships-application.spec.ts"
+    },
+    {
+      "name": "interested-volunteer/applies-to-become-a-volunteer",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-volunteer/applies-to-become-a-volunteer.spec.ts"
+    },
+    {
+      "name": "interested-donor/learns-about-the-organization",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-donor/learns-about-the-organization.spec.ts"
+    },
+    {
+      "name": "interested-donor/makes-a-donation",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-donor/makes-a-donation.spec.ts"
+    },
+    {
       "name": "blog-admin/assign-roles-to-users-and-change-tag-properties",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-roles-to-users-and-change-tag-properties.spec.ts"
     },
