@@ -418,6 +418,16 @@ const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
 
 const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
 
+// Splash page
+const getAndroidAppButtonSelector = '.e2e-test-splash-android-app-button';
+
+// Navbar
+const navbarLearnDropdownContainerSelector =
+  '.e2e-test-classroom-oppia-list-item';
+const navbarAboutDropdownConatinaerSelector = '.e2e-test-about-oppia-list-item';
+const navbarGetInvolvedDropdownContainerSelector =
+  '.e2e-test-navbar-get-involved-menu';
+
 // Partnership Page
 const partnershipsHeadingSelector = '.e2e-test-partnership-heading';
 const partnershipPageSubheadingsSelector =
@@ -435,6 +445,14 @@ const androidAppButtonInAboutUsPageSelector =
   '.e2e-test-about-page-android-button';
 const partnershipStoryBoardSelector = '.oppia-about-partnerships-card';
 const impactStatsTitleSelector = '.e2e-test-about-oppia-impact-stat-title';
+const impactChartContainerSelector = '.e2e-test-about-impact-chart-container';
+
+// Parents and Teachers Page
+const subheadingInParentsAndTeachersPageSelector =
+  '.e2e-test-teach-page-subheading';
+
+// Android Page
+const redirectToPlayStoreImageSelector = '.e2e-test-play-store-redirect-img';
 
 // Donation Page
 const ourLearnersSectionSelector = '.e2e-test-donate-our-learners';
@@ -1858,6 +1876,19 @@ export class LoggedOutUser extends BaseUser {
       'Get Android App button',
       androidUrl,
       'Android page'
+    );
+  }
+
+  /**
+   * Function to click the Get Android App button in the Splash page
+   * and check if it opens the Android page.
+   */
+  async clickGetAndroidAppButtonInSplashPage(): Promise<void> {
+    await this.clickButtonToNavigateToNewPage(
+      getAndroidAppButtonSelector,
+      'Access the Android App',
+      androidUrl,
+      'Android Page'
     );
   }
 
@@ -4997,6 +5028,19 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  async expectImpactChartsToBe(n: number): Promise<void> {
+    const impactCharts = await this.page.$$eval(
+      impactChartContainerSelector,
+      elements => elements.map(element => (element as HTMLElement).textContent)
+    );
+
+    if (impactCharts.length != n) {
+      throw new Error(
+        `Expected ${n} impact charts, but found ${impactCharts.length} (${impactCharts.join(', ')})`
+      );
+    }
+  }
+
   async expectOurImpactSectionInDonationPageToBePresent(): Promise<void> {
     await this.isElementVisible(ourNetworkSectionSelector);
   }
@@ -5017,6 +5061,29 @@ export class LoggedOutUser extends BaseUser {
       readyToMakeDonationSelector,
       ' Ready to make an impact? '
     );
+  }
+
+  async expectViewReportButtonInAboutPageToBeVisible(): Promise<void> {
+    await this.isElementVisible(impactReportButtonInAboutPage);
+  }
+
+  async subheadingInParentsAndTeachersPageToContain(
+    subheading: string
+  ): Promise<void> {
+    await this.expectAnyElementWithSelectorToHaveTextContent(
+      subheadingInParentsAndTeachersPageSelector,
+      subheading
+    );
+  }
+
+  async clickOnPlayStoreImageInAndroidPageAndVerifyNavigation(): Promise<void> {
+    await this.isElementVisible(redirectToPlayStoreImageSelector);
+
+    await this.clickOn(redirectToPlayStoreImageSelector);
+
+    const pageURL = this.page.url();
+    expect(pageURL).toContain('play.google.com');
+    expect(pageURL).toContain('org.oppia.android');
   }
 }
 

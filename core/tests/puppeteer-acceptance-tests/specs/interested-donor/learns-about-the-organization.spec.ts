@@ -59,13 +59,14 @@ describe('Interested Donor', function () {
     await interestedDonor.expectExploreLessonsButtonInAboutPageToBePresent();
     await interestedDonor.expectAndroidAppButtonInAboutPageToBePresent();
 
-    // TODO: Expand features
+    // Expand features
+    await interestedDonor.expectFeaturesAccordionToBeFunctionalInAboutPage();
 
     // Our partnerships
     await interestedDonor.expectSubheadingInAboutUsPageToContain(
       ' Our partnerships and how we’re improving lives '
     );
-    // TODO: coursal
+    await interestedDonor.expectVolunteerCarouselToBeFunctionalInAboutPage();
     await interestedDonor.expectPartnershipStoryBoardsToBe(4);
 
     // The Oppia Impact
@@ -73,7 +74,7 @@ describe('Interested Donor', function () {
       ' The Oppia Impact '
     );
     await interestedDonor.expectImpactStatsTitlesToBe(4);
-    // TODO: Charts
+    await interestedDonor.expectImpactChartsToBe(2);
   });
 
   it('should be able to download impact reports from about dropdown in navbar', async function () {
