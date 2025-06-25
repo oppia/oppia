@@ -1,23 +1,19 @@
-/**
- * @license
- * Copyright 2025 The Oppia Authors. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS-IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 /**
- * @fileoverview
- * Acceptance test from CUJv3 Doc
+ * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
  * IP.PJ. Parent learns about the organization
@@ -38,7 +34,7 @@ describe('Interested Parent', function () {
     await parentUser.navigateToSplashPage();
     await parentUser.expectScreenshotToMatch('homePage', __dirname);
 
-    // Visit the About Page
+    // Visit the About Page.
     await parentUser.navigateToAboutPage();
     await parentUser.expectAboutUsPageHeadingToBe(
       ' Empowering learners around the globe '
@@ -58,24 +54,24 @@ describe('Interested Parent', function () {
     await parentUser.expectExploreLessonsButtonInAboutPageToBePresent();
     await parentUser.expectAndroidAppButtonInAboutPageToBePresent();
 
-    // Expand features
+    // Expand features.
     await parentUser.expectFeaturesAccordionToBeFunctionalInAboutPage();
 
-    // Our partnerships
+    // Our partnerships.
     await parentUser.expectSubheadingInAboutUsPageToContain(
       ' Our partnerships and how we’re improving lives '
     );
     await parentUser.expectVolunteerCarouselToBeFunctionalInAboutPage();
     await parentUser.expectPartnershipStoryBoardsToBe(4);
 
-    // The Oppia Impact
+    // The Oppia Impact.
     await parentUser.expectSubheadingInAboutUsPageToContain(
       ' The Oppia Impact '
     );
     await parentUser.expectImpactStatsTitlesToBe(4);
     await parentUser.expectImpactChartsToBe(2);
 
-    // View Report Button should be visible
+    // View Report Button should be visible.
     await parentUser.expectViewReportButtonInAboutPageToBeVisible();
   });
 

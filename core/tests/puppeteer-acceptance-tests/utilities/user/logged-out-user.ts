@@ -416,19 +416,17 @@ const youtubePlayerSelector = '.e2e-test-youtube-player';
 const collapsibleRTEHeaderSelector = 'e2e-test-collapsible-heading';
 const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
 
-const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
-
-// Splash page
+// Splash page.
 const getAndroidAppButtonSelector = '.e2e-test-splash-android-app-button';
 
-// Navbar
+// Navbar.
 const navbarLearnDropdownContainerSelector =
   '.e2e-test-classroom-oppia-list-item';
 const navbarAboutDropdownConatinaerSelector = '.e2e-test-about-oppia-list-item';
 const navbarGetInvolvedDropdownContainerSelector =
   '.e2e-test-navbar-get-involved-menu';
 
-// Partnership Page
+// Partnership Page.
 const partnershipsHeadingSelector = '.e2e-test-partnership-heading';
 const partnershipPageSubheadingsSelector =
   '.e2e-test-partnerships-page .oppia-partnerships-h3';
@@ -436,7 +434,7 @@ const partneringWithUsImageSelector = '.e2e-test-partnering-with-oppia-image';
 const partnershipYoutubeVideoIFrameSelector =
   '.e2e-test-partnership-youtube-video-iframe';
 
-// About Us Page Selectors
+// About Us Page Selectors.
 const aboutUsHeadingSelector = '.e2e-test-about-us-title';
 const aboutUsSubheadingSelector = '.e2e-test-about-page-title-new';
 const exploreLessonsButtonInAboutUsPageSelector =
@@ -447,14 +445,14 @@ const partnershipStoryBoardSelector = '.oppia-about-partnerships-card';
 const impactStatsTitleSelector = '.e2e-test-about-oppia-impact-stat-title';
 const impactChartContainerSelector = '.e2e-test-about-impact-chart-container';
 
-// Parents and Teachers Page
+// Parents and Teachers Page.
 const subheadingInParentsAndTeachersPageSelector =
   '.e2e-test-teach-page-subheading';
 
-// Android Page
+// Android Page.
 const redirectToPlayStoreImageSelector = '.e2e-test-play-store-redirect-img';
 
-// Donation Page
+// Donation Page.
 const ourLearnersSectionSelector = '.e2e-test-donate-our-learners';
 const ourNetworkSectionSelector = '.e2e-test-donate-highlights';
 const donationHeadingSelector = '.e2e-test-donate-heading';
@@ -4827,7 +4825,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if all dropdowns in navbar open properly.
    */
-  async expectDropdownsInNavbarToWorkProperly() {
+  async expectDropdownsInNavbarToWorkProperly(): Promise<void> {
     await this.clickOn(navbarLearnTab);
     await this.isElementVisible(navbarLearnDropdownContainerSelector);
 
@@ -4871,7 +4869,7 @@ export class LoggedOutUser extends BaseUser {
   async expectAnyElementWithSelectorToHaveTextContent(
     selector: string,
     value: string
-  ) {
+  ): Promise<void> {
     const values = await this.page.$$eval(selector, elements =>
       elements.map(element => (element as HTMLElement).textContent)
     );
@@ -4987,7 +4985,9 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
-  async expectSectionGoalsInAboutPageToContain(sectionGoal: string) {
+  async expectSectionGoalsInAboutPageToContain(
+    sectionGoal: string
+  ): Promise<void> {
     await this.expectAnyElementWithSelectorToHaveTextContent(
       '.oppia-about-foundation-section-goal-title',
       sectionGoal
@@ -5002,13 +5002,13 @@ export class LoggedOutUser extends BaseUser {
     await this.isElementVisible(androidAppButtonInAboutUsPageSelector);
   }
 
-  async expectPartnershipStoryBoardsToBe(n: number) {
+  async expectPartnershipStoryBoardsToBe(n: number): Promise<void> {
     const storyBoards = await this.page.$$eval(
       partnershipStoryBoardSelector,
       elements => elements.map(element => (element as HTMLElement).textContent)
     );
 
-    if (storyBoards.length != n) {
+    if (storyBoards.length !== n) {
       throw new Error(
         `Expected ${n} story boards, but found ${storyBoards.length} (${storyBoards.join(', ')})`
       );
@@ -5021,7 +5021,7 @@ export class LoggedOutUser extends BaseUser {
       elements => elements.map(element => (element as HTMLElement).textContent)
     );
 
-    if (impactStats.length != n) {
+    if (impactStats.length !== n) {
       throw new Error(
         `Expected ${n} impact stats, but found ${impactStats.length} (${impactStats.join(', ')})`
       );
@@ -5034,7 +5034,7 @@ export class LoggedOutUser extends BaseUser {
       elements => elements.map(element => (element as HTMLElement).textContent)
     );
 
-    if (impactCharts.length != n) {
+    if (impactCharts.length !== n) {
       throw new Error(
         `Expected ${n} impact charts, but found ${impactCharts.length} (${impactCharts.join(', ')})`
       );
