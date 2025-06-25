@@ -17,6 +17,26 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/interested-donor/makes-a-donation.spec.ts"
     },
     {
+      "name": "interested-parent/attempts-to-contact-the-organization",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/attempts-to-contact-the-organization.spec.ts"
+    },
+    {
+      "name": "interested-parent/checks-the-tos-and-privacy-pages",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/checks-the-tos-and-privacy-pages.spec.ts"
+    },
+    {
+      "name": "interested-parent/downloads-the-android-app",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/downloads-the-android-app.spec.ts"
+    },
+    {
+      "name": "interested-parent/learns-about-the-organization",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/learns-about-the-organization.spec.ts"
+    },
+    {
+      "name": "interested-parent/signsup-for-oppias-newsletter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/signsup-for-oppias-newsletter.spec.ts"
+    },
+    {
       "name": "blog-admin/assign-roles-to-users-and-change-tag-properties",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-roles-to-users-and-change-tag-properties.spec.ts"
     },
