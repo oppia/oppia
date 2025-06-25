@@ -1217,6 +1217,17 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
             new_ticket_model)
 
         app_feedback_report_services.reassign_ticket(
+            self.android_report_obj, new_ticket_obj)
+
+        updated_ticket_model = (
+            app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
+                self.android_ticket_id))
+
+        self.assertLessEqual(
+            updated_ticket_model.newest_report_timestamp,
+            self.REPORT_SUBMITTED_TIMESTAMP)
+
+        app_feedback_report_services.reassign_ticket(
             self.android_report_obj, None)
 
         updated_ticket_model = (
@@ -1225,10 +1236,7 @@ class AppFeedbackReportServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertLessEqual(
             updated_ticket_model.newest_report_timestamp,
-            self.REPORT_SUBMITTED_TIMESTAMP,
-            msg=(
-                'Expected newest_report_timestamp to remain unchanged since no '
-                'remaining reports are newer.'))
+            self.REPORT_SUBMITTED_TIMESTAMP)
 
     def test_reassign_updates_new_ticket_newest_report_creation_timestamp(
             self) -> None:
