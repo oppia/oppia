@@ -78,18 +78,22 @@ describe('Logged-in User', function () {
       await loggedInUser1.selectAndOpenTopic('Addition and Subtraction');
       await loggedInUser1.navigateToStudyTab();
       await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
-      await loggedInUser1.expectStudyGuideToHaveContent('Adding Numbers', [
-        ['Adding With Your Fingers', 'One way to add is using your...'],
-        ['Using an Addition Table', 'To add two single-digit...'],
-      ]);
+      await loggedInUser1.expectSubtopicStudyGuideToHaveTitleAndSections(
+        'Adding Numbers',
+        [
+          ['Adding With Your Fingers', 'One way to add is using your...'],
+          ['Using an Addition Table', 'To add two single-digit...'],
+        ]
+      );
       await loggedInUser1.expectScreenshotToMatch(
         'finalSubtopicViewerView',
         __dirname
       );
       await loggedInUser1.clickOnNextStudyGuideButton();
-      await loggedInUser1.expectStudyGuideToHaveContent('Subtracting Numbers', [
-        ['Common Mistakes', 'Some common mistakes students make are...'],
-      ]);
+      await loggedInUser1.expectSubtopicStudyGuideToHaveTitleAndSections(
+        'Subtracting Numbers',
+        [['Common Mistakes', 'Some common mistakes students make are...']]
+      );
       await loggedInUser1.clickOnStudyGuideMenuButton();
       await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
       await loggedInUser1.clickOnPracticeButton();

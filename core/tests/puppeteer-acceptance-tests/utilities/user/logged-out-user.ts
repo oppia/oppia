@@ -3534,12 +3534,12 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Verifies if the review card has the expected title and description.
+   * Verifies if the subtopic study guide has the expected title and sections.
    * @param {string} studyGuideTitle - The expected title of the study guide.
    * @param {string[][]} studyGuideSections - The expected sections of the study guide.
    * It is a list of sections. Sections are a list of strings having length of 2 - heading and content.
    */
-  async expectStudyGuideToHaveContent(
+  async expectSubtopicStudyGuideToHaveTitleAndSections(
     studyGuideTitle: string,
     studyGuideSections: string[][]
   ): Promise<void> {
