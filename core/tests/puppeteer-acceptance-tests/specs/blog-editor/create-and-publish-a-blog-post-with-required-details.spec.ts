@@ -65,7 +65,7 @@ describe('Blog Editor', function () {
     async function () {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.openBlogEditorPage();
-      await blogPostEditor.updateTitleTo('');
+      await blogPostEditor.updateBlogPostTitle('');
       await blogPostEditor.updateBodyTextTo('');
       await blogPostEditor.expectPublishButtonToBeDisabled();
     },
