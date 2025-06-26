@@ -30,7 +30,6 @@ import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {ExplorationModeService} from '../../services/exploration-mode.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 import {
   animate,
@@ -108,7 +107,6 @@ export class ProgressNavComponent {
   constructor(
     private explorationModeService: ExplorationModeService,
     private focusManagerService: FocusManagerService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
