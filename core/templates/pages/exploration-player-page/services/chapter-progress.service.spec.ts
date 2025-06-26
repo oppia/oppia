@@ -67,13 +67,13 @@ describe('ChapterProgressService', () => {
 
     chapterProgressService.updateCompletedChaptersCount(true);
     tick();
-    expect(chapterProgressService.isChapterCompletedForTheFirstTime()).toBe(
+    expect(chapterProgressService.getChapterCompletedForTheFirstTime()).toBe(
       true
     );
 
     chapterProgressService.updateCompletedChaptersCount(true);
     tick();
-    expect(chapterProgressService.isChapterCompletedForTheFirstTime()).toBe(
+    expect(chapterProgressService.getChapterCompletedForTheFirstTime()).toBe(
       false
     );
   }));

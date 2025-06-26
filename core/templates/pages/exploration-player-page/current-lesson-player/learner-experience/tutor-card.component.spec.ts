@@ -577,7 +577,7 @@ describe('Tutor card component', () => {
     () => {
       componentInstance.inStoryMode = true;
       chapterProgressService.setChapterCompletedForTheFirstTime(true);
-      chapterProgressService.setCompletedChaptersCount(1);
+      chapterProgressService.setCompletedChaptersCount(2);
       spyOn(componentInstance, 'generateMilestoneMessage').and.callThrough();
       spyOn(translateService, 'instant').and.callThrough();
 
