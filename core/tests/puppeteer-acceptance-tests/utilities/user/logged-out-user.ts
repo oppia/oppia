@@ -5022,19 +5022,12 @@ export class LoggedOutUser extends BaseUser {
   async clickOnPlayStoreImageInAndroidPageAndVerifyNavigation(): Promise<void> {
     await this.isElementVisible(redirectToPlayStoreImageSelector);
 
-    // await this.clickAndWaitForNavigation(redirectToPlayStoreImageSelector);
-    // await this.waitForNetworkIdle();
-
     await this.clickLinkButtonToNewTab(
       redirectToPlayStoreImageSelector,
       'Play Store Image',
       'https://play.google.com/store/apps/details?id=org.oppia.android',
       'Oppia - Apps on Google Play'
     );
-
-    // const pageURL = this.page.url();
-    // expect(pageURL).toContain('play.google.com');
-    // expect(pageURL).toContain('org.oppia.android');
   }
 
   /**
