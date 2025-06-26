@@ -31,7 +31,6 @@ import {ExplorationEngineService} from '../../services/exploration-engine.servic
 import {ExplorationRecommendationsService} from '../../services/exploration-recommendations.service';
 import {FatigueDetectionService} from '../../services/fatigue-detection.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {GuestCollectionProgressService} from 'domain/collection/guest-collection-progress.service';
 import {HintsAndSolutionManagerService} from '../../services/hints-and-solution-manager.service';
 import {
   I18nLanguageCodeService,
@@ -79,8 +78,6 @@ import {ProgressUrlService} from 'pages/exploration-player-page/services/progres
 
 import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
-import {TranslateService} from '@ngx-translate/core';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {DiagnosticTestPlayerEngineService} from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
@@ -92,6 +89,10 @@ const TIME_FADEOUT_MSEC = 100;
 const TIME_HEIGHT_CHANGE_MSEC = 500;
 const TIME_FADEIN_MSEC = 100;
 const TIME_NUM_CARDS_CHANGE_MSEC = 500;
+const ALERT_MESSAGE_TIMEOUT = 6000;
+const TIME_PADDING_MSEC = 250;
+const TIME_SCROLL_MSEC = 600;
+const MIN_CARD_LOADING_DELAY_MSEC = 950;
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -103,42 +104,29 @@ export class ConversationSkinComponent {
   @Input() diagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
 
-  TIME_PADDING_MSEC = 250;
-  TIME_SCROLL_MSEC = 600;
-  MIN_CARD_LOADING_DELAY_MSEC = 950;
-
   hasInteractedAtLeastOnce: boolean = false;
   _nextFocusLabel = null;
   _editorPreviewMode;
   explorationActuallyStarted: boolean = false;
 
-  CONTINUE_BUTTON_FOCUS_LABEL =
-    ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL;
-
   isLoggedIn: boolean;
   voiceoversAreLoaded: boolean = false;
-  storyNodeIdToAdd: string;
+
   inStoryMode: boolean = false;
-  collectionId: string;
   collectionTitle: string;
   answerIsBeingProcessed: boolean = false;
   explorationId: string;
   isInPreviewMode: boolean;
   isIframed: boolean;
   hasFullyLoaded = false;
-  recommendedExplorationSummaries = [];
+  recommendedExplorationSummaries: LearnerExplorationSummary[] = [];
   answerIsCorrect = false;
-  nextCard;
-  nextCardIfStuck: StateCard | null;
   alertMessage = {};
   pendingCardWasSeenBefore: boolean = false;
   OPPIA_AVATAR_IMAGE_URL: string;
   displayedCard: StateCard;
   upcomingInlineInteractionHtml;
-  responseTimeout: NodeJS.Timeout | null = null;
   correctnessFooterIsShown: boolean = true;
-  DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
-    AppConstants.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 
   // If the exploration is iframed, send data to its parent about
   // its height so that the parent can be resized as necessary.
@@ -156,21 +144,16 @@ export class ConversationSkinComponent {
   moveToExploration: boolean;
   upcomingInteractionInstructions;
   visitedCheckpointStateNames: string[] = [];
-  completedStateNames: string[] = [];
   prevSessionStatesProgress: string[] = [];
-  mostRecentlyReachedCheckpoint: string;
-  numberOfIncorrectSubmissions: number = 0;
   showProgressClearanceMessage: boolean = false;
-  alertMessageTimeout = 6000;
+
   // 'completedChaptersCount' is fetched via a HTTP request.
   // Until the response is received, it remains undefined.
   completedChaptersCount: number | undefined;
   chapterIsCompletedForTheFirstTime: boolean = false;
   pidInUrl: string;
   submitButtonIsDisabled = true;
-  solutionForState: Solution | null = null;
   isLearnerReallyStuck: boolean = false;
-  continueToReviseStateButtonIsVisible: boolean = false;
   showInteraction: boolean = true;
 
   // The fields are used to customize the component for the diagnostic player,
@@ -181,6 +164,9 @@ export class ConversationSkinComponent {
   navigationThroughCardHistoryIsEnabled: boolean = true;
   checkpointCelebrationModalIsEnabled: boolean = true;
   skipButtonIsShown: boolean = false;
+
+  // Finalized state for the component.
+  continueToReviseStateButtonIsVisible: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -199,7 +185,6 @@ export class ConversationSkinComponent {
     private fatigueDetectionService: FatigueDetectionService,
     private focusManagerService: FocusManagerService,
     private explorationInitializationService: ExplorationInitializationService,
-    private guestCollectionProgressService: GuestCollectionProgressService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
     private conceptCardManagerService: ConceptCardManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -229,7 +214,6 @@ export class ConversationSkinComponent {
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private checkpointProgressService: CheckpointProgressService,
-    private translateService: TranslateService,
     private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
     private conversationFlowService: ConversationFlowService,
     private voiceoverPlayerService: VoiceoverPlayerService
@@ -245,12 +229,12 @@ export class ConversationSkinComponent {
     this._editorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
 
-    this.collectionId = this.urlService.getCollectionIdFromExplorationUrl();
+    let collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     this.pidInUrl = this.urlService.getPidFromUrl();
 
-    if (this.collectionId) {
+    if (collectionId) {
       this.readOnlyCollectionBackendApiService
-        .loadCollectionAsync(this.collectionId)
+        .loadCollectionAsync(collectionId)
         .then(collection => {
           this.collectionTitle = collection.getTitle();
         });
@@ -311,31 +295,41 @@ export class ConversationSkinComponent {
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardOpened.subscribe(
         (newCard: StateCard) => {
-          this.solutionForState = newCard.getSolution();
-          this.numberOfIncorrectSubmissions = 0;
-          this.nextCardIfStuck = null;
+          this.conversationFlowService.setSolutionForState(
+            newCard.getSolution()
+          );
+          this.playerTranscriptService.resetNumberOfIncorrectSubmissions();
+          this.conversationFlowService.setNextCardIfStuck(null);
           this.continueToReviseStateButtonIsVisible = false;
-          this.triggerIfLearnerStuckAction();
+          this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
+            this.continueToReviseStateButtonIsVisible = true;
+          });
         }
       )
     );
 
     this.directiveSubscriptions.add(
       this.hintsAndSolutionManagerService.onLearnerReallyStuck.subscribe(() => {
-        this.triggerIfLearnerStuckActionDirectly();
+        this.conversationFlowService.triggerIfLearnerStuckAction(false, () => {
+          this.continueToReviseStateButtonIsVisible = true;
+        });
       })
     );
 
     this.directiveSubscriptions.add(
       this.hintsAndSolutionManagerService.onHintsExhausted.subscribe(() => {
-        this.triggerIfLearnerStuckAction();
+        this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
+          this.continueToReviseStateButtonIsVisible = true;
+        });
       })
     );
 
     this.directiveSubscriptions.add(
       this.conceptCardManagerService.onLearnerGetsReallyStuck.subscribe(() => {
         this.isLearnerReallyStuck = true;
-        this.triggerIfLearnerStuckActionDirectly();
+        this.conversationFlowService.triggerIfLearnerStuckAction(false, () => {
+          this.continueToReviseStateButtonIsVisible = true;
+        });
       })
     );
 
@@ -349,9 +343,10 @@ export class ConversationSkinComponent {
           if (!this._editorPreviewMode) {
             this.imagePreloaderService.onStateChange(newStateName);
           }
+          let nextCard = this.conversationFlowService.getNextStateCard();
           // Ensure the transition to a terminal state properly logs
           // the end of the exploration.
-          if (!this._editorPreviewMode && this.nextCard.isTerminal()) {
+          if (!this._editorPreviewMode && nextCard.isTerminal()) {
             const currentEngineService =
               this.currentEngineService.getCurrentEngineService();
             this.statsReportingService.recordExplorationCompleted(
@@ -363,20 +358,6 @@ export class ConversationSkinComponent {
               String(this.playerTranscriptService.getNumCards()),
               currentEngineService.getLanguageCode()
             );
-
-            // If the user is a guest, has completed this exploration
-            // within the context of a collection, and the collection is
-            // allowlisted, record their temporary progress.
-
-            if (
-              this.doesCollectionAllowsGuestProgress(this.collectionId) &&
-              !this.isLoggedIn
-            ) {
-              this.guestCollectionProgressService.recordExplorationCompletedInCollection(
-                this.collectionId,
-                this.explorationId
-              );
-            }
 
             // For single state explorations, when the exploration
             // reachesthe terminal state and explorationActuallyStarted
@@ -441,9 +422,9 @@ export class ConversationSkinComponent {
 
       this.collectionSummary = null;
 
-      if (this.collectionId) {
+      if (collectionId) {
         this.collectionPlayerBackendApiService
-          .fetchCollectionSummariesAsync(this.collectionId)
+          .fetchCollectionSummariesAsync(collectionId)
           .then(response => {
             this.collectionSummary = response.summaries[0];
           })
@@ -471,34 +452,29 @@ export class ConversationSkinComponent {
           .then(response => {
             expVersion = response.version;
             firstStateName = response.exploration.init_state_name;
-            this.mostRecentlyReachedCheckpoint =
+            let mostRecentlyReachedCheckpoint =
               response.most_recently_reached_checkpoint_state_name;
+
             // If the exploration is freshly started, mark the first state
             // as the most recently reached checkpoint.
-            if (!this.mostRecentlyReachedCheckpoint && this.isLoggedIn) {
-              this.editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
-                this.explorationId,
-                expVersion,
-                firstStateName,
-                true
-              );
+            if (!mostRecentlyReachedCheckpoint) {
+              mostRecentlyReachedCheckpoint = firstStateName;
+              if (this.isLoggedIn) {
+                this.editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
+                  this.explorationId,
+                  expVersion,
+                  firstStateName,
+                  true
+                );
+              }
             }
-            this.checkpointProgressService.setLastCompletedCheckpoint(
-              firstStateName
+            this.checkpointProgressService.setMostRecentlyReachedCheckpoint(
+              mostRecentlyReachedCheckpoint
             );
             this.visitedCheckpointStateNames.push(firstStateName);
           });
       }
     });
-  }
-
-  doesCollectionAllowsGuestProgress(collectionId: string | never): boolean {
-    let allowedCollectionIds =
-      AppConstants.ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS;
-    return (
-      (allowedCollectionIds as readonly []).indexOf(collectionId as never) !==
-      -1
-    );
   }
 
   isSubmitButtonDisabled(): boolean {
@@ -599,20 +575,6 @@ export class ConversationSkinComponent {
     return this.pendingCardWasSeenBefore && !this.answerIsCorrect;
   }
 
-  private _getRandomSuffix(): string {
-    // This is a bit of a hack. When a refresh to a component property
-    // happens, Angular compares the new value of the property to its previous
-    // value. If they are the same, then the property is not updated.
-    // Appending a random suffix makes the new value different from the
-    // previous one, and thus indirectly forces a refresh.
-    let randomSuffix = '';
-    let N = Math.round(Math.random() * 1000);
-    for (let i = 0; i < N; i++) {
-      randomSuffix += ' ';
-    }
-    return randomSuffix;
-  }
-
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
@@ -649,88 +611,9 @@ export class ConversationSkinComponent {
   }
 
   getExplorationLink(): string {
-    if (
-      this.recommendedExplorationSummaries &&
-      this.recommendedExplorationSummaries[0]
-    ) {
-      if (!this.recommendedExplorationSummaries[0].id) {
-        return '#';
-      } else {
-        let result = '/explore/' + this.recommendedExplorationSummaries[0].id;
-        let urlParams = this.urlService.getUrlParams();
-        let parentExplorationIds =
-          this.recommendedExplorationSummaries[0].parentExplorationIds;
-
-        let collectionIdToAdd = this.collectionId;
-        let storyUrlFragmentToAdd = null;
-        let topicUrlFragment = null;
-        let classroomUrlFragment = null;
-        // Replace the collection ID with the one in the URL if it
-        // exists in urlParams.
-        if (parentExplorationIds && urlParams.hasOwnProperty('collection_id')) {
-          collectionIdToAdd = urlParams.collection_id;
-        } else if (
-          this.urlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
-          this.recommendedExplorationSummaries[0].nextNodeId
-        ) {
-          storyUrlFragmentToAdd =
-            this.urlService.getStoryUrlFragmentFromLearnerUrl();
-          topicUrlFragment =
-            this.urlService.getTopicUrlFragmentFromLearnerUrl();
-          classroomUrlFragment =
-            this.urlService.getClassroomUrlFragmentFromLearnerUrl();
-        } else if (
-          urlParams.hasOwnProperty('story_url_fragment') &&
-          urlParams.hasOwnProperty('node_id') &&
-          urlParams.hasOwnProperty('topic_url_fragment') &&
-          urlParams.hasOwnProperty('classroom_url_fragment')
-        ) {
-          topicUrlFragment = urlParams.topic_url_fragment;
-          classroomUrlFragment = urlParams.classroom_url_fragment;
-          storyUrlFragmentToAdd = urlParams.story_url_fragment;
-        }
-
-        if (collectionIdToAdd) {
-          result = this.urlService.addField(
-            result,
-            'collection_id',
-            collectionIdToAdd
-          );
-        }
-        if (parentExplorationIds) {
-          for (let i = 0; i < parentExplorationIds.length - 1; i++) {
-            result = this.urlService.addField(
-              result,
-              'parent',
-              parentExplorationIds[i]
-            );
-          }
-        }
-        if (storyUrlFragmentToAdd && this.storyNodeIdToAdd) {
-          result = this.urlService.addField(
-            result,
-            'topic_url_fragment',
-            topicUrlFragment
-          );
-          result = this.urlService.addField(
-            result,
-            'classroom_url_fragment',
-            classroomUrlFragment
-          );
-          result = this.urlService.addField(
-            result,
-            'story_url_fragment',
-            storyUrlFragmentToAdd
-          );
-          result = this.urlService.addField(
-            result,
-            'node_id',
-            this.storyNodeIdToAdd
-          );
-        }
-        return result;
-      }
-    }
+    return this.explorationRecommendationsService.getExplorationLink(
+      this.recommendedExplorationSummaries
+    );
   }
 
   reloadExploration(): void {
@@ -765,28 +648,25 @@ export class ConversationSkinComponent {
     );
   }
 
-  private _recordLeaveForRefresherExp(refresherExpId): void {
-    if (!this._editorPreviewMode) {
-      this.statsReportingService.recordLeaveForRefresherExp(
-        this.playerPositionService.getCurrentStateName(),
-        refresherExpId
-      );
-    }
-  }
-
   private _navigateToMostRecentlyReachedCheckpoint() {
     let states: StateObjectsBackendDict;
     this.readOnlyExplorationBackendApiService
       .loadLatestExplorationAsync(this.explorationId, this.pidInUrl)
       .then(response => {
         states = response.exploration.states;
-        this.mostRecentlyReachedCheckpoint =
+
+        let mostRecentlyReachedCheckpoint =
+          this.checkpointProgressService.getMostRecentlyReachedCheckpoint() ||
           response.most_recently_reached_checkpoint_state_name;
+
+        this.checkpointProgressService.setMostRecentlyReachedCheckpoint(
+          mostRecentlyReachedCheckpoint
+        );
 
         this.prevSessionStatesProgress =
           this.explorationEngineService.getShortestPathToState(
             states,
-            this.mostRecentlyReachedCheckpoint
+            mostRecentlyReachedCheckpoint
           );
 
         let indexToRedirectTo = 0;
@@ -813,7 +693,7 @@ export class ConversationSkinComponent {
             this.visitedCheckpointStateNames.push(stateName);
           }
 
-          if (this.mostRecentlyReachedCheckpoint === stateName) {
+          if (mostRecentlyReachedCheckpoint === stateName) {
             break;
           }
 
@@ -834,7 +714,7 @@ export class ConversationSkinComponent {
             if (alertInfoElement) {
               alertInfoElement.remove();
             }
-          }, this.alertMessageTimeout);
+          }, ALERT_MESSAGE_TIMEOUT);
         }
 
         // Move to most recently reached checkpoint card.
@@ -866,7 +746,7 @@ export class ConversationSkinComponent {
         this.readOnlyExplorationBackendApiService
           .loadLatestExplorationAsync(this.explorationId)
           .then(response => {
-            this.checkpointProgressService.setLastCompletedCheckpoint(
+            this.checkpointProgressService.setMostRecentlyReachedCheckpoint(
               currentStateName
             );
             this.editableExplorationBackendApiService.recordMostRecentlyReachedCheckpointAsync(
@@ -990,7 +870,9 @@ export class ConversationSkinComponent {
             let nextStoryNode: LearnerExplorationSummary[] = [];
             for (let i = 0; i < res.nodes.length; i++) {
               if (res.nodes[i].id === nodeId && i + 1 < res.nodes.length) {
-                this.storyNodeIdToAdd = res.nodes[i].destinationNodeIds[0];
+                this.explorationRecommendationsService.setRecommendedStoryNodeId(
+                  res.nodes[i].destinationNodeIds[0]
+                );
                 nextStoryNode.push(res.nodes[i + 1].explorationSummary);
                 break;
               }
@@ -1064,64 +946,16 @@ export class ConversationSkinComponent {
           if (alertInfoElement) {
             alertInfoElement.remove();
           }
-        }, this.alertMessageTimeout);
+        }, ALERT_MESSAGE_TIMEOUT);
       }
-    }
-  }
-
-  triggerIfLearnerStuckAction(): void {
-    if (this.responseTimeout) {
-      clearTimeout(this.responseTimeout);
-      this.responseTimeout = null;
-    }
-    this.responseTimeout = setTimeout(() => {
-      if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
-        // Let the learner know about the redirection to a state
-        // for clearing concepts.
-        this.playerTranscriptService.addNewResponseToExistingFeedback(
-          this.translateService.instant(
-            'I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE'
-          )
-        );
-        // Enable visibility of ContinueToRevise button.
-        this.continueToReviseStateButtonIsVisible = true;
-      } else if (
-        this.solutionForState !== null &&
-        this.numberOfIncorrectSubmissions >=
-          ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION
-      ) {
-        // Release solution if no separate state for addressing
-        // the stuck learner exists and the solution exists.
-        this.hintsAndSolutionManagerService.releaseSolution();
-      }
-    }, ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC);
-  }
-
-  triggerIfLearnerStuckActionDirectly(): void {
-    if (this.responseTimeout) {
-      clearTimeout(this.responseTimeout);
-      this.responseTimeout = null;
-    }
-    // Directly trigger action for the really stuck learner.
-    if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
-      this.playerTranscriptService.addNewResponseToExistingFeedback(
-        this.translateService.instant('I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
-      );
-      // Enable visibility of ContinueToRevise button.
-      this.continueToReviseStateButtonIsVisible = true;
-    } else if (
-      this.solutionForState !== null &&
-      this.numberOfIncorrectSubmissions >=
-        ExplorationPlayerConstants.MAX_INCORRECT_ANSWERS_BEFORE_RELEASING_SOLUTION
-    ) {
-      // Release solution if it exists.
-      this.hintsAndSolutionManagerService.releaseSolution();
     }
   }
 
   triggerRedirectionToStuckState(): void {
     // Redirect the learner.
-    this.nextCard = this.nextCardIfStuck;
+    this.conversationFlowService.setNextStateCard(
+      this.conversationFlowService.getNextCardIfStuck()
+    );
     this.showInteraction = false;
     this.showPendingCard();
   }
@@ -1130,12 +964,15 @@ export class ConversationSkinComponent {
     this.loaderService.hideLoadingScreen();
   }
 
-  private _initializeDirectiveComponents(initialCard, focusLabel): void {
+  private _initializeDirectiveComponents(
+    initialCard: StateCard,
+    focusLabel
+  ): void {
     this._addNewCard(initialCard);
-    this.nextCard = initialCard;
+    this.conversationFlowService.setNextStateCard(initialCard);
     if (!this.explorationModeService.isInDiagnosticTestPlayerMode()) {
       this.conversationFlowService.onPlayerStateChange.emit(
-        this.nextCard.getStateName()
+        initialCard.getStateName()
       );
     }
 
@@ -1182,7 +1019,7 @@ export class ConversationSkinComponent {
 
   skipCurrentQuestion(): void {
     this.diagnosticTestPlayerEngineService.skipCurrentQuestion(nextCard => {
-      this.nextCard = nextCard;
+      this.conversationFlowService.setNextStateCard(nextCard);
       this.showPendingCard();
     });
   }
@@ -1262,11 +1099,10 @@ export class ConversationSkinComponent {
           this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion()
         );
         this.answerIsBeingProcessed = false;
-        this.playerPositionService.onHelpCardAvailable.emit({
-          helpCardHtml:
-            this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion(),
-          hasContinueButton: false,
-        });
+        this.conversationFlowService.emitHelpCard(
+          this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion(),
+          false
+        );
       }, 100);
       return;
     }
@@ -1292,8 +1128,8 @@ export class ConversationSkinComponent {
         nextCardIfReallyStuck,
         focusLabel
       ) => {
-        this.nextCard = nextCard;
-        this.nextCardIfStuck = nextCardIfReallyStuck;
+        this.conversationFlowService.setNextStateCard(nextCard);
+        this.conversationFlowService.setNextCardIfStuck(nextCardIfReallyStuck);
         if (
           !this._editorPreviewMode &&
           !this.explorationModeService.isPresentingIsolatedQuestions()
@@ -1352,7 +1188,7 @@ export class ConversationSkinComponent {
           millisecsLeftToWait = 1.0;
         } else {
           millisecsLeftToWait = Math.max(
-            this.MIN_CARD_LOADING_DELAY_MSEC -
+            MIN_CARD_LOADING_DELAY_MSEC -
               (new Date().getTime() - timeAtServerCall),
             1.0
           );
@@ -1374,8 +1210,9 @@ export class ConversationSkinComponent {
               refreshInteraction,
               refresherExplorationId
             );
+            this.scrollToBottom();
           } else {
-            this.moveToNewCard(feedbackHtml, isFinalQuestion, nextCard);
+            this.moveToNewCard(feedbackHtml, isFinalQuestion);
           }
           this.answerIsBeingProcessed = false;
         }, millisecsLeftToWait);
@@ -1400,20 +1237,13 @@ export class ConversationSkinComponent {
     refreshInteraction: boolean,
     refresherExplorationId: string | null
   ) {
-    this.numberOfIncorrectSubmissions++;
-    this.hintsAndSolutionManagerService.recordWrongAnswer();
-    this.conceptCardManagerService.recordWrongAnswer();
+    this.conversationFlowService.recordIncorrectAnswer();
     this.playerTranscriptService.addNewResponse(feedbackHtml);
-    let helpCardAvailable = false;
-    if (feedbackHtml && !this.displayedCard.isInteractionInline()) {
-      helpCardAvailable = true;
-    }
+    let helpCardAvailable =
+      feedbackHtml && !this.displayedCard.isInteractionInline();
 
     if (helpCardAvailable) {
-      this.playerPositionService.onHelpCardAvailable.emit({
-        helpCardHtml: feedbackHtml,
-        hasContinueButton: false,
-      });
+      this.conversationFlowService.emitHelpCard(feedbackHtml, false);
     }
     if (missingPrerequisiteSkillId) {
       this.displayedCard.markAsCompleted();
@@ -1422,10 +1252,7 @@ export class ConversationSkinComponent {
         .then(conceptCardObject => {
           this.conceptCard = conceptCardObject[0];
           if (helpCardAvailable) {
-            this.playerPositionService.onHelpCardAvailable.emit({
-              helpCardHtml: feedbackHtml,
-              hasContinueButton: true,
-            });
+            this.conversationFlowService.emitHelpCard(feedbackHtml, true);
           }
         });
     }
@@ -1434,7 +1261,8 @@ export class ConversationSkinComponent {
       // same type.
       this._nextFocusLabel = this.focusManagerService.generateFocusLabel();
       this.playerTranscriptService.updateLatestInteractionHtml(
-        this.displayedCard.getInteractionHtml() + this._getRandomSuffix()
+        this.displayedCard.getInteractionHtml() +
+          this.explorationEngineService.getRandomSuffix()
       );
     }
 
@@ -1443,9 +1271,11 @@ export class ConversationSkinComponent {
     if (refresherExplorationId) {
       // TODO(bhenning): Add tests to verify the event is
       // properly recorded.
-      let confirmRedirection = () => {
+      const confirmRedirection = () => {
         this.redirectToRefresherExplorationConfirmed = true;
-        this._recordLeaveForRefresherExp(refresherExplorationId);
+        this.conversationFlowService.recordLeaveForRefresherExp(
+          refresherExplorationId
+        );
       };
       this.explorationSummaryBackendApiService
         .loadPublicExplorationSummariesAsync([refresherExplorationId])
@@ -1459,14 +1289,9 @@ export class ConversationSkinComponent {
         });
     }
     this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
-    this.scrollToBottom();
   }
 
-  private moveToNewCard(
-    feedbackHtml: string | null,
-    isFinalQuestion: boolean,
-    nextCard: StateCard
-  ) {
+  private moveToNewCard(feedbackHtml: string | null, isFinalQuestion: boolean) {
     // There is a new card. If there is no feedback, move on
     // immediately. Otherwise, give the learner a chance to read
     // the feedback, and display a 'Continue' button.
@@ -1495,12 +1320,13 @@ export class ConversationSkinComponent {
     this.fatigueDetectionService.reset();
     this.numberAttemptsService.reset();
 
-    let _isNextInteractionInline = this.nextCard.isInteractionInline();
+    let nextCard = this.conversationFlowService.getNextStateCard();
+    let _isNextInteractionInline = nextCard.isInteractionInline();
     this.upcomingInlineInteractionHtml = _isNextInteractionInline
-      ? this.nextCard.getInteractionHtml()
+      ? nextCard.getInteractionHtml()
       : '';
     this.upcomingInteractionInstructions =
-      this.nextCard.getInteractionInstructions();
+      nextCard.getInteractionInstructions();
 
     if (feedbackHtml) {
       if (
@@ -1571,7 +1397,8 @@ export class ConversationSkinComponent {
 
     setTimeout(
       () => {
-        this._addNewCard(this.nextCard);
+        let nextCard = this.conversationFlowService.getNextStateCard();
+        this._addNewCard(nextCard);
 
         this.upcomingInlineInteractionHtml = null;
         this.upcomingInteractionInstructions = null;
@@ -1594,10 +1421,11 @@ export class ConversationSkinComponent {
       0.1 * TIME_FADEOUT_MSEC +
         TIME_HEIGHT_CHANGE_MSEC +
         TIME_FADEIN_MSEC +
-        this.TIME_PADDING_MSEC
+        TIME_PADDING_MSEC
     );
 
-    this.playerPositionService.onNewCardOpened.emit(this.nextCard);
+    let nextCard = this.conversationFlowService.getNextStateCard();
+    this.playerPositionService.onNewCardOpened.emit(nextCard);
   }
 
   showUpcomingCard(): void {
@@ -1626,9 +1454,10 @@ export class ConversationSkinComponent {
       );
       return;
     }
+    let nextCard = this.conversationFlowService.getNextStateCard();
     if (
       this.displayedCard.isCompleted() &&
-      this.nextCard.getStateName() === this.displayedCard.getStateName() &&
+      nextCard.getStateName() === this.displayedCard.getStateName() &&
       this.conceptCard
     ) {
       this.conversationFlowService.recordNewCardAdded();
@@ -1646,7 +1475,7 @@ export class ConversationSkinComponent {
     if (this.isLearnAgainButton()) {
       const indexOfRevisionCard =
         this.playerTranscriptService.findIndexOfLatestStateWithName(
-          this.nextCard.getStateName()
+          nextCard.getStateName()
         );
       if (indexOfRevisionCard !== null) {
         this.displayedCard.markAsNotCompleted();
@@ -1686,11 +1515,7 @@ export class ConversationSkinComponent {
 
       if (windowBottom < tutorCardBottom) {
         const targetScrollY = tutorCardBottom - window.innerHeight + 12;
-        this.smoothScrollTo(
-          targetScrollY,
-          this.TIME_SCROLL_MSEC,
-          'easeOutQuad'
-        );
+        this.smoothScrollTo(targetScrollY, TIME_SCROLL_MSEC, 'easeOutQuad');
       }
     }, 100);
   }
@@ -1760,7 +1585,7 @@ export class ConversationSkinComponent {
           doneCallback();
         }
       },
-      TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC + this.TIME_PADDING_MSEC
+      TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC + TIME_PADDING_MSEC
     );
   }
 
