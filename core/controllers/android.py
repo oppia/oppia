@@ -148,8 +148,8 @@ class AndroidActivityHandler(base.BaseHandler[
                         constants.ACTIVITY_TYPE_STORY,
                         constants.ACTIVITY_TYPE_SKILL,
                         constants.ACTIVITY_TYPE_SUBTOPIC,
-                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_OLD,
-                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_NEW,
+                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION,
+                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE,
                         constants.ACTIVITY_TYPE_LEARN_TOPIC,
                         constants.ACTIVITY_TYPE_CLASSROOM
                     ]
@@ -238,7 +238,7 @@ class AndroidActivityHandler(base.BaseHandler[
                         else None)
                 })
         elif activity_type == (
-            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_OLD
+            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION
         ):
             for activity_data in activities_data:
                 topic_id, study_guide_id = activity_data['id'].split('-')
@@ -258,7 +258,7 @@ class AndroidActivityHandler(base.BaseHandler[
                     )
                 })
         elif activity_type == (
-            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_NEW
+            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE
         ):
             for activity_data in activities_data:
                 topic_id, study_guide_id = activity_data['id'].split('-')
