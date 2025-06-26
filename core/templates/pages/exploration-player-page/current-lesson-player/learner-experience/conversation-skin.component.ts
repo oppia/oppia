@@ -113,6 +113,7 @@ export class ConversationSkinComponent {
   isIframed: boolean;
   hasFullyLoaded = false;
   recommendedExplorationSummaries: LearnerExplorationSummary[] = [];
+  recommendedExplorationSummaries: LearnerExplorationSummary[] = [];
   answerIsCorrect = false;
   pendingCardWasSeenBefore: boolean = false;
   OPPIA_AVATAR_IMAGE_URL: string;

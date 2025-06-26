@@ -187,6 +187,11 @@ export class ConversationFlowService {
    *
    * @returns {string} The language code of the exploration.
    */
+  /**
+   * Retrieves the language code of the exploration from the current engine service.
+   *
+   * @returns {string} The language code of the exploration.
+   */
   getLanguageCode(): string {
     let currentEngineService =
       this.currentEngineService.getCurrentEngineService();
@@ -506,5 +511,61 @@ export class ConversationFlowService {
 
   get onShowProgressModal(): EventEmitter<boolean> {
     return this._playerProgressModalShownEventEmitter;
+  }
+
+  /**
+   * Retrieves the next card to be displayed if the user is stuck.
+   * This card will be shown when the user is unable to progress further.
+   *
+   * @returns {StateCard | null} The next card if stuck, or null if none is set.
+   */
+  getNextCardIfStuck(): StateCard | null {
+    return this.nextCardIfStuck;
+  }
+
+  /**
+   * Sets the next card to be displayed if the user is stuck.
+   * This card will be shown when the user is unable to progress further.
+   *
+   * @param {StateCard | null} card - The card to set as the next card if stuck.
+   */
+  setNextCardIfStuck(card: StateCard | null): void {
+    this.nextCardIfStuck = card;
+  }
+
+  /**
+   * Sets the solution for the current state.
+   *
+   * @param {Solution | null} solution - The solution to set for the current state.
+   */
+  setSolutionForState(solution: Solution | null): void {
+    this.solutionForState = solution;
+  }
+
+  /**
+   * Retrieves the solution for the current state.
+   *
+   * @returns {Solution | null} The solution for the current state, or null if none is set.
+   */
+  getSolutionForState(): Solution | null {
+    return this.solutionForState;
+  }
+
+  /**
+   * Retrieves the next state card to be displayed.
+   *
+   * @returns {StateCard | null} The next state card, or null if none is set.
+   */
+  getNextStateCard(): StateCard | null {
+    return this.nextStateCard;
+  }
+
+  /**
+   * Sets the next state card to be displayed.
+   *
+   * @param {StateCard | null} card - The next state card to set, or null if none.
+   */
+  setNextStateCard(card: StateCard | null): void {
+    this.nextStateCard = card;
   }
 }
