@@ -27,17 +27,17 @@ import {Injectable} from '@angular/core';
   providedIn: 'root',
 })
 export class CheckpointProgressService {
-  lastCompletedCheckpoint!: string;
+  mostRecentlyReachedCheckpoint!: string;
   constructor() {}
 
-  setLastCompletedCheckpoint(checkpointStateName: string): void {
-    this.lastCompletedCheckpoint = checkpointStateName;
+  setMostRecentlyReachedCheckpoint(checkpointStateName: string): void {
+    this.mostRecentlyReachedCheckpoint = checkpointStateName;
   }
 
-  getLastCompletedCheckpoint(): string {
-    if (!this.lastCompletedCheckpoint) {
+  getMostRecentlyReachedCheckpoint(): string {
+    if (!this.mostRecentlyReachedCheckpoint) {
       throw new Error('Last completed checkpoint is not set.');
     }
-    return this.lastCompletedCheckpoint;
+    return this.mostRecentlyReachedCheckpoint;
   }
 }
