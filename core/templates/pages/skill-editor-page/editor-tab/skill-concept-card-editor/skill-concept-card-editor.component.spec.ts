@@ -51,6 +51,8 @@ describe('Skill Concept Card Editor Component', () => {
   let ngbModal: NgbModal;
   let skillEditorStateService: SkillEditorStateService;
   let skillUpdateService: SkillUpdateService;
+  let urlInterpolationService: UrlInterpolationService;
+  let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();
   let sampleSkill: Skill;
   let resizeEvent = new Event('resize');
@@ -81,6 +83,8 @@ describe('Skill Concept Card Editor Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     skillUpdateService = TestBed.inject(SkillUpdateService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
 
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
@@ -136,6 +140,14 @@ describe('Skill Concept Card Editor Component', () => {
     expect(component.getConceptCardChange.emit).toHaveBeenCalled();
   });
 
+  it('should return image url', () => {
+    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
+      'imagePath'
+    );
+
+    expect(component.getStaticImageUrl('/imagePath')).toBe('imagePath');
+  });
+
   it('should update skill on saving explanation', () => {
     let updateSpy = spyOn(
       skillUpdateService,
@@ -184,4 +196,17 @@ describe('Skill Concept Card Editor Component', () => {
       expect(modalSpy).toHaveBeenCalled();
     })
   );
+
+  it('should toggle skill editor card on clicking', () => {
+    component.skillEditorCardIsShown = true;
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+
+    component.toggleSkillEditorCard();
+
+    expect(component.skillEditorCardIsShown).toBeFalse();
+
+    component.toggleSkillEditorCard();
+
+    expect(component.skillEditorCardIsShown).toBeTrue();
+  });
 });

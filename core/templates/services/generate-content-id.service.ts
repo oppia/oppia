@@ -19,8 +19,6 @@
 
 import {Injectable} from '@angular/core';
 
-import {AppConstants} from 'app.constants';
-
 @Injectable({
   providedIn: 'root',
 })
@@ -31,25 +29,6 @@ export class GenerateContentIdService {
   init(getNextIndex: () => number, revertUnusedIndexes: () => void): void {
     this.getNextIndex = getNextIndex;
     this.revertUnusedIndexes = revertUnusedIndexes;
-  }
-
-  generateIdForComponent(
-    existingComponentIds: string[],
-    componentName: string
-  ): string {
-    let contentIdList = JSON.parse(JSON.stringify(existingComponentIds));
-    let searchKey = componentName + '_';
-    let count = 0;
-    for (let contentId in contentIdList) {
-      if (contentIdList[contentId].indexOf(searchKey) === 0) {
-        let splitContentId = contentIdList[contentId].split('_');
-        let tempCount = parseInt(splitContentId[splitContentId.length - 1]);
-        if (tempCount > count) {
-          count = tempCount;
-        }
-      }
-    }
-    return searchKey + String(count + 1);
   }
 
   _getNextStateId(prefix: string): string {
