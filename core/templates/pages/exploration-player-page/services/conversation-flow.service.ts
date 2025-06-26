@@ -50,7 +50,7 @@ export class ConversationFlowService {
   // TODO(#22780): Remove these variable and related code.
   redirectToRefresherExplorationConfirmed!: boolean;
   isRefresherExploration!: boolean;
-  parentExplorationIds: string[];
+  parentExplorationIds: string[] = [];
 
   private _playerStateChangeEventEmitter: EventEmitter<string> =
     new EventEmitter<string>();
@@ -117,7 +117,7 @@ export class ConversationFlowService {
    *     a refresher exploration. Otherwise, no redirection is offered.
    */
   giveFeedbackAndStayOnCurrentCard(
-    feedbackHtml: string | null,
+    feedbackHtml: string,
     missingPrerequisiteSkillId: string | null,
     refreshInteraction: boolean,
     refresherExplorationId: string | null
@@ -303,7 +303,7 @@ export class ConversationFlowService {
    */
   moveForwardByOneCard(): void {
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
-    this.validateIndexAndChangeCard(displayedCardIndex + 1);
+    this._validateIndexAndChangeCard(displayedCardIndex + 1);
   }
 
   /**
@@ -317,7 +317,7 @@ export class ConversationFlowService {
    */
   moveBackwardByOneCard(): void {
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
-    this.validateIndexAndChangeCard(displayedCardIndex - 1);
+    this._validateIndexAndChangeCard(displayedCardIndex - 1);
   }
 
   /**
@@ -391,69 +391,13 @@ export class ConversationFlowService {
    * @param index - The index of the card to validate and display.
    * @throws Will throw an error if the index is out of bounds.
    */
-  private validateIndexAndChangeCard(index: number): void {
+  private _validateIndexAndChangeCard(index: number): void {
     let transcriptLength = this.playerTranscriptService.getNumCards();
     if (index >= 0 && index < transcriptLength) {
       this.changeCard(index);
     } else {
       throw new Error('Target card index out of bounds.');
     }
-  }
-
-  /**
-   * Retrieves the next card to be displayed if the user is stuck.
-   * This card will be shown when the user is unable to progress further.
-   *
-   * @returns {StateCard | null} The next card if stuck, or null if none is set.
-   */
-  getNextCardIfStuck(): StateCard | null {
-    return this.nextCardIfStuck;
-  }
-
-  /**
-   * Sets the next card to be displayed if the user is stuck.
-   * This card will be shown when the user is unable to progress further.
-   *
-   * @param {StateCard | null} card - The card to set as the next card if stuck.
-   */
-  setNextCardIfStuck(card: StateCard | null): void {
-    this.nextCardIfStuck = card;
-  }
-
-  /**
-   * Sets the solution for the current state.
-   *
-   * @param {Solution | null} solution - The solution to set for the current state.
-   */
-  setSolutionForState(solution: Solution | null): void {
-    this.solutionForState = solution;
-  }
-
-  /**
-   * Retrieves the solution for the current state.
-   *
-   * @returns {Solution | null} The solution for the current state, or null if none is set.
-   */
-  getSolutionForState(): Solution | null {
-    return this.solutionForState;
-  }
-
-  /**
-   * Retrieves the next state card to be displayed.
-   *
-   * @returns {StateCard | null} The next state card, or null if none is set.
-   */
-  getNextStateCard(): StateCard | null {
-    return this.nextStateCard;
-  }
-
-  /**
-   * Sets the next state card to be displayed.
-   *
-   * @param {StateCard | null} card - The next state card to set, or null if none.
-   */
-  setNextStateCard(card: StateCard | null): void {
-    this.nextStateCard = card;
   }
 
   /**
@@ -501,18 +445,6 @@ export class ConversationFlowService {
     return this.parentExplorationIds;
   }
 
-  get onPlayerStateChange(): EventEmitter<string> {
-    return this._playerStateChangeEventEmitter;
-  }
-
-  get onOppiaFeedbackAvailable(): EventEmitter<void> {
-    return this._oppiaFeedbackAvailableEventEmitter;
-  }
-
-  get onShowProgressModal(): EventEmitter<boolean> {
-    return this._playerProgressModalShownEventEmitter;
-  }
-
   /**
    * Retrieves the next card to be displayed if the user is stuck.
    * This card will be shown when the user is unable to progress further.
@@ -567,5 +499,17 @@ export class ConversationFlowService {
    */
   setNextStateCard(card: StateCard | null): void {
     this.nextStateCard = card;
+  }
+
+  get onPlayerStateChange(): EventEmitter<string> {
+    return this._playerStateChangeEventEmitter;
+  }
+
+  get onOppiaFeedbackAvailable(): EventEmitter<void> {
+    return this._oppiaFeedbackAvailableEventEmitter;
+  }
+
+  get onShowProgressModal(): EventEmitter<boolean> {
+    return this._playerProgressModalShownEventEmitter;
   }
 }
