@@ -38,7 +38,6 @@ import {AlertsService} from 'services/alerts.service';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {
@@ -58,6 +57,7 @@ import {StatsReportingService} from './stats-reporting.service';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {LearnerAnswerInfoService} from './learner-answer-info.service';
 
 @Injectable({
   providedIn: 'root',
@@ -66,7 +66,6 @@ export class ExplorationEngineService {
   private _explorationId!: string;
 
   answerIsBeingProcessed: boolean = false;
-  alwaysAskLearnersForAnswerDetails: boolean = false;
   exploration: Exploration;
 
   // This list may contain duplicates. A state name is added to it each time
@@ -88,13 +87,13 @@ export class ExplorationEngineService {
     private pageContextService: PageContextService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private entityTranslationsService: EntityTranslationsService,
-    private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private explorationObjectFactory: ExplorationObjectFactory,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
     private imagePreloaderService: ImagePreloaderService,
     private learnerParamsService: LearnerParamsService,
+    private learnerAnswerInfoService: LearnerAnswerInfoService,
     private playerTranscriptService: PlayerTranscriptService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
@@ -344,15 +343,6 @@ export class ExplorationEngineService {
     );
   }
 
-  checkAlwaysAskLearnersForAnswerDetails(): void {
-    this.explorationFeaturesBackendApiService
-      .fetchExplorationFeaturesAsync(this._explorationId)
-      .then(featuresData => {
-        this.alwaysAskLearnersForAnswerDetails =
-          featuresData.alwaysAskLearnersForAnswerDetails;
-      });
-  }
-
   // This should only be used in editor preview mode. It sets the
   // exploration data from what's currently specified in the editor, and
   // also initializes the parameters to empty strings.
@@ -413,7 +403,7 @@ export class ExplorationEngineService {
       this.imagePreloaderService.kickOffImagePreloader(
         this.exploration.getInitialState().name
       );
-      this.checkAlwaysAskLearnersForAnswerDetails();
+      this.learnerAnswerInfoService.checkAlwaysAskLearnersForAnswerDetails();
       this._loadInitialState(successCallback);
     }
 
@@ -440,10 +430,6 @@ export class ExplorationEngineService {
 
   moveToExploration(successCallback: (StateCard, string) => void): void {
     this._loadInitialState(successCallback);
-  }
-
-  isCurrentStateInitial(): boolean {
-    return this.currentStateName === this.exploration.initStateName;
   }
 
   recordNewCardAdded(): void {
@@ -694,14 +680,6 @@ export class ExplorationEngineService {
       this.exploration.getInteraction(this.nextStateIfStuckName),
       this.exploration.getState(this.nextStateIfStuckName).content.contentId
     );
-  }
-
-  isAnswerBeingProcessed(): boolean {
-    return this.answerIsBeingProcessed;
-  }
-
-  getAlwaysAskLearnerForAnswerDetails(): boolean {
-    return this.alwaysAskLearnersForAnswerDetails;
   }
 
   getStateCardByName(stateName: string): StateCard {

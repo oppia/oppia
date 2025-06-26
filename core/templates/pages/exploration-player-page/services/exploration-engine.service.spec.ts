@@ -572,7 +572,6 @@ describe('Exploration engine service ', () => {
         );
 
         expect(submitAnswerSuccessCb).toHaveBeenCalled();
-        expect(explorationEngineService.isAnswerBeingProcessed()).toBe(false);
         expect(isAnswerCorrect).toBe(true);
       }
     );

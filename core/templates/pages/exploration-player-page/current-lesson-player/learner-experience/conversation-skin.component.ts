@@ -464,7 +464,7 @@ export class ConversationSkinComponent {
   }
 
   alwaysAskLearnerForAnswerDetails(): boolean {
-    return this.explorationEngineService.getAlwaysAskLearnerForAnswerDetails();
+    return this.learnerAnswerInfoService.getAlwaysAskLearnerForAnswerDetails();
   }
 
   getCanAskLearnerForAnswerInfo(): boolean {

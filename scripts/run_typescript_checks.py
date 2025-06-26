@@ -126,8 +126,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/exploration-player-page/current-lesson-player/learner-experience/conversation-skin.component.ts',
     'core/templates/pages/exploration-player-page/services/answer-classification.service.spec.ts',
     'core/templates/pages/exploration-player-page/services/exploration-engine.service.spec.ts',
-    'core/templates/pages/exploration-player-page/services/exploration-engine.service.ts',
-    'core/templates/pages/exploration-player-page/services/exploration-player-state.service.ts',
     'core/templates/pages/exploration-player-page/services/question-player-engine.service.spec.ts',
     'core/templates/pages/exploration-player-page/services/question-player-engine.service.ts',
     'core/templates/pages/learner-dashboard-page/learner-dashboard-page.component.spec.ts',

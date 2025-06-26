@@ -1684,7 +1684,7 @@ describe('Conversation skin component', () => {
 
   it('should always ask learner for answer details', () => {
     spyOn(
-      explorationEngineService,
+      learnerAnswerInfoService,
       'getAlwaysAskLearnerForAnswerDetails'
     ).and.returnValues(true, false);
 

@@ -278,10 +278,6 @@ export class QuestionPlayerEngineService {
     return false;
   }
 
-  isAnswerBeingProcessed(): boolean {
-    return this.answerIsBeingProcessed;
-  }
-
   setAnswerIsBeingProcessed(value: boolean): void {
     this.answerIsBeingProcessed = value;
   }
