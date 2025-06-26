@@ -63,6 +63,8 @@ export type ModalUserInteractions = (
   container: string
 ) => Promise<void>;
 
+const actionStatusMessageSelector = '.e2e-test-status-message';
+
 export class BaseUser {
   page!: Page;
   browserObject!: Browser;
@@ -647,13 +649,29 @@ export class BaseUser {
       showMessage('The exploration is not accessible with the URL.');
     }
   }
-
   /**
-   * Checks if an element is visible on the page.
+   * Waits and checks for the element to be visible.
+   * @param {string} selector - The selector of the element to wait for.
+   * @param {boolean} hidden - Whether the element should be hidden or not. Default is false.
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
    */
-  async isElementVisible(selector: string): Promise<boolean> {
+  async isElementVisible(
+    selector: string,
+    visible: boolean = true,
+    timeout: number = 30000
+  ): Promise<boolean> {
     try {
-      await this.page.waitForSelector(selector, {visible: true, timeout: 3000});
+      if (visible) {
+        await this.page.waitForSelector(selector, {
+          visible: true,
+          timeout: timeout,
+        });
+      } else {
+        await this.page.waitForSelector(selector, {
+          hidden: true,
+          timeout: timeout,
+        });
+      }
       return true;
     } catch {
       return false;
@@ -807,7 +825,8 @@ export class BaseUser {
       }
     }
   }
-  /*
+
+  /**
    * Waits for the network to become idle on the given page.
    *
    * If the network does not become idle within the specified timeout, this function will log a message and continue. This is
@@ -897,6 +916,105 @@ export class BaseUser {
       window.scrollTo(0, document.body.scrollHeight);
     });
     await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Returns text in nested element
+   * @param {string} selector - The selector of the element to get text from.
+   */
+  async getTextContent(selector: string): Promise<string> {
+    const element = await this.page.$(selector);
+    const text = await this.page.evaluate(
+      (el: Element) => el.textContent,
+      element
+    );
+    return text?.trim() ?? '';
+  }
+
+  /**
+   * Verify text content inside an element
+   * @param {string} selector - The selector of the element to get text from.
+   * @param {string} textContent - The expected text content.
+   */
+  async expectTextContentToMatch(
+    selector: string,
+    textContent: string
+  ): Promise<void> {
+    const currentTextContent = await this.getTextContent(selector);
+    if (currentTextContent !== textContent) {
+      throw new Error(
+        `Text did not match within the specified time. Actual text: "${currentTextContent}", expected text: "${textContent}"`
+      );
+    }
+  }
+
+  /**
+   * Checks if element is clickable or not.
+   */
+  async expectElementToBeClickable(
+    selector: string,
+    clickable: boolean = true
+  ): Promise<void> {
+    const element = await this.page.$(selector);
+    await this.page.waitForFunction(isElementClickable, {}, element, clickable);
+  }
+
+  /**
+   * Helper method to wait for a action progress message to disappear
+   * @param {string} progressMessage - The processing message to wait for completion
+   */
+  private async waitForProgressMessageDisappear(progressMessage: string) {
+    const maxWaitTime = 10000; // 10 seconds.
+    const pollInterval = 500; // 500ms.
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < maxWaitTime) {
+      const currentMessage = await this.page.$eval(
+        actionStatusMessageSelector,
+        el => el.textContent?.trim()
+      );
+
+      // If the current message doesn't contain the processing message, we're done.
+      if (!currentMessage?.includes(progressMessage)) {
+        return;
+      }
+
+      // Wait before checking again.
+      await new Promise(resolve => setTimeout(resolve, pollInterval));
+    }
+
+    // If we get here, processing didn't complete within the timeout.
+    throw new Error(
+      `Progress message "${progressMessage}" did not disappear within ${maxWaitTime}ms`
+    );
+  }
+
+  /**
+   * Verifies that the action status message matches the expected message.
+   * @param {string} statusMessage - The expected status message to check for.
+   * @param {string} [progressMessage] - Optional processing message to wait for before checking the expected message.
+   * @throws {Error} If the actual status message does not match the expected message according to the comparison type.
+   */
+  async expectActionStatusMessageToBe(
+    statusMessage: string,
+    progressMessage?: string
+  ): Promise<void> {
+    // If progressMessage is provided, wait for it to disappear.
+    if (progressMessage) {
+      await this.waitForProgressMessageDisappear(progressMessage);
+    }
+
+    const actualStatusMessage = await this.page.$eval(
+      actionStatusMessageSelector,
+      el => el.textContent?.trim()
+    );
+
+    if (!actualStatusMessage?.includes(statusMessage)) {
+      throw new Error(
+        `Action status message did not include the expected text. Actual status message: "${actualStatusMessage}", expected text: "${statusMessage}"`
+      );
+    }
+    return;
   }
 }
 
