@@ -441,7 +441,10 @@ const exploreLessonsButtonInAboutUsPageSelector =
   '.e2e-test-about-page-explore-lessons-button';
 const androidAppButtonInAboutUsPageSelector =
   '.e2e-test-about-page-android-button';
-const partnershipStoryBoardSelector = '.oppia-about-partnerships-card';
+const partnershipStoryBoardDesktopSelector =
+  '.oppia-about-partnerships-cards-container-desktop .oppia-about-partnerships-card';
+const partnershipStoryBoardMobileSelector =
+  '.oppia-about-partnerships-cards-container-tablet .oppia-about-partnerships-card';
 const impactStatsTitleSelector = '.e2e-test-about-oppia-impact-stat-title';
 const impactChartContainerSelector = '.e2e-test-about-impact-chart-container';
 
@@ -4905,9 +4908,11 @@ export class LoggedOutUser extends BaseUser {
    * @returns {Promise<void>} - A promise that resolves when the number of story boards is checked.
    */
   async expectPartnershipStoryBoardsToBe(n: number): Promise<void> {
-    const storyBoards = await this.page.$$eval(
-      partnershipStoryBoardSelector,
-      elements => elements.map(element => (element as HTMLElement).textContent)
+    const selector = this.isViewportAtMobileWidth()
+      ? partnershipStoryBoardMobileSelector
+      : partnershipStoryBoardDesktopSelector;
+    const storyBoards = await this.page.$$eval(selector, elements =>
+      elements.map(element => (element as HTMLElement).textContent)
     );
 
     if (storyBoards.length !== n) {
@@ -5015,11 +5020,19 @@ export class LoggedOutUser extends BaseUser {
   async clickOnPlayStoreImageInAndroidPageAndVerifyNavigation(): Promise<void> {
     await this.isElementVisible(redirectToPlayStoreImageSelector);
 
-    await this.clickOn(redirectToPlayStoreImageSelector);
+    // await this.clickAndWaitForNavigation(redirectToPlayStoreImageSelector);
+    // await this.waitForNetworkIdle();
 
-    const pageURL = this.page.url();
-    expect(pageURL).toContain('play.google.com');
-    expect(pageURL).toContain('org.oppia.android');
+    await this.clickLinkButtonToNewTab(
+      redirectToPlayStoreImageSelector,
+      'Play Store Image',
+      'https://play.google.com/store/apps/details?id=org.oppia.android',
+      'Oppia - Apps on Google Play'
+    );
+
+    // const pageURL = this.page.url();
+    // expect(pageURL).toContain('play.google.com');
+    // expect(pageURL).toContain('org.oppia.android');
   }
 
   /**
