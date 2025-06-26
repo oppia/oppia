@@ -614,7 +614,9 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the splash page.
    */
-  async navigateToSplashPage(expectedURL: string = baseUrl): Promise<void> {
+  async navigateToSplashPage(
+    expectedURL: string = `${baseUrl}/`
+  ): Promise<void> {
     await this.goto(splashPageUrl, false);
 
     expect(this.page.url()).toBe(expectedURL);
