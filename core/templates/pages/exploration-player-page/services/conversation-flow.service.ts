@@ -33,6 +33,10 @@ import {StatsReportingService} from './stats-reporting.service';
 import {PageContextService} from 'services/page-context.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
+import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
+import {RefresherExplorationConfirmationModalService} from './refresher-exploration-confirmation-modal.service';
+import {ExplorationEngineService} from './exploration-engine.service';
 
 @Injectable({
   providedIn: 'root',
@@ -42,6 +46,10 @@ export class ConversationFlowService {
   solutionForState: Solution | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
   nextStateCard: StateCard | null = null;
+
+  // TODO(#22780): Remove this variable and realted code.
+  redirectToRefresherExplorationConfirmed!: boolean;
+
   private _playerStateChangeEventEmitter: EventEmitter<string> =
     new EventEmitter<string>();
 
@@ -57,10 +65,14 @@ export class ConversationFlowService {
     private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
     private stateEditorService: StateEditorService,
+    private refresherExplorationConfirmationModalService: RefresherExplorationConfirmationModalService,
     private pageContextService: PageContextService,
+    private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
+    private conceptCardBackendApiService: ConceptCardBackendApiService,
     private conceptCardManagerService: ConceptCardManagerService,
     private currentEngineService: CurrentEngineService,
     private statsReportingService: StatsReportingService,
+    private explorationEngineService: ExplorationEngineService,
     private translateService: TranslateService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService
   ) {}
@@ -79,6 +91,84 @@ export class ConversationFlowService {
 
   isSupplementalCardNonempty(card: StateCard): boolean {
     return !card.isInteractionInline();
+  }
+
+  /**
+   * Handles the display of feedback to the learner while staying on the current card.
+   * This method is called when an answer is submitted and the system decides to give feedback
+   * instead of moving to the next state (e.g., due to an incorrect answer or missing prerequisite).
+   *
+   * It:
+   * - Records the incorrect answer
+   * - Displays feedback and help cards if applicable
+   * - Loads concept cards if a prerequisite skill is missing
+   * - Optionally refreshes the interaction UI
+   * - Optionally prompts for redirection to a refresher exploration
+   *
+   * @param {string | null} feedbackHtml - HTML string containing feedback to show to the learner.
+   *     If null, no feedback is shown.
+   * @param {string | null} missingPrerequisiteSkillId - The ID of a prerequisite skill the learner
+   *     needs to revisit. If provided, triggers concept card loading.
+   * @param {boolean} refreshInteraction - Whether the interaction should be visually refreshed
+   *     (e.g., to give a new randomized version of the same interaction).
+   * @param {string | null} refresherExplorationId - If provided, prompts the learner to redirect to
+   *     a refresher exploration. Otherwise, no redirection is offered.
+   */
+  giveFeedbackAndStayOnCurrentCard(
+    feedbackHtml: string | null,
+    missingPrerequisiteSkillId: string | null,
+    refreshInteraction: boolean,
+    refresherExplorationId: string | null
+  ): void {
+    let displayedCard = this._getCurrentCard();
+    this.recordIncorrectAnswer();
+    this.playerTranscriptService.addNewResponse(feedbackHtml);
+    let helpCardAvailable =
+      feedbackHtml && !displayedCard.isInteractionInline();
+
+    if (helpCardAvailable) {
+      this.emitHelpCard(feedbackHtml, false);
+    }
+    if (missingPrerequisiteSkillId) {
+      displayedCard.markAsCompleted();
+      this.conceptCardBackendApiService
+        .loadConceptCardsAsync([missingPrerequisiteSkillId])
+        .then(conceptCardObject => {
+          this.conceptCardManagerService.setConceptCard(conceptCardObject[0]);
+          if (helpCardAvailable) {
+            this.emitHelpCard(feedbackHtml, true);
+          }
+        });
+    }
+    if (refreshInteraction) {
+      // Replace the previous interaction with another of the
+      // same type.
+      this.playerTranscriptService.updateLatestInteractionHtml(
+        displayedCard.getInteractionHtml() +
+          this.explorationEngineService.getRandomSuffix()
+      );
+    }
+
+    this.redirectToRefresherExplorationConfirmed = false;
+
+    if (refresherExplorationId) {
+      // TODO(bhenning): Add tests to verify the event is
+      // properly recorded.
+      const confirmRedirection = () => {
+        this.redirectToRefresherExplorationConfirmed = true;
+        this.recordLeaveForRefresherExp(refresherExplorationId);
+      };
+      this.explorationSummaryBackendApiService
+        .loadPublicExplorationSummariesAsync([refresherExplorationId])
+        .then(response => {
+          if (response.summaries.length > 0) {
+            this.refresherExplorationConfirmationModalService.displayRedirectConfirmationModal(
+              refresherExplorationId,
+              confirmRedirection
+            );
+          }
+        });
+    }
   }
 
   /**
@@ -357,6 +447,15 @@ export class ConversationFlowService {
    */
   setNextStateCard(card: StateCard | null): void {
     this.nextStateCard = card;
+  }
+
+  /**
+   * Checks if the user has confirmed redirection to a refresher exploration.
+   *
+   * @returns {boolean} True if the user has confirmed redirection, false otherwise.
+   */
+  getRedirectToRefresherExplorationConfirmed(): boolean {
+    return this.redirectToRefresherExplorationConfirmed;
   }
 
   get onPlayerStateChange(): EventEmitter<string> {
