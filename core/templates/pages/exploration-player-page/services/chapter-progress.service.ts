@@ -13,7 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview
+ * @fileoverview Service for tracking and updating the number of chapters
+ * a learner has completed.
+ *
+ * This service encapsulates logic related to learner chapter completion
+ * progress and exposes methods to access the current count and completion state.
  */
 
 import {Injectable} from '@angular/core';
