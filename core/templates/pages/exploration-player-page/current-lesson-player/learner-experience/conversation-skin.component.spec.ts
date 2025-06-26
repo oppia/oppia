@@ -631,7 +631,7 @@ describe('Conversation skin component', () => {
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
     spyOn(questionPlayerStateService, 'solutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
-    spyOn(componentInstance, 'fetchCompletedChaptersCount');
+    spyOn(chapterProgressService, 'updateCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
     spyOn(statsReportingService, 'recordExplorationActuallyStarted');
     spyOn(
@@ -769,7 +769,10 @@ describe('Conversation skin component', () => {
     ).and.returnValue(
       Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
     );
-    spyOn(componentInstance, 'fetchCompletedChaptersCount').and.callThrough();
+    spyOn(
+      chapterProgressService,
+      'updateCompletedChaptersCount'
+    ).and.callThrough();
     spyOn(
       learnerDashboardBackendApiService,
       'fetchLearnerCompletedChaptersCountDataAsync'
@@ -926,7 +929,7 @@ describe('Conversation skin component', () => {
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
     spyOn(questionPlayerStateService, 'solutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
-    spyOn(componentInstance, 'fetchCompletedChaptersCount');
+    spyOn(chapterProgressService, 'updateCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
     spyOn(statsReportingService, 'recordExplorationActuallyStarted');
     spyOn(
@@ -1645,9 +1648,7 @@ describe('Conversation skin component', () => {
       conversationFlowService,
       'isSupplementalCardNonempty'
     ).and.returnValues(false, true, true, false);
-    spyOn(componentInstance, 'animateToOneCard').and.callFake(callb => {
-      callb();
-    });
+    spyOn(componentInstance, 'animateToOneCard');
 
     componentInstance.showPendingCard();
     tick(1000);
@@ -1970,7 +1971,7 @@ describe('Conversation skin component', () => {
     spyOn(playerTranscriptService, 'findIndexOfLatestStateWithName')
       .withArgs('revisionState')
       .and.returnValue(2);
-    const changeCard = spyOn(componentInstance, 'changeCard');
+    const changeCard = spyOn(conversationFlowService, 'changeCard');
     const recordNewCardAdded = spyOn(
       conversationFlowService,
       'recordNewCardAdded'
@@ -2104,9 +2105,7 @@ describe('Conversation skin component', () => {
       conversationFlowService,
       'isSupplementalCardNonempty'
     ).and.returnValues(false, true, true, false);
-    spyOn(componentInstance, 'animateToOneCard').and.callFake(callb => {
-      callb();
-    });
+    spyOn(componentInstance, 'animateToOneCard');
 
     componentInstance.showPendingCard();
     tick(1000);
@@ -2340,9 +2339,7 @@ describe('Conversation skin component', () => {
     spyOn(playerTranscriptService, 'getCard');
     spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(true);
     spyOn(playerPositionService, 'setDisplayedCardIndex');
-    spyOn(componentInstance, 'animateToTwoCards').and.callFake(callb => {
-      callb();
-    });
+    spyOn(componentInstance, 'animateToTwoCards');
     spyOn(playerPositionService, 'changeCurrentQuestion');
     spyOn(componentInstance, 'showPendingCard');
     spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue([]);
@@ -2364,6 +2361,7 @@ describe('Conversation skin component', () => {
   });
 
   it('should submit answer and reset current answer state', fakeAsync(() => {
+    spyOn(conversationFlowService, 'giveFeedbackAndStayOnCurrentCard');
     spyOn(displayedCard, 'updateCurrentAnswer');
     componentInstance.displayedCard = displayedCard;
     componentInstance.answerIsBeingProcessed = true;
@@ -2851,10 +2849,13 @@ describe('Conversation skin component', () => {
   });
 
   it('should animate to one card', fakeAsync(() => {
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
+    spyOn(playerPositionService, 'setDisplayedCardIndex');
     componentInstance.animateToOneCard();
 
     tick(600);
     expect(componentInstance.isAnimatingToOneCard).toBeFalse();
+    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(0);
   }));
 
   it('should animate to two cards', fakeAsync(() => {
