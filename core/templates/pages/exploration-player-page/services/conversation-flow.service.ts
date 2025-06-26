@@ -47,8 +47,10 @@ export class ConversationFlowService {
   responseTimeout: NodeJS.Timeout | null = null;
   nextStateCard: StateCard | null = null;
 
-  // TODO(#22780): Remove this variable and realted code.
+  // TODO(#22780): Remove these variable and related code.
   redirectToRefresherExplorationConfirmed!: boolean;
+  isRefresherExploration!: boolean;
+  parentExplorationIds: string[];
 
   private _playerStateChangeEventEmitter: EventEmitter<string> =
     new EventEmitter<string>();
@@ -456,6 +458,42 @@ export class ConversationFlowService {
    */
   getRedirectToRefresherExplorationConfirmed(): boolean {
     return this.redirectToRefresherExplorationConfirmed;
+  }
+
+  /**
+   * Checks if the current exploration is a refresher exploration.
+   *
+   * @returns {boolean} True if the current exploration is a refresher exploration, false otherwise.
+   */
+  getIsRefresherExploration(): boolean {
+    return this.isRefresherExploration;
+  }
+
+  /**
+   * Sets whether the current exploration is a refresher exploration.
+   *
+   * @param {boolean} isRefresher - True if the current exploration is a refresher exploration, false otherwise.
+   */
+  setIsRefresherExploration(isRefresher: boolean): void {
+    this.isRefresherExploration = isRefresher;
+  }
+
+  /**
+   * Sets the parent exploration IDs for the current exploration.
+   *
+   * @param {string[]} parentExplorationIds - An array of parent exploration IDs.
+   */
+  setParentExplorationIds(parentExplorationIds: string[]): void {
+    this.parentExplorationIds = [...parentExplorationIds];
+  }
+
+  /**
+   * Retrieves the parent exploration IDs for the current exploration.
+   *
+   * @returns {string[]} An array of parent exploration IDs.
+   */
+  getParentExplorationIds(): string[] {
+    return this.parentExplorationIds;
   }
 
   get onPlayerStateChange(): EventEmitter<string> {

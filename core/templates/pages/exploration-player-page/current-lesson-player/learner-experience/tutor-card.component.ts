@@ -123,9 +123,7 @@ export class TutorCardComponent {
   @Input() explorationIsInPreviewMode!: boolean;
   @Input() questionPlayerConfig!: QuestionPlayerConfig;
   @Input() collectionSummary!: CollectionSummary;
-  @Input() isRefresherExploration!: boolean;
   @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
-  @Input() parentExplorationIds!: string[];
   @Input() nextLessonLink!: string;
   @Input() completedChaptersCount!: number;
   @Input() milestoneMessageIsToBeDisplayed!: boolean;
