@@ -37,6 +37,39 @@ if MYPY: # pragma: no cover
 
 (subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
+def _migrate_sections_to_latest_schema(
+    versioned_sections: (
+        study_guide_domain.VersionedStudyGuideSectionsDict
+    )
+) -> None:
+    """Holds the responsibility of performing a step-by-step, sequential update
+    of the sections structure based on the schema version of the input
+    sections dictionary. If the current sections schema changes, a
+    new conversion function must be added and some code appended to this
+    function to account for that new version.
+
+    Args:
+        versioned_sections: dict. A dict with two keys:
+          - schema_version: int. The schema version for the page_contents dict.
+          - sections: list. The list comprising the dicts of sections.
+
+    Raises:
+        Exception. The schema version of the sections is outside of what
+            is supported at present.
+    """
+    sections_schema_version = versioned_sections['schema_version']
+    if not (1 <= sections_schema_version
+            <= feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d page schemas at '
+            'present.' % feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION)
+
+    while (sections_schema_version <
+           feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION):
+        study_guide_domain.StudyGuide.update_sections_from_model(
+            versioned_sections, sections_schema_version)
+        sections_schema_version += 1
+
 
 def get_study_guide_from_model(
     study_guide_model: subtopic_models.StudyGuideModel
@@ -56,10 +89,9 @@ def get_study_guide_from_model(
         'schema_version': study_guide_model.sections_schema_version,
         'sections': copy.deepcopy(study_guide_model.sections)
     }
-    # TODO(#22781): Add migrate_sections_to_latest_schema method
-    # call if the model schema version is not equal to
-    # CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION once the
-    # migrate_sections_to_latest_schema method is created.
+    if (study_guide_model.sections_schema_version !=
+            feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION):
+        _migrate_sections_to_latest_schema(versioned_sections)
     sections = []
     for section in versioned_sections['sections']:
         sections.append(

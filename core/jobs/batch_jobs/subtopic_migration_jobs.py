@@ -366,7 +366,7 @@ class MigrateStudyGuideModels(beam.PTransform):# type: ignore[misc]
             logging.exception(e)
             return result.Err((study_guide_id, e))
 
-        return result.Ok((study_guide_id, subtopic))
+        return result.Ok((study_guide_id, study_guide))
 
     @staticmethod
     def _generate_study_guide_changes(
