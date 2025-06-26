@@ -188,7 +188,7 @@ export class ExplorationEngineService {
     );
   }
 
-  private _getRandomSuffix(): string {
+  getRandomSuffix(): string {
     // This is a bit of a hack. When a refresh to a component property
     // happens, Angular compares the new value of the property to its previous
     // value. If they are the same, then the property is not updated.
@@ -616,8 +616,8 @@ export class ExplorationEngineService {
       this.learnerParamsService.init(newParams);
     }
 
-    questionHtml = questionHtml + this._getRandomSuffix();
-    nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
+    questionHtml = questionHtml + this.getRandomSuffix();
+    nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
 
     let nextCard = StateCard.createNewCard(
       this.nextStateName,
@@ -683,9 +683,9 @@ export class ExplorationEngineService {
       );
     }
 
-    questionHtmlIfStuck = questionHtmlIfStuck + this._getRandomSuffix();
+    questionHtmlIfStuck = questionHtmlIfStuck + this.getRandomSuffix();
     nextInteractionIfStuckHtml =
-      nextInteractionIfStuckHtml + this._getRandomSuffix();
+      nextInteractionIfStuckHtml + this.getRandomSuffix();
 
     return StateCard.createNewCard(
       this.nextStateIfStuckName,
@@ -719,8 +719,8 @@ export class ExplorationEngineService {
     }
     let contentHtml =
       this.exploration.getState(stateName).content.html +
-      this._getRandomSuffix();
-    interactionHtml = interactionHtml + this._getRandomSuffix();
+      this.getRandomSuffix();
+    interactionHtml = interactionHtml + this.getRandomSuffix();
 
     return StateCard.createNewCard(
       stateName,
