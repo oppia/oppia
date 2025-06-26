@@ -412,19 +412,8 @@ const learnerViewCardSelector = '.oppia-learner-view-card-content';
 const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const loginButtonSelector = '.e2e-mobile-test-login';
 
-const youtubePlayerSelector = '.e2e-test-youtube-player';
-const collapsibleRTEHeaderSelector = 'e2e-test-collapsible-heading';
-const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
-
 // Splash page.
 const getAndroidAppButtonSelector = '.e2e-test-splash-android-app-button';
-
-// Navbar.
-const navbarLearnDropdownContainerSelector =
-  '.e2e-test-classroom-oppia-list-item';
-const navbarAboutDropdownConatinaerSelector = '.e2e-test-about-oppia-list-item';
-const navbarGetInvolvedDropdownContainerSelector =
-  '.e2e-test-navbar-get-involved-menu';
 
 // Partnership Page.
 const partnershipsHeadingSelector = '.e2e-test-partnership-heading';
