@@ -36,12 +36,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {AppConstants} from 'app.constants';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {CdkDragSortEvent} from '@angular/cdk/drag-drop';
 import {of} from 'rxjs';
-
-class MockNgbModalRef {
-  componentInstance = {};
-}
 
 class MockNgbModalRefPreview {
   componentInstance = {
@@ -56,8 +51,6 @@ describe('Skill Concept Card Editor Component', () => {
   let ngbModal: NgbModal;
   let skillEditorStateService: SkillEditorStateService;
   let skillUpdateService: SkillUpdateService;
-  let urlInterpolationService: UrlInterpolationService;
-  let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();
   let sampleSkill: Skill;
   let resizeEvent = new Event('resize');
@@ -88,8 +81,6 @@ describe('Skill Concept Card Editor Component', () => {
     ngbModal = TestBed.inject(NgbModal);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     skillUpdateService = TestBed.inject(SkillUpdateService);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
 
     const conceptCard = new ConceptCard(
       SubtitledHtml.createDefault(
