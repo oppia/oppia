@@ -22,14 +22,14 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-describe('Interested Partner Organization', function () {
+describe('Interested Parent', function () {
   let interestedParent: LoggedOutUser;
 
   beforeAll(async function () {
     interestedParent = await UserFactory.createLoggedOutUser();
   });
 
-  it("should be able to learn about Oppia's partnership program", async function () {
+  it("should be able to sign up for the Oppia's newletter", async function () {
     // Submit Email to the Newsletter Input Field.
     await interestedParent.submitEmailForNewsletter(
       'example.abc@domain.xyz.mn'

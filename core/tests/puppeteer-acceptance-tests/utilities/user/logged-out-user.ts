@@ -620,6 +620,8 @@ export class LoggedOutUser extends BaseUser {
   async navigateToSplashPage(
     expectedURL: string = `${baseUrl}/`
   ): Promise<void> {
+    // We explicitly check for expected URL instead of verifying it through
+    // BaseUser.goto as /splash redirects user to a different page.
     await this.goto(splashPageUrl, false);
 
     expect(this.page.url()).toBe(expectedURL);
@@ -1827,7 +1829,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the Check out our guide button in the Teach page
    * and check if it opens the parents Teachers Guide Url link
    */
-  async clickGuideButtonInTeachPage(): Promise<void> {
+  async clickAndVerifyGuideButtonInTeachPage(): Promise<void> {
     await this.openExternalLink(
       guideButtonInTeachPage,
       parentsTeachersGuideUrl
@@ -1838,7 +1840,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the Check out our blog button in the Teach page
    * and check if it opens the Teacher Story tagged blogs link
    */
-  async clickBlogButtonInTeachPage(): Promise<void> {
+  async clickAndVerifyBlogButtonInTeachPage(): Promise<void> {
     await this.openExternalLink(
       blogButtonInTeachPage,
       teacherStoryTaggedBlogsLink
@@ -2114,7 +2116,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the Download Brochure button in the Partnerships page
    * and check if it opens the Partnerships Brochure.
    */
-  async clickDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
+  async clickAndVerifyDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
     await this.page.waitForSelector(brochureButtonInPartnershipsPage, {
       visible: true,
     });

@@ -71,7 +71,7 @@ describe('Interested Partner Organization', function () {
     );
 
     // Download Brochure.
-    await partherOrganizationUser.clickDownloadBrochureButtonInPartnershipsPage();
+    await partherOrganizationUser.clickAndVerifyDownloadBrochureButtonInPartnershipsPage();
 
     // Special foundation video.
     await partherOrganizationUser.expectYouTubeVideoInPartnershipPageToBePlayabe();

@@ -41,9 +41,6 @@ describe('Interested Volunteer', function () {
 
     // Check for various headings and sections.
     await interestedVolunteer.expectVolunteerPageHeadingToContain(
-      'Meet our volunteers'
-    );
-    await interestedVolunteer.expectVolunteerPageHeadingToContain(
       'Volunteer to make a difference'
     );
 
@@ -52,6 +49,9 @@ describe('Interested Volunteer', function () {
 
     // Check for Expectations Tab.
     await interestedVolunteer.navigateToVolunteerPage();
+    await interestedVolunteer.expectVolunteerPageHeadingToContain(
+      'Meet our volunteers'
+    );
     await interestedVolunteer.expectVolunteerExpectationsTabsToBeFunctionalInVolunteerPage();
 
     // Open Volunteer Form.

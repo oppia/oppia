@@ -86,8 +86,8 @@ describe('Interested Parent', function () {
       ' Looking for tips on how to use Oppia lessons? '
     );
 
-    await parentUser.clickGuideButtonInTeachPage();
-    await parentUser.clickBlogButtonInTeachPage();
+    await parentUser.clickAndVerifyGuideButtonInTeachPage();
+    await parentUser.clickAndVerifyBlogButtonInTeachPage();
 
     await parentUser.expectLessonCreatorsCarouselToBeFunctionalInTeachPage();
     await parentUser.clickLinkedInButtonInTeachPage();

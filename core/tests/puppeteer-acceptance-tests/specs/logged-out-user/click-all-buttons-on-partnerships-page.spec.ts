@@ -61,7 +61,7 @@ describe('Logged-out User in Partnerships page', function () {
   it(
     'should open the Partnerships Brochure when the "Download Brochure" button is clicked.',
     async function () {
-      await loggedOutUser.clickDownloadBrochureButtonInPartnershipsPage();
+      await loggedOutUser.clickAndVerifyDownloadBrochureButtonInPartnershipsPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

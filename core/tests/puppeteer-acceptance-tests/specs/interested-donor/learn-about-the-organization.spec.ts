@@ -71,6 +71,9 @@ describe('Interested Donor', function () {
     );
     await interestedDonor.expectImpactStatsTitlesToBe(4);
     await interestedDonor.expectImpactChartsToBe(2);
+
+    // View Report Button should be visible.
+    await interestedDonor.expectViewReportButtonInAboutPageToBeVisible();
   });
 
   it('should be able to download impact reports from about dropdown in navbar', async function () {
