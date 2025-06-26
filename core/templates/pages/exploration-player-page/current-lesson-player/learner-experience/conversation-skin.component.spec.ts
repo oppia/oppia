@@ -68,7 +68,6 @@ import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.s
 import {LoaderService} from '../../../../services/loader.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {MessengerService} from '../../../../services/messenger.service';
-import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
 import {FocusManagerService} from '../../../../services/stateful/focus-manager.service';
 import {UserService} from '../../../../services/user.service';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
@@ -1367,59 +1366,6 @@ describe('Conversation skin component', () => {
     expect(componentInstance.showPendingCard).toHaveBeenCalled();
   }));
 
-  // it('should fetch completed chapters count if user is logged in', fakeAsync(() => {
-  //   spyOn(
-  //     learnerDashboardBackendApiService,
-  //     'fetchLearnerCompletedChaptersCountDataAsync'
-  //   ).and.returnValue(
-  //     Promise.resolve({
-  //       completedChaptersCount: 1,
-  //     })
-  //   );
-  //   componentInstance.isLoggedIn = false;
-
-  //   componentInstance.fetchCompletedChaptersCount();
-  //   tick();
-
-  //   expect(
-  //     learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync
-  //   ).not.toHaveBeenCalled();
-  //   expect(componentInstance.completedChaptersCount).toBeUndefined();
-
-  //   componentInstance.isLoggedIn = true;
-
-  //   componentInstance.fetchCompletedChaptersCount();
-  //   tick();
-
-  //   expect(
-  //     learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync
-  //   ).toHaveBeenCalled();
-
-  //   expect(componentInstance.completedChaptersCount).toEqual(1);
-  // }));
-
-  // it('should change card', () => {
-  //   spyOn(playerPositionService, 'recordNavigationButtonClick');
-  //   spyOn(playerPositionService, 'setDisplayedCardIndex');
-  //   spyOn(explorationEngineService.onUpdateActiveStateIfInEditor, 'emit');
-  //   spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
-  //     'state_name'
-  //   );
-  //   spyOn(playerPositionService, 'changeCurrentQuestion');
-
-  //   componentInstance.changeCard(1);
-
-  //   expect(
-  //     playerPositionService.recordNavigationButtonClick
-  //   ).toHaveBeenCalled();
-  //   expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalled();
-  //   expect(
-  //     explorationEngineService.onUpdateActiveStateIfInEditor.emit
-  //   ).toHaveBeenCalled();
-  //   expect(playerPositionService.getCurrentStateName).toHaveBeenCalled();
-  //   expect(playerPositionService.changeCurrentQuestion).toHaveBeenCalled();
-  // });
-
   it(
     'should navigate to the most recently reached checkpoint ' +
       'on page load if user is logged in',
@@ -2384,7 +2330,6 @@ describe('Conversation skin component', () => {
     stateCard.markAsCompleted();
     componentInstance.displayedCard = stateCard;
     conversationFlowService.setNextStateCard(stateCard);
-    let conceptCard = new ConceptCard(new SubtitledHtml('', ''), [], null);
     spyOn(conversationFlowService, 'recordNewCardAdded');
     spyOn(conversationFlowService, 'addNewCard');
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(10);
