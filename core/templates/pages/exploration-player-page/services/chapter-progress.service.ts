@@ -56,11 +56,15 @@ export class ChapterProgressService {
     return this.completedChaptersCount;
   }
 
-  isChapterCompletedForTheFirstTime(): boolean {
-    return this.chapterIsCompletedForTheFirstTime;
+  setCompletedChaptersCount(count: number): void {
+    this.completedChaptersCount = count;
   }
 
   getChapterCompletedForTheFirstTime(): boolean {
     return this.chapterIsCompletedForTheFirstTime;
+  }
+
+  setChapterCompletedForTheFirstTime(isCompleted: boolean): void {
+    this.chapterIsCompletedForTheFirstTime = isCompleted;
   }
 }
