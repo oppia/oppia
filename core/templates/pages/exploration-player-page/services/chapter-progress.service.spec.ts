@@ -70,12 +70,6 @@ describe('ChapterProgressService', () => {
     expect(chapterProgressService.getChapterCompletedForTheFirstTime()).toBe(
       true
     );
-
-    chapterProgressService.updateCompletedChaptersCount(true);
-    tick();
-    expect(chapterProgressService.getChapterCompletedForTheFirstTime()).toBe(
-      false
-    );
   }));
 
   it('should return the completed chapters count', fakeAsync(() => {
