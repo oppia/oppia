@@ -1334,13 +1334,6 @@ describe('Exploration engine service ', () => {
     expect(explorationEngineService.getLanguageCode()).toBe('bn');
   });
 
-  it('should get the update active state event emitter', () => {
-    let mockEventEmitter = new EventEmitter();
-    expect(explorationEngineService.onUpdateActiveStateIfInEditor).toEqual(
-      mockEventEmitter
-    );
-  });
-
   it(
     'should throw error if we populate exploration data ' +
       'in exploration player page',

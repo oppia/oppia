@@ -586,6 +586,17 @@ describe('Tutor card component', () => {
     }
   );
 
+  it('should return the value from getChapterCompletedForTheFirstTime', () => {
+    spyOn(
+      chapterProgressService,
+      'getChapterCompletedForTheFirstTime'
+    ).and.callThrough();
+    componentInstance.getMilestoneMessageIsToBeDisplayed();
+    expect(
+      chapterProgressService.getChapterCompletedForTheFirstTime
+    ).toHaveBeenCalled();
+  });
+
   it('should correctly show milestone progress bar', () => {
     componentInstance.inStoryMode = true;
     chapterProgressService.setChapterCompletedForTheFirstTime(false);

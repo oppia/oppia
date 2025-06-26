@@ -410,6 +410,15 @@ export class ConversationFlowService {
   }
 
   /**
+   * Sets whether the user has confirmed redirection to a refresher exploration.
+   *
+   * @param {boolean} confirmed - True if the user has confirmed redirection, false otherwise.
+   */
+  setRedirectToRefresherExplorationConfirmed(confirmed: boolean): void {
+    this.redirectToRefresherExplorationConfirmed = confirmed;
+  }
+
+  /**
    * Checks if the current exploration is a refresher exploration.
    *
    * @returns {boolean} True if the current exploration is a refresher exploration, false otherwise.

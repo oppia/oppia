@@ -55,6 +55,10 @@ export class CheckpointProgressService {
     }
   }
 
+  resetVisitedCheckpointStateNames(): void {
+    this.visitedCheckpointStateNames = [];
+  }
+
   checkIfCheckpointIsVisited(checkpointStateName: string): boolean {
     return this.visitedCheckpointStateNames.includes(checkpointStateName);
   }
