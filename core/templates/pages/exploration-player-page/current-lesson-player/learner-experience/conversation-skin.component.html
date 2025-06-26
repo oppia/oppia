@@ -16,9 +16,7 @@
                         [questionPlayerConfig]="questionPlayerConfig"
                         [explorationIsInPreviewMode]="isInPreviewMode"
                         [recommendedExplorationSummaries]="recommendedExplorationSummaries"
-                        [nextLessonLink]="getExplorationLink()"
-                        [completedChaptersCount]="completedChaptersCount"
-                        [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime">
+                        [nextLessonLink]="getExplorationLink()">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"

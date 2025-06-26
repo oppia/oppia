@@ -58,6 +58,7 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 import {EndChapterCheckMarkComponent} from './end-chapter-check-mark.component';
 import {EndChapterConfettiComponent} from './end-chapter-confetti.component';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ChapterProgressService} from '../../services/chapter-progress.service';
 import {ExplorationModeService} from '../../services/exploration-mode.service';
 import {QuestionPlayerConfig} from './ratings-and-recommendations.component';
 
@@ -125,8 +126,7 @@ export class TutorCardComponent {
   @Input() collectionSummary!: CollectionSummary;
   @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
   @Input() nextLessonLink!: string;
-  @Input() completedChaptersCount!: number;
-  @Input() milestoneMessageIsToBeDisplayed!: boolean;
+
   feedbackIsEnabled: boolean = true;
   inputOutputHistoryIsShown: boolean = false;
   checkpointCelebrationModalIsEnabled: boolean = false;
@@ -165,6 +165,7 @@ export class TutorCardComponent {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private playerPositionService: PlayerPositionService,
+    private chapterProgressService: ChapterProgressService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private userService: UserService,
@@ -317,19 +318,23 @@ export class TutorCardComponent {
   }
 
   generateMilestoneMessage(): string {
+    const milestoneMessageIsToBeDisplayed =
+      this.chapterProgressService.getChapterCompletedForTheFirstTime();
+    const completedChaptersCount =
+      this.chapterProgressService.getCompletedChaptersCount();
     if (
       !this.inStoryMode ||
-      !this.milestoneMessageIsToBeDisplayed ||
-      !this.completedChaptersCount ||
+      !milestoneMessageIsToBeDisplayed ||
+      !completedChaptersCount ||
       !MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-        this.completedChaptersCount
+        completedChaptersCount
       )
     ) {
       return '';
     }
     let chapterCountMessageIndex =
       MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
-        this.completedChaptersCount
+        completedChaptersCount
       ) + 1;
     let milestoneMessageTranslationKey =
       'I18N_END_CHAPTER_MILESTONE_MESSAGE_' + chapterCountMessageIndex;
@@ -346,15 +351,20 @@ export class TutorCardComponent {
       return false;
     }
 
+    let milestoneMessageIsToBeDisplayed =
+      this.chapterProgressService.getChapterCompletedForTheFirstTime();
+    const completedChaptersCount =
+      this.chapterProgressService.getCompletedChaptersCount();
+
     if (
-      !this.milestoneMessageIsToBeDisplayed &&
+      !milestoneMessageIsToBeDisplayed &&
       MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-        this.completedChaptersCount
+        completedChaptersCount
       )
     ) {
       let chapterCountIndex =
         MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.indexOf(
-          this.completedChaptersCount
+          completedChaptersCount
         );
       this.nextMilestoneChapterCount =
         MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS[chapterCountIndex + 1];
@@ -362,7 +372,7 @@ export class TutorCardComponent {
     }
 
     for (let milestoneCount of MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS) {
-      if (milestoneCount > this.completedChaptersCount) {
+      if (milestoneCount > completedChaptersCount) {
         this.nextMilestoneChapterCount = milestoneCount;
         return true;
       }
@@ -372,16 +382,23 @@ export class TutorCardComponent {
   }
 
   isMilestoneReachedAndMilestoneMessageToBeDisplayed(): boolean {
+    let milestoneMessageIsToBeDisplayed =
+      this.chapterProgressService.getChapterCompletedForTheFirstTime();
+    const completedChaptersCount =
+      this.chapterProgressService.getCompletedChaptersCount();
+
     return (
-      this.milestoneMessageIsToBeDisplayed &&
+      milestoneMessageIsToBeDisplayed &&
       MILESTONE_SPECIFIC_COMPLETED_CHAPTER_COUNTS.includes(
-        this.completedChaptersCount
+        completedChaptersCount
       )
     );
   }
 
   isCompletedChaptersCountGreaterThanLastMilestone(): boolean {
-    return this.completedChaptersCount > 50;
+    const completedChaptersCount =
+      this.chapterProgressService.getCompletedChaptersCount();
+    return completedChaptersCount > 50;
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -459,6 +476,10 @@ export class TutorCardComponent {
 
   getContentFocusLabel(index: number): string {
     return ExplorationPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX + index;
+  }
+
+  getMilestoneMessageIsToBeDisplayed(): boolean {
+    return this.chapterProgressService.getChapterCompletedForTheFirstTime();
   }
 
   toggleShowPreviousResponses(): void {

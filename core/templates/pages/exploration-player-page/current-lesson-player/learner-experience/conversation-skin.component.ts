@@ -45,7 +45,6 @@ import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
 import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
@@ -67,7 +66,6 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
-import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
 import {ProgressUrlService} from 'pages/exploration-player-page/services/progress-url.service';
@@ -77,6 +75,7 @@ import {ConceptCardManagerService} from '../../services/concept-card-manager.ser
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {DiagnosticTestPlayerEngineService} from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
+import {ChapterProgressService} from 'pages/exploration-player-page/services/chapter-progress.service';
 import {CurrentEngineService} from 'pages/exploration-player-page/services/current-engine.service';
 
 // Note: This file should be assumed to be in an IIFE, and the constants below
@@ -131,10 +130,6 @@ export class ConversationSkinComponent {
   moveToExploration: boolean;
   showProgressClearanceMessage: boolean = false;
 
-  // 'completedChaptersCount' is fetched via a HTTP request.
-  // Until the response is received, it remains undefined.
-  completedChaptersCount: number | undefined;
-  chapterIsCompletedForTheFirstTime: boolean = false;
   pidInUrl: string;
   submitButtonIsDisabled = true;
   isLearnerReallyStuck: boolean = false;
@@ -174,7 +169,6 @@ export class ConversationSkinComponent {
     private questionPlayerEngineService: QuestionPlayerEngineService,
     private questionPlayerStateService: QuestionPlayerStateService,
     private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
-    private siteAnalyticsService: SiteAnalyticsService,
     private statsReportingService: StatsReportingService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
@@ -187,8 +181,8 @@ export class ConversationSkinComponent {
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private checkpointProgressService: CheckpointProgressService,
-    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
     private conversationFlowService: ConversationFlowService,
+    private chapterProgressService: ChapterProgressService,
     private voiceoverPlayerService: VoiceoverPlayerService
   ) {}
 
@@ -310,12 +304,12 @@ export class ConversationSkinComponent {
           if (!this._editorPreviewMode && nextCard.isTerminal()) {
             const currentEngineService =
               this.currentEngineService.getCurrentEngineService();
+            const completedChaptersCount =
+              this.chapterProgressService.getCompletedChaptersCount();
             this.statsReportingService.recordExplorationCompleted(
               newStateName,
               this.learnerParamsService.getAllParams(),
-              String(
-                this.completedChaptersCount && this.completedChaptersCount + 1
-              ),
+              String(completedChaptersCount && completedChaptersCount + 1),
               String(this.playerTranscriptService.getNumCards()),
               currentEngineService.getLanguageCode()
             );
@@ -397,7 +391,9 @@ export class ConversationSkinComponent {
           });
       }
 
-      this.fetchCompletedChaptersCount();
+      if (this.isLoggedIn) {
+        this.chapterProgressService.updateCompletedChaptersCount();
+      }
 
       // We do not save checkpoints progress for iframes.
       if (
@@ -473,16 +469,6 @@ export class ConversationSkinComponent {
 
   getCanAskLearnerForAnswerInfo(): boolean {
     return this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
-  }
-
-  fetchCompletedChaptersCount(): void {
-    if (this.isLoggedIn) {
-      this.learnerDashboardBackendApiService
-        .fetchLearnerCompletedChaptersCountDataAsync()
-        .then(data => {
-          this.completedChaptersCount = data.completedChaptersCount;
-        });
-    }
   }
 
   initLearnerAnswerInfoService(
@@ -866,18 +852,7 @@ export class ConversationSkinComponent {
                   }
                 );
               }
-              this.learnerDashboardBackendApiService
-                .fetchLearnerCompletedChaptersCountDataAsync()
-                .then(responseData => {
-                  let newCompletedChaptersCount =
-                    responseData.completedChaptersCount;
-                  if (
-                    newCompletedChaptersCount !== this.completedChaptersCount
-                  ) {
-                    this.completedChaptersCount = newCompletedChaptersCount;
-                    this.chapterIsCompletedForTheFirstTime = true;
-                  }
-                });
+              this.chapterProgressService.updateCompletedChaptersCount(true);
             });
         } else {
           let loginRedirectUrl = this.urlInterpolationService.interpolateUrl(
@@ -1101,6 +1076,8 @@ export class ConversationSkinComponent {
           !this.explorationModeService.isPresentingIsolatedQuestions()
         ) {
           let oldStateName = this.playerPositionService.getCurrentStateName();
+          const completedChaptersCount =
+            this.chapterProgressService.getCompletedChaptersCount();
           if (!remainOnCurrentCard) {
             this.statsReportingService.recordStateTransition(
               oldStateName,
@@ -1108,9 +1085,7 @@ export class ConversationSkinComponent {
               answer,
               this.learnerParamsService.getAllParams(),
               isFirstHit,
-              String(
-                this.completedChaptersCount && this.completedChaptersCount + 1
-              ),
+              String(completedChaptersCount && completedChaptersCount + 1),
               String(this.playerTranscriptService.getNumCards()),
               currentEngineService.getLanguageCode()
             );
