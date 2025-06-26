@@ -28,7 +28,7 @@ const blogDashboardAuthorDetailsModal = 'div.modal-dialog';
 const blogAuthorBioField = 'textarea.e2e-test-blog-author-bio-field';
 const blogDashboardUrl = testConstants.URLs.BlogDashboard;
 const authorBioSaveButton = 'button.e2e-test-save-author-details-button';
-const confirmButton = 'button.e2e-test-confirm-button';
+const confirmButtonSelector = 'button.e2e-test-confirm-button';
 const publishBlogPostButton = 'button.e2e-test-publish-blog-post-button';
 const addThumbnailImageButton = 'button.e2e-test-photo-upload-submit';
 const blogPostThumbnailImage = testConstants.data.blogPostThumbnailImage;
@@ -36,9 +36,11 @@ const toastMessage = 'div.e2e-test-toast-warning-message';
 const blogPostTitlePage = '.e2e-test-blog-post-title';
 const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
 
+const blogBodySaveButtonSelector = '.e2e-test-save-blog-post-content';
+const publisedBlogsTabContainerSelector = '.e2e-test-published-blogs-tab';
+
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
 const LABEL_FOR_SAVE_BUTTON = 'Save';
-const LABEL_FOR_DONE_BUTTON = 'DONE';
 const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
@@ -76,7 +78,7 @@ export class BlogPostEditor extends BaseUser {
     await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
     await this.updateBlogPostTitle(draftBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content');
-    await this.saveTheChanges();
+    await this.saveBlogBodyChanges();
     await this.saveTheDraftBlogPost();
 
     showMessage('Successfully created a draft blog post!');
@@ -104,13 +106,19 @@ export class BlogPostEditor extends BaseUser {
         await this.doWithinModal({
           selector: 'div.modal-dialog',
           whenOpened: async (_this: BaseUser, container: string) => {
-            _this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
+            _this.clickOn(confirmButtonSelector);
           },
         });
+
+        await this.isElementVisible(confirmButtonSelector, false);
         showMessage('Draft blog post with given title deleted successfully!');
         return;
       }
     }
+
+    throw new Error(
+      'Draft blog post with given title does not exist in the blog dashboard!'
+    );
   }
 
   /**
@@ -142,6 +150,7 @@ export class BlogPostEditor extends BaseUser {
       await this.uploadFile(blogPostThumbnailImage);
       await this.clickOn(addThumbnailImageButton);
     } else {
+      await this.isElementVisible(thumbnailPhotoBox);
       await this.clickOn(thumbnailPhotoBox);
       await this.uploadFile(blogPostThumbnailImage);
       await this.clickOn(addThumbnailImageButton);
@@ -162,7 +171,7 @@ export class BlogPostEditor extends BaseUser {
     await this.updateBodyTextTo('test blog post body content');
     await this.selectTags('News', 'International');
     const blogId = (await this.page.url().split('/').pop()) as string;
-    await this.saveTheChanges();
+    await this.saveBlogBodyChanges();
 
     await this.publishTheBlogPost();
     return blogId;
@@ -181,22 +190,38 @@ export class BlogPostEditor extends BaseUser {
    * This function updates the title of the blog post.
    */
   async updateBlogPostTitle(newBlogPostTitle: string): Promise<void> {
+    await this.isElementVisible(blogTitleInput);
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
+
+    const modelValue = await this.page.$eval(
+      blogTitleInput,
+      el => (el as HTMLInputElement).value
+    );
+    if (modelValue !== newBlogPostTitle) {
+      throw new Error(
+        `Title is not updated! Found ${modelValue}, expected ${newBlogPostTitle}`
+      );
+    }
   }
 
   /**
    * This function updates the body text of the blog post.
    */
   async updateBodyTextTo(newBodyText: string): Promise<void> {
+    await this.isElementVisible(blogBodyInput);
     await this.type(blogBodyInput, newBodyText);
+
+    await this.expectTextContentToMatch(blogBodyInput, newBodyText);
   }
 
   /**
    * This function saves the blog post.
    */
-  async saveTheChanges(): Promise<void> {
-    await this.clickOn(LABEL_FOR_DONE_BUTTON);
+  async saveBlogBodyChanges(): Promise<void> {
+    await this.isElementVisible(blogBodySaveButtonSelector);
+    await this.clickOn(blogBodySaveButtonSelector);
+    await this.isElementVisible(blogBodySaveButtonSelector, false);
   }
 
   /**
@@ -219,7 +244,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async publishTheBlogPost(): Promise<void> {
     await this.clickOn('PUBLISH');
-    await this.page.waitForSelector(confirmButton);
+    await this.page.waitForSelector(confirmButtonSelector);
     await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
     showMessage('Successfully published a blog post!');
   }
@@ -237,7 +262,7 @@ export class BlogPostEditor extends BaseUser {
     await this.updateBlogPostTitle(newBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content - duplicate');
     await this.selectTags('News', 'International');
-    await this.saveTheChanges();
+    await this.saveBlogBodyChanges();
   }
 
   /**
@@ -259,7 +284,7 @@ export class BlogPostEditor extends BaseUser {
           element => (element as HTMLElement).click()
         );
         await this.clickOn(LABEL_FOR_DELETE_BUTTON);
-        await this.page.waitForSelector(confirmButton);
+        await this.page.waitForSelector(confirmButtonSelector);
         await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
         showMessage(
           'Published blog post with given title deleted successfully!'
@@ -319,6 +344,8 @@ export class BlogPostEditor extends BaseUser {
   async navigateToPublishTab(): Promise<void> {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
+
+    await this.isElementVisible(publisedBlogsTabContainerSelector);
     showMessage('Navigated to publish tab.');
   }
 
