@@ -17,15 +17,12 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {fakeAsync, TestBed, tick} from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
 import {InteractionObjectFactory} from '../../../domain/exploration/InteractionObjectFactory';
-import {
-  ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from '../../../domain/exploration/ExplorationObjectFactory';
+import {ExplorationBackendDict} from '../../../domain/exploration/ExplorationObjectFactory';
 import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   ParamChangeBackendDict,
@@ -41,14 +38,7 @@ import {TextInputRulesService} from '../../../../../extensions/interactions/Text
 import {AlertsService} from '../../../services/alerts.service';
 import {PageContextService} from '../../../services/page-context.service';
 import {UrlService} from '../../../services/contextual/url.service';
-import {
-  ExplorationFeatures,
-  ExplorationFeaturesBackendApiService,
-} from '../../../services/exploration-features-backend-api.service';
-import {
-  AnswerClassificationService,
-  InteractionRulesService,
-} from './answer-classification.service';
+import {AnswerClassificationService} from './answer-classification.service';
 import {AudioPreloaderService} from './audio-preloader.service';
 import {ContentTranslationLanguageService} from './content-translation-language.service';
 import {ExplorationEngineService} from './exploration-engine.service';
@@ -64,9 +54,7 @@ describe('Exploration engine service ', () => {
   let pageContextService: PageContextService;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
-  let explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService;
   let explorationEngineService: ExplorationEngineService;
-  let explorationObjectFactory: ExplorationObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
   let interactionObjectFactory: InteractionObjectFactory;
   let learnerParamsService: LearnerParamsService;
@@ -75,12 +63,11 @@ describe('Exploration engine service ', () => {
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
   let paramChangeObjectFactory: ParamChangeObjectFactory;
-  let textInputService: InteractionRulesService;
+  let textInputService: TextInputRulesService;
   let translateService: TranslateService;
   let explorationDict: ExplorationBackendDict;
   let paramChangeDict: ParamChangeBackendDict;
   let explorationBackendResponse: FetchExplorationBackendResponse;
-  let explorationFeatures: ExplorationFeatures;
 
   beforeEach(() => {
     explorationDict = {
@@ -342,11 +329,6 @@ describe('Exploration engine service ', () => {
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1,
     };
-
-    explorationFeatures = {
-      explorationIsCurated: true,
-      alwaysAskLearnersForAnswerDetails: true,
-    };
   });
 
   beforeEach(() => {
@@ -370,10 +352,6 @@ describe('Exploration engine service ', () => {
     expressionInterpolationService = TestBed.inject(
       ExpressionInterpolationService
     );
-    explorationFeaturesBackendApiService = TestBed.inject(
-      ExplorationFeaturesBackendApiService
-    );
-    explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
@@ -993,41 +971,6 @@ describe('Exploration engine service ', () => {
     });
   });
 
-  it(
-    'should check whether we can ask learner for answer ' + 'details',
-    fakeAsync(() => {
-      let initSuccessCb = jasmine.createSpy('success');
-
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-      spyOn(
-        explorationFeaturesBackendApiService,
-        'fetchExplorationFeaturesAsync'
-      ).and.returnValue(Promise.resolve(explorationFeatures));
-
-      // Here default value is set to false.
-      expect(
-        explorationEngineService.getAlwaysAskLearnerForAnswerDetails()
-      ).toBe(false);
-
-      explorationEngineService.init(
-        explorationDict,
-        1,
-        null,
-        true,
-        ['en'],
-        [],
-        initSuccessCb
-      );
-      tick();
-
-      const answerDetails =
-        explorationEngineService.getAlwaysAskLearnerForAnswerDetails();
-      expect(answerDetails).toBe(true);
-    })
-  );
-
   it('should return default exploration id', () => {
     // Please note that default exploration id is 'test_id'.
     // This is being initialized in the constructor.
@@ -1199,36 +1142,6 @@ describe('Exploration engine service ', () => {
       expect(explorationEngineService.currentStateName).toBe('Start');
       explorationEngineService.recordNewCardAdded();
       expect(explorationEngineService.currentStateName).toBe('Mid');
-    }
-  );
-
-  it(
-    'should return true if current state is initial state ' +
-      "when calling 'isCurrentStateInitial'",
-    () => {
-      let initSuccessCb = jasmine.createSpy('success');
-
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-
-      expect(() => {
-        explorationEngineService.isCurrentStateInitial();
-      }).toThrowError(
-        "Cannot read properties of undefined (reading 'initStateName')"
-      );
-
-      explorationEngineService.init(
-        explorationDict,
-        1,
-        null,
-        true,
-        ['en'],
-        [],
-        initSuccessCb
-      );
-
-      expect(explorationEngineService.isCurrentStateInitial()).toBe(true);
     }
   );
 
