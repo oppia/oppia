@@ -77,7 +77,7 @@ describe('Interested Donor', function () {
   });
 
   it('should be able to view impact reports', async function () {
-    await interestedDonor.clickImpactReportButtonInAboutMenuOnNavbar();
+    await interestedDonor.verifyImpactReportButtonInAboutMenuOnNavbar();
   });
 
   it('should be able to read more what organization has done', async function () {

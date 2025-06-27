@@ -56,7 +56,7 @@ describe('Parent/Teacher', function () {
       await loggedOutUser.clickOnForParentsSlashTeachersLinkInFooter();
 
       // Navigating to "Parents/Teachers guide pdf" by clicking on the "Check out our guide" button.
-      await loggedOutUser.clickAndVerifyGuideButtonInTeachPage();
+      await loggedOutUser.verifyGuideButtonInTeachPage();
       // Navigating to "Teacher Story tagged blogs page" by clicking on the "Check out our blog" button.
       await loggedOutUser.clickAndVerifyBlogButtonInTeachPage();
       // Checking if the lesson creators carousel is working in the "For Parent/Teacher" page.

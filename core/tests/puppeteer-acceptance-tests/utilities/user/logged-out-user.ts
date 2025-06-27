@@ -987,7 +987,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the Impact Report button in the About Menu on navbar
    * and check if it opens the Impact Report.
    */
-  async clickImpactReportButtonInAboutMenuOnNavbar(): Promise<void> {
+  async verifyImpactReportButtonInAboutMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
@@ -1824,7 +1824,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the Check out our guide button in the Teach page
    * and check if it opens the parents Teachers Guide Url link
    */
-  async clickAndVerifyGuideButtonInTeachPage(): Promise<void> {
+  async verifyGuideButtonInTeachPage(): Promise<void> {
     await this.openExternalLink(
       guideButtonInTeachPage,
       parentsTeachersGuideUrl
@@ -2111,7 +2111,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to click the Download Brochure button in the Partnerships page
    * and check if it opens the Partnerships Brochure.
    */
-  async clickAndVerifyDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
+  async verifyDownloadBrochureButtonInPartnershipsPage(): Promise<void> {
     await this.page.waitForSelector(brochureButtonInPartnershipsPage, {
       visible: true,
     });
@@ -2791,7 +2791,6 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Clicks on the donate button on the donate page in mobile mode and waits
    *  for the second iframe to appear(one used in the mobile viewport).
-   * @returns {Promise<void>}
    */
   async clickDonateButtonOnDonatePageInMobileMode(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -4062,7 +4061,6 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Simulates a delay to avoid triggering the fatigue detection service.
    * This is important because the fatigue detection service could be activated again after further submissions. It can by-passed if there is 10 seconds of gap post quick 3 submissions.
-   * @returns {Promise<void>}
    */
   async simulateDelayToAvoidFatigueDetection(): Promise<void> {
     await this.page.waitForTimeout(10000);
@@ -4070,7 +4068,6 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Checks if the sign-up button is present on the page.
-   * @returns {Promise<void>}
    */
   async expectSignUpButtonToBePresent(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
@@ -4080,7 +4077,6 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Checks if the sign-in button is present on the page.
-   * @returns {Promise<void>}
    */
   async expectSignInButtonToBePresent(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
@@ -4668,7 +4664,6 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} feedback - The feedback to write in the popup.
    * @param {boolean} stayAnonymous - Whether to stay anonymous while giving feedback.
    * @param {boolean} verifyFeedbackPopup - Whether to verify the feedback popup after submission.
-   * @returns {Promise<void>}
    */
   async writeAndSubmitFeedback(
     feedback: string,
@@ -4695,7 +4690,6 @@ export class LoggedOutUser extends BaseUser {
   /**
    * TODO(#22716): Update naming to be more descriptive and start with expect.
    * Verifies that the feedback submission was successful by checking for the presence of the feedback popup.
-   * @returns {Promise<void>}
    */
   async verifyFeedbackSubmissionSuccess(): Promise<void> {
     try {
@@ -4714,8 +4708,7 @@ export class LoggedOutUser extends BaseUser {
    * @param selector - The CSS selector to find the element.
    * @param value - The expected text content value.
    * @param exactMatch - If true, checks for exact match. If false, checks if value is contained in text content.
-   * @returns {Promise<void>} - A promise that resolves when the text content is checked.
-   */
+\   */
   async expectTextContentInElementWithSelectorToBe(
     selector: string,
     value: string,
@@ -4744,8 +4737,6 @@ export class LoggedOutUser extends BaseUser {
    * given value.
    * @param selector - The CSS selector to find the elements.
    * @param value - The expected text content value.
-   * @returns {Promise<void>} - A promise that resolves when the text content
-   * is checked.
    */
   async expectAnyElementWithSelectorToHaveTextContent(
     selector: string,
@@ -4765,7 +4756,6 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if heading in partnership matches the expected heading.
    * @param heading - The expected heading.
-   * @returns {Promise<void>} - A promise that resolves when the heading is checked.
    */
   async expectPartnershipHeadingToBe(heading: string): Promise<void> {
     try {
@@ -4783,7 +4773,6 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Checks if the partner with us button is visible at the top of the partnerships page.
-   * @returns {Promise<void>} - A promise that resolves when the button is checked.
    */
   async expectPartnerWithUsButtonIsVisible(): Promise<void> {
     await this.isElementVisible(partnerWithUsButtonAtTheTopOfPartnershipsPage);
@@ -4792,7 +4781,6 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if the subheadings in the partnerships page contain the expected subheading.
    * @param subheading - The expected subheading.
-   * @returns {Promise<void>} - A promise that resolves when the subheading is checked.
    */
   async expectSubheadingsInPartnershipPageToContain(
     subheading: string
@@ -4813,7 +4801,6 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Checks if the partnerships page contains the expected image.
-   * @returns {Promise<void>} - A promise that resolves when the image is checked.
    */
   async expectPartneringWithUsImageToBePresent(): Promise<void> {
     await this.isElementVisible(partneringWithUsImageSelector);
@@ -4821,7 +4808,6 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Checks if the partnerships page contains the expected image.
-   * @returns {Promise<void>} - A promise that resolves when the image is checked.
    */
   async expectYouTubeVideoInPartnershipPageToBePlayabe(): Promise<void> {
     await this.isElementVisible(partnershipYoutubeVideoIFrameSelector);
@@ -4852,7 +4838,6 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if given subheading is available in about page.
    * @param subheading - The expected subheading.
-   * @returns {Promise<void>} - A promise that resolves when the subheading is checked.
    */
   async expectSubheadingInAboutUsPageToContain(
     subheading: string
@@ -4874,7 +4859,6 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if given goal listed in any section of about page.
    * @param sectionGoal - The expected section goal.
-   * @returns {Promise<void>} - A promise that resolves when the subheading is checked.
    */
   async expectSectionGoalsInAboutPageToContain(
     sectionGoal: string
@@ -4902,7 +4886,6 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks for number of partnership stories.
    * @param n - The expected number of story boards.
-   * @returns {Promise<void>} - A promise that resolves when the number of story boards is checked.
    */
   async expectPartnershipStoryBoardsToBe(n: number): Promise<void> {
     const selector = this.isViewportAtMobileWidth()
@@ -4922,7 +4905,6 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks for number of impact stats listed.
    * @param n - The expected number of impact stats.
-   * @returns {Promise<void>} - A promise that resolves when the number of impact stats is checked.
    */
   async expectImpactStatsTitlesToBe(n: number): Promise<void> {
     const impactStats = await this.page.$$eval(
