@@ -41,15 +41,17 @@ describe('CheckpointProgressService', () => {
 
   it('should set and get last completed checkpoint correctly', () => {
     const checkpointStateName = 'checkpoint_1';
-    checkpointProgressService.setLastCompletedCheckpoint(checkpointStateName);
-    expect(checkpointProgressService.getLastCompletedCheckpoint()).toBe(
+    checkpointProgressService.setMostRecentlyReachedCheckpoint(
+      checkpointStateName
+    );
+    expect(checkpointProgressService.getMostRecentlyReachedCheckpoint()).toBe(
       checkpointStateName
     );
   });
 
   it('should return undefined if last completed checkpoint is not set', () => {
     expect(() =>
-      checkpointProgressService.getLastCompletedCheckpoint()
+      checkpointProgressService.getMostRecentlyReachedCheckpoint()
     ).toThrowError();
   });
 });

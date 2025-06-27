@@ -57,7 +57,7 @@
       </div>
       <mat-tab-group class="e2e-test-mat-tabs"
                      *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts">
-        <mat-tab>
+        <mat-tab class="e2e-test-draft-blogs-tab">
           <ng-template mat-tab-label>
             {{ 'I18N_BLOG_DASHBOARD_TAB_DRAFTS' | translate | uppercase }} ({{ blogDashboardData.numOfDraftBlogPosts }})
           </ng-template>
@@ -101,7 +101,7 @@
             </mat-list-item>
           </mat-list>
         </mat-tab>
-        <mat-tab>
+        <mat-tab class="e2e-test-published-blogs-tab">
           <ng-template mat-tab-label class="e2e-test-publish-tab-button">
             {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase }} ({{ blogDashboardData.numOfPublishedBlogPosts }})
           </ng-template>
