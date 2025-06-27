@@ -816,21 +816,6 @@ def apply_change_list(
                     )
                     explanation.validate()
                     skill.update_explanation(explanation)
-                elif (change.property_name ==
-                      skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # UpdateSkillContentsPropertyWorkedExamplesCmd.
-                    update_worked_examples_cmd = cast(
-                        skill_domain.UpdateSkillContentsPropertyWorkedExamplesCmd,  # pylint: disable=line-too-long
-                        change
-                    )
-                    worked_examples_list: List[skill_domain.WorkedExample] = []
-                    for worked_example in update_worked_examples_cmd.new_value:
-                        worked_examples_list.append(
-                            skill_domain.WorkedExample.from_dict(worked_example)
-                        )
-                    skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 # Here we use cast because we are narrowing down the type from
                 # SkillChange to a specific change command.
