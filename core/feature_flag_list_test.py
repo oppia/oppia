@@ -22,7 +22,6 @@ import os
 import re
 import unittest
 
-from core import feature_flag_list
 from core import feature_flag_list as feature_flag_list_module
 from core import utils
 from core.domain import feature_flag_domain
@@ -45,8 +44,9 @@ ENUM_MEMBER_REGEXP: Final = re.compile(
 )
 
 
-"""Unit tests for feature_flag_list module's public methods."""
 class FeatureFlagListCoverageTests(unittest.TestCase):
+    """Unit tests for feature_flag_list module's public methods."""
+
     def test_get_all_feature_names(self) -> None:
         """Test that get_all_feature_names returns correct values."""
         expected_names = [f.name for f in feature_flag_list_module.FeatureNames]
