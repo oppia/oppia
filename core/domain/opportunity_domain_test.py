@@ -435,8 +435,7 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
     def test_invalid_language_code_in_incomplete_list_fails_validation(
         self
     ) -> None:
-        self.valid_translation_opportunity.\
-            incomplete_translation_language_codes = ['xyz']
+        self.valid_translation_opportunity.incomplete_translation_language_codes = ['xyz']  # pylint: disable=line-too-long
         self._assert_validation_error(
             self.valid_translation_opportunity,
             'Invalid language_code in '
