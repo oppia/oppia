@@ -456,24 +456,77 @@ export class ExplorationEngineService {
     return this.exploration.getState(stateName);
   }
 
+  /**
+   * Returns the unique ID of the current exploration.
+   *
+   * @returns {string} The exploration ID.
+   */
   getExplorationId(): string {
     return this._explorationId;
   }
 
+  /**
+   * Returns the title of the current exploration.
+   *
+   * @returns {string} The title of the exploration.
+   */
   getExplorationTitle(): string {
     return this.exploration.title;
   }
 
+  /**
+   * Returns a list of exploration IDs that the author recommends
+   * for the given state.
+   *
+   * These are typically shown to the learner as suggested next steps.
+   *
+   * @param {string} stateName - The name of the state for which to fetch recommendations.
+   * @returns {string[]} A list of recommended exploration IDs.
+   */
   getAuthorRecommendedExpIdsByStateName(stateName: string): string[] {
     let authorRecommendedExpIds =
       this.exploration.getAuthorRecommendedExpIds(stateName);
     return authorRecommendedExpIds ? authorRecommendedExpIds : [];
   }
 
+  /**
+   * Returns the language code for the current exploration.
+   *
+   * @returns {string} The language code (e.g., 'en', 'hi').
+   */
   getLanguageCode(): string {
     return this.exploration.getLanguageCode();
   }
 
+  /**
+   * Handles the submission of an answer by the learner.
+   *
+   * This function classifies the answer using the provided interaction rules,
+   * records learner statistics, computes feedback and parameters for the next
+   * state, and generates the next StateCard to be displayed.
+   *
+   * If applicable, it also generates a special "stuck state" card used in
+   * scenarios where the learner is not progressing.
+   *
+   * @param {string} answer - The learner's submitted answer.
+   * @param {InteractionRulesService} interactionRulesService - The service used to classify the answer.
+   * @param {Function} successCallback - Callback that is called after successful processing
+   *   of the answer. It receives the next StateCard and other context information:
+   *   - nextCard: The generated StateCard for the next state.
+   *   - refreshInteraction: Whether the interaction should be refreshed.
+   *   - feedbackHtml: HTML string representing feedback to the learner.
+   *   - refresherExplorationId: ID of an exploration to refer the learner to (if applicable).
+   *   - missingPrerequisiteSkillId: ID of a missing skill (if applicable).
+   *   - remainOnCurrentCard: Whether the learner remains on the same state.
+   *   - taggedSkillMisconceptionId: ID of a tagged misconception (currently unused).
+   *   - wasOldStateInitial: Whether the current state was the initial state.
+   *   - isFirstHit: Whether this is the learner’s first time visiting the new state.
+   *   - isFinalQuestion: Whether the question was the final one (currently unused).
+   *   - nextCardIfReallyStuck: A special fallback card if learner is stuck.
+   *   - focusLabel: The label used for accessibility focus management.
+   *
+   * @returns {boolean} Whether the answer is classified as correct.
+   */
   submitAnswer(
     answer: string,
     interactionRulesService: InteractionRulesService,
@@ -677,6 +730,21 @@ export class ExplorationEngineService {
     return answerIsCorrect;
   }
 
+  /**
+   * Computes the fallback StateCard to show if the learner is determined to be
+   * "really stuck" (e.g., consistently giving incorrect responses).
+   *
+   * This method generates the question content and interaction HTML for the
+   * fallback state (if provided), and constructs a new StateCard for it.
+   *
+   * @param {string} answer - The learner’s submitted answer.
+   * @param {string | null} newStateNameIfStuck - The name of the fallback state to move to.
+   * @param {ExplorationParams} oldParams - The current exploration parameters.
+   * @param {string} nextFocusLabel - The label used for accessibility focus management.
+   *
+   * @returns {StateCard | null} A StateCard for the fallback state, or null if no fallback exists.
+   * @throws {Error} If the content ID of the fallback state is null.
+   */
   private _getNextCardIfReallyStuck(
     answer: string,
     newStateNameIfStuck: string | null,
@@ -739,6 +807,19 @@ export class ExplorationEngineService {
     );
   }
 
+  /**
+   * Returns a new StateCard object for the given state name.
+   *
+   * This function generates the HTML for both the content and interaction
+   * of the specified state, appends random suffixes for uniqueness,
+   * and ensures the contentId is not null. It throws an error if the
+   * interaction is not defined or if contentId is null.
+   *
+   * @param {string} stateName - The name of the state to get the StateCard for.
+   * @returns {StateCard} A newly created StateCard object for the given state.
+   * @throws {Error} If the interaction for the state is not defined.
+   * @throws {Error} If the content ID of the state is null.
+   */
   getStateCardByName(stateName: string): StateCard {
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let interactionHtml = null;
@@ -771,6 +852,18 @@ export class ExplorationEngineService {
     );
   }
 
+  /**
+   * Returns the shortest path (as an array of state names) from the initial
+   * state to the specified destination state.
+   *
+   * The path is computed using a breadth-first search over the state graph
+   * constructed from all possible answer groups and default outcomes.
+   *
+   * @param {StateObjectsBackendDict} allStates - A dictionary of all state objects.
+   * @param {string} destStateName - The name of the destination state.
+   * @returns {string[]} The list of state names representing the shortest path
+   *   from the initial state to the destination state.
+   */
   getShortestPathToState(
     allStates: StateObjectsBackendDict,
     destStateName: string
