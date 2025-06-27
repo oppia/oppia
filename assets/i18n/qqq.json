@@ -1750,6 +1750,7 @@
 	"I18N_TOPNAV_ANDROID_APP_HEADING": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over the learn button. When the option is clicked, the android app page is loaded.",
 	"I18N_TOPNAV_BLOG": "Text displayed inside a drop-down menu. - This link in the About dropdown navigates to Oppia’s Blog page.",
 	"I18N_TOPNAV_BLOG_DASHBOARD": "Text displayed in the dropdown on the navbar for reaching the blog dashboard.",
+	"I18N_TOPNAV_BLOG_WITH_OPPIA": "Text displayed inside a drop-down menu. - This link encourages blogging with Oppia and opens the blog dashboard.",
 	"I18N_TOPNAV_CLASSROOM_BASIC_MATHS": "Text displayed inside drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_LEARN button. When the option is clicked, the Maths Classroom page is loaded.",
 	"I18N_TOPNAV_CONTACT_US": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the Contact Us page is loaded.\n{{Identical|Contact us}}",
 	"I18N_TOPNAV_CONTACT_US_DESCRIPTION": "Text displayed inside a drop-down menu. - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the Contact Us page is loaded.\n{{Identical|Contact us}}",
