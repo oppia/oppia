@@ -405,7 +405,10 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
                     self.valid_translation_opportunity_dict))
 
     def test_to_and_from_dict_works_correctly(self) -> None:
-        with self.mock_supported_audio_languages_context:
+        with self.swap(
+            constants, 'SUPPORTED_AUDIO_LANGUAGES',
+            self.mock_supported_audio_languages
+        ):
             opportunity = (
                 opportunity_domain.TranslationOpportunity.from_dict(
                     self.valid_translation_opportunity_dict))
@@ -485,13 +488,19 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             'currently_available_to_learners': True
         }
 
-        with self.mock_supported_audio_languages_context:
+        with self.swap(
+            constants, 'SUPPORTED_AUDIO_LANGUAGES',
+            self.mock_supported_audio_languages
+        ):
             self.valid_card_info = (
                 opportunity_domain.TranslationOpportunityCardInfo.from_dict(
                     self.valid_card_info_dict))
 
     def test_to_and_from_dict_works_correctly(self) -> None:
-        with self.mock_supported_audio_languages_context:
+        with self.swap(
+            constants, 'SUPPORTED_AUDIO_LANGUAGES',
+            self.mock_supported_audio_languages
+        ):
             card_info = opportunity_domain.TranslationOpportunityCardInfo.from_dict(
                 self.valid_card_info_dict)
 
@@ -504,23 +513,17 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
         )
 
     def test_inherited_validation_works_correctly(self) -> None:
-        with self.mock_supported_audio_languages_context:
+        with self.swap(
+            constants, 'SUPPORTED_AUDIO_LANGUAGES',
+            self.mock_supported_audio_languages
+        ):
             # This should pass silently (no validation error).
-            opportunity_domain.TranslationOpportunityCardInfo.from_dict(
-                self.valid_card_info_dict)
+            self.valid_card_info.validate()
 
             # Now set an invalid value.
-            invalid_card_info_dict = self.valid_card_info_dict.copy()
-            invalid_card_info_dict['content_count'] = -2
-
-            invalid_card_info = (
-                opportunity_domain.TranslationOpportunityCardInfo.from_dict.__func__(
-                    opportunity_domain.TranslationOpportunityCardInfo,
-                    invalid_card_info_dict
-                )
-            )
+            self.valid_card_info.content_count = -2
 
             self._assert_validation_error(
-                invalid_card_info,
+                self.valid_card_info,
                 'Expected content_count to be a non-negative integer, received -2'
             )
