@@ -25,7 +25,6 @@ import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
 } from 'domain/exploration/ExplorationObjectFactory';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {Outcome} from 'domain/exploration/outcome.model';
@@ -58,7 +57,6 @@ import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-p
 import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {LearnerAnswerInfoService} from './learner-answer-info.service';
-import {ParamSpec} from 'domain/exploration/ParamSpecObjectFactory';
 
 @Injectable({
   providedIn: 'root',
