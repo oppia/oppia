@@ -27,8 +27,6 @@ from core.domain import translation_domain
 
 from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 
-from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
-
 STUDY_GUIDE_PROPERTY_SECTIONS: Final = 'sections'
 
 # These will be deprecated once we shift to using just study guides.
@@ -365,24 +363,6 @@ class StudyGuide:
         }
 
     @classmethod
-    def _convert_page_contents_v3_dict_to_v4_dict(
-        cls, sections_dicts_list: List[StudyGuideSectionDict]
-    ) -> List[StudyGuideSectionDict]:
-        """Converts v1 StudyGuide Sections schema to the demo schema.
-        v2 schema makes all html field 'Hello'.
-
-        Args:
-            sections_dicts_list: list. A list used to initialize a
-                StudyGuide domain object.
-
-        Returns:
-            list. The converted sections_dicts_list.
-        """
-        return cls.convert_html_fields_in_study_guide_sections(
-            sections_dicts_list,
-            html_validation_service.change_to_hello)
-
-    @classmethod
     def update_sections_from_model(
         cls,
         versioned_sections: VersionedStudyGuideSectionsDict,
@@ -403,11 +383,13 @@ class StudyGuide:
         """
         versioned_sections['schema_version'] = current_version + 1
 
-        for i, section in enumerate(versioned_sections['sections']):
+        for i, _ in enumerate(versioned_sections['sections']):
             conversion_fn = getattr(
                 cls, '_convert_section_v%s_dict_to_v%s_dict' % (
                     current_version, current_version + 1))
-            versioned_sections['sections'][i] = conversion_fn(section)
+            versioned_sections['sections'][i] = conversion_fn(
+                versioned_sections['sections'][i]
+            )
 
     @classmethod
     def convert_html_fields_in_study_guide_sections(
@@ -427,14 +409,12 @@ class StudyGuide:
         Returns:
             dict. The converted subtopic_page_contents_dict.
         """
-        new_study_guide_section_dicts = []
-        for section in study_guide_section_dicts:
-            modified_section = section.copy()
-            modified_section['content']['html'] = (
-                conversion_fn(
-                    modified_section['content']['html']))
-            new_study_guide_section_dicts.append(modified_section)
-        return new_study_guide_section_dicts
+        for _ in study_guide_section_dicts:
+            study_guide_section_dicts[
+                'content']['html'] = conversion_fn(
+                    study_guide_section_dicts['content']['html']
+                )
+        return study_guide_section_dicts
 
     @classmethod
     def convert_unicode_fields_in_study_guide_sections(
@@ -454,14 +434,12 @@ class StudyGuide:
         Returns:
             dict. The converted subtopic_page_contents_dict.
         """
-        new_study_guide_section_dicts = []
-        for section in study_guide_section_dicts:
-            modified_section = section.copy()
-            modified_section['heading']['unicode_str'] = (
-                conversion_fn(
-                    modified_section['heading']['unicode_str']))
-            new_study_guide_section_dicts.append(modified_section)
-        return new_study_guide_section_dicts
+        for _ in study_guide_section_dicts:
+            study_guide_section_dicts['heading']['unicode_str'] = conversion_fn(
+                    study_guide_section_dicts[
+                        'heading']['unicode_str']
+                )
+        return study_guide_section_dicts
 
     @classmethod
     def get_study_guide_id(cls, topic_id: str, subtopic_id: int) -> str:
