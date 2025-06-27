@@ -30,9 +30,9 @@ import {MockTranslateService} from '../../../../components/forms/schema-based-ed
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 import {UrlService} from '../../../../services/contextual/url.service';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
-import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {RefresherExplorationConfirmationModal} from './refresher-exploration-confirmation-modal.component';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
+import {PageContextService} from '../../../../services/page-context.service';
 
 describe('Refresher Exploration Confirmation Modal', () => {
   let fixture: ComponentFixture<RefresherExplorationConfirmationModal>;
@@ -64,7 +64,7 @@ describe('Refresher Exploration Confirmation Modal', () => {
       declarations: [MockTranslatePipe, RefresherExplorationConfirmationModal],
       providers: [
         WindowRef,
-        ExplorationEngineService,
+        PageContextService,
         UrlInterpolationService,
         {
           provide: UrlService,

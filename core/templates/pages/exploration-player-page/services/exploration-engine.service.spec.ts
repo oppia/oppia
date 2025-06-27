@@ -1327,13 +1327,9 @@ describe('Exploration engine service ', () => {
           null
         );
 
-        const newParams = explorationEngineService.makeParams(
-          oldParams,
-          [paramChanges],
-          []
-        );
-
-        expect(newParams).toBe(null);
+        expect(() => {
+          explorationEngineService.makeParams(oldParams, [paramChanges], []);
+        }).toThrowError('Parameter evaluation failed.');
       }
     );
 

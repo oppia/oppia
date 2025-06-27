@@ -607,7 +607,7 @@ describe('Conversation skin component', () => {
     ).and.returnValue(
       Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
     );
-    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
       explorationEngineService
     );
@@ -780,7 +780,7 @@ describe('Conversation skin component', () => {
         completedChaptersCount: 1,
       })
     );
-    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
@@ -909,7 +909,7 @@ describe('Conversation skin component', () => {
     ).and.returnValue(
       Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
     );
-    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
@@ -1046,9 +1046,7 @@ describe('Conversation skin component', () => {
       ).and.returnValue(
         Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
       );
-      spyOn(explorationEngineService, 'getExplorationId').and.returnValue(
-        expId
-      );
+      spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
       spyOn(urlService, 'isIframed').and.returnValue(isIframed);
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
@@ -1552,9 +1550,7 @@ describe('Conversation skin component', () => {
         null
       );
       spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
-      spyOn(explorationEngineService, 'getExplorationId').and.returnValue(
-        'expl_1'
-      );
+      spyOn(pageContextService, 'getExplorationId').and.returnValue('expl_1');
       spyOn(urlService, 'isIframed').and.returnValue(false);
 
       componentInstance.ngOnInit();
