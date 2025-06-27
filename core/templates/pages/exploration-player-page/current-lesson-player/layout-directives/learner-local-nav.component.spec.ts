@@ -47,6 +47,7 @@ describe('Learner Local Nav Component ', () => {
   let fixture: ComponentFixture<LearnerLocalNavComponent>;
   let ngbModal: NgbModal;
   let attributionService: AttributionService;
+  let pageContextService: PageContextService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let userService: UserService;
 
@@ -132,6 +133,9 @@ describe('Learner Local Nav Component ', () => {
       ReadOnlyExplorationBackendApiService
     );
     attributionService = TestBed.inject(AttributionService);
+    pageContextService = TestBed.inject(PageContextService);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('test_id');
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
   });
 
   afterAll(() => {

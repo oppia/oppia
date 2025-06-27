@@ -39,6 +39,7 @@ describe('Refresher Exploration Confirmation Modal', () => {
   let componentInstance: RefresherExplorationConfirmationModal;
   let collectionId: string = 'test_id';
   let mockUrlService: MockUrlService;
+  let pageContextService: PageContextService;
   let ngbActiveModal: NgbActiveModal;
   let windowRef: WindowRef;
 
@@ -86,6 +87,8 @@ describe('Refresher Exploration Confirmation Modal', () => {
     mockUrlService = TestBed.inject(UrlService);
     windowRef = TestBed.inject(WindowRef);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
+    pageContextService = TestBed.inject(PageContextService);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('test_id');
   });
 
   it('should create', () => {
