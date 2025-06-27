@@ -27,10 +27,9 @@ import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {ExplorationModeService} from '../../services/exploration-mode.service';
 import {SchemaFormSubmittedService} from 'services/schema-form-submitted.service';
 import {
   animate,
@@ -106,9 +105,8 @@ export class ProgressNavComponent {
   ];
 
   constructor(
-    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private explorationModeService: ExplorationModeService,
     private focusManagerService: FocusManagerService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
@@ -164,11 +162,11 @@ export class ProgressNavComponent {
     this.hasNext = !this.playerTranscriptService.isLastCard(
       this.displayedCardIndex
     );
-    this.explorationPlayerStateService.isInQuestionMode();
+    this.explorationModeService.isInQuestionMode();
 
     this.conceptCardIsBeingShown =
       this.displayedCard.getStateName() === null &&
-      !this.explorationPlayerStateService.isPresentingIsolatedQuestions();
+      !this.explorationModeService.isPresentingIsolatedQuestions();
 
     if (!this.conceptCardIsBeingShown) {
       this.interactionIsInline = this.displayedCard.isInteractionInline();

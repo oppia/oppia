@@ -31,7 +31,7 @@ import {QuestionBackendDict} from 'domain/question/QuestionObjectFactory';
 import {InteractionRulesService} from '../../../pages/exploration-player-page/services/answer-classification.service';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {ExplorationPlayerConstants} from '../../../pages/exploration-player-page/current-lesson-player/exploration-player-page.constants.ts';
 import {UrlService} from 'services/contextual/url.service';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
@@ -135,7 +135,7 @@ describe('Skill Preview Tab Component', () => {
   let urlService: UrlService;
   let skillEditorStateService: SkillEditorStateService;
   let currentInteractionService: CurrentInteractionService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let conversationFlowService: ConversationFlowService;
   let mockOnSkillChangeEmitter = new EventEmitter();
   let mockInteractionRule: InteractionRulesService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
@@ -167,7 +167,7 @@ describe('Skill Preview Tab Component', () => {
         SkillEditorStateService,
         UrlService,
         CurrentInteractionService,
-        ExplorationPlayerStateService,
+        ConversationFlowService,
         QuestionPlayerEngineService,
         {
           provide: QuestionBackendApiService,
@@ -229,9 +229,7 @@ describe('Skill Preview Tab Component', () => {
     urlService = TestBed.inject(UrlService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     currentInteractionService = TestBed.inject(CurrentInteractionService);
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
-    );
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     questionPlayerEngineService =
@@ -366,7 +364,7 @@ describe('Skill Preview Tab Component', () => {
   });
 
   it('should trigger feedback when an answer is submitted', fakeAsync(() => {
-    spyOn(explorationPlayerStateService.onOppiaFeedbackAvailable, 'emit');
+    spyOn(conversationFlowService.onOppiaFeedbackAvailable, 'emit');
 
     component.ngOnInit();
     currentInteractionService.onSubmit('answer', mockInteractionRule);

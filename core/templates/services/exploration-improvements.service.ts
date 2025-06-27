@@ -26,7 +26,7 @@ import {State} from 'domain/state/StateObjectFactory';
 import {ExplorationRightsService} from 'pages/exploration-editor-page/services/exploration-rights.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationImprovementsBackendApiService} from 'services/exploration-improvements-backend-api.service';
 import {ExplorationImprovementsTaskRegistryService} from 'services/exploration-improvements-task-registry.service';
 import {ExplorationStatsService} from 'services/exploration-stats.service';
@@ -54,7 +54,7 @@ export class ExplorationImprovementsService {
     private explorationRightsService: ExplorationRightsService,
     private explorationStatesService: ExplorationStatesService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private explorationImprovementsBackendApiService: ExplorationImprovementsBackendApiService,
     private explorationImprovementsTaskRegistryService: ExplorationImprovementsTaskRegistryService,
     private explorationStatsService: ExplorationStatsService,
@@ -120,7 +120,7 @@ export class ExplorationImprovementsService {
       return;
     }
 
-    const expId = this.contextService.getExplorationId();
+    const expId = this.pageContextService.getExplorationId();
     this.config =
       await this.explorationImprovementsBackendApiService.getConfigAsync(expId);
 
