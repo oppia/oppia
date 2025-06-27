@@ -22,7 +22,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import Dict, List, TypedDict
+from typing import Dict, List, TypedDict, overload, Union
 
 
 class PartialExplorationOpportunitySummaryDict(TypedDict):
@@ -555,30 +555,49 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
         self.is_pinned = is_pinned
         self.currently_available_to_learners = currently_available_to_learners
 
+    @overload
+    @classmethod
+    def from_dict(
+        cls, data: TranslationOpportunityDict
+    ) -> TranslationOpportunityCardInfo: ...
+
+    @overload
+    @classmethod
+    def from_dict(
+        cls, data: TranslationOpportunityCardInfoDict
+    ) -> TranslationOpportunityCardInfo: ...
+
     @classmethod
     def from_dict(
         cls,
-        card_info_dict: TranslationOpportunityCardInfoDict
+        data: Union[
+            TranslationOpportunityDict,
+            TranslationOpportunityCardInfoDict
+        ]
     ) -> 'TranslationOpportunityCardInfo':
-        """Returns a TranslationOpportunityCardInfo object from a dict."""
         return cls(
-            card_info_dict['topic_ids'],
-            card_info_dict['entity_id'],
-            card_info_dict['content_count'],
-            card_info_dict['incomplete_translation_language_codes'],
-            card_info_dict['translation_counts'],
-            card_info_dict['entity_type'],
-            card_info_dict['topic_name'],
-            card_info_dict['entity_description'],
-            card_info_dict['is_pinned'],
-            card_info_dict['currently_available_to_learners']
+            data['topic_ids'],
+            data['entity_id'],
+            data['content_count'],
+            data['incomplete_translation_language_codes'],
+            data['translation_counts'],
+            data['entity_type'],
+            data.get('topic_name', ''),  # Defaults required for base type
+            data.get('entity_description', ''),
+            data.get('is_pinned', False),
+            data.get('currently_available_to_learners', False)
         )
 
     def to_dict(self) -> TranslationOpportunityCardInfoDict:
         """Returns a dict representation of the card info."""
-        base_dict = super().to_dict()
         return {
-            **base_dict,
+            'topic_ids': self.topic_ids,
+            'entity_id': self.entity_id,
+            'content_count': self.content_count,
+            'incomplete_translation_language_codes': (
+                self.incomplete_translation_language_codes),
+            'translation_counts': self.translation_counts,
+            'entity_type': self.entity_type,
             'topic_name': self.topic_name,
             'entity_description': self.entity_description,
             'is_pinned': self.is_pinned,
