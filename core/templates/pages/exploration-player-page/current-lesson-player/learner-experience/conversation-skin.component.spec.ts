@@ -2311,7 +2311,7 @@ describe('Conversation skin component', () => {
 
     componentInstance.questionSessionCompleted = false;
     componentInstance.moveToExploration = true;
-    spyOn(explorationEngineService, 'moveToExploration');
+    spyOn(explorationEngineService, 'loadInitialState');
 
     componentInstance.showUpcomingCard();
 

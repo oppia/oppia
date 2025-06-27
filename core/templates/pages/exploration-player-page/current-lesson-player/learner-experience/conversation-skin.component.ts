@@ -1315,7 +1315,7 @@ export class ConversationSkinComponent {
     if (this.moveToExploration) {
       this.moveToExploration = false;
       this.explorationModeService.setExplorationModeFromUrl();
-      this.explorationEngineService.moveToExploration(
+      this.explorationEngineService.loadInitialState(
         this._initializeDirectiveComponents.bind(this)
       );
       return;

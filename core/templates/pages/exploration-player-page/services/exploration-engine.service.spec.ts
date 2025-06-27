@@ -1202,26 +1202,6 @@ describe('Exploration engine service ', () => {
     }
   );
 
-  it('should load initial state when moved to new exploration', () => {
-    let moveToExplorationCb = jasmine.createSpy('success');
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-      false
-    );
-
-    explorationEngineService.exploration =
-      explorationObjectFactory.createFromBackendDict(explorationDict);
-
-    let currentStateName = explorationEngineService.currentStateName;
-    expect(currentStateName).toBe(undefined);
-
-    // Please note that we are not calling init funtion here.
-    explorationEngineService.moveToExploration(moveToExplorationCb);
-
-    currentStateName = explorationEngineService.currentStateName;
-    let initalState = explorationEngineService.exploration.initStateName;
-    expect(currentStateName).toBe(initalState);
-  });
-
   it(
     'should return true if current state is initial state ' +
       "when calling 'isCurrentStateInitial'",
