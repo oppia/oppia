@@ -27,6 +27,8 @@ from core.domain import translation_domain
 
 from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 
+from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
+
 STUDY_GUIDE_PROPERTY_SECTIONS: Final = 'sections'
 
 # These will be deprecated once we shift to using just study guides.
@@ -361,6 +363,24 @@ class StudyGuide:
             'language_code': self.language_code,
             'version': self.version
         }
+
+    @classmethod
+    def _convert_page_contents_v3_dict_to_v4_dict(
+        cls, sections_dicts_list: List[StudyGuideSectionDict]
+    ) -> List[StudyGuideSectionDict]:
+        """Converts v1 StudyGuide Sections schema to the demo schema.
+        v2 schema makes all html field 'Hello'.
+
+        Args:
+            sections_dicts_list: list. A list used to initialize a
+                StudyGuide domain object.
+
+        Returns:
+            list. The converted sections_dicts_list.
+        """
+        return cls.convert_html_fields_in_study_guide_sections(
+            sections_dicts_list,
+            html_validation_service.change_to_hello)
 
     @classmethod
     def update_sections_from_model(
