@@ -413,8 +413,10 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
                 opportunity_domain.TranslationOpportunity.from_dict(
                     self.valid_translation_opportunity_dict))
 
-        self.assertIsInstance(opportunity, opportunity_domain.TranslationOpportunity)
-        self.assertEqual(opportunity.to_dict(), self.valid_translation_opportunity_dict)
+        self.assertIsInstance(
+            opportunity, opportunity_domain.TranslationOpportunity)
+        self.assertEqual(
+            opportunity.to_dict(), self.valid_translation_opportunity_dict)
 
     def test_negative_content_count_fails_validation_check(self) -> None:
         self.valid_translation_opportunity.content_count = -1
@@ -430,14 +432,20 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
             'Invalid entity_type: invalid_entity'
         )
 
-    def test_invalid_language_code_in_incomplete_list_fails_validation(self) -> None:
-        self.valid_translation_opportunity.incomplete_translation_language_codes = ['xyz']
+    def test_invalid_language_code_in_incomplete_list_fails_validation(
+        self
+    ) -> None:
+        self.valid_translation_opportunity.\
+            incomplete_translation_language_codes = ['xyz']
         self._assert_validation_error(
             self.valid_translation_opportunity,
-            'Invalid language_code in incomplete_translation_language_codes: xyz'
+            'Invalid language_code in '
+            'incomplete_translation_language_codes: xyz'
         )
 
-    def test_invalid_language_code_in_translation_counts_fails_validation(self) -> None:
+    def test_invalid_language_code_in_translation_counts_fails_validation(
+        self
+    ) -> None:
         self.valid_translation_opportunity.translation_counts = {'bad-lang': 1}
         self._assert_validation_error(
             self.valid_translation_opportunity,
@@ -452,7 +460,9 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
             'non-negative, received -3'
         )
 
-    def test_translation_count_exceeds_content_count_fails_validation(self) -> None:
+    def test_translation_count_exceeds_content_count_fails_validation(
+        self
+    ) -> None:
         self.valid_translation_opportunity.translation_counts = {'en': 10}
         self._assert_validation_error(
             self.valid_translation_opportunity,
@@ -475,7 +485,9 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             constants, 'SUPPORTED_AUDIO_LANGUAGES',
             self.mock_supported_audio_languages)
 
-        self.valid_card_info_dict: opportunity_domain.TranslationOpportunityCardInfoDict = {
+        self.valid_card_info_dict: (
+            opportunity_domain.TranslationOpportunityCardInfoDict
+        ) = {
             'topic_ids': ['topic_1'],
             'entity_id': 'exploration_1',
             'content_count': 5,
@@ -501,8 +513,10 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             constants, 'SUPPORTED_AUDIO_LANGUAGES',
             self.mock_supported_audio_languages
         ):
-            card_info = opportunity_domain.TranslationOpportunityCardInfo.from_dict(
-                self.valid_card_info_dict)
+            card_info = (
+                opportunity_domain.TranslationOpportunityCardInfo
+                .from_dict(self.valid_card_info_dict)
+            )
 
         self.assertIsInstance(
             card_info, opportunity_domain.TranslationOpportunityCardInfo)
@@ -525,5 +539,6 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
 
             self._assert_validation_error(
                 self.valid_card_info,
-                'Expected content_count to be a non-negative integer, received -2'
+                'Expected content_count to be a non-negative integer, '
+                'received -2'
             )
