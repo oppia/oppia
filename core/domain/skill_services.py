@@ -1164,8 +1164,7 @@ def compute_summary_of_skill(
         Exception. No data available for when the skill was created.
     """
     skill_model_misconception_count = len(skill.misconceptions)
-    skill_model_worked_examples_count = len(
-        skill.skill_contents.worked_examples)
+    skill_model_worked_examples_count = 0
 
     if skill.created_on is None:
         raise Exception(
