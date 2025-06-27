@@ -103,6 +103,17 @@ export class ExplorationEngineService {
     this.setExplorationProperties();
   }
 
+  /**
+   * Initializes exploration-related properties based on the current URL path.
+   *
+   * This function detects whether the page is within an exploration context
+   * (e.g., learner view, editor, skill editor, embed, lesson, etc.).
+   * If so, it sets the exploration ID and version using services and fetches
+   * the full exploration data unless in question player or skill editor mode.
+   * Otherwise, assigns default test values for the ID and version.
+   *
+   * This method must be called before exploration initialization in most cases.
+   */
   setExplorationProperties(): void {
     let pathnameArray = this.urlService.getPathname().split('/');
     let explorationContext = false;
@@ -147,10 +158,31 @@ export class ExplorationEngineService {
     }
   }
 
+  /**
+   * Returns a random element from the provided array.
+   *
+   * @template T
+   * @param {readonly T[]} arr - The array from which to select a random element.
+   * @returns {T} A randomly selected element from the array.
+   */
   randomFromArray<T>(arr: readonly T[]): T {
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
+  /**
+   * Generates the appropriate feedback to display for a given answer.
+   *
+   * If the interaction is a TextInput and the outcome is the default one,
+   * the function checks if the answer is likely a misspelling. If so, it returns
+   * a localized "misspelled answer" response. Otherwise, it interpolates the
+   * feedback using the current parameter environment.
+   *
+   * @param {string} answer - The learner's submitted answer.
+   * @param {StateCard} oldStateCard - The StateCard representing the current state.
+   * @param {Outcome} outcome - The outcome returned by the classifier.
+   * @param {Record<string, string>[]} envs - A list of parameter environments for interpolation.
+   * @returns {string} The feedback message to display to the learner.
+   */
   private _getFeedback(
     answer: string,
     oldStateCard: StateCard,
@@ -186,6 +218,14 @@ export class ExplorationEngineService {
     );
   }
 
+  /**
+   * Generates a random string of spaces to force Angular to treat component
+   * input values as changed, even when logically they are the same.
+   *
+   * This is a workaround to force Angular to re-render components when needed.
+   *
+   * @returns {string} A random string consisting of whitespace characters.
+   */
   getRandomSuffix(): string {
     // This is a bit of a hack. When a refresh to a component property
     // happens, Angular compares the new value of the property to its previous
@@ -200,7 +240,19 @@ export class ExplorationEngineService {
     return randomSuffix;
   }
 
-  // Evaluate parameters. Returns null if any evaluation fails.
+  /**
+   * Evaluates and returns a new set of exploration parameters based on the
+   * provided list of parameter changes.
+   *
+   * Parameters may be generated using either the 'Copier' or 'RandomSelector'
+   * generators. If any parameter evaluation fails, an error is thrown.
+   *
+   * @param {ExplorationParams} oldParams - The base set of parameters to extend.
+   * @param {ParamChange[]} paramChanges - A list of parameter changes to apply.
+   * @param {Record<string, string>[]} envs - A list of environments used for interpolation.
+   * @returns {ExplorationParams} A new object with evaluated parameter values.
+   * @throws {Error} If any parameter cannot be evaluated correctly.
+   */
   makeParams(
     oldParams: ExplorationParams,
     paramChanges: ParamChange[],
@@ -238,7 +290,13 @@ export class ExplorationEngineService {
     throw new Error('Parameter evaluation failed.');
   }
 
-  // Evaluate question string.
+  /**
+   * Evaluates and returns the question content (HTML) for a given state.
+   *
+   * @param {State} newState - The state whose content is to be processed.
+   * @param {Record<string, string>[]} envs - A list of environments for interpolation.
+   * @returns {string} The processed HTML string for the question content.
+   */
   makeQuestion(newState: State, envs: Record<string, string>[]): string {
     return this.expressionInterpolationService.processHtml(
       newState.content.html,
@@ -246,7 +304,18 @@ export class ExplorationEngineService {
     );
   }
 
-  // This should only be called when 'exploration' is non-null.
+  /**
+   * Loads and initializes the first state of the exploration.
+   *
+   * This sets the current and next state names to the initial state, processes
+   * initial parameter changes, generates HTML for the interaction, and invokes
+   * the success callback with the constructed StateCard.
+   *
+   * Should only be called when the `exploration` object is already initialized.
+   *
+   * @param {(stateCard: StateCard, str: string) => void} successCallback - Callback function
+   *   that is passed the initial StateCard and the focus label once the state is loaded.
+   */
   loadInitialState(
     successCallback: (stateCard: StateCard, str: string) => void
   ): void {
@@ -315,9 +384,16 @@ export class ExplorationEngineService {
     successCallback(initialCard, nextFocusLabel);
   }
 
-  // Initialize the parameters in the exploration as specified in the
-  // exploration-level initial parameter changes list, followed by any
-  // manual parameter changes (in editor preview mode).
+  /**
+   * Initializes exploration parameters.
+   *
+   * This sets parameter values based on the default exploration-level parameter
+   * specifications and applies any manual parameter changes provided (typically
+   * used in editor preview mode).
+   *
+   * @param {ParamChange[]} manualParamChanges - A list of manually provided parameter changes
+   *   (used in preview mode).
+   */
   initParams(manualParamChanges: ParamChange[]): void {
     let baseParams = {};
     this.exploration.paramSpecs.forEach((paramName, paramSpec) => {
@@ -333,6 +409,19 @@ export class ExplorationEngineService {
     this.learnerParamsService.init(startingParams);
   }
 
+  /**
+   * Generates the HTML string for an interaction for the given state.
+   *
+   * This method fetches the interaction ID and customization arguments for
+   * the given state name, and uses the HTML formatter service to generate the
+   * corresponding HTML. It throws an error if the interaction ID or customization
+   * arguments are not defined.
+   *
+   * @param {string} labelForFocusTarget - The label used for managing screen reader focus.
+   * @param {string} stateName - The name of the state whose interaction HTML is to be generated.
+   * @returns {string} The formatted HTML for the state's interaction.
+   * @throws {Error} If the interaction ID or customization arguments are null.
+   */
   private _getInteractionHtmlByStateName(
     labelForFocusTarget: string,
     stateName: string
@@ -358,9 +447,17 @@ export class ExplorationEngineService {
     );
   }
 
-  // This should only be used in editor preview mode. It sets the
-  // exploration data from what's currently specified in the editor, and
-  // also initializes the parameters to empty strings.
+  /**
+   * Sets up the exploration state and parameters from the editor preview.
+   *
+   * This method is used **only** in exploration editor preview mode. It sets
+   * the initial state name and any manually defined parameter changes so that
+   * the preview behaves like a real learner session.
+   *
+   * @param {string} activeStateNameFromPreviewTab - The name of the state selected in the preview tab.
+   * @param {ParamChange[]} manualParamChangesToInit - A list of parameter changes to initialize.
+   * @throws {Error} If called outside the exploration editor context.
+   */
   initSettingsFromEditor(
     activeStateNameFromPreviewTab: string,
     manualParamChangesToInit: ParamChange[]
@@ -374,18 +471,22 @@ export class ExplorationEngineService {
   }
 
   /**
-   * Initializes an exploration, passing the data for the first state to
-   * successCallback.
+   * Initializes the learner view of the exploration and loads the initial state.
    *
-   * In editor preview mode, populateExploration() must be called before
-   * calling init().
+   * This method is responsible for setting up services related to audio,
+   * images, translations, and learner parameters. It supports both learner mode
+   * and editor preview mode (if called after `initSettingsFromEditor`).
    *
-   * @param {function} successCallback - The function to execute after the
-   *   initial exploration data is successfully loaded. This function will
-   *   be passed two arguments:
-   *   - stateName {string}, the name of the first state
-   *   - initHtml {string}, an HTML string representing the content of the
-   *       first state.
+   * @param {ExplorationBackendDict} explorationDict - The backend dictionary containing exploration data.
+   * @param {number | null} explorationVersion - The current version of the exploration.
+   * @param {string | null} preferredAudioLanguage - The learner's preferred audio language.
+   * @param {boolean | null} autoTtsEnabled - Whether automatic text-to-speech is enabled.
+   * @param {string[]} preferredContentLanguageCodes - List of preferred content languages for translations.
+   * @param {string[]} displayableLanguageCodes - List of available content languages for display.
+   * @param {(stateCard: StateCard, label: string) => void} successCallback - Callback to execute after
+   *   loading the initial state, receiving the generated StateCard and focus label.
+   *
+   * @throws {Error} If the initial state name is null or the exploration version is not set.
    */
   init(
     explorationDict: ExplorationBackendDict,
@@ -443,35 +544,35 @@ export class ExplorationEngineService {
     );
   }
 
+  /**
+   * Updates the current state name to reflect that a new card
+   * (i.e., a new state) has been added to the player's transcript.
+   *
+   * This is typically called after navigating to a new state.
+   */
   recordNewCardAdded(): void {
     this.currentStateName = this.nextStateName;
   }
 
+  /**
+   * Retrieves the current State object based on the last state name
+   * recorded in the player's transcript.
+   *
+   * @returns {State} The current State object.
+   */
   getState(): State {
     let stateName: string = this.playerTranscriptService.getLastStateName();
     return this.exploration.getState(stateName);
   }
 
+  /**
+   * Retrieves the State object corresponding to the provided state name.
+   *
+   * @param {string} stateName - The name of the state to retrieve.
+   * @returns {State} The corresponding State object.
+   */
   getStateFromStateName(stateName: string): State {
     return this.exploration.getState(stateName);
-  }
-
-  /**
-   * Returns the unique ID of the current exploration.
-   *
-   * @returns {string} The exploration ID.
-   */
-  getExplorationId(): string {
-    return this._explorationId;
-  }
-
-  /**
-   * Returns the title of the current exploration.
-   *
-   * @returns {string} The title of the exploration.
-   */
-  getExplorationTitle(): string {
-    return this.exploration.title;
   }
 
   /**

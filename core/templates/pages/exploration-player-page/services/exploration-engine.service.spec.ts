@@ -402,10 +402,6 @@ describe('Exploration engine service ', () => {
         false
       );
 
-      expect(() => {
-        explorationEngineService.getExplorationTitle();
-      }).toThrowError("Cannot read properties of undefined (reading 'title')");
-
       explorationEngineService.init(
         explorationDict,
         1,
@@ -416,8 +412,6 @@ describe('Exploration engine service ', () => {
         initSuccessCb
       );
 
-      const explorationTitle = explorationEngineService.getExplorationTitle();
-      expect(explorationTitle).toBe('My Exploration Title');
       expect(initSuccessCb).toHaveBeenCalled();
     }
   );
@@ -466,10 +460,6 @@ describe('Exploration engine service ', () => {
       // function to manually trigger and tests different edge cases.
       explorationEngineService.setExplorationProperties();
 
-      expect(() => {
-        explorationEngineService.getExplorationTitle();
-      }).toThrowError("Cannot read properties of undefined (reading 'title')");
-
       explorationEngineService.initSettingsFromEditor('Start', [paramChanges]);
       explorationEngineService.init(
         explorationDict,
@@ -481,8 +471,6 @@ describe('Exploration engine service ', () => {
         initSuccessCb
       );
 
-      const explorationTitle = explorationEngineService.getExplorationTitle();
-      expect(explorationTitle).toBe('My Exploration Title');
       expect(initSuccessCb).toHaveBeenCalled();
     }
   );
@@ -970,42 +958,6 @@ describe('Exploration engine service ', () => {
       );
     });
   });
-
-  it('should return default exploration id', () => {
-    // Please note that default exploration id is 'test_id'.
-    // This is being initialized in the constructor.
-
-    const explorationId = explorationEngineService.getExplorationId();
-    expect(explorationId).toBe('test_id');
-  });
-
-  it(
-    'should return exploration title ' + "when calling 'getExplorationTitle'",
-    () => {
-      let initSuccessCb = jasmine.createSpy('success');
-
-      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-        false
-      );
-
-      expect(() => {
-        explorationEngineService.getExplorationTitle();
-      }).toThrowError("Cannot read properties of undefined (reading 'title')");
-
-      explorationEngineService.init(
-        explorationDict,
-        1,
-        null,
-        true,
-        ['en'],
-        [],
-        initSuccessCb
-      );
-
-      const explorationTitle = explorationEngineService.getExplorationTitle();
-      expect(explorationTitle).toBe('My Exploration Title');
-    }
-  );
 
   it(
     'should return exploration version ' +

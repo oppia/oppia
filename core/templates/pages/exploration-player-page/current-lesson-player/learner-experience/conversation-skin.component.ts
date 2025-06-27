@@ -211,7 +211,7 @@ export class ConversationSkinComponent {
       this.collectionTitle = null;
     }
 
-    this.explorationId = this.explorationEngineService.getExplorationId();
+    this.explorationId = this.pageContextService.getExplorationId();
     this.isInPreviewMode = this.pageContextService.isInExplorationEditorPage();
     this.isIframed = this.urlService.isIframed();
     this.loaderService.showLoadingScreen('Loading');
