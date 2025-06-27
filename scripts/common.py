@@ -231,6 +231,7 @@ ACCEPTANCE_TESTS_SUITE_NAMES = [
     'logged-in-user/create-and-delete-account',
     'logged-in-user/edit-avatar-and-view-exploration-from-profile-page',
     'logged-in-user/save-an-exploration-to-play-later',
+    'logged-in-user/view-subtopic-study-guides',
     'logged-in-user/restart-or-continue-exploration-on-revisit',
     'logged-in-user/edit-profile-preferences-and-export-their-account',
     'logged-in-user/set-language-to-rtl-and-navigate-through-site',
