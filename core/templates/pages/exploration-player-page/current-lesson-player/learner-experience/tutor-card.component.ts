@@ -128,7 +128,7 @@ export class TutorCardComponent {
   @Input() nextLessonLink!: string;
 
   feedbackIsEnabled: boolean = true;
-  inputOutputHistoryIsShown: boolean = false;
+  inputOutputHistoryIsShown: boolean = true;
   checkpointCelebrationModalIsEnabled: boolean = false;
   private _editorPreviewMode!: boolean;
   lastAnswer!: {answerDetails: string} | string | null;
@@ -212,7 +212,7 @@ export class TutorCardComponent {
     this._editorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
     this.inputOutputHistoryIsShown =
-      this.pageContextService.isInDiagnosticTestPlayerPage();
+      !this.pageContextService.isInDiagnosticTestPlayerPage();
     this.feedbackIsEnabled =
       !this.pageContextService.isInDiagnosticTestPlayerPage();
     this.checkpointCelebrationModalIsEnabled =
