@@ -178,8 +178,8 @@ class MigrateStudyGuideModels(beam.PTransform):# type: ignore[misc]
         study_guide_objects_list = (
             {
                 'study_guide_model': unmigrated_study_guide_models,
-                'subtopic': migrated_study_guides,
-                'subtopic_changes': study_guide_changes
+                'study_guide': migrated_study_guides,
+                'study_guide_changes': study_guide_changes
             }
             | 'Merge objects' >> beam.CoGroupByKey()
             | 'Get rid of ID' >> beam.Values() # pylint: disable=no-value-for-parameter

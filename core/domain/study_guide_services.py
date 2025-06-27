@@ -37,6 +37,7 @@ if MYPY: # pragma: no cover
 
 (subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
+
 def _migrate_sections_to_latest_schema(
     versioned_sections: (
         study_guide_domain.VersionedStudyGuideSectionsDict
