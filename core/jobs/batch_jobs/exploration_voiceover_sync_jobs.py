@@ -19,23 +19,23 @@
 from __future__ import annotations
 
 import logging
+
 from core.domain import opportunity_services
+from core.domain import state_domain
 from core.jobs import base_jobs
-from core.jobs import job_utils
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
-from core.domain import state_domain
 
 import apache_beam as beam
 
-from typing import Union, List, Optional, Iterable
+from typing import Iterable, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
-    from mypy_imports import voiceover_models
     from mypy_imports import exp_models
+    from mypy_imports import voiceover_models
 
 datastore_services = models.Registry.import_datastore_services()
 
@@ -43,12 +43,15 @@ datastore_services = models.Registry.import_datastore_services()
     [models.Names.VOICEOVER, models.Names.EXPLORATION])
 
 
-def get_exploration_id_and_language_accent_code(entity_voiceovers_model) -> str:
+def get_exploration_id_and_language_accent_code(
+    entity_voiceovers_model: voiceover_models.EntityVoiceoversModel
+) -> str:
     """Returns a string combining the exploration ID and language-accent code
     from the given EntityVoiceoversModel, separated by a hyphen.
 
     Args:
-        entity_voiceovers_model: EntityVoiceoversModel instance.
+        entity_voiceovers_model: EntityVoiceoversModel. An instance of
+            EntityVoiceoversModel.
 
     Returns:
         str. The exploration ID and language-accent code joined by a hyphen.
@@ -66,7 +69,8 @@ def get_content_id_to_manual_voiceovers_mapping(
     from the given EntityVoiceoversModel.
 
     Args:
-        entity_voiceovers_model: EntityVoiceoversModel instance.
+        entity_voiceovers_model: EntityVoiceoversModel. An instance of
+            EntityVoiceoversModel.
 
     Returns:
         dict. A dictionary where keys are content IDs and values are the
@@ -91,7 +95,8 @@ def update_entity_voiceovers_model(
     Args:
         content_id_to_manual_voiceovers: dict. A dictionary mapping content IDs
             to their corresponding manual voiceovers.
-        entity_voiceovers_model: EntityVoiceoversModel instance to be updated.
+        entity_voiceovers_model: EntityVoiceoversModel. An instance of
+            EntityVoiceoversModel to be updated.
 
     Returns:
         EntityVoiceoversModel. The updated EntityVoiceoversModel instance.
@@ -114,13 +119,16 @@ class ExplorationVoiceoverSyncJob(base_jobs.JobBase):
     """Job updates the EntityVoiceoversModel and logs the model IDs and versions
     which went out of sync during Exploration update.
     """
+
     DATASTORE_UPDATES_ALLOWED = True
 
     @staticmethod
     def is_exploration_curated(exploration_id: str) -> Optional[bool]:
         """Checks whether the provided exploration ID is curated or not.
+
         Args:
             exploration_id: str. The given exploration ID.
+
         Returns:
             bool. A boolean value indicating if the exploration is curated
             or not.
@@ -139,10 +147,9 @@ class ExplorationVoiceoverSyncJob(base_jobs.JobBase):
 
     @staticmethod
     def sync_entity_voiceovers_models(
-        _: str,
         entity_voiceovers_models: Iterable[
             voiceover_models.EntityVoiceoversModel],
-        exploration_id_to_version: dict[str, int] = None
+        exploration_id_to_version: dict[str, int]
     ) -> Optional[voiceover_models.EntityVoiceoversModel]:
         """Checks for and resolves out-of-sync issues among
         EntityVoiceoversModels. If any gaps are found between successive model
@@ -153,6 +160,8 @@ class ExplorationVoiceoverSyncJob(base_jobs.JobBase):
         Args:
             entity_voiceovers_models: List[EntityVoiceoversModel]. A list of
                 EntityVoiceoversModel instances to synchronize.
+            exploration_id_to_version: dict. A dictionary mapping exploration
+                IDs to their latest version numbers.
 
         Returns:
             Optional[EntityVoiceoversModel]. The latest updated
@@ -166,7 +175,8 @@ class ExplorationVoiceoverSyncJob(base_jobs.JobBase):
             previous_model = entity_voiceovers_models[0]
             exploration_id = previous_model.entity_id
             latest_exploration_version = exploration_id_to_version.get(
-                exploration_id, None)
+                exploration_id)
+            assert isinstance(latest_exploration_version, int)
 
             logging.info(
                 'Syncing EntityVoiceoversModels for exploration ID: %s, '
@@ -175,7 +185,6 @@ class ExplorationVoiceoverSyncJob(base_jobs.JobBase):
                     previous_model.language_accent_code
                 )
             )
-
 
         for current_model in entity_voiceovers_models:
             if previous_model.entity_version == current_model.entity_version:
@@ -298,7 +307,7 @@ class ExplorationVoiceoverSyncJob(base_jobs.JobBase):
                 beam.GroupByKey())
             | 'Sync EntityVoiceoversModels with latest version' >> beam.Map(
                 lambda kv, version_dict: self.sync_entity_voiceovers_models(
-                    kv[0], kv[1], version_dict),
+                    kv[1], version_dict),
                 beam.pvalue.AsSingleton(
                     exploration_id_to_version_dict))
             | 'Filter out None results' >> beam.Filter(
@@ -316,7 +325,8 @@ class ExplorationVoiceoverSyncJob(base_jobs.JobBase):
             updated_entity_voiceovers_models
             | 'Format results' >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
-                    f'Fixes out-of-sync issue for EntityVoiceoversModel ID: {model.id}.'
+                    'Fixes out-of-sync issue for EntityVoiceoversModel ID: %s.'
+                    % model.id
                 )
             )
         )

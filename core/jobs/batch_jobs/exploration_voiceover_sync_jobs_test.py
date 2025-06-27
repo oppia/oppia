@@ -29,8 +29,8 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
-from core.jobs import job_test_utils
 from core.domain import voiceover_services
+from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exploration_voiceover_sync_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
@@ -46,8 +46,10 @@ if MYPY: # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
+
 class CommonHelperMethodsTests(job_test_utils.JobTestBase):
-    """Tests for common helper methods used in exploration voiceover sync jobs."""
+    """Tests for common helper methods used in exploration voiceover sync jobs.
+    """
 
     def test_correctly_get_exploration_id_and_language_accent_code(
         self
@@ -229,7 +231,6 @@ class CommonHelperMethodsTests(job_test_utils.JobTestBase):
         updated_entity_voiceovers = (
             exploration_voiceover_sync_jobs.ExplorationVoiceoverSyncJob.
             sync_entity_voiceovers_models(
-                entity_voiceovers_model_1.id,
                 entity_voiceovers_list,
                 {'exp_1': 4}
             )
@@ -256,6 +257,7 @@ class CommonHelperMethodsTests(job_test_utils.JobTestBase):
             }
         }
         self.assertIsNotNone(updated_entity_voiceovers)
+        assert updated_entity_voiceovers is not None
         self.assertEqual(
             updated_entity_voiceovers.entity_id, 'exp_1')
         self.assertEqual(
@@ -314,7 +316,6 @@ class CommonHelperMethodsTests(job_test_utils.JobTestBase):
         updated_entity_voiceovers = (
             exploration_voiceover_sync_jobs.ExplorationVoiceoverSyncJob.
             sync_entity_voiceovers_models(
-                entity_voiceovers_model_1.id,
                 entity_voiceovers_list,
                 {'exp_1': 2}
             )
@@ -329,6 +330,7 @@ class CommonHelperMethodsTests(job_test_utils.JobTestBase):
             is_exploration_curated(exploration_id='')
         )
         self.assertFalse(is_exploration_curated)
+
 
 class ExplorationVoiceoverSyncJobTestsBase(
     job_test_utils.JobTestBase, test_utils.GenericTestBase):
@@ -408,6 +410,10 @@ class ExplorationVoiceoverSyncJobTestsBase(
         }
 
     def create_entity_voiceovers_and_exploration_models(self) -> None:
+        """Creates two curated explorations and entity voiceovers models
+        associated with them.
+        """
+
         # Creating the first curated exploration.
         exploration_1 = self.save_new_valid_exploration(
             self.CURATED_EXPLORATION_ID_1,
@@ -457,33 +463,35 @@ class ExplorationVoiceoverSyncJobTestsBase(
             })], 'Changes.')
 
         exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_1, [exp_domain.ExplorationChange({
-            'new_value': {
-                'content_id': 'content_0',
-                'html': 'content 1'
-            },
-            'state_name': 'Introduction',
-            'old_value': {
-                'content_id': 'content_0',
-                'html': ''
-            },
-            'cmd': 'edit_state_property',
-            'property_name': 'content'
-            })], 'Update 2')
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_1, [
+                exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content_0',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content_0',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+                })], 'Update 2')
         exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_1, [exp_domain.ExplorationChange({
-            'new_value': {
-                'content_id': 'content_0',
-                'html': 'content 1'
-            },
-            'state_name': 'Introduction',
-            'old_value': {
-                'content_id': 'content_0',
-                'html': ''
-            },
-            'cmd': 'edit_state_property',
-            'property_name': 'content'
-            })], 'Update 3')
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_1, [
+                exp_domain.ExplorationChange({
+                'new_value': {
+                    'content_id': 'content_0',
+                    'html': 'content 1'
+                },
+                'state_name': 'Introduction',
+                'old_value': {
+                    'content_id': 'content_0',
+                    'html': ''
+                },
+                'cmd': 'edit_state_property',
+                'property_name': 'content'
+                })], 'Update 3')
 
         entity_voiceovers_model_1 = (
             voiceover_models.EntityVoiceoversModel.create_new(
@@ -565,33 +573,35 @@ class ExplorationVoiceoverSyncJobTestsBase(
             })], 'Changes.')
 
         exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_2, [exp_domain.ExplorationChange({
-            'new_value': {
-                'content_id': 'content_0',
-                'html': 'content 1'
-            },
-            'state_name': 'Introduction',
-            'old_value': {
-                'content_id': 'content_0',
-                'html': ''
-            },
-            'cmd': 'edit_state_property',
-            'property_name': 'content'
-            })], 'Update 2')
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_2, [
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                    })], 'Update 2')
         exp_services.update_exploration(
-            self.editor_id_1, self.CURATED_EXPLORATION_ID_2, [exp_domain.ExplorationChange({
-            'new_value': {
-                'content_id': 'content_0',
-                'html': 'content 1'
-            },
-            'state_name': 'Introduction',
-            'old_value': {
-                'content_id': 'content_0',
-                'html': ''
-            },
-            'cmd': 'edit_state_property',
-            'property_name': 'content'
-            })], 'Update 3')
+            self.editor_id_1, self.CURATED_EXPLORATION_ID_2, [
+                exp_domain.ExplorationChange({
+                    'new_value': {
+                        'content_id': 'content_0',
+                        'html': 'content 1'
+                    },
+                    'state_name': 'Introduction',
+                    'old_value': {
+                        'content_id': 'content_0',
+                        'html': ''
+                    },
+                    'cmd': 'edit_state_property',
+                    'property_name': 'content'
+                    })], 'Update 3')
 
         entity_voiceovers_model = (
             voiceover_models.EntityVoiceoversModel.create_new(
