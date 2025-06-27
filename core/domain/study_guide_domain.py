@@ -372,6 +372,7 @@ class StudyGuide:
         in the given versioned_sections dict from current_version to
         current_version + 1. Note that the versioned_sections being
         passed in is modified in-place.
+
         Args:
             versioned_sections: dict. A dict with two keys:
                 - schema_version: str. The schema version for the
@@ -396,11 +397,13 @@ class StudyGuide:
     ) -> List[StudyGuideSectionDict]:
         """Applies a conversion function on all the html strings in study
         guide sections to migrate them to a desired state.
+
         Args:
             study_guide_section_dicts: List. The list containing dicts of
                 study guide sections.
             conversion_fn: function. The conversion function to be applied on
                 the study_guide_section_dicts.
+
         Returns:
             dict. The converted subtopic_page_contents_dict.
         """
@@ -421,11 +424,13 @@ class StudyGuide:
     ) -> List[StudyGuideSectionDict]:
         """Applies a conversion function on all the unicode strings in study
         guide sections to migrate them to a desired state.
+
         Args:
             study_guide_section_dicts: List. The list containing dicts of
                 study guide sections.
             conversion_fn: function. The conversion function to be applied on
                 the study_guide_section_dicts.
+
         Returns:
             dict. The converted subtopic_page_contents_dict.
         """

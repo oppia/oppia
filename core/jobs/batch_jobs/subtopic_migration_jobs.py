@@ -43,7 +43,8 @@ if MYPY: # pragma: no cover
 (base_models, subtopic_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.SUBTOPIC])
 datastore_services = models.Registry.import_datastore_services()
-    
+
+
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that PTransform class is of type Any. Thus to avoid MyPy's error
@@ -201,9 +202,11 @@ class MigrateStudyGuideModels(beam.PTransform):# type: ignore[misc]
             study_guide_objects_list
             | 'Remove migrated models' >> beam.Filter(
                 lambda x: (
-                    len(x['study_guide_changes']) == 0 and len(x['study_guide']) > 0
+                    len(
+                        x['study_guide_changes']
+                    ) == 0 and len(x['study_guide']) > 0
                 ))
-            | 'Transform previously migrated study guide to job run results' >> (
+            | 'Transform previously migrated studyguide to job run results' >> (
                 job_result_transforms.CountObjectsToJobRunResult(
                     'STUDY GUIDE PREVIOUSLY MIGRATED'))
         )
