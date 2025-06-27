@@ -38,7 +38,7 @@ describe('Interested Partner Organization', function () {
     );
 
     // Go to partnerships page and verify required elements.
-    await partherOrganizationUser.navigateToPartnershipsPage();
+    await partherOrganizationUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
     await partherOrganizationUser.expectScreenshotToMatch(
       'partnershipsPage',
       __dirname

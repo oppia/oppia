@@ -32,7 +32,7 @@ describe('Interested Parent', function () {
   it('should be able to check the terms of service', async function () {
     await interestedParent.clickOnTermsOfServiceLinkInFooter();
     await interestedParent.expectScreenshotToMatch(
-      'terms-of-service-page',
+      'termsOfServicePage',
       __dirname
     );
   });

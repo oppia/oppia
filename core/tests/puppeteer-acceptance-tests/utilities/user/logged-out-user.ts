@@ -453,6 +453,11 @@ const readyToMakeDonationSelector = '.e2e-test-ready-to-donate-title';
 // Volunteer Page.
 const volunteerPageHeadingSelector = '.e2e-test-volunteer-page-headings';
 
+// Contact Us Page.
+const contactUsSubheadingSelector = '.e2e-test-contact-subheading';
+const contactUsContentCard = '.e2e-test-contact-page-content';
+const contactUsContentCardHeadingSelector = `${contactUsContentCard} h2`;
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -605,6 +610,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Navigates to the splash page.
+   * @param expectedURL - The expected URL after navigation. Defaults to `${baseUrl}/`.
    */
   async navigateToSplashPage(
     expectedURL: string = `${baseUrl}/`
@@ -5029,6 +5035,56 @@ export class LoggedOutUser extends BaseUser {
       volunteerPageHeadingSelector,
       heading
     );
+  }
+
+  /**
+   * Checks for subheading in Contact Us Page.
+   * @param subheading - The expected subheading text to be found.
+   */
+  async verifyContactUsSubHeading(subheading: string): Promise<void> {
+    const actualSubheading = await this.page.$eval(
+      contactUsSubheadingSelector,
+      element => (element as HTMLElement).textContent
+    );
+
+    if (actualSubheading !== subheading) {
+      throw new Error(
+        `Expected subheading to be ${subheading}, but found ${actualSubheading}`
+      );
+    }
+  }
+
+  /**
+   * Checks if content card with given heading exists in contact us page.
+   * @param heading - The heading to check for in content cards.
+   */
+  async expectContactUsPageToContainContentCardWithHeading(
+    heading: string
+  ): Promise<void> {
+    const contentCardHeadings = this.page.$$eval(
+      contactUsContentCardHeadingSelector,
+      elements => elements.map(element => (element as HTMLElement).textContent)
+    );
+
+    if ((await contentCardHeadings).includes(heading)) {
+      showMessage(`Heading ${heading} is present.`);
+    } else {
+      throw new Error(
+        `Heading "${heading}" is not present. Heading present: ${(await contentCardHeadings).join(', ')}`
+      );
+    }
+  }
+
+  /**
+   * Checks if content cards with given heading exists in contact us page.
+   * @param headings - The headings to check for in content cards.
+   */
+  async expectContactUsPageToContainContentCardsWithHeading(
+    headings: string[]
+  ): Promise<void> {
+    for (let heading of headings) {
+      await this.expectContactUsPageToContainContentCardWithHeading(heading);
+    }
   }
 }
 

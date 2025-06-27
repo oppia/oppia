@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview
- * Acceptance test from CUJv3 Doc
+ * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
  * IP.CP. Parent attempts to contact the organization
@@ -31,7 +30,18 @@ describe('Interested Parent', function () {
   });
 
   it('should be able to ask the organization a question', async function () {
-    interestedParent.navigateToContactUsPage();
+    await interestedParent.navigateToContactUsPage();
+    await interestedParent.expectScreenshotToMatch(' contactUsPage', __dirname);
+
+    await interestedParent.verifyContactUsSubHeading(
+      'We would love to hear from you!'
+    );
+    await interestedParent.expectContactUsPageToContainContentCardsWithHeading([
+      'Donate',
+      'Partner',
+      'Volunteer',
+      'Other Inquiries',
+    ]);
   });
 
   it('should be able to find contact email', async function () {
