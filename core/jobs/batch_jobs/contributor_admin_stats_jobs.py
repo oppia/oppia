@@ -1246,10 +1246,8 @@ class AuditAndLogIncorretDataInContributorAdminStatsJob(base_jobs.JobBase):
             return (logged_suggestions_count, debug_logs)
 
 
-class ValidateTranslationContributionStatsJob(BaseJob):
-    """Validation job for verifying translation total contribution stats for
-    all contributors.
-    """
+class ValidateTotalContributionStatsJob(base_jobs.JobBase):
+    """Validation job for verifying total contribution stats"""
 
     DATASTORE_UPDATES_ALLOWED = False
 
@@ -1266,9 +1264,9 @@ class ValidateTranslationContributionStatsJob(BaseJob):
             self.pipeline
             | 'Get all non-deleted TranslationSubmitterTotalContributionStatsModel' >>  # pylint: disable=line-too-long
                 ndb_io.GetModels(
-                suggestion_models.TranslationSubmitterTotalContributionStatsModel
-                    .get_all(
-                        include_deleted=False))
+                suggestion_models
+                    .TranslationSubmitterTotalContributionStatsModel
+                        .get_all(include_deleted=False))
         )
         question_submitter_total_stats_models = (
             self.pipeline
@@ -1281,8 +1279,9 @@ class ValidateTranslationContributionStatsJob(BaseJob):
 
         translation_validaion_results = (
             translation_submitter_total_stats_models
-            | 'Validate TranslationSubmitterTotalContributionStatsModel' >> beam.Map(
-                GenerateContributorAdminStatsJob._validate_translation_submitter_total_stats_models
+            | 'Validate TranslationSubmitterTotalContributionStatsModel' >> (
+                beam.Map(
+                    self._validate_translation_submitter_total_stats_models)
             )
         )
         success_translation_validaition_count_results = (
@@ -1304,8 +1303,13 @@ class ValidateTranslationContributionStatsJob(BaseJob):
         error_translation_validaition_count_results = (
             error_translation_validaition
             | 'Count translation validation err results' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Invalid Translation Submitter Models'
+                beam.combiners.Count.Globally())
+            | 'Filter err translation count' >> (
+                beam.Filter(lambda x: x > 0))
+            | 'Add err translation count to job run result' >> beam.Map(
+                lambda object_count: job_run_result.JobRunResult.as_stdout(
+                    'Invalid Translation Submitter Models FAILED: %s' % (
+                        object_count)
                 ))
         )
         error_translation_validaition_logs = (
@@ -1316,8 +1320,9 @@ class ValidateTranslationContributionStatsJob(BaseJob):
 
         question_validaion_results = (
             question_submitter_total_stats_models
-            | 'Validate QuestionSubmitterTotalContributionStatsModel' >> beam.Map(
-                GenerateContributorAdminStatsJob._validate_question_submitter_total_stats_models
+            | 'Validate QuestionSubmitterTotalContributionStatsModel' >> (
+                beam.Map(
+                    self._validate_question_submitter_total_stats_models)
             )
         )
         success_question_validaition_count_results = (
@@ -1339,8 +1344,13 @@ class ValidateTranslationContributionStatsJob(BaseJob):
         error_question_validaition_count_results = (
             error_question_validaition
             | 'Count question validation err results' >> (
-                job_result_transforms.CountObjectsToJobRunResult(
-                    'Invalid Question Submitter Models'
+                beam.combiners.Count.Globally())
+            | 'Filter err question count' >> (
+                beam.Filter(lambda x: x > 0))
+            | 'Add err question count to job run result' >> beam.Map(
+                lambda object_count: job_run_result.JobRunResult.as_stdout(
+                    'Invalid Question Submitter Models FAILED: %s' % (
+                        object_count)
                 ))
         )
         error_question_validaition_logs = (
@@ -1362,152 +1372,177 @@ class ValidateTranslationContributionStatsJob(BaseJob):
         )
 
     @staticmethod
-    def _validate_translation_submitter_total_stats_models(total) -> (
+    def _validate_translation_submitter_total_stats_models(
+        total: suggestion_models
+            .TranslationSubmitterTotalContributionStatsModel) -> (
         result.Result[str]):
-        contributor_id = total.contributor_id
-        language_code = total.language_code
-        error_logs = ''
+        with datastore_services.get_ndb_context():
+            contributor_id = total.contributor_id
+            language_code = total.language_code
+            error_logs = ''
 
-        # Fetch and shortlist valid contribution records
-        contributions = suggestion_models.TranslationContributionStatsModel
-            .get_all(
-                contributor_user_id=contributor_id,
-                language_code=language_code
-            )
-        valid_contributions = [
-            c for c in contributions if topic_models.TopicModel.get_by_id(
-                c.topic_id).exists()]
+            # Fetch and shortlist valid contribution records
+            contributions: List[
+                suggestion_models.TranslationContributionStatsModel] = list(
+                    suggestion_models.TranslationContributionStatsModel.query(
+                        suggestion_models.TranslationContributionStatsModel
+                            .contributor_user_id==contributor_id,
+                        suggestion_models.TranslationContributionStatsModel
+                            .language_code==language_code
+                    ).fetch())
+            valid_contributions = [
+                c for c in contributions if topic_models.TopicModel.get(
+                    c.topic_id, strict=False) is not None]
 
-        # Fetch related general suggestions
-        suggestions = suggestion_models.GeneralSuggestionModel.get_all(
-            suggestion_type='translate_content',
-            author_id=contributor_id,
-            language_code=language_code
-        ).order_by('created_on')
+            # Fetch related general suggestions
+            suggestions: List[
+                suggestion_models.GeneralSuggestionModel] = list(
+                    suggestion_models.GeneralSuggestionModel.query(
+                        suggestion_models.GeneralSuggestionModel
+                            .suggestion_type=='translate_content',
+                        suggestion_models.GeneralSuggestionModel
+                            .author_id==contributor_id,
+                        suggestion_models.GeneralSuggestionModel
+                            .language_code==language_code
+                    ).fetch())
+            by_created_on = lambda m: m.created_on
+            suggestions.sort(key=by_created_on)
 
-        # Validate topic_ids list
-        contribution_topic_ids = {c.topic_id for c in valid_contributions}
-        if not contribution_topic_ids.issubset(set(
-            total.topic_ids_with_translation_submissions)):
-            missing = contribution_topic_ids - set(
-                total.topic_ids_with_translation_submissions)
-            error_logs += (
-                f'-> missing topic_ids {missing} in total stats\n'
-            )
-
-        # Validate aggregated counts
-        fields = [
-            'submitted_translations_count',
-            'submitted_translation_word_count',
-            'accepted_translations_count',
-            'accepted_translations_without_reviewer_edits_count',
-            'accepted_translation_word_count',
-            'rejected_translations_count',
-            'rejected_translation_word_count'
-        ]
-        for field in fields:
-            total_value = getattr(total, field)
-            aggregated = sum(getattr(c, field) for c in valid_contributions)
-            if aggregated != total_value:
+            # Validate topic_ids list
+            contribution_topic_ids = {c.topic_id for c in valid_contributions}
+            if not contribution_topic_ids.issubset(set(
+                total.topic_ids_with_translation_submissions)):
+                missing = contribution_topic_ids - set(
+                    total.topic_ids_with_translation_submissions)
                 error_logs += (
-                    f'-> field {field} aggregated {aggregated} != total '
-                    f'{total_value}\n'
+                    f'-> missing topic_ids {missing} in total stats\n'
                 )
 
-        # Validate first and last contribution dates
-        dates = [(
-            c.contribution_dates or [None, None]) for c in valid_contributions]
-        if dates:
-            first_date = min(d[0] for d in dates if d[0])
-            last_date = max(d[1] for d in dates if d[1])
-            if first_date != total.first_contribution_date:
+            # Validate aggregated counts
+            fields = [
+                'submitted_translations_count',
+                'submitted_translation_word_count',
+                'accepted_translations_count',
+                'accepted_translations_without_reviewer_edits_count',
+                'accepted_translation_word_count',
+                'rejected_translations_count',
+                'rejected_translation_word_count'
+            ]
+            for field in fields:
+                total_value = getattr(total, field)
+                aggregated = sum(
+                    getattr(c, field) for c in valid_contributions)
+                if aggregated != total_value:
+                    error_logs += (
+                        f'-> field {field} aggregated {aggregated} != total '
+                        f'{total_value}\n'
+                    )
+
+            # Validate first and last contribution dates
+            dates = [(
+                c.contribution_dates or [
+                    None, None]) for c in valid_contributions]
+            if dates:
+                first_date = min(d[0] for d in dates if d[0])
+                last_date = max(d[1] for d in dates if d[1])
+                if first_date != total.first_contribution_date:
+                    error_logs += (
+                        f'-> first contribution '
+                        f'{first_date} != {total.first_contribution_date}\n'
+                    )
+                if last_date != total.last_contribution_date:
+                    error_logs += (
+                        f'-> last contribution '
+                        f'{last_date} != {total.last_contribution_date}\n'
+                    )
+
+            # Validate recent outcomes and performance
+            recent_review_outcomes = []
+            counts = {
+                'accepted': 0,
+                'accepted_with_edits': 0,
+                'rejected': 0
+            }
+            for v in suggestions:
+                if (v.status == 'accepted' and v.edited_by_reviewer is False):
+                    recent_review_outcomes.append('accepted')
+                elif (v.status == 'accepted' and v.edited_by_reviewer is True):
+                    recent_review_outcomes.append('accepted_with_edits')
+                elif v.status == 'rejected':
+                    recent_review_outcomes.append('rejected')
+
+            if len(recent_review_outcomes) > 100:
+                recent_review_outcomes = recent_review_outcomes[-100:]
+
+            for outcome in recent_review_outcomes:
+                counts[outcome] += 1
+
+            if recent_review_outcomes != total.recent_review_outcomes:
                 error_logs += (
-                    f'-> first contribution '
-                    f'{first_date} != {total.first_contribution_date}\n'
+                    f'-> recent outcomes '
+                    f'{recent_review_outcomes} != {total.recent_review_outcomes}\n'
                 )
-            if last_date != total.last_contribution_date:
+            # Weights of recent_performance as documented in
+            # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
+            recent_performance = (
+                (counts['accepted'] + counts['accepted_with_edits'])
+                - (2 * (counts['rejected']))
+                )
+            if recent_performance != total.recent_performance:
                 error_logs += (
-                    f'-> last contribution '
-                    f'{last_date} != {total.last_contribution_date}\n'
+                    f'-> recent performance '
+                    f'{recent_performance} != {total.recent_performance}\n'
                 )
 
-        # Validate recent outcomes and performance
-        recent_review_outcomes = []
-        counts = {
-            'accepted': 0,
-            'accepted_with_edits': 0,
-            'rejected': 0
-        }
-        for v in suggestions:
-            if (v.status == 'accepted' and v.edited_by_reviewer is False):
-                recent_review_outcomes.append('accepted')
-            elif (v.status == 'accepted' and v.edited_by_reviewer is True):
-                recent_review_outcomes.append('accepted_with_edits')
-            elif v.status == 'rejected':
-                recent_review_outcomes.append('rejected')
+            # Validate overall accuracy
+            if total.submitted_translations_count:
+                accuracy = ((total.accepted_translations_count) / (
+                    total.submitted_translations_count)) * 100
+                if round(accuracy, 2) != total.overall_accuracy:
+                    error_logs += (
+                        f'-> accuracy '
+                        f'{round(accuracy,2)} != {total.overall_accuracy}\n'
+                    )
 
-        if len(recent_review_outcomes) > 100:
-            recent_review_outcomes = recent_review_outcomes[-100:]
-
-        for outcome in recent_review_outcomes:
-            counts[outcome] += 1
-
-        if recent_review_outcomes != total.recent_review_outcomes:
-            error_log += (
-                f'-> recent outcomes '
-                f'{recent_review_outcomes} != {total.recent_review_outcomes}\n'
-            )
-        # Weights of recent_performance as documented in
-        # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
-        recent_performance = (
-            (counts['accepted'] + counts['accepted_with_edits'])
-            - (2 * (counts['rejected']))
-            )
-        if recent_performance != total.recent_performance:
-            error_log += (
-                f'-> recent performance '
-                f'{recent_performance} != {total.recent_performance}\n'
-            )
-
-        # Validate overall accuracy
-        if total.submitted_translations_count:
-            accuracy = ((total.accepted_translations_count) / (
-                total.submitted_translations_count)) * 100
-            if round(accuracy, 2) != total.overall_accuracy:
-                error_log += (
-                    f'-> accuracy '
-                    f'{round(accuracy,2)} != {total.overall_accuracy}\n'
+            if len(error_logs) == 0:
+                return result.Ok(total.id)
+            else:
+                return result.Err(
+                    '\nValidation failed for '
+                    'TranslationSubmitterTotalContributionStatsModel '
+                    f'{total.id}:\n{error_logs}'
                 )
-
-        if len(error_logs) == 0:
-            return result.Ok(total.id)
-        else:
-            return result.Err(
-                '\nValidation failed for '
-                'TranslationSubmitterTotalContributionStatsModel '
-                f'{total.id}:\n{error_logs}'
-            )
 
     @staticmethod
-    def _validate_question_submitter_total_stats_models(total) -> (
+    def _validate_question_submitter_total_stats_models(
+        total: suggestion_models
+            .QuestionSubmitterTotalContributionStatsModel) -> (
         result.Result[str]):
         contributor_id = total.contributor_id
         error_logs = ''
 
         # Fetch and shortlist valid contribution records
-        contributions = suggestion_models.QuestionContributionStatsModel
-            .get_all(
-                contributor_user_id=contributor_id
-            )
+        contributions: List[
+            suggestion_models.QuestionContributionStatsModel] = list(
+                suggestion_models.QuestionContributionStatsModel.query(
+                    suggestion_models.QuestionContributionStatsModel
+                        .contributor_user_id==contributor_id
+                ).fetch())
         valid_contributions = [
-            c for c in contributions if topic_models.TopicModel.get_by_id(
-                c.topic_id).exists()]
+            c for c in contributions if topic_models.TopicModel.get(
+                    c.topic_id, strict=False) is not None]
 
         # Fetch related general suggestions
-        suggestions = suggestion_models.GeneralSuggestionModel.get_all(
-            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
-            author_id=contributor_id
-        ).order_by('created_on')
+        suggestions: List[
+            suggestion_models.GeneralSuggestionModel] = list(
+                suggestion_models.GeneralSuggestionModel.query(
+                    suggestion_models.GeneralSuggestionModel
+                        .suggestion_type==feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                    suggestion_models.GeneralSuggestionModel
+                        .author_id==contributor_id
+                ).fetch())
+        by_created_on = lambda m: m.created_on
+        suggestions.sort(key=by_created_on)
 
         # Validate topic_ids list
         contribution_topic_ids = {c.topic_id for c in valid_contributions}
@@ -1581,7 +1616,7 @@ class ValidateTranslationContributionStatsJob(BaseJob):
             counts[outcome] += 1
 
         if recent_review_outcomes != total.recent_review_outcomes:
-            error_log += (
+            error_logs += (
                 f'-> recent outcomes '
                 f'{recent_review_outcomes} != {total.recent_review_outcomes}\n'
             )
@@ -1592,7 +1627,7 @@ class ValidateTranslationContributionStatsJob(BaseJob):
             - (2 * (counts['rejected']))
             )
         if recent_performance != total.recent_performance:
-            error_log += (
+            error_logs += (
                 f'-> recent performance '
                 f'{recent_performance} != {total.recent_performance}\n'
             )
@@ -1602,7 +1637,7 @@ class ValidateTranslationContributionStatsJob(BaseJob):
             accuracy = ((total.accepted_questions_count) / (
                 total.submitted_questions_count)) * 100
             if round(accuracy, 2) != total.overall_accuracy:
-                error_log += (
+                error_logs += (
                     f'-> accuracy {round(accuracy,2)} != '
                     f'{total.overall_accuracy}\n'
                 )
