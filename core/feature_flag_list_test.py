@@ -20,8 +20,10 @@ from __future__ import annotations
 
 import os
 import re
+import unittest
 
 from core import feature_flag_list
+from core import feature_flag_list as feature_flag_list_module
 from core import utils
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry
