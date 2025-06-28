@@ -28,6 +28,8 @@ import {Injectable} from '@angular/core';
 })
 export class CheckpointProgressService {
   mostRecentlyReachedCheckpoint!: string;
+  visitedCheckpointStateNames: string[] = [];
+
   constructor() {}
 
   setMostRecentlyReachedCheckpoint(checkpointStateName: string): void {
@@ -39,5 +41,25 @@ export class CheckpointProgressService {
       throw new Error('Last completed checkpoint is not set.');
     }
     return this.mostRecentlyReachedCheckpoint;
+  }
+
+  getVisitedCheckpointStateNames(): string[] {
+    if (this.visitedCheckpointStateNames.length === 0) {
+      throw new Error('No checkpoints have been visited yet.');
+    }
+    return this.visitedCheckpointStateNames;
+  }
+  setVisitedCheckpointStateNames(checkpointStateName: string): void {
+    if (!this.visitedCheckpointStateNames.includes(checkpointStateName)) {
+      this.visitedCheckpointStateNames.push(checkpointStateName);
+    }
+  }
+
+  resetVisitedCheckpointStateNames(): void {
+    this.visitedCheckpointStateNames = [];
+  }
+
+  checkIfCheckpointIsVisited(checkpointStateName: string): boolean {
+    return this.visitedCheckpointStateNames.includes(checkpointStateName);
   }
 }
