@@ -187,11 +187,6 @@ export class ConversationFlowService {
    *
    * @returns {string} The language code of the exploration.
    */
-  /**
-   * Retrieves the language code of the exploration from the current engine service.
-   *
-   * @returns {string} The language code of the exploration.
-   */
   getLanguageCode(): string {
     let currentEngineService =
       this.currentEngineService.getCurrentEngineService();
