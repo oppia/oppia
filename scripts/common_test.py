@@ -83,7 +83,7 @@ class CommonTests(test_utils.GenericTestBase):
             f.write('data')
         os.remove(test_file)
         common.recursive_chmod(temp_dir, 0o755)
-        
+
     def tearDown(self) -> None:
         pathlib.Path.unlink(pathlib.Path('mock_app.yaml'), missing_ok=True)
         pathlib.Path.unlink(pathlib.Path('mock_app_dev.yaml'), missing_ok=True)
