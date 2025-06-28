@@ -37,6 +37,9 @@ import {HintsAndSolutionManagerService} from './hints-and-solution-manager.servi
 import {ConceptCardManagerService} from './concept-card-manager.service';
 import {Solution} from '../../../domain/exploration/SolutionObjectFactory';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
+import {ConceptCardBackendApiService} from '../../../domain/skill/concept-card-backend-api.service';
+import {ExplorationSummaryBackendApiService} from '../../../domain/summary/exploration-summary-backend-api.service';
+import {RefresherExplorationConfirmationModalService} from './refresher-exploration-confirmation-modal.service';
 
 describe('Conversation flow service', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
@@ -44,8 +47,11 @@ describe('Conversation flow service', () => {
   let conversationFlowService: ConversationFlowService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
   let conceptCardManagerService: ConceptCardManagerService;
+  let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
   let playerTranscriptService: PlayerTranscriptService;
   let explorationModeService: ExplorationModeService;
+  let refresherExplorationConfirmationModalService: RefresherExplorationConfirmationModalService;
+  let conceptCardBackendApiService: ConceptCardBackendApiService;
   let pageContextService: PageContextService;
   let playerPositionService: PlayerPositionService;
   let statsReportingService: StatsReportingService;
@@ -87,11 +93,19 @@ describe('Conversation flow service', () => {
     conversationFlowService = TestBed.inject(ConversationFlowService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     pageContextService = TestBed.inject(PageContextService);
+    conceptCardBackendApiService = TestBed.inject(ConceptCardBackendApiService);
+    explorationSummaryBackendApiService = TestBed.inject(
+      ExplorationSummaryBackendApiService
+    );
+    refresherExplorationConfirmationModalService = TestBed.inject(
+      RefresherExplorationConfirmationModalService
+    );
     playerPositionService = TestBed.inject(PlayerPositionService);
     statsReportingService = TestBed.inject(StatsReportingService);
     hintsAndSolutionManagerService = TestBed.inject(
       HintsAndSolutionManagerService
     );
+
     conceptCardManagerService = TestBed.inject(ConceptCardManagerService);
     explorationModeService = TestBed.inject(ExplorationModeService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
@@ -202,6 +216,138 @@ describe('Conversation flow service', () => {
     ).toHaveBeenCalled();
     expect(hintsAndSolutionManagerService.recordWrongAnswer).toHaveBeenCalled();
     expect(conceptCardManagerService.recordWrongAnswer).toHaveBeenCalled();
+  });
+
+  it('should handle giveFeedbackAndStayOnCurrentCard correctly', fakeAsync(() => {
+    const feedbackHtml = '<p>Feedback</p>';
+    const missingSkillId = 'skill123';
+    const refresherExpId = 'exp456';
+    const refreshInteraction = true;
+
+    const mockCard = createCard('TextInput');
+    spyOn(conversationFlowService, '_getCurrentCard').and.returnValue(mockCard);
+
+    spyOn(conversationFlowService, 'recordIncorrectAnswer');
+    spyOn(playerTranscriptService, 'addNewResponse');
+    spyOn(conversationFlowService, 'emitHelpCard');
+    spyOn(mockCard, 'isInteractionInline').and.returnValue(false);
+    spyOn(mockCard, 'markAsCompleted');
+    spyOn(
+      conceptCardBackendApiService,
+      'loadConceptCardsAsync'
+    ).and.returnValue(
+      Promise.resolve([{explanation: {html: 'concept explanation'}}])
+    );
+    spyOn(conceptCardManagerService, 'setConceptCard');
+    spyOn(playerTranscriptService, 'updateLatestInteractionHtml');
+    spyOn(explorationEngineService, 'getRandomSuffix').and.returnValue(
+      '-suffix'
+    );
+    spyOn(conversationFlowService, 'recordLeaveForRefresherExp');
+    spyOn(
+      explorationSummaryBackendApiService,
+      'loadPublicExplorationSummariesAsync'
+    ).and.returnValue(Promise.resolve({summaries: [{}]}));
+    spyOn(
+      refresherExplorationConfirmationModalService,
+      'displayRedirectConfirmationModal'
+    ).and.callFake((_id: string, callback: Function) => {
+      callback();
+    });
+
+    conversationFlowService.giveFeedbackAndStayOnCurrentCard(
+      feedbackHtml,
+      missingSkillId,
+      refreshInteraction,
+      refresherExpId
+    );
+    tick();
+
+    expect(conversationFlowService.recordIncorrectAnswer).toHaveBeenCalled();
+    expect(playerTranscriptService.addNewResponse).toHaveBeenCalledWith(
+      feedbackHtml
+    );
+    expect(conversationFlowService.emitHelpCard).toHaveBeenCalledWith(
+      feedbackHtml,
+      false
+    );
+    expect(mockCard.markAsCompleted).toHaveBeenCalled();
+    expect(conceptCardManagerService.setConceptCard).toHaveBeenCalled();
+    expect(conversationFlowService.emitHelpCard).toHaveBeenCalledWith(
+      feedbackHtml,
+      true
+    );
+    expect(
+      playerTranscriptService.updateLatestInteractionHtml
+    ).toHaveBeenCalledWith(mockCard.getInteractionHtml() + '-suffix');
+    expect(
+      refresherExplorationConfirmationModalService.displayRedirectConfirmationModal
+    ).toHaveBeenCalledWith(refresherExpId, jasmine.any(Function));
+    expect(
+      conversationFlowService.redirectToRefresherExplorationConfirmed
+    ).toBeTrue();
+    expect(
+      conversationFlowService.recordLeaveForRefresherExp
+    ).toHaveBeenCalledWith(refresherExpId);
+  }));
+
+  it('should move forward by one card when index is valid', () => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(5);
+    const changeCardSpy = spyOn(conversationFlowService, 'changeCard');
+
+    conversationFlowService.moveForwardByOneCard();
+
+    expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
+    expect(changeCardSpy).toHaveBeenCalledWith(3);
+  });
+
+  it('should move backward by one card when index is valid', () => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(5);
+    const changeCardSpy = spyOn(conversationFlowService, 'changeCard');
+
+    conversationFlowService.moveBackByOneCard();
+
+    expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
+    expect(changeCardSpy).toHaveBeenCalledWith(1);
+  });
+
+  it('should throw error when moving forward beyond last card', () => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(4);
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(5);
+
+    // Moving to index 5 (equal to num cards) → out of bounds.
+    expect(() => {
+      conversationFlowService.moveForwardByOneCard();
+    }).toThrowError('Target card index out of bounds.');
+  });
+
+  it('should throw error when moving backward before first card', () => {
+    spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(0);
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(5);
+
+    // Moving to index -1 → out of bounds.
+    expect(() => {
+      conversationFlowService.moveBackByOneCard();
+    }).toThrowError('Target card index out of bounds.');
+  });
+
+  it('should return correct value for isRefresherExploration', () => {
+    conversationFlowService.isRefresherExploration = true;
+    expect(conversationFlowService.getIsRefresherExploration()).toBeTrue();
+
+    conversationFlowService.isRefresherExploration = false;
+    expect(conversationFlowService.getIsRefresherExploration()).toBeFalse();
+  });
+
+  it('should return correct parent exploration IDs', () => {
+    const parentIds = ['exp1', 'exp2'];
+    conversationFlowService.parentExplorationIds = parentIds;
+
+    expect(conversationFlowService.getParentExplorationIds()).toEqual(
+      parentIds
+    );
   });
 
   it('should emit help card data', () => {
