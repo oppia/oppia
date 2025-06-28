@@ -501,7 +501,10 @@ def recursive_chmod(path: str, mode: int) -> None:
         for directory in directories:
             os.chmod(os.path.join(root, directory), mode)
         for filename in filenames:
-            os.chmod(os.path.join(root, filename), mode)
+            try:
+                os.chmod(os.path.join(root, filename), mode)
+            except FileNotFoundError:
+                continue
 
 
 def print_each_string_after_two_new_lines(strings: List[str]) -> None:
