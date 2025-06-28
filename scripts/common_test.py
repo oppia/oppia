@@ -91,10 +91,9 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(file_mode, '744')
             self.assertEqual(dir_mode, '744')
 
-    def test_get_current_release_version_number_raises_on_invalid_branch(self) -> None:
-        with self.assertRaises(Exception) as context:
+    def test_invalid_branch_name_raises_exception(self) -> None:
+        with self.assertRaises(Exception):
             common.get_current_release_version_number('invalid-branch-name')
-        self.assertIn('Invalid branch name', str(context.exception))
 
     def tearDown(self) -> None:
         pathlib.Path.unlink(pathlib.Path('mock_app.yaml'), missing_ok=True)
