@@ -1379,6 +1379,18 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
         total: suggestion_models
             .TranslationSubmitterTotalContributionStatsModel) -> (
         result.Result[str]):
+        """Validates TranslationSubmitterTotalContributionStatsModel.
+
+        Args:
+            total: TranslationSubmitterTotalContributionStatsModel.
+                TranslationSubmitterTotalContributionStatsModel to
+                validate.
+
+        Returns:
+            Result. An Ok result with the model ID if validation
+            passes, or an Err result with a string containing error logs
+            if validation fails.
+        """
         with datastore_services.get_ndb_context():
             contributor_id = total.contributor_id
             language_code = total.language_code
@@ -1521,6 +1533,18 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
         total: suggestion_models
             .QuestionSubmitterTotalContributionStatsModel) -> (
         result.Result[str]):
+        """Validates QuestionSubmitterTotalContributionStatsModel.
+
+        Args:
+            total: QuestionSubmitterTotalContributionStatsModel.
+                QuestionSubmitterTotalContributionStatsModel to
+                validate.
+
+        Returns:
+            Result. An Ok result with the model ID if validation
+            passes, or an Err result with a string containing error logs
+            if validation fails.
+        """
         contributor_id = total.contributor_id
         error_logs = ''
 

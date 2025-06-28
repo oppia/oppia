@@ -1905,7 +1905,8 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
 
     def test_successful_validation_emits_one_translation_and_one_question(
         self) -> None:
-        # Type Any is used because this list contains models of various kinds.
+        # Here we use type Any because this list contains models of various
+        # kinds.
         models_to_put: List[Any] = []
 
         # 1) TopicModel.
@@ -2065,7 +2066,8 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
 
     def test_failed_validation_for_translation_triggers_all_failure_conditions(
         self) -> None:
-        # Type Any is used because this list contains models of various kinds.
+        # Here we use type Any because this list contains models of various
+        # kinds.
         models_to_put: List[Any] = []
 
         # 1) Create a TranslationContributionStatsModel for topic 'topic1'.
@@ -2186,7 +2188,8 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
 
     def test_failed_validation_for_question_triggers_all_failure_conditions(
         self) -> None:
-        # Type Any is used because this list contains models of various types.
+        # Here we use type Any because this list contains models of various
+        # types.
         models_to_put: List[Any] = []
 
         # 1) Create the TopicModel so the contrib is considered "valid".
@@ -2295,10 +2298,11 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 )
             )
         ])
-    
+
     def test_more_than_hundred_translation_and_question_suggestions(
         self) -> None:
-        # Type Any is used because this list contains models of various kinds.
+        # Here we use type Any because this list contains models of various
+        # kinds.
         models_to_put: List[Any] = []
         recent_review_outcomes: List[str] = []
 
@@ -2367,7 +2371,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                     created_on=datetime.datetime.utcnow()
                 )
                 models_to_put.append(sugg)
-            elif i >= 100 and i < 125:
+            elif 100 <= i < 125:
                 sugg = self.create_model(
                     suggestion_models.GeneralSuggestionModel,
                     suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -2437,7 +2441,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         for i in range(100):
             if i < 50:
                 recent_review_outcomes.append('accepted')
-            elif i >= 50 and i < 75:
+            elif 50 <= i < 75:
                 recent_review_outcomes.append('accepted_with_edits')
             else:
                 recent_review_outcomes.append('rejected')
@@ -2580,7 +2584,6 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 stdout='Valid Translation Submitter Models SUCCESS: 1')
         ])
 
-
     def test_question_skip_date_when_no_valid_contributions(self) -> None:
         # 1) Create a valid TopicModel but no QuestionContributionStatsModel.
         topic = self.create_model(
@@ -2617,10 +2620,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                 stdout='Valid Question Submitter Models SUCCESS: 1')
         ])
 
-
     def test_question_skip_accuracy_when_zero_submissions(self) -> None:
-        """If submitted_questions_count is zero, overall_accuracy branch
-        must be skipped (no error for accuracy)."""
         # Build on previous: create one minimal contribution and total=0.
         contrib = self.create_model(
             suggestion_models.QuestionContributionStatsModel,
