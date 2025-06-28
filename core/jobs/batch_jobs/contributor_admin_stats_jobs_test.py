@@ -1937,20 +1937,23 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             contributor_user_id=self.CONTRIBUTOR_USER_ID,
             language_code=self.LANGUAGE_CODE,
             topic_id=self.TOPIC_ID,
-            submitted_translations_count=2,
-            submitted_translation_word_count=20,
+            submitted_translations_count=3,
+            submitted_translation_word_count=30,
             accepted_translations_count=1,
             accepted_translations_without_reviewer_edits_count=1,
             accepted_translation_word_count=10,
-            rejected_translations_count=0,
-            rejected_translation_word_count=0,
+            rejected_translations_count=1,
+            rejected_translation_word_count=10,
             contribution_dates=self.CONTRIBUTION_DATES
         )
         contrib.update_timestamps()
         models_to_put.append(contrib)
 
         # 3) Two GeneralSuggestionModels for translation.
-        for status, edited in [('accepted', False), ('accepted', True)]:
+        for status, edited in [
+            ('accepted', False),
+            ('accepted', True),
+            ('rejected', False)]:
             sugg = self.create_model(
                 suggestion_models.GeneralSuggestionModel,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
@@ -1975,16 +1978,17 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             language_code=self.LANGUAGE_CODE,
             contributor_id=self.CONTRIBUTOR_USER_ID,
             topic_ids_with_translation_submissions=[self.TOPIC_ID],
-            recent_review_outcomes=['accepted', 'accepted_with_edits'],
-            recent_performance=2,
-            overall_accuracy=round(1 / 2 * 100, 2),
-            submitted_translations_count=2,
-            submitted_translation_word_count=20,
+            recent_review_outcomes=[
+                'accepted', 'accepted_with_edits', 'rejected'],
+            recent_performance=0,
+            overall_accuracy=round(1 / 3 * 100, 2),
+            submitted_translations_count=3,
+            submitted_translation_word_count=30,
             accepted_translations_count=1,
             accepted_translations_without_reviewer_edits_count=1,
             accepted_translation_word_count=10,
-            rejected_translations_count=0,
-            rejected_translation_word_count=0,
+            rejected_translations_count=1,
+            rejected_translation_word_count=10,
             first_contribution_date=self.CONTRIBUTION_DATES[0],
             last_contribution_date=self.CONTRIBUTION_DATES[1]
         )
@@ -1998,7 +2002,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             contributor_user_id=self.CONTRIBUTOR_USER_ID,
             topic_id=self.TOPIC_ID,
             submitted_questions_count=3,
-            accepted_questions_count=2,
+            accepted_questions_count=1,
             accepted_questions_without_reviewer_edits_count=1,
             first_contribution_date=self.CONTRIBUTION_DATES[0],
             last_contribution_date=self.CONTRIBUTION_DATES[1]
@@ -2007,7 +2011,10 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         models_to_put.append(q_contrib)
 
         # 6) Two GeneralSuggestionModels for questions.
-        for status, edited in [('accepted', False), ('rejected', False)]:
+        for status, edited in [
+            ('accepted', False),
+            ('accepted', True),
+            ('rejected', False)]:
             qsugg = self.create_model(
                 suggestion_models.GeneralSuggestionModel,
                 suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
@@ -2031,11 +2038,12 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             id=self.CONTRIBUTOR_USER_ID,
             contributor_id=self.CONTRIBUTOR_USER_ID,
             topic_ids_with_question_submissions=[self.TOPIC_ID],
-            recent_review_outcomes=['accepted', 'rejected'],
-            recent_performance=(1 - 2 * 1),
-            overall_accuracy=round(2 / 3 * 100, 2),
+            recent_review_outcomes=[
+                'accepted', 'accepted_with_edits', 'rejected'],
+            recent_performance=(1 + 1 - 2 * 1),
+            overall_accuracy=round(1 / 3 * 100, 2),
             submitted_questions_count=3,
-            accepted_questions_count=2,
+            accepted_questions_count=1,
             accepted_questions_without_reviewer_edits_count=1,
             rejected_questions_count=1,
             first_contribution_date=self.CONTRIBUTION_DATES[0],
@@ -2123,9 +2131,9 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             recent_review_outcomes=[],
             recent_performance=0,
             overall_accuracy=0.0,
-            submitted_translations_count=0,
+            submitted_translations_count=1,
             submitted_translation_word_count=0,
-            accepted_translations_count=0,
+            accepted_translations_count=1,
             accepted_translations_without_reviewer_edits_count=0,
             accepted_translation_word_count=0,
             rejected_translations_count=0,
@@ -2153,11 +2161,11 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                     'zz.user123:\n'
                     '-> missing topic_ids {\'topic1\'} in total stats\n'
                     '-> field submitted_translations_count aggregated 5 != '
-                    'total 0\n'
+                    'total 1\n'
                     '-> field submitted_translation_word_count aggregated 50 '
                     '!= total 0\n'
                     '-> field accepted_translations_count aggregated 2 != '
-                    'total 0\n'
+                    'total 1\n'
                     '-> field '
                     'accepted_translations_without_reviewer_edits_count '
                     'aggregated 1 != total 0\n'
@@ -2170,7 +2178,8 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                     '-> first contribution 2022-05-02 != 2023-04-02\n'
                     '-> last contribution 2023-04-02 != 2022-05-02\n'
                     '-> recent outcomes [\'accepted\', \'rejected\'] != []\n'
-                    '-> recent performance -1 != 0\n\": 1'
+                    '-> recent performance -1 != 0\n'
+                    '-> accuracy 100.0 != 0.0\n\": 1'
                 )
             )
         ])
@@ -2257,7 +2266,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         # 5) Persist all of them.
         self.put_multi(models_to_put)
 
-        # 7) We expect two question‐failure results in sequence:
+        # 7) We expect two question‐failure results in sequence.
         self.assert_job_output_is([
             # Count of invalids (always on stdout, even for errors).
             job_run_result.JobRunResult(
@@ -2276,13 +2285,382 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
                     '-> field accepted_questions_without_reviewer_edits_count '
                     'aggregated 1 != total 0\n'
                     '-> field rejected_questions_count 1 != total 0\n'
-                    f"-> first contribution {self.CONTRIBUTION_DATES[0]} != "
-                    f"{self.CONTRIBUTION_DATES[1]}\n"
-                    f"-> last contribution {self.CONTRIBUTION_DATES[1]} != "
-                    f"{self.CONTRIBUTION_DATES[0]}\n"
+                    f'-> first contribution {self.CONTRIBUTION_DATES[0]} != '
+                    f'{self.CONTRIBUTION_DATES[1]}\n'
+                    f'-> last contribution {self.CONTRIBUTION_DATES[1]} != '
+                    f'{self.CONTRIBUTION_DATES[0]}\n'
                     '-> recent outcomes [\'rejected\'] != []\n'
                     '-> recent performance -2 != 0\n'
                     '-> accuracy 100.0 != 0.0\n\": 1'
                 )
             )
+        ])
+    
+    def test_more_than_hundred_translation_and_question_suggestions(
+        self) -> None:
+        # Type Any is used because this list contains models of various kinds.
+        models_to_put: List[Any] = []
+        recent_review_outcomes: List[str] = []
+
+        sugg = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='expX',
+            target_version_at_submission=1,
+            status='review',
+            author_id=self.CONTRIBUTOR_USER_ID,
+            change_cmd={},
+            score_category='translation.X',
+            language_code=self.LANGUAGE_CODE,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow()
+        )
+        models_to_put.append(sugg)
+        sugg = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='expX',
+            target_version_at_submission=1,
+            status='review',
+            author_id=self.CONTRIBUTOR_USER_ID,
+            change_cmd={},
+            score_category='translation.X',
+            language_code=None,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow()
+        )
+        models_to_put.append(sugg)
+
+        for i in range(150):
+            if i < 100:
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='accepted',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=self.LANGUAGE_CODE,
+                    edited_by_reviewer=False,
+                    created_on=datetime.datetime.utcnow()
+                )
+                models_to_put.append(sugg)
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='accepted',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=None,
+                    edited_by_reviewer=False,
+                    created_on=datetime.datetime.utcnow()
+                )
+                models_to_put.append(sugg)
+            elif i >= 100 and i < 125:
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='accepted',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=self.LANGUAGE_CODE,
+                    edited_by_reviewer=True,
+                    created_on=datetime.datetime.utcnow()
+                )
+                models_to_put.append(sugg)
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='accepted',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=None,
+                    edited_by_reviewer=True,
+                    created_on=datetime.datetime.utcnow()
+                )
+                models_to_put.append(sugg)
+            else:
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='rejected',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=self.LANGUAGE_CODE,
+                    edited_by_reviewer=False,
+                    created_on=datetime.datetime.utcnow()
+                )
+                models_to_put.append(sugg)
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='rejected',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=None,
+                    edited_by_reviewer=False,
+                    created_on=datetime.datetime.utcnow()
+                )
+                models_to_put.append(sugg)
+
+        for i in range(100):
+            if i < 50:
+                recent_review_outcomes.append('accepted')
+            elif i >= 50 and i < 75:
+                recent_review_outcomes.append('accepted_with_edits')
+            else:
+                recent_review_outcomes.append('rejected')
+
+        topic = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_ID,
+            name='t',
+            canonical_name='t',
+            description='d',
+            story_reference_schema_version=1,
+            uncategorized_skill_ids=[
+                'skill1'],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='t',
+            canonical_story_references=[{
+                'story_id': 'story1',
+                'story_is_published': False
+            }],
+            page_title_fragment_for_web='fragm',
+        )
+        models_to_put.append(topic)
+
+        contrib = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            id=1,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            language_code=self.LANGUAGE_CODE,
+            topic_id=self.TOPIC_ID,
+            submitted_translations_count=27,
+            submitted_translation_word_count=270,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=1,
+            accepted_translation_word_count=10,
+            rejected_translations_count=25,
+            rejected_translation_word_count=250,
+            contribution_dates=self.CONTRIBUTION_DATES
+        )
+        contrib.update_timestamps()
+        models_to_put.append(contrib)
+
+        total = self.create_model(
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel,
+            id=f'{self.LANGUAGE_CODE}.{self.CONTRIBUTOR_USER_ID}',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.CONTRIBUTOR_USER_ID,
+            topic_ids_with_translation_submissions=[self.TOPIC_ID],
+            recent_review_outcomes=recent_review_outcomes,
+            recent_performance=25,
+            overall_accuracy=round(1 / 27 * 100, 2),
+            submitted_translations_count=27,
+            submitted_translation_word_count=270,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=1,
+            accepted_translation_word_count=10,
+            rejected_translations_count=25,
+            rejected_translation_word_count=250,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1]
+        )
+        total.update_timestamps()
+        models_to_put.append(total)
+
+        q_contrib = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            id=2,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_questions_count=27,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=1,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1]
+        )
+        q_contrib.update_timestamps()
+        models_to_put.append(q_contrib)
+
+        q_total = self.create_model(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel,
+            id=self.CONTRIBUTOR_USER_ID,
+            contributor_id=self.CONTRIBUTOR_USER_ID,
+            topic_ids_with_question_submissions=[self.TOPIC_ID],
+            recent_review_outcomes=recent_review_outcomes,
+            recent_performance=25,
+            overall_accuracy=round(1 / 27 * 100, 2),
+            submitted_questions_count=27,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=1,
+            rejected_questions_count=25,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1]
+        )
+        q_total.update_timestamps()
+        models_to_put.append(q_total)
+
+        self.put_multi(models_to_put)
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Valid Translation Submitter Models SUCCESS: 1'),
+            job_run_result.JobRunResult(
+                stdout='Valid Question Submitter Models SUCCESS: 1')
+        ])
+
+    def test_translation_skip_recent_and_accuracy_when_zero_submissions(
+        self) -> None:
+        # 1) Create a valid TopicModel.
+        topic = self.create_model(
+            topic_models.TopicModel, id='t0', name='t0', canonical_name='t0',
+            description='d', story_reference_schema_version=1,
+            uncategorized_skill_ids=['skill1'], subtopic_schema_version=1,
+            next_subtopic_id=1, language_code='en', url_fragment='t0',
+            canonical_story_references=[{
+                'story_id': 's1', 'story_is_published': False}],
+            page_title_fragment_for_web='f0')
+        topic.update_timestamps()
+
+        # 2) No TranslationContributionStatsModel at all (so sums = 0).
+        # 3) One TranslationSubmitterTotalContributionStatsModel with
+        #    submitted_translations_count = 0.
+        total = self.create_model(
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel,
+            id='en.userX', language_code='en', contributor_id='userX',
+            topic_ids_with_translation_submissions=[],
+            recent_review_outcomes=[], recent_performance=0,
+            overall_accuracy=0.0, submitted_translations_count=0,
+            submitted_translation_word_count=0, accepted_translations_count=0,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=0, rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            first_contribution_date=None, last_contribution_date=None)
+        total.update_timestamps()
+
+        self.put_multi([topic, total])
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Valid Translation Submitter Models SUCCESS: 1')
+        ])
+
+
+    def test_question_skip_date_when_no_valid_contributions(self) -> None:
+        # 1) Create a valid TopicModel but no QuestionContributionStatsModel.
+        topic = self.create_model(
+            topic_models.TopicModel, id='q0', name='q0', canonical_name='q0',
+            description='d', story_reference_schema_version=1,
+            uncategorized_skill_ids=['skill1'], subtopic_schema_version=1,
+            next_subtopic_id=1, language_code='en', url_fragment='q0',
+            canonical_story_references=[{
+                'story_id': 's1', 'story_is_published': False}],
+            page_title_fragment_for_web='f0')
+        topic.update_timestamps()
+
+        # 2) One QuestionSubmitterTotalContributionStatsModel but no
+        #    underlying contributions.
+        q_total = self.create_model(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel,
+            id='userQ', contributor_id='userQ',
+            topic_ids_with_question_submissions=[],
+            recent_review_outcomes=[], recent_performance=0,
+            overall_accuracy=0.0,
+            submitted_questions_count=0,
+            accepted_questions_count=0,
+            accepted_questions_without_reviewer_edits_count=0,
+            rejected_questions_count=0,
+            first_contribution_date=None,
+            last_contribution_date=None)
+        q_total.update_timestamps()
+
+        self.put_multi([topic, q_total])
+
+        # Should succeed—no date‐related errors when there are no contributions.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Valid Question Submitter Models SUCCESS: 1')
+        ])
+
+
+    def test_question_skip_accuracy_when_zero_submissions(self) -> None:
+        """If submitted_questions_count is zero, overall_accuracy branch
+        must be skipped (no error for accuracy)."""
+        # Build on previous: create one minimal contribution and total=0.
+        contrib = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            contributor_user_id='uZ', topic_id='qZ',
+            submitted_questions_count=0,
+            accepted_questions_count=0,
+            accepted_questions_without_reviewer_edits_count=0,
+            first_contribution_date=None,
+            last_contribution_date=None)
+        contrib.update_timestamps()
+
+        q_total = self.create_model(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel,
+            id='uZ', contributor_id='uZ',
+            topic_ids_with_question_submissions=['qZ'],
+            recent_review_outcomes=[], recent_performance=0,
+            overall_accuracy=0.0,
+            submitted_questions_count=0,
+            accepted_questions_count=0,
+            accepted_questions_without_reviewer_edits_count=0,
+            rejected_questions_count=0,
+            first_contribution_date=None,
+            last_contribution_date=None)
+        q_total.update_timestamps()
+
+        # We still need a valid topic to avoid the "missing topic_ids" error.
+        topic = self.create_model(
+            topic_models.TopicModel, id='qZ', name='qZ', canonical_name='qZ',
+            description='d', story_reference_schema_version=1,
+            uncategorized_skill_ids=['skill1'], subtopic_schema_version=1,
+            next_subtopic_id=1, language_code='en', url_fragment='qZ',
+            canonical_story_references=[{
+                'story_id': 's1', 'story_is_published': False}],
+            page_title_fragment_for_web='fz')
+        topic.update_timestamps()
+
+        self.put_multi([topic, contrib, q_total])
+
+        # Should pass, because the accuracy branch is skipped when zero.
+        self.assert_job_output_is([
+            job_run_result.JobRunResult(
+                stdout='Valid Question Submitter Models SUCCESS: 1')
         ])

@@ -1442,10 +1442,9 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                     )
 
             # Validate first and last contribution dates.
-            dates = [(
-                c.contribution_dates or [
-                    None, None]) for c in valid_contributions]
-            if dates:
+            dates = [
+                c.contribution_dates for c in valid_contributions]
+            if len(dates) != 0:
                 first_date = min(d[0] for d in dates if d[0])
                 last_date = max(d[1] for d in dates if d[1])
                 if first_date != total.first_contribution_date:
