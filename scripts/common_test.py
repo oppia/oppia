@@ -76,7 +76,7 @@ class CommonTests(test_utils.GenericTestBase):
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
-    def test_recursive_chmod_changes_permissions_for_existing_files(self) -> None:
+    def test_chmod_changes_permissions_existing_files(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             test_file = os.path.join(
                 temp_dir, 'test_file.txt')
@@ -90,6 +90,11 @@ class CommonTests(test_utils.GenericTestBase):
 
             self.assertEqual(file_mode, '744')
             self.assertEqual(dir_mode, '744')
+
+    def test_get_current_release_version_number_raises_on_invalid_branch(self) -> None:
+        with self.assertRaises(Exception) as context:
+            common.get_current_release_version_number('invalid-branch-name')
+        self.assertIn('Invalid branch name', str(context.exception))
 
     def tearDown(self) -> None:
         pathlib.Path.unlink(pathlib.Path('mock_app.yaml'), missing_ok=True)
