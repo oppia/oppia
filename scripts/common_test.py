@@ -79,11 +79,11 @@ class CommonTests(test_utils.GenericTestBase):
     def test_recursive_chmod_handles_missing_file(self) -> None:
         temp_dir = tempfile.mkdtemp()
         test_file = os.path.join(temp_dir, 'test_file.txt')
-        with open(test_file, 'w') as f:
+        with open(test_file, 'w', encoding='utf-8') as f:
             f.write('data')
         os.remove(test_file)
         common.recursive_chmod(temp_dir, 0o755)
-    
+        
     def tearDown(self) -> None:
         pathlib.Path.unlink(pathlib.Path('mock_app.yaml'), missing_ok=True)
         pathlib.Path.unlink(pathlib.Path('mock_app_dev.yaml'), missing_ok=True)
