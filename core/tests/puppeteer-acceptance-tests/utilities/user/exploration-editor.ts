@@ -3065,12 +3065,12 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(sendButtonSelector);
 
     // Check if button is disabled after clicking
-    const isButtonDisabled = await this.page.evaluate(() => {
-      const button = document.querySelector(sendButtonSelector) as
+    const isButtonDisabled = await this.page.evaluate(selector => {
+      const button = document.querySelector(selector) as
         | HTMLButtonElement
         | undefined;
       return button?.disabled;
-    });
+    }, sendButtonSelector);
 
     if (!isButtonDisabled) {
       throw new Error(
