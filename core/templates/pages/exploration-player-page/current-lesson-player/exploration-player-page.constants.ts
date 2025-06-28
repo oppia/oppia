@@ -23,6 +23,8 @@ export const ExplorationPlayerConstants = {
 
   CONTINUE_BUTTON_FOCUS_LABEL: 'continueButton',
 
+  MIN_CARD_LOADING_DELAY_MSEC: 950,
+
   // The enforced waiting period before the first hint request.
   WAIT_FOR_FIRST_HINT_MSEC: 60000,
   // The enforced waiting period before each of the subsequent hint requests.

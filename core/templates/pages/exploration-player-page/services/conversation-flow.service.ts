@@ -37,6 +37,18 @@ import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-ap
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
 import {RefresherExplorationConfirmationModalService} from './refresher-exploration-confirmation-modal.service';
 import {ExplorationEngineService} from './exploration-engine.service';
+import {VoiceoverPlayerService} from './voiceover-player.service';
+import {AppConstants} from 'app.constants';
+import {AudioPlayerService} from 'services/audio-player.service';
+import {ExplorationModeService} from './exploration-mode.service';
+import {LearnerAnswerInfoService} from './learner-answer-info.service';
+import {NumberAttemptsService} from './number-attempts.service';
+import {InteractionRulesService} from './answer-classification.service';
+import {FatigueDetectionService} from './fatigue-detection.service';
+import {QuestionPlayerEngineService} from './question-player-engine.service';
+import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
+import {ChapterProgressService} from './chapter-progress.service';
+import {LearnerParamsService} from './learner-params.service';
 
 @Injectable({
   providedIn: 'root',
@@ -46,6 +58,12 @@ export class ConversationFlowService {
   solutionForState: Solution | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
   nextStateCard: StateCard | null = null;
+
+  // The following variables are used to track the state of the answer submission process.
+  answerIsCorrect = false;
+  answerIsBeingProcessed: boolean = false;
+  hasInteractedAtLeastOnce: boolean = false;
+  explorationActuallyStarted: boolean = false;
 
   // TODO(#22780): Remove these variable and related code.
   redirectToRefresherExplorationConfirmed!: boolean;
@@ -66,15 +84,25 @@ export class ConversationFlowService {
     private contentTranslationManagerService: ContentTranslationManagerService,
     private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
+    private learnerAnswerInfoService: LearnerAnswerInfoService,
     private stateEditorService: StateEditorService,
+    private fatigueDetectionService: FatigueDetectionService,
     private refresherExplorationConfirmationModalService: RefresherExplorationConfirmationModalService,
     private pageContextService: PageContextService,
+    private voiceoverPlayerService: VoiceoverPlayerService,
+    private explorationModeService: ExplorationModeService,
+    private audioPlayerService: AudioPlayerService,
+    private learnerParamsService: LearnerParamsService,
+    private chapterProgressService: ChapterProgressService,
+    private questionPlayerStateService: QuestionPlayerStateService,
     private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
     private conceptCardBackendApiService: ConceptCardBackendApiService,
     private conceptCardManagerService: ConceptCardManagerService,
     private currentEngineService: CurrentEngineService,
     private statsReportingService: StatsReportingService,
     private explorationEngineService: ExplorationEngineService,
+    private questionPlayerEngineService: QuestionPlayerEngineService,
+    private numberAttemptsService: NumberAttemptsService,
     private translateService: TranslateService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService
   ) {}
@@ -327,6 +355,178 @@ export class ConversationFlowService {
     return displayedCard;
   }
 
+  submitAnswer(
+    answer: string,
+    interactionRulesService: InteractionRulesService
+  ): void {
+    let displayedCard = this._getCurrentCard();
+    let editorPreviewMode = this.pageContextService.isInExplorationEditorPage();
+    let explorationId = this.pageContextService.getExplorationId();
+    displayedCard.updateCurrentAnswer(null);
+
+    // Safety check to prevent double submissions from occurring.
+    if (
+      this.answerIsBeingProcessed ||
+      !this.playerPositionService.isCurrentCardAtEndOfTranscript() ||
+      displayedCard.isCompleted()
+    ) {
+      return;
+    }
+
+    if (!editorPreviewMode) {
+      this.fatigueDetectionService.recordSubmissionTimestamp();
+      if (this.fatigueDetectionService.isSubmittingTooFast()) {
+        this.fatigueDetectionService.displayTakeBreakMessage();
+        this.onOppiaFeedbackAvailable.emit();
+        return;
+      }
+    }
+
+    if (
+      !editorPreviewMode &&
+      !this.explorationModeService.isPresentingIsolatedQuestions() &&
+      AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE
+    ) {
+      this.learnerAnswerInfoService.initLearnerAnswerInfoService(
+        explorationId,
+        this.explorationEngineService.getState(),
+        answer,
+        interactionRulesService
+      );
+    }
+
+    this.numberAttemptsService.submitAttempt();
+
+    this.answerIsBeingProcessed = true;
+    this.hasInteractedAtLeastOnce = true;
+
+    this.playerTranscriptService.addNewInput(answer, false);
+
+    if (this.getCanAskLearnerForAnswerInfo()) {
+      setTimeout(() => {
+        this.playerTranscriptService.addNewResponse(
+          this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion()
+        );
+        this.answerIsBeingProcessed = false;
+        this.emitHelpCard(
+          this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion(),
+          false
+        );
+      }, 100);
+      return;
+    }
+
+    let timeAtServerCall = new Date().getTime();
+    this.playerPositionService.recordAnswerSubmission();
+    let currentEngineService =
+      this.currentEngineService.getCurrentEngineService();
+    this.answerIsCorrect = currentEngineService.submitAnswer(
+      answer,
+      interactionRulesService,
+      (
+        nextCard,
+        refreshInteraction,
+        feedbackHtml,
+        refresherExplorationId,
+        missingPrerequisiteSkillId,
+        remainOnCurrentCard,
+        taggedSkillMisconceptionId,
+        wasOldStateInitial,
+        isFirstHit,
+        isFinalQuestion,
+        nextCardIfReallyStuck,
+        focusLabel
+      ) => {
+        this.setNextStateCard(nextCard);
+        this.setNextCardIfStuck(nextCardIfReallyStuck);
+        if (
+          !editorPreviewMode &&
+          !this.explorationModeService.isPresentingIsolatedQuestions()
+        ) {
+          let oldStateName = this.playerPositionService.getCurrentStateName();
+          const completedChaptersCount =
+            this.chapterProgressService.getCompletedChaptersCount();
+          if (!remainOnCurrentCard) {
+            this.statsReportingService.recordStateTransition(
+              oldStateName,
+              nextCard.getStateName(),
+              answer,
+              this.learnerParamsService.getAllParams(),
+              isFirstHit,
+              String(completedChaptersCount && completedChaptersCount + 1),
+              String(this.playerTranscriptService.getNumCards()),
+              currentEngineService.getLanguageCode()
+            );
+
+            this.statsReportingService.recordStateCompleted(oldStateName);
+          }
+          if (nextCard.isTerminal()) {
+            this.statsReportingService.recordStateCompleted(
+              nextCard.getStateName()
+            );
+          }
+          if (wasOldStateInitial && !this.explorationActuallyStarted) {
+            this.statsReportingService.recordExplorationActuallyStarted(
+              oldStateName
+            );
+            this.explorationActuallyStarted = true;
+          }
+        }
+
+        if (!this.explorationModeService.isPresentingIsolatedQuestions()) {
+          this.onPlayerStateChange.emit(nextCard.getStateName());
+        } else if (this.explorationModeService.isInQuestionPlayerMode()) {
+          this.questionPlayerStateService.answerSubmitted(
+            this.questionPlayerEngineService.getCurrentQuestion(),
+            !remainOnCurrentCard,
+            taggedSkillMisconceptionId
+          );
+        }
+
+        let millisecsLeftToWait: number;
+        if (!displayedCard.isInteractionInline()) {
+          // Do not wait if the interaction is supplemental -- there's
+          // already a delay bringing in the help card.
+          millisecsLeftToWait = 1.0;
+        } else if (this.explorationModeService.isInDiagnosticTestPlayerMode()) {
+          // Do not wait if the player mode is the diagnostic test. Since no
+          // feedback will be presented after attempting a question so delaying
+          // is not required.
+          millisecsLeftToWait = 1.0;
+        } else {
+          millisecsLeftToWait = Math.max(
+            ExplorationPlayerConstants.MIN_CARD_LOADING_DELAY_MSEC -
+              (new Date().getTime() - timeAtServerCall),
+            1.0
+          );
+        }
+
+        setTimeout(() => {
+          this.onOppiaFeedbackAvailable.emit();
+          this.setActiveVoiceover(feedbackHtml);
+
+          if (remainOnCurrentCard) {
+            this.giveFeedbackAndStayOnCurrentCard(
+              feedbackHtml,
+              missingPrerequisiteSkillId,
+              refreshInteraction,
+              refresherExplorationId
+            );
+            if (refreshInteraction) {
+              this._nextFocusLabel =
+                this.focusManagerService.generateFocusLabel();
+            }
+            this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
+            this.scrollToBottom();
+          } else {
+            this.moveToNewCard(feedbackHtml, isFinalQuestion);
+          }
+          this.answerIsBeingProcessed = false;
+        }, millisecsLeftToWait);
+      }
+    );
+  }
+
   /**
    * Records that the user has submitted an incorrect answer.
    *
@@ -355,6 +555,26 @@ export class ConversationFlowService {
       helpCardHtml: helpCardHtml,
       hasContinueButton: hasContinueButton,
     });
+  }
+
+  getCanAskLearnerForAnswerInfo(): boolean {
+    return this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
+  }
+
+  setActiveVoiceover(feedbackHtml: string): void {
+    let interaction = this._getCurrentCard().getInteraction();
+
+    let feedbackContentId =
+      interaction.getContentIdForMatchingHtml(feedbackHtml);
+
+    if (feedbackContentId) {
+      this.voiceoverPlayerService.setActiveVoiceover(feedbackContentId);
+    }
+    this.voiceoverPlayerService.setActiveComponentName(
+      AppConstants.COMPONENT_NAME_FEEDBACK
+    );
+
+    this.audioPlayerService.onAutoplayAudio.emit();
   }
 
   /**
@@ -503,6 +723,34 @@ export class ConversationFlowService {
    */
   setNextStateCard(card: StateCard | null): void {
     this.nextStateCard = card;
+  }
+
+  getAnswerIsCorrect(): boolean {
+    return this.answerIsCorrect;
+  }
+
+  setAnswerIsCorrect(isCorrect: boolean): void {
+    this.answerIsCorrect = isCorrect;
+  }
+
+  getAnswerIsBeingProcessed(): boolean {
+    return this.answerIsBeingProcessed;
+  }
+
+  setAnswerIsBeingProcessed(isBeingProcessed: boolean): void {
+    this.answerIsBeingProcessed = isBeingProcessed;
+  }
+
+  getHasInteractedAtLeastOnce(): boolean {
+    return this.hasInteractedAtLeastOnce;
+  }
+
+  getExplorationActuallyStarted(): boolean {
+    return this.explorationActuallyStarted;
+  }
+
+  setExplorationActuallyStarted(hasStarted: boolean): void {
+    this.explorationActuallyStarted = hasStarted;
   }
 
   get onPlayerStateChange(): EventEmitter<string> {

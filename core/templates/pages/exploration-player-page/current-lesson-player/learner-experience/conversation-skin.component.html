@@ -32,7 +32,7 @@
         <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
                             [isLearnAgainButton]="isLearnAgainButton()"
                             [displayedCard]="displayedCard"
-                            [submitButtonIsShown]="!answerIsBeingProcessed && !continueToReviseStateButtonIsVisible"
+                            [submitButtonIsShown]="!getAnswerIsBeingProcessed() && !continueToReviseStateButtonIsVisible"
                             [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
                             (clickContinueButton)="showUpcomingCard()"
                             (clickContinueToReviseButton)="triggerRedirectionToStuckState()"

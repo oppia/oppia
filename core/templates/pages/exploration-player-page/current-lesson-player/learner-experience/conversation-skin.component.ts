@@ -87,7 +87,6 @@ const TIME_NUM_CARDS_CHANGE_MSEC = 500;
 const ALERT_MESSAGE_TIMEOUT = 6000;
 const TIME_PADDING_MSEC = 250;
 const TIME_SCROLL_MSEC = 600;
-const MIN_CARD_LOADING_DELAY_MSEC = 950;
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -99,21 +98,16 @@ export class ConversationSkinComponent {
   @Input() diagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
 
-  hasInteractedAtLeastOnce: boolean = false;
   _nextFocusLabel = null;
   _editorPreviewMode;
-  explorationActuallyStarted: boolean = false;
 
   isLoggedIn: boolean;
   voiceoversAreLoaded: boolean = false;
   collectionTitle: string;
-  answerIsBeingProcessed: boolean = false;
   explorationId: string;
-  isInPreviewMode: boolean;
   isIframed: boolean;
   hasFullyLoaded = false;
   recommendedExplorationSummaries: LearnerExplorationSummary[] = [];
-  answerIsCorrect = false;
   pendingCardWasSeenBefore: boolean = false;
   OPPIA_AVATAR_IMAGE_URL: string;
   displayedCard: StateCard;
@@ -212,7 +206,6 @@ export class ConversationSkinComponent {
     }
 
     this.explorationId = this.pageContextService.getExplorationId();
-    this.isInPreviewMode = this.pageContextService.isInExplorationEditorPage();
     this.isIframed = this.urlService.isIframed();
     this.loaderService.showLoadingScreen('Loading');
 
@@ -315,13 +308,13 @@ export class ConversationSkinComponent {
             );
 
             // For single state explorations, when the exploration
-            // reachesthe terminal state and explorationActuallyStarted
+            // reaches the terminal state and explorationActuallyStarted
             // is false, record exploration actual start event.
-            if (!this.explorationActuallyStarted) {
+            if (!this.conversationFlowService.getExplorationActuallyStarted()) {
               this.statsReportingService.recordExplorationActuallyStarted(
                 newStateName
               );
-              this.explorationActuallyStarted = true;
+              this.conversationFlowService.setExplorationActuallyStarted(true);
             }
           }
         }
@@ -340,8 +333,8 @@ export class ConversationSkinComponent {
           return;
         }
         if (
-          this.hasInteractedAtLeastOnce &&
-          !this.isInPreviewMode &&
+          this.conversationFlowService.getHasInteractedAtLeastOnce() &&
+          !this._editorPreviewMode &&
           !this.displayedCard.isTerminal() &&
           !this.explorationModeService.isInQuestionMode()
         ) {
@@ -463,34 +456,18 @@ export class ConversationSkinComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  alwaysAskLearnerForAnswerDetails(): boolean {
-    return this.learnerAnswerInfoService.getAlwaysAskLearnerForAnswerDetails();
+  getAnswerIsBeingProcessed(): boolean {
+    return this.conversationFlowService.getAnswerIsBeingProcessed();
   }
 
   getCanAskLearnerForAnswerInfo(): boolean {
     return this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo();
   }
 
-  initLearnerAnswerInfoService(
-    entityId: string,
-    state: State,
-    answer: string,
-    interactionRulesService: InteractionRulesService,
-    alwaysAskLearnerForAnswerInfo: boolean
-  ): void {
-    this.learnerAnswerInfoService.initLearnerAnswerInfoService(
-      entityId,
-      state,
-      answer,
-      interactionRulesService,
-      alwaysAskLearnerForAnswerInfo
-    );
-  }
-
   isCorrectnessFooterEnabled(): boolean {
     return (
       this.correctnessFooterIsShown &&
-      this.answerIsCorrect &&
+      this.conversationFlowService.getAnswerIsCorrect() &&
       this.playerPositionService.hasLearnerJustSubmittedAnAnswer()
     );
   }
@@ -513,7 +490,10 @@ export class ConversationSkinComponent {
     if (INTERACTION_SPECS[interaction.id].is_linear) {
       return false;
     }
-    return this.pendingCardWasSeenBefore && !this.answerIsCorrect;
+    return (
+      this.pendingCardWasSeenBefore &&
+      !this.conversationFlowService.getAnswerIsCorrect()
+    );
   }
 
   getStaticImageUrl(imagePath: string): string {
@@ -734,9 +714,7 @@ export class ConversationSkinComponent {
   }
 
   isCurrentCardAtEndOfTranscript(): boolean {
-    return this.playerTranscriptService.isLastCard(
-      this.playerPositionService.getDisplayedCardIndex()
-    );
+    return this.playerPositionService.isCurrentCardAtEndOfTranscript();
   }
 
   private _addNewCard(newCard): void {
@@ -966,7 +944,6 @@ export class ConversationSkinComponent {
   }
 
   initializePage(): void {
-    this.hasInteractedAtLeastOnce = false;
     this.recommendedExplorationSummaries = [];
     this.playerPositionService.init(this._navigateToDisplayedCard.bind(this));
     if (this.questionPlayerConfig) {
@@ -986,194 +963,6 @@ export class ConversationSkinComponent {
       this.explorationInitializationService.initializePlayer(
         this._initializeDirectiveComponents.bind(this)
       );
-    }
-  }
-
-  submitAnswer(
-    answer: string,
-    interactionRulesService: InteractionRulesService
-  ): void {
-    this.displayedCard.updateCurrentAnswer(null);
-
-    // Safety check to prevent double submissions from occurring.
-    if (
-      this.answerIsBeingProcessed ||
-      !this.isCurrentCardAtEndOfTranscript() ||
-      this.displayedCard.isCompleted()
-    ) {
-      return;
-    }
-
-    if (!this.isInPreviewMode) {
-      this.fatigueDetectionService.recordSubmissionTimestamp();
-      if (this.fatigueDetectionService.isSubmittingTooFast()) {
-        this.fatigueDetectionService.displayTakeBreakMessage();
-        this.conversationFlowService.onOppiaFeedbackAvailable.emit();
-        return;
-      }
-    }
-
-    if (
-      !this.isInPreviewMode &&
-      !this.explorationModeService.isPresentingIsolatedQuestions() &&
-      AppConstants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE
-    ) {
-      this.initLearnerAnswerInfoService(
-        this.explorationId,
-        this.explorationEngineService.getState(),
-        answer,
-        interactionRulesService,
-        this.alwaysAskLearnerForAnswerDetails()
-      );
-    }
-
-    this.numberAttemptsService.submitAttempt();
-
-    this.answerIsBeingProcessed = true;
-    this.hasInteractedAtLeastOnce = true;
-
-    this.playerTranscriptService.addNewInput(answer, false);
-
-    if (this.getCanAskLearnerForAnswerInfo()) {
-      setTimeout(() => {
-        this.playerTranscriptService.addNewResponse(
-          this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion()
-        );
-        this.answerIsBeingProcessed = false;
-        this.conversationFlowService.emitHelpCard(
-          this.learnerAnswerInfoService.getSolicitAnswerDetailsQuestion(),
-          false
-        );
-      }, 100);
-      return;
-    }
-
-    let timeAtServerCall = new Date().getTime();
-    this.playerPositionService.recordAnswerSubmission();
-    let currentEngineService =
-      this.currentEngineService.getCurrentEngineService();
-    this.answerIsCorrect = currentEngineService.submitAnswer(
-      answer,
-      interactionRulesService,
-      (
-        nextCard,
-        refreshInteraction,
-        feedbackHtml,
-        refresherExplorationId,
-        missingPrerequisiteSkillId,
-        remainOnCurrentCard,
-        taggedSkillMisconceptionId,
-        wasOldStateInitial,
-        isFirstHit,
-        isFinalQuestion,
-        nextCardIfReallyStuck,
-        focusLabel
-      ) => {
-        this.conversationFlowService.setNextStateCard(nextCard);
-        this.conversationFlowService.setNextCardIfStuck(nextCardIfReallyStuck);
-        if (
-          !this._editorPreviewMode &&
-          !this.explorationModeService.isPresentingIsolatedQuestions()
-        ) {
-          let oldStateName = this.playerPositionService.getCurrentStateName();
-          const completedChaptersCount =
-            this.chapterProgressService.getCompletedChaptersCount();
-          if (!remainOnCurrentCard) {
-            this.statsReportingService.recordStateTransition(
-              oldStateName,
-              nextCard.getStateName(),
-              answer,
-              this.learnerParamsService.getAllParams(),
-              isFirstHit,
-              String(completedChaptersCount && completedChaptersCount + 1),
-              String(this.playerTranscriptService.getNumCards()),
-              currentEngineService.getLanguageCode()
-            );
-
-            this.statsReportingService.recordStateCompleted(oldStateName);
-          }
-          if (nextCard.isTerminal()) {
-            this.statsReportingService.recordStateCompleted(
-              nextCard.getStateName()
-            );
-          }
-          if (wasOldStateInitial && !this.explorationActuallyStarted) {
-            this.statsReportingService.recordExplorationActuallyStarted(
-              oldStateName
-            );
-            this.explorationActuallyStarted = true;
-          }
-        }
-
-        if (!this.explorationModeService.isPresentingIsolatedQuestions()) {
-          this.conversationFlowService.onPlayerStateChange.emit(
-            nextCard.getStateName()
-          );
-        } else if (this.explorationModeService.isInQuestionPlayerMode()) {
-          this.questionPlayerStateService.answerSubmitted(
-            this.questionPlayerEngineService.getCurrentQuestion(),
-            !remainOnCurrentCard,
-            taggedSkillMisconceptionId
-          );
-        }
-
-        let millisecsLeftToWait: number;
-        if (!this.displayedCard.isInteractionInline()) {
-          // Do not wait if the interaction is supplemental -- there's
-          // already a delay bringing in the help card.
-          millisecsLeftToWait = 1.0;
-        } else if (this.explorationModeService.isInDiagnosticTestPlayerMode()) {
-          // Do not wait if the player mode is the diagnostic test. Since no
-          // feedback will be presented after attempting a question so delaying
-          // is not required.
-          millisecsLeftToWait = 1.0;
-        } else {
-          millisecsLeftToWait = Math.max(
-            MIN_CARD_LOADING_DELAY_MSEC -
-              (new Date().getTime() - timeAtServerCall),
-            1.0
-          );
-        }
-
-        setTimeout(() => {
-          this.conversationFlowService.onOppiaFeedbackAvailable.emit();
-          this.setActiveVoiceover(feedbackHtml);
-          this.voiceoverPlayerService.setActiveComponentName(
-            AppConstants.COMPONENT_NAME_FEEDBACK
-          );
-
-          this.audioPlayerService.onAutoplayAudio.emit();
-
-          if (remainOnCurrentCard) {
-            this.conversationFlowService.giveFeedbackAndStayOnCurrentCard(
-              feedbackHtml,
-              missingPrerequisiteSkillId,
-              refreshInteraction,
-              refresherExplorationId
-            );
-            if (refreshInteraction) {
-              this._nextFocusLabel =
-                this.focusManagerService.generateFocusLabel();
-            }
-            this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
-            this.scrollToBottom();
-          } else {
-            this.moveToNewCard(feedbackHtml, isFinalQuestion);
-          }
-          this.answerIsBeingProcessed = false;
-        }, millisecsLeftToWait);
-      }
-    );
-  }
-
-  setActiveVoiceover(feedbackHtml: string): void {
-    let interaction = this.displayedCard.getInteraction();
-
-    let feedbackContentId =
-      interaction.getContentIdForMatchingHtml(feedbackHtml);
-
-    if (feedbackContentId) {
-      this.voiceoverPlayerService.setActiveVoiceover(feedbackContentId);
     }
   }
 
@@ -1200,7 +989,7 @@ export class ConversationSkinComponent {
       } else {
         this.showUpcomingCard();
       }
-      this.answerIsBeingProcessed = false;
+      this.conversationFlowService.setAnswerIsBeingProcessed(false);
       return;
     }
     this.fatigueDetectionService.reset();
@@ -1359,10 +1148,10 @@ export class ConversationSkinComponent {
         clicked) during these transitions which is not required.
         Also, if the 'if' check is not there, Learn Again button would
         briefly switched to Continue before going to next card. */
-    if (this.answerIsCorrect) {
+    if (this.conversationFlowService.getAnswerIsCorrect()) {
       this.pendingCardWasSeenBefore = false;
     }
-    this.answerIsCorrect = false;
+    this.conversationFlowService.setAnswerIsCorrect(false);
     this.showPendingCard();
   }
 
