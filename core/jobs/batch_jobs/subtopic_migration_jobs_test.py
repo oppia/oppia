@@ -64,7 +64,7 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
             id=self.SUBTOPIC_1_ID,
             topic_id=self.TOPIC_1_ID,
             sections=self.study_guide.sections[0].to_dict(),
-            sections_schema_version=0,
+            sections_schema_version=1,
             language_code='cs',
             version=1
         )
@@ -78,8 +78,10 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stdout='STUDY GUIDE PROCESSED SUCCESS: 1'),
+            # Remove 'PREVIOUSLY' from the string once
+            # sections_schema_versions v2 and further are available. 
             job_run_result.JobRunResult(
-                stdout='STUDY GUIDE MIGRATED SUCCESS: 1')
+                stdout='STUDY GUIDE PREVIOUSLY MIGRATED SUCCESS: 1')
         ])
 
         migrated_study_guide_model = subtopic_models.StudyGuideModel.get(
@@ -110,7 +112,7 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
             id=self.SUBTOPIC_2_ID,
             topic_id=self.TOPIC_1_ID,
             sections=self.study_guide.sections[0].to_dict(),
-            sections_schema_version=0,
+            sections_schema_version=1,
             language_code='en',
         )
         second_unmigrated_study_guide_model.update_timestamps()
@@ -213,7 +215,7 @@ class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
             id=self.SUBTOPIC_2_ID,
             topic_id=self.TOPIC_1_ID,
             sections=self.study_guide.sections[0].to_dict(),
-            sections_schema_version=0,
+            sections_schema_version=1,
             language_code='en',
         )
         second_unmigrated_study_guide_model.update_timestamps()
