@@ -59,6 +59,10 @@ const enableAutogenerationSelectorTemplate = (languageAccentCode: string) =>
 const enableAutogenerationOptionSelector =
   '.e2e-test-autogeneration-option-selector';
 
+const explorationEditorSettingsTabSelector =
+  '.e2e-test-exploration-editor-settings-tab';
+const toastWarningContainer = '.e2e-test-toast-warning';
+
 export class VoiceoverAdmin extends BaseUser {
   /**
    * Function to navigate to exploration settings tab.
@@ -66,13 +70,16 @@ export class VoiceoverAdmin extends BaseUser {
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
+      await this.isElementVisible(mobileNavToggelbutton);
       await this.clickOn(mobileNavToggelbutton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
     } else {
+      await this.isElementVisible(explorationSettingsTab);
       await this.clickOn(explorationSettingsTab);
     }
 
+    await this.isElementVisible(explorationEditorSettingsTabSelector);
     showMessage('Navigation to settings tab is successful.');
   }
 
@@ -131,6 +138,8 @@ export class VoiceoverAdmin extends BaseUser {
         visible: true,
       });
       await this.clickOn(dropdownToggleIcon);
+
+      await this.isElementVisible(mobileOptionsDropdown, false);
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
       showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
@@ -167,6 +176,7 @@ export class VoiceoverAdmin extends BaseUser {
     voiceArtists: string[]
   ): Promise<void> {
     for (let i = 0; i < voiceArtists.length; i++) {
+      await this.isElementVisible(editVoiceoverArtistButton);
       await this.clickOn(editVoiceoverArtistButton);
       await this.clickOn(voiceArtistUsernameInputBox);
       await this.page.waitForSelector(voiceArtistUsernameInputBox, {
@@ -214,7 +224,10 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to close toast message.
    */
   async closeToastMessage(): Promise<void> {
+    await this.isElementVisible(toastWarningContainer);
     await this.clickOn(closeToastMessageButton);
+
+    await this.isElementVisible(toastWarningContainer, false);
   }
 
   /**
@@ -294,6 +307,8 @@ export class VoiceoverAdmin extends BaseUser {
       );
       if (textContent === languageAccentDescription) {
         await option.click();
+
+        await this.isElementVisible(addNewLanguageAccentButtonSelector);
         break;
       }
     }
