@@ -73,6 +73,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions.spec.ts"
     },
     {
+      "name": "logged-in-user/view-subtopic-study-guides",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/view-subtopic-study-guides.spec.ts"
+    },
+    {
       "name": "logged-in-user/access-dashboards-from-profile-menu",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/access-dashboards-from-profile-menu.spec.ts"
     },
