@@ -500,7 +500,7 @@ export class QuestionSubmitter extends BaseUser {
     showMessage('Image interaction has been added successfully.');
   }
 
-  // TODO (#22539): This function has a duplicate in exploration-editor.ts.
+  // TODO(#22539): This function has a duplicate in exploration-editor.ts.
   // To avoid unexpected behavior, ensure that any modifications here are also
   // made in editDefaultResponseFeedbackInExplorationEditorPage() in exploration-editor.ts.
   /**
@@ -523,7 +523,6 @@ export class QuestionSubmitter extends BaseUser {
       await this.clickOn(saveOutcomeFeedbackButton);
 
       // Check for text and add post check based on it.
-      // TODO: Verify the text was added correctly.
       const newDefaultResponseText = await this.page.$eval(
         openOutcomeFeedBackEditor,
         el => el.textContent?.trim()

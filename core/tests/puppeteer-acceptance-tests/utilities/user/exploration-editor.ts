@@ -772,7 +772,6 @@ export class ExplorationEditor extends BaseUser {
     await this.type(addTitleBar, title);
     await this.page.keyboard.press('Tab');
 
-    // TODO: Verify post check works.
     const newTitle = await this.page.$eval(addTitleBar, el =>
       (el as HTMLInputElement).value?.trim()
     );
@@ -1328,7 +1327,6 @@ export class ExplorationEditor extends BaseUser {
 
       await this.waitForNetworkIdle({idleTime: 700});
 
-      // TODO: Verify if it works properly.
       const headingName = !cardName.trimEnd().endsWith('...')
         ? cardName
         : cardName.trimEnd().slice(0, -3);
@@ -1454,7 +1452,7 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
-  // TODO (#22539): This function has a duplicate in exploration-editor.ts.
+  // TODO(#22539): This function has a duplicate in exploration-editor.ts.
   // To avoid unexpected behavior, ensure that any modifications here are also
   // made in editDefaultResponseFeedbackInQuestionEditorPage() in question-submitter.ts.
   /**
