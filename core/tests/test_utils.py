@@ -69,6 +69,8 @@ from core.domain import state_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import study_guide_domain
+from core.domain import study_guide_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
@@ -3829,6 +3831,39 @@ version: 1
         subtopic_page_services.save_subtopic_page(
             owner_id, subtopic_page, 'Create new subtopic', subtopic_changes)
         return subtopic_page
+
+    def save_new_study_guide(
+        self, subtopic_id: int, owner_id: str, topic_id: str
+    ) -> study_guide_domain.StudyGuide:
+        """Creates an Oppia study guide and saves it.
+
+        Args:
+            subtopic_id: int. ID of the subtopic for which the study guide is
+                to be created.
+            owner_id: str. The user_id of the creator of the topic.
+            topic_id: str. ID for the topic that the subtopic belongs to.
+
+        Returns:
+            StudyGuide. A newly-created study guide.
+        """
+        study_guide = (
+            study_guide_domain.StudyGuide.create_study_guide(
+                subtopic_id, topic_id, 'Android Study Guide',
+                '<p>Android Study Guide Content</p>'
+            )
+        )
+        study_guide_changes = [
+            study_guide_domain.StudyGuideChange({
+                'cmd': study_guide_domain.CMD_CREATE_NEW,
+                'topic_id': topic_id,
+                'subtopic_id': subtopic_id,
+            })
+        ]
+        study_guide_services.save_study_guide(
+            owner_id, study_guide, 'Created new study guide',
+            study_guide_changes
+        )
+        return study_guide
 
     def save_new_topic(
         self,

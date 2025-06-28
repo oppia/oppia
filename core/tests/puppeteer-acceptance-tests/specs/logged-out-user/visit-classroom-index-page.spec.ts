@@ -57,7 +57,7 @@ describe('Logged-out User', function () {
   it(
     'should be redirected to a 404 error page if no classrooms are present.',
     async function () {
-      await loggedOutUser.navigateToClassroomsPage();
+      await loggedOutUser.navigateToClassroomsPage(false);
       await loggedOutUser.expectToBeOnErrorPage(404);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -77,7 +77,7 @@ describe('Logged-out User', function () {
       await curriculumAdmin.addTopicToClassroom('Math', 'Test Topic 1');
       await curriculumAdmin.publishClassroom('Math');
 
-      await loggedOutUser.navigateToClassroomsPage();
+      await loggedOutUser.navigateToClassroomsPage(false);
       await loggedOutUser.expectToBeOnClassroomPage('Math');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -97,7 +97,7 @@ describe('Logged-out User', function () {
       await curriculumAdmin.addTopicToClassroom('Science', 'Test Topic 2');
       await curriculumAdmin.publishClassroom('Science');
 
-      await loggedOutUser.navigateToClassroomsPage();
+      await loggedOutUser.navigateToClassroomsPage(false);
       await loggedOutUser.expectClassroomCountInClassroomsPageToBe(2);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

@@ -19,7 +19,7 @@
  */
 
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {
   ChangeDetectorRef,
   Component,
@@ -180,7 +180,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private i18nService: I18nService,
     private alertsService: AlertsService,
@@ -215,7 +215,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         return languageInfo;
       }
     );
-    this.showLanguageSelector = !this.contextService
+    this.showLanguageSelector = !this.pageContextService
       .getPageContext()
       .endsWith('editor');
 

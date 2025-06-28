@@ -27,7 +27,7 @@ import {UrlService} from '../../../services/contextual/url.service';
 import {PlayerPositionService} from './player-position.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StateCard} from '../../../domain/state_card/state-card.model';
-import {ContextService} from '../../../services/context.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {InteractionRulesService} from './answer-classification.service';
 import {Interaction} from '../../../domain/exploration/InteractionObjectFactory';
 import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
@@ -35,7 +35,7 @@ import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceover
 describe('Current Interaction Service', () => {
   let urlService: UrlService;
   let currentInteractionService: CurrentInteractionService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let DUMMY_ANSWER = 'dummy_answer';
   let playerTranscriptService: PlayerTranscriptService;
   let playerPositionService: PlayerPositionService;
@@ -50,10 +50,10 @@ describe('Current Interaction Service', () => {
     ''
   );
 
-  // This mock is required since ContextService is used in
+  // This mock is required since PageContextService is used in
   // CurrentInteractionService to obtain the explorationId. So, in the
   // tests also we need to create a mock environment of exploration editor
-  // since ContextService will error if it is used outside the context
+  // since PageContextService will error if it is used outside the context
   // of an exploration.
   beforeEach(() => {
     urlService = TestBed.inject(UrlService);
@@ -63,7 +63,7 @@ describe('Current Interaction Service', () => {
     currentInteractionService = TestBed.inject(CurrentInteractionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     playerPositionService = TestBed.inject(PlayerPositionService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
   });
 
   it('should properly register onSubmitFn and submitAnswerFn', () => {
@@ -163,8 +163,8 @@ describe('Current Interaction Service', () => {
         ''
       )
     );
-    spyOn(contextService, 'getExplorationId').and.returnValue('abc');
-    spyOn(contextService, 'getPageContext').and.returnValue('learner');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('abc');
+    spyOn(pageContextService, 'getPageContext').and.returnValue('learner');
 
     let additionalInfo =
       '\nUndefined submit answer debug logs:' +
