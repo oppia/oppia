@@ -77,24 +77,18 @@ class CommonTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
     def test_recursive_chmod_changes_permissions_for_existing_files(self) -> None:
-        temp_dir = tempfile.mkdtemp()
-        test_file = os.path.join(temp_dir, 'test_file.txt')
-        with open(test_file, 'w', encoding='utf-8') as f:
-            f.write('hello')
+        with tempfile.TemporaryDirectory() as temp_dir:
+            test_file = os.path.join(temp_dir, 'test_file.txt')
+            with open(test_file, 'w', encoding='utf-8') as f:
+                f.write('hello')
 
-        try:
-            # Apply chmod recursively
             common.recursive_chmod(temp_dir, 0o744)
 
-            # Check permission bits
             file_mode = oct(os.stat(test_file).st_mode)[-3:]
             dir_mode = oct(os.stat(temp_dir).st_mode)[-3:]
 
-            # Validate that chmod worked
             self.assertEqual(file_mode, '744')
             self.assertEqual(dir_mode, '744')
-        finally:
-            shutil.rmtree(temp_dir)    
 
     def tearDown(self) -> None:
         pathlib.Path.unlink(pathlib.Path('mock_app.yaml'), missing_ok=True)
