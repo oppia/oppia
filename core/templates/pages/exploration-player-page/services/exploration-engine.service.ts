@@ -394,7 +394,7 @@ export class ExplorationEngineService {
    * @param {ParamChange[]} manualParamChanges - A list of manually provided parameter changes
    *   (used in preview mode).
    */
-  initParams(manualParamChanges: ParamChange[]): void {
+  private _initParams(manualParamChanges: ParamChange[]): void {
     let baseParams = {};
     this.exploration.paramSpecs.forEach((paramName, paramSpec) => {
       baseParams[paramName] = paramSpec.getType().createDefaultValue();
@@ -507,14 +507,14 @@ export class ExplorationEngineService {
     if (this.pageContextService.isInExplorationEditorPage()) {
       this.exploration.setInitialStateName(this.initStateName);
       this.visitedStateNames = [initStateName];
-      this.initParams(this.manualParamChanges);
+      this._initParams(this.manualParamChanges);
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(this.initStateName);
       this.loadInitialState(successCallback);
     } else {
       this.visitedStateNames.push(initStateName);
       this.pageContextService.setExplorationVersion(explorationVersion);
-      this.initParams([]);
+      this._initParams([]);
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(initStateName);
       this.imagePreloaderService.init(this.exploration);
@@ -895,9 +895,6 @@ export class ExplorationEngineService {
 
     let contentId = this.exploration.getState(this.nextStateIfStuckName).content
       .contentId;
-    if (contentId === null) {
-      throw new Error('Content id cannot be null.');
-    }
 
     return StateCard.createNewCard(
       this.nextStateIfStuckName,
