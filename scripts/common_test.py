@@ -78,7 +78,8 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_recursive_chmod_changes_permissions_for_existing_files(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
-            test_file = os.path.join(temp_dir, 'test_file.txt')
+            test_file = os.path.join(
+                temp_dir, 'test_file.txt')
             with open(test_file, 'w', encoding='utf-8') as f:
                 f.write('hello')
 
