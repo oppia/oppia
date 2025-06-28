@@ -259,10 +259,10 @@ describe('Progress nav component', () => {
     componentInstance.moveForwardByOneCard();
     expect(conversationFlowService.moveForwardByOneCard).toHaveBeenCalled();
   });
-  it('should call moveBackwardByOneCard on conversationFlowService', () => {
-    spyOn(conversationFlowService, 'moveBackwardByOneCard');
-    componentInstance.moveBackwardByOneCard();
-    expect(conversationFlowService.moveBackwardByOneCard).toHaveBeenCalled();
+  it('should call moveBackByOneCard on conversationFlowService', () => {
+    spyOn(conversationFlowService, 'moveBackByOneCard');
+    componentInstance.moveBackByOneCard();
+    expect(conversationFlowService.moveBackByOneCard).toHaveBeenCalled();
   });
 
   it('should update displayed card info when view updates', () => {

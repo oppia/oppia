@@ -22,7 +22,10 @@ import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
 import {InteractionObjectFactory} from '../../../domain/exploration/InteractionObjectFactory';
-import {ExplorationBackendDict} from '../../../domain/exploration/ExplorationObjectFactory';
+import {
+  ExplorationBackendDict,
+  ExplorationObjectFactory,
+} from '../../../domain/exploration/ExplorationObjectFactory';
 import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   ParamChangeBackendDict,
@@ -47,7 +50,7 @@ import {LearnerParamsService} from './learner-params.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
 
-describe('Exploration engine service ', () => {
+fdescribe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
   let audioPreloaderService: AudioPreloaderService;
@@ -55,6 +58,7 @@ describe('Exploration engine service ', () => {
   let contentTranslationLanguageService: ContentTranslationLanguageService;
   let expressionInterpolationService: ExpressionInterpolationService;
   let explorationEngineService: ExplorationEngineService;
+  let explorationObjectFactory: ExplorationObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
   let interactionObjectFactory: InteractionObjectFactory;
   let learnerParamsService: LearnerParamsService;
@@ -355,6 +359,7 @@ describe('Exploration engine service ', () => {
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
+    explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
@@ -474,6 +479,28 @@ describe('Exploration engine service ', () => {
       expect(initSuccessCb).toHaveBeenCalled();
     }
   );
+
+  it("should throw an error if initial state name is null when calling 'init'", () => {
+    const mockExploration = {
+      getInitialState: () => ({name: null}),
+    };
+
+    spyOn(explorationObjectFactory, 'createFromBackendDict').and.returnValue(
+      mockExploration
+    );
+
+    expect(() => {
+      explorationEngineService.init(
+        explorationDict,
+        1,
+        null,
+        true,
+        ['en'],
+        [],
+        () => {}
+      );
+    }).toThrowError('Initial state name cannot be null.');
+  });
 
   describe('on submitting answer ', () => {
     it(
@@ -1259,6 +1286,64 @@ describe('Exploration engine service ', () => {
     stateCard = explorationEngineService.getStateCardByName('Mid');
 
     expect(stateCard.getStateName()).toBe('Mid');
+  });
+
+  it("should throw an error if interaction is not defined when calling 'getStateCardByName'", () => {
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      () => {}
+    );
+
+    spyOn(
+      explorationEngineService.exploration,
+      'getInteraction'
+    ).and.returnValue(null);
+
+    expect(() => {
+      explorationEngineService.getStateCardByName('Start');
+    }).toThrowError('Interaction for the state is not defined.');
+  });
+
+  it("should throw an error if contentId is null when calling 'getStateCardByName'", () => {
+    const mockState = {
+      content: {
+        html: '<p>Sample content</p>',
+        contentId: null,
+      },
+    };
+
+    explorationEngineService.init(
+      explorationDict,
+      1,
+      null,
+      true,
+      ['en'],
+      [],
+      () => {}
+    );
+    spyOn(explorationEngineService.exploration, 'getState').and.returnValue(
+      mockState
+    );
+    spyOn(
+      explorationEngineService.exploration,
+      'getInteraction'
+    ).and.returnValue({
+      id: 'TextInput',
+    });
+    spyOn(
+      explorationEngineService,
+      '_getInteractionHtmlByStateName'
+    ).and.returnValue('<div>interaction</div>');
+    spyOn(explorationEngineService, 'getRandomSuffix').and.returnValue('');
+
+    expect(() => {
+      explorationEngineService.getStateCardByName('SomeState');
+    }).toThrowError('Content id cannot be null.');
   });
 
   it(

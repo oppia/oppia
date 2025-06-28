@@ -47,6 +47,7 @@ import {ReadOnlyTopic} from '../../../../domain/topic_viewer/read-only-topic-obj
 import {LearnerExplorationSummary} from '../../../../domain/summary/learner-exploration-summary.model';
 import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
+import {PageContextService} from '../../../../services/page-context.service';
 
 describe('Ratings and recommendations component', () => {
   let fixture: ComponentFixture<RatingsAndRecommendationsComponent>;
@@ -55,6 +56,7 @@ describe('Ratings and recommendations component', () => {
   let learnerViewRatingService: LearnerViewRatingService;
   let urlService: UrlService;
   let userService: UserService;
+  let pageContextService: PageContextService;
   let explorationModeService: ExplorationModeService;
   let urlInterpolationService: UrlInterpolationService;
   let conversationFlowService: ConversationFlowService;
@@ -80,6 +82,24 @@ describe('Ratings and recommendations component', () => {
     };
   }
 
+  class MockPageContextService {
+    getExplorationId(): string {
+      return 'test_id';
+    }
+    getExplorationVersion(): number {
+      return 1;
+    }
+    isInExplorationEditorPage(): boolean {
+      return false;
+    }
+    isInQuestionPlayerMode(): boolean {
+      return false;
+    }
+    setExplorationVersion(_version: number): void {
+      // no-op
+    }
+  }
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, NgbPopoverModule],
@@ -92,6 +112,7 @@ describe('Ratings and recommendations component', () => {
         ExplorationModeService,
         UrlInterpolationService,
         ConversationFlowService,
+        {provide: PageContextService, useClass: MockPageContextService},
         AssetsBackendApiService,
         StoryViewerBackendApiService,
         TopicViewerBackendApiService,
@@ -124,6 +145,7 @@ describe('Ratings and recommendations component', () => {
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    pageContextService = TestBed.inject(PageContextService);
   });
 
   it(

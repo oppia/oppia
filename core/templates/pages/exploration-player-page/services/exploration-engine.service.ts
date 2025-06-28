@@ -66,13 +66,13 @@ export class ExplorationEngineService {
 
   answerIsBeingProcessed: boolean = false;
   exploration!: Exploration;
+  currentStateName!: string;
+  nextStateName!: string;
+  nextStateIfStuckName!: string | null;
 
   // This list may contain duplicates. A state name is added to it each time
   // the learner moves to a new card.
   visitedStateNames: string[] = [];
-  currentStateName!: string;
-  nextStateName!: string;
-  nextStateIfStuckName!: string | null;
 
   // Param changes to be used ONLY in editor preview mode.
   manualParamChanges!: ParamChange[];

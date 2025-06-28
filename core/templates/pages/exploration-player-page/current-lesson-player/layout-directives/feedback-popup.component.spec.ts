@@ -35,6 +35,7 @@ import {PlayerPositionService} from '../../services/player-position.service';
 import {BackgroundMaskService} from '../../../../services/stateful/background-mask.service';
 import {FeedbackPopupBackendApiService} from '../../services/feedback-popup-backend-api.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {PageContextService} from '../../../../services/page-context.service';
 
 describe('FeedbackPopupComponent', () => {
   let component: FeedbackPopupComponent;
@@ -43,12 +44,23 @@ describe('FeedbackPopupComponent', () => {
   let playerPositionService: PlayerPositionService;
   let windowDimensionsService: WindowDimensionsService;
   let feedbackPopupBackendApiService: FeedbackPopupBackendApiService;
+  let pageContextService: PageContextService;
+
+  class MockPageContextService {
+    getExplorationId(): string {
+      return 'test_id';
+    }
+    getExplorationVersion(): number {
+      return 1;
+    }
+  }
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [FeedbackPopupComponent, MockTranslatePipe],
       providers: [
+        {provide: PageContextService, useClass: MockPageContextService},
         BackgroundMaskService,
         {
           provide: TranslateService,
@@ -66,6 +78,7 @@ describe('FeedbackPopupComponent', () => {
     feedbackPopupBackendApiService = TestBed.get(
       FeedbackPopupBackendApiService
     );
+    pageContextService = TestBed.inject(PageContextService);
     fixture = TestBed.createComponent(FeedbackPopupComponent);
     component = fixture.componentInstance;
 
@@ -77,7 +90,9 @@ describe('FeedbackPopupComponent', () => {
   });
 
   afterEach(() => {
-    component.ngOnDestroy();
+    if (component) {
+      component.ngOnDestroy();
+    }
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
