@@ -38,6 +38,7 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AppConstants} from 'app.constants';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 
 interface ResultActionButton {
   type: string;
@@ -69,9 +70,12 @@ export class RatingsAndRecommendationsComponent {
   @Input() explorationIsInPreviewMode!: boolean;
   @Input() questionPlayerConfig!: QuestionPlayerConfig;
   @Input() collectionSummary!: CollectionSummary;
-  @Input() isRefresherExploration!: boolean;
   @Input() recommendedExplorationSummaries!: LearnerExplorationSummary[];
-  @Input() parentExplorationIds!: string[];
+
+  // TODO(#22780): Remove these variable and related code.
+  isRefresherExploration!: boolean;
+  parentExplorationIds!: string[];
+
   // The below property will be undefined when the current chapter
   // is the last chapter of a story.
   @Input() nextLessonLink!: string | undefined;
@@ -94,6 +98,7 @@ export class RatingsAndRecommendationsComponent {
     private urlService: UrlService,
     private userService: UserService,
     private windowRef: WindowRef,
+    private conversationFlowService: ConversationFlowService,
     private urlInterpolationService: UrlInterpolationService,
     private localStorageService: LocalStorageService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
@@ -202,6 +207,14 @@ export class RatingsAndRecommendationsComponent {
     this.localStorageService.updateEndChapterSignUpSectionHiddenPreference(
       'true'
     );
+  }
+
+  getIsRefresherExploration(): boolean {
+    return this.conversationFlowService.getIsRefresherExploration();
+  }
+
+  getParentExplorationIds(): string[] {
+    return this.conversationFlowService.getParentExplorationIds();
   }
 
   isSignUpSectionHidden(): boolean {

@@ -68,7 +68,6 @@ import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.s
 import {LoaderService} from '../../../../services/loader.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {MessengerService} from '../../../../services/messenger.service';
-import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
 import {FocusManagerService} from '../../../../services/stateful/focus-manager.service';
 import {UserService} from '../../../../services/user.service';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
@@ -105,7 +104,7 @@ import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {CurrentEngineService} from '../../services/current-engine.service';
 import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
 import {LearnerExplorationSummary} from '../../../../domain/summary/learner-exploration-summary.model';
-
+import {ChapterProgressService} from '../../services/chapter-progress.service';
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -123,6 +122,7 @@ class MockWindowRef {
 describe('Conversation skin component', () => {
   let fixture: ComponentFixture<ConversationSkinComponent>;
   let componentInstance: ConversationSkinComponent;
+  let chapterProgressService: ChapterProgressService;
   let alertsService: AlertsService;
   let audioPlayerService: AudioPlayerService;
   let checkpointProgressService: CheckpointProgressService;
@@ -160,7 +160,6 @@ describe('Conversation skin component', () => {
   let answerClassificationService: AnswerClassificationService;
   let readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
   let refresherExplorationConfirmationModalService: RefresherExplorationConfirmationModalService;
-  let siteAnalyticsService: SiteAnalyticsService;
   let statsReportingService: StatsReportingService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
   let urlInterpolationService: UrlInterpolationService;
@@ -499,6 +498,7 @@ describe('Conversation skin component', () => {
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService
     );
+    chapterProgressService = TestBed.inject(ChapterProgressService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     explorationModeService = TestBed.inject(ExplorationModeService);
     explorationRecommendationsService = TestBed.inject(
@@ -542,7 +542,6 @@ describe('Conversation skin component', () => {
     refresherExplorationConfirmationModalService = TestBed.inject(
       RefresherExplorationConfirmationModalService
     );
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     statsReportingService = TestBed.inject(StatsReportingService);
     solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
@@ -631,7 +630,7 @@ describe('Conversation skin component', () => {
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
     spyOn(questionPlayerStateService, 'solutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
-    spyOn(componentInstance, 'fetchCompletedChaptersCount');
+    spyOn(chapterProgressService, 'updateCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
     spyOn(statsReportingService, 'recordExplorationActuallyStarted');
     spyOn(
@@ -729,7 +728,7 @@ describe('Conversation skin component', () => {
     tick(100);
 
     expect(componentInstance.continueToReviseStateButtonIsVisible).toBeTrue();
-    componentInstance.redirectToRefresherExplorationConfirmed = true;
+    conversationFlowService.setRedirectToRefresherExplorationConfirmed(true);
 
     spyOn(alertsService, 'addWarning');
     componentInstance.ngOnInit();
@@ -769,7 +768,10 @@ describe('Conversation skin component', () => {
     ).and.returnValue(
       Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
     );
-    spyOn(componentInstance, 'fetchCompletedChaptersCount').and.callThrough();
+    spyOn(
+      chapterProgressService,
+      'updateCompletedChaptersCount'
+    ).and.callThrough();
     spyOn(
       learnerDashboardBackendApiService,
       'fetchLearnerCompletedChaptersCountDataAsync'
@@ -926,7 +928,7 @@ describe('Conversation skin component', () => {
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
     spyOn(questionPlayerStateService, 'solutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
-    spyOn(componentInstance, 'fetchCompletedChaptersCount');
+    spyOn(chapterProgressService, 'updateCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
     spyOn(statsReportingService, 'recordExplorationActuallyStarted');
     spyOn(
@@ -1366,59 +1368,6 @@ describe('Conversation skin component', () => {
     expect(componentInstance.showPendingCard).toHaveBeenCalled();
   }));
 
-  it('should fetch completed chapters count if user is logged in', fakeAsync(() => {
-    spyOn(
-      learnerDashboardBackendApiService,
-      'fetchLearnerCompletedChaptersCountDataAsync'
-    ).and.returnValue(
-      Promise.resolve({
-        completedChaptersCount: 1,
-      })
-    );
-    componentInstance.isLoggedIn = false;
-
-    componentInstance.fetchCompletedChaptersCount();
-    tick();
-
-    expect(
-      learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync
-    ).not.toHaveBeenCalled();
-    expect(componentInstance.completedChaptersCount).toBeUndefined();
-
-    componentInstance.isLoggedIn = true;
-
-    componentInstance.fetchCompletedChaptersCount();
-    tick();
-
-    expect(
-      learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync
-    ).toHaveBeenCalled();
-
-    expect(componentInstance.completedChaptersCount).toEqual(1);
-  }));
-
-  it('should change card', () => {
-    spyOn(playerPositionService, 'recordNavigationButtonClick');
-    spyOn(playerPositionService, 'setDisplayedCardIndex');
-    spyOn(explorationEngineService.onUpdateActiveStateIfInEditor, 'emit');
-    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
-      'state_name'
-    );
-    spyOn(playerPositionService, 'changeCurrentQuestion');
-
-    componentInstance.changeCard(1);
-
-    expect(
-      playerPositionService.recordNavigationButtonClick
-    ).toHaveBeenCalled();
-    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalled();
-    expect(
-      explorationEngineService.onUpdateActiveStateIfInEditor.emit
-    ).toHaveBeenCalled();
-    expect(playerPositionService.getCurrentStateName).toHaveBeenCalled();
-    expect(playerPositionService.changeCurrentQuestion).toHaveBeenCalled();
-  });
-
   it(
     'should navigate to the most recently reached checkpoint ' +
       'on page load if user is logged in',
@@ -1484,7 +1433,7 @@ describe('Conversation skin component', () => {
         readOnlyExplorationBackendApiService,
         'loadLatestExplorationAsync'
       ).and.returnValue(Promise.resolve(expResponse));
-      componentInstance.prevSessionStatesProgress = ['Start', 'Mid'];
+      playerTranscriptService.setPrevSessionStatesProgress(['Start', 'Mid']);
       spyOn(explorationEngineService, 'getShortestPathToState').and.returnValue(
         ['Start', 'Mid']
       );
@@ -1538,12 +1487,16 @@ describe('Conversation skin component', () => {
 
       const mostRecentlyReachedCheckpoint =
         checkpointProgressService.getMostRecentlyReachedCheckpoint();
-      expect(componentInstance.visitedCheckpointStateNames).toContain('Mid');
-      expect(componentInstance.prevSessionStatesProgress).toEqual(['Start']);
+      const prevSessionStatesProgress =
+        playerTranscriptService.getPrevSessionStatesProgress();
+      const visitedCheckpointStateNames =
+        checkpointProgressService.visitedCheckpointStateNames;
+      expect(visitedCheckpointStateNames).toContain('Mid');
+      expect(prevSessionStatesProgress).toEqual(['Start']);
       expect(mostRecentlyReachedCheckpoint).toBe('Mid');
 
-      componentInstance.prevSessionStatesProgress = [];
-      componentInstance.visitedCheckpointStateNames = [];
+      playerTranscriptService.setPrevSessionStatesProgress([]);
+      checkpointProgressService.resetVisitedCheckpointStateNames();
       componentInstance.initializePage();
       tick(100);
       flush();
@@ -1613,7 +1566,7 @@ describe('Conversation skin component', () => {
 
   it('should determine if chapter was completed for the first time', fakeAsync(() => {
     componentInstance.isLoggedIn = true;
-    componentInstance.completedChaptersCount = 0;
+    chapterProgressService.setCompletedChaptersCount(0);
     spyOn(conversationFlowService, 'recordNewCardAdded');
     spyOn(focusManagerService, 'setFocusIfOnDesktop');
     spyOn(componentInstance, 'scrollToTop');
@@ -1694,23 +1647,27 @@ describe('Conversation skin component', () => {
       conversationFlowService,
       'isSupplementalCardNonempty'
     ).and.returnValues(false, true, true, false);
-    spyOn(componentInstance, 'animateToOneCard').and.callFake(callb => {
-      callb();
-    });
+    spyOn(componentInstance, 'animateToOneCard');
 
     componentInstance.showPendingCard();
     tick(1000);
 
-    expect(componentInstance.chapterIsCompletedForTheFirstTime).toBe(true);
-    expect(componentInstance.completedChaptersCount).toBe(1);
+    let completedChaptersCount =
+      chapterProgressService.getCompletedChaptersCount();
+    let chapterIsCompletedForTheFirstTime =
+      chapterProgressService.getChapterCompletedForTheFirstTime();
+    expect(chapterIsCompletedForTheFirstTime).toBe(true);
+    expect(completedChaptersCount).toBe(1);
 
-    componentInstance.completedChaptersCount = 1;
-    componentInstance.chapterIsCompletedForTheFirstTime = false;
+    chapterProgressService.setCompletedChaptersCount(1);
+    chapterProgressService.setChapterCompletedForTheFirstTime(false);
 
     componentInstance.showPendingCard();
     tick(1000);
 
-    expect(componentInstance.chapterIsCompletedForTheFirstTime).toBe(false);
+    chapterIsCompletedForTheFirstTime =
+      chapterProgressService.getChapterCompletedForTheFirstTime();
+    expect(chapterIsCompletedForTheFirstTime).toBe(false);
 
     flush();
   }));
@@ -1787,14 +1744,6 @@ describe('Conversation skin component', () => {
     expect(componentInstance.getContentFocusLabel(index)).toEqual(
       ExplorationPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX + index
     );
-  });
-
-  it('should reload exploration', () => {
-    spyOn(windowRef.nativeWindow.location, 'reload');
-
-    componentInstance.reloadExploration();
-
-    expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
   });
 
   it('should tell if display card is terminal', () => {
@@ -1935,16 +1884,6 @@ describe('Conversation skin component', () => {
     expect(diagnosticTestPlayerEngineService.init).toHaveBeenCalled();
   }));
 
-  it('should register analytics when user visit using iframe', () => {
-    spyOn(siteAnalyticsService, 'registerVisitOppiaFromIframeEvent');
-
-    componentInstance.onNavigateFromIframe();
-
-    expect(
-      siteAnalyticsService.registerVisitOppiaFromIframeEvent
-    ).toHaveBeenCalled();
-  });
-
   it('should submit answer from progress nav and toggle submit clicked', () => {
     componentInstance.displayedCard = displayedCard;
     spyOn(displayedCard, 'toggleSubmitClicked');
@@ -2031,7 +1970,7 @@ describe('Conversation skin component', () => {
     spyOn(playerTranscriptService, 'findIndexOfLatestStateWithName')
       .withArgs('revisionState')
       .and.returnValue(2);
-    const changeCard = spyOn(componentInstance, 'changeCard');
+    const changeCard = spyOn(conversationFlowService, 'changeCard');
     const recordNewCardAdded = spyOn(
       conversationFlowService,
       'recordNewCardAdded'
@@ -2165,9 +2104,7 @@ describe('Conversation skin component', () => {
       conversationFlowService,
       'isSupplementalCardNonempty'
     ).and.returnValues(false, true, true, false);
-    spyOn(componentInstance, 'animateToOneCard').and.callFake(callb => {
-      callb();
-    });
+    spyOn(componentInstance, 'animateToOneCard');
 
     componentInstance.showPendingCard();
     tick(1000);
@@ -2391,10 +2328,8 @@ describe('Conversation skin component', () => {
     stateCard.markAsCompleted();
     componentInstance.displayedCard = stateCard;
     conversationFlowService.setNextStateCard(stateCard);
-    componentInstance.conceptCard = new ConceptCard(
-      new SubtitledHtml('', ''),
-      [],
-      null
+    conceptCardManagerService.setConceptCard(
+      new ConceptCard(new SubtitledHtml('', ''), [], null)
     );
     spyOn(conversationFlowService, 'recordNewCardAdded');
     spyOn(conversationFlowService, 'addNewCard');
@@ -2406,9 +2341,7 @@ describe('Conversation skin component', () => {
     spyOn(playerTranscriptService, 'getCard');
     spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(true);
     spyOn(playerPositionService, 'setDisplayedCardIndex');
-    spyOn(componentInstance, 'animateToTwoCards').and.callFake(callb => {
-      callb();
-    });
+    spyOn(componentInstance, 'animateToTwoCards');
     spyOn(playerPositionService, 'changeCurrentQuestion');
     spyOn(componentInstance, 'showPendingCard');
     spyOn(urlService, 'getQueryFieldValuesAsList').and.returnValue([]);
@@ -2423,13 +2356,14 @@ describe('Conversation skin component', () => {
 
     componentInstance.showUpcomingCard();
 
-    componentInstance.conceptCard = null;
+    conceptCardManagerService.setConceptCard(null);
     componentInstance.answerIsCorrect = true;
 
     componentInstance.showUpcomingCard();
   });
 
   it('should submit answer and reset current answer state', fakeAsync(() => {
+    spyOn(conversationFlowService, 'giveFeedbackAndStayOnCurrentCard');
     spyOn(displayedCard, 'updateCurrentAnswer');
     componentInstance.displayedCard = displayedCard;
     componentInstance.answerIsBeingProcessed = true;
@@ -2845,11 +2779,11 @@ describe('Conversation skin component', () => {
       null
     );
     componentInstance.displayedCard = mockStateCard;
-    componentInstance.prevSessionStatesProgress = ['Temp1', 'Temp2'];
+    playerTranscriptService.setPrevSessionStatesProgress(['Temp1', 'Temp2']);
     expect(
       componentInstance.isDisplayedCardCompletedInPrevSession()
     ).toBeTrue();
-    componentInstance.prevSessionStatesProgress = ['Temp1'];
+    playerTranscriptService.setPrevSessionStatesProgress(['Temp1']);
     expect(
       componentInstance.isDisplayedCardCompletedInPrevSession()
     ).toBeFalse();
@@ -2874,142 +2808,6 @@ describe('Conversation skin component', () => {
     expect(componentInstance.submitButtonIsDisabled).toBeTrue();
     expect(componentInstance.isSubmitButtonDisabled).toHaveBeenCalled();
   });
-
-  it('should be able to set appropriate flags for the diagnostic test', fakeAsync(() => {
-    let collectionId = 'id';
-    let expId = 'exp_id';
-    let isIframed = true;
-    let collectionSummary = {
-      is_admin: true,
-      summaries: [],
-      user_email: '',
-      is_topic_manager: false,
-      username: true,
-    };
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-      false
-    );
-    spyOn(userService, 'getUserInfoAsync').and.returnValue(
-      Promise.resolve(
-        new UserInfo([], false, false, false, false, false, '', '', '', true)
-      )
-    );
-    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValues(
-      collectionId,
-      null
-    );
-    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
-
-    spyOn(
-      readOnlyCollectionBackendApiService,
-      'loadCollectionAsync'
-    ).and.returnValue(
-      Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
-    );
-    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
-    spyOn(urlService, 'isIframed').and.returnValue(isIframed);
-    spyOn(loaderService, 'showLoadingScreen');
-    spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
-      'oppia_avatar_url'
-    );
-    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValues(
-      true,
-      false
-    );
-    spyOn(componentInstance, 'initializePage');
-    spyOn(
-      collectionPlayerBackendApiService,
-      'fetchCollectionSummariesAsync'
-    ).and.returnValue(Promise.resolve(collectionSummary));
-    spyOn(questionPlayerStateService, 'hintUsed');
-    spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-    spyOn(questionPlayerStateService, 'solutionViewed');
-    spyOn(imagePreloaderService, 'onStateChange');
-    spyOn(componentInstance, 'fetchCompletedChaptersCount');
-    spyOn(statsReportingService, 'recordExplorationCompleted');
-    spyOn(statsReportingService, 'recordExplorationActuallyStarted');
-    spyOn(
-      guestCollectionProgressService,
-      'recordExplorationCompletedInCollection'
-    );
-
-    spyOn(statsReportingService, 'recordMaybeLeaveEvent');
-    spyOn(playerTranscriptService, 'getLastStateName').and.returnValue('');
-    spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
-    spyOn(messengerService, 'sendMessage');
-    spyOn(
-      readOnlyExplorationBackendApiService,
-      'loadLatestExplorationAsync'
-    ).and.returnValue(Promise.resolve(explorationResponse));
-    spyOn(explorationEngineService, 'getShortestPathToState').and.returnValue([
-      'Start',
-      'Mid',
-    ]);
-    spyOn(
-      editableExplorationBackendApiService,
-      'recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner'
-    ).and.returnValue(
-      Promise.resolve({unique_progress_url_id: uniqueProgressIdResponse})
-    );
-
-    let mockOnHintConsumed = new EventEmitter();
-    let mockOnSolutionViewedEventEmitter = new EventEmitter();
-    let mockOnPlayerStateChange = new EventEmitter();
-
-    spyOnProperty(
-      hintsAndSolutionManagerService,
-      'onHintConsumed'
-    ).and.returnValue(mockOnHintConsumed);
-    spyOnProperty(
-      hintsAndSolutionManagerService,
-      'onSolutionViewedEventEmitter'
-    ).and.returnValue(mockOnSolutionViewedEventEmitter);
-    spyOnProperty(
-      conversationFlowService,
-      'onPlayerStateChange'
-    ).and.returnValue(mockOnPlayerStateChange);
-
-    const nextCard = new StateCard(
-      null,
-      null,
-      null,
-      new Interaction([], [], null, null, [], 'EndExploration', null),
-      [],
-      '',
-      null
-    );
-    conversationFlowService.setNextStateCard(nextCard);
-    componentInstance.isLoggedIn = false;
-    componentInstance.hasInteractedAtLeastOnce = true;
-    componentInstance.displayedCard = displayedCard;
-
-    expect(componentInstance.feedbackIsEnabled).toBeTrue();
-    expect(componentInstance.learnerCanOnlyAttemptQuestionOnce).toBeFalse();
-    expect(componentInstance.inputOutputHistoryIsShown).toBeTrue();
-    expect(componentInstance.navigationThroughCardHistoryIsEnabled).toBeTrue();
-    expect(componentInstance.checkpointCelebrationModalIsEnabled).toBeTrue();
-    expect(componentInstance.skipButtonIsShown).toBeFalse();
-
-    const topicIdToPrerequisiteTopicIds = {
-      topicId1: [],
-      topicId2: ['topicId1'],
-      topicId3: ['topicId2'],
-    };
-
-    componentInstance.diagnosticTestTopicTrackerModel =
-      new DiagnosticTestTopicTrackerModel(topicIdToPrerequisiteTopicIds);
-    tick();
-
-    componentInstance.ngOnInit();
-    tick(2000);
-
-    expect(componentInstance.feedbackIsEnabled).toBeFalse();
-    expect(componentInstance.learnerCanOnlyAttemptQuestionOnce).toBeTrue();
-    expect(componentInstance.inputOutputHistoryIsShown).toBeFalse();
-    expect(componentInstance.navigationThroughCardHistoryIsEnabled).toBeFalse();
-    expect(componentInstance.checkpointCelebrationModalIsEnabled).toBeFalse();
-    expect(componentInstance.skipButtonIsShown).toBeTrue();
-  }));
 
   it('should be able to skip the current question', fakeAsync(() => {
     let sampleCard = StateCard.createNewCard(
@@ -3053,20 +2851,19 @@ describe('Conversation skin component', () => {
   });
 
   it('should animate to one card', fakeAsync(() => {
-    let doneCallbackSpy = jasmine.createSpy('done callback');
-    componentInstance.animateToOneCard(doneCallbackSpy);
+    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(1);
+    spyOn(playerPositionService, 'setDisplayedCardIndex');
+    componentInstance.animateToOneCard();
 
     tick(600);
     expect(componentInstance.isAnimatingToOneCard).toBeFalse();
-    expect(doneCallbackSpy).toHaveBeenCalled();
+    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(0);
   }));
 
   it('should animate to two cards', fakeAsync(() => {
-    let doneCallbackSpy = jasmine.createSpy('done callback');
-    componentInstance.animateToTwoCards(doneCallbackSpy);
+    componentInstance.animateToTwoCards();
 
     tick(1000);
     expect(componentInstance.isAnimatingToTwoCards).toBeFalse();
-    expect(doneCallbackSpy).toHaveBeenCalled();
   }));
 });
