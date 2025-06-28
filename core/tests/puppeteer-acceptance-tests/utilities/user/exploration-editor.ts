@@ -1329,11 +1329,14 @@ export class ExplorationEditor extends BaseUser {
       await this.waitForNetworkIdle({idleTime: 700});
 
       // TODO: Verify if it works properly.
+      const headingName = !cardName.trimEnd().endsWith('...')
+        ? cardName
+        : cardName.trimEnd().slice(0, -3);
       const currentCardTitle = await this.page.$eval(
         currentCardNameSelector,
         element => (element as HTMLElement).innerText.trim()
       );
-      if (currentCardTitle !== cardName) {
+      if (!currentCardTitle.includes(headingName)) {
         throw new Error(
           `Failed to navigate to card ${cardName}. Current card is ${currentCardTitle}.`
         );
@@ -1958,18 +1961,14 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} fileCount - The number of existing files.
    * @returns {string} - The expected filename.
    */
-  async getExpectedFileName(
+  getExpectedFileName(
     version: number,
     isPublished: boolean,
     fileCount: number
-  ): Promise<string> {
+  ): string {
     const filePrefix = isPublished
       ? PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX
       : UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX;
-
-    await this.page.waitForSelector(filePrefix, {
-      visible: true,
-    });
     return fileCount === 0
       ? `${filePrefix}${version}.zip`
       : `${filePrefix}${version} (${fileCount}).zip`;
