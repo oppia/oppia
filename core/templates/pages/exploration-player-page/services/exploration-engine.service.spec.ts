@@ -583,7 +583,7 @@ describe('Exploration engine service ', () => {
           missing_prerequisite_skill_id: null,
         }),
         0,
-        null, // <=== This triggers the branch
+        null, // This triggers the branch.
         'default_outcome'
       );
 
@@ -625,11 +625,10 @@ describe('Exploration engine service ', () => {
     });
 
     it('should show warning if interaction id is null', fakeAsync(() => {
-      const initSuccessCb = jasmine.createSpy('success');
       const submitAnswerSuccessCb = jasmine.createSpy('success');
 
       const mockInteraction = {
-        id: null, // <=== Triggers the branch
+        id: null, // Triggers the branch.
         customizationArgs: {},
       };
 
@@ -981,7 +980,9 @@ describe('Exploration engine service ', () => {
         explorationEngineService.exploration,
         'getInteraction'
       ).and.callFake((stateName: string) => {
-        if (stateName === 'StuckState') return null; // simulate missing interaction
+        if (stateName === 'StuckState') {
+          return null;
+        }
         return {id: 'TextInput', customizationArgs: {}};
       });
 
@@ -1348,18 +1349,6 @@ describe('Exploration engine service ', () => {
   });
 
   it('should warn and return if interaction customization args are null when calling loadInitialState', () => {
-    // const mockExploration = {
-    //   getInitialState: () => ({
-    //     content: { contentId: 'content_1' },
-    //     paramChanges: []
-    //   }),
-    //   initStateName: 'Intro',
-    //   getInteraction: () => ({ id: 'TextInput' }),
-    //   getInteractionCustomizationArgs: () => null
-    // };
-
-    // spyOn(explorationObjectFactory, 'createFromBackendDict')
-    //   .and.returnValue(mockExploration);
     spyOn(alertsService, 'addWarning');
     spyOn(learnerParamsService, 'getAllParams').and.returnValue({});
     spyOn(explorationEngineService, 'makeParams').and.returnValue({});
@@ -1384,7 +1373,7 @@ describe('Exploration engine service ', () => {
     ).and.returnValue(null);
 
     explorationEngineService.loadInitialState(() => {
-      // This callback should not be invoked because customization args are null
+      // This callback should not be invoked because customization args are null.
       fail('successCallback should not be called');
     });
 

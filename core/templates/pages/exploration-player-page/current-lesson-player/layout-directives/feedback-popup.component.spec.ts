@@ -44,7 +44,6 @@ describe('FeedbackPopupComponent', () => {
   let playerPositionService: PlayerPositionService;
   let windowDimensionsService: WindowDimensionsService;
   let feedbackPopupBackendApiService: FeedbackPopupBackendApiService;
-  let pageContextService: PageContextService;
 
   class MockPageContextService {
     getExplorationId(): string {
@@ -78,7 +77,6 @@ describe('FeedbackPopupComponent', () => {
     feedbackPopupBackendApiService = TestBed.get(
       FeedbackPopupBackendApiService
     );
-    pageContextService = TestBed.inject(PageContextService);
     fixture = TestBed.createComponent(FeedbackPopupComponent);
     component = fixture.componentInstance;
 

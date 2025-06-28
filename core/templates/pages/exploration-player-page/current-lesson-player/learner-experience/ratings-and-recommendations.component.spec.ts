@@ -56,7 +56,6 @@ describe('Ratings and recommendations component', () => {
   let learnerViewRatingService: LearnerViewRatingService;
   let urlService: UrlService;
   let userService: UserService;
-  let pageContextService: PageContextService;
   let explorationModeService: ExplorationModeService;
   let urlInterpolationService: UrlInterpolationService;
   let conversationFlowService: ConversationFlowService;
@@ -95,9 +94,7 @@ describe('Ratings and recommendations component', () => {
     isInQuestionPlayerMode(): boolean {
       return false;
     }
-    setExplorationVersion(_version: number): void {
-      // no-op
-    }
+    setExplorationVersion(_version: number): void {}
   }
 
   beforeEach(waitForAsync(() => {
@@ -145,7 +142,6 @@ describe('Ratings and recommendations component', () => {
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-    pageContextService = TestBed.inject(PageContextService);
   });
 
   it(

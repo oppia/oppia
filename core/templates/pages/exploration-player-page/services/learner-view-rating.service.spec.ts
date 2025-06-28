@@ -27,7 +27,6 @@ import {PageContextService} from '../../../services/page-context.service';
 describe('Learner View Rating Service', () => {
   let learnerViewRatingService: LearnerViewRatingService;
   let learnerViewRatingBackendApiService: LearnerViewRatingBackendApiService;
-  let pageContextService: PageContextService;
 
   class MockPageContextService {
     getExplorationId(): string {
@@ -39,9 +38,7 @@ describe('Learner View Rating Service', () => {
     isInQuestionPlayerMode(): boolean {
       return false;
     }
-    setExplorationVersion(_version: number): void {
-      // no-op
-    }
+    setExplorationVersion(_version: number): void {}
   }
 
   beforeEach(async(() => {
@@ -65,7 +62,6 @@ describe('Learner View Rating Service', () => {
     learnerViewRatingBackendApiService = TestBed.inject(
       LearnerViewRatingBackendApiService
     );
-    pageContextService = TestBed.inject(PageContextService);
   });
 
   it(
