@@ -21,7 +21,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {
@@ -49,7 +49,7 @@ export class TranslationOpportunitiesComponent {
   opportunityType = 'translation';
   languageSelected = false;
   constructor(
-    private readonly contextService: ContextService,
+    private readonly pageContextService: PageContextService,
     private readonly contributionOpportunitiesService: ContributionOpportunitiesService,
     private readonly modalService: NgbModal,
     private readonly siteAnalyticsService: SiteAnalyticsService,

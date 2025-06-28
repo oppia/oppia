@@ -29,7 +29,6 @@ import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 import {UserService} from 'services/user.service';
 import {CollectionNode} from 'domain/collection/collection-node.model';
-import {AppConstants} from 'app.constants';
 import {Collection} from 'domain/collection/collection.model';
 import {CollectionPlayerBackendApiService} from './services/collection-player-backend-api.service';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
@@ -91,7 +90,6 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   ICON_X_RIGHT_PX!: number;
   collectionId!: string;
   nextExplorationId!: string;
-  allowedCollectionIdsForGuestProgress;
   collectionSummary;
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
@@ -346,8 +344,6 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     this.ICON_X_RIGHT_PX = 390;
     this.svgHeight = this.MIN_HEIGHT_FOR_PATH_SVG_PX;
     this.nextExplorationId = null;
-    this.allowedCollectionIdsForGuestProgress =
-      AppConstants.ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS;
 
     this.fetchSummaryAsync(this.collectionId);
 

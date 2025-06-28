@@ -243,7 +243,7 @@
 /core/templates/components/state-editor/ @oppia/lace-frontend-reviewers
 /core/templates/services/blog-search.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/compute-graph.service.ts @oppia/lace-frontend-reviewers
-/core/templates/services/context.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/page-context.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/editability.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/exploration-features*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/exploration-html-formatter.service*.ts @oppia/lace-frontend-reviewers
