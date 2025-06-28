@@ -6,7 +6,7 @@
     <div *ngIf="hasPrevious && !helpCardHasContinueButton && navigationThroughCardHistoryIsEnabled">
       <button mat-raised-button
               aria-label="Previous Card"
-              (click)="moveBackwardByOneCard()"
+              (click)="moveBackByOneCard()"
               class="e2e-test-back-button oppia-back-button oppia-nav-button oppia-nav-left-button">
         <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
       </button>

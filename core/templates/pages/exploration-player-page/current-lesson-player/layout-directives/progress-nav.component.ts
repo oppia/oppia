@@ -212,8 +212,8 @@ export class ProgressNavComponent {
     this.conversationFlowService.moveForwardByOneCard();
   }
 
-  moveBackwardByOneCard(): void {
-    this.conversationFlowService.moveBackwardByOneCard();
+  moveBackByOneCard(): void {
+    this.conversationFlowService.moveBackByOneCard();
   }
 
   // Returns whether the screen is wide enough to fit two

@@ -315,7 +315,7 @@ export class ConversationFlowService {
    * Retrieves the current displayed card index from the player position service,
    * decrements it by one, and updates the displayed card accordingly.
    */
-  moveBackwardByOneCard(): void {
+  moveBackByOneCard(): void {
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
     this._validateIndexAndChangeCard(displayedCardIndex - 1);
   }

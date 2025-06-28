@@ -307,7 +307,7 @@ describe('Conversation flow service', () => {
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(5);
     const changeCardSpy = spyOn(conversationFlowService, 'changeCard');
 
-    conversationFlowService.moveBackwardByOneCard();
+    conversationFlowService.moveBackByOneCard();
 
     expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
     expect(changeCardSpy).toHaveBeenCalledWith(1);
@@ -329,7 +329,7 @@ describe('Conversation flow service', () => {
 
     // Moving to index -1 → out of bounds.
     expect(() => {
-      conversationFlowService.moveBackwardByOneCard();
+      conversationFlowService.moveBackByOneCard();
     }).toThrowError('Target card index out of bounds.');
   });
 
