@@ -43,7 +43,10 @@ if MYPY: # pragma: no cover
     from mypy_imports import suggestion_models
     from mypy_imports import topic_models
 
-(opportunity_models, suggestion_models, topic_models) = models.Registry.import_models([
+(
+    opportunity_models,
+    suggestion_models,
+    topic_models) = models.Registry.import_models([
     models.Names.OPPORTUNITY, models.Names.SUGGESTION, models.Names.TOPIC
 ])
 
@@ -1358,7 +1361,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             | 'Transform question validation err to job run result' >> (
                 job_result_transforms.ResultsToJobRunResults())
         )
-        
+
         return (
             (
                 success_translation_validaition_count_results,
@@ -1381,34 +1384,34 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             language_code = total.language_code
             error_logs = ''
 
-            # Fetch and shortlist valid contribution records
+            # Fetch and shortlist valid contribution records.
             contributions: List[
                 suggestion_models.TranslationContributionStatsModel] = list(
                     suggestion_models.TranslationContributionStatsModel.query(
                         suggestion_models.TranslationContributionStatsModel
-                            .contributor_user_id==contributor_id,
+                            .contributor_user_id == contributor_id,
                         suggestion_models.TranslationContributionStatsModel
-                            .language_code==language_code
+                            .language_code == language_code
                     ).fetch())
             valid_contributions = [
                 c for c in contributions if topic_models.TopicModel.get(
                     c.topic_id, strict=False) is not None]
 
-            # Fetch related general suggestions
+            # Fetch related general suggestions.
             suggestions: List[
                 suggestion_models.GeneralSuggestionModel] = list(
                     suggestion_models.GeneralSuggestionModel.query(
                         suggestion_models.GeneralSuggestionModel
-                            .suggestion_type=='translate_content',
+                            .suggestion_type == 'translate_content',
                         suggestion_models.GeneralSuggestionModel
-                            .author_id==contributor_id,
+                            .author_id == contributor_id,
                         suggestion_models.GeneralSuggestionModel
-                            .language_code==language_code
+                            .language_code == language_code
                     ).fetch())
             by_created_on = lambda m: m.created_on
             suggestions.sort(key=by_created_on)
 
-            # Validate topic_ids list
+            # Validate topic_ids list.
             contribution_topic_ids = {c.topic_id for c in valid_contributions}
             if not contribution_topic_ids.issubset(set(
                 total.topic_ids_with_translation_submissions)):
@@ -1418,7 +1421,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                     f'-> missing topic_ids {missing} in total stats\n'
                 )
 
-            # Validate aggregated counts
+            # Validate aggregated counts.
             fields = [
                 'submitted_translations_count',
                 'submitted_translation_word_count',
@@ -1438,7 +1441,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                         f'{total_value}\n'
                     )
 
-            # Validate first and last contribution dates
+            # Validate first and last contribution dates.
             dates = [(
                 c.contribution_dates or [
                     None, None]) for c in valid_contributions]
@@ -1456,7 +1459,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                         f'{last_date} != {total.last_contribution_date}\n'
                     )
 
-            # Validate recent outcomes and performance
+            # Validate recent outcomes and performance.
             recent_review_outcomes = []
             counts = {
                 'accepted': 0,
@@ -1480,7 +1483,8 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             if recent_review_outcomes != total.recent_review_outcomes:
                 error_logs += (
                     f'-> recent outcomes '
-                    f'{recent_review_outcomes} != {total.recent_review_outcomes}\n'
+                    f'{recent_review_outcomes} != '
+                    f'{total.recent_review_outcomes}\n'
                 )
             # Weights of recent_performance as documented in
             # https://docs.google.com/document/d/19lCEYQUgV7_DwIK_0rz3zslRHX2qKOHn-t9Twpi0qu0/edit.
@@ -1494,7 +1498,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                     f'{recent_performance} != {total.recent_performance}\n'
                 )
 
-            # Validate overall accuracy
+            # Validate overall accuracy.
             if total.submitted_translations_count:
                 accuracy = ((total.accepted_translations_count) / (
                     total.submitted_translations_count)) * 100
@@ -1521,30 +1525,30 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
         contributor_id = total.contributor_id
         error_logs = ''
 
-        # Fetch and shortlist valid contribution records
+        # Fetch and shortlist valid contribution records.
         contributions: List[
             suggestion_models.QuestionContributionStatsModel] = list(
                 suggestion_models.QuestionContributionStatsModel.query(
                     suggestion_models.QuestionContributionStatsModel
-                        .contributor_user_id==contributor_id
+                        .contributor_user_id == contributor_id
                 ).fetch())
         valid_contributions = [
             c for c in contributions if topic_models.TopicModel.get(
                     c.topic_id, strict=False) is not None]
 
-        # Fetch related general suggestions
+        # Fetch related general suggestions.
         suggestions: List[
             suggestion_models.GeneralSuggestionModel] = list(
                 suggestion_models.GeneralSuggestionModel.query(
                     suggestion_models.GeneralSuggestionModel
-                        .suggestion_type==feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                        .suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION,
                     suggestion_models.GeneralSuggestionModel
-                        .author_id==contributor_id
+                        .author_id == contributor_id
                 ).fetch())
         by_created_on = lambda m: m.created_on
         suggestions.sort(key=by_created_on)
 
-        # Validate topic_ids list
+        # Validate topic_ids list.
         contribution_topic_ids = {c.topic_id for c in valid_contributions}
         if not contribution_topic_ids.issubset(set(
             total.topic_ids_with_question_submissions)):
@@ -1554,7 +1558,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                 f'-> missing topic_ids {missing} in total stats\n'
             )
 
-        # Validate aggregated counts
+        # Validate aggregated counts.
         fields = [
             'submitted_questions_count',
             'accepted_questions_count',
@@ -1577,12 +1581,12 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                 f'{total.rejected_questions_count}\n'
             )
 
-        # Validate first and last contribution dates
+        # Validate first and last contribution dates.
         if len(valid_contributions):
-            first_date = min([
-                c.first_contribution_date for c in valid_contributions])
-            last_date = max([
-                c.last_contribution_date for c in valid_contributions])
+            first_date = min(
+                c.first_contribution_date for c in valid_contributions)
+            last_date = max(
+                c.last_contribution_date for c in valid_contributions)
             if first_date != total.first_contribution_date:
                 error_logs += (
                     f'-> first contribution '
@@ -1594,7 +1598,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                     f'{last_date} != {total.last_contribution_date}\n'
                 )
 
-        # Validate recent outcomes and performance
+        # Validate recent outcomes and performance.
         recent_review_outcomes = []
         counts = {
             'accepted': 0,
@@ -1632,7 +1636,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                 f'{recent_performance} != {total.recent_performance}\n'
             )
 
-        # Validate overall accuracy
+        # Validate overall accuracy.
         if total.submitted_questions_count:
             accuracy = ((total.accepted_questions_count) / (
                 total.submitted_questions_count)) * 100
@@ -1641,7 +1645,7 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
                     f'-> accuracy {round(accuracy,2)} != '
                     f'{total.overall_accuracy}\n'
                 )
-        
+
         if len(error_logs) == 0:
             return result.Ok(total.id)
         else:

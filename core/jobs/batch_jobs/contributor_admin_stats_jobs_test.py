@@ -1905,6 +1905,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
 
     def test_successful_validation_emits_one_translation_and_one_question(
         self) -> None:
+        # Type Any is used because this list contains models of various kinds.
         models_to_put: List[Any] = []
 
         # 1) TopicModel.
@@ -2056,7 +2057,8 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
 
     def test_failed_validation_for_translation_triggers_all_failure_conditions(
         self) -> None:
-        contrib_models: List[Any] = []
+        # Type Any is used because this list contains models of various kinds.
+        models_to_put: List[Any] = []
 
         # 1) Create a TranslationContributionStatsModel for topic 'topic1'.
         bad_contrib = self.create_model(
@@ -2074,7 +2076,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             contribution_dates=self.CONTRIBUTION_DATES
         )
         bad_contrib.update_timestamps()
-        contrib_models.append(bad_contrib)
+        models_to_put.append(bad_contrib)
 
         # 2) Create two GeneralSuggestionModels with mixed outcomes.
         gs1 = self.create_model(
@@ -2109,7 +2111,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             created_on=datetime.datetime.combine(
                 self.CONTRIBUTION_DATES[1], datetime.time.min)
         )
-        contrib_models.extend([gs1, gs2])
+        models_to_put.extend([gs1, gs2])
 
         # 3) Build a TranslationSubmitterTotalContributionStatsModel.
         bad_total = self.create_model(
@@ -2132,10 +2134,10 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             last_contribution_date=self.CONTRIBUTION_DATES[0]
         )
         bad_total.update_timestamps()
-        contrib_models.append(bad_total)
+        models_to_put.append(bad_total)
 
         # 4) Persist everything at once.
-        self.put_multi(contrib_models)
+        self.put_multi(models_to_put)
 
         # 5) Run the job and assert that it flags exactly one invalid total.
         self.assert_job_output_is([
@@ -2173,10 +2175,10 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             )
         ])
 
-
     def test_failed_validation_for_question_triggers_all_failure_conditions(
         self) -> None:
-        models: List[Any] = []
+        # Type Any is used because this list contains models of various types.
+        models_to_put: List[Any] = []
 
         # 1) Create the TopicModel so the contrib is considered "valid".
         topic = self.create_model(
@@ -2198,7 +2200,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             }],
             page_title_fragment_for_web='fragm'
         )
-        models.append(topic)
+        models_to_put.append(topic)
 
         # 2) Create real QuestionContributionStatsModel for topic 'topic_q'.
         q_contrib = self.create_model(
@@ -2212,7 +2214,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             last_contribution_date=self.CONTRIBUTION_DATES[1]
         )
         q_contrib.update_timestamps()
-        models.append(q_contrib)
+        models_to_put.append(q_contrib)
 
         # 3) Create rejected GeneralSuggestionModel for the recent outcomes.
         qsugg = self.create_model(
@@ -2231,7 +2233,7 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             created_on=datetime.datetime.combine(
                 self.CONTRIBUTION_DATES[0], datetime.time.min)
         )
-        models.append(qsugg)
+        models_to_put.append(qsugg)
 
         # 4) Build a QuestionSubmitterTotalContributionStatsModel.
         bad_q_total = self.create_model(
@@ -2250,10 +2252,10 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
             last_contribution_date=self.CONTRIBUTION_DATES[0]
         )
         bad_q_total.update_timestamps()
-        models.append(bad_q_total)
+        models_to_put.append(bad_q_total)
 
         # 5) Persist all of them.
-        self.put_multi(models)
+        self.put_multi(models_to_put)
 
         # 7) We expect two question‐failure results in sequence:
         self.assert_job_output_is([
