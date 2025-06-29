@@ -41,6 +41,8 @@ from core.domain import topic_services
 from core.domain import user_domain
 from core.platform import models
 from google.cloud import ndb
+import time
+import random
 
 from typing import Dict, List, Optional, Tuple, TypedDict
 
@@ -113,6 +115,17 @@ class DisplayableCollectionSummaryDict(TypedDict):
     community_owned: bool
     thumbnail_icon_url: str
     thumbnail_bg_color: str
+
+def retry_with_backoff(fn, *args, max_attempts=5, **kwargs):
+    for i in range(max_attempts):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as e:
+            if "409" in str(e):
+                time.sleep((2 ** i) * 0.1 + random.uniform(0, 0.1))
+                continue
+            raise
+    raise RuntimeError("Retries exhausted")
 
 
 def _get_completed_activities_from_model(
@@ -350,14 +363,13 @@ def _txn_mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
         _save_completed_activities(activities_completed)
 
 def mark_exploration_as_completed(user_id: str, exp_id: str):
-    _txn_mark_exploration_completed(user_id, exp_id)
+    retry_with_backoff(_txn_mark_exploration_completed(user_id, exp_id))
 
 def mark_story_as_completed(user_id: str, story_id: str):
-    _txn_mark_story_as_completed(user_id, story_id)
+    retry_with_backoff(_txn_mark_story_as_completed(user_id, story_id))
 
 def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
-    _txn_mark_topic_as_learnt(user_id, topic_id)
-
+    retry_with_backoff(_txn_mark_topic_as_learnt(user_id, topic_id))
 
 
 def mark_collection_as_completed(user_id: str, collection_id: str) -> None:
