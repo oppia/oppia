@@ -42,8 +42,6 @@ from core.domain import user_domain
 from core.platform import models
 from google.cloud import ndb
 
-_client = ndb.Client()
-
 from typing import Dict, List, Optional, Tuple, TypedDict
 
 MYPY = False
@@ -352,16 +350,13 @@ def _txn_mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
         _save_completed_activities(activities_completed)
 
 def mark_exploration_as_completed(user_id: str, exp_id: str):
-    with _client.context():
-        _txn_mark_exploration_completed(user_id, exp_id)
+    _txn_mark_exploration_completed(user_id, exp_id)
 
 def mark_story_as_completed(user_id: str, story_id: str):
-    with _client.context():
-        _txn_mark_story_as_completed(user_id, story_id)
+    _txn_mark_story_as_completed(user_id, story_id)
 
 def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
-    with _client.context():
-        _txn_mark_topic_as_learnt(user_id, topic_id)
+    _txn_mark_topic_as_learnt(user_id, topic_id)
 
 
 
