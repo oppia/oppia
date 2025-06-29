@@ -27,6 +27,8 @@ from core.domain import translation_domain
 
 from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 
+from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
+
 STUDY_GUIDE_PROPERTY_SECTIONS: Final = 'sections'
 
 # These will be deprecated once we shift to using just study guides.
@@ -392,54 +394,70 @@ class StudyGuide:
             )
 
     @classmethod
-    def convert_html_fields_in_study_guide_sections(
-        cls,
-        study_guide_section_dicts: List[StudyGuideSectionDict],
-        conversion_fn: Callable[[str], str]
-    ) -> List[StudyGuideSectionDict]:
-        """Applies a conversion function on all the html strings in study
-        guide sections to migrate them to a desired state.
-
+    def _convert_section_v1_dict_to_v2_dict(
+        cls, section_dict: StudyGuideSectionDict
+    ) -> StudyGuideSectionDict:
+        """Converts v1 StudyGuide Sections schema to the demo schema.
+        v2 schema makes all html field 'Hello'.
         Args:
-            study_guide_section_dicts: List. The list containing dicts of
-                study guide sections.
-            conversion_fn: function. The conversion function to be applied on
-                the study_guide_section_dicts.
-
+            sections_dicts_list: list. A list used to initialize a
+                StudyGuide domain object.
         Returns:
-            dict. The converted subtopic_page_contents_dict.
+            list. The converted sections_dicts_list.
         """
-        for _ in study_guide_section_dicts:
-            study_guide_section_dicts[
-                'content']['html'] = conversion_fn(
-                    study_guide_section_dicts['content']['html']
-                )
-        return study_guide_section_dicts
+        return cls.convert_html_fields_in_study_guide_section(
+            section_dict,
+            html_validation_service.change_to_hello)
 
     @classmethod
-    def convert_unicode_fields_in_study_guide_sections(
+    def convert_html_fields_in_study_guide_section(
         cls,
-        study_guide_section_dicts: List[StudyGuideSectionDict],
+        study_guide_section_dict: StudyGuideSectionDict,
         conversion_fn: Callable[[str], str]
-    ) -> List[StudyGuideSectionDict]:
-        """Applies a conversion function on all the unicode strings in study
-        guide sections to migrate them to a desired state.
+    ) -> StudyGuideSectionDict:
+        """Applies a conversion function on all the html strings in a study
+        guide section to migrate them to a desired state.
 
         Args:
-            study_guide_section_dicts: List. The list containing dicts of
-                study guide sections.
+            study_guide_section_dict: dict. The dict containing the
+                study guide section.
             conversion_fn: function. The conversion function to be applied on
-                the study_guide_section_dicts.
+                the study_guide_section_dict.
 
         Returns:
             dict. The converted subtopic_page_contents_dict.
         """
-        for _ in study_guide_section_dicts:
-            study_guide_section_dicts['heading']['unicode_str'] = conversion_fn(
-                    study_guide_section_dicts[
+        for _ in study_guide_section_dict:
+            study_guide_section_dict[
+                'content']['html'] = conversion_fn(
+                    study_guide_section_dict['content']['html']
+                )
+        return study_guide_section_dict
+
+    @classmethod
+    def convert_unicode_fields_in_study_guide_section(
+        cls,
+        study_guide_section_dict: StudyGuideSectionDict,
+        conversion_fn: Callable[[str], str]
+    ) -> StudyGuideSectionDict:
+        """Applies a conversion function on all the unicode strings in study
+        guide section to migrate them to a desired state.
+
+        Args:
+            study_guide_section_dict: dict. The dict containing the
+                study guide section.
+            conversion_fn: function. The conversion function to be applied on
+                the study_guide_section_dict.
+
+        Returns:
+            dict. The converted subtopic_page_contents_dict.
+        """
+        for _ in study_guide_section_dict:
+            study_guide_section_dict['heading']['unicode_str'] = conversion_fn(
+                    study_guide_section_dict[
                         'heading']['unicode_str']
                 )
-        return study_guide_section_dicts
+        return study_guide_section_dict
 
     @classmethod
     def get_study_guide_id(cls, topic_id: str, subtopic_id: int) -> str:
