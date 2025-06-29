@@ -1220,7 +1220,7 @@ describe('Conversation skin component', () => {
         'releaseSolution'
       );
       let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
-      componentInstance.solutionForState = Solution.createNew(
+      const solutionForState = Solution.createNew(
         true,
         'answer',
         'Html',
@@ -1294,7 +1294,7 @@ describe('Conversation skin component', () => {
         'releaseSolution'
       );
       let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
-      componentInstance.solutionForState = Solution.createNew(
+      const solutionForState = Solution.createNew(
         true,
         'answer',
         'Html',
