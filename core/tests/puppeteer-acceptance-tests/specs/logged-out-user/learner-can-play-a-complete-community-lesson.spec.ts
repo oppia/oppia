@@ -86,50 +86,57 @@ describe('Logged-Out Learner', function () {
     );
   }, 600000); // Setup takes loner than default timeout.
 
-  it(
-    'should use all RTE components in the exploration',
-    async function () {
-      // Navigate to community library page and expect it to contain 3
-      // different explorations.
-      await loggedOutLearner.navigateToCommunityLibraryPage();
-      await loggedOutLearner.expectSearchResultsToContain([
-        'What are the place values?',
-        'Dummy Exploration 1',
-        'Dummy Exploration 2',
-      ]);
+  it('should use all RTE components in the exploration', async function () {
+    // Navigate to community library page and expect it to contain 3
+    // different explorations.
+    await loggedOutLearner.navigateToCommunityLibraryPage();
+    await loggedOutLearner.expectSearchResultsToContain([
+      'What are the place values?',
+      'Dummy Exploration 1',
+      'Dummy Exploration 2',
+    ]);
 
-      // Search and play the exploration "What are the place values?".
-      // Expect to be on the exploration player page and there is "Lesson info" text.
-      await loggedOutLearner.searchForLessonInSearchBar(
-        'What are the place values?'
-      );
-      await loggedOutLearner.playLessonFromSearchResults(
-        'What are the place values?'
-      );
-      await loggedOutLearner.expectToBeOnPage(
-        `http://localhost:8181/explore/${explorationId}`
-      );
+    // Search and play the exploration "What are the place values?".
+    // Expect to be on the exploration player page and there is "Lesson info" text.
+    await loggedOutLearner.searchForLessonInSearchBar(
+      'What are the place values?'
+    );
+    await loggedOutLearner.playLessonFromSearchResults(
+      'What are the place values?'
+    );
+    await loggedOutLearner.expectToBeOnPage(
+      `http://localhost:8181/explore/${explorationId}`
+    );
 
-      // Concept Card RTE.
+    // Concept Card RTE.
+    await loggedOutLearner.expectConceptCardLinkInLessonToWorkProperly(
+      'Introduction to Oppia'
+    );
 
-      // Video RTE.
-      await loggedOutLearner.expectVideoRTEToBePresent();
+    // Video RTE.
+    await loggedOutLearner.expectVideoRTEToBePresent();
 
-      // Link RTE.
-      await loggedOutLearner.expectLinkRTEToPresent('https://www.oppia.org');
+    // Link RTE.
+    await loggedOutLearner.expectLinkRTEToPresent('https://www.oppia.org');
 
-      // Collapsible RTE.
-      await loggedOutLearner.expectCollapsibleRTEToBePresent();
+    // Collapsible RTE.
+    await loggedOutLearner.expectCollapsibleRTEToBePresent();
 
-      // Tab RTE.
+    // Tab RTE.
+    await loggedOutLearner.expecttabElementInLessonCardToContain(
+      'Hint introduction',
+      'This set of tabs shows some hints. Click on the other tabs to display the relevant hints.'
+    );
+    await loggedOutLearner.expecttabElementInLessonCardToContain(
+      'Hint 1',
+      'This is a first hint.'
+    );
 
-      // Continue to next card and check for lesson player.
-      await loggedOutLearner.continueToNextCard();
-      await loggedOutLearner.expectGoBackToPreviousCardButton(true);
-      await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // Continue to next card and check for lesson player.
+    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.expectGoBackToPreviousCardButton(true);
+    await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

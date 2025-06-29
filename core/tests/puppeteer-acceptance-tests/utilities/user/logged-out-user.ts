@@ -426,6 +426,12 @@ const collapsibleRTEHeaderSelector = 'e2e-test-collapsible-heading';
 const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
 
 const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
+const conceptCardLinkSelector = '.e2e-test-concept-card-link';
+const conceptCardViewerSelector = '.e2e-test-concept-card-viewer';
+const nonInteractiveTabsHeaderSelector =
+  '.e2e-test-non-interactive-tabs-headers';
+const nonInteractiveTabContentSelector =
+  '.e2e-test-non-interactive-tab-content';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -4583,7 +4589,7 @@ export class LoggedOutUser extends BaseUser {
     // Replace spaces in the expectedPage with hyphens.
     const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
 
-    if (!url.includes(expectedPageInUrl.toLowerCase())) {
+    if (!url.includes(expectedPageInUrl)) {
       throw new Error(
         `Expected to be on page ${expectedPage}, but found ${url}`
       );
@@ -4930,6 +4936,59 @@ export class LoggedOutUser extends BaseUser {
 
     await this.clickOn(navbarGetInvolvedTab);
     await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
+  }
+
+  async expectConceptCardLinkInLessonToWorkProperly(
+    content: string
+  ): Promise<void> {
+    await this.isElementVisible(conceptCardLinkSelector);
+
+    await this.clickOn(conceptCardLinkSelector);
+    const conceptCardContent: string =
+      (await this.page.$eval(
+        conceptCardViewerSelector,
+        el => (el as HTMLElement).textContent
+      )) ?? '';
+
+    if (!conceptCardContent.includes(content)) {
+      throw new Error(
+        `Expected concept card content to be ${content}, but it was ${conceptCardContent}`
+      );
+    }
+  }
+
+  /**
+   * Checks if non-interactive tab with given heading contains expected content in lesson card.
+   * @param tabHeading - The tab heading to check content for.
+   * @param tabContent - The content of tab
+   */
+  async expecttabElementInLessonCardToContain(
+    tabHeading: string,
+    tabContent: string
+  ) {
+    const tabHeaderElements = await this.page.$$(
+      nonInteractiveTabsHeaderSelector
+    );
+
+    for (const element of tabHeaderElements) {
+      const text = await this.page.evaluate(el => el.textContent, element);
+      if (text?.trim() === tabHeading) {
+        // You found the right tab
+        await element.click();
+        break;
+      }
+    }
+
+    const actualContent = await this.page.$eval(
+      nonInteractiveTabContentSelector,
+      el => el.textContent
+    );
+
+    if (actualContent?.trim() !== tabContent) {
+      throw new Error(
+        `Expected tab content to be ${tabContent}, but it was ${actualContent}`
+      );
+    }
   }
 }
 
