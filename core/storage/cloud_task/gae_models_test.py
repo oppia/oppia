@@ -64,7 +64,6 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
             cloud_task_models.CloudTaskRunModel.get_deletion_policy(),
             base_models.DELETION_POLICY.NOT_APPLICABLE)
 
-
     def test_create_new_model_successfully(self) -> None:
 
         model = cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
@@ -95,7 +94,7 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_model.current_retry_attempt, 1)
 
     def test_get_queue_id_from_task_name(self) -> None:
-        cloud_task_name=(
+        cloud_task_name = (
             'projects/dev-project-id/locations/us-central1/queues/'
             'voiceover-regeneration/tasks/task1')
 
@@ -105,7 +104,7 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(queue_id, 'voiceover-regeneration')
 
     def test_get_task_id_from_task_name(self) -> None:
-        cloud_task_name=(
+        cloud_task_name = (
             'projects/dev-project-id/locations/us-central1/queues/'
             'voiceover-regeneration/tasks/task1')
 
@@ -146,8 +145,9 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
             current_retry_attempt=2
         )
 
-        models = cloud_task_models.CloudTaskRunModel.get_all().fetch()
-        self.assertEqual(len(models), 3)
+        cloud_task_run_models = (
+            cloud_task_models.CloudTaskRunModel.get_all().fetch())
+        self.assertEqual(len(cloud_task_run_models), 3)
 
         filtered_models = (
             cloud_task_models.CloudTaskRunModel.get_by_queue_id('queueA')
@@ -162,4 +162,4 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
             'projects/dev-project-id/locations/us-central1/queues/queueA/'
             'tasks/task3'
         ]
-        self.assertListEqual(fetched_task_names, expected_task_names)
+        self.assertItemsEqual(fetched_task_names, expected_task_names)

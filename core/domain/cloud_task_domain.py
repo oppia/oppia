@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2018 The Oppia Authors. All Rights Reserved.
+# Copyright 2025 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -79,6 +79,8 @@ class CloudTaskRun:
             exception_messages_for_failed_runs=cloud_task_run_dict[
                 'exception_messages_for_failed_runs'],
             current_retry_attempt=cloud_task_run_dict['current_retry_attempt'],
-            last_updated=cloud_task_run_dict['last_updated'],
-            created_on=cloud_task_run_dict['created_on']
+            last_updated=datetime.datetime.fromisoformat(
+                cloud_task_run_dict['last_updated']),
+            created_on=datetime.datetime.fromisoformat(
+                cloud_task_run_dict['created_on'])
         )

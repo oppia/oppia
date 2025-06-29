@@ -201,6 +201,9 @@ class Emulator:
             task_name: str|None. Optional. The name of the task.
             retry: None. The retry mechanism that should be used. Here we ignore
                 the value and it is not used for anything.
+
+        Returns:
+            Task. The task that was created and added to the queue.
         """
         scheduled_for_time = (
             time.mktime(scheduled_for.timetuple())
@@ -212,8 +215,8 @@ class Emulator:
                     self._launch_queue_thread(queue_name)
             queue = self._queues[queue_name]
 
-            # https://cloud.google.com/tasks/docs/reference/rest/v2/projects.
-            # locations.queues.tasks#Task
+            # Reference documentation link: "https://cloud.google.com/tasks/
+            # docs/reference/rest/v2/projects.locations.queues.tasks#Task".
             if task_name is None:
                 project_id = 'dev-project-id'
                 location_id = 'us-central'
@@ -224,7 +227,6 @@ class Emulator:
                         project_id, location_id, queue_name, task_id
                     )
                 )
-
 
             task = Task(
                 queue_name, url, payload, scheduled_for=scheduled_for_time,

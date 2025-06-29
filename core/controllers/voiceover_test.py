@@ -16,8 +16,8 @@
 
 from __future__ import annotations
 
+import datetime
 import uuid
-from datetime import datetime, timedelta
 
 from core import feconf
 from core.domain import rights_domain
@@ -497,7 +497,7 @@ class AutomaticVoiceoverRegenerationRecordHandlerTests(
             new_model_id)
         start_date = cloud_task_run.created_on.strftime('%a %b %d %Y')
         end_date = (
-            cloud_task_run.created_on + timedelta(days=1)
+            cloud_task_run.created_on + datetime.timedelta(days=1)
         ).strftime('%a %b %d %Y')
 
         url = '/automatic_voiceover_regeneration_record/%s/%s' % (

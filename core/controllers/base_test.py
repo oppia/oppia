@@ -398,7 +398,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     def test_no_redirection_for_tasks(self) -> None:
         tasks_data = '{"fn_identifier": "%s", "args": [[]], "kwargs": {}}' % (
-            taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']
         )
 
         # Valid URL, where user now has permissions.
@@ -2483,7 +2484,7 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
 
 NotLoggedInException: Unauthenticated user
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}
@@ -2507,7 +2508,7 @@ Handler class name: BaseHandler
 
 NotFoundException: Invalid URL requested
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}
@@ -2531,7 +2532,7 @@ Handler class name: BaseHandler
 
 UnauthorizedUserException: Exception raised
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}
@@ -2555,7 +2556,7 @@ Handler class name: BaseHandler
 
 InvalidInputException: Exception raised
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}
@@ -2579,7 +2580,7 @@ Handler class name: BaseHandler
 
 InternalErrorException: Exception raised
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}
@@ -2607,7 +2608,7 @@ Handler class name: BaseHandler
 
 Exception: Exception raised
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}

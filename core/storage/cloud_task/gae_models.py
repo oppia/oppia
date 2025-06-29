@@ -64,10 +64,15 @@ class CloudTaskState(enum.Enum):
     """Constants from an enum, this represents the state of a cloud task run.
     """
 
+    # The job is successfully completed.
     SUCCEEDED = 'SUCCEEDED'
+    # The job has permanently failed and will not be retried.
     PERMANENTLY_FAILED = 'PERMANENTLY_FAILED'
+    # The job has failed but is awaiting retry.
     FAILED_AND_AWAITING_RETRY = 'FAILED_AND_AWAITING_RETRY'
+    # The job is currently running.
     RUNNING = 'RUNNING'
+    # The job is pending and has not yet started to run.
     PENDING = 'PENDING'
 
 
@@ -213,6 +218,7 @@ class CloudTaskRunModel(base_models.BaseModel):
 
         return cloud_task_run_model
 
+    @staticmethod
     def get_queue_id_from_task_name(cloud_task_name: str) -> str:
         """Returns the queue ID from the cloud task name.
 
@@ -231,6 +237,7 @@ class CloudTaskRunModel(base_models.BaseModel):
         queue_id = task_name_components[5]
         return queue_id
 
+    @staticmethod
     def get_task_id_from_task_name(cloud_task_name: str) -> str:
         """Returns the queue ID from the cloud task name.
 
@@ -244,7 +251,7 @@ class CloudTaskRunModel(base_models.BaseModel):
         # The cloud task name follows the pattern:
         # 'projects/{project_id}/locations/{location_id}/queues/{queue_id}/
         # tasks/{task_id}'.
-        # Therefore, the queue_id can be extracted from the 5th index.
+        # Therefore, the queue_id can be extracted from the 7th index.
         task_name_components = cloud_task_name.split('/')
         task_id = task_name_components[7]
         return task_id

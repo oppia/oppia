@@ -57,10 +57,12 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             ValueError,
             'The args or kwargs passed to the deferred call with '
             'function_identifier, %s, are not json serializable.' %
-            taskqueue_services.FUNCTION_ID_UPDATE_STATS)
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_UPDATE_STATS'])
         with serialization_exception:
             taskqueue_services.defer(
-                taskqueue_services.FUNCTION_ID_UPDATE_STATS,
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_UPDATE_STATS'],
                 taskqueue_services.QUEUE_NAME_DEFAULT, arg1)
 
     def test_exception_raised_when_email_task_params_is_not_serializable(
@@ -83,27 +85,16 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         correct_args = (1, 2, 3)
         correct_kwargs = {'a': 'b', 'c': 'd'}
 
-        expected_queue_name = taskqueue_services.QUEUE_NAME_EMAILS
-        expected_url = feconf.TASK_URL_DEFERRED
-        expected_payload = {
-            'fn_identifier': correct_fn_identifier,
-            'args': correct_args,
-            'kwargs': correct_kwargs
-        }
-
-        create_http_task_swap = self.swap_with_checks(
-            platform_taskqueue_services,
-            'create_http_task',
-            lambda queue_name, url, payload=None, scheduled_for=None: None,
-            expected_kwargs=None
-        )
-
-        # with create_http_task_swap:
         taskqueue_services.defer(
             correct_fn_identifier,
             taskqueue_services.QUEUE_NAME_EMAILS,
             *correct_args, **correct_kwargs
         )
+
+        cloud_task_run_model = (
+            cloud_task_models.CloudTaskRunModel.get_all().fetch())[0]
+        self.assertEqual(
+            cloud_task_run_model.function_id, correct_fn_identifier)
 
     def test_enqueue_task_makes_the_correct_request(self) -> None:
         correct_payload = {
@@ -255,5 +246,8 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         start_datetime = cloud_task_run.last_updated
         end_datetime = cloud_task_run.last_updated
 
-        models = taskqueue_services.get_cloud_task_run_by_given_params(
-            queue_name, start_datetime, end_datetime)
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_given_params(
+            queue_name, start_datetime, end_datetime)[0]
+
+        self.assertEqual(cloud_task_run.cloud_task_name, task_name)
+        self.assertEqual(cloud_task_run.function_id, function_id)
