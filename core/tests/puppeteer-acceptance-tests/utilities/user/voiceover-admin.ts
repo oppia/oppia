@@ -52,6 +52,16 @@ const addNewLanguageAccentButtonSelector =
   '.e2e-test-add-new-language-accent-button';
 const languageAccentDropdownSelector =
   '.e2e-test-language-accent-dropdown-selector';
+const enableAutogenerationConfirmationButtonSelector =
+  '.e2e-test-autogeneration-confirmation';
+const enableAutogenerationSelectorTemplate = (languageAccentCode: string) =>
+  `.e2e-test-${languageAccentCode}-supports-autogeneration-select`;
+const enableAutogenerationOptionSelector =
+  '.e2e-test-autogeneration-option-selector';
+
+const explorationEditorSettingsTabSelector =
+  '.e2e-test-exploration-editor-settings-tab';
+const toastWarningContainer = '.e2e-test-toast-warning';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
@@ -60,13 +70,16 @@ export class VoiceoverAdmin extends BaseUser {
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
+      await this.isElementVisible(mobileNavToggelbutton);
       await this.clickOn(mobileNavToggelbutton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
     } else {
+      await this.isElementVisible(explorationSettingsTab);
       await this.clickOn(explorationSettingsTab);
     }
 
+    await this.isElementVisible(explorationEditorSettingsTabSelector);
     showMessage('Navigation to settings tab is successful.');
   }
 
@@ -125,6 +138,8 @@ export class VoiceoverAdmin extends BaseUser {
         visible: true,
       });
       await this.clickOn(dropdownToggleIcon);
+
+      await this.isElementVisible(mobileOptionsDropdown, false);
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
       showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
@@ -161,6 +176,7 @@ export class VoiceoverAdmin extends BaseUser {
     voiceArtists: string[]
   ): Promise<void> {
     for (let i = 0; i < voiceArtists.length; i++) {
+      await this.isElementVisible(editVoiceoverArtistButton);
       await this.clickOn(editVoiceoverArtistButton);
       await this.clickOn(voiceArtistUsernameInputBox);
       await this.page.waitForSelector(voiceArtistUsernameInputBox, {
@@ -208,7 +224,10 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to close toast message.
    */
   async closeToastMessage(): Promise<void> {
+    await this.isElementVisible(toastWarningContainer);
     await this.clickOn(closeToastMessageButton);
+
+    await this.isElementVisible(toastWarningContainer, false);
   }
 
   /**
@@ -265,10 +284,10 @@ export class VoiceoverAdmin extends BaseUser {
 
   /**
    * Function to register supported language and accent combinations for Oppia voiceovers.
-   * @param languageAccentCode - The language-accent code to add.
+   * @param languageAccentDescription - The language-accent to add.
    */
   async addSupportedLanguageAccentPair(
-    languageAccentCode: string
+    languageAccentDescription: string
   ): Promise<void> {
     await this.navigateToVoiceoverAdminPage();
     await this.waitForPageToFullyLoad();
@@ -286,11 +305,57 @@ export class VoiceoverAdmin extends BaseUser {
       const textContent = await option.evaluate(
         el => el.textContent?.trim() || ''
       );
-      if (textContent === languageAccentCode) {
+      if (textContent === languageAccentDescription) {
+        await option.click();
+
+        await this.isElementVisible(addNewLanguageAccentButtonSelector);
+        break;
+      }
+    }
+  }
+
+  /**
+   * Function to register supported language and accent combinations for Oppia voiceovers.
+   * @param languageAccentCode - The language-accent code to enable autogeneration for.
+   */
+  async enableAutogenerationForLanguageAccentPair(
+    languageAccentCode: string
+  ): Promise<void> {
+    const enableAutogenerationSelector =
+      enableAutogenerationSelectorTemplate(languageAccentCode);
+    await this.page.waitForSelector(enableAutogenerationSelector);
+    await this.clickOn(enableAutogenerationSelector);
+
+    await this.page.waitForSelector(enableAutogenerationOptionSelector);
+    const options = await this.page.$$(enableAutogenerationOptionSelector);
+    for (const option of options) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === 'Yes') {
         await option.click();
         break;
       }
     }
+
+    await this.page.waitForSelector(
+      enableAutogenerationConfirmationButtonSelector,
+      {
+        visible: true,
+        timeout: 5000,
+      }
+    );
+    await this.clickOn(enableAutogenerationConfirmationButtonSelector);
+    await this.page.waitForSelector(
+      enableAutogenerationConfirmationButtonSelector,
+      {
+        hidden: true,
+      }
+    );
+
+    showMessage(
+      `Autogeneration enabled for language-accent pair: ${languageAccentCode}`
+    );
   }
 }
 

@@ -19,18 +19,18 @@
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
 
-import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
+import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
 import {
   AnswerClassificationService,
   InteractionRulesService,
-} from 'pages/exploration-player-page/services/answer-classification.service';
-import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
-import {InteractionSpecsService} from 'services/interaction-specs.service';
-import {Outcome} from 'domain/exploration/outcome.model';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
-import {TextInputRulesService} from 'interactions/TextInput/directives/text-input-rules.service';
-import {AlertsService} from 'services/alerts.service';
+} from './answer-classification.service';
+import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
+import {InteractionSpecsService} from '../../../services/interaction-specs.service';
+import {Outcome} from '../../../domain/exploration/outcome.model';
+import {StateObjectFactory} from '../../../domain/state/StateObjectFactory';
+import {TextInputRulesService} from '../../../../../extensions/interactions/TextInput/directives/text-input-rules.service';
+import {AlertsService} from '../../../services/alerts.service';
 
 describe('Answer Classification Service', () => {
   const stateName = 'Test State';

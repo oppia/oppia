@@ -45,7 +45,7 @@ import {ExplorationNextContentIdIndexService} from '../services/exploration-next
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {VersionHistoryService} from '../services/version-history.service';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
@@ -99,10 +99,38 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private joyride: JoyrideService,
     private versionHistoryService: VersionHistoryService,
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private skillBackendApiService: SkillBackendApiService,
     private alertsService: AlertsService
   ) {}
+
+  private smoothScrollTo(targetY: number, duration: number): void {
+    const startY = window.scrollY;
+    const difference = targetY - startY;
+    const startTime = performance.now();
+
+    const step = (currentTime: number) => {
+      const elapsedTime = currentTime - startTime;
+
+      // Calculate and set the next scroll position.
+      if (elapsedTime < duration) {
+        // Use easeInOutQuad easing function for smooth animation.
+        const progress = elapsedTime / duration;
+        const easeProgress =
+          progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+        window.scrollTo(0, startY + difference * easeProgress);
+        requestAnimationFrame(step);
+      } else {
+        // Ensure we arrive exactly at target.
+        window.scrollTo(0, targetY);
+      }
+    };
+
+    requestAnimationFrame(step);
+  }
 
   startTutorial(): void {
     this.tutorialInProgress = true;
@@ -129,12 +157,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
             .focus();
 
           if (value.number === 2) {
-            $('html, body').animate(
-              {
-                scrollTop: true ? 0 : 20,
-              },
-              1000
-            );
+            this.smoothScrollTo(0, 1000);
 
             document.querySelector<HTMLElement>(
               '.joyride-step__counter'
@@ -150,13 +173,10 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
               ? this._ID_TUTORIAL_PREVIEW_TAB
               : this._ID_TUTORIAL_STATE_INTERACTION;
 
-            $('html, body').animate(
-              {
-                scrollTop:
-                  document.getElementById(idToScrollTo)?.offsetTop - 200,
-              },
-              1000
-            );
+            const element = document.getElementById(idToScrollTo);
+            if (element) {
+              this.smoothScrollTo(element.offsetTop - 200, 1000);
+            }
 
             document.querySelector<HTMLElement>(
               '.joyride-step__counter'
@@ -172,13 +192,10 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
               ? this._ID_TUTORIAL_PREVIEW_TAB
               : this._ID_TUTORIAL_STATE_INTERACTION;
 
-            $('html, body').animate(
-              {
-                scrollTop:
-                  document.getElementById(idToScrollTo)?.offsetTop - 200,
-              },
-              1000
-            );
+            const element = document.getElementById(idToScrollTo);
+            if (element) {
+              this.smoothScrollTo(element.offsetTop - 200, 1000);
+            }
 
             document.querySelector<HTMLElement>(
               '.joyride-step__counter'
@@ -419,7 +436,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
       if (this.versionHistoryService.getLatestVersionOfExploration() !== null) {
         this.versionHistoryBackendApiService
           .fetchStateVersionHistoryAsync(
-            this.contextService.getExplorationId(),
+            this.pageContextService.getExplorationId(),
             stateData.name,
             this.versionHistoryService.getLatestVersionOfExploration()
           )

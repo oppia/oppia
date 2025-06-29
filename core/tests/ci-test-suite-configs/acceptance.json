@@ -25,6 +25,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-publish-unpublish-and-delete-topic-and-skill.spec.ts"
     },
     {
+      "name": "curriculum-admin/create-subtopic-study-guide-with-multiple-sections",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-subtopic-study-guide-with-multiple-sections.spec.ts"
+    },
+    {
       "name": "exploration-editor/create-exploration-and-change-basic-settings",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-exploration-and-change-basic-settings.spec.ts"
     },
@@ -67,6 +71,10 @@
     {
       "name": "exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions.spec.ts"
+    },
+    {
+      "name": "logged-in-user/view-subtopic-study-guides",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/view-subtopic-study-guides.spec.ts"
     },
     {
       "name": "logged-in-user/access-dashboards-from-profile-menu",
@@ -171,6 +179,10 @@
     {
       "name": "logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/play-lesson-in-different-languages-and-listen-to-voiceovers.spec.ts"
+    },
+    {
+      "name": "logged-out-user/generate-and-play-automated-voiceovers",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/generate-and-play-automated-voiceovers.spec.ts"
     },
     {
       "name": "logged-out-user/play-through-lesson-while-getting-feedback-and-hints",

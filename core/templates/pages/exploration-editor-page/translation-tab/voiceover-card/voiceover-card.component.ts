@@ -18,6 +18,7 @@
 
 import {
   Component,
+  ChangeDetectorRef,
   ElementRef,
   OnInit,
   ViewChild,
@@ -28,7 +29,7 @@ import {Subscription} from 'rxjs';
 import {AddAudioTranslationModalComponent} from '../modal-templates/add-audio-translation-modal.component';
 import {AlertsService} from 'services/alerts.service';
 import {AudioPlayerService} from 'services/audio-player.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {IdGenerationService} from 'services/id-generation.service';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
@@ -97,7 +98,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
   constructor(
     private audioPlayerService: AudioPlayerService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
+    private changeDetectorRef: ChangeDetectorRef,
     private translationLanguageService: TranslationLanguageService,
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
     private ngbModal: NgbModal,
@@ -149,10 +151,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         }
       )
     );
-    this.voiceoversAreLoaded =
-      Object.keys(
-        this.entityVoiceoversService.languageAccentCodeToEntityVoiceovers
-      ).length !== 0;
 
     if (!this.entityVoiceoversService.getActiveLanguageAccentCode()) {
       this.voiceoversAreLoaded = true;
@@ -212,6 +210,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     } else {
       this.isGenerateAutomaticVoiceoverOptionEnabled = false;
     }
+    this.isVoiceoverAutogenerationSupportedForSelectedAccent =
+      this.voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
+        this.languageAccentCode
+      );
+    this.changeDetectorRef.detectChanges();
   }
 
   isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
@@ -487,6 +490,18 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  isExplorationLinkedToStory(): boolean {
+    return this.pageContextService.isExplorationLinkedToStory();
+  }
+
+  shouldShowAutoVoiceoverRegenerationSection(): boolean {
+    return (
+      this.isVoiceoverAutogenerationSupportedForSelectedAccent &&
+      this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled() &&
+      this.isExplorationLinkedToStory()
+    );
+  }
+
   deleteManualVoiceover(): void {
     const modalRef = this.ngbModal.open(VoiceoverRemovalConfirmModalComponent, {
       backdrop: 'static',
@@ -591,9 +606,9 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
         if (this.activeEntityVoiceoversInstance === undefined) {
           this.activeEntityVoiceoversInstance = new EntityVoiceovers(
-            this.contextService.getExplorationId(),
+            this.pageContextService.getExplorationId(),
             'exploration',
-            this.contextService.getExplorationVersion() as number,
+            this.pageContextService.getExplorationVersion() as number,
             this.languageAccentCode,
             {},
             {}
@@ -665,8 +680,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
         this.voiceoverBackendApiService
           .generateAutotmaticVoiceoverAsync(
-            this.contextService.getExplorationId(),
-            this.contextService.getExplorationVersion() as number,
+            this.pageContextService.getExplorationId(),
+            this.pageContextService.getExplorationVersion() as number,
             this.stateEditorService.getActiveStateName() as string,
             this.activeContentId,
             this.languageAccentCode
@@ -680,9 +695,9 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
             );
             if (this.activeEntityVoiceoversInstance === undefined) {
               this.activeEntityVoiceoversInstance = new EntityVoiceovers(
-                this.contextService.getExplorationId(),
+                this.pageContextService.getExplorationId(),
                 'exploration',
-                this.contextService.getExplorationVersion() as number,
+                this.pageContextService.getExplorationVersion() as number,
                 this.languageAccentCode,
                 {},
                 {}

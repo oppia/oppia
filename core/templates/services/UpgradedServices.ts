@@ -64,7 +64,7 @@ import {CollectionRightsBackendApiService} from 'domain/collection/collection-ri
 import {CollectionValidationService} from 'domain/collection/collection-validation.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
 import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ContinueRulesService} from 'interactions/Continue/directives/continue-rules.service';
 import {ContinueValidationService} from 'interactions/Continue/directives/continue-validation.service';
 import {
@@ -346,6 +346,7 @@ import {QuestionValidationService} from './question-validation.service';
 import {MathInteractionsService} from './math-interactions.service';
 import {EntityVoiceoversService} from './entity-voiceovers.services';
 import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
+import {AutomaticVoiceoverHighlightService} from './automatic-voiceover-highlight-service';
 
 interface UpgradedServicesDict {
   // Type 'unknown' is used here because we don't know the exact type of
@@ -411,6 +412,10 @@ export class UpgradedServices {
     );
     upgradedServices['VoiceoverLanguageManagementService'] =
       new VoiceoverLanguageManagementService();
+    upgradedServices['AutomaticVoiceoverHighlightService'] =
+      new AutomaticVoiceoverHighlightService(
+        upgradedServices['LocalStorageService']
+      );
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
     upgradedServices['I18nLanguageCodeService'] = new I18nLanguageCodeService();
@@ -690,7 +695,7 @@ export class UpgradedServices {
       upgradedServices['NormalizeWhitespacePipe'],
       upgradedServices['CodeNormalizerService']
     );
-    upgradedServices['ContextService'] = new ContextService(
+    upgradedServices['PageContextService'] = new PageContextService(
       upgradedServices['UrlService'],
       upgradedServices['BlogPostPageService']
     );
@@ -800,7 +805,7 @@ export class UpgradedServices {
       new EmailDashboardBackendApiService(upgradedServices['HttpClient']);
     upgradedServices['ExplorationPermissionsBackendApiService'] =
       new ExplorationPermissionsBackendApiService(
-        upgradedServices['ContextService'],
+        upgradedServices['PageContextService'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']
       );
@@ -863,7 +868,7 @@ export class UpgradedServices {
       );
     upgradedServices['CurrentInteractionService'] =
       new CurrentInteractionService(
-        upgradedServices['ContextService'],
+        upgradedServices['PageContextService'],
         upgradedServices['PlayerPositionService'],
         upgradedServices['PlayerTranscriptService']
       );
@@ -987,7 +992,7 @@ export class UpgradedServices {
       );
     upgradedServices['StatsReportingBackendApiService'] =
       new StatsReportingBackendApiService(
-        upgradedServices['ContextService'],
+        upgradedServices['PageContextService'],
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']
       );
@@ -1043,7 +1048,7 @@ export class UpgradedServices {
       );
     upgradedServices['ExplorationRecommendationsService'] =
       new ExplorationRecommendationsService(
-        upgradedServices['ContextService'],
+        upgradedServices['PageContextService'],
         upgradedServices['UrlService'],
         upgradedServices['ExplorationRecommendationsBackendApiService']
       );
@@ -1084,7 +1089,7 @@ export class UpgradedServices {
     upgradedServices['AudioPreloaderService'] = new AudioPreloaderService(
       upgradedServices['AssetsBackendApiService'],
       upgradedServices['ComputeGraphService'],
-      upgradedServices['ContextService']
+      upgradedServices['PageContextService']
     );
     upgradedServices['ExplorationHtmlFormatterService'] =
       new ExplorationHtmlFormatterService(

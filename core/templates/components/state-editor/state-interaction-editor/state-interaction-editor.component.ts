@@ -41,7 +41,7 @@ import {StateEditorService} from '../state-editor-properties-services/state-edit
 import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
 import {StateContentService} from '../state-editor-properties-services/state-content.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {
   InteractionCustomizationArgs,
@@ -96,7 +96,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
 
   constructor(
     private alertsService: AlertsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editabilityService: EditabilityService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private interactionDetailsCacheService: InteractionDetailsCacheService,
@@ -144,7 +144,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     );
     this.interactionIsDisabled =
       this.interactionId === 'EndExploration' &&
-      this.contextService.isExplorationLinkedToStory();
+      this.pageContextService.isExplorationLinkedToStory();
   }
 
   _updateAnswerChoices(): void {

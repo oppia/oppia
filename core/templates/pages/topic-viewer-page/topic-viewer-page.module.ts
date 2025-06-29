@@ -52,7 +52,7 @@ import {TopicViewerAccessGuard} from './topic-viewer-page-auth.guard';
             component: PracticeTabComponent,
           },
           {
-            path: 'revision',
+            path: 'studyguide',
             component: SubtopicsListComponent,
           },
         ],
