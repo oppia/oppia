@@ -400,12 +400,28 @@ class StudyGuide:
         """Converts v1 StudyGuide Sections schema to the demo schema.
         v2 schema makes all html field 'Hello'.
         Args:
-            sections_dicts_list: list. A list used to initialize a
+            section_dict: dict. A dict used to initialize a
                 StudyGuide domain object.
         Returns:
-            list. The converted sections_dicts_list.
+            dict. The converted section_dict.
         """
         return cls.convert_html_fields_in_study_guide_section(
+            section_dict,
+            html_validation_service.change_to_hello)
+    
+    @classmethod
+    def _convert_section_v2_dict_to_v3_dict(
+        cls, section_dict: StudyGuideSectionDict
+    ) -> StudyGuideSectionDict:
+        """Converts v2 StudyGuide Sections schema to the demo schema.
+        v3 schema makes all unicode field 'Hello'.
+        Args:
+            section_dict: dict. A dict used to initialize a
+                StudyGuide domain object.
+        Returns:
+            dict. The converted section_dict.
+        """
+        return cls.convert_unicode_fields_in_study_guide_section(
             section_dict,
             html_validation_service.change_to_hello)
 
@@ -427,11 +443,10 @@ class StudyGuide:
         Returns:
             dict. The converted subtopic_page_contents_dict.
         """
-        for _ in study_guide_section_dict:
-            study_guide_section_dict[
-                'content']['html'] = conversion_fn(
-                    study_guide_section_dict['content']['html']
-                )
+        study_guide_section_dict[
+            'content']['html'] = conversion_fn(
+                study_guide_section_dict['content']['html']
+            )
         return study_guide_section_dict
 
     @classmethod
@@ -452,11 +467,10 @@ class StudyGuide:
         Returns:
             dict. The converted subtopic_page_contents_dict.
         """
-        for _ in study_guide_section_dict:
-            study_guide_section_dict['heading']['unicode_str'] = conversion_fn(
-                    study_guide_section_dict[
-                        'heading']['unicode_str']
-                )
+        study_guide_section_dict['heading']['unicode_str'] = conversion_fn(
+                study_guide_section_dict[
+                    'heading']['unicode_str']
+            )
         return study_guide_section_dict
 
     @classmethod
