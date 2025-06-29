@@ -11,7 +11,7 @@
          [attr.aria-hidden]="true">
       </i>
     </div>
-    <div class="oppia-mobile-collapsible-card-content" *ngIf="skillEditorCardIsShown">
+    <div class="oppia-mobile-collapsible-card-content e2e-test-skill-editor-collapsible-card" *ngIf="skillEditorCardIsShown">
       <oppia-skill-description-editor (onSaveDescription)="onSaveDescription()"></oppia-skill-description-editor>
       <div class="oppia-editor-card-section review-material-container">
         <strong class="heading-text">Review Material</strong>
@@ -45,7 +45,7 @@
            [attr.aria-hidden]="true">
         </i>
       </div>
-      <div *ngIf="workedExamplesListIsShown" class="oppia-mobile-collapsible-card-content">
+      <div *ngIf="workedExamplesListIsShown" class="oppia-mobile-collapsible-card-content e2e-test-skill-editor-collapsible-card">
         <div class="concept-card-subtitle">
           These will be displayed one-by-one to the learner, in order, if they ask for them.
         </div>

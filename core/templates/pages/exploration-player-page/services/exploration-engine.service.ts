@@ -16,7 +16,7 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
@@ -57,14 +57,13 @@ import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import isEqual from 'lodash/isEqual';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExplorationEngineService {
   private _explorationId!: string;
-  private _updateActiveStateIfInEditorEventEmitter: EventEmitter<string> =
-    new EventEmitter();
 
   answerIsBeingProcessed: boolean = false;
   alwaysAskLearnersForAnswerDetails: boolean = false;
@@ -99,6 +98,7 @@ export class ExplorationEngineService {
     private playerTranscriptService: PlayerTranscriptService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
+    private stateEditorService: StateEditorService,
     private translateService: TranslateService,
     private urlService: UrlService
   ) {
@@ -188,7 +188,7 @@ export class ExplorationEngineService {
     );
   }
 
-  private _getRandomSuffix(): string {
+  getRandomSuffix(): string {
     // This is a bit of a hack. When a refresh to a component property
     // happens, Angular compares the new value of the property to its previous
     // value. If they are the same, then the property is not updated.
@@ -601,7 +601,7 @@ export class ExplorationEngineService {
     this.nextStateName = newStateName;
     let onSameCard: boolean = oldStateName === newStateName;
 
-    this._updateActiveStateIfInEditorEventEmitter.emit(newStateName);
+    this.stateEditorService.onUpdateActiveStateIfInEditor.emit(newStateName);
 
     let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let nextInteractionHtml = null;
@@ -616,8 +616,8 @@ export class ExplorationEngineService {
       this.learnerParamsService.init(newParams);
     }
 
-    questionHtml = questionHtml + this._getRandomSuffix();
-    nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
+    questionHtml = questionHtml + this.getRandomSuffix();
+    nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
 
     let nextCard = StateCard.createNewCard(
       this.nextStateName,
@@ -683,9 +683,9 @@ export class ExplorationEngineService {
       );
     }
 
-    questionHtmlIfStuck = questionHtmlIfStuck + this._getRandomSuffix();
+    questionHtmlIfStuck = questionHtmlIfStuck + this.getRandomSuffix();
     nextInteractionIfStuckHtml =
-      nextInteractionIfStuckHtml + this._getRandomSuffix();
+      nextInteractionIfStuckHtml + this.getRandomSuffix();
 
     return StateCard.createNewCard(
       this.nextStateIfStuckName,
@@ -704,10 +704,6 @@ export class ExplorationEngineService {
     return this.alwaysAskLearnersForAnswerDetails;
   }
 
-  get onUpdateActiveStateIfInEditor(): EventEmitter<string> {
-    return this._updateActiveStateIfInEditorEventEmitter;
-  }
-
   getStateCardByName(stateName: string): StateCard {
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let interactionHtml = null;
@@ -719,8 +715,8 @@ export class ExplorationEngineService {
     }
     let contentHtml =
       this.exploration.getState(stateName).content.html +
-      this._getRandomSuffix();
-    interactionHtml = interactionHtml + this._getRandomSuffix();
+      this.getRandomSuffix();
+    interactionHtml = interactionHtml + this.getRandomSuffix();
 
     return StateCard.createNewCard(
       stateName,
