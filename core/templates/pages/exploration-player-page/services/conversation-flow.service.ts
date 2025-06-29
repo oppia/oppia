@@ -1606,6 +1606,15 @@ export class ConversationFlowService {
     return this.hasInteractedAtLeastOnce;
   }
 
+  /**
+   * Sets whether the learner has interacted with the exploration at least once.
+   *
+   * @param {boolean} hasInteracted - True if the learner has interacted, false otherwise.
+   */
+  setHasInteractedAtLeastOnce(hasInteracted: boolean): void {
+    this.hasInteractedAtLeastOnce = hasInteracted;
+  }
+
   getExplorationActuallyStarted(): boolean {
     return this.explorationActuallyStarted;
   }
