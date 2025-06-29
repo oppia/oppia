@@ -362,12 +362,13 @@ class StudyGuide:
             'version': self.version
         }
 
+    # Remove no cover comment once migrations for study guides are available.
     @classmethod
     def update_sections_from_model(
         cls,
         versioned_sections: VersionedStudyGuideSectionsDict,
         current_version: int
-    ) -> None:
+    ) -> None: # pragme: no cover
         """Converts the sections in the sections list contained
         in the given versioned_sections dict from current_version to
         current_version + 1. Note that the versioned_sections being
@@ -391,12 +392,13 @@ class StudyGuide:
                 versioned_sections['sections'][i]
             )
 
+    # Remove no cover comment once migrations for study guides are available.
     @classmethod
     def convert_html_fields_in_study_guide_section(
         cls,
         study_guide_section_dict: StudyGuideSectionDict,
         conversion_fn: Callable[[str], str]
-    ) -> StudyGuideSectionDict:
+    ) -> StudyGuideSectionDict: # pragma: no cover
         """Applies a conversion function on all the html strings in a study
         guide section to migrate them to a desired state.
 
@@ -415,12 +417,13 @@ class StudyGuide:
             )
         return study_guide_section_dict
 
+    # Remove no cover comment once migrations for study guides are available.
     @classmethod
     def convert_unicode_fields_in_study_guide_section(
         cls,
         study_guide_section_dict: StudyGuideSectionDict,
         conversion_fn: Callable[[str], str]
-    ) -> StudyGuideSectionDict:
+    ) -> StudyGuideSectionDict: # pragma: no cover
         """Applies a conversion function on all the unicode strings in study
         guide section to migrate them to a desired state.
 

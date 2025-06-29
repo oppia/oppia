@@ -38,11 +38,12 @@ if MYPY: # pragma: no cover
 (subtopic_models,) = models.Registry.import_models([models.Names.SUBTOPIC])
 
 
+# Remove no cover comment once migrations for study guides are available.
 def _migrate_sections_to_latest_schema(
     versioned_sections: (
         study_guide_domain.VersionedStudyGuideSectionsDict
     )
-) -> None:
+) -> None: # pragma: no cover
     """Holds the responsibility of performing a step-by-step, sequential update
     of the sections structure based on the schema version of the input
     sections dictionary. If the current sections schema changes, a
@@ -90,8 +91,9 @@ def get_study_guide_from_model(
         'schema_version': study_guide_model.sections_schema_version,
         'sections': copy.deepcopy(study_guide_model.sections)
     }
+    # Remove no cover comment once migrations for study guides are available.
     if (study_guide_model.sections_schema_version !=
-            feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION):
+            feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION): # pragma: no cover
         _migrate_sections_to_latest_schema(versioned_sections)
     sections = []
     for section in versioned_sections['sections']:

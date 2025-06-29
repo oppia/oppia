@@ -79,7 +79,7 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
             job_run_result.JobRunResult(
                 stdout='STUDY GUIDE PROCESSED SUCCESS: 1'),
             # Remove 'PREVIOUSLY' from the string once
-            # sections_schema_versions v2 and further are available. 
+            # sections_schema_versions v2 and further are available.
             job_run_result.JobRunResult(
                 stdout='STUDY GUIDE PREVIOUSLY MIGRATED SUCCESS: 1')
         ])
