@@ -60,7 +60,6 @@ def managed_process(
         shell: bool. Whether the command should be run inside of its own shell.
             WARNING: Executing shell commands that incorporate unsanitized input
             from an untrusted source makes a program vulnerable to
-import json
             [shell injection](https://w.wiki/_Ac2), a serious security flaw
             which can result in arbitrary command execution. For this reason,
             the use of `shell=True` is **strongly discouraged** in cases where
