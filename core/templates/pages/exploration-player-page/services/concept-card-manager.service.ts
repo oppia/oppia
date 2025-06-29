@@ -22,6 +22,7 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {ExplorationEngineService} from './exploration-engine.service';
+import {ConceptCard} from 'domain/skill/concept-card.model';
 
 @Injectable({
   providedIn: 'root',
@@ -45,6 +46,7 @@ export class ConceptCardManagerService {
   conceptCardConsumed: boolean = false;
   wrongAnswersSinceConceptCardConsumed: number = 0;
   learnerIsReallyStuck: boolean = false;
+  conceptCard!: ConceptCard;
 
   // Variable tooltipIsOpen is a flag which says that the tooltip is currently
   // visible to the learner.
@@ -168,6 +170,14 @@ export class ConceptCardManagerService {
       // Learner is really stuck.
       this.emitLearnerStuckedness();
     }
+  }
+
+  setConceptCard(conceptCard: ConceptCard): void {
+    this.conceptCard = conceptCard;
+  }
+
+  getConceptCard(): ConceptCard {
+    return this.conceptCard;
   }
 
   get onLearnerGetsReallyStuck(): EventEmitter<string> {

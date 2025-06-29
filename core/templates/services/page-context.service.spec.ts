@@ -518,6 +518,17 @@ describe('PageContext service', () => {
       }
     );
 
+    it(
+      'should correctly retrieve the page context as ' + 'diagnostic player',
+      () => {
+        expect(ecs.getPageContext()).toBe('other');
+        spyOn(urlService, 'getPathname').and.returnValue(
+          '/diagnostic-test-player/'
+        );
+        expect(ecs.getPageContext()).toBe('diagnostic_test_player');
+      }
+    );
+
     it('should correctly retrieve the page context as contributor dashboard', () => {
       expect(ecs.getPageContext()).toBe('other');
       spyOn(urlService, 'getPathname').and.returnValue(

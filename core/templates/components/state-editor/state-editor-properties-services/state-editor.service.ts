@@ -72,6 +72,8 @@ export class StateEditorService {
   private _updateMisconceptionsEventEmitter = new EventEmitter<void>();
   private _onChangeLinkedSkillIdEventEmitter = new EventEmitter<void>();
   private _objectFormValidityChangeEventEmitter = new EventEmitter<boolean>();
+  private _updateActiveStateIfInEditorEventEmitter: EventEmitter<string> =
+    new EventEmitter();
 
   activeStateName: string | null = null;
   // These properties are initialized using Angular lifecycle hooks
@@ -364,5 +366,9 @@ export class StateEditorService {
 
   get onChangeLinkedSkillId(): EventEmitter<void> {
     return this._onChangeLinkedSkillIdEventEmitter;
+  }
+
+  get onUpdateActiveStateIfInEditor(): EventEmitter<string> {
+    return this._updateActiveStateIfInEditorEventEmitter;
   }
 }
