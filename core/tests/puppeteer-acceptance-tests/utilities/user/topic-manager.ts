@@ -217,6 +217,11 @@ const storyEditorNodeSelector = '.story-editor-node';
 const resetChapterThumbnailButton = '.e2e-test-thumbnail-reset-button';
 const saveExplorationIDButton = '.e2e-test-exploration-id-save-button';
 const addPrerequisiteSkillButton = '.e2e-test-add-prerequisite-skill';
+const addPrerequisiteSkillInSkillEditorButton =
+  '.e2e-test-add-prerequisite-skill-in-skill-editor-button';
+const togglePrerequisiteSkillsDropdown =
+  '.e2e-test-toggle-prereq-skills-dropdown';
+const toggleSkillRubricsDropdown = '.e2e-test-toggle-rubrics-dropdown';
 const addAcquiredSkillButton = '.e2e-test-add-acquired-skill';
 const mobileCollapsibleCardHeaderSelector =
   '.oppia-mobile-collapsible-card-header';
@@ -1911,7 +1916,10 @@ export class TopicManager extends BaseUser {
    */
   async addPrerequisiteSkillInSkillEditor(skillName: string): Promise<void> {
     try {
-      await this.clickOn('+ ADD PREREQUISITE SKILL');
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(togglePrerequisiteSkillsDropdown);
+      }
+      await this.clickOn(addPrerequisiteSkillInSkillEditorButton);
       await this.type(skillNameInputSelector, skillName);
 
       await this.page.waitForSelector(radioInnerCircleSelector);
@@ -2042,6 +2050,9 @@ export class TopicManager extends BaseUser {
    * @param {string} explanation - The explanation to update.
    */
   async updateRubric(difficulty: string, explanation: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(toggleSkillRubricsDropdown);
+    }
     await this.waitForStaticAssetsToLoad();
     let difficultyValue: string;
     switch (difficulty) {
