@@ -98,7 +98,7 @@ import {LearnerDashboardBackendApiService} from '../../../../domain/learner_dash
 import {EditableExplorationBackendApiService} from '../../../../domain/exploration/editable-exploration-backend-api.service';
 import {DiagnosticTestTopicTrackerModel} from '../../../../pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
-import {Solution} from '../../../../domain/exploration/SolutionObjectFactory';
+import {Solution} from '../../../../domain/exploration/solution.model';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {CurrentEngineService} from '../../services/current-engine.service';
