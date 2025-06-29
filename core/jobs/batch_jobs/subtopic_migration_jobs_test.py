@@ -42,8 +42,8 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
     ] = subtopic_migration_jobs.MigrateStudyGuideJob
 
     TOPIC_1_ID: Final = 'topic_1_id'
-    SUBTOPIC_1_ID: Final = 'subtopic_1_id'
-    SUBTOPIC_2_ID: Final = 'subtopic_2_id'
+    STUDY_GUIDE_1_ID: Final = 'study_guide_1_id'
+    STUDY_GUIDE_2_ID: Final = 'study_guide_2_id'
     subtopic_id = 1
 
     def setUp(self) -> None:
@@ -61,9 +61,9 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
     ) -> None:
         unmigrated_study_guide_model = self.create_model(
             subtopic_models.StudyGuideModel,
-            id=self.SUBTOPIC_1_ID,
+            id=self.STUDY_GUIDE_1_ID,
             topic_id=self.TOPIC_1_ID,
-            sections=self.study_guide.sections[0].to_dict(),
+            sections=[self.study_guide.sections[0].to_dict()],
             sections_schema_version=1,
             language_code='cs',
             version=1
@@ -85,7 +85,7 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
         ])
 
         migrated_study_guide_model = subtopic_models.StudyGuideModel.get(
-            self.SUBTOPIC_1_ID
+            self.STUDY_GUIDE_1_ID
         )
         self.assertEqual(
             migrated_study_guide_model.sections_schema_version,
@@ -94,9 +94,9 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
     def test_broken_study_guide_leads_to_no_migration(self) -> None:
         first_unmigrated_study_guide_model = self.create_model(
             subtopic_models.StudyGuideModel,
-            id=self.SUBTOPIC_1_ID,
+            id=self.STUDY_GUIDE_1_ID,
             topic_id=self.TOPIC_1_ID,
-            sections=self.study_guide.sections[0].to_dict(),
+            sections=[self.study_guide.sections[0].to_dict()],
             sections_schema_version=1,
             language_code='abc',
         )
@@ -109,9 +109,9 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
 
         second_unmigrated_study_guide_model = self.create_model(
             subtopic_models.StudyGuideModel,
-            id=self.SUBTOPIC_2_ID,
+            id=self.STUDY_GUIDE_2_ID,
             topic_id=self.TOPIC_1_ID,
-            sections=self.study_guide.sections[0].to_dict(),
+            sections=[self.study_guide.sections[0].to_dict()],
             sections_schema_version=1,
             language_code='en',
         )
@@ -124,7 +124,7 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'STUDY GUIDE PROCESSED ERROR: "(\'subtopic_1_id\', '
+                    'STUDY GUIDE PROCESSED ERROR: "(\'study_guide_1_id\', '
                     'ValidationError(\'Invalid language code: abc\''
                     '))": 1'
                 )
@@ -134,19 +134,19 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
             )
         ])
         first_migrated_model = subtopic_models.StudyGuideModel.get(
-            self.SUBTOPIC_1_ID)
+            self.STUDY_GUIDE_1_ID)
         self.assertEqual(first_migrated_model.version, 1)
 
-        second_migrated_model = subtopic_models.SubtopicPageModel.get(
-            self.SUBTOPIC_2_ID)
+        second_migrated_model = subtopic_models.StudyGuideModel.get(
+            self.STUDY_GUIDE_2_ID)
         self.assertEqual(second_migrated_model.version, 1)
 
     def test_migrated_study_guide_is_not_migrated(self) -> None:
         unmigrated_study_guide_model = self.create_model(
             subtopic_models.StudyGuideModel,
-            id=self.SUBTOPIC_1_ID,
+            id=self.STUDY_GUIDE_1_ID,
             topic_id=self.TOPIC_1_ID,
-            sections=self.study_guide.sections[0].to_dict(),
+            sections=[self.study_guide.sections[0].to_dict()],
             sections_schema_version=(
                 feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
             ),
@@ -169,7 +169,7 @@ class MigrateStudyGuideJobTests(job_test_utils.JobTestBase):
         ])
 
         migrated_study_guide_model = subtopic_models.StudyGuideModel.get(
-            self.SUBTOPIC_1_ID)
+            self.STUDY_GUIDE_1_ID)
         self.assertEqual(migrated_study_guide_model.version, 1)
 
 
@@ -180,8 +180,8 @@ class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
     ] = subtopic_migration_jobs.AuditStudyGuideMigrationJob
 
     TOPIC_1_ID: Final = 'topic_1_id'
-    SUBTOPIC_1_ID: Final = 'subtopic_1_id'
-    SUBTOPIC_2_ID: Final = 'subtopic_2_id'
+    STUDY_GUIDE_2_ID: Final = 'study_guide_2_id'
+    STUDY_GUIDE_1_ID: Final = 'study_guide_1_id'
     subtopic_id = 1
 
     def setUp(self) -> None:
@@ -197,9 +197,9 @@ class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
     def test_broken_study_guide_leads_to_no_migration(self) -> None:
         first_unmigrated_study_guide_model = self.create_model(
             subtopic_models.StudyGuideModel,
-            id=self.SUBTOPIC_1_ID,
+            id=self.STUDY_GUIDE_1_ID,
             topic_id=self.TOPIC_1_ID,
-            sections=self.study_guide.sections[0].to_dict(),
+            sections=[self.study_guide.sections[0].to_dict()],
             sections_schema_version=1,
             language_code='abc',
         )
@@ -212,9 +212,9 @@ class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
 
         second_unmigrated_study_guide_model = self.create_model(
             subtopic_models.StudyGuideModel,
-            id=self.SUBTOPIC_2_ID,
+            id=self.STUDY_GUIDE_2_ID,
             topic_id=self.TOPIC_1_ID,
-            sections=self.study_guide.sections[0].to_dict(),
+            sections=[self.study_guide.sections[0].to_dict()],
             sections_schema_version=1,
             language_code='en',
         )
@@ -227,7 +227,7 @@ class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is([
             job_run_result.JobRunResult(
                 stderr=(
-                    'STUDY GUIDE PROCESSED ERROR: "(\'subtopic_1_id\', '
+                    'STUDY GUIDE PROCESSED ERROR: "(\'study_guide_1_id\', '
                     'ValidationError(\'Invalid language code: abc\''
                     '))": 1'
                 )
@@ -237,19 +237,19 @@ class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
             )
         ])
         first_migrated_model = subtopic_models.StudyGuideModel.get(
-            self.SUBTOPIC_1_ID)
+            self.STUDY_GUIDE_1_ID)
         self.assertEqual(first_migrated_model.version, 1)
 
         second_migrated_model = subtopic_models.StudyGuideModel.get(
-            self.SUBTOPIC_2_ID)
+            self.STUDY_GUIDE_2_ID)
         self.assertEqual(second_migrated_model.version, 1)
 
     def test_migrated_study_guide_is_not_migrated(self) -> None:
         unmigrated_study_guide_model = self.create_model(
             subtopic_models.StudyGuideModel,
-            id=self.SUBTOPIC_1_ID,
+            id=self.STUDY_GUIDE_1_ID,
             topic_id=self.TOPIC_1_ID,
-            sections=self.study_guide.sections[0].to_dict(),
+            sections=[self.study_guide.sections[0].to_dict()],
             sections_schema_version=(
                 feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION
             ),
@@ -272,5 +272,5 @@ class AuditStudyGuideMigrationJobTests(job_test_utils.JobTestBase):
         ])
 
         migrated_study_guide_model = subtopic_models.StudyGuideModel.get(
-            self.SUBTOPIC_1_ID)
+            self.STUDY_GUIDE_1_ID)
         self.assertEqual(migrated_study_guide_model.version, 1)

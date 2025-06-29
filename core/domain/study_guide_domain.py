@@ -27,8 +27,6 @@ from core.domain import translation_domain
 
 from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 
-from core.domain import html_validation_service  # pylint: disable=invalid-import-from # isort:skip
-
 STUDY_GUIDE_PROPERTY_SECTIONS: Final = 'sections'
 
 # These will be deprecated once we shift to using just study guides.
@@ -392,38 +390,6 @@ class StudyGuide:
             versioned_sections['sections'][i] = conversion_fn(
                 versioned_sections['sections'][i]
             )
-
-    @classmethod
-    def _convert_section_v1_dict_to_v2_dict(
-        cls, section_dict: StudyGuideSectionDict
-    ) -> StudyGuideSectionDict:
-        """Converts v1 StudyGuide Sections schema to the demo schema.
-        v2 schema makes all html field 'Hello'.
-        Args:
-            section_dict: dict. A dict used to initialize a
-                StudyGuide domain object.
-        Returns:
-            dict. The converted section_dict.
-        """
-        return cls.convert_html_fields_in_study_guide_section(
-            section_dict,
-            html_validation_service.change_to_hello)
-    
-    @classmethod
-    def _convert_section_v2_dict_to_v3_dict(
-        cls, section_dict: StudyGuideSectionDict
-    ) -> StudyGuideSectionDict:
-        """Converts v2 StudyGuide Sections schema to the demo schema.
-        v3 schema makes all unicode field 'Hello'.
-        Args:
-            section_dict: dict. A dict used to initialize a
-                StudyGuide domain object.
-        Returns:
-            dict. The converted section_dict.
-        """
-        return cls.convert_unicode_fields_in_study_guide_section(
-            section_dict,
-            html_validation_service.change_to_hello)
 
     @classmethod
     def convert_html_fields_in_study_guide_section(

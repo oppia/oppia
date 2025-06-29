@@ -1005,32 +1005,6 @@ def fix_incorrectly_encoded_chars(html_string: str) -> str:
         )
     )
 
-def change_to_hello(html_string: str) -> str:
-    """Replaces all html with Hello.
-    Args:
-        html_string: str. The HTML string to modify.
-    Returns:
-        str. The updated html string.
-    """
-    return str(
-        _process_string_with_components(
-            html_string,
-            _replace_with_hello
-        )
-    )
-
-
-def _replace_with_hello(soup_context: bs4.BeautifulSoup) -> str:
-    """Replaces html with hello.
-    Args:
-        soup_context: bs4.BeautifulSoup. The bs4 soup context.
-    Returns:
-        str. The updated html string.
-    """
-    html_string = str(soup_context)
-    html_string = html_string.replace(html_string, 'Hello')
-    return html_string
-
 
 def _process_string_with_components(
     html_string: str, conversion_fn: Callable[[bs4.BeautifulSoup], str]
