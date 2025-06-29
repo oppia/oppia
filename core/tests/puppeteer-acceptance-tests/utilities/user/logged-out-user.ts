@@ -2033,6 +2033,10 @@ export class LoggedOutUser extends BaseUser {
     await this.page.reload();
   }
 
+  /**
+   * Checks if the the language dropdown is available or not.
+   * @param status - Status of language dropdown.
+   */
   async expectLanguageDropdownToBePresent(
     status: boolean = true
   ): Promise<void> {
@@ -4766,15 +4770,27 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if Video RTE is present in current lesson card.
+   */
   async expectVideoRTEToBePresent(): Promise<void> {
     await this.page.waitForSelector(youtubePlayerSelector, {visible: true});
   }
 
+  /**
+   * Checks if there is link text RTE present in current lesson card.
+   * @param linkURL - The URL to which link text should redirect when clicked.
+   */
   async expectLinkRTEToPresent(linkURL: string): Promise<void> {
     const linkSelector = `oppia-noninteractive-link a.linkText[href="${linkURL}"]`;
     await this.page.waitForSelector(linkSelector, {visible: true});
   }
 
+  /**
+   * Check if colllapsible RTE element is present or not.
+   * @param header - The header of collapsible RTE element.
+   * @param content - The content collapsible RTE element should have.
+   */
   async expectCollapsibleRTEToBePresent(
     header: string = 'Sample Header',
     content: string = 'You have opened the collapsible block.'
@@ -4813,6 +4829,10 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if button with "left arrow" icon is present to move back to previous lesson card.
+   * @param visibility - Boolean value representing should be visible or not.
+   */
   async expectGoBackToPreviousCardButton(
     visibility: boolean = true
   ): Promise<void> {
@@ -4823,6 +4843,10 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if "Stay Anonymous" checkbox is checked or not.
+   * @param status - Boolean value representing that checkbox should be checked or not.
+   */
   async expectStayAnonymousCheckboxToBePresent(
     status: boolean = true
   ): Promise<void> {
@@ -4846,6 +4870,10 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if "Contine" button is present in the lesson card.
+   * @param status - Boolean value representing that button should be present or not. Default is true (visible)
+   */
   async expectContinueToNextCardButtonToBePresent(
     status: boolean = true
   ): Promise<void> {
@@ -4867,6 +4895,10 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if lesson info text is visible or not.
+   * @param status - Boolean value representing that info text should be visible or not.
+   */
   async expectLessonInfoTextToBePresent(status: boolean = true): Promise<void> {
     if (status) {
       await this.page.waitForSelector(lessonInfoButton, {visible: true});
