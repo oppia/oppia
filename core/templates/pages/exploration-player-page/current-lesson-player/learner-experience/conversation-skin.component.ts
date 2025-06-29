@@ -18,7 +18,6 @@
 
 import {Subscription} from 'rxjs';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {ServicesConstants} from 'services/services.constants';
 import {ChangeDetectorRef, Component, Input} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {AlertsService} from 'services/alerts.service';
@@ -28,7 +27,6 @@ import {PageContextService} from 'services/page-context.service';
 import {CurrentInteractionService} from '../../services/current-interaction.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {ExplorationRecommendationsService} from '../../services/exploration-recommendations.service';
-import {FatigueDetectionService} from '../../services/fatigue-detection.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {HintsAndSolutionManagerService} from '../../services/hints-and-solution-manager.service';
 import {
@@ -39,54 +37,35 @@ import {ImagePreloaderService} from '../../services/image-preloader.service';
 import {LearnerAnswerInfoService} from '../../services/learner-answer-info.service';
 import {LearnerParamsService} from '../../services/learner-params.service';
 import {LoaderService} from 'services/loader.service';
-import {MessengerService} from 'services/messenger.service';
-import {NumberAttemptsService} from '../../services/number-attempts.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
 import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
-import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
-import {State} from 'domain/state/StateObjectFactory';
-import {InteractionRulesService} from '../../services/answer-classification.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ExplorationInitializationService} from '../../services/exploration-initialization.service';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
-import {AppConstants} from 'app.constants';
-import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domain.constants';
-import {StoryViewerDomainConstants} from 'domain/story_viewer/story-viewer-domain.constants';
 import {CollectionPlayerBackendApiService} from 'pages/collection-player-page/services/collection-player-backend-api.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
 import {ProgressUrlService} from 'pages/exploration-player-page/services/progress-url.service';
 
 import './conversation-skin.component.css';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
-import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {DiagnosticTestPlayerEngineService} from 'pages/exploration-player-page/services/diagnostic-test-player-engine.service';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {ChapterProgressService} from 'pages/exploration-player-page/services/chapter-progress.service';
 import {CurrentEngineService} from 'pages/exploration-player-page/services/current-engine.service';
-
-// Note: This file should be assumed to be in an IIFE, and the constants below
-// should only be used within this file.
-const TIME_FADEOUT_MSEC = 100;
-const TIME_HEIGHT_CHANGE_MSEC = 500;
-const TIME_FADEIN_MSEC = 100;
-const TIME_NUM_CARDS_CHANGE_MSEC = 500;
-const ALERT_MESSAGE_TIMEOUT = 6000;
-const TIME_PADDING_MSEC = 250;
-const TIME_SCROLL_MSEC = 600;
+import {CardAnimationService} from 'pages/exploration-player-page/services/card-animation.service';
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -98,7 +77,6 @@ export class ConversationSkinComponent {
   @Input() diagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
 
-  _nextFocusLabel = null;
   _editorPreviewMode;
 
   isLoggedIn: boolean;
@@ -108,21 +86,12 @@ export class ConversationSkinComponent {
   isIframed: boolean;
   hasFullyLoaded = false;
   recommendedExplorationSummaries: LearnerExplorationSummary[] = [];
-  pendingCardWasSeenBefore: boolean = false;
   OPPIA_AVATAR_IMAGE_URL: string;
   displayedCard: StateCard;
   correctnessFooterIsShown: boolean = true;
 
-  // If the exploration is iframed, send data to its parent about
-  // its height so that the parent can be resized as necessary.
-  lastRequestedHeight: number = 0;
-  lastRequestedScroll: boolean = false;
   collectionSummary;
-  isAnimatingToTwoCards: boolean;
-  isAnimatingToOneCard: boolean;
-  questionSessionCompleted: boolean;
   moveToExploration: boolean;
-  showProgressClearanceMessage: boolean = false;
 
   pidInUrl: string;
   submitButtonIsDisabled = true;
@@ -145,7 +114,7 @@ export class ConversationSkinComponent {
     private explorationEngineService: ExplorationEngineService,
     private explorationRecommendationsService: ExplorationRecommendationsService,
     private explorationModeService: ExplorationModeService,
-    private fatigueDetectionService: FatigueDetectionService,
+    private cardAnimationService: CardAnimationService,
     private focusManagerService: FocusManagerService,
     private explorationInitializationService: ExplorationInitializationService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
@@ -155,16 +124,13 @@ export class ConversationSkinComponent {
     private learnerAnswerInfoService: LearnerAnswerInfoService,
     private learnerParamsService: LearnerParamsService,
     private loaderService: LoaderService,
-    private messengerService: MessengerService,
     private localStorageService: LocalStorageService,
-    private numberAttemptsService: NumberAttemptsService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
     private questionPlayerStateService: QuestionPlayerStateService,
     private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
     private statsReportingService: StatsReportingService,
-    private storyViewerBackendApiService: StoryViewerBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
     private progressUrlService: ProgressUrlService,
     private urlService: UrlService,
@@ -176,21 +142,15 @@ export class ConversationSkinComponent {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private checkpointProgressService: CheckpointProgressService,
     private conversationFlowService: ConversationFlowService,
-    private chapterProgressService: ChapterProgressService,
-    private voiceoverPlayerService: VoiceoverPlayerService
+    private chapterProgressService: ChapterProgressService
   ) {}
-
-  adjustPageHeightOnresize(): void {
-    this.windowRef.nativeWindow.onresize = () => {
-      this.adjustPageHeight(false, null);
-    };
-  }
 
   ngOnInit(): void {
     this._editorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
     this.correctnessFooterIsShown =
       !this.pageContextService.isInDiagnosticTestPlayerPage();
+    this.inStoryMode = this.explorationModeService.isInStoryChapterMode();
 
     let collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     this.pidInUrl = this.urlService.getPidFromUrl();
@@ -362,10 +322,10 @@ export class ConversationSkinComponent {
         this.localStorageService.removeUniqueProgressIdOfLoggedOutLearner();
       }
 
-      this.adjustPageHeightOnresize();
+      this.cardAnimationService.adjustPageHeightOnresize();
 
       this.currentInteractionService.setOnSubmitFn(
-        this.submitAnswer.bind(this)
+        this.conversationFlowService.submitAnswer
       );
       this.initializePage();
 
@@ -472,63 +432,12 @@ export class ConversationSkinComponent {
     );
   }
 
-  isLearnAgainButton(): boolean {
-    let conceptCardIsBeingShown =
-      this.displayedCard.getStateName() === null &&
-      !this.explorationModeService.isInQuestionMode();
-    if (conceptCardIsBeingShown) {
-      return false;
-    }
-    let interaction = this.displayedCard.getInteraction();
-
-    if (!interaction.id) {
-      // An editor might also try to view preview tab without adding
-      // interaction to concept card.
-      return false;
-    }
-
-    if (INTERACTION_SPECS[interaction.id].is_linear) {
-      return false;
-    }
-    return (
-      this.pendingCardWasSeenBefore &&
-      !this.conversationFlowService.getAnswerIsCorrect()
-    );
-  }
-
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
 
   getContentFocusLabel(index: number): string {
     return ExplorationPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX + index;
-  }
-
-  adjustPageHeight(scroll: boolean, callback: () => void): void {
-    setTimeout(() => {
-      let newHeight = document.body.scrollHeight;
-      if (
-        Math.abs(this.lastRequestedHeight - newHeight) > 50.5 ||
-        (scroll && !this.lastRequestedScroll)
-      ) {
-        // Sometimes setting iframe height to the exact content height
-        // still produces scrollbar, so adding 50 extra px.
-        newHeight += 50;
-        this.messengerService.sendMessage(
-          ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE,
-          {
-            height: newHeight,
-            scroll: scroll,
-          }
-        );
-        this.lastRequestedHeight = newHeight;
-        this.lastRequestedScroll = scroll;
-      }
-
-      if (callback) {
-        callback();
-      }
-    }, 100);
   }
 
   getExplorationLink(): string {
@@ -550,6 +459,14 @@ export class ConversationSkinComponent {
     );
   }
 
+  getIsAnimatingToTwoCards(): boolean {
+    return this.cardAnimationService.getIsAnimatingToTwoCards();
+  }
+
+  getIsAnimatingToOneCard(): boolean {
+    return this.cardAnimationService.getIsAnimatingToOneCard();
+  }
+
   isSupplementalNavShown(): boolean {
     if (
       this.displayedCard.getStateName() === null &&
@@ -563,88 +480,6 @@ export class ConversationSkinComponent {
       INTERACTION_SPECS[interaction.id].show_generic_submit_button &&
       this.isCurrentCardAtEndOfTranscript()
     );
-  }
-
-  private _navigateToMostRecentlyReachedCheckpoint() {
-    let states: StateObjectsBackendDict;
-    this.readOnlyExplorationBackendApiService
-      .loadLatestExplorationAsync(this.explorationId, this.pidInUrl)
-      .then(response => {
-        states = response.exploration.states;
-
-        let mostRecentlyReachedCheckpoint =
-          this.checkpointProgressService.getMostRecentlyReachedCheckpoint() ||
-          response.most_recently_reached_checkpoint_state_name;
-
-        this.checkpointProgressService.setMostRecentlyReachedCheckpoint(
-          mostRecentlyReachedCheckpoint
-        );
-
-        let prevSessionStatesProgress =
-          this.explorationEngineService.getShortestPathToState(
-            states,
-            mostRecentlyReachedCheckpoint
-          );
-
-        let indexToRedirectTo = 0;
-
-        for (let i = 0; i < prevSessionStatesProgress.length; i++) {
-          // Set state name of a previously completed state.
-          let stateName = prevSessionStatesProgress[i];
-          let stateData =
-            this.explorationEngineService.getStateFromStateName(stateName);
-
-          // Skip the card if it has already been added to transcript.
-          if (
-            !this.playerTranscriptService.hasEncounteredStateBefore(stateName)
-          ) {
-            let stateCard =
-              this.explorationEngineService.getStateCardByName(stateName);
-            this._addNewCard(stateCard);
-          }
-
-          if (
-            !this.checkpointProgressService.checkIfCheckpointIsVisited(
-              stateName
-            ) &&
-            stateData.cardIsCheckpoint
-          ) {
-            this.checkpointProgressService.setVisitedCheckpointStateNames(
-              stateName
-            );
-          }
-
-          if (mostRecentlyReachedCheckpoint === stateName) {
-            break;
-          }
-
-          indexToRedirectTo += 1;
-        }
-
-        // Remove the last card from progress as it is not completed
-        // yet and is only most recently reached.
-        prevSessionStatesProgress.pop();
-        this.playerTranscriptService.setPrevSessionStatesProgress(
-          prevSessionStatesProgress
-        );
-
-        if (indexToRedirectTo > 0) {
-          setTimeout(() => {
-            let alertInfoElement = document.querySelector(
-              '.oppia-exploration-checkpoints-message'
-            );
-
-            // Remove the alert message after 6 sec.
-            if (alertInfoElement) {
-              alertInfoElement.remove();
-            }
-          }, ALERT_MESSAGE_TIMEOUT);
-        }
-
-        // Move to most recently reached checkpoint card.
-        this.conversationFlowService.changeCard(indexToRedirectTo);
-        this.playerPositionService.onLoadedMostRecentCheckpoint.emit();
-      });
   }
 
   // Navigates to the currently-active card, and resets the
@@ -695,11 +530,9 @@ export class ConversationSkinComponent {
 
     this.audioPlayerService.onAutoplayAudio.emit();
     this.autogeneratedAudioPlayerService.cancel();
-    if (
-      this._nextFocusLabel &&
-      this.playerTranscriptService.isLastCard(index)
-    ) {
-      this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
+    let focusLabel = this.conversationFlowService.getNextFocusLabel();
+    if (focusLabel && this.playerTranscriptService.isLastCard(index)) {
+      this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     } else {
       this.focusManagerService.setFocusIfOnDesktop(
         this.getContentFocusLabel(index)
@@ -707,167 +540,8 @@ export class ConversationSkinComponent {
     }
   }
 
-  returnToExplorationAfterConceptCard(): void {
-    this.playerTranscriptService.addPreviousCard();
-    let numCards = this.playerTranscriptService.getNumCards();
-    this.playerPositionService.setDisplayedCardIndex(numCards - 1);
-  }
-
   isCurrentCardAtEndOfTranscript(): boolean {
     return this.playerPositionService.isCurrentCardAtEndOfTranscript();
-  }
-
-  private _addNewCard(newCard): void {
-    this.conversationFlowService.addNewCard(newCard);
-
-    let totalNumCards = this.playerTranscriptService.getNumCards();
-
-    let previousSupplementalCardIsNonempty =
-      totalNumCards > 1 &&
-      this.conversationFlowService.isSupplementalCardNonempty(
-        this.playerTranscriptService.getCard(totalNumCards - 2)
-      );
-
-    let nextSupplementalCardIsNonempty =
-      this.conversationFlowService.isSupplementalCardNonempty(
-        this.playerTranscriptService.getLastCard()
-      );
-
-    if (
-      totalNumCards > 1 &&
-      this.canWindowShowTwoCards() &&
-      !previousSupplementalCardIsNonempty &&
-      nextSupplementalCardIsNonempty
-    ) {
-      this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-      this.animateToTwoCards();
-    } else if (
-      totalNumCards > 1 &&
-      this.canWindowShowTwoCards() &&
-      previousSupplementalCardIsNonempty &&
-      !nextSupplementalCardIsNonempty
-    ) {
-      this.animateToOneCard();
-    } else {
-      this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-    }
-    this.playerPositionService.changeCurrentQuestion(
-      this.playerPositionService.getDisplayedCardIndex()
-    );
-
-    if (this.displayedCard && this.displayedCard.isTerminal()) {
-      this.conversationFlowService.setIsRefresherExploration(false);
-      let parentExplorationIds =
-        this.urlService.getQueryFieldValuesAsList('parent');
-      this.conversationFlowService.setParentExplorationIds(
-        parentExplorationIds
-      );
-      let recommendedExplorationIds = [];
-      let includeAutogeneratedRecommendations = false;
-      let numberOfParentExplorationIds = parentExplorationIds.length;
-
-      if (numberOfParentExplorationIds > 0) {
-        this.conversationFlowService.setIsRefresherExploration(true);
-        let parentExplorationId =
-          parentExplorationIds[numberOfParentExplorationIds - 1];
-        recommendedExplorationIds.push(parentExplorationId);
-      } else {
-        recommendedExplorationIds =
-          this.explorationEngineService.getAuthorRecommendedExpIdsByStateName(
-            this.displayedCard.getStateName()
-          );
-        includeAutogeneratedRecommendations = true;
-      }
-
-      if (this.explorationModeService.isInStoryChapterMode()) {
-        recommendedExplorationIds = [];
-        includeAutogeneratedRecommendations = false;
-        let topicUrlFragment =
-          this.urlService.getUrlParams().topic_url_fragment;
-        let classroomUrlFragment =
-          this.urlService.getUrlParams().classroom_url_fragment;
-        let storyUrlFragment =
-          this.urlService.getUrlParams().story_url_fragment;
-        let nodeId = this.urlService.getUrlParams().node_id;
-        this.inStoryMode = true;
-        this.storyViewerBackendApiService
-          .fetchStoryDataAsync(
-            topicUrlFragment,
-            classroomUrlFragment,
-            storyUrlFragment
-          )
-          .then(res => {
-            let nextStoryNode: LearnerExplorationSummary[] = [];
-            for (let i = 0; i < res.nodes.length; i++) {
-              if (res.nodes[i].id === nodeId && i + 1 < res.nodes.length) {
-                this.explorationRecommendationsService.setRecommendedStoryNodeId(
-                  res.nodes[i].destinationNodeIds[0]
-                );
-                nextStoryNode.push(res.nodes[i + 1].explorationSummary);
-                break;
-              }
-            }
-            this.recommendedExplorationSummaries = nextStoryNode;
-          });
-        if (this.isLoggedIn) {
-          this.storyViewerBackendApiService
-            .recordChapterCompletionAsync(
-              topicUrlFragment,
-              classroomUrlFragment,
-              storyUrlFragment,
-              nodeId
-            )
-            .then(returnObject => {
-              if (returnObject.readyForReviewTest) {
-                (
-                  this.windowRef.nativeWindow as {location: string | Location}
-                ).location = this.urlInterpolationService.interpolateUrl(
-                  TopicViewerDomainConstants.REVIEW_TESTS_URL_TEMPLATE,
-                  {
-                    topic_url_fragment: topicUrlFragment,
-                    classroom_url_fragment: classroomUrlFragment,
-                    story_url_fragment: storyUrlFragment,
-                  }
-                );
-              }
-              this.chapterProgressService.updateCompletedChaptersCount(true);
-            });
-        } else {
-          let loginRedirectUrl = this.urlInterpolationService.interpolateUrl(
-            StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE,
-            {
-              topic_url_fragment: topicUrlFragment,
-              classroom_url_fragment: classroomUrlFragment,
-              story_url_fragment: storyUrlFragment,
-              node_id: nodeId,
-            }
-          );
-          this.userService.setReturnUrl(loginRedirectUrl);
-        }
-      } else {
-        this.explorationRecommendationsService.getRecommendedSummaryDicts(
-          recommendedExplorationIds,
-          includeAutogeneratedRecommendations,
-          summaries => {
-            this.recommendedExplorationSummaries = summaries;
-          }
-        );
-      }
-
-      if (!this.showProgressClearanceMessage) {
-        this.showProgressClearanceMessage = true;
-        setTimeout(() => {
-          let alertInfoElement = document.querySelector(
-            '.oppia-exploration-checkpoints-message'
-          );
-
-          // Remove the alert message after 6 sec.
-          if (alertInfoElement) {
-            alertInfoElement.remove();
-          }
-        }, ALERT_MESSAGE_TIMEOUT);
-      }
-    }
   }
 
   triggerRedirectionToStuckState(): void {
@@ -876,70 +550,17 @@ export class ConversationSkinComponent {
       this.conversationFlowService.getNextCardIfStuck()
     );
     this.showInteraction = false;
-    this.showPendingCard();
+    this.conversationFlowService.showPendingCard();
   }
 
   showQuestionAreNotAvailable(): void {
     this.loaderService.hideLoadingScreen();
   }
 
-  private _initializeDirectiveComponents(
-    initialCard: StateCard,
-    focusLabel
-  ): void {
-    this._addNewCard(initialCard);
-    this.conversationFlowService.setNextStateCard(initialCard);
-    if (!this.explorationModeService.isInDiagnosticTestPlayerMode()) {
-      this.conversationFlowService.onPlayerStateChange.emit(
-        initialCard.getStateName()
-      );
-    }
-
-    // We do not store checkpoints progress for iframes hence we do not
-    // need to consider redirecting the user to the most recently
-    // reached checkpoint on exploration initial load in that case.
-    if (
-      !this.isIframed &&
-      !this._editorPreviewMode &&
-      !this.explorationModeService.isInQuestionPlayerMode() &&
-      !this.explorationModeService.isInDiagnosticTestPlayerMode()
-    ) {
-      // Navigate the learner to the most recently reached checkpoint state.
-      this._navigateToMostRecentlyReachedCheckpoint();
-    }
-    this.hasFullyLoaded = true;
-
-    this.focusManagerService.setFocusIfOnDesktop(focusLabel);
-    this.loaderService.hideLoadingScreen();
-
-    // If the exploration is embedded, use the url language code
-    // as site language. If the url language code is not supported
-    // as site language, English is used as default.
-    let langCodes = AppConstants.SUPPORTED_SITE_LANGUAGES.map(language => {
-      return language.id;
-    }) as string[];
-    if (this.isIframed) {
-      let urlLanguageCode = this.urlService.getUrlParams().lang;
-      if (urlLanguageCode && langCodes.indexOf(urlLanguageCode) !== -1) {
-        this.i18nLanguageCodeService.setI18nLanguageCode(urlLanguageCode);
-      } else {
-        this.i18nLanguageCodeService.setI18nLanguageCode('en');
-      }
-    }
-    this.adjustPageHeight(false, null);
-    this.windowRef.nativeWindow.scrollTo(0, 0);
-
-    // The timeout is needed in order to give the recipient of the
-    // broadcast sufficient time to load.
-    setTimeout(() => {
-      this.playerPositionService.onNewCardOpened.emit(initialCard);
-    });
-  }
-
   skipCurrentQuestion(): void {
     this.diagnosticTestPlayerEngineService.skipCurrentQuestion(nextCard => {
       this.conversationFlowService.setNextStateCard(nextCard);
-      this.showPendingCard();
+      this.conversationFlowService.showPendingCard();
     });
   }
 
@@ -950,236 +571,20 @@ export class ConversationSkinComponent {
       this.explorationModeService.setQuestionPlayerMode();
       this.questionPlayerEngineService.initQuestionPlayer(
         this.questionPlayerConfig,
-        this._initializeDirectiveComponents.bind(this),
+        this.conversationFlowService.initializeDirectiveComponents,
         this.showQuestionAreNotAvailable
       );
     } else if (this.diagnosticTestTopicTrackerModel) {
       this.explorationModeService.setDiagnosticTestPlayerMode();
       this.diagnosticTestPlayerEngineService.init(
         this.diagnosticTestTopicTrackerModel,
-        this._initializeDirectiveComponents.bind(this)
+        this.conversationFlowService.initializeDirectiveComponents
       );
     } else {
       this.explorationInitializationService.initializePlayer(
-        this._initializeDirectiveComponents.bind(this)
+        this.conversationFlowService.initializeDirectiveComponents
       );
     }
-  }
-
-  private moveToNewCard(feedbackHtml: string | null, isFinalQuestion: boolean) {
-    // There is a new card. If there is no feedback, move on
-    // immediately. Otherwise, give the learner a chance to read
-    // the feedback, and display a 'Continue' button.
-    this.pendingCardWasSeenBefore = false;
-    this.displayedCard.markAsCompleted();
-    if (isFinalQuestion) {
-      if (this.explorationModeService.isInQuestionPlayerMode()) {
-        // We will redirect to the results page here.
-        this.questionSessionCompleted = true;
-      }
-      this.moveToExploration = true;
-      if (feedbackHtml) {
-        this.playerTranscriptService.addNewResponse(feedbackHtml);
-        if (!this.displayedCard.isInteractionInline()) {
-          this.playerPositionService.onHelpCardAvailable.emit({
-            helpCardHtml: feedbackHtml,
-            hasContinueButton: true,
-          });
-        }
-      } else {
-        this.showUpcomingCard();
-      }
-      this.conversationFlowService.setAnswerIsBeingProcessed(false);
-      return;
-    }
-    this.fatigueDetectionService.reset();
-    this.numberAttemptsService.reset();
-
-    let nextCard = this.conversationFlowService.getNextStateCard();
-
-    if (feedbackHtml) {
-      if (
-        this.playerTranscriptService.hasEncounteredStateBefore(
-          nextCard.getStateName()
-        )
-      ) {
-        this.pendingCardWasSeenBefore = true;
-      }
-      this.playerTranscriptService.addNewResponse(feedbackHtml);
-      if (!this.displayedCard.isInteractionInline()) {
-        this.playerPositionService.onHelpCardAvailable.emit({
-          helpCardHtml: feedbackHtml,
-          hasContinueButton: true,
-        });
-      }
-      this.playerPositionService.onNewCardAvailable.emit();
-      this._nextFocusLabel =
-        ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL;
-      this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
-      this.scrollToBottom();
-    } else {
-      this.playerTranscriptService.addNewResponse(feedbackHtml);
-      // If there is no feedback, it immediately moves on
-      // to next card. Therefore this.answerIsCorrect needs
-      // to be set to false before it proceeds to next card.
-      this.answerIsCorrect = false;
-      this.showPendingCard();
-    }
-    this.currentInteractionService.clearPresubmitHooks();
-  }
-
-  private smoothScrollTo(
-    targetY: number,
-    duration: number,
-    easingName: string = 'easeOutQuad'
-  ): void {
-    const startY = window.scrollY;
-    const difference = targetY - startY;
-    const startTime = performance.now();
-
-    const easingFunctions = {
-      easeOutQuad: (t: number): number => t * (2 - t),
-      easeOutQuart: (t: number): number => 1 - Math.pow(1 - t, 4),
-    };
-
-    const easingFunction =
-      easingFunctions[easingName] || easingFunctions.easeOutQuad;
-
-    const step = (currentTime: number) => {
-      const elapsedTime = currentTime - startTime;
-
-      if (elapsedTime < duration) {
-        const progress = elapsedTime / duration;
-        window.scrollTo(0, startY + difference * easingFunction(progress));
-        requestAnimationFrame(step);
-      } else {
-        window.scrollTo(0, targetY);
-      }
-    };
-
-    requestAnimationFrame(step);
-  }
-
-  showPendingCard(): void {
-    this.conversationFlowService.recordNewCardAdded();
-
-    setTimeout(
-      () => {
-        let nextCard = this.conversationFlowService.getNextStateCard();
-        this._addNewCard(nextCard);
-      },
-      0.1 * TIME_FADEOUT_MSEC + 0.1 * TIME_HEIGHT_CHANGE_MSEC
-    );
-
-    setTimeout(
-      () => {
-        this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
-        this.scrollToTop();
-      },
-      0.1 * TIME_FADEOUT_MSEC + TIME_HEIGHT_CHANGE_MSEC + 0.5 * TIME_FADEIN_MSEC
-    );
-
-    let nextCard = this.conversationFlowService.getNextStateCard();
-    this.playerPositionService.onNewCardOpened.emit(nextCard);
-  }
-
-  showUpcomingCard(): void {
-    let currentIndex = this.playerPositionService.getDisplayedCardIndex();
-    let conceptCardIsBeingShown =
-      this.displayedCard.getStateName() === null &&
-      !this.explorationModeService.isInQuestionMode();
-    if (
-      conceptCardIsBeingShown &&
-      this.playerTranscriptService.isLastCard(currentIndex)
-    ) {
-      this.returnToExplorationAfterConceptCard();
-      return;
-    }
-    if (this.questionSessionCompleted) {
-      this.questionPlayerStateService.onQuestionSessionCompleted.emit(
-        this.questionPlayerStateService.getQuestionPlayerStateData()
-      );
-      return;
-    }
-    if (this.moveToExploration) {
-      this.moveToExploration = false;
-      this.explorationModeService.setExplorationModeFromUrl();
-      this.explorationEngineService.loadInitialState(
-        this._initializeDirectiveComponents.bind(this)
-      );
-      return;
-    }
-    let nextCard = this.conversationFlowService.getNextStateCard();
-    let conceptCard = this.conceptCardManagerService.getConceptCard();
-    if (
-      this.displayedCard.isCompleted() &&
-      nextCard.getStateName() === this.displayedCard.getStateName() &&
-      conceptCard
-    ) {
-      this.conversationFlowService.recordNewCardAdded();
-      this._addNewCard(
-        StateCard.createNewCard(
-          null,
-          conceptCard.getExplanation().html,
-          null,
-          null,
-          null
-        )
-      );
-      return;
-    }
-    if (this.isLearnAgainButton()) {
-      const indexOfRevisionCard =
-        this.playerTranscriptService.findIndexOfLatestStateWithName(
-          nextCard.getStateName()
-        );
-      if (indexOfRevisionCard !== null) {
-        this.displayedCard.markAsNotCompleted();
-        this.conversationFlowService.changeCard(indexOfRevisionCard);
-        return;
-      }
-    }
-    /* This is for the following situation:
-        if A->B->C is the arrangement of cards and C redirected to A,
-        then after this, B and C are visited cards and hence
-        pendingCardWasSeenBefore would be true during both these
-        transitions and as answerIsCorrect is set to false below,
-        Continue would briefly change to Learn Again (after it is
-        clicked) during these transitions which is not required.
-        Also, if the 'if' check is not there, Learn Again button would
-        briefly switched to Continue before going to next card. */
-    if (this.conversationFlowService.getAnswerIsCorrect()) {
-      this.pendingCardWasSeenBefore = false;
-    }
-    this.conversationFlowService.setAnswerIsCorrect(false);
-    this.showPendingCard();
-  }
-
-  scrollToBottom(): void {
-    setTimeout(() => {
-      const tutorCard = document.querySelector(
-        '.conversation-skin-main-tutor-card'
-      );
-
-      if (!tutorCard) {
-        return;
-      }
-      const tutorCardRect = tutorCard.getBoundingClientRect();
-      const tutorCardBottom =
-        tutorCardRect.top + window.scrollY + tutorCardRect.height;
-      const windowBottom = window.scrollY + window.innerHeight;
-
-      if (windowBottom < tutorCardBottom) {
-        const targetScrollY = tutorCardBottom - window.innerHeight + 12;
-        this.smoothScrollTo(targetScrollY, TIME_SCROLL_MSEC, 'easeOutQuad');
-      }
-    }, 100);
-  }
-
-  scrollToTop(): void {
-    setTimeout(() => {
-      this.smoothScrollTo(0, 800, 'easeOutQuart');
-    });
   }
 
   submitAnswerFromProgressNav(): void {
@@ -1215,7 +620,7 @@ export class ConversationSkinComponent {
   }
 
   isProgressClearanceMessageShown(): boolean {
-    return this.showProgressClearanceMessage;
+    return this.conversationFlowService.getShowProgressClearanceMessage();
   }
 
   // Returns whether the screen is wide enough to fit two
@@ -1225,24 +630,5 @@ export class ConversationSkinComponent {
       this.windowDimensionsService.getWidth() >
       ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX
     );
-  }
-
-  animateToTwoCards(): void {
-    this.isAnimatingToTwoCards = true;
-    setTimeout(
-      () => {
-        this.isAnimatingToTwoCards = false;
-      },
-      TIME_NUM_CARDS_CHANGE_MSEC + TIME_FADEIN_MSEC + TIME_PADDING_MSEC
-    );
-  }
-
-  animateToOneCard(): void {
-    this.isAnimatingToOneCard = true;
-    setTimeout(() => {
-      this.isAnimatingToOneCard = false;
-      let totalNumCards = this.playerTranscriptService.getNumCards();
-      this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-    }, TIME_NUM_CARDS_CHANGE_MSEC);
   }
 }
