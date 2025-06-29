@@ -40,7 +40,9 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_domain
 from core.platform import models
+from google.cloud import ndb
 
+_client = ndb.Client()
 
 from typing import Dict, List, Optional, Tuple, TypedDict
 
@@ -256,8 +258,8 @@ def _save_last_playthrough_information(
     last_playthrough_information_model.update_timestamps()
     last_playthrough_information_model.put()
 
-
-def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
+@ndb.transactional()
+def _txn_mark_exploration_completed(user_id: str, exp_id: str) -> None:
     """Adds the exploration id to the completed list of the user unless the
     exploration has already been completed or has been created/edited by the
     user. It is also removed from the incomplete list and the learner playlist
@@ -294,8 +296,8 @@ def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
         activities_completed.add_exploration_id(exp_id)
         _save_completed_activities(activities_completed)
 
-
-def mark_story_as_completed(user_id: str, story_id: str) -> None:
+@ndb.transactional()
+def _txn_mark_story_as_completed(user_id: str, story_id: str) -> None:
     """Adds the story id to the completed list of the user unless the
     story has already been completed by the user. It is also removed from
     the incomplete list(if present).
@@ -319,8 +321,8 @@ def mark_story_as_completed(user_id: str, story_id: str) -> None:
         activities_completed.add_story_id(story_id)
         _save_completed_activities(activities_completed)
 
-
-def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
+@ndb.transactional()
+def _txn_mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
     """Adds the topic id to the learnt list of the user unless the
     topic has already been learnt by the user. It is also removed from
     the partially learnt list and topics to learn list(if present).
@@ -348,6 +350,19 @@ def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
                 user_id, [topic_id])
         activities_completed.add_learnt_topic_id(topic_id)
         _save_completed_activities(activities_completed)
+
+def mark_exploration_as_completed(user_id: str, exp_id: str):
+    with _client.context():
+        _txn_mark_exploration_completed(user_id, exp_id)
+
+def mark_story_as_completed(user_id: str, story_id: str):
+    with _client.context():
+        _txn_mark_story_as_completed(user_id, story_id)
+
+def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
+    with _client.context():
+        _txn_mark_topic_as_learnt(user_id, topic_id)
+
 
 
 def mark_collection_as_completed(user_id: str, collection_id: str) -> None:
