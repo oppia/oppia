@@ -13,8 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview
+ * @fileoverview Service for managing animations and layout transitions
+ * between cards in the exploration player. This includes handling smooth
+ * scrolling, card focus transitions, two-card layout animations, and
+ * responsive iframe height adjustments for embedded explorations.
  */
+
 import {Injectable} from '@angular/core';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
@@ -46,6 +50,13 @@ export class CardAnimationService {
     private windowDimensionsService: WindowDimensionsService
   ) {}
 
+  /**
+   * Schedules the transition to the next card with animation timing.
+   * Scrolls to top and sets focus after the transition.
+   *
+   * @param {string} focusLabel - The label for the element to focus on after transition.
+   * @param {Function} callback - The function to execute to trigger the transition.
+   */
   scheduleNextCardTransition(focusLabel: string, callback: Function): void {
     setTimeout(
       () => {
@@ -58,7 +69,7 @@ export class CardAnimationService {
     setTimeout(
       () => {
         this.focusManagerService.setFocusIfOnDesktop(focusLabel);
-        this.scrollToTop();
+        this._scrollToTop();
       },
       0.1 * ExplorationPlayerConstants.TIME_FADEOUT_MSEC +
         ExplorationPlayerConstants.TIME_HEIGHT_CHANGE_MSEC +
@@ -66,12 +77,9 @@ export class CardAnimationService {
     );
   }
 
-  scrollToTop(): void {
-    setTimeout(() => {
-      this.smoothScrollTo(0, 800, 'easeOutQuart');
-    });
-  }
-
+  /**
+   * Smoothly scrolls to the bottom of the tutor card if it is not fully visible.
+   */
   scrollToBottom(): void {
     setTimeout(() => {
       const tutorCard = document.querySelector(
@@ -97,6 +105,127 @@ export class CardAnimationService {
     }, 100);
   }
 
+  /**
+   * Triggers animation for transitioning to a two-card layout
+   * (tutor + supplemental card).
+   */
+  animateToTwoCards(): void {
+    this.isAnimatingToTwoCards = true;
+    setTimeout(
+      () => {
+        this.isAnimatingToTwoCards = false;
+      },
+      ExplorationPlayerConstants.TIME_NUM_CARDS_CHANGE_MSEC +
+        ExplorationPlayerConstants.TIME_FADEIN_MSEC +
+        ExplorationPlayerConstants.TIME_PADDING_MSEC
+    );
+  }
+
+  /**
+   * Triggers animation for transitioning back to a single-card layout
+   * and updates the displayed card index to the latest.
+   */
+  animateToOneCard(): void {
+    this.isAnimatingToOneCard = true;
+    setTimeout(() => {
+      this.isAnimatingToOneCard = false;
+      let totalNumCards = this.playerTranscriptService.getNumCards();
+      this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
+    }, ExplorationPlayerConstants.TIME_NUM_CARDS_CHANGE_MSEC);
+  }
+
+  /**
+   * Updates the card layout based on whether supplemental cards are non-empty
+   * and screen size allows for two-card display.
+   *
+   * @param {Function} callback - A function that checks whether a card has a supplemental view.
+   */
+  updateCardLayout(callback: Function): void {
+    const totalNumCards = this.playerTranscriptService.getNumCards();
+    const lastCard = this.playerTranscriptService.getLastCard();
+    const secondLastCard = this.playerTranscriptService.getCard(
+      totalNumCards - 2
+    );
+    const isSupplementalCardNonempty = callback;
+    const prevNonempty =
+      totalNumCards > 1 && isSupplementalCardNonempty(secondLastCard);
+    const nextNonempty = isSupplementalCardNonempty(lastCard);
+
+    if (totalNumCards > 1 && this._canWindowShowTwoCards()) {
+      if (!prevNonempty && nextNonempty) {
+        this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
+        this.animateToTwoCards();
+        return;
+      } else if (prevNonempty && !nextNonempty) {
+        this.animateToOneCard();
+        return;
+      }
+    }
+    this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
+  }
+
+  /**
+   * Adjusts the iframe height to fit the content and optionally scrolls.
+   * Sends height change message to the parent window.
+   *
+   * @param {boolean} scroll - Whether the page should scroll to the new height.
+   * @param {Function} callback - Optional callback to run after height adjustment.
+   */
+  adjustPageHeight(scroll: boolean, callback: () => void): void {
+    setTimeout(() => {
+      let newHeight = document.body.scrollHeight;
+      if (
+        Math.abs(this.lastRequestedHeight - newHeight) > 50.5 ||
+        (scroll && !this.lastRequestedScroll)
+      ) {
+        // Sometimes setting iframe height to the exact content height
+        // still produces scrollbar, so adding 50 extra px.
+        newHeight += 50;
+        this.messengerService.sendMessage(
+          ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE,
+          {
+            height: newHeight,
+            scroll: scroll,
+          }
+        );
+        this.lastRequestedHeight = newHeight;
+        this.lastRequestedScroll = scroll;
+      }
+
+      if (callback) {
+        callback();
+      }
+    }, 100);
+  }
+
+  /**
+   * Sets up the window resize listener to adjust iframe height dynamically
+   * when the window size changes.
+   */
+  adjustPageHeightOnresize(): void {
+    this.windowRef.nativeWindow.onresize = () => {
+      this.adjustPageHeight(false, null);
+    };
+  }
+
+  /**
+   * Smoothly scrolls the page to the top using an easing animation.
+   * @private
+   */
+  private _scrollToTop(): void {
+    setTimeout(() => {
+      this.smoothScrollTo(0, 800, 'easeOutQuart');
+    });
+  }
+
+  /**
+   * Smoothly scrolls the page to a specific vertical position using easing.
+   *
+   * @param {number} targetY - The Y-position to scroll to.
+   * @param {number} duration - The duration of the scroll animation in milliseconds.
+   * @param {string} [easingName='easeOutQuad'] - The name of the easing function to use.
+   * @private
+   */
   private smoothScrollTo(
     targetY: number,
     duration: number,
@@ -129,98 +258,35 @@ export class CardAnimationService {
     requestAnimationFrame(step);
   }
 
-  animateToTwoCards(): void {
-    this.isAnimatingToTwoCards = true;
-    setTimeout(
-      () => {
-        this.isAnimatingToTwoCards = false;
-      },
-      ExplorationPlayerConstants.TIME_NUM_CARDS_CHANGE_MSEC +
-        ExplorationPlayerConstants.TIME_FADEIN_MSEC +
-        ExplorationPlayerConstants.TIME_PADDING_MSEC
-    );
-  }
-
-  animateToOneCard(): void {
-    this.isAnimatingToOneCard = true;
-    setTimeout(() => {
-      this.isAnimatingToOneCard = false;
-      let totalNumCards = this.playerTranscriptService.getNumCards();
-      this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-    }, ExplorationPlayerConstants.TIME_NUM_CARDS_CHANGE_MSEC);
-  }
-
-  updateCardLayout(callback: Function): void {
-    const totalNumCards = this.playerTranscriptService.getNumCards();
-    const lastCard = this.playerTranscriptService.getLastCard();
-    const secondLastCard = this.playerTranscriptService.getCard(
-      totalNumCards - 2
-    );
-    const isSupplementalCardNonempty = callback;
-    const prevNonempty =
-      totalNumCards > 1 && isSupplementalCardNonempty(secondLastCard);
-    const nextNonempty = isSupplementalCardNonempty(lastCard);
-
-    if (totalNumCards > 1 && this.canWindowShowTwoCards()) {
-      if (!prevNonempty && nextNonempty) {
-        this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-        this.animateToTwoCards();
-        return;
-      } else if (prevNonempty && !nextNonempty) {
-        this.animateToOneCard();
-        return;
-      }
-    }
-    this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-  }
-
-  getIsAnimatingToTwoCards(): boolean {
-    return this.isAnimatingToTwoCards;
-  }
-
-  getIsAnimatingToOneCard(): boolean {
-    return this.isAnimatingToOneCard;
-  }
-
-  adjustPageHeight(scroll: boolean, callback: () => void): void {
-    setTimeout(() => {
-      let newHeight = document.body.scrollHeight;
-      if (
-        Math.abs(this.lastRequestedHeight - newHeight) > 50.5 ||
-        (scroll && !this.lastRequestedScroll)
-      ) {
-        // Sometimes setting iframe height to the exact content height
-        // still produces scrollbar, so adding 50 extra px.
-        newHeight += 50;
-        this.messengerService.sendMessage(
-          ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE,
-          {
-            height: newHeight,
-            scroll: scroll,
-          }
-        );
-        this.lastRequestedHeight = newHeight;
-        this.lastRequestedScroll = scroll;
-      }
-
-      if (callback) {
-        callback();
-      }
-    }, 100);
-  }
-
-  adjustPageHeightOnresize(): void {
-    this.windowRef.nativeWindow.onresize = () => {
-      this.adjustPageHeight(false, null);
-    };
-  }
-
-  // Returns whether the screen is wide enough to fit two
-  // cards (e.g., the tutor and supplemental cards) side-by-side.
-  canWindowShowTwoCards(): boolean {
+  /**
+   * Checks whether the current window width can accommodate two cards
+   * side-by-side.
+   *
+   * @returns {boolean} - True if two-card layout is supported; otherwise, false.
+   * @private
+   */
+  private _canWindowShowTwoCards(): boolean {
     return (
       this.windowDimensionsService.getWidth() >
       ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX
     );
+  }
+
+  /**
+   * Gets whether the animation to two-card layout is in progress.
+   *
+   * @returns {boolean} - True if animating to two cards.
+   */
+  getIsAnimatingToTwoCards(): boolean {
+    return this.isAnimatingToTwoCards;
+  }
+
+  /**
+   * Gets whether the animation to one-card layout is in progress.
+   *
+   * @returns {boolean} - True if animating to one card.
+   */
+  getIsAnimatingToOneCard(): boolean {
+    return this.isAnimatingToOneCard;
   }
 }
