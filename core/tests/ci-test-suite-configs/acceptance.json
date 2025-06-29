@@ -1,6 +1,14 @@
 {
   "suites": [
     {
+      "name": "logged-in-user/deny-access-to-pages-without-additional-roles",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
+    },
+    {
+      "name": "logged-in-user/save-an-exploration-to-play-later",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/save-an-exploration-to-play-later.spec.ts"
+    },
+    {
       "name": "blog-admin/assign-roles-to-users-and-change-tag-properties",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-roles-to-users-and-change-tag-properties.spec.ts"
     },
