@@ -12,7 +12,7 @@
            aria-hidden="true">
         </i>
       </div>
-      <div *ngIf="rubricsListIsShown" class="oppia-mobile-collapsible-card-content">
+      <div *ngIf="rubricsListIsShown" class="oppia-mobile-collapsible-card-content e2e-test-skill-editor-collapsible-card">
         <oppia-rubrics-editor [rubrics]="skill.getRubrics()"
                               (saveRubric)="onSaveRubric($event.difficulty, $event.data)"
                               [newSkillBeingCreated]="false">

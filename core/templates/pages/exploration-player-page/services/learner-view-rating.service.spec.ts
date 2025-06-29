@@ -19,7 +19,7 @@
 import {async, fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {LearnerViewRatingService} from './learner-view-rating.service';
 import {LearnerViewRatingBackendApiService} from './learner-view-rating-backend-api.service';
 

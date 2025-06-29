@@ -19,7 +19,7 @@
 import {Component, OnInit, ViewChild, ElementRef} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
@@ -41,14 +41,14 @@ export class WelcomeTranslationModalComponent
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private siteAnalyticsService: SiteAnalyticsService
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
-    this.explorationId = this.contextService.getExplorationId();
+    this.explorationId = this.pageContextService.getExplorationId();
     this.siteAnalyticsService.registerTutorialModalOpenEvent(
       this.explorationId
     );

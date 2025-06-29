@@ -34,7 +34,7 @@ import {AppConstants} from 'app.constants';
 import {TranslationTabActiveContentIdService} from 'pages/exploration-editor-page/translation-tab/services/translation-tab-active-content-id.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {AudioPlayerService} from 'services/audio-player.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 import {
@@ -114,7 +114,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
     private audioPlayerService: AudioPlayerService,
     private voiceoverPlayerService: VoiceoverPlayerService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService,
     private localStorageService: LocalStorageService,
     private platformFeatureService: PlatformFeatureService
@@ -475,9 +475,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // The below if-else block is used to get the active content ID based on the
     // current page.
     if (
-      this.contextService.isInExplorationPlayerPage() ||
-      (this.contextService.isInExplorationEditorPage() &&
-        this.contextService.getEditorTabContext() ===
+      this.pageContextService.isInExplorationPlayerPage() ||
+      (this.pageContextService.isInExplorationEditorPage() &&
+        this.pageContextService.getEditorTabContext() ===
           ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW)
     ) {
       return this.voiceoverPlayerService.getActiveContentId();

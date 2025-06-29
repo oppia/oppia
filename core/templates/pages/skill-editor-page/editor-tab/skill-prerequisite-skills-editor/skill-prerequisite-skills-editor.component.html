@@ -14,7 +14,7 @@
            aria-hidden="true">
         </i>
       </div>
-      <div *ngIf="prerequisiteSkillsAreShown" class="oppia-mobile-collapsible-card-content">
+      <div *ngIf="prerequisiteSkillsAreShown" class="oppia-mobile-collapsible-card-content e2e-test-skill-editor-collapsible-card">
         <div class="skill-id mat-card"  *ngFor="let skillId of skill.getPrerequisiteSkillIds(); index as i">
           <div class="skill-description-card">
             <span class="remove-skill-icon" (click)="removeSkillId(skillId)" aria-hidden="true">

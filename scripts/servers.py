@@ -759,10 +759,11 @@ def managed_acceptance_tests_server(
             suite names.
     """
     available_suites = {}
-    with open(common.ACCEPTANCE_TEST_CONFIG_FILE_PATH, 'r', encoding='utf-8') as f:
+    with open(
+        common.ACCEPTANCE_TEST_CONFIG_FILE_PATH, 'r', encoding='utf-8'
+    ) as f:
         filedata = json.load(f)
-        for suite_type in filedata:
-            suites = filedata[suite_type]
+        for suites in filedata.values():
             for suite in suites:
                 available_suites[suite['name']] = suite['module']
     if suite_name not in available_suites:
