@@ -38,7 +38,7 @@ import {StateInteractionIdService} from 'components/state-editor/state-editor-pr
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Rule} from 'domain/exploration/rule.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 
 describe('Responses Service', () => {
   let alertsService: AlertsService;
@@ -69,7 +69,6 @@ describe('Responses Service', () => {
     stateSolutionService = TestBed.get(StateSolutionService);
 
     savedMemento = new Solution(
-      explorationHtmlFormatterService,
       true,
       'This is the correct answer',
       new SubtitledHtml('', 'tesster')
@@ -933,6 +932,79 @@ describe('Responses Service', () => {
       updatedAnswerGroups,
       updatedDefaultOutcome
     );
+  });
+
+  it('should get oppia short answer', () => {
+    const interaction = new Interaction(
+      [],
+      [],
+      {
+        choices: {
+          value: [new SubtitledHtml('This is a choice', 'id1')],
+        },
+      },
+      null,
+      [],
+      '0',
+      null
+    );
+    const solution = new Solution(
+      false,
+      'This is a correct answer!',
+      new SubtitledHtml('This is the explanation', 'solution')
+    );
+    const expectedShortAnswerHtml = {
+      prefix: 'One',
+      answer:
+        '<oppia-short-response-0 answer="&amp;quot;' +
+        'This is a correct answer!&amp;quot;" choices="' +
+        '[{&amp;quot;_html&amp;quot;:&amp;quot;This is a choice' +
+        '&amp;quot;,&amp;quot;_contentId&amp;quot;:' +
+        '&amp;quot;id1&amp;quot;}]"></oppia-short-response-0>',
+    };
+
+    spyOn(
+      explorationHtmlFormatterService,
+      'getShortAnswerHtml'
+    ).and.returnValue(expectedShortAnswerHtml.answer);
+
+    const shortAnswerResponse =
+      responsesService.getOppiaShortAnswerResponseHtml(interaction, solution);
+
+    expect(shortAnswerResponse).toEqual(expectedShortAnswerHtml);
+    expect(
+      explorationHtmlFormatterService.getShortAnswerHtml
+    ).toHaveBeenCalledWith(
+      solution.correctAnswer,
+      interaction.id,
+      interaction.customizationArgs
+    );
+  });
+
+  it("should throw an error if Interaction's id is null", () => {
+    const interaction = new Interaction(
+      [],
+      [],
+      {
+        choices: {
+          value: [new SubtitledHtml('This is a choice', '')],
+        },
+      },
+      null,
+      [],
+      null,
+      null
+    );
+
+    const solution = new Solution(
+      false,
+      'This is a correct answer!',
+      new SubtitledHtml('This is the explanation', 'solution')
+    );
+
+    expect(() => {
+      responsesService.getOppiaShortAnswerResponseHtml(interaction, solution);
+    }).toThrowError('Interaction id is possibly null.');
   });
 
   it('should fetch EventEmitters', () => {
