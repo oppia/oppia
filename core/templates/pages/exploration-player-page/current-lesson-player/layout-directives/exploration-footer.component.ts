@@ -32,11 +32,9 @@ import {Subscription} from 'rxjs';
 import {PageContextService} from 'services/page-context.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {UrlService} from 'services/contextual/url.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UserService} from 'services/user.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
 import {LearnerViewInfoBackendApiService} from '../../services/learner-view-info-backend-api.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
@@ -45,7 +43,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {ProgressReminderModalComponent} from 'pages/exploration-player-page/current-lesson-player/templates/progress-reminder-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import './exploration-footer.component.css';
 import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
@@ -91,7 +89,7 @@ export class ExplorationFooterComponent {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private ngbModal: NgbModal,
     private urlService: UrlService,
-    private windowDimensionsService: WindowDimensionsService,
+    private conversationFlowService: ConversationFlowService,
     private questionPlayerStateService: QuestionPlayerStateService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
@@ -99,7 +97,6 @@ export class ExplorationFooterComponent {
     private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
     private explorationEngineService: ExplorationEngineService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
     private userService: UserService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
@@ -198,7 +195,7 @@ export class ExplorationFooterComponent {
     this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
 
     if (this.completedCheckpointsCount === 0) {
-      this.explorationPlayerStateService.onShowProgressModal.emit();
+      this.conversationFlowService.onShowProgressModal.emit();
       return;
     }
 
@@ -233,7 +230,7 @@ export class ExplorationFooterComponent {
     let modalRef = this.ngbModal.open(ProgressReminderModalComponent, {
       windowClass: 'oppia-progress-reminder-modal',
     });
-    this.explorationPlayerStateService.onShowProgressModal.emit();
+    this.conversationFlowService.onShowProgressModal.emit();
 
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
     if (displayedCardIndex > 0) {

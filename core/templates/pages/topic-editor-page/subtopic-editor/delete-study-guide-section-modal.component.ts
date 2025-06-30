@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for delete worked example modal.
+ * @fileoverview Component for delete study guide section modal.
  */
 
 import {Component} from '@angular/core';
@@ -21,10 +21,10 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-delete-worked-example-modal',
-  templateUrl: './delete-worked-example-modal.component.html',
+  selector: 'oppia-delete-study-guide-section-modal',
+  templateUrl: './delete-study-guide-section-modal.component.html',
 })
-export class DeleteWorkedExampleComponent extends ConfirmOrCancelModal {
+export class DeleteStudyGuideSectionComponent extends ConfirmOrCancelModal {
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }

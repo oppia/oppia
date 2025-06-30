@@ -13,36 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the Solution object factory.
+ * @fileoverview Unit tests for the Solution Model class.
  */
 
 import {TestBed} from '@angular/core/testing';
 
-import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
-import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
-import {
-  Solution,
-  SolutionObjectFactory,
-} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {Interaction} from './InteractionObjectFactory';
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {
-    let sof: SolutionObjectFactory, solution: Solution;
+    let solution: Solution;
     beforeEach(() => {
-      TestBed.configureTestingModule({
-        providers: [
-          CamelCaseToHyphensPipe,
-          CapitalizePipe,
-          ConvertToPlainTextPipe,
-          FormatRtePreviewPipe,
-        ],
-      });
-      sof = TestBed.inject(SolutionObjectFactory);
-      solution = sof.createFromBackendDict({
+      TestBed.configureTestingModule({});
+      solution = Solution.createFromBackendDict({
         answer_is_exclusive: false,
         correct_answer: 'This is a correct answer!',
         explanation: {
@@ -66,7 +50,7 @@ describe('Solution object factory', () => {
     });
 
     it('should create a new solution from scratch', () => {
-      const solutionFromScratch = sof.createNew(
+      const solutionFromScratch = Solution.createNew(
         true,
         'This is the correct answer!',
         'This is the explanation to the answer',
@@ -254,57 +238,8 @@ describe('Solution object factory', () => {
       );
     });
 
-    it('should get oppia short answer', () => {
-      const interaction = new Interaction(
-        [],
-        [],
-        {
-          choices: {
-            value: [new SubtitledHtml('This is a choice', 'id1')],
-          },
-        },
-        null,
-        [],
-        '0',
-        null
-      );
-      const expectedShortAnswerHtml = {
-        prefix: 'One',
-        answer:
-          '<oppia-short-response-0 answer="&amp;quot;' +
-          'This is a correct answer!&amp;quot;" choices="' +
-          '[{&amp;quot;_html&amp;quot;:&amp;quot;This is a choice' +
-          '&amp;quot;,&amp;quot;_contentId&amp;quot;:' +
-          '&amp;quot;id1&amp;quot;}]"></oppia-short-response-0>',
-      };
-
-      expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual(
-        expectedShortAnswerHtml
-      );
-    });
-
-    it("should throw an error if Interaction's id is null", () => {
-      const interaction = new Interaction(
-        [],
-        [],
-        {
-          choices: {
-            value: [new SubtitledHtml('This is a choice', '')],
-          },
-        },
-        null,
-        [],
-        null,
-        null
-      );
-
-      expect(() => {
-        solution.getOppiaShortAnswerResponseHtml(interaction);
-      }).toThrowError('Interaction id is possibly null.');
-    });
-
     it('should handle when answer exclusivity is true', () => {
-      const solution = sof.createFromBackendDict({
+      const solution = Solution.createFromBackendDict({
         answer_is_exclusive: true,
         correct_answer: 'This is a correct answer!',
         explanation: {

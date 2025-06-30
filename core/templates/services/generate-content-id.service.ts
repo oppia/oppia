@@ -19,8 +19,6 @@
 
 import {Injectable} from '@angular/core';
 
-import {AppConstants} from 'app.constants';
-
 @Injectable({
   providedIn: 'root',
 })
@@ -33,45 +31,9 @@ export class GenerateContentIdService {
     this.revertUnusedIndexes = revertUnusedIndexes;
   }
 
-  generateIdForComponent(
-    existingComponentIds: string[],
-    componentName: string
-  ): string {
-    let contentIdList = JSON.parse(JSON.stringify(existingComponentIds));
-    let searchKey = componentName + '_';
-    let count = 0;
-    for (let contentId in contentIdList) {
-      if (contentIdList[contentId].indexOf(searchKey) === 0) {
-        let splitContentId = contentIdList[contentId].split('_');
-        let tempCount = parseInt(splitContentId[splitContentId.length - 1]);
-        if (tempCount > count) {
-          count = tempCount;
-        }
-      }
-    }
-    return searchKey + String(count + 1);
-  }
-
-  _getNextId(existingComponentIds: string[], componentName: string): string {
-    // Worked example questions and explanations do not live in the State domain
-    // so they do not use next content id index.
-    if (
-      componentName === AppConstants.COMPONENT_NAME_WORKED_EXAMPLE.QUESTION ||
-      componentName === AppConstants.COMPONENT_NAME_WORKED_EXAMPLE.EXPLANATION
-    ) {
-      return this.generateIdForComponent(existingComponentIds, componentName);
-    } else {
-      throw new Error('Unknown component name provided.');
-    }
-  }
-
   _getNextStateId(prefix: string): string {
     const contentIdIndex = this.getNextIndex();
     return `${prefix}_${contentIdIndex}`;
-  }
-
-  getNextId(existingComponentIds: string[], componentName: string): string {
-    return this._getNextId(existingComponentIds, componentName);
   }
 
   getNextStateId(prefix: string): string {

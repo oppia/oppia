@@ -17,8 +17,8 @@
  */
 
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
 import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
@@ -57,7 +57,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private pageContextService: PageContextService,
     private urlService: UrlService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private explorationModeService: ExplorationModeService,
     private hintAndSolutionModalService: HintAndSolutionModalService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -165,7 +165,7 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
 
   displaySolutionModal(): void {
     this.solutionModalIsActive = true;
-    let inQuestionMode = this.explorationPlayerStateService.isInQuestionMode();
+    let inQuestionMode = this.explorationModeService.isInQuestionMode();
     if (!this._editorPreviewMode && !inQuestionMode) {
       this.statsReportingService.recordSolutionHit(
         this.playerPositionService.getCurrentStateName()

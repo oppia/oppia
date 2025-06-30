@@ -1,0 +1,47 @@
+<div class="modal-header e2e-test-add-study-guide-section-modal">
+  <h3>Add Section</h3>
+</div>
+
+<div class="modal-body">
+  <form name="addStudyGuideSectionForm.studyGuideSectionTextForm"
+        class="form-inline">
+    <div class="oppia-rule-details-header">
+      <div class="section-heading-and-content-section">
+        <strong>Heading</strong>
+        <schema-based-editor class="e2e-test-add-study-guide-section-modal-heading-field"
+                             [schema]="getHeadingSchema()"
+                             [localValue]="tempSectionHeadingPlaintext"
+                             (localValueChange)="this.updateLocalHeading($event)">
+        </schema-based-editor>
+      </div>
+      <div class="section-heading-and-content-section">
+        <strong>Content</strong>
+        <schema-based-editor class="e2e-test-add-study-guide-section-modal-content-field"
+                             [schema]="getContentSchema()"
+                             [localValue]="tempSectionContentHtml"
+                             (localValueChange)="this.updateLocalContent($event)">
+        </schema-based-editor>
+      </div>
+      <div *ngIf="isSectionContentLengthExceeded()" class="oppia-length-validation-error e2e-test-add-study-guide-section-content-length-error">
+        The content length is too long. Please use at most 1000 characters.
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary e2e-test-add-study-guide-section-modal-cancel-button" (click)="cancel()" type="button">Cancel</button>
+  <button class="btn btn-success e2e-test-add-study-guide-section-modal-save-button"
+          (click)="saveSection()"
+          [disabled]="!(tempSectionHeadingPlaintext && tempSectionContentHtml) || isSectionContentLengthExceeded()">
+  Save
+  </button>
+</div>
+<style>
+  .section-heading-and-content-section {
+    margin-top: 2.5vh;
+  }
+  .oppia-new-study-guide-editable-field {
+    font-size: 12px;
+  }
+</style>

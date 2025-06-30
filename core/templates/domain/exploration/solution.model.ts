@@ -13,15 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of Solution
+ * @fileoverview Model class for creating new frontend instances of Solution
  * domain objects.
  */
 
-import {} from '@angular/upgrade/static';
-import {Injectable} from '@angular/core';
-
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {Fraction} from 'domain/objects/fraction.model';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {LoggerService} from 'services/contextual/logger.service';
@@ -34,7 +30,6 @@ import {
   NumberWithUnitsAnswer,
   PencilCodeEditorAnswer,
 } from 'interactions/answer-defs';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {BaseTranslatableObject} from 'domain/objects/BaseTranslatableObject.model';
 import {
   InteractionCustomizationArgs,
@@ -61,19 +56,16 @@ export interface ShortAnswerResponse {
 }
 
 export class Solution extends BaseTranslatableObject {
-  ehfs: ExplorationHtmlFormatterService;
   answerIsExclusive: boolean;
   correctAnswer: InteractionAnswer;
   explanation: SubtitledHtml;
   constructor(
-    ehfs: ExplorationHtmlFormatterService,
     answerIsExclusive: boolean,
     correctAnswer: InteractionAnswer,
     explanation: SubtitledHtml
   ) {
     super();
 
-    this.ehfs = ehfs;
     this.answerIsExclusive = answerIsExclusive;
     this.correctAnswer = correctAnswer;
     this.explanation = explanation;
@@ -166,53 +158,30 @@ export class Solution extends BaseTranslatableObject {
     this.explanation = explanation;
   }
 
-  getOppiaShortAnswerResponseHtml(
-    interaction: Interaction
-  ): ShortAnswerResponse {
-    if (interaction.id === null) {
-      throw new Error('Interaction id is possibly null.');
-    }
-    return {
-      prefix: this.answerIsExclusive ? 'The only' : 'One',
-      answer: this.ehfs.getShortAnswerHtml(
-        this.correctAnswer,
-        interaction.id,
-        interaction.customizationArgs
-      ),
-    };
-  }
-
   getOppiaSolutionExplanationResponseHtml(): string {
     return this.explanation.html;
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class SolutionObjectFactory {
-  constructor(private ehfs: ExplorationHtmlFormatterService) {}
-
-  createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
-    return new Solution(
-      this.ehfs,
-      solutionBackendDict.answer_is_exclusive,
-      solutionBackendDict.correct_answer,
-      SubtitledHtml.createFromBackendDict(solutionBackendDict.explanation)
-    );
-  }
-
-  createNew(
+  static createNew(
     answerIsExclusive: boolean,
     correctAnswer: InteractionAnswer,
     explanationHtml: string,
     explanationId: string
   ): Solution {
     return new Solution(
-      this.ehfs,
       answerIsExclusive,
       correctAnswer,
       SubtitledHtml.createDefault(explanationHtml, explanationId)
+    );
+  }
+
+  static createFromBackendDict(
+    solutionBackendDict: SolutionBackendDict
+  ): Solution {
+    return new Solution(
+      solutionBackendDict.answer_is_exclusive,
+      solutionBackendDict.correct_answer,
+      SubtitledHtml.createFromBackendDict(solutionBackendDict.explanation)
     );
   }
 }
