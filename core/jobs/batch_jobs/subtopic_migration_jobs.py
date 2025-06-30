@@ -86,11 +86,12 @@ class MigrateStudyGuideModels(beam.PTransform):# type: ignore[misc]
 
         return result.Ok((study_guide_id, study_guide))
 
+    # Remove no cover comment once migrations for study guides are available.
     @staticmethod
     def _generate_study_guide_changes(
         study_guide_id: str,
         study_guide_model: subtopic_models.StudyGuideModel
-    ) -> Iterable[Tuple[str, study_guide_domain.StudyGuideChange]]:
+    ) -> Iterable[Tuple[str, study_guide_domain.StudyGuideChange]]: # pragma: no cover
         """Generates Study Guide change objects. Study Guide change object is
         generated when schema version for some field is lower than the latest
         schema version.
@@ -233,12 +234,13 @@ class MigrateStudyGuideModels(beam.PTransform):# type: ignore[misc]
 class MigrateStudyGuideJob(base_jobs.JobBase):
     """Job that migrates StudyGuide models."""
 
+    # Remove no cover comment once migrations for study guides are available.
     @staticmethod
     def _update_study_guide(
         study_guide_model: subtopic_models.StudyGuideModel,
         migrated_study_guide: study_guide_domain.StudyGuide,
         study_guide_change: Sequence[study_guide_domain.StudyGuideChange]
-    ) -> Sequence[base_models.BaseModel]:
+    ) -> Sequence[base_models.BaseModel]: # pragma: no cover
         """Generates newly updated study guide models.
 
         Args:
@@ -276,7 +278,7 @@ class MigrateStudyGuideJob(base_jobs.JobBase):
         datastore_services.update_timestamps_multi(list(models_to_put_values))
         return models_to_put_values
 
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]: # pragma: no cover
         """Returns a PCollection of results from the study guide migration.
 
         Returns:

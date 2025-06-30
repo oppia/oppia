@@ -93,7 +93,7 @@ def get_study_guide_from_model(
     }
     # Remove no cover comment once migrations for study guides are available.
     if (study_guide_model.sections_schema_version !=
-            feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION): # pragma: no cover
+            feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION): # pragma: no cover pylint: disable=line-too-long
         _migrate_sections_to_latest_schema(versioned_sections)
     sections = []
     for section in versioned_sections['sections']:

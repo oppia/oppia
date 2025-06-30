@@ -368,7 +368,7 @@ class StudyGuide:
         cls,
         versioned_sections: VersionedStudyGuideSectionsDict,
         current_version: int
-    ) -> None: # pragme: no cover
+    ) -> None: # pragma: no cover
         """Converts the sections in the sections list contained
         in the given versioned_sections dict from current_version to
         current_version + 1. Note that the versioned_sections being
