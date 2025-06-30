@@ -178,11 +178,11 @@ def update_cloud_task_run_model(
         ValueError. If the CloudTaskRunModel with the given ID does not exist.
     """
     cloud_task_model = cloud_task_models.CloudTaskRunModel.get(
-        cloud_task_run_domain_instance.id, strict=False)
+        cloud_task_run_domain_instance.task_run_id, strict=False)
     if cloud_task_model is None:
         raise ValueError(
             'CloudTaskRunModel with id %s does not exist.' %
-            cloud_task_run_domain_instance.id)
+            cloud_task_run_domain_instance.task_run_id)
 
     cloud_task_model.latest_job_state = (
         cloud_task_run_domain_instance.latest_job_state)
@@ -227,9 +227,9 @@ def convert_cloud_task_run_model_to_domain_object(
         model.
     """
     model_dict: cloud_task_domain.CloudTaskRunDict = {
-        'id': cloud_task_model.id,
+        'task_run_id': cloud_task_model.id,
         'cloud_task_name': cloud_task_model.cloud_task_name,
-        'cloud_task_id': cloud_task_model.cloud_task_id,
+        'task_id': cloud_task_model.task_id,
         'queue_id': cloud_task_model.queue_id,
         'function_id': cloud_task_model.function_id,
         'latest_job_state': cloud_task_model.latest_job_state,

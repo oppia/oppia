@@ -41,7 +41,7 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
             cloud_task_models.CloudTaskRunModel.get_export_policy(), {
                 'cloud_task_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'queue_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'cloud_task_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'task_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'current_retry_attempt': (
                     base_models.EXPORT_POLICY.NOT_APPLICABLE),
                 'exception_messages_for_failed_runs': (
@@ -86,7 +86,7 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             retrieved_model.queue_id, 'voiceover-regeneration')
         self.assertEqual(
-            retrieved_model.cloud_task_id, 'task1')
+            retrieved_model.task_id, 'task1')
         self.assertEqual(
             retrieved_model.latest_job_state, model.latest_job_state)
         self.assertEqual(retrieved_model.function_id, model.function_id)

@@ -49,9 +49,9 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
             cloud_task_run_id, task_name, task_id, queue_name,
             current_run_state, function_id, [], 0, last_updated, created_on)
 
-        self.assertEqual(cloud_task_run.id, cloud_task_run_id)
+        self.assertEqual(cloud_task_run.task_run_id, cloud_task_run_id)
         self.assertEqual(cloud_task_run.cloud_task_name, task_name)
-        self.assertEqual(cloud_task_run.cloud_task_id, task_id)
+        self.assertEqual(cloud_task_run.task_id, task_id)
         self.assertEqual(cloud_task_run.queue_id, queue_name)
         self.assertEqual(cloud_task_run.latest_job_state, current_run_state)
         self.assertEqual(cloud_task_run.function_id, function_id)
@@ -78,9 +78,9 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         function_id = 'delete_exps_from_user_models'
 
         cloud_task_run_dict: cloud_task_domain.CloudTaskRunDict = {
-            'id': cloud_task_run_id,
+            'task_run_id': cloud_task_run_id,
             'cloud_task_name': task_name,
-            'cloud_task_id': task_id,
+            'task_id': task_id,
             'queue_id': queue_name,
             'latest_job_state': current_run_state,
             'function_id': function_id,

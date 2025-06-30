@@ -17,7 +17,7 @@
  */
 
 export interface CloudTaskRunBackendDict {
-  id: string;
+  task_run_id: string;
   cloud_task_name: string;
   latest_job_state: string;
   function_id: string;
@@ -50,7 +50,7 @@ export class CloudTaskRun {
   matIcon!: MatIcon;
 
   constructor(
-    id: string,
+    taskRunId: string,
     cloudTaskName: string,
     latestJobState: string,
     functionId: string,
@@ -59,7 +59,7 @@ export class CloudTaskRun {
     lastUpdated: Date,
     createdOn: Date
   ) {
-    this.id = id;
+    this.id = taskRunId;
     this.cloudTaskName = cloudTaskName;
     this.latestJobState = latestJobState;
     this.functionId = functionId;
@@ -91,7 +91,7 @@ export class CloudTaskRun {
     backendDict: CloudTaskRunBackendDict
   ): CloudTaskRun {
     return new CloudTaskRun(
-      backendDict.id,
+      backendDict.task_run_id,
       backendDict.cloud_task_name,
       backendDict.latest_job_state,
       backendDict.function_id,

@@ -25,9 +25,9 @@ from typing import List, TypedDict
 class CloudTaskRunDict(TypedDict):
     """Dictionary representing the CloudTaskRun object."""
 
-    id: str
+    task_run_id: str
     cloud_task_name: str
-    cloud_task_id: str
+    task_id: str
     queue_id: str
     latest_job_state: str
     function_id: str
@@ -42,9 +42,9 @@ class CloudTaskRun:
 
     def __init__(
         self,
-        id: str,
+        task_run_id: str,
         cloud_task_name: str,
-        cloud_task_id: str,
+        task_id: str,
         queue_id: str,
         latest_job_state: str,
         function_id: str,
@@ -53,9 +53,9 @@ class CloudTaskRun:
         last_updated: datetime.datetime,
         created_on: datetime.datetime
     ) -> None:
-        self.id = id
+        self.task_run_id = task_run_id
         self.cloud_task_name = cloud_task_name
-        self.cloud_task_id = cloud_task_id
+        self.task_id = task_id
         self.queue_id = queue_id
         self.latest_job_state = latest_job_state
         self.function_id = function_id
@@ -73,9 +73,9 @@ class CloudTaskRun:
             object, with keys matching the attributes of the object.
         """
         return {
-            'id': self.id,
+            'task_run_id': self.task_run_id,
             'cloud_task_name': self.cloud_task_name,
-            'cloud_task_id': self.cloud_task_id,
+            'task_id': self.task_id,
             'queue_id': self.queue_id,
             'latest_job_state': self.latest_job_state,
             'function_id': self.function_id,
@@ -99,9 +99,9 @@ class CloudTaskRun:
             dictionary.
         """
         return cls(
-            id=cloud_task_run_dict['id'],
+            task_run_id=cloud_task_run_dict['task_run_id'],
             cloud_task_name=cloud_task_run_dict['cloud_task_name'],
-            cloud_task_id=cloud_task_run_dict['cloud_task_id'],
+            task_id=cloud_task_run_dict['task_id'],
             queue_id=cloud_task_run_dict['queue_id'],
             latest_job_state=cloud_task_run_dict['latest_job_state'],
             function_id=cloud_task_run_dict['function_id'],

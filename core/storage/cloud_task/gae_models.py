@@ -92,9 +92,9 @@ class CloudTaskRunModel(base_models.BaseModel):
     cloud_task_name = (
         datastore_services.StringProperty(required=False, indexed=True))
 
-    # The cloud_task_id is the ID of the cloud task run. Added as a seperate
+    # The task_id is the ID of the cloud task run. Added as a seperate
     # property to allow for easier querying of tasks by their ID.
-    cloud_task_id = datastore_services.StringProperty(
+    task_id = datastore_services.StringProperty(
         required=True, indexed=True, default=None)
 
     # The queue_id is the ID of the queue that the cloud task belongs to. Added
@@ -155,7 +155,7 @@ class CloudTaskRunModel(base_models.BaseModel):
         """Model doesn't contain any data directly corresponding to a user."""
         return dict(super(CloudTaskRunModel, cls).get_export_policy(), **{
             'cloud_task_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'cloud_task_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'task_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'queue_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'latest_job_state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'function_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -207,7 +207,7 @@ class CloudTaskRunModel(base_models.BaseModel):
             id=cloud_task_run_model_id,
             cloud_task_name=cloud_task_name,
             queue_id=queue_id,
-            cloud_task_id=task_id,
+            task_id=task_id,
             latest_job_state=latest_job_state,
             function_id=function_id,
             current_retry_attempt=current_retry_attempt
