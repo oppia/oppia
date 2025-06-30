@@ -135,6 +135,25 @@ var ReleaseCoordinatorPage = function () {
     return null;
   };
 
+  // Remove this method after the show_voiceover_tab_for_non_curated_explorations
+  // feature flag is deprecated.
+  this.getShowVoiceoverTabForNonCuratedExplorationsFeatureElement =
+    async function () {
+      var featureFlagElements = await featureFlagElementsSelector();
+      var count = featureFlagElements.length;
+      for (let i = 0; i < count; i++) {
+        var elem = featureFlagElements[i];
+        if (
+          (await action.getText('Feature Flag', elem.$(featureNameLocator))) ===
+          'show_voiceover_tab_for_non_curated_explorations'
+        ) {
+          return elem;
+        }
+      }
+
+      return null;
+    };
+
   // This function is meant to be used to enable a feature gated behind
   // a feature flag.
   this.enableFeature = async function (featureElement) {

@@ -64,6 +64,11 @@ describe('Voiceover upload features', function () {
     var voiceoverContributionFlag =
       await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
     await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
+    var voiceoverForNonCuratedExplorationsFlag =
+      await releaseCoordinatorPage.getShowVoiceoverTabForNonCuratedExplorationsFeatureElement();
+    await releaseCoordinatorPage.enableFeature(
+      voiceoverForNonCuratedExplorationsFlag
+    );
     await users.logout();
 
     await users.createUser(TEST_EMAIL, TEST_USERNAME);

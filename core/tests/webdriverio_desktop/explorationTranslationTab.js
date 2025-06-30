@@ -69,6 +69,12 @@ describe('Exploration translation and voiceover tab', function () {
     var voiceoverContributionFlag =
       await releaseCoordinatorPage.getVoiceoverContributionFeatureElement();
     await releaseCoordinatorPage.enableFeature(voiceoverContributionFlag);
+    var voiceoverForNonCuratedExplorationsFlag =
+      await releaseCoordinatorPage.getShowVoiceoverTabForNonCuratedExplorationsFeatureElement();
+    await releaseCoordinatorPage.enableFeature(
+      voiceoverForNonCuratedExplorationsFlag
+    );
+
     await users.logout();
 
     await users.login('user@editorTab.com');

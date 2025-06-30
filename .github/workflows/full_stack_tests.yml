@@ -86,7 +86,7 @@ jobs:
         id: check_skip
         # TODO(#22448): Remove once all suites are fixed.
         run: |
-          broken_suites=("contributorDashboard" "contributorAdminDashboard" "explorationTranslationTab" "fileUploadFeatures")
+          broken_suites=("contributorDashboard" "contributorAdminDashboard")
           for suite in "${broken_suites[@]}"; do
             if [[ "${{ matrix.suite.name }}" == "$suite" ]]; then
               echo "Suite '${{ matrix.suite.name }}' is marked to be skipped."
