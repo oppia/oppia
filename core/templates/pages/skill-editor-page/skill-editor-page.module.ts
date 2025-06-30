@@ -25,10 +25,7 @@ import {SkillEditorNavbarBreadcrumbComponent} from 'pages/skill-editor-page/navb
 import {DeleteMisconceptionModalComponent} from './modal-templates/delete-misconception-modal.component';
 import {SkillDescriptionEditorComponent} from './editor-tab/skill-description-editor/skill-description-editor.component';
 import {SkillPrerequisiteSkillsEditorComponent} from './editor-tab/skill-prerequisite-skills-editor/skill-prerequisite-skills-editor.component';
-import {WorkedExampleEditorComponent} from './editor-tab/skill-concept-card-editor/worked-example-editor.component';
 import {MisconceptionEditorComponent} from './editor-tab/skill-misconceptions-editor/misconception-editor.component';
-import {DeleteWorkedExampleComponent} from './modal-templates/delete-worked-example-modal.component';
-import {AddWorkedExampleModalComponent} from './modal-templates/add-worked-example.component';
 import {SkillRubricsEditorComponent} from './editor-tab/skill-rubrics-editor/skill-rubrics-editor.component';
 import {AddMisconceptionModalComponent} from './modal-templates/add-misconception-modal.component';
 import {SkillEditorSaveModalComponent} from './modal-templates/skill-editor-save-modal.component';
@@ -72,10 +69,7 @@ import {RteHelperService} from 'services/rte-helper.service';
     SkillPrerequisiteSkillsEditorComponent,
     SkillPreviewModalComponent,
     SkillEditorSaveModalComponent,
-    WorkedExampleEditorComponent,
     MisconceptionEditorComponent,
-    AddWorkedExampleModalComponent,
-    DeleteWorkedExampleComponent,
     SkillRubricsEditorComponent,
     AddMisconceptionModalComponent,
     SkillMisconceptionsEditorComponent,
@@ -93,10 +87,7 @@ import {RteHelperService} from 'services/rte-helper.service';
     SkillPrerequisiteSkillsEditorComponent,
     SkillPreviewModalComponent,
     SkillEditorSaveModalComponent,
-    WorkedExampleEditorComponent,
     MisconceptionEditorComponent,
-    AddWorkedExampleModalComponent,
-    DeleteWorkedExampleComponent,
     SkillRubricsEditorComponent,
     AddMisconceptionModalComponent,
     SkillMisconceptionsEditorComponent,

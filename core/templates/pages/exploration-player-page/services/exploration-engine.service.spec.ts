@@ -17,7 +17,6 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {EventEmitter} from '@angular/core';
 import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
@@ -1332,13 +1331,6 @@ describe('Exploration engine service ', () => {
       initSuccessCb
     );
     expect(explorationEngineService.getLanguageCode()).toBe('bn');
-  });
-
-  it('should get the update active state event emitter', () => {
-    let mockEventEmitter = new EventEmitter();
-    expect(explorationEngineService.onUpdateActiveStateIfInEditor).toEqual(
-      mockEventEmitter
-    );
   });
 
   it(

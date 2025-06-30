@@ -46,6 +46,7 @@ import {ReadOnlyStoryNode} from '../../../../domain/story_viewer/read-only-story
 import {ReadOnlyTopic} from '../../../../domain/topic_viewer/read-only-topic-object.factory';
 import {LearnerExplorationSummary} from '../../../../domain/summary/learner-exploration-summary.model';
 import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
+import {ConversationFlowService} from '../../services/conversation-flow.service';
 
 describe('Ratings and recommendations component', () => {
   let fixture: ComponentFixture<RatingsAndRecommendationsComponent>;
@@ -56,6 +57,7 @@ describe('Ratings and recommendations component', () => {
   let userService: UserService;
   let explorationModeService: ExplorationModeService;
   let urlInterpolationService: UrlInterpolationService;
+  let conversationFlowService: ConversationFlowService;
   let localStorageService: LocalStorageService;
   let assetsBackendApiService: AssetsBackendApiService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -89,6 +91,7 @@ describe('Ratings and recommendations component', () => {
         UserService,
         ExplorationModeService,
         UrlInterpolationService,
+        ConversationFlowService,
         AssetsBackendApiService,
         StoryViewerBackendApiService,
         TopicViewerBackendApiService,
@@ -113,6 +116,7 @@ describe('Ratings and recommendations component', () => {
     learnerViewRatingService = TestBed.inject(LearnerViewRatingService);
     urlService = TestBed.inject(UrlService);
     userService = TestBed.inject(UserService);
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     explorationModeService = TestBed.inject(ExplorationModeService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     localStorageService = TestBed.inject(LocalStorageService);
@@ -364,6 +368,23 @@ describe('Ratings and recommendations component', () => {
       expect(siteAnalyticsService.registerNewSignupEvent).toHaveBeenCalled();
     })
   );
+
+  it('should return the value from getIsRefresherExploration', () => {
+    spyOn(
+      conversationFlowService,
+      'getIsRefresherExploration'
+    ).and.callThrough();
+    componentInstance.getIsRefresherExploration();
+    expect(
+      conversationFlowService.getIsRefresherExploration
+    ).toHaveBeenCalled();
+  });
+
+  it('should return the value from getParentExplorationIds', () => {
+    spyOn(conversationFlowService, 'getParentExplorationIds').and.callThrough();
+    componentInstance.getParentExplorationIds();
+    expect(conversationFlowService.getParentExplorationIds).toHaveBeenCalled();
+  });
 
   it("should save user's sign up section preference to localStorage", () => {
     spyOn(localStorageService, 'updateEndChapterSignUpSectionHiddenPreference');

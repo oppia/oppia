@@ -182,7 +182,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     // navigating in preview mode, ensuring that the state does not
     // change when toggling between editor and preview.
     this.directiveSubscriptions.add(
-      this.explorationEngineService.onUpdateActiveStateIfInEditor.subscribe(
+      this.stateEditorService.onUpdateActiveStateIfInEditor.subscribe(
         stateName => {
           this.stateEditorService.setActiveStateName(stateName);
         }
