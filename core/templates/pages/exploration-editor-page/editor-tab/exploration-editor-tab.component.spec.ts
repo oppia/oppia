@@ -32,7 +32,7 @@ import {Outcome} from 'domain/exploration/outcome.model';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
@@ -90,7 +90,6 @@ describe('Exploration editor tab component', () => {
   let routerService: RouterService;
   let siteAnalyticsService: SiteAnalyticsService;
   let stateEditorRefreshService: StateEditorRefreshService;
-  let solutionObjectFactory: SolutionObjectFactory;
   let stateCardIsCheckpointService: StateCardIsCheckpointService;
   let stateEditorService: StateEditorService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
@@ -212,7 +211,6 @@ describe('Exploration editor tab component', () => {
 
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateCardIsCheckpointService = TestBed.inject(StateCardIsCheckpointService);
@@ -843,7 +841,7 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.solution).toEqual(
-      solutionObjectFactory.createFromBackendDict({
+      Solution.createFromBackendDict({
         correct_answer: 'This is the correct answer',
         answer_is_exclusive: false,
         explanation: {
@@ -853,7 +851,7 @@ describe('Exploration editor tab component', () => {
       })
     );
 
-    let displayedValue = solutionObjectFactory.createFromBackendDict({
+    let displayedValue = Solution.createFromBackendDict({
       correct_answer: 'This is the second correct answer',
       answer_is_exclusive: true,
       explanation: {

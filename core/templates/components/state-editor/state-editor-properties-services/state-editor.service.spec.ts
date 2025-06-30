@@ -28,8 +28,8 @@ import {
   Interaction,
   InteractionObjectFactory,
 } from 'domain/exploration/InteractionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
@@ -37,11 +37,9 @@ import {Subscription} from 'rxjs';
 
 describe('Editor state service', () => {
   let ecs: StateEditorService;
-  let sof: SolutionObjectFactory;
   let interactionObjectFactory: InteractionObjectFactory;
   let solutionValidityService: SolutionValidityService;
   let mockInteraction: Interaction;
-
   let stateEditorInitializedSpy: jasmine.Spy<jasmine.Func>;
   let stateEditorDirectiveInitializedSpy: jasmine.Spy<jasmine.Func>;
   let interactionEditorInitializedSpy: jasmine.Spy<jasmine.Func>;
@@ -59,7 +57,6 @@ describe('Editor state service', () => {
     });
 
     ecs = TestBed.inject(StateEditorService);
-    sof = TestBed.inject(SolutionObjectFactory);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     solutionValidityService = TestBed.inject(SolutionValidityService);
 
@@ -516,7 +513,7 @@ describe('Editor state service', () => {
   });
 
   it('should set interaction solution', () => {
-    let newSolution = sof.createFromBackendDict({
+    let newSolution = Solution.createFromBackendDict({
       answer_is_exclusive: true,
       correct_answer: 'test_answer_new',
       explanation: {
@@ -526,7 +523,7 @@ describe('Editor state service', () => {
     });
     ecs.setInteraction(mockInteraction);
     expect(ecs.interaction.solution).toEqual(
-      sof.createFromBackendDict({
+      Solution.createFromBackendDict({
         answer_is_exclusive: true,
         correct_answer: 'test_answer',
         explanation: {
