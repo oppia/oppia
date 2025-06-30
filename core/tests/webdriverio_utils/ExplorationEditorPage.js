@@ -67,6 +67,7 @@ var ExplorationEditorPage = function () {
   );
   var sharePublishModalElement = $('.e2e-test-share-publish-modal');
   var toastMessage = $('.e2e-test-toast-message');
+  var translationTabContentContainer = $('.e2e-test-translation-tab');
 
   /*
    * Non-Interactive elements
@@ -503,6 +504,10 @@ var ExplorationEditorPage = function () {
     await action.click(
       'Translation tab button',
       navigateToTranslationTabButton
+    );
+    await waitFor.presenceOf(
+      translationTabContentContainer,
+      'Failed to navigate to tanslation tab'
     );
     await waitFor.pageToFullyLoad();
   };
