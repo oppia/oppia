@@ -34,7 +34,7 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {AddHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import {DeleteHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
 import {DeleteLastHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 
 interface DeleteValueResponse {
