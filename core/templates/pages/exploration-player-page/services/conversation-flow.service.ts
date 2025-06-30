@@ -24,7 +24,7 @@ import {ContentTranslationLanguageService} from './content-translation-language.
 import {ContentTranslationManagerService} from './content-translation-manager.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {CurrentEngineService} from './current-engine.service';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import {TranslateService} from '@ngx-translate/core';
 import {HintsAndSolutionManagerService} from './hints-and-solution-manager.service';
