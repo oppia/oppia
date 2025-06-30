@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,15 +19,15 @@
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {DeleteWorkedExampleComponent} from './delete-worked-example-modal.component';
+import {DeleteStudyGuideSectionComponent} from './delete-study-guide-section-modal.component';
 
-describe('Delete Worked Example Modal Component', function () {
-  let component: DeleteWorkedExampleComponent;
-  let fixture: ComponentFixture<DeleteWorkedExampleComponent>;
+describe('Delete Study Guide Section Component', function () {
+  let component: DeleteStudyGuideSectionComponent;
+  let fixture: ComponentFixture<DeleteStudyGuideSectionComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [DeleteWorkedExampleComponent],
+      declarations: [DeleteStudyGuideSectionComponent],
       providers: [
         {
           provide: NgbActiveModal,
@@ -38,13 +38,13 @@ describe('Delete Worked Example Modal Component', function () {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DeleteWorkedExampleComponent);
+    fixture = TestBed.createComponent(DeleteStudyGuideSectionComponent);
     component = fixture.componentInstance;
 
     TestBed.inject(NgbActiveModal);
   });
 
-  // This component have no more frontend tests as it inherits the
+  // This component has no more frontend tests as it inherits the
   // ConfirmOrCancelModalComponent and doesn't have any additional
   // functionality. Please see the ConfirmOrCancelModalComponent for more tests.
   it('should create', () => {

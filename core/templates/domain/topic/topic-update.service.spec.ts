@@ -26,7 +26,9 @@ import {Topic, TopicBackendDict} from 'domain/topic/topic-object.model';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {TestBed} from '@angular/core/testing';
 import {SubtopicPage} from './subtopic-page.model';
+import {StudyGuide} from './study-guide.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {StudyGuideSection} from './study-guide-sections.model';
 
 describe('Topic update service', function () {
   let topicUpdateService: TopicUpdateService;
@@ -36,6 +38,7 @@ describe('Topic update service', function () {
   let _secondSkillSummary = null;
   let _thirdSkillSummary = null;
   let _sampleSubtopicPage = null;
+  let _sampleStudyGuide = null;
 
   let sampleTopicBackendObject = {
     topicDict: {
@@ -103,6 +106,24 @@ describe('Topic update service', function () {
     },
     language_code: 'en',
   };
+  let sampleStudyGuideObject = {
+    id: 'topicId-1',
+    topic_id: 'topicId',
+    sections: [
+      {
+        heading: {
+          content_id: 'section_heading_0',
+          unicode_str: 'heading 1',
+        },
+        content: {
+          content_id: 'section_content_1',
+          html: '<p>content 1</p>',
+        },
+      },
+    ],
+    next_content_id_index: 2,
+    language_code: 'en',
+  };
 
   beforeEach(() => {
     topicUpdateService = TestBed.get(TopicUpdateService);
@@ -114,6 +135,9 @@ describe('Topic update service', function () {
 
     _sampleSubtopicPage = SubtopicPage.createFromBackendDict(
       sampleSubtopicPageObject
+    );
+    _sampleStudyGuide = StudyGuide.createFromBackendDict(
+      sampleStudyGuideObject
     );
     _sampleTopic = Topic.create(
       sampleTopicBackendObject.topicDict as TopicBackendDict,
@@ -1290,6 +1314,103 @@ describe('Topic update service', function () {
       expect(undoRedoService.getCommittableChangeList()).toEqual([]);
     }
   );
+
+  it('should add and delete a study guide section', () => {
+    var newSampleSectionDict = {
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'new heading',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: 'new content',
+      },
+    };
+    var newSampleSection =
+      StudyGuideSection.createFromBackendDict(newSampleSectionDict);
+    var oldSections = _sampleStudyGuide.getSections();
+    expect(oldSections[0].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'heading 1',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: '<p>content 1</p>',
+      },
+    });
+    topicUpdateService.addSection(_sampleStudyGuide, newSampleSection, 1);
+    var oldSections = _sampleStudyGuide.getSections();
+    expect(oldSections.length).toEqual(2);
+    expect(oldSections[1].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'new heading',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: 'new content',
+      },
+    });
+
+    topicUpdateService.deleteSection(_sampleStudyGuide, 1, 1);
+    var oldSections = _sampleStudyGuide.getSections();
+    expect(oldSections.length).toEqual(1);
+    expect(oldSections[0].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'heading 1',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: '<p>content 1</p>',
+      },
+    });
+  });
+
+  it('should update a study guide section and undo the changes', () => {
+    var oldSections = _sampleStudyGuide.getSections();
+    expect(oldSections[0].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'heading 1',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: '<p>content 1</p>',
+      },
+    });
+    topicUpdateService.updateSection(
+      _sampleStudyGuide,
+      0,
+      'updated heading',
+      'updated content',
+      1
+    );
+    var oldSections = _sampleStudyGuide.getSections();
+    expect(oldSections[0].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'updated heading',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: 'updated content',
+      },
+    });
+    undoRedoService.undoChange(_sampleStudyGuide);
+    var oldSections = _sampleStudyGuide.getSections();
+    expect(oldSections[0].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'heading 1',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: '<p>content 1</p>',
+      },
+    });
+  });
 
   it("should set/unset changes to a subtopic page's page content", () => {
     var newSampleSubtitledHtmlDict = {

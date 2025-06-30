@@ -226,7 +226,7 @@ export class ReadOnlyExplorationBackendApiService {
    */
   async loadExplorationAsync(
     explorationId: string,
-    version: number
+    version: number | null = null
   ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       this._fetchExplorationAsync(explorationId, version).then(exploration => {

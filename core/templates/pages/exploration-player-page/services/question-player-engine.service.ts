@@ -16,13 +16,9 @@
  * @fileoverview Utility service for the question player for an exploration.
  */
 
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
-import {
-  Question,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
@@ -37,11 +33,26 @@ import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import cloneDeep from 'lodash/cloneDeep';
+import {
+  Question,
+  QuestionBackendDict,
+  QuestionObjectFactory,
+} from 'domain/question/QuestionObjectFactory';
+import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {PlayerTranscriptService} from './player-transcript.service';
+
+interface QuestionPlayerConfigDict {
+  skillList: string[];
+  questionCount: number;
+  questionsSortedByDifficulty: boolean;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class QuestionPlayerEngineService {
+  private _totalQuestionsReceivedEventEmitter: EventEmitter<number> =
+    new EventEmitter();
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
   private currentIndex: number = null;
@@ -51,9 +62,11 @@ export class QuestionPlayerEngineService {
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
     private pageContextService: PageContextService,
+    private questionBackendApiService: QuestionBackendApiService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
+    private playerTranscriptService: PlayerTranscriptService,
     private questionObjectFactory: QuestionObjectFactory
   ) {}
 
@@ -153,6 +166,46 @@ export class QuestionPlayerEngineService {
       labelForFocusTarget,
       null
     );
+  }
+
+  initQuestionPlayer(
+    questionPlayerConfig: QuestionPlayerConfigDict,
+    successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
+    errorCallback: () => void
+  ): void {
+    this.playerTranscriptService.init();
+    this.questionBackendApiService
+      .fetchQuestionsAsync(
+        questionPlayerConfig.skillList,
+        questionPlayerConfig.questionCount,
+        questionPlayerConfig.questionsSortedByDifficulty
+      )
+      .then(questionData => {
+        this._totalQuestionsReceivedEventEmitter.emit(questionData.length);
+        this.initializeQuestionPlayerServices(
+          questionData,
+          successCallback,
+          errorCallback
+        );
+      });
+  }
+
+  private initializeQuestionPlayerServices(
+    questionDicts: QuestionBackendDict[],
+    successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
+    errorCallback: () => void
+  ): void {
+    let questionObjects = questionDicts.map(questionDict => {
+      return this.questionObjectFactory.createFromBackendDict(questionDict);
+    });
+    this.init(questionObjects, successCallback, errorCallback);
+  }
+
+  initializePretestServices(
+    pretestQuestionObjects: Question[],
+    callback: (initialCard: StateCard, nextFocusLabel: string) => void
+  ): void {
+    this.init(pretestQuestionObjects, callback, () => {});
   }
 
   init(
@@ -355,5 +408,9 @@ export class QuestionPlayerEngineService {
       _nextFocusLabel
     );
     return answerIsCorrect;
+  }
+
+  get onTotalQuestionsReceived(): EventEmitter<number> {
+    return this._totalQuestionsReceivedEventEmitter;
   }
 }

@@ -38,7 +38,7 @@ describe('Logged-out User', function () {
   it(
     'should not be able to add an exploration to "play later" from the community library page.',
     async function () {
-      await loggedOutUser.navigateToCommunityLibraryPage();
+      await loggedOutUser.navigateToCommunityLibraryPage(false);
       await loggedOutUser.expectCannotAddExplorationToPlayLater();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -47,7 +47,7 @@ describe('Logged-out User', function () {
   it(
     'should not be able to visit the learner dashboard.',
     async function () {
-      await loggedOutUser.navigateToLearnerDashboard();
+      await loggedOutUser.navigateToLearnerDashboard(false);
       await loggedOutUser.expectToBeOnLoginPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -56,7 +56,7 @@ describe('Logged-out User', function () {
   it(
     'should not be able to visit the creator dashboard.',
     async function () {
-      await loggedOutUser.navigateToCreatorDashboard();
+      await loggedOutUser.navigateToCreatorDashboard(false);
       await loggedOutUser.expectToBeOnLoginPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -65,7 +65,7 @@ describe('Logged-out User', function () {
   it(
     'should not be able to visit the moderator page.',
     async function () {
-      await loggedOutUser.navigateToModeratorPage();
+      await loggedOutUser.navigateToModeratorPage(false);
       await loggedOutUser.expectToBeOnLoginPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -74,7 +74,7 @@ describe('Logged-out User', function () {
   it(
     'should not be able to visit the preferences page.',
     async function () {
-      await loggedOutUser.navigateToPreferencesPage();
+      await loggedOutUser.navigateToPreferencesPage(false);
       await loggedOutUser.expectToBeOnLoginPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -83,7 +83,7 @@ describe('Logged-out User', function () {
   it(
     'should not be able to visit the topics and skills dashboard page.',
     async function () {
-      await loggedOutUser.navigateToTopicsAndSkillsDashboardPage();
+      await loggedOutUser.navigateToTopicsAndSkillsDashboardPage(false);
       await loggedOutUser.expectToBeOnLoginPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

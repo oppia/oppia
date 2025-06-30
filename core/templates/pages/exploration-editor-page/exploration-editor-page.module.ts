@@ -144,7 +144,6 @@ import {LoaderService} from 'services/loader.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {ParameterMetadataService} from './services/parameter-metadata.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PopulateRuleContentIdsService} from './services/populate-rule-content-ids.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ResponsesService} from './editor-tab/services/responses.service';
@@ -371,7 +370,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     LoggerService,
     ParameterMetadataService,
     PlatformFeatureService,
-    PlayerPositionService,
     PopulateRuleContentIdsService,
     ReadOnlyExplorationBackendApiService,
     ResponsesService,

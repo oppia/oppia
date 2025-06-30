@@ -57,7 +57,7 @@ export class StatsReportingService {
   explorationVersion!: number;
   sessionId!: string;
   stateStopwatch!: Stopwatch;
-  optionalCollectionId!: string;
+  optionalCollectionId!: string | null;
   currentStateName!: string;
   nextExpId!: string;
   previousStateName!: string;
@@ -145,7 +145,7 @@ export class StatsReportingService {
     newExplorationTitle: string,
     newExplorationVersion: number,
     newSessionId: string,
-    collectionId: string
+    collectionId: string | null
   ): void {
     this.explorationId = newExplorationId;
     this.explorationTitle = newExplorationTitle;

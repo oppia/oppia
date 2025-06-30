@@ -25,7 +25,6 @@ import {EditableExplorationBackendApiService} from 'domain/exploration/editable-
 import {ParamChange} from 'domain/exploration/param-change.model';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {
   ExplorationParams,
   LearnerParamsService,
@@ -39,6 +38,7 @@ import {ExplorationInitStateNameService} from '../services/exploration-init-stat
 import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
 import {ExplorationStatesService} from '../services/exploration-states.service';
 import {GraphDataService} from '../services/graph-data.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {ParameterMetadataService} from '../services/parameter-metadata.service';
 import {RouterService} from '../services/router.service';
 import {PreviewSetParametersModalComponent} from './templates/preview-set-parameters-modal.component';
@@ -64,7 +64,6 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private explorationFeaturesService: ExplorationFeaturesService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private explorationParamChangesService: ExplorationParamChangesService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
     private explorationStatesService: ExplorationStatesService,
     private graphDataService: GraphDataService,
     private learnerParamsService: LearnerParamsService,
@@ -74,7 +73,8 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
     private paramChangesObjectFactory: ParamChangesObjectFactory,
-    private entityVoiceoversService: EntityVoiceoversService
+    private entityVoiceoversService: EntityVoiceoversService,
+    private conversationFlowService: ConversationFlowService
   ) {}
 
   getManualParamChanges(
@@ -173,7 +173,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     // navigating in preview mode, ensuring that the state does not
     // change when toggling between editor and preview.
     this.directiveSubscriptions.add(
-      this.explorationEngineService.onUpdateActiveStateIfInEditor.subscribe(
+      this.stateEditorService.onUpdateActiveStateIfInEditor.subscribe(
         stateName => {
           this.stateEditorService.setActiveStateName(stateName);
         }
@@ -181,7 +181,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     );
 
     this.directiveSubscriptions.add(
-      this.explorationPlayerStateService.onPlayerStateChange.subscribe(() => {
+      this.conversationFlowService.onPlayerStateChange.subscribe(() => {
         this.allParams = this.learnerParamsService.getAllParams();
       })
     );

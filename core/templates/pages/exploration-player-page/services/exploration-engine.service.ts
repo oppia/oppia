@@ -16,7 +16,7 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {AppConstants} from 'app.constants';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
@@ -57,16 +57,13 @@ import {PlayerTranscriptService} from './player-transcript.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import isEqual from 'lodash/isEqual';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExplorationEngineService {
-  private _explorationId: string;
-  private _editorPreviewMode: boolean;
-  private _questionPlayerMode: boolean;
-  private _updateActiveStateIfInEditorEventEmitter: EventEmitter<string> =
-    new EventEmitter();
+  private _explorationId!: string;
 
   answerIsBeingProcessed: boolean = false;
   alwaysAskLearnersForAnswerDetails: boolean = false;
@@ -82,7 +79,6 @@ export class ExplorationEngineService {
   // Param changes to be used ONLY in editor preview mode.
   manualParamChanges: ParamChange[];
   initStateName: string;
-  version: number;
 
   constructor(
     private alertsService: AlertsService,
@@ -102,6 +98,7 @@ export class ExplorationEngineService {
     private playerTranscriptService: PlayerTranscriptService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private statsReportingService: StatsReportingService,
+    private stateEditorService: StateEditorService,
     private translateService: TranslateService,
     private urlService: UrlService
   ) {
@@ -127,29 +124,28 @@ export class ExplorationEngineService {
 
     if (explorationContext) {
       this._explorationId = this.pageContextService.getExplorationId();
-      this.version = this.urlService.getExplorationVersionFromUrl();
-      this._editorPreviewMode =
-        this.pageContextService.isInExplorationEditorPage();
-      this._questionPlayerMode =
-        this.pageContextService.isInQuestionPlayerMode();
+      let version = this.urlService.getExplorationVersionFromUrl();
+      this.pageContextService.setExplorationVersion(version);
+
+      const pathSegment = this.urlService
+        .getPathname()
+        .split('/')[1]
+        .replace(/"/g, "'");
+
       if (
-        !this._questionPlayerMode &&
-        !(
-          'skill_editor' ===
-          this.urlService.getPathname().split('/')[1].replace(/"/g, "'")
-        )
+        !this.pageContextService.isInQuestionPlayerMode() &&
+        pathSegment !== 'skill_editor'
       ) {
         this.readOnlyExplorationBackendApiService
-          .loadExplorationAsync(this._explorationId, this.version)
+          .loadExplorationAsync(this._explorationId, version)
           .then(exploration => {
-            this.version = exploration.version;
+            this.pageContextService.setExplorationVersion(exploration.version);
           });
       }
     } else {
       this._explorationId = 'test_id';
-      this.version = 1;
-      this._editorPreviewMode = false;
-      this._questionPlayerMode = false;
+      let version = 1;
+      this.pageContextService.setExplorationVersion(version);
     }
   }
 
@@ -192,7 +188,7 @@ export class ExplorationEngineService {
     );
   }
 
-  private _getRandomSuffix(): string {
+  getRandomSuffix(): string {
     // This is a bit of a hack. When a refresh to a component property
     // happens, Angular compares the new value of the property to its previous
     // value. If they are the same, then the property is not updated.
@@ -298,7 +294,7 @@ export class ExplorationEngineService {
       return;
     }
 
-    if (!this._editorPreviewMode) {
+    if (!this.pageContextService.isInExplorationEditorPage()) {
       this.statsReportingService.recordExplorationStarted(
         this.exploration.initStateName,
         newParams
@@ -364,7 +360,7 @@ export class ExplorationEngineService {
     activeStateNameFromPreviewTab: string,
     manualParamChangesToInit: ParamChange[]
   ): void {
-    if (this._editorPreviewMode) {
+    if (this.pageContextService.isInExplorationEditorPage()) {
       this.manualParamChanges = manualParamChangesToInit;
       this.initStateName = activeStateNameFromPreviewTab;
     } else {
@@ -388,9 +384,9 @@ export class ExplorationEngineService {
    */
   init(
     explorationDict: ExplorationBackendDict,
-    explorationVersion: number,
+    explorationVersion: number | null,
     preferredAudioLanguage: string | null,
-    autoTtsEnabled: boolean,
+    autoTtsEnabled: boolean | null,
     preferredContentLanguageCodes: string[],
     displayableLanguageCodes: string[],
     successCallback: (stateCard: StateCard, label: string) => void
@@ -398,7 +394,7 @@ export class ExplorationEngineService {
     this.exploration =
       this.explorationObjectFactory.createFromBackendDict(explorationDict);
     this.answerIsBeingProcessed = false;
-    if (this._editorPreviewMode) {
+    if (this.pageContextService.isInExplorationEditorPage()) {
       this.exploration.setInitialStateName(this.initStateName);
       this.visitedStateNames = [this.exploration.getInitialState().name];
       this.initParams(this.manualParamChanges);
@@ -407,7 +403,7 @@ export class ExplorationEngineService {
       this._loadInitialState(successCallback);
     } else {
       this.visitedStateNames.push(this.exploration.getInitialState().name);
-      this.version = explorationVersion;
+      this.pageContextService.setExplorationVersion(explorationVersion);
       this.initParams([]);
       this.audioPreloaderService.init(this.exploration);
       this.audioPreloaderService.kickOffAudioPreloader(
@@ -421,10 +417,15 @@ export class ExplorationEngineService {
       this._loadInitialState(successCallback);
     }
 
+    const version = this.pageContextService.getExplorationVersion();
+    if (!version) {
+      throw new Error('Exploration version is not set.');
+    }
+
     this.entityTranslationsService.init(
       this._explorationId,
       'exploration',
-      this.version
+      version
     );
     this.contentTranslationManagerService.setOriginalTranscript(
       this.exploration.getLanguageCode()
@@ -466,20 +467,12 @@ export class ExplorationEngineService {
     return this.exploration.title;
   }
 
-  getExplorationVersion(): number {
-    return this.version;
-  }
-
   getAuthorRecommendedExpIdsByStateName(stateName: string): string[] {
     return this.exploration.getAuthorRecommendedExpIds(stateName);
   }
 
   getLanguageCode(): string {
     return this.exploration.getLanguageCode();
-  }
-
-  isInPreviewMode(): boolean {
-    return !!this._editorPreviewMode;
   }
 
   submitAnswer(
@@ -523,7 +516,7 @@ export class ExplorationEngineService {
     let outcome = {...classificationResult.outcome};
     let newStateName: string = outcome.dest;
 
-    if (!this._editorPreviewMode) {
+    if (!this.pageContextService.isInExplorationEditorPage()) {
       let feedbackIsUseful: boolean =
         this.answerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
           oldStateName,
@@ -608,7 +601,7 @@ export class ExplorationEngineService {
     this.nextStateName = newStateName;
     let onSameCard: boolean = oldStateName === newStateName;
 
-    this._updateActiveStateIfInEditorEventEmitter.emit(newStateName);
+    this.stateEditorService.onUpdateActiveStateIfInEditor.emit(newStateName);
 
     let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let nextInteractionHtml = null;
@@ -623,8 +616,8 @@ export class ExplorationEngineService {
       this.learnerParamsService.init(newParams);
     }
 
-    questionHtml = questionHtml + this._getRandomSuffix();
-    nextInteractionHtml = nextInteractionHtml + this._getRandomSuffix();
+    questionHtml = questionHtml + this.getRandomSuffix();
+    nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
 
     let nextCard = StateCard.createNewCard(
       this.nextStateName,
@@ -690,9 +683,9 @@ export class ExplorationEngineService {
       );
     }
 
-    questionHtmlIfStuck = questionHtmlIfStuck + this._getRandomSuffix();
+    questionHtmlIfStuck = questionHtmlIfStuck + this.getRandomSuffix();
     nextInteractionIfStuckHtml =
-      nextInteractionIfStuckHtml + this._getRandomSuffix();
+      nextInteractionIfStuckHtml + this.getRandomSuffix();
 
     return StateCard.createNewCard(
       this.nextStateIfStuckName,
@@ -711,10 +704,6 @@ export class ExplorationEngineService {
     return this.alwaysAskLearnersForAnswerDetails;
   }
 
-  get onUpdateActiveStateIfInEditor(): EventEmitter<string> {
-    return this._updateActiveStateIfInEditorEventEmitter;
-  }
-
   getStateCardByName(stateName: string): StateCard {
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
     let interactionHtml = null;
@@ -726,8 +715,8 @@ export class ExplorationEngineService {
     }
     let contentHtml =
       this.exploration.getState(stateName).content.html +
-      this._getRandomSuffix();
-    interactionHtml = interactionHtml + this._getRandomSuffix();
+      this.getRandomSuffix();
+    interactionHtml = interactionHtml + this.getRandomSuffix();
 
     return StateCard.createNewCard(
       stateName,

@@ -253,7 +253,6 @@ import {SkillCreationBackendApiService} from 'domain/skill/skill-creation-backen
 import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
 import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
 import {SkillRightsBackendApiService} from 'domain/skill/skill-rights-backend-api.service';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {SpeechSynthesisChunkerService} from 'services/speech-synthesis-chunker.service';
 import {
@@ -619,7 +618,8 @@ export class UpgradedServices {
       upgradedServices['StateCustomizationArgsService'],
       upgradedServices['StateEditorService'],
       upgradedServices['StateInteractionIdService'],
-      upgradedServices['StateSolutionService']
+      upgradedServices['StateSolutionService'],
+      upgradedServices['ExplorationHtmlFormatterService']
     );
     upgradedServices['QuestionValidationService'] =
       new QuestionValidationService(
@@ -1099,9 +1099,6 @@ export class UpgradedServices {
       );
 
     // Topological level: 6.
-    upgradedServices['SolutionObjectFactory'] = new SolutionObjectFactory(
-      upgradedServices['ExplorationHtmlFormatterService']
-    );
     upgradedServices['StateInteractionStatsService'] =
       new StateInteractionStatsService(
         upgradedServices['AnswerClassificationService'],
@@ -1116,9 +1113,8 @@ export class UpgradedServices {
       );
 
     // Topological level: 7.
-    upgradedServices['InteractionObjectFactory'] = new InteractionObjectFactory(
-      upgradedServices['SolutionObjectFactory']
-    );
+    upgradedServices['InteractionObjectFactory'] =
+      new InteractionObjectFactory();
 
     // Topological level: 8.
     upgradedServices['InteractionAttributesExtractorService'] =

@@ -11,22 +11,12 @@
                         [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
                         [avatarImageIsShown]="true"
                         [shouldHideInteraction]="continueToReviseStateButtonIsVisible || !showInteraction"
-                        [startCardChangeAnimation]="startCardChangeAnimation"
                         [userIsLoggedIn]="isLoggedIn"
                         [collectionSummary]="collectionSummary"
                         [questionPlayerConfig]="questionPlayerConfig"
                         [explorationIsInPreviewMode]="isInPreviewMode"
-                        [isRefresherExploration]="isRefresherExploration"
                         [recommendedExplorationSummaries]="recommendedExplorationSummaries"
-                        [parentExplorationIds]="parentExplorationIds"
-                        [inStoryMode]="inStoryMode"
-                        [nextLessonLink]="getExplorationLink()"
-                        [completedChaptersCount]="completedChaptersCount"
-                        [milestoneMessageIsToBeDisplayed]="chapterIsCompletedForTheFirstTime"
-                        [feedbackIsEnabled]="feedbackIsEnabled"
-                        [learnerCanOnlyAttemptQuestionOnce]="learnerCanOnlyAttemptQuestionOnce"
-                        [inputOutputHistoryIsShown]="inputOutputHistoryIsShown"
-                        [checkpointCelebrationModalIsEnabled]="checkpointCelebrationModalIsEnabled">
+                        [nextLessonLink]="getExplorationLink()">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <oppia-supplemental-card (clickContinueButton)="showUpcomingCard()"
@@ -46,9 +36,6 @@
                             [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
                             (clickContinueButton)="showUpcomingCard()"
                             (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
-                            (changeCard)="changeCard($event)"
-                            [navigationThroughCardHistoryIsEnabled]="navigationThroughCardHistoryIsEnabled"
-                            [skipButtonIsShown]="skipButtonIsShown"
                             (skipQuestion)="skipCurrentQuestion()">
         </oppia-progress-nav>
       </div>
