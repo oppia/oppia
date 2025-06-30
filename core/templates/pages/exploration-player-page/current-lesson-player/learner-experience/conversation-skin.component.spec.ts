@@ -1903,4 +1903,34 @@ describe('Conversation skin component', () => {
 
     expect(componentInstance.canWindowShowTwoCards()).toBeTrue();
   });
+
+  it('should return true when Learn Again button is shown', () => {
+    spyOn(conversationFlowService, 'isLearnAgainButton').and.returnValue(true);
+
+    expect(componentInstance.isLearnAgainButton()).toBeTrue();
+  });
+
+  it('should return true when animating to two cards', () => {
+    spyOn(cardAnimationService, 'getIsAnimatingToTwoCards').and.returnValue(
+      true
+    );
+
+    expect(componentInstance.getIsAnimatingToTwoCards()).toBeTrue();
+  });
+
+  it('should return false when not animating to one card', () => {
+    spyOn(cardAnimationService, 'getIsAnimatingToOneCard').and.returnValue(
+      false
+    );
+
+    expect(componentInstance.getIsAnimatingToOneCard()).toBeFalse();
+  });
+
+  it('should return false when answer is not being processed', () => {
+    spyOn(conversationFlowService, 'getAnswerIsBeingProcessed').and.returnValue(
+      false
+    );
+
+    expect(componentInstance.getAnswerIsBeingProcessed()).toBeFalse();
+  });
 });

@@ -48,6 +48,7 @@ import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceo
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {PlatformFeatureService} from '../../../../services/platform-feature.service';
 import {TranslateModule} from '@ngx-translate/core';
+import {ConversationFlowService} from '../../services/conversation-flow.service';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -68,6 +69,7 @@ describe('Supplemental card component', () => {
   let audioPlayerService: AudioPlayerService;
   let currentInteractionService: CurrentInteractionService;
   let playerPositionService: PlayerPositionService;
+  let conversationFlowService: ConversationFlowService;
   let urlInterpolationService: UrlInterpolationService;
   let windowRef: WindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -93,6 +95,7 @@ describe('Supplemental card component', () => {
       declarations: [SupplementalCardComponent],
       providers: [
         AudioPlayerService,
+        ConversationFlowService,
         {
           provide: ChangeDetectorRef,
           useClass: MockChangeDetectorRef,
@@ -118,6 +121,7 @@ describe('Supplemental card component', () => {
     playerPositionService = TestBed.inject(PlayerPositionService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowRef = TestBed.inject(WindowRef);
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
 
@@ -237,6 +241,14 @@ describe('Supplemental card component', () => {
     componentInstance.updateHelpCardBottomPosition();
 
     expect(componentInstance.helpCardBottomPosition).toEqual(350);
+  });
+
+  it('should show the upcoming card when continue button is clicked', () => {
+    spyOn(conversationFlowService, 'showUpcomingCard');
+
+    componentInstance.onClickContinueButton();
+
+    expect(conversationFlowService.showUpcomingCard).toHaveBeenCalled();
   });
 
   it('should get feedback audio highlight class', () => {

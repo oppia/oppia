@@ -239,7 +239,7 @@ export class StateCard {
     this._inputResponsePairs.push(cloneDeep(inputResponsePair));
   }
 
-  setLastOppiaResponse(response: string): void {
+  setLastOppiaResponse(response: string | null): void {
     // This check is added here to ensure that this._inputReponsePairs is
     // accessed only if there is atleast one input response pair present.
     // In the editor preview tab if a user clicks on restart from beginning
