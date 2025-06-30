@@ -22,15 +22,16 @@ import {ReadOnlySubtopicPageData} from 'domain/subtopic_viewer/read-only-subtopi
 
 describe('Subtopic data object factory', () => {
   describe('subtopic data object factory', () => {
-    var _sampleSubtopicData: ReadOnlySubtopicPageData;
+    var _sampleSubtopicDataWithPageContents: ReadOnlySubtopicPageData;
 
     beforeEach(() => {
-      var sampleSubtopicDataBackendDict = {
+      var sampleSubtopicDataBackendDictWithPageContents = {
         topic_id: 'topic_id',
         topic_name: 'topic',
         next_subtopic_dict: null,
         prev_subtopic_dict: null,
         subtopic_title: 'sample_title',
+        sections: null,
         page_contents: {
           subtitled_html: {
             html: 'test content',
@@ -51,17 +52,30 @@ describe('Subtopic data object factory', () => {
         },
       };
 
-      _sampleSubtopicData = ReadOnlySubtopicPageData.createFromBackendDict(
-        sampleSubtopicDataBackendDict
-      );
+      _sampleSubtopicDataWithPageContents =
+        ReadOnlySubtopicPageData.createFromBackendDict(
+          sampleSubtopicDataBackendDictWithPageContents
+        );
     });
 
     it('should be able to get all the values', function () {
-      expect(_sampleSubtopicData.getParentTopicId()).toEqual('topic_id');
-      expect(_sampleSubtopicData.getParentTopicName()).toEqual('topic');
-      expect(_sampleSubtopicData.getNextSubtopic()).toEqual(null);
-      expect(_sampleSubtopicData.getSubtopicTitle()).toEqual('sample_title');
-      expect(_sampleSubtopicData.getPageContents()).toEqual(
+      expect(_sampleSubtopicDataWithPageContents.getParentTopicId()).toEqual(
+        'topic_id'
+      );
+      expect(_sampleSubtopicDataWithPageContents.getParentTopicName()).toEqual(
+        'topic'
+      );
+      expect(_sampleSubtopicDataWithPageContents.getNextSubtopic()).toEqual(
+        null
+      );
+      expect(_sampleSubtopicDataWithPageContents.getPrevSubtopic()).toEqual(
+        null
+      );
+      expect(_sampleSubtopicDataWithPageContents.getSubtopicTitle()).toEqual(
+        'sample_title'
+      );
+      expect(_sampleSubtopicDataWithPageContents.getSections()).toEqual([]);
+      expect(_sampleSubtopicDataWithPageContents.getPageContents()).toEqual(
         SubtopicPageContents.createFromBackendDict({
           subtitled_html: {
             html: 'test content',
@@ -81,6 +95,24 @@ describe('Subtopic data object factory', () => {
           },
         })
       );
+    });
+
+    it('should throw error if both sections and pageContents are null', function () {
+      var sampleSubtopicDataBackendDictWithPageContents = {
+        topic_id: 'topic_id',
+        topic_name: 'topic',
+        next_subtopic_dict: null,
+        prev_subtopic_dict: null,
+        subtopic_title: 'sample_title',
+        sections: null,
+        page_contents: null,
+      };
+
+      expect(function () {
+        ReadOnlySubtopicPageData.createFromBackendDict(
+          sampleSubtopicDataBackendDictWithPageContents
+        );
+      }).toThrowError('Neither sections nor page_contents provided.');
     });
   });
 });

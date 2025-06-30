@@ -71,7 +71,7 @@ import {
 } from '@angular/core';
 import {createCustomElement} from '@angular/elements';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
 import {ProfilePageBackendApiService} from 'pages/profile-page/profile-page-backend-api.service';
@@ -160,7 +160,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   direction: string = 'ltr';
 
   static classroomBackendApiService: ClassroomBackendApiService;
-  static contextService: ContextService;
+  static pageContextService: PageContextService;
   static i18nLanguageCodeService: I18nLanguageCodeService;
   static ngZone: NgZone;
   static pageTitleService: PageTitleService;
@@ -189,7 +189,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private injector: Injector,
-    private contextService: ContextService
+    private pageContextService: PageContextService
   ) {
     if (OppiaAngularRootComponent.rteElementsAreInitialized) {
       return;
@@ -200,14 +200,14 @@ export class OppiaAngularRootComponent implements AfterViewInit {
   }
 
   public ngAfterViewInit(): void {
-    if (!OppiaAngularRootComponent.contextService) {
-      OppiaAngularRootComponent.contextService = this.contextService;
+    if (!OppiaAngularRootComponent.pageContextService) {
+      OppiaAngularRootComponent.pageContextService = this.pageContextService;
     }
     this.ngZone.runOutsideAngular(() => {
       CkEditorInitializerService.ckEditorInitializer(
         OppiaAngularRootComponent.rteHelperService,
         this.htmlEscaperService,
-        this.contextService,
+        this.pageContextService,
         this.ngZone
       );
     });

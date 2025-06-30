@@ -155,7 +155,7 @@ export class UrlService {
 
   getSubtopicUrlFragmentFromLearnerUrl(): string {
     let pathname = this.getPathname();
-    if (pathname.startsWith('/learn') && pathname.includes('/revision')) {
+    if (pathname.startsWith('/learn') && pathname.includes('/studyguide')) {
       return decodeURIComponent(pathname.split('/')[5]);
     }
     throw new Error('Invalid URL for subtopic');
@@ -217,7 +217,7 @@ export class UrlService {
   getSubtopicIdFromUrl(): string {
     let pathname = this.getPathname();
     let argumentsArray = pathname.split('/');
-    if (pathname.match(/\/revision/g) && argumentsArray.length === 6) {
+    if (pathname.match(/\/studyguide/g) && argumentsArray.length === 6) {
       return decodeURIComponent(argumentsArray[5]);
     }
     throw new Error('Invalid URL for subtopic');

@@ -34,7 +34,7 @@ import {
 } from 'domain/question/editable-question-backend-api.service';
 import {QuestionSummary} from 'domain/question/question-summary-object.model';
 import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
@@ -43,7 +43,7 @@ import {State} from 'domain/state/StateObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {QuestionValidationService} from 'services/question-validation.service';
@@ -87,10 +87,9 @@ describe('Questions List Component', () => {
   let questionObjectFactory: QuestionObjectFactory;
   let editableQuestionBackendApiService: EditableQuestionBackendApiService;
   let questionUndoRedoService: QuestionUndoRedoService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let questionValidationService: QuestionValidationService;
   let skillObjectFactory: SkillObjectFactory;
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let question = null;
   let questionStateData = null;
   let skill = null;
@@ -116,7 +115,7 @@ describe('Questions List Component', () => {
           provide: UrlInterpolationService,
           useClass: MockUrlInterpolationService,
         },
-        ContextService,
+        PageContextService,
         QuestionValidationService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -129,7 +128,6 @@ describe('Questions List Component', () => {
 
     ngbModal = TestBed.inject(NgbModal);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
 
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     questionsListService = TestBed.inject(QuestionsListService);
@@ -142,7 +140,7 @@ describe('Questions List Component', () => {
     );
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
     loggerService = TestBed.inject(LoggerService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     questionValidationService = TestBed.inject(QuestionValidationService);
 
     question = questionObjectFactory.createFromBackendDict({
@@ -216,9 +214,6 @@ describe('Questions List Component', () => {
           id: 'TextInput',
         },
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {},
-        },
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,
@@ -347,6 +342,55 @@ describe('Questions List Component', () => {
     })
   );
 
+  it(
+    'should fetch difficulty count for selected skill on' + ' initialization',
+    fakeAsync(() => {
+      component.selectedSkillId = 'true';
+
+      const skillWithExplanations = skillObjectFactory.createFromBackendDict({
+        id: 'skillId1',
+        description: 'test description 1',
+        misconceptions: [],
+        rubrics: [
+          {
+            difficulty: 'Easy',
+            explanations: ['explanation1'],
+          },
+          {
+            difficulty: 'Medium',
+            explanations: [],
+          },
+        ],
+        skill_contents: {
+          explanation: {html: 'test explanation', content_id: 'explanation'},
+          worked_examples: [],
+          recorded_voiceovers: {voiceovers_mapping: {}},
+        },
+        language_code: 'en',
+        version: 3,
+        prerequisite_skill_ids: [],
+        all_questions_merged: null,
+        next_misconception_id: null,
+        superseding_skill_id: null,
+      });
+
+      spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
+        Promise.resolve({
+          skill: skillWithExplanations,
+          assignedSkillTopicData: {},
+          groupedSkillSummaries: {},
+        })
+      );
+
+      expect(component.difficultyCount).toEqual(undefined);
+
+      component.ngOnInit();
+      tick();
+
+      expect(component.difficultyCount).toEqual(1);
+    })
+  );
+
   it('should start creating question on navigating to question editor', () => {
     spyOn(
       skillEditorRoutingService,
@@ -431,7 +475,7 @@ describe('Questions List Component', () => {
 
     expect(component.misconceptionsBySkill).toEqual({
       skillId1: [
-        misconceptionObjectFactory.createFromBackendDict({
+        Misconception.createFromBackendDict({
           id: 2,
           name: 'test name',
           notes: 'test notes',
@@ -756,12 +800,12 @@ describe('Questions List Component', () => {
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.resolve('confirm'),
       } as NgbModalRef);
-      spyOn(contextService, 'resetImageSaveDestination').and.stub();
+      spyOn(pageContextService, 'resetImageSaveDestination').and.stub();
 
       component.cancel();
       tick();
 
-      expect(contextService.resetImageSaveDestination).toHaveBeenCalled();
+      expect(pageContextService.resetImageSaveDestination).toHaveBeenCalled();
     })
   );
 
@@ -938,12 +982,12 @@ describe('Questions List Component', () => {
       ' opened while a question is already being created',
     () => {
       component.newQuestionIsBeingCreated = true;
-      spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+      spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
 
       component.openQuestionEditor();
 
       expect(
-        contextService.setImageSaveDestinationToLocalStorage
+        pageContextService.setImageSaveDestinationToLocalStorage
       ).toHaveBeenCalled();
     }
   );

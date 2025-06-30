@@ -63,7 +63,6 @@ import {ExplorationEditorTabComponent} from './editor-tab/exploration-editor-tab
 import {ExplorationSaveAndPublishButtonsComponent} from './exploration-save-and-publish-buttons/exploration-save-and-publish-buttons.component';
 import {ExplorationSavePromptModalComponent} from './modal-templates/exploration-save-prompt-modal.component';
 import {AddAudioTranslationModalComponent} from './translation-tab/modal-templates/add-audio-translation-modal.component';
-import {AudioTranslationBarComponent} from './translation-tab/audio-translation-bar/audio-translation-bar.component';
 import {VoiceoverCardComponent} from './translation-tab/voiceover-card/voiceover-card.component';
 import {StateTranslationEditorComponent} from './translation-tab/state-translation-editor/state-translation-editor.component';
 import {StateTranslationComponent} from './translation-tab/state-translation/state-translation.component';
@@ -74,11 +73,12 @@ import {ValueGeneratorEditorComponent} from './param-changes-editor/value-genera
 import {ParamChangesEditorComponent} from './param-changes-editor/param-changes-editor.component';
 import {ExplorationEditorPageComponent} from './exploration-editor-page.component';
 import {VoiceoverRemovalConfirmModalComponent} from './translation-tab/voiceover-card/modals/voiceover-removal-confirm-modal.component';
+import {AutomaticVoiceoverRegenerationConfirmModalComponent} from './translation-tab/voiceover-card/modals/automatic-voiceover-regeneration-confirm-modal.component';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {OppiaCkEditorCopyToolBarModule} from 'components/ck-editor-helpers/ck-editor-copy-toolbar/ck-editor-copy-toolbar.module';
-import {ExplorationPlayerViewerCommonModule} from 'pages/exploration-player-page/exploration-player-viewer-common.module';
+import {ExplorationPlayerViewerCommonModule} from 'pages/exploration-player-page/current-lesson-player/exploration-player-viewer-common.module';
 import {StateVersionHistoryModalComponent} from './modal-templates/state-version-history-modal.component';
 import {MetadataVersionHistoryModalComponent} from './modal-templates/metadata-version-history-modal.component';
 import {StateVersionHistoryComponent} from './editor-tab/state-version-history/state-version-history.component';
@@ -98,7 +98,7 @@ import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AutosaveInfoModalsService} from './services/autosave-info-modals.service';
 import {ChangeListService} from './services/change-list.service';
 import {ComputeGraphService} from 'services/compute-graph.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {EditorFirstTimeEventsService} from './services/editor-first-time-events.service';
 import {EditabilityService} from 'services/editability.service';
@@ -144,7 +144,6 @@ import {LoaderService} from 'services/loader.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {ParameterMetadataService} from './services/parameter-metadata.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PopulateRuleContentIdsService} from './services/populate-rule-content-ids.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ResponsesService} from './editor-tab/services/responses.service';
@@ -210,6 +209,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     VoiceoverRemovalConfirmModalComponent,
+    AutomaticVoiceoverRegenerationConfirmModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
@@ -246,7 +246,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     StateStatsModalComponent,
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent,
     VoiceoverCardComponent,
     StateTranslationEditorComponent,
     StateVersionHistoryModalComponent,
@@ -265,6 +264,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     DeleteStateSkillModalComponent,
     StateParamChangesEditorComponent,
     VoiceoverRemovalConfirmModalComponent,
+    AutomaticVoiceoverRegenerationConfirmModalComponent,
     WelcomeModalComponent,
     StateDiffModalComponent,
     CreateFeedbackThreadModalComponent,
@@ -301,7 +301,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     StateStatsModalComponent,
     StatisticsTabComponent,
     AddAudioTranslationModalComponent,
-    AudioTranslationBarComponent,
     VoiceoverCardComponent,
     StateTranslationEditorComponent,
     StateVersionHistoryModalComponent,
@@ -323,7 +322,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     AutosaveInfoModalsService,
     ChangeListService,
     ComputeGraphService,
-    ContextService,
+    PageContextService,
     CurrentInteractionService,
     EditorFirstTimeEventsService,
     EditabilityService,
@@ -371,7 +370,6 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     LoggerService,
     ParameterMetadataService,
     PlatformFeatureService,
-    PlayerPositionService,
     PopulateRuleContentIdsService,
     ReadOnlyExplorationBackendApiService,
     ResponsesService,

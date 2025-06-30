@@ -292,7 +292,7 @@ EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION = 41
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 56
+CURRENT_STATE_SCHEMA_VERSION = 57
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -320,6 +320,9 @@ CURRENT_STORY_REFERENCE_SCHEMA_VERSION = 1
 
 # The current version of page_contents dict in the subtopic page schema.
 CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 4
+
+# The current version of sections dict in the study guide schema.
+CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION = 1
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -515,14 +518,18 @@ OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 
 # This flag is used for distinguishing the prod/test environments for feature
 # gating.
-ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(OPPIA_PROJECT_ID == 'oppiaserver')
+ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(
+    os.environ.get('GOOGLE_CLOUD_PROJECT', 'dev-project-id') == 'oppiaserver')
 
-# NOTE TO RELEASE COORDINATORS: Replace these GCS bucket paths with real prod
-# buckets. It's OK for them to be the same.
+# TODO(release-scripts#137): Update once release scripts are updated to remove
+# config updates to these fields.
 DATAFLOW_TEMP_LOCATION = 'gs://todo/todo'
 DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 
-OPPIA_VERSION = '3.4.5'
+DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
+DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
+
+OPPIA_VERSION = '3.4.6'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -997,6 +1004,7 @@ UPDATE_QUESTION_SUGGESTION_URL_PREFIX = (
 USER_GROUPS_HANDLER_URL = '/user_groups_handler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
+STUDY_GUIDE_EDITOR_DATA_URL_PREFIX = '/study_guide_editor_handler/data'
 TOPIC_VIEWER_URL_PREFIX = (
     '/learn/<classroom_url_fragment>/<topic_url_fragment>')
 TOPIC_DATA_HANDLER = '/topic_data_handler'
@@ -1042,6 +1050,8 @@ VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
     '/voiceover_language_codes_mapping')
 VOICE_ARTIST_METADATA_HANDLER = '/voice_artist_metadata_handler'
 GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST = '/get_sample_voiceovers'
+REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
+    '/regenerate_automatic_voiceover/<exploration_id>')
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1072,6 +1082,7 @@ COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 COMMIT_MESSAGE_SKILL_DELETED = 'Skill deleted.'
 COMMIT_MESSAGE_STORY_DELETED = 'Story deleted.'
 COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED = 'Subtopic page deleted.'
+COMMIT_MESSAGE_STUDY_GUIDE_DELETED = 'Study Guide deleted.'
 COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Max number of playthroughs for an issue.

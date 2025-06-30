@@ -20,10 +20,10 @@ import {TestBed} from '@angular/core/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 
-import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
-import {ComputeGraphService} from 'services/compute-graph.service';
-import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
-import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
+import {CheckpointCelebrationUtilityService} from './checkpoint-celebration-utility.service';
+import {ComputeGraphService} from '../../../services/compute-graph.service';
+import {StateObjectsBackendDict} from '../../../domain/exploration/StatesObjectFactory';
+import {StatesObjectFactory} from '../../../domain/exploration/StatesObjectFactory';
 
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
@@ -70,12 +70,6 @@ describe('Checkpoint celebration utility service', () => {
           content_id: 'content',
           html: '',
         },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
-        },
         interaction: {
           answer_groups: [],
           confirmed_unclassified_answers: [],
@@ -110,12 +104,6 @@ describe('Checkpoint celebration utility service', () => {
         content: {
           content_id: 'content',
           html: '',
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-          },
         },
         interaction: {
           answer_groups: [],

@@ -28,8 +28,6 @@ from core.jobs.types import model_property
 from core.platform import models
 from core.tests import test_utils as core_test_utils
 
-from typing import Union
-
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
@@ -52,17 +50,17 @@ class BarModel(base_models.BaseModel):
     value = datastore_services.StringProperty()
 
 
-class FooError(base_validation_errors.BaseAuditError):
+class FooError(base_validation_errors.BaseValidationError):
     """A simple test-only error."""
 
-    def __init__(self, model: Union[base_models.BaseModel, str]) -> None:
+    def __init__(self, model: base_models.BaseModel) -> None:
         super().__init__('foo', model)
 
 
-class BarError(base_validation_errors.BaseAuditError):
+class BarError(base_validation_errors.BaseValidationError):
     """A simple test-only error."""
 
-    def __init__(self, model: Union[base_models.BaseModel, str]) -> None:
+    def __init__(self, model: base_models.BaseModel) -> None:
         super().__init__('bar', model)
 
 
@@ -74,21 +72,7 @@ class AuditErrorsTestBase(core_test_utils.TestBase):
     YEAR_LATER: datetime.datetime = NOW + datetime.timedelta(weeks=52)
 
 
-class ErrorMessageTests(core_test_utils.TestBase):
-
-    def test_error_message_with_wrong_input(self) -> None:
-        error = base_validation_errors.BaseAuditError(
-            'testing string',
-            'non-existing model',
-            None
-        )
-        self.assertEqual(
-            error.stderr,
-            'BaseAuditError in non-existing model: testing string'
-        )
-
-
-class BaseAuditErrorTests(AuditErrorsTestBase):
+class BaseValidationErrorTests(AuditErrorsTestBase):
 
     def setUp(self) -> None:
         super().setUp()
@@ -109,15 +93,25 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
 
         self.assertEqual(error.stderr, 'FooError in BaseModel(id="123"): foo')
 
+    def test_missing_model_id(self) -> None:
+        def mock_get_model_id(unused_model: base_models.BaseModel) -> None:
+            return None
+
+        get_model_id_swap = self.swap(
+            job_utils, 'get_model_id', mock_get_model_id)
+
+        with get_model_id_swap, self.assertRaisesRegex(
+            AssertionError, 'Model ID should not be none'
+        ):
+            FooError(self.model)
+
     def test_message_raises_type_error_if_assigned_a_non_string_value(
         self
     ) -> None:
-        class ErrorWithIntMessage(base_validation_errors.BaseAuditError):
+        class ErrorWithIntMessage(base_validation_errors.BaseValidationError):
             """Subclass that tries to assign an int value to self.stderr."""
 
-            def __init__(
-                self, model: Union[base_models.BaseModel, str]
-            ) -> None:
+            def __init__(self, model: base_models.BaseModel) -> None:
                 # TODO(#13059): Here we use MyPy ignore because after we
                 # fully type the codebase we plan to get rid of the tests
                 # that intentionally test wrong inputs that we can normally
@@ -130,12 +124,10 @@ class BaseAuditErrorTests(AuditErrorsTestBase):
     def test_message_raises_value_error_if_assigned_an_empty_value(
         self
     ) -> None:
-        class ErrorWithEmptyMessage(base_validation_errors.BaseAuditError):
+        class ErrorWithEmptyMessage(base_validation_errors.BaseValidationError):
             """Subclass that tries to assign an empty value to self.stderr."""
 
-            def __init__(
-                self, model: Union[base_models.BaseModel, str]
-            ) -> None:
+            def __init__(self, model: base_models.BaseModel) -> None:
                 super().__init__('', model)
 
         with self.assertRaisesRegex(ValueError, 'must be a non-empty string'):
@@ -357,7 +349,7 @@ class ModelRelationshipErrorTests(AuditErrorsTestBase):
     def test_message(self) -> None:
         error = base_validation_errors.ModelRelationshipError(
             model_property.ModelProperty(FooModel, FooModel.bar_id),
-            '123',
+            FooModel(id='123'),
             'BarModel',
             '123'
         )

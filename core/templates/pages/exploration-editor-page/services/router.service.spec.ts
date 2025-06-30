@@ -28,7 +28,7 @@ import {
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import $ from 'jquery';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
 import {ExplorationStatesService} from './exploration-states.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -36,7 +36,7 @@ import {ExplorationInitStateNameService} from './exploration-init-state-name.ser
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
-class MockContextService {
+class MockPageContextService {
   getExplorationId() {
     return 'expID';
   }
@@ -78,8 +78,8 @@ describe('Router Service', () => {
         StateEditorService,
         TranslationLanguageService,
         {
-          provide: ContextService,
-          useClass: MockContextService,
+          provide: PageContextService,
+          useClass: MockPageContextService,
         },
         {
           provide: ExplorationInitStateNameService,
@@ -331,6 +331,7 @@ describe('Router Service', () => {
       location: {
         hash: '#/gui/Introduction',
       },
+      scrollTo: () => {},
     });
 
     routerService.savePendingChanges();
@@ -339,6 +340,52 @@ describe('Router Service', () => {
     );
 
     routerService.navigateToMainTab('/Introduction');
+    flush();
+    discardPeriodicTasks();
+  }));
+
+  it('should fadeOut, navigate, and fadeIn when navigating to main tab', fakeAsync(() => {
+    const service = routerService as unknown as {
+      _savePendingChanges: () => void;
+      _getCurrentStateFromLocationPath: () => string;
+      _actuallyNavigate: (slug: string, state: string | null) => void;
+      _activeTabName: string;
+      TABS: {MAIN: {name: string}};
+      SLUG_GUI: string;
+      navigateToMainTab: (state: string | null) => void;
+    };
+
+    spyOn(service, '_savePendingChanges');
+    spyOn(service, '_getCurrentStateFromLocationPath').and.returnValue(
+      '/oldState'
+    );
+    const navigateSpy = spyOn(service, '_actuallyNavigate');
+
+    service._activeTabName = service.TABS.MAIN.name;
+
+    // Create a fake container.
+    const container = document.createElement('div');
+    container.className = 'oppia-editor-cards-container';
+    container.style.opacity = '1';
+    document.body.appendChild(container);
+
+    spyOn(window, 'requestAnimationFrame').and.callFake(
+      (cb: FrameRequestCallback) => {
+        setTimeout(() => cb(performance.now()), 0);
+        return 0;
+      }
+    );
+
+    service.navigateToMainTab('newState');
+
+    tick(200);
+    tick(150);
+    tick(200);
+
+    expect(navigateSpy).toHaveBeenCalledWith(service.SLUG_GUI, 'newState');
+    expect(container.style.opacity).toBe('1');
+
+    document.body.removeChild(container);
     flush();
     discardPeriodicTasks();
   }));

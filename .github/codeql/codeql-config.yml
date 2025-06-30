@@ -17,6 +17,5 @@ paths-ignore:
   - core/templates/pages/exploration-editor-page/changes-in-human-readable-form/changes-in-human-readable-form.component.spec.ts
   - core/templates/components/ck-editor-helpers/ck-editor-copy-content.service.ts
   - core/templates/filters/format-rte-preview.pipe.ts
-  - core/templates/domain/objects/NumberWithUnitsObjectFactory.ts
   - extensions/rich_text_components/rte-output-display.component.spec.ts
   - core/tests/webdriverio_utils/forms.js

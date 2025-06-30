@@ -42,7 +42,7 @@ export class SubtopicViewerNavbarPreLogoActionComponent implements OnInit {
   ngOnInit(): void {
     this.topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.topicUrl = this.urlInterpolationService.interpolateUrl(
-      ClassroomDomainConstants.TOPIC_VIEWER_REVISION_URL_TEMPLATE,
+      ClassroomDomainConstants.TOPIC_VIEWER_STUDYGUIDE_URL_TEMPLATE,
       {
         topic_url_fragment: this.topicUrlFragment,
         classroom_url_fragment:

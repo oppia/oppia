@@ -16,7 +16,7 @@
  * @fileoverview Data and component for the Oppia contributors' library page.
  */
 
-import {Component} from '@angular/core';
+import {Component, Renderer2, ElementRef} from '@angular/core';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -117,7 +117,9 @@ export class LibraryPageComponent {
     private classroomBackendApiService: ClassroomBackendApiService,
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private siteAnalyticsService: SiteAnalyticsService,
+    private renderer: Renderer2,
+    private el: ElementRef
   ) {}
 
   setActiveGroup(groupIndex: number): void {
@@ -152,10 +154,15 @@ export class LibraryPageComponent {
       this.MAX_NUM_TILES_PER_ROW
     );
 
-    $('.oppia-library-carousel').css({
-      'max-width':
-        this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX + 'px',
-    });
+    let maxWidth =
+      this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX + 'px';
+    let carouselElem = this.el.nativeElement.querySelector(
+      '.oppia-library-carousel'
+    );
+
+    if (carouselElem) {
+      this.renderer.setStyle(carouselElem, 'max-width', maxWidth);
+    }
 
     // The following determines whether to enable left scroll after
     // resize.
@@ -177,18 +184,15 @@ export class LibraryPageComponent {
     if (this.isAnyCarouselCurrentlyScrolling) {
       return;
     }
-    let carouselJQuerySelector = '.oppia-library-carousel-tiles:eq(n)'.replace(
-      'n',
-      ind.toString()
+
+    const carouselElements = document.querySelectorAll(
+      '.oppia-library-carousel-tiles'
     );
 
-    let direction = isLeftScroll ? -1 : 1;
-    // The number 0 here is just to make sure that the type of width is
-    // number, it is never assigned as the selector will never be undefined.
-    let carouselScrollPositionPx = $(carouselJQuerySelector).scrollLeft() || 0;
+    const carouselElement = carouselElements[ind] as HTMLElement;
 
-    // Prevent scrolling if there more carousel pixed widths than
-    // there are tile widths.
+    let direction = isLeftScroll ? -1 : 1;
+
     if (
       this.libraryGroups[ind].activity_summary_dicts.length <=
       this.tileDisplayCount
@@ -196,7 +200,8 @@ export class LibraryPageComponent {
       return;
     }
 
-    carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
+    let currentScrollPosition = carouselElement?.scrollLeft || 0;
+    currentScrollPosition = Math.max(0, currentScrollPosition);
 
     if (isLeftScroll) {
       this.leftmostCardIndices[ind] = Math.max(
@@ -213,24 +218,35 @@ export class LibraryPageComponent {
     }
 
     let newScrollPositionPx =
-      carouselScrollPositionPx +
+      currentScrollPosition +
       this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction;
 
-    $(carouselJQuerySelector).animate(
-      {
-        scrollLeft: newScrollPositionPx,
-      },
-      {
-        duration: 800,
-        queue: false,
-        start: () => {
-          this.isAnyCarouselCurrentlyScrolling = true;
-        },
-        complete: () => {
+    if (carouselElement) {
+      const scrollDistance = newScrollPositionPx - currentScrollPosition;
+      const duration = 800;
+
+      let startTime: number;
+
+      const scrollStep = (timestamp: number) => {
+        if (!startTime) {
+          startTime = timestamp;
+        }
+        const timeElapsed = timestamp - startTime;
+        const progress = Math.min(timeElapsed / duration, 1);
+
+        carouselElement.scrollLeft =
+          currentScrollPosition + scrollDistance * progress;
+
+        if (timeElapsed < duration) {
+          requestAnimationFrame(scrollStep);
+        } else {
           this.isAnyCarouselCurrentlyScrolling = false;
-        },
-      }
-    );
+        }
+      };
+
+      this.isAnyCarouselCurrentlyScrolling = true;
+      requestAnimationFrame(scrollStep);
+    }
   }
 
   // The carousels do not work when the width is 1 card long, so we need

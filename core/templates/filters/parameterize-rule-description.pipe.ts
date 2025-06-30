@@ -20,7 +20,7 @@ import {Pipe, PipeTransform} from '@angular/core';
 import {Fraction} from 'domain/objects/fraction.model';
 import {Ratio} from 'domain/objects/ratio.model';
 import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
-import {NumberWithUnitsObjectFactory} from 'domain/objects/NumberWithUnitsObjectFactory';
+import {NumberWithUnits} from 'domain/objects/number-with-units.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {
   FractionAnswer,
@@ -41,10 +41,7 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
   name: 'parameterizeRuleDescriptionPipe',
 })
 export class ParameterizeRuleDescriptionPipe implements PipeTransform {
-  constructor(
-    private formatRtePreviewPipe: FormatRtePreviewPipe,
-    private numberWithUnitsObjectFactory: NumberWithUnitsObjectFactory
-  ) {}
+  constructor(private formatRtePreviewPipe: FormatRtePreviewPipe) {}
 
   transform(
     rule: Rule | null,
@@ -191,9 +188,9 @@ export class ParameterizeRuleDescriptionPipe implements PipeTransform {
           inputs[varName] as FractionAnswer
         ).toString();
       } else if (varType === 'NumberWithUnits') {
-        replacementText = this.numberWithUnitsObjectFactory
-          .fromDict(inputs[varName] as NumberWithUnitsAnswer)
-          .toString();
+        replacementText = NumberWithUnits.fromDict(
+          inputs[varName] as NumberWithUnitsAnswer
+        ).toString();
       } else if (varType === 'TranslatableSetOfNormalizedString') {
         replacementText = '[';
         for (

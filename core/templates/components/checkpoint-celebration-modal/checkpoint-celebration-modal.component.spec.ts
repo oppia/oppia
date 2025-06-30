@@ -30,7 +30,7 @@ import {MockTranslateService} from 'components/forms/schema-based-editors/integr
 import {CheckpointCelebrationModalComponent} from './checkpoint-celebration-modal.component';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
@@ -38,9 +38,8 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {StateCard} from 'domain/state_card/state-card.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
-import {AudioTranslationLanguageService} from 'pages/exploration-player-page/services/audio-translation-language.service';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 
 class MockCheckpointCelebrationUtilityService {
   isOnCheckpointedState = false;
@@ -88,12 +87,6 @@ const dummyExplorationBackendDict = {
         content_id: 'content',
         html: '',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
@@ -128,12 +121,6 @@ const dummyExplorationBackendDict = {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -202,14 +189,13 @@ describe('Checkpoint celebration modal component', function () {
   let fixture: ComponentFixture<CheckpointCelebrationModalComponent>;
   let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let playerPositionService: PlayerPositionService;
   let windowDimensionsService: WindowDimensionsService;
   let urlInterpolationService: UrlInterpolationService;
   let interactionObjectFactory: InteractionObjectFactory;
-  let audioTranslationLanguageService: AudioTranslationLanguageService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let explorationModeService: ExplorationModeService;
   let dummyStateCard: StateCard;
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -220,13 +206,12 @@ describe('Checkpoint celebration modal component', function () {
       declarations: [CheckpointCelebrationModalComponent],
       providers: [
         ReadOnlyExplorationBackendApiService,
-        ContextService,
+        PageContextService,
         I18nLanguageCodeService,
         PlayerPositionService,
         UrlInterpolationService,
         InteractionObjectFactory,
-        AudioTranslationLanguageService,
-        ExplorationPlayerStateService,
+        ExplorationModeService,
         {
           provide: WindowDimensionsService,
           useValue: {
@@ -253,18 +238,13 @@ describe('Checkpoint celebration modal component', function () {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
     );
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     playerPositionService = TestBed.inject(PlayerPositionService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    audioTranslationLanguageService = TestBed.inject(
-      AudioTranslationLanguageService
-    );
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
-    );
+    explorationModeService = TestBed.inject(ExplorationModeService);
     fixture = TestBed.createComponent(CheckpointCelebrationModalComponent);
     component = fixture.componentInstance;
 
@@ -328,13 +308,12 @@ describe('Checkpoint celebration modal component', function () {
         },
       }),
       RecordedVoiceovers.createEmpty(),
-      'content',
-      audioTranslationLanguageService
+      'content'
     );
   });
 
   it('should initialize the component', fakeAsync(() => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');
     spyOn(
       urlInterpolationService,
       'getStaticCopyrightedImageUrl'
@@ -464,10 +443,7 @@ describe('Checkpoint celebration modal component', function () {
     spyOn(checkpointCelebrationUtilityService, 'setIsOnCheckpointedState');
     spyOn(component, 'triggerStandardMessage');
     spyOn(component, 'triggerMiniMessage');
-    spyOn(
-      explorationPlayerStateService,
-      'isInStoryChapterMode'
-    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
     component.currentStateName = 'Introduction';
     component.mostRecentlyReachedCheckpointStateName =
       'MostRecentlyReachedCheckpointStateName';
@@ -546,10 +522,9 @@ describe('Checkpoint celebration modal component', function () {
     component.currentStateName = 'Introduction';
     component.mostRecentlyReachedCheckpointStateName =
       'MostRecentlyReachedCheckpointStateName';
-    spyOn(
-      explorationPlayerStateService,
-      'isInStoryChapterMode'
-    ).and.returnValue(false);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+      false
+    );
     spyOn(checkpointCelebrationUtilityService, 'getCheckpointMessage');
 
     component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');

@@ -70,7 +70,7 @@ oppia-story-viewer-page-root .story-mascot {
 
 /* To avoid double shadows caused by overlaying preview card
 over the blank preview card */
-oppia-story-viewer-page-root .exploration-summary-tile md-card {
+oppia-story-viewer-page-root .exploration-summary-tile mat-card {
   box-shadow: none;
 }
 
