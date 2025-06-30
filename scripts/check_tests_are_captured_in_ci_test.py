@@ -34,6 +34,10 @@ ACCEPTANCE_TEST_SUITES: List[check_tests_are_captured_in_ci.TestSuiteDict] = [ #
     {
         'name': 'test2/acceptance_suite2',
         'module': 'acceptance/specs/test2/acceptance_suite2.spec.ts'
+    },
+    {
+        'name': 'test3/acceptance_suite3',
+        'module': 'acceptance/specs-old/test3/acceptance_suite3.spec.ts'
     }
 ]
 
@@ -82,7 +86,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         self.dummy_acceptance_specs_directory = os.path.join(
             self.dummy_acceptance_directory, 'specs')
         self.dummy_acceptance_old_directory = os.path.join(
-            self.dummy_acceptance_directory, 'old_specs')
+            self.dummy_acceptance_directory, 'specs-old')
         os.mkdir(self.dummy_acceptance_specs_directory)
         os.mkdir(self.dummy_acceptance_old_directory)
         for suite in ACCEPTANCE_TEST_SUITES:
@@ -300,7 +304,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                         .get_acceptance_test_suites_from_acceptance_directory())
                 self.assertEqual(
                     acceptance_test_suites,
-                    ACCEPTANCE_TEST_SUITES[:1]
+                    ACCEPTANCE_TEST_SUITES[:1] + ACCEPTANCE_TEST_SUITES[2:]
                 )
 
     def test_check_tests_are_captured_in_ci_with_acceptance_error(self) -> None:
@@ -329,7 +333,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                         'Please update the CI config file for acceptance tests '
                         'at core/tests/ci-test-suite-configs/acceptance.json '
                         'with the suites listed above.' % (
-                            json.dumps(ACCEPTANCE_TEST_SUITES[1:2]))
+                            json.dumps(ACCEPTANCE_TEST_SUITES[1:3]))
                     )
                 ):
                     check_tests_are_captured_in_ci.main()
