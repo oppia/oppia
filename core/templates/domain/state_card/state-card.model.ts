@@ -23,7 +23,7 @@ import {AppConstants} from 'app.constants';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 
 import {
   InteractionSpecsConstants,

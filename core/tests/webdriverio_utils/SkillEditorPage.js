@@ -25,8 +25,6 @@ var SkillEditorPage = function () {
   var EDITOR_URL_PREFIX = '/skill_editor/';
   var addMisconceptionButton = $('.e2e-test-add-misconception-modal-button');
   var addMisconceptionModal = $('.e2e-test-add-misconception-modal');
-  var addWorkedExampleButton = $('.e2e-test-add-worked-example');
-  var addWorkedExampleModal = $('.e2e-test-add-worked-example-modal');
   var closeSaveModalButton = $('.e2e-test-close-save-modal-button');
   var commitMessageField = $('.e2e-test-commit-message-input');
   var conceptCardExplanationEditorInput = $(
@@ -37,9 +35,6 @@ var SkillEditorPage = function () {
   var confirmAddMisconception = $('.e2e-test-confirm-add-misconception-button');
   var confirmDeleteMisconception = $(
     '.e2e-test-confirm-delete-misconception-button'
-  );
-  var confirmDeleteWorkedExample = $(
-    '.e2e-test-confirm-delete-worked-example-button'
   );
   var confirmSkillDifficultyButton = $(
     '.e2e-test-confirm-skill-difficulty-button'
@@ -54,11 +49,7 @@ var SkillEditorPage = function () {
   var deleteRubricExplanationButton = $(
     '.e2e-test-delete-rubric-explanation-button'
   );
-  var deleteWorkedExampleButton = function (index) {
-    return $(`.e2e-test-worked-example-${index}`).$(deleteExampleButtonLocator);
-  };
 
-  var deleteWorkedExampleModal = $('.e2e-test-delete-worked-example-modal');
   var easyRubricDifficulty = $('.e2e-test-skill-difficulty-easy');
   var editConceptCardExplanationButton = $('.e2e-test-edit-concept-card');
   var misconceptionFeedbackField = $(
@@ -86,25 +77,11 @@ var SkillEditorPage = function () {
   var saveRubricExplanationButton = $(
     '.e2e-test-save-rubric-explanation-button'
   );
-  var saveWorkedExampleButton = $('.e2e-test-save-worked-example-button');
   var selectRubricDifficulty = $('.e2e-test-select-rubric-difficulty');
   var skillChangeCount = $('.e2e-test-changes-count-text');
   var skillDescriptionField = $('.e2e-test-skill-description-field');
   var staleTabInfoModal = $('.e2e-test-stale-tab-info-modal');
   var unsavedChangesStatusInfoModal = $('.e2e-test-unsaved-changes-info-modal');
-  var workedExampleExplanationField = $(
-    '.e2e-test-worked-example-explanation-field'
-  );
-  var workedExampleExplanationInput = $(
-    '.e2e-test-worked-example-explanation .e2e-test-rte'
-  );
-  var workedExampleQuestionField = $('.e2e-test-worked-example-question-field');
-  var workedExampleQuestionInput = $(
-    '.e2e-test-worked-example-question .e2e-test-rte'
-  );
-  var workedExampleSummary = function (index) {
-    return $(`.e2e-test-worked-example-${index}`);
-  };
 
   this.get = async function (skillId) {
     await browser.url(EDITOR_URL_PREFIX + skillId);
@@ -339,84 +316,6 @@ var SkillEditorPage = function () {
       conceptCardExplanationText
     );
     expect(text).toMatch(explanation);
-  };
-
-  this.addWorkedExample = async function (question, explanation) {
-    await action.click('Add worked example', addWorkedExampleButton);
-
-    await waitFor.visibilityOf(
-      addWorkedExampleModal,
-      'Add Worked Example Modal takes too long to appear'
-    );
-
-    await action.setValue(
-      'Worked example question',
-      workedExampleQuestionInput,
-      question,
-      true
-    );
-
-    await action.setValue(
-      'Worked example question',
-      workedExampleExplanationInput,
-      explanation,
-      true
-    );
-
-    await action.click('Save worked example', saveWorkedExampleButton);
-    await waitFor.invisibilityOf(
-      addWorkedExampleModal,
-      'Add Worked Example Modal takes too long to close'
-    );
-  };
-
-  this.deleteWorkedExampleWithIndex = async function (index) {
-    await action.click(
-      'Delete Worked Example button',
-      deleteWorkedExampleButton(index)
-    );
-
-    await waitFor.visibilityOf(
-      deleteWorkedExampleModal,
-      'Delete Worked Example Modal takes too long to appear'
-    );
-
-    await action.click(
-      'Confirm delete worked example',
-      confirmDeleteWorkedExample
-    );
-
-    await waitFor.invisibilityOf(
-      deleteWorkedExampleModal,
-      'Delete Worked Example Modal takes too long to close'
-    );
-  };
-
-  this.expectWorkedExampleSummariesToMatch = async function (
-    questions,
-    explanations
-  ) {
-    // This is declared separately since the expect() statements are in an async
-    // callback and so 'index' gets incremented before the check is done. So, we
-    // need another variable to track the correct index to check.
-    var questionIndexToCheck = 0;
-    var explanationIndexToCheck = 0;
-    for (var index in questions) {
-      await action.click('Worked Example Summary', workedExampleSummary(index));
-      var text = await action.getText(
-        'Worked example question field',
-        workedExampleQuestionField
-      );
-      expect(text).toMatch(questions[questionIndexToCheck]);
-      questionIndexToCheck++;
-      var text = await action.getText(
-        'Worked example explanation field',
-        workedExampleExplanationField
-      );
-      expect(text).toMatch(explanations[explanationIndexToCheck]);
-      explanationIndexToCheck++;
-      await action.click('Worked Example Summary', workedExampleSummary(index));
-    }
   };
 
   this.addMisconception = async function (name, notes, feedback) {
