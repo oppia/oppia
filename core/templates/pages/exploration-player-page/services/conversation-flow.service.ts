@@ -32,6 +32,11 @@ import {PlayerPositionService} from './player-position.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {PageContextService} from 'services/page-context.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {ConceptCardBackendApiService} from 'domain/skill/concept-card-backend-api.service';
+import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
+import {RefresherExplorationConfirmationModalService} from './refresher-exploration-confirmation-modal.service';
+import {ExplorationEngineService} from './exploration-engine.service';
 
 @Injectable({
   providedIn: 'root',
@@ -41,6 +46,12 @@ export class ConversationFlowService {
   solutionForState: Solution | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
   nextStateCard: StateCard | null = null;
+
+  // TODO(#22780): Remove these variable and related code.
+  redirectToRefresherExplorationConfirmed!: boolean;
+  isRefresherExploration!: boolean;
+  parentExplorationIds: string[] = [];
+
   private _playerStateChangeEventEmitter: EventEmitter<string> =
     new EventEmitter<string>();
 
@@ -55,10 +66,15 @@ export class ConversationFlowService {
     private contentTranslationManagerService: ContentTranslationManagerService,
     private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
+    private stateEditorService: StateEditorService,
+    private refresherExplorationConfirmationModalService: RefresherExplorationConfirmationModalService,
     private pageContextService: PageContextService,
+    private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
+    private conceptCardBackendApiService: ConceptCardBackendApiService,
     private conceptCardManagerService: ConceptCardManagerService,
     private currentEngineService: CurrentEngineService,
     private statsReportingService: StatsReportingService,
+    private explorationEngineService: ExplorationEngineService,
     private translateService: TranslateService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService
   ) {}
@@ -77,6 +93,84 @@ export class ConversationFlowService {
 
   isSupplementalCardNonempty(card: StateCard): boolean {
     return !card.isInteractionInline();
+  }
+
+  /**
+   * Handles the display of feedback to the learner while staying on the current card.
+   * This method is called when an answer is submitted and the system decides to give feedback
+   * instead of moving to the next state (e.g., due to an incorrect answer or missing prerequisite).
+   *
+   * It:
+   * - Records the incorrect answer
+   * - Displays feedback and help cards if applicable
+   * - Loads concept cards if a prerequisite skill is missing
+   * - Optionally refreshes the interaction UI
+   * - Optionally prompts for redirection to a refresher exploration
+   *
+   * @param {string | null} feedbackHtml - HTML string containing feedback to show to the learner.
+   *     If null, no feedback is shown.
+   * @param {string | null} missingPrerequisiteSkillId - The ID of a prerequisite skill the learner
+   *     needs to revisit. If provided, triggers concept card loading.
+   * @param {boolean} refreshInteraction - Whether the interaction should be visually refreshed
+   *     (e.g., to give a new randomized version of the same interaction).
+   * @param {string | null} refresherExplorationId - If provided, prompts the learner to redirect to
+   *     a refresher exploration. Otherwise, no redirection is offered.
+   */
+  giveFeedbackAndStayOnCurrentCard(
+    feedbackHtml: string,
+    missingPrerequisiteSkillId: string | null,
+    refreshInteraction: boolean,
+    refresherExplorationId: string | null
+  ): void {
+    let displayedCard = this._getCurrentCard();
+    this.recordIncorrectAnswer();
+    this.playerTranscriptService.addNewResponse(feedbackHtml);
+    let helpCardAvailable =
+      feedbackHtml && !displayedCard.isInteractionInline();
+
+    if (helpCardAvailable) {
+      this.emitHelpCard(feedbackHtml, false);
+    }
+    if (missingPrerequisiteSkillId) {
+      displayedCard.markAsCompleted();
+      this.conceptCardBackendApiService
+        .loadConceptCardsAsync([missingPrerequisiteSkillId])
+        .then(conceptCardObject => {
+          this.conceptCardManagerService.setConceptCard(conceptCardObject[0]);
+          if (helpCardAvailable) {
+            this.emitHelpCard(feedbackHtml, true);
+          }
+        });
+    }
+    if (refreshInteraction) {
+      // Replace the previous interaction with another of the
+      // same type.
+      this.playerTranscriptService.updateLatestInteractionHtml(
+        displayedCard.getInteractionHtml() +
+          this.explorationEngineService.getRandomSuffix()
+      );
+    }
+
+    this.redirectToRefresherExplorationConfirmed = false;
+
+    if (refresherExplorationId) {
+      // TODO(bhenning): Add tests to verify the event is
+      // properly recorded.
+      const confirmRedirection = () => {
+        this.redirectToRefresherExplorationConfirmed = true;
+        this.recordLeaveForRefresherExp(refresherExplorationId);
+      };
+      this.explorationSummaryBackendApiService
+        .loadPublicExplorationSummariesAsync([refresherExplorationId])
+        .then(response => {
+          if (response.summaries.length > 0) {
+            this.refresherExplorationConfirmationModalService.displayRedirectConfirmationModal(
+              refresherExplorationId,
+              confirmRedirection
+            );
+          }
+        });
+    }
   }
 
   /**
@@ -194,6 +288,34 @@ export class ConversationFlowService {
   }
 
   /**
+   * Moves the displayed card forward by one position in the previously seen cards.
+   *
+   * This method should only be used when navigating through cards the user
+   * has already seen, not for progressing to new or unseen cards.
+   *
+   * Retrieves the current displayed card index from the player position service,
+   * increments it by one, and updates the displayed card accordingly.
+   */
+  moveForwardByOneCard(): void {
+    let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
+    this._validateIndexAndChangeCard(displayedCardIndex + 1);
+  }
+
+  /**
+   * Moves the displayed card backward by one position in the previously seen cards.
+   *
+   * This method should only be used when navigating through cards the user
+   * has already seen, not for progressing to new or unseen cards.
+   *
+   * Retrieves the current displayed card index from the player position service,
+   * decrements it by one, and updates the displayed card accordingly.
+   */
+  moveBackByOneCard(): void {
+    let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
+    this._validateIndexAndChangeCard(displayedCardIndex - 1);
+  }
+
+  /**
    * Returns the currently displayed state card based on the
    * learner's current position in the transcript.
    *
@@ -205,12 +327,29 @@ export class ConversationFlowService {
     return displayedCard;
   }
 
+  /**
+   * Records that the user has submitted an incorrect answer.
+   *
+   * This method updates multiple services to reflect the incorrect submission:
+   * - Increments the count of incorrect submissions in the transcript.
+   * - Notifies the hints and solution manager for potential hint logic.
+   * - Notifies the concept card manager, possibly for tracking misconceptions.
+   */
   recordIncorrectAnswer(): void {
     this.playerTranscriptService.incrementNumberOfIncorrectSubmissions();
     this.hintsAndSolutionManagerService.recordWrongAnswer();
     this.conceptCardManagerService.recordWrongAnswer();
   }
 
+  /**
+   * Emits a help card to be displayed to the user.
+   *
+   * This method notifies the system that a help card is available,
+   * providing its HTML content and whether it includes a "Continue" button.
+   *
+   * @param helpCardHtml - The HTML content of the help card.
+   * @param hasContinueButton - Whether the help card includes a continue button.
+   */
   emitHelpCard(helpCardHtml: string, hasContinueButton: boolean): void {
     this.playerPositionService.onHelpCardAvailable.emit({
       helpCardHtml: helpCardHtml,
@@ -218,16 +357,96 @@ export class ConversationFlowService {
     });
   }
 
-  get onPlayerStateChange(): EventEmitter<string> {
-    return this._playerStateChangeEventEmitter;
+  /**
+   * Changes the currently displayed card to the specified index.
+   *
+   * This method records the navigation action, updates the displayed card index,
+   * notifies the state editor (if in editor mode), and sets the corresponding
+   * question based on the index.
+   *
+   * @param index - The index of the card to be displayed.
+   */
+  changeCard(index: number): void {
+    this.playerPositionService.recordNavigationButtonClick();
+    this.playerPositionService.setDisplayedCardIndex(index);
+    this.stateEditorService.onUpdateActiveStateIfInEditor.emit(
+      this.playerPositionService.getCurrentStateName()
+    );
+    this.playerPositionService.changeCurrentQuestion(index);
   }
 
-  get onOppiaFeedbackAvailable(): EventEmitter<void> {
-    return this._oppiaFeedbackAvailableEventEmitter;
+  /**
+   * Validates the given index before changing to the corresponding card.
+   *
+   * Ensures that the target index is within the bounds of the player transcript.
+   * If valid, it proceeds to change the card. Otherwise, it throws an error.
+   *
+   * This method is used to safely navigate through previously seen cards only.
+   *
+   * @param index - The index of the card to validate and display.
+   * @throws Will throw an error if the index is out of bounds.
+   */
+  private _validateIndexAndChangeCard(index: number): void {
+    let transcriptLength = this.playerTranscriptService.getNumCards();
+    if (index >= 0 && index < transcriptLength) {
+      this.changeCard(index);
+    } else {
+      throw new Error('Target card index out of bounds.');
+    }
   }
 
-  get onShowProgressModal(): EventEmitter<boolean> {
-    return this._playerProgressModalShownEventEmitter;
+  /**
+   * Checks if the user has confirmed redirection to a refresher exploration.
+   *
+   * @returns {boolean} True if the user has confirmed redirection, false otherwise.
+   */
+  getRedirectToRefresherExplorationConfirmed(): boolean {
+    return this.redirectToRefresherExplorationConfirmed;
+  }
+
+  /**
+   * Sets whether the user has confirmed redirection to a refresher exploration.
+   *
+   * @param {boolean} confirmed - True if the user has confirmed redirection, false otherwise.
+   */
+  setRedirectToRefresherExplorationConfirmed(confirmed: boolean): void {
+    this.redirectToRefresherExplorationConfirmed = confirmed;
+  }
+
+  /**
+   * Checks if the current exploration is a refresher exploration.
+   *
+   * @returns {boolean} True if the current exploration is a refresher exploration, false otherwise.
+   */
+  getIsRefresherExploration(): boolean {
+    return this.isRefresherExploration;
+  }
+
+  /**
+   * Sets whether the current exploration is a refresher exploration.
+   *
+   * @param {boolean} isRefresher - True if the current exploration is a refresher exploration, false otherwise.
+   */
+  setIsRefresherExploration(isRefresher: boolean): void {
+    this.isRefresherExploration = isRefresher;
+  }
+
+  /**
+   * Sets the parent exploration IDs for the current exploration.
+   *
+   * @param {string[]} parentExplorationIds - An array of parent exploration IDs.
+   */
+  setParentExplorationIds(parentExplorationIds: string[]): void {
+    this.parentExplorationIds = [...parentExplorationIds];
+  }
+
+  /**
+   * Retrieves the parent exploration IDs for the current exploration.
+   *
+   * @returns {string[]} An array of parent exploration IDs.
+   */
+  getParentExplorationIds(): string[] {
+    return this.parentExplorationIds;
   }
 
   /**
@@ -284,5 +503,17 @@ export class ConversationFlowService {
    */
   setNextStateCard(card: StateCard | null): void {
     this.nextStateCard = card;
+  }
+
+  get onPlayerStateChange(): EventEmitter<string> {
+    return this._playerStateChangeEventEmitter;
+  }
+
+  get onOppiaFeedbackAvailable(): EventEmitter<void> {
+    return this._oppiaFeedbackAvailableEventEmitter;
+  }
+
+  get onShowProgressModal(): EventEmitter<boolean> {
+    return this._playerProgressModalShownEventEmitter;
   }
 }

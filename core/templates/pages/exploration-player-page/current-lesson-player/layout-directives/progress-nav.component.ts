@@ -42,6 +42,8 @@ import {ContentTranslationManagerService} from '../../services/content-translati
 
 import './progress-nav.component.css';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-progress-nav',
@@ -68,9 +70,8 @@ export class ProgressNavComponent {
   @Input() displayedCard!: StateCard;
   @Input() submitButtonIsShown!: boolean;
   @Input() showContinueToReviseButton!: boolean;
-  @Input() navigationThroughCardHistoryIsEnabled!: boolean;
-  @Input() skipButtonIsShown!: boolean;
-  displayedCardIndex!: number;
+  navigationThroughCardHistoryIsEnabled: boolean = true;
+  skipButtonIsShown: boolean = false;
   hasPrevious!: boolean;
   hasNext!: boolean;
   conceptCardIsBeingShown!: boolean;
@@ -89,12 +90,9 @@ export class ProgressNavComponent {
   @Output() clickContinueToReviseButton: EventEmitter<void> =
     new EventEmitter();
 
-  @Output() changeCard: EventEmitter<number> = new EventEmitter();
-
   @Output() skipQuestion: EventEmitter<void> = new EventEmitter();
 
   directiveSubscriptions = new Subscription();
-  transcriptLength: number = 0;
   interactionIsInline: boolean = true;
   CONTINUE_BUTTON_FOCUS_LABEL: string =
     ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL;
@@ -110,6 +108,8 @@ export class ProgressNavComponent {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private urlService: UrlService,
+    private pageContextService: PageContextService,
+    private conversationFlowService: ConversationFlowService,
     private schemaFormSubmittedService: SchemaFormSubmittedService,
     private windowDimensionsService: WindowDimensionsService,
     private contentTranslationManagerService: ContentTranslationManagerService
@@ -124,6 +124,10 @@ export class ProgressNavComponent {
 
   ngOnInit(): void {
     this.isIframed = this.urlService.isIframed();
+    this.navigationThroughCardHistoryIsEnabled =
+      !this.pageContextService.isInDiagnosticTestPlayerPage();
+    this.skipButtonIsShown =
+      this.pageContextService.isInDiagnosticTestPlayerPage();
 
     this.directiveSubscriptions.add(
       this.playerPositionService.onHelpCardAvailable.subscribe(helpCard => {
@@ -155,13 +159,9 @@ export class ProgressNavComponent {
   }
 
   updateDisplayedCardInfo(): void {
-    this.transcriptLength = this.playerTranscriptService.getNumCards();
-    this.displayedCardIndex =
-      this.playerPositionService.getDisplayedCardIndex();
-    this.hasPrevious = this.displayedCardIndex > 0;
-    this.hasNext = !this.playerTranscriptService.isLastCard(
-      this.displayedCardIndex
-    );
+    let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
+    this.hasPrevious = displayedCardIndex > 0;
+    this.hasNext = !this.playerTranscriptService.isLastCard(displayedCardIndex);
     this.explorationModeService.isInQuestionMode();
 
     this.conceptCardIsBeingShown =
@@ -208,12 +208,12 @@ export class ProgressNavComponent {
     }
   }
 
-  validateIndexAndChangeCard(index: number): void {
-    if (index >= 0 && index < this.transcriptLength) {
-      this.changeCard.emit(index);
-    } else {
-      throw new Error('Target card index out of bounds.');
-    }
+  moveForwardByOneCard(): void {
+    this.conversationFlowService.moveForwardByOneCard();
+  }
+
+  moveBackByOneCard(): void {
+    this.conversationFlowService.moveBackByOneCard();
   }
 
   // Returns whether the screen is wide enough to fit two

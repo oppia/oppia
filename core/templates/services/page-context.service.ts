@@ -146,6 +146,10 @@ export class PageContextService {
           this.pageContext =
             ServicesConstants.PAGE_CONTEXT.LEARNER_GROUP_EDITOR;
           return ServicesConstants.PAGE_CONTEXT.LEARNER_GROUP_EDITOR;
+        } else if (pathnameArray[i] === 'diagnostic-test-player') {
+          this.pageContext =
+            ServicesConstants.PAGE_CONTEXT.DIAGNOSTIC_TEST_PLAYER;
+          return ServicesConstants.PAGE_CONTEXT.DIAGNOSTIC_TEST_PLAYER;
         }
       }
 
@@ -363,6 +367,13 @@ export class PageContextService {
   isInBlogPostEditorPage(): boolean {
     return (
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD
+    );
+  }
+
+  isInDiagnosticTestPlayerPage(): boolean {
+    return (
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.DIAGNOSTIC_TEST_PLAYER
     );
   }
 

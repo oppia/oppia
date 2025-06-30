@@ -46,6 +46,7 @@ export class PlayerTranscriptService {
   // on the current card, regardless of correctness.
   totalNumberOfAnswersSubmitted = 0;
   numberOfIncorrectSubmissions: number = 0;
+  prevSessionStatesProgress: string[] = [];
 
   restore(oldTranscript: StateCard[]): void {
     this.transcript = cloneDeep(oldTranscript);
@@ -186,5 +187,23 @@ export class PlayerTranscriptService {
    */
   resetNumberOfIncorrectSubmissions(): void {
     this.numberOfIncorrectSubmissions = 0;
+  }
+
+  /**
+   * Returns the list of states that were previously visited in the session.
+   *
+   * @returns {string[]} The list of previously visited states.
+   */
+  getPrevSessionStatesProgress(): string[] {
+    return this.prevSessionStatesProgress;
+  }
+
+  /**
+   * Sets the list of states that were previously visited in the session.
+   *
+   * @param {string[]} states - The list of previously visited states.
+   */
+  setPrevSessionStatesProgress(states: string[]): void {
+    this.prevSessionStatesProgress = [...states];
   }
 }
