@@ -4,7 +4,7 @@ on:
     types: 
         - opened
         - reopened
-permissions: read-all
+permissions: {}
 jobs:
   validate_branch_name:
     runs-on: ubuntu-24.04
@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-      - name: Comment and close PR
+      - name: Close PR if branch name is invalid
         uses: actions/github-script@v6
         with:
           script: |
@@ -26,23 +26,29 @@ jobs:
             if (branch === "develop" ||
                 branch.startsWith("release-") ||
                 branch.startsWith("test-")
-                ) {
+            ) {
                 const pr = context.payload.pull_request;
                 const author = context.payload.pull_request.user;
-                const comment = `Hi @${author.login}, PRs made from a branch whose name is prefixed with \`${branch}\` are not allowed. Also PRs made from develop branch or from a branch whose name is prefixed with develop, release or test are not allowed. So this PR is being closed. Please make your changes in another branch and send in the PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change) (Rule 1 specifically). Thanks!`;
-
+                let comment;
+                if (branch === "develop") {
+                    comment = `Hi @${author.login}, PRs made from the \`develop\` branch are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change) (Rule 1 specifically). Thanks!`;
+                } else if (branch.startsWith("release-")) {
+                    comment = `Hi @${author.login}, PRs made from branches with names prefixed with \`release-\` are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change) (Rule 1 specifically). Thanks!`;
+                } else if (branch.startsWith("test-")) {
+                    comment = `Hi @${author.login}, PRs made from branches with names prefixed with \`test-\` are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#instructions-for-making-a-code-change) (Rule 1 specifically). Thanks!`;
+                }
                 await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: pr.number,
-                body: comment
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: pr.number,
+                  body: comment
                 });
 
                 await github.rest.pulls.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: pr.number,
-                state: 'closed'
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  state: 'closed'
                 });
             }
         
@@ -50,7 +56,7 @@ jobs:
         if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "Signed CLA checker failed on the upstream develop branch."
+          message: "Validating branch name failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
 
                             
