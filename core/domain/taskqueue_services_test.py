@@ -26,7 +26,7 @@ from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Optional, Set
+from typing import Dict, List, Optional, Set
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -91,8 +91,9 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             *correct_args, **correct_kwargs
         )
 
-        cloud_task_run_model = (
+        cloud_task_run_model: cloud_task_models.CloudTaskRunModel = (
             cloud_task_models.CloudTaskRunModel.get_all().fetch())[0]
+        assert cloud_task_run_model is not None
         self.assertEqual(
             cloud_task_run_model.function_id, correct_fn_identifier)
 
@@ -141,8 +142,9 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         taskqueue_services.create_new_cloud_task_model(
             new_model_id, task_name, function_id)
 
-        cloud_task_run_models = (
+        cloud_task_run_models: List[cloud_task_models.CloudTaskRunModel] = list(
             cloud_task_models.CloudTaskRunModel.get_all().fetch())
+        self.assertIsNotNone(cloud_task_run_models)
         self.assertEqual(len(cloud_task_run_models), 1)
 
         self.assertEqual(
@@ -176,6 +178,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
 
         cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
             new_model_id)
+        assert cloud_task_run is not None
         self.assertIsNotNone(cloud_task_run)
 
         cloud_task_run.current_retry_attempt = 1
@@ -188,6 +191,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
 
         updated_cloud_task_run = (
             taskqueue_services.get_cloud_task_run_by_model_id(new_model_id))
+        assert updated_cloud_task_run is not None
 
         self.assertEqual(
             updated_cloud_task_run.current_retry_attempt, 1)
@@ -242,6 +246,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
 
         cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
             new_model_id)
+        assert cloud_task_run is not None
 
         start_datetime = cloud_task_run.last_updated
         end_datetime = cloud_task_run.last_updated

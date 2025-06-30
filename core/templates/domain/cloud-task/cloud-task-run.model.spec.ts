@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for CloudTaskRun.
  */
 
-import {CloudTaskRun, MatIcon} from 'domain/cloud-task/cloud-task-run.model';
+import {CloudTaskRun} from 'domain/cloud-task/cloud-task-run.model';
 
 describe('Cloud Task Run', () => {
   it('should create a CloudTaskRun instance', () => {

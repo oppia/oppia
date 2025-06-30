@@ -36,8 +36,8 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         task_id = uuid.uuid4().hex
         queue_name = 'test_queue_name'
         current_run_state = 'running'
-        last_updated = datetime.utcnow()
-        created_on = datetime.utcnow()
+        last_updated = datetime.datetime.utcnow()
+        created_on = datetime.datetime.utcnow()
         task_name = (
             'projects/%s/locations/%s/queues/%s/tasks/%s' % (
                 project_id, location_id, queue_name, task_id
@@ -68,8 +68,8 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         task_id = uuid.uuid4().hex
         queue_name = 'test_queue_name'
         current_run_state = 'running'
-        last_updated = datetime.utcnow()
-        created_on = datetime.utcnow()
+        last_updated = datetime.datetime.utcnow()
+        created_on = datetime.datetime.utcnow()
         task_name = (
             'projects/%s/locations/%s/queues/%s/tasks/%s' % (
                 project_id, location_id, queue_name, task_id
@@ -77,7 +77,7 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         )
         function_id = 'delete_exps_from_user_models'
 
-        cloud_task_run_dict = {
+        cloud_task_run_dict: cloud_task_domain.CloudTaskRunDict = {
             'id': cloud_task_run_id,
             'cloud_task_name': task_name,
             'cloud_task_id': task_id,

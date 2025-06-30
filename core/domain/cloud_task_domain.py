@@ -19,7 +19,22 @@
 from __future__ import annotations
 import datetime
 
-from typing import List
+from typing import List, TypedDict
+
+
+class CloudTaskRunDict(TypedDict):
+    """Dictionary representing the CloudTaskRun object."""
+
+    id: str
+    cloud_task_name: str
+    cloud_task_id: str
+    queue_id: str
+    latest_job_state: str
+    function_id: str
+    exception_messages_for_failed_runs: List[str]
+    last_updated: str
+    current_retry_attempt: int
+    created_on: str
 
 
 class CloudTaskRun:
@@ -50,8 +65,13 @@ class CloudTaskRun:
         self.last_updated = last_updated
         self.created_on = created_on
 
-    def to_dict(self) -> dict:
-        """Returns a dictionary representation of this domain object."""
+    def to_dict(self) -> CloudTaskRunDict:
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            CloudTaskRunDict. A dictionary representation of the CloudTaskRun
+            object, with keys matching the attributes of the object.
+        """
         return {
             'id': self.id,
             'cloud_task_name': self.cloud_task_name,
@@ -67,8 +87,17 @@ class CloudTaskRun:
         }
 
     @classmethod
-    def from_dict(cls, cloud_task_run_dict: dict) -> CloudTaskRun:
-        """Returns a domain object from a dictionary."""
+    def from_dict(cls, cloud_task_run_dict: CloudTaskRunDict) -> CloudTaskRun:
+        """Returns a domain object from a dictionary.
+
+        Args:
+            cloud_task_run_dict: CloudTaskRunDict. A dictionary representation
+                of the CloudTaskRun object.
+
+        Returns:
+            CloudTaskRun. A CloudTaskRun domain object created from the given
+            dictionary.
+        """
         return cls(
             id=cloud_task_run_dict['id'],
             cloud_task_name=cloud_task_run_dict['cloud_task_name'],

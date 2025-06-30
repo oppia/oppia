@@ -194,12 +194,12 @@
       <ng-container matColumnDef="state">
         <th mat-header-cell *matHeaderCellDef> State </th>
         <td mat-cell *matCellDef="let element">
-            <mat-icon class="job-status-mat-icon"
-                      [matTooltip]="element.getJobStatusTooltipString()"
-                      [color]="element.getJobStatusMaterialThemeColor()"
-                      [ngClass]="{'error-icon': element.getJobStatusMaterialIconCode() === 'error'}">
-              {{ element.getJobStatusMaterialIconCode() }}
-            </mat-icon>
+          <mat-icon class="job-status-mat-icon"
+                    [matTooltip]="element.getJobStatusTooltipString()"
+                    [color]="element.getJobStatusMaterialThemeColor()"
+                    [ngClass]="{'error-icon': element.getJobStatusMaterialIconCode() === 'error'}">
+            {{ element.getJobStatusMaterialIconCode() }}
+          </mat-icon>
         </td>
       </ng-container>
 
@@ -250,8 +250,8 @@
   }
   .datepicker-container {
     display: flex;
+    margin-left: 70%;
     padding: 20px;
-    margin-left: 70%
   }
   .date-selector-inner-container {
     align-items: center;
@@ -277,8 +277,8 @@
   }
   .date-selector-inner-container mat-form-field .mat-form-field-infix {
     border-top: 0;
-    padding-left: 4px;
     display: flex;
+    padding-left: 4px;
     width: 100px;
   }
   .date-selector-inner-container mat-form-field .mat-form-field-wrapper .mat-form-field-flex {

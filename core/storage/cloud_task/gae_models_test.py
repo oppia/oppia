@@ -21,6 +21,8 @@ from __future__ import annotations
 from core.platform import models
 from core.tests import test_utils
 
+from typing import List
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import base_models
@@ -145,8 +147,9 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
             current_retry_attempt=2
         )
 
-        cloud_task_run_models = (
+        cloud_task_run_models: List[cloud_task_models.CloudTaskRunModel] = list(
             cloud_task_models.CloudTaskRunModel.get_all().fetch())
+        assert cloud_task_run_models is not None
         self.assertEqual(len(cloud_task_run_models), 3)
 
         filtered_models = (

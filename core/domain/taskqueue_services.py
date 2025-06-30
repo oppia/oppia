@@ -105,7 +105,7 @@ def defer(
 
     task = platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
-
+    assert task.task_name is not None
     cloud_task_model = create_new_cloud_task_model(
         new_cloud_task_model_id, task.task_name, fn_identifier)
     cloud_task_model.update_timestamps()
@@ -226,7 +226,7 @@ def convert_cloud_task_run_model_to_domain_object(
         CloudTaskRun. The CloudTaskRun domain object created from the given
         model.
     """
-    model_dict = {
+    model_dict: cloud_task_domain.CloudTaskRunDict = {
         'id': cloud_task_model.id,
         'cloud_task_name': cloud_task_model.cloud_task_name,
         'cloud_task_id': cloud_task_model.cloud_task_id,

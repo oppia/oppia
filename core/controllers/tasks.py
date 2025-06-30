@@ -288,6 +288,7 @@ class DeferredTasksHandler(
         cloud_task_run_domain_instance = (
             taskqueue_services.get_cloud_task_run_by_model_id(
                 cloud_task_model_id))
+        assert cloud_task_run_domain_instance is not None
         cloud_task_run_domain_instance.latest_job_state = 'RUNNING'
 
         try:

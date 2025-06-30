@@ -47,7 +47,7 @@ export class CloudTaskRun {
   currentRetryAttempt: number;
   lastUpdated: Date;
   createdOn: Date;
-  matIcon: MatIcon;
+  matIcon!: MatIcon;
 
   constructor(
     id: string,

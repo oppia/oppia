@@ -495,6 +495,7 @@ class AutomaticVoiceoverRegenerationRecordHandlerTests(
 
         cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
             new_model_id)
+        assert cloud_task_run is not None
         start_date = cloud_task_run.created_on.strftime('%a %b %d %Y')
         end_date = (
             cloud_task_run.created_on + datetime.timedelta(days=1)

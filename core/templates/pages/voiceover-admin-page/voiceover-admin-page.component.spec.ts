@@ -17,7 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {COMPILER_OPTIONS, NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   discardPeriodicTasks,
@@ -26,7 +26,7 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {VoiceoverAdminPageComponent} from './voiceover-admin-page.component';
 import {VoiceoverBackendApiService} from '../../domain/voiceover/voiceover-backend-api.service';

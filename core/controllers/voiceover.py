@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+import datetime
 
 from core import feconf
 from core.controllers import acl_decorators
@@ -316,8 +316,10 @@ class AutomaticVoiceoverRegenerationRecordHandler(
             end_date: str. The end date for filtering records.
         """
         # Convert start_date and end_date to datetime objects.
-        start_date_obj: datetime = datetime.strptime(start_date, '%a %b %d %Y')
-        end_date_obj: datetime = datetime.strptime(end_date, '%a %b %d %Y')
+        start_date_obj: datetime.datetime = datetime.datetime.strptime(
+            start_date, '%a %b %d %Y')
+        end_date_obj: datetime.datetime = datetime.datetime.strptime(
+            end_date, '%a %b %d %Y')
 
         # Fetch only those records that are related to voiceover regeneration
         # and are within the specified date range.
