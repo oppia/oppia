@@ -91,7 +91,7 @@ class MigrateStudyGuideModels(beam.PTransform):# type: ignore[misc]
     def _generate_study_guide_changes(
         study_guide_id: str,
         study_guide_model: subtopic_models.StudyGuideModel
-    ) -> Iterable[Tuple[str, study_guide_domain.StudyGuideChange]]: # pragma: no cover
+    ) -> Iterable[Tuple[str, study_guide_domain.StudyGuideChange]]: # pragma: no cover pylint: disable=line-too-long
         """Generates Study Guide change objects. Study Guide change object is
         generated when schema version for some field is lower than the latest
         schema version.
@@ -278,7 +278,7 @@ class MigrateStudyGuideJob(base_jobs.JobBase):
         datastore_services.update_timestamps_multi(list(models_to_put_values))
         return models_to_put_values
 
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]: # pragma: no cover
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]: # pragma: no cover pylint: disable=line-too-long
         """Returns a PCollection of results from the study guide migration.
 
         Returns:
