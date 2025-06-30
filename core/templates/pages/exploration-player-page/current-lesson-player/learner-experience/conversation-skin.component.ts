@@ -588,4 +588,8 @@ export class ConversationSkinComponent {
   getDisplayedCard(): StateCard {
     return this.conversationFlowService.getDisplayedCard();
   }
+
+  getHasFullyLoaded(): boolean {
+    return this.conversationFlowService.getHasFullyLoaded();
+  }
 }

@@ -654,6 +654,37 @@ export class ConversationFlowService {
   }
 
   /**
+   * Updates the card layout based on whether supplemental cards are non-empty
+   * and screen size allows for two-card display.     *
+   */
+  _updateCardLayout(): void {
+    const totalNumCards = this.playerTranscriptService.getNumCards();
+    const prevNonempty =
+      totalNumCards > 1 &&
+      this.isSupplementalCardNonempty(
+        this.playerTranscriptService.getCard(totalNumCards - 2)
+      );
+    const nextNonempty = this.isSupplementalCardNonempty(
+      this.playerTranscriptService.getLastCard()
+    );
+
+    if (
+      totalNumCards > 1 &&
+      this.cardAnimationService.canWindowShowTwoCards()
+    ) {
+      if (!prevNonempty && nextNonempty) {
+        this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
+        this.cardAnimationService.animateToTwoCards();
+        return;
+      } else if (prevNonempty && !nextNonempty) {
+        this.cardAnimationService.animateToOneCard();
+        return;
+      }
+    }
+    this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
+  }
+
+  /**
    * Records the addition of a new card in the current engine service.
    */
   private _recordNewCardAdded(): void {
@@ -731,17 +762,16 @@ export class ConversationFlowService {
     refreshInteraction: boolean,
     refresherExplorationId: string | null
   ): void {
-    let displayedCard = this._getCurrentCard();
     this._recordIncorrectAnswer();
     this.playerTranscriptService.addNewResponse(feedbackHtml);
     let helpCardAvailable =
-      feedbackHtml && !displayedCard.isInteractionInline();
+      feedbackHtml && !this.displayedCard.isInteractionInline();
 
     if (helpCardAvailable) {
       this._emitHelpCard(feedbackHtml, false);
     }
     if (missingPrerequisiteSkillId) {
-      displayedCard.markAsCompleted();
+      this.displayedCard.markAsCompleted();
       this.conceptCardBackendApiService
         .loadConceptCardsAsync([missingPrerequisiteSkillId])
         .then(conceptCardObject => {
@@ -755,7 +785,7 @@ export class ConversationFlowService {
       // Replace the previous interaction with another of the
       // same type.
       this.playerTranscriptService.updateLatestInteractionHtml(
-        displayedCard.getInteractionHtml() +
+        this.displayedCard.getInteractionHtml() +
           this.explorationEngineService.getRandomSuffix()
       );
     }
@@ -983,9 +1013,7 @@ export class ConversationFlowService {
   private _addNewCard(newCard: StateCard): void {
     this.playerTranscriptService.addNewCard(newCard);
     this._shouldDisplayTranslation();
-    this.cardAnimationService.updateCardLayout(
-      this.isSupplementalCardNonempty.bind(this)
-    );
+    this._updateCardLayout();
 
     this.playerPositionService.changeCurrentQuestion(
       this.playerPositionService.getDisplayedCardIndex()
@@ -1418,10 +1446,7 @@ export class ConversationFlowService {
     const numberOfIncorrectSubmissions =
       this.playerTranscriptService.getNumberOfIncorrectSubmissions();
 
-    if (
-      this.nextCardIfStuck &&
-      this.nextCardIfStuck !== this._getCurrentCard()
-    ) {
+    if (this.nextCardIfStuck && this.nextCardIfStuck !== this.displayedCard) {
       this.playerTranscriptService.addNewResponseToExistingFeedback(
         this.translateService.instant('I18N_REDIRECTION_TO_STUCK_STATE_MESSAGE')
       );

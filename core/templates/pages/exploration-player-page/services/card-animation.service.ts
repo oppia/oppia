@@ -135,36 +135,6 @@ export class CardAnimationService {
   }
 
   /**
-   * Updates the card layout based on whether supplemental cards are non-empty
-   * and screen size allows for two-card display.
-   *
-   * @param {Function} callback - A function that checks whether a card has a supplemental view.
-   */
-  updateCardLayout(callback: Function): void {
-    const totalNumCards = this.playerTranscriptService.getNumCards();
-    const lastCard = this.playerTranscriptService.getLastCard();
-    const secondLastCard = this.playerTranscriptService.getCard(
-      totalNumCards - 2
-    );
-    const isSupplementalCardNonempty = callback;
-    const prevNonempty =
-      totalNumCards > 1 && isSupplementalCardNonempty(secondLastCard);
-    const nextNonempty = isSupplementalCardNonempty(lastCard);
-
-    if (totalNumCards > 1 && this._canWindowShowTwoCards()) {
-      if (!prevNonempty && nextNonempty) {
-        this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-        this.animateToTwoCards();
-        return;
-      } else if (prevNonempty && !nextNonempty) {
-        this.animateToOneCard();
-        return;
-      }
-    }
-    this.playerPositionService.setDisplayedCardIndex(totalNumCards - 1);
-  }
-
-  /**
    * Adjusts the iframe height to fit the content and optionally scrolls.
    * Sends height change message to the parent window.
    *
@@ -266,7 +236,7 @@ export class CardAnimationService {
    * @returns {boolean} - True if two-card layout is supported; otherwise, false.
    * @private
    */
-  private _canWindowShowTwoCards(): boolean {
+  canWindowShowTwoCards(): boolean {
     return (
       this.windowDimensionsService.getWidth() >
       ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX
