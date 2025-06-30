@@ -53,6 +53,7 @@ import {StatsReportingService} from './stats-reporting.service';
 describe('Exploration engine service ', () => {
   let alertsService: AlertsService;
   let answerClassificationService: AnswerClassificationService;
+  let answerClassificationResult: AnswerClassificationService;
   let audioPreloaderService: AudioPreloaderService;
   let pageContextService: PageContextService;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
@@ -333,6 +334,24 @@ describe('Exploration engine service ', () => {
       most_recently_reached_checkpoint_state_name: 'State A',
       most_recently_reached_checkpoint_exp_version: 1,
     };
+
+    answerClassificationResult = {
+      outcome: {
+        dest: 'Mid',
+        destIfReallyStuck: 'Mid',
+        feedback: {
+          content_id: 'feedback_1',
+          html: 'Answer is correct!',
+        },
+        labelledAsCorrect: true,
+        paramChanges: [],
+        refresherExplorationId: null,
+        missingPrerequisiteSkillId: null,
+      },
+      answerGroupIndex: 1,
+      ruleIndex: 0,
+      classificationCategorization: 'default_outcome',
+    };
   });
 
   beforeEach(() => {
@@ -509,23 +528,6 @@ describe('Exploration engine service ', () => {
         let initSuccessCb = jasmine.createSpy('success');
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
-        let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createFromBackendDict({
-            dest: 'Mid',
-            dest_if_really_stuck: 'Mid',
-            feedback: {
-              content_id: 'feedback_1',
-              html: 'Answer is correct!',
-            },
-            labelled_as_correct: true,
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
-          }),
-          1,
-          0,
-          'default_outcome'
-        );
 
         let lastCard = StateCard.createNewCard(
           'Card 1',
@@ -573,19 +575,8 @@ describe('Exploration engine service ', () => {
       const initSuccessCb = jasmine.createSpy('success');
       const submitAnswerSuccessCb = jasmine.createSpy('success');
 
-      const classificationResult = new AnswerClassificationResult(
-        Outcome.createFromBackendDict({
-          dest: 'Mid',
-          feedback: {html: 'feedback', content_id: 'cid'},
-          labelled_as_correct: false,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null,
-        }),
-        0,
-        null, // This triggers the branch.
-        'default_outcome'
-      );
+      answerClassificationResult.ruleIndex = null;
+      answerClassificationResult.answerGroupIndex = 0;
 
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
@@ -594,12 +585,19 @@ describe('Exploration engine service ', () => {
         'Start'
       );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
-        StateCard.createNewCard('Start', 'Content', '', null, null, 'cid')
+        StateCard.createNewCard(
+          'Start',
+          'Content',
+          '',
+          null,
+          null,
+          'feedback_1'
+        )
       );
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'
-      ).and.returnValue(classificationResult);
+      ).and.returnValue(answerClassificationResult);
       const alertSpy = spyOn(alertsService, 'addWarning');
 
       explorationEngineService.init(
@@ -645,29 +643,15 @@ describe('Exploration engine service ', () => {
           '',
           mockInteraction,
           null,
-          'cid'
+          'feedback_1'
         )
       );
 
+      answerClassificationResult.ruleIndex = 0;
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'
-      ).and.callFake(
-        () =>
-          new AnswerClassificationResult(
-            Outcome.createFromBackendDict({
-              dest: 'Mid',
-              feedback: {html: 'feedback', content_id: 'cid'},
-              labelled_as_correct: true,
-              param_changes: [],
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null,
-            }),
-            0,
-            0,
-            'default_outcome'
-          )
-      );
+      ).and.returnValue(answerClassificationResult);
 
       explorationEngineService.init(
         explorationDict,
@@ -705,20 +689,7 @@ describe('Exploration engine service ', () => {
     }));
 
     it('should show warning if interaction for next state is not defined', fakeAsync(() => {
-      const classificationResult = new AnswerClassificationResult(
-        Outcome.createFromBackendDict({
-          dest: 'Mid',
-          feedback: {html: 'feedback', content_id: 'cid'},
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null,
-        }),
-        0,
-        0,
-        'default_outcome'
-      );
-
+      answerClassificationResult.answerGroupIndex = 0;
       const successCallback = jasmine.createSpy('successCallback');
 
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
@@ -728,13 +699,20 @@ describe('Exploration engine service ', () => {
         'Start'
       );
       spyOn(playerTranscriptService, 'getLastCard').and.returnValue(
-        StateCard.createNewCard('Start', 'Content', '', null, null, 'cid')
+        StateCard.createNewCard(
+          'Start',
+          'Content',
+          '',
+          null,
+          null,
+          'feedback_1'
+        )
       );
 
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'
-      ).and.returnValue(classificationResult);
+      ).and.returnValue(answerClassificationResult);
 
       spyOn(alertsService, 'addWarning');
 
@@ -768,19 +746,8 @@ describe('Exploration engine service ', () => {
     it('should show warning if content id is null', fakeAsync(() => {
       const submitAnswerSuccessCb = jasmine.createSpy('submitSuccess');
 
-      const classificationResult = new AnswerClassificationResult(
-        Outcome.createFromBackendDict({
-          dest: 'Mid',
-          feedback: {html: 'feedback', content_id: null},
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null,
-        }),
-        0,
-        0,
-        'default_outcome'
-      );
+      answerClassificationResult.answerGroupIndex = 0;
+      answerClassificationResult.outcome.feedback.content_id = null; // Triggers the branch.
 
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
@@ -795,13 +762,13 @@ describe('Exploration engine service ', () => {
           '',
           {id: 'TextInput', customizationArgs: {}},
           null,
-          'cid'
+          'feedback_1'
         )
       );
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'
-      ).and.returnValue(classificationResult);
+      ).and.returnValue(answerClassificationResult);
 
       explorationEngineService.init(
         explorationDict,
@@ -849,24 +816,6 @@ describe('Exploration engine service ', () => {
         let initSuccessCb = jasmine.createSpy('success');
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
-        let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createFromBackendDict({
-            dest: 'Mid',
-            dest_if_really_stuck: 'Mid',
-            feedback: {
-              content_id: 'feedback_1',
-              html: 'Answer is correct!',
-            },
-            labelled_as_correct: true,
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
-          }),
-          1,
-          0,
-          'default_outcome'
-        );
-
         let lastCard = StateCard.createNewCard(
           'Card 1',
           'Content html',
@@ -913,20 +862,8 @@ describe('Exploration engine service ', () => {
     it('should show warning if interaction for the next state if stuck is not defined', fakeAsync(() => {
       const submitAnswerSuccessCb = jasmine.createSpy('submitSuccess');
 
-      const classificationResult = new AnswerClassificationResult(
-        Outcome.createFromBackendDict({
-          dest: 'Mid',
-          dest_if_really_stuck: 'StuckState',
-          feedback: {html: 'feedback', content_id: 'cid'},
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null,
-        }),
-        0,
-        0,
-        'default_outcome'
-      );
+      answerClassificationResult.outcome.destIfReallyStuck = 'StuckState';
+      answerClassificationResult.answerGroupIndex = 0;
 
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         false
@@ -940,13 +877,13 @@ describe('Exploration engine service ', () => {
           'Content',
           '',
           {id: 'TextInput', customizationArgs: {}},
-          'cid'
+          'feedback_1'
         )
       );
       spyOn(
         answerClassificationService,
         'getMatchingClassificationResult'
-      ).and.returnValue(classificationResult);
+      ).and.returnValue(answerClassificationResult);
 
       explorationEngineService.init(
         explorationDict,
@@ -963,13 +900,13 @@ describe('Exploration engine service ', () => {
         (stateName: string) => {
           if (stateName === 'StuckState') {
             return {
-              content: {contentId: 'cid', html: 'Stuck content'},
+              content: {contentId: 'feedback_1', html: 'Stuck content'},
               interaction: {id: 'TextInput', customizationArgs: {}},
               paramChanges: [],
             };
           }
           return {
-            content: {content_id: 'cid', html: 'Start content'},
+            content: {content_id: 'feedback_1', html: 'Start content'},
             interaction: {id: 'TextInput', customizationArgs: {}},
             paramChanges: [],
           };
@@ -1005,23 +942,7 @@ describe('Exploration engine service ', () => {
         let initSuccessCb = jasmine.createSpy('success');
         let submitAnswerSuccessCb = jasmine.createSpy('success');
         let answer = 'answer';
-        let answerClassificationResult = new AnswerClassificationResult(
-          Outcome.createFromBackendDict({
-            dest: 'Mid',
-            dest_if_really_stuck: 'Mid',
-            feedback: {
-              content_id: 'feedback_1',
-              html: null,
-            },
-            labelled_as_correct: true,
-            param_changes: [],
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null,
-          }),
-          1,
-          0,
-          'default_outcome'
-        );
+        answerClassificationResult.outcome.feedback.html = null; // Triggers the branch.
 
         let lastCard = StateCard.createNewCard(
           'Card 1',
@@ -1074,23 +995,6 @@ describe('Exploration engine service ', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
-      let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createFromBackendDict({
-          dest: 'Mid',
-          dest_if_really_stuck: 'Mid',
-          feedback: {
-            content_id: 'feedback_1',
-            html: 'feedback',
-          },
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null,
-        }),
-        1,
-        0,
-        'default_outcome'
-      );
 
       let lastCard = StateCard.createNewCard(
         'Card 1',
@@ -1144,23 +1048,6 @@ describe('Exploration engine service ', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
-      let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createFromBackendDict({
-          dest: 'Mid',
-          dest_if_really_stuck: 'Mid',
-          feedback: {
-            content_id: 'feedback_1',
-            html: 'feedback',
-          },
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null,
-        }),
-        1,
-        0,
-        'default_outcome'
-      );
 
       let lastCard = StateCard.createNewCard(
         'Card 1',
@@ -1458,23 +1345,6 @@ describe('Exploration engine service ', () => {
       let initSuccessCb = jasmine.createSpy('success');
       let submitAnswerSuccessCb = jasmine.createSpy('success');
       let answer = 'answer';
-      let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createFromBackendDict({
-          dest: 'Mid',
-          dest_if_really_stuck: 'Mid',
-          feedback: {
-            content_id: 'feedback_1',
-            html: 'Answer is correct!',
-          },
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null,
-        }),
-        1,
-        0,
-        'default_outcome'
-      );
 
       let lastCard = StateCard.createNewCard(
         'Card 1',
