@@ -50,7 +50,7 @@ import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-descrip
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {TranslationLanguageService} from '../services/translation-language.service';
