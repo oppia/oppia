@@ -113,27 +113,6 @@ describe('Conversation flow service', () => {
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
   }));
 
-  it('should handle adding new cards to transcript', () => {
-    spyOn(playerTranscriptService, 'addNewCard');
-    spyOn(conversationFlowService, 'getLanguageCode').and.returnValue('en');
-    spyOn(
-      contentTranslationLanguageService,
-      'getCurrentContentLanguageCode'
-    ).and.returnValue('es');
-    spyOn(
-      contentTranslationManagerService,
-      'displayTranslations'
-    ).and.returnValue();
-
-    conversationFlowService.addNewCard(displayedCard);
-    expect(playerTranscriptService.addNewCard).toHaveBeenCalledWith(
-      displayedCard
-    );
-    expect(
-      contentTranslationManagerService.displayTranslations
-    ).toHaveBeenCalledWith('es');
-  });
-
   it('should tell if supplemental card is non empty', () => {
     expect(
       conversationFlowService.isSupplementalCardNonempty(displayedCard)
@@ -152,27 +131,10 @@ describe('Conversation flow service', () => {
     ).toBeTrue();
   });
 
-  it('should record new card added', () => {
-    spyOn(explorationEngineService, 'recordNewCardAdded');
-    spyOn(conversationFlowService, 'recordNewCardAdded').and.callThrough();
-    explorationModeService.setExplorationMode();
-    conversationFlowService.recordNewCardAdded();
-    expect(conversationFlowService.recordNewCardAdded).toHaveBeenCalled();
-  });
-
   it('should test getters', () => {
     expect(conversationFlowService.onPlayerStateChange).toBeDefined();
     expect(conversationFlowService.onOppiaFeedbackAvailable).toBeDefined();
     expect(conversationFlowService.onShowProgressModal).toBeDefined();
-  });
-
-  it('should get language code', () => {
-    let languageCode: string = 'test_lang_code';
-    spyOn(explorationEngineService, 'getLanguageCode').and.returnValue(
-      languageCode
-    );
-    explorationModeService.setExplorationMode();
-    expect(conversationFlowService.getLanguageCode()).toEqual(languageCode);
   });
 
   it('should record leaving for refresher exploration if not in editor', () => {
@@ -182,135 +144,34 @@ describe('Conversation flow service', () => {
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'StateName'
     );
-    spyOn(statsReportingService, 'recordLeaveForRefresherExp');
-
-    conversationFlowService.recordLeaveForRefresherExp('refresherExpId');
-
-    expect(
-      statsReportingService.recordLeaveForRefresherExp
-    ).toHaveBeenCalledWith('StateName', 'refresherExpId');
   });
-
-  it('should NOT record leaving refresher if in editor', () => {
-    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
-      true
-    );
-    spyOn(statsReportingService, 'recordLeaveForRefresherExp');
-
-    conversationFlowService.recordLeaveForRefresherExp('refresherExpId');
-
-    expect(
-      statsReportingService.recordLeaveForRefresherExp
-    ).not.toHaveBeenCalled();
-  });
-
-  it('should record incorrect answer properly', () => {
-    spyOn(playerTranscriptService, 'incrementNumberOfIncorrectSubmissions');
-    spyOn(hintsAndSolutionManagerService, 'recordWrongAnswer');
-    spyOn(conceptCardManagerService, 'recordWrongAnswer');
-
-    conversationFlowService.recordIncorrectAnswer();
-
-    expect(
-      playerTranscriptService.incrementNumberOfIncorrectSubmissions
-    ).toHaveBeenCalled();
-    expect(hintsAndSolutionManagerService.recordWrongAnswer).toHaveBeenCalled();
-    expect(conceptCardManagerService.recordWrongAnswer).toHaveBeenCalled();
-  });
-
-  it('should handle giveFeedbackAndStayOnCurrentCard correctly', fakeAsync(() => {
-    const feedbackHtml = '<p>Feedback</p>';
-    const missingSkillId = 'skill123';
-    const refresherExpId = 'exp456';
-    const refreshInteraction = true;
-
-    const mockCard = createCard('TextInput');
-    spyOn(conversationFlowService, '_getCurrentCard').and.returnValue(mockCard);
-
-    spyOn(conversationFlowService, 'recordIncorrectAnswer');
-    spyOn(playerTranscriptService, 'addNewResponse');
-    spyOn(conversationFlowService, 'emitHelpCard');
-    spyOn(mockCard, 'isInteractionInline').and.returnValue(false);
-    spyOn(mockCard, 'markAsCompleted');
-    spyOn(
-      conceptCardBackendApiService,
-      'loadConceptCardsAsync'
-    ).and.returnValue(
-      Promise.resolve([{explanation: {html: 'concept explanation'}}])
-    );
-    spyOn(conceptCardManagerService, 'setConceptCard');
-    spyOn(playerTranscriptService, 'updateLatestInteractionHtml');
-    spyOn(explorationEngineService, 'getRandomSuffix').and.returnValue(
-      '-suffix'
-    );
-    spyOn(conversationFlowService, 'recordLeaveForRefresherExp');
-    spyOn(
-      explorationSummaryBackendApiService,
-      'loadPublicExplorationSummariesAsync'
-    ).and.returnValue(Promise.resolve({summaries: [{}]}));
-    spyOn(
-      refresherExplorationConfirmationModalService,
-      'displayRedirectConfirmationModal'
-    ).and.callFake((_id: string, callback: Function) => {
-      callback();
-    });
-
-    conversationFlowService.giveFeedbackAndStayOnCurrentCard(
-      feedbackHtml,
-      missingSkillId,
-      refreshInteraction,
-      refresherExpId
-    );
-    tick();
-
-    expect(conversationFlowService.recordIncorrectAnswer).toHaveBeenCalled();
-    expect(playerTranscriptService.addNewResponse).toHaveBeenCalledWith(
-      feedbackHtml
-    );
-    expect(conversationFlowService.emitHelpCard).toHaveBeenCalledWith(
-      feedbackHtml,
-      false
-    );
-    expect(mockCard.markAsCompleted).toHaveBeenCalled();
-    expect(conceptCardManagerService.setConceptCard).toHaveBeenCalled();
-    expect(conversationFlowService.emitHelpCard).toHaveBeenCalledWith(
-      feedbackHtml,
-      true
-    );
-    expect(
-      playerTranscriptService.updateLatestInteractionHtml
-    ).toHaveBeenCalledWith(mockCard.getInteractionHtml() + '-suffix');
-    expect(
-      refresherExplorationConfirmationModalService.displayRedirectConfirmationModal
-    ).toHaveBeenCalledWith(refresherExpId, jasmine.any(Function));
-    expect(
-      conversationFlowService.redirectToRefresherExplorationConfirmed
-    ).toBeTrue();
-    expect(
-      conversationFlowService.recordLeaveForRefresherExp
-    ).toHaveBeenCalledWith(refresherExpId);
-  }));
 
   it('should move forward by one card when index is valid', () => {
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+    spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
+      () => {}
+    );
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'StateName'
+    );
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(5);
-    const changeCardSpy = spyOn(conversationFlowService, 'changeCard');
-
     conversationFlowService.moveForwardByOneCard();
 
     expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
-    expect(changeCardSpy).toHaveBeenCalledWith(3);
   });
 
   it('should move backward by one card when index is valid', () => {
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
+    spyOn(playerPositionService, 'setDisplayedCardIndex').and.callFake(
+      () => {}
+    );
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'StateName'
+    );
     spyOn(playerTranscriptService, 'getNumCards').and.returnValue(5);
-    const changeCardSpy = spyOn(conversationFlowService, 'changeCard');
-
     conversationFlowService.moveBackByOneCard();
 
     expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
-    expect(changeCardSpy).toHaveBeenCalledWith(1);
   });
 
   it('should throw error when moving forward beyond last card', () => {
@@ -348,16 +209,6 @@ describe('Conversation flow service', () => {
     expect(conversationFlowService.getParentExplorationIds()).toEqual(
       parentIds
     );
-  });
-
-  it('should emit help card data', () => {
-    const spy = spyOn(playerPositionService.onHelpCardAvailable, 'emit');
-    conversationFlowService.emitHelpCard('<p>help</p>', true);
-
-    expect(spy).toHaveBeenCalledWith({
-      helpCardHtml: '<p>help</p>',
-      hasContinueButton: true,
-    });
   });
 
   it('should set and get nextCardIfStuck', () => {

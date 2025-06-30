@@ -1627,8 +1627,16 @@ export class ConversationFlowService {
     return this.showProgressClearanceMessage;
   }
 
+  setShowProgressClearanceMessage(showMessage: boolean): void {
+    this.showProgressClearanceMessage = showMessage;
+  }
+
   getNextFocusLabel(): string {
     return this._nextFocusLabel;
+  }
+
+  getHasFullyLoaded(): boolean {
+    return this.hasFullyLoaded;
   }
 
   setHasFullyLoaded(hasLoaded: boolean): void {

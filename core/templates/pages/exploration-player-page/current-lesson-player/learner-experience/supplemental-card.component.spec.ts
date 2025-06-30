@@ -47,6 +47,7 @@ import {Interaction} from '../../../../domain/exploration/InteractionObjectFacto
 import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {PlatformFeatureService} from '../../../../services/platform-feature.service';
+import {TranslateModule} from '@ngx-translate/core';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -88,7 +89,7 @@ describe('Supplemental card component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule, TranslateModule.forRoot()],
       declarations: [SupplementalCardComponent],
       providers: [
         AudioPlayerService,

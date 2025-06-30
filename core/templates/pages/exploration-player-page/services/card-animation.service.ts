@@ -33,8 +33,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
   providedIn: 'root',
 })
 export class CardAnimationService {
-  isAnimatingToTwoCards: boolean;
-  isAnimatingToOneCard: boolean;
+  isAnimatingToTwoCards!: boolean;
+  isAnimatingToOneCard!: boolean;
 
   // If the exploration is iframed, send data to its parent about
   // its height so that the parent can be resized as necessary.
@@ -204,7 +204,7 @@ export class CardAnimationService {
    */
   adjustPageHeightOnresize(): void {
     this.windowRef.nativeWindow.onresize = () => {
-      this.adjustPageHeight(false, null);
+      this.adjustPageHeight(false, () => {});
     };
   }
 
@@ -234,14 +234,15 @@ export class CardAnimationService {
     const startY = window.scrollY;
     const difference = targetY - startY;
     const startTime = performance.now();
+    type EasingName = 'easeOutQuad' | 'easeOutQuart';
 
-    const easingFunctions = {
+    const easingFunctions: Record<EasingName, (t: number) => number> = {
       easeOutQuad: (t: number): number => t * (2 - t),
       easeOutQuart: (t: number): number => 1 - Math.pow(1 - t, 4),
     };
 
     const easingFunction =
-      easingFunctions[easingName] || easingFunctions.easeOutQuad;
+      easingFunctions[easingName as EasingName] || easingFunctions.easeOutQuad;
 
     const step = (currentTime: number) => {
       const elapsedTime = currentTime - startTime;

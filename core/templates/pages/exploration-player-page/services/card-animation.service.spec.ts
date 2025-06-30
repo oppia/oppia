@@ -1,7 +1,7 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
+// You may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
@@ -11,6 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+/**
+ * @fileoverview Unit tests for CardAnimationService.
+ */
 
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 import {CardAnimationService} from './card-animation.service';
@@ -34,7 +38,7 @@ describe('CardAnimationService', () => {
   let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
   let windowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
   let messengerService: jasmine.SpyObj<MessengerService>;
-  let windowRef: jasmine.SpyObj<WindowRef>;
+  let windowRef: WindowRef;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -70,7 +74,12 @@ describe('CardAnimationService', () => {
           provide: MessengerService,
           useValue: jasmine.createSpyObj('MessengerService', ['sendMessage']),
         },
-        {provide: WindowRef, useValue: {nativeWindow: {}}},
+        {
+          provide: WindowRef,
+          useValue: {
+            nativeWindow: {} as Window,
+          },
+        },
       ],
     });
 
@@ -90,7 +99,7 @@ describe('CardAnimationService', () => {
     messengerService = TestBed.inject(
       MessengerService
     ) as jasmine.SpyObj<MessengerService>;
-    windowRef = TestBed.inject(WindowRef) as jasmine.SpyObj<WindowRef>;
+    windowRef = TestBed.inject(WindowRef);
   });
 
   it('should animate to two cards and reset animation flag after timeout', fakeAsync(() => {
@@ -128,14 +137,9 @@ describe('CardAnimationService', () => {
   }));
 
   it('should set displayed card index directly when window cannot show two cards', () => {
-    const totalCards = 3;
-    const lastCard: Card = {content: ''};
-    const secondLastCard: Card = {content: ''};
-
-    playerTranscriptService.getNumCards.and.returnValue(totalCards);
-    playerTranscriptService.getLastCard.and.returnValue(lastCard);
-    playerTranscriptService.getCard.and.returnValue(secondLastCard);
-
+    playerTranscriptService.getNumCards.and.returnValue(3);
+    playerTranscriptService.getLastCard.and.returnValue({content: ''});
+    playerTranscriptService.getCard.and.returnValue({content: ''});
     windowDimensionsService.getWidth.and.returnValue(300);
 
     const isSupplementalCardNonempty = (card: Card): boolean =>
@@ -143,81 +147,74 @@ describe('CardAnimationService', () => {
 
     service.updateCardLayout(isSupplementalCardNonempty);
 
-    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(
-      totalCards - 1
-    );
+    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(2);
   });
 
-  it('should call smoothScrollTo indirectly via scrollToBottom when tutor card is out of view', fakeAsync(() => {
-    const mockTutorCard: HTMLElement = {
-      getBoundingClientRect: () => ({
-        top: 100,
-        height: 100,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: 0,
-        x: 0,
-        y: 0,
-        toJSON: () => {},
-      }),
-    } as HTMLElement;
+  it('should call scrollTo if tutor card is partially out of view', fakeAsync(() => {
+    const mockTutorCard = document.createElement('div');
+    mockTutorCard.getBoundingClientRect = () => ({
+      top: 100,
+      height: 100,
+      bottom: 200,
+      left: 0,
+      right: 0,
+      width: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
 
     spyOn(document, 'querySelector').and.returnValue(mockTutorCard);
     spyOnProperty(window, 'scrollY', 'get').and.returnValue(50);
     spyOnProperty(window, 'innerHeight', 'get').and.returnValue(120);
 
-    const scrollToSpy = spyOn(window, 'scrollTo').and.callThrough();
+    const scrollSpy = spyOn(window, 'scrollTo');
 
     service.scrollToBottom();
     tick(150);
 
-    expect(scrollToSpy).toHaveBeenCalled();
+    expect(scrollSpy).toHaveBeenCalled();
   }));
 
-  it('should not call window.scrollTo via scrollToBottom if tutor card fully visible', fakeAsync(() => {
-    const mockTutorCard: HTMLElement = {
-      getBoundingClientRect: () => ({
-        top: 100,
-        height: 100,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: 0,
-        x: 0,
-        y: 0,
-        toJSON: () => {},
-      }),
-    } as HTMLElement;
+  it('should not scroll if tutor card is already visible', fakeAsync(() => {
+    const mockTutorCard = document.createElement('div');
+    mockTutorCard.getBoundingClientRect = () => ({
+      top: 100,
+      height: 100,
+      bottom: 200,
+      left: 0,
+      right: 0,
+      width: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
 
     spyOn(document, 'querySelector').and.returnValue(mockTutorCard);
     spyOnProperty(window, 'scrollY', 'get').and.returnValue(200);
     spyOnProperty(window, 'innerHeight', 'get').and.returnValue(200);
 
-    const scrollToSpy = spyOn(window, 'scrollTo').and.callThrough();
+    const scrollSpy = spyOn(window, 'scrollTo');
 
     service.scrollToBottom();
     tick(150);
 
-    expect(scrollToSpy).not.toHaveBeenCalled();
+    expect(scrollSpy).not.toHaveBeenCalled();
   }));
 
-  it('should not scrollToBottom if tutor card is not present', fakeAsync(() => {
+  it('should not scroll if tutor card is missing', fakeAsync(() => {
     spyOn(document, 'querySelector').and.returnValue(null);
-    spyOnProperty(window, 'scrollY', 'get').and.returnValue(200);
-    spyOnProperty(window, 'innerHeight', 'get').and.returnValue(200);
-
-    const scrollToSpy = spyOn(window, 'scrollTo').and.callThrough();
+    const scrollSpy = spyOn(window, 'scrollTo');
 
     service.scrollToBottom();
     tick(150);
 
-    expect(scrollToSpy).not.toHaveBeenCalled();
+    expect(scrollSpy).not.toHaveBeenCalled();
   }));
 
-  it('should schedule next card transition, call callback and focus after delay', fakeAsync(() => {
+  it('should call callback and focus after transition', fakeAsync(() => {
     const callback = jasmine.createSpy('callback');
-    service.scheduleNextCardTransition('nextFocus', callback);
+    service.scheduleNextCardTransition('focusLabel', callback);
 
     tick(
       0.1 * ExplorationPlayerConstants.TIME_FADEOUT_MSEC +
@@ -232,39 +229,29 @@ describe('CardAnimationService', () => {
     );
 
     expect(focusManagerService.setFocusIfOnDesktop).toHaveBeenCalledWith(
-      'nextFocus'
+      'focusLabel'
     );
   }));
 
-  it('should update card layout and animate to two cards if conditions are met', () => {
+  it('should animate to two cards if conditions match', () => {
     playerTranscriptService.getNumCards.and.returnValue(3);
-    const lastCard: Card = {content: 'last'};
-    const secondLastCard: Card = {content: 'secondLast'};
-    playerTranscriptService.getLastCard.and.returnValue(lastCard);
-    playerTranscriptService.getCard.and.returnValue(secondLastCard);
+    playerTranscriptService.getLastCard.and.returnValue({content: 'a'});
+    playerTranscriptService.getCard.and.returnValue({content: 'b'});
     windowDimensionsService.getWidth.and.returnValue(1200);
 
-    const isSupplementalCardNonempty = (card: Card): boolean =>
-      card.content === 'last';
-
-    service.updateCardLayout(isSupplementalCardNonempty);
+    service.updateCardLayout((card: Card) => card.content === 'a');
 
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(2);
     expect(service.getIsAnimatingToTwoCards()).toBeTrue();
   });
 
-  it('should update card layout and animate to one card if conditions are met', fakeAsync(() => {
+  it('should animate to one card if conditions match', fakeAsync(() => {
     playerTranscriptService.getNumCards.and.returnValue(3);
-    const lastCard: Card = {content: ''};
-    const secondLastCard: Card = {content: 'secondLast'};
-    playerTranscriptService.getLastCard.and.returnValue(lastCard);
-    playerTranscriptService.getCard.and.returnValue(secondLastCard);
+    playerTranscriptService.getLastCard.and.returnValue({content: ''});
+    playerTranscriptService.getCard.and.returnValue({content: 'b'});
     windowDimensionsService.getWidth.and.returnValue(1200);
 
-    const isSupplementalCardNonempty = (card: Card): boolean =>
-      card.content !== '';
-
-    service.updateCardLayout(isSupplementalCardNonempty);
+    service.updateCardLayout((card: Card) => card.content !== '');
 
     expect(service.getIsAnimatingToOneCard()).toBeTrue();
 
@@ -273,11 +260,8 @@ describe('CardAnimationService', () => {
     expect(service.getIsAnimatingToOneCard()).toBeFalse();
   }));
 
-  it('should adjust iframe height and send message on significant height change', fakeAsync(() => {
-    Object.defineProperty(document, 'body', {
-      get: () => ({scrollHeight: 1000}),
-      configurable: true,
-    });
+  it('should send message on significant height change', fakeAsync(() => {
+    spyOnProperty(document.body, 'scrollHeight', 'get').and.returnValue(1000);
 
     service.adjustPageHeight(true, () => {});
     tick(100);
@@ -288,12 +272,9 @@ describe('CardAnimationService', () => {
     );
   }));
 
-  it('should call callback after height adjustment', fakeAsync(() => {
+  it('should call callback after adjusting height', fakeAsync(() => {
+    spyOnProperty(document.body, 'scrollHeight', 'get').and.returnValue(900);
     let called = false;
-    Object.defineProperty(document, 'body', {
-      get: () => ({scrollHeight: 900}),
-      configurable: true,
-    });
 
     service.adjustPageHeight(false, () => {
       called = true;
@@ -303,11 +284,12 @@ describe('CardAnimationService', () => {
     expect(called).toBeTrue();
   }));
 
-  it('should register window resize callback to adjust page height', () => {
+  it('should register resize callback and adjust height on resize', () => {
     const adjustSpy = spyOn(service, 'adjustPageHeight');
+
     service.adjustPageHeightOnresize();
 
     (windowRef.nativeWindow as Window).onresize?.(new UIEvent('resize'));
-    expect(adjustSpy).toHaveBeenCalledWith(false, null);
+    expect(adjustSpy).toHaveBeenCalledWith(false, jasmine.any(Function));
   });
 });
