@@ -7,7 +7,7 @@ on:
   issues:
     types:
       - assigned
-permissions: read-all
+permissions: {}
 jobs:
   check-cla:
     runs-on: ubuntu-24.04
@@ -27,23 +27,15 @@ jobs:
         id: check-cla
         uses: actions/github-script@v6
         env:
-          SHEETS_CRED: '${{ secrets.SHEETS_CRED }}'
-          SPREADSHEET_ID: '${{ secrets.SPREADSHEET_ID }}'
+          CLIENT_SECRET: '${{ secrets.SHEETS_CRED }}'
+          CLA_SHEET_ID: '${{ secrets.SPREADSHEET_ID }}'
           USERNAME: '${{ github.event.pull_request.user.login || github.event.assignee.login }}'
         with:
           script: |
             try {
-              const sheetsCredRaw = process.env.SHEETS_CRED;
+              const sheetsCredRaw = process.env.CLIENT_SECRET;
               let sheetsCredJson;
-              try {
-                sheetsCredJson = JSON.parse(sheetsCredRaw);
-                console.log("SHEETS_CRED parsed successfully");
-              } catch (parseError) {
-                console.error("Failed to parse SHEETS_CRED:", parseError.message);
-                console.log("First 10 chars:", sheetsCredRaw.substring(0, 10) + "...");
-                throw parseError;
-              }
-              console.log("SHEETS_CRED loaded successfully");
+              sheetsCredJson = JSON.parse(sheetsCredRaw);
               const username = process.env.USERNAME;
               console.log(`Checking CLA signature for user: ${username}`);
 
@@ -52,9 +44,9 @@ jobs:
               const { OAuth2Client } = require('google-auth-library');
 
               if (!sheetsCredJson.installed || !sheetsCredJson.installed.client_id || !sheetsCredJson.installed.client_secret || !sheetsCredJson.refresh_token) {
-                console.error("SHEETS_CRED is missing required credential fields");
-                core.warning("SHEETS_CRED is missing required credential fields");
-                core.setOutput('has-signed-cla', 'true');
+                console.error("CLIENT_SECRET is missing required credential fields");
+                core.warning("CLIENT_SECRET is missing required credential fields");
+                core.setOutput('has-signed-cla', 'false');
                 return;
               }
 
@@ -67,19 +59,18 @@ jobs:
               });
 
               const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
-              console.log(`Fetching data from spreadsheet ID: ${process.env.SPREADSHEET_ID}`);
               const response = await sheets.spreadsheets.values.get({
-                spreadsheetId: process.env.SPREADSHEET_ID,
+                spreadsheetId: process.env.CLA_SHEET_ID,
                 range: 'Usernames!A:A',
               });
 
               if (!response) {
-                console.log("No response from Google Sheets API");
+                console.error("No response from Google Sheets API");
                 core.setOutput('has-signed-cla', 'false');
                 return;
               }
               if (!response.data.values) {
-                console.log("No values found in spreadsheet");
+                console.error("No values found in spreadsheet");
                 core.setOutput('has-signed-cla', 'false');
                 return;
               }
@@ -96,32 +87,31 @@ jobs:
             } catch (error) {
               console.error("Error during CLA verification:", error);
               core.warning(`CLA check failed: ${error.message}`);
-              // Don't fail the workflow on error, default to allowing the contribution
-              core.setOutput('has-signed-cla', 'true');
+              core.setOutput('has-signed-cla', 'false');
             }
 
 
       - name: Remove assignee and notify if CLA not signed
         if: steps.check-cla.outputs.has-signed-cla == 'false'
         uses: actions/github-script@v6
+        env:
+          USERNAME: '${{ github.event.pull_request.user.login || github.event.assignee.login }}'
         with:
           script: |
-            // Determine if we're handling a PR or an issue
-            const isPullRequest = !!context.payload.pull_request;
-            const isIssue = !!context.payload.issue;
-            const assignee = context.payload.assignee;
-            let targetNumber, assigneeLogin, commentBody;
+            const isPullRequest = Boolean(context.payload.pull_request);
+            const isIssue = Boolean(context.payload.issue);
+            const username = process.env.USERNAME;
+            let targetNumber, commentBody;
             
             if (isIssue && context.payload.assignee) {
               const issue = context.payload.issue;
-              const assignee = context.payload.assignee;
               if (!issue) {
                 core.setFailed('Invalid issue payload');
                 return;
               }
 
               const linkToCla = '[here](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up)';
-              commentBody = `Hi @${assignee.login}, you need to sign the CLA before you can get assigned to issues. Follow the instructions ${linkToCla} to get started. I am unassigning you for now, feel free to assign yourself once you have signed the CLA. Thanks!`;
+              commentBody = `Hi @${username}, you need to sign the CLA before you can get assigned to issues. Follow the instructions ${linkToCla} to get started. I am unassigning you for now; feel free to assign yourself once you have signed the CLA. Thanks!`;
               
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
@@ -134,10 +124,10 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                assignees: [assignee.login]
+                assignees: username
               });
               
-              console.log(`Removed assignee ${assignee.login} from issue #${issue.number} due to unsigned CLA`);
+              console.log(`Removed assignee ${username} from issue #${issue.number} due to unsigned CLA`);
 
             } else if (isPullRequest) {
               // Handle pull request
@@ -146,9 +136,9 @@ jobs:
                 core.setFailed('Invalid pull request payload');
                 return;
               }
-              console.log(`Pull request #${pr.number} opened by @${pr.user.login}`);
+              console.log(`Pull request #${pr.number} opened by @${username}`);
               const linkToCla = '[here](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up)';
-              commentBody = `Hi @${pr.user.login}, you need to sign the CLA before we can accept your pull request. Follow the instructions ${linkToCla} to get started. Thanks!`;
+              commentBody = `Hi @${username}, you need to sign the CLA before we can accept your pull request. Follow the instructions ${linkToCla} to get started. Thanks!`;
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -165,7 +155,15 @@ jobs:
 
               console.log(`Closed and commented on PR #${pr.number} due to unsigned CLA`);
             } else {
+              const contextInfo = {
+                eventName: context.eventName,
+                username: username,
+                fullPayload: context.payload
+              };
+              console.error('CLA enforcement failed - unable to determine event type');
+              console.error("Context information:", contextInfo);
               core.setFailed('Unknown event type or missing context');
+              
             }
 
       - name: Report failure if failed on oppia/oppia develop branch
