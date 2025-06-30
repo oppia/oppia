@@ -7,7 +7,7 @@
                       !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty(),
                     'conversation-skin-tutor-card-alone':
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
-      <oppia-tutor-card [displayedCard]="displayedCard"
+      <oppia-tutor-card [displayedCard]="getDisplayedCard()"
                         [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
                         [avatarImageIsShown]="true"
                         [shouldHideInteraction]="continueToReviseStateButtonIsVisible || !showInteraction"
@@ -19,7 +19,7 @@
                         [nextLessonLink]="getExplorationLink()">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
-        <oppia-supplemental-card [displayedCard]="displayedCard"
+        <oppia-supplemental-card [displayedCard]="getDisplayedCard()"
                                  [isLearnAgainButton]="isLearnAgainButton()">
         </oppia-supplemental-card>
       </div>
@@ -29,7 +29,7 @@
       <div *ngIf="!getCanAskLearnerForAnswerInfo()">
         <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
                             [isLearnAgainButton]="isLearnAgainButton()"
-                            [displayedCard]="displayedCard"
+                            [displayedCard]="getDisplayedCard()"
                             [submitButtonIsShown]="!getAnswerIsBeingProcessed() && !continueToReviseStateButtonIsVisible"
                             [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
                             (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
@@ -60,7 +60,7 @@
     <div *ngIf="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
       <div class="supplemental-card-parent-container">
-        <oppia-supplemental-card [displayedCard]="displayedCard"
+        <oppia-supplemental-card [displayedCard]="getDisplayedCard()"
                                  [isLearnAgainButton]="isLearnAgainButton()">
         </oppia-supplemental-card>
         <div class="conversation-skin-supplemental-nav" *ngIf="isSupplementalNavShown() && !getCanAskLearnerForAnswerInfo()">

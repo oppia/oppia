@@ -86,7 +86,6 @@ export class ConversationSkinComponent {
   isIframed: boolean;
   recommendedExplorationSummaries: LearnerExplorationSummary[] = [];
   OPPIA_AVATAR_IMAGE_URL: string;
-  displayedCard: StateCard;
   correctnessFooterIsShown: boolean = true;
 
   collectionSummary;
@@ -294,7 +293,7 @@ export class ConversationSkinComponent {
         if (
           this.conversationFlowService.getHasInteractedAtLeastOnce() &&
           !this._editorPreviewMode &&
-          !this.displayedCard.isTerminal() &&
+          !this.conversationFlowService.getDisplayedCard().isTerminal() &&
           !this.explorationModeService.isInQuestionMode()
         ) {
           this.statsReportingService.recordMaybeLeaveEvent(
@@ -444,15 +443,15 @@ export class ConversationSkinComponent {
   }
 
   isOnTerminalCard(): boolean {
-    return this.displayedCard && this.displayedCard.isTerminal();
+    let displayedCard = this.conversationFlowService.getDisplayedCard();
+    return displayedCard && displayedCard.isTerminal();
   }
 
   isCurrentSupplementalCardNonempty(): boolean {
+    let displayedCard = this.conversationFlowService.getDisplayedCard();
     return (
-      this.displayedCard &&
-      this.conversationFlowService.isSupplementalCardNonempty(
-        this.displayedCard
-      )
+      displayedCard &&
+      this.conversationFlowService.isSupplementalCardNonempty(displayedCard)
     );
   }
 
@@ -465,13 +464,14 @@ export class ConversationSkinComponent {
   }
 
   isSupplementalNavShown(): boolean {
+    let displayedCard = this.conversationFlowService.getDisplayedCard();
     if (
-      this.displayedCard.getStateName() === null &&
+      displayedCard.getStateName() === null &&
       !this.explorationModeService.isInQuestionMode()
     ) {
       return false;
     }
-    let interaction = this.displayedCard.getInteraction();
+    let interaction = displayedCard.getInteraction();
     return (
       Boolean(interaction.id) &&
       INTERACTION_SPECS[interaction.id].show_generic_submit_button &&
@@ -541,7 +541,7 @@ export class ConversationSkinComponent {
   }
 
   submitAnswerFromProgressNav(): void {
-    this.displayedCard.toggleSubmitClicked(true);
+    this.conversationFlowService.getDisplayedCard().toggleSubmitClicked(true);
     this.currentInteractionService.submitAnswer();
   }
 
@@ -565,10 +565,10 @@ export class ConversationSkinComponent {
   isDisplayedCardCompletedInPrevSession(): boolean {
     let prevSessionStatesProgress =
       this.playerTranscriptService.getPrevSessionStatesProgress();
+    let displayedCard = this.conversationFlowService.getDisplayedCard();
     return (
-      this.displayedCard.getInteraction() &&
-      prevSessionStatesProgress.indexOf(this.displayedCard.getStateName()) !==
-        -1
+      displayedCard.getInteraction() &&
+      prevSessionStatesProgress.indexOf(displayedCard.getStateName()) !== -1
     );
   }
 
@@ -583,5 +583,9 @@ export class ConversationSkinComponent {
       this.windowDimensionsService.getWidth() >
       ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX
     );
+  }
+
+  getDisplayedCard(): StateCard {
+    return this.conversationFlowService.getDisplayedCard();
   }
 }

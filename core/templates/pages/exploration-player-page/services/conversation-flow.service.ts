@@ -103,6 +103,7 @@ export class ConversationFlowService {
   solutionForState: Solution | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
   nextStateCard!: StateCard;
+  displayedCard: StateCard;
 
   // The following variables are used to track the state of the answer submission process.
   answerIsCorrect = false;
@@ -283,6 +284,7 @@ export class ConversationFlowService {
     let isInEditorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
     let explorationId = this.pageContextService.getExplorationId();
+    this.displayedCard = this._getCurrentCard();
 
     if (
       index > 0 &&
@@ -363,13 +365,12 @@ export class ConversationFlowService {
     answer: string,
     interactionRulesService: InteractionRulesService
   ): void {
-    let displayedCard = this._getCurrentCard();
     let editorPreviewMode = this.pageContextService.isInExplorationEditorPage();
     let explorationId = this.pageContextService.getExplorationId();
-    displayedCard.updateCurrentAnswer(null);
+    this.displayedCard.updateCurrentAnswer(null);
 
     // Safety check to prevent double submissions from occurring.
-    if (this._shouldBlockSubmission(displayedCard)) {
+    if (this._shouldBlockSubmission(this.displayedCard)) {
       return;
     }
 
@@ -406,6 +407,7 @@ export class ConversationFlowService {
     this.playerPositionService.recordAnswerSubmission();
     const currentEngineService =
       this.currentEngineService.getCurrentEngineService();
+    let displayedCard = this.displayedCard;
     this.answerIsCorrect = currentEngineService.submitAnswer(
       answer,
       interactionRulesService,
@@ -457,14 +459,13 @@ export class ConversationFlowService {
    * @returns {boolean} True if "Learn Again" button should be shown, false otherwise.
    */
   isLearnAgainButton(): boolean {
-    let displayedCard = this._getCurrentCard();
     let conceptCardIsBeingShown =
-      displayedCard.getStateName() === null &&
+      this.displayedCard.getStateName() === null &&
       !this.explorationModeService.isInQuestionMode();
     if (conceptCardIsBeingShown) {
       return false;
     }
-    let interaction = displayedCard.getInteraction();
+    let interaction = this.displayedCard.getInteraction();
 
     if (!interaction.id) {
       // An editor might also try to view preview tab without adding
@@ -556,10 +557,9 @@ export class ConversationFlowService {
    * - Proceeding to the next pending card otherwise.
    */
   showUpcomingCard(): void {
-    let displayedCard = this._getCurrentCard();
     let currentIndex = this.playerPositionService.getDisplayedCardIndex();
     let conceptCardIsBeingShown =
-      displayedCard.getStateName() === null &&
+      this.displayedCard.getStateName() === null &&
       !this.explorationModeService.isInQuestionMode();
     if (
       conceptCardIsBeingShown &&
@@ -585,8 +585,8 @@ export class ConversationFlowService {
     let nextCard = this.getNextStateCard();
     let conceptCard = this.conceptCardManagerService.getConceptCard();
     if (
-      displayedCard.isCompleted() &&
-      nextCard.getStateName() === displayedCard.getStateName() &&
+      this.displayedCard.isCompleted() &&
+      nextCard.getStateName() === this.displayedCard.getStateName() &&
       conceptCard
     ) {
       this._recordNewCardAdded();
@@ -607,7 +607,7 @@ export class ConversationFlowService {
           nextCard.getStateName()
         );
       if (indexOfRevisionCard !== null) {
-        displayedCard.markAsNotCompleted();
+        this.displayedCard.markAsNotCompleted();
         this._changeCard(indexOfRevisionCard);
         return;
       }
@@ -913,13 +913,11 @@ export class ConversationFlowService {
     feedbackHtml: string | null,
     isFinalQuestion: boolean
   ): void {
-    let displayedCard = this._getCurrentCard();
-
     // There is a new card. If there is no feedback, move on
     // immediately. Otherwise, give the learner a chance to read
     // the feedback, and display a 'Continue' button.
     this.pendingCardWasSeenBefore = false;
-    displayedCard.markAsCompleted();
+    this.displayedCard.markAsCompleted();
     if (isFinalQuestion) {
       if (this.explorationModeService.isInQuestionPlayerMode()) {
         // We will redirect to the results page here.
@@ -928,7 +926,7 @@ export class ConversationFlowService {
       this.moveToExploration = true;
       if (feedbackHtml) {
         this.playerTranscriptService.addNewResponse(feedbackHtml);
-        if (!displayedCard.isInteractionInline()) {
+        if (!this.displayedCard.isInteractionInline()) {
           this.playerPositionService.onHelpCardAvailable.emit({
             helpCardHtml: feedbackHtml,
             hasContinueButton: true,
@@ -954,7 +952,7 @@ export class ConversationFlowService {
         this.pendingCardWasSeenBefore = true;
       }
       this.playerTranscriptService.addNewResponse(feedbackHtml);
-      if (!displayedCard.isInteractionInline()) {
+      if (!this.displayedCard.isInteractionInline()) {
         this.playerPositionService.onHelpCardAvailable.emit({
           helpCardHtml: feedbackHtml,
           hasContinueButton: true,
@@ -983,7 +981,6 @@ export class ConversationFlowService {
    * @param newCard - The new card object to be added to the transcript.
    */
   private _addNewCard(newCard: StateCard): void {
-    let displayedCard = this._getCurrentCard();
     this.playerTranscriptService.addNewCard(newCard);
     this._shouldDisplayTranslation();
     this.cardAnimationService.updateCardLayout(
@@ -994,8 +991,8 @@ export class ConversationFlowService {
       this.playerPositionService.getDisplayedCardIndex()
     );
 
-    if (displayedCard && displayedCard.isTerminal()) {
-      this._handleTerminalCard(displayedCard);
+    if (this.displayedCard && this.displayedCard.isTerminal()) {
+      this._handleTerminalCard(this.displayedCard);
     }
   }
 
@@ -1491,7 +1488,7 @@ export class ConversationFlowService {
    * @returns {void}
    */
   private _setActiveVoiceover(feedbackHtml: string): void {
-    let interaction = this._getCurrentCard().getInteraction();
+    let interaction = this.displayedCard.getInteraction();
 
     let feedbackContentId =
       interaction.getContentIdForMatchingHtml(feedbackHtml);
@@ -1691,6 +1688,14 @@ export class ConversationFlowService {
 
   setHasFullyLoaded(hasLoaded: boolean): void {
     this.hasFullyLoaded = hasLoaded;
+  }
+
+  getDisplayedCard(): StateCard {
+    return this.displayedCard;
+  }
+
+  setDisplayedCard(card: StateCard): void {
+    this.displayedCard = card;
   }
 
   get onPlayerStateChange(): EventEmitter<string> {
