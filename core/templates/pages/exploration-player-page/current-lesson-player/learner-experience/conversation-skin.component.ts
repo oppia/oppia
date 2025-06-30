@@ -324,7 +324,9 @@ export class ConversationSkinComponent {
       this.cardAnimationService.adjustPageHeightOnresize();
 
       this.currentInteractionService.setOnSubmitFn(
-        this.conversationFlowService.submitAnswer
+        this.conversationFlowService.submitAnswer.bind(
+          this.conversationFlowService
+        )
       );
       this.initializePage();
 
@@ -508,24 +510,32 @@ export class ConversationSkinComponent {
   initializePage(): void {
     this.recommendedExplorationSummaries = [];
     this.playerPositionService.init(
-      this.conversationFlowService.navigateToDisplayedCard
+      this.conversationFlowService.navigateToDisplayedCard.bind(
+        this.conversationFlowService
+      )
     );
     if (this.questionPlayerConfig) {
       this.explorationModeService.setQuestionPlayerMode();
       this.questionPlayerEngineService.initQuestionPlayer(
         this.questionPlayerConfig,
-        this.conversationFlowService.initializeDirectiveComponents,
+        this.conversationFlowService.initializeDirectiveComponents.bind(
+          this.conversationFlowService
+        ),
         this.showQuestionAreNotAvailable
       );
     } else if (this.diagnosticTestTopicTrackerModel) {
       this.explorationModeService.setDiagnosticTestPlayerMode();
       this.diagnosticTestPlayerEngineService.init(
         this.diagnosticTestTopicTrackerModel,
-        this.conversationFlowService.initializeDirectiveComponents
+        this.conversationFlowService.initializeDirectiveComponents.bind(
+          this.conversationFlowService
+        )
       );
     } else {
       this.explorationInitializationService.initializePlayer(
-        this.conversationFlowService.initializeDirectiveComponents
+        this.conversationFlowService.initializeDirectiveComponents.bind(
+          this.conversationFlowService
+        )
       );
     }
   }

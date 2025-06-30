@@ -578,7 +578,7 @@ export class ConversationFlowService {
       this.moveToExploration = false;
       this.explorationModeService.setExplorationModeFromUrl();
       this.explorationEngineService.loadInitialState(
-        this.initializeDirectiveComponents
+        this.initializeDirectiveComponents.bind(this)
       );
       return;
     }
@@ -986,7 +986,9 @@ export class ConversationFlowService {
     let displayedCard = this._getCurrentCard();
     this.playerTranscriptService.addNewCard(newCard);
     this._shouldDisplayTranslation();
-    this.cardAnimationService.updateCardLayout(this.isSupplementalCardNonempty);
+    this.cardAnimationService.updateCardLayout(
+      this.isSupplementalCardNonempty.bind(this)
+    );
 
     this.playerPositionService.changeCurrentQuestion(
       this.playerPositionService.getDisplayedCardIndex()
