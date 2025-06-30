@@ -98,13 +98,14 @@ import {LearnerDashboardBackendApiService} from '../../../../domain/learner_dash
 import {EditableExplorationBackendApiService} from '../../../../domain/exploration/editable-exploration-backend-api.service';
 import {DiagnosticTestTopicTrackerModel} from '../../../../pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
-import {SolutionObjectFactory} from '../../../../domain/exploration/SolutionObjectFactory';
+import {Solution} from '../../../../domain/exploration/solution.model';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {CurrentEngineService} from '../../services/current-engine.service';
 import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
 import {LearnerExplorationSummary} from '../../../../domain/summary/learner-exploration-summary.model';
 import {ChapterProgressService} from '../../services/chapter-progress.service';
+
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -173,7 +174,6 @@ describe('Conversation skin component', () => {
   let translateService: TranslateService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let conceptCardManagerService: ConceptCardManagerService;
-  let solutionObjectFactory: SolutionObjectFactory;
   let voiceoverPlayerService: VoiceoverPlayerService;
 
   let displayedCard = new StateCard(
@@ -464,7 +464,6 @@ describe('Conversation skin component', () => {
       imports: [HttpClientTestingModule],
       declarations: [ConversationSkinComponent, MockTranslatePipe],
       providers: [
-        SolutionObjectFactory,
         {
           provide: WindowRef,
           useClass: MockWindowRef,
@@ -543,7 +542,6 @@ describe('Conversation skin component', () => {
       RefresherExplorationConfirmationModalService
     );
     statsReportingService = TestBed.inject(StatsReportingService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
@@ -1222,7 +1220,7 @@ describe('Conversation skin component', () => {
         'releaseSolution'
       );
       let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
-      const solutionForState = solutionObjectFactory.createNew(
+      const solutionForState = Solution.createNew(
         true,
         'answer',
         'Html',
@@ -1296,7 +1294,7 @@ describe('Conversation skin component', () => {
         'releaseSolution'
       );
       let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
-      const solutionForState = solutionObjectFactory.createNew(
+      const solutionForState = Solution.createNew(
         true,
         'answer',
         'Html',
