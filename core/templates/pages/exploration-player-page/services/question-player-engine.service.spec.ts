@@ -37,6 +37,7 @@ import {
 } from './answer-classification.service';
 import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service.ts';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
+import {StateObjectFactory} from '../../../domain/state/StateObjectFactory';
 
 describe('Question player engine service', () => {
   let alertsService: AlertsService;
@@ -52,6 +53,10 @@ describe('Question player engine service', () => {
   let multipleQuestionsObjects: Question[];
   let questionBackendApiService: QuestionBackendApiService;
   let textInputService: InteractionRulesService;
+
+  let questionId = 'question_id';
+  let stateObject: StateObjectFactory;
+  let question: Question;
 
   beforeEach(() => {
     singleQuestionBackendDict = {
@@ -379,6 +384,7 @@ describe('Question player engine service', () => {
         QuestionPlayerEngineService,
         QuestionObjectFactory,
         QuestionBackendApiService,
+        StateObjectFactory,
         ExpressionInterpolationService,
         FocusManagerService,
         AlertsService,
@@ -389,6 +395,7 @@ describe('Question player engine service', () => {
     });
 
     alertsService = TestBed.inject(AlertsService);
+    stateObject = TestBed.inject(StateObjectFactory);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     pageContextService = TestBed.inject(PageContextService);
     expressionInterpolationService = TestBed.inject(
@@ -408,6 +415,53 @@ describe('Question player engine service', () => {
         return questionObjectFactory.createFromBackendDict(questionDict);
       }
     );
+    question = new Question(
+      questionId,
+      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      '',
+      7,
+      [],
+      [],
+      2
+    );
+  });
+
+  it('should register hint as used', () => {
+    questionPlayerEngineService.hintUsed(question);
+
+    expect(
+      questionPlayerEngineService.questionPlayerState[questionId]
+    ).toBeDefined();
+  });
+
+  it('should register solution viewed', () => {
+    questionPlayerEngineService.solutionViewed(question);
+
+    expect(
+      questionPlayerEngineService.questionPlayerState[questionId].viewedSolution
+    ).toBeDefined();
+  });
+
+  it('should submit answer', () => {
+    questionPlayerEngineService.answerSubmitted(question, true, '');
+    questionPlayerEngineService.solutionViewed(question);
+    questionPlayerEngineService.answerSubmitted(question, true, '');
+
+    expect(
+      questionPlayerEngineService.questionPlayerState[questionId].answers.length
+    ).toEqual(1);
+  });
+
+  it('should get question player state data', () => {
+    expect(
+      questionPlayerEngineService.getQuestionPlayerStateData()
+    ).toBeDefined();
+  });
+
+  it('should access on question session completed', () => {
+    expect(
+      questionPlayerEngineService.onQuestionSessionCompleted
+    ).toBeDefined();
   });
 
   it('should load questions when initialized', () => {

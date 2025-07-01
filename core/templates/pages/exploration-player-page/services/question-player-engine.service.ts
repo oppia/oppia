@@ -47,16 +47,40 @@ interface QuestionPlayerConfigDict {
   questionsSortedByDifficulty: boolean;
 }
 
+interface UsedHintOrSolution {
+  timestamp: number;
+}
+
+interface Answer {
+  isCorrect: boolean;
+  timestamp: number;
+  taggedSkillMisconceptionId: string;
+}
+
+// Viewed solution being undefined signifies that the solution
+// has not yet been viewed.
+interface QuestionPlayerState {
+  [key: string]: {
+    linkedSkillIds: string[];
+    answers: Answer[];
+    usedHints: UsedHintOrSolution[];
+    viewedSolution: UsedHintOrSolution | undefined;
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class QuestionPlayerEngineService {
   private _totalQuestionsReceivedEventEmitter: EventEmitter<number> =
     new EventEmitter();
+  private _questionSessionCompletedEventEmitter = new EventEmitter<object>();
+  private _resultsPageIsLoadedEventEmitter = new EventEmitter<boolean>();
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
   private currentIndex: number = null;
   private nextIndex: number = null;
+  questionPlayerState: QuestionPlayerState = {};
 
   constructor(
     private alertsService: AlertsService,
@@ -69,104 +93,6 @@ export class QuestionPlayerEngineService {
     private playerTranscriptService: PlayerTranscriptService,
     private questionObjectFactory: QuestionObjectFactory
   ) {}
-
-  // Evaluate feedback.
-  private makeFeedback(
-    feedbackHtml: string,
-    envs: Record<string, string>[]
-  ): string {
-    return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
-  }
-
-  // Evaluate question string.
-  private makeQuestion(
-    newState: State,
-    envs: Record<string, string>[]
-  ): string {
-    return this.expressionInterpolationService.processHtml(
-      newState.content.html,
-      envs
-    );
-  }
-
-  private getRandomSuffix(): string {
-    // This is a bit of a hack. When a refresh to a component property
-    // happens, Angular compares the new value of the property to its previous
-    // value. If they are the same, then the property is not updated.
-    // Appending a random suffix makes the new value different from the
-    // previous one, and thus indirectly forces a refresh.
-    let randomSuffix = '';
-    const N = Math.round(Math.random() * 1000);
-    for (let i = 0; i < N; i++) {
-      randomSuffix += ' ';
-    }
-    return randomSuffix;
-  }
-
-  // This should only be called when 'exploration' is non-null.
-  private loadInitialQuestion(
-    successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-    errorCallback: () => void
-  ): void {
-    this.pageContextService.setCustomEntityContext(
-      AppConstants.ENTITY_TYPE.QUESTION,
-      this.questions[0].getId()
-    );
-    const initialState = this.questions[0].getStateData();
-
-    const questionHtml = this.makeQuestion(initialState, []);
-    if (questionHtml === null) {
-      this.alertsService.addWarning('Question name should not be empty.');
-      errorCallback();
-      return;
-    }
-
-    this.setCurrentIndex(0);
-    this.nextIndex = 0;
-
-    const interaction = initialState.interaction;
-    const nextFocusLabel = this.focusManagerService.generateFocusLabel();
-
-    const interactionId = interaction.id;
-    let interactionHtml = null;
-
-    if (interactionId) {
-      interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
-        interactionId,
-        interaction.customizationArgs,
-        true,
-        nextFocusLabel,
-        null
-      );
-    }
-    const initialCard = StateCard.createNewCard(
-      null,
-      questionHtml,
-      interactionHtml,
-      interaction,
-      initialState.content.contentId
-    );
-    successCallback(initialCard, nextFocusLabel);
-  }
-
-  private getCurrentStateData() {
-    return this.questions[this.currentIndex].getStateData();
-  }
-
-  private getNextStateData() {
-    return this.questions[this.nextIndex].getStateData();
-  }
-
-  private getNextInteractionHtml(labelForFocusTarget: string): string {
-    const interactionId = this.getNextStateData().interaction.id;
-    return this.explorationHtmlFormatterService.getInteractionHtml(
-      interactionId,
-      this.getNextStateData().interaction.customizationArgs,
-      true,
-      labelForFocusTarget,
-      null
-    );
-  }
 
   initQuestionPlayer(
     questionPlayerConfig: QuestionPlayerConfigDict,
@@ -188,17 +114,6 @@ export class QuestionPlayerEngineService {
           errorCallback
         );
       });
-  }
-
-  private initializeQuestionPlayerServices(
-    questionDicts: QuestionBackendDict[],
-    successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
-    errorCallback: () => void
-  ): void {
-    let questionObjects = questionDicts.map(questionDict => {
-      return this.questionObjectFactory.createFromBackendDict(questionDict);
-    });
-    this.init(questionObjects, successCallback, errorCallback);
   }
 
   initializePretestServices(
@@ -404,6 +319,193 @@ export class QuestionPlayerEngineService {
       _nextFocusLabel
     );
     return answerIsCorrect;
+  }
+
+  hintUsed(question: Question): void {
+    let questionId = question.getId() as string;
+    if (!this.questionPlayerState[questionId]) {
+      this._createNewQuestionPlayerState(
+        questionId,
+        question.getLinkedSkillIds()
+      );
+    }
+    this.questionPlayerState[questionId].usedHints.push({
+      timestamp: this._getCurrentTime(),
+    });
+  }
+
+  solutionViewed(question: Question): void {
+    let questionId = question.getId() as string;
+    if (!this.questionPlayerState[questionId]) {
+      this._createNewQuestionPlayerState(
+        questionId,
+        question.getLinkedSkillIds()
+      );
+    }
+    this.questionPlayerState[questionId].viewedSolution = {
+      timestamp: this._getCurrentTime(),
+    };
+  }
+
+  answerSubmitted(
+    question: Question,
+    isCorrect: boolean,
+    taggedSkillMisconceptionId: string
+  ): void {
+    let questionId = question.getId() as string;
+    if (!this.questionPlayerState[questionId]) {
+      this._createNewQuestionPlayerState(
+        questionId,
+        question.getLinkedSkillIds()
+      );
+    }
+    // Don't store a correct answer in the case where
+    // the learner viewed the solution for this question.
+    if (isCorrect && this.questionPlayerState[questionId].viewedSolution) {
+      return;
+    }
+    this.questionPlayerState[questionId].answers.push({
+      isCorrect: isCorrect,
+      timestamp: this._getCurrentTime(),
+      taggedSkillMisconceptionId: taggedSkillMisconceptionId,
+    });
+  }
+
+  getQuestionPlayerStateData(): object {
+    return this.questionPlayerState;
+  }
+
+  // Evaluate feedback.
+  private makeFeedback(
+    feedbackHtml: string,
+    envs: Record<string, string>[]
+  ): string {
+    return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
+  }
+
+  // Evaluate question string.
+  private makeQuestion(
+    newState: State,
+    envs: Record<string, string>[]
+  ): string {
+    return this.expressionInterpolationService.processHtml(
+      newState.content.html,
+      envs
+    );
+  }
+
+  private getRandomSuffix(): string {
+    // This is a bit of a hack. When a refresh to a component property
+    // happens, Angular compares the new value of the property to its previous
+    // value. If they are the same, then the property is not updated.
+    // Appending a random suffix makes the new value different from the
+    // previous one, and thus indirectly forces a refresh.
+    let randomSuffix = '';
+    const N = Math.round(Math.random() * 1000);
+    for (let i = 0; i < N; i++) {
+      randomSuffix += ' ';
+    }
+    return randomSuffix;
+  }
+
+  private _getCurrentTime(): number {
+    return new Date().getTime();
+  }
+
+  // This should only be called when 'exploration' is non-null.
+  private loadInitialQuestion(
+    successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
+    errorCallback: () => void
+  ): void {
+    this.pageContextService.setCustomEntityContext(
+      AppConstants.ENTITY_TYPE.QUESTION,
+      this.questions[0].getId()
+    );
+    const initialState = this.questions[0].getStateData();
+
+    const questionHtml = this.makeQuestion(initialState, []);
+    if (questionHtml === null) {
+      this.alertsService.addWarning('Question name should not be empty.');
+      errorCallback();
+      return;
+    }
+
+    this.setCurrentIndex(0);
+    this.nextIndex = 0;
+
+    const interaction = initialState.interaction;
+    const nextFocusLabel = this.focusManagerService.generateFocusLabel();
+
+    const interactionId = interaction.id;
+    let interactionHtml = null;
+
+    if (interactionId) {
+      interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
+        interactionId,
+        interaction.customizationArgs,
+        true,
+        nextFocusLabel,
+        null
+      );
+    }
+    const initialCard = StateCard.createNewCard(
+      null,
+      questionHtml,
+      interactionHtml,
+      interaction,
+      initialState.content.contentId
+    );
+    successCallback(initialCard, nextFocusLabel);
+  }
+
+  private getCurrentStateData() {
+    return this.questions[this.currentIndex].getStateData();
+  }
+
+  private getNextStateData() {
+    return this.questions[this.nextIndex].getStateData();
+  }
+
+  private getNextInteractionHtml(labelForFocusTarget: string): string {
+    const interactionId = this.getNextStateData().interaction.id;
+    return this.explorationHtmlFormatterService.getInteractionHtml(
+      interactionId,
+      this.getNextStateData().interaction.customizationArgs,
+      true,
+      labelForFocusTarget,
+      null
+    );
+  }
+
+  private initializeQuestionPlayerServices(
+    questionDicts: QuestionBackendDict[],
+    successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
+    errorCallback: () => void
+  ): void {
+    let questionObjects = questionDicts.map(questionDict => {
+      return this.questionObjectFactory.createFromBackendDict(questionDict);
+    });
+    this.init(questionObjects, successCallback, errorCallback);
+  }
+
+  private _createNewQuestionPlayerState(
+    questionId: string,
+    linkedSkillIds: string[]
+  ): void {
+    this.questionPlayerState[questionId] = {
+      linkedSkillIds: linkedSkillIds,
+      answers: [],
+      usedHints: [],
+      viewedSolution: undefined,
+    };
+  }
+
+  get onQuestionSessionCompleted(): EventEmitter<object> {
+    return this._questionSessionCompletedEventEmitter;
+  }
+
+  get resultsPageIsLoadedEventEmitter(): EventEmitter<boolean> {
+    return this._resultsPageIsLoadedEventEmitter;
   }
 
   get onTotalQuestionsReceived(): EventEmitter<number> {
