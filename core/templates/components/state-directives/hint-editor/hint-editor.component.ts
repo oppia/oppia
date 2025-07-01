@@ -27,7 +27,7 @@ import {
 import {FormControl, FormGroup} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {Hint} from 'domain/exploration/hint-object.model';
@@ -61,7 +61,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editabilityService: EditabilityService,
     private externalSaveService: ExternalSaveService,
     private htmlLengthService: HtmlLengthService
@@ -119,7 +119,7 @@ export class HintEditorComponent implements OnInit, OnDestroy {
       type: 'html',
       ui_config: {
         hide_complex_extensions:
-          this.contextService.getEntityType() === 'question',
+          this.pageContextService.getEntityType() === 'question',
       },
     };
   }

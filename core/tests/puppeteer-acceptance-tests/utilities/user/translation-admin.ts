@@ -55,6 +55,7 @@ const removeContributonRightsLanguageSelect =
   'select#remove-contribution-rights-language-select';
 const removeContributionRightsSubmitButton =
   'button#remove-contribution-rights-submit-button';
+const userRightsTableSelector = '.e2e-test-user-review-rights-table';
 
 export class TranslationAdmin extends BaseUser {
   /**
@@ -72,6 +73,7 @@ export class TranslationAdmin extends BaseUser {
     username: string,
     languageCode: string
   ): Promise<void> {
+    await this.isElementVisible(addContributorUsernameInput);
     await this.type(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect,
@@ -80,7 +82,10 @@ export class TranslationAdmin extends BaseUser {
     await this.select(addContributonRightsLanguageDropdown, languageCode);
     await this.clickOn(addContributionRightsSubmitButton);
 
-    await this.waitForNetworkIdle();
+    await this.expectActionStatusMessageToBe(
+      'Success.',
+      'Adding contribution rights'
+    );
   }
 
   /**
@@ -90,6 +95,7 @@ export class TranslationAdmin extends BaseUser {
     username: string,
     languageCode: string
   ): Promise<void> {
+    await this.isElementVisible(removeContributorUsernameInput);
     await this.type(removeContributorUsernameInput, username);
     await this.select(
       removeContributonRightsCategorySelect,
@@ -98,18 +104,20 @@ export class TranslationAdmin extends BaseUser {
     await this.select(removeContributonRightsLanguageSelect, languageCode);
     await this.clickOn(removeContributionRightsSubmitButton);
 
-    await this.waitForNetworkIdle();
+    await this.expectActionStatusMessageToBe('Success.', 'Processing query...');
   }
 
   /**
    * Function to display contribution rights by user.
    */
   async viewContributionRightsForUser(username: string): Promise<void> {
+    await this.isElementVisible(viewContributorFilterMethodSelect);
     await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
+    await this.isElementVisible(userRightsTableSelector);
   }
 
   /**
@@ -118,12 +126,14 @@ export class TranslationAdmin extends BaseUser {
   async viewContributorTranslationRightsByLanguageCode(
     languageCode: string
   ): Promise<void> {
+    await this.isElementVisible(viewContributorFilterMethodSelect);
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
     await this.select(viewContributorLanguageSelect, languageCode);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
+    await this.isElementVisible(userRightsTableSelector);
   }
 
   /**

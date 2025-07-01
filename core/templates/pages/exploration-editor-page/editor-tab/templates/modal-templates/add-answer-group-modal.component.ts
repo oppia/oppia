@@ -34,7 +34,7 @@ import {
 } from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -96,7 +96,7 @@ export class AddAnswerGroupModalComponent
   constructor(
     private ngbActiveModal: NgbActiveModal,
     private urlInterpolationService: UrlInterpolationService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private windowRef: WindowRef,
     private eventBusService: EventBusService,
     private populateRuleContentIdsService: PopulateRuleContentIdsService,

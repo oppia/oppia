@@ -35,7 +35,7 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {ChangeListService} from '../services/change-list.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {TranslationLanguageService} from '../translation-tab/services/translation-language.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {FormsModule} from '@angular/forms';
@@ -52,7 +52,7 @@ describe('Modify Translations Modal Component', function () {
   let fixture: ComponentFixture<ModifyTranslationsModalComponent>;
   let entityTranslationsService: EntityTranslationsService;
   let changeListService: ChangeListService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let ngbModal: NgbModal;
   let ngbActiveModal: NgbActiveModal;
   let translationLanguageService: TranslationLanguageService;
@@ -72,7 +72,7 @@ describe('Modify Translations Modal Component', function () {
     component = fixture.componentInstance;
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     changeListService = TestBed.inject(ChangeListService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     ngbModal = TestBed.inject(NgbModal);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
@@ -116,7 +116,7 @@ describe('Modify Translations Modal Component', function () {
 
   describe('when initializing content translations', () => {
     it('should use latest translations from entity translations service', fakeAsync(() => {
-      spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+      spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');
       let expectedTranslation = TranslatedContent.createFromBackendDict({
         content_value: 'This is text one.',
         content_format: 'html',
@@ -135,7 +135,7 @@ describe('Modify Translations Modal Component', function () {
   });
 
   it('should initialize the languageIsCheckedStatusDict properly', fakeAsync(() => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');
     component.contentId = 'content1';
 
     component.ngOnInit();
@@ -147,7 +147,7 @@ describe('Modify Translations Modal Component', function () {
   }));
 
   it('should determine if data format is set of strings', fakeAsync(() => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');
     component.contentId = 'content1';
     component.ngOnInit();
 
@@ -160,7 +160,7 @@ describe('Modify Translations Modal Component', function () {
   }));
 
   it('should handle translations being removed', () => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');
     spyOn(changeListService, 'getTranslationChangeList').and.returnValue([
       {
         cmd: 'remove_translations',
@@ -181,7 +181,7 @@ describe('Modify Translations Modal Component', function () {
 
   it('should update translations from response of translation editor modal', fakeAsync(() => {
     const testTranslation = 'New test translation in Hindi';
-    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: MockNgbModalRef,
       result: Promise.resolve(testTranslation),
@@ -210,7 +210,7 @@ describe('Modify Translations Modal Component', function () {
 
   it('should add changes to the change list for checked translations', fakeAsync(() => {
     const testTranslation = 'Test translation 2 in Hindi';
-    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: MockNgbModalRef,
       result: Promise.resolve(testTranslation),
@@ -249,7 +249,7 @@ describe('Modify Translations Modal Component', function () {
 
   it('should mark as needing update in the change list for unchecked translations', fakeAsync(() => {
     const testTranslation = 'Test translation 2 in Hindi';
-    spyOn(contextService, 'getExplorationId').and.returnValue('expId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: MockNgbModalRef,
       result: Promise.resolve(testTranslation),

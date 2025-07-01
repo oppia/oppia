@@ -43,14 +43,14 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {ExplorationSavePromptModalComponent} from '../modal-templates/exploration-save-prompt-modal.component';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 describe('Exploration save and publish buttons component', () => {
   let component: ExplorationSaveAndPublishButtonsComponent;
   let fixture: ComponentFixture<ExplorationSaveAndPublishButtonsComponent>;
   let changeListService: ChangeListService;
   let ngbModal: NgbModal;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let ics: InternetConnectivityService;
   let explorationRightsService: ExplorationRightsService;
   let explorationSaveService: ExplorationSaveService;
@@ -154,13 +154,13 @@ describe('Exploration save and publish buttons component', () => {
     component = fixture.componentInstance;
 
     changeListService = TestBed.inject(ChangeListService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     ngbModal = TestBed.inject(NgbModal);
     ics = TestBed.inject(InternetConnectivityService);
     explorationRightsService = TestBed.inject(ExplorationRightsService);
     explorationSaveService = TestBed.inject(ExplorationSaveService);
     explorationWarningsService = TestBed.inject(ExplorationWarningsService);
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
     editabilityService = TestBed.inject(EditabilityService);
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService

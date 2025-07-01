@@ -22,7 +22,7 @@ import {Subscription} from 'rxjs';
 import {UrlService} from 'services/contextual/url.service';
 import {PracticeSessionPageConstants} from 'pages/practice-session-page/practice-session-page.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {QuestionPlayerConfig} from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
+import {QuestionPlayerConfig} from 'pages/exploration-player-page/current-lesson-player/learner-experience/ratings-and-recommendations.component';
 import {LoaderService} from 'services/loader.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
