@@ -40,7 +40,7 @@ describe('Interested Parent', function () {
   it('should be able to check the privacy policy', async function () {
     await interestedParent.clickOnPrivacyPolicyLinkInFooter();
     await interestedParent.expectScreenshotToMatch(
-      'privacy-policy-page',
+      'privacyPolicyPage',
       __dirname
     );
   });

@@ -452,9 +452,12 @@ const redirectToPlayStoreImageSelector = '.e2e-test-play-store-redirect-img';
 
 // Donation Page.
 const ourLearnersSectionSelector = '.e2e-test-donate-our-learners';
-const ourNetworkSectionSelector = '.e2e-test-donate-highlights';
+const donationHighlightsSelector = '.e2e-test-donate-highlights';
+const ourNetworkHeadingSelector = '.e2e-test-dp-our-network-heading';
+const ourNetworkSectionSelector = '.e2e-test-dp-our-network-section';
 const donationHeadingSelector = '.e2e-test-donate-heading';
 const readyToMakeDonationSelector = '.e2e-test-ready-to-donate-title';
+const ourImpactSectionSelector = '.e2e-test-dp-our-impact-section';
 
 // Volunteer Page.
 const volunteerPageHeadingSelector = '.e2e-test-volunteer-page-headings';
@@ -5009,7 +5012,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if "Our Impact" section is visible in donation page.
    */
   async expectOurImpactSectionInDonationPageToBePresent(): Promise<void> {
-    await this.isElementVisible(ourNetworkSectionSelector);
+    await this.isElementVisible(ourImpactSectionSelector);
   }
 
   /**
@@ -5038,6 +5041,21 @@ export class LoggedOutUser extends BaseUser {
       readyToMakeDonationSelector,
       ' Ready to make an impact? '
     );
+  }
+
+  /**
+   * Checks if "Our Network" section is visible in donation page.
+   */
+  async expectOurNetworkSectionInDonationPageToBePresent(): Promise<void> {
+    await this.isElementVisible(ourNetworkHeadingSelector);
+
+    await this.expectTextContentInElementWithSelectorToBe(
+      ourNetworkHeadingSelector,
+      'Our Network'
+    );
+
+    await this.isElementVisible(ourNetworkSectionSelector);
+    await this.isElementVisible(donationHighlightsSelector);
   }
 
   /**

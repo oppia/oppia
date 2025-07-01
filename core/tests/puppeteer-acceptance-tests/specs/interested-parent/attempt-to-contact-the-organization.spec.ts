@@ -31,7 +31,7 @@ describe('Interested Parent', function () {
 
   it('should be able to ask the organization a question', async function () {
     await interestedParent.navigateToContactUsPage();
-    await interestedParent.expectScreenshotToMatch(' contactUsPage', __dirname);
+    await interestedParent.expectScreenshotToMatch('contactUsPage', __dirname);
 
     await interestedParent.verifyContactUsSubHeading(
       'We would love to hear from you!'

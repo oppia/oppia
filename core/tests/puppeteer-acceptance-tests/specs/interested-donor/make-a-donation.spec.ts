@@ -35,13 +35,12 @@ describe('Interested Donor', function () {
 
     await interestedDonor.expectDonationPageHeadingToBe(' Our Impact ');
     await interestedDonor.expectOurImpactSectionInDonationPageToBePresent();
+    await interestedDonor.expectOurNetworkSectionInDonationPageToBePresent();
     await interestedDonor.expectOurLearnersSectionInDonationPageToBePresent();
     await interestedDonor.expectReadyToMakeAnImpactToBePresent();
 
     await interestedDonor.isDonorBoxVisbleOnDonatePage();
   });
-
-  it('should be able to make a donation', async function () {});
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
