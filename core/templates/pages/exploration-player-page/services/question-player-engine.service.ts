@@ -13,7 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utility service for the question player for an exploration.
+ * @fileoverview Service for managing the logic and state of the Question Player.
+ *
+ * This service is responsible for initializing, managing, and tracking the
+ * lifecycle of questions presented to the learner in a question-based
+ * interaction environment. It supports both practice question sessions and
+ * pretest mode.
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
