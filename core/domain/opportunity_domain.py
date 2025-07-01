@@ -521,9 +521,15 @@ class TranslationOpportunity:
         }
 
 
-class TranslationOpportunityCardInfoDict(TranslationOpportunityDict, TypedDict):
+class TranslationOpportunityCardInfoDict(TypedDict):
     """A dictionary representing a TranslationOpportunityCardInfo object."""
 
+    topic_ids: List[str]
+    entity_id: str
+    content_count: int
+    incomplete_translation_language_codes: List[str]
+    translation_counts: Dict[str, int]
+    entity_type: str
     topic_name: str
     entity_description: str
     is_pinned: bool
@@ -555,43 +561,17 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             translation_counts,
             entity_type
         )
+        self.topic_ids = topic_ids
+        self.entity_id = entity_id
+        self.content_count = content_count
+        self.incomplete_translation_language_codes = (
+            incomplete_translation_language_codes)
+        self.translation_counts = translation_counts
+        self.entity_type = entity_type
         self.topic_name = topic_name
         self.entity_description = entity_description
         self.is_pinned = is_pinned
         self.currently_available_to_learners = currently_available_to_learners
-
-    @overload
-    @classmethod
-    def from_dict(
-        cls, data: TranslationOpportunityDict
-    ) -> TranslationOpportunityCardInfo: ...
-
-    @overload
-    @classmethod
-    def from_dict(
-        cls, data: TranslationOpportunityCardInfoDict
-    ) -> TranslationOpportunityCardInfo: ...
-
-    @classmethod
-    def from_dict(
-        cls,
-        data: Union[
-            TranslationOpportunityDict,
-            TranslationOpportunityCardInfoDict
-        ]
-    ) -> TranslationOpportunityCardInfo:
-        return cls(
-            data['topic_ids'],
-            data['entity_id'],
-            data['content_count'],
-            data['incomplete_translation_language_codes'],
-            data['translation_counts'],
-            data['entity_type'],
-            data.get('topic_name', ''),
-            data.get('entity_description', ''),
-            data.get('is_pinned', False),
-            data.get('currently_available_to_learners', False)
-        )
 
     def to_dict(self) -> TranslationOpportunityCardInfoDict:
         """Returns a dict representation of the card info."""
