@@ -348,15 +348,64 @@ export class ConversationSkinComponent {
           if (!this._editorPreviewMode && this.nextCard.isTerminal()) {
             const currentEngineService =
               this.explorationPlayerStateService.getCurrentEngineService();
-            this.statsReportingService.recordExplorationCompleted(
-              newStateName,
-              this.learnerParamsService.getAllParams(),
-              String(
-                this.completedChaptersCount && this.completedChaptersCount + 1
-              ),
-              String(this.playerTranscriptService.getNumCards()),
-              currentEngineService.getLanguageCode()
-            );
+            if (this.explorationPlayerStateService.isInStoryChapterMode()) {
+              if (this.isLoggedIn) {
+                let topicUrlFragment =
+                  this.urlService.getUrlParams().topic_url_fragment;
+                let classroomUrlFragment =
+                  this.urlService.getUrlParams().classroom_url_fragment;
+                let storyUrlFragment =
+                  this.urlService.getUrlParams().story_url_fragment;
+                let nodeId = this.urlService.getUrlParams().node_id;
+                this.storyViewerBackendApiService
+                  .recordChapterCompletionAsync(
+                    topicUrlFragment,
+                    classroomUrlFragment,
+                    storyUrlFragment,
+                    nodeId
+                  )
+                  .then(returnObject => {
+                    if (returnObject.readyForReviewTest) {
+                      (
+                        this.windowRef.nativeWindow as {
+                          location: string | Location;
+                        }
+                      ).location = this.urlInterpolationService.interpolateUrl(
+                        TopicViewerDomainConstants.REVIEW_TESTS_URL_TEMPLATE,
+                        {
+                          topic_url_fragment: topicUrlFragment,
+                          classroom_url_fragment: classroomUrlFragment,
+                          story_url_fragment: storyUrlFragment,
+                        }
+                      );
+                    }
+                    this.learnerDashboardBackendApiService
+                      .fetchLearnerCompletedChaptersCountDataAsync()
+                      .then(responseData => {
+                        let newCompletedChaptersCount =
+                          responseData.completedChaptersCount;
+                        if (
+                          newCompletedChaptersCount !==
+                          this.completedChaptersCount
+                        ) {
+                          this.completedChaptersCount =
+                            newCompletedChaptersCount;
+                          this.chapterIsCompletedForTheFirstTime = true;
+                        }
+                      });
+                  });
+              }
+            } else {
+              this.statsReportingService.recordExplorationCompleted(
+                newStateName,
+                this.learnerParamsService.getAllParams(),
+                String(
+                  this.completedChaptersCount && this.completedChaptersCount + 1
+                ),
+                String(this.playerTranscriptService.getNumCards()),
+                currentEngineService.getLanguageCode()
+              );
+            }
 
             // If the user is a guest, has completed this exploration
             // within the context of a collection, and the collection is
@@ -991,41 +1040,7 @@ export class ConversationSkinComponent {
             }
             this.recommendedExplorationSummaries = nextStoryNode;
           });
-        if (this.isLoggedIn) {
-          this.storyViewerBackendApiService
-            .recordChapterCompletionAsync(
-              topicUrlFragment,
-              classroomUrlFragment,
-              storyUrlFragment,
-              nodeId
-            )
-            .then(returnObject => {
-              if (returnObject.readyForReviewTest) {
-                (
-                  this.windowRef.nativeWindow as {location: string | Location}
-                ).location = this.urlInterpolationService.interpolateUrl(
-                  TopicViewerDomainConstants.REVIEW_TESTS_URL_TEMPLATE,
-                  {
-                    topic_url_fragment: topicUrlFragment,
-                    classroom_url_fragment: classroomUrlFragment,
-                    story_url_fragment: storyUrlFragment,
-                  }
-                );
-              }
-              this.learnerDashboardBackendApiService
-                .fetchLearnerCompletedChaptersCountDataAsync()
-                .then(responseData => {
-                  let newCompletedChaptersCount =
-                    responseData.completedChaptersCount;
-                  if (
-                    newCompletedChaptersCount !== this.completedChaptersCount
-                  ) {
-                    this.completedChaptersCount = newCompletedChaptersCount;
-                    this.chapterIsCompletedForTheFirstTime = true;
-                  }
-                });
-            });
-        } else {
+        if (!this.isLoggedIn) {
           let loginRedirectUrl = this.urlInterpolationService.interpolateUrl(
             StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE,
             {

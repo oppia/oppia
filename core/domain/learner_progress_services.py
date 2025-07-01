@@ -40,9 +40,6 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_domain
 from core.platform import models
-from google.cloud import ndb
-import time
-import random
 
 from typing import Dict, List, Optional, Tuple, TypedDict
 
@@ -115,17 +112,6 @@ class DisplayableCollectionSummaryDict(TypedDict):
     community_owned: bool
     thumbnail_icon_url: str
     thumbnail_bg_color: str
-
-def retry_with_backoff(fn, *args, max_attempts=3, **kwargs):
-    for i in range(max_attempts):
-        try:
-            return fn(*args, **kwargs)
-        except Exception as e:
-            if "409" in str(e):
-                time.sleep((2 ** i) * 0.1 + random.uniform(0, 0.1))
-                continue
-            raise
-    raise RuntimeError("Retries exhausted")
 
 
 def _get_completed_activities_from_model(
@@ -269,8 +255,7 @@ def _save_last_playthrough_information(
     last_playthrough_information_model.update_timestamps()
     last_playthrough_information_model.put()
 
-@ndb.transactional(retries=1)
-def _txn_mark_exploration_completed(user_id: str, exp_id: str) -> None:
+def mark_exploration_as_completed(user_id: str, exp_id: str) -> None:
     """Adds the exploration id to the completed list of the user unless the
     exploration has already been completed or has been created/edited by the
     user. It is also removed from the incomplete list and the learner playlist
@@ -307,8 +292,7 @@ def _txn_mark_exploration_completed(user_id: str, exp_id: str) -> None:
         activities_completed.add_exploration_id(exp_id)
         _save_completed_activities(activities_completed)
 
-@ndb.transactional(retries=1)
-def _txn_mark_story_as_completed(user_id: str, story_id: str) -> None:
+def mark_story_as_completed(user_id: str, story_id: str) -> None:
     """Adds the story id to the completed list of the user unless the
     story has already been completed by the user. It is also removed from
     the incomplete list(if present).
@@ -332,8 +316,7 @@ def _txn_mark_story_as_completed(user_id: str, story_id: str) -> None:
         activities_completed.add_story_id(story_id)
         _save_completed_activities(activities_completed)
 
-@ndb.transactional(retries=1)
-def _txn_mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
+def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
     """Adds the topic id to the learnt list of the user unless the
     topic has already been learnt by the user. It is also removed from
     the partially learnt list and topics to learn list(if present).
@@ -361,15 +344,6 @@ def _txn_mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
                 user_id, [topic_id])
         activities_completed.add_learnt_topic_id(topic_id)
         _save_completed_activities(activities_completed)
-
-def mark_exploration_as_completed(user_id: str, exp_id: str):
-    retry_with_backoff(_txn_mark_exploration_completed,user_id, exp_id)
-
-def mark_story_as_completed(user_id: str, story_id: str):
-    retry_with_backoff(_txn_mark_story_as_completed,user_id, story_id)
-
-def mark_topic_as_learnt(user_id: str, topic_id: str) -> None:
-    retry_with_backoff(_txn_mark_topic_as_learnt,user_id, topic_id)
 
 
 def mark_collection_as_completed(user_id: str, collection_id: str) -> None:

@@ -31,6 +31,7 @@ from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
 from core.domain import topic_fetchers
+from core.domain import learner_progress_services
 
 from typing import Dict, List, Optional, Tuple
 
@@ -172,10 +173,11 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         next_exp_ids = []
         next_node_id = None
+        exp_id = None
         if node_id not in completed_node_ids:
             story_services.record_completed_node_in_story_context(
                 self.user_id, story_id, node_id)
-
+            
             completed_nodes = story_fetchers.get_completed_nodes_in_story(
                 self.user_id, story_id
             ) if self.user_id else []
@@ -183,6 +185,9 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 completed_node.id for completed_node in completed_nodes]
 
             for node in ordered_nodes:
+                if exp_id is None and node_id == node.id:
+                    exp_id = node.exploration_id
+                    learner_progress_services.mark_exploration_as_completed(self.user_id, exp_id)
                 if node.id not in completed_node_ids:
                     next_exp_ids = (
                         [node.exploration_id] if node.exploration_id else []
