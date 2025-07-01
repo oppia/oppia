@@ -419,15 +419,17 @@ class TranslationOpportunity:
         """Constructs a TranslationOpportunity domain object.
 
         Args:
-            topic_ids: list(str). A list of topic IDs related to this opportunity.
+            topic_ids: list(str). A list of topic IDs related to this
+                opportunity.
             entity_id: str. The ID of the related entity.
-            content_count: int. The total number of contents available in the entity.
-            incomplete_translation_language_codes: list(str). A list of language codes
-                in which the entity translation is incomplete.
-            translation_counts: dict. A dict mapping language codes to the number of
-                completed translations.
-            entity_type: str. The type of the entity. One of: "exploration", "skill",
-                "topic", "story", "classroom".
+            content_count: int. The total number of contents available in the
+                entity.
+            incomplete_translation_language_codes: list(str). A list of
+                language codes in which the entity translation is incomplete.
+            translation_counts: dict. A dict mapping language codes to the
+                number of completed translations.
+            entity_type: str. The type of the entity. One of: "exploration",
+                "skill", "topic", "story", "classroom".
         """
         self.topic_ids = topic_ids
         self.entity_id = entity_id
@@ -459,7 +461,8 @@ class TranslationOpportunity:
         for language_code in self.incomplete_translation_language_codes:
             if language_code not in allowed_language_codes:
                 raise utils.ValidationError(
-                    'Invalid language_code in incomplete_translation_language_codes: %s'
+                    'Invalid language_code in '
+                    'incomplete_translation_language_codes: %s'
                     % language_code)
 
         for language_code, count in self.translation_counts.items():
@@ -494,7 +497,8 @@ class TranslationOpportunity:
             translation_opportunity_dict['topic_ids'],
             translation_opportunity_dict['entity_id'],
             translation_opportunity_dict['content_count'],
-            translation_opportunity_dict['incomplete_translation_language_codes'],
+            translation_opportunity_dict[
+                'incomplete_translation_language_codes'],
             translation_opportunity_dict['translation_counts'],
             translation_opportunity_dict['entity_type']
         )
@@ -503,13 +507,15 @@ class TranslationOpportunity:
         """Returns a copy of the object as a dictionary.
 
         Returns:
-            dict. A dict mapping the fields of the TranslationOpportunity instance.
+            dict. A dict mapping the fields of the TranslationOpportunity
+            instance.
         """
         return {
             'topic_ids': self.topic_ids,
             'entity_id': self.entity_id,
             'content_count': self.content_count,
-            'incomplete_translation_language_codes': self.incomplete_translation_language_codes,
+            'incomplete_translation_language_codes': (
+                self.incomplete_translation_language_codes),
             'translation_counts': self.translation_counts,
             'entity_type': self.entity_type
         }
@@ -574,7 +580,7 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             TranslationOpportunityDict,
             TranslationOpportunityCardInfoDict
         ]
-    ) -> 'TranslationOpportunityCardInfo':
+    ) -> TranslationOpportunityCardInfo:
         return cls(
             data['topic_ids'],
             data['entity_id'],
@@ -582,7 +588,7 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             data['incomplete_translation_language_codes'],
             data['translation_counts'],
             data['entity_type'],
-            data.get('topic_name', ''),  # Defaults required for base type
+            data.get('topic_name', ''),
             data.get('entity_description', ''),
             data.get('is_pinned', False),
             data.get('currently_available_to_learners', False)
@@ -601,5 +607,6 @@ class TranslationOpportunityCardInfo(TranslationOpportunity):
             'topic_name': self.topic_name,
             'entity_description': self.entity_description,
             'is_pinned': self.is_pinned,
-            'currently_available_to_learners': self.currently_available_to_learners
+            'currently_available_to_learners': (
+                self.currently_available_to_learners)
         }
