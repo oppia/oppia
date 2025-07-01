@@ -426,6 +426,9 @@ const partnershipPageSubheadingsSelector =
 const partneringWithUsImageSelector = '.e2e-test-partnering-with-oppia-image';
 const partnershipYoutubeVideoIFrameSelector =
   '.e2e-test-partnership-youtube-video-iframe';
+const learnerStoriesHeadingSelector = '.e2e-test-learner-stories-heading';
+const learnerStoriesCarouselContainerSelector =
+  '.e2e-test-learner-stories-coursal-container';
 
 // About Us Page Selectors.
 const aboutUsHeadingSelector = '.e2e-test-about-us-title';
@@ -5152,6 +5155,69 @@ export class LoggedOutUser extends BaseUser {
     for (let heading of headings) {
       await this.expectContactUsPageToContainContentCardWithHeading(heading);
     }
+  }
+
+  /**
+   * Checks if YouTube video IFrame has Youtube URL and Video ID.
+   * @param videoID - The expected video ID to be found in the YouTube video URL.
+   */
+  async expectYouTubeVideoInPartnershipWithVideoID(
+    videoID: string
+  ): Promise<void> {
+    const videoBaseURI = await this.page.$eval(
+      partnershipYoutubeVideoIFrameSelector,
+      el => (el as HTMLIFrameElement).src
+    );
+
+    expect(videoBaseURI).toContain('https://www.youtube.com/embed');
+    expect(videoBaseURI).toContain(videoID);
+  }
+
+  async testLearnerStoriesCarouselInPartnershipPage(): Promise<void> {
+    const activeItemSelector = `${learnerStoriesCarouselContainerSelector} .carousel-item.active`;
+    await this.isElementVisible(learnerStoriesHeadingSelector);
+
+    // Verify Coursal Heading
+    const subHeading = await this.page.$eval(
+      learnerStoriesHeadingSelector,
+      element => (element as HTMLElement).textContent
+    );
+    expect(subHeading).toBe('Learner Stories');
+
+    // Check if coursal works properly.
+    const carouselItems = await this.page.$$eval(
+      `${learnerStoriesCarouselContainerSelector} .carousel-item`,
+      elements => elements.map(element => (element as HTMLElement).textContent)
+    );
+    expect(carouselItems.length).toBe(3);
+
+    const activeCarouselItems = await this.page.$$eval(
+      activeItemSelector,
+      elements => elements.map(element => (element as HTMLElement).textContent)
+    );
+    expect(activeCarouselItems.length).toBe(1);
+
+    // Check if carousel items are moving.
+    // Capture the initial slide ID
+    const initialSlideId = await this.page.$eval(
+      activeItemSelector,
+      el => el.id
+    );
+
+    // Wait for the active class to move to a different slide
+    await this.page.waitForFunction(
+      (initialId: string, selector: string) => {
+        const active = document.querySelector(selector);
+        return active && active.id !== initialId;
+      },
+      {timeout: 10000}, // Timeout after 10 seconds if no change
+      initialSlideId,
+      activeItemSelector
+    );
+
+    // Confirm new slide ID is different
+    const newSlideId = await this.page.$eval(activeItemSelector, el => el.id);
+    expect(newSlideId).not.toBe(initialSlideId);
   }
 }
 

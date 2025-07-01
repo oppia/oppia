@@ -23,68 +23,73 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 describe('Interested Partner Organization', function () {
-  let partherOrganizationUser: LoggedOutUser;
+  let partnerOrganizationUser: LoggedOutUser;
 
   beforeAll(async function () {
-    partherOrganizationUser = await UserFactory.createLoggedOutUser();
+    partnerOrganizationUser = await UserFactory.createLoggedOutUser();
   });
 
   it("should be able to learn about Oppia's partnership program", async function () {
     // Navigate to splash tab and veirfy it.
-    await partherOrganizationUser.navigateToSplashPage();
-    await partherOrganizationUser.expectScreenshotToMatch(
+    await partnerOrganizationUser.navigateToSplashPage();
+    await partnerOrganizationUser.expectScreenshotToMatch(
       'homePage',
       __dirname
     );
 
     // Go to partnerships page and verify required elements.
-    await partherOrganizationUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
-    await partherOrganizationUser.expectScreenshotToMatch(
+    await partnerOrganizationUser.clickPartnershipsButtonInGetInvolvedMenuOnNavbar();
+    await partnerOrganizationUser.expectScreenshotToMatch(
       'partnershipsPage',
       __dirname
     );
-    await partherOrganizationUser.expectPartnershipHeadingToBe(
+    await partnerOrganizationUser.expectPartnershipHeadingToBe(
       'Partnerships with the Oppia Foundation'
     );
-    await partherOrganizationUser.expectPartnerWithUsButtonIsVisible();
-    await partherOrganizationUser.expectSubheadingsInPartnershipPageToContain(
+    await partnerOrganizationUser.expectPartnerWithUsButtonIsVisible();
+    await partnerOrganizationUser.expectSubheadingsInPartnershipPageToContain(
       'Our partnership process'
     );
-    await partherOrganizationUser.expectSubheadingsInPartnershipPageToContain(
+    await partnerOrganizationUser.expectSubheadingsInPartnershipPageToContain(
       'What is it like partnering with Oppia?'
     );
-    await partherOrganizationUser.expectSubheadingsInPartnershipPageToContain(
+    await partnerOrganizationUser.expectSubheadingsInPartnershipPageToContain(
       'Our partners'
     );
-    await partherOrganizationUser.expectPartneringWithUsImageToBePresent();
-    await partherOrganizationUser.expectSubheadingsInPartnershipPageToContain(
+    await partnerOrganizationUser.expectPartneringWithUsImageToBePresent();
+    await partnerOrganizationUser.expectSubheadingsInPartnershipPageToContain(
       'Partner Stories'
     );
-    await partherOrganizationUser.expectSubheadingsInPartnershipPageToContain(
+    await partnerOrganizationUser.expectSubheadingsInPartnershipPageToContain(
       'Learner Stories'
     );
-    await partherOrganizationUser.expectSubheadingsInPartnershipPageToContain(
+    await partnerOrganizationUser.expectSubheadingsInPartnershipPageToContain(
       'Ready to join us?'
     );
-    await partherOrganizationUser.expectSubheadingsInPartnershipPageToContain(
+    await partnerOrganizationUser.expectSubheadingsInPartnershipPageToContain(
       'Frequently asked questions'
     );
 
     // Download Brochure.
-    await partherOrganizationUser.verifyDownloadBrochureButtonInPartnershipsPage();
+    await partnerOrganizationUser.verifyDownloadBrochureButtonInPartnershipsPage();
 
     // Special foundation video.
-    await partherOrganizationUser.expectYouTubeVideoInPartnershipPageToBePlayabe();
+    await partnerOrganizationUser.expectYouTubeVideoInPartnershipWithVideoID(
+      'mDfiDLn2Rko'
+    );
 
     // Read More stories.
-    await partherOrganizationUser.clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation();
+    await partnerOrganizationUser.navigateToPartnershipsPage();
+    await partnerOrganizationUser.clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation();
 
-    // Learner stories crousal.
-    await partherOrganizationUser.clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation();
+    // TODO: Learner stories crousal.
+    await partnerOrganizationUser.navigateToPartnershipsPage();
+    await partnerOrganizationUser.testLearnerStoriesCarouselInPartnershipPage();
   });
 
   it('should be able to open partnership form', async function () {
-    await partherOrganizationUser.clickPartnerWithUsButtonInPartnershipsPage();
+    await partnerOrganizationUser.navigateToPartnershipsPage();
+    await partnerOrganizationUser.clickPartnerWithUsButtonInPartnershipsPage();
   });
 
   afterAll(async function () {
