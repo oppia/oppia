@@ -1,4 +1,4 @@
-name: Check Issue Assignee CLA
+name: Check CLA Signature for Issues and Pull Requests
 on:
   pull_request_target:
     types:
@@ -87,7 +87,7 @@ jobs:
             } catch (error) {
               console.error("Error during CLA verification:", error);
               core.warning(`CLA check failed: ${error.message}`);
-              core.setOutput('has-signed-cla', 'false');
+              throw error;
             }
 
 
