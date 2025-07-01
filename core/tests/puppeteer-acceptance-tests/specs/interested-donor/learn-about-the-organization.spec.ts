@@ -33,7 +33,7 @@ describe('Interested Donor', function () {
     await interestedDonor.navigateToSplashPage();
 
     // Visit "About" page.
-    await interestedDonor.navigateToAboutPage();
+    await interestedDonor.clickAboutButtonInAboutMenuOnNavbar();
     await interestedDonor.expectScreenshotToMatch('aboutPage', __dirname);
 
     // Empowering Learners around the globe.
@@ -81,6 +81,7 @@ describe('Interested Donor', function () {
   });
 
   it('should be able to read more what organization has done', async function () {
+    await interestedDonor.clickAboutButtonInAboutMenuOnNavbar();
     await interestedDonor.clickOnBlogLinkInFooter();
     await interestedDonor.expectScreenshotToMatch('blogPage', __dirname);
   });

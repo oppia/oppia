@@ -1014,6 +1014,10 @@ export class LoggedOutUser extends BaseUser {
         '2022',
         impactReport2022Url
       );
+
+      // Close Navbar once links are verified
+      await this.clickOn(mobileSidebarExpandAboutMenuButton);
+      await this.clickOn(mobileNavbarOpenSidebarButton);
     } else {
       await this.page.waitForSelector(navbarAboutTab, {
         visible: true,
