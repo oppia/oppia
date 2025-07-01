@@ -314,6 +314,10 @@ const oppiaTopicTitleSelector = '.oppia-topic-title';
 const topicPageLessonTabSelector = '.e2e-test-study-tab-link';
 const subTopicTitleInLessTabSelector = '.subtopic-title';
 const reviewCardTitleSelector = '.oppia-subtopic-title';
+const goBackToTopicButton = '.e2e-test-go-back-to-topic-button';
+const goToPracticeSectionButton = '.e2e-test-go-to-practice-section-button';
+const goToNextStudyGuideButton = '.e2e-test-go-to-next-study-guide-button';
+const goToStudyGuideMenuButton = '.e2e-test-go-to-study-guide-menu-button';
 const topicNameSelector = '.e2e-test-topic-name';
 const loginPromptContainer = '.story-viewer-login-container';
 const NavbarBackButton = '.oppia-navbar-back-button';
@@ -503,8 +507,10 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the community library page.
    */
-  async navigateToCommunityLibraryPage(): Promise<void> {
-    await this.goto(communityLibraryUrl);
+  async navigateToCommunityLibraryPage(
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(communityLibraryUrl, verifyURL);
   }
 
   /**
@@ -552,18 +558,18 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the classrooms page.
    */
-  async navigateToClassroomsPage(): Promise<void> {
+  async navigateToClassroomsPage(verifyURL: boolean = true): Promise<void> {
     if (this.page.url() === classroomsPageUrl) {
       await this.page.reload();
     }
-    await this.goto(classroomsPageUrl);
+    await this.goto(classroomsPageUrl, verifyURL);
   }
 
   /**
    * Navigates to the splash page.
    */
-  async navigateToSplashPage(): Promise<void> {
-    await this.goto(splashPageUrl);
+  async navigateToSplashPage(verifyURL: boolean = true): Promise<void> {
+    await this.goto(splashPageUrl, verifyURL);
   }
 
   /**
@@ -2929,29 +2935,31 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the Creator Dashboard.
    */
-  async navigateToCreatorDashboard(): Promise<void> {
-    await this.goto(creatorDashboardUrl);
+  async navigateToCreatorDashboard(verifyURL: boolean = true): Promise<void> {
+    await this.goto(creatorDashboardUrl, verifyURL);
   }
 
   /**
    * Function to navigate to the Moderator Page.
    */
-  async navigateToModeratorPage(): Promise<void> {
-    await this.goto(moderatorPageUrl);
+  async navigateToModeratorPage(verifyURL: boolean = true): Promise<void> {
+    await this.goto(moderatorPageUrl, verifyURL);
   }
 
   /**
    * Function to navigate to the Preferences Page.
    */
-  async navigateToPreferencesPage(): Promise<void> {
-    await this.goto(preferencesPageUrl);
+  async navigateToPreferencesPage(verifyURL: boolean = true): Promise<void> {
+    await this.goto(preferencesPageUrl, verifyURL);
   }
 
   /**
    * Function to navigate to the Topics and Skills Dashboard Page.
    */
-  async navigateToTopicsAndSkillsDashboardPage(): Promise<void> {
-    await this.goto(topicsAndSkillsDashboardUrl);
+  async navigateToTopicsAndSkillsDashboardPage(
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(topicsAndSkillsDashboardUrl, verifyURL);
   }
 
   /**
@@ -2965,8 +2973,8 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the Learner Dashboard.
    */
-  async navigateToLearnerDashboard(): Promise<void> {
-    await this.goto(learnerDashboardUrl);
+  async navigateToLearnerDashboard(verifyURL: boolean = true): Promise<void> {
+    await this.goto(learnerDashboardUrl, verifyURL);
   }
 
   /**
@@ -3523,6 +3531,87 @@ export class LoggedOutUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Verifies if the subtopic study guide has the expected title and sections.
+   * @param {string} studyGuideTitle - The expected title of the study guide.
+   * @param {string[][]} studyGuideSections - The expected sections of the study guide.
+   * It is a list of sections. Sections are a list of strings having length of 2 - heading and content.
+   */
+  async expectSubtopicStudyGuideToHaveTitleAndSections(
+    studyGuideTitle: string,
+    studyGuideSections: string[][]
+  ): Promise<void> {
+    try {
+      const isTitlePresent = await this.isTextPresentOnPage(studyGuideTitle);
+
+      if (!isTitlePresent) {
+        throw new Error(
+          'Expected study guide title to be present, but it was not found.'
+        );
+      }
+
+      for (var i = 0; i < studyGuideSections.length; i++) {
+        for (var j = 0; j < 2; j++) {
+          const isHeadingPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
+          );
+          if (!isHeadingPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} heading to be present on the page, but it was not found`
+            );
+          }
+          j++;
+          const isContentPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
+          );
+          if (!isContentPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} content to be present on the page, but it was not found`
+            );
+          }
+        }
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify asections of study guide: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Click on the next study guide button.
+   */
+  async clickOnNextStudyGuideButton(): Promise<void> {
+    await this.clickOn(goToNextStudyGuideButton);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Click on the study guide menu button.
+   */
+  async clickOnStudyGuideMenuButton(): Promise<void> {
+    await this.clickOn(goToStudyGuideMenuButton);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Click on the practice button
+   */
+  async clickOnPracticeButton(): Promise<void> {
+    await this.clickOn(goToPracticeSectionButton);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Click on the back to topic button
+   */
+  async clickOnBackToTopicButton(): Promise<void> {
+    await this.clickOn(goBackToTopicButton);
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -4183,8 +4272,11 @@ export class LoggedOutUser extends BaseUser {
    * Starts an exploration with a progress URL.
    * @param {string} progressUrl - The URL to navigate to.
    */
-  async startExplorationUsingProgressUrl(progressUrl: string): Promise<void> {
-    await this.goto(progressUrl);
+  async startExplorationUsingProgressUrl(
+    progressUrl: string,
+    verifyURL: boolean = true
+  ): Promise<void> {
+    await this.goto(progressUrl, verifyURL);
   }
 
   /**

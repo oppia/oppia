@@ -68,6 +68,9 @@ class FeatureNames(enum.Enum):
         'show_restructured_study_guides')
     ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS = (
         'enable_translation_opps_with_new_opp_models')
+    ENABLE_WORKED_EXAMPLES_RTE_COMPONENT = (
+        'enable_worked_examples_rte_component'
+     )
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -93,7 +96,8 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
-    FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+    FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -294,6 +298,13 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'This flag enables the new translation opportunity structure to '
             'the contributor dashboard.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT.value: (
+        (
+            'Allows creators to add worked examples to the review material '
+            'section of skills and explanation of the study guides.',
             feature_flag_domain.ServerMode.DEV
         )
     )

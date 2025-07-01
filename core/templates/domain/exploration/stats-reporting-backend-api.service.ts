@@ -319,7 +319,7 @@ export class StatsReportingBackendApiService {
 
   async recordExplorationCompletedAsync(
     clientTimeSpentInSecs: number,
-    collectionId: string,
+    collectionId: string | null,
     params: Object,
     sessionId: string,
     stateName: string,
@@ -395,7 +395,7 @@ export class StatsReportingBackendApiService {
 
   async recordMaybeLeaveEventAsync(
     clientTimeSpentInSecs: number,
-    collectionId: string,
+    collectionId: string | null,
     params: Object,
     sessionId: string,
     stateName: string,
