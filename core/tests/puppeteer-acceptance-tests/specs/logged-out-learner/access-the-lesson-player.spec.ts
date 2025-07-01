@@ -32,10 +32,7 @@ describe('Logged-Out Learner', function () {
 
   let explorationId: string | null;
   beforeAll(async function () {
-    loggedOutLearner = await UserFactory.createNewUser(
-      'loggedOutLearner',
-      'loggedOutLearner@example.com'
-    );
+    loggedOutLearner = await UserFactory.createLoggedOutUser();
 
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',

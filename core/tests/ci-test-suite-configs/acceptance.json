@@ -385,8 +385,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/learner-starts-from-beginning-after-completing-a-lesson.spec.ts"
     },
     {
-      "name": "logged-out-user/learner-can-access-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/learner-can-access-the-lesson-player.spec.ts"
+      "name": "logged-out-learner/access-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/logged-out-learner/access-the-lesson-player.spec.ts"
     },
     {
       "name": "logged-out-user/learner-can-complete-the-embedded-lesson",
