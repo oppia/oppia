@@ -282,7 +282,7 @@ class _Gae(Platform):
             module. The speech synthesis services module based on the current
             environment.
         """
-        if constants.DEV_MODE or constants.EMULATOR_MODE:
+        if constants.EMULATOR_MODE:
             from core.platform.speech_synthesis import (
                 dev_mode_speech_synthesis_services)
             return dev_mode_speech_synthesis_services
