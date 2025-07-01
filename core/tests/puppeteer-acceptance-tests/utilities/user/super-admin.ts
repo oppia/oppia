@@ -1176,6 +1176,7 @@ export class SuperAdmin extends BaseUser {
    */
   async enableTextToSpeechSynthesisUsingCloudService(): Promise<void> {
     await this.navigateToAdminPageMiscTab();
+    await this.scrollToBottomOfPage();
     await this.page.waitForSelector(enableAutogenerationToggleSelector);
     const toggle = await this.page.$(enableAutogenerationToggleSelector);
     if (!toggle) {
