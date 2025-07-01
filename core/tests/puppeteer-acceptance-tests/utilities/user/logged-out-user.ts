@@ -20,7 +20,6 @@ import puppeteer from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {YouTubePlayer} from '../common/youtube-player';
 
 const aboutUrl = testConstants.URLs.About;
 const androidUrl = testConstants.URLs.Android;
@@ -4892,24 +4891,6 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectPartneringWithUsImageToBePresent(): Promise<void> {
     await this.isElementVisible(partneringWithUsImageSelector);
-  }
-
-  /**
-   * Checks if the partnerships page contains the expected image.
-   */
-  async expectYouTubeVideoInPartnershipPageToBePlayabe(): Promise<void> {
-    await this.isElementVisible(partnershipYoutubeVideoIFrameSelector);
-
-    const youtubePlayerIFrameElement = await this.page.$(
-      partnershipYoutubeVideoIFrameSelector
-    );
-    const youtubePlayer = new YouTubePlayer(youtubePlayerIFrameElement);
-
-    await youtubePlayer.expectPlayerToBeInReadyMode();
-    await youtubePlayer.playVidioForFirstTime();
-    await youtubePlayer.expectPauseButtonToBeVisible();
-    await youtubePlayer.clickOnPlayPauseButton();
-    await youtubePlayer.expectPlayButtonToBeVisible();
   }
 
   /**
