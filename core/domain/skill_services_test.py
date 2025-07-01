@@ -1628,7 +1628,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
 
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
+                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION),
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}
@@ -1685,7 +1685,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-math>')
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
+                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION),
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}

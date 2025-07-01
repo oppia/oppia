@@ -150,18 +150,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                         'explanation': {}
                     }
                 },
-                'worked_examples': [
-                    {
-                        'question': {
-                            'html': '<p>A Question</p>',
-                            'content_id': 'id'
-                        },
-                        'explanation': {
-                            'html': '<p>An explanation</p>',
-                            'content_id': 'id'
-                        }
-                    }
-                ]
             }
         }
         self.skill.update_skill_contents_from_model(
@@ -639,12 +627,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Expected misconceptions to be a list')
 
     def test_skill_contents_validation(self) -> None:
-        # TODO(#13059): Here we use MyPy ignore because after we fully type the
-        # codebase we plan to get rid of the tests that intentionally test wrong
-        # inputs that we can normally catch by typing.
-        self.skill.skill_contents.worked_examples = ''  # type: ignore[assignment]
-        self._assert_validation_error('Expected worked examples to be a list')
-
         # TODO(#13059): Here we use MyPy ignore because after we fully type the
         # codebase we plan to get rid of the tests that intentionally test wrong
         # inputs that we can normally catch by typing.
