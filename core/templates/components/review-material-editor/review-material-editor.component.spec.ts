@@ -41,7 +41,6 @@ describe('Review Material Editor Component', () => {
 
     component.bindableDict = {
       displayedConceptCardExplanation: 'Explanation',
-      displayedWorkedExamples: 'Examples',
     };
     fixture.detectChanges();
   });

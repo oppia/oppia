@@ -41,15 +41,31 @@ describe('CheckpointProgressService', () => {
 
   it('should set and get last completed checkpoint correctly', () => {
     const checkpointStateName = 'checkpoint_1';
-    checkpointProgressService.setLastCompletedCheckpoint(checkpointStateName);
-    expect(checkpointProgressService.getLastCompletedCheckpoint()).toBe(
+    checkpointProgressService.setMostRecentlyReachedCheckpoint(
+      checkpointStateName
+    );
+    expect(checkpointProgressService.getMostRecentlyReachedCheckpoint()).toBe(
       checkpointStateName
     );
   });
 
   it('should return undefined if last completed checkpoint is not set', () => {
     expect(() =>
-      checkpointProgressService.getLastCompletedCheckpoint()
+      checkpointProgressService.getMostRecentlyReachedCheckpoint()
     ).toThrowError();
+  });
+
+  it('should return visited checkpoint state names when they exist', () => {
+    const expectedStateNames = ['checkpoint1', 'checkpoint2'];
+    checkpointProgressService.visitedCheckpointStateNames = expectedStateNames;
+    const result = checkpointProgressService.getVisitedCheckpointStateNames();
+    expect(result).toEqual(expectedStateNames);
+  });
+
+  it('should throw an error when no checkpoints have been visited', () => {
+    checkpointProgressService.visitedCheckpointStateNames = [];
+    expect(() => {
+      checkpointProgressService.getVisitedCheckpointStateNames();
+    }).toThrowError('No checkpoints have been visited yet.');
   });
 });

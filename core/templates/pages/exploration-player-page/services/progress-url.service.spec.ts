@@ -61,7 +61,7 @@ describe('ProgressUrlService', () => {
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp123');
     spyOn(
       checkpointProgressService,
-      'getLastCompletedCheckpoint'
+      'getMostRecentlyReachedCheckpoint'
     ).and.returnValue('checkpoint_id');
     spyOn(pageContextService, 'getExplorationVersion').and.returnValue(null);
 
@@ -78,7 +78,7 @@ describe('ProgressUrlService', () => {
     );
     spyOn(
       checkpointProgressService,
-      'getLastCompletedCheckpoint'
+      'getMostRecentlyReachedCheckpoint'
     ).and.returnValue('checkpoint_id');
     spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
     spyOn(
