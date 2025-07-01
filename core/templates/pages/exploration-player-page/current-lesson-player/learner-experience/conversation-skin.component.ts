@@ -211,7 +211,7 @@ export class ConversationSkinComponent {
       this.collectionTitle = null;
     }
 
-    this.explorationId = this.explorationEngineService.getExplorationId();
+    this.explorationId = this.pageContextService.getExplorationId();
     this.isInPreviewMode = this.pageContextService.isInExplorationEditorPage();
     this.isIframed = this.urlService.isIframed();
     this.loaderService.showLoadingScreen('Loading');
@@ -464,7 +464,7 @@ export class ConversationSkinComponent {
   }
 
   alwaysAskLearnerForAnswerDetails(): boolean {
-    return this.explorationEngineService.getAlwaysAskLearnerForAnswerDetails();
+    return this.learnerAnswerInfoService.getAlwaysAskLearnerForAnswerDetails();
   }
 
   getCanAskLearnerForAnswerInfo(): boolean {
@@ -1315,7 +1315,7 @@ export class ConversationSkinComponent {
     if (this.moveToExploration) {
       this.moveToExploration = false;
       this.explorationModeService.setExplorationModeFromUrl();
-      this.explorationEngineService.moveToExploration(
+      this.explorationEngineService.loadInitialState(
         this._initializeDirectiveComponents.bind(this)
       );
       return;
