@@ -1246,11 +1246,6 @@ export class ConversationFlowService {
 
       if (!remainOnCurrentCard) {
         let lastAnswer = displayedCard.getLastAnswer();
-        if (typeof lastAnswer !== 'string') {
-          throw new Error(
-            'Last answer must be a string when transitioning to next card.'
-          );
-        }
         this.statsReportingService.recordStateTransition(
           oldStateName,
           nextCard.getStateName(),

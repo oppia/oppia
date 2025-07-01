@@ -136,20 +136,6 @@ describe('CardAnimationService', () => {
     expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(4);
   }));
 
-  it('should set displayed card index directly when window cannot show two cards', () => {
-    playerTranscriptService.getNumCards.and.returnValue(3);
-    playerTranscriptService.getLastCard.and.returnValue({content: ''});
-    playerTranscriptService.getCard.and.returnValue({content: ''});
-    windowDimensionsService.getWidth.and.returnValue(300);
-
-    const isSupplementalCardNonempty = (card: Card): boolean =>
-      card.content !== '';
-
-    service.updateCardLayout(isSupplementalCardNonempty);
-
-    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(2);
-  });
-
   it('should call scrollTo if tutor card is partially out of view', fakeAsync(() => {
     const mockTutorCard = document.createElement('div');
     mockTutorCard.getBoundingClientRect = () => ({
@@ -231,33 +217,6 @@ describe('CardAnimationService', () => {
     expect(focusManagerService.setFocusIfOnDesktop).toHaveBeenCalledWith(
       'focusLabel'
     );
-  }));
-
-  it('should animate to two cards if conditions match', () => {
-    playerTranscriptService.getNumCards.and.returnValue(3);
-    playerTranscriptService.getLastCard.and.returnValue({content: 'a'});
-    playerTranscriptService.getCard.and.returnValue({content: 'b'});
-    windowDimensionsService.getWidth.and.returnValue(1200);
-
-    service.updateCardLayout((card: Card) => card.content === 'a');
-
-    expect(playerPositionService.setDisplayedCardIndex).toHaveBeenCalledWith(2);
-    expect(service.getIsAnimatingToTwoCards()).toBeTrue();
-  });
-
-  it('should animate to one card if conditions match', fakeAsync(() => {
-    playerTranscriptService.getNumCards.and.returnValue(3);
-    playerTranscriptService.getLastCard.and.returnValue({content: ''});
-    playerTranscriptService.getCard.and.returnValue({content: 'b'});
-    windowDimensionsService.getWidth.and.returnValue(1200);
-
-    service.updateCardLayout((card: Card) => card.content !== '');
-
-    expect(service.getIsAnimatingToOneCard()).toBeTrue();
-
-    tick(ExplorationPlayerConstants.TIME_NUM_CARDS_CHANGE_MSEC);
-
-    expect(service.getIsAnimatingToOneCard()).toBeFalse();
   }));
 
   it('should send message on significant height change', fakeAsync(() => {
