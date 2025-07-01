@@ -27,16 +27,11 @@ import {WindowRef} from '../../../services/contextual/window-ref.service';
 import {ServicesConstants} from '../../../services/services.constants';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 
-interface Card {
-  content: string;
-}
-
 describe('CardAnimationService', () => {
   let service: CardAnimationService;
   let focusManagerService: jasmine.SpyObj<FocusManagerService>;
   let playerTranscriptService: jasmine.SpyObj<PlayerTranscriptService>;
   let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
-  let windowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
   let messengerService: jasmine.SpyObj<MessengerService>;
   let windowRef: WindowRef;
 
@@ -93,9 +88,6 @@ describe('CardAnimationService', () => {
     playerPositionService = TestBed.inject(
       PlayerPositionService
     ) as jasmine.SpyObj<PlayerPositionService>;
-    windowDimensionsService = TestBed.inject(
-      WindowDimensionsService
-    ) as jasmine.SpyObj<WindowDimensionsService>;
     messengerService = TestBed.inject(
       MessengerService
     ) as jasmine.SpyObj<MessengerService>;

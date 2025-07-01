@@ -1163,7 +1163,7 @@ describe('Conversation skin component', () => {
         hintsAndSolutionManagerService,
         'releaseSolution'
       );
-      let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
+      let redirectionSpy = spyOn(conversationFlowService, 'showUpcomingCard');
       const solutionForState = Solution.createNew(
         true,
         'answer',
@@ -1237,7 +1237,7 @@ describe('Conversation skin component', () => {
         hintsAndSolutionManagerService,
         'releaseSolution'
       );
-      let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
+      let redirectionSpy = spyOn(conversationFlowService, 'showUpcomingCard');
       const solutionForState = Solution.createNew(
         true,
         'answer',

@@ -1718,6 +1718,16 @@ export class ConversationFlowService {
     this.displayedCard = card;
   }
 
+  setRecommendedExplorationSummaries(
+    summaries: LearnerExplorationSummary[]
+  ): void {
+    this.recommendedExplorationSummaries = summaries;
+  }
+
+  getRecommendedExplorationSummaries(): LearnerExplorationSummary[] {
+    return this.recommendedExplorationSummaries;
+  }
+
   get onPlayerStateChange(): EventEmitter<string> {
     return this._playerStateChangeEventEmitter;
   }
