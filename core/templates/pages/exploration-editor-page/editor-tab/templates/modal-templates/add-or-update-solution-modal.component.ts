@@ -27,10 +27,7 @@ import {InteractionAnswer} from 'interactions/answer-defs';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {
-  Solution,
-  SolutionObjectFactory,
-} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {
   InteractionSpecsConstants,
   InteractionSpecsKey,
@@ -98,7 +95,6 @@ export class AddOrUpdateSolutionModalComponent
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private generateContentIdService: GenerateContentIdService,
     private ngbActiveModal: NgbActiveModal,
-    private solutionObjectFactory: SolutionObjectFactory,
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateInteractionIdService: StateInteractionIdService,
     private stateSolutionService: StateSolutionService,
@@ -144,7 +140,7 @@ export class AddOrUpdateSolutionModalComponent
       this.data.explanationContentId !== null
     ) {
       this.ngbActiveModal.close({
-        solution: this.solutionObjectFactory.createNew(
+        solution: Solution.createNew(
           this.data.answerIsExclusive,
           this.data.correctAnswer,
           this.data.explanationHtml,

@@ -39,7 +39,7 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 
 class MockCheckpointCelebrationUtilityService {
   isOnCheckpointedState = false;
@@ -195,7 +195,7 @@ describe('Checkpoint celebration modal component', function () {
   let windowDimensionsService: WindowDimensionsService;
   let urlInterpolationService: UrlInterpolationService;
   let interactionObjectFactory: InteractionObjectFactory;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let explorationModeService: ExplorationModeService;
   let dummyStateCard: StateCard;
   let mockResizeEmitter: EventEmitter<void>;
 
@@ -211,7 +211,7 @@ describe('Checkpoint celebration modal component', function () {
         PlayerPositionService,
         UrlInterpolationService,
         InteractionObjectFactory,
-        ExplorationPlayerStateService,
+        ExplorationModeService,
         {
           provide: WindowDimensionsService,
           useValue: {
@@ -244,9 +244,7 @@ describe('Checkpoint celebration modal component', function () {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
-    );
+    explorationModeService = TestBed.inject(ExplorationModeService);
     fixture = TestBed.createComponent(CheckpointCelebrationModalComponent);
     component = fixture.componentInstance;
 
@@ -445,10 +443,7 @@ describe('Checkpoint celebration modal component', function () {
     spyOn(checkpointCelebrationUtilityService, 'setIsOnCheckpointedState');
     spyOn(component, 'triggerStandardMessage');
     spyOn(component, 'triggerMiniMessage');
-    spyOn(
-      explorationPlayerStateService,
-      'isInStoryChapterMode'
-    ).and.returnValue(true);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
     component.currentStateName = 'Introduction';
     component.mostRecentlyReachedCheckpointStateName =
       'MostRecentlyReachedCheckpointStateName';
@@ -527,10 +522,9 @@ describe('Checkpoint celebration modal component', function () {
     component.currentStateName = 'Introduction';
     component.mostRecentlyReachedCheckpointStateName =
       'MostRecentlyReachedCheckpointStateName';
-    spyOn(
-      explorationPlayerStateService,
-      'isInStoryChapterMode'
-    ).and.returnValue(false);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(
+      false
+    );
     spyOn(checkpointCelebrationUtilityService, 'getCheckpointMessage');
 
     component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');

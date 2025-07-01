@@ -31,6 +31,11 @@ const featuredActivityRowSelector =
   '#e2e-test-schema-based-list-editor-table-row';
 const deleteFeaturedActivityButton = '.e2e-test-delete-list-entry';
 
+const featuredActivitiesHeaderSelector = '.e2e-test-featured-activities-header';
+const feedbackMessagesHeaderSelector = '.e2e-test-feedback-messages-header';
+const explorationFeedbackTabContainerSelector =
+  '.e2e-test-exploration-feedback-card';
+
 export class Moderator extends BaseUser {
   /**
    * Function to navigate to the moderator page.
@@ -44,6 +49,8 @@ export class Moderator extends BaseUser {
    */
   async navigateToFeaturedActivitiesTab(): Promise<void> {
     await this.clickOn(featuredActivitiesTab);
+
+    await this.isElementVisible(featuredActivitiesHeaderSelector);
   }
 
   /**
@@ -116,6 +123,7 @@ export class Moderator extends BaseUser {
       isCommunityOwned,
     };
   }
+
   /**
    * Function to check if a specific commit has all the expected properties.
    * @param {number} commitIndex - The index of the commit to check.
@@ -143,6 +151,8 @@ export class Moderator extends BaseUser {
     title: string
   ): Promise<void> {
     await this.clickAndWaitForNavigation(title);
+
+    await this.isElementVisible(explorationFeedbackTabContainerSelector);
   }
 
   /**
@@ -181,7 +191,6 @@ export class Moderator extends BaseUser {
    * @param {number} messageIndex - The index of the feedback message to fetch, starting from 1.
    */
   private async fetchFeedbackMessage(messageIndex: number): Promise<object> {
-    await this.page.waitForSelector(feedbackMessageRowSelector);
     const messageRows = await this.page.$$(feedbackMessageRowSelector);
     if (messageRows.length === 0) {
       throw new Error('No feedback messages found');
@@ -239,6 +248,8 @@ export class Moderator extends BaseUser {
     explorationID: string | null
   ): Promise<void> {
     await this.clickAndWaitForNavigation(` ${explorationID} ` as string);
+
+    await this.isElementVisible(explorationFeedbackTabContainerSelector);
   }
 
   /**
@@ -246,6 +257,8 @@ export class Moderator extends BaseUser {
    */
   async navigateToRecentFeedbackMessagesTab(): Promise<void> {
     await this.clickOn(feedbackMessagesTab);
+
+    await this.isElementVisible(feedbackMessagesHeaderSelector);
   }
 
   /**
@@ -280,10 +293,6 @@ export class Moderator extends BaseUser {
     index -= 1;
 
     await this.navigateToFeaturedActivitiesTab();
-    await this.page.waitForSelector(featuredActivityRowSelector, {
-      visible: true,
-    });
-
     const rows = await this.page.$$(featuredActivityRowSelector);
 
     if (rows.length === 0) {

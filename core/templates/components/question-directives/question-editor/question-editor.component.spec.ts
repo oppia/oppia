@@ -28,7 +28,7 @@ import {
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {QuestionUpdateService} from 'domain/question/question-update.service';
 import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
@@ -354,7 +354,7 @@ describe('Question Editor Component', () => {
     // because of the need to test validations. This error is thrown because
     // the value of 'htmlFormatter' is null.
     // @ts-ignore
-    let solution = new Solution(null, null, null, null);
+    let solution = new Solution(null, null, null);
     component.saveSolution(solution);
 
     expect(stateEditorService.setInteractionSolution).toHaveBeenCalledWith(
