@@ -78,8 +78,8 @@ export class QuestionPlayerEngineService {
   private _resultsPageIsLoadedEventEmitter = new EventEmitter<boolean>();
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
-  private currentIndex: number = null;
   private nextIndex: number = null;
+  currentIndex: number = null;
   questionPlayerState: QuestionPlayerState = {};
 
   constructor(
@@ -94,6 +94,16 @@ export class QuestionPlayerEngineService {
     private questionObjectFactory: QuestionObjectFactory
   ) {}
 
+  /**
+   * Initializes the question player with configuration settings and fetches
+   * questions from the backend based on skill list and difficulty.
+   *
+   * Once questions are fetched, initializes services and loads the first question.
+   *
+   * @param {QuestionPlayerConfigDict} questionPlayerConfig - The configuration object specifying skills, number of questions, and sorting.
+   * @param {(initialCard: StateCard, nextFocusLabel: string) => void} successCallback - Called after loading the first question successfully.
+   * @param {() => void} errorCallback - Called if question loading fails or returns no data.
+   */
   initQuestionPlayer(
     questionPlayerConfig: QuestionPlayerConfigDict,
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
@@ -116,6 +126,14 @@ export class QuestionPlayerEngineService {
       });
   }
 
+  /**
+   * Initializes the question player in pretest mode using a predefined list of question objects.
+   *
+   * This is typically used for assessments before starting an exploration or course.
+   *
+   * @param {Question[]} pretestQuestionObjects - An array of pretest questions.
+   * @param {(initialCard: StateCard, nextFocusLabel: string) => void} callback - Called after the first question is loaded.
+   */
   initializePretestServices(
     pretestQuestionObjects: Question[],
     callback: (initialCard: StateCard, nextFocusLabel: string) => void
@@ -123,6 +141,18 @@ export class QuestionPlayerEngineService {
     this.init(pretestQuestionObjects, callback, () => {});
   }
 
+  /**
+   * Core initialization logic shared between normal and pretest modes.
+   *
+   * - Marks question player as open.
+   * - Shuffles question order randomly.
+   * - Adds questions to internal list.
+   * - Loads the first question and triggers appropriate callback.
+   *
+   * @param {Question[]} questionObjects - Array of question objects to initialize.
+   * @param {(initialCard: StateCard, nextFocusLabel: string) => void} successCallback - Called after successfully loading the first question.
+   * @param {() => void} [errorCallback] - Optional error callback if no questions are found.
+   */
   init(
     questionObjects: Question[],
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
@@ -153,6 +183,11 @@ export class QuestionPlayerEngineService {
     this.loadInitialQuestion(successCallback, errorCallback);
   }
 
+  /**
+   * Updates the current index to reflect that a new card has been added.
+   *
+   * This function also updates the page context to point to the current question.
+   */
   recordNewCardAdded(): void {
     this.currentIndex = this.nextIndex;
     this.pageContextService.setCustomEntityContext(
@@ -161,46 +196,88 @@ export class QuestionPlayerEngineService {
     );
   }
 
-  getCurrentIndex(): number {
-    return this.currentIndex;
-  }
-
-  setCurrentIndex(value: number): void {
-    this.currentIndex = value;
-  }
-
+  /**
+   * Retrieves the currently active question object.
+   *
+   * @returns {Question} The current question.
+   */
   getCurrentQuestion(): Question {
     return this.questions[this.currentIndex];
   }
 
+  /**
+   * Retrieves the ID of the currently active question.
+   *
+   * @returns {string} The ID of the current question.
+   */
   getCurrentQuestionId(): string {
     return this.questions[this.currentIndex].getId();
   }
 
+  /**
+   * Returns the total number of questions currently loaded.
+   *
+   * @returns {number} The number of questions in the player.
+   */
   getQuestionCount(): number {
     return this.questions.length;
   }
 
+  /**
+   * Clears all questions from the question player.
+   *
+   * Useful for resetting state when the player is being reused.
+   */
   clearQuestions(): void {
     this.questions = [];
   }
 
+  /**
+   * Returns the language code of the currently active question.
+   *
+   * This is typically used for localization or accessibility features.
+   *
+   * @returns {string} The language code of the current question.
+   */
   getLanguageCode(): string {
     return this.questions[this.currentIndex].getLanguageCode();
   }
 
-  isInPreviewMode(): boolean {
-    return false;
-  }
-
+  /**
+   * Sets the internal flag that indicates if an answer is currently being processed.
+   *
+   * Used to prevent multiple answer submissions at the same time.
+   *
+   * @param {boolean} value - True if an answer is being processed; otherwise, false.
+   */
   setAnswerIsBeingProcessed(value: boolean): void {
     this.answerIsBeingProcessed = value;
   }
 
+  /**
+   * Adds a new question to the question player.
+   *
+   * Useful when building the question list dynamically (e.g., from API calls).
+   *
+   * @param {Question} question - The question object to be added.
+   */
   addQuestion(question: Question): void {
     this.questions.push(question);
   }
 
+  /**
+   * Submits the learner's answer and handles classification, feedback generation,
+   * and state progression. Based on whether the answer is correct, it may move
+   * to the next question or remain on the current one.
+   *
+   * It also constructs the next `StateCard`, feedback message, and triggers
+   * the provided `successCallback()` with full result data needed to update the UI.
+   *
+   * @param {InteractionAnswer} answer - The learner's submitted answer.
+   * @param {InteractionRulesService} interactionRulesService - Rules service used to classify the answer.
+   * @param {Function} successCallback - Callback invoked after processing the answer with updated UI data.
+   * @returns {boolean} - Whether the answer was classified as correct.
+   */
   submitAnswer(
     answer: InteractionAnswer,
     interactionRulesService: InteractionRulesService,
@@ -321,6 +398,15 @@ export class QuestionPlayerEngineService {
     return answerIsCorrect;
   }
 
+  /**
+   * Logs that a hint was used for the given question.
+   *
+   * Creates a new question state entry if it doesn't exist, then records
+   * the timestamp at which the hint was accessed. Useful for analytics,
+   * progress tracking, or limiting hints.
+   *
+   * @param {Question} question - The question for which the hint was used.
+   */
   hintUsed(question: Question): void {
     let questionId = question.getId() as string;
     if (!this.questionPlayerState[questionId]) {
@@ -334,6 +420,15 @@ export class QuestionPlayerEngineService {
     });
   }
 
+  /**
+   * Records that the learner viewed the solution for a given question.
+   *
+   * Creates a question state if needed, then logs the current timestamp.
+   * This flag can be used to avoid counting future correct answers toward
+   * learning progress or mastery if the solution was seen first.
+   *
+   * @param {Question} question - The question for which the solution was viewed.
+   */
   solutionViewed(question: Question): void {
     let questionId = question.getId() as string;
     if (!this.questionPlayerState[questionId]) {
@@ -347,6 +442,18 @@ export class QuestionPlayerEngineService {
     };
   }
 
+  /**
+   * Records the submission of an answer for a given question.
+   *
+   * If the question does not already have a state entry in `questionPlayerState`,
+   * one is created. The answer is only stored if it is incorrect, or if the
+   * correct answer was submitted without the learner having viewed the solution.
+   *
+   * @param {Question} question - The question object being answered.
+   * @param {boolean} isCorrect - Whether the submitted answer is correct.
+   * @param {string} taggedSkillMisconceptionId - The ID of the tagged misconception
+   *     (if any) associated with the answer, used for diagnostic or reporting purposes.
+   */
   answerSubmitted(
     question: Question,
     isCorrect: boolean,
@@ -371,11 +478,29 @@ export class QuestionPlayerEngineService {
     });
   }
 
+  /**
+   * Retrieves the complete state data for the question player.
+   *
+   * This includes all answers submitted, hints used, and solutions viewed
+   * for each question attempted during the session.
+   *
+   * @returns {object} An object mapping question IDs to their state data.
+   */
   getQuestionPlayerStateData(): object {
     return this.questionPlayerState;
   }
 
-  // Evaluate feedback.
+  /**
+   * Processes and returns the feedback HTML with any embedded expressions evaluated.
+   *
+   * This uses the expression interpolation service to replace variables in the
+   * feedback HTML with values from the environment context (`envs`), allowing
+   * dynamic or personalized feedback messages.
+   *
+   * @param {string} feedbackHtml - The raw HTML string containing feedback text and expressions.
+   * @param {Record<string, string>[]} envs - An array of variable environments for expression evaluation.
+   * @returns {string} The processed HTML with interpolated values.
+   */
   private makeFeedback(
     feedbackHtml: string,
     envs: Record<string, string>[]
@@ -383,7 +508,17 @@ export class QuestionPlayerEngineService {
     return this.expressionInterpolationService.processHtml(feedbackHtml, envs);
   }
 
-  // Evaluate question string.
+  /**
+   * Processes and returns the question's HTML content with expressions evaluated.
+   *
+   * Similar to `makeFeedback`, this function dynamically injects contextual
+   * values into the question content by evaluating expressions within the
+   * HTML against the provided environment variables.
+   *
+   * @param {State} newState - The state object containing question HTML content.
+   * @param {Record<string, string>[]} envs - An array of variable environments for expression evaluation.
+   * @returns {string} The processed HTML with evaluated expressions.
+   */
   private makeQuestion(
     newState: State,
     envs: Record<string, string>[]
@@ -394,6 +529,17 @@ export class QuestionPlayerEngineService {
     );
   }
 
+  /**
+   * Generates a random whitespace suffix.
+   *
+   * This method is used as a workaround to force Angular to detect property
+   * changes when the actual value remains the same. Angular's change detection
+   * compares new values with old ones, and if they are strictly equal,
+   * the update is skipped. By appending a random number of spaces,
+   * the value becomes different, thereby triggering a refresh.
+   *
+   * @returns {string} A string of whitespace characters of random length.
+   */
   private getRandomSuffix(): string {
     // This is a bit of a hack. When a refresh to a component property
     // happens, Angular compares the new value of the property to its previous
@@ -408,11 +554,31 @@ export class QuestionPlayerEngineService {
     return randomSuffix;
   }
 
+  /**
+   * Returns the current timestamp in milliseconds since the UNIX epoch.
+   *
+   * Useful for tracking time-based events or for performance logging.
+   *
+   * @returns {number} The current time in milliseconds.
+   */
   private _getCurrentTime(): number {
     return new Date().getTime();
   }
 
-  // This should only be called when 'exploration' is non-null.
+  /**
+   * Loads and renders the first question in the question player.
+   *
+   * This function assumes that the 'exploration' context is already set and valid.
+   * It prepares the question content, generates the interaction HTML,
+   * and constructs the initial StateCard object. If the question is invalid
+   * (e.g., missing a name or content), the error callback is invoked.
+   *
+   * @param {(initialCard: StateCard, nextFocusLabel: string) => void} successCallback
+   *    A callback to execute once the initial question is successfully loaded.
+   *    It receives the constructed StateCard and a focus label for accessibility.
+   * @param {() => void} errorCallback
+   *    A callback to execute if the question fails to load (e.g., invalid data).
+   */
   private loadInitialQuestion(
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
     errorCallback: () => void
@@ -430,7 +596,7 @@ export class QuestionPlayerEngineService {
       return;
     }
 
-    this.setCurrentIndex(0);
+    this.currentIndex = 0;
     this.nextIndex = 0;
 
     const interaction = initialState.interaction;
@@ -458,14 +624,33 @@ export class QuestionPlayerEngineService {
     successCallback(initialCard, nextFocusLabel);
   }
 
+  /**
+   * Retrieves the state data for the currently active question.
+   *
+   * Useful for accessing the current question's content, interaction
+   * configuration, and other related metadata.
+   *
+   * @returns {State} The current question's state data object.
+   */
   private getCurrentStateData() {
     return this.questions[this.currentIndex].getStateData();
   }
 
+  /**
+   * Retrieves the state data for the next question in the sequence.
+   *
+   * @returns {State} The state data object of the next question.
+   */
   private getNextStateData() {
     return this.questions[this.nextIndex].getStateData();
   }
 
+  /**
+   * Generates the HTML string for the interaction of the next question.
+   *
+   * @param {string} labelForFocusTarget - A label used to set focus for accessibility.
+   * @returns {string} The HTML string representing the interaction.
+   */
   private getNextInteractionHtml(labelForFocusTarget: string): string {
     const interactionId = this.getNextStateData().interaction.id;
     return this.explorationHtmlFormatterService.getInteractionHtml(
@@ -477,6 +662,13 @@ export class QuestionPlayerEngineService {
     );
   }
 
+  /**
+   * Initializes the question player with a set of questions.
+   *
+   * @param {QuestionBackendDict[]} questionDicts - An array of question backend dicts to initialize with.
+   * @param {(initialCard: StateCard, nextFocusLabel: string) => void} successCallback - Called when initialization succeeds.
+   * @param {() => void} errorCallback - Called when initialization fails.
+   */
   private initializeQuestionPlayerServices(
     questionDicts: QuestionBackendDict[],
     successCallback: (initialCard: StateCard, nextFocusLabel: string) => void,
@@ -488,6 +680,12 @@ export class QuestionPlayerEngineService {
     this.init(questionObjects, successCallback, errorCallback);
   }
 
+  /**
+   * Creates a new state entry for a question in the question player.
+   *
+   * @param {string} questionId - The unique identifier of the question.
+   * @param {string[]} linkedSkillIds - An array of skill IDs linked to the question.
+   */
   private _createNewQuestionPlayerState(
     questionId: string,
     linkedSkillIds: string[]

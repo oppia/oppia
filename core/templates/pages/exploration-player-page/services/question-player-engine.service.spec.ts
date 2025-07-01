@@ -698,12 +698,6 @@ describe('Question player engine service', () => {
     }
   );
 
-  it("should always return false when calling 'isInPreviewMode()'", () => {
-    let previewMode = questionPlayerEngineService.isInPreviewMode();
-
-    expect(previewMode).toBe(false);
-  });
-
   it(
     'should show warning message while loading a question ' +
       'if the question name is empty',
@@ -918,7 +912,7 @@ describe('Question player engine service', () => {
         initSuccessCb,
         initErrorCb
       );
-      questionPlayerEngineService.setCurrentIndex(0);
+      questionPlayerEngineService.currentIndex = 0;
       questionPlayerEngineService.submitAnswer(
         answer,
         textInputService,
@@ -928,47 +922,6 @@ describe('Question player engine service', () => {
       expect(alertsServiceSpy).toHaveBeenCalledWith(
         'Question name should not be empty.'
       );
-    });
-
-    it('should update the current index when a card is added', () => {
-      let submitAnswerSuccessCb = jasmine.createSpy('success');
-      let initSuccessCb = jasmine.createSpy('success');
-      let initErrorCb = jasmine.createSpy('fail');
-      let answer = 'answer';
-      let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createNew('default', '', '', []),
-        1,
-        0,
-        'default_outcome'
-      );
-      answerClassificationResult.outcome.labelledAsCorrect = true;
-
-      spyOn(pageContextService, 'setQuestionPlayerIsOpen');
-      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
-      spyOn(
-        answerClassificationService,
-        'getMatchingClassificationResult'
-      ).and.returnValue(answerClassificationResult);
-      spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
-      );
-
-      questionPlayerEngineService.init(
-        multipleQuestionsObjects,
-        initSuccessCb,
-        initErrorCb
-      );
-      questionPlayerEngineService.submitAnswer(
-        answer,
-        textInputService,
-        submitAnswerSuccessCb
-      );
-
-      expect(questionPlayerEngineService.getCurrentIndex()).toBe(0);
-
-      questionPlayerEngineService.recordNewCardAdded();
-
-      expect(questionPlayerEngineService.getCurrentIndex()).toBe(1);
     });
 
     it(
