@@ -47,6 +47,17 @@ describe('Concept card object factory', () => {
     );
   });
 
+  it('should set explanation', () => {
+    let conceptCard = ConceptCard.createFromBackendDict(conceptCardDict);
+    expect(conceptCard.getExplanation()).toEqual(
+      SubtitledHtml.createDefault('test explanation', 'explanation')
+    );
+    conceptCard.setExplanation(SubtitledHtml.createDefault('test', 'test exp'));
+    expect(conceptCard.getExplanation()).toEqual(
+      SubtitledHtml.createDefault('test', 'test exp')
+    );
+  });
+
   it('should convert to a backend dictionary', () => {
     let conceptCard = ConceptCard.createFromBackendDict(conceptCardDict);
     expect(conceptCard.toBackendDict()).toEqual(conceptCardDict);

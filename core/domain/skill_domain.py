@@ -638,7 +638,7 @@ class Rubric:
         ):
             raise utils.ValidationError(
                 'Expected at least one explanation in medium level rubrics')
-    
+ 
 
 class SkillContentsDict(TypedDict):
     """Dictionary representing the SkillContents object."""
@@ -1266,7 +1266,7 @@ class Skill:
         return cls.convert_html_fields_in_skill_contents(
             skill_contents_dict,
             html_validation_service.fix_incorrectly_encoded_chars)
-    
+
     @classmethod
     def _convert_skill_contents_v4_dict_to_v5_dict(
         cls, skill_contents_dict: SkillContentsDict

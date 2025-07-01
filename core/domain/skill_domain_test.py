@@ -26,7 +26,7 @@ from core.domain import state_domain
 from core.domain import translation_domain
 from core.tests import test_utils
 
-from typing import Final, List
+from typing import Final
 
 
 class SkillDomainUnitTests(test_utils.GenericTestBase):

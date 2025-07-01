@@ -50,16 +50,6 @@ export class ConceptCard {
     };
   }
 
-  _getElementsInFirstSetButNotInSecond(
-    setA: Set<string>,
-    setB: Set<string>
-  ): string[] {
-    let diffList = Array.from(setA).filter(element => {
-      return !setB.has(element);
-    });
-    return diffList;
-  }
-
   getExplanation(): SubtitledHtml {
     return this._explanation;
   }

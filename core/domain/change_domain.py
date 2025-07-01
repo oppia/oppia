@@ -33,7 +33,6 @@ if MYPY: # pragma: no cover
     from core.domain import param_domain
     from core.domain import platform_parameter_domain
     from core.domain import question_domain
-    from core.domain import skill_domain
     from core.domain import state_domain
     from core.domain import translation_domain
 
