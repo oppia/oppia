@@ -303,16 +303,18 @@ export class ConversationSkinComponent {
           // the end of the exploration.
           if (!this._editorPreviewMode && nextCard.isTerminal()) {
             const currentEngineService =
-              this.explorationPlayerStateService.getCurrentEngineService();
-            if (this.explorationPlayerStateService.isInStoryChapterMode()) {
+              this.currentEngineService.getCurrentEngineService();
+            const completedChaptersCount =
+              this.chapterProgressService.getCompletedChaptersCount();
+            if (this.explorationModeService.isInStoryChapterMode()) {
+              let topicUrlFragment =
+                this.urlService.getUrlParams().topic_url_fragment;
+              let classroomUrlFragment =
+                this.urlService.getUrlParams().classroom_url_fragment;
+              let storyUrlFragment =
+                this.urlService.getUrlParams().story_url_fragment;
+              let nodeId = this.urlService.getUrlParams().node_id;
               if (this.isLoggedIn) {
-                let topicUrlFragment =
-                  this.urlService.getUrlParams().topic_url_fragment;
-                let classroomUrlFragment =
-                  this.urlService.getUrlParams().classroom_url_fragment;
-                let storyUrlFragment =
-                  this.urlService.getUrlParams().story_url_fragment;
-                let nodeId = this.urlService.getUrlParams().node_id;
                 this.storyViewerBackendApiService
                   .recordChapterCompletionAsync(
                     topicUrlFragment,
@@ -335,37 +337,32 @@ export class ConversationSkinComponent {
                         }
                       );
                     }
-                    this.learnerDashboardBackendApiService
-                      .fetchLearnerCompletedChaptersCountDataAsync()
-                      .then(responseData => {
-                        let newCompletedChaptersCount =
-                          responseData.completedChaptersCount;
-                        if (
-                          newCompletedChaptersCount !==
-                          this.completedChaptersCount
-                        ) {
-                          this.completedChaptersCount =
-                            newCompletedChaptersCount;
-                          this.chapterIsCompletedForTheFirstTime = true;
-                        }
-                      });
+                    this.chapterProgressService.updateCompletedChaptersCount(
+                      true
+                    );
                   });
+              } else {
+                let loginRedirectUrl =
+                  this.urlInterpolationService.interpolateUrl(
+                    StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE,
+                    {
+                      topic_url_fragment: topicUrlFragment,
+                      classroom_url_fragment: classroomUrlFragment,
+                      story_url_fragment: storyUrlFragment,
+                      node_id: nodeId,
+                    }
+                  );
+                this.userService.setReturnUrl(loginRedirectUrl);
               }
             } else {
-              this.currentEngineService.getCurrentEngineService();
-              const completedChaptersCount =
-                this.chapterProgressService.getCompletedChaptersCount();
               this.statsReportingService.recordExplorationCompleted(
                 newStateName,
                 this.learnerParamsService.getAllParams(),
-                String(
-                  this.completedChaptersCount && this.completedChaptersCount + 1
-                ),
+                String(completedChaptersCount && completedChaptersCount + 1),
                 String(this.playerTranscriptService.getNumCards()),
                 currentEngineService.getLanguageCode()
               );
             }
-
             // For single state explorations, when the exploration
             // reachesthe terminal state and explorationActuallyStarted
             // is false, record exploration actual start event.
@@ -883,18 +880,6 @@ export class ConversationSkinComponent {
             }
             this.recommendedExplorationSummaries = nextStoryNode;
           });
-        if (!this.isLoggedIn) {
-          let loginRedirectUrl = this.urlInterpolationService.interpolateUrl(
-            StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE,
-            {
-              topic_url_fragment: topicUrlFragment,
-              classroom_url_fragment: classroomUrlFragment,
-              story_url_fragment: storyUrlFragment,
-              node_id: nodeId,
-            }
-          );
-          this.userService.setReturnUrl(loginRedirectUrl);
-        }
       } else {
         this.explorationRecommendationsService.getRecommendedSummaryDicts(
           recommendedExplorationIds,
