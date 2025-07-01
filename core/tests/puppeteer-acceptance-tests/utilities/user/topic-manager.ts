@@ -150,8 +150,6 @@ const desktopSkillListItemOptions = '.e2e-test-skill-edit-box';
 const desktopDeleteSkillButton = '.e2e-test-delete-skill-button';
 const mobileSkillListItemOptions = '.e2e-test-mobile-skills-option';
 const mobileDeleteSkillButton = '.e2e-test-mobile-delete-skill-button';
-const workedExampleSelector =
-  '.oppia-skill-concept-card-preview-list .e2e-test-worked-example-title';
 const misconceptionTitleSelector =
   '.oppia-skill-misconception-card-preview-list .e2e-test-worked-example-title';
 const misconceptionTitleElement = '.e2e-test-worked-example-title';
@@ -177,15 +175,8 @@ const addButtonSelector = '.e2e-test-add-misconception-modal-button';
 const misconceptionCardHeader = 'div.oppia-misconception-card-header';
 const nameFieldSelector = '.e2e-test-misconception-name-field';
 const saveMisconceptionButton = '.e2e-test-confirm-add-misconception-button';
-const saveWorkedExamplesButton = '.e2e-test-save-worked-example-button';
-const addWorkedExampleButton = '.e2e-test-add-worked-example';
-const workedExampleListItem = '.oppia-skill-concept-card-preview-list';
-const workedExampleTitleElement = '.e2e-test-worked-example-title';
-const workedExampleDeleteButton = '.e2e-test-delete-example-button';
 const misconceptionListSelector =
   '.oppia-skill-misconception-card-preview-list';
-const confirmDeleteWorkedExampleButton =
-  '.e2e-test-confirm-delete-worked-example-button';
 const confirmDeleteMisconceptionButton =
   '.e2e-test-confirm-delete-misconception-button';
 const optionalMisconceptionToggle = '.e2e-test-misconception-optional-check';
@@ -226,6 +217,11 @@ const storyEditorNodeSelector = '.story-editor-node';
 const resetChapterThumbnailButton = '.e2e-test-thumbnail-reset-button';
 const saveExplorationIDButton = '.e2e-test-exploration-id-save-button';
 const addPrerequisiteSkillButton = '.e2e-test-add-prerequisite-skill';
+const addPrerequisiteSkillInSkillEditorButton =
+  '.e2e-test-add-prerequisite-skill-in-skill-editor-button';
+const togglePrerequisiteSkillsDropdown =
+  '.e2e-test-toggle-prereq-skills-dropdown';
+const toggleSkillRubricsDropdown = '.e2e-test-toggle-rubrics-dropdown';
 const addAcquiredSkillButton = '.e2e-test-add-acquired-skill';
 const mobileCollapsibleCardHeaderSelector =
   '.oppia-mobile-collapsible-card-header';
@@ -1736,124 +1732,6 @@ export class TopicManager extends BaseUser {
   }
 
   /**
-   * Adds a worked example to the topic.
-   * @param {string} exampleQuestion - The question part of the worked example.
-   * @param {string} exampleExplanation - The explanation part of the worked example.
-   */
-  async addWorkedExample(
-    exampleQuestion: string,
-    exampleExplanation: string
-  ): Promise<void> {
-    await this.openAllMobileDropdownsInSkillEditor();
-    await this.waitForStaticAssetsToLoad();
-    await this.clickOn(addWorkedExampleButton);
-    await this.type(rteSelector, exampleQuestion);
-    const rteElements = await this.page.$$(rteSelector);
-    await this.waitForElementToBeClickable(rteElements[1]);
-    await rteElements[1].type(exampleExplanation);
-    await this.clickOn(saveWorkedExamplesButton);
-    await this.isElementVisible(saveWorkedExamplesButton, false);
-  }
-
-  /**
-   * Deletes a worked example from the topic.
-   * @param {string} exampleQuestion - The question part of the worked example to delete.
-   */
-  async deleteWorkedExample(exampleQuestion: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
-    await this.page.waitForSelector(workedExampleListItem, {visible: true});
-    const previewLists = await this.page.$$(workedExampleListItem);
-    if (!previewLists) {
-      throw new Error('No worked examples found');
-    }
-    let exampleFound = false;
-
-    for (const previewList of previewLists) {
-      await this.page.waitForSelector(workedExampleTitleElement, {
-        visible: true,
-      });
-      const titleElement = await previewList.$(workedExampleTitleElement);
-      if (titleElement) {
-        const title = await this.page.evaluate(
-          el => el.textContent,
-          titleElement
-        );
-        if (title.trim() === exampleQuestion) {
-          await this.page.waitForSelector(workedExampleDeleteButton, {
-            visible: true,
-          });
-          const deleteButton = await previewList.$(workedExampleDeleteButton);
-          if (deleteButton) {
-            await this.waitForElementToBeClickable(deleteButton);
-            await deleteButton.click();
-            await this.waitForStaticAssetsToLoad();
-            await this.clickOn(confirmDeleteWorkedExampleButton);
-            await this.isElementVisible(
-              confirmDeleteWorkedExampleButton,
-              false
-            );
-            exampleFound = true;
-            break;
-          }
-        }
-      }
-    }
-    if (!exampleFound) {
-      throw new Error(
-        `Worked example with question "${exampleQuestion}" not found.`
-      );
-    }
-  }
-
-  /**
-   * Verifies if a worked example is present on the page.
-   * @param {string} workedExample - The title of the worked example to verify.
-   * @param {boolean} isPresent - Whether the worked example is expected to be present.
-   */
-  async verifyWorkedExamplePresence(
-    workedExample: string,
-    isPresent: boolean
-  ): Promise<void> {
-    await this.openAllMobileDropdownsInSkillEditor();
-
-    try {
-      await this.page.waitForSelector(workedExampleSelector, {
-        timeout: 5000,
-        visible: true,
-      });
-      const workedExamples = await this.page.$$(workedExampleSelector);
-
-      for (const example of workedExamples) {
-        const title = await this.page.evaluate(el => el.textContent, example);
-        if (title.trim() === workedExample) {
-          if (!isPresent) {
-            throw new Error(
-              `The worked example ${workedExample} is present, which was not expected`
-            );
-          }
-          return;
-        }
-      }
-
-      if (isPresent) {
-        throw new Error(
-          `The worked example ${workedExample} is not present, which was expected`
-        );
-      }
-    } catch (error) {
-      if (isPresent) {
-        throw new Error(
-          `The worked example ${workedExample} is not present, which was expected`
-        );
-      }
-    }
-
-    showMessage(
-      `The worked example is ${isPresent ? '' : 'not'} present as expected.`
-    );
-  }
-
-  /**
    * Adds a misconception to the topic.
    * @param {string} misconceptionName - The name of the misconception to add.
    * @param {string} notes - The notes for question creators to understand how handling this misconception is useful for the skill being tested.
@@ -2038,7 +1916,10 @@ export class TopicManager extends BaseUser {
    */
   async addPrerequisiteSkillInSkillEditor(skillName: string): Promise<void> {
     try {
-      await this.clickOn('+ ADD PREREQUISITE SKILL');
+      if (this.isViewportAtMobileWidth()) {
+        await this.clickOn(togglePrerequisiteSkillsDropdown);
+      }
+      await this.clickOn(addPrerequisiteSkillInSkillEditorButton);
       await this.type(skillNameInputSelector, skillName);
 
       await this.page.waitForSelector(radioInnerCircleSelector);
@@ -2169,6 +2050,9 @@ export class TopicManager extends BaseUser {
    * @param {string} explanation - The explanation to update.
    */
   async updateRubric(difficulty: string, explanation: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(toggleSkillRubricsDropdown);
+    }
     await this.waitForStaticAssetsToLoad();
     let difficultyValue: string;
     switch (difficulty) {
@@ -2280,7 +2164,6 @@ export class TopicManager extends BaseUser {
       showMessage('Skipping opening dropdowns since we are in desktop view');
     }
     await this.clickOn('Misconceptions');
-    await this.clickOn('Worked Examples');
     await this.clickOn(' Prerequisite Skills ');
     await this.clickOn('Rubrics');
 

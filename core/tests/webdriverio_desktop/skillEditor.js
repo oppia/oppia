@@ -78,33 +78,6 @@ describe('Skill Editor functionality', function () {
     );
   });
 
-  it('should create and delete worked examples', async function () {
-    await skillEditorPage.addWorkedExample(
-      'Example Question 1',
-      'Example Explanation 1'
-    );
-    await skillEditorPage.addWorkedExample(
-      'Example Question 2',
-      'Example Explanation 2'
-    );
-    await skillEditorPage.saveOrPublishSkill('Added worked examples');
-
-    await skillEditorPage.get(skillId);
-    await skillEditorPage.expectWorkedExampleSummariesToMatch(
-      ['Example Question 1', 'Example Question 2'],
-      ['Example Explanation 1', 'Example Explanation 2']
-    );
-
-    await skillEditorPage.deleteWorkedExampleWithIndex(0);
-    await skillEditorPage.saveOrPublishSkill('Deleted a worked example');
-
-    await skillEditorPage.get(skillId);
-    await skillEditorPage.expectWorkedExampleSummariesToMatch(
-      ['Example Question 2'],
-      ['Example Explanation 2']
-    );
-  });
-
   it('should edit rubrics for the skill', async function () {
     await skillEditorPage.addRubricExplanationForDifficulty(
       'Easy',
