@@ -38,7 +38,7 @@ import {PageContextService} from '../../../services/page-context.service';
 import {PlayerPositionService} from './player-position.service';
 import {HintsAndSolutionManagerService} from './hints-and-solution-manager.service';
 import {ProgressUrlService} from './progress-url.service';
-import {Solution} from '../../../domain/exploration/SolutionObjectFactory';
+import {Solution} from '../../../domain/exploration/solution.model';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import {CheckpointProgressService} from './checkpoint-progress.service';
 import {EditableExplorationBackendApiService} from '../../../domain/exploration/editable-exploration-backend-api.service';

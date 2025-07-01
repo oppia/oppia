@@ -26,11 +26,10 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {State} from 'domain/state/StateObjectFactory';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {StateEditorService} from './state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from './state-editor-properties-services/state-interaction-id.service';
 import {StateEditorComponent} from './state-editor.component';
@@ -41,7 +40,6 @@ describe('State Editor Component', () => {
   let windowDimensionsService: WindowDimensionsService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
-  let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -63,9 +61,6 @@ describe('State Editor Component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    explorationHtmlFormatterService = TestBed.inject(
-      ExplorationHtmlFormatterService
-    );
 
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'Introduction'
@@ -112,7 +107,6 @@ describe('State Editor Component', () => {
     component.sendNavigateToState('');
     component.sendOnSaveSolution(
       new Solution(
-        explorationHtmlFormatterService,
         true,
         [],
         new SubtitledHtml('<p> Previous HTML string </p>', 'Id')
