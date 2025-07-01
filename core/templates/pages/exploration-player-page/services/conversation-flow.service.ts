@@ -103,7 +103,7 @@ export class ConversationFlowService {
   solutionForState: Solution | null = null;
   responseTimeout: NodeJS.Timeout | null = null;
   nextStateCard!: StateCard;
-  displayedCard: StateCard;
+  displayedCard!: StateCard;
 
   // The following variables are used to track the state of the answer submission process.
   answerIsCorrect = false;
