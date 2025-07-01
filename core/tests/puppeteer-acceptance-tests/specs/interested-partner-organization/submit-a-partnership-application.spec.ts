@@ -82,7 +82,7 @@ describe('Interested Partner Organization', function () {
     await partnerOrganizationUser.navigateToPartnershipsPage();
     await partnerOrganizationUser.clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation();
 
-    // TODO: Learner stories crousal.
+    // Learner stories crousal.
     await partnerOrganizationUser.navigateToPartnershipsPage();
     await partnerOrganizationUser.testLearnerStoriesCarouselInPartnershipPage();
   });

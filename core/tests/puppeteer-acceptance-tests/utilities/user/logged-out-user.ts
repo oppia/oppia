@@ -5183,7 +5183,7 @@ export class LoggedOutUser extends BaseUser {
     const activeItemSelector = `${learnerStoriesCarouselContainerSelector} .carousel-item.active`;
     await this.isElementVisible(learnerStoriesHeadingSelector);
 
-    // Verify Coursal Heading
+    // Verify Coursal Heading.
     const subHeading = await this.page.$eval(
       learnerStoriesHeadingSelector,
       element => (element as HTMLElement).textContent
@@ -5204,24 +5204,24 @@ export class LoggedOutUser extends BaseUser {
     expect(activeCarouselItems.length).toBe(1);
 
     // Check if carousel items are moving.
-    // Capture the initial slide ID
+    // Capture the initial slide ID.
     const initialSlideId = await this.page.$eval(
       activeItemSelector,
       el => el.id
     );
 
-    // Wait for the active class to move to a different slide
+    // Wait for the active class to move to a different slide.
     await this.page.waitForFunction(
       (initialId: string, selector: string) => {
         const active = document.querySelector(selector);
         return active && active.id !== initialId;
       },
-      {timeout: 10000}, // Timeout after 10 seconds if no change
+      {timeout: 10000}, // Timeout after 10 seconds if no change.
       initialSlideId,
       activeItemSelector
     );
 
-    // Confirm new slide ID is different
+    // Confirm new slide ID is different.
     const newSlideId = await this.page.$eval(activeItemSelector, el => el.id);
     expect(newSlideId).not.toBe(initialSlideId);
   }
