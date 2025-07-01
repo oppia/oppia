@@ -22,7 +22,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import Dict, List, TypedDict, Union, overload
+from typing import Dict, List, TypedDict
 
 
 class PartialExplorationOpportunitySummaryDict(TypedDict):
