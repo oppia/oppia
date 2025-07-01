@@ -222,7 +222,7 @@ export class ConversationSkinComponent {
     if (this.explorationModeService.isInQuestionPlayerMode()) {
       this.directiveSubscriptions.add(
         this.hintsAndSolutionManagerService.onHintConsumed.subscribe(() => {
-          this.questionPlayerEngineService.hintUsed(
+          this.questionPlayerEngineService.recordHintUsed(
             this.questionPlayerEngineService.getCurrentQuestion()
           );
         })
@@ -231,7 +231,7 @@ export class ConversationSkinComponent {
       this.directiveSubscriptions.add(
         this.hintsAndSolutionManagerService.onSolutionViewedEventEmitter.subscribe(
           () => {
-            this.questionPlayerEngineService.solutionViewed(
+            this.questionPlayerEngineService.recordSolutionViewed(
               this.questionPlayerEngineService.getCurrentQuestion()
             );
           }
@@ -1108,7 +1108,7 @@ export class ConversationSkinComponent {
             nextCard.getStateName()
           );
         } else if (this.explorationModeService.isInQuestionPlayerMode()) {
-          this.questionPlayerEngineService.answerSubmitted(
+          this.questionPlayerEngineService.registerAnswer(
             this.questionPlayerEngineService.getCurrentQuestion(),
             !remainOnCurrentCard,
             taggedSkillMisconceptionId

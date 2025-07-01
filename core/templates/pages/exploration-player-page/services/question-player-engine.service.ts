@@ -134,8 +134,6 @@ export class QuestionPlayerEngineService {
   /**
    * Initializes the question player in pretest mode using a predefined list of question objects.
    *
-   * This is typically used for assessments before starting an exploration or course.
-   *
    * @param {Question[]} pretestQuestionObjects - An array of pretest questions.
    * @param {(initialCard: StateCard, nextFocusLabel: string) => void} callback - Called after the first question is loaded.
    */
@@ -189,9 +187,12 @@ export class QuestionPlayerEngineService {
   }
 
   /**
-   * Updates the current index to reflect that a new card has been added.
+   * Updates the current index to reflect that a new question card has been shown,
+   * and sets the page context for the active question.
    *
-   * This function also updates the page context to point to the current question.
+   * This ensures that services relying on entity context (such as logging,
+   * analytics, or context-aware components) are aware that the current
+   * entity is a QUESTION, and provides its ID for tracking or processing.
    */
   recordNewCardAdded(): void {
     this.currentIndex = this.nextIndex;
@@ -271,17 +272,35 @@ export class QuestionPlayerEngineService {
   }
 
   /**
-   * Submits the learner's answer and handles classification, feedback generation,
-   * and state progression. Based on whether the answer is correct, it may move
-   * to the next question or remain on the current one.
+   * Submits the learner's answer, classifies it using the provided rules service,
+   * generates appropriate feedback, and determines whether to move to the next
+   * question or stay on the current one.
    *
-   * It also constructs the next `StateCard`, feedback message, and triggers
-   * the provided `successCallback()` with full result data needed to update the UI.
+   * - If the answer is correct and not the last question, the player advances to the next question.
+   * - If the answer is incorrect, the player remains on the same question.
+   * - In both cases, feedback is generated and passed to the UI via the success callback.
+   *
+   * Constructs a new `StateCard` and interaction HTML when transitioning
+   * to the next question. Also determines whether the interaction needs to
+   * be refreshed (e.g., inline interactions or correct answers).
    *
    * @param {InteractionAnswer} answer - The learner's submitted answer.
-   * @param {InteractionRulesService} interactionRulesService - Rules service used to classify the answer.
-   * @param {Function} successCallback - Callback invoked after processing the answer with updated UI data.
-   * @returns {boolean} - Whether the answer was classified as correct.
+   * @param {InteractionRulesService} interactionRulesService - Service used to classify the answer based on rules.
+   * @param {Function} successCallback - Callback invoked after answer processing, containing data to update the UI:
+   *   - nextCard: The next StateCard (or null if remaining on current).
+   *   - refreshInteraction: Whether the interaction needs to be redrawn.
+   *   - feedbackHtml: The feedback message to show.
+   *   - refresherExplorationId: Reserved (null).
+   *   - missingPrerequisiteSkillId: Reserved (null).
+   *   - remainOnCurrentCard: Whether to stay on the current question.
+   *   - taggedSkillMisconceptionId: If linked to a known misconception.
+   *   - wasOldStateInitial: Reserved (null).
+   *   - isFirstHit: Reserved (null).
+   *   - isFinalQuestion: Whether this was the last question in the session.
+   *   - nextCardIfReallyStuck: Reserved (null).
+   *   - focusLabel: Label to manage focus in the UI.
+   *
+   * @returns {boolean} Whether the answer was classified as correct.
    */
   submitAnswer(
     answer: InteractionAnswer,
@@ -407,12 +426,11 @@ export class QuestionPlayerEngineService {
    * Logs that a hint was used for the given question.
    *
    * Creates a new question state entry if it doesn't exist, then records
-   * the timestamp at which the hint was accessed. Useful for analytics,
-   * progress tracking, or limiting hints.
+   * the timestamp at which the hint was accessed.
    *
    * @param {Question} question - The question for which the hint was used.
    */
-  hintUsed(question: Question): void {
+  recordHintUsed(question: Question): void {
     let questionId = question.getId() as string;
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
@@ -434,7 +452,7 @@ export class QuestionPlayerEngineService {
    *
    * @param {Question} question - The question for which the solution was viewed.
    */
-  solutionViewed(question: Question): void {
+  recordSolutionViewed(question: Question): void {
     let questionId = question.getId() as string;
     if (!this.questionPlayerState[questionId]) {
       this._createNewQuestionPlayerState(
@@ -459,7 +477,7 @@ export class QuestionPlayerEngineService {
    * @param {string} taggedSkillMisconceptionId - The ID of the tagged misconception
    *     (if any) associated with the answer, used for diagnostic or reporting purposes.
    */
-  answerSubmitted(
+  registerAnswer(
     question: Question,
     isCorrect: boolean,
     taggedSkillMisconceptionId: string

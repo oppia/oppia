@@ -621,9 +621,9 @@ describe('Conversation skin component', () => {
       collectionPlayerBackendApiService,
       'fetchCollectionSummariesAsync'
     ).and.returnValue(Promise.resolve(collectionSummary));
-    spyOn(questionPlayerEngineService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'recordHintUsed');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-    spyOn(questionPlayerEngineService, 'solutionViewed');
+    spyOn(questionPlayerEngineService, 'recordSolutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
     spyOn(chapterProgressService, 'updateCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
@@ -790,9 +790,9 @@ describe('Conversation skin component', () => {
       collectionPlayerBackendApiService,
       'fetchCollectionSummariesAsync'
     ).and.returnValue(Promise.resolve(collectionSummary));
-    spyOn(questionPlayerEngineService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'recordHintUsed');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-    spyOn(questionPlayerEngineService, 'solutionViewed');
+    spyOn(questionPlayerEngineService, 'recordSolutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
     spyOn(statsReportingService, 'recordExplorationCompleted');
     spyOn(statsReportingService, 'recordExplorationActuallyStarted');
@@ -919,9 +919,9 @@ describe('Conversation skin component', () => {
       collectionPlayerBackendApiService,
       'fetchCollectionSummariesAsync'
     ).and.returnValue(Promise.resolve(collectionSummary));
-    spyOn(questionPlayerEngineService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'recordHintUsed');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-    spyOn(questionPlayerEngineService, 'solutionViewed');
+    spyOn(questionPlayerEngineService, 'recordSolutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
     spyOn(chapterProgressService, 'updateCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
@@ -1056,9 +1056,9 @@ describe('Conversation skin component', () => {
         collectionPlayerBackendApiService,
         'fetchCollectionSummariesAsync'
       ).and.returnValue(Promise.resolve(collectionSummary));
-      spyOn(questionPlayerEngineService, 'hintUsed');
+      spyOn(questionPlayerEngineService, 'recordHintUsed');
       spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-      spyOn(questionPlayerEngineService, 'solutionViewed');
+      spyOn(questionPlayerEngineService, 'recordSolutionViewed');
       spyOn(imagePreloaderService, 'onStateChange');
       spyOn(statsReportingService, 'recordExplorationCompleted');
       spyOn(statsReportingService, 'recordExplorationActuallyStarted');
@@ -2605,7 +2605,7 @@ describe('Conversation skin component', () => {
     spyOn(componentInstance, 'showUpcomingCard');
     spyOn(fatigueDetectionService, 'reset');
     spyOn(numberAttemptsService, 'reset');
-    spyOn(questionPlayerEngineService, 'answerSubmitted');
+    spyOn(questionPlayerEngineService, 'registerAnswer');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
     spyOn(playerTranscriptService, 'updateLatestInteractionHtml');
     spyOn(

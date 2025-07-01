@@ -427,7 +427,7 @@ describe('Question player engine service', () => {
   });
 
   it('should register hint as used', () => {
-    questionPlayerEngineService.hintUsed(question);
+    questionPlayerEngineService.recordHintUsed(question);
 
     expect(
       questionPlayerEngineService.questionPlayerState[questionId]
@@ -435,7 +435,7 @@ describe('Question player engine service', () => {
   });
 
   it('should register solution viewed', () => {
-    questionPlayerEngineService.solutionViewed(question);
+    questionPlayerEngineService.recordSolutionViewed(question);
 
     expect(
       questionPlayerEngineService.questionPlayerState[questionId].viewedSolution
@@ -443,9 +443,9 @@ describe('Question player engine service', () => {
   });
 
   it('should submit answer', () => {
-    questionPlayerEngineService.answerSubmitted(question, true, '');
-    questionPlayerEngineService.solutionViewed(question);
-    questionPlayerEngineService.answerSubmitted(question, true, '');
+    questionPlayerEngineService.registerAnswer(question, true, '');
+    questionPlayerEngineService.recordSolutionViewed(question);
+    questionPlayerEngineService.registerAnswer(question, true, '');
 
     expect(
       questionPlayerEngineService.questionPlayerState[questionId].answers.length
