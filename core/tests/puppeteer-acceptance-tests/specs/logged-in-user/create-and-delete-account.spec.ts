@@ -37,7 +37,7 @@ describe('Logged-in User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to check admin suggestion',
+    'should be able to create an account, validate email, check admin suggestion, verify terms of use, login and delete account',
     async function () {
       // Calling openBrowser since we didn't use createNewUser to create loggedInUser2 as it needs a username and a email.
       await loggedInUser2.openBrowser();
@@ -45,26 +45,14 @@ describe('Logged-in User', function () {
 
       await loggedInUser2.clickAdminAccessInfoLink();
       await loggedInUser2.expectAdminEmailSuggestion('testadmin@example.com');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
-  it(
-    'should be able to enter a vaild email',
-    async function () {
       // Entering invalid email.
       await loggedInUser2.enterEmail('123@gmail.');
       await loggedInUser2.expectValidationError('Invalid email address');
 
       // Entering valid email.
       await loggedInUser2.enterEmail('logged_in_user2@example.com');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
-  it(
-    'should be able to check username availability',
-    async function () {
       // Checking username availability via entering username that already exists.
       await loggedInUser2.signInWithUsername('loggedInUser1', false);
       await loggedInUser2.expectUsernameError(
@@ -79,13 +67,7 @@ describe('Logged-in User', function () {
 
       // Entering valid username and signing up.
       await loggedInUser2.signInWithUsername('loggedInUser2');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
-  it(
-    'should be able to delete account',
-    async function () {
       // Delete the account.
       await loggedInUser2.navigateToPreferencesPage();
       await loggedInUser2.deleteAccount();

@@ -357,32 +357,32 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
     },
     {
-      "name": "logged-in-user/add-and-remove-exploration-from-play-later",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/add-and-remove-exploration-from-play-later.spec.ts"
+      "name": "logged-in-learner/add-and-remove-exploration-from-play-later",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/add-and-remove-exploration-from-play-later.spec.ts"
     },
     {
-      "name": "logged-in-user/learner-can-provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/learner-can-provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player.spec.ts"
+      "name": "logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player.spec.ts"
     },
     {
-      "name": "logged-in-user/learner-cannot-access-pages-that-require-higher-privileges",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/learner-cannot-access-pages-that-require-higher-privileges.spec.ts"
+      "name": "logged-in-learner/access-pages-that-require-higher-privileges",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/access-pages-that-require-higher-privileges.spec.ts"
     },
     {
-      "name": "logged-in-user/learner-completes-the-exploration-and-decides-what-to-do-next",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/learner-completes-the-exploration-and-decides-what-to-do-next.spec.ts"
+      "name": "logged-in-learner/completes-the-exploration-and-decides-what-to-do-next",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts"
     },
     {
-      "name": "logged-in-user/learner-goes-through-the-sign-in-flow",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/learner-goes-through-the-sign-in-flow.spec.ts"
+      "name": "logged-in-learner/goes-through-the-sign-in-flow",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/goes-through-the-sign-in-flow.spec.ts"
     },
     {
-      "name": "logged-in-user/learner-reaches-a-checkpoint-and-saves-their-progress",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/learner-reaches-a-checkpoint-and-saves-their-progress.spec.ts"
+      "name": "logged-in-learner/reaches-a-checkpoint-and-saves-their-progress",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts"
     },
     {
-      "name": "logged-in-user/learner-starts-from-beginning-after-completing-a-lesson",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/learner-starts-from-beginning-after-completing-a-lesson.spec.ts"
+      "name": "logged-in-learner/starts-from-beginning-after-completing-a-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/starts-from-beginning-after-completing-a-lesson.spec.ts"
     },
     {
       "name": "logged-out-learner/access-the-lesson-player",
