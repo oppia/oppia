@@ -384,6 +384,11 @@ describe('Conversation flow service', () => {
     expect(conversationFlowService.getAnswerIsCorrect()).toBeFalse();
   });
 
+  it('should get solutionForState correctly', () => {
+    conversationFlowService.solutionForState = null;
+    expect(conversationFlowService.getSolutionForState()).toBeFalsy();
+  });
+
   it('should set and get answerIsBeingProcessed correctly', () => {
     conversationFlowService.setAnswerIsBeingProcessed(true);
     expect(conversationFlowService.getAnswerIsBeingProcessed()).toBeTrue();

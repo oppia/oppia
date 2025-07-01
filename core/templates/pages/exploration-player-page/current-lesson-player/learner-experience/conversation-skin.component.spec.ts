@@ -552,7 +552,6 @@ describe('Conversation skin component', () => {
       Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
     );
     spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
-    spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
       explorationEngineService
     );
@@ -1331,7 +1330,7 @@ describe('Conversation skin component', () => {
       {alice: {num_commits: 3}}
     );
 
-    componentInstance.recommendedExplorationSummaries = [mockSummary];
+    conversationFlowService.setRecommendedExplorationSummaries([mockSummary]);
 
     spyOn(
       explorationRecommendationsService,
@@ -1632,7 +1631,6 @@ describe('Conversation skin component', () => {
 
     componentInstance.initializePage();
     tick(100);
-    expect(componentInstance.recommendedExplorationSummaries).toEqual([]);
     expect(playerPositionService.init).toHaveBeenCalled();
 
     componentInstance.questionPlayerConfig = null;
