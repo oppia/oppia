@@ -22,7 +22,7 @@ from core import feconf
 from core import utils
 from core.constants import constants
 
-from typing import Dict, List, TypedDict, overload, Union
+from typing import Dict, List, TypedDict, Union, overload
 
 
 class PartialExplorationOpportunitySummaryDict(TypedDict):
@@ -519,7 +519,6 @@ class TranslationOpportunity:
             'translation_counts': self.translation_counts,
             'entity_type': self.entity_type
         }
-
 
 
 class TranslationOpportunityCardInfoDict(TranslationOpportunityDict, TypedDict):
