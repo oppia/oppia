@@ -1,6 +1,6 @@
 <background-banner></background-banner>
 <form *ngIf="hasPageLoaded" [formGroup]="preferencesForm" (ngSubmit)="savePreferences()">
-  <div class="oppia-dashboard-container ng-scope">
+  <div class="oppia-dashboard-container ng-scope e2e-test-preferences-container">
     <h1 class="oppia-preferences-page-heading e2e-test-preferences-title" tabindex="0">
         {{ 'I18N_PREFERENCES_HEADING' | translate }}
     </h1>
