@@ -5154,6 +5154,9 @@ export class LoggedOutUser extends BaseUser {
     expect(videoBaseURI).toContain(videoID);
   }
 
+  /**
+   * Checks if Carousel of Learner Stories in Partnership Page works properly.
+   */
   async testLearnerStoriesCarouselInPartnershipPage(): Promise<void> {
     const activeItemSelector = `${learnerStoriesCarouselContainerSelector} .carousel-item.active`;
     await this.isElementVisible(learnerStoriesHeadingSelector);
