@@ -47,8 +47,13 @@ describe('Interested Volunteer', function () {
     // Apply to become a volunteer at top of the page.
     await interestedVolunteer.clickApplyToVolunteerAtTheTopOfVolunteerPage();
 
-    // Check for Expectations Tab.
+    // "Why Volunteer with Us?" heading.
     await interestedVolunteer.navigateToVolunteerPage();
+    await interestedVolunteer.expectVolunteerPageHeadingToContain(
+      'Why volunteer with us?'
+    );
+
+    // Meet our volunteers.
     await interestedVolunteer.expectVolunteerPageHeadingToContain(
       'Meet our volunteers'
     );
