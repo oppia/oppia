@@ -37,7 +37,7 @@ describe('Logged-In Learner', function () {
     );
 
     explorationId =
-      await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+      await explorationEditor.createAndPublishExplorationWithCards(
         'What are the Place Values?'
       );
 

@@ -17,6 +17,7 @@
  * from the lesson player.
  */
 
+import {showMessage} from '../../utilities/common/show-message';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
@@ -46,6 +47,17 @@ describe('Logged-Out Learner', function () {
   let explorationId: string | null;
 
   beforeAll(async function () {
+    // TODO(19443): Once this issue is resolved (which was not allowing to make the feedback
+    // in mobile viewport which is required for testing the feedback messages tab),
+    // remove this part of skipping the test and make the test to run in mobile viewport as well.
+    // Also, attribution cannot be generated in mobile devices, so keep that part skipped in mobile
+    // tests.
+    // see: https://github.com/oppia/oppia/issues/19443
+    if (process.env.MOBILE === 'true') {
+      showMessage('Test skipped in mobile viewport');
+      process.exit(0);
+    }
+
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com'
