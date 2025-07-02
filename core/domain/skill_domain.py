@@ -638,7 +638,7 @@ class Rubric:
         ):
             raise utils.ValidationError(
                 'Expected at least one explanation in medium level rubrics')
- 
+
 
 class SkillContentsDict(TypedDict):
     """Dictionary representing the SkillContents object."""
