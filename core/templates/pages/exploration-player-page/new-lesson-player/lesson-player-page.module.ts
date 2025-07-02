@@ -41,6 +41,7 @@ import {PlayerSidebarComponent} from './sidebar-components/player-sidebar.compon
 import {PlayerFooterComponent} from './conversation-skin-components/progress-tracker-components/player-footer.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
 import {NewConversationSkinComponent} from './conversation-skin-components/new-conversation-skin.component';
+import {ConversationDisplayComponent} from './conversation-skin-components/conversation-display-components/conversation-display.component';
 
 @NgModule({
   imports: [
@@ -58,6 +59,7 @@ import {NewConversationSkinComponent} from './conversation-skin-components/new-c
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
+    ConversationDisplayComponent,
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
     PlayerHeaderComponent,
@@ -67,6 +69,7 @@ import {NewConversationSkinComponent} from './conversation-skin-components/new-c
     NewAudioBarComponent,
   ],
   entryComponents: [
+    ConversationDisplayComponent,
     NewLessonPlayerPageComponent,
     NewConversationSkinComponent,
     NewLessonPlayerPageRootComponent,

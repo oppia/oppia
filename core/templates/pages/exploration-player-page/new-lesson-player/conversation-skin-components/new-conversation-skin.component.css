@@ -53,6 +53,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
     max-width: 1400px;
     padding: 56px 14px 0;
     width: 100%;
+    background-color: aqua;
   }
   
   .conversation-skin-cards-container-embedded {
@@ -74,6 +75,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
     position: relative;
     width: 42%;
     z-index: 3;
+    background-color: tomato;
   }
   
   /* Some mobile devices have CSS width below 360px, use a responsive min-width
@@ -95,6 +97,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
     position: relative;
     width: 42%;
     z-index: 2;
+    background-color: pink;
   }
   
   .conversation-skin-supplemental-nav-submit-button,
@@ -118,6 +121,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
   
   .oppia-conversation-skin-animate-cards-container {
     margin: 0 auto;
+    background-color: yellowgreen;
   }
   
   .oppia-conversation-skin-next-lesson-text-container {
