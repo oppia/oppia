@@ -120,6 +120,18 @@ describe('Logged-in User', function () {
     await loggedInUser.verifyCheckpointModalAppears();
   });
 
+  it('should be able to resume the lesson from the last progress saved', async function () {
+    // Again reload the page to check the 'Resume' exploration in the progress remainder as well.
+    await loggedInUser.reloadPage();
+    await loggedInUser.expectProgressRemainder(true);
+    await loggedInUser.chooseActionInProgressRemainder('Resume');
+
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.expectCardContentToMatch(
+      'Lesson completed successfully. We have practiced negative numbers.'
+    );
+  });
+
   it('should be able to restart the lesson from the beginning', async function () {
     // Reloading from the current progress.
     await loggedInUser.reloadPage();
@@ -131,18 +143,6 @@ describe('Logged-in User', function () {
     await loggedInUser.continueToNextCard();
     await loggedInUser.submitAnswer('-99');
     await loggedInUser.continueToNextCard();
-  });
-
-  it('should be able to resume the lesson from the last progress saved', async function () {
-    // Again reload the page to check the 'Resume' exploration in the progress remainder as well.
-    await loggedInUser.reloadPage();
-    await loggedInUser.expectProgressRemainder(true);
-    await loggedInUser.chooseActionInProgressRemainder('Resume');
-
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.expectCardContentToMatch(
-      'Lesson completed successfully. We have practiced negative numbers.'
-    );
   });
 
   it('should be able to exit the lesson player', async function () {
