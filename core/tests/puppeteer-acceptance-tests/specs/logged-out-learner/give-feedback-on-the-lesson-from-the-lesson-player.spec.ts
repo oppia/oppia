@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if a learner can give a feedback
- * from the lesson player.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * EL.FB. Learner can give feedback on the lesson from the lesson player
  */
 
 import {showMessage} from '../../utilities/common/show-message';

@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test to verify that a logged-in learner can save
- * progress after reaching a checkpoint.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * LI. Learner starts from beginning after completing a lesson
  */
 
 import testConstants from '../../utilities/common/test-constants';

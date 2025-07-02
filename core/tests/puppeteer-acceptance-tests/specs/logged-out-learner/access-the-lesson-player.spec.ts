@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if a user can access lesson
- * player without logging in.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * EL.LP.  Learner can access the lesson player
  */
 
 import testConstants from '../../utilities/common/test-constants';

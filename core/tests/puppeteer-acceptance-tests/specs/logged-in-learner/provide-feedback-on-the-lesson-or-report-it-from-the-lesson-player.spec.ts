@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if a logged-in learner can
- * provide feedback and report the exploration.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * LI. Learner can report a lesson from the lesson player
  */
 
 import {showMessage} from '../../utilities/common/show-message';

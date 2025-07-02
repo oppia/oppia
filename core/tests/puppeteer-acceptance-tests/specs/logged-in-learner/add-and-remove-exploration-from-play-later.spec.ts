@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance tests for the user journey below.
- * User Journey: Adding an exploration to 'play later' from the community library page,
- * playing the exploration from the learner dashboard, and then removing it from 'play later'.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * LI.PL. Learner selects an exploration to “play later” from the community library
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
