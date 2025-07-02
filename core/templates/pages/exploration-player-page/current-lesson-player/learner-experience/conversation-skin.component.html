@@ -15,7 +15,7 @@
                         [collectionSummary]="collectionSummary"
                         [questionPlayerConfig]="questionPlayerConfig"
                         [explorationIsInPreviewMode]="isInPreviewMode"
-                        [recommendedExplorationSummaries]="recommendedExplorationSummaries"
+                        [recommendedExplorationSummaries]="this.getRecommendationExplorationSummaries()"
                         [nextLessonLink]="getExplorationLink()">
       </oppia-tutor-card>
       <div *ngIf="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
@@ -36,15 +36,15 @@
                             (skipQuestion)="skipCurrentQuestion()">
         </oppia-progress-nav>
       </div>
-      <div *ngIf="isOnTerminalCard() && recommendedExplorationSummaries && recommendedExplorationSummaries.length > 0 && (inStoryMode || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))"
+      <div *ngIf="isOnTerminalCard() && this.getRecommendationExplorationSummaries() && this.getRecommendationExplorationSummaries().length > 0 && (inStoryMode || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))"
            class="conversation-skin-next-lesson-wrapper">
         <div class="oppia-conversation-skin-next-lesson-text-container">
           <span class="conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>
-          <span *ngIf="!isHackyExpTitleTranslationDisplayed(recommendedExplorationSummaries[0].id)">
-            {{ recommendedExplorationSummaries[0].title }}
+          <span *ngIf="!isHackyExpTitleTranslationDisplayed(this.getRecommendationExplorationSummaries()[0].id)">
+            {{ this.getRecommendationExplorationSummaries()[0].title }}
           </span>
-          <span *ngIf="isHackyExpTitleTranslationDisplayed(recommendedExplorationSummaries[0].id)">
-            {{ getRecommendedExpTitleTranslationKey(recommendedExplorationSummaries[0].id) | translate }}
+          <span *ngIf="isHackyExpTitleTranslationDisplayed(this.getRecommendationExplorationSummaries()[0].id)">
+            {{ getRecommendedExpTitleTranslationKey(this.getRecommendationExplorationSummaries()[0].id) | translate }}
           </span>
         </div>
         <div>

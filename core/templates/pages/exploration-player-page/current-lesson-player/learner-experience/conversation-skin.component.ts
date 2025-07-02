@@ -59,6 +59,7 @@ import {ExplorationModeService} from 'pages/exploration-player-page/services/exp
 import {ChapterProgressService} from 'pages/exploration-player-page/services/chapter-progress.service';
 import {CurrentEngineService} from 'pages/exploration-player-page/services/current-engine.service';
 import {CardAnimationService} from 'pages/exploration-player-page/services/card-animation.service';
+import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 
 @Component({
   selector: 'oppia-conversation-skin',
@@ -578,5 +579,9 @@ export class ConversationSkinComponent {
 
   getHasFullyLoaded(): boolean {
     return this.conversationFlowService.getHasFullyLoaded();
+  }
+
+  getRecommendationExplorationSummaries(): LearnerExplorationSummary[] {
+    return this.conversationFlowService.getRecommendedExplorationSummaries();
   }
 }
