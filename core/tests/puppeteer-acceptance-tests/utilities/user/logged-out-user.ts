@@ -1015,7 +1015,7 @@ export class LoggedOutUser extends BaseUser {
         impactReport2022Url
       );
 
-      // Close Navbar once links are verified
+      // Close Navbar once links are verified.
       await this.clickOn(mobileSidebarExpandAboutMenuButton);
       await this.clickOn(mobileNavbarOpenSidebarButton);
     } else {
