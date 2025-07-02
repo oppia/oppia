@@ -236,9 +236,16 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Navigates to the splash page.
+   * @param expectedURL - The expected URL after navigation. Defaults to `${baseUrl}/`.
    */
-  async navigateToSplashPage(verifyURL: boolean = true): Promise<void> {
-    await this.goto(splashPageUrl, verifyURL);
+  async navigateToSplashPage(
+    expectedURL: string = learnerDashboardUrl
+  ): Promise<void> {
+    // We explicitly check for expected URL instead of verifying it through
+    // BaseUser.goto as /splash redirects user to a different page.
+    await this.goto(splashPageUrl, false);
+
+    expect(this.page.url()).toBe(expectedURL);
   }
 
   /**
