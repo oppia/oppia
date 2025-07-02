@@ -80,13 +80,13 @@ jobs:
           python -m scripts.check_for_unresolved_todos --repository_path=$(pwd) --pull_request=${{ github.event.pull_request.number }} --commit_sha=${{ github.sha }} --generate_github_file
       - name: Check for duplicate todo comment
         id: check_for_duplicate_todo_comment
-        if: failure() && steps.check_for_unresolved_todos.outcome == 'failure'
+        if: failure() && steps.check_for_unresolved_todos.outcome == 'failure' && steps.check_for_unresolved_todos.outputs.unresolved_todos_found == 'true'
         env:
           GH_TOKEN: ${{ secrets.TODO_CHECKS_TOKEN }}
         run: |
           python -m scripts.check_for_duplicate_todo_comment --repository_path=$(pwd) --pull_request=${{ github.event.pull_request.number }} --new_comment_file=unresolved_todo_list.txt
       - name: Add Comment
-        if: failure() && steps.check_for_duplicate_todo_comment.outcome == 'failure'
+        if: failure() && steps.check_for_duplicate_todo_comment.outcome == 'failure' && steps.check_for_unresolved_todos.outputs.unresolved_todos_found == 'true'
         env:
           GH_TOKEN: ${{ secrets.TODO_CHECKS_TOKEN }}
         run: |

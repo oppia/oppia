@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 
 from scripts import github_api
 from scripts import todo_finder
@@ -120,9 +121,7 @@ def log_unresolved_todos_failure(
         todos: List[TodoDict]. The todos to log.
         issue_number: int. The issue number that the todos are associated with.
     """
-    print(
-        'The following TODOs are unresolved '
-        'for this issue #' + str(issue_number) + ':')
+    print(f'The following TODOs are unresolved for this issue #{issue_number}:')
     for todo in sorted(
         todos,
         key=lambda todo: (todo['file_path'], todo['line_number'])
@@ -172,6 +171,9 @@ def main(args: Optional[List[str]] = None) -> None:
                     todos_associated_with_issue,
                     github_perma_link_url,
                     issue_number)
+    with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as o:
+        print(
+            f'unresolved_todos_found={str(todos_found).lower()}', file=o)
     if todos_found:
         raise Exception(UNRESOLVED_TODOS_PRESENT_INDICATOR)
     print(UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR)

@@ -176,7 +176,7 @@ class GithubApiTests(test_utils.GenericTestBase):
                     'Invalid command passed to subprocess.run method')
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
         error_message = (
-            'Failed to get GitHub Auth Token from the GitHub CLI.')
+            'Failed to get GitHub auth token from the GitHub CLI.')
         with swap_subprocess_run, self.assertRaisesRegex(
             RuntimeError, error_message):
             github_api.get_github_auth_token()
