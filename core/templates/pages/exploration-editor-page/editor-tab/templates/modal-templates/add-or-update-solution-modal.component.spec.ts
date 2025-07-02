@@ -22,10 +22,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from 'components/state-editor/state-editor-properties-services/state-solution.service';
-import {
-  Solution,
-  SolutionObjectFactory,
-} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
@@ -51,7 +48,6 @@ describe('Add Or Update Solution Modal Component', () => {
   let currentInteractionService: CurrentInteractionService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let ngbActiveModal: NgbActiveModal;
-  let solutionObjectFactory: SolutionObjectFactory;
   let stateInteractionIdService: StateInteractionIdService;
   let stateSolutionService: StateSolutionService;
   let generateContentIdService: GenerateContentIdService;
@@ -86,7 +82,6 @@ describe('Add Or Update Solution Modal Component', () => {
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService
     );
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
     stateSolutionService = TestBed.inject(StateSolutionService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
@@ -108,7 +103,6 @@ describe('Add Or Update Solution Modal Component', () => {
       ).and.returnValue('<p>Interaction Html</p>');
 
       answerEditorHtml = new Solution(
-        explorationHtmlFormatterService,
         true,
         'solution',
         SubtitledHtml.createDefault('Explanation html', 'cont_1')
@@ -194,7 +188,7 @@ describe('Add Or Update Solution Modal Component', () => {
       component.saveSolution();
 
       expect(ngbActiveModal.close).toHaveBeenCalledWith({
-        solution: solutionObjectFactory.createNew(
+        solution: Solution.createNew(
           true,
           'answer',
           'Explanation html',
