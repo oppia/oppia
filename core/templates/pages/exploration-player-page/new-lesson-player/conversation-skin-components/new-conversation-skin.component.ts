@@ -75,7 +75,6 @@ export class NewConversationSkinComponent {
 
   isLoggedIn: boolean;
   voiceoversAreLoaded: boolean = false;
-  collectionTitle: string;
   explorationId: string;
   isIframed: boolean;
   OPPIA_AVATAR_IMAGE_URL: string;
@@ -140,16 +139,6 @@ export class NewConversationSkinComponent {
 
     let collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     this.pidInUrl = this.urlService.getPidFromUrl();
-
-    if (collectionId) {
-      this.readOnlyCollectionBackendApiService
-        .loadCollectionAsync(collectionId)
-        .then(collection => {
-          this.collectionTitle = collection.getTitle();
-        });
-    } else {
-      this.collectionTitle = null;
-    }
 
     this.explorationId = this.pageContextService.getExplorationId();
     this.isIframed = this.urlService.isIframed();
