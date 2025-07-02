@@ -1868,6 +1868,63 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
+   * Creates and publishes a topic with a subtopic (having study guides) and skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} skillName - The name of the skill.
+   */
+  async createAndPublishTopicWithSubtopicsAndStudyGuides(
+    topicName: string,
+    subtopicName: string,
+    skillName: string
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(/ /g, '-')
+    );
+    await this.createSubtopicWithStudyGuideForTopic(
+      subtopicName,
+      subtopicName.toLowerCase().replace(/ /g, '-'),
+      'Adding With Your Fingers',
+      'One way to add is using your...',
+      topicName
+    );
+    await this.addSubtopicStudyGuideSection(
+      'Using an Addition Table',
+      'To add two single-digit...',
+      1
+    );
+    await this.saveTopicDraft(topicName);
+
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 3);
+    await this.assignSkillToSubtopicInTopicEditor(
+      skillName,
+      subtopicName,
+      topicName
+    );
+    await this.addSkillToDiagnosticTest(skillName, topicName);
+
+    await this.createSubtopicWithStudyGuideForTopic(
+      'Subtracting Numbers',
+      'subtract-nos',
+      'Common Mistakes',
+      'Some common mistakes students make are...',
+      topicName
+    );
+    await this.saveTopicDraft(topicName);
+
+    await this.createSkillForTopic('Skill 2', topicName);
+    await this.assignSkillToSubtopicInTopicEditor(
+      'Skill 2',
+      'Subtracting Numbers',
+      topicName
+    );
+
+    await this.publishDraftTopic(topicName);
+  }
+
+  /**
    * Creates, updates, and publishes a new classroom with a topic.
    * @param {string} classroomName - The name of the classroom.
    * @param {string} urlFragment - The URL fragment for the classroom.
