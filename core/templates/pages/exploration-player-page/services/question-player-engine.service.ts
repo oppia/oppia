@@ -286,19 +286,20 @@ export class QuestionPlayerEngineService {
    *
    * @param {InteractionAnswer} answer - The learner's submitted answer.
    * @param {InteractionRulesService} interactionRulesService - Service used to classify the answer based on rules.
-   * @param {Function} successCallback - Callback invoked after answer processing, containing data to update the UI:
-   *   - nextCard: The next StateCard (or null if remaining on current).
-   *   - refreshInteraction: Whether the interaction needs to be redrawn.
-   *   - feedbackHtml: The feedback message to show.
-   *   - refresherExplorationId: Reserved (null).
-   *   - missingPrerequisiteSkillId: Reserved (null).
-   *   - remainOnCurrentCard: Whether to stay on the current question.
-   *   - taggedSkillMisconceptionId: If linked to a known misconception.
-   *   - wasOldStateInitial: Reserved (null).
-   *   - isFirstHit: Reserved (null).
-   *   - isFinalQuestion: Whether this was the last question in the session.
-   *   - nextCardIfReallyStuck: Reserved (null).
-   *   - focusLabel: Label to manage focus in the UI.
+   * @param {Function} successCallback - Callback invoked after answer processing.
+   *   @param {Object} successCallback.result
+   *   @param {StateCard|null} successCallback.result.nextCard - The next card or null if staying.
+   *   @param {boolean} successCallback.result.refreshInteraction - Whether interaction needs redraw.
+   *   @param {string} successCallback.result.feedbackHtml - Feedback message to display.
+   *   @param {?string} successCallback.result.refresherExplorationId - Reserved.
+   *   @param {?string} successCallback.result.missingPrerequisiteSkillId - Reserved.
+   *   @param {boolean} successCallback.result.remainOnCurrentCard - Whether to stay on current question.
+   *   @param {?string} successCallback.result.taggedSkillMisconceptionId - Known misconception link.
+   *   @param {?boolean} successCallback.result.wasOldStateInitial - Reserved.
+   *   @param {?boolean} successCallback.result.isFirstHit - Reserved.
+   *   @param {boolean} successCallback.result.isFinalQuestion - Whether this is the last question.
+   *   @param {?string} successCallback.result.nextCardIfReallyStuck - Reserved.
+   *   @param {string} successCallback.result.focusLabel - Label for UI focus management.
    *
    * @returns {boolean} Whether the answer was classified as correct.
    */
@@ -477,7 +478,7 @@ export class QuestionPlayerEngineService {
    * @param {string} taggedSkillMisconceptionId - The ID of the tagged misconception
    *     (if any) associated with the answer, used for diagnostic or reporting purposes.
    */
-  registerAnswer(
+  recordAnswerSubmitted(
     question: Question,
     isCorrect: boolean,
     taggedSkillMisconceptionId: string

@@ -443,9 +443,9 @@ describe('Question player engine service', () => {
   });
 
   it('should submit answer', () => {
-    questionPlayerEngineService.registerAnswer(question, true, '');
+    questionPlayerEngineService.recordAnswerSubmitted(question, true, '');
     questionPlayerEngineService.recordSolutionViewed(question);
-    questionPlayerEngineService.registerAnswer(question, true, '');
+    questionPlayerEngineService.recordAnswerSubmitted(question, true, '');
 
     expect(
       questionPlayerEngineService.questionPlayerState[questionId].answers.length

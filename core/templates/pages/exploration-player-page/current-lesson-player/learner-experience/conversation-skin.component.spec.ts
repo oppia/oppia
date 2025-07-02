@@ -2605,7 +2605,7 @@ describe('Conversation skin component', () => {
     spyOn(componentInstance, 'showUpcomingCard');
     spyOn(fatigueDetectionService, 'reset');
     spyOn(numberAttemptsService, 'reset');
-    spyOn(questionPlayerEngineService, 'registerAnswer');
+    spyOn(questionPlayerEngineService, 'recordAnswerSubmitted');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
     spyOn(playerTranscriptService, 'updateLatestInteractionHtml');
     spyOn(

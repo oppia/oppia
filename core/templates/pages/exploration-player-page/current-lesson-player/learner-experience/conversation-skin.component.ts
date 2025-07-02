@@ -1108,7 +1108,7 @@ export class ConversationSkinComponent {
             nextCard.getStateName()
           );
         } else if (this.explorationModeService.isInQuestionPlayerMode()) {
-          this.questionPlayerEngineService.registerAnswer(
+          this.questionPlayerEngineService.recordAnswerSubmitted(
             this.questionPlayerEngineService.getCurrentQuestion(),
             !remainOnCurrentCard,
             taggedSkillMisconceptionId
