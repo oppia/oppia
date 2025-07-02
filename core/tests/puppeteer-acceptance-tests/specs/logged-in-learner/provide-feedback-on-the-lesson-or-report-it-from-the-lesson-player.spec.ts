@@ -117,8 +117,6 @@ describe('Logged-In Learner', function () {
 
     // Report Exploration.
     await loggedInLearner.reportExploration('It is an ad');
-
-    // TODO: Verify some pop-up.
   });
 
   afterAll(async function () {
