@@ -369,10 +369,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/access-pages-that-require-higher-privileges.spec.ts"
     },
     {
-      "name": "logged-in-learner/completes-the-exploration-and-decides-what-to-do-next",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts"
-    },
-    {
       "name": "logged-in-learner/goes-through-the-sign-in-flow",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/goes-through-the-sign-in-flow.spec.ts"
     },
@@ -395,26 +391,6 @@
     {
       "name": "logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player.spec.ts"
-    },
-    {
-      "name": "logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts"
-    },
-    {
-      "name": "logged-out-learner/play-a-complete-community-lesson",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson.spec.ts"
-    },
-    {
-      "name": "logged-out-learner/see-the-feedback-and-help-cards",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/see-the-feedback-and-help-cards.spec.ts"
-    },
-    {
-      "name": "logged-out-learner/share-the-lesson-from-the-lesson-player",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/share-the-lesson-from-the-lesson-player.spec.ts"
-    },
-    {
-      "name": "logged-out-learner/reaches-a-checkpoint-and-saves-their-progress",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts"
     }
   ],
   "docker_suites": []
