@@ -67,14 +67,14 @@ def deep_get(
 
 
 def get_github_auth_token() -> str:
-    """Gets the Github auth token from the environment.
+    """Gets the GitHub auth token from the environment.
 
     Returns:
-        str. The Github auth token.
+        str. The GitHub auth token.
 
     Raises:
-        RuntimeError. Github CLI is not installed.
-        RuntimeError. Failed to get Github auth token.
+        RuntimeError. GitHub CLI is not installed.
+        RuntimeError. Failed to get GitHub auth token.
     """
 
     env = os.environ.copy()
@@ -83,7 +83,7 @@ def get_github_auth_token() -> str:
         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
     if process.returncode:
         raise RuntimeError(
-            'GitHub CLI is not installed. Please install the GitHub CLI ' +
+            'GitHub CLI is not installed. Please install the GitHub CLI '
             'before running GitHub API functions.')
 
     process = subprocess.run(

@@ -84,7 +84,9 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
         if os.path.isdir(os.path.join(os.getcwd(), 'dummy_directory')):
             shutil.rmtree('dummy_directory')
 
-    def test_get_unresolved_todos_no_generate_github_file_should_fail(self) -> None:
+    def test_get_unresolved_todos_no_generate_github_file_should_fail(
+        self
+    ) -> None:
         mock_stdout = io.StringIO()
 
         swap_stdout_write = self.swap(sys, 'stdout', mock_stdout)
@@ -174,7 +176,7 @@ class CheckForUnresolvedTodosTests(test_utils.GenericTestBase):
 
         def mock_fetch_linked_issues_for_pull_request(
             pull_request: int
-        ) -> List[github_api.GithubIssueDict]:
+        ) -> List[github_api.GitHubIssueDict]:
             return [
                 {
                     'body': 'Issue 4151',

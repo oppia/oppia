@@ -63,9 +63,11 @@ def check_if_todo_is_associated_with_issue(
     issue_number: int
 ) -> bool:
     """Checks if the todo is associated with the issue.
+
     Args:
         todo: TodoDict. The todo to check.
         issue_number: int. The issue number to check for.
+
     Returns:
         bool. Whether the todo is associated with the issue.
     """
@@ -119,7 +121,7 @@ def log_unresolved_todos_failure(
         issue_number: int. The issue number that the todos are associated with.
     """
     print(
-        'The following TODOs are unresolved ' +
+        'The following TODOs are unresolved '
         'for this issue #' + str(issue_number) + ':')
     for todo in sorted(
         todos,
