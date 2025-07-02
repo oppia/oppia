@@ -25,7 +25,7 @@ from core.domain import change_domain
 from core.domain import state_domain
 from core.domain import translation_domain
 
-from typing import Final, List, Literal, Optional, TypedDict, Union
+from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 
 STUDY_GUIDE_PROPERTY_SECTIONS: Final = 'sections'
 
@@ -361,6 +361,86 @@ class StudyGuide:
             'language_code': self.language_code,
             'version': self.version
         }
+
+    # Remove no cover comment once migrations for study guides are available.
+    @classmethod
+    def update_sections_from_model(
+        cls,
+        versioned_sections: VersionedStudyGuideSectionsDict,
+        current_version: int
+    ) -> None: # pragma: no cover
+        """Converts the sections in the sections list contained
+        in the given versioned_sections dict from current_version to
+        current_version + 1. Note that the versioned_sections being
+        passed in is modified in-place.
+
+        Args:
+            versioned_sections: dict. A dict with two keys:
+                - schema_version: str. The schema version for the
+                    sections dict.
+                - sections: List. The list comprising of the study guide
+                    section dicts.
+            current_version: int. The current schema version of sections.
+        """
+        versioned_sections['schema_version'] = current_version + 1
+
+        for i, _ in enumerate(versioned_sections['sections']):
+            conversion_fn = getattr(
+                cls, '_convert_section_v%s_dict_to_v%s_dict' % (
+                    current_version, current_version + 1))
+            versioned_sections['sections'][i] = conversion_fn(
+                versioned_sections['sections'][i]
+            )
+
+    # Remove no cover comment once migrations for study guides are available.
+    @classmethod
+    def convert_html_fields_in_study_guide_section(
+        cls,
+        study_guide_section_dict: StudyGuideSectionDict,
+        conversion_fn: Callable[[str], str]
+    ) -> StudyGuideSectionDict: # pragma: no cover
+        """Applies a conversion function on all the html strings in a study
+        guide section to migrate them to a desired state.
+
+        Args:
+            study_guide_section_dict: dict. The dict containing the
+                study guide section.
+            conversion_fn: function. The conversion function to be applied on
+                the study_guide_section_dict.
+
+        Returns:
+            dict. The converted subtopic_page_contents_dict.
+        """
+        study_guide_section_dict[
+            'content']['html'] = conversion_fn(
+                study_guide_section_dict['content']['html']
+            )
+        return study_guide_section_dict
+
+    # Remove no cover comment once migrations for study guides are available.
+    @classmethod
+    def convert_unicode_fields_in_study_guide_section(
+        cls,
+        study_guide_section_dict: StudyGuideSectionDict,
+        conversion_fn: Callable[[str], str]
+    ) -> StudyGuideSectionDict: # pragma: no cover
+        """Applies a conversion function on all the unicode strings in study
+        guide section to migrate them to a desired state.
+
+        Args:
+            study_guide_section_dict: dict. The dict containing the
+                study guide section.
+            conversion_fn: function. The conversion function to be applied on
+                the study_guide_section_dict.
+
+        Returns:
+            dict. The converted subtopic_page_contents_dict.
+        """
+        study_guide_section_dict['heading']['unicode_str'] = conversion_fn(
+                study_guide_section_dict[
+                    'heading']['unicode_str']
+            )
+        return study_guide_section_dict
 
     @classmethod
     def get_study_guide_id(cls, topic_id: str, subtopic_id: int) -> str:
