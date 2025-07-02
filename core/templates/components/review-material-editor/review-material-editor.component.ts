@@ -33,7 +33,6 @@ interface HtmlSchema {
 
 interface BindableDict {
   displayedConceptCardExplanation: string;
-  displayedWorkedExamples: string;
 }
 
 @Component({
