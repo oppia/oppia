@@ -58,7 +58,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 # `original` above.
                 setattr(
                     sys, 'real_prefix', original # pylint: disable=used-before-assignment
-                    )
+                )
             else:
                 delattr(sys, 'real_prefix')
 
