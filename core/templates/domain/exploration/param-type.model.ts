@@ -68,11 +68,7 @@ export class ParamType {
     this.defaultValue = typeDefinitionObject.default_value;
   }
 
-  private static initializeRegistry(): void {
-    if (ParamType.isInitialized) {
-      return;
-    }
-
+  static {
     const definitions: Record<string, TypeDefinitionObject> = {
       UnicodeString: {
         validate: (value: Object) =>
@@ -89,7 +85,6 @@ export class ParamType {
     }
 
     Object.freeze(ParamType.registry);
-    ParamType.isInitialized = true;
   }
 
   /** @returns {Object} - A valid default value for this particular type. */
@@ -104,7 +99,6 @@ export class ParamType {
 
   /** @returns {ParamType} - Implementation-defined default parameter type. */
   static getDefaultType(): ParamType {
-    ParamType.initializeRegistry();
     return this.registry.UnicodeString;
   }
 
@@ -114,7 +108,6 @@ export class ParamType {
    * @throws {Error} - When the given type name isn't registered.
    */
   static getTypeFromBackendName(backendName: string): ParamType {
-    ParamType.initializeRegistry();
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }
