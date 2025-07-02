@@ -32,12 +32,9 @@ export class ParamType {
   valueIsValid: (arg0: Object) => boolean;
   defaultValue: Object;
 
-  /** @private @static */
-  private static isInitialized = false;
-
   // Type registration.
   /** @type {Object.<String, ParamType>} */
-  private static registry: Record<string, ParamType> = {};
+  private static registry: Record<string, ParamType> = ParamType.initRegistry();
 
   /**
    * @private @constructor
@@ -68,7 +65,7 @@ export class ParamType {
     this.defaultValue = typeDefinitionObject.default_value;
   }
 
-  static {
+  private static initRegistry(): Record<string, ParamType> {
     const definitions: Record<string, TypeDefinitionObject> = {
       UnicodeString: {
         validate: (value: Object) =>
@@ -77,14 +74,14 @@ export class ParamType {
       },
     };
 
+    const registry: Record<string, ParamType> = {};
     for (const [name, definition] of Object.entries(definitions)) {
       const paramType = new ParamType(definition);
       paramType._name = name;
       Object.freeze(paramType);
-      ParamType.registry[name] = paramType;
+      registry[name] = paramType;
     }
-
-    Object.freeze(ParamType.registry);
+    return Object.freeze(registry);
   }
 
   /** @returns {Object} - A valid default value for this particular type. */
