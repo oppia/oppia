@@ -25,6 +25,8 @@ import {
   AnswerClassificationService,
   InteractionRulesService,
 } from 'pages/exploration-player-page/services/answer-classification.service';
+import {ExplorationFeaturesBackendApiService} from 'services/exploration-features-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Injectable({
   providedIn: 'root',
@@ -32,6 +34,8 @@ import {
 export class LearnerAnswerInfoService {
   constructor(
     private answerClassificationService: AnswerClassificationService,
+    private explorationFeaturesBackendApiService: ExplorationFeaturesBackendApiService,
+    private pageContextService: PageContextService,
     private learnerAnswerDetailsBackendApiService: LearnerAnswerDetailsBackendApiService
   ) {}
 
@@ -47,6 +51,7 @@ export class LearnerAnswerInfoService {
   private currentInteractionRulesService!: InteractionRulesService;
   private submittedAnswerInfoCount: number = 0;
   private canAskLearnerForAnswerInfo: boolean = false;
+  alwaysAskLearnersForAnswerDetails: boolean = false;
   private visitedStates: string[] = [];
   private probabilityIndexes = {
     // The probability that a request for explanation of the answer that is
@@ -70,6 +75,20 @@ export class LearnerAnswerInfoService {
     const min = 0;
     const max = 100;
     return (Math.floor(Math.random() * (max - min + 1)) + min) / 100;
+  }
+
+  checkAlwaysAskLearnersForAnswerDetails(): void {
+    let explorationId = this.pageContextService.getExplorationId();
+    this.explorationFeaturesBackendApiService
+      .fetchExplorationFeaturesAsync(explorationId)
+      .then(featuresData => {
+        this.alwaysAskLearnersForAnswerDetails =
+          featuresData.alwaysAskLearnersForAnswerDetails;
+      });
+  }
+
+  getAlwaysAskLearnerForAnswerDetails(): boolean {
+    return this.alwaysAskLearnersForAnswerDetails;
   }
 
   initLearnerAnswerInfoService(

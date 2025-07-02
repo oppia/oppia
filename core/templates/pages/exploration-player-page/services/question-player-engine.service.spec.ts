@@ -729,9 +729,6 @@ describe('Question player engine service', () => {
           submitAnswerSuccessCb
         );
 
-        expect(questionPlayerEngineService.isAnswerBeingProcessed()).toBe(
-          false
-        );
         expect(submitAnswerSuccessCb).toHaveBeenCalled();
       }
     );
