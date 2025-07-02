@@ -4149,7 +4149,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the sign-in button is present on the page.
    * @returns {Promise<void>}
    */
-  async expectSignInButtonToBePresent(): Promise<void> {
+  async expectSignInButtonToBePresent(visible: boolean = true): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     try {
       await this.page.waitForSelector(signInButton, {timeout: 5000});
@@ -4158,8 +4158,16 @@ export class LoggedOutUser extends BaseUser {
         await this.page.waitForSelector(singInButtonInProgressModal, {
           timeout: 5000,
         });
+
+        if (!visible) {
+          throw new Error(
+            'Expected Sign-In button to be invisble, but found it visible.'
+          );
+        }
       } catch (error) {
-        throw new Error('Sign-in button not found.');
+        if (visible) {
+          throw new Error('Sign-in button not found.');
+        }
       }
     }
     showMessage('Sign-in button present.');
@@ -4938,6 +4946,10 @@ export class LoggedOutUser extends BaseUser {
     await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
   }
 
+  /**
+   * Checks if concept card RTE link in Lesson Card works properly.
+   * @param content - The content that should be present in content card.
+   */
   async expectConceptCardLinkInLessonToWorkProperly(
     content: string
   ): Promise<void> {
@@ -4987,6 +4999,28 @@ export class LoggedOutUser extends BaseUser {
     if (actualContent?.trim() !== tabContent) {
       throw new Error(
         `Expected tab content to be ${tabContent}, but it was ${actualContent}`
+      );
+    }
+  }
+
+  /**
+   * Checks if Audio bar is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectVoiceoverBarToBePresent(visible: boolean = true): Promise<void> {
+    let isVisible = true;
+
+    try {
+      await this.page.waitForSelector(voiceoverDropdown);
+    } catch (error) {
+      isVisible = false;
+    }
+
+    if (!visible === isVisible) {
+      throw new Error(
+        `Expected voiceover bar to be ${
+          visible ? 'visible' : 'hidden'
+        }, but it was ${isVisible ? 'visible' : 'hidden'}`
       );
     }
   }
