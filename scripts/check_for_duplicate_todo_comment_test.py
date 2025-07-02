@@ -98,16 +98,16 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     def test_check_for_duplicate_todo_comment_with_no_duplicate_error(
         self
     ) -> None:
-        def mock_fetch_latest_comment_from_issue(
+        def mock_fetch_latest_comment_for_issue(
             issue: int
-        ) -> Optional[github_api.GithubCommentDict]:
+        ) -> Optional[github_api.GitHubCommentDict]:
             return {
                 'body': ''
             } if issue == 4175 else None
 
         fetch_latest_comment_swap = self.swap(
-            github_api, 'fetch_latest_comment_from_issue',
-            mock_fetch_latest_comment_from_issue)
+            github_api, 'fetch_latest_comment_for_issue',
+            mock_fetch_latest_comment_for_issue)
         with fetch_latest_comment_swap, self.assertRaisesRegex(
             Exception,
             check_for_duplicate_todo_comment.NEW_COMMENT_SHOULD_BE_POSTED
@@ -121,9 +121,9 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     def test_check_for_duplicate_todo_comment_two_shas_with_no_duplicate_error(
         self
     ) -> None:
-        def mock_fetch_latest_comment_from_issue(
+        def mock_fetch_latest_comment_for_issue(
             issue: int
-        ) -> Optional[github_api.GithubCommentDict]:
+        ) -> Optional[github_api.GitHubCommentDict]:
             body = textwrap.dedent(
                 f"""
                 The following TODOs are unresolved for this issue #4176:
@@ -136,8 +136,8 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
             } if issue == 4176 else None
 
         fetch_latest_comment_swap = self.swap(
-            github_api, 'fetch_latest_comment_from_issue',
-            mock_fetch_latest_comment_from_issue)
+            github_api, 'fetch_latest_comment_for_issue',
+            mock_fetch_latest_comment_for_issue)
         with fetch_latest_comment_swap, self.assertRaisesRegex(
             Exception,
             check_for_duplicate_todo_comment.NEW_COMMENT_SHOULD_BE_POSTED
@@ -153,7 +153,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     ) -> None:
         def mock_fetch_latest_comment_from_pull_request(
             pull_request: int
-        ) -> Optional[github_api.GithubCommentDict]:
+        ) -> Optional[github_api.GitHubCommentDict]:
             body = textwrap.dedent(
                 f"""
                 The following TODOs are unresolved for this issue #4177:
@@ -186,7 +186,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
 
         def mock_fetch_latest_comment_from_pull_request(
             pull_request: int
-        ) -> Optional[github_api.GithubCommentDict]:
+        ) -> Optional[github_api.GitHubCommentDict]:
             body = textwrap.dedent(
                 f"""
                 The following TODOs are unresolved for this issue #4177:
@@ -216,7 +216,7 @@ class CheckForDuplicateTodoCommentTest(test_utils.GenericTestBase):
     def test_check_for_duplicate_todo_comment_no_comment_error(self) -> None:
         def mock_fetch_latest_comment_from_pull_request(
             _: int
-        ) -> Optional[github_api.GithubCommentDict]:
+        ) -> Optional[github_api.GitHubCommentDict]:
             return None
 
         fetch_latest_comment_swap = self.swap(

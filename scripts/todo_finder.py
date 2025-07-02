@@ -48,8 +48,10 @@ class TodoDict(TypedDict):
 
 def is_file_excluded(file_path: str) -> bool:
     """Checks if the file should be excluded from the search.
+
     Args:
         file_path: str. The file path to check.
+
     Returns:
         bool. Whether the file should be excluded from the search.
     """
@@ -61,8 +63,10 @@ def is_file_excluded(file_path: str) -> bool:
 
 def get_search_files(repository_path: str) -> List[str]:
     """Gets the files to search for todos.
+
     Args:
         repository_path: str. The path to the repository.
+
     Returns:
         List[str]. The files to search for todos.
     """
@@ -85,10 +89,12 @@ def get_todo_in_line(
     line_number: int
 ) -> Optional[TodoDict]:
     """Gets the todo in the line if it exists.
+
     Args:
         file_path: str. The path to the file.
         line_content: str. The content of the line.
         line_number: int. The line number.
+
     Returns:
         Optional[TodoDict]. The todo if it exists.
     """
@@ -103,8 +109,10 @@ def get_todo_in_line(
 
 def get_todos(repository_path: str) -> List[TodoDict]:
     """Gets the todos in the repository.
+
     Args:
         repository_path: str. The path to the repository.
+
     Returns:
         List[TodoDict]. The todos in the repository.
     """
@@ -122,8 +130,10 @@ def get_todos(repository_path: str) -> List[TodoDict]:
 
 def get_issue_number_from_todo(line_content: str) -> Optional[int]:
     """Gets the issue number from the todo.
+
     Args:
         line_content: str. The content of the line.
+
     Returns:
         Optional[int]. The issue number if it exists.
     """
@@ -135,8 +145,10 @@ def get_issue_number_from_todo(line_content: str) -> Optional[int]:
 
 def get_correctly_formated_todos(todos: List[TodoDict]) -> List[TodoDict]:
     """Gets the correctly formated todos.
+
     Args:
         todos: List[TodoDict]. The todos to check.
+
     Returns:
         List[TodoDict]. The correctly formated todos.
     """

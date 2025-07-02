@@ -82,6 +82,7 @@ def append_todos_to_file(
 ) -> None:
     """Appends to the todo list file with the todos information and the github 
     perma link for the line.
+
     Args:
         repository_path: str. The path to the repository.
         todos: List[TodoDict]. The todos to generate the file with.
@@ -111,6 +112,7 @@ def log_unresolved_todos_failure(
     issue_number: int
 ) -> None:
     """Logs the unresolved todos to the console.
+
     Args:
         repository_path: str. The path to the repository.
         todos: List[TodoDict]. The todos to log.

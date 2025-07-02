@@ -62,9 +62,9 @@ def main(args: Optional[List[str]] = None) -> None:
     # might change depending on the workflow.
     compare_start_index = len(github_perma_link_url) + COMMIT_SHA_HASH_LENGTH
 
-    latest_comment: Optional[github_api.GithubCommentDict] = None
+    latest_comment: Optional[github_api.GitHubCommentDict] = None
     if parsed_args.issue:
-        latest_comment = github_api.fetch_latest_comment_from_issue(
+        latest_comment = github_api.fetch_latest_comment_for_issue(
             parsed_args.issue)
     elif parsed_args.pull_request:
         latest_comment = github_api.fetch_latest_comment_from_pull_request(
@@ -84,14 +84,12 @@ def main(args: Optional[List[str]] = None) -> None:
     ) as new_comment_file:
         new_comment_lines = new_comment_file.read().splitlines()
 
-    # Automatically fail if the first line or number of lines differs.
     if (
         len(latest_comment_lines) != len(new_comment_lines) or
         latest_comment_lines[0] != new_comment_lines[0]
     ):
         raise Exception(NEW_COMMENT_SHOULD_BE_POSTED)
 
-    # Loop through each line and check if the line content differs.
     for index in range(1, len(latest_comment_lines)):
         latest_comment_line_content = (
             latest_comment_lines[index][compare_start_index:])

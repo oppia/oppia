@@ -156,7 +156,7 @@ class GithubApiTests(test_utils.GenericTestBase):
                     'Invalid command passed to subprocess.run method')
         swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
         error_message = (
-            'Github CLI is not installed. Please install the Github CLI ' +
+            'Github CLI is not installed. Please install the Github CLI '
             'before running Github API functions.')
         with swap_subprocess_run, self.assertRaisesRegex(
             RuntimeError, error_message):
@@ -181,10 +181,10 @@ class GithubApiTests(test_utils.GenericTestBase):
             RuntimeError, error_message):
             github_api.get_github_auth_token()
 
-    def test_get_authorization_bearer(self) -> None:
+    def test_get_github_api_authorization_header(self) -> None:
         with self.swap_to_successful_gh_subprocess_run():
             self.assertEqual(
-                github_api.get_authorization_bearer(),
+                github_api.get_github_api_authorization_header(),
                 'Bearer github_pat_11A')
 
     def test_run_graphql_query_unauthorized_throws_error(self) -> None:
@@ -285,7 +285,7 @@ class GithubApiTests(test_utils.GenericTestBase):
                 with self.assertRaisesRegex(Exception, error_message):
                     github_api.fetch_linked_issues_for_pull_request(12345)
 
-    def test_fetch_latest_comment_from_issue_nonexistent_throws_error(
+    def test_fetch_latest_comment_for_issue_nonexistent_throws_error(
         self
     ) -> None:
         query = textwrap.dedent(
@@ -305,9 +305,9 @@ class GithubApiTests(test_utils.GenericTestBase):
         with self.swap_to_successful_gh_subprocess_run():
             with self.swap_to_graphql_urlopen(body, 200, query):
                 with self.assertRaisesRegex(Exception, error_message):
-                    github_api.fetch_latest_comment_from_issue(12343)
+                    github_api.fetch_latest_comment_for_issue(12343)
 
-    def test_fetch_latest_comment_from_issue_success(self) -> None:
+    def test_fetch_latest_comment_for_issue_success(self) -> None:
         query = textwrap.dedent(
             """
             issue(number: 12345) {
@@ -332,7 +332,7 @@ class GithubApiTests(test_utils.GenericTestBase):
         with self.swap_to_successful_gh_subprocess_run():
             with self.swap_to_graphql_urlopen(body, 200, query):
                 self.assertEqual(
-                    github_api.fetch_latest_comment_from_issue(12345), {
+                    github_api.fetch_latest_comment_for_issue(12345), {
                         'body': 'Comment Body Number 1'
                     })
 
