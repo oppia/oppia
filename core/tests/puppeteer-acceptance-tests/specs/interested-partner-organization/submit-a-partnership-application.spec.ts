@@ -84,7 +84,7 @@ describe('Interested Partner Organization', function () {
 
     // Learner stories crousal.
     await partnerOrganizationUser.navigateToPartnershipsPage();
-    await partnerOrganizationUser.testLearnerStoriesCarouselInPartnershipPage();
+    await partnerOrganizationUser.verifyLearnerStoriesCarouselInPartnershipPageWorksProperly();
   });
 
   it('should be able to open partnership form', async function () {

@@ -5179,7 +5179,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if Carousel of Learner Stories in Partnership Page works properly.
    */
-  async testLearnerStoriesCarouselInPartnershipPage(): Promise<void> {
+  async verifyLearnerStoriesCarouselInPartnershipPageWorksProperly(): Promise<void> {
     const activeItemSelector = `${learnerStoriesCarouselContainerSelector} .carousel-item.active`;
     await this.isElementVisible(learnerStoriesHeadingSelector);
 
