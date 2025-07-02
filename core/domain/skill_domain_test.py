@@ -700,7 +700,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                         'explanation': {}
                     }
                 },
-                'worked_examples': []
             },
             'misconceptions_schema_version': (
                 feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
@@ -1141,7 +1140,6 @@ class SkillSummaryTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'version': 1,
             'misconception_count': 1,
-            'worked_examples_count': 1,
             'skill_model_created_on': time_in_millisecs,
             'skill_model_last_updated': time_in_millisecs
         }
@@ -1206,24 +1204,6 @@ class SkillSummaryTests(test_utils.GenericTestBase):
                 'received \'-1\'')):
             self.skill_summary.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
-    def test_validation_fails_with_invalid_worked_examples_count(self) -> None:
-        self.skill_summary.worked_examples_count = '10'  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected worked_examples_count to be an int, received \'10\''):
-            self.skill_summary.validate()
-
-    def test_validation_fails_with_negative_worked_examples_count(self) -> None:
-        self.skill_summary.worked_examples_count = -1
-        with self.assertRaisesRegex(
-            utils.ValidationError, (
-                'Expected worked_examples_count to be non-negative, '
-                'received \'-1\'')):
-            self.skill_summary.validate()
-
 
 class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
 
@@ -1243,7 +1223,6 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'version': 1,
             'misconception_count': 1,
-            'worked_examples_count': 1,
             'topic_names': ['topic1'],
             'classroom_names': ['math'],
             'skill_model_created_on': self.time_in_millisecs,
