@@ -71,7 +71,6 @@ import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFa
 import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
