@@ -17,8 +17,6 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import cloneDeep from 'lodash/cloneDeep';
-
 import {ConceptCardBackendDict} from './concept-card.model';
 import {Misconception} from 'domain/skill/misconception.model';
 import {

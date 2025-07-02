@@ -16,6 +16,7 @@
  * @fileoverview Service to handle the updating of a skill.
  */
 
+import cloneDeep from 'lodash/cloneDeep';
 import {EventEmitter, Injectable} from '@angular/core';
 import {
   BackendChangeObject,
