@@ -1,37 +1,67 @@
 name: Checking PR description
-on:
+'on':
   pull_request:
     types:
-        - opened
+      - opened
+      - reopened
+      - edited
 permissions: {}
 jobs:
   check_pr_description:
+    permissions:
+      pull-requests: write
     runs-on: ubuntu-latest
-    steps: 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+    steps:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-
       - name: Run PR description check
         uses: actions/github-script@v6
         with:
-            script: |
-                const prDescription = context.payload.pull_request.body;
-                console.log("PR Description:", prDescription);
-                const requiredFormat = /^#\s+PR Title\n\n(?:- .+\n)+/;
+          script: |
+            const pr = context.payload.pull_request;
+            const prDescription = pr.body;
 
-                if (!prDescription || !requiredFormat.test(prDescription)) {
-                    throw new Error("The PR description is missing or does not meet the required format.");
-                }
-        
+            if (!prDescription) {
+                throw new Error("The PR description is missing or does not meet the required format.");
+            }
 
-      - name: Report failure if PR description is missing
-        if: failure()
+            const requiredSections = [
+                '## Overview',
+                '## Essential Checklist',
+                '## Proof that changes are correct',
+                '## PR Pointers'
+            ];
+
+            const missingSections = requiredSections.filter(
+                section => !prDescription.includes(section)
+            );
+
+            if (missingSections.length > 0) {
+                const username = pr.user.login;
+                const comment = `Hi @${username}, your PR is missing the following required section(s):\n\n` + missingSections.map(s => `- ${s.replace(/^##\s*/, '')}`).join('\n') + `\n\nPlease update the description accordingly and open the PR.`;
+
+                await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    body: comment
+                });
+
+                await github.rest.pulls.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: pr.number,
+                    state: 'closed'
+                });
+
+                throw new Error("The PR description is missing required sections.");
+            }
+
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
         uses: ./.github/actions/send-webhook-notification
         with:
-          message: "The PR description is missing or does not meet the required format."
+          message: "Validating PR description failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
