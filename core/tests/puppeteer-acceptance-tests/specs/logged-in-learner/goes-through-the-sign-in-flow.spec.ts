@@ -31,32 +31,25 @@ describe('Logged-Out Learner', function () {
     new LoggedOutUser()
   );
 
-  it(
-    'should be able to log in',
-    async function () {
-      // Navigate to sign in page.
-      await loggedInUser.openBrowser();
-      await loggedInUser.navigateToSignUpPage();
+  it('should be able to log in', async function () {
+    // Navigate to sign in page.
+    await loggedInUser.openBrowser();
+    await loggedInUser.navigateToSignUpPage();
 
-      // Sign Up
-      await loggedInUser.enterEmail('logged_in_user@example.com');
-      await loggedInUser.signInWithUsername('loggedInUser');
+    // Sign Up.
+    await loggedInUser.enterEmail('logged_in_user@example.com');
+    await loggedInUser.signInWithUsername('loggedInUser');
 
-      await loggedInUser.expectToBeOnLearnerDashboardPage();
-      await loggedInUser.expectGreetingToHaveNameOfUser('loggedInUser');
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    await loggedInUser.expectToBeOnLearnerDashboardPage();
+    await loggedInUser.expectGreetingToHaveNameOfUser('loggedInUser');
+  });
 
-  it(
-    'should land on navbar',
-    async function () {
-      await loggedInUser.expectDropdownsInNavbarToWorkProperly();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  it('should land on navbar', async function () {
+    await loggedInUser.expectDropdownsInNavbarToWorkProperly();
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+    await loggedInUser.closeBrowser();
+  });
 });

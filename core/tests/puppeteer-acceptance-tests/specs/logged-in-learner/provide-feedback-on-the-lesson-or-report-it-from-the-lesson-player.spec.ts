@@ -106,26 +106,22 @@ describe('Logged-In Learner', function () {
       'loggedInUser',
       'logged_in_user@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
-  it(
-    'should be able to report the lesson from the sidebar',
-    async function () {
-      // Navigate to a lesson
-      await loggedInLearner.navigateToCommunityLibraryPage();
-      await loggedInLearner.searchForLessonInSearchBar('Algebra Basics');
-      await loggedInLearner.playLessonFromSearchResults('Algebra Basics');
-      await loggedInLearner.continueToNextCard();
+  it('should be able to report the lesson from the sidebar', async function () {
+    // Navigate to a lesson.
+    await loggedInLearner.navigateToCommunityLibraryPage();
+    await loggedInLearner.searchForLessonInSearchBar('Algebra Basics');
+    await loggedInLearner.playLessonFromSearchResults('Algebra Basics');
+    await loggedInLearner.continueToNextCard();
 
-      // Report Exploration
-      await loggedInLearner.reportExploration('It is an ad');
+    // Report Exploration.
+    await loggedInLearner.reportExploration('It is an ad');
 
-      // TODO: Verify some pop-up
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // TODO: Verify some pop-up.
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 });
