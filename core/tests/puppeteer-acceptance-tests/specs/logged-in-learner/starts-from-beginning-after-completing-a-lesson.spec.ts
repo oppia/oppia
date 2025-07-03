@@ -19,7 +19,6 @@
  * LI. Learner starts from beginning after completing a lesson
  */
 
-import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
   ExplorationEditor,
@@ -27,8 +26,6 @@ import {
 } from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-In User', function () {
   let explorationEditor: ExplorationEditor;
@@ -104,15 +101,16 @@ describe('Logged-In User', function () {
       'loggedInUser',
       'logged_in_user@example.com'
     );
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 
   it('should be able to start lesson from beginning on revisit', async function () {
     // TODO(#20563): When a user revisits an exploration after completing it,
     // the exploration should start from the beginning, not from the previous checkpoint.
     // see: https://github.com/oppia/oppia/issues/20563.
+    await loggedInUser.navigateToLearnerDashboard();
   });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 });

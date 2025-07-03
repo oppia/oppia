@@ -20,7 +20,6 @@
  */
 
 import {showMessage} from '../../utilities/common/show-message';
-import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {
   ExplorationEditor,
@@ -28,7 +27,6 @@ import {
 } from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedInUser & LoggedOutUser;
