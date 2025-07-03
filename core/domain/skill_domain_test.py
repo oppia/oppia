@@ -1145,7 +1145,7 @@ class SkillSummaryTests(test_utils.GenericTestBase):
         }
 
         self.skill_summary = skill_domain.SkillSummary(
-            'skill_id', 'description', 'en', 1, 1, 1,
+            'skill_id', 'description', 'en', 1, 1,
             current_time, current_time)
 
     def test_skill_summary_gets_created(self) -> None:
@@ -1213,7 +1213,7 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
         self.time_in_millisecs = utils.get_time_in_millisecs(current_time)
 
         self.augmented_skill_summary = skill_domain.AugmentedSkillSummary(
-            'skill_id', 'description', 'en', 1, 1, 1,
+            'skill_id', 'description', 'en', 1, 1,
             ['topic1'], ['math'], current_time, current_time)
 
     def test_augmented_skill_summary_gets_created(self) -> None:
@@ -1322,7 +1322,7 @@ class ShortSkillSummaryTests(test_utils.GenericTestBase):
         super().setUp()
         self.skill_summary = skill_domain.SkillSummary(
             'skill_1', 'Description 1', 'en', 1,
-            0, 0, datetime.datetime.now(), datetime.datetime.now())
+            0, datetime.datetime.now(), datetime.datetime.now())
         self.short_skill_summary = skill_domain.ShortSkillSummary(
             'skill_1', 'Description 1')
 
