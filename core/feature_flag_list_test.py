@@ -44,16 +44,6 @@ ENUM_MEMBER_REGEXP: Final = re.compile(
 )
 
 
-class FeatureFlagListCoverageTests(unittest.TestCase):
-    """Unit tests for feature_flag_list module's public methods."""
-
-    def test_get_all_feature_names(self) -> None:
-        """Test that get_all_feature_names returns correct values."""
-        expected_names = [f.name for f in feature_flag_list.FeatureNames]
-        actual_names = feature_flag_list.get_all_feature_names()
-        self.assertEqual(actual_names, expected_names)
-
-
 class FeatureFlagListTest(test_utils.GenericTestBase):
     """Tests for feature flags listed in feature_flag_list.py."""
 

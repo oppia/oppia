@@ -300,6 +300,3 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
 }
 
 
-def get_all_feature_names() -> List[str]:
-    """Returns a list of all feature flag names as strings."""
-    return [f.name for f in FeatureNames]
