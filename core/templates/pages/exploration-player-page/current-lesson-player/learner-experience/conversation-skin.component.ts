@@ -51,7 +51,6 @@ import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
 import {State} from 'domain/state/StateObjectFactory';
 import {InteractionRulesService} from '../../services/answer-classification.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -167,7 +166,6 @@ export class ConversationSkinComponent {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
-    private questionPlayerStateService: QuestionPlayerStateService,
     private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
     private statsReportingService: StatsReportingService,
     private storyViewerBackendApiService: StoryViewerBackendApiService,
@@ -224,7 +222,7 @@ export class ConversationSkinComponent {
     if (this.explorationModeService.isInQuestionPlayerMode()) {
       this.directiveSubscriptions.add(
         this.hintsAndSolutionManagerService.onHintConsumed.subscribe(() => {
-          this.questionPlayerStateService.hintUsed(
+          this.questionPlayerEngineService.recordHintUsed(
             this.questionPlayerEngineService.getCurrentQuestion()
           );
         })
@@ -233,7 +231,7 @@ export class ConversationSkinComponent {
       this.directiveSubscriptions.add(
         this.hintsAndSolutionManagerService.onSolutionViewedEventEmitter.subscribe(
           () => {
-            this.questionPlayerStateService.solutionViewed(
+            this.questionPlayerEngineService.recordSolutionViewed(
               this.questionPlayerEngineService.getCurrentQuestion()
             );
           }
@@ -1110,7 +1108,7 @@ export class ConversationSkinComponent {
             nextCard.getStateName()
           );
         } else if (this.explorationModeService.isInQuestionPlayerMode()) {
-          this.questionPlayerStateService.answerSubmitted(
+          this.questionPlayerEngineService.recordAnswerSubmitted(
             this.questionPlayerEngineService.getCurrentQuestion(),
             !remainOnCurrentCard,
             taggedSkillMisconceptionId
@@ -1307,8 +1305,8 @@ export class ConversationSkinComponent {
       return;
     }
     if (this.questionSessionCompleted) {
-      this.questionPlayerStateService.onQuestionSessionCompleted.emit(
-        this.questionPlayerStateService.getQuestionPlayerStateData()
+      this.questionPlayerEngineService.onQuestionSessionCompleted.emit(
+        this.questionPlayerEngineService.getQuestionPlayerStateData()
       );
       return;
     }

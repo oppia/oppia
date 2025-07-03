@@ -37,7 +37,6 @@ import {
   QuestionPlayerComponent,
   QuestionPlayerConfig,
 } from './question-player.component';
-import {QuestionPlayerStateService} from './services/question-player-state.service';
 import {Location} from '@angular/common';
 import {UserInfo} from 'domain/user/user-info.model';
 import {UrlService} from 'services/contextual/url.service';
@@ -57,12 +56,11 @@ describe('Question Player Component', () => {
   let playerPositionService: PlayerPositionService;
   let preventPageUnloadEventService: PreventPageUnloadEventService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
-  let questionPlayerStateService: QuestionPlayerStateService;
   let userService: UserService;
   let windowRef: WindowRef;
-  let playerPositionServiceEmitter = new EventEmitter();
-  let questionPlayerEngineServiceEmitter = new EventEmitter();
-  let questionPlayerStateServiceEmitter = new EventEmitter();
+  let playerPositionServiceEmitter: EventEmitter<number>;
+  let onTotalQuestionsReceivedEmitter: EventEmitter<number>;
+  let onQuestionSessionCompletedEmitter: EventEmitter<string>;
   let urlService: UrlService;
   let userInfo = new UserInfo(
     [],
@@ -89,15 +87,18 @@ describe('Question Player Component', () => {
   }
 
   class MockPlayerPositionService {
-    onCurrentQuestionChange = playerPositionServiceEmitter;
+    get onCurrentQuestionChange() {
+      return playerPositionServiceEmitter;
+    }
   }
 
   class MockQuestionPlayerEngineService {
-    onTotalQuestionsReceived = questionPlayerEngineServiceEmitter;
-  }
-
-  class MockQuestionPlayerStateService {
-    onQuestionSessionCompleted = questionPlayerStateServiceEmitter;
+    get onTotalQuestionsReceived() {
+      return onTotalQuestionsReceivedEmitter;
+    }
+    get onQuestionSessionCompleted() {
+      return onQuestionSessionCompletedEmitter;
+    }
     resultsPageIsLoadedEventEmitter = new EventEmitter();
   }
 
@@ -129,10 +130,6 @@ describe('Question Player Component', () => {
           useClass: MockQuestionPlayerEngineService,
         },
         {
-          provide: QuestionPlayerStateService,
-          useClass: MockQuestionPlayerStateService,
-        },
-        {
           provide: Location,
           useClass: MockLocation,
         },
@@ -145,6 +142,10 @@ describe('Question Player Component', () => {
   }));
 
   beforeEach(() => {
+    playerPositionServiceEmitter = new EventEmitter();
+    onTotalQuestionsReceivedEmitter = new EventEmitter<number>();
+    onQuestionSessionCompletedEmitter = new EventEmitter<string>();
+
     fixture = TestBed.createComponent(QuestionPlayerComponent);
     component = fixture.componentInstance;
 
@@ -154,14 +155,13 @@ describe('Question Player Component', () => {
       PreventPageUnloadEventService
     );
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
-    questionPlayerStateService = TestBed.inject(QuestionPlayerStateService);
     userService = TestBed.inject(UserService);
     windowRef = TestBed.inject(WindowRef);
     urlService = TestBed.inject(UrlService);
 
     fixture.detectChanges();
 
-    spyOn(questionPlayerStateService.resultsPageIsLoadedEventEmitter, 'emit');
+    spyOn(questionPlayerEngineService.resultsPageIsLoadedEventEmitter, 'emit');
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(userInfo)
     );
@@ -182,21 +182,21 @@ describe('Question Player Component', () => {
     expect(component.scorePerSkillMapping).toEqual({});
     expect(component.testIsPassed).toBe(true);
     expect(
-      questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit
+      questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit
     ).toHaveBeenCalledWith(false);
   });
 
   it('should add subscriptions on initialization', fakeAsync(() => {
     spyOn(playerPositionService.onCurrentQuestionChange, 'subscribe');
     spyOn(questionPlayerEngineService.onTotalQuestionsReceived, 'subscribe');
-    spyOn(questionPlayerStateService.onQuestionSessionCompleted, 'subscribe');
+    spyOn(questionPlayerEngineService.onQuestionSessionCompleted, 'subscribe');
 
     component.ngOnInit();
     tick();
 
     playerPositionServiceEmitter.emit(1);
-    questionPlayerEngineServiceEmitter.emit(10);
-    questionPlayerStateServiceEmitter.emit('result');
+    onTotalQuestionsReceivedEmitter.emit(10);
+    onQuestionSessionCompletedEmitter.emit('result');
     tick();
 
     expect(
@@ -206,7 +206,7 @@ describe('Question Player Component', () => {
       questionPlayerEngineService.onTotalQuestionsReceived.subscribe
     ).toHaveBeenCalled();
     expect(
-      questionPlayerStateService.onQuestionSessionCompleted.subscribe
+      questionPlayerEngineService.onQuestionSessionCompleted.subscribe
     ).toHaveBeenCalled();
   }));
 
@@ -228,9 +228,9 @@ describe('Question Player Component', () => {
 
     expect(component.totalQuestions).toBe(0);
 
-    questionPlayerEngineServiceEmitter.emit(3);
+    onTotalQuestionsReceivedEmitter.emit(3);
     tick();
-    questionPlayerStateServiceEmitter.emit('new uri');
+    onQuestionSessionCompletedEmitter.emit('new uri');
     tick();
 
     expect(component.totalQuestions).toBe(3);
@@ -446,7 +446,7 @@ describe('Question Player Component', () => {
 
     expect(component.totalScore).toBe(55);
     expect(
-      questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit
+      questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit
     ).toHaveBeenCalledWith(true);
   });
 
@@ -495,7 +495,7 @@ describe('Question Player Component', () => {
     );
 
     expect(
-      questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit
+      questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit
     ).not.toHaveBeenCalledWith(false);
   });
 
