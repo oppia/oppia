@@ -69,7 +69,7 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
 
       // Compare screenshot of the embedded lesson player.
       await loggedOutUser.expectScreenshotToMatch(
-        'lesson-player-embedded',
+        'lessonPlayerEmbedded',
         __dirname
       );
     },
