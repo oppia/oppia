@@ -437,6 +437,9 @@ const audioExpandButtonInLPSelector = '.e2e-test-lp-audio-expand-button';
 const audioForwardButtonSelector = '.e2e-test-audio-forward-button';
 const audioBackwardButtonSelector = '.e2e-test-audio-backward-button';
 
+const fractionInputSelector = '.e2e-test-fraction-input';
+const wrongInputErrorContainerSelector = '.oppia-form-error-container';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -4032,6 +4035,35 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Function to verify the number of hint models.
+   * @param {number} n - The expected number of hint models.
+   */
+  async expectHintModelsToBe(n: number) {
+    const actualNumberOfHintModels = await this.page.$$(hintButtonSelector);
+
+    if (actualNumberOfHintModels.length !== n) {
+      throw new Error(
+        `Expected ${n} hint models, but found ${actualNumberOfHintModels.length}`
+      );
+    }
+  }
+
+  async waitForHintModelsToBe(n: number): Promise<void> {
+    // Wait until number of elements is not equal to given.
+    await this.page.waitForFunction(
+      (selector, expectedLength) => {
+        const elements = document.querySelectorAll(selector);
+        return elements.length !== expectedLength;
+      },
+      {
+        timeout: 30000,
+      },
+      hintButtonSelector,
+      n
+    );
+  }
+
+  /**
    * Function to close the hint modal.
    */
   async closeHintModal(): Promise<void> {
@@ -5042,6 +5074,28 @@ export class LoggedOutUser extends BaseUser {
   async expectAudioForwardBackwardButtonToBeVisible(): Promise<void> {
     await this.isElementVisible(audioBackwardButtonSelector);
     await this.isElementVisible(audioForwardButtonSelector);
+  }
+
+  /**
+   * Checks if fraction input is visible.
+   */
+  async expectFractionInputToBeVisible(): Promise<void> {
+    await this.isElementVisible(fractionInputSelector);
+  }
+
+  async expectErrorMessageForWrongInputToBe(
+    errorMessage: string
+  ): Promise<void> {
+    const actualErrorMessage = await this.page.$eval(
+      wrongInputErrorContainerSelector,
+      el => el.textContent
+    );
+
+    if (!actualErrorMessage?.includes(errorMessage)) {
+      throw new Error(
+        `Expected error message to be ${errorMessage}, but it was ${actualErrorMessage}`
+      );
+    }
   }
 }
 
