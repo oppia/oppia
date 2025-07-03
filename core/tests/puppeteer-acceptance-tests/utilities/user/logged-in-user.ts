@@ -220,6 +220,15 @@ const explorationSuccessfullyFlaggedMessage =
 const feedbackUpdatesMainContentContainer =
   '.e2e-test-feedback-updates-main-content-container';
 
+const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
+const navbarLearnDropdownContainerSelector =
+  '.e2e-test-classroom-oppia-list-item';
+const navbarAboutDropdownConatinaerSelector = '.e2e-test-about-oppia-list-item';
+const navbarGetInvolvedDropdownContainerSelector =
+  '.e2e-test-navbar-get-involved-menu';
+const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
+const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
+
 export class LoggedInUser extends BaseUser {
   /**
    * Function for navigating to the profile page for a given username.
@@ -2192,6 +2201,21 @@ export class LoggedInUser extends BaseUser {
     );
     expect(greetingText).toContain(userName);
   }
+
+  /**
+   * Checks if all dropdowns in navbar open properly.
+   */
+  async expectDropdownsInNavbarToWorkProperly(): Promise<void> {
+    await this.clickOn(navbarLearnTab);
+    await this.isElementVisible(navbarLearnDropdownContainerSelector);
+
+    await this.clickOn(navbarAboutTab);
+    await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
+
+    await this.clickOn(navbarGetInvolvedTab);
+    await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
+  }
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();
+navbarGetInvolvedTab;
