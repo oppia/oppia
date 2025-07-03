@@ -29,7 +29,6 @@ import {
 } from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {QuestionPlayerStateService} from '../../../../components/question-directives/question-player/services/question-player-state.service';
 import {Collection} from '../../../../domain/collection/collection.model';
 import {GuestCollectionProgressService} from '../../../../domain/collection/guest-collection-progress.service';
 import {ReadOnlyCollectionBackendApiService} from '../../../../domain/collection/read-only-collection-backend-api.service';
@@ -132,7 +131,7 @@ describe('Conversation skin component', () => {
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
-  let questionPlayerStateService: QuestionPlayerStateService;
+  let answerClassificationService: AnswerClassificationService;
   let readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
   let statsReportingService: StatsReportingService;
   let storyViewerBackendApiService: StoryViewerBackendApiService;
@@ -498,7 +497,6 @@ describe('Conversation skin component', () => {
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
-    questionPlayerStateService = TestBed.inject(QuestionPlayerStateService);
     readOnlyCollectionBackendApiService = TestBed.inject(
       ReadOnlyCollectionBackendApiService
     );
@@ -570,9 +568,9 @@ describe('Conversation skin component', () => {
       collectionPlayerBackendApiService,
       'fetchCollectionSummariesAsync'
     ).and.returnValue(Promise.resolve(collectionSummary));
-    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'recordHintUsed');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(questionPlayerEngineService, 'recordSolutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
     spyOn(chapterProgressService, 'updateCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
@@ -739,9 +737,9 @@ describe('Conversation skin component', () => {
       collectionPlayerBackendApiService,
       'fetchCollectionSummariesAsync'
     ).and.returnValue(Promise.resolve(collectionSummary));
-    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'recordHintUsed');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(questionPlayerEngineService, 'recordSolutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
     spyOn(statsReportingService, 'recordExplorationCompleted');
     spyOn(statsReportingService, 'recordExplorationActuallyStarted');
@@ -868,9 +866,9 @@ describe('Conversation skin component', () => {
       collectionPlayerBackendApiService,
       'fetchCollectionSummariesAsync'
     ).and.returnValue(Promise.resolve(collectionSummary));
-    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'recordHintUsed');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(questionPlayerEngineService, 'recordSolutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
     spyOn(chapterProgressService, 'updateCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
@@ -1005,9 +1003,9 @@ describe('Conversation skin component', () => {
         collectionPlayerBackendApiService,
         'fetchCollectionSummariesAsync'
       ).and.returnValue(Promise.resolve(collectionSummary));
-      spyOn(questionPlayerStateService, 'hintUsed');
+      spyOn(questionPlayerEngineService, 'recordHintUsed');
       spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-      spyOn(questionPlayerStateService, 'solutionViewed');
+      spyOn(questionPlayerEngineService, 'recordSolutionViewed');
       spyOn(imagePreloaderService, 'onStateChange');
       spyOn(statsReportingService, 'recordExplorationCompleted');
       spyOn(statsReportingService, 'recordExplorationActuallyStarted');
