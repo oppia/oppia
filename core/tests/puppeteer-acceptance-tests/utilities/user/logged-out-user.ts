@@ -627,7 +627,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Return to Learner Dashboard from exploration completion card.
    */
-  async returnToLibraryFromExplorationCompletion() {
+  async returnToLibraryFromExplorationCompletion(): Promise<void> {
     await this.isElementVisible(returnToLibraryButtonSelector);
     await this.clickOn(returnToLibraryButtonSelector);
   }
@@ -4957,7 +4957,7 @@ export class LoggedOutUser extends BaseUser {
   async expecttabElementInLessonCardToContain(
     tabHeading: string,
     tabContent: string
-  ) {
+  ): Promise<void> {
     const tabHeaderElements = await this.page.$$(
       nonInteractiveTabsHeaderSelector
     );
@@ -4965,7 +4965,7 @@ export class LoggedOutUser extends BaseUser {
     for (const element of tabHeaderElements) {
       const text = await this.page.evaluate(el => el.textContent, element);
       if (text?.trim() === tabHeading) {
-        // You found the right tab
+        // You found the right tab.
         await element.click();
         break;
       }
