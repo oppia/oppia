@@ -145,12 +145,6 @@ describe('Logged-in User', function () {
     await loggedInUser.continueToNextCard();
   });
 
-  it('should be able to exit the lesson player', async function () {
-    // TODO: Performing steps given in CUJ doesn't match the outcomes given
-    // in CUJ. When back button is clicked, no save progress button is
-    // displayed.
-  });
-
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
