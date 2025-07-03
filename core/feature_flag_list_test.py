@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import os
 import re
-import unittest
 
 from core import feature_flag_list
 from core import utils
