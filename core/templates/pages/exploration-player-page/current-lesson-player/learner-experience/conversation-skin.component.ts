@@ -42,8 +42,6 @@ import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {State} from 'domain/state/StateObjectFactory';
-import {InteractionRulesService} from '../../services/answer-classification.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ExplorationInitializationService} from '../../services/exploration-initialization.service';

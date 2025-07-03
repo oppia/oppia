@@ -47,7 +47,6 @@ import {NumberAttemptsService} from './number-attempts.service';
 import {InteractionRulesService} from './answer-classification.service';
 import {FatigueDetectionService} from './fatigue-detection.service';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
-import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
 import {ChapterProgressService} from './chapter-progress.service';
 import {LearnerParamsService} from './learner-params.service';
 import {CurrentInteractionService} from './current-interaction.service';
@@ -165,7 +164,6 @@ export class ConversationFlowService {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private userService: UserService,
     private explorationRecommendationsService: ExplorationRecommendationsService,
-    private questionPlayerStateService: QuestionPlayerStateService,
     private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
     private conceptCardBackendApiService: ConceptCardBackendApiService,
     private conceptCardManagerService: ConceptCardManagerService,
@@ -569,8 +567,8 @@ export class ConversationFlowService {
       return;
     }
     if (this.questionSessionCompleted) {
-      this.questionPlayerStateService.onQuestionSessionCompleted.emit(
-        this.questionPlayerStateService.getQuestionPlayerStateData()
+      this.questionPlayerEngineService.onQuestionSessionCompleted.emit(
+        this.questionPlayerEngineService.getQuestionPlayerStateData()
       );
       return;
     }
@@ -1276,7 +1274,7 @@ export class ConversationFlowService {
     if (!this.explorationModeService.isPresentingIsolatedQuestions()) {
       this.onPlayerStateChange.emit(nextCard.getStateName());
     } else if (this.explorationModeService.isInQuestionPlayerMode()) {
-      this.questionPlayerStateService.answerSubmitted(
+      this.questionPlayerEngineService.recordAnswerSubmitted(
         this.questionPlayerEngineService.getCurrentQuestion(),
         !remainOnCurrentCard,
         taggedSkillMisconceptionId
