@@ -175,7 +175,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         )
         filenames = skill_services.get_image_filenames_from_skill(self.skill)
-        self.assertItemsEqual(filenames, ['img.svg', 'img2.svg'])
+        self.assertItemsEqual(filenames, ['img.svg'])
 
     def test_get_new_skill_id(self) -> None:
         new_skill_id = skill_services.get_new_skill_id()
@@ -1659,12 +1659,12 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 6)
+            feconf, 'CURRENT_MISCONCEPTIONS_SCHEMA_VERSION', 5)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.misconceptions_schema_version, 6)
+        self.assertEqual(skill.misconceptions_schema_version, 5)
         self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
         self.assertEqual(skill.misconceptions[0].notes, html_content)
         self.assertEqual(

@@ -108,7 +108,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_html_content_strings(self) -> None:
         html_strings = self.skill.get_all_html_content_strings()
-        self.assertEqual(len(html_strings), 8)
+        self.assertEqual(len(html_strings), 6)
 
     def test_valid_misconception_name(self) -> None:
         misconception_name = 'This string is smaller than 50'
