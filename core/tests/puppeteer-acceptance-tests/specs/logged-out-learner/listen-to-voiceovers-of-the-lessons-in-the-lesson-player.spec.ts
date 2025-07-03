@@ -13,87 +13,51 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if a learner can access
- * voiceovers in lesson player
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * EL.VO. Learner can listen to voiceovers of the lessons in the lesson player
  */
 
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use curriculumAdmin file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-/**
- * @fileoverview Acceptance Test for covering usage of voiceovers and available translation in an exploration.
- */
-
-import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {UserFactory} from '../../utilities/common/user-factory';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {
+  ExplorationEditor,
+  INTERACTION_TYPES,
+} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ConsoleReporter} from '../../utilities/common/console-reporter';
 import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+const ROLES = testConstants.Roles;
 const INTRO_CONTENT_VOICEOVER_IN_HI =
   testConstants.data.IntroContentVoiceoverInHindi;
 const CONTINUE_INTERACTION_VOICEOVER_IN_HI =
   testConstants.data.ContinueInteractionVoiceoverInHindi;
 const LAST_CARD_VOICEOVER_IN_HI =
   testConstants.data.LastCardContentVoiceoverInHindi;
-const ROLES = testConstants.Roles;
-
-const INTRODUCTION_CARD_CONTENT: string =
-  'This exploration will test your understanding of negative numbers.';
-
-enum INTERACTION_TYPES {
-  CONTINUE_BUTTON = 'Continue Button',
-  END_EXPLORATION = 'End Exploration',
-}
-enum CARD_NAME {
-  INTRODUCTION = 'Introduction',
-  FINAL_CARD = 'Final Card',
-}
-
-ConsoleReporter.setConsoleErrorsToIgnore([
-  /Occurred at http:\/\/localhost:8181\/create\/[a-zA-Z0-9]+\/.*Invalid active state name: null/,
-  new RegExp('Invalid active state name: null'),
-]);
 
 describe('Logged-Out Learner', function () {
+  let explorationId: string;
+  let loggedOutLearner: LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
-  let loggedOutUser: LoggedOutUser;
   let voiceoverAdmin: VoiceoverAdmin;
-  let explorationEditor: ExplorationEditor;
-  let explorationId: string | null;
 
   beforeAll(async function () {
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculumAdmin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
-    );
-
-    explorationEditor = await UserFactory.createNewUser(
-      'explorationEditor',
-      'exploration_editor@example.com'
-    );
+    loggedOutLearner = await UserFactory.createLoggedOutUser();
 
     releaseCoordinator = await UserFactory.createNewUser(
       'releaseCoordinator',
       'release_coordinator@example.com',
       [ROLES.RELEASE_COORDINATOR]
+    );
+
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_admin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
     );
 
     voiceoverAdmin = await UserFactory.createNewUser(
@@ -102,171 +66,164 @@ describe('Logged-Out Learner', function () {
       [ROLES.VOICEOVER_ADMIN]
     );
 
-    await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
-
-    // Enable the feature flag.
+    // Enable required feature flags
     await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_can_modify_translations'
     );
+    await releaseCoordinator.enableFeatureFlag('enable_voiceover_contribution');
 
-    // Navigate to the creator dashboard and create a new exploration.
-    await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(
-      'This is introduction chapter to what are place values?'
+    // Enable Voiceover Contributions.
+    await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
+
+    // Navigate to Exploration Editor.
+    await curriculumAdmin.navigateToCreatorDashboardPage();
+    await curriculumAdmin.navigateToExplorationEditorPage();
+
+    // Add Interaction Cards.
+    await curriculumAdmin.dismissWelcomeModal();
+    await curriculumAdmin.updateCardContent(
+      'Welcome, to the Place Values Exploration.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await curriculumAdmin.viewOppiaResponses();
+    await curriculumAdmin.directLearnersToNewCard('Second Card');
 
-    // Add the final card.
-    await explorationEditor.viewOppiaResponses();
-    await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.saveExplorationDraft();
+    await curriculumAdmin.navigateToCard('Second Card');
+    await curriculumAdmin.updateCardContent(
+      "What is 3/6 equal to in it's simplest form?"
+    );
+    await curriculumAdmin.addMathInteraction(INTERACTION_TYPES.FRACTION_INPUT);
+    await curriculumAdmin.addResponsesToTheInteraction(
+      INTERACTION_TYPES.FRACTION_INPUT,
+      '1/2',
+      'Correct!',
+      'Final Card',
+      true
+    );
+    await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Incorrect, try again!'
+    );
 
-    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.updateCardContent('Thank you!');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
-    // Navigate back to the introduction card and save the draft.
-    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.saveExplorationDraft();
-
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
+    await curriculumAdmin.navigateToCard('Final Card');
+    await curriculumAdmin.updateCardContent(
+      'You have successfully completed the lesson!'
+    );
+    await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await curriculumAdmin.saveExplorationDraft();
+    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
       'What are the Place Values?',
-      'This is a test exploration.',
-      'Algebra'
+      'Learn basic Mathematics including Place Values',
+      'Mathematics'
     );
-    if (!explorationId) {
-      throw new Error('Error in publishing exploration successfully.');
-    }
 
     await curriculumAdmin.createAndPublishTopic(
       'Place Values',
-      'Place Values I',
-      'Place Values I'
+      'Place Values',
+      'place values'
     );
 
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
-      'Place Values'
+      'Algebra I'
     );
 
     await curriculumAdmin.createAndPublishStoryWithChapter(
-      'Place Value Story',
-      'place-values-story',
-      'What are the Place Values?',
+      'What are Plave values',
+      'place-values',
+      'Understanding Place Values',
       explorationId as string,
       'Place Values'
     );
 
-    // Setting up translations for the exploration.
-    await explorationEditor.page.bringToFront();
-    await explorationEditor.reloadPage();
-    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.navigateToTranslationsTab();
-    await explorationEditor.dismissTranslationTabWelcomeModal();
-    await explorationEditor.editTranslationOfContent(
+    // Add Translations
+    await curriculumAdmin.navigateToExplorationEditor(explorationId);
+    await curriculumAdmin.navigateToTranslationsTab();
+    await curriculumAdmin.dismissTranslationTabWelcomeModal();
+
+    await curriculumAdmin.navigateToCard('Second Card');
+    await curriculumAdmin.editTranslationOfContent(
       'हिन्दी (Hindi)',
       'Content',
-      'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण करेगा।'
+      '3/6 का सबसे सरल रूप में क्या बराबर है?'
     );
-
-    await explorationEditor.navigateToEditorTab();
-    await explorationEditor.reloadPage();
-    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.navigateToTranslationsTab();
-    await explorationEditor.editTranslationOfContent(
+    await curriculumAdmin.editTranslationOfContent(
       'हिन्दी (Hindi)',
       'Interaction',
-      'जारी रखना'
+      '3/6 का सबसे सरल रूप में क्या बराबर है?'
     );
-
-    await explorationEditor.navigateToEditorTab();
-    await explorationEditor.reloadPage();
-    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.navigateToTranslationsTab();
-    await explorationEditor.editTranslationOfContent(
+    await curriculumAdmin.editTranslationOfContent(
       'हिन्दी (Hindi)',
-      'Content',
-      'हमने ऋणात्मक संख्याओं का अभ्यास किया है।'
+      'Feedback',
+      'सही!'
     );
 
-    // Adding voiceovers to the exploration.
-    await explorationEditor.navigateToEditorTab();
-    await explorationEditor.reloadPage();
-    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.navigateToTranslationsTab();
-    await explorationEditor.addVoiceoverToContent(
+    // Add Voiceovers
+    await curriculumAdmin.navigateToTranslationsTab();
+    await curriculumAdmin.addVoiceoverToContent(
       'हिन्दी (Hindi)',
       'Hindi (India)',
       'Content',
       INTRO_CONTENT_VOICEOVER_IN_HI
     );
 
-    await explorationEditor.navigateToEditorTab();
-    await explorationEditor.reloadPage();
-    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
-    await explorationEditor.navigateToTranslationsTab();
-    await explorationEditor.addVoiceoverToContent(
+    await curriculumAdmin.addVoiceoverToContent(
       'हिन्दी (Hindi)',
       'Hindi (India)',
       'Interaction',
       CONTINUE_INTERACTION_VOICEOVER_IN_HI
     );
 
-    await explorationEditor.navigateToEditorTab();
-    await explorationEditor.reloadPage();
-    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
-    await explorationEditor.navigateToTranslationsTab();
-    await explorationEditor.addVoiceoverToContent(
-      'हिन्दी (Hindi)',
-      'Hindi (India)',
-      'Content',
-      LAST_CARD_VOICEOVER_IN_HI
+    await curriculumAdmin.saveExplorationDraft();
+  });
+
+  it('should be able to play/pause the audio', async function () {
+    // Navigate to Lesson Player.
+    await loggedOutLearner.navigateToClassroomPage('math');
+    await loggedOutLearner.selectAndOpenTopic('Place Values');
+    await loggedOutLearner.selectChapterWithinStoryToLearn(
+      'What are Plave values',
+      'Understanding Place Values'
     );
 
-    await explorationEditor.saveExplorationDraft();
+    // Check Audiobar status.
+    await loggedOutLearner.isTextPresentOnPage('Listen to the lesson');
+    await loggedOutLearner.expectAudioExpandButtonToBeVisibleInLP();
 
-    loggedOutUser = await UserFactory.createLoggedOutUser();
+    // Check audio (voiceover) avaibility.
+    await loggedOutLearner.expectVoiceoverIsPlayable(false);
 
-    // Setup is taking really long.
-  }, 600000);
+    // Check audio (voiceover) avaibility in next card.
+    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.expectVoiceoverIsPlayable(false);
 
-  it(
-    'should be able to play/pause the audio',
-    async function () {
-      await loggedOutUser.navigateToClassroomPage('math');
-      await loggedOutUser.selectAndOpenTopic('Place Values');
-      await loggedOutUser.selectChapterWithinStoryToLearn(
-        'Place Value Story',
-        'What are the Place Values?'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    // Play Voiceovers.
+    await loggedOutLearner.startVoiceover();
+    await loggedOutLearner.expectAudioForwardBackwardButtonToBeVisible();
+    await loggedOutLearner.expectScreenshotToMatch('audioBar', __dirname);
+  });
 
-  it(
-    'should allow the learner to view and play a lesson entirely in a particular language and start listening to the voiceover from any state',
-    async function () {
-      await loggedOutUser.navigateToClassroomPage('math');
-      // Change the language of the lesson using the dropdown on the first card.
-      await loggedOutUser.changeLessonLanguage('hi');
-      // Verify that the lesson is in the selected language.
-      await loggedOutUser.expectCardContentToMatch(
-        'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण'
-      );
-      await loggedOutUser.startVoiceover();
-      await loggedOutUser.continueToNextCard();
-      await loggedOutUser.verifyVoiceoverIsPlaying(true);
-      // Pausing the voiceover and restarting it to confirm that voiceover can be started on any state/card.
-      await loggedOutUser.pauseVoiceover();
-      await loggedOutUser.startVoiceover();
-      await loggedOutUser.verifyVoiceoverIsPlaying(true);
-      await loggedOutUser.pauseVoiceover();
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  it('should be able to change the audio language', async function () {
+    // Play voiceovers in Hindi.
+    await loggedOutLearner.playExploration(explorationId);
+    await loggedOutLearner.changeLessonLanguage('hi');
+
+    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.expectVoiceoverIsPlayable();
+  });
+
+  it('should be able to skip some parts of audio', async function () {
+    // TODO: Need help, how can I perform this?
+    // Click on the 5 seconds forward icon button
+    // The audio starts playing 5 seconds ahead of the current position
+    // Can't verify someting that is time-sensitive.
+  });
+
+  it('should be able to play audio till the end', async function () {
+    await loggedOutLearner.startVoiceover();
+    await loggedOutLearner.waitUntilAudioIsPlaying();
+    await loggedOutLearner.verifyVoiceoverIsPlaying(false);
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

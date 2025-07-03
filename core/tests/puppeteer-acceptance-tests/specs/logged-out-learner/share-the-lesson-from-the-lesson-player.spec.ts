@@ -126,6 +126,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutUser.expectAttributionInPrintToBe(
       EXPLORATION_ATTRIBUTION_PRINT
     );
+    await loggedOutUser.expectScreenshotToMatch('attributionModel', __dirname);
     await loggedOutUser.closeAttributionModal();
   });
 

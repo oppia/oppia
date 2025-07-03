@@ -433,6 +433,10 @@ const nonInteractiveTabsHeaderSelector =
 const nonInteractiveTabContentSelector =
   '.e2e-test-non-interactive-tab-content';
 
+const audioExpandButtonInLPSelector = '.e2e-test-lp-audio-expand-button';
+const audioForwardButtonSelector = '.e2e-test-audio-forward-button';
+const audioBackwardButtonSelector = '.e2e-test-audio-backward-button';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -4686,6 +4690,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Verifies if the voiceover is playing.
+   * @param {boolean} shouldBePlaying - If the voiceover should be playing or not.
    */
   async verifyVoiceoverIsPlaying(shouldBePlaying: boolean): Promise<void> {
     if (shouldBePlaying) {
@@ -4710,6 +4715,39 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(pauseVoiceoverButton);
     await this.page.waitForSelector(playVoiceoverButton, {visible: true});
     showMessage('Voiceover paused successfully.');
+  }
+
+  /**
+   * Checks if voiceover is playable.
+   * @param playable - If voiceover should be playable or not.
+   */
+  async expectVoiceoverIsPlayable(playable: boolean = true) {
+    try {
+      await this.startVoiceover();
+
+      // Pause Voiceover once verified.
+      await this.pauseVoiceover();
+
+      if (!playable) {
+        throw new Error(
+          'Voiceover expected to be not playable, but is playable'
+        );
+      }
+    } catch (error) {
+      if (playable) {
+        throw new Error(
+          'Voiceover expected to be playable, but is not playable'
+        );
+      }
+    }
+  }
+
+  /**
+   * Waits until audio is playing.
+   * @param {number} timeout - The timeout for waiting until audio is playing.
+   */
+  async waitUntilAudioIsPlaying(timeout: number = 20000): Promise<void> {
+    await this.isElementVisible(pauseVoiceoverButton, true, timeout);
   }
 
   /**
@@ -4989,6 +5027,21 @@ export class LoggedOutUser extends BaseUser {
         `Expected tab content to be ${tabContent}, but it was ${actualContent}`
       );
     }
+  }
+
+  /**
+   * Checks if audio expand button is visible in lesson player.
+   */
+  async expectAudioExpandButtonToBeVisibleInLP(): Promise<void> {
+    await this.isElementVisible(audioExpandButtonInLPSelector);
+  }
+
+  /**
+   * Checks if audio forward and backward buttons are visible in lesson player.
+   */
+  async expectAudioForwardBackwardButtonToBeVisible(): Promise<void> {
+    await this.isElementVisible(audioBackwardButtonSelector);
+    await this.isElementVisible(audioForwardButtonSelector);
   }
 }
 

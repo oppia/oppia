@@ -13,6 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if a learner can access
- * use feedback and help cards while learning the lesson.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * EL.HC. Learner can see the feedback and help cards
  */

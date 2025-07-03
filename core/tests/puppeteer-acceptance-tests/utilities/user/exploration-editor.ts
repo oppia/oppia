@@ -270,6 +270,7 @@ export enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
   NUMERIC_INPUT = 'Number Input',
+  FRACTION_INPUT = 'Fraction Input',
 }
 
 enum INTERACTION_TABS {
@@ -371,7 +372,7 @@ export class ExplorationEditor extends BaseUser {
     goal: string,
     category: string,
     tags?: string
-  ): Promise<string | null> {
+  ): Promise<string> {
     const fillExplorationMetadataDetails = async () => {
       await this.clickOn(explorationTitleInput);
       await this.type(explorationTitleInput, `${title}`);
@@ -401,7 +402,7 @@ export class ExplorationEditor extends BaseUser {
       }
     };
 
-    const confirmPublish = async () => {
+    const confirmPublish = async (): Promise<string> => {
       await this.clickOn(saveExplorationChangesButton);
       await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(explorationConfirmPublishButton, {
@@ -553,6 +554,10 @@ export class ExplorationEditor extends BaseUser {
       INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'PROGRAMMING'
     ) {
       await this.clickOn(programmingInteractionsButton);
+    } else if (
+      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'MATH'
+    ) {
+      await this.clickOn();
     }
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
