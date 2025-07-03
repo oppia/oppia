@@ -75,6 +75,7 @@ describe('Logged-Out Learner', function () {
   let releaseCoordinator: ReleaseCoordinator;
   let loggedOutUser: LoggedOutUser;
   let voiceoverAdmin: VoiceoverAdmin;
+  let explorationEditor: ExplorationEditor;
   let explorationId: string | null;
 
   beforeAll(async function () {
@@ -82,6 +83,11 @@ describe('Logged-Out Learner', function () {
       'curriculumAdm',
       'curriculumAdmin@example.com',
       [ROLES.CURRICULUM_ADMIN]
+    );
+
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
     );
 
     releaseCoordinator = await UserFactory.createNewUser(
@@ -104,28 +110,28 @@ describe('Logged-Out Learner', function () {
     );
 
     // Navigate to the creator dashboard and create a new exploration.
-    await curriculumAdmin.navigateToCreatorDashboardPage();
-    await curriculumAdmin.navigateToExplorationEditorPage();
-    await curriculumAdmin.dismissWelcomeModal();
-    await curriculumAdmin.updateCardContent(
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.updateCardContent(
       'This is introduction chapter to what are place values?'
     );
-    await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
     // Add the final card.
-    await curriculumAdmin.viewOppiaResponses();
-    await curriculumAdmin.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
-    await curriculumAdmin.saveExplorationDraft();
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.saveExplorationDraft();
 
-    await curriculumAdmin.navigateToCard(CARD_NAME.FINAL_CARD);
-    await curriculumAdmin.updateCardContent('Thank you!');
-    await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.updateCardContent('Thank you!');
+    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
 
     // Navigate back to the introduction card and save the draft.
-    await curriculumAdmin.navigateToCard(CARD_NAME.INTRODUCTION);
-    await curriculumAdmin.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.saveExplorationDraft();
 
-    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
       'What are the Place Values?',
       'This is a test exploration.',
       'Algebra'
@@ -155,72 +161,72 @@ describe('Logged-Out Learner', function () {
     );
 
     // Setting up translations for the exploration.
-    await curriculumAdmin.page.bringToFront();
-    await curriculumAdmin.reloadPage();
-    await curriculumAdmin.navigateToCard(CARD_NAME.INTRODUCTION);
-    await curriculumAdmin.navigateToTranslationsTab();
-    await curriculumAdmin.dismissTranslationTabWelcomeModal();
-    await curriculumAdmin.editTranslationOfContent(
+    await explorationEditor.page.bringToFront();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.dismissTranslationTabWelcomeModal();
+    await explorationEditor.editTranslationOfContent(
       'हिन्दी (Hindi)',
       'Content',
-      'यह स्थानीय मान क्या हैं? का परिचयात्मक अध्याय है।'
+      'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण करेगा।'
     );
 
-    await curriculumAdmin.navigateToEditorTab();
-    await curriculumAdmin.reloadPage();
-    await curriculumAdmin.navigateToCard(CARD_NAME.INTRODUCTION);
-    await curriculumAdmin.navigateToTranslationsTab();
-    await curriculumAdmin.editTranslationOfContent(
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.editTranslationOfContent(
       'हिन्दी (Hindi)',
       'Interaction',
       'जारी रखना'
     );
 
-    await curriculumAdmin.navigateToEditorTab();
-    await curriculumAdmin.reloadPage();
-    await curriculumAdmin.navigateToCard(CARD_NAME.FINAL_CARD);
-    await curriculumAdmin.navigateToTranslationsTab();
-    await curriculumAdmin.editTranslationOfContent(
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.editTranslationOfContent(
       'हिन्दी (Hindi)',
       'Content',
-      'धन्यवाद!'
+      'हमने ऋणात्मक संख्याओं का अभ्यास किया है।'
     );
 
     // Adding voiceovers to the exploration.
-    await curriculumAdmin.navigateToEditorTab();
-    await curriculumAdmin.reloadPage();
-    await curriculumAdmin.navigateToCard(CARD_NAME.INTRODUCTION);
-    await curriculumAdmin.navigateToTranslationsTab();
-    await curriculumAdmin.addVoiceoverToContent(
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.addVoiceoverToContent(
       'हिन्दी (Hindi)',
       'Hindi (India)',
       'Content',
       INTRO_CONTENT_VOICEOVER_IN_HI
     );
 
-    await curriculumAdmin.navigateToEditorTab();
-    await curriculumAdmin.reloadPage();
-    await curriculumAdmin.navigateToCard(CARD_NAME.INTRODUCTION);
-    await curriculumAdmin.navigateToTranslationsTab();
-    await curriculumAdmin.addVoiceoverToContent(
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.addVoiceoverToContent(
       'हिन्दी (Hindi)',
       'Hindi (India)',
       'Interaction',
       CONTINUE_INTERACTION_VOICEOVER_IN_HI
     );
 
-    await curriculumAdmin.navigateToEditorTab();
-    await curriculumAdmin.reloadPage();
-    await curriculumAdmin.navigateToCard(CARD_NAME.FINAL_CARD);
-    await curriculumAdmin.navigateToTranslationsTab();
-    await curriculumAdmin.addVoiceoverToContent(
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.reloadPage();
+    await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
+    await explorationEditor.navigateToTranslationsTab();
+    await explorationEditor.addVoiceoverToContent(
       'हिन्दी (Hindi)',
       'Hindi (India)',
       'Content',
       LAST_CARD_VOICEOVER_IN_HI
     );
 
-    await curriculumAdmin.saveExplorationDraft();
+    await explorationEditor.saveExplorationDraft();
 
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
@@ -243,21 +249,21 @@ describe('Logged-Out Learner', function () {
   it(
     'should allow the learner to view and play a lesson entirely in a particular language and start listening to the voiceover from any state',
     async function () {
-      //   await loggedOutUser.navigateToClassroomPage('math');
-      //   // Change the language of the lesson using the dropdown on the first card.
-      //   await loggedOutUser.changeLessonLanguage('hi');
-      //   // Verify that the lesson is in the selected language.
-      //   await loggedOutUser.expectCardContentToMatch(
-      //     'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण'
-      //   );
-      //   await loggedOutUser.startVoiceover();
-      //   await loggedOutUser.continueToNextCard();
-      //   await loggedOutUser.verifyVoiceoverIsPlaying(true);
-      //   // Pausing the voiceover and restarting it to confirm that voiceover can be started on any state/card.
-      //   await loggedOutUser.pauseVoiceover();
-      //   await loggedOutUser.startVoiceover();
-      //   await loggedOutUser.verifyVoiceoverIsPlaying(true);
-      //   await loggedOutUser.pauseVoiceover();
+      await loggedOutUser.navigateToClassroomPage('math');
+      // Change the language of the lesson using the dropdown on the first card.
+      await loggedOutUser.changeLessonLanguage('hi');
+      // Verify that the lesson is in the selected language.
+      await loggedOutUser.expectCardContentToMatch(
+        'यह अन्वेषण ऋणात्मक संख्याओं के बारे में आपकी समझ का परीक्षण'
+      );
+      await loggedOutUser.startVoiceover();
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.verifyVoiceoverIsPlaying(true);
+      // Pausing the voiceover and restarting it to confirm that voiceover can be started on any state/card.
+      await loggedOutUser.pauseVoiceover();
+      await loggedOutUser.startVoiceover();
+      await loggedOutUser.verifyVoiceoverIsPlaying(true);
+      await loggedOutUser.pauseVoiceover();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

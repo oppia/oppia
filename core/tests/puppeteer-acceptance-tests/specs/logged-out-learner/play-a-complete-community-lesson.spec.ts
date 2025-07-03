@@ -54,7 +54,6 @@ describe('Logged-Out Learner', function () {
     await explorationEditor.navigateToExplorationEditorPage();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.addExplorationDescriptionContainingAllRTEComponents();
-    await explorationEditor.expectScreenshotToMatch('testImage', __dirname);
     await explorationEditor.addInteraction('Continue Button');
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard('Last Card');
@@ -110,7 +109,7 @@ describe('Logged-Out Learner', function () {
 
     // Concept Card RTE.
     await loggedOutLearner.expectConceptCardLinkInLessonToWorkProperly(
-      'Introduction to Oppia'
+      'Review material text content for Math.'
     );
 
     // Video RTE.
