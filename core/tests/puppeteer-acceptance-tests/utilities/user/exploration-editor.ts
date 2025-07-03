@@ -554,10 +554,6 @@ export class ExplorationEditor extends BaseUser {
       INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'PROGRAMMING'
     ) {
       await this.clickOn(programmingInteractionsButton);
-    } else if (
-      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'MATH'
-    ) {
-      await this.clickOn();
     }
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
