@@ -26,7 +26,7 @@ import isEqual from 'lodash/isEqual';
 
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {
   ChangeListService,
   StatePropertyNames,
@@ -51,7 +51,7 @@ import {WrittenTranslations} from 'domain/exploration/WrittenTranslationsObjectF
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
@@ -105,7 +105,7 @@ export class ExplorationStatesService {
     private alertsService: AlertsService,
     private answerClassificationService: AnswerClassificationService,
     private changeListService: ChangeListService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private interactionRulesRegistryService: InteractionRulesRegistryService,
     private windowRef: WindowRef,
@@ -386,7 +386,7 @@ export class ExplorationStatesService {
         '\nRequested state name: ' +
         stateName +
         '\nExploration ID: ' +
-        this.contextService.getExplorationId() +
+        this.pageContextService.getExplorationId() +
         '\nChange list: ' +
         JSON.stringify(this.changeListService.getChangeList()) +
         '\nAll states names: ' +

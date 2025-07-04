@@ -41,7 +41,12 @@ export class PlayerTranscriptService {
   // -- this happens if the current card offers feedback to the learner before
   // they carry on.
   transcript: StateCard[] = [];
-  numAnswersSubmitted = 0;
+
+  // Tracks the total number of answers submitted by the learner
+  // on the current card, regardless of correctness.
+  totalNumberOfAnswersSubmitted = 0;
+  numberOfIncorrectSubmissions: number = 0;
+  prevSessionStatesProgress: string[] = [];
 
   restore(oldTranscript: StateCard[]): void {
     this.transcript = cloneDeep(oldTranscript);
@@ -56,7 +61,7 @@ export class PlayerTranscriptService {
 
   init(): void {
     this.transcript = [];
-    this.numAnswersSubmitted = 0;
+    this.totalNumberOfAnswersSubmitted = 0;
   }
 
   hasEncounteredStateBefore(stateName: string): boolean {
@@ -67,7 +72,7 @@ export class PlayerTranscriptService {
 
   addNewCard(newCard: StateCard): void {
     this.transcript.push(newCard);
-    this.numAnswersSubmitted = 0;
+    this.totalNumberOfAnswersSubmitted = 0;
   }
 
   addPreviousCard(): void {
@@ -96,7 +101,7 @@ export class PlayerTranscriptService {
       );
     }
     if (!isHint) {
-      this.numAnswersSubmitted += 1;
+      this.totalNumberOfAnswersSubmitted += 1;
     }
     this.transcript[this.transcript.length - 1].addInputResponsePair({
       learnerInput: input,
@@ -141,7 +146,7 @@ export class PlayerTranscriptService {
   }
 
   getNumSubmitsForLastCard(): number {
-    return this.numAnswersSubmitted;
+    return this.totalNumberOfAnswersSubmitted;
   }
 
   updateLatestInteractionHtml(newInteractionHtml: string): void {
@@ -159,5 +164,46 @@ export class PlayerTranscriptService {
       }
     }
     return null;
+  }
+
+  /**
+   * Returns the total number of incorrect submissions made by the learner.
+   *
+   * @returns {number} The number of incorrect submissions.
+   */
+  getNumberOfIncorrectSubmissions(): number {
+    return this.numberOfIncorrectSubmissions;
+  }
+
+  /**
+   * Increments the count of incorrect submissions by the learner.
+   */
+  incrementNumberOfIncorrectSubmissions(): void {
+    this.numberOfIncorrectSubmissions += 1;
+  }
+
+  /**
+   * Resets the count of incorrect submissions to zero.
+   */
+  resetNumberOfIncorrectSubmissions(): void {
+    this.numberOfIncorrectSubmissions = 0;
+  }
+
+  /**
+   * Returns the list of states that were previously visited in the session.
+   *
+   * @returns {string[]} The list of previously visited states.
+   */
+  getPrevSessionStatesProgress(): string[] {
+    return this.prevSessionStatesProgress;
+  }
+
+  /**
+   * Sets the list of states that were previously visited in the session.
+   *
+   * @param {string[]} states - The list of previously visited states.
+   */
+  setPrevSessionStatesProgress(states: string[]): void {
+    this.prevSessionStatesProgress = [...states];
   }
 }

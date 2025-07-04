@@ -28,16 +28,15 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {Subscription} from 'rxjs';
 import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {QuestionPlayerConceptCardModalComponent} from './question-player-concept-card-modal.component';
 import {QuestionPlayerConstants} from 'components/question-directives/question-player/question-player.constants';
 import {SkillMasteryModalComponent} from './skill-mastery-modal.component';
 import {UserService} from 'services/user.service';
-import {QuestionPlayerStateService} from './services/question-player-state.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
+import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlService} from 'services/contextual/url.service';
 
@@ -112,13 +111,12 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
   componentSubscription = new Subscription();
 
   constructor(
-    private contextService: ContextService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private pageContextService: PageContextService,
+    private questionPlayerEngineService: QuestionPlayerEngineService,
     private location: Location,
     private ngbModal: NgbModal,
     private playerPositionService: PlayerPositionService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
-    private questionPlayerStateService: QuestionPlayerStateService,
     private skillMasteryBackendApiService: SkillMasteryBackendApiService,
     private userService: UserService,
     private windowRef: WindowRef,
@@ -178,7 +176,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.finalCorrect = this.totalScore;
     this.totalScore = Math.round((this.totalScore * 100) / totalQuestions);
     this.resultsLoaded = true;
-    this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+    this.questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit(
       this.resultsLoaded
     );
   }
@@ -553,18 +551,18 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       );
 
       this.componentSubscription.add(
-        this.explorationPlayerStateService.onTotalQuestionsReceived.subscribe(
+        this.questionPlayerEngineService.onTotalQuestionsReceived.subscribe(
           result => this.updateTotalQuestions(result)
         )
       );
 
       this.componentSubscription.add(
-        this.questionPlayerStateService.onQuestionSessionCompleted.subscribe(
+        this.questionPlayerEngineService.onQuestionSessionCompleted.subscribe(
           result => {
             this.windowRef.nativeWindow.location.hash =
               QuestionPlayerConstants.HASH_PARAM +
               encodeURIComponent(JSON.stringify(result));
-            this.contextService.removeCustomEntityContext();
+            this.pageContextService.removeCustomEntityContext();
           }
         )
       );
@@ -613,7 +611,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       // The initResults function is written separately since it is also
       // called in ngOnInit when some external events are triggered.
       this.initResults();
-      this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+      this.questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit(
         this.resultsLoaded
       );
       this.preventPageUnloadEventService.addListener(() => {

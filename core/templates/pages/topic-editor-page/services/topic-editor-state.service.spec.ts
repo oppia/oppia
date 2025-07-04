@@ -30,6 +30,10 @@ import {
   SubtopicPage,
   SubtopicPageBackendDict,
 } from 'domain/topic/subtopic-page.model';
+import {
+  StudyGuide,
+  StudyGuideBackendDict,
+} from 'domain/topic/study-guide.model';
 import {TopicRightsBackendApiService} from 'domain/topic/topic-rights-backend-api.service';
 import {
   TopicRights,
@@ -77,6 +81,7 @@ describe('Topic editor state service', () => {
   let topicDict: TopicBackendDict;
   let storySummaryBackendDict: StorySummaryBackendDict;
   let subtopicPage: SubtopicPageBackendDict;
+  let studyGuide: StudyGuideBackendDict;
 
   class MockEditableTopicBackendApiService {
     fetchTopicAsync(topicId: string): Promise<FetchTopicResponse> {
@@ -102,6 +107,13 @@ describe('Topic editor state service', () => {
       subtopicId: number
     ): Promise<SubtopicPageBackendDict> {
       return Promise.resolve(subtopicPage);
+    }
+
+    fetchStudyGuideAsync(
+      topicId: number,
+      subtopicId: number
+    ): Promise<StudyGuideBackendDict> {
+      return Promise.resolve(studyGuide);
     }
 
     updateTopicAsync(
@@ -246,6 +258,24 @@ describe('Topic editor state service', () => {
       },
       language_code: 'en',
     };
+    studyGuide = {
+      id: 'topicId-2',
+      topic_id: 'topicId',
+      sections: [
+        {
+          heading: {
+            content_id: 'section_heading_0',
+            unicode_str: 'heading 1',
+          },
+          content: {
+            content_id: 'section_content_1',
+            html: '<p>content 1</p>',
+          },
+        },
+      ],
+      next_content_id_index: 2,
+      language_code: 'en',
+    };
   });
 
   it('should create', () => {
@@ -305,6 +335,19 @@ describe('Topic editor state service', () => {
     );
   }));
 
+  it('should load study guide', fakeAsync(() => {
+    topicEditorStateService.loadStudyGuide('1', 2);
+    tick();
+    expect(topicEditorStateService.getStudyGuide()).toEqual(
+      StudyGuide.createFromBackendDict(studyGuide)
+    );
+    expect(topicEditorStateService.getCachedStudyGuides()).toHaveSize(1);
+    topicEditorStateService.loadStudyGuide('1', 2);
+    expect(topicEditorStateService.getStudyGuide()).toEqual(
+      StudyGuide.createFromBackendDict(studyGuide)
+    );
+  }));
+
   it('should show error when loading subtopic page fails', fakeAsync(() => {
     spyOn(
       mockEditableTopicBackendApiService,
@@ -317,6 +360,24 @@ describe('Topic editor state service', () => {
     // type.
     // @ts-ignore
     topicEditorStateService.loadSubtopicPage(null, null);
+    tick();
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'There was an error when loading the topic.'
+    );
+  }));
+
+  it('should show error when loading study guide fails', fakeAsync(() => {
+    spyOn(
+      mockEditableTopicBackendApiService,
+      'fetchStudyGuideAsync'
+    ).and.returnValue(Promise.reject());
+    spyOn(alertsService, 'addWarning');
+    // This throws "Argument of type 'null' is not assignable to parameter of
+    // type 'string'" We need to suppress this error because of the need to test
+    // validations. This is because the backend api service returns an unknown
+    // type.
+    // @ts-ignore
+    topicEditorStateService.loadStudyGuide(null, null);
     tick();
     expect(alertsService.addWarning).toHaveBeenCalledWith(
       'There was an error when loading the topic.'
@@ -368,6 +429,25 @@ describe('Topic editor state service', () => {
     );
   }));
 
+  it('should set study guide', fakeAsync(() => {
+    studyGuide.id = 'topic_id1234-0';
+    topicEditorStateService.setStudyGuide(
+      StudyGuide.createFromBackendDict(studyGuide)
+    );
+    expect(topicEditorStateService.getStudyGuide()).toEqual(
+      StudyGuide.createFromBackendDict(studyGuide)
+    );
+
+    topicEditorStateService.loadStudyGuide('topic_id1234', 0);
+    tick();
+    topicEditorStateService.setStudyGuide(
+      StudyGuide.createFromBackendDict(studyGuide)
+    );
+    expect(topicEditorStateService.getStudyGuide()).toEqual(
+      StudyGuide.createFromBackendDict(studyGuide)
+    );
+  }));
+
   it('should set topic', () => {
     let topic = Topic.create(topicDict, {});
     topicEditorStateService.setTopic(topic);
@@ -403,6 +483,38 @@ describe('Topic editor state service', () => {
     expect(topicEditorStateService.getCachedSubtopicPages()).toEqual([
       subtopic0,
       subtopic1,
+    ]);
+  }));
+
+  it('should delete study guide when user deletes subtopic', fakeAsync(() => {
+    topicDict.id = 'topic_id1234';
+    let topic = Topic.create(topicDict, {});
+    topicEditorStateService.setTopic(topic);
+    studyGuide.id = 'topic_id1234-0';
+    topicEditorStateService.setStudyGuide(
+      StudyGuide.createFromBackendDict(studyGuide)
+    );
+    tick();
+    studyGuide.id = 'topic_id1234-1';
+    topicEditorStateService.setStudyGuide(
+      StudyGuide.createFromBackendDict(studyGuide)
+    );
+    tick();
+    studyGuide.id = 'topic_id1234-2';
+    topicEditorStateService.setStudyGuide(
+      StudyGuide.createFromBackendDict(studyGuide)
+    );
+    tick();
+
+    topicEditorStateService.deleteStudyGuide('topic_id1234', 1);
+
+    studyGuide.id = 'topic_id1234-0';
+    let studyGuide0 = StudyGuide.createFromBackendDict(studyGuide);
+    studyGuide.id = 'topic_id1234-1';
+    let studyGuide1 = StudyGuide.createFromBackendDict(studyGuide);
+    expect(topicEditorStateService.getCachedStudyGuides()).toEqual([
+      studyGuide0,
+      studyGuide1,
     ]);
   }));
 
@@ -539,11 +651,18 @@ describe('Topic editor state service', () => {
     topicEditorStateService.deleteSubtopicPage('1', 2);
   }));
 
+  it('should delete study guide', fakeAsync(() => {
+    topicEditorStateService.loadStudyGuide('1', 2);
+    tick();
+    topicEditorStateService.deleteStudyGuide('1', 2);
+  }));
+
   it('should test getters', () => {
     expect(topicEditorStateService.getSkillIdToRubricsObject()).toBeDefined();
     expect(topicEditorStateService.getCanonicalStorySummaries()).toBeDefined();
     expect(topicEditorStateService.onStorySummariesInitialized).toBeDefined();
     expect(topicEditorStateService.onSubtopicPageLoaded).toBeDefined();
+    expect(topicEditorStateService.onStudyGuideLoaded).toBeDefined();
     expect(topicEditorStateService.isSavingTopic()).toBeDefined();
     expect(topicEditorStateService.onTopicInitialized).toBeDefined();
     expect(topicEditorStateService.onTopicReinitialized).toBeDefined();

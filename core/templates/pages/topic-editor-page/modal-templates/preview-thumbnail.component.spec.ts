@@ -21,20 +21,20 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {ThumbnailDisplayComponent} from 'components/forms/custom-forms-directives/thumbnail-display.component';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {PreviewThumbnailComponent} from './preview-thumbnail.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 describe('Preview Thumbnail Component', function () {
   let componentInstance: PreviewThumbnailComponent;
   let fixture: ComponentFixture<PreviewThumbnailComponent>;
   let imageUploadHelperService: ImageUploadHelperService;
   let testUrl = 'test_url';
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [PreviewThumbnailComponent, ThumbnailDisplayComponent],
-      providers: [ImageUploadHelperService, ContextService],
+      providers: [ImageUploadHelperService, PageContextService],
     }).compileComponents();
   }));
 
@@ -44,7 +44,7 @@ describe('Preview Thumbnail Component', function () {
     imageUploadHelperService = TestBed.inject(
       ImageUploadHelperService
     ) as jasmine.SpyObj<ImageUploadHelperService>;
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     spyOn(
       imageUploadHelperService,
       'getTrustedResourceUrlForThumbnailFilename'
@@ -52,18 +52,18 @@ describe('Preview Thumbnail Component', function () {
   });
 
   it('should create', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue('topic');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('topic');
     expect(componentInstance).toBeDefined();
   });
 
   it('should initialize', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue('topic');
+    spyOn(pageContextService, 'getEntityType').and.returnValue('topic');
     componentInstance.ngOnInit();
     expect(componentInstance.editableThumbnailDataUrl).toEqual(testUrl);
   });
 
   it('should throw error if no image is present for a preview', () => {
-    spyOn(contextService, 'getEntityType').and.returnValue(undefined);
+    spyOn(pageContextService, 'getEntityType').and.returnValue(undefined);
     expect(() => {
       componentInstance.ngOnInit();
     }).toThrowError('No image present for preview');

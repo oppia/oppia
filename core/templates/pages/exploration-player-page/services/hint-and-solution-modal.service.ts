@@ -18,9 +18,9 @@
 
 import {Injectable} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {DisplayHintModalComponent} from '../modals/display-hint-modal.component';
-import {DisplaySolutionInterstititalModalComponent} from '../modals/display-solution-interstitial-modal.component';
-import {DisplaySolutionModalComponent} from '../modals/display-solution-modal.component';
+import {DisplayHintModalComponent} from '../current-lesson-player/modals/display-hint-modal.component';
+import {DisplaySolutionInterstititalModalComponent} from '../current-lesson-player/modals/display-solution-interstitial-modal.component';
+import {DisplaySolutionModalComponent} from '../current-lesson-player/modals/display-solution-modal.component';
 
 @Injectable({
   providedIn: 'root',
