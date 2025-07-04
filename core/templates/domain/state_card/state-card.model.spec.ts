@@ -27,12 +27,11 @@ import {StateCard} from 'domain/state_card/state-card.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('State card object factory', () => {
   let interactionObjectFactory: InteractionObjectFactory;
-  let solutionObjectFactory: SolutionObjectFactory;
   let _sampleCard1: StateCard;
   let _sampleCard2: StateCard;
 
@@ -42,7 +41,6 @@ describe('State card object factory', () => {
     });
 
     interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
 
     let interactionDict: InteractionBackendDict = {
       answer_groups: [],
@@ -239,7 +237,7 @@ describe('State card object factory', () => {
   });
 
   it('should get interaction solution', () => {
-    let expectedResult = solutionObjectFactory.createFromBackendDict({
+    let expectedResult = Solution.createFromBackendDict({
       answer_is_exclusive: true,
       correct_answer: 'correct answer',
       explanation: {

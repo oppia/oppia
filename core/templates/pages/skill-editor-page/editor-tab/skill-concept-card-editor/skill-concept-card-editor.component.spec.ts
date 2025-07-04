@@ -36,19 +36,12 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {AppConstants} from 'app.constants';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {CdkDragSortEvent} from '@angular/cdk/drag-drop';
-import {WorkedExample} from 'domain/skill/worked-example.model';
 import {of} from 'rxjs';
-
-class MockNgbModalRef {
-  componentInstance = {};
-}
 
 class MockNgbModalRefPreview {
   componentInstance = {
     skillDescription: null,
     skillExplanation: null,
-    skillWorkedExamples: null,
   };
 }
 
@@ -147,22 +140,6 @@ describe('Skill Concept Card Editor Component', () => {
     expect(component.getConceptCardChange.emit).toHaveBeenCalled();
   });
 
-  it('should change list oder', () => {
-    component.ngOnInit();
-
-    const event = {
-      previousIndex: 1,
-      currentIndex: 2,
-    };
-    spyOn(skillUpdateService, 'updateWorkedExamples').and.callThrough();
-    spyOn(component.getConceptCardChange, 'emit').and.callThrough();
-
-    component.drop(event as CdkDragSortEvent<WorkedExample[]>);
-
-    expect(skillUpdateService.updateWorkedExamples).toHaveBeenCalled();
-    expect(component.getConceptCardChange.emit).toHaveBeenCalled();
-  });
-
   it('should return image url', () => {
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
       'imagePath'
@@ -187,113 +164,6 @@ describe('Skill Concept Card Editor Component', () => {
 
     expect(updateSpy).toHaveBeenCalled();
   });
-
-  it('should change current index on calling', () => {
-    component.ngOnInit();
-
-    // Case: 1
-    // If we try to update new index same as old index
-    // it should set index value to null.
-    component.activeWorkedExampleIndex = 2;
-    component.changeActiveWorkedExampleIndex(2);
-
-    expect(component.activeWorkedExampleIndex).toBe(null);
-
-    // Case: 2
-    // It should set new index as current index.
-    component.changeActiveWorkedExampleIndex(3);
-
-    expect(component.activeWorkedExampleIndex).toBe(3);
-  });
-
-  it(
-    'should open delete worked example modal when ' +
-      'clicking on delete button',
-    fakeAsync(() => {
-      let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: new MockNgbModalRef(),
-        result: Promise.resolve(),
-      } as NgbModalRef);
-      let deleteWorkedExampleSpy = spyOn(
-        skillUpdateService,
-        'deleteWorkedExample'
-      ).and.callThrough();
-
-      component.ngOnInit();
-      component.deleteWorkedExample(0, '');
-      tick();
-
-      expect(modalSpy).toHaveBeenCalled();
-      expect(deleteWorkedExampleSpy).toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should close delete worked example modal when ' +
-      'clicking on cancel button',
-    fakeAsync(() => {
-      let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: new MockNgbModalRef(),
-        result: Promise.reject(),
-      } as NgbModalRef);
-      let deleteWorkedExampleSpy = spyOn(
-        skillUpdateService,
-        'deleteWorkedExample'
-      ).and.callThrough();
-
-      component.ngOnInit();
-      component.deleteWorkedExample(0, '');
-      tick();
-
-      expect(modalSpy).toHaveBeenCalled();
-      expect(deleteWorkedExampleSpy).not.toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should open add worked example modal when ' + 'clicking on add button',
-    fakeAsync(() => {
-      let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: new MockNgbModalRef(),
-        result: Promise.resolve({
-          workedExampleQuestionHtml: 'questionHtml',
-          workedExampleExplanationHtml: 'explanationHtml',
-        }),
-      } as NgbModalRef);
-      let addWorkedExampleSpy = spyOn(
-        skillUpdateService,
-        'addWorkedExample'
-      ).and.callThrough();
-
-      component.ngOnInit();
-      component.openAddWorkedExampleModal();
-      tick();
-
-      expect(modalSpy).toHaveBeenCalled();
-      expect(addWorkedExampleSpy).toHaveBeenCalled();
-    })
-  );
-
-  it(
-    'should close add worked example modal when ' + 'clicking on cancel button',
-    fakeAsync(() => {
-      let modalSpy = spyOn(ngbModal, 'open').and.returnValue({
-        componentInstance: new MockNgbModalRef(),
-        result: Promise.reject(),
-      } as NgbModalRef);
-      let addWorkedExampleSpy = spyOn(
-        skillUpdateService,
-        'addWorkedExample'
-      ).and.callThrough();
-
-      component.ngOnInit();
-      component.openAddWorkedExampleModal();
-      tick();
-
-      expect(modalSpy).toHaveBeenCalled();
-      expect(addWorkedExampleSpy).not.toHaveBeenCalled();
-    })
-  );
 
   it(
     'should open show skill preview modal when ' + 'clicking on preview button',
@@ -327,19 +197,6 @@ describe('Skill Concept Card Editor Component', () => {
     })
   );
 
-  it('should toggle worked example on clicking', () => {
-    component.workedExamplesListIsShown = true;
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-
-    component.toggleWorkedExampleList();
-
-    expect(component.workedExamplesListIsShown).toBeFalse();
-
-    component.toggleWorkedExampleList();
-
-    expect(component.workedExamplesListIsShown).toBeTrue();
-  });
-
   it('should toggle skill editor card on clicking', () => {
     component.skillEditorCardIsShown = true;
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
@@ -351,60 +208,5 @@ describe('Skill Concept Card Editor Component', () => {
     component.toggleSkillEditorCard();
 
     expect(component.skillEditorCardIsShown).toBeTrue();
-  });
-
-  it('should format given worked example summary html content', () => {
-    let result = component.getWorkedExampleSummary('<p>Worked Example</p>');
-
-    expect(result).toBe('Worked Example');
-  });
-
-  it('should show worked examples list when the window is narrow', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
-    spyOn(windowDimensionsService, 'getResizeEvent').and.returnValue(
-      mockEventEmitter
-    );
-    component.windowIsNarrow = false;
-
-    expect(component.workedExamplesListIsShown).toBe(false);
-
-    component.ngOnInit();
-    mockEventEmitter.emit();
-
-    expect(component.workedExamplesListIsShown).toBe(false);
-    expect(component.windowIsNarrow).toBe(true);
-  });
-
-  it('should show worked examples list when the window is wide', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    component.windowIsNarrow = true;
-
-    expect(component.workedExamplesListIsShown).toBe(false);
-
-    component.ngOnInit();
-    mockEventEmitter.emit();
-
-    expect(component.workedExamplesListIsShown).toBe(true);
-    expect(component.windowIsNarrow).toBe(false);
-  });
-
-  it('should not toggle Worked Example list when window is wide', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-
-    component.workedExamplesListIsShown = true;
-
-    component.toggleWorkedExampleList();
-
-    expect(component.workedExamplesListIsShown).toBe(true);
-  });
-
-  it('should not toggle skill card editor when window is wide', () => {
-    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-
-    component.skillEditorCardIsShown = true;
-
-    component.toggleWorkedExampleList();
-
-    expect(component.skillEditorCardIsShown).toBe(true);
   });
 });

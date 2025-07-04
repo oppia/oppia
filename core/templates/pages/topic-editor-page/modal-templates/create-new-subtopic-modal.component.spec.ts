@@ -28,11 +28,14 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {TopicUpdateService} from 'domain/topic/topic-update.service';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
 import {SubtopicValidationService} from 'pages/topic-editor-page/services/subtopic-validation.service';
+import {HtmlLengthService} from 'services/html-length.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {AppConstants} from 'app.constants';
 import {CreateNewSubtopicModalComponent} from './create-new-subtopic-modal.component';
 import {Subtopic} from 'domain/topic/subtopic.model';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
+import {StudyGuide} from 'domain/topic/study-guide.model';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
 
@@ -43,6 +46,7 @@ class MockWindowRef {
     },
   };
 }
+
 class MockActiveModal {
   close(): void {
     return;
@@ -52,7 +56,11 @@ class MockActiveModal {
     return;
   }
 }
+
 class MockTopicEditorStateService {
+  private topicReinitializedEventEmitter: EventEmitter<void> =
+    new EventEmitter();
+
   getTopic() {
     return new Topic(
       '',
@@ -84,11 +92,25 @@ class MockTopicEditorStateService {
   deleteSubtopicPage() {}
 
   get onTopicReinitialized(): EventEmitter<void> {
-    let topicReinitializedEventEmitter: EventEmitter<void> = new EventEmitter();
-    return topicReinitializedEventEmitter;
+    return this.topicReinitializedEventEmitter;
   }
 
   setSubtopicPage() {}
+  setStudyGuide() {}
+}
+
+class MockPlatformFeatureService {
+  status = {
+    ShowRestructuredStudyGuides: {
+      isEnabled: false,
+    },
+  };
+}
+
+class MockHtmlLengthService {
+  computeHtmlLength(html: string, calculationType: string): number {
+    return html.length;
+  }
 }
 
 describe('create new subtopic modal', function () {
@@ -98,6 +120,8 @@ describe('create new subtopic modal', function () {
   let topicUpdateService: TopicUpdateService;
   let topicEditorStateService: MockTopicEditorStateService;
   let subtopicValidationService: SubtopicValidationService;
+  let platformFeatureService: MockPlatformFeatureService;
+  let htmlLengthService: MockHtmlLengthService;
   let topic: Topic;
   let DefaultSubtopicPageSchema = {
     type: 'html',
@@ -108,6 +132,9 @@ describe('create new subtopic modal', function () {
 
   beforeEach(waitForAsync(() => {
     topicEditorStateService = new MockTopicEditorStateService();
+    platformFeatureService = new MockPlatformFeatureService();
+    htmlLengthService = new MockHtmlLengthService();
+
     TestBed.configureTestingModule({
       declarations: [
         CreateNewSubtopicModalComponent,
@@ -126,12 +153,21 @@ describe('create new subtopic modal', function () {
           provide: TopicEditorStateService,
           useValue: topicEditorStateService,
         },
+        {
+          provide: PlatformFeatureService,
+          useValue: platformFeatureService,
+        },
+        {
+          provide: HtmlLengthService,
+          useValue: htmlLengthService,
+        },
         TopicUpdateService,
         SubtopicValidationService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
+
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateNewSubtopicModalComponent);
     component = fixture.componentInstance;
@@ -172,6 +208,9 @@ describe('create new subtopic modal', function () {
     topic.getNextSubtopicId = function () {
       return 1;
     };
+    topic.getUrlFragment = function () {
+      return 'topic-url-fragment';
+    };
     spyOn(topicEditorStateService, 'getTopic').and.returnValue(topic);
 
     fixture.detectChanges();
@@ -186,15 +225,35 @@ describe('create new subtopic modal', function () {
     expect(component.schemaEditorIsShown).toBe(false);
     expect(component.subtopicUrlFragmentExists).toBe(false);
     expect(component.errorMsg).toBe(null);
+    expect(component.htmlData).toBe('');
+    expect(component.sectionHeadingPlaintext).toBe('');
+    expect(component.sectionContentHtml).toBe('');
+    expect(component.editableThumbnailFilename).toBe('');
+    expect(component.editableThumbnailBgColor).toBe('');
+    expect(component.editableUrlFragment).toBe('');
+    expect(component.subtopicTitle).toBe('');
     expect(component.MAX_CHARS_IN_SUBTOPIC_TITLE).toBe(
       AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE
     );
     expect(component.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT).toBe(
       AppConstants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
     );
+    expect(component.MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING).toBe(
+      AppConstants.MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING
+    );
+    expect(component.generatedUrlPrefix).toBe(
+      'local/learn/non /topic-url-fragment/studyguide'
+    );
+  });
 
+  it('should update htmlData when localValueChange is called', () => {
     component.localValueChange('working fine');
     expect(component.htmlData).toBe('working fine');
+  });
+
+  it('should update sectionContentHtml when localContentValueChange is called', () => {
+    component.localContentValueChange('section content');
+    expect(component.sectionContentHtml).toBe('section content');
   });
 
   it(
@@ -234,36 +293,96 @@ describe('create new subtopic modal', function () {
   it(
     'should reset errorMsg when user' + ' enter data in "Title" input area',
     () => {
+      component.errorMsg = 'Some error';
       component.resetErrorMsg();
 
       expect(component.errorMsg).toBe(null);
     }
   );
 
-  it(
-    'should check whether subtopic is valid when' +
-      ' "Create Subtopic" button clicked',
-    () => {
-      component.editableThumbnailFilename = 'examplefilename';
-      component.subtopicTitle = 'title';
-      component.htmlData = 'data';
-      component.editableUrlFragment = 'url';
+  it('should check if section content length is exceeded', () => {
+    component.sectionContentHtml = 'short content';
+    let computeHtmlLengthSpy = spyOn(htmlLengthService, 'computeHtmlLength');
+    computeHtmlLengthSpy.and.returnValue(500);
+    let isExceeded = component.isSectionContentLengthExceeded();
+    expect(isExceeded).toBe(false);
 
-      let isSubtopicValid = component.isSubtopicValid();
+    computeHtmlLengthSpy.and.returnValue(1500);
+    isExceeded = component.isSectionContentLengthExceeded();
+    expect(isExceeded).toBe(true);
+  });
 
-      spyOn(subtopicValidationService, 'isUrlFragmentValid').and.returnValue(
-        true
-      );
-      expect(isSubtopicValid).toBe(true);
-    }
-  );
+  it('should check whether subtopic is valid for legacy mode', () => {
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
+    component.editableThumbnailFilename = 'examplefilename';
+    component.subtopicTitle = 'title';
+    component.htmlData = 'data';
+    component.editableUrlFragment = 'url';
+
+    spyOn(component, 'isUrlFragmentValid').and.returnValue(true);
+    let isSubtopicValid = component.isSubtopicValid();
+    expect(isSubtopicValid).toBe(true);
+  });
+
+  it('should check whether subtopic is valid for restructured study guides mode', () => {
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
+    component.editableThumbnailFilename = 'examplefilename';
+    component.subtopicTitle = 'title';
+    component.sectionHeadingPlaintext = 'section heading';
+    component.sectionContentHtml = 'section content';
+    component.editableUrlFragment = 'url';
+
+    spyOn(component, 'isUrlFragmentValid').and.returnValue(true);
+    let isSubtopicValid = component.isSubtopicValid();
+    expect(isSubtopicValid).toBe(true);
+  });
+
+  it('should return false when subtopic is not valid', () => {
+    component.editableThumbnailFilename = '';
+    component.subtopicTitle = '';
+    component.htmlData = '';
+    component.editableUrlFragment = '';
+
+    let isSubtopicValid = component.isSubtopicValid();
+    expect(isSubtopicValid).toBe(false);
+  });
+
+  it('should check if url fragment is valid', () => {
+    component.editableUrlFragment = 'valid-url-fragment';
+    spyOn(subtopicValidationService, 'isUrlFragmentValid').and.returnValue(
+      true
+    );
+
+    let isValid = component.isUrlFragmentValid();
+    expect(isValid).toBe(true);
+    expect(subtopicValidationService.isUrlFragmentValid).toHaveBeenCalledWith(
+      'valid-url-fragment'
+    );
+  });
+
+  it('should check if restructured study guides feature is enabled', () => {
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
+    expect(component.isShowRestructuredStudyGuidesFeatureEnabled()).toBe(true);
+
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
+    expect(component.isShowRestructuredStudyGuidesFeatureEnabled()).toBe(false);
+  });
 
   it('should not create subtopic when "Cancel" button clicked', fakeAsync(() => {
     spyOn(topicEditorStateService, 'deleteSubtopicPage');
+    spyOn(topicEditorStateService.onTopicReinitialized, 'emit');
+    spyOn(ngbActiveModal, 'dismiss');
 
     component.cancel();
 
-    expect(topicEditorStateService.deleteSubtopicPage).toHaveBeenCalled();
+    expect(topicEditorStateService.deleteSubtopicPage).toHaveBeenCalledWith(
+      '1',
+      1
+    );
+    expect(
+      topicEditorStateService.onTopicReinitialized.emit
+    ).toHaveBeenCalled();
+    expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
   }));
 
   it(
@@ -280,45 +399,118 @@ describe('create new subtopic modal', function () {
     }
   );
 
-  it(
-    'should save create new subtoic when' + ' "Create Subtopic" button clicked',
-    () => {
-      component.subtopicId = 123;
-      spyOn(
-        subtopicValidationService,
-        'checkValidSubtopicName'
-      ).and.returnValue(true);
-      spyOn(topicUpdateService, 'setSubtopicTitle');
-      spyOn(topicUpdateService, 'addSubtopic');
-      spyOn(topicUpdateService, 'setSubtopicThumbnailFilename').and.stub();
-      spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor').and.stub();
-      spyOn(topicUpdateService, 'setSubtopicUrlFragment');
-      spyOn(SubtopicPage, 'createDefault').and.callThrough();
-      spyOn(topicEditorStateService, 'setSubtopicPage').and.callThrough();
-      spyOn(ngbActiveModal, 'close');
+  it('should update editableUrlFragment and call checkSubtopicExistence', () => {
+    spyOn(component, 'checkSubtopicExistence');
+    const newUrlFragment = 'new-url-fragment';
+    component.onUrlFragmentChange(newUrlFragment);
+    expect(component.editableUrlFragment).toBe(newUrlFragment);
+    expect(component.checkSubtopicExistence).toHaveBeenCalled();
+  });
 
-      component.save();
+  it('should save create new subtopic in legacy mode when "Create Subtopic" button clicked', () => {
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
+    component.subtopicId = 123;
+    component.subtopicTitle = 'Test Subtopic';
+    component.editableUrlFragment = 'test-url';
+    component.htmlData = 'test html data';
 
-      expect(topicUpdateService.addSubtopic).toHaveBeenCalled();
-      expect(topicUpdateService.setSubtopicTitle).toHaveBeenCalled();
-      expect(topicUpdateService.setSubtopicUrlFragment).toHaveBeenCalled();
-      expect(SubtopicPage.createDefault).toHaveBeenCalled();
-      expect(topicEditorStateService.setSubtopicPage).toHaveBeenCalled();
-      expect(ngbActiveModal.close).toHaveBeenCalled();
-    }
-  );
+    spyOn(subtopicValidationService, 'checkValidSubtopicName').and.returnValue(
+      true
+    );
+    spyOn(topicUpdateService, 'addSubtopic');
+    spyOn(topicUpdateService, 'setSubtopicTitle');
+    spyOn(topicUpdateService, 'setSubtopicThumbnailFilename');
+    spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor');
+    spyOn(topicUpdateService, 'setSubtopicUrlFragment');
+    spyOn(topicUpdateService, 'setSubtopicPageContentsHtml');
+    spyOn(SubtopicPage, 'createDefault').and.callThrough();
+    spyOn(topicEditorStateService, 'setSubtopicPage');
+    spyOn(ngbActiveModal, 'close');
+
+    component.save();
+
+    expect(topicUpdateService.addSubtopic).toHaveBeenCalledWith(
+      topic,
+      'Test Subtopic',
+      'test-url'
+    );
+    expect(topicUpdateService.setSubtopicTitle).toHaveBeenCalledWith(
+      topic,
+      123,
+      'Test Subtopic'
+    );
+    expect(topicUpdateService.setSubtopicUrlFragment).toHaveBeenCalledWith(
+      topic,
+      123,
+      'test-url'
+    );
+    expect(SubtopicPage.createDefault).toHaveBeenCalledWith('1', 123);
+    expect(topicEditorStateService.setSubtopicPage).toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalledWith(123);
+  });
+
+  it('should save new subtopic in restructured study guides mode when "Create Subtopic" button clicked', () => {
+    platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
+    component.subtopicId = 123;
+    component.subtopicTitle = 'Test Subtopic';
+    component.editableUrlFragment = 'test-url';
+    component.sectionHeadingPlaintext = 'Test Heading';
+    component.sectionContentHtml = 'Test Content';
+
+    spyOn(subtopicValidationService, 'checkValidSubtopicName').and.returnValue(
+      true
+    );
+    spyOn(topicUpdateService, 'addSubtopic');
+    spyOn(topicUpdateService, 'setSubtopicTitle');
+    spyOn(topicUpdateService, 'setSubtopicThumbnailFilename');
+    spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor');
+    spyOn(topicUpdateService, 'setSubtopicUrlFragment');
+    spyOn(topicUpdateService, 'updateSection');
+    spyOn(StudyGuide, 'createDefault').and.callThrough();
+    spyOn(topicEditorStateService, 'setStudyGuide');
+    spyOn(ngbActiveModal, 'close');
+
+    component.save();
+
+    expect(topicUpdateService.addSubtopic).toHaveBeenCalledWith(
+      topic,
+      'Test Subtopic',
+      'test-url'
+    );
+    expect(topicUpdateService.setSubtopicTitle).toHaveBeenCalledWith(
+      topic,
+      123,
+      'Test Subtopic'
+    );
+    expect(topicUpdateService.setSubtopicUrlFragment).toHaveBeenCalledWith(
+      topic,
+      123,
+      'test-url'
+    );
+    expect(StudyGuide.createDefault).toHaveBeenCalledWith('1', 123);
+    expect(topicUpdateService.updateSection).toHaveBeenCalledWith(
+      jasmine.any(Object),
+      0,
+      'Test Heading',
+      'Test Content',
+      123
+    );
+    expect(topicEditorStateService.setStudyGuide).toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalledWith(123);
+  });
 
   it(
     'should not close modal if subtopic name is not valid' +
       ' when "Create Subtopic" button clicked',
     () => {
       spyOn(ngbActiveModal, 'close');
-
       spyOn(
         subtopicValidationService,
         'checkValidSubtopicName'
       ).and.returnValue(false);
+
       component.save();
+
       expect(component.errorMsg).toBe(
         'A subtopic with this title already exists'
       );
@@ -336,11 +528,39 @@ describe('create new subtopic modal', function () {
     expect(component.onUrlFragmentChange).toHaveBeenCalledWith(testFragment);
   });
 
-  it('should update editableUrlFragment and call checkSubtopicExistence', () => {
-    spyOn(component, 'checkSubtopicExistence');
-    const newUrlFragment = 'new-url-fragment';
-    component.onUrlFragmentChange(newUrlFragment);
-    expect(component.editableUrlFragment).toBe(newUrlFragment);
-    expect(component.checkSubtopicExistence).toHaveBeenCalled();
+  it('should call addSubtopic with correct parameters', () => {
+    component.subtopicTitle = 'Test Title';
+    component.editableUrlFragment = 'test-fragment';
+    spyOn(topicUpdateService, 'addSubtopic');
+    spyOn(topicUpdateService, 'setSubtopicThumbnailFilename');
+    spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor');
+
+    component.addSubtopic();
+
+    expect(topicUpdateService.addSubtopic).toHaveBeenCalledWith(
+      topic,
+      'Test Title',
+      'test-fragment'
+    );
+  });
+
+  it('should set subtopic thumbnail properties correctly', () => {
+    component.subtopicId = 123;
+    component.editableThumbnailFilename = 'test-image.jpg';
+    component.editableThumbnailBgColor = '#FF0000';
+
+    spyOn(topicUpdateService, 'setSubtopicThumbnailFilename');
+    spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor');
+
+    component.addSubtopic();
+
+    expect(
+      topicUpdateService.setSubtopicThumbnailFilename
+    ).toHaveBeenCalledWith(topic, 123, 'test-image.jpg');
+    expect(topicUpdateService.setSubtopicThumbnailBgColor).toHaveBeenCalledWith(
+      topic,
+      123,
+      '#FF0000'
+    );
   });
 });
