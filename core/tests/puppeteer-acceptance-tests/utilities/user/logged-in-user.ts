@@ -228,6 +228,16 @@ const navbarGetInvolvedDropdownContainerSelector =
   '.e2e-test-navbar-get-involved-menu';
 const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
 const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
+const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
+const mobileAboutMenuDropdownSelector =
+  '.e2e-mobile-test-sidebar-expand-about-menu';
+const mobileAboutPageButtonSelector = '.e2e-mobile-test-sidebar-about-button';
+const mobileGetInvolvedDropdownSelector =
+  '.e2e-mobile-test-sidebar-expand-get-involved-menu';
+const mobileGetInvolvedMenuContainerSelector =
+  '.e2e-mobile-test-sidebar-get-involved-menu';
+const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
+const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -2203,9 +2213,13 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Checks if all dropdowns in navbar open properly.
+   * Checks if all dropdowns in deskop navbar open properly.
    */
-  async expectDropdownsInNavbarToWorkProperly(): Promise<void> {
+  async expectDropdownsInDesktopNavbarToWorkProperly(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage('Skipped desktop dropdowns check in mobile view.');
+      return;
+    }
     await this.clickOn(navbarLearnTab);
     await this.isElementVisible(navbarLearnDropdownContainerSelector);
 
@@ -2215,7 +2229,49 @@ export class LoggedInUser extends BaseUser {
     await this.clickOn(navbarGetInvolvedTab);
     await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
   }
+
+  /**
+   * Checks if all dropdowns in mobile navbar open properly.
+   */
+  async expectDropdownsInMobileNavMenuToWorkProperly(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage('Skipped mobile dropdowns check in desktop view.');
+      return;
+    }
+
+    await this.clickOn(mobileNavbarOpenSidebarButton);
+    // Learn Dropdown.
+    await this.isElementVisible(mobileLearnDropdownSelector);
+    await this.isElementVisible(mobileLearnSubMenuSelector);
+    await this.clickOn(mobileLearnDropdownSelector);
+    await this.isElementVisible(mobileLearnSubMenuSelector, false);
+    await this.clickOn(mobileLearnDropdownSelector);
+
+    // About Dropdown.
+    await this.isElementVisible(mobileAboutMenuDropdownSelector);
+    await this.isElementVisible(mobileAboutPageButtonSelector, false);
+    await this.clickOn(mobileAboutMenuDropdownSelector);
+    await this.isElementVisible(mobileAboutPageButtonSelector);
+    await this.clickOn(mobileAboutMenuDropdownSelector);
+
+    // Get Involved Dropdown.
+    await this.isElementVisible(mobileGetInvolvedDropdownSelector);
+    await this.isElementVisible(mobileGetInvolvedMenuContainerSelector, false);
+    await this.clickOn(mobileGetInvolvedDropdownSelector);
+    await this.isElementVisible(mobileGetInvolvedMenuContainerSelector);
+    await this.clickOn(mobileGetInvolvedDropdownSelector);
+
+    // Close Navmenu
+    await this.clickOn(mobileNavbarOpenSidebarButton);
+  }
+
+  /**
+   * Checks if navbar in mobile and desktop view open properly.
+   */
+  async expectNavBarInMobileInDesktopToWorkProperly(): Promise<void> {
+    await this.expectDropdownsInDesktopNavbarToWorkProperly();
+    await this.expectDropdownsInMobileNavMenuToWorkProperly();
+  }
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();
-navbarGetInvolvedTab;

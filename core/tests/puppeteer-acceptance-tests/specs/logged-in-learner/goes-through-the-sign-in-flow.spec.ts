@@ -43,7 +43,7 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should land on navbar', async function () {
-    await loggedInUser.expectDropdownsInNavbarToWorkProperly();
+    await loggedInUser.expectNavBarInMobileInDesktopToWorkProperly();
   });
 
   afterAll(async function () {
