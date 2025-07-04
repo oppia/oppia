@@ -63,12 +63,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [example_1],
+            state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
@@ -133,7 +129,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
-        self.assertEqual(skill_summary.worked_examples_count, 1)
+        self.assertEqual(skill_summary.worked_examples_count, 0)
 
     def test_raises_error_when_the_skill_provided_with_no_created_on_data(
         self
@@ -166,18 +162,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
             '</oppia-noninteractive-image>'
         )
-        example_explanation_html = (
-            'Explanation with image: <oppia-noninteractive-image '
-            'filepath-with-value="&quot;img2.svg&quot;" caption-with-value='
-            '"&quot;&quot;" alt-with-value="&quot;Image&quot;">'
-            '</oppia-noninteractive-image>'
-        )
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', example_explanation_html)
-        )
         self.skill.skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', explanation_html), [example_1],
+            state_domain.SubtitledHtml('1', explanation_html),
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     '1': {}, '2': {}, '3': {}
@@ -190,7 +176,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             })
         )
         filenames = skill_services.get_image_filenames_from_skill(self.skill)
-        self.assertItemsEqual(filenames, ['img.svg', 'img2.svg'])
+        self.assertItemsEqual(filenames, ['img.svg'])
 
     def test_get_new_skill_id(self) -> None:
         new_skill_id = skill_services.get_new_skill_id()
@@ -199,16 +185,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_models.SkillModel.get_by_id(new_skill_id), None)
 
     def test_get_descriptions_of_skills(self) -> None:
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
         self.save_new_skill(
             'skill_id_1', self.user_id_admin, description='Description 1',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
-                [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
                         '1': {}, '2': {}, '3': {}
@@ -226,7 +207,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
-                [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
                         '1': {}, '2': {}, '3': {}
@@ -252,16 +232,11 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_rubrics_of_linked_skills(self) -> None:
-        example_1 = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        )
         self.save_new_skill(
             'skill_id_1', self.user_id_admin, description='Description 1',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
-                [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
                         '1': {}, '2': {}, '3': {}
@@ -287,7 +262,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'),
-                [example_1],
                 state_domain.RecordedVoiceovers.from_dict({
                     'voiceovers_mapping': {
                         '1': {}, '2': {}, '3': {}
@@ -337,7 +311,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
-        self.assertEqual(skill_summary.worked_examples_count, 1)
+        self.assertEqual(skill_summary.worked_examples_count, 0)
 
     def test_get_all_skill_summaries(self) -> None:
         skill_summaries = skill_services.get_all_skill_summaries()
@@ -346,7 +320,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].id, self.SKILL_ID)
         self.assertEqual(skill_summaries[0].description, 'Description')
         self.assertEqual(skill_summaries[0].misconception_count, 1)
-        self.assertEqual(skill_summaries[0].worked_examples_count, 1)
+        self.assertEqual(skill_summaries[0].worked_examples_count, 0)
 
     def test_commit_log_entry(self) -> None:
         skill_commit_log_entry = (
@@ -1088,40 +1062,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.skill_contents.explanation.to_dict(), new_explanation)
 
-    def test_update_skill_worked_examples(self) -> None:
-        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
-        old_worked_example = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1</p>')
-        ).to_dict()
-        new_worked_example = skill_domain.WorkedExample(
-            state_domain.SubtitledHtml('2', '<p>Example Question 1 new</p>'),
-            state_domain.SubtitledHtml('3', '<p>Example Explanation 1 new</p>')
-        ).to_dict()
-
-        self.assertEqual(len(skill.skill_contents.worked_examples), 1)
-        self.assertEqual(
-            skill.skill_contents.worked_examples[0].to_dict(),
-            old_worked_example)
-
-        changelist = [
-            skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
-                'property_name': (
-                    skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES),
-                'old_value': [old_worked_example],
-                'new_value': [new_worked_example]
-            })
-        ]
-        skill_services.update_skill(
-            self.USER_ID, self.SKILL_ID, changelist, 'Change worked examples.')
-
-        skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
-        self.assertEqual(len(skill.skill_contents.worked_examples), 1)
-        self.assertEqual(
-            skill.skill_contents.worked_examples[0].to_dict(),
-            new_worked_example)
-
     def test_delete_skill_misconception(self) -> None:
         skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
 
@@ -1627,21 +1567,10 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                 }
             }
         }
-        worked_example_dict_math: skill_domain.WorkedExampleDict = {
-            'question': {
-                'content_id': 'question1',
-                'html': html_content
-            },
-            'explanation': {
-                'content_id': 'explanation1',
-                'html': html_content
-            }
-        }
 
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
                 explanation_content_id, ''),
-            [skill_domain.WorkedExample.from_dict(worked_example_dict_math)],
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}
@@ -1653,10 +1582,6 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         skill_contents_dict['explanation']['html'] = html_content
         skill_contents_dict['written_translations']['translations_mapping'][
             'content1']['en']['translation'] = html_content
-        skill_contents_dict['worked_examples'][0]['question']['html'] = (
-            html_content)
-        skill_contents_dict['worked_examples'][0]['explanation']['html'] = (
-            html_content)
 
         model = skill_models.SkillModel(
             id='skill_id',
@@ -1676,21 +1601,18 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'skill model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 4)
+            feconf, 'CURRENT_SKILL_CONTENTS_SCHEMA_VERSION', 5)
 
         with current_schema_version_swap:
             skill = skill_fetchers.get_skill_from_model(model)
 
-        self.assertEqual(skill.skill_contents_schema_version, 4)
+        self.assertEqual(skill.skill_contents_schema_version, 5)
 
         self.assertEqual(
             skill.skill_contents.explanation.html, html_content)
         self.assertEqual(
             skill.skill_contents.written_translations.to_dict(),
             written_translations_dict)
-        self.assertEqual(
-            skill.skill_contents.worked_examples[0].to_dict(),
-            worked_example_dict_math)
 
     def test_migrate_misconceptions_to_latest_schema(self) -> None:
         commit_cmd = skill_domain.SkillChange({
@@ -1706,7 +1628,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
 
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
+                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION),
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}
@@ -1763,7 +1685,7 @@ class SkillMigrationTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-math>')
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION), [],
+                explanation_content_id, feconf.DEFAULT_SKILL_EXPLANATION),
             state_domain.RecordedVoiceovers.from_dict({
                 'voiceovers_mapping': {
                     explanation_content_id: {}
