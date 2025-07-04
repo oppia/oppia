@@ -45,137 +45,145 @@ describe('Logged-Out Learner', function () {
   let releaseCoordinator: ReleaseCoordinator;
   let voiceoverAdmin: VoiceoverAdmin;
 
-  beforeAll(async function () {
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+  beforeAll(
+    async function () {
+      loggedOutLearner = await UserFactory.createLoggedOutUser();
 
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
-      [ROLES.RELEASE_COORDINATOR]
-    );
+      releaseCoordinator = await UserFactory.createNewUser(
+        'releaseCoordinator',
+        'release_coordinator@example.com',
+        [ROLES.RELEASE_COORDINATOR]
+      );
 
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculum_admin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
-    );
+      curriculumAdmin = await UserFactory.createNewUser(
+        'curriculumAdm',
+        'curriculum_admin@example.com',
+        [ROLES.CURRICULUM_ADMIN]
+      );
 
-    voiceoverAdmin = await UserFactory.createNewUser(
-      'voiceoverAdm',
-      'voiceover_admin@example.com',
-      [ROLES.VOICEOVER_ADMIN]
-    );
+      voiceoverAdmin = await UserFactory.createNewUser(
+        'voiceoverAdm',
+        'voiceover_admin@example.com',
+        [ROLES.VOICEOVER_ADMIN]
+      );
 
-    // Enable required feature flags
-    await releaseCoordinator.enableFeatureFlag(
-      'exploration_editor_can_modify_translations'
-    );
-    await releaseCoordinator.enableFeatureFlag('enable_voiceover_contribution');
+      // Enable required feature flags
+      await releaseCoordinator.enableFeatureFlag(
+        'exploration_editor_can_modify_translations'
+      );
+      await releaseCoordinator.enableFeatureFlag(
+        'enable_voiceover_contribution'
+      );
 
-    // Enable Voiceover Contributions.
-    await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
+      // Enable Voiceover Contributions.
+      await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
 
-    // Navigate to Exploration Editor.
-    await curriculumAdmin.navigateToCreatorDashboardPage();
-    await curriculumAdmin.navigateToExplorationEditorPage();
+      // Navigate to Exploration Editor.
+      await curriculumAdmin.navigateToCreatorDashboardPage();
+      await curriculumAdmin.navigateToExplorationEditorPage();
 
-    // Add Interaction Cards.
-    await curriculumAdmin.dismissWelcomeModal();
-    await curriculumAdmin.updateCardContent(
-      'Welcome, to the Place Values Exploration.'
-    );
-    await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-    await curriculumAdmin.viewOppiaResponses();
-    await curriculumAdmin.directLearnersToNewCard('Second Card');
+      // Add Interaction Cards.
+      await curriculumAdmin.dismissWelcomeModal();
+      await curriculumAdmin.updateCardContent(
+        'Welcome, to the Place Values Exploration.'
+      );
+      await curriculumAdmin.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await curriculumAdmin.viewOppiaResponses();
+      await curriculumAdmin.directLearnersToNewCard('Second Card');
 
-    await curriculumAdmin.navigateToCard('Second Card');
-    await curriculumAdmin.updateCardContent(
-      "What is 3/6 equal to in it's simplest form?"
-    );
-    await curriculumAdmin.addMathInteraction(INTERACTION_TYPES.FRACTION_INPUT);
-    await curriculumAdmin.addResponsesToTheInteraction(
-      INTERACTION_TYPES.FRACTION_INPUT,
-      '1/2',
-      'Correct!',
-      'Final Card',
-      true
-    );
-    await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Incorrect, try again!'
-    );
+      await curriculumAdmin.navigateToCard('Second Card');
+      await curriculumAdmin.updateCardContent(
+        "What is 3/6 equal to in it's simplest form?"
+      );
+      await curriculumAdmin.addMathInteraction(
+        INTERACTION_TYPES.FRACTION_INPUT
+      );
+      await curriculumAdmin.addResponsesToTheInteraction(
+        INTERACTION_TYPES.FRACTION_INPUT,
+        '1/2',
+        'Correct!',
+        'Final Card',
+        true
+      );
+      await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
+        'Incorrect, try again!'
+      );
 
-    await curriculumAdmin.navigateToCard('Final Card');
-    await curriculumAdmin.updateCardContent(
-      'You have successfully completed the lesson!'
-    );
-    await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-    await curriculumAdmin.saveExplorationDraft();
-    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-      'What are the Place Values?',
-      'Learn basic Mathematics including Place Values',
-      'Mathematics'
-    );
+      await curriculumAdmin.navigateToCard('Final Card');
+      await curriculumAdmin.updateCardContent(
+        'You have successfully completed the lesson!'
+      );
+      await curriculumAdmin.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+      await curriculumAdmin.saveExplorationDraft();
+      explorationId = await curriculumAdmin.publishExplorationWithMetadata(
+        'What are the Place Values?',
+        'Learn basic Mathematics including Place Values',
+        'Mathematics'
+      );
 
-    await curriculumAdmin.createAndPublishTopic(
-      'Place Values',
-      'Place Values',
-      'place values'
-    );
+      await curriculumAdmin.createAndPublishTopic(
+        'Place Values',
+        'Place Values',
+        'place values'
+      );
 
-    await curriculumAdmin.createAndPublishClassroom(
-      'Math',
-      'math',
-      'Algebra I'
-    );
+      await curriculumAdmin.createAndPublishClassroom(
+        'Math',
+        'math',
+        'Algebra I'
+      );
 
-    await curriculumAdmin.createAndPublishStoryWithChapter(
-      'What are Plave values',
-      'place-values',
-      'Understanding Place Values',
-      explorationId as string,
-      'Place Values'
-    );
+      await curriculumAdmin.createAndPublishStoryWithChapter(
+        'What are Plave values',
+        'place-values',
+        'Understanding Place Values',
+        explorationId as string,
+        'Place Values'
+      );
 
-    // Add Translations
-    await curriculumAdmin.navigateToExplorationEditor(explorationId);
-    await curriculumAdmin.navigateToTranslationsTab();
-    await curriculumAdmin.dismissTranslationTabWelcomeModal();
+      // Add Translations
+      await curriculumAdmin.navigateToExplorationEditor(explorationId);
+      await curriculumAdmin.navigateToTranslationsTab();
+      await curriculumAdmin.dismissTranslationTabWelcomeModal();
 
-    await curriculumAdmin.navigateToCard('Second Card');
-    await curriculumAdmin.editTranslationOfContent(
-      'हिन्दी (Hindi)',
-      'Content',
-      '3/6 का सबसे सरल रूप में क्या बराबर है?'
-    );
-    await curriculumAdmin.editTranslationOfContent(
-      'हिन्दी (Hindi)',
-      'Interaction',
-      '3/6 का सबसे सरल रूप में क्या बराबर है?'
-    );
-    await curriculumAdmin.editTranslationOfContent(
-      'हिन्दी (Hindi)',
-      'Feedback',
-      'सही!'
-    );
+      await curriculumAdmin.navigateToCard('Second Card');
+      await curriculumAdmin.editTranslationOfContent(
+        'हिन्दी (Hindi)',
+        'Content',
+        '3/6 का सबसे सरल रूप में क्या बराबर है?'
+      );
+      await curriculumAdmin.editTranslationOfContent(
+        'हिन्दी (Hindi)',
+        'Interaction',
+        '3/6 का सबसे सरल रूप में क्या बराबर है?'
+      );
+      await curriculumAdmin.editTranslationOfContent(
+        'हिन्दी (Hindi)',
+        'Feedback',
+        'सही!'
+      );
 
-    // Add Voiceovers
-    await curriculumAdmin.navigateToTranslationsTab();
-    await curriculumAdmin.addVoiceoverToContent(
-      'हिन्दी (Hindi)',
-      'Hindi (India)',
-      'Content',
-      INTRO_CONTENT_VOICEOVER_IN_HI
-    );
+      // Add Voiceovers
+      await curriculumAdmin.navigateToTranslationsTab();
+      await curriculumAdmin.addVoiceoverToContent(
+        'हिन्दी (Hindi)',
+        'Hindi (India)',
+        'Content',
+        INTRO_CONTENT_VOICEOVER_IN_HI
+      );
 
-    await curriculumAdmin.addVoiceoverToContent(
-      'हिन्दी (Hindi)',
-      'Hindi (India)',
-      'Interaction',
-      CONTINUE_INTERACTION_VOICEOVER_IN_HI
-    );
+      await curriculumAdmin.addVoiceoverToContent(
+        'हिन्दी (Hindi)',
+        'Hindi (India)',
+        'Interaction',
+        CONTINUE_INTERACTION_VOICEOVER_IN_HI
+      );
 
-    await curriculumAdmin.saveExplorationDraft();
-  });
+      await curriculumAdmin.saveExplorationDraft();
+    },
+    // Setup takes more time than default.
+    60000
+  );
 
   it('should be able to play/pause the audio', async function () {
     // Navigate to Lesson Player.
