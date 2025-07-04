@@ -373,8 +373,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts"
     },
     {
-      "name": "logged-out-learner/see-the-feedback-and-help-cards",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/see-the-feedback-and-help-cards.spec.ts"
+      "name": "logged-out-learner/use-the-feedback-and-help-cards",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/use-the-feedback-and-help-cards.spec.ts"
     },
     {
       "name": "logged-out-learner/share-the-lesson-from-the-lesson-player",
