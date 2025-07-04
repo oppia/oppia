@@ -174,11 +174,7 @@ export class ConversationFlowService {
     private numberAttemptsService: NumberAttemptsService,
     private translateService: TranslateService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService
-  ) {
-    this.userService.getUserInfoAsync().then(async userInfo => {
-      this.isLoggedIn = userInfo.isLoggedIn();
-    });
-  }
+  ) {}
 
   /**
    * Determines whether the supplemental card (i.e., the card displayed
@@ -534,7 +530,7 @@ export class ConversationFlowService {
         this.i18nLanguageCodeService.setI18nLanguageCode('en');
       }
     }
-    this.cardAnimationService.adjustPageHeight(false, () => {});
+    this.cardAnimationService.adjustPageHeight();
     this.windowRef.nativeWindow.scrollTo(0, 0);
 
     // The timeout is needed in order to give the recipient of the
@@ -1724,6 +1720,10 @@ export class ConversationFlowService {
 
   getRecommendedExplorationSummaries(): LearnerExplorationSummary[] {
     return this.recommendedExplorationSummaries;
+  }
+
+  setIsLoggedIn(userStatus: boolean): void {
+    this.isLoggedIn = userStatus;
   }
 
   get onPlayerStateChange(): EventEmitter<string> {

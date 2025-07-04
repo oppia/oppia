@@ -24,7 +24,6 @@ import {PlayerPositionService} from './player-position.service';
 import {WindowDimensionsService} from '../../../services/contextual/window-dimensions.service';
 import {MessengerService} from '../../../services/messenger.service';
 import {WindowRef} from '../../../services/contextual/window-ref.service';
-import {ServicesConstants} from '../../../services/services.constants';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 
 describe('CardAnimationService', () => {
@@ -32,7 +31,6 @@ describe('CardAnimationService', () => {
   let focusManagerService: jasmine.SpyObj<FocusManagerService>;
   let playerTranscriptService: jasmine.SpyObj<PlayerTranscriptService>;
   let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
-  let messengerService: jasmine.SpyObj<MessengerService>;
   let windowRef: WindowRef;
 
   beforeEach(() => {
@@ -88,9 +86,6 @@ describe('CardAnimationService', () => {
     playerPositionService = TestBed.inject(
       PlayerPositionService
     ) as jasmine.SpyObj<PlayerPositionService>;
-    messengerService = TestBed.inject(
-      MessengerService
-    ) as jasmine.SpyObj<MessengerService>;
     windowRef = TestBed.inject(WindowRef);
   });
 
@@ -211,36 +206,12 @@ describe('CardAnimationService', () => {
     );
   }));
 
-  it('should send message on significant height change', fakeAsync(() => {
-    spyOnProperty(document.body, 'scrollHeight', 'get').and.returnValue(1000);
-
-    service.adjustPageHeight(true, () => {});
-    tick(100);
-
-    expect(messengerService.sendMessage).toHaveBeenCalledWith(
-      ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE,
-      jasmine.objectContaining({height: 1050, scroll: true})
-    );
-  }));
-
-  it('should call callback after adjusting height', fakeAsync(() => {
-    spyOnProperty(document.body, 'scrollHeight', 'get').and.returnValue(900);
-    let called = false;
-
-    service.adjustPageHeight(false, () => {
-      called = true;
-    });
-    tick(100);
-
-    expect(called).toBeTrue();
-  }));
-
   it('should register resize callback and adjust height on resize', () => {
     const adjustSpy = spyOn(service, 'adjustPageHeight');
 
     service.adjustPageHeightOnresize();
 
     (windowRef.nativeWindow as Window).onresize?.(new UIEvent('resize'));
-    expect(adjustSpy).toHaveBeenCalledWith(false, jasmine.any(Function));
+    expect(adjustSpy).toHaveBeenCalledWith();
   });
 });

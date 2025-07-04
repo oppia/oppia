@@ -269,6 +269,7 @@ export class ConversationSkinComponent {
     // variable needs to be defined before the following code is executed.
     this.userService.getUserInfoAsync().then(async userInfo => {
       this.isLoggedIn = userInfo.isLoggedIn();
+      this.conversationFlowService.setIsLoggedIn(this.isLoggedIn);
 
       this.windowRef.nativeWindow.addEventListener('beforeunload', e => {
         let redirectToRefresherExplorationConfirmed =
