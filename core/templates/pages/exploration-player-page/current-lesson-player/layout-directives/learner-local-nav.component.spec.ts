@@ -35,7 +35,7 @@ import {AlertsService} from '../../../../services/alerts.service';
 import {AttributionService} from '../../../../services/attribution.service';
 import {LoaderService} from '../../../../services/loader.service';
 import {UserService} from '../../../../services/user.service';
-import {ExplorationEngineService} from '../../services/exploration-engine.service';
+import {PageContextService} from '../../../../services/page-context.service';
 import {LearnerLocalNavBackendApiService} from '../../services/learner-local-nav-backend-api.service';
 
 import {LearnerLocalNavComponent} from './learner-local-nav.component';
@@ -47,6 +47,7 @@ describe('Learner Local Nav Component ', () => {
   let fixture: ComponentFixture<LearnerLocalNavComponent>;
   let ngbModal: NgbModal;
   let attributionService: AttributionService;
+  let pageContextService: PageContextService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let userService: UserService;
 
@@ -108,7 +109,7 @@ describe('Learner Local Nav Component ', () => {
       providers: [
         AlertsService,
         AttributionService,
-        ExplorationEngineService,
+        PageContextService,
         LoaderService,
         ReadOnlyExplorationBackendApiService,
         UserService,
@@ -132,6 +133,9 @@ describe('Learner Local Nav Component ', () => {
       ReadOnlyExplorationBackendApiService
     );
     attributionService = TestBed.inject(AttributionService);
+    pageContextService = TestBed.inject(PageContextService);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('test_id');
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
   });
 
   afterAll(() => {

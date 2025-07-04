@@ -18,7 +18,7 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {ExplorationEngineService} from './exploration-engine.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Injectable({
   providedIn: 'root',
@@ -28,11 +28,11 @@ export class FeedbackPopupBackendApiService {
 
   constructor(
     private httpClient: HttpClient,
-    private explorationEngineService: ExplorationEngineService
+    private pageContextService: PageContextService
   ) {
     this.feedbackUrl =
       '/explorehandler/give_feedback/' +
-      this.explorationEngineService.getExplorationId();
+      this.pageContextService.getExplorationId();
   }
 
   async submitFeedbackAsync(

@@ -29,7 +29,6 @@ import {
 } from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {QuestionPlayerStateService} from '../../../../components/question-directives/question-player/services/question-player-state.service';
 import {Collection} from '../../../../domain/collection/collection.model';
 import {GuestCollectionProgressService} from '../../../../domain/collection/guest-collection-progress.service';
 import {ReadOnlyCollectionBackendApiService} from '../../../../domain/collection/read-only-collection-backend-api.service';
@@ -98,13 +97,14 @@ import {LearnerDashboardBackendApiService} from '../../../../domain/learner_dash
 import {EditableExplorationBackendApiService} from '../../../../domain/exploration/editable-exploration-backend-api.service';
 import {DiagnosticTestTopicTrackerModel} from '../../../../pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
-import {SolutionObjectFactory} from '../../../../domain/exploration/SolutionObjectFactory';
+import {Solution} from '../../../../domain/exploration/solution.model';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {CurrentEngineService} from '../../services/current-engine.service';
 import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
 import {LearnerExplorationSummary} from '../../../../domain/summary/learner-exploration-summary.model';
 import {ChapterProgressService} from '../../services/chapter-progress.service';
+
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -156,7 +156,6 @@ describe('Conversation skin component', () => {
   let playerPositionService: PlayerPositionService;
   let playerTranscriptService: PlayerTranscriptService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
-  let questionPlayerStateService: QuestionPlayerStateService;
   let answerClassificationService: AnswerClassificationService;
   let readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService;
   let refresherExplorationConfirmationModalService: RefresherExplorationConfirmationModalService;
@@ -173,7 +172,6 @@ describe('Conversation skin component', () => {
   let translateService: TranslateService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let conceptCardManagerService: ConceptCardManagerService;
-  let solutionObjectFactory: SolutionObjectFactory;
   let voiceoverPlayerService: VoiceoverPlayerService;
 
   let displayedCard = new StateCard(
@@ -464,7 +462,6 @@ describe('Conversation skin component', () => {
       imports: [HttpClientTestingModule],
       declarations: [ConversationSkinComponent, MockTranslatePipe],
       providers: [
-        SolutionObjectFactory,
         {
           provide: WindowRef,
           useClass: MockWindowRef,
@@ -535,7 +532,6 @@ describe('Conversation skin component', () => {
     playerPositionService = TestBed.inject(PlayerPositionService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
-    questionPlayerStateService = TestBed.inject(QuestionPlayerStateService);
     readOnlyCollectionBackendApiService = TestBed.inject(
       ReadOnlyCollectionBackendApiService
     );
@@ -543,7 +539,6 @@ describe('Conversation skin component', () => {
       RefresherExplorationConfirmationModalService
     );
     statsReportingService = TestBed.inject(StatsReportingService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
@@ -607,7 +602,7 @@ describe('Conversation skin component', () => {
     ).and.returnValue(
       Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
     );
-    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(currentEngineService, 'getCurrentEngineService').and.returnValue(
       explorationEngineService
     );
@@ -626,9 +621,9 @@ describe('Conversation skin component', () => {
       collectionPlayerBackendApiService,
       'fetchCollectionSummariesAsync'
     ).and.returnValue(Promise.resolve(collectionSummary));
-    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'recordHintUsed');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(questionPlayerEngineService, 'recordSolutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
     spyOn(chapterProgressService, 'updateCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
@@ -780,7 +775,7 @@ describe('Conversation skin component', () => {
         completedChaptersCount: 1,
       })
     );
-    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
@@ -795,9 +790,9 @@ describe('Conversation skin component', () => {
       collectionPlayerBackendApiService,
       'fetchCollectionSummariesAsync'
     ).and.returnValue(Promise.resolve(collectionSummary));
-    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'recordHintUsed');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(questionPlayerEngineService, 'recordSolutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
     spyOn(statsReportingService, 'recordExplorationCompleted');
     spyOn(statsReportingService, 'recordExplorationActuallyStarted');
@@ -909,7 +904,7 @@ describe('Conversation skin component', () => {
     ).and.returnValue(
       Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
     );
-    spyOn(explorationEngineService, 'getExplorationId').and.returnValue(expId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
@@ -924,9 +919,9 @@ describe('Conversation skin component', () => {
       collectionPlayerBackendApiService,
       'fetchCollectionSummariesAsync'
     ).and.returnValue(Promise.resolve(collectionSummary));
-    spyOn(questionPlayerStateService, 'hintUsed');
+    spyOn(questionPlayerEngineService, 'recordHintUsed');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-    spyOn(questionPlayerStateService, 'solutionViewed');
+    spyOn(questionPlayerEngineService, 'recordSolutionViewed');
     spyOn(imagePreloaderService, 'onStateChange');
     spyOn(chapterProgressService, 'updateCompletedChaptersCount');
     spyOn(statsReportingService, 'recordExplorationCompleted');
@@ -1046,9 +1041,7 @@ describe('Conversation skin component', () => {
       ).and.returnValue(
         Promise.resolve(new Collection('', '', '', '', [], null, '', 6, 8, []))
       );
-      spyOn(explorationEngineService, 'getExplorationId').and.returnValue(
-        expId
-      );
+      spyOn(pageContextService, 'getExplorationId').and.returnValue(expId);
       spyOn(urlService, 'isIframed').and.returnValue(isIframed);
       spyOn(loaderService, 'showLoadingScreen');
       spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValue(
@@ -1063,9 +1056,9 @@ describe('Conversation skin component', () => {
         collectionPlayerBackendApiService,
         'fetchCollectionSummariesAsync'
       ).and.returnValue(Promise.resolve(collectionSummary));
-      spyOn(questionPlayerStateService, 'hintUsed');
+      spyOn(questionPlayerEngineService, 'recordHintUsed');
       spyOn(questionPlayerEngineService, 'getCurrentQuestion');
-      spyOn(questionPlayerStateService, 'solutionViewed');
+      spyOn(questionPlayerEngineService, 'recordSolutionViewed');
       spyOn(imagePreloaderService, 'onStateChange');
       spyOn(statsReportingService, 'recordExplorationCompleted');
       spyOn(statsReportingService, 'recordExplorationActuallyStarted');
@@ -1222,7 +1215,7 @@ describe('Conversation skin component', () => {
         'releaseSolution'
       );
       let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
-      const solutionForState = solutionObjectFactory.createNew(
+      const solutionForState = Solution.createNew(
         true,
         'answer',
         'Html',
@@ -1296,7 +1289,7 @@ describe('Conversation skin component', () => {
         'releaseSolution'
       );
       let redirectionSpy = spyOn(componentInstance, 'showUpcomingCard');
-      const solutionForState = solutionObjectFactory.createNew(
+      const solutionForState = Solution.createNew(
         true,
         'answer',
         'Html',
@@ -1552,9 +1545,7 @@ describe('Conversation skin component', () => {
         null
       );
       spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
-      spyOn(explorationEngineService, 'getExplorationId').and.returnValue(
-        'expl_1'
-      );
+      spyOn(pageContextService, 'getExplorationId').and.returnValue('expl_1');
       spyOn(urlService, 'isIframed').and.returnValue(false);
 
       componentInstance.ngOnInit();
@@ -1684,7 +1675,7 @@ describe('Conversation skin component', () => {
 
   it('should always ask learner for answer details', () => {
     spyOn(
-      explorationEngineService,
+      learnerAnswerInfoService,
       'getAlwaysAskLearnerForAnswerDetails'
     ).and.returnValues(true, false);
 
@@ -2298,8 +2289,8 @@ describe('Conversation skin component', () => {
     componentInstance.showUpcomingCard();
 
     componentInstance.questionSessionCompleted = true;
-    spyOn(questionPlayerStateService.onQuestionSessionCompleted, 'emit');
-    spyOn(questionPlayerStateService, 'getQuestionPlayerStateData');
+    spyOn(questionPlayerEngineService.onQuestionSessionCompleted, 'emit');
+    spyOn(questionPlayerEngineService, 'getQuestionPlayerStateData');
     spyOn(urlService, 'getUrlParams').and.returnValue({
       topic_url_fragment: 'topicUrlFragment',
       classroom_url_fragment: 'classroomUrlFragment',
@@ -2311,7 +2302,7 @@ describe('Conversation skin component', () => {
 
     componentInstance.questionSessionCompleted = false;
     componentInstance.moveToExploration = true;
-    spyOn(explorationEngineService, 'moveToExploration');
+    spyOn(explorationEngineService, 'loadInitialState');
 
     componentInstance.showUpcomingCard();
 
@@ -2614,7 +2605,7 @@ describe('Conversation skin component', () => {
     spyOn(componentInstance, 'showUpcomingCard');
     spyOn(fatigueDetectionService, 'reset');
     spyOn(numberAttemptsService, 'reset');
-    spyOn(questionPlayerStateService, 'answerSubmitted');
+    spyOn(questionPlayerEngineService, 'recordAnswerSubmitted');
     spyOn(questionPlayerEngineService, 'getCurrentQuestion');
     spyOn(playerTranscriptService, 'updateLatestInteractionHtml');
     spyOn(

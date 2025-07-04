@@ -1899,6 +1899,5 @@
 	"I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Text content in why to volunteer section in volunteer page. -Third paragraph",
 	"I18N_WARNING_MODAL_DESCRIPTION": "Text shown in the warning modal before the solution is displayed",
 	"I18N_WARNING_MODAL_TITLE": "Title of the modal shown before the modal that displays the solution, to warn the user\n\n{{Identical|Warning}}",
-	"I18N_WORKED_EXAMPLE": "The text that is displayed on the button to view another worked example when a skill concept card is displayed in the exploration player.",
 	"I18N_YES": "Text on button to accept the content of a modal.\n\n{{Identical|Yes}}"
 }

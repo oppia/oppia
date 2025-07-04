@@ -35,7 +35,7 @@ import {PlayerPositionService} from './player-position.service';
 import {StatsReportingService} from './stats-reporting.service';
 import {HintsAndSolutionManagerService} from './hints-and-solution-manager.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
-import {Solution} from '../../../domain/exploration/SolutionObjectFactory';
+import {Solution} from '../../../domain/exploration/solution.model';
 import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import {ConceptCardBackendApiService} from '../../../domain/skill/concept-card-backend-api.service';
 import {ExplorationSummaryBackendApiService} from '../../../domain/summary/exploration-summary-backend-api.service';

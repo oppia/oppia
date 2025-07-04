@@ -30,15 +30,16 @@ import {MockTranslateService} from '../../../../components/forms/schema-based-ed
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 import {UrlService} from '../../../../services/contextual/url.service';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
-import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {RefresherExplorationConfirmationModal} from './refresher-exploration-confirmation-modal.component';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
+import {PageContextService} from '../../../../services/page-context.service';
 
 describe('Refresher Exploration Confirmation Modal', () => {
   let fixture: ComponentFixture<RefresherExplorationConfirmationModal>;
   let componentInstance: RefresherExplorationConfirmationModal;
   let collectionId: string = 'test_id';
   let mockUrlService: MockUrlService;
+  let pageContextService: PageContextService;
   let ngbActiveModal: NgbActiveModal;
   let windowRef: WindowRef;
 
@@ -64,7 +65,7 @@ describe('Refresher Exploration Confirmation Modal', () => {
       declarations: [MockTranslatePipe, RefresherExplorationConfirmationModal],
       providers: [
         WindowRef,
-        ExplorationEngineService,
+        PageContextService,
         UrlInterpolationService,
         {
           provide: UrlService,
@@ -86,6 +87,8 @@ describe('Refresher Exploration Confirmation Modal', () => {
     mockUrlService = TestBed.inject(UrlService);
     windowRef = TestBed.inject(WindowRef);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
+    pageContextService = TestBed.inject(PageContextService);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('test_id');
   });
 
   it('should create', () => {
