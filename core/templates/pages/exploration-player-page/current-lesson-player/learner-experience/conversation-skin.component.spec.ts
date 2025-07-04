@@ -1892,6 +1892,11 @@ describe('Conversation skin component', () => {
     expect(componentInstance.getAnswerIsBeingProcessed()).toBeTrue();
   });
 
+  it('should get is in story mode', () => {
+    spyOn(conversationFlowService, 'getInStoryMode').and.returnValue(true);
+    expect(componentInstance.getIsInStoryMode()).toBeTrue();
+  });
+
   it('should get is animating to two cards', () => {
     spyOn(cardAnimationService, 'getIsAnimatingToTwoCards').and.returnValue(
       true

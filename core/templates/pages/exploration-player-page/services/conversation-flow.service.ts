@@ -109,6 +109,7 @@ export class ConversationFlowService {
   answerIsBeingProcessed: boolean = false;
   hasInteractedAtLeastOnce: boolean = false;
   explorationActuallyStarted: boolean = false;
+  inStoryMode: boolean = false;
 
   pendingCardWasSeenBefore: boolean = false;
   questionSessionCompleted: boolean = false;
@@ -1046,6 +1047,7 @@ export class ConversationFlowService {
     }
 
     if (this.explorationModeService.isInStoryChapterMode()) {
+      this.inStoryMode = true;
       recommendedExplorationIds = [];
       this._handleStoryModeTerminalCard();
     } else {
@@ -1776,6 +1778,10 @@ export class ConversationFlowService {
    */
   setIsLoggedIn(userStatus: boolean): void {
     this.isLoggedIn = userStatus;
+  }
+
+  getInStoryMode(): boolean {
+    return this.explorationModeService.isInStoryChapterMode();
   }
 
   get onPlayerStateChange(): EventEmitter<string> {
