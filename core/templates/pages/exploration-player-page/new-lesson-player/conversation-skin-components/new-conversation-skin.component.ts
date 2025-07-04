@@ -432,14 +432,6 @@ export class NewConversationSkinComponent {
     );
   }
 
-  getIsAnimatingToTwoCards(): boolean {
-    return this.cardAnimationService.getIsAnimatingToTwoCards();
-  }
-
-  getIsAnimatingToOneCard(): boolean {
-    return this.cardAnimationService.getIsAnimatingToOneCard();
-  }
-
   isSupplementalNavShown(): boolean {
     let displayedCard = this.conversationFlowService.getDisplayedCard();
     if (
