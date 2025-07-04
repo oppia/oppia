@@ -777,7 +777,7 @@ export class ExplorationEditor extends BaseUser {
       (el as HTMLInputElement).value?.trim()
     );
 
-    // Compare first 36 characters of title
+    // Compare first 36 characters of title.
     if (newTitle !== title.slice(0, 36)) {
       throw new Error(
         `Failed to update title. Expected: ${title}, but got: ${newTitle}`
@@ -829,8 +829,10 @@ export class ExplorationEditor extends BaseUser {
     await this.type(addGoalInputBox, goal);
     await this.page.keyboard.press('Tab');
 
-    const newGoal = await this.page.$eval(addGoalInputBox, el =>
-      el.textContent?.trim()
+    const addGoalInput = await this.page.$(addGoalInputBox);
+    const newGoal = await this.page.evaluate(
+      input => input.value,
+      addGoalInput
     );
     if (!newGoal || newGoal !== goal) {
       throw new Error(
