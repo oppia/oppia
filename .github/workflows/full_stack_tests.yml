@@ -80,7 +80,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
+        suite:
+          - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
+          - name: logged-out-learner/play-a-complete-community-lesson
+          - name: logged-out-learner/reaches-a-checkpoint-and-saves-their-progress
+          - name: logged-out-learner/use-the-feedback-and-help-cards
+          - name: logged-out-learner/share-the-lesson-from-the-lesson-player
+          - name: logged-in-learner/see-their-progress-on-learner-dashboard
+          - name: logged-in-learner/completes-the-exploration-and-decides-what-to-do-next
     name: Acceptance (${{ matrix.suite.name }})
     steps:
       - name: Check for broken suites
