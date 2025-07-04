@@ -4879,7 +4879,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Checks if "Contine" button is present in the lesson card.
+   * Checks if "Continue" button is present in the lesson card.
    * @param status - Boolean value representing that button should be present or not. Default is true (visible)
    */
   async expectContinueToNextCardButtonToBePresent(

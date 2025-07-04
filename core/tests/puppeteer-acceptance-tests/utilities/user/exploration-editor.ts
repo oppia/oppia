@@ -28,6 +28,9 @@ const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
+const oppiaLink = 'https://www.oppia.org';
+const oppiaYouTubeVideoLink = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
+
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
@@ -2956,12 +2959,12 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('ArrowRight');
 
     // Video.
-    await this.addVideoRTE('https://www.youtube.com/watch?v=0tRc75S9MFU');
+    await this.addVideoRTE(oppiaYouTubeVideoLink);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
     // Add LinkEnter.
-    await this.addTextWithLinkRTE('Oppia', 'https://www.oppia.org');
+    await this.addTextWithLinkRTE('Oppia', oppiaLink);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
