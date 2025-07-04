@@ -189,6 +189,7 @@ const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const progressTabSectionInLearnerDashboard =
   '.e2e-test-learner-dash-progress-tab';
 const goalsTabSectionInLearnerDashboard = '.e2e-test-current-goals-section';
+const emptySuggestionSectionSelector = '.e2e-test-home-tab-empty-suggestions';
 
 // Creator dashboard selectors.
 const creatorDashboardContainerSelector =
@@ -2191,6 +2192,26 @@ export class LoggedInUser extends BaseUser {
       greetingElement
     );
     expect(greetingText).toContain(userName);
+  }
+
+  /**
+   * Checks if the suggestion container in Learner Dashboard is empty.
+   */
+  async expectLearnSomethingNewInLDToBeEmpty(): Promise<void> {
+    await this.isElementVisible(emptySuggestionSectionSelector);
+  }
+
+  /**
+   * Checks if the continue from where you left off section in Learner Dashboard is present.
+   * @param {boolean} visible - Whether the section should be visible or not.
+   */
+  async expectContinueWhereYouLeftOffSectionInLDToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.isElementVisible(
+      continueFromWhereLeftOffSectionSelector,
+      visible
+    );
   }
 }
 

@@ -77,7 +77,7 @@
         *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
       <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate">
       </p>
-      <div class="empty-suggested-for-you-section">
+      <div class="empty-suggested-for-you-section e2e-test-home-tab-empty-suggestions">
         <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate">
         </p>
       </div>
@@ -136,7 +136,7 @@
     <div class="oppia-learner-dash-section px-3 py-4 w-100"
         *ngIf="!isNonemptyObject(untrackedTopics) && continueWhereYouLeftOffList.length === 0">
       <p class="oppia-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate }} </p>
-      <div class="empty-suggested-for-you-section">
+      <div class="empty-suggested-for-you-section e2e-test-home-tab-empty-suggestions">
         <p> {{ 'I18N_LEARNER_DASHBOARD_EMPTY_SUGGESTED_FOR_YOU_SECTION' | translate }} </p>
       </div>
     </div>
