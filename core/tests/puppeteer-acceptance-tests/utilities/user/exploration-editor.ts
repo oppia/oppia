@@ -763,6 +763,7 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Deletes the previous written title and updates the new title.
+   * @param {string} title - The new title to be added to the exploration.
    */
   async updateTitleTo(title: string): Promise<void> {
     await this.page.waitForSelector(addTitleBar, {
@@ -775,13 +776,15 @@ export class ExplorationEditor extends BaseUser {
     const newTitle = await this.page.$eval(addTitleBar, el =>
       (el as HTMLInputElement).value?.trim()
     );
-    if (!newTitle || newTitle !== title) {
+
+    // Compare first 36 characters of title
+    if (newTitle !== title.slice(0, 36)) {
       throw new Error(
         `Failed to update title. Expected: ${title}, but got: ${newTitle}`
       );
     }
 
-    showMessage(`Title has been updated to ${title}`);
+    showMessage(`Title has been updated to ${newTitle}`);
   }
 
   /**
