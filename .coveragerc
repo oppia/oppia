@@ -26,6 +26,8 @@ omit =
     */core/jobs/batch_jobs/math_interactions_audit_jobs.py
     */core/jobs/batch_jobs/model_validation_jobs.py
     */core/jobs/batch_jobs/opportunity_management_jobs.py
+    */core/jobs/batch_jobs/missing_translation_images_repair_jobs.py
+    */core/jobs/batch_jobs/populate_study_guide_models_jobs.py
     */core/jobs/batch_jobs/question_migration_jobs.py
     */core/jobs/batch_jobs/remove_profile_picture_data_url_field_jobs.py
     */core/jobs/batch_jobs/skill_migration_jobs.py
