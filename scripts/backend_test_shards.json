@@ -53,7 +53,8 @@
         "core.controllers.release_coordinator_test",
         "core.platform.secrets.dev_mode_secrets_services_test",
         "scripts.generate_root_files_mapping_test",
-        "core.jobs.batch_jobs.delete_voiceover_models_data_job_test"
+        "core.jobs.batch_jobs.delete_voiceover_models_data_job_test",
+        "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
