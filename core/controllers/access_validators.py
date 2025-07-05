@@ -114,6 +114,46 @@ class ClassroomsPageAccessValidationHandler(
             raise self.NotFoundException
 
 
+class SubtopicViewerPageRevisionRedirectHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Redirects /revision URLs to /studyguide for subtopic viewer page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'subtopic_url_fragment': {
+            'schema': {
+                'type': 'basestring',
+                'validators': [{
+                    'id': 'is_regex_matched',
+                    'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX
+                }, {
+                    'id': 'has_length_at_most',
+                    'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
+                }]
+            }
+        }
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_subtopic_viewer_page
+    def get(self, *args: str) -> None:
+        """Handles GET requests and redirects to study guide URL."""
+        classroom_url_fragment = self.request.route_kwargs.get(
+            'classroom_url_fragment')
+        topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
+        subtopic_url_fragment = self.request.route_kwargs.get(
+            'subtopic_url_fragment')
+        new_url = '/learn/%s/%s/studyguide/%s' % (
+            classroom_url_fragment,
+            topic_url_fragment,
+            subtopic_url_fragment
+        )
+        self.redirect(new_url, permanent=True)
+
+
 class SubtopicViewerPageAccessValidationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -164,6 +204,31 @@ class CollectionViewerPageAccessValidationHandler(
     def get(self, _: str) -> None:
         """Handles GET requests."""
         pass
+
+
+class TopicViewerPageRevisionRedirectHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Redirects old revision URLs to study guide URLs for topic viewer page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_topic_viewer_page
+    def get(self, *args: str) -> None:
+        """Handles GET requests and redirects to study guide URL."""
+        classroom_url_fragment = self.request.route_kwargs.get(
+            'classroom_url_fragment')
+        topic_url_fragment = self.request.route_kwargs.get('topic_url_fragment')
+        new_url = '/learn/%s/%s/studyguide' % (
+            classroom_url_fragment,
+            topic_url_fragment
+        )
+        self.redirect(new_url, permanent=True)
 
 
 class TopicViewerPageAccessValidationHandler(

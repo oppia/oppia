@@ -84,6 +84,8 @@ export default {
   "ACTIVITY_TYPE_STORY": "story",
   "ACTIVITY_TYPE_SKILL": "skill",
   "ACTIVITY_TYPE_SUBTOPIC": "subtopic",
+  "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION": "subtopic_with_study_guide_migration",
+  "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE": "subtopic_with_study_guide",
   "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
   "ACTIVITY_TYPE_CLASSROOM": "classroom",
   "DISABLED_EXPLORATION_IDS": ["5"],
@@ -6144,8 +6146,6 @@ export default {
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 
-  "ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
-
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
   "MAX_CURRENT_GOALS_COUNT": 5,
@@ -6242,6 +6242,10 @@ export default {
   "MAX_CHARS_IN_TOPIC_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
+  "MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING": 200,
+  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 1000,
+  "DEFAULT_SECTION_HEADING_CONTENT_ID": "section_heading_0",
+  "DEFAULT_SECTION_CONTENT_CONTENT_ID": "section_content_1",
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
@@ -6259,8 +6263,8 @@ export default {
   // 'story URL fragment'.
   "MAX_CHARS_IN_STORY_URL_FRAGMENT": 30,
   // This represents the maximum number of characters in the URL fragment for
-  // subtopic in the revision page URL. E.g.
-  // in /learn/math/fractions/revision/place-values, 'place-values' is the
+  // subtopic in the study guide page URL. E.g.
+  // in /learn/math/fractions/studyguide/place-values, 'place-values' is the
   // 'subtopic URL fragment'.
   "MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT": 25,
   // This is same as base_models.ID_Length.
@@ -6305,9 +6309,6 @@ export default {
       "solution": null
     },
     "param_changes": [],
-    "recorded_voiceovers": {
-      "voiceovers_mapping": {}
-    },
     "solicit_answer_details": false,
     "card_is_checkpoint": false
   },
@@ -6666,7 +6667,7 @@ export default {
       ]
     },
     "SUBTOPIC_VIEWER": {
-      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/revision/:subtopic_url_fragment",
+      "ROUTE": "learn/:classroom_url_fragment/:topic_url_fragment/studyguide/:subtopic_url_fragment",
       "TITLE": "Oppia",
       "MANUALLY_REGISTERED_WITH_BACKEND": true,
       "META": [
@@ -7754,5 +7755,66 @@ export default {
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
   "BRANCH_NAME": "",
-  "SHORT_COMMIT_HASH": ""
+  "SHORT_COMMIT_HASH": "",
+  // Please consult the translation team before adding any entries here.
+  // These words improve the quality of automatic voiceovers.
+  "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {
+    "en": {
+      "+": "plus",
+      "-": "minus",
+      "*": "times",
+      "×": "times",
+      "÷": "divided by",
+      "=": "equals",
+      "!": "factorial of",
+      "^": "to the power of",
+      "^2": "squared",
+      "^3": "cubed"
+    },
+    "hi": {
+      "+": "जोड़",
+      "-": "घटा",
+      "*": "गुणा",
+      "×": "गुणा",
+      "÷": "विभाजित",
+      "=": "बराबर",
+      "!": "फैक्टोरियल",
+      "^": "की घात",
+      "^2": "वर्ग",
+      "^3": "घन"
+    },
+    "pt": {
+      "+": "mais",
+      "-": "menos",
+      "*": "vezes",
+      "×": "vezes",
+      "÷": "dividido por",
+      "=": "igual a",
+      "!": "fatorial",
+      "^": "a potência de",
+      "^2": "ao quadrado",
+      "^3": "ao cubo"
+    },
+    "ar": {
+      "+": "زَائِدْ",
+      "-": "نَاقِصْ",
+      "*": "ضَرْبْ",
+      "×": "ضَرْبْ",
+      "÷": "تَقْسِيمْ",
+      "=": "يُسَاوِي",
+      "!": "عاملي",
+      "^": "للقوة",
+      "^2": "تربيع",
+      "^3": "تكعيب"
+    }
+  },
+  // Please consult the translation team before adding any entries here.
+  // These punctuation marks are used to identify sentence boundaries during
+  // voiceover playback.
+  "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
+    "ar": "؟!",
+    "en": ".!?",
+    "pt": ".!?",
+    "hi": "।!?"
+  }
 } as const;

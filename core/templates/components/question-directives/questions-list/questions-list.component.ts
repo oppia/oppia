@@ -40,9 +40,9 @@ import {
   SkillSummaryBackendDict,
 } from 'domain/skill/skill-summary.model';
 import {
-  MisconceptionObjectFactory,
+  Misconception,
   MisconceptionSkillMap,
-} from 'domain/skill/MisconceptionObjectFactory';
+} from 'domain/skill/misconception.model';
 import {
   Question,
   QuestionObjectFactory,
@@ -56,7 +56,7 @@ import {
 } from 'components/skill-selector/select-skill-modal.component';
 import {ConfirmQuestionExitModalComponent} from '../modal-templates/confirm-question-exit-modal.component';
 import {QuestionEditorSaveModalComponent} from '../modal-templates/question-editor-save-modal.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {QuestionsListService} from 'services/questions-list.service';
@@ -117,12 +117,11 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
   constructor(
     private alertsService: AlertsService,
     private changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editableQuestionBackendApiService: EditableQuestionBackendApiService,
     private focusManagerService: FocusManagerService,
     private imageLocalStorageService: ImageLocalStorageService,
     private loggerService: LoggerService,
-    private misconceptionObjectFactory: MisconceptionObjectFactory,
     private ngbModal: NgbModal,
     private questionObjectFactory: QuestionObjectFactory,
     private questionsListService: QuestionsListService,
@@ -162,7 +161,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.populateMisconceptions(this.newQuestionSkillIds);
 
     this.imageLocalStorageService.flushStoredImagesData();
-    this.contextService.setImageSaveDestinationToLocalStorage();
+    this.pageContextService.setImageSaveDestinationToLocalStorage();
     this.question = this.questionObjectFactory.createDefaultQuestion(
       this.newQuestionSkillIds
     );
@@ -261,9 +260,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             response.associated_skill_dicts.forEach(skillDict => {
               this.misconceptionsBySkill[skillDict.id] =
                 skillDict.misconceptions.map(misconception => {
-                  return this.misconceptionObjectFactory.createFromBackendDict(
-                    misconception
-                  );
+                  return Misconception.createFromBackendDict(misconception);
                 });
               this.associatedSkillSummaries.push(
                 ShortSkillSummary.create(skillDict.id, skillDict.description)
@@ -291,7 +288,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     this.topicEditorStateService.toggleQuestionEditor(true);
     this.imageLocalStorageService.flushStoredImagesData();
     if (this.newQuestionIsBeingCreated) {
-      this.contextService.setImageSaveDestinationToLocalStorage();
+      this.pageContextService.setImageSaveDestinationToLocalStorage();
     }
 
     this.windowRef.nativeWindow.location.hash = '/questions#' + this.questionId;
@@ -622,7 +619,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          this.contextService.resetImageSaveDestination();
+          this.pageContextService.resetImageSaveDestination();
           this.editorIsOpen = false;
           this.topicEditorStateService.toggleQuestionEditor(false);
           this.windowRef.nativeWindow.location.hash = null;
@@ -670,7 +667,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
 
   saveQuestion(): void {
     this.questionIsBeingSaved = true;
-    this.contextService.resetImageSaveDestination();
+    this.pageContextService.resetImageSaveDestination();
     this.windowRef.nativeWindow.location.hash = null;
     if (this.questionIsBeingUpdated) {
       this.ngbModal
@@ -685,7 +682,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
             ) {
               this.updateSkillLinkageAndQuestions(commitMessage);
             } else {
-              this.contextService.resetImageSaveDestination();
+              this.pageContextService.resetImageSaveDestination();
               this.saveAndPublishQuestion(commitMessage);
             }
             this.topicEditorStateService.toggleQuestionEditor(false);
@@ -696,7 +693,7 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
         );
     } else {
       this.topicEditorStateService.toggleQuestionEditor(false);
-      this.contextService.resetImageSaveDestination();
+      this.pageContextService.resetImageSaveDestination();
       this.saveAndPublishQuestion(null);
       this.skillEditorRoutingService.creatingNewQuestion(false);
     }

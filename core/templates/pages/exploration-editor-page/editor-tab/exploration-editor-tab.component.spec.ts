@@ -25,15 +25,15 @@ import {
   ComponentFixture,
   waitForAsync,
 } from '@angular/core/testing';
-import {AnswerGroupObjectFactory} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ExplorationDataService} from '../services/exploration-data.service';
@@ -66,7 +66,7 @@ import {
   StateObjectFactory,
 } from 'domain/state/StateObjectFactory';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationNextContentIdIndexService} from '../services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from '../services/version-history.service';
@@ -76,13 +76,12 @@ import {
   SkillBackendApiService,
 } from 'domain/skill/skill-backend-api.service';
 import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
-import {MisconceptionObjectFactory} from 'domain/skill/MisconceptionObjectFactory';
+import {Misconception} from 'domain/skill/misconception.model';
 import {AlertsService} from 'services/alerts.service';
 
 describe('Exploration editor tab component', () => {
   let component: ExplorationEditorTabComponent;
   let fixture: ComponentFixture<ExplorationEditorTabComponent>;
-  let answerGroupObjectFactory: AnswerGroupObjectFactory;
   let editabilityService: EditabilityService;
   let explorationFeaturesService: ExplorationFeaturesService;
   let explorationInitStateNameService: ExplorationInitStateNameService;
@@ -91,12 +90,11 @@ describe('Exploration editor tab component', () => {
   let routerService: RouterService;
   let siteAnalyticsService: SiteAnalyticsService;
   let stateEditorRefreshService: StateEditorRefreshService;
-  let solutionObjectFactory: SolutionObjectFactory;
   let stateCardIsCheckpointService: StateCardIsCheckpointService;
   let stateEditorService: StateEditorService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let focusManagerService: FocusManagerService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   var generateContentIdService: GenerateContentIdService;
   var explorationNextContentIdIndexService: ExplorationNextContentIdIndexService;
   let mockRefreshStateEditorEventEmitter = null;
@@ -106,7 +104,6 @@ describe('Exploration editor tab component', () => {
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let skillBackendApiService: SkillBackendApiService;
   let skillObjectFactory: SkillObjectFactory;
-  let misconceptionObjectFactory: MisconceptionObjectFactory;
   let alertsService: AlertsService;
 
   class MockJoyrideService {
@@ -212,10 +209,8 @@ describe('Exploration editor tab component', () => {
     fixture = TestBed.createComponent(ExplorationEditorTabComponent);
     component = fixture.componentInstance;
 
-    answerGroupObjectFactory = TestBed.inject(AnswerGroupObjectFactory);
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateCardIsCheckpointService = TestBed.inject(StateCardIsCheckpointService);
@@ -232,7 +227,7 @@ describe('Exploration editor tab component', () => {
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService
     );
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     explorationNextContentIdIndexService = TestBed.inject(
       ExplorationNextContentIdIndexService
     );
@@ -243,11 +238,12 @@ describe('Exploration editor tab component', () => {
     );
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
     skillObjectFactory = TestBed.inject(SkillObjectFactory);
-    misconceptionObjectFactory = TestBed.inject(MisconceptionObjectFactory);
     alertsService = TestBed.inject(AlertsService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
-    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'explorationId'
+    );
     spyOn(
       stateEditorService,
       'checkEventListenerRegistrationStatus'
@@ -271,12 +267,6 @@ describe('Exploration editor tab component', () => {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -382,20 +372,6 @@ describe('Exploration editor tab component', () => {
           linked_skill_id: null,
           param_changes: [],
           solicit_answer_details: false,
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {
-                en: {
-                  filename: 'myfile2.mp3',
-                  file_size_bytes: 120000,
-                  needs_update: false,
-                  duration_secs: 1.2,
-                },
-              },
-            },
-          },
         },
         'Second State': {
           classifier_model_id: null,
@@ -403,13 +379,6 @@ describe('Exploration editor tab component', () => {
           content: {
             content_id: 'content',
             html: 'Second State Content',
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content: {},
-              default_outcome: {},
-              feedback_1: {},
-            },
           },
           interaction: {
             id: 'TextInput',
@@ -713,7 +682,6 @@ describe('Exploration editor tab component', () => {
               html: 'test explanation',
               content_id: 'explanation',
             },
-            worked_examples: [],
             recorded_voiceovers: {
               voiceovers_mapping: {},
             },
@@ -734,7 +702,7 @@ describe('Exploration editor tab component', () => {
 
     expect(component.misconceptionsBySkill).toEqual({
       skill_id1: [
-        misconceptionObjectFactory.createFromBackendDict({
+        Misconception.createFromBackendDict({
           id: 2,
           name: 'test name',
           notes: 'test notes',
@@ -745,7 +713,7 @@ describe('Exploration editor tab component', () => {
     });
     expect(stateEditorService.setMisconceptionsBySkill).toHaveBeenCalledWith({
       skill_id1: [
-        misconceptionObjectFactory.createFromBackendDict({
+        Misconception.createFromBackendDict({
           id: 2,
           name: 'test name',
           notes: 'test notes',
@@ -776,7 +744,7 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.answerGroups).toEqual([
-      answerGroupObjectFactory.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
           training_data: null,
@@ -799,7 +767,7 @@ describe('Exploration editor tab component', () => {
     ]);
 
     let displayedValue = [
-      answerGroupObjectFactory.createFromBackendDict(
+      AnswerGroup.createFromBackendDict(
         {
           rule_specs: [],
           outcome: {
@@ -872,7 +840,7 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.solution).toEqual(
-      solutionObjectFactory.createFromBackendDict({
+      Solution.createFromBackendDict({
         correct_answer: 'This is the correct answer',
         answer_is_exclusive: false,
         explanation: {
@@ -882,7 +850,7 @@ describe('Exploration editor tab component', () => {
       })
     );
 
-    let displayedValue = solutionObjectFactory.createFromBackendDict({
+    let displayedValue = Solution.createFromBackendDict({
       correct_answer: 'This is the second correct answer',
       answer_is_exclusive: true,
       explanation: {

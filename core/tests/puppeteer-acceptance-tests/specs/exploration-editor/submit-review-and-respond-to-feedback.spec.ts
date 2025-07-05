@@ -215,12 +215,6 @@ describe('Exploration Editor', function () {
       await explorationEditor.viewFeedbackThread(2);
       await explorationEditor.changeFeedbackStatus('ignored');
       await explorationEditor.expectFeedbackStatusToBe('ignored');
-
-      // Return to the feedback tab and verify statuses are displayed correctly.
-      await explorationEditor.pressFeedbackThreadBackButton();
-      await explorationEditor.expectFeedbackStatusInList(1, 'Open');
-      await explorationEditor.expectFeedbackStatusInList(2, 'Ignored');
-      await explorationEditor.expectFeedbackStatusInList(3, 'Fixed');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

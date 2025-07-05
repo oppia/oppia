@@ -41,6 +41,8 @@ E2E_CI_TEST_SUITE_CONFIG_FILE_PATH = os.path.join(
 
 ACCEPTANCE_TEST_SPECS_DIRECTORY = os.path.join(
     os.getcwd(), 'core', 'tests', 'puppeteer-acceptance-tests', 'specs')
+ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD = os.path.join(
+    os.getcwd(), 'core', 'tests', 'puppeteer-acceptance-tests', 'specs-old')
 E2E_WEBDRIVERIO_CONFIG_FILE_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'wdio.conf.js')
 
@@ -184,22 +186,24 @@ def get_acceptance_test_suites_from_acceptance_directory() -> List[TestSuiteDict
         the name and module of a test suite from the acceptance test
         specs directory.
     """
-
-    acceptance_test_files = glob.glob(
-        os.path.join(ACCEPTANCE_TEST_SPECS_DIRECTORY, '**/*.spec.ts'))
     acceptance_test_suites: List[TestSuiteDict] = []
-    for module in acceptance_test_files:
-        acceptance_test_suite_name = os.path.relpath(
-            module, ACCEPTANCE_TEST_SPECS_DIRECTORY).replace('.spec.ts', '')
-        if (
-            acceptance_test_suite_name in
-            ACCEPTANCE_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI
-        ):
-            continue
-        acceptance_test_suites.append({
-            'name': acceptance_test_suite_name,
-            'module': os.path.relpath(module, os.getcwd())
-        })
+    for test_specs_directory in [
+        ACCEPTANCE_TEST_SPECS_DIRECTORY, ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD]:
+        acceptance_test_files = glob.glob(
+            os.path.join(test_specs_directory, '**/*.spec.ts'))
+
+        for module in acceptance_test_files:
+            acceptance_test_suite_name = os.path.relpath(
+                module, test_specs_directory).replace('.spec.ts', '')
+            if (
+                acceptance_test_suite_name in
+                ACCEPTANCE_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI
+            ):
+                continue
+            acceptance_test_suites.append({
+                'name': acceptance_test_suite_name,
+                'module': os.path.relpath(module, os.getcwd())
+            })
     return sorted(
         acceptance_test_suites,
         key=lambda x: x['name']

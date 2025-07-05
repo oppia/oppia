@@ -33,21 +33,10 @@ import {Subtopic} from 'domain/topic/subtopic.model';
 import {PracticeTabComponent} from './practice-tab.component';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {LoaderService} from 'services/loader.service';
-
-class MockUrlService {
-  getTopicUrlFragmentFromLearnerUrl() {
-    return 'topic_1';
-  }
-
-  getClassroomUrlFragmentFromLearnerUrl() {
-    return 'classroom_1';
-  }
-}
 
 class MockWindowRef {
   _window = {
@@ -63,12 +52,6 @@ class MockWindowRef {
   }
 }
 
-class MockQuestionBackendApiService {
-  async fetchTotalQuestionCountForSkillIdsAsync() {
-    return Promise.resolve(1);
-  }
-}
-
 class MockTranslateService {
   onLangChange: EventEmitter<string> = new EventEmitter();
   instant(key: string, interpolateParams?: Object): string {
@@ -80,7 +63,7 @@ describe('Practice tab component', function () {
   let component: PracticeTabComponent;
   let fixture: ComponentFixture<PracticeTabComponent>;
   let windowRef: MockWindowRef;
-  let questionBackendApiService: MockQuestionBackendApiService;
+  let questionBackendApiService: QuestionBackendApiService;
   let ngbModal: NgbModal;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let loaderService: LoaderService;
@@ -88,7 +71,6 @@ describe('Practice tab component', function () {
 
   beforeEach(async(() => {
     windowRef = new MockWindowRef();
-    questionBackendApiService = new MockQuestionBackendApiService();
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [PracticeTabComponent, MockTranslatePipe],
@@ -96,13 +78,9 @@ describe('Practice tab component', function () {
         NgbModal,
         I18nLanguageCodeService,
         LoaderService,
+        QuestionBackendApiService,
         UrlInterpolationService,
-        {provide: UrlService, useClass: MockUrlService},
         {provide: WindowRef, useValue: windowRef},
-        {
-          provide: QuestionBackendApiService,
-          useValue: questionBackendApiService,
-        },
         {
           provide: TranslateService,
           useClass: MockTranslateService,
@@ -155,6 +133,7 @@ describe('Practice tab component', function () {
     ngbModal = TestBed.inject(NgbModal);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     loaderService = TestBed.inject(LoaderService);
+    questionBackendApiService = TestBed.inject(QuestionBackendApiService);
     translateService = TestBed.inject(TranslateService);
   });
 
@@ -245,31 +224,54 @@ describe('Practice tab component', function () {
     }
   );
 
-  it('should have start button enabled when a subtopic is selected', function () {
+  it('should have start button enabled when a subtopic is selected', fakeAsync(() => {
     component.selectedSubtopicIndices[0] = true;
-    component.questionsAreAvailable = true;
+    spyOn(
+      questionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(Promise.resolve(1));
 
-    expect(component.isStartButtonDisabled()).toBe(false);
-  });
+    component.checkIfQuestionsExist(component.selectedSubtopicIndices);
+    tick();
+
+    expect(component.startButtonIsDisabled).toBe(false);
+  }));
+
+  it('should have start button disabled when a subtopic is selected but no questions are available', fakeAsync(() => {
+    component.selectedSubtopicIndices[0] = true;
+    spyOn(
+      questionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(Promise.resolve(0));
+
+    component.checkIfQuestionsExist(component.selectedSubtopicIndices);
+    tick();
+
+    expect(component.startButtonIsDisabled).toBe(true);
+  }));
 
   it('should have start button disabled when there is no subtopic selected', function () {
     component.selectedSubtopicIndices[0] = false;
 
-    expect(component.isStartButtonDisabled()).toBe(true);
+    expect(component.startButtonIsDisabled).toBe(true);
   });
 
   it('should have start button disabled when the disable boolean is set', function () {
-    component.previewMode = true;
+    component.startButtonIsDisabled = true;
 
-    expect(component.isStartButtonDisabled()).toBe(true);
+    expect(component.startButtonIsDisabled).toBe(true);
   });
 
   it(
     'should open a new practice session containing the selected subtopic' +
       ' when start button is clicked for topicViewer display area',
-    function () {
+    fakeAsync(() => {
       spyOn(loaderService, 'showLoadingScreen');
+
+      component.displayArea = 'progressTab';
       component.selectedSubtopicIndices[0] = true;
+      component.topicUrlFragment = 'topic_1';
+      component.classroomUrlFragment = 'classroom_1';
 
       component.openNewPracticeSession();
 
@@ -278,10 +280,15 @@ describe('Practice tab component', function () {
           'selected_subtopic_ids=%5B1%5D'
       );
       expect(loaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
-    }
+    })
   );
 
   it('should check if questions exist for the selected subtopics', fakeAsync(() => {
+    spyOn(
+      questionBackendApiService,
+      'fetchTotalQuestionCountForSkillIdsAsync'
+    ).and.returnValue(Promise.resolve(1));
+
     component.checkIfQuestionsExist([true]);
     flushMicrotasks();
 
@@ -398,11 +405,11 @@ describe('Practice tab component', function () {
       ' when start button is clicked and learner agrees to continue',
     function () {
       spyOn(loaderService, 'showLoadingScreen');
-      component.displayArea = 'progressTab';
+
       component.topicUrlFragment = 'topic_1';
       component.classroomUrlFragment = 'classroom_1';
-      component.selectedSubtopicIndices[0] = true;
 
+      component.selectedSubtopicIndices[0] = true;
       component.openNewPracticeSession();
 
       expect(windowRef.nativeWindow.location.href).toBe(

@@ -369,6 +369,37 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             manual_voiceover.to_dict(),
             self.dummy_manual_voiceover_dict)
 
+    def test_should_be_able_to_add_automated_voiceover_audio_offset(
+        self
+    ) -> None:
+        entity_voiceovers_object = (
+            voiceover_domain.EntityVoiceovers.create_empty(
+                'exp_id', 'exploration', 1, 'en-US'))
+
+        entity_voiceovers_object.add_new_content_id_without_voiceovers(
+            'content_1')
+        entity_voiceovers_object.add_automated_voiceovers_audio_offsets(
+            'content_1',
+            [
+                {'token': 'This', 'audio_offset_msecs': 0.0},
+                {'token': 'is', 'audio_offset_msecs': 100.0},
+                {'token': 'a', 'audio_offset_msecs': 200.0},
+                {'token': 'test', 'audio_offset_msecs': 300.0},
+                {'token': 'text', 'audio_offset_msecs': 400.0},
+            ]
+        )
+
+        self.assertEqual(
+            entity_voiceovers_object.automated_voiceovers_audio_offsets_msecs[
+                'content_1'], [
+                    {'token': 'This', 'audio_offset_msecs': 0.0},
+                    {'token': 'is', 'audio_offset_msecs': 100.0},
+                    {'token': 'a', 'audio_offset_msecs': 200.0},
+                    {'token': 'test', 'audio_offset_msecs': 300.0},
+                    {'token': 'text', 'audio_offset_msecs': 400.0},
+                ]
+        )
+
     def test_is_both_voiceovers_empty_should_return_successfully(self) -> None:
         entity_voiceovers_object = (
             voiceover_domain.EntityVoiceovers.create_empty(
@@ -394,3 +425,41 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(
             entity_voiceovers_object.is_both_voiceovers_empty('content_0'))
+
+    def test_should_mark_voiceover_as_needing_update(self) -> None:
+        entity_voiceovers_object = (
+            voiceover_domain.EntityVoiceovers.create_empty(
+                'exp_id', 'exploration', 1, 'en-US'))
+        dummy_new_voiceover_dict: state_domain.VoiceoverDict = {
+            'filename': 'filename2.mp3',
+            'file_size_bytes': 4000,
+            'needs_update': False,
+            'duration_secs': 6.0
+        }
+        new_voiceover_object = state_domain.Voiceover.from_dict(
+            dummy_new_voiceover_dict)
+        entity_voiceovers_object.add_new_content_id_without_voiceovers(
+            'content_0')
+
+        entity_voiceovers_object.add_voiceover(
+            content_id='content_0',
+            voiceover_type=feconf.VoiceoverType.MANUAL,
+            voiceovers_mapping=new_voiceover_object)
+
+        entity_voiceovers_object.mark_manual_voiceovers_as_needing_update(
+            'content')
+
+        voiceover = entity_voiceovers_object.voiceovers_mapping[
+            'content_0'][feconf.VoiceoverType.MANUAL]
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover is not None
+        self.assertFalse(voiceover.needs_update)
+
+        entity_voiceovers_object.mark_manual_voiceovers_as_needing_update(
+            'content_0')
+
+        voiceover = entity_voiceovers_object.voiceovers_mapping[
+            'content_0'][feconf.VoiceoverType.MANUAL]
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover is not None
+        self.assertTrue(voiceover.needs_update)

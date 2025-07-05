@@ -20,7 +20,6 @@ Topic Summary models in the datastore."""
 from __future__ import annotations
 
 from core.jobs import base_jobs
-from core.jobs import job_utils
 from core.jobs.io import ndb_io
 from core.jobs.types import base_validation_errors
 from core.jobs.types import model_property
@@ -41,7 +40,8 @@ if MYPY: # pragma: no cover
 class ValidateTopicModelsJob(base_jobs.JobBase):
     """Job that validates Topic models and their associated models."""
 
-    def run(self) -> beam.PCollection[base_validation_errors.BaseAuditError]:
+    def run(self) -> beam.PCollection[
+        base_validation_errors.BaseValidationError]:
         """Returns a PCollection of audit errors aggregated from all
         Topic models.
 
@@ -104,12 +104,12 @@ class ValidateTopicModelsJob(base_jobs.JobBase):
             for rights_model in topic_rights_models):
             errors.append(
                 base_validation_errors.ModelRelationshipError(
-                id_property=model_property.ModelProperty(
-                    topic_models.TopicModel,
-                    topic_models.TopicModel.name),
-                model_id=job_utils.get_model_id(topic_model),
-                target_kind='TopicRightsModel',
-                target_id=topic_model.name
+                    id_property=model_property.ModelProperty(
+                        topic_models.TopicModel,
+                        topic_models.TopicModel.name),
+                    model=topic_model,
+                    target_kind='TopicRightsModel',
+                    target_id=topic_model.name
             ))
 
         if not any(
@@ -117,10 +117,10 @@ class ValidateTopicModelsJob(base_jobs.JobBase):
             for summary_model in topic_summary_models):
             errors.append(
                 base_validation_errors.ModelRelationshipError(
-                id_property=model_property.ModelProperty(
-                    topic_models.TopicModel,
-                    topic_models.TopicModel.name),
-                model_id=job_utils.get_model_id(topic_model),
-                target_kind='TopicSummaryModel',
-                target_id=topic_model.name))
+                    id_property=model_property.ModelProperty(
+                        topic_models.TopicModel,
+                        topic_models.TopicModel.name),
+                    model=topic_model,
+                    target_kind='TopicSummaryModel',
+                    target_id=topic_model.name))
         return errors

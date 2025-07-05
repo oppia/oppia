@@ -375,8 +375,8 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'outline_is_finalized': False,
             'exploration_id': self.EXP_ID_1,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }
@@ -622,8 +622,8 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             'outline_is_finalized': False,
             'exploration_id': self.EXP_ID_3,
             'status': 'Draft',
-            'planned_publication_date_msecs': 100.0,
-            'last_modified_msecs': 100.0,
+            'planned_publication_date_msecs': 100,
+            'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
             'unpublishing_reason': None
         }

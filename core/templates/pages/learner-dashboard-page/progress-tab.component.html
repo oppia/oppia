@@ -1,6 +1,6 @@
 <div>
   <ng-container *ngIf="!learnerDashboardRedesignFeatureFlag">
-    <div tabindex="0" class="community-lessons-section" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
+    <div tabindex="0" class="community-lessons-section e2e-test-community-lessons-section" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
       <h1 class="lessons-title" [ngClass]="{'oppia-force-right-align': isLanguageRTL()}" [innerHTML]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION' | translate">
       </h1>
       <div class="dropdown" *ngIf="windowIsNarrow && (totalCompletedLessonsList.length !== 0 || totalIncompleteLessonsList.length !== 0)">

@@ -65,7 +65,6 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
                 'content_id': 'content_id',
                 'html': '<b>bo ld</b>'
             },
-            'worked_examples': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
                     'content_id': {}
@@ -202,7 +201,6 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
                     'content_id': 'content_id',
                     'html': '<b>bo&nbsp;ld\n</b>'
                 },
-                'worked_examples': [],
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
                         'content_id': {}
@@ -253,7 +251,6 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
                     'content_id': 'content_id',
                     'html': '<b>bo&nbsp;ld\n</b>'
                 },
-                'worked_examples': [],
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
                         'content_id': {}
@@ -414,7 +411,6 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
                 'content_id': 'content_id',
                 'html': '<b>bo ld</b>'
             },
-            'worked_examples': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
                     'content_id': {}
@@ -540,7 +536,6 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
                     'content_id': 'content_id',
                     'html': '<b>bo&nbsp;ld\n</b>'
                 },
-                'worked_examples': [],
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
                         'content_id': {}
@@ -584,7 +579,6 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
                     'content_id': 'content_id',
                     'html': '<b>bo&nbsp;ld\n</b>'
                 },
-                'worked_examples': [],
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
                         'content_id': {}

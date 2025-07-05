@@ -20,7 +20,7 @@ import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {AppConstants} from 'app.constants';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
 import {
   TRANSLATION_DATA_FORMAT_HTML,
   TRANSLATION_DATA_FORMAT_UNICODE,
@@ -47,10 +47,10 @@ import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {TranslationLanguageService} from '../services/translation-language.service';
@@ -131,10 +131,6 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   isVoiceoverContributionEnabled(): boolean {
     return this.platformFeatureService.status.EnableVoiceoverContribution
       .isEnabled;
-  }
-
-  isVoiceoverContributionWithAccentEnabled(): boolean {
-    return this.platformFeatureService.status.AddVoiceoverWithAccent.isEnabled;
   }
 
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {

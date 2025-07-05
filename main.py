@@ -263,7 +263,11 @@ URLS = [
         access_validators.BlogHomePageAccessValidationHandler),
 
     get_redirect_route(
-        r'%s/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>' % # pylint: disable=line-too-long
+        '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>', # pylint: disable=line-too-long
+        access_validators.SubtopicViewerPageRevisionRedirectHandler),
+
+    get_redirect_route(
+        r'%s/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/studyguide/<subtopic_url_fragment>' % # pylint: disable=line-too-long
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.SubtopicViewerPageAccessValidationHandler),
 
@@ -354,8 +358,13 @@ URLS = [
     ),
 
     get_redirect_route(
+        '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision',
+        access_validators.TopicViewerPageRevisionRedirectHandler
+    ),
+
+    get_redirect_route(
         r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
-        r'/<topic_url_fragment>/revision' %
+        r'/<topic_url_fragment>/studyguide' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler
     ),
@@ -505,7 +514,7 @@ URLS = [
         story_editor.StoryUrlFragmentHandler),
     get_redirect_route(
         r'%s/<topic_name>' % feconf.TOPIC_NAME_HANDLER,
-        topic_editor.TopicNameHandler),
+        topic_viewer.TopicNameHandler),
     get_redirect_route(
         r'%s/<topic_url_fragment>' % feconf.TOPIC_URL_FRAGMENT_HANDLER,
         topic_editor.TopicUrlFragmentHandler),
@@ -575,6 +584,10 @@ URLS = [
         r'/entity_voiceovers_bulk_handler/<entity_type>/<entity_id>/'
         r'<entity_version>/<language_code>',
         voiceover.EntityVoiceoversBulkHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL,
+        voiceover.RegenerateAutomaticVoiceoverHandler
     ),
 
     get_redirect_route(
@@ -974,6 +987,11 @@ URLS = [
         feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableSubtopicPageDataHandler),
     get_redirect_route(
+        r'%s/<topic_id>/<subtopic_id>' %
+        feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX,
+        topic_editor.EditableStudyGuideDataHandler
+    ),
+    get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_RIGHTS_URL_PREFIX,
         topic_editor.TopicRightsHandler),
     get_redirect_route(
@@ -1258,7 +1276,7 @@ URLS.extend((
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(
-        r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        r'%s/studyguide' % feconf.TOPIC_VIEWER_URL_PREFIX,
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(

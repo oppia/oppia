@@ -20,7 +20,7 @@ import {Component, NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {WelcomeModalComponent} from './welcome-modal.component';
 
@@ -44,7 +44,7 @@ describe('Welcome Modal Component', () => {
   let component: WelcomeModalComponent;
   let fixture: ComponentFixture<WelcomeModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let siteAnalyticsService: SiteAnalyticsService;
   const explorationId = 'exp1';
   let siteAnalyticsServiceSpy: jasmine.Spy;
@@ -56,7 +56,7 @@ describe('Welcome Modal Component', () => {
         ChangesInHumanReadableFormComponentStub,
       ],
       providers: [
-        ContextService,
+        PageContextService,
         SiteAnalyticsService,
         UrlInterpolationService,
         {
@@ -73,13 +73,15 @@ describe('Welcome Modal Component', () => {
     component = fixture.componentInstance;
 
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     siteAnalyticsServiceSpy = spyOn(
       siteAnalyticsService,
       'registerTutorialModalOpenEvent'
     );
-    spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      explorationId
+    );
     fixture.detectChanges();
   });
 
