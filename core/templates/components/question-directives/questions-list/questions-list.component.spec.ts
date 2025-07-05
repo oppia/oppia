@@ -245,7 +245,6 @@ describe('Questions List Component', () => {
           html: 'test explanation',
           content_id: 'explanation',
         },
-        worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {},
         },
@@ -361,7 +360,6 @@ describe('Questions List Component', () => {
         ],
         skill_contents: {
           explanation: {html: 'test explanation', content_id: 'explanation'},
-          worked_examples: [],
           recorded_voiceovers: {voiceovers_mapping: {}},
         },
         language_code: 'en',
@@ -447,7 +445,6 @@ describe('Questions List Component', () => {
           html: 'test explanation',
           content_id: 'explanation',
         },
-        worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {},
         },
@@ -1174,7 +1171,6 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 1,
       misconception_count: 3,
-      worked_examples_count: 3,
       skill_model_created_on: 1593138898626.193,
       skill_model_last_updated: 1593138898626.193,
     };
@@ -1210,7 +1206,6 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 1,
       misconception_count: 3,
-      worked_examples_count: 3,
       skill_model_created_on: 1593138898626.193,
       skill_model_last_updated: 1593138898626.193,
     };
@@ -1266,7 +1261,6 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 1,
       misconception_count: 3,
-      worked_examples_count: 3,
       skill_model_created_on: 1593138898626.193,
       skill_model_last_updated: 1593138898626.193,
     };

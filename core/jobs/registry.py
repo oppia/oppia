@@ -85,6 +85,7 @@ from core.jobs.batch_jobs import user_bios_change_jobs               # pylint: d
 from core.jobs.batch_jobs import (skill_inspection_jobs)             # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import delete_voiceover_models_data_job    # pylint: disable=unused-import  # isort: skip
 from core.jobs.batch_jobs import populate_study_guide_models_jobs    # pylint: disable=unused-import  # isort: skip
+from core.jobs.batch_jobs import exploration_voiceover_sync_jobs    # pylint: disable=unused-import  # isort: skip
 
 
 def get_all_jobs() -> List[Type[base_jobs.JobBase]]:
