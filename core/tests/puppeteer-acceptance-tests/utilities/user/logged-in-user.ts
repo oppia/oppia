@@ -2261,7 +2261,7 @@ export class LoggedInUser extends BaseUser {
     await this.isElementVisible(mobileGetInvolvedMenuContainerSelector);
     await this.clickOn(mobileGetInvolvedDropdownSelector);
 
-    // Close Navmenu
+    // Close Navmenu.
     await this.clickOn(mobileNavbarOpenSidebarButton);
   }
 
