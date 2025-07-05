@@ -102,7 +102,7 @@ describe('Logged-out User', function () {
     'should open Impact Report when the "Impact Report" button is clicked' +
       'in About Menu on navbar',
     async function () {
-      await loggedOutUser.clickImpactReportButtonInAboutMenuOnNavbar();
+      await loggedOutUser.verifyImpactReportButtonInAboutMenuOnNavbar();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

@@ -47,7 +47,7 @@ describe('Moderator', function () {
     LoggedOutUser = await UserFactory.createLoggedOutUser();
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.createMinimalExploration(
       'Test Exploration',
