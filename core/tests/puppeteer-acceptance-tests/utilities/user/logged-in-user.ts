@@ -239,6 +239,7 @@ const mobileGetInvolvedMenuContainerSelector =
 const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
 
+const removeFromPlayLaterInLibrarySelector = '.e2e-test-remove-from-play-later';
 export class LoggedInUser extends BaseUser {
   /**
    * Function for navigating to the profile page for a given username.
@@ -837,6 +838,68 @@ export class LoggedInUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  async removeLessonFromPlayLaterInlibrary(lessonTitle: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const lessonCardTitleSelector = isMobileViewport
+      ? mobileLessonCardTitleSelector
+      : desktopLessonCardTitleSelector;
+
+    await this.page.waitForSelector(lessonCardTitleSelector);
+    const lessonTitles = await this.page.$$eval(
+      lessonCardTitleSelector,
+      elements => elements.map(el => el.textContent?.trim())
+    );
+
+    const lessonIndex = lessonTitles.indexOf(lessonTitle);
+
+    if (lessonIndex === -1) {
+      throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
+    }
+
+    const lessonSelector = `${lessonCardTitleSelector}:nth-child(${lessonIndex + 1})`;
+    const tooltipSelector = `${lessonSelector} ${removeFromPlayLaterInLibrarySelector}`;
+
+    await this.clickOn(tooltipSelector);
+    await this.clickOn('Remove');
+  }
+
+  /**
+   * Expects the tooltip text of the 'Play Later' icon for the given lesson title to match the expected tooltip text.
+   * @param {string} lessonTitle - The title of the lesson to check the 'Play Later' icon tooltip text for.
+   * @param {string} expectedTooltip - The expected tooltip text for the 'Play Later' icon.
+   */
+  async expectPlayLaterIconToolTipToBe(
+    lessonTitle: string,
+    expectedTooltip: string
+  ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const lessonCardTitleSelector = isMobileViewport
+      ? mobileLessonCardTitleSelector
+      : desktopLessonCardTitleSelector;
+
+    await this.page.waitForSelector(lessonCardTitleSelector);
+    const lessonTitles = await this.page.$$eval(
+      lessonCardTitleSelector,
+      elements => elements.map(el => el.textContent?.trim())
+    );
+
+    const lessonIndex = lessonTitles.indexOf(lessonTitle);
+
+    if (lessonIndex === -1) {
+      throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
+    }
+
+    const lessonSelector = `${lessonCardTitleSelector}:nth-child(${lessonIndex + 1})`;
+    const tooltipSelector = `${lessonSelector} ${removeFromPlayLaterInLibrarySelector}`;
+
+    await this.page.waitForSelector(removeFromPlayLaterInLibrarySelector, {
+      visible: true,
+    });
+    await this.expectToolTipTextToBe(tooltipSelector, expectedTooltip);
   }
 
   /**

@@ -1016,6 +1016,31 @@ export class BaseUser {
     }
     return;
   }
+
+  /**
+   * Verifies that the tooltip text matches the expected tooltip text.
+   * @param {string} selector - The selector of the element to hover over.
+   * @param {string} expectedToolTip - The expected tooltip text.
+   */
+  async expectToolTipTextToBe(
+    selector: string,
+    expectedToolTip: string
+  ): Promise<void> {
+    // Hover over element.
+    await this.page.waitForSelector(selector, {visible: true});
+    await this.page.hover(selector);
+
+    // Wait for the tooltip to appear.
+    await this.page.waitForSelector('.tooltip', {
+      visible: true,
+    });
+
+    // Check the tooltip content.
+    const tooltipText = await this.page.$eval('.tooltip', el => el.textContent);
+
+    // Verify Tooltip.
+    expect(tooltipText).toBe(expectedToolTip);
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();

@@ -426,6 +426,10 @@ const nonInteractiveTabsHeaderSelector =
   '.e2e-test-non-interactive-tabs-headers';
 const nonInteractiveTabContentSelector =
   '.e2e-test-non-interactive-tab-content';
+const communityLibraryLinkInNavbarSelector =
+  '.e2e-test-topnb-go-to-community-library-link';
+const communityLibraryContainerSelector = '.e2e-test-library-container';
+const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -523,6 +527,32 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(communityLibraryUrl, verifyURL);
+  }
+
+  async navigateToCommunityLibraryUsingNavbar(): Promise<void> {
+    // Open navigation menu for mobile view.
+    await this.openNavMenuInMobile();
+
+    // Click on "Learn" if in desktop view.
+    if (!this.isViewportAtMobileWidth()) {
+      if ((await this.isElementVisible(navbarLearnTab)) !== true) {
+        throw new Error('Learn tab is not visible in the navbar.');
+      }
+      await this.clickOn(navbarLearnTab);
+    }
+
+    // Click on Community Library link.
+    const selector = this.isViewportAtMobileWidth()
+      ? communityLibraryLinkInNavMenuSelector
+      : communityLibraryLinkInNavbarSelector;
+    await this.clickOn(selector);
+
+    // Verify navigated to Community Library.
+    if (
+      (await this.isElementVisible(communityLibraryContainerSelector)) !== true
+    ) {
+      throw new Error('Community Library container is not visible.');
+    }
   }
 
   /**
@@ -857,6 +887,24 @@ export class LoggedOutUser extends BaseUser {
         'Math Classroom'
       );
     }
+  }
+
+  /**
+   * Open the navigation menu in mobile view.
+   */
+  async openNavMenuInMobile(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage('Skipped: Open Navigation Menu (mobile).');
+      return;
+    }
+    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
+      visible: true,
+    });
+    await this.clickOn(mobileNavbarOpenSidebarButton);
+    await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
+      visible: true,
+    });
+    showMessage('Opened Navigation Menu (mobile).');
   }
 
   /**

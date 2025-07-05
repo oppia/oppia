@@ -45,6 +45,11 @@ describe('Logged-in User', function () {
       'Algebra',
       false
     );
+    await explorationEditor.createAndPublishAMinimalExplorationWithTitle(
+      'Whole Numbers',
+      'Algebra',
+      false
+    );
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser',
@@ -52,56 +57,79 @@ describe('Logged-in User', function () {
     );
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
-  it(
-    'should be able to add an exploration to play later, play it from the learner dashboard, and then remove it.',
-    async function () {
-      await loggedInUser.navigateToCommunityLibraryPage();
+  it('should be able to navigate to community library', async function () {
+    await loggedInUser.navigateToCommunityLibraryUsingNavbar();
+  });
 
-      // Add a lesson to 'play later'.
-      await loggedInUser.addLessonToPlayLater('Negative Numbers', true);
-      await loggedInUser.expectToolTipMessage(
-        "Successfully added to your 'Play Later' list."
-      );
+  it('should be able to save an exploration to play later', async function () {
+    // Add a lesson to 'play later'.
+    await loggedInUser.addLessonToPlayLater('Negative Numbers', true);
+    await loggedInUser.expectToolTipMessage(
+      "Successfully added to your 'Play Later' list."
+    );
 
-      // Add a lesson to 'play later'.
-      await loggedInUser.addLessonToPlayLater('Positive Numbers', true);
-      await loggedInUser.expectToolTipMessage(
-        "Successfully added to your 'Play Later' list."
-      );
+    // Add other lessons to 'play later'.
+    await loggedInUser.addLessonToPlayLater('Positive Numbers', false);
+    await loggedInUser.addLessonToPlayLater('Whole Numbers', false);
+  });
 
-      // Navigate to the learner dashboard and play the lesson.
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToCommunityLessonsSection();
-      await loggedInUser.verifyLessonPresenceInPlayLater(
-        'Positive Numbers',
-        true
-      );
-      await loggedInUser.playLessonFromDashboard('Positive Numbers');
+  it('should be able to remove an exploration from play later in community library', async function () {
+    await loggedInUser.expectPlayLaterIconToolTipToBe(
+      'Whole Numbers',
+      'Already added to playlist'
+    );
+    await loggedInUser.removeLessonFromPlayLaterInlibrary('Whole Numbers');
 
-      // The exploration has a single state.
-      await loggedInUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
+    await loggedInUser.expectPlayLaterIconToolTipToBe(
+      'Whole Numbers',
+      "Add to 'Play Later' list"
+    );
+  });
 
-      // Navigate back to the learner dashboard and remove the lesson from play later.
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToCommunityLessonsSection();
+  it('should be able to check play later in learner dashboard', async function () {
+    // Navigate to the learner dashboard and play the lesson.
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToCommunityLessonsSection();
+    await loggedInUser.verifyLessonPresenceInPlayLater(
+      'Positive Numbers',
+      true
+    );
+    await loggedInUser.verifyLessonPresenceInPlayLater(
+      'Negative Numbers',
+      true
+    );
 
-      // Since the exploration played, it should have been automatically removed from the "play later" list.
-      await loggedInUser.verifyLessonPresenceInPlayLater(
-        'Positive Numbers',
-        false
-      );
+    // "Whole Numbers" exploration should not be present.
+    await loggedInUser.verifyLessonPresenceInPlayLater('Whole Numbers', false);
+  });
 
-      // Removing a lesson from play later list.
-      await loggedInUser.removeLessonFromPlayLater('Negative Numbers');
-      await loggedInUser.verifyLessonPresenceInPlayLater(
-        'Positive Numbers',
-        false
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  it('should be able to remove exploration from play later in learner dashboard', async function () {
+    // Removing a lesson from play later list.
+    await loggedInUser.removeLessonFromPlayLater('Negative Numbers');
+    await loggedInUser.verifyLessonPresenceInPlayLater(
+      'Negative Numbers',
+      false
+    );
+  });
+
+  it('should be able to play exploration from play later', async function () {
+    await loggedInUser.playLessonFromDashboard('Positive Numbers');
+
+    // The exploration has a single state.
+    await loggedInUser.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
+
+    // Navigate back to the learner dashboard and check lesson is removed from play later.
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToCommunityLessonsSection();
+
+    // Since the exploration played, it should have been automatically removed from the "play later" list.
+    await loggedInUser.verifyLessonPresenceInPlayLater(
+      'Positive Numbers',
+      false
+    );
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
