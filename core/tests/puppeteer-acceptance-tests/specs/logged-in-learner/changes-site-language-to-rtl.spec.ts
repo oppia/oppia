@@ -82,7 +82,7 @@ describe('Interested Partner Organization', function () {
       __dirname
     );
 
-    await loggedInUser1.navigateToHome();
+    await loggedInUser1.navigateToHome(false);
     await loggedInUser1.verifyPageIsRTL();
     await loggedInUser1.expectScreenshotToMatch('RTLArabicHomePage', __dirname);
   });

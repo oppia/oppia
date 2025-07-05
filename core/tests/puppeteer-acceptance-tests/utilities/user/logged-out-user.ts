@@ -453,9 +453,10 @@ type KeyInput =
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
    */
-  async navigateToHome(): Promise<void> {
-    await this.goto(homeUrl);
+  async navigateToHome(verifyURL: boolean = true): Promise<void> {
+    await this.goto(homeUrl, verifyURL);
   }
 
   /**
