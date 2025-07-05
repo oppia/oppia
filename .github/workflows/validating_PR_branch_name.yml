@@ -4,7 +4,7 @@ on:
     types: 
         - opened
         - reopened
-permissions: {}
+permissions: read-all
 jobs:
   validate_branch_name:
     runs-on: ubuntu-24.04
