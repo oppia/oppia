@@ -7,6 +7,6 @@
 .oppia-new-audio-bar {
   background-color: #ff0000;
   height: 40px;
-  position: absolute;
+  position: relative;
   width: 100%;
 }
