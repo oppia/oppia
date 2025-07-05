@@ -37,8 +37,6 @@ import {AppConstants} from 'app.constants';
 
 describe('Skill object factory', () => {
   let skillObjectFactory: SkillObjectFactory;
-  let example1 = null;
-  let example2 = null;
   let misconceptionDict1: MisconceptionBackendDict;
   let misconceptionDict2: MisconceptionBackendDict;
   let rubricDict: RubricBackendDict;
@@ -73,38 +71,14 @@ describe('Skill object factory', () => {
       explanations: ['explanation'],
     };
 
-    example1 = {
-      question: {
-        html: 'worked example question 1',
-        content_id: 'worked_example_q_1',
-      },
-      explanation: {
-        html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1',
-      },
-    };
-    example2 = {
-      question: {
-        html: 'worked example question 1',
-        content_id: 'worked_example_q_1',
-      },
-      explanation: {
-        html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1',
-      },
-    };
-
     skillContentsDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [example1, example2],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_1: {},
-          worked_example_2: {},
         },
       },
     };
