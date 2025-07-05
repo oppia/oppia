@@ -1650,23 +1650,42 @@ export class ConversationFlowService {
   setNextStateCard(card: StateCard): void {
     this.nextStateCard = card;
   }
-
+  /**
+   * Returns whether the answer is marked as correct.
+   * @returns {boolean} `true` if the answer is correct, otherwise `false`.
+   */
   getAnswerIsCorrect(): boolean {
     return this.answerIsCorrect;
   }
 
+  /**
+   * Sets whether the answer is correct.
+   * @param {boolean} isCorrect - `true` if the answer is correct, otherwise `false`.
+   */
   setAnswerIsCorrect(isCorrect: boolean): void {
     this.answerIsCorrect = isCorrect;
   }
 
+  /**
+   * Returns whether the answer is currently being processed.
+   * @returns {boolean} `true` if the answer is being processed, otherwise `false`.
+   */
   getAnswerIsBeingProcessed(): boolean {
     return this.answerIsBeingProcessed;
   }
 
+  /**
+   * Sets whether the answer is currently being processed.
+   * @param {boolean} isBeingProcessed - `true` if the answer is being processed, otherwise `false`.
+   */
   setAnswerIsBeingProcessed(isBeingProcessed: boolean): void {
     this.answerIsBeingProcessed = isBeingProcessed;
   }
 
+  /**
+   * Returns whether the user has interacted at least once.
+   * @returns {boolean} `true` if the user has interacted at least once, otherwise `false`.
+   */
   getHasInteractedAtLeastOnce(): boolean {
     return this.hasInteractedAtLeastOnce;
   }
