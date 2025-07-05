@@ -95,8 +95,7 @@ export class LearnerAnswerInfoService {
     entityId: string,
     state: State,
     answer: string,
-    interactionRulesService: InteractionRulesService,
-    alwaysAskLearnerForAnswerInfo: boolean
+    interactionRulesService: InteractionRulesService
   ): void {
     this.currentEntityId = entityId;
     this.currentAnswer = answer;
@@ -133,7 +132,7 @@ export class LearnerAnswerInfoService {
       return;
     }
 
-    if (alwaysAskLearnerForAnswerInfo === true) {
+    if (this.getAlwaysAskLearnerForAnswerDetails() === true) {
       this.canAskLearnerForAnswerInfo = true;
       return;
     }

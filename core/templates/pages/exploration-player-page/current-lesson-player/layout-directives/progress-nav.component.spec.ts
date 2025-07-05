@@ -275,4 +275,12 @@ describe('Progress nav component', () => {
     expect(componentInstance.lastDisplayedCard).toEqual(mockDisplayedCard);
     expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
   });
+
+  it('should show the upcoming card when continue button is clicked', () => {
+    spyOn(conversationFlowService, 'showUpcomingCard');
+
+    componentInstance.onClickContinueButton();
+
+    expect(conversationFlowService.showUpcomingCard).toHaveBeenCalled();
+  });
 });
