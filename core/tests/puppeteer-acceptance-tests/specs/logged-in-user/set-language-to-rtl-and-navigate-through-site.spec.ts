@@ -81,7 +81,7 @@ describe('Logged-in User', function () {
       await loggedInUser1.navigateToLearnerDashboard();
       await loggedInUser1.verifyPageIsRTL();
 
-      await loggedInUser1.navigateToSplashPage(false);
+      await loggedInUser1.navigateToSplashPage();
       await loggedInUser1.verifyPageIsRTL();
 
       await loggedInUser1.navigateToAboutPage();
