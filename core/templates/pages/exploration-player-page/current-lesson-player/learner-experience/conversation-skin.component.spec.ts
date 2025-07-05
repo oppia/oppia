@@ -54,6 +54,7 @@ import {DiagnosticTestPlayerEngineService} from '../../services/diagnostic-test-
 import {UrlService} from '../../../../services/contextual/url.service';
 import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
+import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {LoaderService} from '../../../../services/loader.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {MessengerService} from '../../../../services/messenger.service';
@@ -121,6 +122,7 @@ describe('Conversation skin component', () => {
   let explorationInitializationService: ExplorationInitializationService;
   let guestCollectionProgressService: GuestCollectionProgressService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
+  let i18nLanguageCodeService: I18nLanguageCodeService;
   let imagePreloaderService: ImagePreloaderService;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
   let diagnosticTestPlayerEngineService: DiagnosticTestPlayerEngineService;
@@ -486,6 +488,7 @@ describe('Conversation skin component', () => {
     hintsAndSolutionManagerService = TestBed.inject(
       HintsAndSolutionManagerService
     );
+    i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerAnswerInfoService = TestBed.inject(LearnerAnswerInfoService);
     explorationInitializationService = TestBed.inject(
