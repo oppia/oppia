@@ -42,7 +42,6 @@ import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ExplorationInitializationService} from '../../services/exploration-initialization.service';
@@ -90,7 +89,6 @@ export class NewConversationSkinComponent {
 
   // Finalized state for the component.
   continueToReviseStateButtonIsVisible: boolean = false;
-  inStoryMode: boolean = false;
 
   constructor(
     private windowRef: WindowRef,
@@ -114,7 +112,6 @@ export class NewConversationSkinComponent {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
-    private questionPlayerStateService: QuestionPlayerStateService,
     private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
     private statsReportingService: StatsReportingService,
     private urlInterpolationService: UrlInterpolationService,
@@ -135,7 +132,6 @@ export class NewConversationSkinComponent {
       this.pageContextService.isInExplorationEditorPage();
     this.correctnessFooterIsShown =
       !this.pageContextService.isInDiagnosticTestPlayerPage();
-    this.inStoryMode = this.explorationModeService.isInStoryChapterMode();
 
     let collectionId = this.urlService.getCollectionIdFromExplorationUrl();
     this.pidInUrl = this.urlService.getPidFromUrl();
@@ -152,7 +148,7 @@ export class NewConversationSkinComponent {
     if (this.explorationModeService.isInQuestionPlayerMode()) {
       this.directiveSubscriptions.add(
         this.hintsAndSolutionManagerService.onHintConsumed.subscribe(() => {
-          this.questionPlayerStateService.hintUsed(
+          this.questionPlayerEngineService.recordHintUsed(
             this.questionPlayerEngineService.getCurrentQuestion()
           );
         })
@@ -161,7 +157,7 @@ export class NewConversationSkinComponent {
       this.directiveSubscriptions.add(
         this.hintsAndSolutionManagerService.onSolutionViewedEventEmitter.subscribe(
           () => {
-            this.questionPlayerStateService.solutionViewed(
+            this.questionPlayerEngineService.recordSolutionViewed(
               this.questionPlayerEngineService.getCurrentQuestion()
             );
           }
@@ -260,6 +256,7 @@ export class NewConversationSkinComponent {
     // variable needs to be defined before the following code is executed.
     this.userService.getUserInfoAsync().then(async userInfo => {
       this.isLoggedIn = userInfo.isLoggedIn();
+      this.conversationFlowService.setIsLoggedIn(this.isLoggedIn);
 
       this.windowRef.nativeWindow.addEventListener('beforeunload', e => {
         let redirectToRefresherExplorationConfirmed =
@@ -564,5 +561,9 @@ export class NewConversationSkinComponent {
 
   getRecommendationExplorationSummaries(): LearnerExplorationSummary[] {
     return this.conversationFlowService.getRecommendedExplorationSummaries();
+  }
+
+  getIsInStoryMode(): boolean {
+    return this.explorationModeService.isInStoryChapterMode();
   }
 }
