@@ -79,6 +79,7 @@ const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
 const mobileProgressSectionButton = '.e2e-test-mobile-progress-section';
 const addProfilePictureButton = '.e2e-test-photo-upload-submit';
+const cancelProfileUploadButtonSelector = '.e2e-test-photo-upload-cancel';
 const editProfilePictureButton = '.e2e-test-photo-clickable';
 const bioTextareaSelector = '.e2e-test-user-bio';
 const saveChangesButtonSelector = '.e2e-test-save-changes-button';
@@ -219,7 +220,33 @@ const explorationSuccessfullyFlaggedMessage =
 const feedbackUpdatesMainContentContainer =
   '.e2e-test-feedback-updates-main-content-container';
 
+const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
+const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
+const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
+
 export class LoggedInUser extends BaseUser {
+  /**
+   * Function for clicking on the profile dropdown.
+   */
+  async clickOnProfileDropdown(): Promise<void> {
+    await this.isElementVisible(profileDropdownToggleSelector);
+    await this.clickOn(profileDropdownToggleSelector);
+  }
+
+  async expectProfileDropdownToContainElementWithContent(
+    item: string
+  ): Promise<void> {
+    await this.isElementVisible(profileDropdownContainerSelector);
+
+    const elementsContents = await this.page.$$eval(
+      profileDropdownAnchorSelector,
+      elements =>
+        elements.map(el => (el as HTMLAnchorElement).textContent?.trim())
+    );
+
+    expect(elementsContents).toContain(item);
+  }
+
   /**
    * Function for navigating to the profile page for a given username.
    */
@@ -978,6 +1005,27 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(addProfilePictureButton, {
       hidden: true,
     });
+  }
+
+  /**
+   * Checks if profile photo doesn't work
+   */
+  async expectProfilePhotoDoNotUpdate(picturePath: string): Promise<void> {
+    try {
+      await this.page.waitForSelector(editProfilePictureButton, {
+        visible: true,
+      });
+      await this.clickOn(editProfilePictureButton);
+      await this.uploadFile(picturePath);
+
+      await this.expectElementToBeClickable(addProfilePictureButton, false);
+      await this.clickOn(cancelProfileUploadButtonSelector);
+      await this.page.waitForSelector(addProfilePictureButton, {
+        hidden: true,
+      });
+    } catch (error) {
+      throw new Error('Profile photo is uploadable.');
+    }
   }
 
   /**

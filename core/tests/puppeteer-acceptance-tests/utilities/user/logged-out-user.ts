@@ -275,6 +275,7 @@ const partnerLearnMoreMobileButtonInAboutPage =
   '.e2e-test-about-page-partner-learn-more-mobile-button';
 const impactReportButtonInAboutPage =
   '.e2e-test-about-page-impact-report-button';
+const profileContainerSelector = '.e2e-test-profile-container';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -414,6 +415,9 @@ const topicPageRevisionTabContentSelector =
 const learnerViewCardSelector = '.oppia-learner-view-card-content';
 const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const loginButtonSelector = '.e2e-mobile-test-login';
+
+const contributorIconInLessonInfoSelctor =
+  '.e2e-test-lesson-info-contributor-profile';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -4277,6 +4281,23 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(progressUrl, verifyURL);
+  }
+
+  /**
+   * Clicks on first contributor in Lesson Info model.
+   */
+  async clickOnProfileIconInLessonInfoModel(): Promise<void> {
+    await this.page.waitForSelector(contributorIconInLessonInfoSelctor, {
+      visible: true,
+    });
+
+    await this.clickOn(contributorIconInLessonInfoSelctor);
+    const navigated = await this.isElementVisible(profileContainerSelector);
+    if (!navigated) {
+      throw new Error('Navigation to profile page failed.');
+    }
+
+    expect(this.page.url()).toContain('/profile');
   }
 
   /**
