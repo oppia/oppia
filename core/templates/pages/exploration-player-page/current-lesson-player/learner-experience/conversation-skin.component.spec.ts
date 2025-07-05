@@ -1893,7 +1893,7 @@ describe('Conversation skin component', () => {
   });
 
   it('should get is in story mode', () => {
-    spyOn(conversationFlowService, 'getInStoryMode').and.returnValue(true);
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
     expect(componentInstance.getIsInStoryMode()).toBeTrue();
   });
 

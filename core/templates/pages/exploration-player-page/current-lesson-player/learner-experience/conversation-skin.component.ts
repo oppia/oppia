@@ -583,6 +583,6 @@ export class ConversationSkinComponent {
   }
 
   getIsInStoryMode(): boolean {
-    return this.conversationFlowService.getInStoryMode();
+    return this.explorationModeService.isInStoryChapterMode();
   }
 }
