@@ -301,10 +301,7 @@ export class PageContextService {
         }
       }
     }
-    throw new Error(
-      'PageContextService should not be used outside the ' +
-        'context of an exploration or a question.'
-    );
+    return '';
   }
 
   // Returns a string representing the learnerGroupId (obtained from the

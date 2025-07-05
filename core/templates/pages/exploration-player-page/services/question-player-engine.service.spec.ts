@@ -37,6 +37,7 @@ import {
 } from './answer-classification.service';
 import {QuestionBackendApiService} from '../../../domain/question/question-backend-api.service.ts';
 import {QuestionPlayerEngineService} from './question-player-engine.service';
+import {StateObjectFactory} from '../../../domain/state/StateObjectFactory';
 
 describe('Question player engine service', () => {
   let alertsService: AlertsService;
@@ -52,6 +53,10 @@ describe('Question player engine service', () => {
   let multipleQuestionsObjects: Question[];
   let questionBackendApiService: QuestionBackendApiService;
   let textInputService: InteractionRulesService;
+
+  let questionId = 'question_id';
+  let stateObject: StateObjectFactory;
+  let question: Question;
 
   beforeEach(() => {
     singleQuestionBackendDict = {
@@ -379,6 +384,7 @@ describe('Question player engine service', () => {
         QuestionPlayerEngineService,
         QuestionObjectFactory,
         QuestionBackendApiService,
+        StateObjectFactory,
         ExpressionInterpolationService,
         FocusManagerService,
         AlertsService,
@@ -389,6 +395,7 @@ describe('Question player engine service', () => {
     });
 
     alertsService = TestBed.inject(AlertsService);
+    stateObject = TestBed.inject(StateObjectFactory);
     answerClassificationService = TestBed.inject(AnswerClassificationService);
     pageContextService = TestBed.inject(PageContextService);
     expressionInterpolationService = TestBed.inject(
@@ -408,6 +415,53 @@ describe('Question player engine service', () => {
         return questionObjectFactory.createFromBackendDict(questionDict);
       }
     );
+    question = new Question(
+      questionId,
+      stateObject.createDefaultState('state', 'content_0', 'default_outcome_1'),
+      '',
+      7,
+      [],
+      [],
+      2
+    );
+  });
+
+  it('should register hint as used', () => {
+    questionPlayerEngineService.recordHintUsed(question);
+
+    expect(
+      questionPlayerEngineService.questionPlayerState[questionId]
+    ).toBeDefined();
+  });
+
+  it('should register solution viewed', () => {
+    questionPlayerEngineService.recordSolutionViewed(question);
+
+    expect(
+      questionPlayerEngineService.questionPlayerState[questionId].viewedSolution
+    ).toBeDefined();
+  });
+
+  it('should submit answer', () => {
+    questionPlayerEngineService.recordAnswerSubmitted(question, true, '');
+    questionPlayerEngineService.recordSolutionViewed(question);
+    questionPlayerEngineService.recordAnswerSubmitted(question, true, '');
+
+    expect(
+      questionPlayerEngineService.questionPlayerState[questionId].answers.length
+    ).toEqual(1);
+  });
+
+  it('should get question player state data', () => {
+    expect(
+      questionPlayerEngineService.getQuestionPlayerStateData()
+    ).toBeDefined();
+  });
+
+  it('should access on question session completed', () => {
+    expect(
+      questionPlayerEngineService.onQuestionSessionCompleted
+    ).toBeDefined();
   });
 
   it('should load questions when initialized', () => {
@@ -644,12 +698,6 @@ describe('Question player engine service', () => {
     }
   );
 
-  it("should always return false when calling 'isInPreviewMode()'", () => {
-    let previewMode = questionPlayerEngineService.isInPreviewMode();
-
-    expect(previewMode).toBe(false);
-  });
-
   it(
     'should show warning message while loading a question ' +
       'if the question name is empty',
@@ -864,7 +912,7 @@ describe('Question player engine service', () => {
         initSuccessCb,
         initErrorCb
       );
-      questionPlayerEngineService.setCurrentIndex(0);
+      questionPlayerEngineService.currentIndex = 0;
       questionPlayerEngineService.submitAnswer(
         answer,
         textInputService,
@@ -874,47 +922,6 @@ describe('Question player engine service', () => {
       expect(alertsServiceSpy).toHaveBeenCalledWith(
         'Question name should not be empty.'
       );
-    });
-
-    it('should update the current index when a card is added', () => {
-      let submitAnswerSuccessCb = jasmine.createSpy('success');
-      let initSuccessCb = jasmine.createSpy('success');
-      let initErrorCb = jasmine.createSpy('fail');
-      let answer = 'answer';
-      let answerClassificationResult = new AnswerClassificationResult(
-        Outcome.createNew('default', '', '', []),
-        1,
-        0,
-        'default_outcome'
-      );
-      answerClassificationResult.outcome.labelledAsCorrect = true;
-
-      spyOn(pageContextService, 'setQuestionPlayerIsOpen');
-      spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
-      spyOn(
-        answerClassificationService,
-        'getMatchingClassificationResult'
-      ).and.returnValue(answerClassificationResult);
-      spyOn(expressionInterpolationService, 'processHtml').and.callFake(
-        (html, envs) => html
-      );
-
-      questionPlayerEngineService.init(
-        multipleQuestionsObjects,
-        initSuccessCb,
-        initErrorCb
-      );
-      questionPlayerEngineService.submitAnswer(
-        answer,
-        textInputService,
-        submitAnswerSuccessCb
-      );
-
-      expect(questionPlayerEngineService.getCurrentIndex()).toBe(0);
-
-      questionPlayerEngineService.recordNewCardAdded();
-
-      expect(questionPlayerEngineService.getCurrentIndex()).toBe(1);
     });
 
     it(

@@ -39,7 +39,6 @@ export class CardAnimationService {
   // If the exploration is iframed, send data to its parent about
   // its height so that the parent can be resized as necessary.
   lastRequestedHeight: number = 0;
-  lastRequestedScroll: boolean = false;
 
   constructor(
     private focusManagerService: FocusManagerService,
@@ -138,16 +137,11 @@ export class CardAnimationService {
    * Adjusts the iframe height to fit the content and optionally scrolls.
    * Sends height change message to the parent window.
    *
-   * @param {boolean} scroll - Whether the page should scroll to the new height.
-   * @param {Function} callback - Optional callback to run after height adjustment.
    */
-  adjustPageHeight(scroll: boolean, callback: () => void): void {
+  adjustPageHeight(): void {
     setTimeout(() => {
       let newHeight = document.body.scrollHeight;
-      if (
-        Math.abs(this.lastRequestedHeight - newHeight) > 50.5 ||
-        (scroll && !this.lastRequestedScroll)
-      ) {
+      if (Math.abs(this.lastRequestedHeight - newHeight) > 50.5) {
         // Sometimes setting iframe height to the exact content height
         // still produces scrollbar, so adding 50 extra px.
         newHeight += 50;
@@ -155,15 +149,10 @@ export class CardAnimationService {
           ServicesConstants.MESSENGER_PAYLOAD.HEIGHT_CHANGE,
           {
             height: newHeight,
-            scroll: scroll,
+            scroll: false,
           }
         );
         this.lastRequestedHeight = newHeight;
-        this.lastRequestedScroll = scroll;
-      }
-
-      if (callback) {
-        callback();
       }
     }, 100);
   }
@@ -174,7 +163,7 @@ export class CardAnimationService {
    */
   adjustPageHeightOnresize(): void {
     this.windowRef.nativeWindow.onresize = () => {
-      this.adjustPageHeight(false, () => {});
+      this.adjustPageHeight();
     };
   }
 
