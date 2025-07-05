@@ -82,7 +82,7 @@ describe('Exploration User Roles', function () {
 
     // Create exploration with explorationCreator user.
     await explorationCreator.navigateToCreatorDashboardPage();
-    await explorationCreator.navigateToExplorationEditorPage();
+    await explorationCreator.navigateToExplorationEditorFromCreatorDashboard();
     await explorationCreator.dismissWelcomeModal();
 
     await explorationCreator.createMinimalExploration(
