@@ -7,7 +7,7 @@ on:
   issues:
     types:
       - assigned
-permissions: {}
+permissions: read-all
 jobs:
   check-cla:
     runs-on: ubuntu-24.04
@@ -15,8 +15,6 @@ jobs:
       pull-requests: write
       issues: write
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -45,8 +43,7 @@ jobs:
 
               if (!sheetsCredJson.installed || !sheetsCredJson.installed.client_id || !sheetsCredJson.installed.client_secret || !sheetsCredJson.refresh_token) {
                 console.error("CLIENT_SECRET is missing required credential fields");
-                core.warning("CLIENT_SECRET is missing required credential fields");
-                core.setOutput('has-signed-cla', 'false');
+                core.setFailed('CLIENT_SECRET is missing required credential fields');
                 return;
               }
 
@@ -66,12 +63,12 @@ jobs:
 
               if (!response) {
                 console.error("No response from Google Sheets API");
-                core.setOutput('has-signed-cla', 'false');
+                core.setFailed('No response from Google Sheets API');
                 return;
               }
               if (!response.data.values) {
                 console.error("No values found in spreadsheet");
-                core.setOutput('has-signed-cla', 'false');
+                core.setFailed('No values found in spreadsheet');
                 return;
               }
 
@@ -92,7 +89,7 @@ jobs:
 
 
       - name: Remove assignee and notify if CLA not signed
-        if: steps.check-cla.outputs.has-signed-cla == 'false'
+        if: steps.check-cla.outputs.has-signed-cla != 'true'
         uses: actions/github-script@v6
         env:
           USERNAME: '${{ github.event.pull_request.user.login || github.event.assignee.login }}'
@@ -130,7 +127,6 @@ jobs:
               console.log(`Removed assignee ${username} from issue #${issue.number} due to unsigned CLA`);
 
             } else if (isPullRequest) {
-              // Handle pull request
               const pr = context.payload.pull_request;
               if (!pr) {
                 core.setFailed('Invalid pull request payload');
