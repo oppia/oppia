@@ -4,7 +4,6 @@ name: Checking PR description
     types:
       - opened
       - reopened
-      - edited
 permissions: {}
 jobs:
   check_pr_description:
@@ -40,7 +39,7 @@ jobs:
 
             if (missingSections.length > 0) {
                 const username = pr.user.login;
-                const comment = `Hi @${username}, your PR is missing the following required section(s):\n\n` + missingSections.map(s => `- ${s.replace(/^##\s*/, '')}`).join('\n') + `\n\nPlease update the description accordingly and open the PR.`;
+                const comment = `Hi @${username}, your PR is missing the following required section(s):\n\n` + missingSections.map(s => `- ${s.replace(/^##\s*/, '')}`).join('\n') + `\n\nPlease update the description accordingly and re-open the PR.`;
 
                 await github.rest.issues.createComment({
                     owner: context.repo.owner,
