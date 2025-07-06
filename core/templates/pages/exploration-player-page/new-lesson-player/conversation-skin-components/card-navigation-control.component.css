@@ -8,11 +8,11 @@
 /*
   This affects the progress nav bar.
 */
-.progress-nav-bar .oppia-nav-button .mat-button.oppia-autofocus:focus {
+.card-navigation-control .oppia-nav-button .mat-button.oppia-autofocus:focus {
     background-color: #0d48a1;
   }
   
-  .progress-nav-bar .oppia-learner-confirm-button {
+  .card-navigation-control .oppia-learner-confirm-button {
     border-radius: 2px;
     font-size: 16px;
     line-height: 22px;
@@ -20,25 +20,70 @@
     text-transform: uppercase;
   }
   
-  .progress-nav-bar .continue-button {
+  .card-navigation-control .continue-button {
     margin-bottom: 8px;
     margin-left: 8px;
     margin-right: 8px;
     margin-top: 12px;
   }
-  
-  .progress-nav-bar {
+
+  .card-navigation-control .oppia-learner-confirm-button,
+  .card-navigation-control.continue-button {
+    background: #0d48a1;
+    border: 1px solid #0d48a1;
+    border-radius: 4px;
+    box-shadow: inset -5px -5px 4px rgba(0, 0, 0, 0.25);
+    color: #fff;
+    display: flex;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    gap: 4px;
+    height: 44px;
+    letter-spacing: 0;
+    line-height: 22px;
+    padding: 10px 4px 10px 8px;
+    text-align: left;
+    width: 100%;
+  }
+
+  .card-navigation-control {
     background-color: white;
     margin-left: 0;
     margin-right: 0;
     max-width: 100%;
   }
   
-  .progress-nav-bar .oppia-nav-button {
+  .card-navigation-control .oppia-nav-button {
     height: 36px;
     margin: 0 12px 20px 12px;
     min-width: 36px;
     padding: 6px;
+  }
+
+  .card-navigation-control .oppia-nav-left-button {
+    background: #fcfcfd;
+    border: 1px solid #0d48a1;
+    border-radius: 4px;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+    color: #0d48a1;
+    height: 44px;
+    margin: 0 auto;
+    width: 44px;
+    padding: 10px 0;
+  }
+
+  .card-navigation-control .oppia-nav-right-button {
+    background: #fcfcfd;
+    border: 1px solid #0d48a1;
+    border-radius: 4px;
+    box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.25), inset -2px -2px 4px rgba(0, 0, 0, 0.3);
+    color: #0d48a1;
+    height: 44px;
+    margin: 0 auto;
+    width: 44px;
+    padding: 10px 0;
+    margin: 5px;
   }
   
   /*
@@ -47,7 +92,8 @@
     to replace the value of the input style to whatever is specified in the
     comment.
   */
-  .progress-nav-bar .oppia-arrow {
+  .card-navigation-control .oppia-arrow {
+    padding-bottom: 5px;
     font-size: 19px;
     padding-top: 1.5px;
     -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
@@ -55,28 +101,28 @@
     -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
     transform: scaleX(1) /*rtl:scaleX(-1)*/;
   }
-  .progress-nav-bar .oppia-nav-button.oppia-nav-left-button {
-    margin: 0 12px 12px 12px;
+  .card-navigation-control .oppia-nav-button.oppia-nav-left-button {
+    margin-left: 12px;
   }
   
-  .progress-nav-bar.row {
+  .card-navigation-control.row {
     display: flex;
     flex-direction: row;
   }
-  .progress-nav-bar.space-between {
+  .card-navigation-control.space-between {
     justify-content: space-between;
   }
-  .progress-nav-bar.center {
+  .card-navigation-control.center {
     align-content: center;
     align-items: center;
   }
-  .progress-nav-bar .row-item {
+  .card-navigation-control .row-item {
     flex-grow: 1;
   }
-  .progress-nav-bar .row-item-next-card {
+  .card-navigation-control .row-item-next-card {
     text-align: right;
   }
-  .progress-nav-bar .row-item-previous-card {
+  .card-navigation-control .row-item-previous-card {
     text-align: left;
   }
   
@@ -86,14 +132,14 @@
     to replace the value of the input style to whatever is specified in the
     comment.
   */
-  .progress-nav-bar .material-icons {
+  .card-navigation-control .material-icons {
     -moz-transform: scaleX(1) /*rtl:scaleX(-1)*/;
     -o-transform: scaleX(1) /*rtl:scaleX(-1)*/;
     -webkit-transform: scaleX(1) /*rtl:scaleX(-1)*/;
     transform: scaleX(1) /*rtl:scaleX(-1)*/;
   }
   
-  .progress-nav-bar .oppia-skip-button {
+  .card-navigation-control .oppia-skip-button {
     border: 1px solid #0d48a1;
     color: #0d48a1;
     font-weight: bold;

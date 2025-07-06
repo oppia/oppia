@@ -17,7 +17,6 @@ oppia-conversation-display .oppia-learner-view-card-top-section {
 }
 
 oppia-conversation-display .oppia-learner-view-card {
-  background-color: chocolate;
   border-radius: 2px;
   margin-left: 40px ;
   max-width: 100vw;
@@ -28,7 +27,6 @@ oppia-conversation-display .oppia-learner-view-card {
 }
 
 oppia-conversation-display .oppia-learner-view-card-top-content {
-  background-color: rgba(224,242,241,1);
   border-top-left-radius: 0;
   padding: 12px;
   width: 100%;
@@ -171,11 +169,24 @@ oppia-conversation-display .conversation-skin-responses-dropdown-icon-rotated {
 }
 
 oppia-conversation-display .conversation-skin-inline-interaction {
-  background-color: blue;
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
-  padding: 8px 20px 25px;
+  padding: 10px;
+  margin-left: 40px;
   position: relative;
+  border-radius: 16px;
+}
+
+oppia-conversation-display .conversation-skin-inline-interaction .form-control {
+  border: none;
+  outline: none;
+  padding: 0;
+}
+
+input.form-control:focus {
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 oppia-conversation-display .conversation-skin-inline-interaction .conversation-skin-user-avatar {
@@ -259,7 +270,8 @@ oppia-conversation-display .oppia-conversation-skin-inline-interaction {
 }
 
 oppia-conversation-display .oppia-conversation-skin-instruction-container {
-  background-color: chartreuse;
+  background-color: #fff;
+  border-radius: 8px;
   padding: 6px 12px;
 }
 

@@ -36,6 +36,7 @@ import isString from 'lodash/isString';
 
 import './input-response-pair.component.css';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 @Component({
   selector: 'oppia-input-response-pair',
@@ -59,6 +60,7 @@ export class InputResponsePairComponent {
 
   constructor(
     private audioPlayerService: AudioPlayerService,
+    private i18nLanguageCodeService: I18nLanguageCodeService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
@@ -108,6 +110,9 @@ export class InputResponsePairComponent {
     );
   }
 
+  isLanguageRTL(): boolean {
+    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
+  }
   // Returns a HTML string representing a short summary of the answer
   // , or null if the answer does not have to be summarized.
   getShortAnswerHtml(): string {
