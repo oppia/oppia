@@ -19,7 +19,6 @@
 
 import {Component, ElementRef, ViewChild} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {QuestionPlayerStateService} from 'components/question-directives/question-player/services/question-player-state.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {
   FetchExplorationBackendResponse,
@@ -48,6 +47,7 @@ import './exploration-footer.component.css';
 import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import {ConceptCardManagerService} from '../../services/concept-card-manager.service';
 import {StateCard} from 'domain/state_card/state-card.model';
+import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 
 @Component({
   selector: 'oppia-exploration-footer',
@@ -85,12 +85,12 @@ export class ExplorationFooterComponent {
 
   constructor(
     private pageContextService: PageContextService,
+    private questionPlayerEngineService: QuestionPlayerEngineService,
     private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private ngbModal: NgbModal,
     private urlService: UrlService,
     private conversationFlowService: ConversationFlowService,
-    private questionPlayerStateService: QuestionPlayerStateService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService,
     private loggerService: LoggerService,
@@ -146,7 +146,7 @@ export class ExplorationFooterComponent {
     } catch (err) {}
 
     if (this.pageContextService.isInQuestionPlayerMode()) {
-      this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.subscribe(
+      this.questionPlayerEngineService.resultsPageIsLoadedEventEmitter.subscribe(
         (resultsLoaded: boolean) => {
           this.hintsAndSolutionsAreSupported = !resultsLoaded;
         }

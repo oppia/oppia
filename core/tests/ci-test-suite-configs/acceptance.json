@@ -1,6 +1,42 @@
 {
   "suites": [
     {
+      "name": "interested-partner-organization/submit-a-partnership-application",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/submit-a-partnership-application.spec.ts"
+    },
+    {
+      "name": "interested-volunteer/apply-to-become-a-volunteer",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-volunteer/apply-to-become-a-volunteer.spec.ts"
+    },
+    {
+      "name": "interested-donor/learn-about-the-organization",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-donor/learn-about-the-organization.spec.ts"
+    },
+    {
+      "name": "interested-donor/make-a-donation",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-donor/make-a-donation.spec.ts"
+    },
+    {
+      "name": "interested-parent/attempt-to-contact-the-organization",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/attempt-to-contact-the-organization.spec.ts"
+    },
+    {
+      "name": "interested-parent/check-the-tos-and-privacy-pages",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/check-the-tos-and-privacy-pages.spec.ts"
+    },
+    {
+      "name": "interested-parent/download-the-android-app",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/download-the-android-app.spec.ts"
+    },
+    {
+      "name": "interested-parent/learn-about-the-organization",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/learn-about-the-organization.spec.ts"
+    },
+    {
+      "name": "interested-parent/sign-up-for-oppias-newsletter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/interested-parent/sign-up-for-oppias-newsletter.spec.ts"
+    },
+    {
       "name": "blog-admin/assign-roles-to-users-and-change-tag-properties",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-roles-to-users-and-change-tag-properties.spec.ts"
     },

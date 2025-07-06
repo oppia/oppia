@@ -29,10 +29,6 @@ import {Skill} from 'domain/skill/SkillObjectFactory';
 import {SkillDomainConstants} from 'domain/skill/skill-domain.constants';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {
-  WorkedExample,
-  WorkedExampleBackendDict,
-} from 'domain/skill/worked-example.model';
-import {
   SubtitledHtml,
   SubtitledHtmlBackendDict,
 } from 'domain/exploration/subtitled-html.model';
@@ -164,8 +160,8 @@ export class SkillUpdateService {
   private _applySkillContentsPropertyChange = (
     skill: Skill,
     propertyName: string,
-    newValue: WorkedExampleBackendDict[] | SubtitledHtmlBackendDict,
-    oldValue: WorkedExampleBackendDict[] | SubtitledHtmlBackendDict,
+    newValue: SubtitledHtmlBackendDict,
+    oldValue: SubtitledHtmlBackendDict,
     apply: SkillUpdateApply,
     reverse: SkillUpdateReverse
   ) => {
@@ -222,88 +218,6 @@ export class SkillUpdateService {
         skill.getConceptCard().setExplanation(oldExplanation);
       }
     );
-  }
-
-  addWorkedExample(skill: Skill, newWorkedExample: WorkedExample): void {
-    const oldWorkedExamples = cloneDeep(
-      skill.getConceptCard().getWorkedExamples()
-    );
-    const newWorkedExamples = cloneDeep(oldWorkedExamples);
-    newWorkedExamples.push(newWorkedExample);
-    this._applySkillContentsPropertyChange(
-      skill,
-      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-      newWorkedExamples.map(workedExample => {
-        return workedExample.toBackendDict();
-      }),
-      oldWorkedExamples.map(workedExample => workedExample.toBackendDict()),
-      (changeDict, skill) => {
-        skill.getConceptCard().setWorkedExamples(newWorkedExamples);
-      },
-      (changeDict, skill) => {
-        skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
-      }
-    );
-  }
-
-  deleteWorkedExample(skill: Skill, index: number): void {
-    const oldWorkedExamples = cloneDeep(
-      skill.getConceptCard().getWorkedExamples()
-    );
-    const newWorkedExamples = cloneDeep(oldWorkedExamples);
-    newWorkedExamples.splice(index, 1);
-    this._applySkillContentsPropertyChange(
-      skill,
-      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-      newWorkedExamples.map(workedExample => {
-        return workedExample.toBackendDict();
-      }),
-      oldWorkedExamples.map(workedExample => {
-        return workedExample.toBackendDict();
-      }),
-      (changeDict, skill) => {
-        skill.getConceptCard().setWorkedExamples(newWorkedExamples);
-      },
-      (changeDict, skill) => {
-        skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
-      }
-    );
-  }
-
-  updateWorkedExamples(skill: Skill, newWorkedExamples: WorkedExample[]): void {
-    const oldWorkedExamples = skill.getConceptCard().getWorkedExamples();
-    this._applySkillContentsPropertyChange(
-      skill,
-      SkillDomainConstants.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
-      newWorkedExamples.map(workedExample => {
-        return workedExample.toBackendDict();
-      }),
-      oldWorkedExamples.map(workedExample => {
-        return workedExample.toBackendDict();
-      }),
-      (changeDict, skill) => {
-        skill.getConceptCard().setWorkedExamples(newWorkedExamples);
-      },
-      (changeDict, skill) => {
-        skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
-      }
-    );
-  }
-
-  updateWorkedExample(
-    skill: Skill,
-    workedExampleIndex: number,
-    newWorkedExampleQuestionHtml: string,
-    newWorkedExampleAnswerHtml: string
-  ): void {
-    const newWorkedExamples = cloneDeep(
-      skill.getConceptCard().getWorkedExamples()
-    );
-    newWorkedExamples[workedExampleIndex].getQuestion().html =
-      newWorkedExampleQuestionHtml;
-    newWorkedExamples[workedExampleIndex].getExplanation().html =
-      newWorkedExampleAnswerHtml;
-    this.updateWorkedExamples(skill, newWorkedExamples);
   }
 
   addMisconception(skill: Skill, newMisconception: Misconception): void {
