@@ -129,7 +129,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
-        self.assertEqual(skill_summary.worked_examples_count, 0)
 
     def test_raises_error_when_the_skill_provided_with_no_created_on_data(
         self
@@ -311,7 +310,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
-        self.assertEqual(skill_summary.worked_examples_count, 0)
 
     def test_get_all_skill_summaries(self) -> None:
         skill_summaries = skill_services.get_all_skill_summaries()
@@ -320,7 +318,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].id, self.SKILL_ID)
         self.assertEqual(skill_summaries[0].description, 'Description')
         self.assertEqual(skill_summaries[0].misconception_count, 1)
-        self.assertEqual(skill_summaries[0].worked_examples_count, 0)
 
     def test_commit_log_entry(self) -> None:
         skill_commit_log_entry = (

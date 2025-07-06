@@ -18,8 +18,6 @@
 
 import {
   Component,
-  Output,
-  EventEmitter,
   Input,
   OnInit,
   OnDestroy,
@@ -40,6 +38,7 @@ import {PlayerPositionService} from '../../services/player-position.service';
 
 import './supplemental-card.component.css';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 
 @Component({
   selector: 'oppia-supplemental-card',
@@ -47,7 +46,6 @@ import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
   styleUrls: ['./supplemental-card.component.css'],
 })
 export class SupplementalCardComponent implements OnInit, OnDestroy {
-  @Output() clickContinueButton: EventEmitter<void> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -75,6 +73,7 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private currentInteractionService: CurrentInteractionService,
     private el: ElementRef,
+    private conversationFlowService: ConversationFlowService,
     private playerPositionService: PlayerPositionService,
     private urlInterpolationService: UrlInterpolationService,
     private voiceoverPlayerService: VoiceoverPlayerService,
@@ -187,5 +186,9 @@ export class SupplementalCardComponent implements OnInit, OnDestroy {
       return ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
     }
     return null;
+  }
+
+  onClickContinueButton(): void {
+    this.conversationFlowService.showUpcomingCard();
   }
 }

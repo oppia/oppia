@@ -1140,13 +1140,12 @@ class SkillSummaryTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'version': 1,
             'misconception_count': 1,
-            'worked_examples_count': 1,
             'skill_model_created_on': time_in_millisecs,
             'skill_model_last_updated': time_in_millisecs
         }
 
         self.skill_summary = skill_domain.SkillSummary(
-            'skill_id', 'description', 'en', 1, 1, 1,
+            'skill_id', 'description', 'en', 1, 1,
             current_time, current_time)
 
     def test_skill_summary_gets_created(self) -> None:
@@ -1205,24 +1204,6 @@ class SkillSummaryTests(test_utils.GenericTestBase):
                 'received \'-1\'')):
             self.skill_summary.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type the
-    # codebase we plan to get rid of the tests that intentionally test wrong
-    # inputs that we can normally catch by typing.
-    def test_validation_fails_with_invalid_worked_examples_count(self) -> None:
-        self.skill_summary.worked_examples_count = '10'  # type: ignore[assignment]
-        with self.assertRaisesRegex(
-            utils.ValidationError,
-            'Expected worked_examples_count to be an int, received \'10\''):
-            self.skill_summary.validate()
-
-    def test_validation_fails_with_negative_worked_examples_count(self) -> None:
-        self.skill_summary.worked_examples_count = -1
-        with self.assertRaisesRegex(
-            utils.ValidationError, (
-                'Expected worked_examples_count to be non-negative, '
-                'received \'-1\'')):
-            self.skill_summary.validate()
-
 
 class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
 
@@ -1232,7 +1213,7 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
         self.time_in_millisecs = utils.get_time_in_millisecs(current_time)
 
         self.augmented_skill_summary = skill_domain.AugmentedSkillSummary(
-            'skill_id', 'description', 'en', 1, 1, 1,
+            'skill_id', 'description', 'en', 1, 1,
             ['topic1'], ['math'], current_time, current_time)
 
     def test_augmented_skill_summary_gets_created(self) -> None:
@@ -1242,7 +1223,6 @@ class AugmentedSkillSummaryTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'version': 1,
             'misconception_count': 1,
-            'worked_examples_count': 1,
             'topic_names': ['topic1'],
             'classroom_names': ['math'],
             'skill_model_created_on': self.time_in_millisecs,
@@ -1342,7 +1322,7 @@ class ShortSkillSummaryTests(test_utils.GenericTestBase):
         super().setUp()
         self.skill_summary = skill_domain.SkillSummary(
             'skill_1', 'Description 1', 'en', 1,
-            0, 0, datetime.datetime.now(), datetime.datetime.now())
+            0, datetime.datetime.now(), datetime.datetime.now())
         self.short_skill_summary = skill_domain.ShortSkillSummary(
             'skill_1', 'Description 1')
 
