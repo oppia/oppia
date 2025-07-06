@@ -36,7 +36,6 @@ import {LoaderService} from 'services/loader.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
-import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
@@ -59,6 +58,7 @@ import {ChapterProgressService} from 'pages/exploration-player-page/services/cha
 import {CurrentEngineService} from 'pages/exploration-player-page/services/current-engine.service';
 import {CardAnimationService} from 'pages/exploration-player-page/services/card-animation.service';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
+import {DiagnosticTestTopicTrackerModel} from 'pages/diagnostic-test-player-page/diagnostic-test-topic-tracker.model';
 
 @Component({
   selector: 'oppia-new-conversation-skin',
@@ -66,23 +66,27 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
   styleUrls: ['./new-conversation-skin.component.css'],
 })
 export class NewConversationSkinComponent {
+  // This throws "Type 'QuestionPlayerConfig' is not assignable to type 'QuestionPlayerConfigDict'".
+  // We need to suppress this error because we are inputting it as type of QuestionPlayerConfig
+  // and passing it to a parameter of QuestionPlayerConfigDict, so it throws a type error.
+  // That's why we have to keep it ignored until we finalize the correct type.
+  // TODO: Reconcile the types QuestionPlayerConfig and QuestionPlayerConfigDict
+  // to remove the need for @ts-ignore and ensure type safety.
+  // @ts-ignore
   @Input() questionPlayerConfig;
-  @Input() diagnosticTestTopicTrackerModel;
+  @Input() diagnosticTestTopicTrackerModel!: DiagnosticTestTopicTrackerModel;
   directiveSubscriptions = new Subscription();
 
-  _editorPreviewMode;
+  _editorPreviewMode!: boolean;
 
-  isLoggedIn: boolean;
+  isLoggedIn!: boolean;
   voiceoversAreLoaded: boolean = false;
-  explorationId: string;
-  isIframed: boolean;
-  OPPIA_AVATAR_IMAGE_URL: string;
+  explorationId!: string;
+  isIframed!: boolean;
+  OPPIA_AVATAR_IMAGE_URL!: string;
   correctnessFooterIsShown: boolean = true;
-
-  collectionSummary;
-  moveToExploration: boolean;
-
-  pidInUrl: string;
+  collectionSummary: string | null = null;
+  pidInUrl!: string | null;
   submitButtonIsDisabled = true;
   isLearnerReallyStuck: boolean = false;
   showInteraction: boolean = true;
@@ -112,7 +116,6 @@ export class NewConversationSkinComponent {
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
-    private readOnlyCollectionBackendApiService: ReadOnlyCollectionBackendApiService,
     private statsReportingService: StatsReportingService,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
@@ -297,13 +300,20 @@ export class NewConversationSkinComponent {
       this.cardAnimationService.adjustPageHeightOnresize();
 
       this.currentInteractionService.setOnSubmitFn(
+        // This throws "Argument of type '(answer: string, interactionRulesService: InteractionRulesService) => void'
+        // is not assignable to parameter of type 'OnSubmitFn'. Types of parameters 'answer' and 'answer' are incompatible.
+        // Type 'InteractionAnswer' is not assignable to type 'string'."
+        // We need to suppress this error because the submitAnswer function currently expects a string,
+        // but the OnSubmitFn type allows for multiple types (e.g., number, boolean, object).
+        // This is safe in this context because the interaction associated with this component only returns string answers.
+        // TODO: Refactor submitAnswer to handle all InteractionAnswer types for full type safety.
+        // @ts-ignore
         this.conversationFlowService.submitAnswer.bind(
           this.conversationFlowService
         )
       );
-      this.initializePage();
 
-      this.collectionSummary = null;
+      this.initializePage();
 
       if (collectionId) {
         this.collectionPlayerBackendApiService
@@ -437,12 +447,25 @@ export class NewConversationSkinComponent {
     ) {
       return false;
     }
+
     let interaction = displayedCard.getInteraction();
-    return (
-      Boolean(interaction.id) &&
-      INTERACTION_SPECS[interaction.id].show_generic_submit_button &&
-      this.isCurrentCardAtEndOfTranscript()
-    );
+    if (!interaction || !interaction.id) {
+      return false;
+    }
+
+    const interactionId = interaction.id;
+
+    if (
+      typeof interactionId === 'string' &&
+      interactionId in INTERACTION_SPECS
+    ) {
+      return (
+        INTERACTION_SPECS[interactionId as keyof typeof INTERACTION_SPECS]
+          .show_generic_submit_button && this.isCurrentCardAtEndOfTranscript()
+      );
+    }
+
+    return false;
   }
 
   isCurrentCardAtEndOfTranscript(): boolean {
@@ -451,9 +474,10 @@ export class NewConversationSkinComponent {
 
   triggerRedirectionToStuckState(): void {
     // Redirect the learner.
-    this.conversationFlowService.setNextStateCard(
-      this.conversationFlowService.getNextCardIfStuck()
-    );
+    let nextStateCard = this.conversationFlowService.getNextCardIfStuck();
+    if (nextStateCard) {
+      this.conversationFlowService.setNextStateCard(nextStateCard);
+    }
     this.showInteraction = false;
     this.conversationFlowService.showPendingCard();
   }
