@@ -23,9 +23,9 @@
 }
 
 .conversation-wrapper {
-  flex: 1;
-  display: flex;
   align-items: flex-end;
+  display: flex;
+  flex: 1;
 }
 
 oppia-new-conversation-skin {
