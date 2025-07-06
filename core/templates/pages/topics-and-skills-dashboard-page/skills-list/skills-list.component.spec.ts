@@ -64,7 +64,6 @@ describe('Skills List Component', () => {
     language_code: 'sadf',
     version: 10,
     misconception_count: 0,
-    worked_examples_count: 1,
     skill_model_created_on: 2,
     skill_model_last_updated: 3,
     topic_names: ['a'],

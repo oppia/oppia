@@ -22,7 +22,6 @@ export interface AugmentedSkillSummaryBackendDict {
   language_code: string;
   version: number;
   misconception_count: number;
-  worked_examples_count: number;
   skill_model_created_on: number;
   skill_model_last_updated: number;
   topic_names: string[];
@@ -36,7 +35,6 @@ export class AugmentedSkillSummary {
     public languageCode: string,
     public version: number,
     public misconceptionCount: number,
-    public workedExamplesCount: number,
     public skillModelCreatedOn: number,
     public skillModelLastUpdated: number,
     public topicNames: string[],
@@ -52,7 +50,6 @@ export class AugmentedSkillSummary {
       summaryDict.language_code,
       summaryDict.version,
       summaryDict.misconception_count,
-      summaryDict.worked_examples_count,
       summaryDict.skill_model_created_on,
       summaryDict.skill_model_last_updated,
       summaryDict.topic_names,

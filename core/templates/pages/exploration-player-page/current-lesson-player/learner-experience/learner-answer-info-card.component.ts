@@ -16,27 +16,19 @@
  * @fileoverview Component for asking learner for answer details.
  */
 
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component} from '@angular/core';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {InteractionRulesService} from '../../services/answer-classification.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {LearnerAnswerInfoService} from '../../services/learner-answer-info.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
-
-interface SubmitAnswerEventDataInterface {
-  currentAnswer: string;
-  rulesService: InteractionRulesService;
-}
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 
 @Component({
   selector: 'oppia-learner-answer-info-card',
   templateUrl: './learner-answer-info-card.component.html',
 })
 export class LearnerAnswerInfoCard {
-  @Output() submitAnswer: EventEmitter<SubmitAnswerEventDataInterface> =
-    new EventEmitter();
-
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -47,6 +39,7 @@ export class LearnerAnswerInfoCard {
     private explorationEngineService: ExplorationEngineService,
     private explorationHtmlFormatter: ExplorationHtmlFormatterService,
     private learnerAnswerInfoService: LearnerAnswerInfoService,
+    private conversationFlowService: ConversationFlowService,
     private playerTranscriptService: PlayerTranscriptService
   ) {
     this.interaction = this.explorationEngineService.getState().interaction;
@@ -58,11 +51,10 @@ export class LearnerAnswerInfoCard {
     this.playerTranscriptService.addNewResponse(
       this.learnerAnswerInfoService.getSolicitAnswerDetailsFeedback()
     );
-    this.submitAnswer.emit({
-      currentAnswer: this.learnerAnswerInfoService.getCurrentAnswer(),
-      rulesService:
-        this.learnerAnswerInfoService.getCurrentInteractionRulesService(),
-    });
+    this.conversationFlowService.submitAnswer(
+      this.learnerAnswerInfoService.getCurrentAnswer(),
+      this.learnerAnswerInfoService.getCurrentInteractionRulesService()
+    );
   }
 
   displayCurrentAnswer(): string {

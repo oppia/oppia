@@ -42,7 +42,6 @@ let skillSummaryBackendDict: SkillSummaryBackendDict = {
   language_code: 'sadf',
   version: 10,
   misconception_count: 0,
-  worked_examples_count: 1,
   skill_model_created_on: 2,
   skill_model_last_updated: 3,
 };
@@ -74,7 +73,6 @@ const topicsAndSkillsDashboardData: TopicsAndSkillDashboardData = {
       languageCode: 'en',
       version: 1,
       misconceptionCount: 0,
-      workedExamplesCount: 0,
       skillModelCreatedOn: 1622827020924.104,
       skillModelLastUpdated: 1622827020924.109,
     },

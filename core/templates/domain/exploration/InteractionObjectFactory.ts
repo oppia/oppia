@@ -27,11 +27,7 @@ import {
 } from 'domain/exploration/answer-group.model';
 import {HintBackendDict, Hint} from 'domain/exploration/hint-object.model';
 import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
-import {
-  SolutionBackendDict,
-  Solution,
-  SolutionObjectFactory,
-} from 'domain/exploration/SolutionObjectFactory';
+import {SolutionBackendDict, Solution} from 'domain/exploration/solution.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {
   AlgebraicExpressionInputCustomizationArgs,
@@ -330,7 +326,7 @@ export class Interaction extends BaseTranslatableObject {
   providedIn: 'root',
 })
 export class InteractionObjectFactory {
-  constructor(private solutionFactory: SolutionObjectFactory) {}
+  constructor() {}
 
   _createFromContinueCustomizationArgsBackendDict(
     caBackendDict: ContinueCustomizationArgsBackendDict
@@ -591,6 +587,6 @@ export class InteractionObjectFactory {
   createSolutionFromBackendDict(
     solutionBackendDict: SolutionBackendDict
   ): Solution {
-    return this.solutionFactory.createFromBackendDict(solutionBackendDict);
+    return Solution.createFromBackendDict(solutionBackendDict);
   }
 }

@@ -82,7 +82,7 @@ describe('Exploration Creator', function () {
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
 
-      await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
 
       await explorationEditor.dismissWelcomeModal();
 
