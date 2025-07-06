@@ -4099,8 +4099,7 @@ oppia-response-text-input {
 }
 
 @media screen and (max-width: 959px) {
-  .conversation-skin-user-avatar,
-  .conversation-skin-oppia-avatar {
+  .conversation-skin-user-avatar {
     display: none;
   }
 }

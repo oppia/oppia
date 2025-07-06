@@ -434,7 +434,7 @@ import { TopicEditorAuthGuard } from 'pages/topic-editor-page/topic-editor-auth.
 import { TopicsAndSkillsDashboardAuthGuard } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-auth.guard';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
-import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
+import { LessonPlayerPageAuthGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-auth.guard';
 import { SkillEditorAccessGuard } from 'pages/skill-editor-page/skill-editor-access.guard';
 import { MobileMenuService } from 'pages/exploration-player-page/services/mobile-menu.service';
 import { CollectionEditorPageAuthGuard } from 'pages/collection-editor-page/collection-editor-page-auth.guard';
@@ -672,7 +672,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ItemSelectionInputRulesService', ItemSelectionInputRulesService],
   ['ItemSelectionInputValidationService', ItemSelectionInputValidationService],
   ['IsLoggedInGuard', IsLoggedInGuard],
-  ['IsNewLessonPlayerGuard', IsNewLessonPlayerGuard],
+  ['LessonPlayerPageAuthGuard', LessonPlayerPageAuthGuard],
   ['KeyboardShortcutService', KeyboardShortcutService],
   ['LanguageBannerService', LanguageBannerService],
   ['LanguageUtilService', LanguageUtilService],
