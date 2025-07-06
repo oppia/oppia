@@ -10,72 +10,15 @@
   position: relative;
 }
 
-.conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
-  height: 100px;
-  left: -104px;
-  top: 2px;
-  width: 100px;
-}
-
-
-.conversation-skin-oppia-feedback-container {
-  border-radius: 0 16px 16px;
-  margin-top: 10px;
-  background-color: #fff;
-  width: 70%;
-}
-
-.conversation-skin-learner-answer-content {
-  /* background-color: rgba(236,239,241,1); */
-  border-bottom-right-radius: 0;
-}
-
-.conversation-skin-oppia-feedback-content,
-.conversation-skin-learner-answer-content {
-  padding: 12px;
-  word-wrap: break-word;
-}
-
-.conversation-skin-oppia-feedback-content,
-.conversation-skin-help-card-content {
-  /* background-color: rgba(224,242,241,1); */
-  border-top-left-radius: 0;
-}
-
 .conversation-skin-learner-answer-container {
-  border-radius: 16px 0 16px 16px;
-  margin-top: 10px;
-  background-color: #fff8e5;
-  width: 70%;
-}
-
-.answer-wrapper {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.answer-wrapper .right-side-curve {
-  height: 49px;
-  right: -36px;
-  position: absolute;
-  top: -9px;
-  width: 39px;
-  transform: scaleX(-1);
-}
-
-.feedback-wrapper .left-side-curve {
-  height: 49px;
-  left: -37px;
-  position: absolute;
-  top: -9px;
-  width: 39px;
+  text-align: right;
 }
 
 .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
   border: 2px solid #094142;
   height: 100px;
-  right: -104px;
-  top: 3px;
+  right: -98px;
+  top: -33px;
   width: 100px;
 }
 
@@ -139,74 +82,4 @@ oppia-input-response-pair .oppia-popover {
 
 .conversation-skin-oppia-avatar {
   left: -87px;
-}
-
-
-/* ======================================================================================================= */
-
-@media (max-width: 480px) {
-  .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
-    height: 34px;
-    left: -37px;
-    top: 5px;
-    width: 34px;
-  }
-
-  .answer-wrapper .right-side-curve {
-    height: 29px;
-    right: -17px;
-    position: absolute;
-    top: -7px;
-    width: 19px;
-    transform: scaleX(-1);
-  }
-
-  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
-    border: 2px solid #094142;
-    height: 34px;
-    right: -39px;
-    top: 6px;
-    width: 34px;
-  }
-
-  .feedback-wrapper .left-side-curve {
-    height: 29px;
-    left: -18px;
-    position: absolute;
-    top: -7px;
-    width: 19px;
-  }
-}
-
-@media (min-width: 481px) and (max-width: 768px) {
-  .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
-    height: 64px;
-    left: -68px;
-    top: 5px;
-    width: 64px;
-  }
-
-  .feedback-wrapper .left-side-curve {
-    height: 39px;
-    left: -27px;
-    position: absolute;
-    top: -8px;
-    width: 29px;
-  }
-
-  .answer-wrapper .right-side-curve {
-    height: 39px;
-    right: -28px;
-    position: absolute;
-    top: -8px;
-    width: 29px;
-    transform: scaleX(-1);
-  }
-
-  .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
-    height: 64px;
-    right: -69px;
-    top: 3px;
-    width: 64px;
-  }
 }

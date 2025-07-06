@@ -211,6 +211,7 @@ import {SaveVersionMismatchModalComponent} from 'pages/exploration-editor-page/m
 import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import {SaveValidationFailModalComponent} from 'pages/exploration-editor-page/modal-templates/save-validation-fail-modal.component';
 import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component';
+import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-input-response-pair.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -292,6 +293,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    NewInputResponsePairComponent,
     ImageUploaderComponent,
     ImageUploaderModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -464,6 +466,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    NewInputResponsePairComponent,
     ImageUploaderComponent,
     ImageUploaderModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -618,6 +621,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    NewInputResponsePairComponent,
     ImageUploaderComponent,
     ImageUploaderModalComponent,
     LazyLoadingComponent,
