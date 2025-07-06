@@ -67,7 +67,6 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
 
 .new-conversation-skin-tutor-card-container {
   flex-shrink: 10000;
-  /* margin-bottom: 84px; */
   margin-bottom: 10px;
   max-width: 650px;
   /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
@@ -204,7 +203,6 @@ oppia-new-conversation-skin .oppia-button-icon {
   }
 }
 
-/* ======================================================================================================== */
 
 @media (max-width: 480px) {
   .new-conversation-skin-cards-container {
