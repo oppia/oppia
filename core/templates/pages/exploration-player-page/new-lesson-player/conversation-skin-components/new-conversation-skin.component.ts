@@ -70,7 +70,7 @@ export class NewConversationSkinComponent {
   // We need to suppress this error because we are inputting it as type of QuestionPlayerConfig
   // and passing it to a parameter of QuestionPlayerConfigDict, so it throws a type error.
   // That's why we have to keep it ignored until we finalize the correct type.
-  // TODO: Reconcile the types QuestionPlayerConfig and QuestionPlayerConfigDict
+  // TODO(#10474): Reconcile the types QuestionPlayerConfig and QuestionPlayerConfigDict
   // to remove the need for @ts-ignore and ensure type safety.
   // @ts-ignore
   @Input() questionPlayerConfig;
@@ -306,7 +306,7 @@ export class NewConversationSkinComponent {
         // We need to suppress this error because the submitAnswer function currently expects a string,
         // but the OnSubmitFn type allows for multiple types (e.g., number, boolean, object).
         // This is safe in this context because the interaction associated with this component only returns string answers.
-        // TODO: Refactor submitAnswer to handle all InteractionAnswer types for full type safety.
+        // TODO(#10474): Refactor submitAnswer to handle all InteractionAnswer types for full type safety.
         // @ts-ignore
         this.conversationFlowService.submitAnswer.bind(
           this.conversationFlowService

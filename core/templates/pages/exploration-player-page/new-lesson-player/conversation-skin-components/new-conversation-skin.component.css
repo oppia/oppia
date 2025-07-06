@@ -9,13 +9,13 @@ otherwise they will interfere with the iframed conversation skin directive. */
 
 /* All classes below should start with .conversation-skin */
 .new-conversation-skin-correctness-footer-container {
-    bottom: 40px;
-    left: 0;
-    padding: 0;
-    pointer-events: none;
-    position: fixed;
-    width: 100%;
-    z-index: 16;
+  bottom: 40px;
+  left: 0;
+  padding: 0;
+  pointer-events: none;
+  position: fixed;
+  width: 100%;
+  z-index: 16;
 }
 
 oppia-new-conversation-skin .new-supplemental-card-parent-container {
@@ -211,4 +211,3 @@ oppia-new-conversation-skin .oppia-button-icon {
     margin-bottom: 200px;
   }
 }
-

@@ -41,7 +41,6 @@ import {UserService} from 'services/user.service';
 import {ExplorationPlayerConstants} from '../../../current-lesson-player/exploration-player-page.constants';
 import {AudioPreloaderService} from '../../../services/audio-preloader.service';
 import {CurrentInteractionService} from '../../../services/current-interaction.service';
-import {LearnerAnswerInfoService} from '../../../services/learner-answer-info.service';
 import {PlayerPositionService} from '../../../services/player-position.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {
@@ -137,7 +136,6 @@ export class ConversationDisplayComponent {
   interactionInstructions!: string | null;
   inStoryMode!: boolean;
   isIframed!: boolean;
-  getCanAskLearnerForAnswerInfo!: () => boolean;
   OPPIA_AVATAR_IMAGE_URL!: string;
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
@@ -162,7 +160,6 @@ export class ConversationDisplayComponent {
     private deviceInfoService: DeviceInfoService,
     private explorationModeService: ExplorationModeService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private learnerAnswerInfoService: LearnerAnswerInfoService,
     private playerPositionService: PlayerPositionService,
     private chapterProgressService: ChapterProgressService,
     private urlInterpolationService: UrlInterpolationService,
@@ -218,8 +215,6 @@ export class ConversationDisplayComponent {
       this.pageContextService.isInExplorationPlayerPage();
     this.getUserInfoAsync();
     this.isIframed = this.urlService.isIframed();
-    this.getCanAskLearnerForAnswerInfo =
-      this.learnerAnswerInfoService.getCanAskLearnerForAnswerInfo;
     this.OPPIA_AVATAR_IMAGE_URL =
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
