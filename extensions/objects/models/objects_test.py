@@ -965,7 +965,9 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                     # skew between it and the key that is used in the default
                     # value.
                     self.assertEqual(
-                        sorted(['contentId', member._value_key_name]),  # pylint: disable=protected-access
+                        sorted(
+                            ['contentId', member._value_key_name] # pylint: disable=protected-access
+                        ),
                         sorted(member.default_value.keys()))
                     self.assertIsNone(member.default_value['contentId'])
 
