@@ -380,7 +380,18 @@
       "name": "logged-out-learner/share-the-lesson-from-the-lesson-player",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/share-the-lesson-from-the-lesson-player.spec.ts"
     },
-    {"name": "logged-in-learner/see-their-progress-on-learner-dashboard", "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/see-their-progress-on-learner-dashboard.spec.ts"}
+    {
+      "name": "logged-in-learner/chooses-new-lesson-to-play-from-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/chooses-new-lesson-to-play-from-learner-dashboard.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/see-their-progress-on-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/see-their-progress-on-learner-dashboard.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/sets-goal-on-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/sets-goal-on-learner-dashboard.spec.ts"
+    }
   ],
   "docker_suites": []
 }

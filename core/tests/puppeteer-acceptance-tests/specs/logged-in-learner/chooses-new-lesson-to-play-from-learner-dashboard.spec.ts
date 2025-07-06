@@ -13,11 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview
- * Acceptance test from CUJv3 Doc
+ * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * LI.DP. Learner sees their progress on the Learner Dashboard
+ * LI.DM. Learner chooses new lessons to play from their Learner Dashboard
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -25,21 +24,22 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Logged-In Learner', function () {
-  let loggedInLearner: LoggedInUser;
+describe('Interested Partner Organization', function () {
+  let loggedInLearner: LoggedOutUser & LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
-
   let explorationId1: string;
   let explorationId2: string;
 
   beforeAll(async function () {
+    // Create users.
     loggedInLearner = await UserFactory.createNewUser(
-      'learner',
-      'learner@example.com'
+      'loggedInLearner',
+      'logged_in_learner@example.com'
     );
 
     curriculumAdmin = await UserFactory.createNewUser(
@@ -48,11 +48,12 @@ describe('Logged-In Learner', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    // Create 2 Explorations.
+    // Create explorations.
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Negative Numbers'
       );
+
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Positive Numbers',
@@ -60,19 +61,20 @@ describe('Logged-In Learner', function () {
         false
       );
 
-    // Create "Algebra I" topic and add the topic to "Math" classroom.
+    // Create topic, classroom and add explorations to the topic.
+
     await curriculumAdmin.createAndPublishTopic(
       'Algebra I',
       'Negative Numbers',
       'Negative Numbers'
     );
+
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
       'Algebra I'
     );
 
-    // Create a story and add above 2 explorations as chapters.
     await curriculumAdmin.addStoryToTopic(
       'Test Story 1',
       'test-story-one',
@@ -90,13 +92,41 @@ describe('Logged-In Learner', function () {
     await curriculumAdmin.publishStoryDraft();
   });
 
-  it('should be able to see their progress in Learner Dashbaord', async function () {
-    // Navigate to Learner Dashboard using profile dropdown.
+  it('should be able to add a goal', async function () {
+    // Navigate to goals section.
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
-    await loggedInLearner.expectContinueWhereYouLeftOffSectionInLDToBePresent(
-      false
+    await loggedInLearner.navigateToGoalsSection();
+
+    // Add "Math" to the goal list.
+    await loggedInLearner.addGoals(['Math']);
+    await loggedInLearner.expectToolTipMessage(
+      "Successfully added to your 'Current Goals' list."
     );
+
+    await loggedInLearner.expectCurrentGoalsToInclude('Learn Math');
+  });
+
+  it('should be able to open learner dashboard', async function () {
+    // Navigate to learner dashboard using profile dropdown menu.
+    await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
+    await loggedInLearner.expectSectinoHeadingInLDToContain([
+      'Continue where you left off',
+      'Learn Something New',
+    ]);
+
+    // Play the exploration from continue where you left off section.
+    await loggedInLearner.expectContinueWhereYouLeftOffSectionInLDToBePresent();
     await loggedInLearner.expectLearnSomethingNewInLDToBeEmpty();
+
+    await loggedInLearner.playLessonFromContinueWhereLeftOff('Algebra I');
+    // The exploration has a single state.
+    await loggedInLearner.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
+
+    // Navigate to learner dashboard using profile dropdown menu.
+    await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
+    // TODO: complete from here.
   });
 
   afterAll(async function () {

@@ -17,7 +17,7 @@
  * Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * LI.DP. Learner sees their progress on the Learner Dashboard
+ * IO.PP. Partner submits a partnerships application.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -25,34 +25,35 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
 describe('Logged-In Learner', function () {
-  let loggedInLearner: LoggedInUser;
+  let loggedInLearner: LoggedOutUser & LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
-
   let explorationId1: string;
   let explorationId2: string;
 
   beforeAll(async function () {
+    // Create users.
     loggedInLearner = await UserFactory.createNewUser(
-      'learner',
-      'learner@example.com'
+      'loggedInLearner',
+      'logged_in_learner@example.com'
     );
-
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculumAdmin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    // Create 2 Explorations.
+    // Create explorations.
     explorationId1 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Negative Numbers'
       );
+
     explorationId2 =
       await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
         'Positive Numbers',
@@ -60,19 +61,19 @@ describe('Logged-In Learner', function () {
         false
       );
 
-    // Create "Algebra I" topic and add the topic to "Math" classroom.
+    // Create topic, classroom and add explorations to the topic.
     await curriculumAdmin.createAndPublishTopic(
       'Algebra I',
       'Negative Numbers',
       'Negative Numbers'
     );
+
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
       'Algebra I'
     );
 
-    // Create a story and add above 2 explorations as chapters.
     await curriculumAdmin.addStoryToTopic(
       'Test Story 1',
       'test-story-one',
@@ -90,13 +91,38 @@ describe('Logged-In Learner', function () {
     await curriculumAdmin.publishStoryDraft();
   });
 
-  it('should be able to see their progress in Learner Dashbaord', async function () {
-    // Navigate to Learner Dashboard using profile dropdown.
+  it('should be able to see goals section', async function () {
+    // Navigate to the goals section.
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
-    await loggedInLearner.expectContinueWhereYouLeftOffSectionInLDToBePresent(
-      false
+    await loggedInLearner.navigateToGoalsSection();
+
+    await loggedInLearner.expectGoalsSectionToContainHeadings([
+      'Current Goals',
+      'Edit Goals',
+      'Completed Lessons',
+    ]);
+
+    await loggedInLearner.expectCurrentGoalsSectionToBeEmpty();
+  });
+
+  it('should be able to add a goal', async function () {
+    await loggedInLearner.addGoals(['Algebra I']);
+    await loggedInLearner.expectToolTipMessage(
+      "Successfully added to your 'Current Goals' list."
     );
-    await loggedInLearner.expectLearnSomethingNewInLDToBeEmpty();
+
+    await loggedInLearner.expectCurrentGoalsSectionToBeEmpty(false);
+  });
+
+  it('should be able to remove a goal', async function () {
+    await loggedInLearner.clickOnCheckboxOfFirstCurrentGoalAndRemoveIt();
+
+    await loggedInLearner.expectRemoveActivityModelToBeDisplayed(
+      "Remove from 'Current Goals' list?",
+      "Are you sure you want to remove 'Algebra' from your 'Current Goals' list?"
+    );
+    await loggedInLearner.clickButtonInRemoveActivityModal('Remove');
+    await loggedInLearner.expectCurrentGoalsSectionToBeEmpty();
   });
 
   afterAll(async function () {
