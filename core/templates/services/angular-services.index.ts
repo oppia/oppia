@@ -448,6 +448,7 @@ import { ExplorationModeService } from 'pages/exploration-player-page/services/e
 import { CheckpointProgressService } from 'pages/exploration-player-page/services/checkpoint-progress.service';
 import { ProgressUrlService } from 'pages/exploration-player-page/services/progress-url.service';
 import { ExplorationInitializationService } from 'pages/exploration-player-page/services/exploration-initialization.service';
+import { CardAnimationService } from 'pages/exploration-player-page/services/card-animation.service';
 
 
 export const angularServices: [string, Type<{}>][] = [
@@ -490,6 +491,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BrowserCheckerService', BrowserCheckerService],
   ['CamelCaseToHyphensPipe', CamelCaseToHyphensPipe],
   ['CapitalizePipe', CapitalizePipe],
+  ['CardAnimationService', CardAnimationService],
   ['CheckpointCelebrationUtilityService', CheckpointCelebrationUtilityService],
   ['CkEditorCopyContentService', CkEditorCopyContentService],
   ['CkEditorInitializerService', CkEditorInitializerService],

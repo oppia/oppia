@@ -45,7 +45,6 @@ SKILL_PROPERTY_ALL_QUESTIONS_MERGED: Final = 'all_questions_merged'
 SKILL_PROPERTY_PREREQUISITE_SKILL_IDS: Final = 'prerequisite_skill_ids'
 
 SKILL_CONTENTS_PROPERTY_EXPLANATION: Final = 'explanation'
-SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES: Final = 'worked_examples'
 
 SKILL_MISCONCEPTIONS_PROPERTY_NAME: Final = 'name'
 SKILL_MISCONCEPTIONS_PROPERTY_NOTES: Final = 'notes'
@@ -1846,7 +1845,6 @@ class SkillSummaryDict(TypedDict):
     language_code: str
     version: int
     misconception_count: int
-    worked_examples_count: int
     skill_model_created_on: float
     skill_model_last_updated: float
 
@@ -1861,7 +1859,6 @@ class SkillSummary:
         language_code: str,
         version: int,
         misconception_count: int,
-        worked_examples_count: int,
         skill_model_created_on: datetime.datetime,
         skill_model_last_updated: datetime.datetime
     ) -> None:
@@ -1874,8 +1871,6 @@ class SkillSummary:
             version: int. The version of the skill.
             misconception_count: int. The number of misconceptions associated
                 with the skill.
-            worked_examples_count: int. The number of worked examples in the
-                skill.
             skill_model_created_on: datetime.datetime. Date and time when
                 the skill model is created.
             skill_model_last_updated: datetime.datetime. Date and time
@@ -1886,7 +1881,6 @@ class SkillSummary:
         self.language_code = language_code
         self.version = version
         self.misconception_count = misconception_count
-        self.worked_examples_count = worked_examples_count
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
 
@@ -1921,16 +1915,6 @@ class SkillSummary:
                 'Expected misconception_count to be non-negative, '
                 'received \'%s\'' % self.misconception_count)
 
-        if not isinstance(self.worked_examples_count, int):
-            raise utils.ValidationError(
-                'Expected worked_examples_count to be an int, '
-                'received \'%s\'' % self.worked_examples_count)
-
-        if self.worked_examples_count < 0:
-            raise utils.ValidationError(
-                'Expected worked_examples_count to be non-negative, '
-                'received \'%s\'' % self.worked_examples_count)
-
     def to_dict(self) -> SkillSummaryDict:
         """Returns a dictionary representation of this domain object.
 
@@ -1943,7 +1927,6 @@ class SkillSummary:
             'language_code': self.language_code,
             'version': self.version,
             'misconception_count': self.misconception_count,
-            'worked_examples_count': self.worked_examples_count,
             'skill_model_created_on': utils.get_time_in_millisecs(
                 self.skill_model_created_on),
             'skill_model_last_updated': utils.get_time_in_millisecs(
@@ -1959,7 +1942,6 @@ class AugmentedSkillSummaryDict(TypedDict):
     language_code: str
     version: int
     misconception_count: int
-    worked_examples_count: int
     topic_names: List[str]
     classroom_names: List[str]
     skill_model_created_on: float
@@ -1979,7 +1961,6 @@ class AugmentedSkillSummary:
         language_code: str,
         version: int,
         misconception_count: int,
-        worked_examples_count: int,
         topic_names: List[str],
         classroom_names: List[str],
         skill_model_created_on: datetime.datetime,
@@ -1994,8 +1975,6 @@ class AugmentedSkillSummary:
             version: int. The version of the skill.
             misconception_count: int. The number of misconceptions associated
                 with the skill.
-            worked_examples_count: int. The number of worked examples in the
-                skill.
             topic_names: list(str). The names of the topics to which the skill
                 is assigned.
             classroom_names: list(str). The names of the classrooms to which the
@@ -2010,7 +1989,6 @@ class AugmentedSkillSummary:
         self.language_code = language_code
         self.version = version
         self.misconception_count = misconception_count
-        self.worked_examples_count = worked_examples_count
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
         self.topic_names = topic_names
@@ -2028,7 +2006,6 @@ class AugmentedSkillSummary:
             'language_code': self.language_code,
             'version': self.version,
             'misconception_count': self.misconception_count,
-            'worked_examples_count': self.worked_examples_count,
             'topic_names': self.topic_names,
             'classroom_names': self.classroom_names,
             'skill_model_created_on': utils.get_time_in_millisecs(
