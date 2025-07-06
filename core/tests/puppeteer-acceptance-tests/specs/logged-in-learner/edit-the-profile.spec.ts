@@ -124,8 +124,9 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.saveChangesInPreferencesPage();
 
     await loggedInLearner.waitForNetworkIdle();
-    await loggedInLearner.navigateToSplashPage(false);
-    expect(loggedInLearner.page.url()).toContain('/creator-dashboard');
+    await loggedInLearner.navigateToSplashPage(
+      'https://localhost:8181/creator-dashboard'
+    );
   });
 
   it('should be able to go to their profile by clicking on their username', async function () {
