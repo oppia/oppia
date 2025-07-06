@@ -13,10 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Auth guard for the exploration player page.
+ * @fileoverview Auth guard for the lesson player page.
  */
 
-import {Location} from '@angular/common';
 import {Injectable} from '@angular/core';
 import {
   ActivatedRouteSnapshot,
@@ -26,13 +25,14 @@ import {
 } from '@angular/router';
 
 import {AppConstants} from 'app.constants';
+import {Location} from '@angular/common';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class ExplorationPlayerPageAuthGuard implements CanActivate {
+export class LessonPlayerPageAuthGuard implements CanActivate {
   constructor(
     private platformFeatureService: PlatformFeatureService,
     private accessValidationBackendApiService: AccessValidationBackendApiService,
@@ -47,41 +47,45 @@ export class ExplorationPlayerPageAuthGuard implements CanActivate {
     return new Promise<boolean>(resolve => {
       const version = route.queryParams.v || null;
       let explorationId = route.paramMap.get('exploration_id') || '';
-      this.accessValidationBackendApiService
-        .validateAccessToExplorationPlayerPage(explorationId, version)
-        .then(() => {
-          if (this.platformFeatureService.status.NewLessonPlayer.isEnabled) {
-            const tree = this.router.createUrlTree(['/lesson', explorationId], {
-              queryParams: route.queryParams,
-            });
-            this.router.navigateByUrl(tree).then(() => resolve(false));
-          } else {
+      if (this.platformFeatureService.status.NewLessonPlayer.isEnabled) {
+        this.accessValidationBackendApiService
+          .validateAccessToExplorationPlayerPage(explorationId, version)
+          .then(() => {
             resolve(true);
-          }
-        })
-        .catch(err => {
-          let currentUrl = state.url;
-          if (currentUrl.includes('embed')) {
-            this.router
-              .navigate([
-                `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE}`,
-              ])
-              .then(() => {
-                this.location.replaceState(state.url);
-                resolve(false);
-              });
-            return;
-          } else {
-            this.router
-              .navigate([
-                `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${err.status}`,
-              ])
-              .then(() => {
-                this.location.replaceState(state.url);
-                resolve(false);
-              });
-          }
-        });
+          })
+          .catch(err => {
+            let currentUrl = state.url;
+            if (currentUrl.includes('embed')) {
+              this.router
+                .navigate([
+                  `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE}`,
+                ])
+                .then(() => {
+                  this.location.replaceState(state.url);
+                  resolve(false);
+                });
+              return;
+            } else {
+              this.router
+                .navigate([
+                  `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/${err.status}`,
+                ])
+                .then(() => {
+                  this.location.replaceState(state.url);
+                  resolve(false);
+                });
+            }
+          });
+      } else {
+        this.router
+          .navigate([
+            `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
+          ])
+          .then(() => {
+            this.location.replaceState(state.url);
+            resolve(false);
+          });
+      }
     });
   }
 }
