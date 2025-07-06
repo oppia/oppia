@@ -42,6 +42,7 @@ import {PlayerFooterComponent} from './conversation-skin-components/progress-tra
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
 import {NewConversationSkinComponent} from './conversation-skin-components/new-conversation-skin.component';
 import {ConversationDisplayComponent} from './conversation-skin-components/conversation-display-components/conversation-display.component';
+import {CardNavigationControlComponent} from './conversation-skin-components/card-navigation-control.component';
 
 @NgModule({
   imports: [
@@ -59,6 +60,7 @@ import {ConversationDisplayComponent} from './conversation-skin-components/conve
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
+    CardNavigationControlComponent,
     ConversationDisplayComponent,
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
@@ -69,6 +71,7 @@ import {ConversationDisplayComponent} from './conversation-skin-components/conve
     NewAudioBarComponent,
   ],
   entryComponents: [
+    CardNavigationControlComponent,
     ConversationDisplayComponent,
     NewLessonPlayerPageComponent,
     NewConversationSkinComponent,

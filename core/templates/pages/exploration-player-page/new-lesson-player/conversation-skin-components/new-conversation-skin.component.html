@@ -23,18 +23,6 @@
         <oppia-learner-answer-info-card></oppia-learner-answer-info-card>
       </div>
 
-      <!-- Progress Navbar -->
-      <!-- <div *ngIf="!getCanAskLearnerForAnswerInfo()" class="new-progress-nav-bar-container">
-        <oppia-progress-nav (submit)="submitAnswerFromProgressNav()"
-                            [isLearnAgainButton]="isLearnAgainButton()"
-                            [displayedCard]="getDisplayedCard()"
-                            [submitButtonIsShown]="!getAnswerIsBeingProcessed() && !continueToReviseStateButtonIsVisible"
-                            [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
-                            (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
-                            (skipQuestion)="skipCurrentQuestion()">
-        </oppia-progress-nav>
-      </div> -->
-
       <!-- End card display -->
       <div *ngIf="isOnTerminalCard() && this.getRecommendationExplorationSummaries() && this.getRecommendationExplorationSummaries().length > 0 && (inStoryMode || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))"
            class="new-conversation-skin-next-lesson-wrapper">
@@ -75,6 +63,17 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <div *ngIf="!getCanAskLearnerForAnswerInfo()" class="new-progress-nav-bar-container">
+    <oppia-card-navigation-control (submit)="submitAnswerFromProgressNav()"
+                        [isLearnAgainButton]="isLearnAgainButton()"
+                        [displayedCard]="getDisplayedCard()"
+                        [submitButtonIsShown]="!getAnswerIsBeingProcessed() && !continueToReviseStateButtonIsVisible"
+                        [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
+                        (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
+                        (skipQuestion)="skipCurrentQuestion()">
+    </oppia-card-navigation-control>
   </div>
 
   <!-- Correct Answer Pop-Up -->

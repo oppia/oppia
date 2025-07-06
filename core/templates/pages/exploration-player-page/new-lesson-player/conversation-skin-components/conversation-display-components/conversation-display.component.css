@@ -17,6 +17,7 @@ oppia-conversation-display .oppia-learner-view-card-top-section {
 }
 
 oppia-conversation-display .oppia-learner-view-card {
+  background-color: chocolate;
   border-radius: 2px;
   margin-left: 40px ;
   max-width: 100vw;
@@ -170,6 +171,7 @@ oppia-conversation-display .conversation-skin-responses-dropdown-icon-rotated {
 }
 
 oppia-conversation-display .conversation-skin-inline-interaction {
+  background-color: blue;
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
   padding: 8px 20px 25px;
@@ -257,6 +259,7 @@ oppia-conversation-display .oppia-conversation-skin-inline-interaction {
 }
 
 oppia-conversation-display .oppia-conversation-skin-instruction-container {
+  background-color: chartreuse;
   padding: 6px 12px;
 }
 
