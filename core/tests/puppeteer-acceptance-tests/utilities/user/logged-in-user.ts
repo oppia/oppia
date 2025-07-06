@@ -240,6 +240,11 @@ const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
 
 const removeFromPlayLaterInLibrarySelector = '.e2e-test-remove-from-play-later';
+
+// Community Library (.e2e-test-community-library).
+const lessonCardContainerSelector =
+  '.e2e-test-community-library .e2e-test-exp-summary-tile';
+
 export class LoggedInUser extends BaseUser {
   /**
    * Function for navigating to the profile page for a given username.
@@ -876,14 +881,9 @@ export class LoggedInUser extends BaseUser {
     expectedTooltip: string
   ): Promise<void> {
     await this.waitForPageToFullyLoad();
-    const isMobileViewport = this.isViewportAtMobileWidth();
-    const lessonCardTitleSelector = isMobileViewport
-      ? mobileLessonCardTitleSelector
-      : desktopLessonCardTitleSelector;
-
-    await this.page.waitForSelector(lessonCardTitleSelector);
+    await this.page.waitForSelector(lessonCardContainerSelector);
     const lessonTitles = await this.page.$$eval(
-      lessonCardTitleSelector,
+      lessonCardContainerSelector,
       elements => elements.map(el => el.textContent?.trim())
     );
 
@@ -893,7 +893,7 @@ export class LoggedInUser extends BaseUser {
       throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
     }
 
-    const lessonSelector = `${lessonCardTitleSelector}:nth-child(${lessonIndex + 1})`;
+    const lessonSelector = `${lessonCardContainerSelector}:nth-child(${lessonIndex + 1})`;
     const tooltipSelector = `${lessonSelector} ${removeFromPlayLaterInLibrarySelector}`;
 
     await this.page.waitForSelector(removeFromPlayLaterInLibrarySelector, {
