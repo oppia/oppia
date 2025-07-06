@@ -275,4 +275,4 @@ export const FILEPATHS = {
     __dirname,
     '../../data/profile-pictures/profile.svg'
   ),
-};
+} as const;

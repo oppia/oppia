@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview
- * Acceptance test from CUJv3 Doc
+ * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
  * LI.PP. Learner Export or Delete the Account from preference page.
@@ -40,7 +39,7 @@ describe('Logged-In Learner', function () {
   });
 
   it('should be able to delete account', async function () {
-    // Delete Account
+    // Delete Account.
     await loggedInLearner.deleteAccount();
     // Initiating account deletion from /preferences page redirects to /delete-account page.
     await loggedInLearner.expectToBeOnPage('delete account');
