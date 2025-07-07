@@ -124,6 +124,8 @@ const continueFromWhereLeftOffSectionSelector =
 const issueTypeSelector = '.e2e-test-report-exploration-radio-button';
 const addTopicToCurrentGoalsButton =
   '.e2e-test-add-topic-to-current-goals-button';
+const removeTopicFromCurrentGoalsButton =
+  '.e2e-test-remove-topic-from-current-goals-button';
 const mobileCompletedLessonSection = '.community-lessons-section';
 const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
 const homeSectionGreetingElement = '.greeting';
@@ -188,7 +190,25 @@ const communityLessonsSectionInLearnerDashboard =
 const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const progressTabSectionInLearnerDashboard =
   '.e2e-test-learner-dash-progress-tab';
-const goalsTabSectionInLearnerDashboard = '.e2e-test-current-goals-section';
+const goalsTabSectionInLearnerDashboard = '.e2e-test-goals-section-inner';
+const emptySuggestionSectionSelector = '.e2e-test-home-tab-empty-suggestions';
+const emptyCurrentGoalsSectionSelector =
+  '.e2e-test-goals-section .e2e-test-current-goals-section.e2e-test-empty-section';
+const nonEmptyCurrentGoalsSectionSelector =
+  '.e2e-test-goals-section .e2e-test-current-goals-section.e2e-test-non-empty-section';
+const goalsStatusTitleSelector =
+  '.e2e-test-goals-section .e2e-test-goals-status-title';
+const topicInCurrentGoalsSelector =
+  '.e2e-test-goals-section .e2e-test-topic-name-in-current-goals';
+// Learner Dashboard > Home Tab Seclectors.
+const hometabSectionHeadingSelector =
+  '.e2e-test-learner-dash-home-tab .e2e-test-section-heading';
+const continueWhereYouLeftOffSectionSelector =
+  '.e2e-test-learner-dash-home-tab .e2e-test-continue-section.e2e-test-non-empty-section';
+const emptyContinueWhereYouLeftOffSectionSelector =
+  '.e2e-test-learner-dash-home-tab .e2e-test-continue-section.e2e-test-empty-section';
+const emptySuggestedForYouSectionSelector =
+  '.e2e-test-learner-dash-home-tab .empty-suggested-for-you';
 
 // Creator dashboard selectors.
 const creatorDashboardContainerSelector =
@@ -220,7 +240,38 @@ const explorationSuccessfullyFlaggedMessage =
 const feedbackUpdatesMainContentContainer =
   '.e2e-test-feedback-updates-main-content-container';
 
+// Common > Remove modal selectors.
+const removeModalContainerSelector =
+  '.e2e-test-remove-activity-modal-container';
+const removeModalHeaderSelector =
+  '.e2e-test-remove-activity-modal-container .e2e-test-modal-header';
+const removeModalBodySelector =
+  '.e2e-test-remove-activity-modal-container .e2e-test-modal-body';
+const removeModalCancelButtonSelector =
+  '.e2e-test-remove-activity-modal-container .e2e-test-modal-cancel-delete-button';
+const removeModalConfirmButtonSelector =
+  '.e2e-test-remove-activity-modal-container .e2e-test-modal-confirm-delete-button';
+
 export class LoggedInUser extends BaseUser {
+  /**
+   * Clicks on the given button in the remove activity modal.
+   * @param {'Remove' | 'Cancel'} button - The button to click.
+   */
+  async clickButtonInRemoveActivityModal(
+    button: 'Remove' | 'Cancel'
+  ): Promise<void> {
+    await this.page.waitForSelector(removeModalContainerSelector);
+
+    if (button === 'Remove') {
+      await this.clickOn(removeModalConfirmButtonSelector);
+    } else if (button === 'Cancel') {
+      await this.clickOn(removeModalCancelButtonSelector);
+    }
+
+    await this.page.waitForSelector(removeModalContainerSelector, {
+      hidden: true,
+    });
+  }
   /**
    * Function for navigating to the profile page for a given username.
    */
@@ -1560,6 +1611,23 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Click on checkbox of first current goal and remove it.
+   */
+  async clickOnCheckboxOfFirstCurrentGoalAndRemoveIt(): Promise<void> {
+    await this.page.waitForSelector(removeTopicFromCurrentGoalsButton, {
+      visible: true,
+    });
+    const removeGoalButton = await this.page.$(
+      removeTopicFromCurrentGoalsButton
+    );
+    if (!removeGoalButton) {
+      throw new Error('Remove goal button not found.');
+    }
+    await removeGoalButton?.click();
+    showMessage('Goal removed successfully.');
+  }
+
+  /**
    * Checks if the completed goals include the expected goals.
    * @param {string[]} expectedGoals - The expected goals.
    */
@@ -2191,6 +2259,131 @@ export class LoggedInUser extends BaseUser {
       greetingElement
     );
     expect(greetingText).toContain(userName);
+  }
+
+  /**
+   * Checks if the suggestion container in Learner Dashboard is empty.
+   */
+  async expectLearnSomethingNewInLDToBeEmpty(): Promise<void> {
+    await this.isElementVisible(emptySuggestionSectionSelector);
+  }
+
+  /**
+   * Checks if the continue from where you left off section in Learner Dashboard is present.
+   * @param {boolean} visible - Whether the section should be visible or not.
+   */
+  async expectContinueWhereYouLeftOffSectionInLDToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    expect(
+      await this.isElementVisible(
+        continueFromWhereLeftOffSectionSelector,
+        visible
+      )
+    ).toBe(visible);
+  }
+
+  /**
+   * Function to verify the goals section contains the expected heading.
+   * @param {string} heading - The heading to check for.
+   */
+  async expectGoalsSectionToContainHeadings(
+    expectedHeadings: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(goalsStatusTitleSelector);
+    const headings: (string | null)[] = await this.page.$$eval(
+      goalsStatusTitleSelector,
+      headings => headings.map(heading => heading.textContent)
+    );
+
+    expect(headings).toContain(expectedHeadings);
+  }
+
+  async expectCurrentGoalsSectionToBeEmpty(
+    empty: boolean = true
+  ): Promise<void> {
+    if (empty) {
+      await this.page.waitForSelector(emptyCurrentGoalsSectionSelector, {
+        visible: true,
+      });
+    } else {
+      await this.page.waitForSelector(nonEmptyCurrentGoalsSectionSelector, {
+        visible: true,
+      });
+    }
+  }
+
+  /**
+   * Expects the remove activity model to be displayed.
+   * @param {string} [header] - The header of the modal.
+   */
+  async expectRemoveActivityModelToBeDisplayed(header?: string, body?: string) {
+    // Check for the modal container.
+    await this.page.waitForSelector(removeModalContainerSelector);
+
+    // Check for the header.
+    if (header) {
+      await this.page.waitForSelector(removeModalHeaderSelector);
+      const headerText = await this.page.$eval(
+        removeModalHeaderSelector,
+        el => el.textContent
+      );
+      expect(headerText).toEqual(header);
+    }
+
+    // Check for the body.
+    if (body) {
+      await this.page.waitForSelector(removeModalBodySelector);
+      const bodyText = await this.page.$eval(
+        removeModalBodySelector,
+        el => el.textContent
+      );
+      expect(bodyText).toEqual(body);
+    }
+  }
+
+  /**
+   * Check if the given topic is in the current goals section.
+   * @param {string} topicName - The name of the topic to check.
+   */
+  async expectCurrentGoalsToInclude(topicName: string): Promise<void> {
+    await this.page.waitForSelector(nonEmptyCurrentGoalsSectionSelector);
+
+    const topicsInCurrentGoals = await this.page.$$eval(
+      topicInCurrentGoalsSelector,
+      (elements: Element[]) => elements.map(el => el.textContent)
+    );
+
+    expect(topicsInCurrentGoals).toContain(topicName);
+  }
+
+  /**
+   * Check if the given section heading is in the home tab section.
+   * @param {string[]} expectedHeading - The expected heading to check.
+   */
+  async expectSectinoHeadingInLDToContain(
+    expectedHeading: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(homeTabSectionInLearnerDashboard);
+
+    const headings = await this.page.$$eval(
+      hometabSectionHeadingSelector,
+      (elements: Element[]) => elements.map(el => el.textContent)
+    );
+
+    expect(headings).toContain(expectedHeading);
+  }
+
+  /**
+   * Checks if the continue where you left off section is present or not.
+   * @param {boolean} empty - Boolean value representing should be visible or not.
+   */
+  async expectSuggestedForYouSectionToBeEmpty(
+    empty: boolean = true
+  ): Promise<void> {
+    expect(
+      await this.isElementVisible(emptySuggestedForYouSectionSelector)
+    ).toBe(empty);
   }
 }
 

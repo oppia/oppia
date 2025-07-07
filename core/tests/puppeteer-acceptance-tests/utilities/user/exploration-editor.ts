@@ -1967,7 +1967,7 @@ export class ExplorationEditor extends BaseUser {
     title: string,
     category: string = 'Algebra',
     flag: boolean = true
-  ): Promise<string | null> {
+  ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorPage();
     if (flag) {
