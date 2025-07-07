@@ -57,28 +57,14 @@ describe('Skill backend API service', () => {
       explanations: ['explanation'],
     };
 
-    const exampleDict = {
-      question: {
-        html: 'worked example question 1',
-        content_id: 'worked_example_q_1',
-      },
-      explanation: {
-        html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1',
-      },
-    };
-
     const skillContentsDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [exampleDict],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_1: {},
-          worked_example_2: {},
         },
       },
     };
@@ -130,7 +116,6 @@ describe('Skill backend API service', () => {
       skill_model_last_updated: 1594649197855.071,
       skill_model_created_on: 1594649197855.059,
       id: 'Q5JuLf64rzV0',
-      worked_examples_count: 0,
       description: 'Dummy Skill 1',
       misconception_count: 0,
       version: 1,
