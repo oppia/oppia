@@ -39,9 +39,6 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {PlayerHeaderComponent} from './lesson-header/player-header.component';
 import {PlayerSidebarComponent} from './sidebar-components/player-sidebar.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
-import {NewConversationSkinComponent} from './conversation-skin-components/new-conversation-skin.component';
-import {ConversationDisplayComponent} from './conversation-skin-components/conversation-display-components/conversation-display.component';
-import {CardNavigationControlComponent} from './conversation-skin-components/card-navigation-control.component';
 
 @NgModule({
   imports: [
@@ -59,20 +56,14 @@ import {CardNavigationControlComponent} from './conversation-skin-components/car
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
-    CardNavigationControlComponent,
-    ConversationDisplayComponent,
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
     PlayerHeaderComponent,
-    NewConversationSkinComponent,
     PlayerSidebarComponent,
     NewAudioBarComponent,
   ],
   entryComponents: [
-    CardNavigationControlComponent,
-    ConversationDisplayComponent,
     NewLessonPlayerPageComponent,
-    NewConversationSkinComponent,
     NewLessonPlayerPageRootComponent,
     PlayerHeaderComponent,
     PlayerSidebarComponent,
