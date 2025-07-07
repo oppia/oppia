@@ -11,7 +11,7 @@
     <oppia-new-conversation-skin class="preview-conversation-skin" *ngIf="voiceoversAreLoaded && IsNewLessonPlayerEnabled()"></oppia-new-conversation-skin>
   </div>
 
-  <div class="oppia-preview-bottom-right-container" [ngStyle]="IsNewLessonPlayerEnabled() ? {bottom: 58px} : {bottom: 42px}">]>
+  <div class="oppia-preview-bottom-right-container" [ngStyle]="IsNewLessonPlayerEnabled() ? {bottom: '58px'} : {bottom: '42px'}">
     <div class="oppia-parameter-summary" *ngIf="showParameterSummary()">
       <strong>Parameters:</strong>
       <table>
@@ -107,10 +107,10 @@
   }
 
   .preview-conversation-skin {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1010;
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    z-index: 1010;
   }
 </style>

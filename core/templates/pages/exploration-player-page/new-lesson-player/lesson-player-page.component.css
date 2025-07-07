@@ -34,14 +34,3 @@ oppia-new-conversation-skin {
   justify-content: flex-end;
   width: 100%;
 }
-
-.conversation-wrapper {
-  align-items: flex-end;
-  display: flex;
-  flex: 1;
-}
-
-oppia-new-conversation-skin {
-  width: 100%;
-}
-

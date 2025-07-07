@@ -169,12 +169,10 @@ oppia-conversation-display .conversation-skin-responses-dropdown-icon-rotated {
 }
 
 oppia-conversation-display .conversation-skin-inline-interaction {
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
-  padding: 10px;
-  margin-left: 40px;
-  position: relative;
   border-radius: 16px;
+  margin-left: 40px;
+  padding: 10px;
+  position: relative;
 }
 
 oppia-conversation-display .conversation-skin-inline-interaction .form-control {
@@ -185,8 +183,8 @@ oppia-conversation-display .conversation-skin-inline-interaction .form-control {
 
 input.form-control:focus {
   border: none;
-  outline: none;
   box-shadow: none;
+  outline: none;
 }
 
 oppia-conversation-display .conversation-skin-inline-interaction .conversation-skin-user-avatar {

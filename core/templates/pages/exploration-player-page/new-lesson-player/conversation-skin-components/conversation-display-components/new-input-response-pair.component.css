@@ -17,11 +17,10 @@
   width: 100px;
 }
 
-
 .conversation-skin-oppia-feedback-container {
+  background-color: #fff;
   border-radius: 0 16px 16px;
   margin-top: 10px;
-  background-color: #fff;
   width: 70%;
 }
 
@@ -41,9 +40,9 @@
 }
 
 .conversation-skin-learner-answer-container {
+  background-color: #fff8e5;
   border-radius: 16px 0 16px 16px;
   margin-top: 10px;
-  background-color: #fff8e5;
   width: 70%;
 }
 
@@ -54,11 +53,11 @@
 
 .answer-wrapper .right-side-curve {
   height: 49px;
-  right: -36px;
   position: absolute;
+  right: -36px;
   top: -9px;
-  width: 39px;
   transform: scaleX(-1);
+  width: 39px;
 }
 
 .feedback-wrapper .left-side-curve {
@@ -96,11 +95,6 @@ oppia-new-input-response-pair .oppia-popover {
   opacity: 1;
 }
 
-.conversation-skin-oppia-avatar {
-  left: -87px;
-}
-
-
 @media (max-width: 480px) {
   .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
     height: 34px;
@@ -111,11 +105,11 @@ oppia-new-input-response-pair .oppia-popover {
 
   .answer-wrapper .right-side-curve {
     height: 29px;
-    right: -17px;
     position: absolute;
+    right: -17px;
     top: -7px;
-    width: 19px;
     transform: scaleX(-1);
+    width: 19px;
   }
 
   .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
@@ -153,11 +147,11 @@ oppia-new-input-response-pair .oppia-popover {
 
   .answer-wrapper .right-side-curve {
     height: 39px;
-    right: -28px;
     position: absolute;
+    right: -28px;
     top: -8px;
-    width: 29px;
     transform: scaleX(-1);
+    width: 29px;
   }
 
   .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
