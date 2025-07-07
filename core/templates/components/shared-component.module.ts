@@ -212,6 +212,9 @@ import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/ed
 import {SaveValidationFailModalComponent} from 'pages/exploration-editor-page/modal-templates/save-validation-fail-modal.component';
 import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component';
 import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-input-response-pair.component';
+import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
+import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
+import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -269,6 +272,9 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    ConversationDisplayComponent,
+    CardNavigationControlComponent,
+    NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
     CreateNewSkillModalComponent,
@@ -422,6 +428,9 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
     ConceptCardComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    ConversationDisplayComponent,
+    CardNavigationControlComponent,
+    NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
     CreateNewSkillModalComponent,
@@ -596,6 +605,9 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    ConversationDisplayComponent,
+    CardNavigationControlComponent,
+    NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
     CreateNewSkillModalComponent,
