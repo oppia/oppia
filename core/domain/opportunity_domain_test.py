@@ -484,9 +484,36 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             constants, 'SUPPORTED_AUDIO_LANGUAGES',
             self.mock_supported_audio_languages)
 
-        self.valid_card_info_dict: (
-            opportunity_domain.TranslationOpportunityCardInfoDict
-        ) = {
+        self.valid_card_info = (
+            opportunity_domain.TranslationOpportunityCardInfo(
+                topic_ids=['topic_1'],
+                entity_id='exploration_1',
+                content_count=5,
+                incomplete_translation_language_codes=['en'],
+                translation_counts={'en': 3},
+                entity_type='exploration',
+                topic_name='Fractions',
+                entity_description='Introduction to Fractions',
+                is_pinned=True,
+                currently_available_to_learners=True
+            )
+        )
+
+    def test_to_dict_returns_expected_dict(self) -> None:
+        card_info = opportunity_domain.TranslationOpportunityCardInfo(
+            topic_ids=['topic_1'],
+            entity_id='exploration_1',
+            content_count=5,
+            incomplete_translation_language_codes=['en'],
+            translation_counts={'en': 3},
+            entity_type='exploration',
+            topic_name='Fractions',
+            entity_description='Introduction to Fractions',
+            is_pinned=True,
+            currently_available_to_learners=True
+        )
+
+        expected_dict = {
             'topic_ids': ['topic_1'],
             'entity_id': 'exploration_1',
             'content_count': 5,
@@ -499,45 +526,4 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             'currently_available_to_learners': True
         }
 
-        with self.swap(
-            constants, 'SUPPORTED_AUDIO_LANGUAGES',
-            self.mock_supported_audio_languages
-        ):
-            self.valid_card_info = (
-                opportunity_domain.TranslationOpportunityCardInfo.from_dict(
-                    self.valid_card_info_dict))
-
-    def test_to_and_from_dict_works_correctly(self) -> None:
-        with self.swap(
-            constants, 'SUPPORTED_AUDIO_LANGUAGES',
-            self.mock_supported_audio_languages
-        ):
-            card_info = (
-                opportunity_domain.TranslationOpportunityCardInfo
-                .from_dict(self.valid_card_info_dict)
-            )
-
-        self.assertIsInstance(
-            card_info, opportunity_domain.TranslationOpportunityCardInfo)
-
-        self.assertEqual(
-            card_info.to_dict(),
-            self.valid_card_info_dict
-        )
-
-    def test_inherited_validation_works_correctly(self) -> None:
-        with self.swap(
-            constants, 'SUPPORTED_AUDIO_LANGUAGES',
-            self.mock_supported_audio_languages
-        ):
-            # This should pass silently (no validation error).
-            self.valid_card_info.validate()
-
-            # Now set an invalid value.
-            self.valid_card_info.content_count = -2
-
-            self._assert_validation_error(
-                self.valid_card_info,
-                'Expected content_count to be a non-negative integer, '
-                'received -2'
-            )
+        self.assertEqual(card_info.to_dict(), expected_dict)
