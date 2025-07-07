@@ -34,7 +34,6 @@
   border-radius: 4px;
   box-shadow: inset -5px -5px 4px rgba(0, 0, 0, 0.25);
   color: #fff;
-  display: flex;
   font-family: 'Roboto', Arial, sans-serif;
   font-size: 18px;
   font-weight: 700;
@@ -44,7 +43,6 @@
   line-height: 22px;
   padding: 10px 4px 10px 8px;
   text-align: left;
-  width: 100%;
 }
 
 .card-navigation-control {
