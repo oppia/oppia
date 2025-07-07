@@ -34,7 +34,6 @@
   border-radius: 4px;
   box-shadow: inset -5px -5px 4px rgba(0, 0, 0, 0.25);
   color: #fff;
-  font-family: 'Roboto', Arial, sans-serif;
   font-size: 18px;
   font-weight: 700;
   gap: 4px;
@@ -43,6 +42,24 @@
   line-height: 22px;
   padding: 10px 4px 10px 8px;
   text-align: left;
+}
+
+.card-navigation-control .oppia-learner-submit-answer-button {
+  background: #00645c;
+  border-radius: 4px;
+  box-shadow: inset -5px -5px 4px rgba(0, 0, 0, 0.25);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  gap: 4px;
+  height: 44px;
+  line-height: 22px;
+}
+
+.card-navigation-control .oppia-learner-submit-answer-button[disabled] {
+  background: #d9d9d9;
+  color: #757575;
+  cursor: default;
 }
 
 .card-navigation-control {

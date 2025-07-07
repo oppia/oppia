@@ -191,7 +191,6 @@ why they need to be overriden.  */
   line-height: 22px;
   margin: 0;
   min-width: 55px;
-  text-transform: uppercase;
 }
 
 .oppia-length-validation-error {
