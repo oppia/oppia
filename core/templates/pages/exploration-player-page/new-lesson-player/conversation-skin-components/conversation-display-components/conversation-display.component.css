@@ -1,0 +1,354 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+oppia-conversation-display .oppia-learner-view-card-content .oppia-learner-confirm-button {
+  margin-bottom: 10px;
+  margin-left: 10px;
+}
+
+oppia-conversation-display .oppia-learner-view-card-top-section {
+  background-color: #fff;
+  border-radius: 0 16px 16px;
+  padding: 20px;
+  position: relative;
+}
+
+oppia-conversation-display .oppia-learner-view-card {
+  border-radius: 2px;
+  margin-left: 40px ;
+  max-width: 100vw;
+  padding-bottom: 18px;
+  padding-left: 0;
+  padding-top: 20px;
+  text-align: left;
+}
+
+oppia-conversation-display .oppia-learner-view-card-top-content {
+  background-color: rgba(224,242,241,1);
+  border-top-left-radius: 0;
+  padding: 12px;
+  width: 100%;
+}
+
+oppia-conversation-display .oppia-content-language-selector-container {
+  float: right;
+  margin-bottom: 12px;
+  margin-right: 0;
+}
+oppia-conversation-display .oppia-content-language-selector-icon {
+  color: rgb(75, 74, 74);
+  font-size: 25px;
+  margin-right: 4px;
+}
+oppia-conversation-display .oppia-content-language-selector {
+  border-radius: 9px;
+  font-size: 15px;
+  margin-left: 5px;
+  padding-left: 3px;
+}
+oppia-conversation-display .oppia-exploration-language {
+  padding: 0 5px 0 5px;
+}
+
+oppia-conversation-display .oppia-learner-view-card-content {
+  word-wrap: break-word;
+}
+
+oppia-conversation-display .conversation-skin-instruction-disabled {
+  color: gray;
+}
+
+oppia-conversation-display .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
+  height: 100px;
+  left: -105px;
+  top: 5px;
+  width: 100px;
+}
+
+oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
+  height: 49px;
+  left: -37px;
+  position: absolute;
+  top: -9px;
+  width: 39px;
+}
+
+oppia-conversation-display .conversation-skin-tutor-card-middle-section .conversation-skin-user-avatar,
+oppia-conversation-display .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-avatar {
+  display: none;
+}
+
+oppia-conversation-display .oppia-learner-view-card-top-content p:not(:last-child) {
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+/* This should match the value defined in AUDIO_HIGHLIGHT_CSS_CLASS. */
+oppia-conversation-display .conversation-skin-audio-highlight {
+  border: 3px solid #f3d140;
+}
+
+oppia-conversation-display .conversation-skin-future-tutor-card {
+  background: #fff;
+  border-radius: 2px;
+  margin-left: 87px;
+  padding-top: 20px;
+  text-align: left;
+}
+
+oppia-conversation-display .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {
+  background-color: rgba(236,239,241,0.4);
+}
+
+oppia-conversation-display .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content {
+  background-color: rgba(224,242,241,0.4);
+}
+
+oppia-conversation-display .conversation-skin-tutor-card-middle-section .conversation-skin-oppia-feedback-content::before,
+oppia-conversation-display .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content::before {
+  display: none;
+}
+
+oppia-conversation-display .check-mark-hidden {
+  display: none;
+}
+
+oppia-conversation-display .check-mark-skipped {
+  opacity: 0;
+}
+
+oppia-conversation-display .end-chapter-check-mark {
+  transition-duration: 0.5s;
+  transition-property: opacity;
+}
+
+oppia-conversation-display .learner-view-card-transition-class {
+  transition-duration: 1s;
+  transition-property: transform, opacity;
+}
+
+oppia-conversation-display .card-content-hidden {
+  opacity: 0;
+  position: fixed;
+  transform: translate(0, 7px);
+}
+
+.conversation-skin-responses-dropdown-container {
+  border-bottom: 1px solid #ccc;
+  cursor: pointer;
+  line-height: 0.1em;
+  margin: 8px 20px 20px 20px;
+  text-align: center;
+}
+
+oppia-conversation-display .conversation-skin-responses-dropdown-text {
+  background-color: #fff;
+  color: #000;
+  font-size: 0.8em;
+  padding: 0 10px;
+}
+
+oppia-conversation-display .conversation-skin-responses-dropdown-icon {
+  font-size: 13px;
+  margin-bottom: -2px;
+  -moz-transition: all 0.2s;
+  -o-transition: all 0.2s;
+  -webkit-transition: all 0.2s;
+  transition: all 0.2s;
+}
+
+oppia-conversation-display .conversation-skin-responses-dropdown-icon-rotated {
+  margin-bottom: -2px;
+  -moz-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+  transition: transform 0.2s ease-in-out;
+}
+
+oppia-conversation-display .conversation-skin-inline-interaction {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  padding: 8px 20px 25px;
+  position: relative;
+}
+
+oppia-conversation-display .conversation-skin-inline-interaction .conversation-skin-user-avatar {
+  left: -20px;
+  top: 14px;
+}
+
+oppia-conversation-display .conversation-skin-milestone-message {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  padding: 0 20px;
+}
+
+oppia-conversation-display .conversation-skin-milestone-message.milestone-progress-message {
+  flex-direction: column;
+}
+
+oppia-conversation-display .conversation-skin-milestone-message .milestone-message-star-container {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  height: 72px;
+  justify-content: center;
+  margin-right: 10px;
+  width: 72px;
+}
+
+oppia-conversation-display .conversation-skin-milestone-message .milestone-message-star-container .star-icon {
+  position: absolute;
+  transform: scale(1.5);
+}
+
+oppia-conversation-display .conversation-skin-milestone-message .completed-chapter-count {
+  font-weight: 500;
+  margin-top: 9px;
+  position: relative;
+}
+
+oppia-conversation-display .conversation-skin-milestone-message .chapters-left-count {
+  font-weight: 500;
+  margin-top: 9px;
+  position: relative;
+}
+
+oppia-conversation-display .conversation-skin-milestone-message .milestone-message-text {
+  font-size: 1.1em;
+  font-weight: 800;
+  margin-top: 9px;
+  text-align: center;
+}
+
+oppia-conversation-display .conversation-skin-milestone-message .milestone-message-progress-bar-container {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  margin-top: -25px;
+  width: 100%;
+}
+
+oppia-conversation-display .milestone-message-progress-bar-container .milestone-progress-bar-outer {
+  border: 2px solid #00645c;
+  height: 20px;
+  margin-right: 30px;
+  width: 300px;
+}
+
+oppia-conversation-display .milestone-message-progress-bar-container .milestone-progress-bar-inner {
+  background: #a6dacf;
+  height: 100%;
+}
+
+oppia-conversation-display .milestone-message-progress-bar-container .milestone-message-star-container {
+  margin-bottom: 9px;
+  margin-left: -57px;
+}
+
+oppia-conversation-display .oppia-conversation-skin-inline-interaction {
+  opacity: 0.8;
+}
+
+oppia-conversation-display .oppia-conversation-skin-instruction-container {
+  padding: 6px 12px;
+}
+
+oppia-conversation-display .oppia-no-interaction-text {
+  color: #f00;
+}
+
+oppia-conversation-display .conversation-skin-oppia-completed-state-card {
+  margin: 60px 0 40px;
+  padding: 0 20px;
+  position: relative;
+}
+
+oppia-conversation-display .conversation-skin-oppia-completed-state-card .conversation-skin-oppia-feedback-content {
+  color: #888;
+  font-style: italic;
+}
+
+oppia-conversation-display .checkpoint-celebration-modal-container {
+  position: absolute;
+}
+
+oppia-conversation-display .oppia-mcq-question-description-text {
+  display: block;
+  padding: 0 20px;
+}
+
+@media screen and (max-width: 959px) {
+  oppia-conversation-display .oppia-learner-view-card .instructions-button {
+    background-color: #0d48a1;
+    color: #fff;
+    padding: 6px 12px;
+    white-space: normal;
+  }
+
+  oppia-conversation-display .oppia-learner-view-card button.mat-button.mat-default-theme.instructions-button:focus,
+  oppia-conversation-display .oppia-learner-view-card button.mat-button.mat-default-theme.instructions-button:hover {
+    background-color: #115fd4;
+  }
+
+  oppia-conversation-display .oppia-learner-view-card {
+    margin-left: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+  }
+}
+
+/* ============================This comment has been placed to segregate the old code and the new CSS media queries=================================================== */
+/* It will be removed after the completion of the New lesson Player */
+
+@media (max-width: 480px) {
+  oppia-conversation-display .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
+    height: 34px;
+    left: -39px;
+    top: 12px;
+    width: 34px;
+  }
+
+  oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
+    height: 39px;
+    left: -28px;
+    position: absolute;
+    top: -8px;
+    width: 29px;
+  }
+  
+
+  oppia-conversation-display .oppia-learner-view-card {
+    margin-left: 40px;
+    margin-top: 30px;
+    padding-bottom: 30px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  oppia-conversation-display .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
+    height: 64px;
+    left: -68px;
+    width: 64px;
+  }
+
+  oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
+    height: 39px;
+    left: -28px;
+    position: absolute;
+    top: -8px;
+    width: 29px;
+  }
+
+  oppia-conversation-display .oppia-learner-view-card {
+    margin-left: 55px;
+    margin-top: 30px;
+    padding-bottom: 30px;
+  }
+}

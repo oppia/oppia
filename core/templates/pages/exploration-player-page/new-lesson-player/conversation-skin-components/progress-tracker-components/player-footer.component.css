@@ -5,9 +5,9 @@
 */
 
 .oppia-lesson-player-footer {
-  background-color: #fff;
+  background-color: #f00;
   bottom: 0;
   height: 40px;
-  position: absolute;
+  position: relative;
   width: 100%;
 }
