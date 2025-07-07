@@ -331,6 +331,13 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to navigate to exploration editor.
+   */
+  async navigateToExplorationEditorPage(): Promise<void> {
+    await this.clickAndWaitForNavigation(createExplorationButton);
+  }
+
+  /**
    * Function to create an exploration with a content and interaction.
    * This is a composite function that can be used when a straightforward, simple exploration setup is required.
    *
