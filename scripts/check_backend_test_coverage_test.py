@@ -33,7 +33,8 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.print_arr: list[str] = []
-        def mock_print(msg: str, end: str = '\n') -> None:  # pylint: disable=unused-argument
+        def mock_print( # pylint: disable=unused-argument
+            msg: str, end: str = '\n') -> None:
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
         self.env = os.environ.copy()
@@ -48,7 +49,8 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
             returncode = 0
             stdout = 'No data to report.'
             stderr = 'None'
-        def mock_subprocess_run(*args: str, **kwargs: str) -> MockProcess: # pylint: disable=unused-argument
+        def mock_subprocess_run( # pylint: disable=unused-argument
+            *args: str, **kwargs: str) -> MockProcess:
             return MockProcess()
         swap_subprocess_run = self.swap_with_checks(
             subprocess, 'run', mock_subprocess_run,
@@ -72,7 +74,8 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
             returncode = 1
             stdout = 'Some error occured.'
             stderr = 'Some error.'
-        def mock_subprocess_run(*args: str, **kwargs: str) -> MockProcess: # pylint: disable=unused-argument
+        def mock_subprocess_run( # pylint: disable=unused-argument
+            *args: str, **kwargs: str) -> MockProcess:
             return MockProcess()
         swap_subprocess_run = self.swap_with_checks(
             subprocess, 'run', mock_subprocess_run,
@@ -95,7 +98,8 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         class MockProcess:
             returncode = 0
             stdout = 'TOTALL     40571  10682  13759   1161   70% '
-        def mock_subprocess_run(*args: str, **kwargs: str) -> MockProcess: # pylint: disable=unused-argument
+        def mock_subprocess_run( # pylint: disable=unused-argument
+            *args: str, **kwargs: str) -> MockProcess:
             return MockProcess()
         swap_subprocess_run = self.swap_with_checks(
             subprocess, 'run', mock_subprocess_run,
@@ -116,7 +120,8 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         class MockProcess:
             returncode = 0
             stdout = 'TOTAL     40571  10682  13759   1161   70% '
-        def mock_subprocess_run(*args: str, **kwargs: str) -> MockProcess: # pylint: disable=unused-argument
+        def mock_subprocess_run( # pylint: disable=unused-argument
+            *args: str, **kwargs: str) -> MockProcess:
             return MockProcess()
         swap_subprocess_run = self.swap_with_checks(
             subprocess, 'run', mock_subprocess_run,
@@ -141,7 +146,8 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         class MockProcess:
             returncode = 0
             stdout = 'TOTAL     40571  0  13759   0   100% '
-        def mock_subprocess_run(*args: str, **kwargs: str) -> MockProcess: # pylint: disable=unused-argument
+        def mock_subprocess_run( # pylint: disable=unused-argument
+            *args: str, **kwargs: str) -> MockProcess:
             return MockProcess()
         swap_subprocess_run = self.swap_with_checks(
             subprocess, 'run', mock_subprocess_run,
