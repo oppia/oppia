@@ -45,10 +45,58 @@ describe('Interested Partner Organization', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
-    explorationId =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'What is a Fraction?'
-      );
+    await curriculumAdmin.navigateToCreatorDashboardPage();
+    await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
+    await curriculumAdmin.dismissWelcomeModal();
+    await curriculumAdmin.updateCardContent('Introduction to Fractions');
+    await curriculumAdmin.addInteraction('Continue Button');
+
+    // Add a new card with a basic algebra problem.
+    await curriculumAdmin.viewOppiaResponses();
+    await curriculumAdmin.directLearnersToNewCard('Second Card');
+    await curriculumAdmin.saveExplorationDraft();
+
+    // Navigate to the new card and update its content.
+    await curriculumAdmin.navigateToCard('Second Card');
+    await curriculumAdmin.updateCardContent('Enter a negative number.');
+    await curriculumAdmin.addInteraction('Number Input');
+
+    await curriculumAdmin.addResponsesToTheInteraction(
+      'Number Input',
+      '-1',
+      'Perfect!',
+      'Last Card',
+      true
+    );
+    await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong, try again!'
+    );
+    await curriculumAdmin.addHintToState(
+      'Remember that negative numbers are less than 0.'
+    );
+    await curriculumAdmin.addSolutionToState(
+      '-99',
+      'The number -99 is a negative number.',
+      true
+    );
+    await curriculumAdmin.saveExplorationDraft();
+
+    // Navigate to the new card and add Study Guide content.
+    await curriculumAdmin.navigateToCard('Last Card');
+    await curriculumAdmin.updateCardContent('Thank you for learning!');
+    await curriculumAdmin.addInteraction('End Explorations');
+    await curriculumAdmin.updateCardContent(
+      'Congratulations! You have completed the exploration.'
+    );
+    await curriculumAdmin.addInteraction('End Exploration');
+
+    // Save the draft.
+    await curriculumAdmin.saveExplorationDraft();
+    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
+      'What is a Fraction?',
+      'Learn the basics of Fractions',
+      'Algebra'
+    );
 
     await curriculumAdmin.createAndPublishTopic(
       'Fractions',
