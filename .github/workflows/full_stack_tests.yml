@@ -11,7 +11,6 @@ on:
     branches:
       - develop
       - release-*
-      - at-1.2.2
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
@@ -81,13 +80,15 @@ jobs:
       fail-fast: false
       matrix:
         suite:
+          - name: logged-in-learner/chooses-new-lesson-to-play-from-learner-dashboard
+          - name: logged-in-learner/completes-the-exploration-and-decides-what-to-do-next
+          - name: logged-in-learner/see-their-progress-on-learner-dashboard
+          - name: logged-in-learner/sets-goal-on-learner-dashboard
           - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
           - name: logged-out-learner/play-a-complete-community-lesson
           - name: logged-out-learner/reaches-a-checkpoint-and-saves-their-progress
-          - name: logged-out-learner/use-the-feedback-and-help-cards
           - name: logged-out-learner/share-the-lesson-from-the-lesson-player
-          - name: logged-in-learner/see-their-progress-on-learner-dashboard
-          - name: logged-in-learner/completes-the-exploration-and-decides-what-to-do-next
+          - name: logged-out-learner/use-the-feedback-and-help-cards
     name: Acceptance (${{ matrix.suite.name }})
     steps:
       - name: Check for broken suites
