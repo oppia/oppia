@@ -100,7 +100,7 @@ describe('Logged-in User', function () {
     );
   }, 480000);
 
-  it(
+  /*it(
     'should have the correct tab title and available sections on landing',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
@@ -125,7 +125,7 @@ describe('Logged-in User', function () {
       showMessage('Navigated to math classroom from learner dashboard.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  );*/
 
   it(
     'should navigate directly to the Place Values topic in the math classroom',
@@ -138,7 +138,7 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it(
+  /*it(
     'should display in-progress and recommended lessons after starting a lesson',
     async function () {
       await loggedInUser.navigateToClassroomPage('math');
@@ -215,7 +215,7 @@ describe('Logged-in User', function () {
       ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+  );*/
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

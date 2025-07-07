@@ -1951,7 +1951,16 @@ export class LoggedInUser extends BaseUser {
       learnerDashSelectors.cardDisplay.heading
     );
 
-    const topicsAvailableInClassroomElement = await this.findElement(
+    const topicsAvailableInClassroomElement = await this.findElementByXPath(
+      learnerDashSelectors.cardDisplay,
+      "Topics available in Oppia's Classroom"
+    );
+    const topicCardElement = await this.findElementByXPath(
+      learnerDashSelectors.topicCard,
+      topic,
+      topicsAvailableInClassroomElement
+    );
+    /*const topicsAvailableInClassroomElement = await this.findElement(
       this.page,
       learnerDashSelectors.cardDisplay,
       "Topics available in Oppia's Classroom"
@@ -1961,7 +1970,9 @@ export class LoggedInUser extends BaseUser {
       topicsAvailableInClassroomElement,
       learnerDashSelectors.topicCard,
       topic
-    );
+    );*/
+    console.log(topicsAvailableInClassroomElement);
+    console.log(topicCardElement);
 
     if (topicCardElement) {
       await topicCardElement.click();
@@ -2072,6 +2083,24 @@ export class LoggedInUser extends BaseUser {
       new URL(this.page.url()).pathname.toLowerCase()
     );
     showMessage(`Navigated to ${lessonTitle}`);
+  }
+
+  async findElementByXPath(
+    selectors: Record<string, string>,
+    targetText: string,
+    parentElement: puppeteer.Page | puppeteer.ElementHandle | null = this.page
+  ): Promise<puppeteer.ElementHandle | null> {
+    if (!parentElement) {
+      return null;
+    }
+
+    const content = selectors.content.slice(1);
+    const heading = selectors.heading.slice(1);
+    const foundElement = await parentElement.$x(
+      `//*[contains(concat(' ', normalize-space(@class), ' '), " ${content} ") and .//*[contains(concat(' ', normalize-space(@class), ' '), " ${heading} ") and normalize-space(.) = "${targetText}"] ]`
+    );
+
+    return foundElement.length > 0 ? foundElement[0] : null;
   }
 }
 
