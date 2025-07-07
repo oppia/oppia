@@ -20,6 +20,7 @@
 var forms = require('../webdriverio_utils/forms.js');
 var general = require('../webdriverio_utils/general.js');
 var users = require('../webdriverio_utils/users.js');
+var waitFor = require('../webdriverio_utils/waitFor.js');
 var workflow = require('../webdriverio_utils/workflow.js');
 var AdminPage = require('../webdriverio_utils/AdminPage.js');
 
@@ -141,8 +142,11 @@ describe('Exploration translation and voiceover tab', function () {
   it('should walkthrough translation tutorial when user clicks next', async function () {
     await users.login('user@editorTab.com');
     await creatorDashboardPage.get();
+    await waitFor.pageToFullyLoad();
     await creatorDashboardPage.editExploration('Test Exploration');
+    await waitFor.pageToFullyLoad();
     await explorationEditorPage.navigateToTranslationTab();
+    await waitFor.pageToFullyLoad();
     await explorationEditorTranslationTab.startTutorial();
     await explorationEditorTranslationTab.playTutorial();
     await explorationEditorTranslationTab.finishTutorial();
@@ -162,8 +166,11 @@ describe('Exploration translation and voiceover tab', function () {
   it('should cache the selected language for translation and voiceover', async function () {
     await users.login('voiceArtist@translationTab.com');
     await creatorDashboardPage.get();
+    await waitFor.pageToFullyLoad();
     await creatorDashboardPage.editExploration('Test Exploration');
+    await waitFor.pageToFullyLoad();
     await explorationEditorPage.navigateToTranslationTab();
+    await waitFor.pageToFullyLoad();
     await explorationEditorTranslationTab.expectSelectedLanguageToBe('English');
     await explorationEditorTranslationTab.changeLanguage('हिन्दी (Hindi)');
     await browser.refresh();
