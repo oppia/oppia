@@ -386,6 +386,6 @@ describe('Preview Tab Component', () => {
 
   it('should check new lesson player feature flag is enabled', () => {
     mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
-    expect(component.IsNewLessonPlayerEnabled()).toBe(true);
+    expect(component.isNewLessonPlayerEnabled()).toBe(true);
   });
 });

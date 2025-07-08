@@ -244,7 +244,7 @@ describe('Diagnostic test player component', () => {
 
   it('should check new lesson player feature flag is enabled', () => {
     mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
-    expect(component.IsNewLessonPlayerEnabled()).toBe(true);
+    expect(component.isNewLessonPlayerEnabled()).toBe(true);
   });
 
   it('should redirect to the 404 page if the classroom url fragment is not present', fakeAsync(() => {

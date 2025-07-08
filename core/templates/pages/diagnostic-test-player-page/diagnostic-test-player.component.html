@@ -44,9 +44,9 @@
         <span><i>{{ getProgressText() }}</i></span>
       </div>
     </div>
-    <oppia-conversation-skin [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel" *ngIf="!IsNewLessonPlayerEnabled()">
+    <oppia-conversation-skin [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel" *ngIf="!isNewLessonPlayerEnabled()">
     </oppia-conversation-skin>
-    <oppia-new-conversation-skin class="diagnostic-player-conversation-skin" [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel" *ngIf="IsNewLessonPlayerEnabled()">
+    <oppia-new-conversation-skin class="diagnostic-player-conversation-skin" [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel" *ngIf="isNewLessonPlayerEnabled()">
     </oppia-new-conversation-skin>
   </div>
 

@@ -626,7 +626,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.componentSubscription.unsubscribe();
   }
 
-  IsNewLessonPlayerEnabled(): boolean {
+  isNewLessonPlayerEnabled(): boolean {
     return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

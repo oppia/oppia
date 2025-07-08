@@ -274,7 +274,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  IsNewLessonPlayerEnabled(): boolean {
+  isNewLessonPlayerEnabled(): boolean {
     return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

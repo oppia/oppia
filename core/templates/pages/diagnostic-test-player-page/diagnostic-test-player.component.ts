@@ -202,7 +202,7 @@ export class DiagnosticTestPlayerComponent implements OnInit {
     }
   }
 
-  IsNewLessonPlayerEnabled(): boolean {
+  isNewLessonPlayerEnabled(): boolean {
     return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

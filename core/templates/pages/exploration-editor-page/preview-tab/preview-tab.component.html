@@ -4,14 +4,14 @@
       <div class="oppia-preview-state-warning">{{ previewWarning }}</div>
     </div>
     <oppia-loading-message [message]="'Loading'" *ngIf="!voiceoversAreLoaded"></oppia-loading-message>
-    <oppia-conversation-skin *ngIf="voiceoversAreLoaded && !IsNewLessonPlayerEnabled()"></oppia-conversation-skin>
-    <page-footer *ngIf="!IsNewLessonPlayerEnabled()">
+    <oppia-conversation-skin *ngIf="voiceoversAreLoaded && !isNewLessonPlayerEnabled()"></oppia-conversation-skin>
+    <page-footer *ngIf="!isNewLessonPlayerEnabled()">
       <oppia-exploration-footer></oppia-exploration-footer>
     </page-footer>
-    <oppia-new-conversation-skin class="preview-conversation-skin" *ngIf="voiceoversAreLoaded && IsNewLessonPlayerEnabled()"></oppia-new-conversation-skin>
+    <oppia-new-conversation-skin class="preview-conversation-skin" *ngIf="voiceoversAreLoaded && isNewLessonPlayerEnabled()"></oppia-new-conversation-skin>
   </div>
 
-  <div class="oppia-preview-bottom-right-container" [ngStyle]="IsNewLessonPlayerEnabled() ? {bottom: '58px'} : {bottom: '42px'}">
+  <div class="oppia-preview-bottom-right-container" [ngStyle]="isNewLessonPlayerEnabled() ? {bottom: '58px'} : {bottom: '42px'}">
     <div class="oppia-parameter-summary" *ngIf="showParameterSummary()">
       <strong>Parameters:</strong>
       <table>
