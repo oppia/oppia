@@ -517,7 +517,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(topicStatusDropdownSelector);
       await this.selectOption(topicStatusDropdownSelector, status);
 
-      await this.expectTextContentToMatch(
+      await this.expectElementContentToBe(
         `${topicStatusDropdownSelector} .mat-select-value-text`,
         status
       );
@@ -544,7 +544,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(classroomDropdownSelector);
       await this.selectOption(classroomDropdownSelector, classroom);
 
-      await this.expectTextContentToMatch(
+      await this.expectElementContentToBe(
         `${classroomDropdownSelector} .mat-select-min-line`,
         classroom
       );
@@ -573,7 +573,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(multiSelectionInputSelector);
       await this.type(multiSelectionInputSelector, keyword);
       await this.page.keyboard.press('Enter');
-      await this.expectTextContentToMatch(
+      await this.expectElementContentToBe(
         `${multiSelectionInputChipSelector}`,
         // We are checking multi-selection-field components and it has cancel
         // icon (text) within the chip element, so we need to add cancel.
@@ -601,7 +601,7 @@ export class TopicManager extends BaseUser {
       }
       await this.page.waitForSelector(sortDropdownSelector);
       await this.selectOption(sortDropdownSelector, sortOption);
-      await this.expectTextContentToMatch(
+      await this.expectElementContentToBe(
         `${sortDropdownSelector} .mat-select-value-text`,
         sortOption
       );
@@ -1350,7 +1350,7 @@ export class TopicManager extends BaseUser {
       }
       await this.page.waitForSelector(skillStatusDropdownSelector);
       await this.selectOption(skillStatusDropdownSelector, status);
-      await this.expectTextContentToMatch(
+      await this.expectElementContentToBe(
         `${skillStatusDropdownSelector} .mat-select-value-text`,
         status
       );
@@ -1380,7 +1380,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(multiSelectionInputSelector);
       await this.type(multiSelectionInputSelector, keyword);
       await this.page.keyboard.press('Enter');
-      await this.expectTextContentToMatch(
+      await this.expectElementContentToBe(
         `${multiSelectionInputChipSelector}`,
         // We are checking multi-selection-field components and it has cancel
         // icon (text) within the chip element, so we need to add cancel.
@@ -1410,7 +1410,7 @@ export class TopicManager extends BaseUser {
       }
       await this.page.waitForSelector(sortDropdownSelector);
       await this.selectOption(sortDropdownSelector, sortOption);
-      await this.expectTextContentToMatch(
+      await this.expectElementContentToBe(
         `${sortDropdownSelector} .mat-select-value-text`,
         sortOption
       );
