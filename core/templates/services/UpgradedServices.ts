@@ -209,7 +209,6 @@ import {PageTitleService} from 'services/page-title.service';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
 import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
-import {ParamTypeObjectFactory} from 'domain/exploration/ParamTypeObjectFactory';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {
   PencilCodeEditorValidationService,
@@ -451,7 +450,8 @@ export class UpgradedServices {
       new NumericExpressionInputRulesService();
     upgradedServices['NumericInputRulesService'] =
       new NumericInputRulesService();
-    upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
+    upgradedServices['ParamChangeObjectFactory'] =
+      new ParamChangeObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['RatioExpressionInputRulesService'] =
@@ -598,11 +598,11 @@ export class UpgradedServices {
       upgradedServices['Meta'],
       upgradedServices['Title']
     );
-    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory(
-      upgradedServices['ParamTypeObjectFactory']
-    );
     upgradedServices['ParamChangesObjectFactory'] =
-      new ParamChangesObjectFactory();
+      new ParamChangesObjectFactory(
+        upgradedServices['ParamChangeObjectFactory']
+      );
+    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory();
     upgradedServices['PencilCodeEditorValidationService'] =
       new PencilCodeEditorValidationService(
         upgradedServices['BaseInteractionValidationService']
