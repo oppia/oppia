@@ -888,9 +888,9 @@ export class LoggedInUser extends BaseUser {
     expectedTooltip: string
   ): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(lessonCardContainerSelector);
+    await this.page.waitForSelector(lessonCardTitleSelector);
     const lessonTitles = await this.page.$$eval(
-      lessonCardContainerSelector,
+      lessonCardTitleSelector,
       elements => elements.map(el => el.textContent?.trim())
     );
 
