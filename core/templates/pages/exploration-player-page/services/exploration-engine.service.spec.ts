@@ -27,8 +27,7 @@ import {
   ExplorationObjectFactory,
 } from 'domain/exploration/ExplorationObjectFactory';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {ParamChangeBackendDict} from 'domain/exploration/param-change.model';
-import {ParamChange} from 'domain/exploration/param-change.model';
+import {ParamChangeBackendDict,ParamChange} from 'domain/exploration/param-change.model';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
