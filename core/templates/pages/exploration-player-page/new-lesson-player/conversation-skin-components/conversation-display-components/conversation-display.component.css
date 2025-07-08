@@ -27,7 +27,6 @@ oppia-conversation-display .oppia-learner-view-card {
 }
 
 oppia-conversation-display .oppia-learner-view-card-top-content {
-  background-color: rgba(224,242,241,1);
   border-top-left-radius: 0;
   padding: 12px;
   width: 100%;
@@ -62,6 +61,8 @@ oppia-conversation-display .conversation-skin-instruction-disabled {
 }
 
 oppia-conversation-display .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
+  border: 2px solid #c55f45;
+  border-radius: 50%;
   height: 100px;
   left: -105px;
   top: 5px;
@@ -170,10 +171,22 @@ oppia-conversation-display .conversation-skin-responses-dropdown-icon-rotated {
 }
 
 oppia-conversation-display .conversation-skin-inline-interaction {
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
-  padding: 8px 20px 25px;
+  border-radius: 8px;
+  margin-left: 40px;
+  padding: 10px;
   position: relative;
+}
+
+oppia-conversation-display .conversation-skin-inline-interaction .form-control {
+  border: none;
+  outline: none;
+  padding: 0;
+}
+
+input.form-control:focus {
+  border: none;
+  box-shadow: none;
+  outline: none;
 }
 
 oppia-conversation-display .conversation-skin-inline-interaction .conversation-skin-user-avatar {
@@ -257,6 +270,8 @@ oppia-conversation-display .oppia-conversation-skin-inline-interaction {
 }
 
 oppia-conversation-display .oppia-conversation-skin-instruction-container {
+  background-color: #fff;
+  border-radius: 8px;
   padding: 6px 12px;
 }
 
@@ -310,17 +325,17 @@ oppia-conversation-display .oppia-mcq-question-description-text {
 @media (max-width: 480px) {
   oppia-conversation-display .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
     height: 34px;
-    left: -39px;
-    top: 12px;
+    left: -38px;
+    top: 7px;
     width: 34px;
   }
 
   oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
-    height: 39px;
-    left: -28px;
+    height: 29px;
+    left: -18px;
     position: absolute;
-    top: -8px;
-    width: 29px;
+    top: -7px;
+    width: 19px;
   }
   
 
