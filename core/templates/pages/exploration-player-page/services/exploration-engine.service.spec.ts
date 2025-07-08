@@ -27,7 +27,10 @@ import {
   ExplorationObjectFactory,
 } from '../../../domain/exploration/ExplorationObjectFactory';
 import {Outcome} from '../../../domain/exploration/outcome.model';
-import {ParamChangeBackendDict, ParamChange} from '../../../domain/exploration/param-change.model';
+import {
+  ParamChangeBackendDict,
+  ParamChange,
+} from '../../../domain/exploration/param-change.model';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
@@ -1473,8 +1476,7 @@ describe('Exploration engine service ', () => {
       // Please note that 'initSettingsFromEditor' function is strictly
       // used for the exploration editor page before initialization.
       // This method should not be called from the exploration player page.
-      let paramChanges =
-        ParamChange.createFromBackendDict(paramChangeDict);
+      let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
 
       // Checking if we are currently in exploration editor preview mode.
       expect(pageContextService.isInExplorationEditorPage()).toBe(false);
@@ -1694,8 +1696,7 @@ describe('Exploration engine service ', () => {
         answer: 'val1, val2',
       };
 
-      let paramChanges =
-        ParamChange.createFromBackendDict(paramChangeDict);
+      let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
       const newParams = explorationEngineService.makeParams(
         oldParams,
         [paramChanges],
@@ -1710,8 +1711,7 @@ describe('Exploration engine service ', () => {
         paramChangeDict.customization_args.parse_with_jinja = true;
         let oldParams = {};
 
-        let paramChanges =
-          ParamChange.createFromBackendDict(paramChangeDict);
+        let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
         spyOn(expressionInterpolationService, 'processUnicode').and.returnValue(
           null
         );
@@ -1729,8 +1729,7 @@ describe('Exploration engine service ', () => {
         answer: 'val',
       };
 
-      let paramChanges =
-        ParamChange.createFromBackendDict(paramChangeDict);
+      let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
       const newParams = explorationEngineService.makeParams(
         oldParams,
         [paramChanges],
