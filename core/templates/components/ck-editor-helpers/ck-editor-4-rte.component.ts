@@ -511,20 +511,10 @@ export class CkEditor4RteComponent
         this.uiConfig &&
         this.uiConfig.hide_complex_extensions &&
         componentDefn.isComplex;
-      var notSupportedOnAndroidFlag =
-        this.pageContextService.isExplorationLinkedToStory() &&
-        AppConstants.VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(
-          componentDefn.id
-        ) === -1;
-      if (
-        !(
-          hideComplexExtensionFlag ||
-          notSupportedOnAndroidFlag ||
-          this.isInvalidForBlogPostEditorRTE(componentDefn)
-        )
-      ) {
-        names.push(componentDefn.id);
-        icons.push(componentDefn.iconDataUrl);
+
+      if (isInComponentList && !hideComplexExtensionFlag) {
+        result.names.push(componentDefn.id);
+        result.icons.push(componentDefn.iconDataUrl);
       }
 
       if (componentDefn.requiresInternet) {

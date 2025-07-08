@@ -66,8 +66,8 @@ export default {
     }],
 
     "RTE_COMPONENT_CONFIGS": {
-      "ALL_COMPONENTS": ["tabs", "skillreview", "image", "link", "video"],
-      "BLOG_COMPONENTS": ["image", "collapsible", "link", "video"]
+      "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
+      "BLOG_COMPONENTS": ["image", "link", "video"]
     },
 
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
@@ -5118,10 +5118,6 @@ export default {
     "Sport": "#893327",
     "Welcome": "#992a2b"
   },
-
-  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": [
-    "tabs", "math", "collapsible", "skillreview"
-  ],
 
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
