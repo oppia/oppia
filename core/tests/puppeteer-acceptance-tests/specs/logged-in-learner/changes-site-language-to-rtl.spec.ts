@@ -84,7 +84,7 @@ describe('Interested Partner Organization', function () {
     // Navigate to the new card and add Study Guide content.
     await curriculumAdmin.navigateToCard('Last Card');
     await curriculumAdmin.updateCardContent('Thank you for learning!');
-    await curriculumAdmin.addInteraction('End Explorations');
+    await curriculumAdmin.addInteraction('End Exploration');
     await curriculumAdmin.updateCardContent(
       'Congratulations! You have completed the exploration.'
     );
