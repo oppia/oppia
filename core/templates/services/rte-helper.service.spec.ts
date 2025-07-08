@@ -49,6 +49,7 @@ describe('Rte Helper Service', () => {
             schema: {
               type: 'html',
               ui_config: {
+                rte_components: 'ALL_COMPONENTS',
                 hide_complex_extensions: true,
               },
             },
@@ -226,6 +227,10 @@ describe('Rte Helper Service', () => {
             name: 'tab_contents',
             description: 'The tab titles and contents.',
             schema: {
+              ui_config: {
+                rte_components: 'ALL_COMPONENTS',
+                hide_complex_extensions: true,
+              },
               type: 'custom',
               obj_type: 'ListOfTabs',
             },
