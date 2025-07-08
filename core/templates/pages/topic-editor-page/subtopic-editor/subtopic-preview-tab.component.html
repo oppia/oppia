@@ -1,10 +1,27 @@
-<div class="e2e-test-subtopic-preview-container">
+<div *ngIf="!isShowRestructuredStudyGuidesFeatureEnabled()" class="e2e-test-subtopic-preview-container">
   <div class="content-box">
     <div class="content">
       <span class="content-title">{{ editableTitle }}</span>
       <div class="html-content">
         <oppia-rte-output-display [rteString]="pageContents?.getHtml()">
         </oppia-rte-output-display>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="isShowRestructuredStudyGuidesFeatureEnabled()" class="oppia-subtopic-viewer-container">
+  <p class="content-title">{{ editableTitle }}</p>
+  <div class="content-box">
+    <div class="content">
+      <div class="card" *ngFor="let section of sections">
+        <div class="card-header">
+          <h3 class="card-title">{{ section.heading.unicode }}</h3>
+        </div>
+        <div class="card-content">
+          <oppia-rte-output-display [rteString]="section.content.html">
+          </oppia-rte-output-display>
+        </div>
       </div>
     </div>
   </div>
@@ -22,19 +39,58 @@
   .content {
     background-color: #fff;
     border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding: 30px 35px;
     width: 65%;
   }
   .content-title {
     color: #00645c;
     display: block;
-    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-family: Capriola, Arial, sans-serif;
     font-size: 30px;
+    font-weight: 400;
     margin-bottom: 15px;
+    text-align: center;
   }
   .html-content {
     background-color: #ecf5fc;
     padding: 15px 25px;
+  }
+
+  .card {
+    background-color: #fff;
+    border: none !important;
+    overflow: hidden;
+  }
+
+  .card-header {
+    background-color: #003b36;
+    padding: 15px 20px;
+  }
+
+  .card-title {
+    color: #fff;
+    font-family: Roboto, Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 300;
+    margin: 0;
+    text-align: center;
+  }
+
+  .card-content {
+    border: none !important;
+    padding: 20px;
+  }
+
+  .oppia-subtopic-viewer-container {
+    margin-top: 32px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 40px;
+    position: relative;
+    text-align: left;
   }
 
   @media screen and (max-width: 1100px) {
@@ -56,5 +112,23 @@
     .content {
       padding: 30px;
     }
+
+    .card-header {
+      padding: 12px 15px;
+    }
+
+    .card-title {
+      font-size: 18px;
+    }
+
+    .card-content {
+      padding: 15px;
+    }
   }
+
+  @media screen and (max-width: 600px) {
+  .oppia-subtopic-viewer-container {
+    padding-top: 80px;
+  }
+}
 </style>

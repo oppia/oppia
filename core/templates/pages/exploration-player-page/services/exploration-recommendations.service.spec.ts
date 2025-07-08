@@ -208,4 +208,38 @@ describe('Exploration Recommendations Service', () => {
       });
     });
   });
+
+  describe('getExplorationLink', () => {
+    beforeEach(() => {
+      expRecsService = TestBed.inject(ExplorationRecommendationsService);
+    });
+    it('should return "#" if no recommendations are present', () => {
+      const result = expRecsService.getExplorationLink([]);
+      expect(result).toBe('#');
+    });
+
+    it('should return "#" if recommendation has no ID', () => {
+      const result = expRecsService.getExplorationLink([{id: null}]);
+      expect(result).toBe('#');
+    });
+
+    it('should return link with only collection_id', () => {
+      const result = expRecsService.getExplorationLink([{id: 'exp123'}]);
+      expect(result).toBe(`/explore/exp123?collection_id=${COLLECTION_ID}`);
+    });
+
+    it('should return link with full story params and node_id if present', () => {
+      expRecsService.setRecommendedStoryNodeId(NODE_ID);
+      (urlService.getUrlParams as jasmine.Spy).and.returnValue({
+        story_url_fragment: 'some_story',
+        node_id: NODE_ID,
+        topic_url_fragment: 'some_topic',
+        classroom_url_fragment: 'some_classroom',
+      });
+      const result = expRecsService.getExplorationLink([{id: 'exp123'}]);
+      expect(result).toBe(
+        `/explore/exp123?collection_id=${COLLECTION_ID}&topic_url_fragment=some_topic&classroom_url_fragment=some_classroom&story_url_fragment=some_story&node_id=${NODE_ID}`
+      );
+    });
+  });
 });
