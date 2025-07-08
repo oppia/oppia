@@ -85,8 +85,6 @@ export class ProgressNavComponent {
   currentCardIndex!: number;
   @Output() submit: EventEmitter<void> = new EventEmitter();
 
-  @Output() clickContinueButton: EventEmitter<void> = new EventEmitter();
-
   @Output() clickContinueToReviseButton: EventEmitter<void> =
     new EventEmitter();
 
@@ -242,5 +240,9 @@ export class ProgressNavComponent {
         this.displayedCard.isCompleted() &&
         this.displayedCard.getLastOppiaResponse()
     );
+  }
+
+  onClickContinueButton(): void {
+    this.conversationFlowService.showUpcomingCard();
   }
 }

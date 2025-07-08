@@ -1,0 +1,84 @@
+<div role="main" class="new-conversation-skin-animate-cards-container position-relative" *ngIf="getHasFullyLoaded()">
+  <div class="new-conversation-skin-cards-container"
+       [ngClass]="{'new-conversation-skin-cards-container-embedded': isIframed}">
+
+    <!-- tutor Card -->
+    <div class="new-conversation-skin-tutor-card-container"
+         [ngClass]="{'new-conversation-skin-tutor-card-alone':
+                      !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
+      <oppia-conversation-display [displayedCard]="getDisplayedCard()"
+                        [displayedCardWasCompletedInPrevSession]="isDisplayedCardCompletedInPrevSession()"
+                        [avatarImageIsShown]="true"
+                        [shouldHideInteraction]="continueToReviseStateButtonIsVisible || !showInteraction"
+                        [userIsLoggedIn]="isLoggedIn"
+                        [collectionSummary]="collectionSummary"
+                        [questionPlayerConfig]="questionPlayerConfig"
+                        [explorationIsInPreviewMode]="isInPreviewMode"
+                        [recommendedExplorationSummaries]="this.getRecommendationExplorationSummaries()"
+                        [nextLessonLink]="getExplorationLink()">
+      </oppia-conversation-display>
+
+      <!-- Ask more information about answer -->
+      <div *ngIf="getCanAskLearnerForAnswerInfo()">
+        <oppia-learner-answer-info-card></oppia-learner-answer-info-card>
+      </div>
+
+
+      <!-- End card display -->
+      <div *ngIf="isOnTerminalCard() && this.getRecommendationExplorationSummaries() && this.getRecommendationExplorationSummaries().length > 0 && (inStoryMode || (collectionSummary && isOnTerminalCard() && isCurrentCardAtEndOfTranscript()))"
+           class="new-conversation-skin-next-lesson-wrapper">
+        <div class="new-conversation-skin-next-lesson-text-container">
+          <span class="new-conversation-skin-next-lesson-text" translate="I18N_NEXT_LESSON"></span>
+          <span *ngIf="!isHackyExpTitleTranslationDisplayed(this.getRecommendationExplorationSummaries()[0].id)">
+            {{ this.getRecommendationExplorationSummaries()[0].title }}
+          </span>
+          <span *ngIf="isHackyExpTitleTranslationDisplayed(this.getRecommendationExplorationSummaries()[0].id)">
+            {{ getRecommendedExpTitleTranslationKey(this.getRecommendationExplorationSummaries()[0].id) | translate }}
+          </span>
+        </div>
+        <div>
+          <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
+            <button mat-raised-button class="oppia-new-button-raised e2e-test-next-lesson-button">
+              <i class="material-icons oppia-vcenter oppia-button-icon" aria-hidden="true">&#xE5C8;</i>
+            </button>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supplemental card -->
+    <div *ngIf="isCurrentSupplementalCardNonempty()"
+         class="new-conversation-skin-supplemental-card-container">
+      <div class="new-supplemental-card-parent-container">
+        <oppia-supplemental-card [displayedCard]="getDisplayedCard()"
+                                 [isLearnAgainButton]="isLearnAgainButton()">
+        </oppia-supplemental-card>
+        <div class="new-conversation-skin-supplemental-nav" *ngIf="!getCanAskLearnerForAnswerInfo()">
+          <button mat-button
+                  type="submit"
+                  class="oppia-learner-confirm-button oppia-learner-submit-answer-button e2e-test-submit-answer-button new-conversation-skin-supplemental-nav-submit-button"
+                  (click)="submitAnswerFromProgressNav()"
+                  [disabled]="isSubmitButtonDisabled()">
+            {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Correct Answer Pop-Up -->
+  <div class="new-conversation-skin-correctness-footer-container" *ngIf="isCorrectnessFooterEnabled()">
+    <oppia-correctness-footer></oppia-correctness-footer>
+  </div>
+</div>
+
+<!-- Blue modal which shows at the end of the lesson to tell that next time lesson will start from the starting -->
+<div *ngIf="isProgressClearanceMessageShown()" class="oppia-exploration-checkpoints-message">
+  <div id="toast-container" class="toast-top-center toast-container">
+    <div class="toast-info checkpoints-toast-info ngx-toastr ng-trigger ng-trigger-flyInOut">
+      <div aria-live="polite" role="alertdialog" class="toast-message e2e-test-lesson-completion-message" attr.aria-label="{{'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate}}">
+        {{ 'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate }}
+      </div>
+    </div>
+  </div>
+</div>

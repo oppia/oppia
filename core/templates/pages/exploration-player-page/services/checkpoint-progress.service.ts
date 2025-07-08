@@ -32,7 +32,10 @@ export class CheckpointProgressService {
 
   constructor() {}
 
-  setMostRecentlyReachedCheckpoint(checkpointStateName: string): void {
+  setMostRecentlyReachedCheckpoint(checkpointStateName: string | null): void {
+    if (!checkpointStateName) {
+      throw new Error('Checkpoint state name cannot be null.');
+    }
     this.mostRecentlyReachedCheckpoint = checkpointStateName;
   }
 
@@ -59,7 +62,10 @@ export class CheckpointProgressService {
     this.visitedCheckpointStateNames = [];
   }
 
-  checkIfCheckpointIsVisited(checkpointStateName: string): boolean {
+  checkIfCheckpointIsVisited(checkpointStateName: string | null): boolean {
+    if (!checkpointStateName) {
+      throw new Error('Checkpoint state name cannot be null.');
+    }
     return this.visitedCheckpointStateNames.includes(checkpointStateName);
   }
 }

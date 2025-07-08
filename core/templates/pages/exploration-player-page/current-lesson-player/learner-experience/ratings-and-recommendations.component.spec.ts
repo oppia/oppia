@@ -82,6 +82,7 @@ describe('Ratings and recommendations component', () => {
   }
 
   class MockPageContextService {
+    private pageContext = 'EXPLORATION_PLAYER';
     getExplorationId(): string {
       return 'test_id';
     }
@@ -93,6 +94,9 @@ describe('Ratings and recommendations component', () => {
     }
     isInQuestionPlayerMode(): boolean {
       return false;
+    }
+    getPageContext(): string {
+      return this.pageContext;
     }
     setExplorationVersion(_version: number): void {}
   }
