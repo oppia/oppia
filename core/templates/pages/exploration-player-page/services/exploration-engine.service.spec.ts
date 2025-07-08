@@ -67,7 +67,6 @@ describe('Exploration engine service ', () => {
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
-  let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: TextInputRulesService;
   let translateService: TranslateService;
   let explorationDict: ExplorationBackendDict;
