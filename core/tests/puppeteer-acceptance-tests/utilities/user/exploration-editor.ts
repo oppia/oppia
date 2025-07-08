@@ -459,14 +459,14 @@ export class ExplorationEditor extends BaseUser {
     const valueElements = await this.page.$$(customizeOptionValueSelector);
     const valueElement = valueElements[optionIndex];
 
-    const typeOfElement = await valueElement.getProperty('name');
+    const typeOfElement = await valueElement.name;
 
     // TODO: remove it.
     showMessage(typeOfElement + 'TYPE OF MESSAGE');
 
     if (typeOfElement === 'unicodeEditor') {
       const inputElement = await valueElement.$('input');
-      await inputElement.type(value);
+      await inputElement.type(value as string);
     }
   }
 
