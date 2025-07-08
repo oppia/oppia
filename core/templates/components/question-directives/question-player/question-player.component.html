@@ -27,9 +27,12 @@
         <div class="practice-questions-coming-soon-text">There are no questions created yet for the selected subtopic(s). Please check back later!</div>
       </div>
     </div>
-    <div class="oppia-question-player-body">
+    <div class="oppia-question-player-body" *ngIf="!isNewLessonPlayerEnabled()">
       <oppia-conversation-skin [questionPlayerConfig]="questionPlayerConfig"></oppia-conversation-skin>
       <attribution-guide></attribution-guide>
+    </div>
+    <div class="oppia-new-question-player-body" *ngIf="isNewLessonPlayerEnabled()">
+      <oppia-new-conversation-skin [questionPlayerConfig]="questionPlayerConfig"></oppia-new-conversation-skin>
     </div>
   </div>
   <!-- End of Question Player -->
@@ -126,6 +129,14 @@
 </div>
 
 <style>
+  .oppia-new-question-player-body {
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    z-index: 1010;
+  }
+
   .results-footer {
     margin-top: 30px;
   }

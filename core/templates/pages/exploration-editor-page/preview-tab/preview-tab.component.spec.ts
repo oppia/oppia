@@ -48,10 +48,19 @@ import {ExplorationDataService} from '../services/exploration-data.service';
 import {NumberAttemptsService} from 'pages/exploration-player-page/services/number-attempts.service';
 import {RouterService} from '../services/router.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {PlatformFeatureService} from '../../../services/platform-feature.service';
 
 class MockNgbModalRef {
   componentInstance!: {
     manualParamChanges: null;
+  };
+}
+
+class MockPlatformFeatureService {
+  status = {
+    NewLessonPlayer: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -72,6 +81,7 @@ describe('Preview Tab Component', () => {
   let explorationEngineService: ExplorationEngineService;
   let explorationInitStateNameService: ExplorationInitStateNameService;
   let explorationFeaturesService: ExplorationFeaturesService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let conversationFlowService: ConversationFlowService;
   let explorationParamChangesService: ExplorationParamChangesService;
   let explorationStatesService: ExplorationStatesService;
@@ -137,6 +147,10 @@ describe('Preview Tab Component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
         {
           provide: ExplorationDataService,
@@ -369,4 +383,9 @@ describe('Preview Tab Component', () => {
 
     expect(component.loadPreviewState).toHaveBeenCalled();
   }));
+
+  it('should check new lesson player feature flag is enabled', () => {
+    mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
+    expect(component.isNewLessonPlayerEnabled()).toBe(true);
+  });
 });
