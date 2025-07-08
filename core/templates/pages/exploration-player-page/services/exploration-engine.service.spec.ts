@@ -383,7 +383,7 @@ describe('Exploration engine service ', () => {
     statsReportingService = TestBed.inject(StatsReportingService);
     urlService = TestBed.inject(UrlService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
+    paramChange = TestBed.inject(ParamChange);
     textInputService = TestBed.inject(TextInputRulesService);
     translateService = TestBed.inject(TranslateService);
   });
@@ -1474,7 +1474,7 @@ describe('Exploration engine service ', () => {
       // used for the exploration editor page before initialization.
       // This method should not be called from the exploration player page.
       let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+        ParamChange.createFromBackendDict(paramChangeDict);
 
       // Checking if we are currently in exploration editor preview mode.
       expect(pageContextService.isInExplorationEditorPage()).toBe(false);
@@ -1695,7 +1695,7 @@ describe('Exploration engine service ', () => {
       };
 
       let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+        ParamChange.createFromBackendDict(paramChangeDict);
       const newParams = explorationEngineService.makeParams(
         oldParams,
         [paramChanges],
@@ -1711,7 +1711,7 @@ describe('Exploration engine service ', () => {
         let oldParams = {};
 
         let paramChanges =
-          paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+          ParamChange.createFromBackendDict(paramChangeDict);
         spyOn(expressionInterpolationService, 'processUnicode').and.returnValue(
           null
         );
@@ -1730,7 +1730,7 @@ describe('Exploration engine service ', () => {
       };
 
       let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+        ParamChange.createFromBackendDict(paramChangeDict);
       const newParams = explorationEngineService.makeParams(
         oldParams,
         [paramChanges],
