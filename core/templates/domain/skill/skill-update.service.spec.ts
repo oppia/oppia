@@ -17,11 +17,8 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import cloneDeep from 'lodash/cloneDeep';
-
 import {ConceptCardBackendDict} from './concept-card.model';
 import {Misconception} from 'domain/skill/misconception.model';
-import {SkillContentsWorkedExamplesChange} from 'domain/editor/undo_redo/change.model';
 import {
   SkillBackendDict,
   SkillObjectFactory,
@@ -29,10 +26,6 @@ import {
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
-import {
-  WorkedExample,
-  WorkedExampleBackendDict,
-} from 'domain/skill/worked-example.model';
 import {LocalStorageService} from 'services/local-storage.service';
 import {EntityEditorBrowserTabsInfo} from 'domain/entity_editor_browser_tabs_info/entity-editor-browser-tabs-info.model';
 import {EventEmitter} from '@angular/core';
@@ -45,8 +38,6 @@ describe('Skill update service', () => {
 
   let skillDict: SkillBackendDict;
   let skillContentsDict: ConceptCardBackendDict;
-  let example1: WorkedExampleBackendDict;
-  let example2: WorkedExampleBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -80,41 +71,14 @@ describe('Skill update service', () => {
       explanations: ['explanation'],
     };
 
-    example1 = {
-      question: {
-        html: 'worked example question 1',
-        content_id: 'worked_example_q_1',
-      },
-      explanation: {
-        html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1',
-      },
-    };
-
-    example2 = {
-      question: {
-        html: 'worked example question 2',
-        content_id: 'worked_example_q_2',
-      },
-      explanation: {
-        html: 'worked example explanation 2',
-        content_id: 'worked_example_e_2',
-      },
-    };
-
     skillContentsDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [example1, example2],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_q_1: {},
-          worked_example_e_1: {},
-          worked_example_q_2: {},
-          worked_example_e_2: {},
         },
       },
     };
@@ -399,159 +363,6 @@ describe('Skill update service', () => {
 
     undoRedoService.undoChange(skill);
     expect(skill.findMisconceptionById(2).isMandatory()).toEqual(true);
-  });
-
-  it('should add a worked example', () => {
-    const skill = skillObjectFactory.createFromBackendDict(skillDict);
-
-    const newExample: WorkedExampleBackendDict = {
-      question: {
-        html: 'worked example question 3',
-        content_id: 'worked_example_q_3',
-      },
-      explanation: {
-        html: 'worked example explanation 3',
-        content_id: 'worked_example_e_3',
-      },
-    };
-
-    skillUpdateService.addWorkedExample(
-      skill,
-      WorkedExample.createFromBackendDict(newExample)
-    );
-
-    const workedExamplesObject: SkillContentsWorkedExamplesChange = {
-      cmd: 'update_skill_contents_property',
-      property_name: 'worked_examples',
-      old_value: skillContentsDict.worked_examples,
-      new_value: [...skillContentsDict.worked_examples, newExample],
-    };
-
-    expect(undoRedoService.getCommittableChangeList()).toEqual([
-      workedExamplesObject,
-    ]);
-    expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      WorkedExample.createFromBackendDict(example1),
-      WorkedExample.createFromBackendDict(example2),
-      WorkedExample.createFromBackendDict(newExample),
-    ]);
-
-    undoRedoService.undoChange(skill);
-    expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      WorkedExample.createFromBackendDict(example1),
-      WorkedExample.createFromBackendDict(example2),
-    ]);
-  });
-
-  it('should delete a worked example', () => {
-    const skill = skillObjectFactory.createFromBackendDict(skillDict);
-
-    skillUpdateService.deleteWorkedExample(skill, 0);
-
-    const workedExamplesObject: SkillContentsWorkedExamplesChange = {
-      cmd: 'update_skill_contents_property',
-      property_name: 'worked_examples',
-      old_value: skillContentsDict.worked_examples,
-      new_value: [skillContentsDict.worked_examples[1]],
-    };
-
-    expect(undoRedoService.getCommittableChangeList()).toEqual([
-      workedExamplesObject,
-    ]);
-    expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      WorkedExample.createFromBackendDict(example2),
-    ]);
-
-    undoRedoService.undoChange(skill);
-    expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      WorkedExample.createFromBackendDict(example1),
-      WorkedExample.createFromBackendDict(example2),
-    ]);
-  });
-
-  it('should update a worked example', () => {
-    const skill = skillObjectFactory.createFromBackendDict(skillDict);
-
-    const modifiedExample1 = {
-      question: {
-        html: 'new question 1',
-        content_id: 'worked_example_q_1',
-      },
-      explanation: {
-        html: 'new explanation 1',
-        content_id: 'worked_example_e_1',
-      },
-    };
-
-    skillUpdateService.updateWorkedExample(
-      skill,
-      0,
-      'new question 1',
-      'new explanation 1'
-    );
-
-    const workedExamplesObject: SkillContentsWorkedExamplesChange = {
-      cmd: 'update_skill_contents_property',
-      property_name: 'worked_examples',
-      old_value: skillContentsDict.worked_examples,
-      new_value: [modifiedExample1, example2],
-    };
-
-    expect(undoRedoService.getCommittableChangeList()).toEqual([
-      workedExamplesObject,
-    ]);
-    expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      WorkedExample.createFromBackendDict(modifiedExample1),
-      WorkedExample.createFromBackendDict(example2),
-    ]);
-
-    undoRedoService.undoChange(skill);
-    expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      WorkedExample.createFromBackendDict(example1),
-      WorkedExample.createFromBackendDict(example2),
-    ]);
-  });
-
-  it('should update all worked examples within a skill', () => {
-    const skill = skillObjectFactory.createFromBackendDict(skillDict);
-
-    const oldWorkedExamples = cloneDeep(
-      skill.getConceptCard().getWorkedExamples()
-    );
-    const newWorkedExamples = oldWorkedExamples.map((workedExample, index) => {
-      workedExample.getQuestion().html = `new question ${index + 1}`;
-      workedExample.getExplanation().html = `new explanation ${index + 1}`;
-      return workedExample;
-    });
-
-    skillUpdateService.updateWorkedExamples(skill, newWorkedExamples);
-
-    const workedExamplesObject: SkillContentsWorkedExamplesChange = {
-      cmd: 'update_skill_contents_property',
-      property_name: 'worked_examples',
-      old_value: skillContentsDict.worked_examples,
-      new_value: newWorkedExamples.map(workedExample => {
-        return workedExample.toBackendDict();
-      }),
-    };
-
-    expect(undoRedoService.getCommittableChangeList()).toEqual([
-      workedExamplesObject,
-    ]);
-    expect(skill.getConceptCard().getWorkedExamples()).toEqual(
-      newWorkedExamples.map(workedExample => {
-        return WorkedExample.createFromBackendDict(
-          workedExample.toBackendDict()
-        );
-      })
-    );
-
-    undoRedoService.undoChange(skill);
-
-    expect(skill.getConceptCard().getWorkedExamples()).toEqual([
-      WorkedExample.createFromBackendDict(example1),
-      WorkedExample.createFromBackendDict(example2),
-    ]);
   });
 
   it('should update skill editor browser tabs unsaved changes status', () => {

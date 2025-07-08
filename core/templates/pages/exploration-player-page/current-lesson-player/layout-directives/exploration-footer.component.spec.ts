@@ -40,7 +40,6 @@ import {
   ExplorationSummaryDict,
 } from '../../../../domain/summary/exploration-summary-backend-api.service';
 import {EventEmitter} from '@angular/core';
-import {QuestionPlayerStateService} from '../../../../components/question-directives/question-player/services/question-player-state.service';
 import {LearnerExplorationSummaryBackendDict} from '../../../../domain/summary/learner-exploration-summary.model';
 import {LearnerViewInfoBackendApiService} from '../../services/learner-view-info-backend-api.service';
 import {LoggerService} from '../../../../services/contextual/logger.service';
@@ -56,6 +55,7 @@ import {PlayerTranscriptService} from '../../services/player-transcript.service'
 import {StateCard} from '../../../../domain/state_card/state-card.model';
 import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {UserInfo} from '../../../../domain/user/user-info.model';
+import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
 import {UserService} from '../../../../services/user.service';
 import {
   Interaction,
@@ -120,9 +120,9 @@ describe('ExplorationFooterComponent', () => {
   let urlService: UrlService;
   let learnerViewInfoBackendApiService: LearnerViewInfoBackendApiService;
   let loggerService: LoggerService;
+  let questionPlayerEngineService: QuestionPlayerEngineService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
-  let questionPlayerStateService: QuestionPlayerStateService;
   let mockResizeEventEmitter = new EventEmitter();
   let explorationSummaryBackendApiService: ExplorationSummaryBackendApiService;
   let stateObjectFactory: StateObjectFactory;
@@ -173,7 +173,7 @@ describe('ExplorationFooterComponent', () => {
         LimitToPipe,
       ],
       providers: [
-        QuestionPlayerStateService,
+        QuestionPlayerEngineService,
         LearnerViewInfoBackendApiService,
         LoggerService,
         UrlInterpolationService,
@@ -205,13 +205,13 @@ describe('ExplorationFooterComponent', () => {
     readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
     );
+    questionPlayerEngineService = TestBed.inject(QuestionPlayerEngineService);
     explorationSummaryBackendApiService = TestBed.inject(
       ExplorationSummaryBackendApiService
     );
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService
     );
-    questionPlayerStateService = TestBed.inject(QuestionPlayerStateService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     playerPositionService = TestBed.inject(PlayerPositionService);
@@ -651,7 +651,7 @@ describe('ExplorationFooterComponent', () => {
       expect(component.hintsAndSolutionsAreSupported).toBeTrue();
 
       spyOnProperty(
-        questionPlayerStateService,
+        questionPlayerEngineService,
         'resultsPageIsLoadedEventEmitter'
       ).and.returnValue(mockResultsLoadedEventEmitter);
 
@@ -1313,7 +1313,7 @@ describe('ExplorationFooterComponent', () => {
       spyOn(pageContextService, 'getExplorationId').and.returnValue('expId');
       spyOn(pageContextService, 'isInQuestionPlayerMode').and.returnValue(true);
       spyOn(
-        questionPlayerStateService.resultsPageIsLoadedEventEmitter,
+        questionPlayerEngineService.resultsPageIsLoadedEventEmitter,
         'subscribe'
       );
 
@@ -1321,7 +1321,7 @@ describe('ExplorationFooterComponent', () => {
 
       expect(component.hintsAndSolutionsAreSupported).toBeTrue();
       expect(
-        questionPlayerStateService.resultsPageIsLoadedEventEmitter.subscribe
+        questionPlayerEngineService.resultsPageIsLoadedEventEmitter.subscribe
       ).toHaveBeenCalled();
     }
   );

@@ -28,6 +28,7 @@ import {ExplorationHtmlFormatterService} from '../../../../services/exploration-
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {LearnerAnswerInfoService} from '../../services/learner-answer-info.service';
+import {ConversationFlowService} from '../../services/conversation-flow.service';
 
 describe('LearnerAnswerInfoCard', () => {
   let component: LearnerAnswerInfoCard;
@@ -35,6 +36,7 @@ describe('LearnerAnswerInfoCard', () => {
   let explorationHtmlFormatter: ExplorationHtmlFormatterService;
   let explorationEngineService: ExplorationEngineService;
   let stateObjectFactory: StateObjectFactory;
+  let conversationFlowService: ConversationFlowService;
   let playerTranscriptService: PlayerTranscriptService;
   let learnerAnswerInfoService: LearnerAnswerInfoService;
 
@@ -58,6 +60,7 @@ describe('LearnerAnswerInfoCard', () => {
     explorationHtmlFormatter = TestBed.get(ExplorationHtmlFormatterService);
     learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     explorationEngineService = TestBed.get(ExplorationEngineService);
     spyOn(explorationEngineService, 'getState').and.returnValue(
       stateObjectFactory.createFromBackendDict('stateName', {
@@ -119,10 +122,10 @@ describe('LearnerAnswerInfoCard', () => {
     spyOn(playerTranscriptService, 'addNewInput').and.stub();
     spyOn(playerTranscriptService, 'addNewResponse').and.stub();
     spyOn(learnerAnswerInfoService, 'recordLearnerAnswerInfo').and.stub();
-    spyOn(component.submitAnswer, 'emit');
+    spyOn(conversationFlowService, 'submitAnswer');
 
     component.submitLearnerAnswerInfo();
 
-    expect(component.submitAnswer.emit).toHaveBeenCalled();
+    expect(conversationFlowService.submitAnswer).toHaveBeenCalled();
   });
 });

@@ -73,7 +73,6 @@ describe('State Skill Editor Component', () => {
     language_code: 'sadf',
     version: 10,
     misconception_count: 0,
-    worked_examples_count: 1,
     skill_model_created_on: 2,
     skill_model_last_updated: 3,
   };
@@ -144,7 +143,6 @@ describe('State Skill Editor Component', () => {
         languageCode: 'en',
         version: 1,
         misconceptionCount: 0,
-        workedExamplesCount: 0,
         skillModelCreatedOn: 1622827020924.104,
         skillModelLastUpdated: 1622827020924.109,
       },
@@ -329,7 +327,6 @@ describe('State Skill Editor Component', () => {
           html: 'test explanation',
           content_id: 'explanation',
         },
-        worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {},
         },
