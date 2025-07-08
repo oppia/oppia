@@ -288,6 +288,10 @@ const currentHintSummarySelector =
 const currentOutcomeDestinationSelector = '.e2e-test-current-outcome-dest';
 const currentSolutionSummarySelector =
   '.e2e-test-oppia-solution-tab .e2e-test-response-summary';
+const customizeInteractionBodySelector = '.e2e-test-customize-interaction-body';
+const customizeOptionSelector = `${customizeInteractionBodySelector} .e2e-test-multiple-options`;
+const customizeOptionLabelSelector = `${customizeOptionSelector} .oppia-interaction-customization-label`;
+const customizeOptionValueSelector = `${customizeOptionSelector} .e2e-test-schema-based-editor`;
 const editCardContentButtonSelector = '.e2e-test-edit-content-pencil-button';
 const editOutcomeDestPencilButtonSelector =
   '.e2e-test-edit-outcome-dest-pencil-button';
@@ -431,6 +435,33 @@ export class ExplorationEditor extends BaseUser {
       default:
         throw new Error(`Unsupported interaction type: ${interactionType}`);
     }
+  }
+
+  async updateInteractionCustomizationOption(
+    optionLabel: string,
+    value: string | boolean | number
+  ): Promise<void> {
+    await this.page.waitForSelector(customizeInteractionBodySelector, {
+      visible: true,
+    });
+
+    const labels = await this.page.$$eval(
+      customizeOptionLabelSelector,
+      elements => elements.map(element => element.textContent)
+    );
+
+    const optionIndex = labels.indexOf(optionLabel);
+
+    if (optionIndex === -1) {
+      throw new Error(`Option "${optionLabel}" not found.`);
+    }
+
+    const valueElements = await this.page.$$(customizeOptionValueSelector);
+    const valueElement = valueElements[optionIndex];
+
+    const typeOfElement = await valueElement.getProperty('name');
+
+    showMessage(typeOfElement + "TYPE OF MESSAGE")
   }
 
   // New functions ends.
