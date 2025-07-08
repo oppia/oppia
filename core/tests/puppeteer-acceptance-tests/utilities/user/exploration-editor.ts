@@ -277,10 +277,32 @@ const voiceoverConfirmationModalButton =
 
 const previousCardButton = '.e2e-test-back-button';
 
-enum INTERACTION_TYPES {
+// Editor Tab Selectors.
+const addResponseModalHeaderSelector = '.e2e-test-add-response-modal-header';
+const checkboxInInteractionCustomizationSelector =
+  '.e2e-test-interaction-editor .e2e-test-schema-based-bool-checkbox';
+const contentBoxSelector =
+  '.e2e-test-state-editor .e2e-test-state-content-display';
+const currentHintSummarySelector =
+  '.e2e-test-current-hint-box .e2e-test-response-summary';
+const currentOutcomeDestinationSelector = '.e2e-test-current-outcome-dest';
+const currentSolutionSummarySelector =
+  '.e2e-test-oppia-solution-tab .e2e-test-response-summary';
+const editCardContentButtonSelector = '.e2e-test-edit-content-pencil-button';
+const editOutcomeDestPencilButtonSelector =
+  '.e2e-test-edit-outcome-dest-pencil-button';
+const interactionPreviewCardSelector = '.e2e-test-interaction-preview';
+const nodeLabelSelector = '.e2e-test-node-background';
+const removeInteractionButttonSelector = '.e2e-test-delete-interaction';
+
+export enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
+  FRACTION_INPUT = 'Fraction Input',
+  MULTIPLE_CHOICE = 'Multiple Choice',
+  NUMBER_INPUT = 'Number Input',
+  TEXT_INPUT = 'Text Input',
 }
 
 enum INTERACTION_TABS {
@@ -296,6 +318,123 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
+  /**
+   * Function to add responses to the interactions.
+   * Currently, it only handles 'Number Input', 'Multiple Choice', 'Number Input', and 'Text Input' interaction types.
+   * @param {string} interactionType - The type of the interaction.
+   * @param {string} answer - The response to be added.
+   * @param {string} feedback - The feedback for the response.
+   * @param {string} destination - The destination state for the response.
+   * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
+   * @param {boolean} isLastResponse - Whether the response is last and more aren't going to be added.
+   */
+  async addResponsesToTheInteraction(
+    interactionType: string,
+    answer: string,
+    feedback: string,
+    destination: string,
+    responseIsCorrect: boolean,
+    isLastResponse: boolean = true
+  ): Promise<void> {
+    await this.updateAnswersInResponseModal(
+      interactionType as INTERACTION_TYPES,
+      answer
+    );
+    await this.clickOn(feedbackEditorSelector);
+    await this.type(stateContentInputField, feedback);
+    // The '/' value is used to select the 'a new card called' option in the dropdown.
+    if (destination) {
+      await this.select(destinationCardSelector, '/');
+      await this.type(addStateInput, destination);
+    }
+    if (responseIsCorrect) {
+      await this.clickOn(correctAnswerInTheGroupSelector);
+    }
+    if (isLastResponse) {
+      await this.page.waitForSelector(addNewResponseButton, {
+        visible: true,
+      });
+      await this.clickOn(addNewResponseButton);
+      await this.page
+        .waitForSelector(responseModalHeaderSelector, {
+          hidden: true,
+        })
+        .catch(async () => {
+          await this.clickOn(addNewResponseButton);
+        });
+    } else {
+      await this.clickOn(addAnotherResponseButton);
+      // The waitForNetworkIdle method waits for the response
+      // to the "Save Draft" request from change-list.service.ts
+      // to get executed, the Add Response modal to fully appear
+      // and all the fields in it to become clickable before
+      // moving on to next steps.
+      await this.waitForNetworkIdle();
+    }
+  }
+
+  async updateAnswersInResponseModal(
+    interactionType: INTERACTION_TYPES,
+    answer: string
+  ) {
+    switch (interactionType) {
+      case INTERACTION_TYPES.NUMBER_INPUT:
+        await this.page.waitForSelector(floatFormInput);
+        await this.page.type(floatFormInput, answer);
+        break;
+      case INTERACTION_TYPES.MULTIPLE_CHOICE:
+        await this.page.waitForSelector(multipleChoiceResponseDropdown, {
+          visible: true,
+        });
+        await this.clickOn(multipleChoiceResponseDropdown);
+        await this.page.waitForSelector(multipleChoiceResponseOption, {
+          visible: true,
+        });
+
+        await this.page.evaluate(
+          (answer, multipleChoiceResponseOption) => {
+            const optionElements = Array.from(
+              document.querySelectorAll(multipleChoiceResponseOption)
+            );
+            const element = optionElements.find(
+              element => element.textContent?.trim() === answer
+            ) as HTMLElement;
+            if (element) {
+              element.click();
+            } else {
+              throw new Error(`Cannot find "${answer}" in options.`);
+            }
+          },
+          answer,
+          multipleChoiceResponseOption
+        );
+        break;
+      case INTERACTION_TYPES.TEXT_INPUT:
+        await this.page.waitForSelector(addResponseOptionButton, {
+          visible: true,
+        });
+        await this.clickOn(addResponseOptionButton);
+        await this.page.waitForSelector(textInputInteractionOption);
+        await this.page.type(textInputInteractionOption, answer);
+        break;
+      case INTERACTION_TYPES.FRACTION_INPUT:
+        await this.page.waitForSelector(intEditorField, {
+          visible: true,
+        });
+        await this.clearAllTextFrom(intEditorField);
+        await this.type(intEditorField, answer);
+        break;
+      // Add cases for other interaction types here
+      // case 'otherInteractionType':
+      //   await this.type(otherFormInput, answer);
+      //   break;
+      default:
+        throw new Error(`Unsupported interaction type: ${interactionType}`);
+    }
+  }
+
+  // New functions ends.
+
   /**
    * Function to navigate to creator dashboard page.
    */
@@ -1354,107 +1493,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to add responses to the interactions. Currently, it only handles 'Number Input' interaction type.
-   * @param {string} interactionType - The type of the interaction.
-   * @param {string} answer - The response to be added.
-   * @param {string} feedback - The feedback for the response.
-   * @param {string} destination - The destination state for the response.
-   * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
-   * @param {boolean} isLastResponse - Whether the response is last and more aren't going to be added.
+   * Function to update the default response feedback for a state interaction.
+   * @param {string} defaultResponseFeedback - The feedback for the default responses.
    */
-  async addResponsesToTheInteraction(
-    interactionType: string,
-    answer: string,
-    feedback: string,
-    destination: string,
-    responseIsCorrect: boolean,
-    isLastResponse: boolean = true
+  async updateDefaultResponseFeedbackInExplorationEditorPage(
+    defaultResponseFeedback: string
   ): Promise<void> {
-    switch (interactionType) {
-      case 'Number Input':
-        await this.page.waitForSelector(floatFormInput);
-        await this.page.type(floatFormInput, answer);
-        break;
-      case 'Multiple Choice':
-        await this.page.waitForSelector(multipleChoiceResponseDropdown, {
-          visible: true,
-        });
-        await this.clickOn(multipleChoiceResponseDropdown);
-        await this.page.waitForSelector(multipleChoiceResponseOption, {
-          visible: true,
-        });
+    await this.page.waitForSelector(openOutcomeFeedBackEditor, {
+      visible: true,
+    });
+    await this.clickOn(stateContentInputField);
+    await this.type(stateContentInputField, defaultResponseFeedback);
+    await this.clickOn(saveOutcomeFeedbackButton);
 
-        await this.page.evaluate(
-          (answer, multipleChoiceResponseOption) => {
-            const optionElements = Array.from(
-              document.querySelectorAll(multipleChoiceResponseOption)
-            );
-            const element = optionElements.find(
-              element => element.textContent?.trim() === answer
-            ) as HTMLElement;
-            if (element) {
-              element.click();
-            } else {
-              throw new Error(`Cannot find "${answer}" in options.`);
-            }
-          },
-          answer,
-          multipleChoiceResponseOption
-        );
-        break;
-      case 'Text Input':
-        await this.page.waitForSelector(addResponseOptionButton, {
-          visible: true,
-        });
-        await this.clickOn(addResponseOptionButton);
-        await this.page.waitForSelector(textInputInteractionOption);
-        await this.page.type(textInputInteractionOption, answer);
-        break;
-      case 'Fraction Input':
-        await this.page.waitForSelector(intEditorField, {
-          visible: true,
-        });
-        await this.clearAllTextFrom(intEditorField);
-        await this.type(intEditorField, answer);
-        break;
-      // Add cases for other interaction types here
-      // case 'otherInteractionType':
-      //   await this.type(otherFormInput, answer);
-      //   break;
-      default:
-        throw new Error(`Unsupported interaction type: ${interactionType}`);
-    }
-    await this.clickOn(feedbackEditorSelector);
-    await this.type(stateContentInputField, feedback);
-    // The '/' value is used to select the 'a new card called' option in the dropdown.
-    if (destination) {
-      await this.select(destinationCardSelector, '/');
-      await this.type(addStateInput, destination);
-    }
-    if (responseIsCorrect) {
-      await this.clickOn(correctAnswerInTheGroupSelector);
-    }
-    if (isLastResponse) {
-      await this.page.waitForSelector(addNewResponseButton, {
-        visible: true,
-      });
-      await this.clickOn(addNewResponseButton);
-      await this.page
-        .waitForSelector(responseModalHeaderSelector, {
-          hidden: true,
-        })
-        .catch(async () => {
-          await this.clickOn(addNewResponseButton);
-        });
-    } else {
-      await this.clickOn(addAnotherResponseButton);
-      // The waitForNetworkIdle method waits for the response
-      // to the "Save Draft" request from change-list.service.ts
-      // to get executed, the Add Response modal to fully appear
-      // and all the fields in it to become clickable before
-      // moving on to next steps.
-      await this.waitForNetworkIdle();
-    }
+    await this.page.waitForSelector(saveOutcomeDestButton, {
+      hidden: true,
+    });
   }
 
   // TODO(#22539): This function has a duplicate in exploration-editor.ts.
@@ -1477,14 +1531,9 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(defaultFeedbackTab);
 
     if (defaultResponseFeedback) {
-      await this.clickOn(openOutcomeFeedBackEditor);
-      await this.clickOn(stateContentInputField);
-      await this.type(stateContentInputField, `${defaultResponseFeedback}`);
-      await this.clickOn(saveOutcomeFeedbackButton);
-
-      await this.page.waitForSelector(saveOutcomeDestButton, {
-        hidden: true,
-      });
+      await this.updateDefaultResponseFeedbackInExplorationEditorPage(
+        defaultResponseFeedback
+      );
     }
 
     if (directToCard) {
@@ -3181,6 +3230,146 @@ export class ExplorationEditor extends BaseUser {
         `Expected feedback status for thread ${threadIndex} to be "${expectedStatus}", but found "${statusText}"`
       );
     }
+  }
+
+  // New functions
+
+  /**
+   * Verifies that the add response modal header is as expected.
+   * @param {string} expectedHeader - The expected header.
+   */
+  async expectAddResponseModalHeaderToBe(
+    expectedHeader: string
+  ): Promise<void> {
+    await this.page.waitForSelector(addResponseModalHeaderSelector, {
+      visible: true,
+    });
+
+    const header = await this.page.$eval(addResponseModalHeaderSelector, el =>
+      el.textContent?.trim()
+    );
+
+    expect(header).toBe(expectedHeader);
+  }
+
+  /**
+   * Verifies that the card content is as expected.
+   * @param {string} expectedCardContent - The expected card content.
+   */
+  async expectCardContentToBe(expectedCardContent: string): Promise<void> {
+    await this.page.waitForSelector(contentBoxSelector, {
+      visible: true,
+    });
+
+    const cardContent = await this.page.$eval(contentBoxSelector, el =>
+      el.textContent?.trim()
+    );
+
+    expect(cardContent).toBe(expectedCardContent);
+  }
+
+  /**
+   * Verifies that the current outcome destination is as expected.
+   * @param {string} expectedDestination - The expected destination.
+   */
+  async expectCurrentOutcomeDestinationToBe(
+    expectedDestination: string
+  ): Promise<void> {
+    await this.page.waitForSelector(currentOutcomeDestinationSelector, {
+      visible: true,
+    });
+    const currentDestination = await this.page.$eval(
+      currentOutcomeDestinationSelector,
+      el => el.textContent?.trim()
+    );
+
+    expect(currentDestination).toBe(expectedDestination);
+  }
+
+  /**
+   * Verifies that the edit card content pencil button is visible.
+   */
+  async expectEditCardContentPencilButtonToBeVisible(): Promise<void> {
+    const visible = await this.isElementVisible(editCardContentButtonSelector);
+
+    expect(visible).toBe(true);
+  }
+
+  /**
+   * Verifies that the edit outcome destination pencil button is visible.
+   */
+  async expectEditOutcomeDestPencilButtonToBeVisible(): Promise<void> {
+    const visible = await this.isElementVisible(
+      editOutcomeDestPencilButtonSelector
+    );
+
+    expect(visible).toBe(true);
+  }
+
+  /**
+   * Verifies that the exploration graph contains the specified card.
+   * @param {string} cardName - The name of the card to check.
+   */
+  async expectExplorationGraphToContainCard(cardName: string): Promise<void> {
+    await this.page.waitForSelector(nodeLabelSelector, {
+      visible: true,
+    });
+    const cardNames = await this.page.$$(nodeLabelSelector);
+
+    expect(cardNames).toContain(cardName);
+  }
+
+  /**
+   * Verifies that the expected hint is in the current hints.
+   * @param {string} expectedHint - The expected hint.
+   */
+  async expectHintsToConatin(expectedHint: string): Promise<void> {
+    await this.page.waitForSelector(currentHintSummarySelector, {
+      visible: true,
+    });
+
+    const hints = await this.page.$$eval(currentHintSummarySelector, elements =>
+      elements.map(el => el.textContent?.trim())
+    );
+
+    expect(hints).toContain(expectedHint);
+  }
+
+  /**
+   * Verifies that the interaction preview card is visible.
+   */
+  async expectInteractionPreviewCardToBeVisible(): Promise<void> {
+    const visible = await this.isElementVisible(interactionPreviewCardSelector);
+
+    expect(visible).toBe(true);
+  }
+
+  /**
+   * Verifies that the remove interaction button is visible.
+   */
+  async expectRemoveInteractionButtonToBeVisible(): Promise<void> {
+    const visible = await this.isElementVisible(
+      removeInteractionButttonSelector
+    );
+
+    expect(visible).toBe(true);
+  }
+
+  /**
+   * Verifies that the expected solution is in the current solutions.
+   * @param {string} expectedSolution - The expected solution.
+   */
+  async expectSolutionsToContain(expectedSolution: string): Promise<void> {
+    await this.page.waitForSelector(currentSolutionSummarySelector, {
+      visible: true,
+    });
+
+    const solutions = await this.page.$$eval(
+      currentSolutionSummarySelector,
+      elements => elements.map(el => el.textContent?.trim())
+    );
+
+    expect(solutions).toContain(expectedSolution);
   }
 }
 
