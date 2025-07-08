@@ -386,7 +386,6 @@ describe('Exploration engine service ', () => {
     statsReportingService = TestBed.inject(StatsReportingService);
     urlService = TestBed.inject(UrlService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    paramChange = TestBed.inject(ParamChange);
     textInputService = TestBed.inject(TextInputRulesService);
     translateService = TestBed.inject(TranslateService);
   });
