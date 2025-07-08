@@ -66,6 +66,9 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.playExploration(explorationId);
     await loggedOutLearner.expectToBeOnPage('/explore/');
 
+    await loggedOutLearner.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
     await loggedOutLearner.expectScreenshotToMatch(
       'explorationPlayerPage',
       __dirname
