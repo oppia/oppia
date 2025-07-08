@@ -43,7 +43,7 @@ import {State} from 'domain/state/StateObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SkillEditorRoutingService} from 'pages/skill-editor-page/services/skill-editor-routing.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {QuestionValidationService} from 'services/question-validation.service';
@@ -87,7 +87,7 @@ describe('Questions List Component', () => {
   let questionObjectFactory: QuestionObjectFactory;
   let editableQuestionBackendApiService: EditableQuestionBackendApiService;
   let questionUndoRedoService: QuestionUndoRedoService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let questionValidationService: QuestionValidationService;
   let skillObjectFactory: SkillObjectFactory;
   let question = null;
@@ -115,7 +115,7 @@ describe('Questions List Component', () => {
           provide: UrlInterpolationService,
           useClass: MockUrlInterpolationService,
         },
-        ContextService,
+        PageContextService,
         QuestionValidationService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -140,7 +140,7 @@ describe('Questions List Component', () => {
     );
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
     loggerService = TestBed.inject(LoggerService);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     questionValidationService = TestBed.inject(QuestionValidationService);
 
     question = questionObjectFactory.createFromBackendDict({
@@ -214,9 +214,6 @@ describe('Questions List Component', () => {
           id: 'TextInput',
         },
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {},
-        },
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,
@@ -250,7 +247,6 @@ describe('Questions List Component', () => {
           html: 'test explanation',
           content_id: 'explanation',
         },
-        worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {},
         },
@@ -366,7 +362,6 @@ describe('Questions List Component', () => {
         ],
         skill_contents: {
           explanation: {html: 'test explanation', content_id: 'explanation'},
-          worked_examples: [],
           recorded_voiceovers: {voiceovers_mapping: {}},
         },
         language_code: 'en',
@@ -452,7 +447,6 @@ describe('Questions List Component', () => {
           html: 'test explanation',
           content_id: 'explanation',
         },
-        worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {},
         },
@@ -803,12 +797,12 @@ describe('Questions List Component', () => {
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.resolve('confirm'),
       } as NgbModalRef);
-      spyOn(contextService, 'resetImageSaveDestination').and.stub();
+      spyOn(pageContextService, 'resetImageSaveDestination').and.stub();
 
       component.cancel();
       tick();
 
-      expect(contextService.resetImageSaveDestination).toHaveBeenCalled();
+      expect(pageContextService.resetImageSaveDestination).toHaveBeenCalled();
     })
   );
 
@@ -985,12 +979,12 @@ describe('Questions List Component', () => {
       ' opened while a question is already being created',
     () => {
       component.newQuestionIsBeingCreated = true;
-      spyOn(contextService, 'setImageSaveDestinationToLocalStorage');
+      spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
 
       component.openQuestionEditor();
 
       expect(
-        contextService.setImageSaveDestinationToLocalStorage
+        pageContextService.setImageSaveDestinationToLocalStorage
       ).toHaveBeenCalled();
     }
   );
@@ -1179,7 +1173,6 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 1,
       misconception_count: 3,
-      worked_examples_count: 3,
       skill_model_created_on: 1593138898626.193,
       skill_model_last_updated: 1593138898626.193,
     };
@@ -1215,7 +1208,6 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 1,
       misconception_count: 3,
-      worked_examples_count: 3,
       skill_model_created_on: 1593138898626.193,
       skill_model_last_updated: 1593138898626.193,
     };
@@ -1271,7 +1263,6 @@ describe('Questions List Component', () => {
       language_code: 'en',
       version: 1,
       misconception_count: 3,
-      worked_examples_count: 3,
       skill_model_created_on: 1593138898626.193,
       skill_model_last_updated: 1593138898626.193,
     };

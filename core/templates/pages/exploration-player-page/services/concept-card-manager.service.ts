@@ -19,9 +19,11 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {StateCard} from 'domain/state_card/state-card.model';
 
-import {ExplorationPlayerConstants} from 'pages/exploration-player-page/exploration-player-page.constants';
+import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {ExplorationEngineService} from './exploration-engine.service';
+import {ConceptCard} from 'domain/skill/concept-card.model';
+import {PlayerTranscriptService} from './player-transcript.service';
 
 @Injectable({
   providedIn: 'root',
@@ -45,6 +47,7 @@ export class ConceptCardManagerService {
   conceptCardConsumed: boolean = false;
   wrongAnswersSinceConceptCardConsumed: number = 0;
   learnerIsReallyStuck: boolean = false;
+  conceptCard!: ConceptCard;
 
   // Variable tooltipIsOpen is a flag which says that the tooltip is currently
   // visible to the learner.
@@ -54,12 +57,13 @@ export class ConceptCardManagerService {
   conceptCardDiscovered: boolean = false;
 
   constructor(
-    playerPositionService: PlayerPositionService,
-    private explorationEngineService: ExplorationEngineService
+    private playerPositionService: PlayerPositionService,
+    private explorationEngineService: ExplorationEngineService,
+    private playerTranscriptService: PlayerTranscriptService
   ) {
     // TODO(#10904): Refactor to move subscriptions into components.
 
-    playerPositionService.onNewCardOpened.subscribe(
+    this.playerPositionService.onNewCardOpened.subscribe(
       (displayedCard: StateCard) => {
         this.hintsAvailable = displayedCard.getHints().length;
       }
@@ -157,6 +161,12 @@ export class ConceptCardManagerService {
     return this.conceptCardConsumed;
   }
 
+  returnToExplorationAfterConceptCard(): void {
+    this.playerTranscriptService.addPreviousCard();
+    let numCards = this.playerTranscriptService.getNumCards();
+    this.playerPositionService.setDisplayedCardIndex(numCards - 1);
+  }
+
   recordWrongAnswer(): void {
     if (this.isConceptCardViewable()) {
       this.wrongAnswersSinceConceptCardConsumed++;
@@ -168,6 +178,14 @@ export class ConceptCardManagerService {
       // Learner is really stuck.
       this.emitLearnerStuckedness();
     }
+  }
+
+  setConceptCard(conceptCard: ConceptCard): void {
+    this.conceptCard = conceptCard;
+  }
+
+  getConceptCard(): ConceptCard {
+    return this.conceptCard;
   }
 
   get onLearnerGetsReallyStuck(): EventEmitter<string> {

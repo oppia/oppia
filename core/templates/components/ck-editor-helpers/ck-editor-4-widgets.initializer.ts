@@ -18,7 +18,7 @@
  */
 
 import {NgZone} from '@angular/core';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
 export interface RteComponentSpecs {
@@ -61,7 +61,7 @@ export class CkEditorInitializerService {
   static ckEditorInitializer(
     rteHelperService: RteHelperService,
     htmlEscaperService: HtmlEscaperService,
-    contextService: ContextService,
+    pageContextService: PageContextService,
     ngZone: NgZone
   ): void {
     if (rteHelperService === undefined) {
@@ -120,7 +120,7 @@ export class CkEditorInitializerService {
               edit: function () {
                 // The following check allows the editing of the RTE components
                 // only in editor pages.
-                if (!contextService.canAddOrEditComponents()) {
+                if (!pageContextService.canAddOrEditComponents()) {
                   return;
                 }
                 editor.fire('lockSnapshot', {

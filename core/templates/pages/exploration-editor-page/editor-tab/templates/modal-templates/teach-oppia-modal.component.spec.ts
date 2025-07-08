@@ -35,7 +35,7 @@ import {TrainingModalService} from '../../training-panel/training-modal.service'
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ResponsesService} from '../../services/responses.service';
 import {
@@ -55,7 +55,7 @@ describe('Teach Oppia Modal Component', () => {
   let component: TeachOppiaModalComponent;
   let fixture: ComponentFixture<TeachOppiaModalComponent>;
   let alertsService: AlertsService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
@@ -133,9 +133,6 @@ describe('Teach Oppia Modal Component', () => {
     },
     linked_skill_id: null,
     param_changes: [],
-    recorded_voiceovers: {
-      voiceovers_mapping: {},
-    },
     solicit_answer_details: false,
     card_is_checkpoint: false,
   };
@@ -231,7 +228,7 @@ describe('Teach Oppia Modal Component', () => {
         },
       ];
       alertsService = TestBed.inject(AlertsService);
-      contextService = TestBed.inject(ContextService);
+      pageContextService = TestBed.inject(PageContextService);
       explorationHtmlFormatterService = TestBed.inject(
         ExplorationHtmlFormatterService
       );
@@ -242,7 +239,9 @@ describe('Teach Oppia Modal Component', () => {
       trainingModalService = TestBed.inject(TrainingModalService);
 
       spyOn(injector, 'get').and.stub();
-      spyOn(contextService, 'getExplorationId').and.returnValue(explorationId);
+      spyOn(pageContextService, 'getExplorationId').and.returnValue(
+        explorationId
+      );
       spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
         stateName
       );

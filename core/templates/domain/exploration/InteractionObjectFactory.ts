@@ -27,11 +27,7 @@ import {
 } from 'domain/exploration/answer-group.model';
 import {HintBackendDict, Hint} from 'domain/exploration/hint-object.model';
 import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
-import {
-  SolutionBackendDict,
-  Solution,
-  SolutionObjectFactory,
-} from 'domain/exploration/SolutionObjectFactory';
+import {SolutionBackendDict, Solution} from 'domain/exploration/solution.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {
   AlgebraicExpressionInputCustomizationArgs,
@@ -137,14 +133,32 @@ export class Interaction extends BaseTranslatableObject {
     return translatableObjects;
   }
 
-  getContentIdToHtml(): {[contentId: string]: string} {
-    let contentIdToHtml = {};
-    let answerGroupsContentIdToHtml = {};
-    let outcomeContentIdToHtml = {};
+  getContentIdToContents(): {[contentId: string]: string} {
+    let contentIdToHtml: {[contentId: string]: string} = {};
+    let answerGroupsContentIdToHtml: {[contentId: string]: string} = {};
+    let outcomeContentIdToHtml: {[contentId: string]: string} = {};
+    let solutionContentIdToHtml: {[contentId: string]: string} = {};
+    let htmlContentToHtml: {[contentId: string]: string} = {};
+    let customizationArgsContentIdToContents: {[contentId: string]: string} =
+      {};
+
+    const subtitledContents = Interaction.getCustomizationArgContents(
+      this.customizationArgs
+    );
+
+    for (let subtitledContent of subtitledContents) {
+      const contentId = subtitledContent.contentId || '';
+
+      if (subtitledContent instanceof SubtitledHtml) {
+        customizationArgsContentIdToContents[contentId] = subtitledContent.html;
+      } else if (subtitledContent instanceof SubtitledUnicode) {
+        customizationArgsContentIdToContents[contentId] =
+          subtitledContent.unicode;
+      }
+    }
 
     for (let answerGroup of this.answerGroups) {
       Object.assign(
-        answerGroupsContentIdToHtml,
         answerGroupsContentIdToHtml,
         answerGroup.getContentIdToHtml()
       );
@@ -154,15 +168,26 @@ export class Interaction extends BaseTranslatableObject {
       outcomeContentIdToHtml = this.defaultOutcome.getContentIdToHtml();
     }
 
+    for (let hint of this.hints) {
+      Object.assign(htmlContentToHtml, hint.getContentIdToHtml());
+    }
+
+    if (this.solution) {
+      solutionContentIdToHtml = this.solution.getContentIdToHtml();
+    }
+
     return Object.assign(
       contentIdToHtml,
+      customizationArgsContentIdToContents,
       answerGroupsContentIdToHtml,
-      outcomeContentIdToHtml
+      outcomeContentIdToHtml,
+      htmlContentToHtml,
+      solutionContentIdToHtml
     );
   }
 
   getContentIdForMatchingHtml(contentHtml: string): string | undefined {
-    let contentIdToHtml = this.getContentIdToHtml();
+    let contentIdToHtml = this.getContentIdToContents();
     for (let contentId in contentIdToHtml) {
       let retrievedHtml = contentIdToHtml[contentId];
 
@@ -301,7 +326,7 @@ export class Interaction extends BaseTranslatableObject {
   providedIn: 'root',
 })
 export class InteractionObjectFactory {
-  constructor(private solutionFactory: SolutionObjectFactory) {}
+  constructor() {}
 
   _createFromContinueCustomizationArgsBackendDict(
     caBackendDict: ContinueCustomizationArgsBackendDict
@@ -562,6 +587,6 @@ export class InteractionObjectFactory {
   createSolutionFromBackendDict(
     solutionBackendDict: SolutionBackendDict
   ): Solution {
-    return this.solutionFactory.createFromBackendDict(solutionBackendDict);
+    return Solution.createFromBackendDict(solutionBackendDict);
   }
 }

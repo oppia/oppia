@@ -53,7 +53,7 @@ describe('Topic Manager', function () {
 
     // Create an exploration with Code Editor.
     await curriculumAdmin.navigateToCreatorDashboardPage();
-    await curriculumAdmin.navigateToExplorationEditorPage();
+    await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
     await curriculumAdmin.dismissWelcomeModal();
 
     // Create an exlporation unsupported by mobile.

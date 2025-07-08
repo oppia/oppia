@@ -23,7 +23,7 @@ import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {AlertsService} from 'services/alerts.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExternalRteSaveService} from 'services/external-rte-save.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -127,10 +127,10 @@ export class RteHelperModalComponent {
   COMPONENT_ID_VIDEO = 'video';
   // Character limit for various RTE components.
   CHARACTER_LIMITS = {
-    'collapsible': 500,
-    'link': 200,
-    'tabs': 500,
-    'default': 500
+    collapsible: 500,
+    link: 200,
+    tabs: 500,
+    default: 500,
   };
 
   constructor(
@@ -139,7 +139,7 @@ export class RteHelperModalComponent {
     private alertsService: AlertsService,
     private fb: FormBuilder,
     private assetsBackendApiService: AssetsBackendApiService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private imageUploadHelperService: ImageUploadHelperService,
     private htmlLengthService: HtmlLengthService
@@ -282,7 +282,12 @@ export class RteHelperModalComponent {
           break;
         } else {
           // Check content length.
-          if (this.isContentLengthExceeded(value[0][tabIndex].content, this.COMPONENT_ID_TABS)) {
+          if (
+            this.isContentLengthExceeded(
+              value[0][tabIndex].content,
+              this.COMPONENT_ID_TABS
+            )
+          ) {
             this.updateRteErrorMessage(
               `The content of tab ${tabIndex + 1} is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_TABS)} characters.`
             );
@@ -290,7 +295,12 @@ export class RteHelperModalComponent {
           }
 
           // Check title length.
-          if (this.isContentLengthExceeded(value[0][tabIndex].title, this.COMPONENT_ID_TABS)) {
+          if (
+            this.isContentLengthExceeded(
+              value[0][tabIndex].title,
+              this.COMPONENT_ID_TABS
+            )
+          ) {
             this.updateRteErrorMessage(
               `The title of tab ${tabIndex + 1} is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_TABS)} characters.`
             );
@@ -353,14 +363,20 @@ export class RteHelperModalComponent {
       }
     } else if (this.componentId === this.COMPONENT_ID_COLLAPSIBLE) {
       // Check heading and content lengths for collapsible components.
-      if (value[0] && this.isContentLengthExceeded(value[0], this.COMPONENT_ID_COLLAPSIBLE)) {
+      if (
+        value[0] &&
+        this.isContentLengthExceeded(value[0], this.COMPONENT_ID_COLLAPSIBLE)
+      ) {
         this.updateRteErrorMessage(
           `The heading is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_COLLAPSIBLE)} characters.`
         );
         return;
       }
 
-      if (value[1] && this.isContentLengthExceeded(value[1], this.COMPONENT_ID_COLLAPSIBLE)) {
+      if (
+        value[1] &&
+        this.isContentLengthExceeded(value[1], this.COMPONENT_ID_COLLAPSIBLE)
+      ) {
         this.updateRteErrorMessage(
           `The content is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_COLLAPSIBLE)} characters.`
         );
@@ -467,7 +483,7 @@ export class RteHelperModalComponent {
 
       let maxAllowedFileSize;
       if (
-        this.contextService.getEntityType() ===
+        this.pageContextService.getEntityType() ===
         AppConstants.ENTITY_TYPE.BLOG_POST
       ) {
         const ONE_MB_IN_BYTES = 1 * 1024 * 1024;
@@ -488,7 +504,7 @@ export class RteHelperModalComponent {
         return;
       }
       if (
-        this.contextService.getImageSaveDestination() ===
+        this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
         this.imageLocalStorageService.saveImage(svgFileName, svgFile);
@@ -505,8 +521,8 @@ export class RteHelperModalComponent {
         .saveMathExpressionImage(
           resampledFile,
           svgFileName,
-          this.contextService.getEntityType(),
-          this.contextService.getEntityId()
+          this.pageContextService.getEntityType(),
+          this.pageContextService.getEntityId()
         )
         .then(
           response => {

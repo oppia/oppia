@@ -29,8 +29,7 @@ import {JoyrideService} from 'ngx-joyride';
 import {Subscription} from 'rxjs';
 import {WelcomeTranslationModalComponent} from 'pages/exploration-editor-page/translation-tab/modal-templates/welcome-translation-modal.component';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {StateRecordedVoiceoversService} from 'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EditabilityService} from 'services/editability.service';
 import {LoaderService} from 'services/loader.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -64,7 +63,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
   };
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editabilityService: EditabilityService,
     private explorationStatesService: ExplorationStatesService,
     private loaderService: LoaderService,
@@ -72,7 +71,6 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     private routerService: RouterService,
     private siteAnalyticsService: SiteAnalyticsService,
     private stateEditorService: StateEditorService,
-    private stateRecordedVoiceoversService: StateRecordedVoiceoversService,
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,
@@ -81,15 +79,8 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
 
   initTranslationTab(): void {
     this.stateTutorialFirstTimeService.initTranslation(
-      this.contextService.getExplorationId()
+      this.pageContextService.getExplorationId()
     );
-    let stateName = this.stateEditorService.getActiveStateName();
-    if (stateName) {
-      this.stateRecordedVoiceoversService.init(
-        stateName,
-        this.explorationStatesService.getRecordedVoiceoversMemento(stateName)
-      );
-    }
     this.showTranslationTabSubDirectives = true;
     this.translationTabActiveModeService.activateVoiceoverMode();
     this.loaderService.hideLoadingScreen();

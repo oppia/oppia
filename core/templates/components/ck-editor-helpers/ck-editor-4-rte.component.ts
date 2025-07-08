@@ -52,7 +52,7 @@ import {
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {CkEditorCopyContentService} from './ck-editor-copy-content.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {Subscription} from 'rxjs';
@@ -107,7 +107,7 @@ export class CkEditor4RteComponent
 
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private elementRef: ElementRef,
     private internetConnectivityService: InternetConnectivityService,
     private renderer: Renderer2
@@ -135,7 +135,8 @@ export class CkEditor4RteComponent
 
   private validateConfiguration(): void {
     if (!this.uiConfig || !this.uiConfig.rte_components) {
-      this.configError = 'No component set specified. Please provide a "rte_components" config in uiConfig.';
+      this.configError =
+        'No component set specified. Please provide a "rte_components" config in uiConfig.';
       console.error('Error: ' + this.configError);
       return;
     }
@@ -150,119 +151,129 @@ export class CkEditor4RteComponent
     }
   }
 
- private validatePastedContent(content: string): {
-  isValid: boolean;
-  invalidComponents: string[];
-  validContent: string;
-  hasValidContent: boolean;
-} {
-  if (this.configError || !content) {
+  private validatePastedContent(content: string): {
+    isValid: boolean;
+    invalidComponents: string[];
+    validContent: string;
+    hasValidContent: boolean;
+  } {
+    if (this.configError || !content) {
+      return {
+        isValid: true,
+        invalidComponents: [],
+        validContent: content || '',
+        hasValidContent: false,
+      };
+    }
+
+    const invalidComponents: string[] = [];
+    const {names: enabledComponents} = this.getEnabledComponents();
+    let validContent = content;
+
+    // Find all RTE components in the pasted content.
+    const componentMatches = Array.from(content.matchAll(this.componentRe));
+
+    for (const match of componentMatches) {
+      const componentParts = match[3]; // E.g., "collapsible" or "ckeditor-collapsible".
+
+      // Extract the actual component name (remove 'ckeditor-' prefix if present)
+      let componentName = componentParts;
+      if (componentName.startsWith('ckeditor-')) {
+        componentName = componentName.substring('ckeditor-'.length);
+      }
+
+      // Check if this component is enabled in the current editor.
+      if (!enabledComponents.includes(componentName)) {
+        if (!invalidComponents.includes(componentName)) {
+          invalidComponents.push(componentName);
+        }
+        // Remove the invalid component from validContent.
+        validContent = validContent.replace(match[0], '');
+      }
+    }
+
+    // Clean up any empty paragraphs or extra whitespace left after removing components.
+    validContent = validContent.replace(/<p>\s*<\/p>/g, '');
+    validContent = validContent.replace(/<div>\s*<\/div>/g, '');
+
+    // Clean up invisible characters and whitespace.
+    validContent = validContent
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&zwsp;/g, '')
+      .replace(/&#8203;/g, '')
+      .replace(/&#x200B;/g, '')
+      .replace(/\u200B/g, '')
+      .replace(/\u00A0/g, ' ')
+      .replace(/\u2060/g, '')
+      .replace(/\uFEFF/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    // Clean up any empty tags that might be left after cleaning invisible characters.
+    validContent = validContent
+      .replace(/<p>\s*<\/p>/g, '')
+      .replace(/<div>\s*<\/div>/g, '')
+      .replace(/<span>\s*<\/span>/g, '')
+      .trim();
+
+    // Check if there's meaningful content left after cleaning
+    // Remove any remaining HTML tags to check for actual text content.
+    let textOnlyContent = validContent.replace(/<[^>]*>/g, '').trim();
+
+    // Remove all kinds of whitespace characters and HTML entities that aren't visible content.
+    textOnlyContent = textOnlyContent
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&zwsp;/g, '')
+      .replace(/&#8203;/g, '')
+      .replace(/&#x200B;/g, '')
+      .replace(/\u200B/g, '')
+      .replace(/\u00A0/g, ' ')
+      .replace(/\u2060/g, '')
+      .replace(/\uFEFF/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const hasMeaningfulContent = textOnlyContent.length > 0;
+
+    // FIXED: Only return hasValidContent as true if there are invalid components AND meaningful valid content.
+    const hasValidContent =
+      invalidComponents.length > 0 && hasMeaningfulContent;
+
     return {
-      isValid: true,
-      invalidComponents: [],
-      validContent: content || '',
-      hasValidContent: false
+      isValid: invalidComponents.length === 0,
+      invalidComponents,
+      validContent,
+      hasValidContent,
     };
   }
 
-  const invalidComponents: string[] = [];
-  const { names: enabledComponents } = this.getEnabledComponents();
-  let validContent = content;
-
-  // Find all RTE components in the pasted content.
-  const componentMatches = Array.from(content.matchAll(this.componentRe));
-
-  for (const match of componentMatches) {
-    const componentParts = match[3]; // E.g., "collapsible" or "ckeditor-collapsible".
-
-    // Extract the actual component name (remove 'ckeditor-' prefix if present)
-    let componentName = componentParts;
-    if (componentName.startsWith('ckeditor-')) {
-      componentName = componentName.substring('ckeditor-'.length);
-    }
-
-    // Check if this component is enabled in the current editor.
-    if (!enabledComponents.includes(componentName)) {
-      if (!invalidComponents.includes(componentName)) {
-        invalidComponents.push(componentName);
-      }
-      // Remove the invalid component from validContent.
-      validContent = validContent.replace(match[0], '');
-    }
-  }
-
-  // Clean up any empty paragraphs or extra whitespace left after removing components.
-  validContent = validContent.replace(/<p>\s*<\/p>/g, '');
-  validContent = validContent.replace(/<div>\s*<\/div>/g, '');
-
-  // Clean up invisible characters and whitespace.
-  validContent = validContent
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&zwsp;/g, '')
-    .replace(/&#8203;/g, '')
-    .replace(/&#x200B;/g, '')
-    .replace(/\u200B/g, '')
-    .replace(/\u00A0/g, ' ')
-    .replace(/\u2060/g, '')
-    .replace(/\uFEFF/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  // Clean up any empty tags that might be left after cleaning invisible characters.
-  validContent = validContent
-    .replace(/<p>\s*<\/p>/g, '')
-    .replace(/<div>\s*<\/div>/g, '')
-    .replace(/<span>\s*<\/span>/g, '')
-    .trim();
-
-  // Check if there's meaningful content left after cleaning
-  // Remove any remaining HTML tags to check for actual text content.
-  let textOnlyContent = validContent.replace(/<[^>]*>/g, '').trim();
-
-  // Remove all kinds of whitespace characters and HTML entities that aren't visible content.
-  textOnlyContent = textOnlyContent
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&zwsp;/g, '')
-    .replace(/&#8203;/g, '')
-    .replace(/&#x200B;/g, '')
-    .replace(/\u200B/g, '')
-    .replace(/\u00A0/g, ' ')
-    .replace(/\u2060/g, '')
-    .replace(/\uFEFF/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  const hasMeaningfulContent = textOnlyContent.length > 0;
-
-  // FIXED: Only return hasValidContent as true if there are invalid components AND meaningful valid content.
-  const hasValidContent = invalidComponents.length > 0 && hasMeaningfulContent;
-
-  return {
-    isValid: invalidComponents.length === 0,
-    invalidComponents,
-    validContent,
-    hasValidContent
-  };
-}
-
- private showPasteError(invalidComponents: string[]): void {
+  private showPasteError(invalidComponents: string[]): void {
     const componentList = invalidComponents.join(', ');
     this.pasteError = `The following component${invalidComponents.length > 1 ? 's are' : ' is'} not supported in this editor: ${componentList}. Please do not add ${invalidComponents.length > 1 ? 'them' : 'it'} here.`;
     this.showPasteConfirmation = false; // Ensure confirmation dialog is not shown
     this.pendingPasteValidContent = null; // Clear any pending valid content
     // Log the error for debugging.
-    console.warn('Paste blocked due to invalid Rich-text editor components:', invalidComponents);
+    console.warn(
+      'Paste blocked due to invalid Rich-text editor components:',
+      invalidComponents
+    );
   }
 
-    private showPasteConfirmationBox(invalidComponents: string[], validContent: string): void {
+  private showPasteConfirmationBox(
+    invalidComponents: string[],
+    validContent: string
+  ): void {
     const componentList = invalidComponents.join(', ');
     this.pasteError = `The pasted content contains unsupported component${invalidComponents.length > 1 ? 's' : ''}: ${componentList}. Would you like to paste only the valid content?`;
     this.pendingPasteValidContent = validContent;
     this.showPasteConfirmation = true; // Show confirmation dialog.
-    console.warn('Paste contains invalid components, asking user for confirmation:', invalidComponents);
+    console.warn(
+      'Paste contains invalid components, asking user for confirmation:',
+      invalidComponents
+    );
   }
 
-    private clearPasteError(): void {
+  private clearPasteError(): void {
     this.pasteError = null;
     this.showPasteConfirmation = false;
     this.pendingPasteData = null;
@@ -471,12 +482,16 @@ export class CkEditor4RteComponent
   }
 
   // Determine which components should be displayed based on the UI configuration.
-  private getEnabledComponents(): { names: string[]; icons: string[]; componentsThatRequireInternet: string[] } {
+  private getEnabledComponents(): {
+    names: string[];
+    icons: string[];
+    componentsThatRequireInternet: string[];
+  } {
     const _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
     const result = {
       names: [],
       icons: [],
-      componentsThatRequireInternet: []
+      componentsThatRequireInternet: [],
     };
 
     if (this.configError) {
@@ -496,10 +511,20 @@ export class CkEditor4RteComponent
         this.uiConfig &&
         this.uiConfig.hide_complex_extensions &&
         componentDefn.isComplex;
-
-      if (isInComponentList && !hideComplexExtensionFlag) {
-        result.names.push(componentDefn.id);
-        result.icons.push(componentDefn.iconDataUrl);
+      var notSupportedOnAndroidFlag =
+        this.pageContextService.isExplorationLinkedToStory() &&
+        AppConstants.VALID_RTE_COMPONENTS_FOR_ANDROID.indexOf(
+          componentDefn.id
+        ) === -1;
+      if (
+        !(
+          hideComplexExtensionFlag ||
+          notSupportedOnAndroidFlag ||
+          this.isInvalidForBlogPostEditorRTE(componentDefn)
+        )
+      ) {
+        names.push(componentDefn.id);
+        icons.push(componentDefn.iconDataUrl);
       }
 
       if (componentDefn.requiresInternet) {
@@ -514,7 +539,8 @@ export class CkEditor4RteComponent
     if (this.configError) {
       return;
     }
-    const { names, icons, componentsThatRequireInternet } = this.getEnabledComponents();
+    const {names, icons, componentsThatRequireInternet} =
+      this.getEnabledComponents();
     this.componentsThatRequireInternet = componentsThatRequireInternet;
 
     var editable =
@@ -560,7 +586,7 @@ export class CkEditor4RteComponent
       })
       .join(',');
     var buttonNames = [];
-    if (this.contextService.canAddOrEditComponents()) {
+    if (this.pageContextService.canAddOrEditComponents()) {
       names.forEach(name => {
         buttonNames.push('Oppia' + name);
         buttonNames.push('-');
@@ -569,7 +595,7 @@ export class CkEditor4RteComponent
     buttonNames.pop();
 
     // Enable format headers in CKE editor for blog post editor rte.
-    this.headersEnabled = this.contextService.isInBlogPostEditorPage();
+    this.headersEnabled = this.pageContextService.isInBlogPostEditorPage();
 
     // Add external plugins.
     CKEDITOR.plugins.addExternal(
@@ -709,36 +735,39 @@ export class CkEditor4RteComponent
     });
 
     // Add paste event listener to validate pasted content.
-    ck.on('paste', (event) => {
-    const pastedData = event.data.dataValue || '';
-    const validation = this.validatePastedContent(pastedData);
+    ck.on('paste', event => {
+      const pastedData = event.data.dataValue || '';
+      const validation = this.validatePastedContent(pastedData);
 
-    if (!validation.isValid) {
-      // Always prevent the default paste operation.
-      event.cancel();
+      if (!validation.isValid) {
+        // Always prevent the default paste operation.
+        event.cancel();
 
-      if (validation.hasValidContent) {
-        // Show confirmation dialog for selective paste.
-        this.showPasteConfirmationBox(validation.invalidComponents, validation.validContent);
+        if (validation.hasValidContent) {
+          // Show confirmation dialog for selective paste.
+          this.showPasteConfirmationBox(
+            validation.invalidComponents,
+            validation.validContent
+          );
+        } else {
+          // Only invalid content, show error message without confirmation buttons.
+          this.showPasteError(validation.invalidComponents);
+        }
+
+        // Force Angular change detection to update the UI.
+        setTimeout(() => {
+          this.elementRef.nativeElement.dispatchEvent(new Event('change'));
+        }, 0);
+
+        // Focus back to the editor.
+        setTimeout(() => {
+          ck.focus();
+        }, 100);
       } else {
-        // Only invalid content, show error message without confirmation buttons.
-        this.showPasteError(validation.invalidComponents);
+        // Clear any existing paste errors on successful paste.
+        this.clearPasteError();
       }
-
-      // Force Angular change detection to update the UI.
-      setTimeout(() => {
-        this.elementRef.nativeElement.dispatchEvent(new Event('change'));
-      }, 0);
-
-      // Focus back to the editor.
-      setTimeout(() => {
-        ck.focus();
-      }, 100);
-    } else {
-      // Clear any existing paste errors on successful paste.
-      this.clearPasteError();
-    }
-  });
+    });
 
     // Angular rendering of components confuses CKEditor's undo system, so
     // we hide all of that stuff away from CKEditor.

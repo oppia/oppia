@@ -28,7 +28,7 @@ export class AccessValidationBackendApiService {
     '/access_validation_handler/can_access_story_editor_page/<story_id>';
 
   SUBTOPIC_VIEWER_PAGE_ACCESS_VALIDATOR =
-    '/access_validation_handler/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>';
+    '/access_validation_handler/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/studyguide/<subtopic_url_fragment>';
 
   CLASSROOM_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_classroom_page';

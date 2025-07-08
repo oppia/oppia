@@ -722,8 +722,8 @@ class ExplorationModeratorRightsHandler(
         # Check that all the prerequisites are satisfied, otherwise do nothing.
         if not email_body:
             raise self.InvalidInputException(
-                'Moderator actions should include an email to the '
-                'recipient.')
+                'Moderator actions should include an email to the recipient.'
+            )
         email_manager.require_moderator_email_prereqs_are_satisfied()
 
         # Unpublish exploration.

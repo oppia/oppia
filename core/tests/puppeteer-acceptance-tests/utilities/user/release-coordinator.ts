@@ -62,6 +62,11 @@ const toastMessageSelector = '.toast-message';
 const memoryCacheProfileTableSelector = '.view-results-table';
 const getMemoryCacheProfileButton = '.e2e-test-get-memory-cache-profile';
 
+const miscTabContainerSelector =
+  '.e2e-test-release-coordiator-misc-tab-container';
+const promoBarSaveButtonSelector =
+  '.e2e-test-release-coordinator-promo-bar-button';
+
 export class ReleaseCoordinator extends BaseUser {
   /**
    * Navigate to the release coordinator page.
@@ -76,9 +81,11 @@ export class ReleaseCoordinator extends BaseUser {
   async navigateToFeaturesTab(): Promise<void> {
     try {
       if (this.isViewportAtMobileWidth()) {
+        await this.isElementVisible(mobileNavBar);
         await this.clickOn(mobileNavBar);
         await this.clickOn(mobileFeaturesTab);
       } else {
+        await this.isElementVisible(featuresTab);
         await this.clickOn(featuresTab);
       }
 
@@ -106,6 +113,8 @@ export class ReleaseCoordinator extends BaseUser {
       const navbarElements = await this.page.$$(navbarElementSelector);
       await this.waitForElementToBeClickable(navbarElements[2]);
       await navbarElements[2].click();
+
+      await this.isElementVisible(miscTabContainerSelector);
     }
   }
 
@@ -169,6 +178,10 @@ export class ReleaseCoordinator extends BaseUser {
             );
           }
 
+          await featureFlags[i].waitForSelector(
+            `${saveButtonSelector}[disabled]`,
+            {visible: true}
+          );
           showMessage(
             `Feature flag: "${featureName}" rollout percentage has been set to ${percentage}%.`
           );
@@ -238,6 +251,11 @@ export class ReleaseCoordinator extends BaseUser {
             );
           }
 
+          await featureFlags[i].waitForSelector(
+            `${saveButtonSelector}[disabled]`,
+            {visible: true}
+          );
+
           showMessage(
             `Feature flag: "${featureName}" has been enabled successfully.`
           );
@@ -260,6 +278,8 @@ export class ReleaseCoordinator extends BaseUser {
   async enablePromoBar(): Promise<void> {
     await this.page.waitForSelector(promoBarToggleSelector);
     await this.clickOn(promoBarToggleSelector);
+
+    await this.expectElementToBeClickable(promoBarSaveButtonSelector);
   }
 
   /**
@@ -269,6 +289,8 @@ export class ReleaseCoordinator extends BaseUser {
   async enterPromoBarMessage(promoMessage: string): Promise<void> {
     await this.page.waitForSelector(promoMessageInputSelector);
     await this.page.type(promoMessageInputSelector, promoMessage);
+
+    await this.expectElementToBeClickable(promoBarSaveButtonSelector);
   }
 
   /**
