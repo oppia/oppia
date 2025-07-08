@@ -65,8 +65,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.print_arr: List[str] = []
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
-        def mock_check_output(
-            cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        def mock_check_output( # pylint: disable=unused-argument
+            cmd_tokens: List[str], encoding: str = 'utf-8'
         ) -> str:
             return 'Output'
         self.linter_code = 0
@@ -134,8 +134,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
                 pre_push_hook.run_script_and_get_returncode(['script']), 0)
 
     def test_has_uncommitted_files(self) -> None:
-        def mock_check_output(
-            cmd_tokens: List[str], encoding: str = 'utf-8'  # pylint: disable=unused-argument
+        def mock_check_output( # pylint: disable=unused-argument
+            cmd_tokens: List[str], encoding: str = 'utf-8'
         ) -> str:
             return 'file1'
         check_output_swap = self.swap(

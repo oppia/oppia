@@ -34,7 +34,6 @@ import {QuestionPlayerConceptCardModalComponent} from './question-player-concept
 import {QuestionPlayerConstants} from 'components/question-directives/question-player/question-player.constants';
 import {SkillMasteryModalComponent} from './skill-mastery-modal.component';
 import {UserService} from 'services/user.service';
-import {QuestionPlayerStateService} from './services/question-player-state.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
 import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
@@ -118,7 +117,6 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     private ngbModal: NgbModal,
     private playerPositionService: PlayerPositionService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
-    private questionPlayerStateService: QuestionPlayerStateService,
     private skillMasteryBackendApiService: SkillMasteryBackendApiService,
     private userService: UserService,
     private windowRef: WindowRef,
@@ -178,7 +176,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.finalCorrect = this.totalScore;
     this.totalScore = Math.round((this.totalScore * 100) / totalQuestions);
     this.resultsLoaded = true;
-    this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+    this.questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit(
       this.resultsLoaded
     );
   }
@@ -559,7 +557,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       );
 
       this.componentSubscription.add(
-        this.questionPlayerStateService.onQuestionSessionCompleted.subscribe(
+        this.questionPlayerEngineService.onQuestionSessionCompleted.subscribe(
           result => {
             this.windowRef.nativeWindow.location.hash =
               QuestionPlayerConstants.HASH_PARAM +
@@ -613,7 +611,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       // The initResults function is written separately since it is also
       // called in ngOnInit when some external events are triggered.
       this.initResults();
-      this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+      this.questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit(
         this.resultsLoaded
       );
       this.preventPageUnloadEventService.addListener(() => {

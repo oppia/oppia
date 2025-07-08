@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ExplorationPlayerPageAuthGuard
+ * @fileoverview Tests for ExplorationPlayerPageAuthGuard.
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -22,25 +22,41 @@ import {
   ActivatedRouteSnapshot,
   Router,
   RouterStateSnapshot,
-  NavigationExtras,
+  convertToParamMap,
 } from '@angular/router';
 import {Location} from '@angular/common';
 
 import {AppConstants} from '../../../app.constants';
 import {AccessValidationBackendApiService} from '../../../pages/oppia-root/routing/access-validation-backend-api.service';
 import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.guard';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockRouter {
-  navigate(commands: string[], extras?: NavigationExtras): Promise<boolean> {
+  navigate(commands: string[]): Promise<boolean> {
     return Promise.resolve(true);
+  }
+  navigateByUrl(_url): Promise<boolean> {
+    return Promise.resolve(true);
+  }
+  createUrlTree(commands: string[], options?): string {
+    return `/lesson/${commands[1]}`;
+  }
+}
+
+class MockPlatformFeatureService {
+  get status() {
+    return {
+      NewLessonPlayer: {isEnabled: false},
+    };
   }
 }
 
 describe('ExplorationPlayerPageAuthGuard', () => {
-  let accessValidationBackendApiService: AccessValidationBackendApiService;
-  let router: Router;
   let guard: ExplorationPlayerPageAuthGuard;
-  let location: Location;
+  let accessValidationBackendApiService: AccessValidationBackendApiService;
+  let platformFeatureService: PlatformFeatureService;
+  let router: Router;
+  let location: jasmine.SpyObj<Location>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,92 +64,124 @@ describe('ExplorationPlayerPageAuthGuard', () => {
       providers: [
         AccessValidationBackendApiService,
         {provide: Router, useClass: MockRouter},
+        {provide: PlatformFeatureService, useClass: MockPlatformFeatureService},
         {
           provide: Location,
           useValue: jasmine.createSpyObj('Location', ['replaceState']),
         },
       ],
-    }).compileComponents();
+    });
 
     guard = TestBed.inject(ExplorationPlayerPageAuthGuard);
     accessValidationBackendApiService = TestBed.inject(
       AccessValidationBackendApiService
     );
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
     router = TestBed.inject(Router);
-    location = TestBed.inject(Location);
+    location = TestBed.inject(Location) as jasmine.SpyObj<Location>;
   });
 
-  it('should allow access if backend validation passes', done => {
+  it('should allow access if validation passes and flag is disabled', done => {
     spyOn(
       accessValidationBackendApiService,
       'validateAccessToExplorationPlayerPage'
     ).and.returnValue(Promise.resolve());
-    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      NewLessonPlayer: {isEnabled: false},
+    });
+
+    const route = {
+      paramMap: convertToParamMap({exploration_id: 'exp123'}),
+      queryParams: {},
+    } as unknown as ActivatedRouteSnapshot;
+
+    const routerSpy = spyOn(router, 'navigateByUrl');
 
     guard
-      .canActivate(
-        {
-          queryParams: {},
-          paramMap: new Map([['explorationId', 'exp123']]),
-        } as unknown as ActivatedRouteSnapshot,
-        {} as RouterStateSnapshot
-      )
-      .then(canActivate => {
-        expect(canActivate).toBeTrue();
-        expect(navigateSpy).not.toHaveBeenCalled();
-      });
-    done();
-  });
-
-  it('should redirect to embed error page if URL contains "embed"', done => {
-    spyOn(
-      accessValidationBackendApiService,
-      'validateAccessToExplorationPlayerPage'
-    ).and.returnValue(Promise.reject({status: 404}));
-    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
-
-    guard
-      .canActivate(
-        {
-          queryParams: {},
-          paramMap: new Map([['exploration_id', 'exp123']]),
-        } as unknown as ActivatedRouteSnapshot,
-        {url: '/embed/exploration/exp123'} as RouterStateSnapshot
-      )
-      .then(canActivate => {
-        expect(canActivate).toBeFalse();
-        expect(navigateSpy).toHaveBeenCalledWith([
-          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE}`,
-        ]);
-        expect(location.replaceState).toHaveBeenCalledWith(
-          '/embed/exploration/exp123'
-        );
+      .canActivate(route, {url: '/explore/exp123'} as RouterStateSnapshot)
+      .then(result => {
+        expect(result).toBeTrue();
+        expect(routerSpy).not.toHaveBeenCalled();
         done();
       });
   });
 
-  it('should redirect to error page with status code on failure', done => {
+  it('should redirect to /lesson/:id if flag is enabled', done => {
     spyOn(
       accessValidationBackendApiService,
       'validateAccessToExplorationPlayerPage'
-    ).and.returnValue(Promise.reject({status: 404}));
-    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+    ).and.returnValue(Promise.resolve());
+
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      NewLessonPlayer: {isEnabled: true},
+    });
+
+    const route = {
+      paramMap: convertToParamMap({exploration_id: 'exp123'}),
+      queryParams: {v: '1'},
+    } as unknown as ActivatedRouteSnapshot;
+
+    const navigateByUrlSpy = spyOn(router, 'navigateByUrl').and.callThrough();
 
     guard
-      .canActivate(
-        {
-          queryParams: {},
-          paramMap: new Map([['exploration_id', 'exp123']]),
-        } as unknown as ActivatedRouteSnapshot,
-        {url: '/exp123'} as RouterStateSnapshot
-      )
-      .then(canActivate => {
-        expect(canActivate).toBeFalse();
-        expect(navigateSpy).toHaveBeenCalledWith([
-          `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/404`,
-        ]);
-        expect(location.replaceState).toHaveBeenCalledWith('/exp123');
+      .canActivate(route, {url: '/explore/exp123?v=1'} as RouterStateSnapshot)
+      .then(result => {
+        expect(result).toBeFalse();
+        expect(navigateByUrlSpy).toHaveBeenCalledWith('/lesson/exp123');
         done();
       });
+  });
+
+  it('should redirect to embed error page if access is denied and URL includes embed', done => {
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToExplorationPlayerPage'
+    ).and.returnValue(Promise.reject({status: 403}));
+
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    const route = {
+      paramMap: convertToParamMap({exploration_id: 'exp123'}),
+      queryParams: {},
+    } as unknown as ActivatedRouteSnapshot;
+
+    const state = {url: '/embed/explore/exp123'} as RouterStateSnapshot;
+
+    guard.canActivate(route, state).then(result => {
+      expect(result).toBeFalse();
+      expect(navigateSpy).toHaveBeenCalledWith([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE}`,
+      ]);
+      expect(location.replaceState).toHaveBeenCalledWith(
+        '/embed/explore/exp123'
+      );
+      done();
+    });
+  });
+
+  it('should redirect to error page with status if access is denied and not embedded', done => {
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToExplorationPlayerPage'
+    ).and.returnValue(Promise.reject({status: 401}));
+
+    const navigateSpy = spyOn(router, 'navigate').and.callThrough();
+
+    const route = {
+      paramMap: convertToParamMap({exploration_id: 'exp123'}),
+      queryParams: {},
+    } as unknown as ActivatedRouteSnapshot;
+
+    const state = {url: '/explore/exp123'} as RouterStateSnapshot;
+
+    guard.canActivate(route, state).then(result => {
+      expect(result).toBeFalse();
+      expect(navigateSpy).toHaveBeenCalledWith([
+        `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
+      ]);
+      expect(location.replaceState).toHaveBeenCalledWith('/explore/exp123');
+      done();
+    });
   });
 });

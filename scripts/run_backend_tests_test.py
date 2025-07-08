@@ -133,11 +133,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_run_shell_command_successfully(self) -> None:
         class MockProcess:
             returncode = 0
-            def communicate(self) -> tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> tuple[bytes, bytes]:
                 return (b'LOG_INFO_TEST: This is task output.\n', b'')
 
-        def mock_popen(
-            cmd_tokens: list[str], **unsued_kwargs: str  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: list[str], **unsued_kwargs: str
         ) -> MockProcess:
             return MockProcess()
 
@@ -156,11 +157,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
     def test_run_shell_command_failure_throws_error(self) -> None:
         class MockProcess:
             returncode = 1
-            def communicate(self) -> Tuple[bytes, bytes]:   # pylint: disable=missing-docstring
+            def communicate( # pylint: disable=missing-docstring
+                self) -> Tuple[bytes, bytes]:
                 return (b'', b'Error XYZ occured.')
 
-        def mock_popen(
-            cmd_tokens: List[str], **unsued_kwargs: str  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            cmd_tokens: List[str], **unsued_kwargs: str
         ) -> MockProcess:
             return MockProcess()
 
@@ -283,8 +285,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             errors_to_retry_on=['Error -11']
         )
         task1.exception = Exception(
-            'Test suite failed: 6 tests run, 0 errors, '
-            '2 failures')
+            'Test suite failed: 6 tests run, 0 errors, 2 failures')
         task1.finished = True
 
         tasks = [task1]
@@ -456,8 +457,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 tasks, task_to_taskspec)
 
         self.assertIn(
-            'An unexpected error occurred. '
-            'Task output:\nXYZ',
+            'An unexpected error occurred. Task output:\nXYZ',
             self.print_arr)
 
     def test_invalid_directory_in_sys_path_throws_error(self) -> None:
@@ -660,8 +660,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         executed_tasks = []
         test_targets = (
-            'scripts.test_file_test,'
-            'scripts.another_test_file_test'
+            'scripts.test_file_test,scripts.another_test_file_test'
         )
 
         def mock_execute(

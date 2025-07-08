@@ -48,7 +48,7 @@ describe('Logged-in User', function () {
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(
       'We will be learning positive numbers.'

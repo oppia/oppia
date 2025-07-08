@@ -1,0 +1,23 @@
+
+<div class="oppia-learner-view-card" [@fadeInOut]="this.displayedCard">
+  <!-- New UI for the question -->
+  <div class="oppia-learner-view-card-top-section">
+    <svg width="30" class="left-side-curve" height="24" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+    [ngStyle]="isLanguageRTL() ? {'transform': 'scaleX(-1)'} : {}">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M0.832031 0C12.8267 5.31326 22.692 13.4676 29.1014 23.3701V0H0.832031Z" fill="white"/>
+    </svg>
+    <img class="conversation-skin-oppia-avatar" [src]="OPPIA_AVATAR_IMAGE_URL" alt=""
+          *ngIf="avatarImageIsShown">
+    <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
+          [ngClass]="getContentAudioHighlightClass()">
+      <div tabindex="0">
+        <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()"
+                                  class="e2e-test-conversation-content">
+        </oppia-rte-output-display>
+      </div>
+      <div *ngIf="isContentAudioTranslationAvailable()" class="conversation-skin-audio-controls">
+      </div>
+    </div>
+  </div>
+  <!-- New UI for the question -->
+</div>
