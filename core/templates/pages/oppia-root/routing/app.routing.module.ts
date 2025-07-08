@@ -21,7 +21,7 @@ import {NgModule} from '@angular/core';
 import {Route, RouterModule} from '@angular/router';
 import {AppConstants} from 'app.constants';
 import {IsLoggedInGuard} from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
-import {IsNewLessonPlayerGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
+import {LessonPlayerPageAuthGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-auth.guard';
 import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/normalize-url-case.guard';
 
 // All paths must be defined in constants.ts file.
@@ -246,7 +246,7 @@ const routes: Route[] = [
         'pages/exploration-player-page/new-lesson-player' +
           '/lesson-player-page.module'
       ).then(m => m.NewLessonPlayerPageModule),
-    canActivate: [IsNewLessonPlayerGuard],
+    canActivate: [LessonPlayerPageAuthGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ANDROID.ROUTE,

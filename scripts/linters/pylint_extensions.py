@@ -221,13 +221,11 @@ class DocstringParameterChecker(checkers.BaseChecker):  # type: ignore[misc]
         'W9006': (
             '"%s" not documented as being raised',
             'missing-raises-doc',
-            'Please document exceptions for '
-            'all raised exception types.'),
+            'Please document exceptions for all raised exception types.'),
         'W9008': (
             'Redundant returns documentation',
             'redundant-returns-doc',
-            'Please remove the return/rtype '
-            'documentation from this method.'),
+            'Please remove the return/rtype documentation from this method.'),
         'W9010': (
             'Redundant yields documentation',
             'redundant-yields-doc',

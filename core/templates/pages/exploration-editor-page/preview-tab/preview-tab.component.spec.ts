@@ -212,7 +212,7 @@ describe('Preview Tab Component', () => {
       paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict(),
     ];
     spyOnProperty(
-      explorationEngineService,
+      stateEditorService,
       'onUpdateActiveStateIfInEditor'
     ).and.returnValue(mockUpdateActiveStateIfInEditorEventEmitter);
     spyOnProperty(

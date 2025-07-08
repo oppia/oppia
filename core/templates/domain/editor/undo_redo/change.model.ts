@@ -27,7 +27,6 @@ import {MisconceptionBackendDict} from 'domain/skill/misconception.model';
 import {RecordedVoiceOverBackendDict} from 'domain/exploration/recorded-voiceovers.model';
 import {StateBackendDict} from 'domain/state/StateObjectFactory';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
-import {WorkedExampleBackendDict} from 'domain/skill/worked-example.model';
 import {Collection} from 'domain/collection/collection.model';
 import {Question} from 'domain/question/QuestionObjectFactory';
 import {Skill} from 'domain/skill/SkillObjectFactory';
@@ -181,16 +180,7 @@ interface SkillContentsExplanationChange {
   old_value: SubtitledHtmlBackendDict;
 }
 
-export interface SkillContentsWorkedExamplesChange {
-  cmd: 'update_skill_contents_property';
-  property_name: 'worked_examples';
-  new_value: WorkedExampleBackendDict[];
-  old_value: WorkedExampleBackendDict[];
-}
-
-type SkillContentsChange =
-  | SkillContentsExplanationChange
-  | SkillContentsWorkedExamplesChange;
+type SkillContentsChange = SkillContentsExplanationChange;
 
 interface SkillAddMisconceptionChange {
   cmd: 'add_skill_misconception';
