@@ -38,7 +38,7 @@
         <i class="fas fa-arrow-right oppia-arrow"></i>
       </button>
       <button mat-button
-              *ngIf="shouldGenericSubmitButtonBeShown()"
+              *ngIf="doesInteractionHaveNavSubmitButton()"
               class="oppia-learner-submit-answer-button e2e-test-submit-answer-button"
               (click)="submit.emit()"
               [disabled]="displayedCard.showNoResponseError() || displayedCard.showInvalidResponseError()">

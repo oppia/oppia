@@ -29,10 +29,8 @@ import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {StateCard} from '../../../../domain/state_card/state-card.model';
 import {UrlService} from '../../../../services/contextual/url.service';
-import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {FocusManagerService} from '../../../../services/stateful/focus-manager.service';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
-import {ExplorationPlayerConstants} from '../../current-lesson-player/exploration-player-page.constants';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {ExplorationModeService} from '../../services/exploration-mode.service';
 import {
@@ -58,7 +56,6 @@ describe('Progress nav component', () => {
   let explorationModeService: ExplorationModeService;
   let focusManagerService: FocusManagerService;
   let playerTranscriptService: PlayerTranscriptService;
-  let windowDimensionsService: WindowDimensionsService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let schemaFormSubmittedService: SchemaFormSubmittedService;
   let contentTranslationManagerService: ContentTranslationManagerService;
@@ -93,7 +90,6 @@ describe('Progress nav component', () => {
         PlayerPositionService,
         PlayerTranscriptService,
         UrlService,
-        WindowDimensionsService,
         SchemaFormSubmittedService,
         {
           provide: TranslateService,
@@ -113,7 +109,6 @@ describe('Progress nav component', () => {
     conversationFlowService = TestBed.inject(ConversationFlowService);
     focusManagerService = TestBed.inject(FocusManagerService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     schemaFormSubmittedService = TestBed.inject(SchemaFormSubmittedService);
     contentTranslationManagerService = TestBed.inject(
@@ -202,26 +197,6 @@ describe('Progress nav component', () => {
 
     expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
   }));
-
-  it('should tell if window can show two cards', () => {
-    spyOn(windowDimensionsService, 'getWidth').and.returnValue(
-      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1
-    );
-
-    expect(componentInstance.canWindowShowTwoCards()).toBeTrue();
-  });
-
-  it('should tell if generic submit button should be shown', () => {
-    spyOn(
-      componentInstance,
-      'doesInteractionHaveNavSubmitButton'
-    ).and.returnValues(false, true);
-    spyOn(componentInstance, 'canWindowShowTwoCards').and.returnValue(false);
-
-    expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeFalse();
-
-    expect(componentInstance.shouldGenericSubmitButtonBeShown()).toBeTrue();
-  });
 
   it('should tell if continue button should be shown', () => {
     componentInstance.conceptCardIsBeingShown = true;

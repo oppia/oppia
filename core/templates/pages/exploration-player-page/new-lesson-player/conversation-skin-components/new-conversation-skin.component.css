@@ -77,32 +77,12 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   background-color: white;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.24), 0 1px 3px rgba(0, 0, 0, 0.12);
   flex-shrink: 1;
-  margin-bottom: 200px;
   margin-left: 12px;
   margin-top: 30px;
   max-width: 650px;
   position: relative;
   width: 42%;
   z-index: 2;
-}
-
-.new-conversation-skin-supplemental-nav-submit-button,
-.new-conversation-skin-supplemental-nav-submit-button.mat-button {
-  margin-right: 10px;
-  position: absolute;
-  right: 8px;
-  top: -10px;
-}
-
-.new-conversation-skin-supplemental-nav-submit-button.oppia-learner-confirm-button {
-  left: auto;
-  right: 8px;
-}
-
-.new-conversation-skin-supplemental-nav {
-  background: white;
-  height: 32px;
-  position: relative;
 }
 
 .new-conversation-skin-animate-cards-container {
@@ -179,18 +159,7 @@ oppia-new-conversation-skin .oppia-button-icon {
   .new-progress-nav-bar-container {
     display: block;
   }
-
-  .new-conversation-skin-supplemental-card-container {
-    margin-bottom: 200px;
-  }
 }
-
-@media (max-width: 767px) {
-  .new-conversation-skin-supplemental-card-container {
-    margin-bottom: 200px;
-  }
-}
-
 
 @media (max-width: 480px) {
   .new-conversation-skin-cards-container {

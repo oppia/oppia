@@ -214,22 +214,6 @@ export class CardNavigationControlComponent {
     this.conversationFlowService.moveBackByOneCard();
   }
 
-  // Returns whether the screen is wide enough to fit two
-  // cards (e.g., the tutor and supplemental cards) side-by-side.
-  canWindowShowTwoCards(): boolean {
-    return (
-      this.windowDimensionsService.getWidth() >
-      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX
-    );
-  }
-
-  shouldGenericSubmitButtonBeShown(): boolean {
-    return (
-      this.doesInteractionHaveNavSubmitButton() &&
-      (this.interactionIsInline || !this.canWindowShowTwoCards())
-    );
-  }
-
   shouldContinueButtonBeShown(): boolean {
     if (this.conceptCardIsBeingShown) {
       return true;
