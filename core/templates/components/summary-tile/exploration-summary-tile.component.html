@@ -1,4 +1,4 @@
-<div *ngIf="!mobileCardToBeShown">
+<div *ngIf="!mobileCardToBeShown" class="e2e-test-exp-summary-tile">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                                 [activityType]="activityType"
                                 [activityId]="explorationId"
@@ -108,7 +108,7 @@
     </i>
   </button>
 </div>
-<div *ngIf="mobileCardToBeShown">
+<div *ngIf="mobileCardToBeShown" class="e2e-test-exp-summary-tile">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                 [activityType]="activityType"
                 [activityId]="explorationId"
