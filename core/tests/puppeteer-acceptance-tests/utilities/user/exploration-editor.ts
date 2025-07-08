@@ -461,7 +461,13 @@ export class ExplorationEditor extends BaseUser {
 
     const typeOfElement = await valueElement.getProperty('name');
 
-    showMessage(typeOfElement + "TYPE OF MESSAGE")
+    // TODO: remove it.
+    showMessage(typeOfElement + 'TYPE OF MESSAGE');
+
+    if (typeOfElement === 'unicodeEditor') {
+      const inputElement = await valueElement.$('input');
+      await inputElement.type(value);
+    }
   }
 
   // New functions ends.
