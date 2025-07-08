@@ -40,10 +40,10 @@
 }
 
 .conversation-skin-learner-answer-container {
-  text-align: left;
   background-color: #fff8e5;
   border-radius: 16px 0 16px 16px;
   margin-top: 10px;
+  text-align: left;
   width: 70%;
 }
 
