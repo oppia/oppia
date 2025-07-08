@@ -67,6 +67,7 @@ describe('Exploration engine service ', () => {
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
+  let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: TextInputRulesService;
   let translateService: TranslateService;
   let explorationDict: ExplorationBackendDict;
@@ -385,6 +386,7 @@ describe('Exploration engine service ', () => {
     statsReportingService = TestBed.inject(StatsReportingService);
     urlService = TestBed.inject(UrlService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
+    paramChange = TestBed.inject(ParamChange);
     textInputService = TestBed.inject(TextInputRulesService);
     translateService = TestBed.inject(TranslateService);
   });
