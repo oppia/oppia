@@ -658,7 +658,7 @@ describe('Exploration editor tab component', () => {
   it('should populate misconceptions for state', fakeAsync(() => {
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
-        skill: skill.createFromBackendDict({
+        skill: Skill.createFromBackendDict({
           id: 'skill_id1',
           description: 'test description 1',
           misconceptions: [
