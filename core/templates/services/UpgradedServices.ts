@@ -208,7 +208,6 @@ import {
 import {PageTitleService} from 'services/page-title.service';
 import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
 import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {
@@ -603,7 +602,6 @@ export class UpgradedServices {
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']
       );
-    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory();
     upgradedServices['PencilCodeEditorValidationService'] =
       new PencilCodeEditorValidationService(
         upgradedServices['BaseInteractionValidationService']

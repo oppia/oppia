@@ -23,8 +23,7 @@ import {Injectable} from '@angular/core';
 import {
   ParamSpecBackendDict,
   ParamSpec,
-  ParamSpecObjectFactory,
-} from 'domain/exploration/ParamSpecObjectFactory';
+} from 'domain/exploration/param-spec.model';
 
 export interface ParamSpecsBackendDict {
   [paramName: string]: ParamSpecBackendDict;
@@ -36,7 +35,7 @@ interface ParamDict {
 
 export class ParamSpecs {
   _paramDict: ParamDict;
-  _paramSpecObjectFactory: ParamSpecObjectFactory;
+  _paramSpec: ParamSpec;
 
   /**
    * @constructor
@@ -45,11 +44,11 @@ export class ParamSpecs {
    */
   constructor(
     paramDict: ParamDict,
-    paramSpecObjectFactory: ParamSpecObjectFactory
+    paramSpec: ParamSpec
   ) {
     /** @member {Object.<String, ParamSpec>} */
     this._paramDict = paramDict;
-    this._paramSpecObjectFactory = paramSpecObjectFactory;
+    this._paramSpec = paramSpec;
   }
 
   /**
@@ -83,7 +82,7 @@ export class ParamSpecs {
   addParamIfNew(paramName: string, paramSpec: ParamSpec): boolean {
     if (!this._paramDict.hasOwnProperty(paramName)) {
       this._paramDict[paramName] =
-        paramSpec || this._paramSpecObjectFactory.createDefault();
+        paramSpec || ParamSpec.createDefault();
       return true;
     }
     return false;
@@ -117,7 +116,7 @@ export class ParamSpecs {
   providedIn: 'root',
 })
 export class ParamSpecsObjectFactory {
-  constructor(private paramSpecObjectFactory: ParamSpecObjectFactory) {}
+  constructor(private paramSpec: ParamSpec) {}
 
   /**
    * @param {!Object.<String, {obj_type: String}>} paramSpecsBackendDict -
@@ -130,10 +129,10 @@ export class ParamSpecsObjectFactory {
   ): ParamSpecs {
     var paramDict: ParamDict = {};
     Object.keys(paramSpecsBackendDict).forEach(paramName => {
-      paramDict[paramName] = this.paramSpecObjectFactory.createFromBackendDict(
+      paramDict[paramName] = ParamSpec.createFromBackendDict(
         paramSpecsBackendDict[paramName]
       );
     });
-    return new ParamSpecs(paramDict, this.paramSpecObjectFactory);
+    return new ParamSpecs(paramDict, this.paramSpec);
   }
 }

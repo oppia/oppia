@@ -18,7 +18,7 @@
  */
 
 import {ParamChangeBackendDict} from 'domain/exploration/ParamChangeObjectFactory';
-import {ParamSpecBackendDict} from 'domain/exploration/ParamSpecObjectFactory';
+import {ParamSpecBackendDict} from 'domain/exploration/param-spec.model';
 import {InteractionBackendDict} from 'domain/exploration/InteractionObjectFactory';
 import {WrittenTranslationsBackendDict} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {SubtitledHtmlBackendDict} from './subtitled-html.model';

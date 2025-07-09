@@ -63,7 +63,7 @@ import {
 } from '../services/version-history.service';
 import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
 import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
@@ -107,7 +107,7 @@ describe('Settings Tab Component', () => {
   let mockEventEmitterRouterService = new EventEmitter();
   let mockEventEmitteruserExplorationPermissionsService = new EventEmitter();
   let versionHistoryService: VersionHistoryService;
-  let paramSpecObjectFactory: ParamSpecObjectFactory;
+  let paramSpec: ParamSpec;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
 
   class MockChangeDetectorRef {
@@ -228,7 +228,7 @@ describe('Settings Tab Component', () => {
     userEmailPreferencesService = TestBed.inject(UserEmailPreferencesService);
     userService = TestBed.inject(UserService);
     versionHistoryService = TestBed.inject(VersionHistoryService);
-    paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
+    paramSpec = TestBed.inject(ParamSpec);
     versionHistoryBackendApiService = TestBed.inject(
       VersionHistoryBackendApiService
     );
@@ -1361,7 +1361,7 @@ describe('Settings Tab Component', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}, paramSpec),
       [],
       false,
       true
@@ -1433,7 +1433,7 @@ describe('Settings Tab Component', () => {
         '',
         55,
         'Introduction',
-        new ParamSpecs({}, paramSpecObjectFactory),
+        new ParamSpecs({}, paramSpec),
         [],
         false,
         true

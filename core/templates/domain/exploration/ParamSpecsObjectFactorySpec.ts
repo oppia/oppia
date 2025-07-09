@@ -18,7 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {
   ParamSpecs,
   ParamSpecsObjectFactory,
@@ -26,7 +26,7 @@ import {
 
 describe('ParamSpecs', () => {
   let paramSpecsObjectFactory: ParamSpecsObjectFactory;
-  let paramSpecObjectFactory: ParamSpecObjectFactory;
+  let paramSpec: ParamSpec;
   let emptyParamSpecs: ParamSpecs;
   let paramName = 'x';
 
@@ -36,7 +36,7 @@ describe('ParamSpecs', () => {
     });
 
     paramSpecsObjectFactory = TestBed.get(ParamSpecsObjectFactory);
-    paramSpecObjectFactory = TestBed.get(ParamSpecObjectFactory);
+    paramSpec = TestBed.get(ParamSpec);
     emptyParamSpecs = paramSpecsObjectFactory.createFromBackendDict({});
   });
 
@@ -47,7 +47,7 @@ describe('ParamSpecs', () => {
   });
 
   it('should add param when missing', () => {
-    let paramSpec = paramSpecObjectFactory.createDefault();
+    let paramSpec = paramSpec.createDefault();
 
     expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBe(true);
     // No longer empty.
@@ -57,19 +57,19 @@ describe('ParamSpecs', () => {
   });
 
   it('should not overwrite existing params', () => {
-    let oldParamSpec = paramSpecObjectFactory.createDefault();
+    let oldParamSpec = paramSpec.createDefault();
     expect(emptyParamSpecs.addParamIfNew(paramName, oldParamSpec)).toBe(true);
     // No longer empty.
     expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
 
-    let newParamSpec = paramSpecObjectFactory.createDefault();
+    let newParamSpec = paramSpec.createDefault();
     expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec)).toBe(false);
     expect(emptyParamSpecs.getParamDict()[paramName]).not.toBe(newParamSpec);
     expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
   });
 
   it('should convert a param specs to backend dict correctly', () => {
-    const paramSpec = paramSpecObjectFactory.createDefault();
+    const paramSpec = paramSpec.createDefault();
     const expectedParamSpecBackendDict = {
       [paramName]: paramSpec.toBackendDict(),
     };
@@ -81,7 +81,7 @@ describe('ParamSpecs', () => {
   });
 
   it('should create a non empty param specs', () => {
-    const paramSpec = paramSpecObjectFactory.createDefault();
+    const paramSpec = paramSpec.createDefault();
     const nonEmptyParamSpecs = paramSpecsObjectFactory.createFromBackendDict({
       [paramName]: paramSpec.toBackendDict(),
     });

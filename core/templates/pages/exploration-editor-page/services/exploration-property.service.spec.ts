@@ -26,7 +26,7 @@ import {
   ParamSpecs,
   ParamSpecsObjectFactory,
 } from 'domain/exploration/ParamSpecsObjectFactory';
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
 
@@ -34,7 +34,7 @@ describe('Exploration Property Service', () => {
   let explorationPropertyService: ExplorationPropertyService;
   let paramChangesObjectFactory: ParamChangesObjectFactory;
   let paramSpecsObjectFactory: ParamSpecsObjectFactory;
-  let paramSpecObjectFactory: ParamSpecObjectFactory;
+  let paramSpec: ParamSpec;
   let changeListService: ChangeListService;
   let editExplorationPropertySpy: jasmine.Spy;
 
@@ -47,7 +47,7 @@ describe('Exploration Property Service', () => {
     changeListService = TestBed.inject(ChangeListService);
     paramChangesObjectFactory = TestBed.inject(ParamChangesObjectFactory);
     paramSpecsObjectFactory = TestBed.inject(ParamSpecsObjectFactory);
-    paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
+    paramSpec = TestBed.inject(ParamSpec);
 
     editExplorationPropertySpy = spyOn(
       changeListService,
@@ -173,7 +173,7 @@ describe('Exploration Property Service', () => {
     child.propertyName = 'param_specs';
     child._normalize = function (paramSpecs: ParamSpecs) {
       // Changing paramSpecs so hasChanged() turns to be true on line 87.
-      let paramSpec = paramSpecObjectFactory.createDefault();
+      let paramSpec = paramSpec.createDefault();
       paramSpecs.addParamIfNew('z', paramSpec);
       return paramSpecs;
     };

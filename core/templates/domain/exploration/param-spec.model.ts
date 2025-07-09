@@ -13,11 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of ParamSpec
+ * @fileoverview Model class for creating new frontend instances of ParamSpec
  * domain objects.
  */
-
-import {Injectable} from '@angular/core';
 
 import {ParamType} from 'domain/exploration/param-type.model';
 
@@ -47,26 +45,20 @@ export class ParamSpec {
       obj_type: this._objType.getName(),
     };
   }
-}
-
-@Injectable({
-  providedIn: 'root',
-})
-export class ParamSpecObjectFactory {
-  constructor() {}
   /**
    * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
    *    backend.
    * @returns {ParamSpec} - A new ParamSpec instance.
    */
-  createFromBackendDict(paramSpecBackendDict: ParamSpecBackendDict): ParamSpec {
+
+   static createFromBackendDict(paramSpecBackendDict: ParamSpecBackendDict): ParamSpec {
     return new ParamSpec(
       ParamType.getTypeFromBackendName(paramSpecBackendDict.obj_type)
     );
   }
 
   /** @returns {ParamSpec} - A default instance for ParamSpec. */
-  createDefault(): ParamSpec {
+  static createDefault(): ParamSpec {
     return new ParamSpec(ParamType.getDefaultType());
   }
 }
