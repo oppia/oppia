@@ -51,17 +51,9 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
     private skillUpdateService: SkillUpdateService,
     private skillEditorStateService: SkillEditorStateService,
     private skill: Skill,
-    private validatorService: ValidatorsService
+    private validatorsService: ValidatorsService
   ) {}
 
-  hasValidDescription(description: string): boolean {
-    var allowDescriptionToBeBlank = false;
-    return this.validatorService.isValidEntityName(
-      description,
-      false,
-      allowDescriptionToBeBlank
-    );
-  }
 
   canEditSkillDescription(): boolean {
     return this.skillRights.canEditSkillDescription();
@@ -75,7 +67,7 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
     if (newSkillDescription === this.skill.getDescription()) {
       return;
     }
-    if (this.hasValidDescription(newSkillDescription)) {
+    if (this.validatorsService.hasValidDescription(newSkillDescription)) {
       this.skillDescriptionEditorIsShown = false;
       this.skillUpdateService.setSkillDescription(
         this.skill,

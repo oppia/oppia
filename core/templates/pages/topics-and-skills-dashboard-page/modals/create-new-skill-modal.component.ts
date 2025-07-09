@@ -62,20 +62,11 @@ export class CreateNewSkillModalComponent {
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
     private changeDetectorRef: ChangeDetectorRef,
-    private validatorService: ValidatorsService
+    private validatorsService: ValidatorsService
   ) {}
 
   ngOnInit(): void {
     this.pageContextService.setImageSaveDestinationToLocalStorage();
-  }
-
-  hasValidDescription(description: string): boolean {
-    var allowDescriptionToBeBlank = false;
-    return this.validatorService.isValidEntityName(
-      description,
-      false,
-      allowDescriptionToBeBlank
-    );
   }
 
   updateExplanation($event: string): void {
@@ -94,7 +85,7 @@ export class CreateNewSkillModalComponent {
   }
 
   setErrorMessageIfNeeded(): void {
-    if (!this.hasValidDescription(this.newSkillDescription)) {
+    if (!this.validatorsService.hasValidDescription(this.newSkillDescription)) {
       this.errorMsg =
         'Please use a non-empty description consisting of ' +
         'alphanumeric characters, spaces and/or hyphens.';

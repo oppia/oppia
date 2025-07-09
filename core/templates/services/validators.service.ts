@@ -29,7 +29,7 @@ import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-
 export class ValidatorsService {
   constructor(
     private alerts: AlertsService,
-    private whitespacefilter: NormalizeWhitespacePipe
+    private whitespacefilter: NormalizeWhitespacePipe,
   ) {}
 
   /**
@@ -125,6 +125,15 @@ export class ValidatorsService {
       return false;
     }
     return true;
+  }
+
+  hasValidDescription(description: string): boolean {
+    var allowDescriptionToBeBlank = false;
+    return this.isValidEntityName(
+      description,
+      false,
+      allowDescriptionToBeBlank
+    );
   }
 
   isValidReviewMessage(input: string, showWarnings: boolean): boolean {
