@@ -367,7 +367,7 @@ describe('Question Suggestion Review Modal component', () => {
 
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
-        skill: skill.createFromBackendDict({
+        skill: Skill.createFromBackendDict({
           id: 'skill1',
           description: 'test description 1',
           misconceptions: [
