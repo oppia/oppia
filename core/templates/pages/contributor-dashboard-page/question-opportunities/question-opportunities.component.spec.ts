@@ -272,7 +272,7 @@ describe('Question opportunities component', () => {
     } as NgbModalRef);
 
     component.createQuestion(
-      skill.createFromBackendDict({
+      Skill.createFromBackendDict({
         id: '1',
         description: 'test description',
         misconceptions: [],
@@ -322,7 +322,7 @@ describe('Question opportunities component', () => {
     let openSpy = spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: MockNgbModalRef,
       result: Promise.resolve({
-        skill: skill.createFromBackendDict({
+        skill: Skill.createFromBackendDict({
           id: '1',
           description: 'test description',
           misconceptions: [],
@@ -377,7 +377,7 @@ describe('Question opportunities component', () => {
     let openSpy = spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: MockNgbModalRef,
       result: Promise.resolve({
-        skill: skill.createFromBackendDict({
+        skill: Skill.createFromBackendDict({
           id: '1',
           description: 'test description',
           misconceptions: [],
