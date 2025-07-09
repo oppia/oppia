@@ -191,7 +191,6 @@ why they need to be overriden.  */
   line-height: 22px;
   margin: 0;
   min-width: 55px;
-  text-transform: uppercase;
 }
 
 .oppia-length-validation-error {
@@ -4062,32 +4061,6 @@ div.oppia-issues-learner-action {
   z-index: 1;
 }
 
-.conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
-  height: 100px;
-  left: -87px;
-  top: -20px;
-  width: 100px;
-}
-
-.conversation-skin-oppia-feedback-content,
-.conversation-skin-learner-answer-content {
-  margin-bottom: 12px;
-  overflow: auto;
-  padding: 8px 12px;
-  word-wrap: break-word;
-}
-
-.conversation-skin-oppia-feedback-content,
-.conversation-skin-help-card-content {
-  background-color: rgba(224,242,241,1);
-  border-top-left-radius: 0;
-}
-
-.conversation-skin-learner-answer-content {
-  background-color: rgba(236,239,241,1);
-  border-bottom-right-radius: 0;
-}
-
 
 /*
     This CSS block is for ensuring that only a response from a multi-line text input preserves newlines.
@@ -4096,12 +4069,6 @@ div.oppia-issues-learner-action {
 */
 oppia-response-text-input {
   white-space: pre-wrap;
-}
-
-@media screen and (max-width: 959px) {
-  .conversation-skin-user-avatar {
-    display: none;
-  }
 }
 
 mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
