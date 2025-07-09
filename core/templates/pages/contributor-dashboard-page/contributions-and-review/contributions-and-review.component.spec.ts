@@ -38,7 +38,6 @@ import {
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {Skill} from 'domain/skill/skill.model';
-import {ContextService} from 'services/context.service';
 import {UserService} from 'services/user.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
