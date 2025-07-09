@@ -39,6 +39,7 @@ describe('Interested Partner Organization', function () {
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+    await explorationEditor.dismissWelcomeModal();
   });
 
   it('should be able to use "continue button" interaction', async function () {
