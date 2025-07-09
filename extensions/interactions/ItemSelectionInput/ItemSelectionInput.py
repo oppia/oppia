@@ -80,6 +80,7 @@ class ItemSelectionInput(base.BaseInteraction):
                 }],
                 'replacement_ui_config': {
                     'html': {
+                        'rte_components': 'ALL_COMPONENTS',
                         'hide_complex_extensions': True,
                         'placeholder': 'Sample item answer',
                     }
