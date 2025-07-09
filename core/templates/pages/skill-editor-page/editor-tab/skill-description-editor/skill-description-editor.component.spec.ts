@@ -130,7 +130,6 @@ describe('Skill Description Editor Component', () => {
       'setSkillDescription'
     ).and.callThrough();
     spyOn(component.onSaveDescription, 'emit').and.callThrough();
-    spyOn(Skill, 'hasValidDescription').and.returnValue(true);
     component.ngOnInit();
     // Old Description.
     expect(component.tmpSkillDescription).toBe('Skill description loading');
@@ -158,7 +157,6 @@ describe('Skill Description Editor Component', () => {
       skillUpdateService,
       'setSkillDescription'
     ).and.callThrough();
-    spyOn(Skill, 'hasValidDescription').and.returnValue(false);
     component.ngOnInit();
     // Old Description.
     expect(component.tmpSkillDescription).toBe('Skill description loading');
