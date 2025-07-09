@@ -74,7 +74,6 @@ describe('Question opportunities component', () => {
         },
         AlertsService,
         SiteAnalyticsService,
-        Skill,
         UserService,
         ContributionOpportunitiesBackendApiService,
         ContributionOpportunitiesService,
