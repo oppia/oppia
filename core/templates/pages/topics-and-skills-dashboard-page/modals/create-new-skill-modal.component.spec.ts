@@ -91,7 +91,6 @@ describe('Create new skill modal', () => {
   });
 
   it('should set error message if needed', () => {
-    spyOn(Skill, 'hasValidDescription').and.returnValue(false);
     componentInstance.skillDescriptionExists = false;
     componentInstance.setErrorMessageIfNeeded();
     expect(componentInstance.errorMsg).toEqual(
@@ -143,7 +142,6 @@ describe('Create new skill modal', () => {
   });
 
   it('should create new skill modal', () => {
-    spyOn(Skill, 'hasValidDescription').and.returnValue(true);
     componentInstance.skillDescriptionExists = false;
     spyOn(ngbActiveModal, 'close');
     componentInstance.createNewSkill();
