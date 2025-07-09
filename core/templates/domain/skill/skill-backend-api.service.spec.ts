@@ -86,7 +86,7 @@ describe('Skill backend API service', () => {
 
   it('should fetch all skills', fakeAsync(() => {
     const skills: SkillBackendDict[] = [];
-    skills.push(skill.createFromBackendDict(skillBackendDict).toBackendDict());
+    skills.push(Skill.createFromBackendDict(skillBackendDict).toBackendDict());
     skillBackendApiService
       .fetchAllSkills()
       .toPromise()
