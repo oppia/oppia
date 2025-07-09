@@ -38,7 +38,7 @@ describe('Interested Partner Organization', function () {
     );
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
   });
 
   it('should be able to use "continue button" interaction', async function () {
@@ -140,7 +140,26 @@ describe('Interested Partner Organization', function () {
       'Fifth Card',
       true
     );
+    await explorationEditor.customizeTextInputInteraction(
+      'Hello, there!',
+      '2',
+      true
+    );
+    await explorationEditor.addResponsesToTheInteraction(
+      INTERACTION_TYPES.TEXT_INPUT,
+      'Hello, Oppia!',
+      'Prefect',
+      'Sixth Card',
+      true
+    );
+    await explorationEditor.expectOutcomeFeedbackToBe('Perfect');
+
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'No write "Hello, Oppia!"'
+    );
   });
+
+  it('should be able to use "image region" interaction', async function () {});
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

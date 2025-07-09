@@ -297,6 +297,7 @@ const editOutcomeDestPencilButtonSelector =
   '.e2e-test-edit-outcome-dest-pencil-button';
 const interactionPreviewCardSelector = '.e2e-test-interaction-preview';
 const nodeLabelSelector = '.e2e-test-node-background';
+const outcomeFeedbackSelector = '.e2e-test-edit-outcome-feedback-button';
 const removeInteractionButttonSelector = '.e2e-test-delete-interaction';
 
 export enum INTERACTION_TYPES {
@@ -377,6 +378,65 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
+  /**
+   * Function to customize the text input interaction.
+   * @param placeHolderText - The placeholder text for the text input.
+   * @param heightInRows - The height of the text input in rows.
+   * @param catchMisspellings - Whether to catch misspellings.+
+   */
+  async customizeTextInputInteraction(
+    placeHolderText?: string,
+    heightInRows?: string,
+    catchMisspellings?: boolean
+  ) {
+    await this.page.waitForSelector(customizeInteractionBodySelector);
+
+    await this.page.waitForSelector(
+      `${customizeInteractionBodySelector} input`
+    );
+    const inputElements = await this.page.$$(
+      `${customizeInteractionBodySelector} input`
+    );
+
+    // Update placeholder text.
+    if (placeHolderText) {
+      await inputElements[0].type(placeHolderText);
+
+      expect(await inputElements[0].getAttribute('value')).toBe(
+        placeHolderText
+      );
+    }
+
+    // Update height in rows.
+    if (heightInRows) {
+      await inputElements[1].click();
+      await this.page.keyboard.press('Backspace');
+      await inputElements[1].type(heightInRows);
+
+      expect(await inputElements[1].getAttribute('value')).toBe(heightInRows);
+    }
+
+    // Update catch misspellings.
+    if (catchMisspellings === true) {
+      inputElements[2].click();
+
+      expect(await inputElements[2].getAttribute('checked')).toBe(
+        catchMisspellings
+      );
+    }
+
+    // Save the interaction.
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * This function updates the answers in the response modal.
+   * @param {INTERACTION_TYPES} interactionType - The type of the interaction.
+   * @param {string} answer - The answer to set in the response modal.
+   */
   async updateAnswersInResponseModal(
     interactionType: INTERACTION_TYPES,
     answer: string
@@ -437,6 +497,12 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
+  /**
+   * TODO: Fix the function
+   * This function updates the customization option of an interaction.
+   * @param {string} optionLabel - The label of the option to update.
+   * @param {string | boolean | number} value - The value to set for the option.
+   */
   async updateInteractionCustomizationOption(
     optionLabel: string,
     value: string | boolean | number
@@ -756,7 +822,10 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
    * Note: A space is added before and after the interaction name to match the format in the UI.
    */
-  async addInteraction(interactionToAdd: string): Promise<void> {
+  async addInteraction(
+    interactionToAdd: string,
+    skipInteractionCustoization: boolean = true
+  ): Promise<void> {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
@@ -771,10 +840,15 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(programmingInteractionsButton);
     }
     await this.clickOn(` ${interactionToAdd} `);
-    await this.clickOn(saveInteractionButton);
-    await this.page.waitForSelector(addInteractionModalSelector, {
-      hidden: true,
+    await this.page.waitForSelector(saveInteractionButton, {
+      visible: true,
     });
+    if (skipInteractionCustoization) {
+      await this.clickOn(saveInteractionButton);
+      await this.page.waitForSelector(addInteractionModalSelector, {
+        hidden: true,
+      });
+    }
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
   }
 
@@ -3379,6 +3453,25 @@ export class ExplorationEditor extends BaseUser {
     const visible = await this.isElementVisible(interactionPreviewCardSelector);
 
     expect(visible).toBe(true);
+  }
+
+  /**
+   * Verifies that the outcome feedback is visible.
+   */
+  async expectOutcomeFeedbackToBe(expectedFeedback: string): Promise<void> {
+    await this.page.waitForSelector(outcomeFeedbackSelector);
+    const feedbackText = await this.page.evaluate(
+      element => element.textContent,
+      outcomeFeedbackSelector
+    );
+
+    // Remove "Oppia tells the learner..." prefix.
+    const feedbackTextWithoutPrefix = feedbackText.replace(
+      'Oppia tells the learner...',
+      ''
+    );
+
+    expect(feedbackTextWithoutPrefix).toBe(expectedFeedback);
   }
 
   /**
