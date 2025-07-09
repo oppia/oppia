@@ -89,7 +89,7 @@ describe('Delete Misconception Modal Component', () => {
       },
     };
 
-    skillObject = skill.createFromBackendDict({
+    skillObject = Skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1],
