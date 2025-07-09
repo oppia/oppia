@@ -93,7 +93,7 @@ describe('Add Misconception Modal Component', function () {
         voiceovers_mapping: {},
       },
     };
-    skillObject = skill.createFromBackendDict({
+    skillObject = Skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1, misconceptionDict2],
