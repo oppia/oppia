@@ -54,7 +54,6 @@ describe('Create new skill modal', () => {
     fixture = TestBed.createComponent(CreateNewSkillModalComponent);
     componentInstance = fixture.componentInstance;
     pageContextService = TestBed.inject(PageContextService);
-    skill = TestBed.inject(Skill);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     skillCreationService = TestBed.inject(SkillCreationService);
