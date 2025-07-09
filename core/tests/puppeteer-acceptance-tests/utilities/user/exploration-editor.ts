@@ -402,9 +402,9 @@ export class ExplorationEditor extends BaseUser {
     if (placeHolderText) {
       await inputElements[0].type(placeHolderText);
 
-      expect(await inputElements[0].getAttribute('value')).toBe(
-        placeHolderText
-      );
+      expect(
+        await inputElements[0].evaluate(el => (el as HTMLInputElement).value)
+      ).toBe(placeHolderText);
     }
 
     // Update height in rows.
@@ -413,16 +413,18 @@ export class ExplorationEditor extends BaseUser {
       await this.page.keyboard.press('Backspace');
       await inputElements[1].type(heightInRows);
 
-      expect(await inputElements[1].getAttribute('value')).toBe(heightInRows);
+      expect(
+        await inputElements[1].evaluate(el => (el as HTMLInputElement).value)
+      ).toBe(heightInRows);
     }
 
     // Update catch misspellings.
     if (catchMisspellings === true) {
       inputElements[2].click();
 
-      expect(await inputElements[2].getAttribute('checked')).toBe(
-        catchMisspellings
-      );
+      expect(
+        await inputElements[2].evaluate(el => (el as HTMLInputElement).checked)
+      ).toBe(catchMisspellings);
     }
 
     // Save the interaction.
