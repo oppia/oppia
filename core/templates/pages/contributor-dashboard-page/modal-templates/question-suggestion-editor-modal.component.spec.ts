@@ -150,7 +150,6 @@ describe('Question Suggestion Editor Modal Component', () => {
         QuestionObjectFactory,
         QuestionUndoRedoService,
         SiteAnalyticsService,
-        Skill,
         StateEditorService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
