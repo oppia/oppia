@@ -299,12 +299,14 @@ const interactionPreviewCardSelector = '.e2e-test-interaction-preview';
 const nodeLabelSelector = '.e2e-test-node-background';
 const outcomeFeedbackSelector = '.e2e-test-edit-outcome-feedback-button';
 const removeInteractionButttonSelector = '.e2e-test-delete-interaction';
+const responseModalBodySelector = '.e2e-test-response-modal-body';
 
 export enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
   FRACTION_INPUT = 'Fraction Input',
+  ITEM_SELECTION = 'Item Selection',
   MULTIPLE_CHOICE = 'Multiple Choice',
   NUMBER_INPUT = 'Number Input',
   TEXT_INPUT = 'Text Input',
@@ -339,12 +341,15 @@ export class ExplorationEditor extends BaseUser {
     feedback: string,
     destination: string,
     responseIsCorrect: boolean,
-    isLastResponse: boolean = true
+    isLastResponse: boolean = true,
+    skipAnswerUpdate: boolean = false
   ): Promise<void> {
-    await this.updateAnswersInResponseModal(
-      interactionType as INTERACTION_TYPES,
-      answer
-    );
+    if (!skipAnswerUpdate) {
+      await this.updateAnswersInResponseModal(
+        interactionType as INTERACTION_TYPES,
+        answer
+      );
+    }
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
@@ -376,6 +381,65 @@ export class ExplorationEditor extends BaseUser {
       // moving on to next steps.
       await this.waitForNetworkIdle();
     }
+  }
+
+  /**
+   * Customizes the item selection interaction.
+   * @param {string[]} options - The options to be selected.
+   * @param {number} minimumNumberOfSelections - The minimum number of selections.
+   * @param {number} maximumNumberOfSelections - The maximum number of selections.
+   */
+  async customizeItemSelectionInteraction(
+    options: string[],
+    minimumNumberOfSelections?: number,
+    maximumNumberOfSelections?: number
+  ): Promise<void> {
+    await this.page.waitForSelector(customizeInteractionBodySelector);
+
+    const inputElements = this.page.$$(
+      `${customizeInteractionBodySelector} input`
+    );
+
+    // Update minimum number of selections.
+    if (minimumNumberOfSelections) {
+      const inputElement = inputElements[0];
+      await inputElement.click();
+      await this.page.keyboard.press('Backspace');
+      await inputElement.type(String(minimumNumberOfSelections));
+
+      expect(
+        await inputElement.evaluate(el => (el as HTMLInputElement).value)
+      ).toBe(String(minimumNumberOfSelections));
+    }
+
+    // Update maximum number of selections.
+    if (maximumNumberOfSelections) {
+      const inputElement = inputElements[1];
+      await inputElement.click();
+      await this.page.keyboard.press('Backspace');
+      await inputElement.type(String(maximumNumberOfSelections));
+
+      expect(
+        await inputElement.evaluate(el => (el as HTMLInputElement).value)
+      ).toBe(String(maximumNumberOfSelections));
+    }
+
+    // Add options.
+    for (let i = 0; i < options.length - 1; i++) {
+      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
+      await this.clickOn(addResponseOptionButton);
+    }
+
+    const responseInputs = await this.page.$$(stateContentInputField);
+    for (let i = 0; i < options.length; i++) {
+      await responseInputs[i].type(`${options[i]}`);
+    }
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage('Item Selection interaction has been customized successfully.');
   }
 
   /**
@@ -536,6 +600,60 @@ export class ExplorationEditor extends BaseUser {
     //   const inputElement = await valueElement.$('input');
     //   await inputElement.type(value as string);
     // }
+  }
+
+  /**
+   * Update the item selection learners answer in the response modal.
+   * @param rule The rule to update.
+   * @param optionsSelections The options selections to update.
+   */
+  async updateItemSelectionLearnersAnswerInResponseModal(
+    rule:
+      | 'is equal to'
+      | 'is proper subset of'
+      | 'contains atleast one of'
+      | 'omits atleast on of',
+    optionsSelections: string[]
+  ): Promise<void> {
+    const responseBox = await this.page.waitForSelector(
+      responseModalBodySelector,
+      {visible: true}
+    );
+
+    if (!responseBox) {
+      throw new Error('Response modal is not visible.');
+    }
+    const selectInput = await responseBox.$('mat-select');
+    await selectInput?.click();
+
+    const ruleOptions = await this.page.$$('mat-option');
+    const ruleOptionTexts = await this.page.$$eval('mat-option', options =>
+      options.map(option => option.textContent)
+    );
+
+    for (let i = 0; i < ruleOptionTexts.length; i++) {
+      if (ruleOptionTexts[i]?.includes(rule)) {
+        await ruleOptions[i].click();
+        break;
+      }
+    }
+
+    expect(await selectInput?.evaluate(el => el.textContent)).toContain(rule);
+
+    // Select given options.
+    const options = await responseBox?.$$('mat-checkbox');
+    for (let option of options) {
+      const optionText =
+        (await option.evaluate(el => el.textContent?.trim())) ?? '';
+      if (optionsSelections.includes(optionText)) {
+        const inputElement = await option.$('input');
+        await inputElement?.click();
+
+        expect(
+          await inputElement?.evaluate(el => (el as HTMLInputElement).checked)
+        ).toBe(true);
+      }
+    }
   }
 
   // New functions ends.

@@ -68,6 +68,8 @@ describe('Interested Partner Organization', function () {
     await explorationEditor.expectCurrentOutcomeDestinationToBe('Second Card');
     await explorationEditor.expectEditOutcomeDestPencilButtonToBeVisible();
     await explorationEditor.expectExplorationGraphToContainCard('Second Card');
+
+    await explorationEditor.saveExplorationDraft();
   });
 
   it('should be able to use "multiple choice" interaction', async function () {
@@ -97,6 +99,8 @@ describe('Interested Partner Organization', function () {
 
     await explorationEditor.addHintToState('Try Google Search.');
     await explorationEditor.expectHintsToConatin('Try Google Search.');
+
+    await explorationEditor.saveExplorationDraft();
   });
 
   it('should be able to use "number input" interaction', async function () {
@@ -122,6 +126,8 @@ describe('Interested Partner Organization', function () {
     await explorationEditor.expectSolutionsToContain(
       'One solution is "100". As said in the question itself..'
     );
+
+    await explorationEditor.saveExplorationDraft();
   });
 
   it('should be able to use "text input" interaction', async function () {
@@ -157,9 +163,58 @@ describe('Interested Partner Organization', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'No write "Hello, Oppia!"'
     );
+
+    await explorationEditor.saveExplorationDraft();
   });
 
-  it('should be able to use "image region" interaction', async function () {});
+  it('should be able to use "Image Region" interaction', async function () {
+    await explorationEditor.navigateToCard('Sixth Card');
+
+    // Add a image region interaction.
+    await explorationEditor.updateCardContent('Enter an image region.');
+    await explorationEditor.addImageInteraction();
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong.'
+    );
+    await explorationEditor.directLearnersToNewCard('Seventh Card');
+    await explorationEditor.saveExplorationDraft();
+
+    await explorationEditor.saveExplorationDraft();
+  });
+
+  it('should be able to use "Item Selection" interaction', async function () {
+    await explorationEditor.navigateToCard('Seventh Card');
+
+    // Add a item selection interaction.
+    await explorationEditor.updateCardContent('Select correct item.');
+    await explorationEditor.addInteraction(
+      INTERACTION_TYPES.ITEM_SELECTION,
+      false
+    );
+    await explorationEditor.customizeItemSelectionInteraction(
+      ['Option 1', 'Option 2', 'Correct Option 1', 'Correct Option 2'],
+      1,
+      2
+    );
+    await explorationEditor.updateItemSelectionLearnersAnswerInResponseModal(
+      'contains atleast one of',
+      ['Correct Option 1', 'Correct Option 2']
+    );
+    await explorationEditor.addResponsesToTheInteraction(
+      INTERACTION_TYPES.ITEM_SELECTION,
+      'null',
+      'Great!',
+      'Eighth Card',
+      true,
+      true,
+      true
+    );
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong Answer. Please try again'
+    );
+
+    await explorationEditor.saveExplorationDraft();
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
