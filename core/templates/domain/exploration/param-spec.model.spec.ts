@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ParamSpecObjectFactory.
+ * @fileoverview Unit tests for param-spec.model.
  */
 
 

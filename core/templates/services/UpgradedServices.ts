@@ -724,9 +724,6 @@ export class UpgradedServices {
       new NumberWithUnitsValidationService(
         upgradedServices['BaseInteractionValidationService']
       );
-    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
-      upgradedServices['ParamSpecObjectFactory']
-    );
     upgradedServices['PencilCodeEditorRulesService'] =
       new PencilCodeEditorRulesService(
         upgradedServices['NormalizeWhitespacePipe'],
