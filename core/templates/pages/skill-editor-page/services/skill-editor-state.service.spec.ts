@@ -244,7 +244,7 @@ describe('Skill editor state service', () => {
 
     fakeSkillBackendApiService.newBackendSkillObject = skillDict;
     fakeSkillBackendApiService.skillObject =
-      skill.createFromBackendDict(skillDict);
+      Skill.createFromBackendDict(skillDict);
   });
 
   it('should test getters', () => {
@@ -307,7 +307,7 @@ describe('Skill editor state service', () => {
 
     fakeSkillBackendApiService.newBackendSkillObject = skillDict2;
     fakeSkillBackendApiService.skillObject =
-      skill.createFromBackendDict(skillDict2);
+      Skill.createFromBackendDict(skillDict2);
 
     const expectedSkill = fakeSkillBackendApiService.skillObject;
     expect(previousSkill).not.toEqual(expectedSkill);
