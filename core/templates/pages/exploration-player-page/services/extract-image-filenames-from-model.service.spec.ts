@@ -49,7 +49,6 @@ describe('Extracting Image file names in the state service', () => {
     eof = TestBed.inject(ExplorationObjectFactory);
     ecs = TestBed.inject(PageContextService);
     eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
-    sof = TestBed.inject(Skill);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
 
     explorationDict = {
