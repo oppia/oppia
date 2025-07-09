@@ -300,10 +300,12 @@ const nodeLabelSelector = '.e2e-test-node-background';
 const outcomeFeedbackSelector = '.e2e-test-edit-outcome-feedback-button';
 const removeInteractionButttonSelector = '.e2e-test-delete-interaction';
 const responseModalBodySelector = '.e2e-test-response-modal-body';
+const ruleEditorInResponseModalSeclector = 'oppia-rule-editor';
 
 export enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
+  DRAG_AND_DROP_SORT = 'Drag and Drop Sort',
   END_EXPLORATION = 'End Exploration',
   FRACTION_INPUT = 'Fraction Input',
   ITEM_SELECTION = 'Item Selection',
@@ -326,30 +328,18 @@ const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
   /**
-   * Function to add responses to the interactions.
-   * Currently, it only handles 'Number Input', 'Multiple Choice', 'Number Input', and 'Text Input' interaction types.
-   * @param {string} interactionType - The type of the interaction.
-   * @param {string} answer - The response to be added.
-   * @param {string} feedback - The feedback for the response.
-   * @param {string} destination - The destination state for the response.
-   * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
-   * @param {boolean} isLastResponse - Whether the response is last and more aren't going to be added.
+   * Adds the response details in the response modal.
+   * @param feedback The feedback to be added in the response modal.
+   * @param destination The destination to be added in the response modal.
+   * @param responseIsCorrect The response is correct or not.
+   * @param isLastResponse Whether the response is the last response or not.
    */
-  async addResponsesToTheInteraction(
-    interactionType: string,
-    answer: string,
+  async addResponseDetailsInResponseModal(
     feedback: string,
     destination: string,
     responseIsCorrect: boolean,
-    isLastResponse: boolean = true,
-    skipAnswerUpdate: boolean = false
+    isLastResponse: boolean = true
   ): Promise<void> {
-    if (!skipAnswerUpdate) {
-      await this.updateAnswersInResponseModal(
-        interactionType as INTERACTION_TYPES,
-        answer
-      );
-    }
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
@@ -381,6 +371,57 @@ export class ExplorationEditor extends BaseUser {
       // moving on to next steps.
       await this.waitForNetworkIdle();
     }
+  }
+  /**
+   * Function to add responses to the interactions.
+   * Currently, it only handles 'Number Input', 'Multiple Choice', 'Number Input', and 'Text Input' interaction types.
+   * @param {string} interactionType - The type of the interaction.
+   * @param {string} answer - The response to be added.
+   * @param {string} feedback - The feedback for the response.
+   * @param {string} destination - The destination state for the response.
+   * @param {boolean} responseIsCorrect - Whether the response is marked as correct.
+   * @param {boolean} isLastResponse - Whether the response is last and more aren't going to be added.
+   */
+  async addResponsesToTheInteraction(
+    interactionType: string,
+    answer: string,
+    feedback: string,
+    destination: string,
+    responseIsCorrect: boolean,
+    isLastResponse: boolean = true
+  ): Promise<void> {
+    await this.updateAnswersInResponseModal(
+      interactionType as INTERACTION_TYPES,
+      answer
+    );
+
+    await this.addResponseDetailsInResponseModal(
+      feedback,
+      destination,
+      responseIsCorrect,
+      isLastResponse
+    );
+  }
+
+  /**
+   * Customizes the drag and drop sort interaction.
+   * @param {string[]} options - The options to be selected.
+   */
+  async customizeDragAndDropSortInteraction(options: string[]): Promise<void> {
+    for (let i = 0; i < options.length - 1; i++) {
+      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
+      await this.clickOn(addResponseOptionButton);
+    }
+
+    const responseInputs = await this.page.$$(stateContentInputField);
+    for (let i = 0; i < options.length; i++) {
+      await responseInputs[i].type(`${options[i]}`);
+    }
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
   }
 
   /**
@@ -602,6 +643,45 @@ export class ExplorationEditor extends BaseUser {
     // }
   }
 
+  async updateDragAndDropSortLearnersAnswerInResponseModal(
+    rule: string,
+    optionsSelections: string[] | number[]
+  ): Promise<void> {
+    // Update Rule.
+    await this.updateRuleInResponseModalTo(rule);
+
+    // Update Options Selections.
+    const ruleBox = await this.page.waitForSelector(
+      ruleEditorInResponseModalSeclector,
+      {
+        visible: true,
+      }
+    );
+
+    if (!ruleBox) {
+      throw new Error('Response modal is not visible.');
+    }
+
+    const ruleType =
+      typeof optionsSelections[0] === 'number' ? 'ordering' : 'comparasion';
+
+    if (ruleType === 'ordering') {
+      const selectBoxes = await ruleBox.$$('select');
+
+      if (selectBoxes.length !== optionsSelections.length) {
+        throw new Error(
+          `Expected ${optionsSelections.length} select boxes, but found ${selectBoxes.length}.`
+        );
+      }
+
+      for (let i = 0; i < selectBoxes.length; i++) {
+        await selectBoxes[i].select(optionsSelections[i] as string);
+      }
+    } else {
+      throw new Error(`Rule currently not supported`);
+    }
+  }
+
   /**
    * Update the item selection learners answer in the response modal.
    * @param rule The rule to update.
@@ -615,6 +695,39 @@ export class ExplorationEditor extends BaseUser {
       | 'omits atleast on of',
     optionsSelections: string[]
   ): Promise<void> {
+    const responseBox = await this.page.waitForSelector(
+      responseModalBodySelector,
+      {visible: true}
+    );
+
+    if (!responseBox) {
+      throw new Error('Response modal is not visible.');
+    }
+
+    // Update Rule
+    await this.updateRuleInResponseModalTo(rule);
+
+    // Select given options.
+    const options = await responseBox?.$$('mat-checkbox');
+    for (let option of options) {
+      const optionText =
+        (await option.evaluate(el => el.textContent?.trim())) ?? '';
+      if (optionsSelections.includes(optionText)) {
+        const inputElement = await option.$('input');
+        await inputElement?.click();
+
+        expect(
+          await inputElement?.evaluate(el => (el as HTMLInputElement).checked)
+        ).toBe(true);
+      }
+    }
+  }
+
+  /**
+   * Updates the rule in the response modal.
+   * @param {string} rule The rule to update the response modal to.
+   */
+  async updateRuleInResponseModalTo(rule: string): Promise<void> {
     const responseBox = await this.page.waitForSelector(
       responseModalBodySelector,
       {visible: true}
@@ -639,21 +752,6 @@ export class ExplorationEditor extends BaseUser {
     }
 
     expect(await selectInput?.evaluate(el => el.textContent)).toContain(rule);
-
-    // Select given options.
-    const options = await responseBox?.$$('mat-checkbox');
-    for (let option of options) {
-      const optionText =
-        (await option.evaluate(el => el.textContent?.trim())) ?? '';
-      if (optionsSelections.includes(optionText)) {
-        const inputElement = await option.$('input');
-        await inputElement?.click();
-
-        expect(
-          await inputElement?.evaluate(el => (el as HTMLInputElement).checked)
-        ).toBe(true);
-      }
-    }
   }
 
   // New functions ends.

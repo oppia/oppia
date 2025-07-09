@@ -201,12 +201,9 @@ describe('Interested Partner Organization', function () {
       'contains atleast one of',
       ['Correct Option 1', 'Correct Option 2']
     );
-    await explorationEditor.addResponsesToTheInteraction(
-      INTERACTION_TYPES.ITEM_SELECTION,
-      'null',
+    await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
       'Eighth Card',
-      true,
       true,
       true
     );
@@ -215,6 +212,38 @@ describe('Interested Partner Organization', function () {
     );
 
     await explorationEditor.saveExplorationDraft();
+  });
+
+  it('should be able to use "Drag and Drop Sort" interaction', async function () {
+    await explorationEditor.navigateToCard('Eigth Card');
+
+    // Add a drag and drop sort interaction.
+    await explorationEditor.updateCardContent('Drag and Drop Sort');
+    await explorationEditor.addInteraction(
+      INTERACTION_TYPES.DRAG_AND_DROP_SORT,
+      false
+    );
+    await explorationEditor.customizeDragAndDropSortInteraction([
+      'First',
+      'Third',
+      'Second',
+    ]);
+    await explorationEditor.updateDragAndDropSortLearnersAnswerInResponseModal(
+      'is equal to ordering',
+      [1, 3, 2]
+    );
+    await explorationEditor.addResponseDetailsInResponseModal(
+      'Great!',
+      'Eighth Card',
+      true,
+      true
+    );
+
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Try Again!'
+    );
+
+    // TODO: Add solution.
   });
 
   afterAll(async function () {
