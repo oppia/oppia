@@ -489,7 +489,7 @@ describe('Contributions and review component', () => {
     ).and.returnValue(mockActiveTopicEventEmitter);
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
-        skill: skill.createFromBackendDict({
+        skill: Skill.createFromBackendDict({
           id: 'skill1',
           description: 'test description 1',
           misconceptions: [
