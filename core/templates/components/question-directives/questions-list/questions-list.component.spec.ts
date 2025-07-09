@@ -344,7 +344,7 @@ describe('Questions List Component', () => {
     fakeAsync(() => {
       component.selectedSkillId = 'true';
 
-      const skillWithExplanations = skill.createFromBackendDict({
+      const skillWithExplanations = Skill.createFromBackendDict({
         id: 'skillId1',
         description: 'test description 1',
         misconceptions: [],
