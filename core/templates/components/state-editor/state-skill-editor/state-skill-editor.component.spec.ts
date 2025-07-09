@@ -338,7 +338,7 @@ describe('State Skill Editor Component', () => {
       superseding_skill_id: '2',
     };
     const fetchSkillResponse = {
-      skill: skill.createFromBackendDict(skillBackendDict),
+      skill: Skill.createFromBackendDict(skillBackendDict),
       assignedSkillTopicData: {},
       groupedSkillSummaries: {},
     };
