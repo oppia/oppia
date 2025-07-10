@@ -36,12 +36,12 @@
   <div class="classroom-content-container">
     <div class="classroom-content">
       <div class="content-section">
-        <h1 class="classroom-content-heading">{{'I18N_CLASSROOM_PAGE_COURSE_DETAILS' | translate}}</h1>
+        <h1 class="classroom-content-heading e2e-test-classroom-content-heading">{{'I18N_CLASSROOM_PAGE_COURSE_DETAILS' | translate}}</h1>
         <p class="classroom-content-text" *ngIf="!isHackyClassroomTranslationDisplayed('courseDetails')">{{classroomData.getCourseDetails()}}</p>
         <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('courseDetails')">{{classroomTranslationKeys.courseDetails | translate}}</p>
       </div>
       <div class="content-section">
-        <h1 class="classroom-content-heading">{{'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate}}</h1>
+        <h1 class="classroom-content-heading e2e-test-classroom-content-heading">{{'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate}}</h1>
         <p class="classroom-content-text" *ngIf="!isHackyClassroomTranslationDisplayed('topicListIntro')">{{classroomData.getTopicListIntro()}}</p>
         <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('topicListIntro')">{{ classroomTranslationKeys.topicListIntro | translate }}</p>
       </div>

@@ -425,11 +425,12 @@ export class ExplorationEditor extends BaseUser {
 
     const fillExplorationMetadataDetails = async () => {
       await this.clickOn(explorationTitleInput);
-      await this.type(explorationTitleInput, `${title}`);
+      await this.type(explorationTitleInput, title);
       await this.clickOn(explorationGoalInput);
-      await this.type(explorationGoalInput, `${goal}`);
+      await this.type(explorationGoalInput, goal);
       await this.clickOn(explorationCategoryDropdown);
-      await this.clickOn(`${category}`);
+      await this.type(explorationCategoryDropdown, category);
+      await this.clickOn(category);
       if (tags) {
         await this.type(tagsField, tags);
       }

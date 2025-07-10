@@ -497,6 +497,15 @@ const nonInteractiveTabsHeaderSelector =
 const nonInteractiveTabContentSelector =
   '.e2e-test-non-interactive-tab-content';
 
+// Learn Page (/learn).
+const classroomHeadingSelector = '.e2e-test-classroom-heading';
+const classroomTileContainerSelector = '.e2e-test-classroom-tile';
+const classroomNameSelector = '.e2e-test-classroom-name';
+
+// Classroom Page.
+const classroomContentHeadingSelector = '.e2e-test-classroom-content-heading';
+const topicSummaryTileSelector = '.e2e-test-topic-summary-tile';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -5383,6 +5392,58 @@ export class LoggedOutUser extends BaseUser {
     ).toBe(title);
   }
 
+  // ================================================================================
+  // Learn Page (/learn)
+  // ================================================================================
+
+  async clickOnClassroomTileInLearnPage(classroomName: string): Promise<void> {
+    await this.isElementVisible(classroomTileContainerSelector);
+
+    const classroomTiles = await this.page.$$(classroomTileContainerSelector);
+
+    for (const classroomTile of classroomTiles) {
+      const classroomTileName = await classroomTile.$eval(
+        classroomNameSelector,
+        el => el.textContent
+      );
+
+      if (classroomTileName === classroomName) {
+        await classroomTile.click();
+        break;
+      }
+    }
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForFunction(
+      (url: string) => {
+        return url !== `${baseUrl}/learn`;
+      },
+      {},
+      this.page.url()
+    );
+  }
+
+  // ================================================================================
+  // Classroom Page
+  // ================================================================================
+
+  /**
+   * Function to verify the heading in classroom page.
+   * @param {string} expectedHeading - The expected heading of the classroom.
+   */
+  async expectHeadingInClassroomPageToContain(
+    expectedHeading: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(classroomContentHeadingSelector);
+    const headings = await this.page.$$eval(
+      classroomContentHeadingSelector,
+      el => el.map(el => el.textContent)
+    );
+
+    expect(headings).toContain(expectedHeading);
+    showMessage(`Success: Heading is ${expectedHeading}.`);
+  }
+
   /**
    * Checks if the views of a lesson card matches the expected views.
    * @param {number} expectedViews - The expected views of the card.
@@ -5415,6 +5476,20 @@ export class LoggedOutUser extends BaseUser {
         return;
       }
     }
+  }
+
+  /**
+   * Function to verify the classroom heading.
+   * @param {string} expectedHeading - The expected heading of the classroom.
+   */
+  async expectClassroomHeadingToBe(expectedHeading: string) {
+    await this.expectElementToBeVisible(classroomHeadingSelector);
+    const heading = await this.page.$eval(
+      classroomHeadingSelector,
+      el => el.textContent
+    );
+
+    expect(heading).toBe(expectedHeading);
   }
 }
 
