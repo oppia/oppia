@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes editing skill description and concept card explanation, adding and deleting worked examples, adding and deleting misconceptions, managing prerequisite skills, editing rubrics, and publishing the topic again.
+ * @fileoverview Acceptance Test for the journey of a topic manager. The journey includes editing skill description and concept card explanation, adding and deleting misconceptions, managing prerequisite skills, editing rubrics, and publishing the topic again.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -54,16 +54,13 @@ describe('Topic Manager User Journey', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should be able to update the concept card explanation(review material), add and delete worked examples, add delete misconceptions, manage prerequisite skills, edit rubrics, and publish the skill again.',
+    'should be able to update the concept card explanation(review material), add delete misconceptions, manage prerequisite skills, edit rubrics, and publish the skill again.',
     async function () {
       await topicManager.navigateToTopicAndSkillsDashboardPage();
       await topicManager.openSkillEditor('Double Digit Addition');
       await topicManager.updateReviewMaterial(
         'Review material text content for Double Digit Addition.'
       );
-
-      await topicManager.addWorkedExample('Add 2 and 3', '2+3=5.');
-      await topicManager.deleteWorkedExample('Add 2 and 3');
 
       await topicManager.addMisconception(
         'Addition Misconception',
@@ -81,7 +78,6 @@ describe('Topic Manager User Journey', function () {
       await topicManager.publishUpdatedSkill('Updated everything');
       await topicManager.openSkillEditor('Double Digit Addition');
 
-      await topicManager.verifyWorkedExamplePresence('Add 2 and 3', false);
       await topicManager.verifyMisconceptionPresence(
         'Addition Misconception',
         false

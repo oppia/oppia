@@ -20,7 +20,6 @@ import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
-import {BindableVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Question} from 'domain/question/QuestionObjectFactory';
 import {State} from 'domain/state/StateObjectFactory';
 import {StateCard} from 'domain/state_card/state-card.model';
@@ -196,7 +195,6 @@ export class DiagnosticTestPlayerEngineService {
       nextCard: StateCard,
       refreshInteraction: boolean,
       feedbackHtml: string,
-      feedbackAudioTranslations: BindableVoiceovers,
       refresherExplorationId: string,
       missingPrerequisiteSkillId: string,
       remainOnCurrentCard: boolean,
@@ -221,7 +219,6 @@ export class DiagnosticTestPlayerEngineService {
     let stateCard: StateCard;
     let refreshInteraction: boolean = false;
     let feedbackHtml: string = '';
-    let feedbackAudioTranslations: BindableVoiceovers = {};
     let refresherExplorationId: string = '';
     let missingPrerequisiteSkillId: string = '';
     let remainOnCurrentCard: boolean = false;
@@ -252,7 +249,6 @@ export class DiagnosticTestPlayerEngineService {
           stateCard,
           refreshInteraction,
           feedbackHtml,
-          feedbackAudioTranslations,
           refresherExplorationId,
           missingPrerequisiteSkillId,
           remainOnCurrentCard,

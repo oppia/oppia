@@ -18,7 +18,7 @@
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {StatePropertyService} from 'components/state-editor/state-editor-properties-services/state-property.service';
 import {UtilsService} from 'services/utils.service';
 

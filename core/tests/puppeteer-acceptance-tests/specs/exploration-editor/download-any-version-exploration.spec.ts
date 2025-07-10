@@ -36,7 +36,7 @@ describe('Exploration Creator', function () {
     );
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
 
     await explorationEditor.createMinimalExploration(

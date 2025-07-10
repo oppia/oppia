@@ -46,7 +46,7 @@ describe('Exploration Editor', function () {
     );
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
 
     // Use createMinimalExploration to set up the introduction card.
