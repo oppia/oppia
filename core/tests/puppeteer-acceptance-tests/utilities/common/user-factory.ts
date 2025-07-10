@@ -180,11 +180,6 @@ export class UserFactory {
       CurriculumAdminFactory(),
     ]);
 
-    // TODO: remove once testing is done.
-    username = username + Math.random().toString(36).substring(0, 8);
-    email = username + '@example.com';
-    // TODO: remove until here.
-
     await user.openBrowser();
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
