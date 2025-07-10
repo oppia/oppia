@@ -399,7 +399,7 @@ export class ExplorationEditor extends BaseUser {
     goal: string,
     category: string,
     tags?: string
-  ): Promise<string | null> {
+  ): Promise<string> {
     const publishExploration = async () => {
       if (this.isViewportAtMobileWidth()) {
         await this.waitForPageToFullyLoad();
@@ -2327,7 +2327,7 @@ export class ExplorationEditor extends BaseUser {
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
     category: string = 'Mathematics'
-  ): Promise<string | null> {
+  ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
     await this.dismissWelcomeModal();

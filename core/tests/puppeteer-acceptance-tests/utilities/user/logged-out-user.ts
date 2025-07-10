@@ -50,6 +50,7 @@ const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
 const CreativeCommonsLegalCodeUrl =
   testConstants.URLs.ExternalLink.CreativeCommonsLegalCode;
 const explorationDesignTipsUrl = testConstants.URLs.ExplorationDesignTips;
+const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 const googleSignUpUrl = testConstants.URLs.ExternalLink.GoogleSignUp;
 const getStartedUrl = testConstants.URLs.GetStarted;
 const homeUrl = testConstants.URLs.Home;
@@ -406,6 +407,14 @@ const blogPostTitleContainerSelector =
 const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 
+// Common Selectors.
+const devModeLabelSelector = '.e2e-test-dev-mode';
+
+// Home Page Selectors.
+const homePageHeadingSelector =
+  '.e2e-test-splash-page .e2e-test-home-page-title';
+const browseLessonButtonSelector =
+  '.e2e-test-splash-page .e2e-test-explore-lessons-btn';
 // Topic Viewer Page Selectors.
 const topicPageRevisionTabContentSelector =
   '.e2e-test-topic-viewer-revision-tab';
@@ -466,6 +475,27 @@ const volunteerPageHeadingSelector = '.e2e-test-volunteer-page-headings';
 const contactUsSubheadingSelector = '.e2e-test-contact-subheading';
 const contactUsContentCard = '.e2e-test-contact-page-content';
 const contactUsContentCardHeadingSelector = `${contactUsContentCard} h2`;
+
+// Community Library.
+const communityLibraryLinkInNavbarSelector =
+  '.e2e-test-topnb-go-to-community-library-link';
+const communityLibraryContainerSelector = '.e2e-test-library-container';
+const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
+const communityLibraryHeading = '.e2e-test-library-main-header';
+const communityLibraryGroupHeader = '.e2e-test-library-group-header';
+
+// Other Selectors.
+const youtubePlayerSelector = '.e2e-test-youtube-player';
+const collapsibleRTEHeaderSelector = 'e2e-test-collapsible-heading';
+const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
+
+const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
+const conceptCardLinkSelector = '.e2e-test-concept-card-link';
+const conceptCardViewerSelector = '.e2e-test-concept-card-viewer';
+const nonInteractiveTabsHeaderSelector =
+  '.e2e-test-non-interactive-tabs-headers';
+const nonInteractiveTabContentSelector =
+  '.e2e-test-non-interactive-tab-content';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -563,6 +593,35 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(communityLibraryUrl, verifyURL);
+  }
+
+  /**
+   * Navigates to the community library page using the navbar.
+   */
+  async navigateToCommunityLibraryUsingNavbar(): Promise<void> {
+    // Open navigation menu for mobile view.
+    await this.openNavMenuInMobile();
+
+    // Click on "Learn" if in desktop view.
+    if (!this.isViewportAtMobileWidth()) {
+      if ((await this.isElementVisible(navbarLearnTab)) !== true) {
+        throw new Error('Learn tab is not visible in the navbar.');
+      }
+      await this.clickOn(navbarLearnTab);
+    }
+
+    // Click on Community Library link.
+    const selector = this.isViewportAtMobileWidth()
+      ? communityLibraryLinkInNavMenuSelector
+      : communityLibraryLinkInNavbarSelector;
+    await this.clickOn(selector);
+
+    // Verify navigated to Community Library.
+    if (
+      (await this.isElementVisible(communityLibraryContainerSelector)) !== true
+    ) {
+      throw new Error('Community Library container is not visible.');
+    }
   }
 
   /**
@@ -990,6 +1049,24 @@ export class LoggedOutUser extends BaseUser {
     if (url !== expectedUrl) {
       throw new Error(`Actual URL differs from expected. Found: ${url}.`);
     }
+  }
+
+  /**
+   * Open the navigation menu in mobile view.
+   */
+  async openNavMenuInMobile(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage('Skipped: Open Navigation Menu (mobile).');
+      return;
+    }
+    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
+      visible: true,
+    });
+    await this.clickOn(mobileNavbarOpenSidebarButton);
+    await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
+      visible: true,
+    });
+    showMessage('Opened Navigation Menu (mobile).');
   }
 
   /**
@@ -3190,43 +3267,28 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if the search results contain a specific result.
    * @param {string[]} searchResultsExpected - The search result to check for.
+   * @param {boolean} present - Whether the search results should be present or not.
    */
   async expectSearchResultsToContain(
-    searchResultsExpected: string[]
+    searchResultsExpected: string[],
+    present: boolean = true
   ): Promise<void> {
-    try {
-      if (searchResultsExpected.length === 0) {
-        await this.waitForPageToFullyLoad();
-        const searchResultsElements = await this.page.$$(
-          lessonCardTitleSelector
-        );
-        if (searchResultsElements.length !== 0) {
-          throw new Error('No search results expected, but some were found.');
-        }
-      } else {
-        await this.page.waitForSelector(lessonCardTitleSelector);
-        const searchResultsElements = await this.page.$$(
-          lessonCardTitleSelector
-        );
-        const searchResults = await Promise.all(
-          searchResultsElements.map(result =>
-            this.page.evaluate(el => el.textContent.trim(), result)
-          )
-        );
+    await this.waitForPageToFullyLoad();
+    const searchResults = await this.page.$$eval(
+      lessonCardTitleSelector,
+      elements => elements.map(element => element.textContent)
+    );
 
-        for (const resultExpected of searchResultsExpected) {
-          if (!searchResults.includes(resultExpected)) {
-            throw new Error(
-              `Search result "${resultExpected}" not found in search results.`
-            );
-          }
-        }
-        showMessage('All expected search results found in search results.');
+    for (const searchResultExpected of searchResultsExpected) {
+      if (searchResults.includes(searchResultExpected) === present) {
+        showMessage(
+          `Success: Search result "${searchResultExpected}" is ${present ? 'present' : 'not present'}.`
+        );
+      } else {
+        throw new Error(
+          `Expected search result "${searchResultExpected}" to be ${present ? 'present' : 'not present'}, but it was ${present ? 'not ' : ''}found.`
+        );
       }
-    } catch (error) {
-      const newError = new Error(`Failed to check search results: ${error}`);
-      newError.stack = error.stack;
-      throw newError;
     }
   }
 
@@ -5224,6 +5286,135 @@ export class LoggedOutUser extends BaseUser {
     // Confirm new slide ID is different.
     const newSlideId = await this.page.$eval(activeItemSelector, el => el.id);
     expect(newSlideId).not.toBe(initialSlideId);
+  }
+
+  /**
+   * Function to verify the community library heading is present.
+   * @param {string} heading - The heading to verify.
+   */
+  async expectCommunityLibraryHeadingToBePresent(
+    heading: string
+  ): Promise<void> {
+    await this.page.waitForSelector(communityLibraryHeading, {
+      visible: true,
+      timeout: 5000,
+    });
+
+    const communityLibraryHeadingText = await this.page.$eval(
+      communityLibraryHeading,
+      el => el.textContent
+    );
+
+    if (communityLibraryHeadingText?.trim() !== heading) {
+      throw new Error(
+        `Expected community library heading to be ${heading}, but found ${communityLibraryHeadingText}`
+      );
+    }
+
+    showMessage(`Success: Community library heading is ${heading}.`);
+  }
+
+  /**
+   * Function to verify the community library group header is present.
+   * @param {string[]} groupHeaders - The group headers to verify.
+   */
+  async expectCommunityLibraryGroupHeaderToContain(groupHeaders: string[]) {
+    await this.page.waitForSelector(communityLibraryGroupHeader, {
+      visible: true,
+    });
+
+    const communityLibraryGroupHeaderText = await this.page.$$eval(
+      communityLibraryGroupHeader,
+      el => el.map(el => el.textContent)
+    );
+
+    for (const groupHeader of groupHeaders) {
+      if (
+        communityLibraryGroupHeaderText?.some(el =>
+          el?.trim().includes(groupHeader)
+        ) === false
+      ) {
+        throw new Error(
+          `Failed: Community library group header does not contain ${groupHeader}.\nActual: ${communityLibraryGroupHeaderText}`
+        );
+      }
+      showMessage(
+        `Success: Community library group header contains ${groupHeader}.`
+      );
+    }
+  }
+
+  // ================================================================================
+  // Common
+  // ================================================================================
+
+  /**
+   * Function to verify the dev mode label is visible or not.
+   * @param {boolean} visible - Whether the dev mode label should be visible or not.
+   */
+  async expectDevModeLabelToBeVisible(visible: boolean = true): Promise<void> {
+    await this.page.waitForSelector(devModeLabelSelector, {
+      visible: visible,
+    });
+  }
+
+  // ================================================================================
+  // Home Page
+  // ================================================================================
+
+  /**
+   * Function to click the Browse Lessons button on the home page.
+   */
+  async clickBrowseLessonsButtonInHomePage(): Promise<void> {
+    await this.expectElementToBeVisible(browseLessonButtonSelector);
+    await this.clickOn(browseLessonButtonSelector);
+
+    await this.expectElementToBeVisible(browseLessonButtonSelector, false);
+  }
+
+  /**
+   * Function to verify the home page title.
+   * @param {string} title - The expected title of the home page.
+   */
+  async expectHomePageTitleToBe(title: string): Promise<void> {
+    await this.page.waitForSelector(homePageHeadingSelector);
+    expect(
+      await this.page.$eval(homePageHeadingSelector, el => el.textContent)
+    ).toBe(title);
+  }
+
+  /**
+   * Checks if the views of a lesson card matches the expected views.
+   * @param {number} expectedViews - The expected views of the card.
+   * @param {string} explorationName - The name of the exploration.
+   */
+  async expectLessonViewsToBe(
+    expectedViews: number,
+    explorationName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(lessonCardSelector);
+    const cards = await this.page.$$(lessonCardSelector);
+    for (const card of cards) {
+      await card.waitForSelector(lessonCardTitleSelector);
+      const titleElement = await card.$(lessonCardTitleSelector);
+      const titleText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        titleElement
+      );
+      if (titleText === explorationName) {
+        await card.waitForSelector(explorationViewsSelector);
+        const views = await card.$eval(explorationViewsSelector, el =>
+          parseInt(el?.textContent?.trim() ?? '0', 10)
+        );
+
+        if (views !== expectedViews) {
+          throw new Error(
+            `Expected views to be ${expectedViews}, but found ${views}`
+          );
+        }
+        return;
+      }
+    }
   }
 }
 
