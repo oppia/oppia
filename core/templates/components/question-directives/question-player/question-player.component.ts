@@ -39,6 +39,7 @@ import {PageContextService} from 'services/page-context.service';
 import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlService} from 'services/contextual/url.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 export interface QuestionData {
   linkedSkillIds: string[];
@@ -120,6 +121,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     private skillMasteryBackendApiService: SkillMasteryBackendApiService,
     private userService: UserService,
     private windowRef: WindowRef,
+    private platformFeatureService: PlatformFeatureService,
     private _sanitizer: DomSanitizer,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlService: UrlService
@@ -622,5 +624,9 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.componentSubscription.unsubscribe();
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }
