@@ -486,6 +486,8 @@
 	"I18N_SPLASH_TITLE": "Educação Gratuita para Todos",
 	"I18N_START_HERE": "Clique aqui para começar!",
 	"I18N_SUBSCRIBE_BUTTON_TEXT": "Subscrever",
+	"I18N_SUBTOPIC_VIEWER_BACK_TO_TOPIC": "Voltar para",
+	"I18N_SUBTOPIC_VIEWER_GO_TO_STUDY_GUIDE_MENU_BUTTON": "Ir para o menu do Guia de Estudo",
 	"I18N_TEACH_PAGE_HEADING": "Oppia para pais, professores, e encarregados de educação",
 	"I18N_THANKS_PAGE_BREADCRUMB": "Obrigado",
 	"I18N_TOPIC_SUMMARY_TILE_LESSONS": "{lessonCount, plural, =1{1 lição} other{# lições}}",
