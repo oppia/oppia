@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,11 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test for logged-out learner completing practice questions.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * FL.PT. Learner does some practice questions.
  */
 
-import {test, expect} from '@playwright/test';
+import {UserFactory} from '../../utilities/common/user-factory';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-test.describe('Logged-out learner completes some practice questions', () => {
-  test('should be able to complete practice questions', async ({page}) => {});
+describe('Logged-Out Learner', function () {
+  let loggedOutLearner: LoggedOutUser;
+
+  beforeAll(async function () {
+    loggedOutLearner = await UserFactory.createLoggedOutUser();
+  });
+
+  it('should be able to do some practice questions through topic page', async function () {
+    // TODO: Go to topic page.
+    // TODO: Navigate to practice tab.
+    // TODO: Learner should see "Master Skills for Math" topic.
+    // TODO: Select a skill to practice.
+    // TODO: Learner should be directed to practice page.
+  });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

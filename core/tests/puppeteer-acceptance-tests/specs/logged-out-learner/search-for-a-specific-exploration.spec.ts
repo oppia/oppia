@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {UserFactory} from '../../utilities/common/user-factory';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
-import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-
 /**
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
  * CL.SE. Learner searches for a specific exploration
  */
+
+import {UserFactory} from '../../utilities/common/user-factory';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;

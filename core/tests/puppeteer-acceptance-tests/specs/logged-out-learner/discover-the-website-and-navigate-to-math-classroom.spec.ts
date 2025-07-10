@@ -37,7 +37,7 @@ describe('Logged-Out Learner', function () {
     // Create Users.
     loggedOutLearner = await UserFactory.createLoggedOutUser();
     curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdmin',
+      'curriculumAdm',
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
