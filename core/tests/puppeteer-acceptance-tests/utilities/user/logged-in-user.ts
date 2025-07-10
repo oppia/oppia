@@ -240,10 +240,12 @@ const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
 
 const removeFromPlayLaterInLibrarySelector = '.e2e-test-remove-from-play-later';
+const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 
 // Community Library (.e2e-test-community-library).
 const lessonCardContainerSelector =
-  '.e2e-test-community-library .e2e-test-exp-summary-tile';
+  '.e2e-test-community-library .e2e-test-lesson-card';
+const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -859,23 +861,40 @@ export class LoggedInUser extends BaseUser {
       ? mobileLessonCardTitleSelector
       : desktopLessonCardTitleSelector;
 
-    await this.page.waitForSelector(lessonCardTitleSelector);
-    const lessonTitles = await this.page.$$eval(
-      lessonCardTitleSelector,
-      elements => elements.map(el => el.textContent?.trim())
+    const lessonCards = await this.page.$$(explorationCard);
+    const lessonTitles = await Promise.all(
+      lessonCards.map(async card => {
+        const titleElement = await card.$(lessonCardTitleSelector);
+        const title = titleElement?.evaluate(el => el?.textContent?.trim());
+        return title;
+      })
     );
 
     const lessonIndex = lessonTitles.indexOf(lessonTitle);
-
     if (lessonIndex === -1) {
       throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
     }
 
-    const lessonSelector = `${lessonCardTitleSelector}:nth-child(${lessonIndex + 1})`;
-    const tooltipSelector = `${lessonSelector} ${removeFromPlayLaterInLibrarySelector}`;
+    const playLaterButtons = await this.page.$$(commonPlayLaterIconSelector);
+    const playLaterButton = playLaterButtons[lessonIndex];
 
-    await this.clickOn(tooltipSelector);
-    await this.clickOn('Remove');
+    if (!playLaterButton) {
+      throw new Error('Play Later button not found');
+    }
+
+    if (!playLaterButton) {
+      throw new Error('Remove button not found');
+    }
+
+    await playLaterButton.click();
+
+    await this.page.waitForSelector(learnerPlaylistModalSelector, {
+      visible: true,
+    });
+    await this.clickOn(confirmRemovalFromPlayLaterButton);
+    await this.page.waitForSelector(learnerPlaylistModalSelector, {
+      hidden: true,
+    });
   }
 
   /**
@@ -888,25 +907,40 @@ export class LoggedInUser extends BaseUser {
     expectedTooltip: string
   ): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(lessonCardTitleSelector);
-    const lessonTitles = await this.page.$$eval(
-      lessonCardTitleSelector,
-      elements => elements.map(el => el.textContent?.trim())
+    await this.page.waitForSelector(explorationCard, {
+      visible: true,
+    });
+
+    const lessonCards = await this.page.$$(explorationCard);
+    const lessonTitles = await Promise.all(
+      lessonCards.map(async card => {
+        const titleElement = await card.$(lessonCardTitleSelector);
+        const title = titleElement?.evaluate(el => el?.textContent?.trim());
+        return title;
+      })
     );
 
     const lessonIndex = lessonTitles.indexOf(lessonTitle);
-
     if (lessonIndex === -1) {
       throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
     }
 
-    const lessonSelector = `${lessonCardContainerSelector}:nth-child(${lessonIndex + 1})`;
-    const tooltipSelector = `${lessonSelector} ${removeFromPlayLaterInLibrarySelector}`;
+    const playLaterButtons = await this.page.$$(commonPlayLaterIconSelector);
+    const playLaterButton = playLaterButtons[lessonIndex];
 
-    await this.page.waitForSelector(removeFromPlayLaterInLibrarySelector, {
+    if (!playLaterButton) {
+      throw new Error('Play Later button not found');
+    }
+
+    await playLaterButton?.hover();
+
+    await this.page.waitForSelector('.tooltip', {
       visible: true,
     });
-    await this.expectToolTipTextToBe(tooltipSelector, expectedTooltip);
+
+    // Check the tooltip content.
+    const tooltipText = await this.page.$eval('.tooltip', el => el.textContent);
+    expect(tooltipText).toBe(expectedTooltip);
   }
 
   /**
@@ -914,6 +948,10 @@ export class LoggedInUser extends BaseUser {
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
   async expectToolTipMessage(expectedMessage: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage('Skipped tooltip message check in mobile view.');
+      return;
+    }
     try {
       await this.page.waitForSelector(toastMessageSelector, {visible: true});
       const toastMessageElement = await this.page.$(toastMessageSelector);

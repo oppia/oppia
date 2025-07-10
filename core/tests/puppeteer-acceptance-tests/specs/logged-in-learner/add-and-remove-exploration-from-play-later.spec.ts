@@ -75,17 +75,17 @@ describe('Logged-in User', function () {
 
   it('should be able to remove an exploration from play later in community library', async function () {
     // TODO(#22716): Fix issue with tooltip function and uncomment code below.
-    // await loggedInUser.expectPlayLaterIconToolTipToBe(
-    //   'Whole Numbers',
-    //   'Already added to playlist'
-    // );
+    await loggedInUser.expectPlayLaterIconToolTipToBe(
+      'Whole Numbers',
+      'Already added to playlist'
+    );
     await loggedInUser.removeLessonFromPlayLaterInlibrary('Whole Numbers');
 
     // TODO(#22716): Fix issue with tooltip function and uncomment code below.
-    // await loggedInUser.expectPlayLaterIconToolTipToBe(
-    //   'Whole Numbers',
-    //   "Add to 'Play Later' list"
-    // );
+    await loggedInUser.expectPlayLaterIconToolTipToBe(
+      'Whole Numbers',
+      "Add to 'Play Later' list"
+    );
   });
 
   it('should be able to check play later in learner dashboard', async function () {
