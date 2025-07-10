@@ -40,7 +40,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.print_arr: list[str] = []
-        def mock_print(msg: str, end: str = '\n') -> None:  # pylint: disable=unused-argument
+        def mock_print( # pylint: disable=unused-argument
+            msg: str, end: str = '\n') -> None:
             self.print_arr.append(msg)
         self.print_swap = self.swap(builtins, 'print', mock_print)
 

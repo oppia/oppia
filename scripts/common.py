@@ -546,7 +546,7 @@ def ask_user_to_confirm(message: str) -> None:
 
 
 def get_personal_access_token() -> str:
-    """"Returns the personal access token for the GitHub id of user.
+    """Returns the personal access token for the GitHub id of user.
 
     Returns:
         str. The personal access token for the GitHub id of user.
