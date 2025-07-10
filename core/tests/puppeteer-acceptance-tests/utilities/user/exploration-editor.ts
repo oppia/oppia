@@ -429,7 +429,6 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(explorationGoalInput);
       await this.type(explorationGoalInput, goal);
       await this.clickOn(explorationCategoryDropdown);
-      await this.type(explorationCategoryDropdown, category);
       await this.clickOn(category);
       if (tags) {
         await this.type(tagsField, tags);
@@ -2245,7 +2244,7 @@ export class ExplorationEditor extends BaseUser {
     title: string,
     category: string = 'Algebra',
     flag: boolean = true
-  ): Promise<string | null> {
+  ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
     if (flag) {

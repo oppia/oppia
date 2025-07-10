@@ -19,18 +19,55 @@
  * FL.PT. Learner does some practice questions.
  */
 
+import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {TopicManager} from '../../utilities/user/topic-manager';
+
+const ROLES = testConstants.Roles;
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
+  let explorationId: string;
 
   beforeAll(async function () {
+    // Create Users.
     loggedOutLearner = await UserFactory.createLoggedOutUser();
+
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_admin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+
+    // Create explorations.
+    explorationId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Fractions'
+      );
+
+    // Create a topic and add stories.
+    await curriculumAdmin.createAndPublishTopic(
+      'Fractions',
+      'Fractions Chapter 1',
+      'fractions'
+    );
+    await curriculumAdmin.addStoryToTopic(
+      'Learning Fractions',
+      'learn-fractions',
+      'Fractions'
+    );
+    await curriculumAdmin.addChapter('Fractions 1', explorationId);
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
   });
 
   it('should be able to do some practice questions through topic page', async function () {
     // TODO: Go to topic page.
+    await loggedOutLearner.selectAndOpenTopic('Fractions');
     // TODO: Navigate to practice tab.
     // TODO: Learner should see "Master Skills for Math" topic.
     // TODO: Select a skill to practice.

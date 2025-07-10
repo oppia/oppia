@@ -89,13 +89,26 @@ describe('Logged-Out Learner', function () {
 
     // Click "Explore Oppia Classrooms" button.
     await loggedOutLearner.clickBrowseLessonsButtonInHomePage();
+    await loggedOutLearner.expectClassroomHeadingToBe('Oppia Classrooms');
+    await loggedOutLearner.clickOnClassroomTileInLearnPage('Math');
 
     // TODO: Learner should be navigated to Math classroom.
-    // TODO: Classroom page should have all the topics created.
+    // Check for topics present in the classroom.
+    await loggedOutLearner.expectHeadingInClassroomPageToContain(
+      'Course Details'
+    );
+    await loggedOutLearner.expectHeadingInClassroomPageToContain(
+      'Topics Covered'
+    );
+    await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
   });
 
   it('should be able start learning from the first topic', async function () {
-    // TODO: Click "Start Here" under "Don't know where to start" section.
+    // Click "Start Here" under "Don't know where to start" section.
+    await loggedOutLearner.expectDiagnosticTestBoxToBePresent(
+      "Don't know where to start?",
+      'Start here'
+    );
     // TODO: Learner should see information about the first topic.
     // TODO: Learner should be able to see list of stories under the topic.
     // TODO: Learner should be able to see list of revision cards.
@@ -103,7 +116,11 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should be able to figure out which topic would be best for them', async function () {
-    // TODO: Click on "Take a Quiz" under "Already know some Math?" section.
+    // Click on "Take a Quiz" under "Already know some Math?" section.
+    await loggedOutLearner.expectDiagnosticTestBoxToBePresent(
+      'Already know some Math?',
+      'Take quiz'
+    );
     // TODO: Click on "Start the test" to start.
     // TODO: Go through the quiz.
     // TODO: Learner should be redirected to diagnostic test page.

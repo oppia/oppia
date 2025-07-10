@@ -505,6 +505,9 @@ const classroomNameSelector = '.e2e-test-classroom-name';
 // Classroom Page.
 const classroomContentHeadingSelector = '.e2e-test-classroom-content-heading';
 const topicSummaryTileSelector = '.e2e-test-topic-summary-tile';
+const diagnosticTestBoxSelector = '.e2e-test-diagnostic-test-box';
+const diagnosticTestHeadingSelector = `${diagnosticTestBoxSelector} h4`;
+const diagnosticTestButtonSelector = `${diagnosticTestBoxSelector} a`;
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -5426,6 +5429,26 @@ export class LoggedOutUser extends BaseUser {
   // ================================================================================
   // Classroom Page
   // ================================================================================
+
+  async expectDiagnosticTestBoxToBePresent(
+    expectedHeading: string,
+    expectedButtonText: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(diagnosticTestBoxSelector);
+    const headings = await this.page.$$eval(diagnosticTestHeadingSelector, el =>
+      el.map(el => el.textContent)
+    );
+
+    expect(headings).toContain(expectedHeading);
+    showMessage(`Success: Heading is ${expectedHeading}.`);
+
+    const buttons = await this.page.$$eval(diagnosticTestButtonSelector, el =>
+      el.map(el => el.textContent)
+    );
+
+    expect(buttons).toContain(expectedButtonText);
+    showMessage(`Success: Button is ${expectedButtonText}.`);
+  }
 
   /**
    * Function to verify the heading in classroom page.

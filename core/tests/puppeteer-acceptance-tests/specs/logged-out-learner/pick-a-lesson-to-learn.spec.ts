@@ -22,7 +22,7 @@
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {curriculumAdmin} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
@@ -30,7 +30,7 @@ const ROLES = testConstants.Roles;
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
-  let curriculumAdmin: CurriculumAdmin & ExplorationEditor & LoggedInUser;
+  let curriculumAdmin: CurriculumAdmin & curriculumAdmin & LoggedInUser;
   let explorationId1: string;
   let explorationId2: string;
 
@@ -38,16 +38,48 @@ describe('Logged-Out Learner', function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
 
     curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdmin',
+      'curriculumAdm',
       'curriculum_admin@example.com',
       [ROLES.CURRICULUM_ADMIN]
     );
 
     // Create explorations.
-    explorationId1 = await curriculumAdmin.createAndPublishExplorationWithCards(
-      'Fractions 1',
-      'Fractions'
+    await curriculumAdmin.navigateToCreatorDashboardPage();
+    await curriculumAdmin.navigateTocurriculumAdminFromCreatorDashboard();
+    await curriculumAdmin.updateCardContent('Hello, World!');
+    await curriculumAdmin.addTextInputInteraction();
+    await curriculumAdmin.addResponsesToTheInteraction(
+      'Text Input',
+      'Hello, Oppia!',
+      'Perfect!',
+      'Second Card',
+      true
     );
+    await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong Answer. Please try again.'
+    );
+    await curriculumAdmin.addSolutionToState(
+      'Hello, Oppia!',
+      'If you are reading this, you have successfully created an exploration.',
+      false
+    );
+    await curriculumAdmin.saveExplorationDraft();
+
+    // Navigate to the new card and update its content.
+    await curriculumAdmin.navigateToCard('Second Card');
+    await curriculumAdmin.updateCardContent(
+      'Enter a negative number greater than -100.'
+    );
+    await curriculumAdmin.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await curriculumAdmin.addResponsesToTheInteraction(
+      INTERACTION_TYPES.NUMERIC_INPUT,
+      '-99',
+      'Prefect!',
+      CARD_NAME.FINAL_CARD,
+      true
+    );
+    await curriculumAdmin.saveExplorationDraft();
+
     explorationId2 = await curriculumAdmin.createAndPublishExplorationWithCards(
       'Fractions 2',
       'Fractions'
