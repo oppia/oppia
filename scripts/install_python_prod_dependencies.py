@@ -431,9 +431,9 @@ def _get_possible_normalized_metadata_directory_names(
             '%s-%s.egg-info' % (
                 library_name.replace('-', '_'), version_string)),
         normalize_directory_name(
-            '%s-%s-py3.9.egg-info' % (library_name, version_string)),
+            '%s-%s-py3.10.egg-info' % (library_name, version_string)),
         normalize_directory_name(
-            '%s-%s-py3.9.egg-info' % (
+            '%s-%s-py3.10.egg-info' % (
                 library_name.replace('-', '_'), version_string))
     }
 
