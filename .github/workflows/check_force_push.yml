@@ -1,51 +1,113 @@
 name: Check for the force push over PR. 
 on:
-    pull_request:
-        types: 
-            - opened
-            - reopened
-permissions: read-all
+  pull_request:
+    branches:
+      - develop
 jobs:
-    check-force-push:
-        runs-on: ubuntu-24.04
-        permissions:
-            pull-requests: write
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
-            - name: Setup Node.js
-              uses: actions/setup-node@v3
-              with:
-                node-version: '16'
-            - name: Check for force push
-              uses: actions/github-script@v6
-              with:
-                script: |
-                  const pr = context.payload.pull_request;
-                  const author = context.payload.pull_request.user;
-                  if (pr.draft || pr.mergeable_state === 'draft') {
-                    return;
-                  }
-                  if (pr.merge_commit_sha && pr.merge_commit_sha !== pr.head.sha) {
-                    const comment = `Hi @${author.login}, force pushes to PRs are not allowed. This PR is being closed. Please make your changes in another branch and open a new PR. To learn more about contributing to Oppia, take a look at our [wiki]()} (Rule 1 specifically). Thanks!`;
-                    await github.rest.issues.createComment({
-                      owner: context.repo.owner,
-                      repo: context.repo.repo,
-                      issue_number: pr.number,
-                      body: comment
-                    });
-                    await github.rest.pulls.update({
-                      owner: context.repo.owner,
-                      repo: context.repo.repo,
-                      pull_number: pr.number,
-                      state: 'closed'
-                    });
-                  }
-            - name: Report failure if failed on oppia/oppia develop branch
-              if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
-              uses: ./.github/actions/send-webhook-notification
-              with:
-                message: "Check for force push failed on the upstream develop branch."
-                webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-              
+  check-force-push:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+    steps:
+      - name: Check for force push in PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const prNumber = pr.number;
+            const author = context.payload.pull_request.user;
 
+            console.log(`Checking PR #${prNumber} opened by ${author.login} for force push commits...`);            
+            console.log(`PR branch: ${pr.head.ref}, Base branch: ${pr.base.ref}`);
+            
+            try {
+              const commits = await github.rest.pulls.listCommits({
+                owner,
+                repo,
+                pull_number: prNumber,
+                per_page: 100
+              });
+              
+              console.log(`Found ${commits.data.length} commits in PR`);
+              
+              let forcePushDetected = false;
+              const suspiciousCommits = [];
+              
+              for (const commit of commits.data) {
+                const commitMessage = commit.commit.message.toLowerCase();
+                const commitSha = commit.sha;
+                
+                const forcePushIndicators = [
+                  'force push',
+                  'force-push',
+                  'forced push',
+                  'force update',
+                  'rewrite history',
+                  'amended commit',
+                  'rebased',
+                  'squashed',
+                  'cherry-pick',
+                  'reset --hard'
+                ];
+                
+                const hasIndicator = forcePushIndicators.some(indicator => 
+                  commitMessage.includes(indicator)
+                );
+                
+                if (hasIndicator) {
+                  suspiciousCommits.push({
+                    sha: commitSha,
+                    message: commit.commit.message,
+                    indicator: forcePushIndicators.find(indicator => 
+                      commitMessage.includes(indicator)
+                    )
+                  });
+                }
+              }
+              
+              if (suspiciousCommits.length > 0) {
+                forcePushDetected = true;
+                console.log('Suspicious commits found:', suspiciousCommits);
+              }
+              
+              if (forcePushDetected) {
+                let commentBody = `**Force Push Detected**\n\n`;
+                commentBody += `Hi @${author.login} this PR appears to contain commits that may have been created using force push or history rewriting operations. Please avoid force pushes, see our [PR guidelines](https://github.com/oppia/oppia/wiki/Rules-for-making-PRs#step-3-push-changes-to-your-github-fork).\n\n`;
+                
+                commentBody += `**Suspicious commits found:**\n`;
+                suspiciousCommits.forEach(commit => {
+                  commentBody += `- \`${commit.sha.substring(0, 7)}\` - ${commit.message.split('\n')[0]} (Indicator: "${commit.indicator}")\n`;
+                });
+                
+                commentBody += `\n I am closing this PR to prevent further issues, you may open a new PR with the necessary changes.`;
+                // Create comment on PR
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                  body: commentBody
+                });
+                
+                await github.rest.pulls.update({
+                  owner,
+                  repo,
+                  pull_number: prNumber,
+                  state: 'closed'
+                })
+                core.setFailed('Force push detected in PR. Please avoid force pushes as per contribution guidelines.');
+              } else {
+                console.log('No force push detected. PR is ready for review.');
+              }
+              
+            } catch (error) {
+              core.setFailed(`Error checking for force push: ${error.message}`);
+            }
+
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop' }}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Check for force push failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
