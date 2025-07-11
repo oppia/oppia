@@ -91,7 +91,11 @@
         {{ 'I18N_LEARNER_DASHBOARD_CONTINUE_WHERE_YOU_LEFT_OFF_SECTION' | translate }}
       </p>
       <div class="d-flex flex-wrap justify-content-between w-100">
-        <oppia-card-display *ngIf="continueWhereYouLeftOffList.length !== 0 || incompleteExplorationsList?.length > 0 || incompleteCollectionsList?.length > 0 || partiallyLearntTopicsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'" [numCards]="getTotalInProgressLessons()" [displayMaxWidth]="'fit-content'">
+        <oppia-card-display *ngIf="continueWhereYouLeftOffList.length !== 0 || incompleteExplorationsList?.length > 0 || incompleteCollectionsList?.length > 0 || partiallyLearntTopicsList.length !== 0" 
+                            [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'" 
+                            [numCards]="getTotalInProgressLessons()" 
+                            [displayMaxWidth]="'fit-content'"
+                            class="e2e-test-continue-where-you-left-off">
           <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
             <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
               <lesson-card [story]="storySummaryTile" [topic]="topicSummaryTile.name" [isGoal]="currentGoalIds.has(topicSummaryTile.id)"> </lesson-card>

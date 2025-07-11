@@ -200,6 +200,11 @@ const goalsStatusTitleSelector =
   '.e2e-test-goals-section .e2e-test-goals-status-title';
 const topicInCurrentGoalsSelector =
   '.e2e-test-goals-section .e2e-test-topic-name-in-current-goals';
+const currentGoalsContainerSelector = '.e2e-test-currernt-goals-section';
+const completedGoalsContainerSelector = '.e2e-test-completed-goals-section';
+const goalContainerSelector = '.e2e-test-goals-container';
+const goalTitleSelector = '.e2e-test-goal-title';
+
 // Learner Dashboard > Home Tab Seclectors.
 const hometabSectionHeadingSelector =
   '.e2e-test-learner-dash-home-tab .e2e-test-section-heading';
@@ -209,6 +214,14 @@ const emptyContinueWhereYouLeftOffSectionSelector =
   '.e2e-test-learner-dash-home-tab .e2e-test-continue-section.e2e-test-empty-section';
 const emptySuggestedForYouSectionSelector =
   '.e2e-test-learner-dash-home-tab .empty-suggested-for-you';
+const learnerGreetingsSelector = '.e2e-test-learner-greetings';
+const addGoalsButtonInRedesignedLearnerDashboard = '.e2e-test-add-goals-button';
+const newGoalsListInRedesignedLearnerDashboard = '.e2e-test-new-goals-list';
+const goalCheckboxInRedesignedLearnerDashboard = `${newGoalsListInRedesignedLearnerDashboard} mat-checkbox`;
+const addNewGoalButtonSelector = '.e2e-test-add-new-goal-button';
+const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
+const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
+  '.e2e-test-continue-where-you-left-off';
 
 // Creator dashboard selectors.
 const creatorDashboardContainerSelector =
@@ -251,6 +264,10 @@ const removeModalCancelButtonSelector =
   '.e2e-test-remove-activity-modal-container .e2e-test-modal-cancel-delete-button';
 const removeModalConfirmButtonSelector =
   '.e2e-test-remove-activity-modal-container .e2e-test-modal-confirm-delete-button';
+
+// Common > Lesson Card.
+const lessonCardContainer = '.e2e-test-redesigned-lesson-card-container';
+const lessonTitleSelector = '.e2e-test-lesson-title';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -2232,6 +2249,105 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  async clickOnAddGoalsButtonInRedesignedLearnerDashboard(): Promise<void> {
+    await this.page.waitForSelector(
+      addGoalsButtonInRedesignedLearnerDashboard,
+      {
+        visible: true,
+      }
+    );
+    await this.clickOn(addGoalsButtonInRedesignedLearnerDashboard);
+
+    await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
+      visible: true,
+    });
+  }
+
+  async clickOnGoalCheckboxInRedesignedLearnerDashboard(
+    goal: string,
+    checked: boolean = true
+  ): Promise<void> {
+    const newGoalsCheckboxes = await this.page.$$(
+      goalCheckboxInRedesignedLearnerDashboard
+    );
+
+    for (const checkbox of newGoalsCheckboxes) {
+      const checkboxText = await checkbox.evaluate(el =>
+        el.textContent?.trim()
+      );
+
+      const isChecked = await checkbox.$eval(
+        'input',
+        el => (el as HTMLInputElement).checked
+      );
+
+      if (isChecked === checked) {
+        showMessage(`Skipped: Add ${goal} to goals.`);
+        break;
+      }
+
+      if (checkboxText === goal) {
+        const goalLabel = await checkbox.$('label');
+        await goalLabel?.click();
+        break;
+      }
+    }
+  }
+
+  async submitGoalInRedesignedLearnerDashboard(): Promise<void> {
+    await this.waitForElementToBeClickable(addNewGoalButtonSelector);
+    await this.page.click(addNewGoalButtonSelector);
+
+    await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
+      visible: false,
+    });
+  }
+
+  async addGoalInRedesignedLearnerDashboard(goal: string): Promise<void> {
+    await this.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
+    await this.clickOnGoalCheckboxInRedesignedLearnerDashboard(goal);
+    await this.submitGoalInRedesignedLearnerDashboard();
+  }
+
+  async removeGoalInRedesignedLearnerDashboard(goal: string): Promise<void> {
+    await this.page.waitForSelector(addGoalsButtonInRedesignedLearnerDashboard);
+    await this.clickOn(addGoalsButtonInRedesignedLearnerDashboard);
+
+    const newGoalsCheckboxes = await this.page.$$(
+      goalCheckboxInRedesignedLearnerDashboard
+    );
+
+    for (const checkbox of newGoalsCheckboxes) {
+      const checkboxText = await checkbox.evaluate(el =>
+        el.textContent?.trim()
+      );
+
+      const checked = await checkbox.$eval(
+        'input',
+        el => (el as HTMLInputElement).checked
+      );
+
+      if (!checked) {
+        showMessage(`Skipped: Remove ${goal} from goals.`);
+        break;
+      }
+
+      if (checkboxText === goal) {
+        const goalLabel = await checkbox.$('label');
+        await goalLabel?.click();
+        break;
+      }
+    }
+
+    await this.waitForElementToBeClickable(addNewGoalButtonSelector);
+    await this.page.click(addNewGoalButtonSelector);
+    await this.clickOn('Remove');
+
+    await this.page.waitForSelector(removeModalContainerSelector, {
+      visible: false,
+    });
+  }
+
   /**
    * Gives feedback on the current page.
    * @param {string} feedback - The feedback text to submit.
@@ -2392,6 +2508,140 @@ export class LoggedInUser extends BaseUser {
     expect(
       await this.isElementVisible(emptySuggestedForYouSectionSelector)
     ).toBe(empty);
+  }
+
+  /**
+   * Checks if the learner greetings are present.
+   * @param {string} expectedGreetings - The expected greetings.
+   */
+  async expectLearnerGreetingsToBe(expectedGreetings: string): Promise<void> {
+    await this.page.waitForSelector(learnerGreetingsSelector);
+
+    const greetings = await this.page.$eval(
+      learnerGreetingsSelector,
+      el => el.textContent
+    );
+
+    expect(greetings).toBe(expectedGreetings);
+  }
+
+  /**
+   * Function to verify the heading of the goals section in the learner dashboard.
+   * @param {string} heading - The heading to check for.
+   * @param {boolean} visible - Whether the heading should be visible or not.
+   */
+  async expectRedesignedGoalsSectionToContainHeading(
+    heading: string,
+    visible: boolean = true
+  ): Promise<void> {
+    const headings = await this.page.$$eval(
+      goalsHeadingInRedesignedDashbaordSelector,
+      headings => headings.map(heading => heading.textContent?.trim())
+    );
+
+    if (visible) {
+      expect(headings).toContain(heading);
+    } else {
+      expect(headings).not.toContain(heading);
+    }
+  }
+
+  /**
+   * Function to verify the lesson card is present in the page.
+   * @param {string} lessonTitle - The title of the lesson card.
+   * @param {puppeteer.ElementHandle<Element> | puppeteer.Page} context - The context of the page.
+   */
+  async expectLessonCardToBePresent(
+    lessonTitle: string,
+    context: puppeteer.ElementHandle<Element> | puppeteer.Page = this.page
+  ) {
+    const lessonCards = await context.$$(lessonCardContainer);
+    const lessonCardTitles = await Promise.all(
+      lessonCards.map(card =>
+        card.$eval(lessonTitleSelector, el => el.textContent?.trim())
+      )
+    );
+    expect(lessonCardTitles).toContain(lessonTitle);
+  }
+
+  async expectContinueWhereYouLeftOffSectionToContainLessonCards(
+    lessonTitles: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(
+      continueFromWhereLeftOffSectionInRedesignedDashboardSelector
+    );
+
+    const context = await this.page.$(
+      continueFromWhereLeftOffSectionInRedesignedDashboardSelector
+    );
+
+    if (!context) {
+      throw new Error('Continue Where You Left Off Section not found.');
+    }
+
+    for (const lessonTitle of lessonTitles) {
+      await this.expectLessonCardToBePresent(lessonTitle, context);
+    }
+  }
+
+  /**
+   * Function to verify the goal in the given context.
+   * @param {string} goal - The goal to check for.
+   * @param {puppeteer.ElementHandle<Element> | puppeteer.Page} context - The context of the page.
+   */
+  async expectGoalToBePresent(
+    goal: string,
+    context: puppeteer.ElementHandle<Element> | puppeteer.Page
+  ): Promise<void> {
+    await context.waitForSelector(goalContainerSelector, {
+      visible: true,
+    });
+
+    const goalTitles = await context.$$eval(goalTitleSelector, elements =>
+      elements.map(el => el.textContent)
+    );
+
+    expect(goalTitles).toContain(goal);
+  }
+
+  /**
+   * Function to verify the goal in the current goals section in the
+   * redesigned learner dashboard.
+   * @param {string} goal - The goal to check for.
+   */
+  async expectCurrentGoalsInRedesignedDashboardToContain(
+    goal: string
+  ): Promise<void> {
+    await this.page.waitForSelector(currentGoalsContainerSelector, {
+      visible: true,
+    });
+    const currentGoalsSection = await this.page.$(
+      currentGoalsContainerSelector
+    );
+    if (!currentGoalsSection) {
+      throw new Error('Current goals section not found.');
+    }
+    await this.expectGoalToBePresent(goal, currentGoalsSection);
+  }
+
+  /**
+   * Function to verify the goal in the completed goals section in the
+   * redesigned learner dashboard.
+   * @param {string} goal - The goal to check for.
+   */
+  async expectCompletedGoalsSectionInRedesignedDashboardToContain(
+    goal: string
+  ): Promise<void> {
+    await this.page.waitForSelector(completedGoalsContainerSelector, {
+      visible: true,
+    });
+    const completedGoalsSection = await this.page.$(
+      completedGoalsContainerSelector
+    );
+    if (!completedGoalsSection) {
+      throw new Error('Completed goals section not found.');
+    }
+    await this.expectGoalToBePresent(goal, completedGoalsSection);
   }
 }
 

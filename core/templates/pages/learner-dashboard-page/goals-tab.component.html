@@ -116,10 +116,10 @@
         <span class="oppia-learner-dash-goals-add-text">{{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_ADD_BUTTON' | translate }} </span>
       </button>
     </div>
-    <ng-container *ngIf="currentGoals.length !== 0">
+    <ng-container *ngIf="currentGoals.length !== 0" class="e2e-test-currernt-goals-section">
       <p class="oppia-learner-dash-goals-heading e2e-test-goals-heading"> {{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }} </p>
       <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
-      <ng-container *ngFor="let goal of currentGoals">
+      <ng-container *ngFor="let goal of currentGoals" class="e2e-test-goals-container">
         <oppia-goal-list [goalTopic]="goal">
           <button aria-label="Remove in-progress goal" (click)="removeGoal(goal.id, goal.name)" class="oppia-learner-dash-button-sm oppia-learner-dash-button-delete-goals border-0">
             <span aria-hidden="true" class="fas fa-trash"></span>
@@ -127,10 +127,10 @@
         </oppia-goal-list>
       </ng-container>
     </ng-container>
-    <ng-container *ngIf="completedGoals.length !== 0">
+    <ng-container *ngIf="completedGoals.length !== 0" class="e2e-test-completed-goals-section">
       <p class="oppia-learner-dash-goals-heading e2e-test-goals-heading"> {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }} </p>
       <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
-      <ng-container *ngFor="let goal of completedGoals">
+      <ng-container *ngFor="let goal of completedGoals" class="e2e-test-goals-container">
         <oppia-goal-list [goalTopic]="goal"></oppia-goal-list>
       </ng-container>
     </ng-container>
