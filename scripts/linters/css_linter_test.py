@@ -73,8 +73,8 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         # Note: In general, stdout and stderr can be ints, e.g. subprocess.PIPE
         # is an Integer constant whose value is -1. Reference:
         # https://github.com/python/cpython/blob/8827b95e80302ef19d19561fdcd81c6efde2ecdb/Lib/subprocess.py#L259
-        def mock_popen(
-            unused_commands: List[str], stdout: int, stderr: int  # pylint: disable=unused-argument
+        def mock_popen( # pylint: disable=unused-argument
+            unused_commands: List[str], stdout: int, stderr: int
         ) -> scripts_test_utils.PopenStub:
             return scripts_test_utils.PopenStub(stdout=b'True', stderr=b'True')
 

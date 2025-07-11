@@ -23,6 +23,7 @@ import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {ConceptCard} from 'domain/skill/concept-card.model';
+import {PlayerTranscriptService} from './player-transcript.service';
 
 @Injectable({
   providedIn: 'root',
@@ -56,12 +57,13 @@ export class ConceptCardManagerService {
   conceptCardDiscovered: boolean = false;
 
   constructor(
-    playerPositionService: PlayerPositionService,
-    private explorationEngineService: ExplorationEngineService
+    private playerPositionService: PlayerPositionService,
+    private explorationEngineService: ExplorationEngineService,
+    private playerTranscriptService: PlayerTranscriptService
   ) {
     // TODO(#10904): Refactor to move subscriptions into components.
 
-    playerPositionService.onNewCardOpened.subscribe(
+    this.playerPositionService.onNewCardOpened.subscribe(
       (displayedCard: StateCard) => {
         this.hintsAvailable = displayedCard.getHints().length;
       }
@@ -157,6 +159,12 @@ export class ConceptCardManagerService {
 
   isConceptCardConsumed(): boolean {
     return this.conceptCardConsumed;
+  }
+
+  returnToExplorationAfterConceptCard(): void {
+    this.playerTranscriptService.addPreviousCard();
+    let numCards = this.playerTranscriptService.getNumCards();
+    this.playerPositionService.setDisplayedCardIndex(numCards - 1);
   }
 
   recordWrongAnswer(): void {
