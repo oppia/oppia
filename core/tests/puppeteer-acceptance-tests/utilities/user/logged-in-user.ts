@@ -242,7 +242,7 @@ const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
 const removeFromPlayLaterInLibrarySelector = '.e2e-test-remove-from-play-later';
 const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 
-// Community Library (.e2e-test-community-library).
+// Community Library.
 const lessonCardContainerSelector =
   '.e2e-test-community-library .e2e-test-lesson-card';
 const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
@@ -854,6 +854,10 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * Removes a lesson from the 'Play Later' list in the community library.
+   * @param {string} lessonTitle - The title of the lesson to remove from the 'Play Later' list.
+   */
   async removeLessonFromPlayLaterInlibrary(lessonTitle: string): Promise<void> {
     await this.waitForPageToFullyLoad();
     const isMobileViewport = this.isViewportAtMobileWidth();
@@ -906,6 +910,10 @@ export class LoggedInUser extends BaseUser {
     lessonTitle: string,
     expectedTooltip: string
   ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage('Skipped tooltip message check in mobile view.');
+      return;
+    }
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(explorationCard, {
       visible: true,
@@ -2322,64 +2330,54 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Checks if all dropdowns in deskop navbar open properly.
-   */
-  async expectDropdownsInDesktopNavbarToWorkProperly(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      showMessage('Skipped desktop dropdowns check in mobile view.');
-      return;
-    }
-    await this.clickOn(navbarLearnTab);
-    await this.isElementVisible(navbarLearnDropdownContainerSelector);
-
-    await this.clickOn(navbarAboutTab);
-    await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
-
-    await this.clickOn(navbarGetInvolvedTab);
-    await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
-  }
-
-  /**
-   * Checks if all dropdowns in mobile navbar open properly.
-   */
-  async expectDropdownsInMobileNavMenuToWorkProperly(): Promise<void> {
-    if (!this.isViewportAtMobileWidth()) {
-      showMessage('Skipped mobile dropdowns check in desktop view.');
-      return;
-    }
-
-    await this.clickOn(mobileNavbarOpenSidebarButton);
-    // Learn Dropdown.
-    await this.isElementVisible(mobileLearnDropdownSelector);
-    await this.isElementVisible(mobileLearnSubMenuSelector);
-    await this.clickOn(mobileLearnDropdownSelector);
-    await this.isElementVisible(mobileLearnSubMenuSelector, false);
-    await this.clickOn(mobileLearnDropdownSelector);
-
-    // About Dropdown.
-    await this.isElementVisible(mobileAboutMenuDropdownSelector);
-    await this.isElementVisible(mobileAboutPageButtonSelector, false);
-    await this.clickOn(mobileAboutMenuDropdownSelector);
-    await this.isElementVisible(mobileAboutPageButtonSelector);
-    await this.clickOn(mobileAboutMenuDropdownSelector);
-
-    // Get Involved Dropdown.
-    await this.isElementVisible(mobileGetInvolvedDropdownSelector);
-    await this.isElementVisible(mobileGetInvolvedMenuContainerSelector, false);
-    await this.clickOn(mobileGetInvolvedDropdownSelector);
-    await this.isElementVisible(mobileGetInvolvedMenuContainerSelector);
-    await this.clickOn(mobileGetInvolvedDropdownSelector);
-
-    // Close Navmenu.
-    await this.clickOn(mobileNavbarOpenSidebarButton);
-  }
-
-  /**
    * Checks if navbar in mobile and desktop view open properly.
    */
-  async expectNavBarInMobileInDesktopToWorkProperly(): Promise<void> {
-    await this.expectDropdownsInDesktopNavbarToWorkProperly();
-    await this.expectDropdownsInMobileNavMenuToWorkProperly();
+  async expectNavbarToWorkProperly(): Promise<void> {
+    // Mobile view port.
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      // Learn Dropdown.
+      await this.isElementVisible(mobileLearnDropdownSelector);
+      await this.isElementVisible(mobileLearnSubMenuSelector);
+      await this.clickOn(mobileLearnDropdownSelector);
+      await this.isElementVisible(mobileLearnSubMenuSelector, false);
+      await this.clickOn(mobileLearnDropdownSelector);
+
+      // About Dropdown.
+      await this.isElementVisible(mobileAboutMenuDropdownSelector);
+      await this.isElementVisible(mobileAboutPageButtonSelector, false);
+      await this.clickOn(mobileAboutMenuDropdownSelector);
+      await this.isElementVisible(mobileAboutPageButtonSelector);
+      await this.clickOn(mobileAboutMenuDropdownSelector);
+
+      // Get Involved Dropdown.
+      await this.isElementVisible(mobileGetInvolvedDropdownSelector);
+      await this.isElementVisible(
+        mobileGetInvolvedMenuContainerSelector,
+        false
+      );
+      await this.clickOn(mobileGetInvolvedDropdownSelector);
+      await this.isElementVisible(mobileGetInvolvedMenuContainerSelector);
+      await this.clickOn(mobileGetInvolvedDropdownSelector);
+
+      // Close Navmenu.
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+    }
+    // Desktop view port.
+    else {
+      if (this.isViewportAtMobileWidth()) {
+        showMessage('Skipped desktop dropdowns check in mobile view.');
+        return;
+      }
+      await this.clickOn(navbarLearnTab);
+      await this.isElementVisible(navbarLearnDropdownContainerSelector);
+
+      await this.clickOn(navbarAboutTab);
+      await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
+
+      await this.clickOn(navbarGetInvolvedTab);
+      await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
+    }
   }
 }
 

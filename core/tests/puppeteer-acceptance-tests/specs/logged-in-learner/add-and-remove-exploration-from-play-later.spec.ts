@@ -58,7 +58,7 @@ describe('Logged-in User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it('should be able to navigate to community library', async function () {
-    await loggedInUser.navigateToCommunityLibraryUsingNavbar();
+    await loggedInUser.navigateToCommunityLibraryOnNavbar();
   });
 
   it('should be able to save an exploration to play later', async function () {
@@ -74,14 +74,12 @@ describe('Logged-in User', function () {
   });
 
   it('should be able to remove an exploration from play later in community library', async function () {
-    // TODO(#22716): Fix issue with tooltip function and uncomment code below.
     await loggedInUser.expectPlayLaterIconToolTipToBe(
       'Whole Numbers',
       'Already added to playlist'
     );
     await loggedInUser.removeLessonFromPlayLaterInlibrary('Whole Numbers');
 
-    // TODO(#22716): Fix issue with tooltip function and uncomment code below.
     await loggedInUser.expectPlayLaterIconToolTipToBe(
       'Whole Numbers',
       "Add to 'Play Later' list"

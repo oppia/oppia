@@ -581,7 +581,10 @@ export class LoggedOutUser extends BaseUser {
     await this.goto(communityLibraryUrl, verifyURL);
   }
 
-  async navigateToCommunityLibraryUsingNavbar(): Promise<void> {
+  /**
+   * Navigates to the community library page on the navbar.
+   */
+  async navigateToCommunityLibraryOnNavbar(): Promise<void> {
     // Open navigation menu for mobile view.
     await this.openNavMenuInMobile();
 
@@ -953,7 +956,6 @@ export class LoggedOutUser extends BaseUser {
    */
   async openNavMenuInMobile(): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
-      showMessage('Skipped: Open Navigation Menu (mobile).');
       return;
     }
     await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
