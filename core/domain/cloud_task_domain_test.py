@@ -29,7 +29,6 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
     """Unit tests for CloudTaskRun domain object."""
 
     def test_that_domain_object_is_created_correctly(self) -> None:
-
         cloud_task_run_id = 'cloud_task_run_id'
         project_id = 'dev-project-id'
         location_id = 'us-central'

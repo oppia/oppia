@@ -31,9 +31,6 @@ export class MatIcon {
   constructor(
     public tooltip: string,
     public code: string,
-    // The color is null for the job state 'cancelling', 'cancelled' and
-    // 'drained' since we want their respective icons to use the default
-    // font color of the component and not any of the theme colors.
     public color: string | null
   ) {}
 }
