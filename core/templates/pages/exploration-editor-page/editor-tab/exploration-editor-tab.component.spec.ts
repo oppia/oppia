@@ -32,7 +32,7 @@ import {Outcome} from 'domain/exploration/outcome.model';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
@@ -66,7 +66,7 @@ import {
   StateObjectFactory,
 } from 'domain/state/StateObjectFactory';
 import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationNextContentIdIndexService} from '../services/exploration-next-content-id-index.service';
 import {VersionHistoryService} from '../services/version-history.service';
@@ -90,12 +90,11 @@ describe('Exploration editor tab component', () => {
   let routerService: RouterService;
   let siteAnalyticsService: SiteAnalyticsService;
   let stateEditorRefreshService: StateEditorRefreshService;
-  let solutionObjectFactory: SolutionObjectFactory;
   let stateCardIsCheckpointService: StateCardIsCheckpointService;
   let stateEditorService: StateEditorService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
   let focusManagerService: FocusManagerService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   var generateContentIdService: GenerateContentIdService;
   var explorationNextContentIdIndexService: ExplorationNextContentIdIndexService;
   let mockRefreshStateEditorEventEmitter = null;
@@ -212,7 +211,6 @@ describe('Exploration editor tab component', () => {
 
     explorationFeaturesService = TestBed.inject(ExplorationFeaturesService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     focusManagerService = TestBed.inject(FocusManagerService);
     stateEditorService = TestBed.inject(StateEditorService);
     stateCardIsCheckpointService = TestBed.inject(StateCardIsCheckpointService);
@@ -229,7 +227,7 @@ describe('Exploration editor tab component', () => {
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService
     );
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     explorationNextContentIdIndexService = TestBed.inject(
       ExplorationNextContentIdIndexService
     );
@@ -243,7 +241,9 @@ describe('Exploration editor tab component', () => {
     alertsService = TestBed.inject(AlertsService);
 
     mockRefreshStateEditorEventEmitter = new EventEmitter();
-    spyOn(contextService, 'getExplorationId').and.returnValue('explorationId');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue(
+      'explorationId'
+    );
     spyOn(
       stateEditorService,
       'checkEventListenerRegistrationStatus'
@@ -682,7 +682,6 @@ describe('Exploration editor tab component', () => {
               html: 'test explanation',
               content_id: 'explanation',
             },
-            worked_examples: [],
             recorded_voiceovers: {
               voiceovers_mapping: {},
             },
@@ -841,7 +840,7 @@ describe('Exploration editor tab component', () => {
     );
 
     expect(stateEditorService.interaction.solution).toEqual(
-      solutionObjectFactory.createFromBackendDict({
+      Solution.createFromBackendDict({
         correct_answer: 'This is the correct answer',
         answer_is_exclusive: false,
         explanation: {
@@ -851,7 +850,7 @@ describe('Exploration editor tab component', () => {
       })
     );
 
-    let displayedValue = solutionObjectFactory.createFromBackendDict({
+    let displayedValue = Solution.createFromBackendDict({
       correct_answer: 'This is the second correct answer',
       answer_is_exclusive: true,
       explanation: {

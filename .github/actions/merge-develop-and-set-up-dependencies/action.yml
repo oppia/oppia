@@ -5,12 +5,11 @@ runs:
   steps:
     - name: Merge develop branch into the current branch
       uses: ./.github/actions/merge
-
-    - name: Setup Python 3.9.20
+    - name: Setup Python 3.10.16
       uses: actions/setup-python@v5
       id: setup_python
       with:
-        python-version: '3.9.20'
+        python-version: '3.10.16'
         architecture: 'x64'
         cache: 'pip'
         cache-dependency-path: |
@@ -34,14 +33,14 @@ runs:
       with:
         key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'requirements_dev.txt', 'scripts/install_python_dev_dependencies.py') }}
         path: |
-          /opt/hostedtoolcache/Python/3.9.20/x64
+          /opt/hostedtoolcache/Python/3.10.16/x64
 
     # TODO (#22567): Fix pip not working properly when fetched from cache.
     - name: Check pip installation and fix if needed
       run: |
         set -e
         echo "Checking if pip is properly installed..."
-        
+
         # This shows pip-related environment and configuration info for debugging:
         # https://pip.pypa.io/en/stable/cli/pip_debug/
         if ! python -m pip debug; then
@@ -72,8 +71,8 @@ runs:
     - name: Show where pip installs its packages, and the contents of that folder.
       run: |
         pip show certifi
-        ls -la /opt/hostedtoolcache/Python/3.9.20/x64/lib/python3.9/site-packages
-        ls -la /opt/hostedtoolcache/Python/3.9.20/x64/bin
+        ls -la /opt/hostedtoolcache/Python/3.10.16/x64/lib/python3.10/site-packages
+        ls -la /opt/hostedtoolcache/Python/3.10.16/x64/bin
       shell: bash
 
     - name: Check Yarn Cache

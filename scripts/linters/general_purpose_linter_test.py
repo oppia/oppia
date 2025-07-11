@@ -293,10 +293,10 @@ class GeneralLintTests(test_utils.LinterTestBase):
         def mock_readlines(unused_self: str) -> Tuple[str, ...]:
             return (
                 'Copyright 2020 The Oppia Authors. All Rights Reserved.',
-                ' * @fileoverview Initializes constants for '
-                'the Oppia codebase.',
-                '"DEV_MODE": false,\n'
-                '"EMULATOR_MODE": true\n')
+                ' * @fileoverview Initializes constants.',
+                '"DEV_MODE": false,',
+                '"EMULATOR_MODE": true',
+            )
 
         with self.swap(FILE_CACHE, 'readlines', mock_readlines):
             linter = general_purpose_linter.GeneralPurposeLinter(
@@ -314,10 +314,10 @@ class GeneralLintTests(test_utils.LinterTestBase):
         def mock_readlines(unused_self: str) -> Tuple[str, ...]:
             return (
                 'Copyright 2020 The Oppia Authors. All Rights Reserved.',
-                ' * @fileoverview Initializes constants for '
-                'the Oppia codebase.',
-                '"DEV_MODE": true,\n'
-                '"EMULATOR_MODE": false\n')
+                ' * @fileoverview Initializes constants.',
+                '"DEV_MODE": true,',
+                '"EMULATOR_MODE": false',
+            )
 
         with self.swap(FILE_CACHE, 'readlines', mock_readlines):
             linter = general_purpose_linter.GeneralPurposeLinter(

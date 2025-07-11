@@ -38,6 +38,8 @@ from core.domain import rights_manager
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_services
+from core.domain import study_guide_domain
+from core.domain import study_guide_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
@@ -1792,7 +1794,8 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -1829,7 +1832,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2286,7 +2289,8 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -2321,7 +2325,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/run-anny-job', expected_status_int=401)
@@ -2418,7 +2422,8 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
 
         self.signup(
@@ -2455,7 +2460,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
 
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
@@ -2616,7 +2621,8 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(feconf.SYSTEM_EMAIL_ADDRESS, self.CURRICULUM_ADMIN_USERNAME)
+        self.system_email_address = 'system@example.com'
+        self.signup(self.system_email_address, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/', self.MockHandler)],
@@ -2634,7 +2640,7 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
             self.get_json('/mock/', expected_status_int=401)
 
     def test_primary_admin_can_delete_any_user(self) -> None:
-        self.login(feconf.SYSTEM_EMAIL_ADDRESS)
+        self.login(self.system_email_address)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
@@ -5536,10 +5542,15 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             '/mock_subtopic_page/<classroom_url_fragment>/'
             '<topic_url_fragment>/studyguide/'
             '<subtopic_url_fragment>')
+        study_guide_url = (
+            '/mock_study_guide/<classroom_url_fragment>/'
+            '<topic_url_fragment>/studyguide/'
+            '<subtopic_url_fragment>')
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [
                 webapp2.Route(subtopic_data_url, self.MockDataHandler),
-                webapp2.Route(subtopic_page_url, self.MockPageHandler)
+                webapp2.Route(subtopic_page_url, self.MockPageHandler),
+                webapp2.Route(study_guide_url, self.MockPageHandler)
             ],
             debug=feconf.DEBUG,
         ))
@@ -5572,6 +5583,34 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             subtopics=[subtopic_1, subtopic_2], next_subtopic_id=3,
             url_fragment='topic-frag')
 
+        self.topic_id_2 = topic_fetchers.get_new_topic_id()
+        subtopic_3 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 3', 'url-frag-three')
+        subtopic_3.skill_ids = ['skill_id_3']
+        subtopic_3.url_fragment = 'sub-three-frag'
+        subtopic_4 = topic_domain.Subtopic.create_default_subtopic(
+            2, 'Subtopic Title 4', 'url-frag-four')
+        subtopic_4.skill_ids = ['skill_id_4']
+        subtopic_4.url_fragment = 'sub-four-frag'
+        self.study_guide_1 = (
+            study_guide_domain.StudyGuide.create_study_guide(
+                1, self.topic_id_2, 'Heading', '<p>Content</p>'))
+        study_guide_services.save_study_guide(
+            self.admin_id, self.study_guide_1, 'Added study guide',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample',
+                'url_fragment': 'sample-fragment-two'
+            })]
+        )
+        self.save_new_topic(
+            self.topic_id_2, self.admin_id, name='topic name 2',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic_3, subtopic_4], next_subtopic_id=3,
+            url_fragment='topic-frag-two')
+
     def test_cannot_access_non_existent_subtopic(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5583,6 +5622,18 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock_subtopic_data/staging/topic-frag/sub-one-frag',
                 expected_status_int=404)
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SHOW_RESTRUCTURED_STUDY_GUIDES
+    ])
+    def test_can_access_subtopic_when_topic_is_published_with_flag(
+        self) -> None:
+        topic_services.publish_topic(self.topic_id_2, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_subtopic_data/staging/topic-frag-two/sub-three-frag',
+                expected_status_int=200)
 
     def test_can_access_subtopic_when_topic_is_published(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -5607,6 +5658,20 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
             studyguide_url_fragment = 'studyguide/sub-one-frag'
             self.get_html_response(
                 '/mock_subtopic_page/staging/topic-frag/%s'
+                % studyguide_url_fragment,
+                expected_status_int=200)
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SHOW_RESTRUCTURED_STUDY_GUIDES
+    ])
+    def test_can_access_subtopic_when_all_url_fragments_are_valid_with_flag(
+            self) -> None:
+        topic_services.publish_topic(self.topic_id_2, self.admin_id)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            studyguide_url_fragment = 'studyguide/sub-three-frag'
+            self.get_html_response(
+                '/mock_study_guide/staging/topic-frag-two/%s'
                 % studyguide_url_fragment,
                 expected_status_int=200)
 
@@ -5637,6 +5702,27 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
                 expected_status_int=302)
             self.assertEqual(
                 'http://localhost/learn/staging/topic-frag/studyguide',
+                response.headers['location'])
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SHOW_RESTRUCTURED_STUDY_GUIDES
+    ])
+    def test_fall_back_to_studyguide_page_when_study_guide_does_not_exist(
+        self
+    ) -> None:
+        studyguide_url_fragment = 'studyguide/sub-three-frag'
+        topic_services.publish_topic(self.topic_id_2, self.admin_id)
+        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        subtopic_swap = self.swap_to_always_return(
+            study_guide_services, 'get_study_guide_by_id', None)
+        with testapp_swap, subtopic_swap:
+            response = self.get_html_response(
+                '/mock_study_guide/staging/topic-frag-two/%s'
+                % studyguide_url_fragment,
+                expected_status_int=302)
+            self.assertEqual(
+                'http://localhost/learn/staging/topic-frag-two/studyguide',
                 response.headers['location'])
 
     def test_redirect_to_classroom_if_abbreviated_topic_is_invalid(

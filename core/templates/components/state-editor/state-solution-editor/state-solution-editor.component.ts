@@ -32,7 +32,7 @@ import {StateEditorService} from '../state-editor-properties-services/state-edit
 import {StateHintsService} from '../state-editor-properties-services/state-hints.service';
 import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
 import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {AppConstants} from 'app.constants';
 import {StateEditorConstants} from '../state-editor.constants';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';

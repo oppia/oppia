@@ -27,7 +27,7 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {LoaderService} from 'services/loader.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -58,7 +58,7 @@ class MockNgbModal {
   }
 }
 
-class MockContextservice {
+class MockPageContextService {
   getExplorationId() {
     return 'exp1';
   }
@@ -68,7 +68,7 @@ describe('Translation tab component', () => {
   let component: TranslationTabComponent;
   let fixture: ComponentFixture<TranslationTabComponent>;
   let ngbModal: NgbModal;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let editabilityService: EditabilityService;
   let explorationStatesService: ExplorationStatesService;
   let loaderService: LoaderService;
@@ -126,7 +126,7 @@ describe('Translation tab component', () => {
         // The UserExplorationPermissionsService has been
         // mocked here because spying the function of
         // UserExplorationPermissionsService is not able to
-        // stop afterAll error i.e. ContextService should not
+        // stop afterAll error i.e. PageContextService should not
         // be used outside the context of an exploration or a question.
         {
           provide: UserExplorationPermissionsService,
@@ -141,8 +141,8 @@ describe('Translation tab component', () => {
           useClass: MockNgbModal,
         },
         {
-          provide: ContextService,
-          useClass: MockContextservice,
+          provide: PageContextService,
+          useClass: MockPageContextService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -153,7 +153,7 @@ describe('Translation tab component', () => {
     fixture = TestBed.createComponent(TranslationTabComponent);
     component = fixture.componentInstance;
 
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     loaderService = TestBed.inject(LoaderService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     userExplorationPermissionsService = TestBed.inject(
@@ -168,7 +168,7 @@ describe('Translation tab component', () => {
       StateTutorialFirstTimeService
     );
 
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp1');
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
       'Introduction'
     );

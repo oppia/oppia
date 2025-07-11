@@ -2,6 +2,7 @@
   <mat-label>{{ label }}</mat-label>
   <mat-chip-list #chipList aria-label="Multiple selection field" role="listbox">
     <mat-chip *ngFor="let selection of selections"
+              class="e2e-test-multi-selection-chip"
               [selectable]="selectable"
               [removable]="removable"
               [attr.aria-selected]="selection === selected ? 'true' : 'false'"

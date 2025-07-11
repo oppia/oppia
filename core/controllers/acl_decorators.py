@@ -34,6 +34,8 @@ from core.domain import classroom_config_services
 from core.domain import email_manager
 from core.domain import feature_flag_services
 from core.domain import feedback_services
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
@@ -41,6 +43,7 @@ from core.domain import skill_domain
 from core.domain import skill_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
+from core.domain import study_guide_services
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
@@ -1346,7 +1349,7 @@ def can_delete_any_user(
         self: _SelfBaseHandlerType, **kwargs: Any
     ) -> _GenericHandlerFunctionReturnType:
         """Checks if the user is logged in and is a primary admin e.g. user with
-        email address equal to feconf.SYSTEM_EMAIL_ADDRESS.
+        email address equal to SYSTEM_EMAIL_ADDRESS.
 
         Args:
             **kwargs: *. Keyword arguments.
@@ -1363,7 +1366,9 @@ def can_delete_any_user(
             raise self.NotLoggedInException
 
         email = user_services.get_email_from_user_id(self.user_id)
-        if email != feconf.SYSTEM_EMAIL_ADDRESS:
+        if email != platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value
+        ):
             raise self.UnauthorizedUserException(
                 '%s cannot delete any user.' % self.user_id)
 
@@ -4278,17 +4283,33 @@ def can_access_subtopic_viewer_page(
                 self.GET_HANDLER_ERROR_RETURN_TYPE)
             return None
 
-        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-            topic.id, subtopic_id, strict=False)
-        if subtopic_page is None:
-            _redirect_based_on_return_type(
-                self,
-                '/learn/%s/%s/studyguide' % (
-                    classroom_url_fragment, topic_url_fragment),
-                self.GET_HANDLER_ERROR_RETURN_TYPE)
-            return None
+        if feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames
+            .SHOW_RESTRUCTURED_STUDY_GUIDES.value, None
+        ):
+            study_guide = study_guide_services.get_study_guide_by_id(
+                topic.id, subtopic_id, strict=False)
+            if study_guide is None:
+                _redirect_based_on_return_type(
+                    self,
+                    '/learn/%s/%s/studyguide' % (
+                        classroom_url_fragment, topic_url_fragment),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                return None
+            else:
+                return handler(self, topic.name, subtopic_id, **kwargs)
         else:
-            return handler(self, topic.name, subtopic_id, **kwargs)
+            subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+                topic.id, subtopic_id, strict=False)
+            if subtopic_page is None:
+                _redirect_based_on_return_type(
+                    self,
+                    '/learn/%s/%s/studyguide' % (
+                        classroom_url_fragment, topic_url_fragment),
+                    self.GET_HANDLER_ERROR_RETURN_TYPE)
+                return None
+            else:
+                return handler(self, topic.name, subtopic_id, **kwargs)
 
     return test_can_access
 
