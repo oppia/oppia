@@ -427,6 +427,10 @@
     {
       "name": "logged-in-learner/sets-goal-on-learner-dashboard",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/sets-goal-on-learner-dashboard.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard.spec.ts"
     }
   ],
   "docker_suites": []
