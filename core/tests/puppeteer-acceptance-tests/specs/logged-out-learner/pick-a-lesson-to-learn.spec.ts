@@ -46,13 +46,20 @@ describe('Logged-Out Learner', function () {
     // Create explorations.
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateTocurriculumAdminFromCreatorDashboard();
+    await curriculumAdmin.updateCardContent('Hello, World! This is a test.');
+    await curriculumAdmin.addInteraction('Continue Button');
+    await curriculumAdmin.viewOppiaResponses();
+    await curriculumAdmin.directLearnersToNewCard('Second Card');
+    await curriculumAdmin.saveExplorationDraft();
+
+    await curriculumAdmin.navigateToCard('Second Card');
     await curriculumAdmin.updateCardContent('Hello, World!');
     await curriculumAdmin.addTextInputInteraction();
     await curriculumAdmin.addResponsesToTheInteraction(
       'Text Input',
       'Hello, Oppia!',
       'Perfect!',
-      'Second Card',
+      'Last Card',
       true
     );
     await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -66,23 +73,22 @@ describe('Logged-Out Learner', function () {
     await curriculumAdmin.saveExplorationDraft();
 
     // Navigate to the new card and update its content.
-    await curriculumAdmin.navigateToCard('Second Card');
+    await curriculumAdmin.navigateToCard('Last Card');
     await curriculumAdmin.updateCardContent(
-      'Enter a negative number greater than -100.'
+      'You have successfully created an exploration.'
     );
-    await curriculumAdmin.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
-    await curriculumAdmin.addResponsesToTheInteraction(
-      INTERACTION_TYPES.NUMERIC_INPUT,
-      '-99',
-      'Prefect!',
-      CARD_NAME.FINAL_CARD,
-      true
-    );
+    await curriculumAdmin.addInteraction('End Exploration');
     await curriculumAdmin.saveExplorationDraft();
+
+    explorationId1 = await curriculumAdmin.publishExplorationWithMetadata(
+      'Fractions 1',
+      'This is Fractions 1.',
+      'Algebra'
+    );
 
     explorationId2 = await curriculumAdmin.createAndPublishExplorationWithCards(
       'Fractions 2',
-      'Fractions'
+      'Algebra'
     );
 
     // Create a topic and classroom.
@@ -114,7 +120,7 @@ describe('Logged-Out Learner', function () {
   it('should be able to find a lesson to start learning', async function () {
     // Navigate to the classroom page.
     await loggedOutLearner.navigateToClassroomPage('math');
-    await loggedOutLearner.expectTopicsToBePresent(['Algebra I']);
+    await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
 
     // Select and open the topic.
     await loggedOutLearner.selectAndOpenTopic('Fractions');

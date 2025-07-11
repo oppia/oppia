@@ -68,4 +68,8 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectLessonsToHaveRating(5, 'Geometry');
     await loggedOutLearner.expectLessonViewsToBe(1, 'Geometry');
   });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });

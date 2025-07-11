@@ -45,17 +45,17 @@ describe('Logged-Out Learner', function () {
     // Create explorations.
     explorationId1 = await curriculumAdmin.createAndPublishExplorationWithCards(
       'Fractions 1',
-      'Fractions'
+      'Algebra'
     );
     explorationId2 = await curriculumAdmin.createAndPublishExplorationWithCards(
       'Fractions 2',
-      'Fractions'
+      'Algebra'
     );
 
     // Create a topic and classroom.
     await curriculumAdmin.createAndPublishTopic(
       'Fractions',
-      'Fractions Chapter 1',
+      'Algebra',
       'fractions'
     );
     await curriculumAdmin.createAndPublishClassroom(
@@ -100,7 +100,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectHeadingInClassroomPageToContain(
       'Topics Covered'
     );
-    await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
+    await loggedOutLearner.expectTopicsToBePresent(['Algebra']);
   });
 
   it('should be able start learning from the first topic', async function () {

@@ -52,7 +52,7 @@ describe('Logged-Out Learner', function () {
     // Create a topic and add stories.
     await curriculumAdmin.createAndPublishTopic(
       'Fractions',
-      'Fractions Chapter 1',
+      'Algebra',
       'fractions'
     );
     await curriculumAdmin.addStoryToTopic(

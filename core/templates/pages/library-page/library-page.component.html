@@ -76,7 +76,7 @@
     </div>
   </div>
 </div>
-<div class="oppia-library-container d-flex">
+<div class="oppia-library-container d-flex" e2e-test-library-container>
   <div class="oppia-library-container-inner m-auto">
     <div>
       <div class="oppia-exp-summary-tiles-container" *ngIf="pageMode === LIBRARY_PAGE_MODES.SEARCH">
@@ -155,7 +155,7 @@
           <div class="oppia-library-group-header-container">
             <h2 [ngClass]="{'active': !libraryWindowIsNarrow && activeGroupIndex === idx}" class="oppia-library-group-header">
               <a *ngIf="group.has_full_results_page"
-                 class="e2e-test-library-{{group.protractor_id}}"
+                 class="e2e-test-library-{{group.protractor_id}} e2e-test-library-group-header"
                  (keydown.enter)="showFullResultsPage(group.categories, group.full_results_url)"
                  (click)="showFullResultsPage(group.categories, group.full_results_url)"
                  tabindex="0">
