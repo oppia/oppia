@@ -204,6 +204,7 @@ const currentGoalsContainerSelector = '.e2e-test-currernt-goals-section';
 const completedGoalsContainerSelector = '.e2e-test-completed-goals-section';
 const goalContainerSelector = '.e2e-test-goals-container';
 const goalTitleSelector = '.e2e-test-goal-title';
+const startGoalButtonSelector = '.e2e-test-start-lesson-button';
 
 // Learner Dashboard > Home Tab Seclectors.
 const hometabSectionHeadingSelector =
@@ -222,6 +223,14 @@ const addNewGoalButtonSelector = '.e2e-test-add-new-goal-button';
 const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
 const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
+const learnSomethingNewSectionSelector =
+  '.e2e-test-learn-something-new-section';
+
+// Learner Dashboard > Progress section selectors.
+const incompleteLessonsSectionSelector =
+  '.e2e-test-in-progress-community-lessons-section';
+const completedLessonsSectionSelector =
+  '.e2e-test-completed-community-lessons-section';
 
 // Creator dashboard selectors.
 const creatorDashboardContainerSelector =
@@ -268,6 +277,8 @@ const removeModalConfirmButtonSelector =
 // Common > Lesson Card.
 const lessonCardContainer = '.e2e-test-redesigned-lesson-card-container';
 const lessonTitleSelector = '.e2e-test-lesson-title';
+const circleProgressElementSelector = 'circle-progress';
+const resumeLessonButtonSelector = '.e2e-test-resume-lesson-btn';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -2367,6 +2378,68 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to start a goal from the goal section in the
+   * redesigned learner dashboard.
+   * @param {string} goal - The goal to start.
+   */
+  async startGoalFromGoalsSectionInRedesignedDashboard(
+    goal: string
+  ): Promise<void> {
+    await this.page.waitForSelector(goalContainerSelector);
+    const goalContainers = await this.page.$$(goalContainerSelector);
+
+    for (const goalContainer of goalContainers) {
+      const goalTitle = await goalContainer.$eval(
+        goalTitleSelector,
+        el => el.textContent
+      );
+
+      if (goalTitle === goal) {
+        const startGoalButton = await goalContainer.$(startGoalButtonSelector);
+        await startGoalButton?.click();
+
+        await this.page.waitForSelector(startGoalButtonSelector, {
+          hidden: true,
+        });
+        return;
+      }
+    }
+  }
+
+  /**
+   * Function to resume a lesson from the learner dashboard.
+   * @param {string} lessonTitle - The title of the lesson.
+   * @param {string} progress - The progress of the lesson.
+   */
+  async resumeLessonFromLearnerDashboard(lessonTitle: string): Promise<void> {
+    await this.page.waitForSelector(lessonCardContainer, {
+      visible: true,
+    });
+
+    const lessonCards = await this.page.$$(lessonCardContainer);
+
+    for (const lessonCard of lessonCards) {
+      const lessonTitleText = await lessonCard.$eval(
+        lessonTitleSelector,
+        el => el.textContent
+      );
+
+      if (!lessonTitleText || lessonTitleText !== lessonTitle) {
+        continue;
+      }
+
+      const resumeLessonButton = await lessonCard.$(resumeLessonButtonSelector);
+      await resumeLessonButton?.click();
+
+      await this.page.waitForSelector(resumeLessonButtonSelector, {
+        hidden: true,
+      });
+      return;
+    }
+    throw new Error(`Lesson not found: ${lessonTitle}`);
+  }
+
+  /**
    * Checks if Learner is on the learner dashboard page.
    */
   expectToBeOnLearnerDashboardPage(): void {
@@ -2564,6 +2637,10 @@ export class LoggedInUser extends BaseUser {
     expect(lessonCardTitles).toContain(lessonTitle);
   }
 
+  /**
+   * Function to verify the lesson cards in the continue where you left off section.
+   * @param {string[]} lessonTitles - The titles of the lesson cards to check.
+   */
   async expectContinueWhereYouLeftOffSectionToContainLessonCards(
     lessonTitles: string[]
   ): Promise<void> {
@@ -2577,6 +2654,26 @@ export class LoggedInUser extends BaseUser {
 
     if (!context) {
       throw new Error('Continue Where You Left Off Section not found.');
+    }
+
+    for (const lessonTitle of lessonTitles) {
+      await this.expectLessonCardToBePresent(lessonTitle, context);
+    }
+  }
+
+  /**
+   * Function to verify the lesson cards in the incomplete lessons section.
+   * @param {string[]} lessonTitles - The titles of the lesson cards to check.
+   */
+  async expectCompletedLessonsSectionToContainLessonCards(
+    lessonTitles: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(completedLessonsSectionSelector);
+
+    const context = await this.page.$(completedLessonsSectionSelector);
+
+    if (!context) {
+      throw new Error('Completed Lessons Section not found.');
     }
 
     for (const lessonTitle of lessonTitles) {
@@ -2642,6 +2739,61 @@ export class LoggedInUser extends BaseUser {
       throw new Error('Completed goals section not found.');
     }
     await this.expectGoalToBePresent(goal, completedGoalsSection);
+  }
+
+  /**
+   * Function to verify the learn something new section in the redesigned learner dashboard.
+   * @param {boolean} visible - Whether the section should be visible or not.
+   */
+  async expectLearnSomethingNewSectionInRedesignedDashboardToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.page.waitForSelector(learnSomethingNewSectionSelector, {
+      visible: visible,
+    });
+  }
+
+  async expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.page.waitForSelector(
+      continueFromWhereLeftOffSectionInRedesignedDashboardSelector,
+      {
+        visible: visible,
+      }
+    );
+  }
+
+  /**
+   * Function to verify the progress of a lesson in the redesigned learner dashboard.
+   * @param {string} lessonTitle - The title of the lesson.
+   * @param {string} progress - The progress of the lesson.
+   */
+  async expectLessonProgressInRedesignedDashboardToBe(
+    lessonTitle: string,
+    progress: string
+  ): Promise<void> {
+    await this.page.waitForSelector(lessonCardContainer);
+    const lessonCards = await this.page.$$(lessonCardContainer);
+
+    for (const lessonCard of lessonCards) {
+      const lessonTitleText = await lessonCard.$eval(
+        lessonTitleSelector,
+        el => el.textContent
+      );
+
+      if (!lessonTitleText || lessonTitleText !== lessonTitle) {
+        continue;
+      }
+
+      const currentProgress = await lessonCard.$eval(
+        circleProgressElementSelector,
+        el => el.textContent
+      );
+      expect(currentProgress).toBe(progress.toString());
+      return;
+    }
+    throw new Error(`Lesson not found: ${lessonTitle}`);
   }
 }
 

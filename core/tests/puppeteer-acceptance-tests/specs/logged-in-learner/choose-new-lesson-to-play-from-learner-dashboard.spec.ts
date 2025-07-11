@@ -109,22 +109,62 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.expectCurrentGoalsInRedesignedDashboardToContain(
       'Algebra I'
     );
+  });
 
-    await loggedInLearner.navigateToHomeSection();
+  it('should be able to open learner dashboard', async function () {
+    await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
+    await loggedInLearner.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent(
+      false
+    );
+
     // TODO(#22940): Home section should show lesson in "Lessons In Progress" section.
     // Once this feature/bug is fixed, update the test.
     // TODO: I closed the issue, but there is still the bug, so reopen the issue.
     await loggedInLearner.navigateToGoalsSection();
-    await loggedInLearner.navigateToCommunityLibraryPage();
-    await loggedInLearner.searchForLessonInSearchBar('Negative Numbers');
-    await loggedInLearner.playLessonFromSearchResults('Negative Numbers');
+    // await loggedInLearner.navigateToCommunityLibraryPage();
+    // await loggedInLearner.searchForLessonInSearchBar('Negative Numbers');
+    // await loggedInLearner.playLessonFromSearchResults('Negative Numbers');
+    await loggedInLearner.startGoalFromGoalsSectionInRedesignedDashboard(
+      'Algebra I'
+    );
 
-    // TODO: Reach upto first checkpoint.
+    await loggedInLearner.continueToNextCard();
+
     await loggedInLearner.navigateToLearnerDashboard();
-    // TODO: Maybe chapter has different view.
     await loggedInLearner.expectContinueWhereYouLeftOffSectionToContainLessonCards(
       ['Chapter 2: Positive Numbers']
     );
+    await loggedInLearner.expectLessonProgressInRedesignedDashboardToBe(
+      'Chapter 2: Positive Numbers',
+      '50%'
+    );
+
+    await loggedInLearner.resumeLessonFromLearnerDashboard(
+      'Chapter 2: Positive Numbers'
+    );
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.navigateToLearnerDashboard();
+
+    await loggedInLearner.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
+    await loggedInLearner.expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(
+      false
+    );
+  });
+
+  it('should be able to check updated goals', async function () {
+    await loggedInLearner.navigateToGoalsSection();
+    await loggedInLearner.expectCompletedGoalsSectionInRedesignedDashboardToContain(
+      'Algebra I'
+    );
+  });
+
+  it('should be able to check updated progress', async function () {
+    await loggedInLearner.navigateToProgressSection();
+    await loggedInLearner.expectCompletedLessonsSectionToContainLessonCards([
+      'Chapter 1: Negative Numbers',
+      'Positive Numbers',
+      'Negative Numbers',
+    ]);
   });
 
   afterAll(async function () {
