@@ -2,42 +2,42 @@
   <div class="d-flex flex-column-reverse">
     <span class="oppia-cke-offline-warning" *ngIf="!connectedToInternet">* Tools with dark background can not be used when offline.</span>
   </div>
-  
+
   <!-- Paste error message display with selective paste option -->
   <div *ngIf="getPasteError()" class="oppia-rte-paste-error-box">
     <div>
       <span>{{ getPasteError() }}</span>
-      
+
       <!-- Show confirmation buttons only when selective paste is available -->
       <div *ngIf="shouldShowPasteConfirmation()" class="oppia-rte-paste-confirmation-buttons">
-        <button 
-          type="button" 
-          class="oppia-rte-paste-confirm-btn oppia-rte-paste-yes-btn" 
-          (click)="confirmSelectivePaste()" 
+        <button
+          type="button"
+          class="oppia-rte-paste-confirm-btn oppia-rte-paste-yes-btn"
+          (click)="confirmSelectivePaste()"
           aria-label="Paste valid content">
           Yes, paste valid content
         </button>
-        <button 
-          type="button" 
-          class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn" 
-          (click)="rejectSelectivePaste()" 
+        <button
+          type="button"
+          class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn"
+          (click)="rejectSelectivePaste()"
           aria-label="Cancel paste">
           No, cancel
         </button>
       </div>
     </div>
-    
+
     <!-- Show dismiss button only when no confirmation is needed -->
-    <button 
+    <button
       *ngIf="!shouldShowPasteConfirmation()"
-      type="button" 
-      class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn" 
-      (click)="dismissPasteError()" 
+      type="button"
+      class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn"
+      (click)="dismissPasteError()"
       aria-label="Dismiss error">
       Dismiss
     </button>
   </div>
-  
+
   <div contenteditable="true" class="oppia-rte-resizer oppia-rte e2e-test-rte" #oppiaRTE></div>
 </div>
 

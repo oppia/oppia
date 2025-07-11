@@ -119,17 +119,23 @@ export class RteHelperModalComponent {
   public customizationArgsForm: FormGroup;
   customizationArgsFormSubscription: Subscription;
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
+  COMPONENT_ID_COLLAPSIBLE_HEADING = 'collapsible_heading';
+  COMPONENT_ID_COLLAPSIBLE_CONTENT = 'collapsible_content';
   COMPONENT_ID_IMAGE = 'image';
   COMPONENT_ID_LINK = 'link';
   COMPONENT_ID_MATH = 'math';
   COMPONENT_ID_SKILLREVIEW = 'skillreview';
   COMPONENT_ID_TABS = 'tabs';
+  COMPONENT_ID_TABS_HEADING = 'tabs_heading';
+  COMPONENT_ID_TABS_CONTENT = 'tabs_content';
   COMPONENT_ID_VIDEO = 'video';
   // Character limit for various RTE components.
   CHARACTER_LIMITS = {
-    collapsible: 500,
+    collapsible_heading: 200,
+    collapsible_content: 500,
     link: 200,
-    tabs: 500,
+    tabs_heading: 200,
+    tabs_content: 500,
     default: 500,
   };
 
@@ -235,7 +241,7 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  onCustomizationArgsFormChange(value: any): void {
+  onCustomizationArgsFormChange(value: number | string | boolean): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
       let rawLatex: string = value[0].raw_latex;
@@ -285,11 +291,11 @@ export class RteHelperModalComponent {
           if (
             this.isContentLengthExceeded(
               value[0][tabIndex].content,
-              this.COMPONENT_ID_TABS
+              this.COMPONENT_ID_TABS_CONTENT
             )
           ) {
             this.updateRteErrorMessage(
-              `The content of tab ${tabIndex + 1} is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_TABS)} characters.`
+              `The content of tab ${tabIndex + 1} is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_TABS_CONTENT)} characters.`
             );
             break;
           }
@@ -298,11 +304,11 @@ export class RteHelperModalComponent {
           if (
             this.isContentLengthExceeded(
               value[0][tabIndex].title,
-              this.COMPONENT_ID_TABS
+              this.COMPONENT_ID_TABS_HEADING
             )
           ) {
             this.updateRteErrorMessage(
-              `The title of tab ${tabIndex + 1} is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_TABS)} characters.`
+              `The title of tab ${tabIndex + 1} is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_TABS_HEADING)} characters.`
             );
             break;
           }
@@ -365,35 +371,28 @@ export class RteHelperModalComponent {
       // Check heading and content lengths for collapsible components.
       if (
         value[0] &&
-        this.isContentLengthExceeded(value[0], this.COMPONENT_ID_COLLAPSIBLE)
+        this.isContentLengthExceeded(
+          value[0],
+          this.COMPONENT_ID_COLLAPSIBLE_HEADING
+        )
       ) {
         this.updateRteErrorMessage(
-          `The heading is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_COLLAPSIBLE)} characters.`
+          `The heading is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_COLLAPSIBLE_HEADING)} characters.`
         );
         return;
       }
 
       if (
         value[1] &&
-        this.isContentLengthExceeded(value[1], this.COMPONENT_ID_COLLAPSIBLE)
+        this.isContentLengthExceeded(
+          value[1],
+          this.COMPONENT_ID_COLLAPSIBLE_CONTENT
+        )
       ) {
         this.updateRteErrorMessage(
-          `The content is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_COLLAPSIBLE)} characters.`
+          `The content is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_COLLAPSIBLE_CONTENT)} characters.`
         );
         return;
-      }
-    }
-
-    // For any other component type that has text content, check if it exceeds the limit.
-    for (let i = 0; i < this.customizationArgSpecs.length; i++) {
-      const argSpec = this.customizationArgSpecs[i];
-      if (argSpec.schema && argSpec.schema.type === 'html' && value[i]) {
-        if (this.isContentLengthExceeded(value[i], this.componentId)) {
-          this.updateRteErrorMessage(
-            `The content is too long. Please use at most ${this.getCharacterLimit(this.componentId)} characters.`
-          );
-          return;
-        }
       }
     }
   }

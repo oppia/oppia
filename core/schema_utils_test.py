@@ -370,7 +370,11 @@ def validate_schema(schema: Dict[str, Any]) -> None:
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
-            [SCHEMA_KEY_REPLACEMENT_UI_CONFIG, SCHEMA_KEY_VALIDATORS])
+            [
+                SCHEMA_KEY_REPLACEMENT_UI_CONFIG,
+                SCHEMA_KEY_UI_CONFIG,
+                SCHEMA_KEY_VALIDATORS
+            ])
         assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(
