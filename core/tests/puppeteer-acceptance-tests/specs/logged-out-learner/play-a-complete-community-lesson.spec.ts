@@ -13,8 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if a learner can play an exploration
- * in the embedded player.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -22,7 +23,8 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
+
+const ROLES = testConstants.Roles;
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
@@ -36,7 +38,7 @@ describe('Logged-Out Learner', function () {
     curriculumAdmin = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
-      [testConstants.Roles.CURRICULUM_ADMIN]
+      [ROLES.CURRICULUM_ADMIN]
     );
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
@@ -51,7 +53,7 @@ describe('Logged-Out Learner', function () {
     // Create a new exploration "What are the place values?" using the
     // exploration editor user.
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.addExplorationDescriptionContainingAllRTEComponents();
     await explorationEditor.addInteraction('Continue Button');

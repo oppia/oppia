@@ -53,7 +53,7 @@ describe('Logged-Out Learner', function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(
       'Welcome, to the Place Values Exploration.'

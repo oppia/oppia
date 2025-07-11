@@ -13,11 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview
- * Acceptance test from CUJv3 Doc
+ * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * IO.PP. Partner submits a partnerships application.
+ * LI.DG. Learner sets goals on the Learner Dashboard
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -26,6 +25,7 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
@@ -33,6 +33,7 @@ const ROLES = testConstants.Roles;
 describe('Logged-In Learner', function () {
   let loggedInLearner: LoggedOutUser & LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
+  let releaseCoordinator: ReleaseCoordinator;
   let explorationId1: string;
   let explorationId2: string;
 
@@ -46,6 +47,16 @@ describe('Logged-In Learner', function () {
       'curriculumAdm',
       'curriculumAdmin@example.com',
       [ROLES.CURRICULUM_ADMIN]
+    );
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseCoordinator',
+      'releaseCoordinator@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+
+    // Enable redesigned learner dashboard.
+    await releaseCoordinator.enableFeatureFlag(
+      'show_redesigned_learner_dashboard'
     );
 
     // Create explorations.
@@ -96,33 +107,47 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
     await loggedInLearner.navigateToGoalsSection();
 
-    await loggedInLearner.expectGoalsSectionToContainHeadings([
-      'Current Goals',
-      'Edit Goals',
-      'Completed Lessons',
-    ]);
+    await loggedInLearner.expectLearnerGreetingsToBe("loggedInLearner's Goals");
 
-    await loggedInLearner.expectCurrentGoalsSectionToBeEmpty();
+    // await loggedInLearner.expectGoalsSectionToContainHeadings([
+    //   'Current Goals',
+    //   'Edit Goals',
+    //   'Completed Lessons',
+    // ]);
+
+    // await loggedInLearner.expectCurrentGoalsSectionToBeEmpty();
   });
 
   it('should be able to add a goal', async function () {
-    await loggedInLearner.addGoals(['Algebra I']);
+    await loggedInLearner.addGoalInRedesignedLearnerDashboard('Algebra I');
+    await loggedInLearner.expectRedesignedGoalsSectionToContainHeading(
+      'In Progress'
+    );
     await loggedInLearner.expectToolTipMessage(
       "Successfully added to your 'Current Goals' list."
     );
 
-    await loggedInLearner.expectCurrentGoalsSectionToBeEmpty(false);
+    // await loggedInLearner.expectCurrentGoalsSectionToBeEmpty(false);
   });
 
   it('should be able to remove a goal', async function () {
-    await loggedInLearner.clickOnCheckboxOfFirstCurrentGoalAndRemoveIt();
+    await this.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
+    await this.clickOnGoalCheckboxInRedesignedLearnerDashboard(
+      'Algebra I',
+      false
+    );
+    await this.submitGoalInRedesignedLearnerDashboard();
 
     await loggedInLearner.expectRemoveActivityModelToBeDisplayed(
       "Remove from 'Current Goals' list?",
       "Are you sure you want to remove 'Algebra' from your 'Current Goals' list?"
     );
     await loggedInLearner.clickButtonInRemoveActivityModal('Remove');
-    await loggedInLearner.expectCurrentGoalsSectionToBeEmpty();
+    await loggedInLearner.expectRedesignedGoalsSectionToContainHeading(
+      'In Progress',
+      false
+    );
+    // await loggedInLearner.expectCurrentGoalsSectionToBeEmpty();
   });
 
   afterAll(async function () {

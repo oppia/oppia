@@ -13,17 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for checking if a learner can share a lesson
- * from the lesson player.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
  */
 
 import {showMessage} from '../../utilities/common/show-message';
-import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
@@ -66,7 +64,7 @@ describe('Logged-Out Learner', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent('Introduction to Algebra');
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
@@ -114,7 +112,8 @@ describe('Logged-Out Learner', function () {
     if (!explorationId) {
       throw new Error('Error publishing exploration successfully.');
     }
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
+
   it('should be able to share the lesson using copy link', async function () {
     await loggedOutUser.playExploration(explorationId);
     await loggedOutUser.continueToNextCard();
