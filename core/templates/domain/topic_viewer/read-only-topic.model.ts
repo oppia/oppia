@@ -17,7 +17,6 @@
  * topic data.
  */
 
-import {Injectable} from '@angular/core';
 
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {
@@ -147,15 +146,8 @@ export class ReadOnlyTopic {
   getClassroomName(): string | null {
     return this._classroomName;
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class ReadOnlyTopicObjectFactory {
-  constructor() {}
-
-  createFromBackendDict(
+  static createFromBackendDict(
     topicDataDict: ReadOnlyTopicBackendDict
   ): ReadOnlyTopic {
     let subtopics = topicDataDict.subtopics.map(subtopic => {
