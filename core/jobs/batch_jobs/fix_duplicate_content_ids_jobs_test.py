@@ -26,13 +26,10 @@ from core.jobs import job_test_utils
 from core.jobs.batch_jobs import fix_duplicate_content_ids_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-from core.tests import test_utils
-
-import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
+    pass
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()
@@ -49,8 +46,8 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
     )
 
     def test_identify_job_with_no_duplicates(self) -> None:
-        """Test that the job finds no duplicates when there are none.
-        """
+        """Test that the job finds no duplicates when there are none."""
+        
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
         exp_services.save_new_exploration('owner_id', exploration)
@@ -99,8 +96,8 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
     )
 
     def test_fix_job_with_no_duplicates(self) -> None:
-        """Test that the job does nothing when there are no duplicates.
-        """
+        """Test that the job does nothing when there are no duplicates."""
+        
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
         exp_services.save_new_exploration('owner_id', exploration)
@@ -141,7 +138,6 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state1_updated = updated_exploration.states['Introduction']
         state2_updated = updated_exploration.states['State2']
 
-
         self.assertEqual(state1_updated.content.content_id, 'content_0')
         self.assertEqual(state2_updated.content.content_id, 'content_2')
 
@@ -157,8 +153,8 @@ class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
     )
 
     def test_audit_identify_job_with_duplicates(self) -> None:
-        """Test that the audit job correctly identifies duplicates.
-        """
+        """Test that the audit job correctly identifies duplicates."""
+
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
 
@@ -197,8 +193,8 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
     )
 
     def test_audit_fix_job_with_duplicates(self) -> None:
-        """Test that the audit fix job shows what would be fixed.
-        """
+        """Test that the audit fix job shows what would be fixed."""
+
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
 
