@@ -44,6 +44,7 @@ def send_email_to_recipients(
     subject: str,
     plaintext_body: str,
     html_body: str,
+    cc: Optional[List[str]] = None,
     bcc: Optional[List[str]] = None,
     reply_to: Optional[str] = None,
     recipient_variables: Optional[
@@ -63,6 +64,7 @@ def send_email_to_recipients(
         plaintext_body: str. The plaintext body of the email. Must be utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Must be utf-8.
+        cc: list(str)|None. Optional argument. List of cc emails.
         bcc: list(str)|None. Optional argument. List of bcc emails.
         reply_to: str|None. Optional argument. Reply address formatted like
             “reply+<reply_id>@<incoming_email_domain_name>
@@ -134,6 +136,9 @@ def send_email_to_recipients(
             'html': html_body,
             'to': email_list[0] if len(email_list) == 1 else email_list
         }
+
+        if cc:
+            data['cc'] = cc[0] if len(cc) == 1 else cc
 
         if bcc:
             data['bcc'] = bcc[0] if len(bcc) == 1 else bcc
