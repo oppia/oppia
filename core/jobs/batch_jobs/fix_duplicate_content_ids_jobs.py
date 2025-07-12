@@ -18,22 +18,18 @@
 
 from __future__ import annotations
 
-import logging
-
 from core.domain import exp_domain
 from core.domain import exp_fetchers
-from core.domain import exp_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
-from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services
     from mypy_imports import exp_models
 
@@ -51,7 +47,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
             identifying explorations with duplicate content IDs.
         """
-        
+
         explorations_with_duplicates = (
             self.pipeline
             | 'Get all exploration models' >> ndb_io.GetModels(
@@ -68,7 +64,8 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             explorations_with_duplicates
             | 'Create job run results' >> beam.Map(
                 lambda result: job_run_result.JobRunResult.as_stdout(
-                    f'Exploration {result["exp_id"]} (version {result["version"]}) '
+                    f'Exploration {result["exp_id"]} '
+                    f'(version {result["version"]}) '
                     f'has duplicate content IDs: {result["duplicates"]}'
                 )
             )
@@ -81,10 +78,12 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         """Check if an exploration has duplicate content IDs.
 
         Args:
-            exploration: The exploration domain object to check.
+            exploration: exp_domain.Exploration. The exploration domain object
+                to check.
 
         Returns:
-            Dict containing exploration info and duplicates if found, None otherwise.
+            Dict containing exploration info and duplicates if found,
+            None otherwise.
         """
         all_content_ids: List[str] = []
         state_to_content_ids: Dict[str, List[str]] = {}
@@ -107,7 +106,8 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             duplicate_details = {}
             for duplicate_id in duplicate_content_ids:
                 states_with_duplicate = [
-                    state_name for state_name, content_ids in state_to_content_ids.items()
+                    state_name for state_name, content_ids in
+                    state_to_content_ids.items()
                     if duplicate_id in content_ids
                 ]
                 duplicate_details[duplicate_id] = states_with_duplicate
@@ -122,7 +122,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 
 
 class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
-    """Job that fixes explorations with duplicate content IDs by regenerating them."""
+    """Job that fixes explorations with duplicate content IDs."""
 
     DATASTORE_UPDATES_ALLOWED = True
 
@@ -133,7 +133,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             PCollection. A PCollection of 'SUCCESS' or 'FAILURE' results from
             fixing explorations with duplicate content IDs.
         """
-        
+
         explorations_to_fix = (
             self.pipeline
             | 'Get all exploration models' >> ndb_io.GetModels(
@@ -158,8 +158,9 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             explorations_to_fix
             | 'Create job run results' >> beam.Map(
                 lambda result: job_run_result.JobRunResult.as_stdout(
-                    f'Fixed exploration {result["exp_id"]} (version {result["version"]}) '
-                    f'- regenerated content IDs: {result["fixed_content_ids"]}'
+                    f'Fixed exploration {result["exp_id"]} '
+                    f'(version {result["version"]}) - '
+                    f'regenerated content IDs: {result["fixed_content_ids"]}'
                 )
             )
         )
@@ -171,10 +172,12 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
         """Check and fix duplicate content IDs in an exploration.
 
         Args:
-            exploration: The exploration domain object to check and fix.
+            exploration: exp_domain.Exploration. The exploration domain object
+                to check and fix.
 
         Returns:
-            Dict containing fix results if duplicates were found and fixed, None otherwise.
+            Dict containing fix results if duplicates were found and fixed,
+            None otherwise.
         """
         all_content_ids: List[str] = []
         state_to_content_ids: Dict[str, List[str]] = {}
@@ -204,26 +207,31 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 
         for duplicate_id in duplicate_content_ids:
             states_with_duplicate = [
-                state_name for state_name, content_ids in state_to_content_ids.items()
+                state_name for state_name, content_ids in
+                state_to_content_ids.items()
                 if duplicate_id in content_ids
             ]
 
             # Keep the first occurrence, regenerate others
-            for i, state_name in enumerate(states_with_duplicate[1:], 1):
+            for state_name in states_with_duplicate[1:]:
                 state = exploration.states[state_name]
-                
+
                 new_content_id = content_id_generator.generate(
                     translation_domain.ContentType.CONTENT)
-                
-                _replace_content_id_in_state(state, duplicate_id, new_content_id)
-                fixed_content_ids.append(f'{duplicate_id} -> {new_content_id} in {state_name}')
 
-        exploration.next_content_id_index = content_id_generator.next_content_id_index
+                _replace_content_id_in_state(
+                    state, duplicate_id, new_content_id)
+                fixed_content_ids.append(
+                    f'{duplicate_id} -> {new_content_id} in {state_name}')
+
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
 
         with datastore_services.get_ndb_context():
             updated_model = exp_models.ExplorationModel.get(exploration.id)
             updated_model.states = exploration.to_dict()['states']
-            updated_model.next_content_id_index = exploration.next_content_id_index
+            updated_model.next_content_id_index = (
+                exploration.next_content_id_index)
             updated_model.version += 1
 
             return {
@@ -234,43 +242,61 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             }
 
 
-def _replace_content_id_in_state(state, old_content_id: str, new_content_id: str) -> None:
+def _replace_content_id_in_state(
+    state, old_content_id: str, new_content_id: str
+) -> None:
     """Replace a content ID in a state with a new one.
-    
-    This is a helper function that updates content IDs throughout a state object.
+
+    This is a helper function that updates content IDs throughout a state
+    object.
+
+    Args:
+        state: State. The state object to update.
+        old_content_id: str. The old content ID to replace.
+        new_content_id: str. The new content ID to use.
     """
-    if hasattr(state.content, 'content_id') and state.content.content_id == old_content_id:
+    if (hasattr(state.content, 'content_id') and
+            state.content.content_id == old_content_id):
         state.content.content_id = new_content_id
 
     if state.interaction:
-        for ca_name, ca_value in state.interaction.customization_args.items():
-            if hasattr(ca_value, 'value') and hasattr(ca_value.value, 'content_id'):
+        for ca_value in state.interaction.customization_args.values():
+            if (hasattr(ca_value, 'value') and
+                    hasattr(ca_value.value, 'content_id')):
                 if ca_value.value.content_id == old_content_id:
                     ca_value.value.content_id = new_content_id
-            elif hasattr(ca_value, 'content_id') and ca_value.content_id == old_content_id:
+            elif (hasattr(ca_value, 'content_id') and
+                  ca_value.content_id == old_content_id):
                 ca_value.content_id = new_content_id
 
         for answer_group in state.interaction.answer_groups:
-            if hasattr(answer_group.outcome, 'feedback') and hasattr(answer_group.outcome.feedback, 'content_id'):
+            if (hasattr(answer_group.outcome, 'feedback') and
+                    hasattr(answer_group.outcome.feedback, 'content_id')):
                 if answer_group.outcome.feedback.content_id == old_content_id:
                     answer_group.outcome.feedback.content_id = new_content_id
 
-        if (state.interaction.default_outcome and 
-            hasattr(state.interaction.default_outcome, 'feedback') and 
-            hasattr(state.interaction.default_outcome.feedback, 'content_id')):
-            if state.interaction.default_outcome.feedback.content_id == old_content_id:
-                state.interaction.default_outcome.feedback.content_id = new_content_id
+        if (state.interaction.default_outcome and
+                hasattr(state.interaction.default_outcome, 'feedback') and
+                hasattr(state.interaction.default_outcome.feedback,
+                        'content_id')):
+            if (state.interaction.default_outcome.feedback.content_id ==
+                    old_content_id):
+                state.interaction.default_outcome.feedback.content_id = (
+                    new_content_id)
 
         for hint in state.interaction.hints:
-            if hasattr(hint, 'hint_content') and hasattr(hint.hint_content, 'content_id'):
+            if (hasattr(hint, 'hint_content') and
+                    hasattr(hint.hint_content, 'content_id')):
                 if hint.hint_content.content_id == old_content_id:
                     hint.hint_content.content_id = new_content_id
 
-        if (state.interaction.solution and 
-            hasattr(state.interaction.solution, 'explanation') and 
-            hasattr(state.interaction.solution.explanation, 'content_id')):
-            if state.interaction.solution.explanation.content_id == old_content_id:
-                state.interaction.solution.explanation.content_id = new_content_id
+        if (state.interaction.solution and
+                hasattr(state.interaction.solution, 'explanation') and
+                hasattr(state.interaction.solution.explanation, 'content_id')):
+            if (state.interaction.solution.explanation.content_id ==
+                    old_content_id):
+                state.interaction.solution.explanation.content_id = (
+                    new_content_id)
 
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJob(
