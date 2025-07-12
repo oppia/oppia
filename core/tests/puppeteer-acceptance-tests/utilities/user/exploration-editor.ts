@@ -59,7 +59,8 @@ const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 
-const programmingInteractionsButton = '.e2e-test-interaction-tab-programming';
+const programmingInteractionsButtonSelector =
+  '.e2e-test-interaction-tab-programming';
 
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
@@ -282,6 +283,7 @@ const closeButtonForExtraModel = '.e2e-test-close-rich-text-component-editor';
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 
 const previousCardButton = '.e2e-test-back-button';
+const mathInteractionButtonSelector = '.e2e-test-interaction-tab-math';
 
 export enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
@@ -293,10 +295,12 @@ export enum INTERACTION_TYPES {
 
 enum INTERACTION_TABS {
   PROGRAMMING = 'PROGRAMMING',
+  MATH = 'MATH',
 }
 
 export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
+  [INTERACTION_TYPES.FRACTION_INPUT]: INTERACTION_TABS.MATH,
 };
 
 interface TabContent {
@@ -608,7 +612,11 @@ export class ExplorationEditor extends BaseUser {
     if (
       INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'PROGRAMMING'
     ) {
-      await this.clickOn(programmingInteractionsButton);
+      await this.clickOn(programmingInteractionsButtonSelector);
+    } else if (
+      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'MATH'
+    ) {
+      await this.clickOn(mathInteractionButtonSelector);
     }
     await this.clickOn(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);

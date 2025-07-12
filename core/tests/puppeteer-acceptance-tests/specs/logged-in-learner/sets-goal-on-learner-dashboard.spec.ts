@@ -37,70 +37,74 @@ describe('Logged-In Learner', function () {
   let explorationId1: string;
   let explorationId2: string;
 
-  beforeAll(async function () {
-    // Create users.
-    loggedInLearner = await UserFactory.createNewUser(
-      'loggedInLearner',
-      'logged_in_learner@example.com'
-    );
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculumAdmin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
-    );
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'releaseCoordinator@example.com',
-      [ROLES.RELEASE_COORDINATOR]
-    );
+  beforeAll(
+    async function () {
+      // Create users.
+      loggedInLearner = await UserFactory.createNewUser(
+        'loggedInLearner',
+        'logged_in_learner@example.com'
+      );
+      curriculumAdmin = await UserFactory.createNewUser(
+        'curriculumAdm',
+        'curriculumAdmin@example.com',
+        [ROLES.CURRICULUM_ADMIN]
+      );
+      releaseCoordinator = await UserFactory.createNewUser(
+        'releaseCoordinator',
+        'releaseCoordinator@example.com',
+        [ROLES.RELEASE_COORDINATOR]
+      );
 
-    // Enable redesigned learner dashboard.
-    await releaseCoordinator.enableFeatureFlag(
-      'show_redesigned_learner_dashboard'
-    );
+      // Enable redesigned learner dashboard.
+      await releaseCoordinator.enableFeatureFlag(
+        'show_redesigned_learner_dashboard'
+      );
 
-    // Create explorations.
-    explorationId1 =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+      // Create explorations.
+      explorationId1 =
+        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+          'Negative Numbers'
+        );
+
+      explorationId2 =
+        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+          'Positive Numbers',
+          'Algebra',
+          false
+        );
+
+      // Create topic, classroom and add explorations to the topic.
+      await curriculumAdmin.createAndPublishTopic(
+        'Algebra I',
+        'Negative Numbers',
         'Negative Numbers'
       );
 
-    explorationId2 =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Positive Numbers',
-        'Algebra',
-        false
+      await curriculumAdmin.createAndPublishClassroom(
+        'Math',
+        'math',
+        'Algebra I'
       );
 
-    // Create topic, classroom and add explorations to the topic.
-    await curriculumAdmin.createAndPublishTopic(
-      'Algebra I',
-      'Negative Numbers',
-      'Negative Numbers'
-    );
-
-    await curriculumAdmin.createAndPublishClassroom(
-      'Math',
-      'math',
-      'Algebra I'
-    );
-
-    await curriculumAdmin.addStoryToTopic(
-      'Test Story 1',
-      'test-story-one',
-      'Algebra I'
-    );
-    await curriculumAdmin.addChapter(
-      'Test Chapter 1',
-      explorationId1 as string
-    );
-    await curriculumAdmin.addChapter(
-      'Test Chapter 2',
-      explorationId2 as string
-    );
-    await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.publishStoryDraft();
-  });
+      await curriculumAdmin.addStoryToTopic(
+        'Test Story 1',
+        'test-story-one',
+        'Algebra I'
+      );
+      await curriculumAdmin.addChapter(
+        'Test Chapter 1',
+        explorationId1 as string
+      );
+      await curriculumAdmin.addChapter(
+        'Test Chapter 2',
+        explorationId2 as string
+      );
+      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.publishStoryDraft();
+    },
+    // Setup takes more time than the default timeout.
+    60000
+  );
 
   it('should be able to see goals section', async function () {
     // Navigate to the goals section.
@@ -131,12 +135,12 @@ describe('Logged-In Learner', function () {
   });
 
   it('should be able to remove a goal', async function () {
-    await this.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
-    await this.clickOnGoalCheckboxInRedesignedLearnerDashboard(
+    await loggedInLearner.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
+    await loggedInLearner.clickOnGoalCheckboxInRedesignedLearnerDashboard(
       'Algebra I',
       false
     );
-    await this.submitGoalInRedesignedLearnerDashboard();
+    await loggedInLearner.submitGoalInRedesignedLearnerDashboard();
 
     await loggedInLearner.expectRemoveActivityModelToBeDisplayed(
       "Remove from 'Current Goals' list?",

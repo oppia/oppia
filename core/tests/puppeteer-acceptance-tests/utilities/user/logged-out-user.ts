@@ -699,7 +699,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Return to Learner Dashboard from exploration completion card.
    */
-  async returnToLibraryFromExplorationCompletion() {
+  async returnToLibraryFromExplorationCompletion(): Promise<void> {
     await this.isElementVisible(returnToLibraryButtonSelector);
     await this.clickOn(returnToLibraryButtonSelector);
   }
@@ -4113,7 +4113,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to verify the number of hint models.
    * @param {number} n - The expected number of hint models.
    */
-  async expectHintModelsToBe(n: number) {
+  async expectHintModelsToBe(n: number): Promise<void> {
     const actualNumberOfHintModels = await this.page.$$(hintButtonSelector);
 
     if (actualNumberOfHintModels.length !== n) {
@@ -4123,10 +4123,14 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
-  async waitForHintModelsToBe(n: number): Promise<void> {
+  /**
+   * Waits until the number of hint models is not equal to given.
+   * @param {number} numberOfHintModals - The expected number of hint models.
+   */
+  async waitForHintModelsToBe(numberOfHintModals: number): Promise<void> {
     // Wait until number of elements is not equal to given.
     await this.page.waitForFunction(
-      (selector, expectedLength) => {
+      (selector: string, expectedLength: number) => {
         const elements = document.querySelectorAll(selector);
         return elements.length !== expectedLength;
       },
@@ -4134,7 +4138,7 @@ export class LoggedOutUser extends BaseUser {
         timeout: 30000,
       },
       hintButtonSelector,
-      n
+      numberOfHintModals
     );
   }
 
@@ -4825,7 +4829,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if voiceover is playable.
    * @param playable - If voiceover should be playable or not.
    */
-  async expectVoiceoverIsPlayable(playable: boolean = true) {
+  async expectVoiceoverIsPlayable(playable: boolean = true): Promise<void> {
     try {
       await this.startVoiceover();
 
@@ -5067,7 +5071,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if all dropdowns in navbar open properly.
    */
-  async expectDropdownsInNavbarToWorkProperly() {
+  async expectDropdownsInNavbarToWorkProperly(): Promise<void> {
     await this.clickOn(navbarLearnTab);
     await this.isElementVisible(navbarLearnDropdownContainerSelector);
 
@@ -5105,7 +5109,7 @@ export class LoggedOutUser extends BaseUser {
   async expecttabElementInLessonCardToContain(
     tabHeading: string,
     tabContent: string
-  ) {
+  ): Promise<void> {
     const tabHeaderElements = await this.page.$$(
       nonInteractiveTabsHeaderSelector
     );
@@ -5113,7 +5117,7 @@ export class LoggedOutUser extends BaseUser {
     for (const element of tabHeaderElements) {
       const text = await this.page.evaluate(el => el.textContent, element);
       if (text?.trim() === tabHeading) {
-        // You found the right tab
+        // You found the right tab.
         await element.click();
         break;
       }

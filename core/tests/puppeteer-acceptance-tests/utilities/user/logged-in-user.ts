@@ -209,10 +209,6 @@ const startGoalButtonSelector = '.e2e-test-start-lesson-button';
 // Learner Dashboard > Home Tab Seclectors.
 const hometabSectionHeadingSelector =
   '.e2e-test-learner-dash-home-tab .e2e-test-section-heading';
-const continueWhereYouLeftOffSectionSelector =
-  '.e2e-test-learner-dash-home-tab .e2e-test-continue-section.e2e-test-non-empty-section';
-const emptyContinueWhereYouLeftOffSectionSelector =
-  '.e2e-test-learner-dash-home-tab .e2e-test-continue-section.e2e-test-empty-section';
 const emptySuggestedForYouSectionSelector =
   '.e2e-test-learner-dash-home-tab .empty-suggested-for-you';
 const learnerGreetingsSelector = '.e2e-test-learner-greetings';
@@ -227,8 +223,6 @@ const learnSomethingNewSectionSelector =
   '.e2e-test-learn-something-new-section';
 
 // Learner Dashboard > Progress section selectors.
-const incompleteLessonsSectionSelector =
-  '.e2e-test-in-progress-community-lessons-section';
 const completedLessonsSectionSelector =
   '.e2e-test-completed-community-lessons-section';
 
@@ -2473,10 +2467,7 @@ export class LoggedInUser extends BaseUser {
     visible: boolean = true
   ): Promise<void> {
     expect(
-      await this.isElementVisible(
-        continueFromWhereLeftOffSectionSelector,
-        visible
-      )
+      await this.isElementVisible(continueFromWhereLeftOffSectionSelector)
     ).toBe(visible);
   }
 
@@ -2514,7 +2505,10 @@ export class LoggedInUser extends BaseUser {
    * Expects the remove activity model to be displayed.
    * @param {string} [header] - The header of the modal.
    */
-  async expectRemoveActivityModelToBeDisplayed(header?: string, body?: string) {
+  async expectRemoveActivityModelToBeDisplayed(
+    header?: string,
+    body?: string
+  ): Promise<void> {
     // Check for the modal container.
     await this.page.waitForSelector(removeModalContainerSelector);
 
@@ -2627,7 +2621,7 @@ export class LoggedInUser extends BaseUser {
   async expectLessonCardToBePresent(
     lessonTitle: string,
     context: puppeteer.ElementHandle<Element> | puppeteer.Page = this.page
-  ) {
+  ): Promise<void> {
     const lessonCards = await context.$$(lessonCardContainer);
     const lessonCardTitles = await Promise.all(
       lessonCards.map(card =>

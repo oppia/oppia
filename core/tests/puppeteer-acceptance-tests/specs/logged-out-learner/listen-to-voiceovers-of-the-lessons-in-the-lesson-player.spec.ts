@@ -35,8 +35,6 @@ const INTRO_CONTENT_VOICEOVER_IN_HI =
   testConstants.data.IntroContentVoiceoverInHindi;
 const CONTINUE_INTERACTION_VOICEOVER_IN_HI =
   testConstants.data.ContinueInteractionVoiceoverInHindi;
-const LAST_CARD_VOICEOVER_IN_HI =
-  testConstants.data.LastCardContentVoiceoverInHindi;
 
 describe('Logged-Out Learner', function () {
   let explorationId: string;
@@ -67,7 +65,7 @@ describe('Logged-Out Learner', function () {
         [ROLES.VOICEOVER_ADMIN]
       );
 
-      // Enable required feature flags
+      // Enable required feature flags.
       await releaseCoordinator.enableFeatureFlag(
         'exploration_editor_can_modify_translations'
       );
@@ -80,7 +78,7 @@ describe('Logged-Out Learner', function () {
 
       // Navigate to Exploration Editor.
       await curriculumAdmin.navigateToCreatorDashboardPage();
-      await curriculumAdmin.navigateToExplorationEditorPage();
+      await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
 
       // Add Interaction Cards.
       await curriculumAdmin.dismissWelcomeModal();
@@ -141,7 +139,7 @@ describe('Logged-Out Learner', function () {
         'Place Values'
       );
 
-      // Add Translations
+      // Add Translations.
       await curriculumAdmin.navigateToExplorationEditor(explorationId);
       await curriculumAdmin.navigateToTranslationsTab();
       await curriculumAdmin.dismissTranslationTabWelcomeModal();
@@ -163,7 +161,7 @@ describe('Logged-Out Learner', function () {
         'सही!'
       );
 
-      // Add Voiceovers
+      // Add Voiceovers.
       await curriculumAdmin.navigateToTranslationsTab();
       await curriculumAdmin.addVoiceoverToContent(
         'हिन्दी (Hindi)',

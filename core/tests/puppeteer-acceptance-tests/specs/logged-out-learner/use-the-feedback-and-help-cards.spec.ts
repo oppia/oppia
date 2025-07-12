@@ -20,16 +20,11 @@
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
-import testConstants from '../../utilities/common/test-constants';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {
   ExplorationEditor,
   INTERACTION_TYPES,
 } from '../../utilities/user/exploration-editor';
-
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-const STUDY_GUIDE_CONTENT =
-  'Remember, a fraction represents a part of a whole. It consists of a numerator and a denominator.';
 
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',

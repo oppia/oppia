@@ -59,7 +59,7 @@ describe('Logged-In Learner', function () {
       await loggedInUser.expectRatingStarsToBeVisible();
       await loggedInUser.rateExploration(3, 'Nice!', false);
 
-      // Return to learner dashboard
+      // Return to learner dashboard.
       await loggedInUser.returnToLibraryFromExplorationCompletion();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
