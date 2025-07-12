@@ -87,7 +87,7 @@ describe('Logged-Out Learner', function () {
     await explorationEditor.addSolutionToState(
       '1/2',
       '1/2 is the correct answer.',
-      false
+      true
     );
     await explorationEditor.saveExplorationDraft();
 
