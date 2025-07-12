@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for FeedbackThread.
  */
 
-import {FeedbackThread} from 'domain/feedback_thread/FeedbackThread';
+import {FeedbackThread} from 'domain/feedback_thread/FeedbackThread.model';
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 
 describe('FeedbackThread', () => {
