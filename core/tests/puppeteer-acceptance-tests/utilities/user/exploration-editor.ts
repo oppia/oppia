@@ -981,7 +981,7 @@ export class ExplorationEditor extends BaseUser {
 
   async updateWorldMapLearnerAnswerInResponseModal(
     rule: string,
-    answer: string
+    answer: string[]
   ): Promise<void> {
     return;
   }
