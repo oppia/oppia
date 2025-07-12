@@ -4952,7 +4952,7 @@ export class LoggedOutUser extends BaseUser {
       collapsibleRTEHeaderSelector
     );
     const collapsibleRTEHeaderText = await this.page.evaluate(
-      element => element.textContent,
+      element => element.textContent?.trim(),
       collapsibleRTEHeader
     );
     if (collapsibleRTEHeaderText !== header) {
