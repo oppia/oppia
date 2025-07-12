@@ -17,7 +17,6 @@
  * topic data.
  */
 
-
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
 import {
   StorySummaryBackendDict,
