@@ -114,7 +114,7 @@ export class ThreadDataBackendApiService {
     if (!threadBackendDict) {
       throw new Error('Missing input backend dict');
     }
-    let thread = this.FeedbackThread.createFromBackendDict(threadBackendDict);
+    let thread = FeedbackThread.createFromBackendDict(threadBackendDict);
     this.threadsById.set(thread.threadId, thread);
     return thread;
   }
