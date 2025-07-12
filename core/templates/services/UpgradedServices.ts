@@ -855,7 +855,6 @@ export class UpgradedServices {
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['FeedbackThread'],
         upgradedServices['SuggestionsService'],
         upgradedServices['LoggerService']
       );
