@@ -8320,7 +8320,7 @@ class VoiceoverRegenerationNotificationEmailUnitTests(
             (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
         ]
     )
-    def test_sends_email_to_tech_leads_on_regeneration_failure(self):
+    def test_sends_email_to_tech_leads_on_regeneration_failure(self) -> None:
         date = '10-10-2025'
         time = '10:00 AM'
         exploration_id = 'exp_id_123'
@@ -8336,21 +8336,22 @@ class VoiceoverRegenerationNotificationEmailUnitTests(
         )
         language_descriptions = ['English', 'Hindi']
 
-        voiceover_regeneration_error_messages = [{
-            'exploration_id': 'exploration_id_1',
-            'language_accent': 'English (India)',
-            'error_messages': [
-                'Error message 1 for English (India)',
-                'Error message 2 for English (India)'
-            ]
-        }, {
-            'exploration_id': 'exploration_id_2',
-            'language_accent': 'Hindi (India)',
-            'error_messages': [
-                'Error message 1 for Hindi (India)',
-                'Error message 2 for Hindi (India)'
-            ]
-        }]
+        voiceover_regeneration_error_messages: List[
+            Dict[str, str|List[str]]] = [{
+                'exploration_id': 'exploration_id_1',
+                'language_accent': 'English (India)',
+                'error_messages': [
+                    'Error message 1 for English (India)',
+                    'Error message 2 for English (India)'
+                ]
+            }, {
+                'exploration_id': 'exploration_id_2',
+                'language_accent': 'Hindi (India)',
+                'error_messages': [
+                    'Error message 1 for Hindi (India)',
+                    'Error message 2 for Hindi (India)'
+                ]
+            }]
 
         expected_email_body = (
             email_manager.VOICEOVER_TECH_LEADS_REGENERATION_NOTIFICATION_EMAIL[

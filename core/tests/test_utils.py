@@ -4349,7 +4349,7 @@ class EmailMessageMock:
         subject: str,
         plaintext_body: str,
         html_body: str,
-        cc: Optional[List[str]] = None,
+        cc: Optional[Sequence[str]] = None,
         bcc: Optional[Sequence[str]] = None,
         reply_to: Optional[str] = None,
         recipient_variables: Optional[

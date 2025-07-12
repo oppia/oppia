@@ -2743,9 +2743,9 @@ def _generate_attachments_for_failed_voiceovers(
     ]
 
     for error_dict in voiceover_regeneration_error_messages:
-        exploration_id = error_dict.get('exploration_id')
-        language_accent = error_dict.get('language_accent')
-        error_messages = error_dict.get('error_messages')
+        exploration_id = error_dict.get('exploration_id', '')
+        language_accent = error_dict.get('language_accent', '')
+        error_messages = error_dict.get('error_messages', [])
 
         lines.append('Exploration ID: %s\n' % exploration_id)
         lines.append('Language Accent: %s\n' % language_accent)
@@ -2791,7 +2791,7 @@ def send_emails_to_voiceover_admins(
     number_of_failed_voiceovers: int,
     language_descriptions: List[str],
     author_username: str,
-):
+) -> None:
     """Sends an email to the voiceover admins with details of the
     voiceover regeneration attempt.
 
@@ -2842,7 +2842,7 @@ def send_emails_to_voiceover_admins(
         feconf.EMAIL_INTENT_VOICEOVER_REGENERATION,
         email_subject,
         email_body,
-        system_email_address,
+        str(system_email_address),
         recipient_email=VOICEOVER_ADMIN_GOOGLE_GROUP
     )
 
@@ -2854,7 +2854,7 @@ def send_emails_to_voiceover_tech_leads(
     time: str,
     language_descriptions: List[str],
     voiceover_regeneration_error_messages: List[Dict[str, List[str]|str]]
-):
+) -> None:
     """Sends an email to the voiceover tech leads with details of failed
     voiceover regeneration attempts.
 
@@ -2905,7 +2905,7 @@ def send_emails_to_voiceover_tech_leads(
         feconf.EMAIL_INTENT_VOICEOVER_REGENERATION,
         email_subject,
         email_body,
-        system_email_address,
+        str(system_email_address),
         recipient_email=VOICEOVER_TECH_LEADS_GOOGLE_GROUP,
         cc_emails=[VOICEOVER_ADMIN_GOOGLE_GROUP],
         attachments=filename_to_path

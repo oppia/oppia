@@ -99,7 +99,7 @@ def send_email_to_recipients(
     if mailgun_api_key is None:
         email_msg = email_services.convert_email_to_loggable_string(
             sender_email, recipient_emails, subject, plaintext_body, html_body,
-            bcc, reply_to, recipient_variables
+            cc, bcc, reply_to, recipient_variables
         )
         raise Exception(
             'Mailgun API key is not available. '
@@ -111,7 +111,7 @@ def send_email_to_recipients(
     if not mailgun_domain_name:
         email_msg = email_services.convert_email_to_loggable_string(
             sender_email, recipient_emails, subject, plaintext_body, html_body,
-            bcc, reply_to, recipient_variables
+            cc, bcc, reply_to, recipient_variables
         )
         raise Exception(
             'Mailgun domain name is not set. '
