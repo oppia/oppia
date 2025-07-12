@@ -1,11 +1,11 @@
 <div *ngIf="!mobileCardToBeShown" class="e2e-test-lesson-card">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                                [activityType]="activityType"
-                                [activityId]="explorationId"
-                                [activityTitle]="explorationTitle"
-                                [isContainerNarrow]="isContainerNarrow"
-                                [isAddToPlaylistIconShown]="!isOwnedByCurrentUser"
-                                class="e2e-test-lesson-playlist-icon">
+                                 [activityType]="activityType"
+                                 [activityId]="explorationId"
+                                 [activityTitle]="explorationTitle"
+                                 [isContainerNarrow]="isContainerNarrow"
+                                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser"
+                                 class="e2e-test-lesson-playlist-icon">
   </oppia-learner-dashboard-icons>
 
   <mat-card (keydown.enter)="$event.stopPropagation(); explorationAnchor.click()"

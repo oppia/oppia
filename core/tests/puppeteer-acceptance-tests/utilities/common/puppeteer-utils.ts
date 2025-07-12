@@ -942,7 +942,7 @@ export class BaseUser {
   ): Promise<void> {
     try {
       await this.page.waitForFunction(
-        (sel, text) => {
+        (sel: string, text: string) => {
           const el = document.querySelector(sel);
           return el && el.textContent?.trim() === text;
         },
@@ -969,7 +969,7 @@ export class BaseUser {
   ): Promise<void> {
     try {
       await this.page.waitForFunction(
-        (sel, text) => {
+        (sel: string, text: string) => {
           const el = document.querySelector(sel);
           return el && el.textContent?.includes(text);
         },

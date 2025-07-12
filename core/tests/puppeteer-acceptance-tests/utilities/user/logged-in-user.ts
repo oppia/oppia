@@ -239,12 +239,9 @@ const mobileGetInvolvedMenuContainerSelector =
 const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
 
-const removeFromPlayLaterInLibrarySelector = '.e2e-test-remove-from-play-later';
 const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 
 // Community Library.
-const lessonCardContainerSelector =
-  '.e2e-test-community-library .e2e-test-lesson-card';
 const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
 
 export class LoggedInUser extends BaseUser {
