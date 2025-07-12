@@ -277,10 +277,15 @@ const voiceoverConfirmationModalButton =
 
 const previousCardButton = '.e2e-test-back-button';
 
+// Common Selectors.
+const inputFieldSelector = '.newTabButtonSelector';
+
 // Editor Tab Selectors.
 const addResponseModalHeaderSelector = '.e2e-test-add-response-modal-header';
+const algebricExpressionEditorSelector = 'algebraic-expression-editor';
 const checkboxInInteractionCustomizationSelector =
   '.e2e-test-interaction-editor .e2e-test-schema-based-bool-checkbox';
+const codeEditorStringEditorSelector = 'code-string-editor';
 const contentBoxSelector =
   '.e2e-test-state-editor .e2e-test-state-content-display';
 const currentHintSummarySelector =
@@ -296,22 +301,36 @@ const editCardContentButtonSelector = '.e2e-test-edit-content-pencil-button';
 const editOutcomeDestPencilButtonSelector =
   '.e2e-test-edit-outcome-dest-pencil-button';
 const interactionPreviewCardSelector = '.e2e-test-interaction-preview';
+const mathEquationEditorSelector = 'math-equation-editor';
+const newTabButtonSelector = '.oppia-new-tab-button-container';
 const nodeLabelSelector = '.e2e-test-node-background';
+const numberWithUnitEditorSelector = 'number-with-units-editor';
+const numericExpressionEditorSelector = 'numeric-expression-editor';
 const outcomeFeedbackSelector = '.e2e-test-edit-outcome-feedback-button';
 const removeInteractionButttonSelector = '.e2e-test-delete-interaction';
 const responseModalBodySelector = '.e2e-test-response-modal-body';
 const ruleEditorInResponseModalSeclector = 'oppia-rule-editor';
 
 export enum INTERACTION_TYPES {
+  ALGEBRIC_EXPRESSION = 'Algebric Expression Input',
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
   DRAG_AND_DROP_SORT = 'Drag and Drop Sort',
   END_EXPLORATION = 'End Exploration',
   FRACTION_INPUT = 'Fraction Input',
+  GRAPH_THEORY = 'Graph Theory',
   ITEM_SELECTION = 'Item Selection',
+  MATH_EQUATION = 'Math Equation Input',
   MULTIPLE_CHOICE = 'Multiple Choice',
+  MUSIC_NOTES_INPUT = 'Music Notes Input',
   NUMBER_INPUT = 'Number Input',
+  NUMBER_WITH_UNITS = 'Number With Units',
+  NUMERIC_EXPRESSION = 'Numeric Expression Input',
+  PENCIL_CODE_EDITOR = 'Pencil Code Editor',
+  RATIO_EXPRESSION_INPUT = 'Ratio Expression Input',
+  SET_INPUT = 'Set Input',
   TEXT_INPUT = 'Text Input',
+  WORLD_MAP = 'World Map',
 }
 
 enum INTERACTION_TABS {
@@ -539,6 +558,65 @@ export class ExplorationEditor extends BaseUser {
     });
   }
 
+  async getRuleEditorModal(): Promise<puppeteer.ElementHandle<Element>> {
+    await this.page.waitForSelector(responseModalBodySelector);
+
+    const responseBox = await this.page.$(responseModalBodySelector);
+    if (!responseBox) {
+      throw new Error('Response modal not found');
+    }
+
+    const ruleEditor = await responseBox.$(ruleEditorInResponseModalSeclector);
+    if (!ruleEditor) {
+      throw new Error('Rule editor not found');
+    }
+
+    return ruleEditor;
+  }
+
+  async updateAlgebricExpressionLearnerAnswerInResponseModal(
+    rule: string,
+    expression: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+
+    const responseBox = await this.getRuleEditorModal();
+    const algebricExpressionEditor = await responseBox.$(
+      algebricExpressionEditorSelector
+    );
+
+    if (!algebricExpressionEditor) {
+      throw new Error('Algebric expression editor not found.');
+    }
+
+    await algebricExpressionEditor.click();
+    await algebricExpressionEditor.type(expression);
+  }
+
+  /**
+   * Updates the numeric expression learner answer in the response modal.
+   * @param {string} rule - The rule to update.
+   * @param {string} expression - The expression to update.
+   */
+  async updateNumericExpressionLearnerAnswerInResponseModal(
+    rule: string,
+    expression: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+
+    const responseBox = await this.getRuleEditorModal();
+    const numericExpressionEditor = await responseBox.$(
+      numericExpressionEditorSelector
+    );
+
+    if (!numericExpressionEditor) {
+      throw new Error('Could not find numeric expression editor.');
+    }
+
+    await numericExpressionEditor.click();
+    await numericExpressionEditor.type(expression);
+  }
+
   /**
    * This function updates the answers in the response modal.
    * @param {INTERACTION_TYPES} interactionType - The type of the interaction.
@@ -602,6 +680,28 @@ export class ExplorationEditor extends BaseUser {
       default:
         throw new Error(`Unsupported interaction type: ${interactionType}`);
     }
+  }
+
+  /**
+   * Updates the code editor in the response modal to the given rule and code
+   * @param rule the rule to update the code editor to
+   * @param code the code to update the code editor to
+   */
+  async updateCodeEditorLearnerAnswerInResponseModal(
+    rule: string,
+    code: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+
+    const ruleEditor = await this.getRuleEditorModal();
+
+    const codeEditor = await ruleEditor.$(codeEditorStringEditorSelector);
+    if (!codeEditor) {
+      throw new Error(`Code editor not found for rule ${rule}`);
+    }
+
+    await codeEditor.click();
+    await codeEditor.type(code);
   }
 
   /**
@@ -682,6 +782,70 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
+  async updateMathEquationLearnerAnswerInResponseModal(
+    rule: string,
+    equation: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+
+    const responseBox = await this.getRuleEditorModal();
+
+    const equationBox = await responseBox.$(mathEquationEditorSelector);
+    if (!equationBox) {
+      throw new Error('Math equation box not found.');
+    }
+
+    await equationBox.click();
+    await equationBox.type(equation);
+  }
+
+  async updateMusicNotesInputLearnerAnswerInResponseModal(
+    rule: 'is equal to',
+    musicNotes: string[]
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+
+    const responseBox = await this.getRuleEditorModal();
+
+    for (let i = 0; i < musicNotes.length; i++) {
+      const addNoteButton = await responseBox.$(addResponseOptionButton);
+      await addNoteButton?.click();
+    }
+
+    const responseInputs = await this.page.$$('select');
+    if (responseInputs.length !== musicNotes.length) {
+      throw new Error(
+        `Expected ${musicNotes.length} response inputs, but found ${responseInputs.length}`
+      );
+    }
+
+    for (let i = 0; i < musicNotes.length; i++) {
+      await responseInputs[i].select(musicNotes[i]);
+    }
+  }
+
+  /**
+   * Updates the number with unit editor in the response modal.
+   * @param {} rule The rule to update the response modal to.
+   */
+  async updateNumberWithUnitsLearnerAnswerInResponseModal(
+    rule: string,
+    numberWithUnit: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+
+    const responseModal = await this.getRuleEditorModal();
+
+    const numberWithUnitEditor = await responseModal.$(
+      numberWithUnitEditorSelector
+    );
+    if (!numberWithUnitEditor) {
+      throw new Error('Could not find number with unit editor');
+    }
+
+    await numberWithUnitEditor.type(numberWithUnit);
+  }
+
   /**
    * Update the item selection learners answer in the response modal.
    * @param rule The rule to update.
@@ -724,6 +888,32 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Updates the ratio expression learner answer in the response modal.
+   * @param {string} rule - The rule to update.
+   * @param {string[]} answer - The answer to update.
+   */
+  async updateRatioExpressionInputLearnerAnswerInResponseModal(
+    rule: string,
+    answer: string[]
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+
+    const ruleEditorModal = await this.getRuleEditorModal();
+
+    const inputFields = await ruleEditorModal.$$('input');
+
+    if (inputFields.length !== answer.length) {
+      throw new Error(
+        `Expected ${answer.length} input fields, but found ${inputFields.length}`
+      );
+    }
+
+    for (let i = 0; i < inputFields.length; i++) {
+      await inputFields[i].type(answer[i]);
+    }
+  }
+
+  /**
    * Updates the rule in the response modal.
    * @param {string} rule The rule to update the response modal to.
    */
@@ -752,6 +942,48 @@ export class ExplorationEditor extends BaseUser {
     }
 
     expect(await selectInput?.evaluate(el => el.textContent)).toContain(rule);
+  }
+
+  /**
+   * Updates the set input learner answer in the response modal.
+   * @param rule The rule to update.
+   * @param values The values to update.
+   */
+  async updateSetInputLearnerAnswerInResponseModal(
+    rule: string,
+    values: string[]
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+
+    await this.page.waitForSelector(responseModalBodySelector, {visible: true});
+
+    const responseBox = await this.page.$(responseModalBodySelector);
+
+    if (!responseBox) {
+      throw new Error('Response box not found.');
+    }
+
+    for (let i = 0; i < values.length; i++) {
+      const addNewElementButton = await responseBox.$(newTabButtonSelector);
+
+      await addNewElementButton?.click();
+
+      const inputFields = await responseBox.$$(inputFieldSelector);
+      const inputField = inputFields[i];
+
+      await inputField?.type(values[i]);
+
+      expect(
+        await inputField.evaluate(el => (el as HTMLInputElement).value)
+      ).toEqual(values[i]);
+    }
+  }
+
+  async updateWorldMapLearnerAnswerInResponseModal(
+    rule: string,
+    answer: string
+  ): Promise<void> {
+    return;
   }
 
   // New functions ends.
@@ -1038,6 +1270,7 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Function to add an interaction to the exploration.
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
+   * @param {boolean} skipInteractionCustoization - Whether to skip interaction customization.
    * Note: A space is added before and after the interaction name to match the format in the UI.
    */
   async addInteraction(
@@ -1057,6 +1290,8 @@ export class ExplorationEditor extends BaseUser {
     ) {
       await this.clickOn(programmingInteractionsButton);
     }
+
+    await this.waitForNetworkIdle();
     await this.clickOn(` ${interactionToAdd} `);
     await this.page.waitForSelector(saveInteractionButton, {
       visible: true,
