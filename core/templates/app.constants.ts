@@ -428,4 +428,5 @@ export enum NavbarAndFooterGATrackingPages {
   VOLUNTEER = 'Volunteer',
   TEACH = 'Teach',
   DONATE = 'Donate',
+  BLOG = 'Blog',
 }

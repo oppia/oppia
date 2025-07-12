@@ -583,6 +583,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.windowRef.nativeWindow.location.href = '/teach';
   }
 
+  navigateToBlogPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.BLOG
+    );
+    this.windowRef.nativeWindow.location.href = '/blog';
+  }
+
   isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {
     return this.platformFeatureService.status
       .ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled;

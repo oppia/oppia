@@ -451,6 +451,19 @@ describe('TopNavigationBarComponent', () => {
     expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
   });
 
+  it('should register Blog header click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickNavbarButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
+
+    component.navigateToBlogPage();
+
+    expect(
+      siteAnalyticsService.registerClickNavbarButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.BLOG);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/blog');
+  });
+
   it('should check if i18n has been run', () => {
     spyOn(document, 'querySelectorAll')
       .withArgs('.oppia-navbar-tab-content')
