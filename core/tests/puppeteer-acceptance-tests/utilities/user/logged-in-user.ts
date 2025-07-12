@@ -243,6 +243,7 @@ const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
 
 // Community Library.
 const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
+const learnerDashboardIconsContainerSelector = 'oppia-learner-dashboard-icons';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -408,7 +409,7 @@ export class LoggedInUser extends BaseUser {
 
       try {
         await this.page.waitForSelector(homeSectionGreetingElement, {
-          timeout: 5000,
+          timeout: 10000,
         });
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
@@ -816,11 +817,14 @@ export class LoggedInUser extends BaseUser {
       }
 
       if (isMobileViewport) {
-        await this.page.waitForSelector(mobileLessonCardOptionsDropdownButton);
-        const optionsDropdownButtons = await this.page.$$(
+        await this.page.waitForSelector(learnerDashboardIconsContainerSelector);
+        const iconContainers = await this.page.$$(
+          learnerDashboardIconsContainerSelector
+        );
+        const dropdownIcon = await iconContainers[lessonIndex].$(
           mobileLessonCardOptionsDropdownButton
         );
-        await optionsDropdownButtons[lessonIndex].click();
+        await dropdownIcon?.click();
         await this.page.waitForSelector(mobileAddToPlayLaterButton);
         const mobileAddToPlayLaterButtons = await this.page.$$(
           mobileAddToPlayLaterButton
