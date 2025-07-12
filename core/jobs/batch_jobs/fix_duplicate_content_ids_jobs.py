@@ -82,7 +82,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
                 to check.
 
         Returns:
-            Dict containing exploration info and duplicates if found,
+            dict|None. Dict containing exploration info and duplicates if found,
             None otherwise.
         """
         all_content_ids: List[str] = []
@@ -176,8 +176,8 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
                 to check and fix.
 
         Returns:
-            Dict containing fix results if duplicates were found and fixed,
-            None otherwise.
+            dict|None. Dict containing fix results if duplicates were found and
+            fixed, None otherwise.
         """
         all_content_ids: List[str] = []
         state_to_content_ids: Dict[str, List[str]] = {}
@@ -212,7 +212,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
                 if duplicate_id in content_ids
             ]
 
-            # Keep the first occurrence, regenerate others
+            # Keep the first occurrence, regenerate others.
             for state_name in states_with_duplicate[1:]:
                 state = exploration.states[state_name]
 
@@ -312,4 +312,4 @@ class AuditFixExplorationsWithDuplicateContentIdsJob(
 ):
     """Audit job for FixExplorationsWithDuplicateContentIdsJob."""
 
-    DATASTORE_UPDATES_ALLOWED = False 
+    DATASTORE_UPDATES_ALLOWED = False

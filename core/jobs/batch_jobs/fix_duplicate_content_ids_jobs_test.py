@@ -49,7 +49,8 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
     )
 
     def test_identify_job_with_no_duplicates(self) -> None:
-        """Test that the job finds no duplicates when there are none."""
+        """Test that the job finds no duplicates when there are none.
+        """
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
         exp_services.save_new_exploration('owner_id', exploration)
@@ -58,7 +59,8 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
 
     def test_identify_job_with_duplicates(self) -> None:
         """Test that the job correctly identifies explorations with
-        duplicate content IDs."""
+        duplicate content IDs.
+        """
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
 
@@ -69,8 +71,6 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
-        # Create duplicate content IDs by setting the same content_id
-        # for both states
         duplicate_content_id = 'content_0'
         state1.content.content_id = duplicate_content_id
         state2.content.content_id = duplicate_content_id
@@ -83,7 +83,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
                 'Exploration exp_id (version 1) has duplicate content IDs: '
-                "{'content_0': ['Introduction', 'State2']}"
+                '{\'content_0\': [\'Introduction\', \'State2\']}'
             )
         ])
 
@@ -99,7 +99,8 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
     )
 
     def test_fix_job_with_no_duplicates(self) -> None:
-        """Test that the job does nothing when there are no duplicates."""
+        """Test that the job does nothing when there are no duplicates.
+        """
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
         exp_services.save_new_exploration('owner_id', exploration)
@@ -108,7 +109,8 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 
     def test_fix_job_with_duplicates(self) -> None:
         """Test that the job correctly fixes explorations with duplicate
-        content IDs."""
+        content IDs.
+        """
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
 
@@ -119,7 +121,6 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
-        # Create duplicate content IDs
         duplicate_content_id = 'content_0'
         state1.content.content_id = duplicate_content_id
         state2.content.content_id = duplicate_content_id
@@ -136,14 +137,12 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             )
         ])
 
-        # Verify the fix was applied
         updated_exploration = exp_fetchers.get_exploration_by_id('exp_id')
         state1_updated = updated_exploration.states['Introduction']
         state2_updated = updated_exploration.states['State2']
 
-        # State1 should keep the original content_id
+
         self.assertEqual(state1_updated.content.content_id, 'content_0')
-        # State2 should have a new content_id
         self.assertEqual(state2_updated.content.content_id, 'content_2')
 
 
@@ -158,7 +157,8 @@ class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
     )
 
     def test_audit_identify_job_with_duplicates(self) -> None:
-        """Test that the audit job correctly identifies duplicates."""
+        """Test that the audit job correctly identifies duplicates.
+        """
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
 
@@ -181,7 +181,7 @@ class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
                 'Exploration exp_id (version 1) has duplicate content IDs: '
-                "{'content_0': ['Introduction', 'State2']}"
+                '{\'content_0\': [\'Introduction\', \'State2\']}'
             )
         ])
 
@@ -197,7 +197,8 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
     )
 
     def test_audit_fix_job_with_duplicates(self) -> None:
-        """Test that the audit fix job shows what would be fixed."""
+        """Test that the audit fix job shows what would be fixed.
+        """
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
 
@@ -224,11 +225,9 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
             )
         ])
 
-        # Verify that the audit job did NOT actually fix anything
         updated_exploration = exp_fetchers.get_exploration_by_id('exp_id')
         state1_updated = updated_exploration.states['Introduction']
         state2_updated = updated_exploration.states['State2']
 
-        # Both states should still have the duplicate content_id
         self.assertEqual(state1_updated.content.content_id, 'content_0')
-        self.assertEqual(state2_updated.content.content_id, 'content_0') 
+        self.assertEqual(state2_updated.content.content_id, 'content_0')
