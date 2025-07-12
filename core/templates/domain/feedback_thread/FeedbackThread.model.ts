@@ -17,8 +17,6 @@
    thread domain objects.
  */
 
-import {Injectable} from '@angular/core';
-
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import {ThreadMessageSummary} from 'domain/feedback_message/ThreadMessageSummary.model';
 
@@ -88,11 +86,8 @@ export class FeedbackThread {
   isSuggestionThread(): boolean {
     return false;
   }
-}
 
-@Injectable({providedIn: 'root'})
-export class FeedbackThreadObjectFactory {
-  createFromBackendDict(
+  static createFromBackendDict(
     feedbackThreadBackendDict: FeedbackThreadBackendDict
   ): FeedbackThread {
     return new FeedbackThread(

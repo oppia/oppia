@@ -24,8 +24,7 @@ import {AppConstants} from 'app.constants';
 import {
   FeedbackThread,
   FeedbackThreadBackendDict,
-  FeedbackThreadObjectFactory,
-} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+} from 'domain/feedback_thread/FeedbackThread.model';
 import {
   ThreadMessage,
   ThreadMessageBackendDict,
@@ -68,7 +67,6 @@ export class ThreadDataBackendApiService {
   constructor(
     private alertsService: AlertsService,
     private pageContextService: PageContextService,
-    private feedbackThreadObjectFactory: FeedbackThreadObjectFactory,
     private http: HttpClient,
     private urlInterpolationService: UrlInterpolationService
   ) {}
@@ -116,8 +114,7 @@ export class ThreadDataBackendApiService {
     if (!threadBackendDict) {
       throw new Error('Missing input backend dict');
     }
-    let thread =
-      this.feedbackThreadObjectFactory.createFromBackendDict(threadBackendDict);
+    let thread = this.FeedbackThread.createFromBackendDict(threadBackendDict);
     this.threadsById.set(thread.threadId, thread);
     return thread;
   }
