@@ -422,7 +422,7 @@ const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const loginButtonSelector = '.e2e-mobile-test-login';
 
 const youtubePlayerSelector = '.e2e-test-youtube-player';
-const collapsibleRTEHeaderSelector = 'e2e-test-collapsible-heading';
+const collapsibleRTEHeaderSelector = '.e2e-test-collapsible-heading';
 const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
 
 const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
