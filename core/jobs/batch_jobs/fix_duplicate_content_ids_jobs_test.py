@@ -47,7 +47,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
 
     def test_identify_job_with_no_duplicates(self) -> None:
         """Test that the job finds no duplicates when there are none."""
-        
+
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
         exp_services.save_new_exploration('owner_id', exploration)
@@ -97,7 +97,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 
     def test_fix_job_with_no_duplicates(self) -> None:
         """Test that the job does nothing when there are no duplicates."""
-        
+
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', title='Test Exploration', category='Test')
         exp_services.save_new_exploration('owner_id', exploration)
