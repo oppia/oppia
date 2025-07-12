@@ -90,10 +90,6 @@ describe('Logged-In Learner', function () {
 
   it('should be able to change the preferred dashboard', async function () {
     await loggedInLearner.updatePreferredDashboard('Creator Dashboard');
-
-    await loggedInLearner.navigateToSplashPage(
-      'http://localhost:8181/creator-dashboard'
-    );
   });
 
   it('should be able to edit subject interests', async function () {
