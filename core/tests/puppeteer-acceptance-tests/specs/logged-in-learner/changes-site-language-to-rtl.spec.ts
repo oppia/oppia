@@ -152,7 +152,16 @@ describe('Interested Partner Organization', function () {
     await loggedInUser1.playLessonFromSearchResults('What is a Fraction?');
     await loggedInUser1.verifyPageIsRTL();
 
-    // TODO: Last steps.
+    // Check hints and lesson info are displayed in RTL.
+    await loggedInUser1.continueToNextCard();
+    await loggedInUser1.submitAnswer('1');
+
+    await loggedInUser1.viewHint();
+    await loggedInUser1.verifyPageIsRTL();
+    await loggedInUser1.closeHintModal();
+
+    await loggedInUser1.openLessonInfoModal();
+    await loggedInUser1.verifyPageIsRTL();
   });
 
   afterAll(async function () {
