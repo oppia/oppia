@@ -4050,7 +4050,10 @@ export class LoggedOutUser extends BaseUser {
    * Function to use a hint.
    */
   async viewHint(): Promise<void> {
-    await this.page.waitForSelector(hintButtonSelector);
+    await this.page.waitForSelector(hintButtonSelector, {
+      // Hint is shown after one minute.
+      timeout: 80000,
+    });
     await this.clickOn(hintButtonSelector);
 
     await this.page.waitForSelector(gotItButtonSelector, {

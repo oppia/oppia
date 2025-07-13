@@ -28,7 +28,7 @@ import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const ROLES = testConstants.Roles;
 
-describe('Interested Partner Organization', function () {
+describe('Logged-In Learner', function () {
   let loggedInUser1: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let explorationId: string | null;
