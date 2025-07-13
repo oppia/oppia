@@ -23,6 +23,7 @@ import {showMessage} from '../common/show-message';
 import {error} from 'console';
 import fs from 'fs';
 import path from 'path';
+import {number} from 'yargs';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -267,6 +268,7 @@ const feedbackTabBackButtonSelector = '.e2e-test-oppia-feedback-back-button';
 const feedbackStatusMenu = '.e2e-test-oppia-feedback-status-menu';
 const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
 const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
+const feedbackAuthorSelector = '.e2e-test-exploration-feedback-author';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
@@ -327,6 +329,12 @@ const historyPaginationDropdownSelector =
 const versionComparasionSelect = '.e2e-test-version-comparasion-select';
 const graphDifferencesSelector = '.e2e-test-graph-diff-container';
 const resetGraphButton = '.e2e-test-reset-graph';
+
+const startNewFeedbackButtonSelector = '.e2e-test-start-new-thread-button';
+const newFeedbackThreadModalSelector = 'oppia-create-feedback-thread-modal';
+const feedbackSubjectSelectorInNewFeedbackModal = `${newFeedbackThreadModalSelector} input`;
+const feedbackSelectorInNewFeedbackModal = `${newFeedbackThreadModalSelector} textarea`;
+const createThreadButtonSelector = '.e2e-test-create-new-feedback-btn';
 
 const pencilCodeIframe = '.pencil-code-editor-iframe';
 const pencilCodeTextArea = `.ace_text-input`;
@@ -476,7 +484,15 @@ export class ExplorationEditor extends BaseUser {
    * @param numberOfItems The expected number of history items.
    */
   async expectNumberOfHistoryItemsToBe(numberOfItems: number) {
-    await this.page.waitForSelector(historyListItemSelector);
+    if (numberOfItems === 0) {
+      await this.page.waitForSelector(historyListItemSelector, {
+        visible: false,
+      });
+      return;
+    }
+    await this.page.waitForSelector(historyListItemSelector, {
+      visible: true,
+    });
     const historyItems = await this.page.$$(historyListItemSelector);
     expect(historyItems.length).toBe(numberOfItems);
   }
@@ -500,13 +516,65 @@ export class ExplorationEditor extends BaseUser {
     await versionSelectElements[1].click();
     await this.selectMatOption(version2);
 
-    expect(versionSelectElements[0].evaluate(el => el.textContent)).toBe(
+    expect(await versionSelectElements[0].evaluate(el => el.textContent)).toBe(
       version1
     );
-    expect(versionSelectElements[1].evaluate(el => el.textContent)).toBe(
+    expect(await versionSelectElements[1].evaluate(el => el.textContent)).toBe(
       version2
     );
   }
+
+  async startAFeedbackThread(subject: string, feedback: string): Promise<void> {
+    await this.page.waitForSelector(startNewFeedbackButtonSelector, {
+      visible: true,
+    });
+    await this.clickOn(startNewFeedbackButtonSelector);
+
+    await this.isTextPresentOnPage('Start New Feedback Thread');
+
+    await this.page.waitForSelector(newFeedbackThreadModalSelector);
+    await this.type(feedbackSubjectSelectorInNewFeedbackModal, subject);
+    await this.type(feedbackSelectorInNewFeedbackModal, feedback);
+
+    expect(
+      await this.page.$eval(
+        feedbackSubjectSelectorInNewFeedbackModal,
+        el => (el as HTMLInputElement).value
+      )
+    ).toBe(subject);
+    expect(
+      await this.page.$eval(
+        feedbackSelectorInNewFeedbackModal,
+        el => (el as HTMLTextAreaElement).value
+      )
+    ).toBe(feedback);
+
+    await this.clickOn(createThreadButtonSelector);
+    await this.page.waitForSelector(newFeedbackThreadModalSelector, {
+      visible: false,
+    });
+  }
+
+  /**
+   * Function to verify if the feedback thread is present
+   * @param {string} feedbackSubject - The feedback subject to be verified
+   */
+  async expectFeedbackThreadToBePresent(
+    feedbackSubject: string
+  ): Promise<void> {
+    await this.page.waitForSelector(feedbackSubjectSelector);
+
+    expect(
+      await this.page.$$eval(feedbackSubjectSelector, subjects =>
+        subjects.map(subject => subject.textContent)
+      )
+    ).toContain(feedbackSubject);
+  }
+
+  async expectFeedbackDetailsToBe(
+    author: string,
+    status: string
+  ): Promise<void> {}
 
   /**
    * Expects the graph differences to be visible or not.
@@ -4207,18 +4275,14 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(sendButtonSelector);
 
     // Check if button is disabled after clicking
-    const isButtonDisabled = await this.page.evaluate(selector => {
-      const button = document.querySelector(selector) as
-        | HTMLButtonElement
-        | undefined;
-      return button?.disabled;
-    }, sendButtonSelector);
-
-    if (!isButtonDisabled) {
-      throw new Error(
-        'Feedback reply button is not disabled after sending a feedback reply.'
-      );
-    }
+    await this.page.waitForFunction(
+      selector => {
+        const btn = document.querySelector(selector);
+        return btn && !btn.disabled;
+      },
+      {},
+      sendButtonSelector
+    );
   }
 
   /**
@@ -4318,6 +4382,30 @@ export class ExplorationEditor extends BaseUser {
     if (statusText !== expectedStatus) {
       throw new Error(
         `Expected feedback status for thread ${threadIndex} to be "${expectedStatus}", but found "${statusText}"`
+      );
+    }
+  }
+
+  /**
+   * Verifies that the feedback author is as expected.
+   * @param {string} expectedAuthor - The expected author.
+   */
+  async expectFeedbackAuthorToBe(expectedAuthor: string): Promise<void> {
+    await this.page.waitForSelector(feedbackAuthorSelector);
+    const feedbackAuthors = await this.page.$$(feedbackAuthorSelector);
+
+    if (feedbackAuthors.length === 0) {
+      throw new Error('Feedback author not found.');
+    }
+
+    const authorText = await feedbackAuthors[0].evaluate(
+      el => el.textContent?.trim(),
+      feedbackAuthors[0]
+    );
+
+    if (authorText !== expectedAuthor) {
+      throw new Error(
+        `Expected feedback author to be "${expectedAuthor}", but found "${authorText}"`
       );
     }
   }

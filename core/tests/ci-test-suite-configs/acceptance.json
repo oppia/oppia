@@ -403,6 +403,10 @@
     {
       "name": "exploration-editor/exploration-settings",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-settings.spec.ts"
+    },
+    {
+      "name": "exploration-editor/exploration-feedback",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-feedback.spec.ts"
     }
   ],
   "docker_suites": []
