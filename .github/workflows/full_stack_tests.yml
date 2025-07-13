@@ -50,6 +50,8 @@ jobs:
       matrix:
         suite: 
           - name: exploration-editor/create-an-exploration-with-all-interactions
+          - name: exploration-editor/exploration-history
+          - name: exploration-editor/exploration-settings
     name: Acceptance (${{ matrix.suite.name }})
     steps:
       - name: Check for broken suites

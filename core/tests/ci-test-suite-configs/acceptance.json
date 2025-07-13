@@ -392,7 +392,18 @@
       "name": "voiceover-admin/add-voiceover-artist-to-an-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
     },
-    {"name": "exploration-editor/create-an-exploration-with-all-interactions", "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-an-exploration-with-all-interactions.spec.ts"}
+    {
+      "name": "exploration-editor/create-an-exploration-with-all-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-an-exploration-with-all-interactions.spec.ts"
+    },
+    {
+      "name": "exploration-editor/exploration-history",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-history.spec.ts"
+    },
+    {
+      "name": "exploration-editor/exploration-settings",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-settings.spec.ts"
+    }
   ],
   "docker_suites": []
 }

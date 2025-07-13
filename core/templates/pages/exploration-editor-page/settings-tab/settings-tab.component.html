@@ -587,7 +587,7 @@
       </p>
       <p *ngIf="canDelete" class="oppia-exploration-ctrl">
         <button type="button" *ngIf="explorationRightsService.isPrivate()"
-                class="btn oppia-delete-button" (click)="deleteExploration()"
+                class="btn oppia-delete-button e2e-test-delete-exploration-button" (click)="deleteExploration()"
                 title="Delete this exploration">
           DELETE EXPLORATION
         </button>

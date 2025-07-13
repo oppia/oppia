@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import puppeteer, {ElementHandle} from 'puppeteer';
+import puppeteer, {ElementHandle, Puppeteer} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -315,6 +315,19 @@ const solutionModal = 'oppia-add-or-update-solution-modal';
 const codeEditorInSolutionModal =
   'oppia-interactive-code-repl .CodeMirror-scroll .CodeMirror-lines';
 
+const deleteExplorationButton = '.e2e-test-delete-exploration-button';
+const deleteExplorationModal = 'oppia-delete-exploration-button';
+const confirmExplorationDeletetionButton =
+  '.e2e-test-really-delete-exploration-button';
+
+const historyUserFilterSelector = 'oppia-history-tab input';
+const historyListItemSelector = '.e2e-test-history-list-item';
+const historyPaginationDropdownSelector =
+  '.e2e-test-history-pagination mat-select';
+const versionComparasionSelect = '.e2e-test-version-comparasion-select';
+const graphDifferencesSelector = '.e2e-test-graph-diff-container';
+const resetGraphButton = '.e2e-test-reset-graph';
+
 const pencilCodeIframe = '.pencil-code-editor-iframe';
 const pencilCodeTextArea = `.ace_text-input`;
 
@@ -386,6 +399,138 @@ const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
   /**
+   * Clicks on the delete exploration button.
+   */
+  async clickOnDeleteExplorationButton(): Promise<void> {
+    await this.page.waitForSelector(deleteExplorationButton, {
+      visible: true,
+    });
+    await this.clickOn(deleteExplorationButton);
+    await this.page.waitForSelector(deleteExplorationModal, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Confirm the delete exploration button.
+   */
+  async confirmDeleteExplorationButton(): Promise<void> {
+    await this.page.waitForSelector(confirmExplorationDeletetionButton, {
+      visible: true,
+    });
+    await this.clickOn(confirmExplorationDeletetionButton);
+    await this.page.waitForSelector(confirmExplorationDeletetionButton, {
+      visible: false,
+    });
+  }
+
+  /**
+   * Searches for a user in the history tab.
+   * @param username The username to be searched.
+   */
+  async searchUserInHistoryTab(username: string) {
+    await this.page.waitForSelector(historyUserFilterSelector);
+
+    await this.clearAllTextFrom(historyListItemSelector);
+    await this.type(historyUserFilterSelector, username);
+
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Changes the pagination in the history tab to the specified number of pages.
+   * @param numberOfPages The number of pages to change the pagination to.
+   */
+  async changePaginationInHistoryTabTo(numberOfPages: number) {
+    await this.page.waitForSelector(historyPaginationDropdownSelector);
+
+    await this.clickOn(historyPaginationDropdownSelector);
+
+    await this.page.waitForSelector('mat-option');
+    const optionsElements = await this.page.$$('mat-option');
+    const optionValues = await this.page.$$eval('mat-option', elements =>
+      elements.map(element => element.textContent)
+    );
+
+    const index = optionValues.indexOf(numberOfPages.toString());
+
+    if (index == -1) {
+      throw new Error(`Could not find option with value ${numberOfPages}`);
+    }
+
+    await optionsElements[index].click();
+
+    await this.page.waitForSelector('mat-option', {
+      visible: false,
+    });
+    expect(
+      await this.page.$eval(
+        historyPaginationDropdownSelector,
+        el => el.textContent
+      )
+    ).toContain(numberOfPages.toString());
+  }
+
+  /**
+   * Expects the number of history items to be the specified number.
+   * @param numberOfItems The expected number of history items.
+   */
+  async expectNumberOfHistoryItemsToBe(numberOfItems: number) {
+    await this.page.waitForSelector(historyListItemSelector);
+    const historyItems = await this.page.$$(historyListItemSelector);
+    expect(historyItems.length).toBe(numberOfItems);
+  }
+
+  /**
+   * Compares the versions of the exploration in the history tab.
+   * @param version1 The first version.
+   * @param version2 The second version.
+   */
+  async compareExplorationVersionsInHistoryTab(
+    version1: string,
+    version2: string
+  ) {
+    await this.page.waitForSelector(versionComparasionSelect);
+
+    const versionSelectElements = await this.page.$$(versionComparasionSelect);
+
+    await versionSelectElements[0].click();
+    await this.selectMatOption(version1);
+
+    await versionSelectElements[1].click();
+    await this.selectMatOption(version2);
+
+    expect(versionSelectElements[0].evaluate(el => el.textContent)).toBe(
+      version1
+    );
+    expect(versionSelectElements[1].evaluate(el => el.textContent)).toBe(
+      version2
+    );
+  }
+
+  /**
+   * Expects the graph differences to be visible or not.
+   * @param visible Whether the graph differences should be visible or not.
+   */
+  async expectGraphDifferencesToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    expect(await this.page.waitForSelector(graphDifferencesSelector)).toBe(
+      visible
+    );
+  }
+
+  /**
+   * Resets the graph differences in the history tab.
+   */
+  async resetGraphDifferenceInHistoryTab(): Promise<void> {
+    await this.page.waitForSelector(resetGraphButton);
+    await this.page.click(resetGraphButton);
+
+    await this.expectGraphDifferencesToBeVisible(false);
+  }
+
+  /**
    * Adds the response details in the response modal.
    * @param feedback The feedback to be added in the response modal.
    * @param destination The destination to be added in the response modal.
@@ -430,6 +575,7 @@ export class ExplorationEditor extends BaseUser {
       await this.waitForNetworkIdle();
     }
   }
+
   /**
    * Function to add responses to the interactions.
    * Currently, it only handles 'Number Input', 'Multiple Choice', 'Number Input', and 'Text Input' interaction types.
@@ -4335,6 +4481,15 @@ export class ExplorationEditor extends BaseUser {
     );
 
     expect(solutions).toContain(expectedSolution);
+  }
+
+  /**
+   * Expect to be in the creator dashboard page.
+   */
+  async expectToBeInCreatorDashboard(): Promise<void> {
+    await this.isTextPresentOnPage('Creator Dashboard');
+
+    expect(this.page.url()).toBe(creatorDashboardPage);
   }
 }
 

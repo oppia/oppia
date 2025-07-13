@@ -442,6 +442,25 @@ export class BaseUser {
   }
 
   /**
+   * Selects the mat-option with the given value.
+   * @param value The value of the mat-option to select.
+   */
+  async selectMatOption(value: string) {
+    await this.page.waitForSelector('mat-option');
+    const matOptionElements = await this.page.$$('mat-option');
+    for (const matOptionElement of matOptionElements) {
+      if ((await matOptionElement.evaluate(el => el.textContent)) === value) {
+        await matOptionElement.click();
+        break;
+      }
+    }
+
+    await this.page.waitForSelector('mat-option', {
+      visible: false,
+    });
+  }
+
+  /**
    * The function clicks the element using the text on the button
    * and wait until the new page is fully loaded.
    */
