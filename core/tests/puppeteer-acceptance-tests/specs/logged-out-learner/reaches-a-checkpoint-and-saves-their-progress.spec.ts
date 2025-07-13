@@ -107,7 +107,7 @@ describe('Logged-out User', function () {
     explorationId = await explorationEditor.publishExplorationWithMetadata(
       'What are the Place Values?',
       'Learn basic Mathematics including Place Values',
-      'Mathematics'
+      'Algebra'
     );
   });
 
