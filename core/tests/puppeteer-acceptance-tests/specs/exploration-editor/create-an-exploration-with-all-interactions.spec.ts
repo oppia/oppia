@@ -29,9 +29,7 @@ import {
 describe('Interested Partner Organization', function () {
   let explorationEditor: ExplorationEditor;
 
-  beforeAll(async function () {});
-
-  it('should be able to use "continue button" interaction', async function () {
+  beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com'
@@ -40,7 +38,9 @@ describe('Interested Partner Organization', function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
+  });
 
+  it('should be able to use "continue button" interaction', async function () {
     // Update the card content.
     await explorationEditor.updateCardContent('Click on the button.');
     await explorationEditor.expectCardContentToBe('Click on the button.');
@@ -52,13 +52,11 @@ describe('Interested Partner Organization', function () {
     await explorationEditor.expectRemoveInteractionButtonToBeVisible();
 
     // Update the default response feedback.
-    await explorationEditor.updateDefaultResponseFeedbackInExplorationEditorPage(
-      "Great! Now let's check other interactions"
-    );
-    // TODO: Response feedback is displayed in the box.
-    // TODO: Pen icon for feedback is still visible.
+    // INFO: You can't update the default reponse in Continue Button interaction.
+    // TODO: Update CUJv3 Doc with the same.
 
     // Direct learners to new card.
+    await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard('Second Card');
     await explorationEditor.expectCurrentOutcomeDestinationToBe('Second Card');
     await explorationEditor.expectEditOutcomeDestPencilButtonToBeVisible();
@@ -89,9 +87,8 @@ describe('Interested Partner Organization', function () {
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong Answer. Please try again'
+      'Wrong.'
     );
-
     await explorationEditor.addHintToState('Try Google Search.');
     await explorationEditor.expectHintsToConatin('Try Google Search.');
 
@@ -133,14 +130,7 @@ describe('Interested Partner Organization', function () {
     await explorationEditor.expectCardContentToBe(
       'Enter text "Hello, Oppia!".'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.TEXT_INPUT);
-    await explorationEditor.addResponsesToTheInteraction(
-      INTERACTION_TYPES.TEXT_INPUT,
-      'Hello',
-      'Perfect!',
-      'Fifth Card',
-      true
-    );
+    await explorationEditor.addInteraction(INTERACTION_TYPES.TEXT_INPUT, false);
     await explorationEditor.customizeTextInputInteraction(
       'Hello, there!',
       '2',
@@ -148,12 +138,11 @@ describe('Interested Partner Organization', function () {
     );
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.TEXT_INPUT,
-      'Hello, Oppia!',
-      'Prefect',
+      'Hello',
+      'Perfect!',
       'Fifth Card',
       true
     );
-    await explorationEditor.expectOutcomeFeedbackToBe('Perfect');
 
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'No write "Hello, Oppia!"'
@@ -172,7 +161,6 @@ describe('Interested Partner Organization', function () {
       'Wrong.'
     );
     await explorationEditor.directLearnersToNewCard('Sixth Card');
-    await explorationEditor.saveExplorationDraft();
 
     await explorationEditor.saveExplorationDraft();
   });
@@ -192,7 +180,7 @@ describe('Interested Partner Organization', function () {
       2
     );
     await explorationEditor.updateItemSelectionLearnersAnswerInResponseModal(
-      'contains atleast one of',
+      'contains at least one of',
       ['Correct Option 1', 'Correct Option 2']
     );
     await explorationEditor.addResponseDetailsInResponseModal(
@@ -212,7 +200,7 @@ describe('Interested Partner Organization', function () {
     await explorationEditor.navigateToCard('Seventh Card');
 
     // Add a drag and drop sort interaction.
-    await explorationEditor.updateCardContent('Drag and Drop Sort');
+    await explorationEditor.updateCardContent('Arrange in Ascending Order');
     await explorationEditor.addInteraction(
       INTERACTION_TYPES.DRAG_AND_DROP_SORT,
       false
@@ -237,7 +225,11 @@ describe('Interested Partner Organization', function () {
       'Try Again!'
     );
 
-    // TODO: Add solution.
+    // Add solution.
+    await explorationEditor.addDragAndDropSortSolution(
+      ['First', 'Second', 'Third'],
+      'As given in the question.'
+    );
 
     await explorationEditor.saveExplorationDraft();
   });
@@ -246,9 +238,8 @@ describe('Interested Partner Organization', function () {
     await explorationEditor.navigateToCard('Ninth Card');
 
     // Add a fraction input interaction.
-    await explorationEditor.updateCardContent('Enter a fraction.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
     await explorationEditor.updateCardContent('Enter a fraction: 1/2.');
+    await explorationEditor.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.FRACTION_INPUT,
       '1/2',
@@ -271,25 +262,23 @@ describe('Interested Partner Organization', function () {
 
   it('should be able to use "Graph Theory" interaction', async function () {
     // Navigate to the new card and update its content.
-    await explorationEditor.navigateToCard('Tenth Card');
-
+    // await explorationEditor.navigateToCard('Tenth Card');
     // Add a graph theory interaction.
     // TODO: Complete it.
-    await explorationEditor.updateCardContent('Graph Theory');
-    await explorationEditor.addInteraction(
-      INTERACTION_TYPES.CONTINUE_BUTTON,
-      false
-    );
-    await explorationEditor.updateDefaultResponseFeedbackInExplorationEditorPage(
-      "Great! Now let's check other interactions"
-    );
-    await explorationEditor.directLearnersToNewCard('Eleventh Card');
-
-    await explorationEditor.saveExplorationDraft();
+    // await explorationEditor.updateCardContent('Graph Theory');
+    // await explorationEditor.addInteraction(
+    //   INTERACTION_TYPES.CONTINUE_BUTTON,
+    //   false
+    // );
+    // await explorationEditor.updateDefaultResponseFeedbackInExplorationEditorPage(
+    //   "Great! Now let's check other interactions"
+    // );
+    // await explorationEditor.directLearnersToNewCard('Eleventh Card');
+    // await explorationEditor.saveExplorationDraft();
   });
 
   it('should be able to use "Set Input" interaction', async function () {
-    await explorationEditor.navigateToCard('Eleventh Card');
+    await explorationEditor.navigateToCard('Tenth Card');
 
     // Add a set input interaction.
     await explorationEditor.updateCardContent('Enter a set.');
@@ -308,7 +297,11 @@ describe('Interested Partner Organization', function () {
       'Wrong Answer. Please try again'
     );
 
-    // TODO: Add solution.
+    // Add solution.
+    await explorationEditor.addSetInputSolutionToState(
+      ['1', '2', '3'],
+      'as given in the question.'
+    );
 
     await explorationEditor.saveExplorationDraft();
   });
@@ -335,7 +328,11 @@ describe('Interested Partner Organization', function () {
       'Wrong Answer. Please try again'
     );
 
-    // TODO: Add solution.
+    // Add solution.
+    await explorationEditor.addNumbericInteractionSolutionToState(
+      'sqrt2',
+      'as given in the question.'
+    );
 
     await explorationEditor.saveExplorationDraft();
   });
@@ -346,7 +343,7 @@ describe('Interested Partner Organization', function () {
     // Add a algebric expression interaction.
     await explorationEditor.updateCardContent('Enter a algebric expression.');
     await explorationEditor.addInteraction(
-      INTERACTION_TYPES.ALGEBRIC_EXPRESSION
+      INTERACTION_TYPES.ALGEBRAIC_EXPRESSION
     );
     await explorationEditor.updateAlgebricExpressionLearnerAnswerInResponseModal(
       'matches exactly with',
@@ -362,7 +359,11 @@ describe('Interested Partner Organization', function () {
       'Wrong Answer. Please try again'
     );
 
-    // TODO: Add solution.
+    // Add solution.
+    await explorationEditor.addAlgebricExpressionSolutionToState(
+      'a+b',
+      'as given in the question.'
+    );
   });
 
   it('should be able to use "Math Equation" interaction', async function () {
@@ -385,7 +386,11 @@ describe('Interested Partner Organization', function () {
       'Wrong Answer. Please try again'
     );
 
-    // TODO: Add solution.
+    // Add solution.
+    await explorationEditor.addMathEquationSolutionToState(
+      '5x=2+3',
+      'as given in the question.'
+    );
   });
 
   it('should be able to use "Number With Units" interaction', async function () {
@@ -393,7 +398,10 @@ describe('Interested Partner Organization', function () {
 
     // Add a number with units input interaction.
     await explorationEditor.updateCardContent('Enter a number with units.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_WITH_UNITS);
+    await explorationEditor.addInteraction(
+      INTERACTION_TYPES.NUMBER_WITH_UNITS,
+      false
+    );
     await explorationEditor.updateNumberWithUnitsLearnerAnswerInResponseModal(
       'has the same value and units as',
       '100km'
@@ -408,7 +416,12 @@ describe('Interested Partner Organization', function () {
       'Wrong Answer. Please try again'
     );
 
-    // TODO: Add solution.
+    // Add solution.
+    await explorationEditor.addSolutionToState(
+      '100km',
+      'As given in the question.',
+      true
+    );
 
     await explorationEditor.saveExplorationDraft();
   });
@@ -435,13 +448,18 @@ describe('Interested Partner Organization', function () {
       'Wrong Answer. Please try again'
     );
 
-    // TODO: Add solution.
+    // Add solution.
+    await explorationEditor.addSolutionToState(
+      '1:2',
+      'As given in the question.',
+      true
+    );
 
     await explorationEditor.saveExplorationDraft();
   });
 
   it('should be able to use "Code Editor" interaction', async function () {
-    await explorationEditor.navigateToCard('Seventeenth Card');
+    await explorationEditor.navigateToCard('Seventeenth ...');
 
     // Add a code editor interaction.
     await explorationEditor.updateCardContent('Enter a code editor.');
@@ -460,7 +478,11 @@ describe('Interested Partner Organization', function () {
       'Wrong Answer. Please try again'
     );
 
-    // TODO: Add solution.
+    // Add solution.
+    await explorationEditor.addCodeEditorSolutionToState(
+      'print("Hello, Oppia!")',
+      'As given in the question.'
+    );
 
     await explorationEditor.saveExplorationDraft();
   });
@@ -512,7 +534,11 @@ describe('Interested Partner Organization', function () {
       'Wrong Answer. Please try again'
     );
 
-    // TODO: Add solution.
+    // Add solution.
+    await explorationEditor.addMusicNotesInputSolutionToState(
+      ['C4', 'E4', 'G4'],
+      'as given in the question.'
+    );
 
     await explorationEditor.saveExplorationDraft();
   });

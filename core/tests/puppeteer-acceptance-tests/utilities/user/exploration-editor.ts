@@ -16,7 +16,7 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import puppeteer from 'puppeteer';
+import puppeteer, {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -282,7 +282,7 @@ const inputFieldSelector = '.newTabButtonSelector';
 
 // Editor Tab Selectors.
 const addResponseModalHeaderSelector = '.e2e-test-add-response-modal-header';
-const algebricExpressionEditorSelector = 'algebraic-expression-editor';
+const algebricExpressionEditorSelector = '.e2e-test-guppy-div';
 const checkboxInInteractionCustomizationSelector =
   '.e2e-test-interaction-editor .e2e-test-schema-based-bool-checkbox';
 const codeEditorStringEditorSelector = 'code-string-editor';
@@ -301,18 +301,28 @@ const editCardContentButtonSelector = '.e2e-test-edit-content-pencil-button';
 const editOutcomeDestPencilButtonSelector =
   '.e2e-test-edit-outcome-dest-pencil-button';
 const interactionPreviewCardSelector = '.e2e-test-interaction-preview';
-const mathEquationEditorSelector = 'math-equation-editor';
+const mathEquationEditorSelector = '.e2e-test-guppy-div';
 const newTabButtonSelector = '.oppia-new-tab-button-container';
-const nodeLabelSelector = '.e2e-test-node-background';
 const numberWithUnitEditorSelector = 'number-with-units-editor';
-const numericExpressionEditorSelector = 'numeric-expression-editor';
+const numericExpressionEditorSelector = '.e2e-test-guppy-div';
 const outcomeFeedbackSelector = '.e2e-test-edit-outcome-feedback-button';
 const removeInteractionButttonSelector = '.e2e-test-delete-interaction';
 const responseModalBodySelector = '.e2e-test-response-modal-body';
 const ruleEditorInResponseModalSeclector = 'oppia-rule-editor';
 
+const dragAndDropItemSelector = '.e2e-test-drag-and-drop-sort-item';
+const solutionModal = 'oppia-add-or-update-solution-modal';
+const codeEditorInSolutionModal =
+  'oppia-interactive-code-repl .CodeMirror-scroll .CodeMirror-lines';
+
+const pencilCodeIframe = '.pencil-code-editor-iframe';
+const pencilCodeTextArea = `.ace_text-input`;
+
+const addMusicNodeInSolutionModal = `${newTabButtonSelector} button`;
+const musicNodeSelectSelector = 'oppia-music-input-valid-note-area select';
+
 export enum INTERACTION_TYPES {
-  ALGEBRIC_EXPRESSION = 'Algebric Expression Input',
+  ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
   DRAG_AND_DROP_SORT = 'Drag and Drop Sort',
@@ -333,9 +343,38 @@ export enum INTERACTION_TYPES {
   WORLD_MAP = 'World Map',
 }
 
+const INTERACTION_SELECTORS = {
+  [INTERACTION_TYPES.DRAG_AND_DROP_SORT]:
+    '.e2e-test-interaction-tile-DragAndDropSortInput',
+  [INTERACTION_TYPES.SET_INPUT]: '.e2e-test-interaction-tile-SetInput',
+  [INTERACTION_TYPES.NUMERIC_EXPRESSION]:
+    '.e2e-test-interaction-tile-NumericExpressionInput',
+  [INTERACTION_TYPES.ALGEBRAIC_EXPRESSION]:
+    '.e2e-test-interaction-tile-AlgebraicExpressionInput',
+  [INTERACTION_TYPES.MATH_EQUATION]:
+    '.e2e-test-interaction-tile-MathEquationInput',
+  [INTERACTION_TYPES.NUMBER_WITH_UNITS]:
+    '.e2e-test-interaction-tile-NumberWithUnits',
+  [INTERACTION_TYPES.RATIO_EXPRESSION_INPUT]:
+    '.e2e-test-interaction-tile-RatioExpressionInput',
+  [INTERACTION_TYPES.WORLD_MAP]: '.e2e-test-interaction-tile-InteractiveMap',
+  [INTERACTION_TYPES.MUSIC_NOTES_INPUT]:
+    '.e2e-test-interaction-tile-MusicNotesInput',
+};
+
 enum INTERACTION_TABS {
   PROGRAMMING = 'PROGRAMMING',
+  MATHS = 'MATHS',
+  MUSIC = 'MUSIC',
+  GEOGRAPHY = 'GEOGRAPHY',
 }
+
+const INTERACTION_TABS_SELECTORS = {
+  [INTERACTION_TABS.PROGRAMMING]: '.e2e-test-interaction-tab-programming',
+  [INTERACTION_TABS.MATHS]: '.e2e-test-interaction-tab-math',
+  [INTERACTION_TABS.GEOGRAPHY]: '.e2e-test-interaction-tab-geography',
+  [INTERACTION_TABS.MUSIC]: '.e2e-test-interaction-tab-music',
+};
 
 export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
@@ -456,9 +495,9 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.page.waitForSelector(customizeInteractionBodySelector);
 
-    const inputElements = this.page.$$(
-      `${customizeInteractionBodySelector} input`
-    );
+    const inputSelctor = `${customizeInteractionBodySelector} input`;
+    await this.page.waitForSelector(inputSelctor);
+    const inputElements = await this.page.$$(inputSelctor);
 
     // Update minimum number of selections.
     if (minimumNumberOfSelections) {
@@ -546,9 +585,13 @@ export class ExplorationEditor extends BaseUser {
     if (catchMisspellings === true) {
       inputElements[2].click();
 
-      expect(
-        await inputElements[2].evaluate(el => (el as HTMLInputElement).checked)
-      ).toBe(catchMisspellings);
+      await this.page.waitForFunction(
+        (ele: HTMLInputElement) => {
+          return ele.checked;
+        },
+        {},
+        inputElements[2]
+      );
     }
 
     // Save the interaction.
@@ -558,6 +601,10 @@ export class ExplorationEditor extends BaseUser {
     });
   }
 
+  /**
+   * Returns the rule editor modal.
+   * @returns The rule editor modal.
+   */
   async getRuleEditorModal(): Promise<puppeteer.ElementHandle<Element>> {
     await this.page.waitForSelector(responseModalBodySelector);
 
@@ -572,6 +619,17 @@ export class ExplorationEditor extends BaseUser {
     }
 
     return ruleEditor;
+  }
+
+  async getSolutionModal(): Promise<puppeteer.ElementHandle<Element>> {
+    await this.page.waitForSelector(solutionModal);
+
+    const solutionBox = await this.page.$(solutionModal);
+    if (!solutionBox) {
+      throw new Error('Solution box not found');
+    }
+
+    return solutionBox;
   }
 
   async updateAlgebricExpressionLearnerAnswerInResponseModal(
@@ -591,6 +649,32 @@ export class ExplorationEditor extends BaseUser {
 
     await algebricExpressionEditor.click();
     await algebricExpressionEditor.type(expression);
+  }
+
+  async addAlgebricExpressionSolutionToState(
+    solution: string,
+    explaination: string
+  ): Promise<void> {
+    // Click on Add Solution button.
+    await this.clickOnAddSolutionButton();
+
+    // Add solution.
+    const solutionModal = await this.getSolutionModal();
+    const algebricExpressionEditor = await solutionModal.$(
+      algebricExpressionEditorSelector
+    );
+
+    if (!algebricExpressionEditor) {
+      throw new Error('Algebric expression editor not found.');
+    }
+
+    await algebricExpressionEditor.click();
+    await algebricExpressionEditor.type(solution);
+
+    await this.clickOn(submitAnswerButton);
+
+    // Add explanation.
+    await this.addSolutionExplanationAndSave(explaination);
   }
 
   /**
@@ -618,6 +702,37 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Adds a numeric interaction solution to the current state card.
+   * @param {string} solution - The solution to add.
+   * @param {string} explaination - The explanation for the solution.
+   */
+  async addNumbericInteractionSolutionToState(
+    solution: string,
+    explaination: string
+  ): Promise<void> {
+    // Click on Add Solution button.
+    await this.clickOnAddSolutionButton();
+
+    // Add solution.
+    const solutionModal = await this.getSolutionModal();
+    const numericExpressionEditor = await solutionModal.$(
+      numericExpressionEditorSelector
+    );
+
+    if (!numericExpressionEditor) {
+      throw new Error('Could not find numeric expression editor.');
+    }
+
+    await numericExpressionEditor.click();
+    await numericExpressionEditor.type(solution);
+
+    await this.clickOn(submitAnswerButton);
+
+    // Add explanation.
+    await this.addSolutionExplanationAndSave(explaination);
+  }
+
+  /**
    * This function updates the answers in the response modal.
    * @param {INTERACTION_TYPES} interactionType - The type of the interaction.
    * @param {string} answer - The answer to set in the response modal.
@@ -632,8 +747,11 @@ export class ExplorationEditor extends BaseUser {
         await this.page.type(floatFormInput, answer);
         break;
       case INTERACTION_TYPES.MULTIPLE_CHOICE:
+        // // TODO: Remove this timeout once the issue is fixed.
+        // break;
         await this.page.waitForSelector(multipleChoiceResponseDropdown, {
           visible: true,
+          timeout: 5000,
         });
         await this.clickOn(multipleChoiceResponseDropdown);
         await this.page.waitForSelector(multipleChoiceResponseOption, {
@@ -702,6 +820,37 @@ export class ExplorationEditor extends BaseUser {
 
     await codeEditor.click();
     await codeEditor.type(code);
+  }
+
+  /**
+   * Adds a solution to the state.
+   * @param solution The solution to add.
+   * @param explaination The explaination for the solution.
+   */
+  async addCodeEditorSolutionToState(
+    solution: string,
+    explaination: string
+  ): Promise<void> {
+    await this.clickOnAddSolutionButton();
+
+    const solutionBox = await this.getSolutionModal();
+    const codeEditor = await solutionBox.$(codeEditorInSolutionModal);
+    if (!codeEditor) {
+      throw new Error(`Code editor not found.`);
+    }
+
+    await codeEditor.click();
+    await this.page.keyboard.down('Control');
+    await this.page.keyboard.press('KeyA');
+    await this.page.keyboard.up('Control');
+    await this.page.keyboard.press('Backspace');
+
+    await this.page.type(codeEditorInSolutionModal, solution);
+
+    await this.clickOn(submitAnswerButton);
+
+    // Add Explaination.
+    await this.addSolutionExplanationAndSave(explaination);
   }
 
   /**
@@ -775,7 +924,7 @@ export class ExplorationEditor extends BaseUser {
       }
 
       for (let i = 0; i < selectBoxes.length; i++) {
-        await selectBoxes[i].select(optionsSelections[i] as string);
+        await selectBoxes[i].select(optionsSelections[i].toString());
       }
     } else {
       throw new Error(`Rule currently not supported`);
@@ -799,6 +948,29 @@ export class ExplorationEditor extends BaseUser {
     await equationBox.type(equation);
   }
 
+  async addMathEquationSolutionToState(
+    solution: string,
+    explaination: string
+  ): Promise<void> {
+    // Click on Add Solution button.
+    await this.clickOnAddSolutionButton();
+
+    // Add solution.
+    const solutionModal = await this.getSolutionModal();
+    const equationBox = await solutionModal.$(mathEquationEditorSelector);
+    if (!equationBox) {
+      throw new Error('Math equation box not found.');
+    }
+
+    await equationBox.click();
+    await equationBox.type(solution);
+
+    await this.clickOn(submitAnswerButton);
+
+    // Add explanation.
+    await this.addSolutionExplanationAndSave(explaination);
+  }
+
   async updateMusicNotesInputLearnerAnswerInResponseModal(
     rule: 'is equal to',
     musicNotes: string[]
@@ -812,7 +984,7 @@ export class ExplorationEditor extends BaseUser {
       await addNoteButton?.click();
     }
 
-    const responseInputs = await this.page.$$('select');
+    const responseInputs = await responseBox.$$('select');
     if (responseInputs.length !== musicNotes.length) {
       throw new Error(
         `Expected ${musicNotes.length} response inputs, but found ${responseInputs.length}`
@@ -822,6 +994,32 @@ export class ExplorationEditor extends BaseUser {
     for (let i = 0; i < musicNotes.length; i++) {
       await responseInputs[i].select(musicNotes[i]);
     }
+  }
+
+  /**
+   * Add a music note input solution to the state
+   * @param musicNodes - music notes to add
+   * @param explaination - explaination of the solution
+   */
+  async addMusicNotesInputSolutionToState(
+    musicNodes: string[],
+    explaination: string
+  ): Promise<void> {
+    await this.clickOnAddSolutionButton();
+
+    const solutionModal = await this.getSolutionModal();
+    for (let i = 0; i < musicNodes.length; i++) {
+      const addNoteButton = await solutionModal.$(addResponseOptionButton);
+      await addNoteButton?.click();
+
+      const nodeSelectElements = await solutionModal.$$('select');
+      const nodeSelectElement = nodeSelectElements[i];
+      await nodeSelectElement.select(musicNodes[i]);
+    }
+
+    await this.clickOn(submitAnswerButton);
+
+    await this.addSolutionExplanationAndSave(explaination);
   }
 
   /**
@@ -855,7 +1053,7 @@ export class ExplorationEditor extends BaseUser {
     rule:
       | 'is equal to'
       | 'is proper subset of'
-      | 'contains atleast one of'
+      | 'contains at least one of'
       | 'omits atleast on of',
     optionsSelections: string[]
   ): Promise<void> {
@@ -877,12 +1075,20 @@ export class ExplorationEditor extends BaseUser {
       const optionText =
         (await option.evaluate(el => el.textContent?.trim())) ?? '';
       if (optionsSelections.includes(optionText)) {
-        const inputElement = await option.$('input');
-        await inputElement?.click();
+        const inputElementContainer = await option.$(
+          '.mat-checkbox-inner-container'
+        );
+        if (!inputElementContainer) {
+          throw new Error(`Option ${optionText} not found.`);
+        }
+        await inputElementContainer.click();
 
-        expect(
-          await inputElement?.evaluate(el => (el as HTMLInputElement).checked)
-        ).toBe(true);
+        const inputElement = await option.$('input');
+        await this.page.waitForFunction(
+          (inputElement: HTMLInputElement) => inputElement.checked,
+          {},
+          inputElement
+        );
       }
     }
   }
@@ -929,6 +1135,7 @@ export class ExplorationEditor extends BaseUser {
     const selectInput = await responseBox.$('mat-select');
     await selectInput?.click();
 
+    await this.page.waitForSelector('mat-option');
     const ruleOptions = await this.page.$$('mat-option');
     const ruleOptionTexts = await this.page.$$eval('mat-option', options =>
       options.map(option => option.textContent)
@@ -941,7 +1148,15 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    expect(await selectInput?.evaluate(el => el.textContent)).toContain(rule);
+    // expect(await selectInput?.evaluate(el => el.textContent)).toContain(rule);
+    await this.page.waitForFunction(
+      (ele: HTMLElement, value: string) => {
+        return ele.textContent?.trim().includes(value);
+      },
+      {},
+      selectInput,
+      rule
+    );
   }
 
   /**
@@ -964,19 +1179,47 @@ export class ExplorationEditor extends BaseUser {
     }
 
     for (let i = 0; i < values.length; i++) {
-      const addNewElementButton = await responseBox.$(newTabButtonSelector);
+      const addNewElementButton = await responseBox.$(addResponseOptionButton);
 
-      await addNewElementButton?.click();
+      if (!addNewElementButton) {
+        throw new Error('Add new element button not found.');
+      }
+      await addNewElementButton.click();
 
-      const inputFields = await responseBox.$$(inputFieldSelector);
+      const inputFields = await responseBox.$$(textInputField);
       const inputField = inputFields[i];
 
-      await inputField?.type(values[i]);
+      await inputField.type(values[i]);
 
       expect(
         await inputField.evaluate(el => (el as HTMLInputElement).value)
       ).toEqual(values[i]);
     }
+  }
+
+  /**
+   * Adds a set input solution to the current state card.
+   * @param {string[]} set - The set of options to add.
+   * @param {string} explaination - The explanation for the solution.
+   */
+  async addSetInputSolutionToState(
+    set: string[],
+    explaination: string
+  ): Promise<void> {
+    await this.clickOnAddSolutionButton();
+
+    let firstOption = true;
+    for (const option of set) {
+      if (!firstOption) {
+        await this.clickOn(addResponseOptionButton);
+        firstOption = false;
+      }
+      await this.type(`${solutionModal} ${textInputField}`, option);
+    }
+
+    await this.clickOn(submitAnswerButton);
+
+    await this.addSolutionExplanationAndSave(explaination);
   }
 
   async updateWorldMapLearnerAnswerInResponseModal(
@@ -1267,6 +1510,41 @@ export class ExplorationEditor extends BaseUser {
     showMessage('Card content is updated successfully.');
   }
 
+  async changeTabInInteractionSelectionModal(
+    interactionType: string
+  ): Promise<void> {
+    const interactionTabs = {
+      [INTERACTION_TABS.PROGRAMMING]: [
+        INTERACTION_TYPES.CODE_EDITOR,
+        INTERACTION_TYPES.PENCIL_CODE_EDITOR,
+      ],
+      [INTERACTION_TABS.MATHS]: [
+        INTERACTION_TYPES.FRACTION_INPUT,
+        INTERACTION_TYPES.GRAPH_THEORY,
+        INTERACTION_TYPES.NUMBER_INPUT,
+        INTERACTION_TYPES.SET_INPUT,
+        INTERACTION_TYPES.NUMERIC_EXPRESSION,
+        INTERACTION_TYPES.ALGEBRAIC_EXPRESSION,
+        INTERACTION_TYPES.MATH_EQUATION,
+        INTERACTION_TYPES.NUMBER_WITH_UNITS,
+        INTERACTION_TYPES.RATIO_EXPRESSION_INPUT,
+      ],
+      [INTERACTION_TABS.GEOGRAPHY]: [INTERACTION_TYPES.WORLD_MAP],
+      [INTERACTION_TABS.MUSIC]: [INTERACTION_TYPES.MUSIC_NOTES_INPUT],
+    };
+
+    for (const interaction in interactionTabs) {
+      if (interactionTabs[interaction].includes(interactionType)) {
+        await this.page.waitForSelector(
+          INTERACTION_TABS_SELECTORS[interaction]
+        );
+        await this.clickOn(INTERACTION_TABS_SELECTORS[interaction]);
+        showMessage(`Switched to ${interaction} tab.`);
+        break;
+      }
+    }
+  }
+
   /**
    * Function to add an interaction to the exploration.
    * @param {string} interactionToAdd - The interaction type to add to the Exploration.
@@ -1283,6 +1561,8 @@ export class ExplorationEditor extends BaseUser {
 
     await this.clickOn(addInteractionButton);
 
+    await this.waitForPageToFullyLoad();
+
     // Change tab based on interaction.
     // Add more conditional tab changes here.
     if (
@@ -1291,12 +1571,19 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(programmingInteractionsButton);
     }
 
+    await this.changeTabInInteractionSelectionModal(interactionToAdd);
+
+    const selector =
+      INTERACTION_SELECTORS[interactionToAdd] ?? ` ${interactionToAdd} `;
+    if (INTERACTION_SELECTORS[interactionToAdd]) {
+      await this.page.waitForSelector(selector);
+    }
     await this.waitForNetworkIdle();
-    await this.clickOn(` ${interactionToAdd} `);
-    await this.page.waitForSelector(saveInteractionButton, {
-      visible: true,
-    });
+    await this.clickOn(selector);
     if (skipInteractionCustoization) {
+      await this.page.waitForSelector(saveInteractionButton, {
+        visible: true,
+      });
       await this.clickOn(saveInteractionButton);
       await this.page.waitForSelector(addInteractionModalSelector, {
         hidden: true,
@@ -2066,6 +2353,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(openOutcomeFeedBackEditor, {
       visible: true,
     });
+    await this.clickOn(openOutcomeFeedBackEditor);
     await this.clickOn(stateContentInputField);
     await this.type(stateContentInputField, defaultResponseFeedback);
     await this.clickOn(saveOutcomeFeedbackButton);
@@ -2135,7 +2423,15 @@ export class ExplorationEditor extends BaseUser {
     await this.type(solutionSelector, answer);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOn(submitAnswerButton);
-    await this.type(stateContentInputField, answerExplanation);
+    await this.addSolutionExplanationAndSave(answerExplanation);
+  }
+
+  /**
+   * Adds a solution explanation to the current state card and saves it.
+   * @param explanation - The solution explanation to add to the state card.
+   */
+  async addSolutionExplanationAndSave(explanation: string): Promise<void> {
+    await this.type(stateContentInputField, explanation);
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
     await this.page.waitForSelector(submitSolutionButton, {
@@ -3446,6 +3742,90 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to click on the add solution button.
+   */
+  async clickOnAddSolutionButton(): Promise<void> {
+    await this.clickOn(addSolutionButton);
+  }
+
+  /**
+   * Function to drag and drop an item in the drag and drop sort solution.
+   * @param {number} startX - The starting x coordinate of the item.
+   * @param {number} startY - The starting y coordinate of the item.
+   * @param {number} endX - The ending x coordinate of the item.
+   * @param {number} endY - The ending y coordinate of the item.
+   */
+  async dragAndDropItem(
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number
+  ): Promise<void> {
+    await this.page.mouse.move(startX, startY);
+    await this.page.mouse.down();
+    await this.page.mouse.move(endX, endY);
+    await this.page.mouse.up();
+  }
+
+  /**
+   * Function to add a drag and drop sort solution.
+   * @param {string[]} sortedOptions - The options to sort.
+   */
+  async addDragAndDropSortSolution(
+    sortedOptions: string[],
+    explaination: string
+  ): Promise<void> {
+    await this.clickOnAddSolutionButton();
+
+    await this.page.waitForSelector(dragAndDropItemSelector, {visible: true});
+    const solutionModal = await this.getSolutionModal();
+
+    for (let i = 0; i < sortedOptions.length - 1; i++) {
+      const option = sortedOptions[i];
+
+      const optionElements = await solutionModal.$$(dragAndDropItemSelector);
+      const destinationElement = optionElements[i];
+
+      let sourceElement: puppeteer.ElementHandle<Element> | null = null;
+
+      for (let j = i; j < optionElements.length; j++) {
+        const optionText = await optionElements[j].evaluate(el =>
+          el.textContent?.trim()
+        );
+        if (optionText === option) {
+          sourceElement = optionElements[j];
+          break;
+        }
+      }
+
+      if (!sourceElement) {
+        throw new Error(`Option "${option}" not found.`);
+      }
+
+      const sourceBox = await sourceElement.boundingBox();
+      const destBox = await destinationElement.boundingBox();
+
+      if (!sourceBox || !destBox) {
+        throw new Error(
+          `Could not get bounding box for drag-and-drop operation.`
+        );
+      }
+
+      await this.dragAndDropItem(
+        sourceBox.x + sourceBox.width / 2,
+        sourceBox.y + sourceBox.height / 2,
+        destBox.x + destBox.width / 2,
+        destBox.y + destBox.height / 2
+      );
+    }
+
+    await this.clickOn(submitAnswerButton);
+
+    // Add explaination.
+    await this.addSolutionExplanationAndSave(explaination);
+  }
+
+  /**
    * Function to verify the average rating and the number of users who submitted ratings.
    * @param {number} expectedRating - The expected average rating.
    * @param {number} expectedUsers - The expected count of users who submitted ratings.
@@ -3875,10 +4255,12 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to check.
    */
   async expectExplorationGraphToContainCard(cardName: string): Promise<void> {
-    await this.page.waitForSelector(nodeLabelSelector, {
+    await this.page.waitForSelector(stateNodeSelector, {
       visible: true,
     });
-    const cardNames = await this.page.$$(nodeLabelSelector);
+    const cardNames = await this.page.$$eval(stateNodeSelector, elements =>
+      elements.map(element => element.textContent?.trim())
+    );
 
     expect(cardNames).toContain(cardName);
   }
