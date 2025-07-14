@@ -94,6 +94,14 @@ ALLOWED_CUSTOM_OBJ_TYPES = [
 # See - https://github.com/python/mypy/issues/731
 UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
     SCHEMA_TYPE_BOOL: {},
+    SCHEMA_TYPE_CUSTOM: {
+        'hide_complex_extensions': {
+            'type': SCHEMA_TYPE_BOOL,
+        },
+        'rte_components': {
+            'type': SCHEMA_TYPE_UNICODE_OR_NONE,
+        },
+    },
     SCHEMA_TYPE_DICT: {},
     SCHEMA_TYPE_FLOAT: {},
     SCHEMA_TYPE_HTML: {
