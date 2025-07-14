@@ -60,6 +60,9 @@ describe('Logged-In Learner', function () {
         'show_redesigned_learner_dashboard'
       );
 
+      // Reload the page to ensure redesigned learner dashboard is shown.
+      await loggedInLearner.reloadPage();
+
       // Create explorations.
       explorationId1 =
         await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(

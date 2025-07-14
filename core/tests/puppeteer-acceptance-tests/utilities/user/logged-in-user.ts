@@ -2584,9 +2584,8 @@ export class LoggedInUser extends BaseUser {
   async expectLearnerGreetingsToBe(expectedGreetings: string): Promise<void> {
     await this.page.waitForSelector(learnerGreetingsSelector);
 
-    const greetings = await this.page.$eval(
-      learnerGreetingsSelector,
-      el => el.textContent
+    const greetings = await this.page.$eval(learnerGreetingsSelector, el =>
+      el.textContent?.trim()
     );
 
     expect(greetings).toBe(expectedGreetings);

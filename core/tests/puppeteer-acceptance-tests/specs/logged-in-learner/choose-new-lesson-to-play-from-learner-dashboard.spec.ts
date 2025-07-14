@@ -60,6 +60,9 @@ describe('Logged-In Learner', function () {
         'show_redesigned_learner_dashboard'
       );
 
+      // Reload page to get latest changes.
+      await loggedInLearner.reloadPage();
+
       // Create explorations.
       explorationId1 =
         await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(

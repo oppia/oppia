@@ -128,7 +128,7 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.createAndPublishClassroom(
         'Math',
         'math',
-        'Algebra I'
+        'Place Values'
       );
 
       await curriculumAdmin.createAndPublishStoryWithChapter(
