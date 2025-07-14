@@ -46,6 +46,7 @@ import {ParameterMetadataService} from '../services/parameter-metadata.service';
 import {RouterService} from '../services/router.service';
 import {PreviewSetParametersModalComponent} from './templates/preview-set-parameters-modal.component';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-preview-tab',
@@ -71,6 +72,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private explorationParamChangesService: ExplorationParamChangesService,
     private explorationStatesService: ExplorationStatesService,
+    private platformFeatureService: PlatformFeatureService,
     private graphDataService: GraphDataService,
     private learnerParamsService: LearnerParamsService,
     private ngbModal: NgbModal,
@@ -182,7 +184,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     // navigating in preview mode, ensuring that the state does not
     // change when toggling between editor and preview.
     this.directiveSubscriptions.add(
-      this.explorationEngineService.onUpdateActiveStateIfInEditor.subscribe(
+      this.stateEditorService.onUpdateActiveStateIfInEditor.subscribe(
         stateName => {
           this.stateEditorService.setActiveStateName(stateName);
         }
@@ -270,5 +272,9 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

@@ -84,6 +84,8 @@ export default {
   "ACTIVITY_TYPE_STORY": "story",
   "ACTIVITY_TYPE_SKILL": "skill",
   "ACTIVITY_TYPE_SUBTOPIC": "subtopic",
+  "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION": "subtopic_with_study_guide_migration",
+  "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE": "subtopic_with_study_guide",
   "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
   "ACTIVITY_TYPE_CLASSROOM": "classroom",
   "DISABLED_EXPLORATION_IDS": ["5"],
@@ -6144,8 +6146,6 @@ export default {
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 
-  "ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
-
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
   "MAX_CURRENT_GOALS_COUNT": 5,
@@ -7800,12 +7800,12 @@ export default {
       "-": "نَاقِصْ",
       "*": "ضَرْبْ",
       "×": "ضَرْبْ",
-      "÷": "تَقْسِيمْ",
+      "÷": "قِسْمَةْ عَلَى",
       "=": "يُسَاوِي",
-      "!": "عاملي",
-      "^": "للقوة",
-      "^2": "تربيع",
-      "^3": "تكعيب"
+      "!": "عَامِلِي",
+      "^": "لِلْقُوَّةِ",
+      "^2": "تَرْبِيعْ",
+      "^3": "تَكْعِيبْ"
     }
   },
   // Please consult the translation team before adding any entries here.

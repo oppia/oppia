@@ -282,12 +282,14 @@ class _Gae(Platform):
             module. The speech synthesis services module based on the current
             environment.
         """
-        # TODO(#22301): Modify the following code to invoke the Cloud service
-        # based on the environment. Refer to the issue for implementation
-        # details.
+        if constants.EMULATOR_MODE:
+            from core.platform.speech_synthesis import (
+                dev_mode_speech_synthesis_services)
+            return dev_mode_speech_synthesis_services
+
         from core.platform.speech_synthesis import (
-            dev_mode_speech_synthesis_services)
-        return dev_mode_speech_synthesis_services
+            azure_speech_synthesis_services)
+        return azure_speech_synthesis_services
 
     @classmethod
     def import_email_services(cls) -> ModuleType:

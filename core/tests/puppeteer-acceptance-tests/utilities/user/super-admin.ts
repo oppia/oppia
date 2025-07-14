@@ -110,6 +110,10 @@ const grantSuperAdminButtonSelector = '.e2e-test-grant-super-admin-button';
 const usernameToGrantPrivilegeInput = '.e2e-test-username-to-grant-input';
 const revokeSuperAdminButton = '.e2e-test-revoke-super-admin-button';
 const usernameToRevokePrivilegeInput = '.e2e-test-username-to-revoke-input';
+const saveAutogenerationToggleButtonSelector =
+  '.e2e-test-save-autogeneration-toggle-button';
+const enableAutogenerationToggleSelector =
+  '.e2e-test-cloud-service-autogeneration-toggle';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -303,15 +307,17 @@ export class SuperAdmin extends BaseUser {
       `.e2e-test-${role}-remove-button-container`
     );
 
-    const deleteRoleButton = await this.page.$(
-      `.e2e-test-${role}-remove-button-container`
-    );
+    const deleteRoleButtonSelector = `.e2e-test-${role}-remove-button-container`;
+    const deleteRoleButton = await this.page.$(deleteRoleButtonSelector);
     if (!deleteRoleButton) {
       throw new Error(`User does not have the "${role}" role!`);
     }
 
     await this.waitForElementToBeClickable(deleteRoleButton);
     await deleteRoleButton.click();
+
+    await this.waitForNetworkIdle();
+    await this.isElementVisible(deleteRoleButtonSelector, false);
     showMessage(`Role ${role} has been removed from user ${username}`);
     return;
   }
@@ -406,6 +412,8 @@ export class SuperAdmin extends BaseUser {
         await this.waitForElementToBeClickable(reloadButton);
         await reloadButton.click();
         await this.waitForNetworkIdle();
+
+        await this.expectActionStatusMessageToBe('Data reloaded successfully.');
         showMessage(`Reloaded exploration ${explorationName}`);
         return;
       }
@@ -479,6 +487,11 @@ export class SuperAdmin extends BaseUser {
           }
           await this.waitForElementToBeClickable(reloadButton);
           await reloadButton.click();
+
+          await this.waitForNetworkIdle();
+          await this.expectActionStatusMessageToBe(
+            'Data reloaded successfully.'
+          );
           return;
         }
       }
@@ -517,6 +530,12 @@ export class SuperAdmin extends BaseUser {
       visible: true,
     });
     await this.clickOn(' Generate Explorations ');
+
+    await this.waitForNetworkIdle();
+    await this.expectActionStatusMessageToBe(
+      'Dummy explorations generated successfully.'
+    );
+    showMessage('Successfully generated and published the dummy explorations.');
   }
 
   /**
@@ -545,7 +564,13 @@ export class SuperAdmin extends BaseUser {
   async loadDummyNewStructuresData(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
     await this.clickOn(' Load Data ');
+
+    await this.waitForNetworkIdle();
+    await this.expectActionStatusMessageToBe(
+      'Dummy new structures data generated successfully.'
+    );
   }
+
   /**
    * Function to check if a topic is present in the Topics and Skills Dashboard.
    * @param {string} topicName - The name of the topic to check.
@@ -595,6 +620,11 @@ export class SuperAdmin extends BaseUser {
   async generateDummySkill(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
     await this.clickOn(' Generate Data ');
+
+    await this.waitForNetworkIdle();
+    await this.expectActionStatusMessageToBe(
+      'Dummy new skill and questions generated successfully.'
+    );
   }
 
   /**
@@ -604,6 +634,11 @@ export class SuperAdmin extends BaseUser {
     await this.navigateToAdminPageActivitiesTab();
     await this.page.waitForSelector(loadDummyMathClassRoomButton);
     await this.clickOn(loadDummyMathClassRoomButton);
+
+    await this.waitForNetworkIdle();
+    await this.expectActionStatusMessageToBe(
+      'Dummy new classroom generated successfully.'
+    );
   }
 
   /**
@@ -629,7 +664,12 @@ export class SuperAdmin extends BaseUser {
    */
   async generateDummyBlogPost(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
+    await this.isElementVisible(generateBlogPostButton);
     await this.clickOn(generateBlogPostButton);
+
+    await this.expectActionStatusMessageToBe(
+      'Dummy Blog Post generated successfully.'
+    );
   }
 
   /**
@@ -638,20 +678,7 @@ export class SuperAdmin extends BaseUser {
   async generateDummyBlogPosts(numBlogs: number): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
     for (let i = 0; i < numBlogs; i++) {
-      await this.clickOn(generateBlogPostButton);
-      await this.page.waitForFunction(
-        (selector: string) => {
-          const statusElem = document.querySelector(selector);
-          return (
-            statusElem &&
-            statusElem.textContent?.includes(
-              'Dummy Blog Post generated successfully.'
-            )
-          );
-        },
-        {timeout: 5000},
-        actionStatusMessageSelector
-      );
+      await this.generateDummyBlogPost();
     }
   }
 
@@ -874,6 +901,11 @@ export class SuperAdmin extends BaseUser {
       }
       await this.waitForElementToBeClickable(saveButton);
       await saveButton.click();
+
+      await platformParameter.waitForSelector(
+        `${paramSaveChangesButton} .btn[disabled]`,
+        {visible: true}
+      );
     } catch (error) {
       console.error(
         `Failed to save changes to platform parameter "${parameterName}": ${error}`
@@ -979,10 +1011,16 @@ export class SuperAdmin extends BaseUser {
   async regenerateContributionOpportunitiesForTopic(
     topicId: string
   ): Promise<void> {
+    await this.isElementVisible(topicIdInputSelector);
     await this.type(topicIdInputSelector, topicId);
 
     await this.page.waitForSelector(regenerateOpportunitiesButton);
     await this.clickOn(regenerateOpportunitiesButton);
+
+    await this.expectActionStatusMessageToBe(
+      'No. of opportunities model created:',
+      'Regenerating opportunities...'
+    );
   }
 
   /**
@@ -991,6 +1029,11 @@ export class SuperAdmin extends BaseUser {
   async regenerateTopicSummaries(): Promise<void> {
     await this.page.waitForSelector(regenerateTopicSummariesButton);
     await this.clickOn(regenerateTopicSummariesButton);
+
+    await this.expectActionStatusMessageToBe(
+      'Successfully regenerated all topic summaries.',
+      'Regenerating all topic summaries'
+    );
   }
 
   /**
@@ -999,10 +1042,16 @@ export class SuperAdmin extends BaseUser {
   async rollbackExplorationToSafeState(
     explorationId: string | null
   ): Promise<void> {
+    await this.isElementVisible(explorationIdInputSelector);
     await this.type(explorationIdInputSelector, explorationId as string);
 
     await this.page.waitForSelector(rollbackExplorationButton);
     await this.clickOn(rollbackExplorationButton);
+
+    await this.expectActionStatusMessageToBe(
+      'Exploration rolledback to version:',
+      'Rollingback exploration'
+    );
   }
 
   /**
@@ -1014,12 +1063,18 @@ export class SuperAdmin extends BaseUser {
     oldUserName: string,
     newUserName: string
   ): Promise<void> {
+    await this.isElementVisible(oldUserNameInputSelector);
     await this.type(oldUserNameInputSelector, oldUserName);
 
     await this.type(newUserNameInputSelector, newUserName);
 
     await this.page.waitForSelector(updateUserNameButtonSelector);
     await this.clickOn(updateUserNameButtonSelector);
+
+    await this.expectActionStatusMessageToBe(
+      `Successfully renamed ${oldUserName} to ${newUserName}!`,
+      'Updating username'
+    );
   }
 
   /**
@@ -1028,6 +1083,11 @@ export class SuperAdmin extends BaseUser {
   async getNumberOfPendingDeletionRequests(): Promise<void> {
     await this.page.waitForSelector(getPendingDeletionRequestsCountButton);
     await this.clickOn(getPendingDeletionRequestsCountButton);
+
+    await this.expectActionStatusMessageToBe(
+      'The number of users that are being deleted is:',
+      'Getting the number of users that are being deleted'
+    );
   }
 
   /**
@@ -1037,6 +1097,7 @@ export class SuperAdmin extends BaseUser {
   async getExplorationInteractions(
     explorationId: string | null
   ): Promise<void> {
+    await this.isElementVisible(explorationIdToGetInteractionsInput);
     await this.type(
       explorationIdToGetInteractionsInput,
       explorationId as string
@@ -1044,6 +1105,11 @@ export class SuperAdmin extends BaseUser {
 
     await this.page.waitForSelector(getInteractionsButton);
     await this.clickOn(getInteractionsButton);
+
+    await this.expectActionStatusMessageToBe(
+      'Successfully fetched interactionIds in exploration.',
+      'Retrieving interactions in exploration'
+    );
   }
 
   /**
@@ -1052,10 +1118,16 @@ export class SuperAdmin extends BaseUser {
    * @returns {Promise<void>}
    */
   async grantSuperAdminPrivileges(username: string): Promise<void> {
+    await this.isElementVisible(usernameToGrantPrivilegeInput);
     await this.type(usernameToGrantPrivilegeInput, username);
 
     await this.page.waitForSelector(grantSuperAdminButtonSelector);
     await this.clickOn(grantSuperAdminButtonSelector);
+
+    await this.expectActionStatusMessageToBe(
+      'Success!',
+      'Communicating with Firebase server'
+    );
   }
 
   /**
@@ -1064,10 +1136,16 @@ export class SuperAdmin extends BaseUser {
    * @returns {Promise<void>}
    */
   async revokeSuperAdminPrivileges(username: string): Promise<void> {
+    await this.isElementVisible(usernameToRevokePrivilegeInput);
     await this.type(usernameToRevokePrivilegeInput, username);
 
     await this.page.waitForSelector(revokeSuperAdminButton);
     await this.clickOn(revokeSuperAdminButton);
+
+    await this.expectActionStatusMessageToBe(
+      'Success!',
+      'Communicating with Firebase server'
+    );
   }
 
   /**
@@ -1081,6 +1159,7 @@ export class SuperAdmin extends BaseUser {
     author: string,
     publishedOn: string
   ): Promise<void> {
+    await this.isElementVisible(blogIdInputSelector);
     await this.type(blogIdInputSelector, blogId);
 
     await this.type(blogAuthorInputSelector, author);
@@ -1089,6 +1168,23 @@ export class SuperAdmin extends BaseUser {
 
     await this.page.waitForSelector(updateBlogPostButtonSelector);
     await this.clickOn(updateBlogPostButtonSelector);
+  }
+
+  /**
+   * Enables text-to-speech synthesis for Oppia voiceovers using a cloud
+   * service.
+   */
+  async enableTextToSpeechSynthesisUsingCloudService(): Promise<void> {
+    await this.navigateToAdminPageMiscTab();
+    await this.scrollToBottomOfPage();
+    await this.page.waitForSelector(enableAutogenerationToggleSelector);
+    const toggle = await this.page.$(enableAutogenerationToggleSelector);
+    if (!toggle) {
+      throw new Error('Enable autogeneration toggle not found on the page.');
+    }
+    await toggle.click();
+    await this.page.waitForSelector(saveAutogenerationToggleButtonSelector);
+    await this.clickOn(saveAutogenerationToggleButtonSelector);
   }
 }
 

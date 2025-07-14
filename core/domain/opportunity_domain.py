@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 from core import utils
 from core.constants import constants
 
@@ -389,4 +390,202 @@ class PinnedOpportunity:
             'language_code': self.language_code,
             'topic_id': self.topic_id,
             'opportunity_id': self.opportunity_id
+        }
+
+
+class TranslationOpportunityDict(TypedDict):
+    """A dictionary representing a TranslationOpportunity object."""
+
+    topic_ids: List[str]
+    entity_id: str
+    content_count: int
+    incomplete_translation_language_codes: List[str]
+    translation_counts: Dict[str, int]
+    entity_type: str
+
+
+class TranslationOpportunity:
+    """The domain object for translation opportunities."""
+
+    def __init__(
+        self,
+        topic_ids: List[str],
+        entity_id: str,
+        content_count: int,
+        incomplete_translation_language_codes: List[str],
+        translation_counts: Dict[str, int],
+        entity_type: str
+    ) -> None:
+        """Constructs a TranslationOpportunity domain object.
+
+        Args:
+            topic_ids: list(str). A list of topic IDs related to this
+                opportunity.
+            entity_id: str. The ID of the related entity.
+            content_count: int. The total number of contents available in the
+                entity.
+            incomplete_translation_language_codes: list(str). A list of
+                language codes in which the entity translation is incomplete.
+            translation_counts: dict. A dict mapping language codes to the
+                number of completed translations.
+            entity_type: str. The type of the entity. One of: "exploration",
+                "skill", "topic", "story", "classroom".
+        """
+        self.topic_ids = topic_ids
+        self.entity_id = entity_id
+        self.content_count = content_count
+        self.incomplete_translation_language_codes = (
+            incomplete_translation_language_codes)
+        self.translation_counts = translation_counts
+        self.entity_type = entity_type
+        self.validate()
+
+    def validate(self) -> None:
+        """Validates various properties of the object.
+
+        Raises:
+            ValidationError. One or more attributes of the object are invalid.
+        """
+        if self.content_count < 0:
+            raise utils.ValidationError(
+                'Expected content_count to be a non-negative integer, '
+                'received %s' % self.content_count)
+
+        if self.entity_type not in feconf.TRANSLATABLE_ENTITY_TYPES:
+            raise utils.ValidationError(
+                'Invalid entity_type: %s' % self.entity_type)
+
+        allowed_language_codes = [language['id'] for language in (
+            constants.SUPPORTED_AUDIO_LANGUAGES)]
+
+        for language_code in self.incomplete_translation_language_codes:
+            if language_code not in allowed_language_codes:
+                raise utils.ValidationError(
+                    'Invalid language_code in '
+                    'incomplete_translation_language_codes: %s'
+                    % language_code)
+
+        for language_code, count in self.translation_counts.items():
+            if not utils.is_supported_audio_language_code(language_code):
+                raise utils.ValidationError(
+                    'Invalid language_code in translation_counts: %s' %
+                    language_code)
+            if count < 0:
+                raise utils.ValidationError(
+                    'Expected translation count for language_code %s to be '
+                    'non-negative, received %s' % (language_code, count))
+            if count > self.content_count:
+                raise utils.ValidationError(
+                    'Expected translation count for language_code %s to be '
+                    'less than or equal to content_count(%s), received %s' % (
+                        language_code, self.content_count, count))
+
+    @classmethod
+    def from_dict(
+        cls, translation_opportunity_dict: TranslationOpportunityDict
+    ) -> TranslationOpportunity:
+        """Returns a TranslationOpportunity domain object from a dict.
+
+        Args:
+            translation_opportunity_dict: dict. The dict representation of a
+                TranslationOpportunity object.
+
+        Returns:
+            TranslationOpportunity. The corresponding domain object.
+        """
+        return cls(
+            translation_opportunity_dict['topic_ids'],
+            translation_opportunity_dict['entity_id'],
+            translation_opportunity_dict['content_count'],
+            translation_opportunity_dict[
+                'incomplete_translation_language_codes'],
+            translation_opportunity_dict['translation_counts'],
+            translation_opportunity_dict['entity_type']
+        )
+
+    def to_dict(self) -> TranslationOpportunityDict:
+        """Returns a copy of the object as a dictionary.
+
+        Returns:
+            dict. A dict mapping the fields of the TranslationOpportunity
+            instance.
+        """
+        return {
+            'topic_ids': self.topic_ids,
+            'entity_id': self.entity_id,
+            'content_count': self.content_count,
+            'incomplete_translation_language_codes': (
+                self.incomplete_translation_language_codes),
+            'translation_counts': self.translation_counts,
+            'entity_type': self.entity_type
+        }
+
+
+class TranslationOpportunityCardInfoDict(TypedDict):
+    """A dictionary representing a TranslationOpportunityCardInfo object."""
+
+    topic_ids: List[str]
+    entity_id: str
+    content_count: int
+    incomplete_translation_language_codes: List[str]
+    translation_counts: Dict[str, int]
+    entity_type: str
+    topic_name: str
+    entity_description: str
+    is_pinned: bool
+    currently_available_to_learners: bool
+
+
+class TranslationOpportunityCardInfo(TranslationOpportunity):
+    """The domain object for rendering translation opportunity cards."""
+
+    def __init__(
+        self,
+        topic_ids: List[str],
+        entity_id: str,
+        content_count: int,
+        incomplete_translation_language_codes: List[str],
+        translation_counts: Dict[str, int],
+        entity_type: str,
+        topic_name: str,
+        entity_description: str,
+        is_pinned: bool,
+        currently_available_to_learners: bool
+    ) -> None:
+        """Constructs a TranslationOpportunityCardInfo domain object."""
+        super().__init__(
+            topic_ids,
+            entity_id,
+            content_count,
+            incomplete_translation_language_codes,
+            translation_counts,
+            entity_type
+        )
+        self.topic_ids = topic_ids
+        self.entity_id = entity_id
+        self.content_count = content_count
+        self.incomplete_translation_language_codes = (
+            incomplete_translation_language_codes)
+        self.translation_counts = translation_counts
+        self.entity_type = entity_type
+        self.topic_name = topic_name
+        self.entity_description = entity_description
+        self.is_pinned = is_pinned
+        self.currently_available_to_learners = currently_available_to_learners
+
+    def to_dict(self) -> TranslationOpportunityCardInfoDict:
+        """Returns a dict representation of the card info."""
+        return {
+            'topic_ids': self.topic_ids,
+            'entity_id': self.entity_id,
+            'content_count': self.content_count,
+            'incomplete_translation_language_codes': (
+                self.incomplete_translation_language_codes),
+            'translation_counts': self.translation_counts,
+            'entity_type': self.entity_type,
+            'topic_name': self.topic_name,
+            'entity_description': self.entity_description,
+            'is_pinned': self.is_pinned,
+            'currently_available_to_learners': (
+                self.currently_available_to_learners)
         }

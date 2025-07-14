@@ -25,7 +25,7 @@
        class="conversation-skin-final-recommendations">
     <div *ngIf="recommendedExplorationSummaries.length > 0">
       <div class="conversation-skin-final-recommendations-header-container">
-        <span *ngIf="!collectionSummary && !isRefresherExploration" class="conversation-skin-final-recommendations-header"
+        <span *ngIf="!collectionSummary && !getIsRefresherExploration()" class="conversation-skin-final-recommendations-header"
               translate="I18N_END_EXPLORATION_RECOMMENDATION_MESSAGE">
         </span>
       </div>
@@ -34,7 +34,7 @@
                                         [collectionId]="collectionId"
                                         [explorationId]="exp.id"
                                         [explorationTitle]="exp.title"
-                                        [parentExplorationIds]="parentExplorationIds"
+                                        [parentExplorationIds]="getParentExplorationIds()"
                                         [lastUpdatedMsec]="exp.lastUpdatedMsec"
                                         [objective]="exp.objective"
                                         [category]="exp.category"
@@ -80,10 +80,10 @@
   <div *ngIf="inStoryMode" class="conversation-skin-back-to-collection-container">
     <a [href]="storyViewerUrl" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_STORY"></a>
   </div>
-  <div *ngIf="!collectionSummary && !isRefresherExploration && !inStoryMode" class="conversation-skin-back-to-collection-container">
+  <div *ngIf="!collectionSummary && !getIsRefresherExploration() && !inStoryMode" class="conversation-skin-back-to-collection-container">
     <a href="/community-library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
   </div>
-  <div *ngIf="collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
+  <div *ngIf="collectionSummary && !getIsRefresherExploration()" class="conversation-skin-back-to-collection-container">
     <a [href]="'/collection/' + collectionId" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_BACK_TO_COLLECTION"></a>
   </div>
 </div>
