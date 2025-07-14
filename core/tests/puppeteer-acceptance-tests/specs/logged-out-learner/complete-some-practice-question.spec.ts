@@ -63,6 +63,13 @@ describe('Logged-Out Learner', function () {
     await curriculumAdmin.addChapter('Fractions 1', explorationId);
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
+
+    // Create classroom.
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Fractions'
+    );
   });
 
   it('should be able to do some practice questions through topic page', async function () {
