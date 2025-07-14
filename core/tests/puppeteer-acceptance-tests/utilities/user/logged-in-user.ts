@@ -826,11 +826,21 @@ export class LoggedInUser extends BaseUser {
           mobileLessonCardOptionsDropdownButton
         );
         await dropdownIcon?.click();
-        await this.page.waitForSelector(mobileAddToPlayLaterButton);
-        const mobileAddToPlayLaterButtons = await this.page.$$(
+
+        await iconContainers[lessonIndex].waitForSelector(
           mobileAddToPlayLaterButton
         );
-        await mobileAddToPlayLaterButtons[lessonIndex].click();
+        const mobileAddToPlayLaterButtonElement = await iconContainers[
+          lessonIndex
+        ].$(mobileAddToPlayLaterButton);
+
+        await mobileAddToPlayLaterButtonElement?.click();
+
+        // await this.page.waitForSelector(mobileAddToPlayLaterButton);
+        // const mobileAddToPlayLaterButtons = await this.page.$$(
+        //   mobileAddToPlayLaterButton
+        // );
+        // await mobileAddToPlayLaterButtons[lessonIndex].click();
       } else {
         await this.page.waitForSelector(desktopAddToPlayLaterButton);
         const addToPlayLaterButtons = await this.page.$$(
@@ -867,13 +877,9 @@ export class LoggedInUser extends BaseUser {
       ? mobileLessonCardTitleSelector
       : desktopLessonCardTitleSelector;
 
-    const lessonCards = await this.page.$$(explorationCard);
-    const lessonTitles = await Promise.all(
-      lessonCards.map(async card => {
-        const titleElement = await card.$(lessonCardTitleSelector);
-        const title = titleElement?.evaluate(el => el?.textContent?.trim());
-        return title;
-      })
+    const lessonTitles = await this.page.$$eval(
+      lessonCardTitleSelector,
+      elements => elements.map(el => el.textContent?.trim())
     );
 
     const lessonIndex = lessonTitles.indexOf(lessonTitle);
@@ -958,10 +964,6 @@ export class LoggedInUser extends BaseUser {
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
   async expectToolTipMessage(expectedMessage: string): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      showMessage('Skipped tooltip message check in mobile view.');
-      return;
-    }
     try {
       await this.page.waitForSelector(toastMessageSelector, {visible: true});
       const toastMessageElement = await this.page.$(toastMessageSelector);

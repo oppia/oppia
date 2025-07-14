@@ -69,8 +69,8 @@ describe('Logged-in User', function () {
     );
 
     // Add other lessons to 'play later'.
-    await loggedInUser.addLessonToPlayLater('Positive Numbers', false);
-    await loggedInUser.addLessonToPlayLater('Whole Numbers', false);
+    await loggedInUser.addLessonToPlayLater('Positive Numbers');
+    await loggedInUser.addLessonToPlayLater('Whole Numbers');
   });
 
   it('should be able to remove an exploration from play later in community library', async function () {

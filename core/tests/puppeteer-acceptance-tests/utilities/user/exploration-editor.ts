@@ -1381,7 +1381,13 @@ export class ExplorationEditor extends BaseUser {
         ? cardName
         : cardName.trimEnd().slice(0, -3);
 
-      await this.expectElementContentToContain(
+      await this.page.waitForFunction(
+        (cardNameSelector: string, headingName: string) => {
+          const currentCardName =
+            document.querySelector(cardNameSelector)?.textContent;
+          return currentCardName?.includes(headingName);
+        },
+        {},
         currentCardNameSelector,
         headingName
       );
