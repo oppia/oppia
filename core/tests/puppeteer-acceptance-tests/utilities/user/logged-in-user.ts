@@ -244,7 +244,6 @@ const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
 
 // Community Library.
 const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
-const learnerDashboardIconsContainerSelector = 'oppia-learner-dashboard-icons';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -835,12 +834,6 @@ export class LoggedInUser extends BaseUser {
         ].$(mobileAddToPlayLaterButton);
 
         await mobileAddToPlayLaterButtonElement?.click();
-
-        // await this.page.waitForSelector(mobileAddToPlayLaterButton);
-        // const mobileAddToPlayLaterButtons = await this.page.$$(
-        //   mobileAddToPlayLaterButton
-        // );
-        // await mobileAddToPlayLaterButtons[lessonIndex].click();
       } else {
         await this.page.waitForSelector(desktopAddToPlayLaterButton);
         const addToPlayLaterButtons = await this.page.$$(
@@ -894,15 +887,14 @@ export class LoggedInUser extends BaseUser {
       throw new Error('Play Later button not found');
     }
 
-    if (!playLaterButton) {
-      throw new Error('Remove button not found');
-    }
-
     await playLaterButton.click();
 
     await this.page.waitForSelector(learnerPlaylistModalSelector, {
       visible: true,
     });
+
+    await this.isTextPresentOnPage("Remove from 'Play Later' list?");
+
     await this.clickOn(confirmRemovalFromPlayLaterButton);
     await this.page.waitForSelector(learnerPlaylistModalSelector, {
       hidden: true,
@@ -2369,10 +2361,6 @@ export class LoggedInUser extends BaseUser {
     }
     // Desktop view port.
     else {
-      if (this.isViewportAtMobileWidth()) {
-        showMessage('Skipped desktop dropdowns check in mobile view.');
-        return;
-      }
       await this.clickOn(navbarLearnTab);
       await this.isElementVisible(navbarLearnDropdownContainerSelector);
 
