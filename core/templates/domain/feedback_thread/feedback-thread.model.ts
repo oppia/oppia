@@ -17,7 +17,6 @@
  * feedback thread domain objects from backend data.
  */
 
-
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import {ThreadMessageSummary} from 'domain/feedback_message/ThreadMessageSummary.model';
 
