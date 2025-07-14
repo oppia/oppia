@@ -202,7 +202,7 @@ const topicInCurrentGoalsSelector =
   '.e2e-test-goals-section .e2e-test-topic-name-in-current-goals';
 const currentGoalsContainerSelector = '.e2e-test-current-goals-section';
 const completedGoalsContainerSelector = '.e2e-test-completed-goals-section';
-const goalContainerSelector = '.e2e-test-goals-container';
+const goalContainerSelector = 'oppia-goal-list';
 const goalTitleSelector = '.e2e-test-goal-title';
 const startGoalButtonSelector = '.e2e-test-start-lesson-button';
 
@@ -2296,8 +2296,11 @@ export class LoggedInUser extends BaseUser {
       }
 
       if (checkboxText === goal) {
-        const goalCheckbox = await checkbox.$('input');
-        await goalCheckbox?.click();
+        const goalCheckbox = await checkbox.$('label');
+        if (!goalCheckbox) {
+          throw new Error(`Could not find goal checkbox for ${goal}`);
+        }
+        await goalCheckbox.click();
         break;
       }
     }
@@ -2389,9 +2392,8 @@ export class LoggedInUser extends BaseUser {
     const goalContainers = await this.page.$$(goalContainerSelector);
 
     for (const goalContainer of goalContainers) {
-      const goalTitle = await goalContainer.$eval(
-        goalTitleSelector,
-        el => el.textContent
+      const goalTitle = await goalContainer.$eval(goalTitleSelector, el =>
+        el.textContent?.trim()
       );
 
       if (goalTitle === goal) {
@@ -2694,7 +2696,7 @@ export class LoggedInUser extends BaseUser {
     });
 
     const goalTitles = await context.$$eval(goalTitleSelector, elements =>
-      elements.map(el => el.textContent)
+      elements.map(el => el.textContent?.trim())
     );
 
     expect(goalTitles).toContain(goal);
@@ -2747,9 +2749,9 @@ export class LoggedInUser extends BaseUser {
   async expectLearnSomethingNewSectionInRedesignedDashboardToBePresent(
     visible: boolean = true
   ): Promise<void> {
-    await this.page.waitForSelector(learnSomethingNewSectionSelector, {
-      visible: visible,
-    });
+    expect(await this.isElementVisible(learnSomethingNewSectionSelector)).toBe(
+      visible
+    );
   }
 
   async expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(
