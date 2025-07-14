@@ -50,7 +50,6 @@ const googleAnalyticsOptOutUrl = testConstants.URLs.GoogleAnalytics.OptOut;
 const CreativeCommonsLegalCodeUrl =
   testConstants.URLs.ExternalLink.CreativeCommonsLegalCode;
 const explorationDesignTipsUrl = testConstants.URLs.ExplorationDesignTips;
-const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 const googleSignUpUrl = testConstants.URLs.ExternalLink.GoogleSignUp;
 const getStartedUrl = testConstants.URLs.GetStarted;
 const homeUrl = testConstants.URLs.Home;
@@ -406,6 +405,7 @@ const blogPostTitleContainerSelector =
   '.e2e-test-blog-post-page-title-container';
 const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
+const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 
 // Common Selectors.
 const devModeLabelSelector = '.e2e-test-dev-mode';
@@ -3288,7 +3288,7 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForPageToFullyLoad();
     const searchResults = await this.page.$$eval(
       lessonCardTitleSelector,
-      elements => elements.map(element => element.textContent)
+      elements => elements.map(element => element.textContent?.trim())
     );
 
     for (const searchResultExpected of searchResultsExpected) {
@@ -3298,7 +3298,9 @@ export class LoggedOutUser extends BaseUser {
         );
       } else {
         throw new Error(
-          `Expected search result "${searchResultExpected}" to be ${present ? 'present' : 'not present'}, but it was ${present ? 'not ' : ''}found.`
+          `Expected search result "${searchResultExpected}" to be ${
+            present ? 'present' : 'not present'
+          }, but it was ${present ? 'not ' : ''}found.\nFound search results: ${searchResults}`
         );
       }
     }

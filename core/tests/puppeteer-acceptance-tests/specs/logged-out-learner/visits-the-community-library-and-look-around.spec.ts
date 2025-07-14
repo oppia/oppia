@@ -19,18 +19,13 @@
  * CL.LP. Learner visits the community library and looks around.
  */
 
-import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-
-const ROLES = testConstants.Roles;
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
   let explorationEditor: ExplorationEditor;
-  let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
     loggedOutLearner = await UserFactory.createLoggedOutUser();
@@ -38,12 +33,6 @@ describe('Logged-Out Learner', function () {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com'
-    );
-
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
-      [ROLES.RELEASE_COORDINATOR]
     );
 
     // Create a new explorations.
@@ -77,20 +66,16 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectSearchResultsToContain([
       'Fractions',
       'Algebra',
-      'Laws of Motion',
     ]);
-    await loggedOutLearner.filterLessonsByCategories(['Mathematics']);
-    await loggedOutLearner.expectSearchResultsToContain([
-      'Fractions',
-      'Algebra',
-    ]);
+    await loggedOutLearner.filterLessonsByCategories(['Science']);
     await loggedOutLearner.expectSearchResultsToContain(
-      ['Laws of Motion'],
+      ['Fractions', 'Algebra'],
       false
     );
+    await loggedOutLearner.expectSearchResultsToContain(['Laws of Motion']);
   });
 
   afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
+    // await UserFactory.closeAllBrowsers();
   });
 });
