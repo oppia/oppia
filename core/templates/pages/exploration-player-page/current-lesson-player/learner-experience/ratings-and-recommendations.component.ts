@@ -32,7 +32,7 @@ import {TopicViewerDomainConstants} from 'domain/topic_viewer/topic-viewer-domai
 import {LocalStorageService} from 'services/local-storage.service';
 import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {AppConstants} from 'app.constants';
