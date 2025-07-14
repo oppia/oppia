@@ -3250,20 +3250,19 @@ export class LoggedOutUser extends BaseUser {
   async expectSearchResultsToContain(
     searchResultsExpected: string[]
   ): Promise<void> {
+    const selector = this.isViewportAtMobileWidth()
+      ? explorationTitleSelector
+      : lessonCardTitleSelector;
     try {
       if (searchResultsExpected.length === 0) {
         await this.waitForPageToFullyLoad();
-        const searchResultsElements = await this.page.$$(
-          lessonCardTitleSelector
-        );
+        const searchResultsElements = await this.page.$$(selector);
         if (searchResultsElements.length !== 0) {
           throw new Error('No search results expected, but some were found.');
         }
       } else {
-        await this.page.waitForSelector(lessonCardTitleSelector);
-        const searchResultsElements = await this.page.$$(
-          lessonCardTitleSelector
-        );
+        await this.page.waitForSelector(selector);
+        const searchResultsElements = await this.page.$$(selector);
         const searchResults = await Promise.all(
           searchResultsElements.map(result =>
             this.page.evaluate(el => el.textContent.trim(), result)
@@ -4961,7 +4960,7 @@ export class LoggedOutUser extends BaseUser {
       );
     }
 
-    await this.clickOn(collapsibleRTEHeaderSelector);
+    await collapsibleRTEHeader?.click();
     await this.page.waitForSelector(collapsibleRTEContentSelector, {
       visible: true,
     });

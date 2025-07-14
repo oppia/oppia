@@ -63,13 +63,13 @@ describe('Logged-Out Learner', function () {
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.SECOND_CARD);
     await explorationEditor.updateCardContent(
-      "What is 3/6 equal to in it's simplest form?"
+      'Give fraction with denominator 2.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
 
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.FRACTION_INPUT,
-      '1/2',
+      '2',
       'Perfect!',
       CARD_NAME.FINAL_CARD,
       true
@@ -77,16 +77,12 @@ describe('Logged-Out Learner', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong, try again!'
     );
-    await explorationEditor.addHintToState(
-      'Remember that we need to divide both numerator and denominator by same non-zero number.'
-    );
-    await explorationEditor.addHintToState(
-      'We can divide both numerator and denominator by same 3.'
-    );
+    await explorationEditor.addHintToState('We can have any numerator.');
+    await explorationEditor.addHintToState('Numerator is the number on top.');
 
     await explorationEditor.addSolutionToState(
       '1/2',
-      '1/2 is the correct answer.',
+      '1/2 here 1 is the numerator and 2 is the denominator.',
       true
     );
     await explorationEditor.saveExplorationDraft();

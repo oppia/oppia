@@ -190,7 +190,7 @@ const communityLessonsSectionInLearnerDashboard =
 const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const progressTabSectionInLearnerDashboard =
   '.e2e-test-learner-dash-progress-tab';
-const goalsTabSectionInLearnerDashboard = '.e2e-test-goals-section-inner';
+const goalsTabSectionInLearnerDashboard = '.e2e-test-goals-section';
 const emptySuggestionSectionSelector = '.e2e-test-home-tab-empty-suggestions';
 const emptyCurrentGoalsSectionSelector =
   '.e2e-test-goals-section .e2e-test-current-goals-section.e2e-test-empty-section';

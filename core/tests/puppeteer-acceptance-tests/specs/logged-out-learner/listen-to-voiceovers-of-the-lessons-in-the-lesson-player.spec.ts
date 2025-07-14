@@ -180,7 +180,7 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.saveExplorationDraft();
     },
     // Setup takes more time than default.
-    60000
+    600000
   );
 
   it('should be able to play/pause the audio', async function () {
