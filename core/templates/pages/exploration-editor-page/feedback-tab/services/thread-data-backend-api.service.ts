@@ -24,7 +24,7 @@ import {AppConstants} from 'app.constants';
 import {
   FeedbackThread,
   FeedbackThreadBackendDict,
-} from 'domain/feedback_thread/FeedbackThread.model';
+} from 'domain/feedback_thread/feedback-thread.model';
 import {
   ThreadMessage,
   ThreadMessageBackendDict,

@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of feedback
-   thread domain objects.
+ * @fileoverview Injectable Angular service for creating frontend instances of
+ * feedback thread domain objects from backend data.
  */
+
 
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 import {ThreadMessageSummary} from 'domain/feedback_message/ThreadMessageSummary.model';

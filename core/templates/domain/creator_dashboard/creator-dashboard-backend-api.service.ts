@@ -35,7 +35,7 @@ import {
 import {
   FeedbackThread,
   FeedbackThreadBackendDict,
-} from 'domain/feedback_thread/FeedbackThread.model';
+} from 'domain/feedback_thread/feedback-thread.model';
 import {
   SuggestionBackendDict,
   Suggestion,
