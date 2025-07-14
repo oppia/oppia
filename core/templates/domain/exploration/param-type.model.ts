@@ -13,30 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of ParamType
+ * @fileoverview Model class for creating new frontend instances of ParamType
  * domain objects.
  */
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import {Injectable} from '@angular/core';
-
 interface TypeDefinitionObject {
   validate: (arg0: Object) => boolean;
 
-  // The default value is typed as Object because it's type could be anything.
+  // The default value is typed as Object because its type could be anything.
   // It depends on the arguments passed to the constructor.
   default_value: Object;
-}
-
-interface RegistryType {
-  [key: string]: ParamType;
 }
 
 export class ParamType {
   _name: string;
   valueIsValid: (arg0: Object) => boolean;
   defaultValue: Object;
+
+  // Type registration.
+  /** @type {Object.<String, ParamType>} */
+  private static registry: Record<string, ParamType> = ParamType.initRegistry();
 
   /**
    * @private @constructor
@@ -47,7 +45,7 @@ export class ParamType {
    * for an example.
    *
    * @param {Function.<?, Boolean>} validateFunction - Returns true when a value
-   *    is valid.
+   * is valid.
    * @param {Object} defaultValue - simple value any parameter of this type can
    * take.
    */
@@ -67,6 +65,25 @@ export class ParamType {
     this.defaultValue = typeDefinitionObject.default_value;
   }
 
+  private static initRegistry(): Record<string, ParamType> {
+    const definitions: Record<string, TypeDefinitionObject> = {
+      UnicodeString: {
+        validate: (value: Object) =>
+          typeof value === 'string' || value instanceof String,
+        default_value: '',
+      },
+    };
+
+    const registry: Record<string, ParamType> = {};
+    for (const [name, definition] of Object.entries(definitions)) {
+      const paramType = new ParamType(definition);
+      paramType._name = name;
+      Object.freeze(paramType);
+      registry[name] = paramType;
+    }
+    return Object.freeze(registry);
+  }
+
   /** @returns {Object} - A valid default value for this particular type. */
   createDefaultValue(): Object {
     return cloneDeep(this.defaultValue);
@@ -76,41 +93,9 @@ export class ParamType {
   getName(): string {
     return this._name;
   }
-}
-
-@Injectable({
-  providedIn: 'root',
-})
-export class ParamTypeObjectFactory {
-  constructor() {
-    // To finalize type registration, we encode the name of each type into their
-    // definition, then freeze them from modifications.
-    Object.keys(this.registry).forEach((paramTypeName: string) => {
-      // The bracket notation is needed since 'paramTypeName' is a dynamic
-      // property and is not defined on 'registry'.
-      /* eslint-disable-next-line dot-notation */
-      var paramType = this.registry[paramTypeName];
-      paramType._name = paramTypeName;
-      Object.freeze(paramType);
-    });
-
-    // Finally, we freeze the registry itself.
-    Object.freeze(this.registry);
-  }
-  // Type registration.
-
-  /** @type {Object.<String, ParamType>} */
-  registry: RegistryType = {
-    UnicodeString: new ParamType({
-      validate: (value: Object) => {
-        return typeof value === 'string' || value instanceof String;
-      },
-      default_value: '',
-    }),
-  };
 
   /** @returns {ParamType} - Implementation-defined default parameter type. */
-  getDefaultType(): ParamType {
+  static getDefaultType(): ParamType {
     return this.registry.UnicodeString;
   }
 
@@ -119,7 +104,7 @@ export class ParamTypeObjectFactory {
    * @returns {ParamType} - The associated type, if any.
    * @throws {Error} - When the given type name isn't registered.
    */
-  getTypeFromBackendName(backendName: string): ParamType {
+  static getTypeFromBackendName(backendName: string): ParamType {
     if (!this.registry.hasOwnProperty(backendName)) {
       throw new Error(backendName + ' is not a registered parameter type.');
     }
