@@ -27,7 +27,7 @@ import {ThreadMessageBackendDict} from 'domain/feedback_message/ThreadMessage.mo
 import {
   FeedbackThread,
   FeedbackThreadBackendDict,
-} from 'domain/feedback_thread/FeedbackThread.model';
+} from 'domain/feedback_thread/feedback-thread.model';
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
 import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
 import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
