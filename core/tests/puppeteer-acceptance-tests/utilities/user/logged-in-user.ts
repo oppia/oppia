@@ -240,6 +240,7 @@ const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
 const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
 
 const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
+const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
 
 // Community Library.
 const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
@@ -817,9 +818,9 @@ export class LoggedInUser extends BaseUser {
       }
 
       if (isMobileViewport) {
-        await this.page.waitForSelector(learnerDashboardIconsContainerSelector);
+        await this.page.waitForSelector(learnerDashboardIconsSelector);
         const iconContainers = await this.page.$$(
-          learnerDashboardIconsContainerSelector
+          learnerDashboardIconsSelector
         );
         const dropdownIcon = await iconContainers[lessonIndex].$(
           mobileLessonCardOptionsDropdownButton
