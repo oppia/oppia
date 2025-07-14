@@ -69,11 +69,9 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should be able to look at different categories in community library', async function () {
-    // TODO: Not all the group headers are present in the community library page,
-    // maybe can be done by some user action.
+    // Check for the lesson categories.
     await loggedOutLearner.expectCommunityLibraryGroupHeaderToContain([
-      'Mathematics',
-      'Science',
+      'Mathematics & Statistics',
     ]);
 
     await loggedOutLearner.expectSearchResultsToContain([

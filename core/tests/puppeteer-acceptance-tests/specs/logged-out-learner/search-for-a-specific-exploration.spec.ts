@@ -51,6 +51,7 @@ describe('Logged-Out Learner', function () {
       );
 
     await explorationEditor.playExploration(explorationId);
+    await explorationEditor.continueToNextCard();
     await explorationEditor.rateExploration(
       5,
       'Excellent advanced Algebra course',

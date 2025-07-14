@@ -66,7 +66,8 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should be able to do some practice questions through topic page', async function () {
-    // TODO: Go to topic page.
+    // Go to topic page.
+    await loggedOutLearner.navigateToClassroomPage('math');
     await loggedOutLearner.selectAndOpenTopic('Fractions');
     // TODO: Navigate to practice tab.
     // TODO: Learner should see "Master Skills for Math" topic.
