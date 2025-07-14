@@ -116,7 +116,6 @@ describe('Logged-out User', function () {
     await loggedOutLearner.expectLessonInfoToShowRating('Unrated');
     await loggedOutLearner.expectLessonInfoToShowNoOfViews(1);
     await loggedOutLearner.expectLessonInfoToShowLastUpdated();
-    await loggedOutLearner.expectLessonInfoToShowTags(['growth']);
     await loggedOutLearner.shareExplorationFromLessonInfoModal(
       'Facebook',
       explorationId

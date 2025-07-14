@@ -200,7 +200,7 @@ const goalsStatusTitleSelector =
   '.e2e-test-goals-section .e2e-test-goals-status-title';
 const topicInCurrentGoalsSelector =
   '.e2e-test-goals-section .e2e-test-topic-name-in-current-goals';
-const currentGoalsContainerSelector = '.e2e-test-currernt-goals-section';
+const currentGoalsContainerSelector = '.e2e-test-current-goals-section';
 const completedGoalsContainerSelector = '.e2e-test-completed-goals-section';
 const goalContainerSelector = '.e2e-test-goals-container';
 const goalTitleSelector = '.e2e-test-goal-title';
@@ -395,6 +395,7 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the learner dashboard using profile dropdown in the navbar.
    */
   async navigateToLearnerDashboardUsingProfileDropdown(): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(profileDropdown, {
       visible: true,
     });
@@ -1979,7 +1980,7 @@ export class LoggedInUser extends BaseUser {
     if (!explorationId) {
       throw new Error('Cannot navigate to editor: explorationId is null');
     }
-    const editorUrl = `${baseUrl}/create/${explorationId}`;
+    const editorUrl = `${baseUrl}/create/${explorationId}#/`;
     await this.goto(editorUrl);
 
     showMessage('Navigation to exploration editor is successful.');
@@ -2263,6 +2264,7 @@ export class LoggedInUser extends BaseUser {
     );
     await this.clickOn(addGoalsButtonInRedesignedLearnerDashboard);
 
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
       visible: true,
     });
@@ -2272,6 +2274,8 @@ export class LoggedInUser extends BaseUser {
     goal: string,
     checked: boolean = true
   ): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
     const newGoalsCheckboxes = await this.page.$$(
       goalCheckboxInRedesignedLearnerDashboard
     );
@@ -2292,8 +2296,8 @@ export class LoggedInUser extends BaseUser {
       }
 
       if (checkboxText === goal) {
-        const goalLabel = await checkbox.$('label');
-        await goalLabel?.click();
+        const goalCheckbox = await checkbox.$('input');
+        await goalCheckbox?.click();
         break;
       }
     }
@@ -2309,6 +2313,8 @@ export class LoggedInUser extends BaseUser {
   }
 
   async addGoalInRedesignedLearnerDashboard(goal: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
     await this.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
     await this.clickOnGoalCheckboxInRedesignedLearnerDashboard(goal);
     await this.submitGoalInRedesignedLearnerDashboard();

@@ -128,9 +128,6 @@ describe('Logged-In Learner', function () {
     // Once this feature/bug is fixed, update the test.
     // TODO: I closed the issue, but there is still the bug, so reopen the issue.
     await loggedInLearner.navigateToGoalsSection();
-    // await loggedInLearner.navigateToCommunityLibraryPage();
-    // await loggedInLearner.searchForLessonInSearchBar('Negative Numbers');
-    // await loggedInLearner.playLessonFromSearchResults('Negative Numbers');
     await loggedInLearner.startGoalFromGoalsSectionInRedesignedDashboard(
       'Algebra I'
     );

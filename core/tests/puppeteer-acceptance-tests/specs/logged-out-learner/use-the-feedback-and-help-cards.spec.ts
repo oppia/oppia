@@ -106,7 +106,7 @@ describe('Logged-Out Learner', function () {
 
   it('should be able to see the first card', async function () {
     // Navigate to Lesson Player.
-    await loggedOutLearner.navigateToClassroomPage('math');
+    await loggedOutLearner.navigateToCommunityLibraryPage();
     await loggedOutLearner.selectAndOpenTopic('Place Values');
     await loggedOutLearner.selectChapterWithinStoryToLearn(
       'What are Plave values',
