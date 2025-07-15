@@ -47,9 +47,7 @@ interface WrittenTranslationsMapping {
 
 export class WrittenTranslations {
   translationsMapping: WrittenTranslationsMapping;
-  constructor(
-    translationsMapping: WrittenTranslationsMapping
-  ) {
+  constructor(translationsMapping: WrittenTranslationsMapping) {
     this.translationsMapping = translationsMapping;
   }
 
@@ -164,8 +162,7 @@ export class WrittenTranslations {
   providedIn: 'root',
 })
 export class WrittenTranslationsObjectFactory {
-  constructor(
-  ) {}
+  constructor() {}
 
   createFromBackendDict(
     writtenTranslationsDict: WrittenTranslationsBackendDict
@@ -184,9 +181,7 @@ export class WrittenTranslationsObjectFactory {
         });
       }
     );
-    return new WrittenTranslations(
-      translationsMapping
-    );
+    return new WrittenTranslations(translationsMapping);
   }
 
   createEmpty(): WrittenTranslations {

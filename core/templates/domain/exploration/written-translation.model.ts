@@ -16,7 +16,6 @@
  * @fileoverview Model class for creating frontend instances of written translations.
  */
 
-
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
 export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
 export const TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING =
@@ -98,26 +97,27 @@ export class WrittenTranslation {
     };
   }
 
+  static createNew(
+    dataFormat: DataFormatToDefaultValuesKey
+  ): WrittenTranslation {
+    if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
+      throw new Error('Invalid translation data format: ' + dataFormat);
+    }
 
-static createNew(dataFormat: DataFormatToDefaultValuesKey): WrittenTranslation {
-  if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
-    throw new Error('Invalid translation data format: ' + dataFormat);
+    return new WrittenTranslation(
+      dataFormat,
+      JSON.parse(JSON.stringify(DATA_FORMAT_TO_DEFAULT_VALUES[dataFormat])),
+      false
+    );
   }
 
-  return new WrittenTranslation(
-    dataFormat,
-    JSON.parse(JSON.stringify(DATA_FORMAT_TO_DEFAULT_VALUES[dataFormat])),
-    false
-  );
-}
-
-static createFromBackendDict(
-  translationBackendDict: TranslationBackendDict
-): WrittenTranslation {
-  return new WrittenTranslation(
-    translationBackendDict.data_format as DataFormatToDefaultValuesKey,
-    translationBackendDict.translation,
-    translationBackendDict.needs_update
-  );
-}
+  static createFromBackendDict(
+    translationBackendDict: TranslationBackendDict
+  ): WrittenTranslation {
+    return new WrittenTranslation(
+      translationBackendDict.data_format as DataFormatToDefaultValuesKey,
+      translationBackendDict.translation,
+      translationBackendDict.needs_update
+    );
+  }
 }
