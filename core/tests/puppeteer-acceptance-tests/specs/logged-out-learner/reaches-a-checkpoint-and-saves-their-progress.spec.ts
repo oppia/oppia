@@ -148,6 +148,7 @@ describe('Logged-out User', function () {
     await loggedOutLearner.goBackToPreviousCard();
     await loggedOutLearner.verifyCannotAnswerPreviouslyAnsweredQuestion();
     await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.submitAnswer('1/2');
     await loggedOutLearner.continueToNextCard();
     await loggedOutLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'

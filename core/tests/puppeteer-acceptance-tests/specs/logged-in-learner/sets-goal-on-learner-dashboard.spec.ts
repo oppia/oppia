@@ -115,14 +115,6 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.navigateToGoalsSection();
 
     await loggedInLearner.expectLearnerGreetingsToBe("loggedInLearner's Goals");
-
-    // await loggedInLearner.expectGoalsSectionToContainHeadings([
-    //   'Current Goals',
-    //   'Edit Goals',
-    //   'Completed Lessons',
-    // ]);
-
-    // await loggedInLearner.expectCurrentGoalsSectionToBeEmpty();
   });
 
   it('should be able to add a goal', async function () {
@@ -147,7 +139,7 @@ describe('Logged-In Learner', function () {
 
     await loggedInLearner.expectRemoveActivityModelToBeDisplayed(
       "Remove from 'Current Goals' list?",
-      "Are you sure you want to remove 'Algebra' from your 'Current Goals' list?"
+      "Are you sure you want to remove 'Algebra I' from your 'Current Goals' list?"
     );
     await loggedInLearner.clickButtonInRemoveActivityModal('Remove');
     await loggedInLearner.expectRedesignedGoalsSectionToContainHeading(

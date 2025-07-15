@@ -3469,7 +3469,8 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('Video URL input not found in the helper modal');
     }
 
-    await this.clickOn(closeButtonForExtraModel);
+    await this.page.waitForSelector(closeButtonForExtraModel);
+    await this.page.click(closeButtonForExtraModel);
     await this.page.waitForSelector(closeButtonForExtraModel, {
       hidden: true,
     });
