@@ -39,6 +39,18 @@ describe('CheckpointProgressService', () => {
     expect(checkpointProgressService).toBeTruthy();
   });
 
+  it('should throw an error when setting a null checkpoint', () => {
+    expect(() => {
+      checkpointProgressService.setMostRecentlyReachedCheckpoint(null);
+    }).toThrowError('Checkpoint state name cannot be null.');
+  });
+
+  it('should throw an error when checking if a null checkpoint is visited', () => {
+    expect(() => {
+      checkpointProgressService.checkIfCheckpointIsVisited(null);
+    }).toThrowError('Checkpoint state name cannot be null.');
+  });
+
   it('should set and get last completed checkpoint correctly', () => {
     const checkpointStateName = 'checkpoint_1';
     checkpointProgressService.setMostRecentlyReachedCheckpoint(

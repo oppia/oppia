@@ -45,6 +45,7 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import study_guide_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
@@ -645,6 +646,47 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 1)
+        story_id = topic_fetchers.get_topic_by_id(
+            topic_summaries[0].id).canonical_story_references[0].story_id
+        self.assertIsNotNone(
+            story_fetchers.get_story_by_id(story_id, strict=False))
+        skill_summaries = skill_services.get_all_skill_summaries()
+        self.assertEqual(len(skill_summaries), 3)
+        questions, _ = (
+            question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+                10, [
+                    skill_summaries[0].id, skill_summaries[1].id,
+                    skill_summaries[2].id], 0)
+        )
+        self.assertEqual(len(questions), 5)
+        # Testing that there are 3 hindi translation opportunities
+        # available on the Contributor Dashboard. Hindi was picked arbitrarily,
+        # any language code other than english (what the dummy explorations
+        # were written in) can be tested here.
+        translation_opportunities, _, _ = (
+            opportunity_services.get_translation_opportunities('hi', '', None))
+        self.assertEqual(len(translation_opportunities), 3)
+        self.logout()
+
+    @test_utils.enable_feature_flags([
+        feature_flag_list.FeatureNames
+        .SHOW_RESTRUCTURED_STUDY_GUIDES
+    ])
+    def test_load_new_structures_data_with_study_guides(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'generate_dummy_new_structures_data'
+            }, csrf_token=csrf_token)
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+        self.assertEqual(len(topic_summaries), 1)
+        study_guide_sections = (
+            study_guide_services
+            .get_study_guide_sections_by_id
+        )(topic_summaries[0].id, 1)
+        self.assertEqual(len(study_guide_sections), 1)
         story_id = topic_fetchers.get_topic_by_id(
             topic_summaries[0].id).canonical_story_references[0].story_id
         self.assertIsNotNone(

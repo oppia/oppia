@@ -40,6 +40,7 @@ import {
 import {Location} from '@angular/common';
 import {UserInfo} from 'domain/user/user-info.model';
 import {UrlService} from 'services/contextual/url.service';
+import {PlatformFeatureService} from '../../../services/platform-feature.service';
 
 class MockNgbModal {
   open() {
@@ -49,11 +50,20 @@ class MockNgbModal {
   }
 }
 
+class MockPlatformFeatureService {
+  status = {
+    NewLessonPlayer: {
+      isEnabled: false,
+    },
+  };
+}
+
 describe('Question Player Component', () => {
   let component: QuestionPlayerComponent;
   let fixture: ComponentFixture<QuestionPlayerComponent>;
   let ngbModal: NgbModal;
   let playerPositionService: PlayerPositionService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let preventPageUnloadEventService: PreventPageUnloadEventService;
   let questionPlayerEngineService: QuestionPlayerEngineService;
   let userService: UserService;
@@ -116,6 +126,10 @@ describe('Question Player Component', () => {
         {
           provide: NgbModal,
           useClass: MockNgbModal,
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
         },
         {
           provide: WindowRef,
@@ -184,6 +198,11 @@ describe('Question Player Component', () => {
     expect(
       questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit
     ).toHaveBeenCalledWith(false);
+  });
+
+  it('should check new lesson player feature flag is enabled', () => {
+    mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
+    expect(component.isNewLessonPlayerEnabled()).toBe(true);
   });
 
   it('should add subscriptions on initialization', fakeAsync(() => {

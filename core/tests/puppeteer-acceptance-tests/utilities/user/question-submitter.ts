@@ -537,7 +537,7 @@ export class QuestionSubmitter extends BaseUser {
     showMessage('Image interaction has been added successfully.');
   }
 
-  // TODO (#22539): This function has a duplicate in exploration-editor.ts.
+  // TODO(#22539): This function has a duplicate in exploration-editor.ts.
   // To avoid unexpected behavior, ensure that any modifications here are also
   // made in editDefaultResponseFeedbackInExplorationEditorPage() in exploration-editor.ts.
   /**
@@ -558,6 +558,20 @@ export class QuestionSubmitter extends BaseUser {
       await this.clickOn(stateContentInputField);
       await this.type(stateContentInputField, `${defaultResponseFeedback}`);
       await this.clickOn(saveOutcomeFeedbackButton);
+
+      // Check for text and add post check based on it.
+      const newDefaultResponseText = await this.page.$eval(
+        openOutcomeFeedBackEditor,
+        el => el.textContent?.trim()
+      );
+
+      if (newDefaultResponseText !== defaultResponseFeedback) {
+        throw new Error(
+          `Error updating default response. Found ${newDefaultResponseText}, expected ${defaultResponseFeedback}`
+        );
+      }
+
+      showMessage(`Default response feedback: ${newDefaultResponseText}`);
     }
 
     if (directToCard) {

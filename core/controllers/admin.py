@@ -22,6 +22,7 @@ import operator
 import random
 import string
 
+from core import feature_flag_list
 from core import feconf
 from core import utils
 from core.constants import constants
@@ -37,6 +38,7 @@ from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import feature_flag_services
 from core.domain import fs_services
 from core.domain import opportunity_services
 from core.domain import platform_parameter_domain as parameter_domain
@@ -56,6 +58,8 @@ from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
+from core.domain import study_guide_domain
+from core.domain import study_guide_services
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import suggestion_services
@@ -998,9 +1002,24 @@ class AdminHandler(
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
 
-            subtopic_page = (
-                subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                    1, topic_id_1))
+            if feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames
+                .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                None
+            ):
+                study_guide = (
+                    study_guide_domain.StudyGuide.create_study_guide(
+                        1, topic_id_1, 'Dummy Study Guide',
+                        'Lorem Ipsum is simply dummy text.'
+                    )
+                )
+            else:
+                subtopic_page = (
+                    subtopic_page_domain.SubtopicPage
+                    .create_default_subtopic_page(
+                        1, topic_id_1
+                    )
+                )
             # These explorations were chosen since they pass the validations
             # for published stories.
             self._reload_exploration('6')
@@ -1070,15 +1089,30 @@ class AdminHandler(
             skill_services.save_new_skill(self.user_id, skill_3)
             story_services.save_new_story(self.user_id, story)
             topic_services.save_new_topic(self.user_id, topic_1)
-            subtopic_page_services.save_subtopic_page(
-                self.user_id, subtopic_page, 'Added subtopic',
-                [topic_domain.TopicChange({
-                    'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                    'subtopic_id': 1,
-                    'title': 'Dummy Subtopic Title',
-                    'url_fragment': 'dummy-fragment'
-                })]
-            )
+            if feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames
+                .SHOW_RESTRUCTURED_STUDY_GUIDES.value,
+                None
+            ):
+                study_guide_services.save_study_guide(
+                    self.user_id, study_guide, 'Added study guide',
+                    [topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': 1,
+                        'title': 'Dummy Subtopic Title',
+                        'url_fragment': 'dummy-fragment'
+                    })]
+                )
+            else:
+                subtopic_page_services.save_subtopic_page(
+                    self.user_id, subtopic_page, 'Added subtopic',
+                    [topic_domain.TopicChange({
+                        'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                        'subtopic_id': 1,
+                        'title': 'Dummy Subtopic Title',
+                        'url_fragment': 'dummy-fragment'
+                    })]
+                )
 
             # Generates translation opportunities for the Contributor Dashboard.
             exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
