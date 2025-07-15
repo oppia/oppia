@@ -24,12 +24,16 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
-  let curriculumAdmin: CurriculumAdmin & ExplorationEditor & LoggedOutUser;
+  let curriculumAdmin: CurriculumAdmin &
+    TopicManager &
+    ExplorationEditor &
+    LoggedOutUser;
   let explorationId1: string;
   let explorationId2: string;
 
@@ -58,11 +62,19 @@ describe('Logged-Out Learner', function () {
       'Algebra',
       'fractions'
     );
+    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+
+    await curriculumAdmin.openSkillEditor('fractions');
+    await curriculumAdmin.navigateToSkillQuestionEditorTab();
+
+    await curriculumAdmin.createQuestionsForSkill('fractions', 7);
+
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
       'Fractions'
     );
+    await curriculumAdmin.enableDiagnosticTestForClassroom('Math');
 
     // Add explorations to classroom.
     await curriculumAdmin.addStoryToTopic(
@@ -76,7 +88,7 @@ describe('Logged-Out Learner', function () {
     // Save draft.
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
-  });
+  }, 600000);
 
   it('should be able to find list of subjects to learn', async function () {
     await loggedOutLearner.navigateToSplashPage();
@@ -89,46 +101,63 @@ describe('Logged-Out Learner', function () {
 
     // Click "Explore Oppia Classrooms" button.
     await loggedOutLearner.clickBrowseLessonsButtonInHomePage();
-    await loggedOutLearner.expectClassroomHeadingToBe('Oppia Classrooms');
-    await loggedOutLearner.clickOnClassroomTileInLearnPage('Math');
+    await loggedOutLearner.isTextPresentOnPage('The Math Classroom');
 
-    // TODO: Learner should be navigated to Math classroom.
-    // Check for topics present in the classroom.
     await loggedOutLearner.expectHeadingInClassroomPageToContain(
       'Course Details'
     );
     await loggedOutLearner.expectHeadingInClassroomPageToContain(
       'Topics Covered'
     );
-    await loggedOutLearner.expectTopicsToBePresent(['Algebra']);
+    await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
   });
 
   it('should be able start learning from the first topic', async function () {
     // Click "Start Here" under "Don't know where to start" section.
     await loggedOutLearner.expectDiagnosticTestBoxToBePresent(
-      "Don't know where to start?",
+      'Don’t know where to start?',
       'Start here'
     );
-    // TODO: Learner should see information about the first topic.
-    // TODO: Learner should be able to see list of stories under the topic.
-    // TODO: Learner should be able to see list of revision cards.
-    // TODO: Learner should be able to see the page from which they can start learning.
+    await loggedOutLearner.clickOnStartHereButtonInClassroomPage();
+    await loggedOutLearner.expectTabTitleInTopicPageToBe('Fractions');
+    await loggedOutLearner.expectTopicToContainStories(['Learning Fractions']);
+
+    await loggedOutLearner.navigateToRevisionTabInTopic();
+    await loggedOutLearner.expectTabTitleInTopicPageToBe(
+      'Study Skills for Fractions'
+    );
+
+    await loggedOutLearner.navigateToPracticeTabInTopic();
+    await loggedOutLearner.expectTabTitleInTopicPageToBe(
+      'Master Skills for Fraction'
+    );
+
+    await loggedOutLearner.navigateBackToClassroomFromTopicPage();
+    await loggedOutLearner.isTextPresentOnPage('The Math Classroom');
   });
 
   it('should be able to figure out which topic would be best for them', async function () {
+    await loggedOutLearner.navigateToClassroomPage('math');
+
     // Click on "Take a Quiz" under "Already know some Math?" section.
     await loggedOutLearner.expectDiagnosticTestBoxToBePresent(
       'Already know some Math?',
       'Take quiz'
     );
-    // TODO: Click on "Start the test" to start.
-    // TODO: Go through the quiz.
-    // TODO: Learner should be redirected to diagnostic test page.
-    // TODO: Learner should be able to see test questions.
-    // TODO: After completing the test, Learner should see the recommendation.
+    await loggedOutLearner.clickOnTakeQuizButtonInClassroomPage();
+    await loggedOutLearner.startDiagnosticTest();
+    await loggedOutLearner.expectToBeInDiagnosticTestPlayer();
+
+    await loggedOutLearner.expectCardContentToMatch('Add 1+2');
+
+    await loggedOutLearner.skipQuestionInDiagnosticTest();
+    await loggedOutLearner.skipQuestionInDiagnosticTest();
+
+    await loggedOutLearner.isTextPresentOnPage('Test complete. Well Done!');
+    await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
   });
 
   afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
+    // await UserFactory.closeAllBrowsers();
   });
 });

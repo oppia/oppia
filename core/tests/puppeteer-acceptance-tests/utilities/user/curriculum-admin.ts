@@ -211,6 +211,8 @@ const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
 const publishClassroomButton =
   '.e2e-test-toggle-classroom-publication-status-btn';
+const enableDiagnosticTestButton =
+  '.e2e-test-toggle-diagnostic-test-status-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
 const deleteClassroomButton = '.e2e-test-delete-classroom-button';
@@ -1811,6 +1813,7 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Function for publishing a classroom.
+   * @param {string} classroomName - The name of the classroom.
    */
   async publishClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
@@ -1820,6 +1823,20 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(saveClassroomButton, {hidden: true});
 
     showMessage(`Published ${classroomName} classroom.`);
+  }
+
+  /**
+   * Enables diagnostic test for a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async enableDiagnosticTestForClassroom(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom(classroomName);
+    await this.clickOn(enableDiagnosticTestButton);
+    await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
+    showMessage(`Enabled diagnostic test for ${classroomName} classroom.`);
   }
 
   /**

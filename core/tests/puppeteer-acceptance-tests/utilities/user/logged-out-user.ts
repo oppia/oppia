@@ -509,6 +509,25 @@ const diagnosticTestBoxSelector = '.e2e-test-diagnostic-test-box';
 const diagnosticTestHeadingSelector = `${diagnosticTestBoxSelector} h4`;
 const diagnosticTestButtonSelector = `${diagnosticTestBoxSelector} a`;
 
+const startHereButtonSelector = '.e2e-test-start-here-button';
+const takeQuizButtonSelector = '.e2e-test-take-diagnostic-test';
+
+const startDiagnosticTestButtonSelector = '.e2e-test-start-diagnostic-test';
+
+// Diagnostic Test Player.
+const diagnosticTestPlayerSelector = 'oppia-dignostic-test-player';
+const skipQuestionButton = '.e2e-test-skip-question-button';
+const currentProgessSelector = '.e2e-test-progress-container';
+
+// Topic Page.
+const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
+const practiceTabButtonSelector = '.e2e-test-practice-tab-link';
+const revisionTabButtonSelector = '.e2e-test-study-tab-link';
+const practiceTabSelector = 'practice-tab';
+const revisionTabSelector = 'subtopics-list';
+
+const backToClassroomLinkSelector = '.e2e-test-classroom-name';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -3457,6 +3476,103 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  async expectTopicToContainStories(storyNames: string[]): Promise<void> {
+    const selector = this.isViewportAtMobileWidth()
+      ? mobileStoryTitleSelector
+      : desktopStoryTitleSelector;
+
+    const storyElements = await this.getAllElementsBySelector(selector);
+    const storyNamesInPage =
+      await this.getTextContentsFromElements(storyElements);
+
+    for (const storyName of storyNames) {
+      expect(storyNamesInPage).toContain(storyName);
+    }
+  }
+
+  /**
+   * Navigates to the practice tab in the topic page.
+   */
+  async navigateToPracticeTabInTopic(): Promise<void> {
+    await this.isElementVisible(practiceTabButtonSelector);
+    await this.clickOn(practiceTabButtonSelector);
+
+    await this.isElementVisible(practiceTabSelector);
+  }
+
+  /**
+   * Navigates to the revision tab in the topic page.
+   */
+  async navigateToRevisionTabInTopic(): Promise<void> {
+    await this.isElementVisible(revisionTabButtonSelector);
+    await this.clickOn(revisionTabButtonSelector);
+
+    await this.isElementVisible(revisionTabSelector);
+  }
+
+  /**
+   * Navigates back to the classroom from the topic page.
+   */
+  async navigateBackToClassroomFromTopicPage(): Promise<void> {
+    await this.isElementVisible(backToClassroomLinkSelector);
+    await this.clickOn(backToClassroomLinkSelector);
+
+    await this.isElementVisible(backToClassroomLinkSelector, false);
+  }
+
+  /**
+   * Clicks on the start here button in the classroom page.
+   */
+  async clickOnStartHereButtonInClassroomPage(): Promise<void> {
+    await this.isElementVisible(startHereButtonSelector);
+
+    await this.clickOn(startHereButtonSelector);
+    await this.isElementVisible(startHereButtonSelector, false);
+  }
+
+  /**
+   * Clicks on the take quiz button in the classroom page.
+   */
+  async clickOnTakeQuizButtonInClassroomPage(): Promise<void> {
+    await this.isElementVisible(takeQuizButtonSelector);
+
+    await this.clickOn(takeQuizButtonSelector);
+    await this.isElementVisible(takeQuizButtonSelector, false);
+  }
+
+  /**
+   * Starts a diagnostic test.
+   */
+  async startDiagnosticTest(): Promise<void> {
+    await this.isElementVisible(startDiagnosticTestButtonSelector);
+
+    await this.clickOn(startDiagnosticTestButtonSelector);
+    await this.isElementVisible(startDiagnosticTestButtonSelector, false);
+  }
+
+  /**
+   * Skips the current question in the diagnostic test.
+   */
+  async skipQuestionInDiagnosticTest(): Promise<void> {
+    const initialProgress =
+      (await this.page.$eval(currentProgessSelector, el =>
+        el.textContent?.trim()
+      )) ?? '';
+    await this.isElementVisible(skipQuestionButton);
+
+    await this.clickOn(skipQuestionButton);
+
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() !== value;
+      },
+      {},
+      currentProgessSelector,
+      initialProgress
+    );
+  }
+
   /**
    * Selects and opens a chapter within a story to learn.
    * @param {string} storyName - The name of the story containing the chapter.
@@ -5515,6 +5631,28 @@ export class LoggedOutUser extends BaseUser {
     );
 
     expect(heading).toBe(expectedHeading);
+  }
+
+  /**
+   * Expects the tab title in the topic page to be the expected tab title.
+   * @param expectedTabTitle The expected tab title.
+   */
+  async expectTabTitleInTopicPageToBe(expectedTabTitle: string): Promise<void> {
+    await this.page.waitForSelector(tabTitleInTopicPageSelector);
+    const tabTitle = await this.page.$eval(tabTitleInTopicPageSelector, el =>
+      el.textContent?.trim()
+    );
+
+    expect(tabTitle).toBe(expectedTabTitle);
+  }
+
+  /**
+   * Expects the user to be in the diagnostic test player.
+   */
+  async expectToBeInDiagnosticTestPlayer(): Promise<void> {
+    await this.isElementVisible(diagnosticTestPlayerSelector);
+
+    await this.isTextPresentOnPage('Learner Diagnostic Test');
   }
 }
 

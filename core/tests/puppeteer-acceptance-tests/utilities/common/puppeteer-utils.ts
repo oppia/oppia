@@ -1024,10 +1024,70 @@ export class BaseUser {
     timeout: number = 30000
   ): Promise<void> {
     const context = parentElement ?? this.page;
+
+    try {
+      await context.waitForSelector(selector, {
+        visible: true,
+        timeout: timeout,
+      });
+
+      // If element is visible, but we need it to be hidden, we throw an error.
+      if (!visibility) {
+        throw new Error(
+          `Element ${selector} was found, but it should be hidden.`
+        );
+      }
+    } catch (error) {
+      // If element is not visible, but we need it to be visible, we throw an error.
+      if (visibility) {
+        throw new Error(
+          `Element ${selector} was not found, but it should be visible.`
+        );
+      }
+    }
+  }
+
+  /**
+   * This function returns all elements matching the given selector.
+   * @param selector - The selector to find elements for.
+   * @param parentElement - The parent element to search within.
+   */
+  async getAllElementsBySelector(
+    selector: string,
+    parentElement?: puppeteer.ElementHandle
+  ): Promise<puppeteer.ElementHandle[]> {
+    const context = parentElement ?? this.page;
+
     await context.waitForSelector(selector, {
-      visible: visibility,
-      timeout: timeout,
+      visible: true,
     });
+
+    const elements = await context.$$(selector);
+
+    if (!elements) {
+      throw new Error(`No elements found for selector ${selector}`);
+    }
+
+    return elements;
+  }
+
+  /**
+   * This function returns the text contents of the given elements.
+   * @param elements - The elements to get the text contents from.
+   */
+  async getTextContentsFromElements(
+    elements: ElementHandle[]
+  ): Promise<string[]> {
+    const textContents: string[] = [];
+
+    for (const element of elements) {
+      const textContent = await element.evaluate(element =>
+        element.textContent?.trim()
+      );
+      textContents.push(textContent ?? '');
+    }
+
+    return textContents;
   }
 }
 

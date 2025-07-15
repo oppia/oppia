@@ -76,7 +76,7 @@ describe('Logged-Out Learner', function () {
     // Go to topic page.
     await loggedOutLearner.navigateToClassroomPage('math');
     await loggedOutLearner.selectAndOpenTopic('Fractions');
-    // TODO: Navigate to practice tab.
+    await loggedOutLearner.navigateToPracticeTabInTopic();
     // TODO: Learner should see "Master Skills for Math" topic.
     // TODO: Select a skill to practice.
     // TODO: Learner should be directed to practice page.
