@@ -21,19 +21,15 @@ import {
   WrittenTranslations,
   WrittenTranslationsObjectFactory,
 } from 'domain/exploration/WrittenTranslationsObjectFactory';
-import {WrittenTranslationObjectFactory} from 'domain/exploration/WrittenTranslationObjectFactory';
+import {WrittenTranslation} from 'domain/exploration/written-translation.model';
 
 describe('Written Translations Object Factory', () => {
   let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
-  let writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
   let writtenTranslationsBackendDict: WrittenTranslations;
 
   beforeEach(() => {
     writtenTranslationsObjectFactory = TestBed.inject(
       WrittenTranslationsObjectFactory
-    );
-    writtenTranslationObjectFactory = TestBed.inject(
-      WrittenTranslationObjectFactory
     );
 
     writtenTranslationsBackendDict =
@@ -145,7 +141,7 @@ describe('Written Translations Object Factory', () => {
     expect(
       writtenTranslationsBackendDict.getWrittenTranslation('content_1', 'hi-en')
     ).toEqual(
-      writtenTranslationObjectFactory.createFromBackendDict({
+      WrittenTranslation.createFromBackendDict({
         data_format: 'html',
         translation: '<p>This is the new HTML</p>',
         needs_update: false,
@@ -172,7 +168,7 @@ describe('Written Translations Object Factory', () => {
     expect(
       writtenTranslationsBackendDict.getWrittenTranslation('content_1', 'hi-en')
     ).toEqual(
-      writtenTranslationObjectFactory.createFromBackendDict({
+      WrittenTranslation.createFromBackendDict({
         data_format: 'html',
         translation: '',
         needs_update: true,
@@ -191,7 +187,7 @@ describe('Written Translations Object Factory', () => {
     expect(
       writtenTranslationsBackendDict.getWrittenTranslation('content_1', 'hi-en')
     ).toEqual(
-      writtenTranslationObjectFactory.createFromBackendDict({
+      WrittenTranslation.createFromBackendDict({
         data_format: 'html',
         translation: '',
         needs_update: false,
@@ -229,7 +225,7 @@ describe('Written Translations Object Factory', () => {
     expect(
       writtenTranslationsBackendDict.getWrittenTranslation('content_1', 'hi-en')
     ).toEqual(
-      writtenTranslationObjectFactory.createFromBackendDict({
+      WrittenTranslation.createFromBackendDict({
         data_format: 'html',
         translation: 'This is the old HTML',
         needs_update: true,
@@ -238,7 +234,7 @@ describe('Written Translations Object Factory', () => {
     expect(
       writtenTranslationsBackendDict.getWrittenTranslation('content_1', 'en')
     ).toEqual(
-      writtenTranslationObjectFactory.createFromBackendDict({
+      WrittenTranslation.createFromBackendDict({
         data_format: 'html',
         translation: '',
         needs_update: true,
