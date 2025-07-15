@@ -129,9 +129,11 @@ describe('Logged-Out Learner', function () {
       'Fractions 1'
     );
 
-    // TODO: Learner should see first scenario conversation.
+    await loggedOutLearner.expectCardContentToMatch('Content0');
+    await loggedOutLearner.clickOnContinueButtonInInteractionCard();
 
-    // TODO: Learner should be able to submit an answer, then click continue.
+    await loggedOutLearner.returnToStoryFromLastState();
+
     // TODO: Learner should see feedback and go through the lesson.
 
     // TODO: Exit the lesson.

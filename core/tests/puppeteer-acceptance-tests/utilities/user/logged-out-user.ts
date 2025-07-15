@@ -3021,6 +3021,16 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Clicks on continue button in continue button interaction.
+   */
+  async clickOnContinueButtonInInteractionCard(): Promise<void> {
+    await this.isElementVisible(nextCardButton);
+    await this.clickOn(nextCardButton);
+
+    await this.isElementVisible(nextCardButton, false);
+  }
+
+  /**
    * Function to submit an answer to a form input field.
    * @param {string} answer - The answer to submit.
    */
