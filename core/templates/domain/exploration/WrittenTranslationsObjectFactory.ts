@@ -118,7 +118,7 @@ export class WrittenTranslations {
       throw new Error('Trying to add duplicate language code.');
     }
     writtenTranslations[languageCode] =
-      this.WrittenTranslation.createNew(dataFormat);
+      WrittenTranslation.createNew(dataFormat);
     writtenTranslations[languageCode].setTranslation(translation);
   }
 
@@ -178,7 +178,7 @@ export class WrittenTranslationsObjectFactory {
           writtenTranslationsDict.translations_mapping[contentId];
         Object.keys(languageCodeToWrittenTranslationDict).forEach(langCode => {
           translationsMapping[contentId][langCode] =
-            this.WrittenTranslation.createFromBackendDict(
+            WrittenTranslation.createFromBackendDict(
               languageCodeToWrittenTranslationDict[langCode]
             );
         });
@@ -190,6 +190,6 @@ export class WrittenTranslationsObjectFactory {
   }
 
   createEmpty(): WrittenTranslations {
-    return new WrittenTranslations({}, this.WrittenTranslation);
+    return new WrittenTranslations({});
   }
 }
