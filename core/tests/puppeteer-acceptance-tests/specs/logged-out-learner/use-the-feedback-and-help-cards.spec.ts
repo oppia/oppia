@@ -107,13 +107,14 @@ describe('Logged-Out Learner', function () {
   it('should be able to see the first card', async function () {
     // Navigate to Lesson Player.
     await loggedOutLearner.navigateToCommunityLibraryPage();
-    await loggedOutLearner.selectAndOpenTopic('Place Values');
-    await loggedOutLearner.selectChapterWithinStoryToLearn(
-      'What are Plave values',
-      'Understanding Place Values'
+    await loggedOutLearner.searchForLessonInSearchBar(
+      'What are the Place Values?'
+    );
+    await loggedOutLearner.playLessonFromSearchResults(
+      'What are the Place Values?'
     );
     await loggedOutLearner.expectCardContentToMatch(
-      'Welcome, to the Place Values Exploration'
+      'Welcome, to the Place Values Exploration.'
     );
     await loggedOutLearner.expectContinueToNextCardButtonToBePresent();
   });
@@ -125,7 +126,7 @@ describe('Logged-Out Learner', function () {
   it('should be able to continue to next card', async function () {
     await loggedOutLearner.continueToNextCard();
     await loggedOutLearner.expectCardContentToMatch(
-      "What is 3/6 equal to in it's simplest form?"
+      'Give fraction with denominator 2.'
     );
     await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
     await loggedOutLearner.verifyCheckpointModalAppears();
@@ -158,13 +159,14 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.closeHintModal();
 
     // View Solution.
-    await loggedOutLearner.viewSolution();
+    await loggedOutLearner.submitAnswer('1/3');
+    await loggedOutLearner.submitAnswer('2/3');
+    await loggedOutLearner.viewSolution(180000);
     await loggedOutLearner.closeSolutionModal();
   });
 
   it('should be able to submit a correct answer and see the celebration pop-up', async function () {
     await loggedOutLearner.submitAnswer('1/2');
-    await loggedOutLearner.submitAnswer('5');
 
     await loggedOutLearner.continueToNextCard();
     await loggedOutLearner.expectExplorationCompletionToastMessage(

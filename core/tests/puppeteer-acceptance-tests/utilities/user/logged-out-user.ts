@@ -2974,6 +2974,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async submitAnswer(answer: string): Promise<void> {
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
+    await this.clearAllTextFrom(submitResponseToInteractionInput);
     await this.type(submitResponseToInteractionInput, answer);
     await this.clickOn(submitAnswerButton);
   }
@@ -3794,7 +3795,9 @@ export class LoggedOutUser extends BaseUser {
 
       const lessonIndex = searchResults.indexOf(lessonTitle);
       if (lessonIndex === -1) {
-        throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
+        throw new Error(
+          `Lesson "${lessonTitle}" not found in search results.\nFound: ${searchResults.join(', ')}`
+        );
       }
 
       await this.waitForElementToBeClickable(
@@ -4039,7 +4042,6 @@ export class LoggedOutUser extends BaseUser {
     try {
       await this.page.waitForSelector(checkpointModalSelector, {
         visible: true,
-        timeout: 5000,
       });
       showMessage('Checkpoint modal found.');
       // Closing the checkpoint modal.
@@ -4131,10 +4133,11 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, expectedLength: number) => {
         const elements = document.querySelectorAll(selector);
-        return elements.length !== expectedLength;
+        return elements.length === expectedLength;
       },
       {
-        timeout: 30000,
+        // Each hint modal takes about 1 minute to appear.
+        timeout: numberOfHintModals * 65000,
       },
       hintButtonSelector,
       numberOfHintModals
@@ -4152,8 +4155,11 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Simulates the action of viewing the solution by clicking on the view solution button and the continue to solution button.
    */
-  async viewSolution(): Promise<void> {
-    await this.page.waitForSelector(viewSolutionButton, {visible: true});
+  async viewSolution(timeout: number = 60000): Promise<void> {
+    await this.page.waitForSelector(viewSolutionButton, {
+      visible: true,
+      timeout: timeout,
+    });
     await this.clickOn(viewSolutionButton);
     await this.clickOn(continueToSolutionButton);
     await this.page.waitForSelector(closeSolutionModalButton, {
@@ -4232,11 +4238,7 @@ export class LoggedOutUser extends BaseUser {
       element => element.textContent,
       element
     );
-    if (cardContent.trim() !== expectedCardContent) {
-      throw new Error(
-        `Card content is not same as expected. Actual: ${cardContent.trim()}, Expected: ${expectedCardContent}.`
-      );
-    }
+    expect(cardContent.trim()).toBe(expectedCardContent);
     showMessage('Card content is as expected.');
   }
 
