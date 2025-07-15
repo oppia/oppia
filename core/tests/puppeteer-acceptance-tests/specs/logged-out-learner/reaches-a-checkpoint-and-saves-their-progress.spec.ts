@@ -32,6 +32,7 @@ const PROGRESS_URL_VALIDITY_INFO =
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   SECOND_CARD = 'Second Card',
+  THIRD_CARD = 'Third Card',
   FINAL_CARD = 'Final Card',
 }
 
@@ -64,7 +65,6 @@ describe('Logged-out User', function () {
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.SECOND_CARD);
-    await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.updateCardContent(
       'Give fraction with denominator 2.'
     );
@@ -74,7 +74,7 @@ describe('Logged-out User', function () {
       INTERACTION_TYPES.FRACTION_INPUT,
       '2',
       'Perfect!',
-      CARD_NAME.FINAL_CARD,
+      CARD_NAME.THIRD_CARD,
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -89,6 +89,13 @@ describe('Logged-out User', function () {
       true
     );
     await explorationEditor.saveExplorationDraft();
+
+    // Add continue button checkpoint.
+    await explorationEditor.navigateToCard(CARD_NAME.THIRD_CARD);
+    await explorationEditor.setTheStateAsCheckpoint();
+    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.viewOppiaResponses();
+    await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
@@ -129,8 +136,10 @@ describe('Logged-out User', function () {
     await loggedOutLearner.expectProgressRemainder(false);
 
     await loggedOutLearner.continueToNextCard();
-    await loggedOutLearner.verifyCheckpointModalAppears();
     await loggedOutLearner.submitAnswer('1/2');
+
+    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.verifyCheckpointModalAppears();
 
     await loggedOutLearner.openLessonInfoModal();
     await loggedOutLearner.saveProgress();
@@ -148,7 +157,6 @@ describe('Logged-out User', function () {
     await loggedOutLearner.goBackToPreviousCard();
     await loggedOutLearner.verifyCannotAnswerPreviouslyAnsweredQuestion();
     await loggedOutLearner.continueToNextCard();
-    await loggedOutLearner.submitAnswer('1/2');
     await loggedOutLearner.continueToNextCard();
     await loggedOutLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'

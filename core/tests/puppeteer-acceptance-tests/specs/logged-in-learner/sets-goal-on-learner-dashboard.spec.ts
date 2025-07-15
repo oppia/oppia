@@ -125,8 +125,6 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.expectToolTipMessage(
       "Successfully added to your 'Current Goals' list."
     );
-
-    // await loggedInLearner.expectCurrentGoalsSectionToBeEmpty(false);
   });
 
   it('should be able to remove a goal', async function () {
@@ -146,7 +144,6 @@ describe('Logged-In Learner', function () {
       'In Progress',
       false
     );
-    // await loggedInLearner.expectCurrentGoalsSectionToBeEmpty();
   });
 
   afterAll(async function () {
