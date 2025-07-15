@@ -141,10 +141,10 @@ describe('Logged-Out Learner', function () {
 
       // Add Translations.
       await curriculumAdmin.navigateToExplorationEditor(explorationId);
+      await curriculumAdmin.navigateToCard('Second Card');
       await curriculumAdmin.navigateToTranslationsTab();
       await curriculumAdmin.dismissTranslationTabWelcomeModal();
 
-      await curriculumAdmin.navigateToCard('Second Card');
       await curriculumAdmin.editTranslationOfContent(
         'हिन्दी (Hindi)',
         'Content',

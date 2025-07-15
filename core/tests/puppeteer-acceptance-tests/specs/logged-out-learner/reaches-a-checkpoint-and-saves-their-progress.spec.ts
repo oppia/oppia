@@ -129,6 +129,7 @@ describe('Logged-out User', function () {
     await loggedOutLearner.expectProgressRemainder(false);
 
     await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.verifyCheckpointModalAppears();
     await loggedOutLearner.submitAnswer('1/2');
 
     await loggedOutLearner.openLessonInfoModal();

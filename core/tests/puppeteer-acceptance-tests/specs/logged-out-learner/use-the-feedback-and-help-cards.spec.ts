@@ -62,6 +62,7 @@ describe('Logged-Out Learner', function () {
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.SECOND_CARD);
+    await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.updateCardContent(
       'Give fraction with denominator 2.'
     );

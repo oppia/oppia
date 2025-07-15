@@ -2608,16 +2608,19 @@ export class LoggedInUser extends BaseUser {
     heading: string,
     visible: boolean = true
   ): Promise<void> {
-    const headings = await this.page.$$eval(
+    await this.page.waitForFunction(
+      (selector: string, heading: string, visible: boolean) => {
+        const headingElements = document.querySelectorAll(selector);
+        const headings = Array.from(headingElements).map(heading =>
+          heading.textContent?.trim()
+        );
+        return headings.includes(heading) === visible;
+      },
+      {},
       goalsHeadingInRedesignedDashbaordSelector,
-      headings => headings.map(heading => heading.textContent?.trim())
+      heading,
+      visible
     );
-
-    if (visible) {
-      expect(headings).toContain(heading);
-    } else {
-      expect(headings).not.toContain(heading);
-    }
   }
 
   /**
