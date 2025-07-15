@@ -109,6 +109,8 @@ describe('Logged-Out Learner', function () {
       `http://localhost:8181/explore/${explorationId}`
     );
 
+    await loggedOutLearner.waitForPageToFullyLoad();
+
     // Concept Card RTE.
     await loggedOutLearner.expectConceptCardLinkInLessonToWorkProperly(
       'Review material text content for Math.'

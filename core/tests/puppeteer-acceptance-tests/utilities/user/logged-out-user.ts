@@ -4952,6 +4952,9 @@ export class LoggedOutUser extends BaseUser {
     const collapsibleRTEHeader = await this.page.$(
       collapsibleRTEHeaderSelector
     );
+    if (!collapsibleRTEHeader) {
+      throw new Error('Collapsible RTE header not found.');
+    }
     const collapsibleRTEHeaderText = await this.page.evaluate(
       element => element.textContent?.trim(),
       collapsibleRTEHeader
@@ -4962,7 +4965,7 @@ export class LoggedOutUser extends BaseUser {
       );
     }
 
-    await collapsibleRTEHeader?.click();
+    await this.clickOn(collapsibleRTEHeaderSelector);
     await this.page.waitForSelector(collapsibleRTEContentSelector, {
       visible: true,
     });
@@ -4973,11 +4976,7 @@ export class LoggedOutUser extends BaseUser {
       element => element.textContent,
       collapsibleRTEContent
     );
-    if (collapsibleRTEContentText.contains(content)) {
-      throw new Error(
-        `Expected collapsible RTE content to be ${content}, but it was ${collapsibleRTEContentText}`
-      );
-    }
+    expect(collapsibleRTEContentText).toContain(content);
   }
 
   /**
@@ -5100,6 +5099,9 @@ export class LoggedOutUser extends BaseUser {
         `Expected concept card content to be ${content}, but it was ${conceptCardContent}`
       );
     }
+
+    await this.clickOn('Close');
+    await this.isElementVisible(conceptCardViewerSelector, false);
   }
 
   /**
@@ -5111,29 +5113,29 @@ export class LoggedOutUser extends BaseUser {
     tabHeading: string,
     tabContent: string
   ): Promise<void> {
-    const tabHeaderElements = await this.page.$$(
-      nonInteractiveTabsHeaderSelector
+    await this.isElementVisible(nonInteractiveTabsHeaderSelector);
+    const tabHeaders = await this.page.$$eval(
+      nonInteractiveTabsHeaderSelector,
+      elements => elements.map(element => element.textContent?.trim())
     );
 
-    for (const element of tabHeaderElements) {
-      const text = await this.page.evaluate(el => el.textContent, element);
-      if (text?.trim() === tabHeading) {
-        // You found the right tab.
-        await element.click();
-        break;
-      }
+    const tabIndex = tabHeaders.indexOf(tabHeading);
+    if (tabIndex === -1) {
+      throw new Error(`Tab ${tabHeading} not found`);
     }
 
+    const selector = `${nonInteractiveTabsHeaderSelector} .e2e-test-element-${tabIndex}`;
+    await this.page.waitForSelector(selector);
+    await this.clickOn(selector);
+
+    const contentSelector = `.e2e-test-tab-content-${tabIndex}`;
+    await this.page.waitForSelector(contentSelector);
     const actualContent = await this.page.$eval(
-      nonInteractiveTabContentSelector,
+      contentSelector,
       el => el.textContent
     );
 
-    if (actualContent?.trim() !== tabContent) {
-      throw new Error(
-        `Expected tab content to be ${tabContent}, but it was ${actualContent}`
-      );
-    }
+    expect(actualContent).toContain(tabContent);
   }
 
   /**

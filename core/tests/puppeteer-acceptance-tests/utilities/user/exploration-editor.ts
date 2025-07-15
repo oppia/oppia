@@ -1378,15 +1378,16 @@ export class ExplorationEditor extends BaseUser {
       const headingName = !cardName.trimEnd().endsWith('...')
         ? cardName
         : cardName.trimEnd().slice(0, -3);
-      const currentCardTitle = await this.page.$eval(
+
+      await this.page.waitForFunction(
+        (selector: string, value: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.includes(value);
+        },
+        {},
         currentCardNameSelector,
-        element => (element as HTMLElement).innerText.trim()
+        headingName
       );
-      if (!currentCardTitle.includes(headingName)) {
-        throw new Error(
-          `Failed to navigate to card ${cardName}. Current card is ${currentCardTitle}.`
-        );
-      }
     } catch (error) {
       const newError = new Error(
         `Error navigating to card ${cardName}: ${error.message}`
