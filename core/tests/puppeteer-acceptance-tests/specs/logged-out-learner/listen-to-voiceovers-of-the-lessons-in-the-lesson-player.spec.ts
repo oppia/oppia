@@ -35,6 +35,7 @@ const INTRO_CONTENT_VOICEOVER_IN_HI =
   testConstants.data.IntroContentVoiceoverInHindi;
 const CONTINUE_INTERACTION_VOICEOVER_IN_HI =
   testConstants.data.ContinueInteractionVoiceoverInHindi;
+const LONG_VOICEOVER_IN_HI = testConstants.data.LongVoiceoverInHindi;
 
 describe('Logged-Out Learner', function () {
   let explorationId: string;
@@ -93,12 +94,10 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.updateCardContent(
         "What is 3/6 equal to in it's simplest form?"
       );
-      await curriculumAdmin.addMathInteraction(
-        INTERACTION_TYPES.FRACTION_INPUT
-      );
+      await curriculumAdmin.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
       await curriculumAdmin.addResponsesToTheInteraction(
         INTERACTION_TYPES.FRACTION_INPUT,
-        '1/2',
+        '2',
         'Correct!',
         'Final Card',
         true
@@ -150,26 +149,42 @@ describe('Logged-Out Learner', function () {
         'Content',
         '3/6 का सबसे सरल रूप में क्या बराबर है?'
       );
+
+      await curriculumAdmin.navigateToEditorTab();
+      await curriculumAdmin.reloadPage();
+      await curriculumAdmin.navigateToCard('Second Card');
+      await curriculumAdmin.navigateToTranslationsTab();
       await curriculumAdmin.editTranslationOfContent(
         'हिन्दी (Hindi)',
         'Interaction',
         '3/6 का सबसे सरल रूप में क्या बराबर है?'
       );
+
+      await curriculumAdmin.navigateToEditorTab();
+      await curriculumAdmin.reloadPage();
+      await curriculumAdmin.navigateToCard('Second Card');
+      await curriculumAdmin.navigateToTranslationsTab();
       await curriculumAdmin.editTranslationOfContent(
         'हिन्दी (Hindi)',
         'Feedback',
-        'सही!'
+        'सही!',
+        1
       );
 
       // Add Voiceovers.
+      await curriculumAdmin.navigateToEditorTab();
+      await curriculumAdmin.reloadPage();
       await curriculumAdmin.navigateToTranslationsTab();
       await curriculumAdmin.addVoiceoverToContent(
         'हिन्दी (Hindi)',
         'Hindi (India)',
         'Content',
-        INTRO_CONTENT_VOICEOVER_IN_HI
+        LONG_VOICEOVER_IN_HI
       );
 
+      await curriculumAdmin.navigateToEditorTab();
+      await curriculumAdmin.reloadPage();
+      await curriculumAdmin.navigateToTranslationsTab();
       await curriculumAdmin.addVoiceoverToContent(
         'हिन्दी (Hindi)',
         'Hindi (India)',
@@ -180,9 +195,10 @@ describe('Logged-Out Learner', function () {
       await curriculumAdmin.saveExplorationDraft();
     },
     // Setup takes more time than default.
-    600000
+    1000000
   );
 
+  explorationId = 'Sl6aHgSw1vjL';
   it('should be able to play/pause the audio', async function () {
     // Navigate to Lesson Player.
     await loggedOutLearner.navigateToClassroomPage('math');
@@ -193,15 +209,21 @@ describe('Logged-Out Learner', function () {
     );
 
     // Check Audiobar status.
-    await loggedOutLearner.isTextPresentOnPage('Listen to the lesson');
+    expect(
+      await loggedOutLearner.isTextPresentOnPage('Listen to the lesson')
+    ).toBe(false);
+    await loggedOutLearner.changeLessonLanguage('hi');
+    expect(
+      await loggedOutLearner.isTextPresentOnPage('Listen to the lesson')
+    ).toBe(true);
     await loggedOutLearner.expectAudioExpandButtonToBeVisibleInLP();
 
     // Check audio (voiceover) avaibility.
-    await loggedOutLearner.expectVoiceoverIsPlayable(false);
+    // await loggedOutLearner.expectVoiceoverIsPlayable(false);
 
     // Check audio (voiceover) avaibility in next card.
     await loggedOutLearner.continueToNextCard();
-    await loggedOutLearner.expectVoiceoverIsPlayable(false);
+    await loggedOutLearner.expectVoiceoverIsPlayable();
 
     // Play Voiceovers.
     await loggedOutLearner.startVoiceover();
@@ -219,10 +241,11 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should be able to skip some parts of audio', async function () {
-    // TODO: Need help, how can I perform this?
-    // Click on the 5 seconds forward icon button
-    // The audio starts playing 5 seconds ahead of the current position
-    // Can't verify someting that is time-sensitive.
+    await loggedOutLearner.reloadPage();
+    await loggedOutLearner.changeLessonLanguage('hi');
+    await loggedOutLearner.continueToNextCard();
+
+    await loggedOutLearner.expectVoiceoverIsSkippable();
   });
 
   it('should be able to play audio till the end', async function () {

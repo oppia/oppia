@@ -412,6 +412,8 @@ const blogPostTitleContainerSelector =
 const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 
+const audioSliderSelector = 'oppia-audio-slider mat-slider';
+
 // Topic Viewer Page Selectors.
 const topicPageRevisionTabContentSelector =
   '.e2e-test-topic-viewer-revision-tab';
@@ -3425,6 +3427,7 @@ export class LoggedOutUser extends BaseUser {
             this.waitForElementToBeClickable(name),
             name.click(),
           ]);
+          showMessage(`Topic ${topicName} is opened successfully.`);
           return;
         }
       }
@@ -3483,6 +3486,7 @@ export class LoggedOutUser extends BaseUser {
                 this.waitForElementToBeClickable(chapter),
                 chapter.click(),
               ]);
+              showMessage(`Chapter ${chapterName} is opened successfully.`);
               return;
             }
           }
@@ -4795,6 +4799,8 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickOn(playVoiceoverButton);
     await this.page.waitForSelector(pauseVoiceoverButton, {visible: true});
+
+    showMessage('Started playing the voiceover.');
   }
 
   /**
@@ -4802,18 +4808,80 @@ export class LoggedOutUser extends BaseUser {
    * @param {boolean} shouldBePlaying - If the voiceover should be playing or not.
    */
   async verifyVoiceoverIsPlaying(shouldBePlaying: boolean): Promise<void> {
-    if (shouldBePlaying) {
-      // If the pause button is present, it means the audio is playing.
-      await this.page.waitForSelector(pauseVoiceoverButton);
-    } else {
-      const pauseButton = await this.page.$(pauseVoiceoverButton);
-      if (pauseButton !== null) {
+    try {
+      const currentSliderValue = await this.page.$eval(
+        audioSliderSelector,
+        el => parseInt(el.textContent?.trim() ?? '', 10)
+      );
+
+      await this.page.waitForFunction(
+        (selector: string, value: number) => {
+          const element = document.querySelector(selector);
+          return parseInt(element?.textContent?.trim() ?? '', 10) >= value;
+        },
+        {},
+        audioSliderSelector,
+        currentSliderValue
+      );
+
+      if (shouldBePlaying) {
+        showMessage('Voiceover is playing, as expected.');
+      } else {
+        throw new Error('Voiceover is playing, expected to be paused.');
+      }
+    } catch (error) {
+      if (shouldBePlaying) {
         throw new Error(
-          'Pause button should not be present when voiceover is paused.'
+          'Voiceover is not playing, expected to be playing.' + error
         );
+      } else {
+        showMessage('Voiceover is not playing, as expected.');
       }
     }
-    showMessage(`Voiceover is ${shouldBePlaying ? 'playing' : 'paused'}.`);
+  }
+
+  async expectVoiceoverIsSkippable(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
+    if (voiceoverDropdownElement) {
+      await this.clickOn(voiceoverDropdown);
+    }
+
+    // Start playing the voiceover.
+    await this.page.waitForSelector(playVoiceoverButton);
+    await this.clickOn(playVoiceoverButton);
+
+    // Check voiceover current time and compare.
+    await this.page.waitForFunction(
+      (selector: string, value: number) => {
+        const element = document.querySelector(selector);
+        return parseInt(element?.textContent?.trim() ?? '', 10) >= value;
+      },
+      {},
+      audioSliderSelector,
+      2
+    );
+
+    const currentSliderValue = await this.page.$eval(audioSliderSelector, el =>
+      parseInt(el.textContent?.trim() ?? '', 10)
+    );
+
+    // Skipping the voiceover for 10 seconds.
+    await this.page.waitForSelector(audioForwardButtonSelector);
+    await this.page.click(audioForwardButtonSelector);
+    await this.page.click(audioForwardButtonSelector);
+
+    // If we skip voiceover twice, and wait for 5 seconds, the audio value should increase
+    // between 10 to 15 seconds. We are checking for more than 12 seconds to avoid flaky test.
+    await this.page.waitForFunction(
+      (selector: string, value: number) => {
+        const element = document.querySelector(selector);
+        return parseInt(element?.textContent?.trim() ?? '', 10) >= value;
+      },
+      {},
+      audioSliderSelector,
+      currentSliderValue + 12
+    );
   }
 
   /**
@@ -4834,7 +4902,23 @@ export class LoggedOutUser extends BaseUser {
     try {
       await this.startVoiceover();
 
-      // Pause Voiceover once verified.
+      // Wait until slider value changes.
+      const currentSliderValue = await this.page.$eval(
+        audioSliderSelector,
+        el => parseInt(el.textContent?.trim() ?? '', 10)
+      );
+
+      await this.page.waitForFunction(
+        (selector: string, value: number) => {
+          const element = document.querySelector(selector);
+          return parseInt(element?.textContent?.trim() ?? '', 10) >= value;
+        },
+        {},
+        audioSliderSelector,
+        currentSliderValue
+      );
+
+      // Pause voiceover once checking is done.
       await this.pauseVoiceover();
 
       if (!playable) {
@@ -4842,12 +4926,25 @@ export class LoggedOutUser extends BaseUser {
           'Voiceover expected to be not playable, but is playable'
         );
       }
+
+      showMessage('Voiceover is playable.');
     } catch (error) {
+      // If we don't press play button again, the voiceover in next interaction
+      // will start playing automatically as we continue to next interaction.
+      // This will make the test flaky. So, we need to press play button again.
+      await this.page.waitForSelector(playVoiceoverButton, {
+        visible: true,
+      });
+
+      // Report error / success based on playable flag.
+      await this.clickOn(playVoiceoverButton);
       if (playable) {
         throw new Error(
-          'Voiceover expected to be playable, but is not playable'
+          'Voiceover expected to be playable, but is not playable' + error
         );
       }
+
+      showMessage('Voiceover is not playable.');
     }
   }
 
@@ -4856,7 +4953,16 @@ export class LoggedOutUser extends BaseUser {
    * @param {number} timeout - The timeout for waiting until audio is playing.
    */
   async waitUntilAudioIsPlaying(timeout: number = 20000): Promise<void> {
-    await this.isElementVisible(pauseVoiceoverButton, true, timeout);
+    await this.page.waitForFunction((selector: string) => {
+      const element = document.querySelector(selector);
+      console.log(element?.getAttribute('aria-valuemax'));
+      return (
+        element?.textContent?.trim() === element?.getAttribute('aria-valuemax')
+      );
+    });
+
+    // While mouse is over pause button, the pause button doesn't change its state.
+    await this.page.mouse.move(10, 10);
   }
 
   /**
@@ -5143,6 +5249,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectAudioExpandButtonToBeVisibleInLP(): Promise<void> {
     await this.isElementVisible(audioExpandButtonInLPSelector);
+    showMessage('Audio Expand button is visible in lesson player.');
   }
 
   /**
@@ -5151,6 +5258,10 @@ export class LoggedOutUser extends BaseUser {
   async expectAudioForwardBackwardButtonToBeVisible(): Promise<void> {
     await this.isElementVisible(audioBackwardButtonSelector);
     await this.isElementVisible(audioForwardButtonSelector);
+
+    showMessage(
+      'Audio forward and backward buttons are visible in lesson player.'
+    );
   }
 
   /**
