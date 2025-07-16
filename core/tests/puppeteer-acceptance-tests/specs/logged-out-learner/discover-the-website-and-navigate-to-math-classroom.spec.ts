@@ -96,7 +96,7 @@ describe('Logged-Out Learner', function () {
       'Free Education for Everyone'
     );
     await loggedOutLearner.expectDevModeLabelToBeVisible(
-      process.env.PROD_ENV === 'true'
+      !(await loggedOutLearner.isInProdMode())
     );
 
     // Click "Explore Oppia Classrooms" button.

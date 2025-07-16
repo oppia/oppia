@@ -140,17 +140,24 @@ export class ConsoleReporter {
         // Sometimes puppeteer returns a JSHandle error so we have to parse
         // it to get the message in this case.
         if (messageText.includes('JSHandle@error')) {
-          const messages = await Promise.all(
-            message.args().map((arg: JSHandle) =>
-              arg.executionContext().evaluate((arg: unknown) => {
-                if (arg instanceof Error) {
-                  return arg.message;
-                }
-                return null;
-              }, arg)
-            )
-          );
-          messageText = messages.join(' ');
+          try {
+            message.args().map(async (arg: JSHandle) => {
+              try {
+                return await arg.executionContext().evaluate((arg: unknown) => {
+                  if (arg instanceof Error) {
+                    return arg.message;
+                  }
+                  return null;
+                }, arg);
+              } catch (contextError) {
+                // Return fallback value when context is destroyed
+                return `[Context destroyed] ${arg.toString()}`;
+              }
+            });
+          } catch (error) {
+            console.log('Failed to process console message:', error.message);
+            return;
+          }
         }
 
         // Here we concat the message text with the message's source if it is present.

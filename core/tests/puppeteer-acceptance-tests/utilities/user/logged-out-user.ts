@@ -711,6 +711,7 @@ export class LoggedOutUser extends BaseUser {
   async navigateToClassroomPage(urlFragment: string): Promise<void> {
     await this.goto(`${classroomsPageUrl}/${urlFragment}`);
 
+    await this.waitForPageToFullyLoad();
     showMessage(
       `Navigated to classroom page: ${classroomsPageUrl}/${urlFragment}`
     );
@@ -3536,6 +3537,7 @@ export class LoggedOutUser extends BaseUser {
     await this.expectElementToBeVisible(practiceTabButtonSelector);
     await this.clickOn(practiceTabButtonSelector);
 
+    await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(practiceTabSelector);
 
     showMessage(`Navigated to practice tab in topic page.`);
@@ -3548,7 +3550,8 @@ export class LoggedOutUser extends BaseUser {
     await this.isElementVisible(revisionTabButtonSelector);
     await this.clickOn(revisionTabButtonSelector);
 
-    await this.isElementVisible(revisionTabSelector);
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(revisionTabSelector);
   }
 
   /**
@@ -3567,7 +3570,7 @@ export class LoggedOutUser extends BaseUser {
   async clickOnStartHereButtonInClassroomPage(): Promise<void> {
     await this.isElementVisible(startHereButtonSelector);
 
-    await this.clickOn(startHereButtonSelector);
+    await this.clickAndWaitForNavigation(startHereButtonSelector);
     await this.isElementVisible(startHereButtonSelector, false);
   }
 
@@ -5561,7 +5564,7 @@ export class LoggedOutUser extends BaseUser {
       if (visible) {
         showMessage('Verified: Dev mode label is visible.');
       } else {
-        throw new Error('Dev mode label is not visible.');
+        throw new Error('Dev mode label is visible.');
       }
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
@@ -5585,7 +5588,8 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickBrowseLessonsButtonInHomePage(): Promise<void> {
     await this.expectElementToBeVisible(browseLessonButtonSelector);
-    await this.clickOn(browseLessonButtonSelector);
+    await this.page.click(browseLessonButtonSelector);
+    showMessage(`Clicked on browse lessons button.`);
 
     await this.expectElementToBeVisible(browseLessonButtonSelector, false);
   }
@@ -5766,10 +5770,6 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(startPracticeButtonSelector, {
       hidden: true,
     });
-
-    showMessage(
-      `Started practice session for ${subtopicsAdded.size} subtopics.`
-    );
   }
 
   /**

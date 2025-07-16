@@ -1017,36 +1017,29 @@ export class BaseUser {
     return;
   }
 
+  /**
+   * This function checks if the element is visible or not.
+   * @param {string} selector - The selector of the element to check.
+   * @param {boolean} visible - Whether the element should be visible or not.
+   * @param {number} timeout - The maximum amount of time to wait, in milliseconds. Default is 30000.
+   */
   async expectElementToBeVisible(
     selector: string,
-    visibility: boolean = true,
-    parentElement?: puppeteer.ElementHandle,
+    visible: boolean = true,
     timeout: number = 30000
   ): Promise<void> {
-    const context = parentElement ?? this.page;
-
     try {
-      await context.waitForSelector(selector, {
-        visible: true,
-        timeout: timeout,
+      await this.page.waitForSelector(selector, {
+        visible,
+        timeout,
       });
-
-      // If element is visible, but we need it to be hidden, we throw an error.
-      if (!visibility) {
-        throw new Error(
-          `Element ${selector} was found, but it should be hidden.`
-        );
-      }
     } catch (error) {
-      // If element is not visible, but we need it to be visible, we throw an error.
-      if (visibility) {
-        throw new Error(
-          `Element ${selector} was not found, but it should be visible.`
-        );
-      }
+      const state = visible ? 'visible' : 'hidden';
+      throw new Error(
+        `Element with selector '${selector}' was not ${state} within ${timeout}ms`
+      );
     }
   }
-
   /**
    * This function returns all elements matching the given selector.
    * @param selector - The selector to find elements for.

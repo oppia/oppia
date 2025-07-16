@@ -245,6 +245,8 @@ const chapterEditorContainerSelector = '.e2e-test-chapter-editor';
 const chapterPreviewContainerSelector = '.e2e-test-thumbnail-container';
 const multiSelectionInputChipSelector = '.e2e-test-multi-selection-chip';
 
+const subtopicExpandHeaderSelector = '.e2e-test-show-subtopics-list';
+
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -697,7 +699,7 @@ export class TopicManager extends BaseUser {
    */
   async togglePracticeTabCheckbox(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn('Subtopics');
+      await this.clickOn(subtopicExpandHeaderSelector);
     }
     try {
       await this.page.waitForSelector(practiceTabToggle);
