@@ -82,7 +82,7 @@ describe('WrittenTranslation object factory', () => {
     expect(setOfStringsWrittenTranslation.isSetOfStrings()).toBe(true);
   });
 
-  it('should throw error for an invalid data format on creation', () => {
+   it('should throw error for an invalid data format on creation', () => {
     expect(() => WrittenTranslation.createNew('invalid')).toThrow(
       'Invalid translation data format: invalid'
     );
@@ -94,7 +94,7 @@ describe('WrittenTranslation object factory', () => {
       translation: 'unicode',
       needs_update: false,
     });
-    expect(() => writtenTranslation.setTranslation(['abc'])).toThrowError(
+    expect(() => writtenTranslation.setTranslation(['abc'])).toThrow(
       'This translation is not of the correct type for data format unicode'
     );
   });
