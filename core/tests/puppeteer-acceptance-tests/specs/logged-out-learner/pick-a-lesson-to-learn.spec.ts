@@ -46,6 +46,7 @@ describe('Logged-Out Learner', function () {
     // Create explorations.
     await curriculumAdmin.navigateToCreatorDashboardPage();
     await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
+    await curriculumAdmin.dismissWelcomeModal();
     await curriculumAdmin.updateCardContent('Hello, World! This is a test.');
     await curriculumAdmin.addInteraction('Continue Button');
     await curriculumAdmin.viewOppiaResponses();

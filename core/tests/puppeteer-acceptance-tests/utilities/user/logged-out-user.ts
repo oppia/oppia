@@ -3339,10 +3339,12 @@ export class LoggedOutUser extends BaseUser {
     searchResultsExpected: string[],
     present: boolean = true
   ): Promise<void> {
+    const selector = this.isViewportAtMobileWidth()
+      ? explorationTitleSelector
+      : lessonCardTitleSelector;
     await this.waitForPageToFullyLoad();
-    const searchResults = await this.page.$$eval(
-      lessonCardTitleSelector,
-      elements => elements.map(element => element.textContent?.trim())
+    const searchResults = await this.page.$$eval(selector, elements =>
+      elements.map(element => element.textContent?.trim())
     );
 
     for (const searchResultExpected of searchResultsExpected) {

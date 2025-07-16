@@ -40,7 +40,8 @@ describe('Logged-Out Learner', function () {
 
       curriculumAdmin = await UserFactory.createNewUser(
         'curriculumAdm',
-        'curriculum_admin@example.com'[ROLES.CURRICULUM_ADMIN]
+        'curriculum_admin@example.com',
+        [ROLES.CURRICULUM_ADMIN]
       );
 
       // Create explorations.
