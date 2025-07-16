@@ -188,6 +188,7 @@ const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const progressTabSectionInLearnerDashboard =
   '.e2e-test-learner-dash-progress-tab';
 const goalsTabSectionInLearnerDashboard = '.e2e-test-current-goals-section';
+const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
 
 // Creator dashboard selectors.
 const creatorDashboardContainerSelector =
@@ -278,14 +279,11 @@ export class LoggedInUser extends BaseUser {
         visible: true,
       });
       await this.page.click(communityLessonsSectionButton);
-
-      await this.page.waitForSelector(
-        communityLessonsSectionInLearnerDashboard,
-        {
-          visible: true,
-        }
-      );
     }
+
+    await this.page.waitForSelector(communityLessonsSectionInLearnerDashboard, {
+      visible: true,
+    });
   }
 
   /**
@@ -351,6 +349,10 @@ export class LoggedInUser extends BaseUser {
         }
       }
       await this.clickOn('Stories');
+
+      await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
+        visible: true,
+      });
     } else {
       await this.page.waitForSelector(progressSectionSelector);
       const progressSection = await this.page.$(progressSectionSelector);
@@ -386,6 +388,10 @@ export class LoggedInUser extends BaseUser {
           throw error;
         }
       }
+
+      await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
+        visible: true,
+      });
     } else {
       await this.page.waitForSelector(homeSectionSelector);
       const homeSectionElement = await this.page.$(homeSectionSelector);
@@ -422,6 +428,10 @@ export class LoggedInUser extends BaseUser {
           throw error;
         }
       }
+
+      await this.page.waitForSelector(currentGoalsSectionSelector, {
+        timeout: 5000,
+      });
     } else {
       await this.page.waitForSelector(goalsSectionSelector);
       const goalSectionElement = await this.page.$(goalsSectionSelector);
@@ -632,8 +642,14 @@ export class LoggedInUser extends BaseUser {
     if (!invalidUsernameErrorContainerElement) {
       await this.clickOn(agreeToTermsCheckbox);
       await this.page.waitForSelector(registerNewUserButton);
-      await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
-      await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+      await Promise.all([
+        this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+        this.clickOn(LABEL_FOR_SUBMIT_BUTTON),
+      ]);
+
+      await this.page.waitForSelector(learnerDashboardContainerSelector, {
+        visible: true,
+      });
     } else if (verifyLogin) {
       // If the username is invalid, we throw an error.
       throw new Error(
@@ -1664,13 +1680,17 @@ export class LoggedInUser extends BaseUser {
           await this.waitForElementToBeClickable(lessonTileTitle),
           lessonTileTitle.click(),
         ]);
+
+        await this.page.waitForSelector(
+          continueFromWhereLeftOffSectionSelector,
+          {
+            hidden: true,
+          }
+        );
         return;
       }
     }
 
-    await this.page.waitForSelector(continueFromWhereLeftOffSectionSelector, {
-      hidden: true,
-    });
     throw new Error(`Lesson not found: ${lessonName}`);
   }
 
