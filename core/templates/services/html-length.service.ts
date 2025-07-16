@@ -53,6 +53,7 @@ export class HtmlLengthService {
     'oppia-noninteractive-video',
     'oppia-noninteractive-tabs',
     'oppia-noninteractive-skillreview',
+    'oppia-noninteractive-workedexample',
   ];
 
   /**

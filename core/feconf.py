@@ -1242,7 +1242,8 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-workedexample': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -1260,7 +1261,8 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-workedexample'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -1282,7 +1284,10 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
                 'blockquote', 'li', '[document]'
             ],
             'oppia-noninteractive-video': ['blockquote', 'li', '[document]'],
-            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]']
+            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-workedexample': [
+                'blockquote', 'li', '[document]'
+            ]
         },
         # Valid html tags in CKEditor.
         'ALLOWED_TAG_LIST': [
@@ -1300,7 +1305,8 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-workedexample'
         ]
 
     }

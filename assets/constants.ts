@@ -66,7 +66,7 @@ export default {
     }],
 
     "RTE_COMPONENT_CONFIGS": {
-      "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
+      "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video", "workedexample"],
       "BLOG_COMPONENTS": ["image", "link", "video"]
     },
 

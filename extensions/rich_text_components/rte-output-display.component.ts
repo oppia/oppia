@@ -75,6 +75,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   @ViewChild('svgdiagram') svgdiagramTagPortal: TemplateRef<unknown>;
   @ViewChild('tabs') tabsTagPortal: TemplateRef<unknown>;
   @ViewChild('video') videoTagPortal: TemplateRef<unknown>;
+  @ViewChild('workedexample') workedexampleTagPortal: TemplateRef<unknown>;
   @Input() rteString: string;
   @Input() altTextIsDisplayed: boolean = false;
   node: OppiaRteNode | string = '';
@@ -95,6 +96,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     'OPPIA-NONINTERACTIVE-VIDEO',
     'OPPIA-NONINTERACTIVE-SKILLREVIEW',
     'OPPIA-NONINTERACTIVE-TABS',
+    'OPPIA-NONINTERACTIVE-WORKEDEXAMPLE',
   ];
 
   // The index is used to assign a unique ID to each sentence of the lesson content.
