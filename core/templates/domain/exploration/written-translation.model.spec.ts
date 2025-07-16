@@ -82,7 +82,7 @@ describe('WrittenTranslation object factory', () => {
     expect(setOfStringsWrittenTranslation.isSetOfStrings()).toBe(true);
   });
 
-   it('should throw error for an invalid data format on creation', () => {
+  it('should throw error for an invalid data format on creation', () => {
     expect(() => WrittenTranslation.createNew('invalid')).toThrowError(
       'Invalid translation data format: invalid'
     );
