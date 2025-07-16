@@ -13,38 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Description of this file.
+ * @fileoverview Unit tests for the ParamType model.
  */
 
-import {
-  ParamTypeObjectFactory,
-  ParamType,
-} from 'domain/exploration/ParamTypeObjectFactory';
+import {ParamType} from 'domain/exploration/param-type.model';
 
 describe('ParamType objects', () => {
-  let paramType: ParamTypeObjectFactory;
-
-  beforeEach(() => {
-    paramType = new ParamTypeObjectFactory();
-  });
-
   it('should have its registry frozen', () => {
-    expect(Object.isFrozen(paramType.registry)).toBe(true);
+    expect(Object.isFrozen(ParamType.registry)).toBe(true);
   });
 
   it('should use UnicodeString as default type', () => {
-    expect(paramType.getDefaultType()).toBe(paramType.registry.UnicodeString);
+    expect(ParamType.getDefaultType()).toBe(ParamType.registry.UnicodeString);
   });
 
   it('should return correct values for existing types', () => {
-    Object.entries(paramType.registry).forEach(([backendName, value]) => {
-      expect(paramType.getTypeFromBackendName(backendName)).toEqual(value);
+    Object.entries(ParamType.registry).forEach(([backendName, value]) => {
+      expect(ParamType.getTypeFromBackendName(backendName)).toEqual(value);
     });
   });
 
   it('should throw for non-existant types', () => {
     expect(() => {
-      paramType.getTypeFromBackendName('MissingType');
+      ParamType.getTypeFromBackendName('MissingType');
     }).toThrowError(/not a registered parameter type/);
   });
 
@@ -53,7 +44,7 @@ describe('ParamType objects', () => {
       // Defines a "Natural Number" type but gives it a negative default value.
       new ParamType({
         validate: function (v) {
-          return v >= 0;
+          return typeof v === 'number' && v >= 0;
         },
         default_value: -1,
       });
@@ -64,7 +55,7 @@ describe('ParamType objects', () => {
     let UnicodeString: ParamType;
 
     beforeEach(() => {
-      UnicodeString = paramType.registry.UnicodeString;
+      UnicodeString = ParamType.registry.UnicodeString;
     });
 
     it('should be frozen', () => {

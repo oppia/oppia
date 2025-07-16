@@ -210,7 +210,6 @@ import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFact
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
 import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
-import {ParamTypeObjectFactory} from 'domain/exploration/ParamTypeObjectFactory';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {
   PencilCodeEditorValidationService,
@@ -239,7 +238,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
-import {ReadOnlyTopicObjectFactory} from 'domain/topic_viewer/read-only-topic-object.factory';
 import {ReviewTestBackendApiService} from 'domain/review_test/review-test-backend-api.service';
 import {ReviewTestEngineService} from 'pages/review-test-page/review-test-engine.service';
 import {SchemaDefaultValueService} from 'services/schema-default-value.service';
@@ -454,7 +452,6 @@ export class UpgradedServices {
       new NumericInputRulesService();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
-    upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['RatioExpressionInputRulesService'] =
@@ -605,9 +602,7 @@ export class UpgradedServices {
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']
       );
-    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory(
-      upgradedServices['ParamTypeObjectFactory']
-    );
+    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory();
     upgradedServices['PencilCodeEditorValidationService'] =
       new PencilCodeEditorValidationService(
         upgradedServices['BaseInteractionValidationService']
@@ -941,8 +936,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']
       );
-    upgradedServices['ReadOnlyTopicObjectFactory'] =
-      new ReadOnlyTopicObjectFactory();
     upgradedServices['ReviewTestBackendApiService'] =
       new ReviewTestBackendApiService(
         upgradedServices['HttpClient'],

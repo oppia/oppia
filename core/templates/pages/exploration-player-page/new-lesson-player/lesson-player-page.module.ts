@@ -38,10 +38,7 @@ import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {PlayerHeaderComponent} from './lesson-header/player-header.component';
 import {PlayerSidebarComponent} from './sidebar-components/player-sidebar.component';
-import {PlayerFooterComponent} from './conversation-skin-components/progress-tracker-components/player-footer.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
-import {NewConversationSkinComponent} from './conversation-skin-components/new-conversation-skin.component';
-import {ConversationDisplayComponent} from './conversation-skin-components/conversation-display-components/conversation-display.component';
 
 @NgModule({
   imports: [
@@ -59,23 +56,17 @@ import {ConversationDisplayComponent} from './conversation-skin-components/conve
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
-    ConversationDisplayComponent,
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
     PlayerHeaderComponent,
-    NewConversationSkinComponent,
     PlayerSidebarComponent,
-    PlayerFooterComponent,
     NewAudioBarComponent,
   ],
   entryComponents: [
-    ConversationDisplayComponent,
     NewLessonPlayerPageComponent,
-    NewConversationSkinComponent,
     NewLessonPlayerPageRootComponent,
     PlayerHeaderComponent,
     PlayerSidebarComponent,
-    PlayerFooterComponent,
     NewAudioBarComponent,
   ],
   providers: [HintAndSolutionModalService, FatigueDetectionService],
