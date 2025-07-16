@@ -311,6 +311,8 @@ const outcomeFeedbackSelector = '.e2e-test-edit-outcome-feedback-button';
 const removeInteractionButttonSelector = '.e2e-test-delete-interaction';
 const responseModalBodySelector = '.e2e-test-response-modal-body';
 const ruleEditorInResponseModalSeclector = 'oppia-rule-editor';
+const creatorDashboardContainerSelector =
+  '.e2e-test-creator-dashboard-container';
 
 const dragAndDropItemSelector = '.e2e-test-drag-and-drop-sort-item';
 const solutionModal = 'oppia-add-or-update-solution-modal';
@@ -4573,9 +4575,11 @@ export class ExplorationEditor extends BaseUser {
    * Expect to be in the creator dashboard page.
    */
   async expectToBeInCreatorDashboard(): Promise<void> {
-    await this.isTextPresentOnPage('Creator Dashboard');
+    await this.page.waitForSelector(creatorDashboardContainerSelector, {
+      visible: true,
+    });
 
-    expect(this.page.url()).toBe(creatorDashboardPage);
+    await this.isTextPresentOnPage('Creator Dashboard');
   }
 }
 
