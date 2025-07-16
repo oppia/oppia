@@ -1035,6 +1035,32 @@ export class BaseUser {
     }
     return;
   }
+
+  /**
+   * Checks if an element is present on the page.
+   * @param {string} selector - The selector of the element to check.
+   * @param {boolean} present - Whether the element should be present or not.
+   */
+  async expectElementToBePresent(selector: string, present: boolean = true) {
+    if (present) {
+      await this.page.waitForSelector(selector);
+      showMessage(`Element with selector ${selector} was found (as expected).`);
+    } else {
+      try {
+        await this.page.waitForSelector(selector);
+        throw new Error(
+          `Element ${selector} was found when it should not have been.`
+        );
+      } catch (e) {
+        if (!(e instanceof puppeteer.errors.TimeoutError)) {
+          throw e;
+        }
+        showMessage(
+          `Element with selector ${selector} was not found  (as expected).`
+        );
+      }
+    }
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();

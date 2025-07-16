@@ -414,9 +414,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(deleteExplorationButton);
-    await this.page.waitForSelector(deleteExplorationModal, {
-      visible: true,
-    });
+    await this.expectElementToBePresent(deleteExplorationModal, false);
   }
 
   /**
