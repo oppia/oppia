@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the WrittenTranslation object factory.
+ * @fileoverview Unit tests for the WrittenTranslation.
  */
 
 import {
