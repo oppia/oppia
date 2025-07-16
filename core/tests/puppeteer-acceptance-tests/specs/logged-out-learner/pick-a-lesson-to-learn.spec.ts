@@ -34,91 +34,96 @@ describe('Logged-Out Learner', function () {
   let explorationId1: string;
   let explorationId2: string;
 
-  beforeAll(async function () {
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+  beforeAll(
+    async function () {
+      loggedOutLearner = await UserFactory.createLoggedOutUser();
 
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculum_admin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
-    );
+      curriculumAdmin = await UserFactory.createNewUser(
+        'curriculumAdm',
+        'curriculum_admin@example.com',
+        [ROLES.CURRICULUM_ADMIN]
+      );
 
-    // Create explorations.
-    await curriculumAdmin.navigateToCreatorDashboardPage();
-    await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
-    await curriculumAdmin.dismissWelcomeModal();
-    await curriculumAdmin.updateCardContent('Hello, World! This is a test.');
-    await curriculumAdmin.addInteraction('Continue Button');
-    await curriculumAdmin.viewOppiaResponses();
-    await curriculumAdmin.directLearnersToNewCard('Second Card');
-    await curriculumAdmin.saveExplorationDraft();
+      // Create explorations.
+      await curriculumAdmin.navigateToCreatorDashboardPage();
+      await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
+      await curriculumAdmin.dismissWelcomeModal();
+      await curriculumAdmin.updateCardContent('Hello, World! This is a test.');
+      await curriculumAdmin.addInteraction('Continue Button');
+      await curriculumAdmin.viewOppiaResponses();
+      await curriculumAdmin.directLearnersToNewCard('Second Card');
+      await curriculumAdmin.saveExplorationDraft();
 
-    await curriculumAdmin.navigateToCard('Second Card');
-    await curriculumAdmin.setTheStateAsCheckpoint();
-    await curriculumAdmin.updateCardContent('Hello, World!');
-    await curriculumAdmin.addTextInputInteraction();
-    await curriculumAdmin.addResponsesToTheInteraction(
-      'Text Input',
-      'Hello, Oppia!',
-      'Perfect!',
-      'Last Card',
-      true
-    );
-    await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong Answer. Please try again.'
-    );
-    await curriculumAdmin.addSolutionToState(
-      'Hello, Oppia!',
-      'If you are reading this, you have successfully created an exploration.',
-      false
-    );
-    await curriculumAdmin.saveExplorationDraft();
+      await curriculumAdmin.navigateToCard('Second Card');
+      await curriculumAdmin.setTheStateAsCheckpoint();
+      await curriculumAdmin.updateCardContent('Hello, World!');
+      await curriculumAdmin.addTextInputInteraction();
+      await curriculumAdmin.addResponsesToTheInteraction(
+        'Text Input',
+        'Hello, Oppia!',
+        'Perfect!',
+        'Last Card',
+        true
+      );
+      await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
+        'Wrong Answer. Please try again.'
+      );
+      await curriculumAdmin.addSolutionToState(
+        'Hello, Oppia!',
+        'If you are reading this, you have successfully created an exploration.',
+        false
+      );
+      await curriculumAdmin.saveExplorationDraft();
 
-    // Navigate to the new card and update its content.
-    await curriculumAdmin.navigateToCard('Last Card');
-    await curriculumAdmin.updateCardContent(
-      'You have successfully created an exploration.'
-    );
-    await curriculumAdmin.addInteraction('End Exploration');
-    await curriculumAdmin.saveExplorationDraft();
+      // Navigate to the new card and update its content.
+      await curriculumAdmin.navigateToCard('Last Card');
+      await curriculumAdmin.updateCardContent(
+        'You have successfully created an exploration.'
+      );
+      await curriculumAdmin.addInteraction('End Exploration');
+      await curriculumAdmin.saveExplorationDraft();
 
-    explorationId1 = await curriculumAdmin.publishExplorationWithMetadata(
-      'Exploration 1',
-      'This is Exploration 1.',
-      'Algebra',
-      'growth'
-    );
+      explorationId1 = await curriculumAdmin.publishExplorationWithMetadata(
+        'Exploration 1',
+        'This is Exploration 1.',
+        'Algebra',
+        'growth'
+      );
 
-    explorationId2 = await curriculumAdmin.createAndPublishExplorationWithCards(
-      'Exploration 2',
-      'Algebra'
-    );
+      explorationId2 =
+        await curriculumAdmin.createAndPublishExplorationWithCards(
+          'Exploration 2',
+          'Algebra'
+        );
 
-    // Create a topic and classroom.
-    await curriculumAdmin.createAndPublishTopic(
-      'Length Measurement',
-      'Basics of Length Measurement',
-      'length-measurement'
-    );
-    await curriculumAdmin.createAndPublishClassroom(
-      'Math',
-      'math',
-      'Length Measurement'
-    );
+      // Create a topic and classroom.
+      await curriculumAdmin.createAndPublishTopic(
+        'Length Measurement',
+        'Basics of Length Measurement',
+        'length-measurement'
+      );
+      await curriculumAdmin.createAndPublishClassroom(
+        'Math',
+        'math',
+        'Length Measurement'
+      );
 
-    // Add explorations to classroom.
-    await curriculumAdmin.addStoryToTopic(
-      'Learning Length Measurement',
-      'learn-length-measurement',
-      'Length Measurement'
-    );
-    await curriculumAdmin.addChapter('Exploration 1', explorationId1);
-    await curriculumAdmin.addChapter('Exploration 2', explorationId2);
+      // Add explorations to classroom.
+      await curriculumAdmin.addStoryToTopic(
+        'Learning Length Measurement',
+        'learn-length-measurement',
+        'Length Measurement'
+      );
+      await curriculumAdmin.addChapter('Exploration 1', explorationId1);
+      await curriculumAdmin.addChapter('Exploration 2', explorationId2);
 
-    // Save draft.
-    await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.publishStoryDraft();
-  });
+      // Save draft.
+      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.publishStoryDraft();
+    },
+    // Test takes longer than default timeout.
+    450000
+  );
 
   it('should be able to find a lesson to start learning', async function () {
     // Navigate to the classroom page.

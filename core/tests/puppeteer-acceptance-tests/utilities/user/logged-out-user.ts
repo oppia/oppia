@@ -5553,9 +5553,27 @@ export class LoggedOutUser extends BaseUser {
    * @param {boolean} visible - Whether the dev mode label should be visible or not.
    */
   async expectDevModeLabelToBeVisible(visible: boolean = true): Promise<void> {
-    await this.page.waitForSelector(devModeLabelSelector, {
-      visible: visible,
-    });
+    try {
+      await this.page.waitForSelector(devModeLabelSelector, {
+        visible: true,
+      });
+
+      if (visible) {
+        showMessage('Verified: Dev mode label is visible.');
+      } else {
+        throw new Error('Dev mode label is not visible.');
+      }
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        if (visible) {
+          throw new Error('Dev mode label is not visible.');
+        } else {
+          showMessage('Verified: Dev mode label is not visible.');
+        }
+      } else {
+        throw error;
+      }
+    }
   }
 
   // ================================================================================
