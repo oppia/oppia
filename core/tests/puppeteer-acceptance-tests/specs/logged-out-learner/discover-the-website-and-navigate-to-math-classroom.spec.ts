@@ -158,6 +158,6 @@ describe('Logged-Out Learner', function () {
   });
 
   afterAll(async function () {
-    // await UserFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

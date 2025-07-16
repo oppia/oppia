@@ -526,6 +526,10 @@ const revisionTabButtonSelector = '.e2e-test-study-tab-link';
 const practiceTabSelector = 'practice-tab';
 const revisionTabSelector = 'subtopics-list';
 
+const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
+const startPracticeButtonSelector = '.e2e-test-practice-start-button';
+const practiceSessionContainerSelector = 'practice-session-page';
+
 const backToClassroomLinkSelector = '.e2e-test-classroom-name';
 
 /**
@@ -695,6 +699,10 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToClassroomPage(urlFragment: string): Promise<void> {
     await this.goto(`${classroomsPageUrl}/${urlFragment}`);
+
+    showMessage(
+      `Navigated to classroom page: ${classroomsPageUrl}/${urlFragment}`
+    );
   }
 
   /**
@@ -3474,6 +3482,8 @@ export class LoggedOutUser extends BaseUser {
             this.waitForElementToBeClickable(name),
             name.click(),
           ]);
+
+          showMessage(`Opened Topic: ${topicName}`);
           return;
         }
       }
@@ -3504,10 +3514,12 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the practice tab in the topic page.
    */
   async navigateToPracticeTabInTopic(): Promise<void> {
-    await this.isElementVisible(practiceTabButtonSelector);
+    await this.expectElementToBeVisible(practiceTabButtonSelector);
     await this.clickOn(practiceTabButtonSelector);
 
-    await this.isElementVisible(practiceTabSelector);
+    await this.expectElementToBeVisible(practiceTabSelector);
+
+    showMessage(`Navigated to practice tab in topic page.`);
   }
 
   /**
@@ -5643,6 +5655,57 @@ export class LoggedOutUser extends BaseUser {
     expect(heading).toBe(expectedHeading);
   }
 
+  // ================================================================================
+  // Topic Page
+  // ================================================================================
+
+  /**
+   * Starts a practice session for the given subtopics.
+   * @param {string[]} subtopicNames - The names of the subtopics to start a practice session for.
+   */
+  async startPracticeSession(subtopicNames: string[]): Promise<void> {
+    await this.page.waitForSelector(subtopicListItemInPracticeTabSelector);
+
+    const subtopicElements = await this.page.$$(
+      subtopicListItemInPracticeTabSelector
+    );
+
+    const subtopicsAdded = new Set<string>();
+
+    for (const subtopicElement of subtopicElements) {
+      const subtopicName = await subtopicElement.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (!subtopicName) {
+        continue;
+      }
+      if (subtopicNames.includes(subtopicName)) {
+        const labelElement = await subtopicElement.$('label');
+
+        if (labelElement) {
+          await labelElement.click();
+          await this.page.waitForFunction(
+            (element: HTMLInputElement) => element.checked === true,
+            {},
+            await labelElement.$('input')
+          );
+
+          subtopicsAdded.add(subtopicName);
+        }
+      }
+    }
+
+    await this.page.waitForSelector(startPracticeButtonSelector);
+    await this.clickOn(startPracticeButtonSelector);
+    await this.page.waitForSelector(startPracticeButtonSelector, {
+      hidden: true,
+    });
+
+    showMessage(
+      `Started practice session for ${subtopicsAdded.size} subtopics.`
+    );
+  }
+
   /**
    * Expects the tab title in the topic page to be the expected tab title.
    * @param expectedTabTitle The expected tab title.
@@ -5655,6 +5718,34 @@ export class LoggedOutUser extends BaseUser {
 
     expect(tabTitle).toBe(expectedTabTitle);
   }
+
+  /**
+   * Expects the subtopics in the practice tab to contain the expected subtopics.
+   * @param subtopicNames The expected subtopics.
+   */
+  async expectSubtopicListInPracticeTabToContain(
+    subtopicNames: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(subtopicListItemInPracticeTabSelector);
+    const subtopicsInList = await this.page.$$eval(
+      subtopicListItemInPracticeTabSelector,
+      subtopics => subtopics.map(subtopic => subtopic.textContent?.trim())
+    );
+
+    for (const subtopicName of subtopicNames) {
+      expect(subtopicsInList).toContain(subtopicName);
+    }
+  }
+
+  async expectToBeInPracticeSession(): Promise<void> {
+    expect(await this.isElementVisible(practiceSessionContainerSelector)).toBe(
+      true
+    );
+  }
+
+  // ================================================================================
+  // Diagnostic Test Player
+  // ================================================================================
 
   /**
    * Expects the user to be in the diagnostic test player.

@@ -33,53 +33,81 @@ describe('Logged-Out Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let explorationId: string;
 
-  beforeAll(async function () {
-    // Create Users.
-    loggedOutLearner = await UserFactory.createLoggedOutUser();
+  beforeAll(
+    async function () {
+      // Create Users.
+      loggedOutLearner = await UserFactory.createLoggedOutUser();
 
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculum_admin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
-    );
-
-    // Create explorations.
-    explorationId =
-      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-        'Fractions'
+      curriculumAdmin = await UserFactory.createNewUser(
+        'curriculumAdm',
+        'curriculum_admin@example.com'[ROLES.CURRICULUM_ADMIN]
       );
 
-    // Create a topic and add stories.
-    await curriculumAdmin.createAndPublishTopic(
-      'Fractions',
-      'Algebra',
-      'fractions'
-    );
-    await curriculumAdmin.addStoryToTopic(
-      'Learning Fractions',
-      'learn-fractions',
-      'Fractions'
-    );
-    await curriculumAdmin.addChapter('Fractions 1', explorationId);
-    await curriculumAdmin.saveStoryDraft();
-    await curriculumAdmin.publishStoryDraft();
+      // Create explorations.
+      explorationId =
+        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+          'Fractions'
+        );
 
-    // Create classroom.
-    await curriculumAdmin.createAndPublishClassroom(
-      'Math',
-      'math',
-      'Fractions'
-    );
-  });
+      // Create a topic and add stories.
+      await curriculumAdmin.createAndPublishTopic(
+        'Fractions',
+        'Algebra',
+        'fractions'
+      );
+
+      await curriculumAdmin.addStoryToTopic(
+        'Learning Fractions',
+        'learn-fractions',
+        'Fractions'
+      );
+      await curriculumAdmin.addChapter('Fractions 1', explorationId);
+      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.publishStoryDraft();
+
+      await curriculumAdmin.createQuestionsForSkill('fractions', 7);
+
+      // Enable the "Show practice tab to learners" in Topic Editor.
+      await curriculumAdmin.openTopicEditor('Fractions');
+      await curriculumAdmin.togglePracticeTabCheckbox();
+      await curriculumAdmin.saveTopicDraft('Fractions');
+
+      // Create classroom.
+      await curriculumAdmin.createAndPublishClassroom(
+        'Math',
+        'math',
+        'Fractions'
+      );
+    },
+    // Test takes too long to run.
+    600000
+  );
 
   it('should be able to do some practice questions through topic page', async function () {
     // Go to topic page.
     await loggedOutLearner.navigateToClassroomPage('math');
     await loggedOutLearner.selectAndOpenTopic('Fractions');
     await loggedOutLearner.navigateToPracticeTabInTopic();
-    // TODO: Learner should see "Master Skills for Math" topic.
-    // TODO: Select a skill to practice.
-    // TODO: Learner should be directed to practice page.
+
+    // Beta is added as the practice tab is in beta and beta tag is contained in the tab title.
+    await loggedOutLearner.expectTabTitleInTopicPageToBe(
+      'BetaMaster Skills for Fractions'
+    );
+    await loggedOutLearner.expectSubtopicListInPracticeTabToContain([
+      'Algebra',
+    ]);
+    await loggedOutLearner.startPracticeSession(['Algebra']);
+    await loggedOutLearner.expectToBeInPracticeSession();
+
+    // Play full practice session.
+    for (let i = 0; i < 10; i++) {
+      await loggedOutLearner.submitAnswer('3');
+      await loggedOutLearner.continueToNextCard();
+    }
+
+    expect(
+      await loggedOutLearner.isTextPresentOnPage('Session complete. Well done!')
+    ).toBe(true);
   });
 
   afterAll(async function () {

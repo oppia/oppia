@@ -693,6 +693,36 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Toggles the "Show practice tab to learners" in Topic Editor.
+   */
+  async togglePracticeTabCheckbox(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn('Subtopics');
+    }
+    try {
+      await this.page.waitForSelector(practiceTabToggle);
+      const practiceTabToggleElement = await this.page.$(practiceTabToggle);
+      if (!practiceTabToggleElement) {
+        throw new Error('Practice tab toggle not found.');
+      }
+      await this.waitForElementToBeClickable(practiceTabToggleElement);
+      await practiceTabToggleElement.click();
+
+      await this.page.waitForFunction(
+        selector => {
+          const element = document.querySelector(selector);
+          return element.checked === true;
+        },
+        {},
+        practiceTabToggle
+      );
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
    * Verifies the status of the practice tab.
    * @param {string} expectedStatus - The expected status of the practice tab.
    */
