@@ -48,6 +48,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 
 @Pipe({name: 'formatTime'})
 class MockFormatTimePipe {
@@ -90,6 +91,7 @@ describe('Voiceover card component', () => {
   let voiceoverLanguageManagementService: VoiceoverLanguageManagementService;
   let platformFeatureService: PlatformFeatureService;
   let explorationStatesService: ExplorationStatesService;
+  let adminBackendApiService: AdminBackendApiService;
   let sof: StateObjectFactory;
 
   beforeEach(waitForAsync(() => {
@@ -136,6 +138,7 @@ describe('Voiceover card component', () => {
     );
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
+    adminBackendApiService = TestBed.inject(AdminBackendApiService);
     sof = TestBed.inject(StateObjectFactory);
 
     spyOn(
@@ -175,6 +178,10 @@ describe('Voiceover card component', () => {
     spyOn(entityVoiceoversService, 'isEntityVoiceoversLoaded').and.returnValue(
       true
     );
+    spyOn(
+      adminBackendApiService,
+      'getAdminConfigForAutomaticVoiceoversAsync'
+    ).and.returnValue(Promise.resolve());
 
     component.manualVoiceoverTotalDuration = 10;
     component.manualVoiceoverProgress = 0;
@@ -923,6 +930,7 @@ describe('Voiceover card component', () => {
       pageContextService,
       'isExplorationLinkedToStory'
     );
+    component.isVoiceoverAutogenerationEnabledByAdmins = true;
     component.isVoiceoverAutogenerationSupportedForSelectedAccent = true;
     spyOn(
       component,
