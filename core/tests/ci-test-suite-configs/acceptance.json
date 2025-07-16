@@ -407,7 +407,8 @@
     {
       "name": "exploration-editor/exploration-feedback",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-feedback.spec.ts"
-    }
+    },
+    {"name": "exploration-editor/exploration-help", "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-help.spec.ts"}, {"name": "exploration-editor/exploration-navbar-header", "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-navbar-header.spec.ts"}, {"name": "exploration-editor/preview-all-exploration-interactions", "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/preview-all-exploration-interactions.spec.ts"}
   ],
   "docker_suites": []
 }
