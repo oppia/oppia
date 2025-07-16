@@ -260,6 +260,9 @@ const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
 const commitMessageInputSelector = '.e2e-test-commit-message-input';
 const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
 
+const openExplorationEditorNavigationMobile =
+  '.oppia-exploration-editor-tabs-dropdown.show';
+
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -307,6 +310,9 @@ export class CurriculumAdmin extends BaseUser {
       : desktopSkillQuestionTab;
 
     if (isMobileWidth) {
+      await this.page.waitForFunction(() =>
+        window.location.href.includes('skill_editor')
+      );
       const currentUrl = new URL(this.page.url());
       const hashParts = currentUrl.hash.split('/');
 
@@ -777,6 +783,11 @@ export class CurriculumAdmin extends BaseUser {
       `.e2e-test-study-guide-section-${index} ${deleteStudyGuideSectionButton}`
     );
     await this.clickOn(studyGuideSectionDeleteConfirmButton);
+
+    await this.expectElementToBeVisible(
+      studyGuideSectionDeleteConfirmButton,
+      false
+    );
   }
 
   /**
@@ -1138,9 +1149,14 @@ export class CurriculumAdmin extends BaseUser {
         timeout: 5000,
       });
       await this.clickOn(dropdownToggleIcon);
+
+      await this.expectElementToBeVisible(
+        openExplorationEditorNavigationMobile,
+        false
+      );
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
+      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -1313,6 +1329,15 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(mobileSaveStoryChangesDropdown);
       await this.page.waitForSelector(mobilePublishStoryButton);
       await this.clickOn(mobilePublishStoryButton);
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === 'Unpublish Story';
+        },
+        {},
+        mobilePublishStoryButton
+      );
     } else {
       await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
       await this.clickOn(publishStoryButton);
@@ -1606,7 +1631,7 @@ export class CurriculumAdmin extends BaseUser {
         `All questions have been successfully removed from the skill "${skillName}".`
       );
     } catch (error) {
-      console.error(
+      throw new Error(
         `Failed to remove all questions from the skill "${skillName}"`,
         error.stack
       );

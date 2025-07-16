@@ -1026,7 +1026,7 @@ export class BaseUser {
     selector: string,
     visible: boolean = true
   ): Promise<void> {
-    expect(this.isElementVisible(selector)).toBe(visible);
+    expect(await this.isElementVisible(selector)).toBe(visible);
   }
 }
 
