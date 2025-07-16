@@ -534,7 +534,7 @@ const currentProgessSelector = '.e2e-test-progress-container';
 const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
 const practiceTabButtonSelector = '.e2e-test-practice-tab-link';
 const revisionTabButtonSelector = '.e2e-test-study-tab-link';
-const practiceTabSelector = 'practice-tab';
+const practiceTabContainerSelector = '.e2e-test-practice-tab-container';
 const revisionTabSelector = 'subtopics-list';
 
 const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
@@ -3538,7 +3538,7 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(practiceTabButtonSelector);
 
     await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(practiceTabSelector);
+    await this.expectElementToBeVisible(practiceTabContainerSelector);
 
     showMessage(`Navigated to practice tab in topic page.`);
   }
