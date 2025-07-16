@@ -313,7 +313,7 @@ export class SuperAdmin extends BaseUser {
     await deleteRoleButton.click();
 
     await this.waitForNetworkIdle();
-    await this.isElementVisible(deleteRoleButtonSelector, false);
+    await this.expectElementToBeVisible(deleteRoleButtonSelector, false);
     showMessage(`Role ${role} has been removed from user ${username}`);
     return;
   }
@@ -660,7 +660,7 @@ export class SuperAdmin extends BaseUser {
    */
   async generateDummyBlogPost(): Promise<void> {
     await this.navigateToAdminPageActivitiesTab();
-    await this.isElementVisible(generateBlogPostButton);
+    await this.expectElementToBeVisible(generateBlogPostButton);
     await this.clickOn(generateBlogPostButton);
 
     await this.expectActionStatusMessageToBe(
@@ -1007,7 +1007,7 @@ export class SuperAdmin extends BaseUser {
   async regenerateContributionOpportunitiesForTopic(
     topicId: string
   ): Promise<void> {
-    await this.isElementVisible(topicIdInputSelector);
+    await this.expectElementToBeVisible(topicIdInputSelector);
     await this.type(topicIdInputSelector, topicId);
 
     await this.page.waitForSelector(regenerateOpportunitiesButton);
@@ -1038,7 +1038,7 @@ export class SuperAdmin extends BaseUser {
   async rollbackExplorationToSafeState(
     explorationId: string | null
   ): Promise<void> {
-    await this.isElementVisible(explorationIdInputSelector);
+    await this.expectElementToBeVisible(explorationIdInputSelector);
     await this.type(explorationIdInputSelector, explorationId as string);
 
     await this.page.waitForSelector(rollbackExplorationButton);
@@ -1059,7 +1059,7 @@ export class SuperAdmin extends BaseUser {
     oldUserName: string,
     newUserName: string
   ): Promise<void> {
-    await this.isElementVisible(oldUserNameInputSelector);
+    await this.expectElementToBeVisible(oldUserNameInputSelector);
     await this.type(oldUserNameInputSelector, oldUserName);
 
     await this.type(newUserNameInputSelector, newUserName);
@@ -1093,7 +1093,7 @@ export class SuperAdmin extends BaseUser {
   async getExplorationInteractions(
     explorationId: string | null
   ): Promise<void> {
-    await this.isElementVisible(explorationIdToGetInteractionsInput);
+    await this.expectElementToBeVisible(explorationIdToGetInteractionsInput);
     await this.type(
       explorationIdToGetInteractionsInput,
       explorationId as string
@@ -1114,7 +1114,7 @@ export class SuperAdmin extends BaseUser {
    * @returns {Promise<void>}
    */
   async grantSuperAdminPrivileges(username: string): Promise<void> {
-    await this.isElementVisible(usernameToGrantPrivilegeInput);
+    await this.expectElementToBeVisible(usernameToGrantPrivilegeInput);
     await this.type(usernameToGrantPrivilegeInput, username);
 
     await this.page.waitForSelector(grantSuperAdminButtonSelector);
@@ -1132,7 +1132,7 @@ export class SuperAdmin extends BaseUser {
    * @returns {Promise<void>}
    */
   async revokeSuperAdminPrivileges(username: string): Promise<void> {
-    await this.isElementVisible(usernameToRevokePrivilegeInput);
+    await this.expectElementToBeVisible(usernameToRevokePrivilegeInput);
     await this.type(usernameToRevokePrivilegeInput, username);
 
     await this.page.waitForSelector(revokeSuperAdminButton);
@@ -1155,7 +1155,7 @@ export class SuperAdmin extends BaseUser {
     author: string,
     publishedOn: string
   ): Promise<void> {
-    await this.isElementVisible(blogIdInputSelector);
+    await this.expectElementToBeVisible(blogIdInputSelector);
     await this.type(blogIdInputSelector, blogId);
 
     await this.type(blogAuthorInputSelector, author);

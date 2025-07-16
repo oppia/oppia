@@ -50,7 +50,7 @@ export class Moderator extends BaseUser {
   async navigateToFeaturedActivitiesTab(): Promise<void> {
     await this.clickOn(featuredActivitiesTab);
 
-    await this.isElementVisible(featuredActivitiesHeaderSelector);
+    await this.expectElementToBeVisible(featuredActivitiesHeaderSelector);
   }
 
   /**
@@ -152,7 +152,9 @@ export class Moderator extends BaseUser {
   ): Promise<void> {
     await this.clickAndWaitForNavigation(title);
 
-    await this.isElementVisible(explorationFeedbackTabContainerSelector);
+    await this.expectElementToBeVisible(
+      explorationFeedbackTabContainerSelector
+    );
   }
 
   /**
@@ -249,7 +251,9 @@ export class Moderator extends BaseUser {
   ): Promise<void> {
     await this.clickAndWaitForNavigation(` ${explorationID} ` as string);
 
-    await this.isElementVisible(explorationFeedbackTabContainerSelector);
+    await this.expectElementToBeVisible(
+      explorationFeedbackTabContainerSelector
+    );
   }
 
   /**
@@ -258,7 +262,7 @@ export class Moderator extends BaseUser {
   async navigateToRecentFeedbackMessagesTab(): Promise<void> {
     await this.clickOn(feedbackMessagesTab);
 
-    await this.isElementVisible(feedbackMessagesHeaderSelector);
+    await this.expectElementToBeVisible(feedbackMessagesHeaderSelector);
   }
 
   /**

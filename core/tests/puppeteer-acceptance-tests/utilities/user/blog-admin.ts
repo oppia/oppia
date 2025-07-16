@@ -65,7 +65,7 @@ export class BlogAdmin extends BaseUser {
    */
   async setMaximumTagLimitTo(limit: number): Promise<void> {
     // These steps are for deleting the existing value in the input field.
-    await this.isElementVisible(maximumTagLimitInput);
+    await this.expectElementToBeVisible(maximumTagLimitInput);
     await this.clearAllTextFrom(maximumTagLimitInput);
 
     await this.type(maximumTagLimitInput, limit.toString());

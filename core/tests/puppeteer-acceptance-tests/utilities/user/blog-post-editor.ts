@@ -110,7 +110,7 @@ export class BlogPostEditor extends BaseUser {
           },
         });
 
-        await this.isElementVisible(confirmButtonSelector, false);
+        await this.expectElementToBeVisible(confirmButtonSelector, false);
         showMessage('Draft blog post with given title deleted successfully!');
         return;
       }
@@ -150,7 +150,7 @@ export class BlogPostEditor extends BaseUser {
       await this.uploadFile(blogPostThumbnailImage);
       await this.clickOn(addThumbnailImageButton);
     } else {
-      await this.isElementVisible(thumbnailPhotoBox);
+      await this.expectElementToBeVisible(thumbnailPhotoBox);
       await this.clickOn(thumbnailPhotoBox);
       await this.uploadFile(blogPostThumbnailImage);
       await this.clickOn(addThumbnailImageButton);
@@ -190,7 +190,7 @@ export class BlogPostEditor extends BaseUser {
    * This function updates the title of the blog post.
    */
   async updateBlogPostTitle(newBlogPostTitle: string): Promise<void> {
-    await this.isElementVisible(blogTitleInput);
+    await this.expectElementToBeVisible(blogTitleInput);
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
 
@@ -209,7 +209,7 @@ export class BlogPostEditor extends BaseUser {
    * This function updates the body text of the blog post.
    */
   async updateBodyTextTo(newBodyText: string): Promise<void> {
-    await this.isElementVisible(blogBodyInput);
+    await this.expectElementToBeVisible(blogBodyInput);
     await this.type(blogBodyInput, newBodyText);
 
     await this.expectTextContentToMatch(blogBodyInput, newBodyText);
@@ -219,9 +219,9 @@ export class BlogPostEditor extends BaseUser {
    * This function saves the blog post.
    */
   async saveBlogBodyChanges(): Promise<void> {
-    await this.isElementVisible(blogBodySaveButtonSelector);
+    await this.expectElementToBeVisible(blogBodySaveButtonSelector);
     await this.clickOn(blogBodySaveButtonSelector);
-    await this.isElementVisible(blogBodySaveButtonSelector, false);
+    await this.expectElementToBeVisible(blogBodySaveButtonSelector, false);
   }
 
   /**
@@ -345,7 +345,7 @@ export class BlogPostEditor extends BaseUser {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
 
-    await this.isElementVisible(publisedBlogsTabContainerSelector);
+    await this.expectElementToBeVisible(publisedBlogsTabContainerSelector);
     showMessage('Navigated to publish tab.');
   }
 

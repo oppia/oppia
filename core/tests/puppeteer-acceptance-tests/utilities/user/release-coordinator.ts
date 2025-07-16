@@ -81,11 +81,11 @@ export class ReleaseCoordinator extends BaseUser {
   async navigateToFeaturesTab(): Promise<void> {
     try {
       if (this.isViewportAtMobileWidth()) {
-        await this.isElementVisible(mobileNavBar);
+        await this.expectElementToBeVisible(mobileNavBar);
         await this.clickOn(mobileNavBar);
         await this.clickOn(mobileFeaturesTab);
       } else {
-        await this.isElementVisible(featuresTab);
+        await this.expectElementToBeVisible(featuresTab);
         await this.clickOn(featuresTab);
       }
 
@@ -114,7 +114,7 @@ export class ReleaseCoordinator extends BaseUser {
       await this.waitForElementToBeClickable(navbarElements[2]);
       await navbarElements[2].click();
 
-      await this.isElementVisible(miscTabContainerSelector);
+      await this.expectElementToBeVisible(miscTabContainerSelector);
     }
   }
 

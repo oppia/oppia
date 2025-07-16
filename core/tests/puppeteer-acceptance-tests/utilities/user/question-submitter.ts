@@ -111,7 +111,7 @@ export class QuestionSubmitter extends BaseUser {
     skillName: string,
     topicName: string
   ): Promise<void> {
-    await this.isElementVisible(submitQuestionTab);
+    await this.expectElementToBeVisible(submitQuestionTab);
     await this.clickOn(submitQuestionTab);
     await this.page.waitForSelector(opportunityListItem, {visible: true});
     const opportunityListItems = await this.page.$$(opportunityListItem);
@@ -141,7 +141,9 @@ export class QuestionSubmitter extends BaseUser {
           button.click();
         }, button);
 
-        await this.isElementVisible(questionDifficultySelectionModalSelector);
+        await this.expectElementToBeVisible(
+          questionDifficultySelectionModalSelector
+        );
         return;
       }
     }
@@ -156,7 +158,9 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} difficulty - The difficulty level of the question.
    */
   async selectQuestionDifficulty(difficulty: string = 'Medium'): Promise<void> {
-    await this.isElementVisible(questionDifficultySelectionModalSelector);
+    await this.expectElementToBeVisible(
+      questionDifficultySelectionModalSelector
+    );
     if (difficulty === 'Easy') {
       await this.clickOn(skillDifficultyEasy);
     } else if (difficulty === 'Medium') {
@@ -168,7 +172,7 @@ export class QuestionSubmitter extends BaseUser {
     }
     await this.clickOn(confirmSkillDificultyButton);
 
-    await this.isElementVisible(confirmSkillDificultyButton, false);
+    await this.expectElementToBeVisible(confirmSkillDificultyButton, false);
   }
 
   /**
@@ -176,21 +180,21 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} text - The text to be added to the question.
    */
   async seedTextToQuestion(text: string): Promise<void> {
-    await this.isElementVisible(textStateEditSelector);
+    await this.expectElementToBeVisible(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.clickOn(stateContentInputField);
     await this.type(stateContentInputField, text);
     await this.clickOn(saveStateEditorContentButton);
 
-    await this.isElementVisible(saveStateEditorContentButton, false);
+    await this.expectElementToBeVisible(saveStateEditorContentButton, false);
   }
 
   /**
    * Function to add a math expression to the question.
    */
   async addMathExpressionToQuestion(): Promise<void> {
-    await this.isElementVisible(textStateEditSelector);
+    await this.expectElementToBeVisible(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.clickOn(stateContentInputField);
@@ -209,14 +213,14 @@ export class QuestionSubmitter extends BaseUser {
     await this.clickOn(closeRichTextEditorButton);
     await this.clickOn(saveStateEditorContentButton);
 
-    await this.isElementVisible(saveStateEditorContentButton, false);
+    await this.expectElementToBeVisible(saveStateEditorContentButton, false);
   }
 
   /**
    * Function to add an image to the question.
    */
   async addImageToQuestion(): Promise<void> {
-    await this.isElementVisible(textStateEditSelector);
+    await this.expectElementToBeVisible(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
 
@@ -234,7 +238,7 @@ export class QuestionSubmitter extends BaseUser {
     await this.clickOn(closeRichTextEditorButton);
     await this.clickOn(saveStateEditorContentButton);
 
-    await this.isElementVisible(saveStateEditorContentButton);
+    await this.expectElementToBeVisible(saveStateEditorContentButton);
   }
 
   /**
@@ -242,12 +246,12 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} hint - The hint to be added to the current state card.
    */
   async addHintToState(hint: string): Promise<void> {
-    await this.isElementVisible(addHintButton);
+    await this.expectElementToBeVisible(addHintButton);
     await this.clickOn(addHintButton);
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintButton);
 
-    await this.isElementVisible(saveHintButton, false);
+    await this.expectElementToBeVisible(saveHintButton, false);
   }
 
   /**
@@ -261,7 +265,7 @@ export class QuestionSubmitter extends BaseUser {
     answerExplanation: string,
     isSolutionNumericInput: boolean
   ): Promise<void> {
-    await this.isElementVisible(addSolutionButton);
+    await this.expectElementToBeVisible(addSolutionButton);
     await this.clickOn(addSolutionButton);
 
     const solutionSelector = isSolutionNumericInput
@@ -275,14 +279,14 @@ export class QuestionSubmitter extends BaseUser {
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
 
-    await this.isElementVisible(submitSolutionButton, false);
+    await this.expectElementToBeVisible(submitSolutionButton, false);
   }
 
   /**
    * Function to submit the question suggestion.
    */
   async submitQuestionSuggestion(): Promise<void> {
-    await this.isElementVisible(submitQuestionButon);
+    await this.expectElementToBeVisible(submitQuestionButon);
     await this.clickOn(submitQuestionButon);
 
     this.isElementVisible(submitQuestionButon, false);
@@ -396,7 +400,7 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string[]} options - The options to be added to the multiple choice interaction.
    */
   async addMultipleChoiceInteraction(options: string[]): Promise<void> {
-    await this.isElementVisible(addInteractionButton);
+    await this.expectElementToBeVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(multipleChoiceInteractionButton, {
       visible: true,
@@ -425,7 +429,7 @@ export class QuestionSubmitter extends BaseUser {
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
 
-    await this.isElementVisible(addNewResponseButton, false);
+    await this.expectElementToBeVisible(addNewResponseButton, false);
     showMessage('Multiple Choice interaction has been added successfully.');
   }
 
@@ -433,7 +437,7 @@ export class QuestionSubmitter extends BaseUser {
    * Add a text input interaction to the card.
    */
   async addTextInputInteraction(answer: string): Promise<void> {
-    await this.isElementVisible(addInteractionButton);
+    await this.expectElementToBeVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(textInputInteractionButton, {
       visible: true,
@@ -456,7 +460,7 @@ export class QuestionSubmitter extends BaseUser {
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
 
-    await this.isElementVisible(addNewResponseButton, false);
+    await this.expectElementToBeVisible(addNewResponseButton, false);
     showMessage('Text input interaction has been added successfully.');
   }
 
@@ -465,7 +469,7 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} interactionToAdd - The interaction type to add to the exploration.
    */
   async addMathInteraction(interactionToAdd: string): Promise<void> {
-    await this.isElementVisible(addInteractionButton);
+    await this.expectElementToBeVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.clickOn(mathInteractionsTab);
     await this.clickOn(` ${interactionToAdd} `);
@@ -480,7 +484,7 @@ export class QuestionSubmitter extends BaseUser {
    * Adds an Image interaction to the current exploration.
    */
   async addImageInteraction(): Promise<void> {
-    await this.isElementVisible(addInteractionButton);
+    await this.expectElementToBeVisible(addInteractionButton);
 
     await this.clickOn(addInteractionButton);
     await this.clickOn('Image Region');
@@ -533,7 +537,7 @@ export class QuestionSubmitter extends BaseUser {
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
 
-    await this.isElementVisible(addNewResponseButton, false);
+    await this.expectElementToBeVisible(addNewResponseButton, false);
     showMessage('Image interaction has been added successfully.');
   }
 

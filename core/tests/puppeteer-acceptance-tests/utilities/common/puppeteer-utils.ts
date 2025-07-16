@@ -1016,6 +1016,18 @@ export class BaseUser {
     }
     return;
   }
+
+  /**
+   * This function checks if the element is visible or not.
+   * @param {string} selector - The selector of the element to check.
+   * @param {boolean} visible - Whether the element should be visible or not.
+   */
+  async expectElementToBeVisible(
+    selector: string,
+    visible: boolean = true
+  ): Promise<void> {
+    expect(this.isElementVisible(selector)).toBe(visible);
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();
