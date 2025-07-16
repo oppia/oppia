@@ -294,6 +294,8 @@ const errorPageHeading = '.e2e-test-error-page-heading';
 const classroomTileContainer = '.oppia-classroom-tile-container';
 
 const submitResponseToInteractionInput = 'oppia-interaction-display input';
+const submitResponseToInteractionTextArea =
+  'oppia-interaction-display textarea';
 const nextCardButton = '.e2e-test-next-card-button';
 const nextCardArrowButton = '.e2e-test-next-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
@@ -364,6 +366,9 @@ const viewsContainerSelector = '.e2e-test-info-card-views';
 const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
 const tagsContainerSelector = '.exploration-tags span';
 const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
+const saveProgressCloseButtonSelector = '.e2e-test-save-progress-close-button';
+const recommendedNextChapterSelector =
+  '.e2e-test-recommended-next-chapter-button';
 
 const topicDescriptionSelector = '.e2e-test-topic-description';
 const storyViewerContainerSelector = '.e2e-test-story-viewer-container';
@@ -406,6 +411,11 @@ const blogPostTitleContainerSelector =
 const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
+
+const returnToStoryFromLastStateSelector =
+  '.e2e-test-end-chapter-return-to-story';
+const contributorsContainerSelector = '.e2e-test-contributors-container';
+const contributorIconPrefix = `${contributorsContainerSelector} .contributor-`;
 
 // Common Selectors.
 const devModeLabelSelector = '.e2e-test-dev-mode';
@@ -496,6 +506,7 @@ const nonInteractiveTabsHeaderSelector =
   '.e2e-test-non-interactive-tabs-headers';
 const nonInteractiveTabContentSelector =
   '.e2e-test-non-interactive-tab-content';
+const closeButtonSelector = '.e2e-test-close-button';
 
 // Learn Page (/learn).
 const classroomHeadingSelector = '.e2e-test-classroom-heading';
@@ -3048,6 +3059,12 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(submitAnswerButton);
   }
 
+  async submitAnswerInTextArea(answer: string): Promise<void> {
+    await this.waitForElementToBeClickable(submitResponseToInteractionTextArea);
+    await this.type(submitResponseToInteractionTextArea, answer);
+    await this.clickOn(submitAnswerButton);
+  }
+
   /**
    * Function to submit an email to the newsletter input field.
    * @param {string} email - The email to submit.
@@ -3595,6 +3612,31 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
+  async playChapterFromStory(chapterName: string): Promise<void> {
+    await this.skipLoginPrompt();
+
+    await this.page.waitForSelector(chapterTitleSelector);
+    const chapterTitles = await this.page.$$(chapterTitleSelector);
+    for (const chapter of chapterTitles) {
+      const chapterText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        chapter
+      );
+      if (chapterText.trim().includes(chapterName.trim())) {
+        await Promise.all([
+          this.page.waitForNavigation({
+            waitUntil: ['networkidle2', 'load'],
+          }),
+          this.waitForElementToBeClickable(chapter),
+          chapter.click(),
+        ]);
+        return;
+      }
+    }
+
+    throw new Error(`Chapter "${chapterName}" not found.`);
+  }
+
   /**
    * Selects and opens a chapter within a story to learn.
    * @param {string} storyName - The name of the story containing the chapter.
@@ -3624,30 +3666,8 @@ export class LoggedOutUser extends BaseUser {
             title.click(),
           ]);
 
-          await this.skipLoginPrompt();
-
-          await this.page.waitForSelector(chapterTitleSelector);
-          const chapterTitles = await this.page.$$(chapterTitleSelector);
-          for (const chapter of chapterTitles) {
-            const chapterText = await this.page.evaluate(
-              el => el.textContent.trim(),
-              chapter
-            );
-            if (chapterText.trim().includes(chapterName.trim())) {
-              await Promise.all([
-                this.page.waitForNavigation({
-                  waitUntil: ['networkidle2', 'load'],
-                }),
-                this.waitForElementToBeClickable(chapter),
-                chapter.click(),
-              ]);
-              return;
-            }
-          }
-
-          throw new Error(
-            `Chapter "${chapterName}" not found in story "${storyName}".`
-          );
+          await this.playChapterFromStory(chapterName);
+          return;
         }
       }
 
@@ -3929,7 +3949,10 @@ export class LoggedOutUser extends BaseUser {
    * Returns to the story from the last state of an exploration.
    */
   async returnToStoryFromLastState(): Promise<void> {
-    await this.clickAndWaitForNavigation('Return to Story');
+    await this.page.waitForSelector(returnToStoryFromLastStateSelector, {
+      visible: true,
+    });
+    await this.page.click(returnToStoryFromLastStateSelector);
 
     await this.page.waitForSelector(storyViewerContainerSelector, {
       visible: true,
@@ -4147,6 +4170,16 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickOn(shareExplorationButtonSelector);
 
+    await this.expectEmbedClassroomLinkToWorkProperly(expectedCode);
+  }
+
+  /**
+   * Checks if embed button works properly, and shows correct embed code.
+   * @param {string} expectedCode - The expected embed code.
+   */
+  async expectEmbedClassroomLinkToWorkProperly(
+    expectedCode: string
+  ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     await this.clickOn(embedLessonButton);
     await this.page.waitForSelector(embedCodeSelector);
@@ -4162,9 +4195,18 @@ export class LoggedOutUser extends BaseUser {
           embedCode
       );
     }
-    await this.clickOn('Close');
-
+    await this.page.click(closeButtonSelector);
     await this.page.waitForSelector(embedCodeSelector, {hidden: true});
+  }
+
+  /**
+   * Checks if the embed classroom in lesson info works properly.
+   * @param explorationId The exploration id.
+   */
+  async expectEmbedClassroomInLessonInfoToWorkProperly(explorationId: string) {
+    const expectedCode = `<iframe src="http://localhost:8181/embed/exploration/${explorationId}" width="700" height="1000">`;
+
+    await this.expectEmbedClassroomLinkToWorkProperly(expectedCode);
   }
 
   /**
@@ -4650,10 +4692,10 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Shares the exploration.
    * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
-   * @param {string} explorationId - The id of the exploration.
+   * @param {'FaceBook' | 'Twitter' | 'Classroom'} explorationId - The id of the exploration.
    */
   async shareExplorationFromLessonInfoModal(
-    platform: string,
+    platform: 'Facebook' | 'Twitter' | 'Classroom',
     explorationId: string | null
   ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
@@ -4678,6 +4720,10 @@ export class LoggedOutUser extends BaseUser {
         break;
       case 'Twitter':
         expectedUrl = testConstants.SocialsShare.Twitter.Domain + explorationId;
+        break;
+      case 'Classroom':
+        expectedUrl =
+          testConstants.SocialsShare.Classroom.Domain + explorationId;
         break;
       default:
         throw new Error(`Unsupported platform: ${platform}`);
@@ -5754,6 +5800,60 @@ export class LoggedOutUser extends BaseUser {
     await this.isElementVisible(diagnosticTestPlayerSelector);
 
     await this.isTextPresentOnPage('Learner Diagnostic Test');
+  }
+
+  // ================================================================================
+  // Others
+  // ================================================================================
+
+  /**
+   * Function to close the save progress menu.
+   */
+  async closeSaveProgressMenu(): Promise<void> {
+    await this.page.waitForSelector(saveProgressCloseButtonSelector);
+    await this.clickOn(saveProgressCloseButtonSelector);
+
+    await this.page.waitForSelector(saveProgressCloseButtonSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Clicks on the next recommended chapter button.
+   */
+  async continueToNextRecommendedLesson(): Promise<void> {
+    await this.page.waitForSelector(recommendedNextChapterSelector);
+    await this.clickOn(recommendedNextChapterSelector);
+
+    await this.page.waitForSelector(recommendedNextChapterSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Verifies the contributor icon in the lesson info modal.
+   * @param {string} contributorName - The name of the contributor.
+   * @param {number} index - The 1-based index of the contributor.
+   */
+  async expectContributorsInLessonInfoModalToBe(
+    contributorName: string,
+    index: number
+  ): Promise<void> {
+    await this.page.waitForSelector(contributorsContainerSelector);
+    await this.page.waitForSelector(`${contributorIconPrefix}${index - 1}`);
+
+    const contributorIcon = await this.page.$(
+      `${contributorIconPrefix}${index - 1}`
+    );
+    if (!contributorIcon) {
+      throw new Error('Contributor icon not found');
+    }
+
+    const userNameInAltText = await contributorIcon.$eval('img', el =>
+      el.getAttribute('alt')
+    );
+
+    expect(userNameInAltText).toBe(contributorName);
   }
 }
 

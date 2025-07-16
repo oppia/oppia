@@ -432,7 +432,7 @@ export class QuestionSubmitter extends BaseUser {
   /**
    * Add a text input interaction to the card.
    */
-  async addTextInputInteraction(answer: string): Promise<void> {
+  async addTextInputInteractionInQuestionEditor(answer: string): Promise<void> {
     await this.isElementVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(textInputInteractionButton, {

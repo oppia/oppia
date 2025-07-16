@@ -114,12 +114,12 @@
             <span class="oppia-icon-accessibility-label">
               {{ 'I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate }}
             </span>
-            <div class="named-contributors-container">
+            <div class="named-contributors-container e2e-test-contributors-container">
               <li *ngFor="let name of (contributorNames | limitTo: 2); index as idx"
                   (click)="cancel()"
                   [ngbTooltip]="name"
                   placement="top"
-                  class="contributor-{{idx}}">
+                  class="contributor-{{idx}} e2e-test-contributor-icon">
                 <profile-link-image [username]="name"></profile-link-image>
               </li>
             </div>
@@ -207,7 +207,7 @@
       <oppia-copy-url [urlToCopy]="loggedOutProgressUniqueUrl"></oppia-copy-url>
     </div>
   </div>
-  <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
+  <button type="button" class="save-progress-close-button e2e-test-save-progress-close-button" (click)="closeSaveProgressMenu()">
     <i class="material-icons md-24">&#xE5CD;</i>
     <span class="oppia-icon-accessibility-label">Close</span>
   </button>

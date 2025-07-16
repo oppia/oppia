@@ -53,6 +53,7 @@ describe('Logged-Out Learner', function () {
     await curriculumAdmin.saveExplorationDraft();
 
     await curriculumAdmin.navigateToCard('Second Card');
+    await curriculumAdmin.setTheStateAsCheckpoint();
     await curriculumAdmin.updateCardContent('Hello, World!');
     await curriculumAdmin.addTextInputInteraction();
     await curriculumAdmin.addResponsesToTheInteraction(
@@ -81,36 +82,37 @@ describe('Logged-Out Learner', function () {
     await curriculumAdmin.saveExplorationDraft();
 
     explorationId1 = await curriculumAdmin.publishExplorationWithMetadata(
-      'Fractions 1',
-      'This is Fractions 1.',
-      'Algebra'
+      'Exploration 1',
+      'This is Exploration 1.',
+      'Algebra',
+      'growth'
     );
 
     explorationId2 = await curriculumAdmin.createAndPublishExplorationWithCards(
-      'Fractions 2',
+      'Exploration 2',
       'Algebra'
     );
 
     // Create a topic and classroom.
     await curriculumAdmin.createAndPublishTopic(
-      'Fractions',
-      'Fractions Chapter 1',
-      'fractions'
+      'Length Measurement',
+      'Basics of Length Measurement',
+      'length-measurement'
     );
     await curriculumAdmin.createAndPublishClassroom(
       'Math',
       'math',
-      'Fractions'
+      'Length Measurement'
     );
 
     // Add explorations to classroom.
     await curriculumAdmin.addStoryToTopic(
-      'Learning Fractions',
-      'learn-fractions',
-      'Fractions'
+      'Learning Length Measurement',
+      'learn-length-measurement',
+      'Length Measurement'
     );
-    await curriculumAdmin.addChapter('Fractions 1', explorationId1);
-    await curriculumAdmin.addChapter('Fractions 2', explorationId2);
+    await curriculumAdmin.addChapter('Exploration 1', explorationId1);
+    await curriculumAdmin.addChapter('Exploration 2', explorationId2);
 
     // Save draft.
     await curriculumAdmin.saveStoryDraft();
@@ -120,24 +122,90 @@ describe('Logged-Out Learner', function () {
   it('should be able to find a lesson to start learning', async function () {
     // Navigate to the classroom page.
     await loggedOutLearner.navigateToClassroomPage('math');
-    await loggedOutLearner.expectTopicsToBePresent(['Fractions']);
+    await loggedOutLearner.expectTopicsToBePresent(['Length Measurement']);
 
     // Select and open the topic.
-    await loggedOutLearner.selectAndOpenTopic('Fractions');
+    await loggedOutLearner.selectAndOpenTopic('Length Measurement');
     await loggedOutLearner.selectChapterWithinStoryToLearn(
-      'Learning Fractions',
-      'Fractions 1'
+      'Learning Length Measurement',
+      'Exploration 1'
     );
 
-    await loggedOutLearner.expectCardContentToMatch('Content0');
-    await loggedOutLearner.clickOnContinueButtonInInteractionCard();
+    await loggedOutLearner.expectCardContentToMatch(
+      'Hello, World! This is a test.'
+    );
+    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.verifyCheckpointModalAppears();
+    await loggedOutLearner.submitAnswerInTextArea('Hello, Oppia!');
+    await loggedOutLearner.continueToNextCard();
 
+    await loggedOutLearner.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
     await loggedOutLearner.returnToStoryFromLastState();
+  });
 
-    // TODO: Learner should see feedback and go through the lesson.
+  it('should be able to reach checkpoint', async function () {
+    await loggedOutLearner.playChapterFromStory('Exploration 1');
 
-    // TODO: Exit the lesson.
-    // TODO: Learner is taken back to the topic page.
+    await loggedOutLearner.openLessonInfoModal();
+
+    // Check basic lesson info.
+    await loggedOutLearner.expectLessonInfoToShowRating('Unrated');
+    // TODO (#22565): Views count is not updating properly.
+    // Once fixed, uncomment the following line.
+    // await loggedOutLearner.expectLessonInfoToShowNoOfViews(1);
+    await loggedOutLearner.expectLessonInfoToShowLastUpdated();
+    await loggedOutLearner.expectContributorsInLessonInfoModalToBe(
+      'curriculumAdm',
+      1
+    );
+    await loggedOutLearner.expectLessonInfoToShowTags(['growth']);
+
+    // Check share options.
+    await loggedOutLearner.shareExplorationFromLessonInfoModal(
+      'Facebook',
+      explorationId1
+    );
+    await loggedOutLearner.shareExplorationFromLessonInfoModal(
+      'Twitter',
+      explorationId1
+    );
+    await loggedOutLearner.shareExplorationFromLessonInfoModal(
+      'Classroom',
+      explorationId1
+    );
+    await loggedOutLearner.expectEmbedClassroomInLessonInfoToWorkProperly(
+      explorationId1
+    );
+
+    // Progress Info.
+    await loggedOutLearner.expectNoSaveProgressBeforeCheckpointInfo();
+    await loggedOutLearner.closeLessonInfoModal();
+    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.verifyCheckpointModalAppears();
+    await loggedOutLearner.openLessonInfoModal();
+    await loggedOutLearner.saveProgress();
+    await loggedOutLearner.expectSignInButtonToBePresent();
+    await loggedOutLearner.expectCreateAccountToBePresent();
+    await loggedOutLearner.checkProgressUrlValidityInfo(
+      'Use the link below to save progress for 72 hours.'
+    );
+    await loggedOutLearner.closeSaveProgressMenu();
+    await loggedOutLearner.closeLessonInfoModal();
+  });
+
+  it('should be able to go to the next lesson', async function () {
+    await loggedOutLearner.submitAnswerInTextArea('Hello, Oppia!');
+    await loggedOutLearner.continueToNextCard();
+
+    await loggedOutLearner.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
+
+    await loggedOutLearner.continueToNextRecommendedLesson();
+
+    await loggedOutLearner.expectCardContentToMatch('Content 0');
   });
 
   afterAll(async function () {
