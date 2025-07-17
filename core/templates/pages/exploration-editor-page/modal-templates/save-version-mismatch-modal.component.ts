@@ -20,11 +20,10 @@ import {Component, ElementRef, Input, OnInit} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
-import {
-  LostChange
-} from 'domain/exploration/lost-change.model';
+import {LostChange} from 'domain/exploration/lost-change.model';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {UtilsService} from 'services/utils.service';
 
 @Component({
   selector: 'oppia-save-version-mismatch-modal',
@@ -47,7 +46,8 @@ export class SaveVersionMismatchModalComponent
     private loggerService: LoggerService,
     private explorationDataService: ExplorationDataService,
     private lostChange: LostChange,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private utilsService: UtilsService
   ) {
     super(ngbActiveModal);
   }
@@ -55,8 +55,8 @@ export class SaveVersionMismatchModalComponent
   ngOnInit(): void {
     this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
     if (this.hasLostChanges) {
-      this.lostChanges = this.lostChanges.map(
-        LostChange.createNew
+      this.lostChanges = this.lostChanges.map(lostChange =>
+        LostChange.createNew(this.utilsService, lostChange)
       );
     }
   }

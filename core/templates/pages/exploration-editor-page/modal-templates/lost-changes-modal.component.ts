@@ -19,9 +19,8 @@
 import {Component, ElementRef, Input, OnInit} from '@angular/core';
 
 import {LoggerService} from 'services/contextual/logger.service';
-import {
-  LostChange
-} from 'domain/exploration/lost-change.model';
+import {UtilsService} from 'services/utils.service';
+import {LostChange} from 'domain/exploration/lost-change.model';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -44,18 +43,18 @@ export class LostChangesModalComponent
     private elRef: ElementRef,
     private windowRef: WindowRef,
     private loggerService: LoggerService,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private utilsService: UtilsService
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
     this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
-    this.lostChanges = this.lostChanges.map(
-      LostChange.createNew
+    this.lostChanges = this.lostChanges.map(lostChange =>
+      LostChange.createNew(this.utilsService, lostChange)
     );
   }
-
   cancel(): void {
     this.ngbActiveModal.dismiss();
   }

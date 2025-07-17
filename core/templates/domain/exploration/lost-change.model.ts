@@ -239,28 +239,23 @@ export class LostChange {
     }
     return language;
   }
-
-  /**
-   * @param {String} lostChangeDict - the name of the type to fetch.
-   * @returns {LostChange} - The associated type, if any.
-   */
   static createNew(
     utilsService: UtilsService,
     lostChangeDict: ExplorationChange | LostChangeBackendDict
   ): LostChange {
-    lostChangeDict = lostChangeDict as LostChangeBackendDict;
+    const dict = lostChangeDict as LostChangeBackendDict;
     return new LostChange(
       utilsService,
-      lostChangeDict.cmd,
-      lostChangeDict.new_state_name,
-      lostChangeDict.old_state_name,
-      lostChangeDict.state_name,
-      lostChangeDict.new_value,
-      lostChangeDict.old_value,
-      lostChangeDict.property_name,
-      lostChangeDict.content_id,
-      lostChangeDict.language_code,
-      lostChangeDict.translation_html
+      dict.cmd,
+      dict.new_state_name,
+      dict.old_state_name,
+      dict.state_name,
+      dict.new_value,
+      dict.old_value,
+      dict.property_name,
+      dict.content_id,
+      dict.language_code,
+      dict.translation_html
     );
   }
 }

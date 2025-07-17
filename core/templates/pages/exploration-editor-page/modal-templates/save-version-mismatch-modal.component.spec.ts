@@ -27,9 +27,7 @@ import {
 
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SaveVersionMismatchModalComponent} from './save-version-mismatch-modal.component';
-import {
-  LostChange
-} from 'domain/exploration/lost-change.model';
+import {LostChange} from 'domain/exploration/lost-change.model';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationDataService} from '../services/exploration-data.service';
 

@@ -49,12 +49,12 @@ describe('Changes in Human Readable Form Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
-      declarations: [ChangesInHumanReadableFormComponent]
+      declarations: [ChangesInHumanReadableFormComponent],
     }).compileComponents();
   }));
 
   beforeEach(waitForAsync(() => {
-  fixture = TestBed.createComponent(ChangesInHumanReadableFormComponent);
+    fixture = TestBed.createComponent(ChangesInHumanReadableFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
