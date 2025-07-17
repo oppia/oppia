@@ -756,6 +756,9 @@ ALLOWED_RTE_EXTENSIONS = {
     'Video': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
+    'WorkedExample': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'WorkedExample')
+    },
 }
 
 # The list of interaction IDs which correspond to interactions that set their

@@ -66,7 +66,7 @@ export class NoninteractiveWorkedExample implements OnInit, OnChanges {
       this.questionWithValue
     ) as string;
     this.answer = this.htmlEscaperService.escapedJsonToObj(
-      this.answer
+      this.answerWithValue
     ) as string;
   }
 
@@ -75,7 +75,7 @@ export class NoninteractiveWorkedExample implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.questionWithValue || changes.headingWithValue) {
+    if (changes.questionWithValue || changes.answerWithValue) {
       this._updateViewOnInputChange();
     }
   }

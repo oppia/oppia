@@ -21,7 +21,7 @@ export const CALCULATION_TYPE_CHARACTER = 'character';
 
 // eslint-disable-next-line max-len
 const CUSTOM_TAG_REGEX =
-  /<oppia-noninteractive-(?:math|image|link|collapsible|video|skillreview|tabs)[^>]*>/g;
+  /<oppia-noninteractive-(?:math|image|link|collapsible|video|skillreview|tabs|workedexample)[^>]*>/g;
 
 type CalculationType =
   | typeof CALCULATION_TYPE_WORD
