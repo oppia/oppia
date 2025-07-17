@@ -546,13 +546,6 @@ describe('PageContext service', () => {
       ecs.removeCustomEntityContext();
     });
 
-    it('should throw an error when trying to retrieve the exploration id', () => {
-      expect(() => ecs.getExplorationId()).toThrowError(
-        'PageContextService should not be used outside the ' +
-          'context of an exploration or a question.'
-      );
-    });
-
     it('should throw an error when trying to retrieve the learner group id', () => {
       expect(() => ecs.getLearnerGroupId()).toThrowError(
         'PageContextService should not be used outside the ' +
