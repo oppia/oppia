@@ -529,6 +529,30 @@ describe('RteHelperModalComponent', () => {
         text: 'google.com',
       });
     }));
+
+    it('should display error message when link exceeds length limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] =
+        'asdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasafdssdfgsdfgsdfgasdfasdfzxcvzxcvzxcvasdfasdfasdfzxcvzxcvzxcvzxcvasdfgsadfasdfzxcvzxcvzxcvasdfasdfasdfzxcvzxcvasdfdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf.com';
+      component.customizationArgsForm.value[1] = 'click';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+    }));
+
+    it('should display error message when text exceeds length limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'google.com';
+      component.customizationArgsForm.value[1] =
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+    }));
   });
 
   describe("when customization args doesn't have a valid youtube video", function () {
@@ -882,6 +906,83 @@ describe('RteHelperModalComponent', () => {
       expect(component.errorMessage).toBe(
         'Please ensure that the content of tab 2 is filled.'
       );
+      flush();
+    }));
+
+    it('should display error message when heading length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0][0].title =
+        'asdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfaszxcvzxcvzxcvzxdfgdsfgsdfgsdfgvbxcvbcvzxcvsdfsdafzxcvzxcvzxcvzxcvzxcvsdzfasdafzxcvzxcvzxcvdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcom';
+      (component.customizationArgsForm.value[0][1].content =
+        'Lorem ipsum dolor sit amet'),
+        component.onCustomizationArgsFormChange(
+          component.customizationArgsForm.value
+        );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+
+    it('should display error message when content length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0][0].title = 'Tab 1';
+      component.customizationArgsForm.value[0][1].content =
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+  });
+
+  describe('when there are validation errors in collapsible form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'heading',
+        default_value: 'Collapsible 1',
+      },
+      {
+        name: 'content',
+        default_value: 'Hello',
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'collapsible'),
+        (component.attrsCustomizationArgsDict = {
+          heading: 'Collapsible 1',
+          content: 'Hello',
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should display error message when heading length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] =
+        'sdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcom';
+      component.customizationArgsForm.value[1] = 'Hello!';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+
+    it('should display error message when content length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'Collapsible 1';
+      component.customizationArgsForm.value[1] =
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
       flush();
     }));
   });

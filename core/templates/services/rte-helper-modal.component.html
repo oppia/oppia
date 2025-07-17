@@ -13,6 +13,11 @@
                                [schema]="customizationArgSpec.schema">
           </schema-based-editor>
         </div>
+        <div *ngIf="customizationArgSpec.schema?.type === 'html' && customizationArgsForm.get(ind.toString())?.value &&
+                     isContentLengthExceeded(customizationArgsForm.get(ind.toString())?.value, componentId)"
+             class="oppia-length-validation-error">
+          The content length is too long. Please use at most {{ getCharacterLimit(componentId) }} characters.
+        </div>
       </div>
     </form>
     <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
@@ -38,7 +43,6 @@
             [disabled]="!customizationArgsForm.valid || isErrorMessageNonempty()">
             Done
     </button>
-
   </div>
 </div>
 <style>
