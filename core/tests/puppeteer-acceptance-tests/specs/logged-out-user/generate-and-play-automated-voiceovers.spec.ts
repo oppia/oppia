@@ -80,6 +80,8 @@ describe('Exploration Editor', function () {
     );
     await voiceoverAdmin.enableAutogenerationForLanguageAccentPair('en-US');
 
+    await UserFactory.enableVoiceoverAutogenerationUsingCloudService();
+
     // Enable the feature flag.
     await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_can_modify_translations'

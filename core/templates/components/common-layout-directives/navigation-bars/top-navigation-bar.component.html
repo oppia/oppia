@@ -101,7 +101,11 @@
           </a>
           <ul ngbDropdownMenu
               [ngStyle]="{'left.px': learnDropdownOffset}"
-              class="dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled"
+              [ngClass]="{
+                'dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled': true,
+                'two-columns': classroomSummariesLength == 2,
+                'three-columns': classroomSummariesLength >= 3
+              }"
               (mouseover)="openSubmenu($event, 'learnMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
               role="menu">

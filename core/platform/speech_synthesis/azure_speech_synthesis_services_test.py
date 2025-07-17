@@ -423,7 +423,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
             expected_transformed_content)
 
     def test_should_pronounce_correctly_for_superscripts(self) -> None:
-        math_symbol_pronounciations = (
+        math_symbol_pronunciations = (
             constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
             'en', {}))
 
@@ -432,7 +432,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             azure_speech_synthesis_services.process_superscript_in_text(
-                content, math_symbol_pronounciations),
+                content, math_symbol_pronunciations),
             expected_content_to_be_pronounced
         )
 
@@ -442,7 +442,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             azure_speech_synthesis_services.process_superscript_in_text(
-                content, math_symbol_pronounciations),
+                content, math_symbol_pronunciations),
             expected_content_to_be_pronounced
         )
 
@@ -452,6 +452,6 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             azure_speech_synthesis_services.process_superscript_in_text(
-                content, math_symbol_pronounciations),
+                content, math_symbol_pronunciations),
             expected_content_to_be_pronounced
         )
