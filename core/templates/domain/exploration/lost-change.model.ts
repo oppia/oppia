@@ -15,6 +15,7 @@
 /**
  * @fileoverview  Model class for creating new frontend instances of LostChange.
  */
+
 import {} from '@angular/upgrade/static';
 import {UtilsService} from 'services/utils.service';
 import isEqual from 'lodash/isEqual';

@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for Lost Change Object Factory.
  */
 
-import {TestBed} from '@angular/core/testing';
 import {LostChange} from 'domain/exploration/lost-change.model';
 import {Outcome} from './outcome.model';
 import {SubtitledHtml} from './subtitled-html.model';
@@ -73,7 +72,7 @@ import {SubtitledHtml} from './subtitled-html.model';
   });
 
   it('should get state property value when it is an array from a Lost Change', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: ['value 1', 'value 2'],
@@ -93,7 +92,7 @@ import {SubtitledHtml} from './subtitled-html.model';
   });
 
   it('should get relative changes when changes is awways from a Lost Change', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: ['value 1', 'value 2', 'value 3'],
@@ -105,7 +104,7 @@ import {SubtitledHtml} from './subtitled-html.model';
     expect(lostChange.isOldValueEmpty()).toBeFalse();
     expect(lostChange.isNewValueEmpty()).toBeFalse();
 
-    const lostChange2 = lcof.createNew({
+    const lostChange2 = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: ['value 1'],
@@ -119,7 +118,7 @@ import {SubtitledHtml} from './subtitled-html.model';
   });
 
   it('should evaluate values from a EndExploration Lost Change', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: 'EndExploration',
@@ -137,7 +136,7 @@ import {SubtitledHtml} from './subtitled-html.model';
   });
 
   it('should evaluate values from a Lost Change with deleted changes', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       // 'new_value' will be null when the EndExploration
@@ -158,7 +157,7 @@ import {SubtitledHtml} from './subtitled-html.model';
     'should evaluate values from a Lost Change with equal outcomes and' +
       ' rules',
     () => {
-      const lostChange = lcof.createNew({
+      const lostChange = LostChange.createNew({
         cmd: 'edit_state_property',
         state_name: 'Edited state name',
         new_value: {
@@ -224,7 +223,7 @@ import {SubtitledHtml} from './subtitled-html.model';
   );
 
   it('should return false if any of the outcome dest are not present', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
@@ -265,7 +264,7 @@ import {SubtitledHtml} from './subtitled-html.model';
   });
 
   it('should evaluate values from a Lost Change with equal outcomes', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {
@@ -331,14 +330,14 @@ import {SubtitledHtml} from './subtitled-html.model';
   });
 
   it('should return the language name from language code', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_exploration_property',
       new_value: 'bn',
       old_value: 'en',
       property_name: 'language_code',
     });
     expect(lostChange.getLanguage()).toBe('বাংলা (Bangla)');
-    const lostChange2 = lcof.createNew({
+    const lostChange2 = LostChange.createNew({
       language_code: 'en',
       cmd: 'add_written_translation',
       content_id: 'content',
@@ -348,4 +347,3 @@ import {SubtitledHtml} from './subtitled-html.model';
     });
     expect(lostChange2.getLanguage()).toBe('English');
   });
-});
