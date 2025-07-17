@@ -42,7 +42,9 @@ export class AddStudyGuideSectionModalComponent extends ConfirmOrCancelModal {
   tempSectionContentHtml: string = '';
   SECTION_FORM_CONTENT_SCHEMA: HtmlFormSchema = {
     type: 'html',
-    ui_config: {},
+    ui_config: {
+      rte_components: 'ALL_COMPONENTS',
+    },
   };
   SECTION_FORM_HEADING_SCHEMA: HtmlFormSchema = {
     type: 'unicode',
