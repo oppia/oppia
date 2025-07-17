@@ -21,9 +21,8 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {
-  LostChange,
-  LostChangeObjectFactory,
-} from 'domain/exploration/LostChangeObjectFactory';
+  LostChange
+} from 'domain/exploration/lost-change.model';
 
 import {LostChangesModalComponent} from './lost-changes-modal.component';
 import {LoggerService} from 'services/contextual/logger.service';
@@ -79,7 +78,6 @@ describe('Lost Changes Modal Component', () => {
         ChangesInHumanReadableFormComponentStub,
       ],
       providers: [
-        LostChangeObjectFactory,
         LoggerService,
         {
           provide: NgbActiveModal,

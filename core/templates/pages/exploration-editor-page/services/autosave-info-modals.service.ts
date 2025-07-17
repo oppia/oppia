@@ -24,7 +24,7 @@ import {SaveVersionMismatchModalComponent} from '../modal-templates/save-version
 import {SaveValidationFailModalComponent} from '../modal-templates/save-validation-fail-modal.component';
 import {LostChangesModalComponent} from '../modal-templates/lost-changes-modal.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
+import {LostChange} from 'domain/exploration/lost-change.model';
 import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
 
 @Injectable({

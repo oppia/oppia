@@ -17,22 +17,13 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {LostChangeObjectFactory} from 'domain/exploration/LostChangeObjectFactory';
+import {LostChange} from 'domain/exploration/lost-change.model';
 import {Outcome} from './outcome.model';
 import {SubtitledHtml} from './subtitled-html.model';
 
-describe('Lost Change Object Factory', () => {
-  let lcof: LostChangeObjectFactory;
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [LostChangeObjectFactory],
-    });
-
-    lcof = TestBed.inject(LostChangeObjectFactory);
-  });
 
   it('should evaluate values from a Lost Change', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'add_state',
       state_name: 'State name',
       content_id_for_state_content: 'content_0',
@@ -44,7 +35,7 @@ describe('Lost Change Object Factory', () => {
   });
 
   it('should evaluate values from a renaming Lost Change', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'rename_state',
       old_state_name: 'Old state name',
       new_state_name: 'New state name',
@@ -56,7 +47,7 @@ describe('Lost Change Object Factory', () => {
   });
 
   it('should evaluate values from a Lost Change with edition changes', () => {
-    const lostChange = lcof.createNew({
+    const lostChange = LostChange.createNew({
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: {

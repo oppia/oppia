@@ -17,7 +17,7 @@
  */
 
 import {Component, Input} from '@angular/core';
-import {LostChange} from 'domain/exploration/LostChangeObjectFactory';
+import {LostChange} from 'domain/exploration/lost-change.model';
 
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
