@@ -134,7 +134,7 @@ describe('Logged-Out Learner', function () {
 
     await loggedOutLearner.navigateToPracticeTabInTopic();
     await loggedOutLearner.expectTabTitleInTopicPageToBe(
-      'Master Skills for Fraction'
+      'BetaMaster Skills for Fractions'
     );
 
     await loggedOutLearner.navigateBackToClassroomFromTopicPage();

@@ -5778,11 +5778,16 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectTabTitleInTopicPageToBe(expectedTabTitle: string): Promise<void> {
     await this.page.waitForSelector(tabTitleInTopicPageSelector);
-    const tabTitle = await this.page.$eval(tabTitleInTopicPageSelector, el =>
-      el.textContent?.trim()
-    );
 
-    expect(tabTitle).toBe(expectedTabTitle);
+    await this.page.waitForFunction(
+      (selector: string, expectedTabTitle: string) => {
+        const tabTitle = document.querySelector(selector)?.textContent?.trim();
+        return tabTitle === expectedTabTitle;
+      },
+      {},
+      tabTitleInTopicPageSelector,
+      expectedTabTitle
+    );
   }
 
   /**
