@@ -47,7 +47,12 @@ export class CreateNewSkillModalComponent {
   skillDescriptionExists: boolean = true;
   conceptCardExplanationEditorIsShown: boolean = false;
   bindableDict = {displayedConceptCardExplanation: ''};
-  HTML_SCHEMA: {type: string} = {type: 'html'};
+  HTML_SCHEMA = {
+    type: 'html',
+    ui_config: {
+      rte_components: 'ALL_COMPONENTS',
+    },
+  };
   MAX_CHARS_IN_SKILL_DESCRIPTION = AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION;
 
   // This property is initialized using Angular lifecycle hooks
