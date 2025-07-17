@@ -15,7 +15,7 @@
 
 build_cmd="python -m scripts.build"
 dev_appserver_cmd="/app/vm_deps/google-cloud-sdk/bin/dev_appserver.py \
---runtime=python39 \
+--runtime=python310 \
 --host=0.0.0.0 \
 --port=8181 \
 --admin_host=0.0.0.0 \
