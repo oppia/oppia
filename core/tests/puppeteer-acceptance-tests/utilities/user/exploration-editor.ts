@@ -344,6 +344,24 @@ const pencilCodeTextArea = `.ace_text-input`;
 const addMusicNodeInSolutionModal = `${newTabButtonSelector} button`;
 const musicNodeSelectSelector = 'oppia-music-input-valid-note-area select';
 
+// Editor Tab > Navigation Bar.
+const helpTabSelector = '.e2e-test-help-button';
+
+// Editor Tab > Help Modal.
+const helpModalContainerSelector = '.e2e-test-help-modal-container';
+const helpModalHeaderSelector = '.e2e-test-help-modal-header';
+const helpPageLinkSelector = '.e2e-test-help-page-link';
+const takeATourButtonSelector = '.e2e-test-tour-button';
+const translationTourButtonSelector = '.e2e-test-translation-tour-button';
+
+// Joyride (Exploration Editor Tour).
+const joyrideBodySelector = '.joyride-step__body';
+const joyrideTitleSelector = '.e2e-test-joyride-title';
+const nextButtonSelector = '.joyride-step__next-container .joyride-button';
+const previousButtonSelector = '.joyride-step__prev-container .joyride-button';
+const joyrideDoneButtonSelector = '.joyride-step__done-button .joyride-button';
+const joyrideStepSelector = '.joyride-step__counter';
+
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
   CODE_EDITOR = 'Code Editor',
@@ -416,7 +434,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(deleteExplorationButton);
-    await this.expectElementToBePresent(deleteExplorationModal, false);
+    await this.expectElementToBeVisible(deleteExplorationModal, false);
   }
 
   /**
@@ -1460,7 +1478,13 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(createExplorationButtonSelector);
     await this.clickAndWaitForNavigation(createExplorationButtonSelector);
 
-    expect(this.page.url()).toContain(`${baseUrl}/create/`);
+    await this.page.waitForFunction(
+      (targetURL: string) => {
+        return document.URL.includes(targetURL);
+      },
+      {},
+      `${baseUrl}/create/`
+    );
   }
 
   /**
@@ -4413,6 +4437,74 @@ export class ExplorationEditor extends BaseUser {
   // New functions
 
   /**
+   * Navigates to the help tab in the exploration editor.
+   */
+  async clickOnHelpButton(): Promise<void> {
+    await this.expectElementToBeVisible(helpTabSelector);
+
+    await this.clickOn(helpTabSelector);
+    await this.expectElementToBeVisible(helpModalContainerSelector);
+  }
+
+  /**
+   * Navigates to the tour tab in the exploration editor.
+   */
+  async clickOnTakeATourButton(): Promise<void> {
+    await this.isElementVisible(takeATourButtonSelector);
+    await this.clickOn(takeATourButtonSelector);
+
+    await this.expectElementToBeVisible(joyrideBodySelector);
+  }
+
+  async clickOnTakeATranslationsTourButton(): Promise<void> {
+    await this.isElementVisible(translationTourButtonSelector);
+    await this.clickOn(translationTourButtonSelector);
+
+    await this.expectElementToBeVisible(joyrideBodySelector);
+  }
+
+  /**
+   * Navigates to the next step in the joyride.
+   */
+  async continueToNextJoyrideStep(): Promise<void> {
+    await this.expectJoyrideNextButtonToBeVisible();
+
+    const currentStep = await this.getTextContent(joyrideStepSelector);
+    await this.page.click(nextButtonSelector);
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForFunction(
+      (selector: string, currentStep: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() !== currentStep;
+      },
+      {},
+      joyrideStepSelector,
+      currentStep
+    );
+  }
+
+  /**
+   * Navigates to the previous step in the joyride.
+   */
+  async continueToPreviousJoyrideStep(): Promise<void> {
+    await this.expectJoyridePreviousButtonToBeVisible();
+
+    const currentStep = await this.getTextContent(joyrideStepSelector);
+    await this.page.click(previousButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string, currentStep: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() !== currentStep;
+      },
+      {},
+      joyrideStepSelector,
+      currentStep
+    );
+  }
+
+  /**
    * Verifies that the add response modal header is as expected.
    * @param {string} expectedHeader - The expected header.
    */
@@ -4500,6 +4592,27 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Visits the help center from the help tab.
+   */
+  async expectHelpCenterButtonToWorkProperly(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    await this.expectAnchorToOpenCorrectPage(
+      helpPageLinkSelector,
+      testConstants.URLs.UserDocumentation
+    );
+  }
+
+  /**
+   * Verifies that the help modal title is as expected.
+   * @param {string} expectedTitle - The expected title.
+   */
+  async expectHelpModalTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(helpModalHeaderSelector);
+
+    await this.expectTextContentToBe(helpModalHeaderSelector, expectedTitle);
+  }
+
+  /**
    * Verifies that the expected hint is in the current hints.
    * @param {string} expectedHint - The expected hint.
    */
@@ -4522,6 +4635,46 @@ export class ExplorationEditor extends BaseUser {
     const visible = await this.isElementVisible(interactionPreviewCardSelector);
 
     expect(visible).toBe(true);
+  }
+
+  /**
+   * Verifies that the joyride content is as expected.
+   * @param expectedContent - The expected content.
+   */
+  async expectJoyrideContentToContain(expectedContent: string): Promise<void> {
+    await this.expectTextContentToContain(joyrideBodySelector, expectedContent);
+  }
+
+  /**
+   * Verifies that the joyride title is as expected.
+   * @param expectedTitle - The expected title.
+   */
+  async expectJoyrideTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectTextContentToBe(joyrideTitleSelector, expectedTitle);
+  }
+
+  async expectJoyrideDoneButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(joyrideDoneButtonSelector, visible);
+  }
+
+  /**
+   * Verifies that the joyride next button is visible.
+   */
+  async expectJoyrideNextButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(nextButtonSelector, visible);
+  }
+
+  /**
+   * Verifies that the joyride previous button is visible.
+   */
+  async expectJoyridePreviousButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(previousButtonSelector, visible);
   }
 
   /**
@@ -4580,6 +4733,16 @@ export class ExplorationEditor extends BaseUser {
     });
 
     await this.isTextPresentOnPage('Creator Dashboard');
+  }
+
+  /**
+   * Function to finish the joyride.
+   */
+  async finishJoyride(): Promise<void> {
+    await this.expectJoyrideDoneButtonToBeVisible();
+
+    await this.page.click(joyrideDoneButtonSelector);
+    await this.expectElementToBeVisible(joyrideDoneButtonSelector, false);
   }
 }
 

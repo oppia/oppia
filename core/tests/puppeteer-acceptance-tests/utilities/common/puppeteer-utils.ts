@@ -968,6 +968,47 @@ export class BaseUser {
   }
 
   /**
+   * Verifies that the text content of the element is as expected.
+   * @param {string} selector - The selector of the element to check.
+   * @param {string} text - The expected text content.
+   */
+  async expectTextContentToBe(selector: string, text: string): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+
+    await this.page.waitForFunction(
+      (selector: string, text: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() === text.trim();
+      },
+      {},
+      selector,
+      text
+    );
+  }
+
+  /**
+   * Verifies that the text content of the element contains the given text.
+   * @param {string} selector - The CSS selector to find the element.
+   * @param {string} text - The expected text content.
+   */
+  async expectTextContentToContain(
+    selector: string,
+    text: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+
+    await this.page.waitForFunction(
+      (selector: string, text: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim().includes(text.trim());
+      },
+      {},
+      selector,
+      text
+    );
+  }
+
+  /**
    * Checks if element is clickable or not.
    */
   async expectElementToBeClickable(
@@ -1041,9 +1082,12 @@ export class BaseUser {
    * @param {string} selector - The selector of the element to check.
    * @param {boolean} present - Whether the element should be present or not.
    */
-  async expectElementToBePresent(selector: string, present: boolean = true) {
+  async expectElementToBeVisible(selector: string, present: boolean = true) {
     if (present) {
-      await this.page.waitForSelector(selector);
+      await this.page.waitForSelector(selector, {
+        visible: true,
+        timeout: 10000,
+      });
       showMessage(`Element with selector ${selector} was found (as expected).`);
     } else {
       try {
@@ -1060,6 +1104,43 @@ export class BaseUser {
         );
       }
     }
+  }
+
+  /**
+   * Function to verify that the anchor opens the correct page.
+   * @param {string} selector - The selector of the anchor.
+   * @param {string} newPageURL - The expected page.
+   */
+  async expectAnchorToOpenCorrectPage(
+    selector: string,
+    newPageURL: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+
+    const newPagePromise: Promise<Page> = new Promise<Page>(resolve => {
+      this.browserObject.once(
+        'targetcreated',
+        async (target: puppeteer.Target) => {
+          const newTab = await target.page();
+          if (newTab) {
+            await newTab.bringToFront();
+            resolve(newTab);
+          }
+        }
+      );
+    });
+    await this.page.click(selector);
+    const newPage = await newPagePromise;
+
+    await newPage.waitForFunction(
+      (expectedURL: string) => {
+        return document.URL.includes(expectedURL);
+      },
+      {},
+      newPageURL
+    );
+
+    await newPage.close();
   }
 }
 
