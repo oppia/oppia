@@ -5,7 +5,7 @@
         <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'story'}" tabindex="0" (keydown.enter)="setActiveTab('story')">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('story')">
             <img *ngIf="!checkTabletView()" alt="play story icon" class="tab-icon" [src]="getStaticImageUrl('/icons/play_icon_24px.svg')">
-            <a class="tab-title"
+            <a class="tab-title e2e-test-lesson-tab-link"
                [innerHTML]="'I18N_TOPIC_VIEWER_LEARN' | translate">
             </a>
           </div>
@@ -31,7 +31,7 @@
   </div>
   <background-banner></background-banner>
   <div class="topic-viewer-page-content" *ngIf="!topicIsLoading">
-    <div *ngIf="activeTab === 'story'">
+    <div *ngIf="activeTab === 'story'" class="e2e-test-lessons-tab-container">
       <stories-list *ngIf="canonicalStorySummaries.length"
                     [topicName]="topicName"
                     [topicId]="topicId"

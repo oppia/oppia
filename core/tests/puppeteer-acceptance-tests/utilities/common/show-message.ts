@@ -16,8 +16,12 @@
  * @fileoverview Utility function for logging the progress of the tests.
  */
 
-export let showMessage = function (message: string): void {
-  // We use console statements to log the progress or feedback of the tests.
+/**
+ * Logs test progress and feedback messages with timestamp
+ */
+export const showMessage = (message: string): void => {
+  const timestamp = Math.floor(Date.now() / 1000);
+
   // eslint-disable-next-line no-console
-  console.log(Date.now() / 1000 + ' LOG: ' + message);
+  console.log(`[${timestamp}] [test-log]: ${message}`);
 };
