@@ -83,6 +83,9 @@ const explorationTitleInput = 'input.e2e-test-exploration-title-input-modal';
 const explorationGoalInput = 'input.e2e-test-exploration-objective-input-modal';
 const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
+const explorationLanguageSelector =
+  '.e2e-test-exploration-language-select-modal';
+const languageOptionSelector = '.e2e-test-exploration-language-select-lan';
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
@@ -281,6 +284,7 @@ const previousCardButton = '.e2e-test-back-button';
 
 // Common Selectors.
 const inputFieldSelector = '.newTabButtonSelector';
+const addListEntryButtonSelector = '.e2e-test-add-list-entry';
 
 // Editor Tab Selectors.
 const addResponseModalHeaderSelector = '.e2e-test-add-response-modal-header';
@@ -296,6 +300,8 @@ const currentOutcomeDestinationSelector = '.e2e-test-current-outcome-dest';
 const currentSolutionSummarySelector =
   '.e2e-test-oppia-solution-tab .e2e-test-response-summary';
 const customizeInteractionBodySelector = '.e2e-test-customize-interaction-body';
+const customizeInteractionHeaderSelector =
+  '.e2e-test-customize-interaction-header';
 const customizeOptionSelector = `${customizeInteractionBodySelector} .e2e-test-multiple-options`;
 const customizeOptionLabelSelector = `${customizeOptionSelector} .oppia-interaction-customization-label`;
 const customizeOptionValueSelector = `${customizeOptionSelector} .e2e-test-schema-based-editor`;
@@ -361,6 +367,19 @@ const nextButtonSelector = '.joyride-step__next-container .joyride-button';
 const previousButtonSelector = '.joyride-step__prev-container .joyride-button';
 const joyrideDoneButtonSelector = '.joyride-step__done-button .joyride-button';
 const joyrideStepSelector = '.joyride-step__counter';
+
+// Save Exploration Modal.
+const saveExplorationModalContainerSelector =
+  '.e2e-test-save-exploration-modal-container';
+const saveDraftTitleSelector = '.e2e-test-save-draft-heading';
+
+// Publish Exploration (Metadata) Modal.
+const publishMetadataExplorationHeaderSelector =
+  '.e2e-test-metadata-modal-header';
+
+// Common Selectors.
+const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalBodySelector = '.e2e-test-modal-body';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -712,6 +731,50 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
+  }
+
+  async customizeEndExplorationInteraction(
+    explorationIds: string[]
+  ): Promise<void> {
+    if (explorationIds.length > 3) {
+      throw new Error(
+        'The maximum number of explorations that can be selected is 3.'
+      );
+    }
+
+    await this.expectElementToBeVisible(customizeInteractionBodySelector);
+    const customizeInteractionBodyElement = await this.page.$(
+      customizeInteractionBodySelector
+    );
+
+    for (const explorationId of explorationIds) {
+      await this.expectElementToBeVisible(addListEntryButtonSelector);
+      await this.page.click(addListEntryButtonSelector);
+
+      const textInputFields =
+        await customizeInteractionBodyElement?.$$(textInputField);
+
+      if (!textInputFields || textInputFields.length === 0) {
+        throw new Error('No text input fields found');
+      }
+
+      const lastTextInputField = textInputFields[textInputFields.length - 1];
+      await lastTextInputField.type(explorationId);
+
+      await this.page.waitForFunction(
+        (element: HTMLInputElement, value: string) => {
+          return element.value.trim() === value.trim();
+        },
+        {},
+        lastTextInputField,
+        explorationId
+      );
+    }
+
+    await this.expectElementToBeClickable(saveInteractionButton);
+    await this.page.click(saveInteractionButton);
+
+    await this.expectElementToBeVisible(saveInteractionButton, false);
   }
 
   /**
@@ -1572,7 +1635,7 @@ export class ExplorationEditor extends BaseUser {
     goal: string,
     category: string,
     tags?: string
-  ): Promise<string | null> {
+  ): Promise<string> {
     const publishExploration = async () => {
       if (this.isViewportAtMobileWidth()) {
         await this.waitForPageToFullyLoad();
@@ -3361,6 +3424,23 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Verifies that the header in the publish exploration modal matches the expected header.
+   * @param {string} expectedHeader - The expected header.
+   */
+  async expectHeaderInPublishExplorationModalToBe(
+    expectedHeader: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      publishMetadataExplorationHeaderSelector
+    );
+
+    await this.expectTextContentToBe(
+      publishMetadataExplorationHeaderSelector,
+      expectedHeader
+    );
+  }
+
+  /**
    * Function to restart the preview after it has been completed.
    */
   async restartPreview(): Promise<void> {
@@ -4446,6 +4526,15 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(helpModalContainerSelector);
   }
 
+  async clickOnPublishExplorationButton(): Promise<void> {
+    await this.expectElementToBeVisible(publishExplorationButtonSelector);
+    await this.clickOn(publishExplorationButtonSelector);
+
+    await this.expectElementToBeVisible(
+      publishMetadataExplorationHeaderSelector
+    );
+  }
+
   /**
    * Navigates to the tour tab in the exploration editor.
    */
@@ -4461,6 +4550,45 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(translationTourButtonSelector);
 
     await this.expectElementToBeVisible(joyrideBodySelector);
+  }
+
+  /**
+   * Clicks on the publish button in the publish modal.
+   */
+  async clickOnPublishButtonInPublishModal(): Promise<void> {
+    await this.expectElementToBeVisible(explorationConfirmPublishButton);
+    await this.clickOn(explorationConfirmPublishButton);
+    await this.expectElementToBeVisible(explorationConfirmPublishButton, false);
+  }
+
+  /**
+   * Clicks on the save changes button in the publish modal.
+   */
+  async clickOnSaveChangesButtonInPublishModal(): Promise<void> {
+    await this.expectElementToBeVisible(saveExplorationChangesButton);
+    await this.clickOn(saveExplorationChangesButton);
+
+    await this.expectElementToBeVisible(saveExplorationChangesButton, false);
+  }
+
+  /**
+   * Clicks on the save draft button.
+   */
+  async clickOnSaveDraftButton(): Promise<void> {
+    await this.expectElementToBeVisible(`${saveChangesButton}:not([disabled])`);
+
+    await this.page.click(saveChangesButton);
+    await this.expectElementToBeVisible(saveExplorationModalContainerSelector);
+  }
+
+  /**
+   * Clicks on the save draft button in the save draft modal.
+   */
+  async clickOnSaveDraftButtonInSaveDraftModal(): Promise<void> {
+    await this.expectElementToBeVisible(`${saveDraftButton}:not([disabled])`);
+    await this.page.click(saveDraftButton);
+
+    await this.expectElementToBeVisible(saveDraftButton, false);
   }
 
   /**
@@ -4554,6 +4682,16 @@ export class ExplorationEditor extends BaseUser {
     );
 
     expect(currentDestination).toBe(expectedDestination);
+  }
+
+  /**
+   * Verifies that the customize interaction header is visible and contains the expected title.
+   * @param {string} title The expected title of the customize interaction header.
+   */
+  async expectCustomizeInteractionTitleToBe(title: string): Promise<void> {
+    await this.expectElementToBeVisible(customizeInteractionHeaderSelector);
+
+    await this.expectTextContentToBe(customizeInteractionHeaderSelector, title);
   }
 
   /**
@@ -4677,6 +4815,23 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(previousButtonSelector, visible);
   }
 
+  async expectModalContentToContain(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalBodySelector);
+    await this.expectTextContentToContain(
+      commonModalBodySelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Verifies that the modal title is as expected.
+   * @param {string} expectedTitle - The expected title.
+   */
+  async expectModalTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToBe(commonModalTitleSelector, expectedTitle);
+  }
+
   /**
    * Verifies that the outcome feedback is visible.
    */
@@ -4707,6 +4862,31 @@ export class ExplorationEditor extends BaseUser {
     expect(visible).toBe(true);
   }
 
+  async expectSaveDraftButtonToBeDisabled(
+    disabled: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(saveChangesButton);
+
+    await this.page.waitForFunction(
+      (selector: string, disabled: boolean) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLButtonElement)?.disabled === disabled;
+      },
+      {},
+      saveChangesButton,
+      disabled
+    );
+  }
+
+  /**
+   * Verifies that the save draft modal title is as expected.
+   * @param {string} title - The expected title.
+   */
+  async expectSaveDraftModalTitleToBe(title: string): Promise<void> {
+    await this.expectElementToBeVisible(saveDraftTitleSelector);
+    await this.expectTextContentToBe(saveDraftTitleSelector, title);
+  }
+
   /**
    * Verifies that the expected solution is in the current solutions.
    * @param {string} expectedSolution - The expected solution.
@@ -4733,6 +4913,56 @@ export class ExplorationEditor extends BaseUser {
     });
 
     await this.isTextPresentOnPage('Creator Dashboard');
+  }
+
+  async fillDescriptionInSaveDraftModal(description: string): Promise<void> {
+    await this.expectElementToBeVisible(commitMessage);
+    await this.type(commitMessage, description);
+
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLTextAreaElement)?.value?.trim() === value.trim();
+      },
+      {},
+      commitMessage,
+      description
+    );
+  }
+
+  async fillExplorationMetadataDetails(
+    explorationTitle: string,
+    goal: string,
+    category: string,
+    language: string,
+    tags: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(explorationTitleInput);
+    await this.clickOn(explorationTitleInput);
+    await this.type(explorationTitleInput, explorationTitle);
+    await this.expectElementValueToBe(explorationTitleInput, explorationTitle);
+
+    await this.expectElementToBeVisible(explorationGoalInput);
+    await this.clickOn(explorationGoalInput);
+    await this.type(explorationGoalInput, goal);
+    await this.expectElementValueToBe(explorationGoalInput, goal);
+
+    await this.expectElementToBeVisible(explorationCategoryDropdown);
+    await this.clickOn(explorationCategoryDropdown);
+    await this.clickOn(category);
+    await this.expectTextContentToBe(categoryDropdown, category);
+
+    await this.expectElementToBeVisible(explorationLanguageSelector);
+    await this.clickOn(explorationLanguageSelector);
+    await this.clickOn(language);
+    await this.expectTextContentToBe(explorationLanguageSelector, language);
+
+    await this.expectElementToBeVisible(tagsField);
+    await this.clickOn(tagsField);
+    for (const tag of tags) {
+      await this.type(tagsField, tag);
+      await this.page.keyboard.press('Enter');
+    }
   }
 
   /**

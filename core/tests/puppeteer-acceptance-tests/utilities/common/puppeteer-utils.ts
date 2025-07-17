@@ -1009,6 +1009,23 @@ export class BaseUser {
   }
 
   /**
+   * Verifies that the element value matches the expected value.
+   * @param {string} selector - The CSS selector of the element.
+   * @param {string} value - The expected value.
+   */
+  async expectElementValueToBe(selector: string, value: string): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLInputElement)?.value?.trim() === value.trim();
+      },
+      {},
+      selector,
+      value
+    );
+  }
+
+  /**
    * Checks if element is clickable or not.
    */
   async expectElementToBeClickable(
@@ -1090,19 +1107,12 @@ export class BaseUser {
       });
       showMessage(`Element with selector ${selector} was found (as expected).`);
     } else {
-      try {
-        await this.page.waitForSelector(selector);
-        throw new Error(
-          `Element ${selector} was found when it should not have been.`
-        );
-      } catch (e) {
-        if (!(e instanceof puppeteer.errors.TimeoutError)) {
-          throw e;
-        }
-        showMessage(
-          `Element with selector ${selector} was not found  (as expected).`
-        );
-      }
+      await this.page.waitForSelector(selector, {
+        hidden: true,
+      });
+      showMessage(
+        `Element with selector ${selector} was not found  (as expected).`
+      );
     }
   }
 

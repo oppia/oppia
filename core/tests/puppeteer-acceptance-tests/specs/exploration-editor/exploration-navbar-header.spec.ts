@@ -16,5 +16,93 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * EC. Navbar Header.
+ * EC. Navigation Bar Header.
  */
+
+import {UserFactory} from '../../utilities/common/user-factory';
+import {
+  ExplorationEditor,
+  INTERACTION_TYPES,
+} from '../../utilities/user/exploration-editor';
+
+describe('Exploration Editor', function () {
+  let explorationEditor: ExplorationEditor;
+  let explorationId: string;
+
+  beforeAll(async function () {
+    explorationEditor = await UserFactory.createNewUser(
+      'explorationEditor',
+      'exploration_editor@example.com'
+    );
+
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+  });
+
+  it('should be able to save draft', async function () {
+    await explorationEditor.updateCardContent('Hello, World!');
+    await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+
+    await explorationEditor.clickOnSaveDraftButton();
+    await explorationEditor.expectSaveDraftModalTitleToBe('Save Draft');
+
+    await explorationEditor.fillDescriptionInSaveDraftModal('First Commit!');
+    await explorationEditor.clickOnSaveDraftButtonInSaveDraftModal();
+
+    await explorationEditor.expectSaveDraftButtonToBeDisabled();
+
+    explorationId = await explorationEditor.publishExplorationWithMetadata(
+      'Exploration 1',
+      'Goal of the the exploration is to test recommendations',
+      'Algebra'
+    );
+  });
+
+  it('should be able to publish an exploration', async function () {
+    await explorationEditor.navigateToCreatorDashboardPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+
+    await explorationEditor.updateCardContent('Hello, World!');
+    await explorationEditor.addInteraction(
+      INTERACTION_TYPES.END_EXPLORATION,
+      false
+    );
+    await explorationEditor.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (End Exploration)'
+    );
+
+    await explorationEditor.customizeEndExplorationInteraction([explorationId]);
+    await explorationEditor.clickOnSaveDraftButton();
+    await explorationEditor.fillDescriptionInSaveDraftModal('First Commit!');
+    await explorationEditor.clickOnSaveDraftButtonInSaveDraftModal();
+
+    await explorationEditor.clickOnPublishExplorationButton();
+    await explorationEditor.expectHeaderInPublishExplorationModalToBe(
+      'Add Some Details'
+    );
+    await explorationEditor.fillExplorationMetadataDetails(
+      'Exploration 2',
+      'Goal of the the exploration is to test recommendations',
+      'Algebra',
+      'Ásụ̀sụ́ Ìgbò (Igbo)',
+      ['algebra']
+    );
+
+    await explorationEditor.clickOnSaveChangesButtonInPublishModal();
+    await explorationEditor.expectModalTitleToBe('Publish Exploration');
+    await explorationEditor.expectModalContentToContain(
+      "Congratulations, you're about to publish an exploration!"
+    );
+
+    await explorationEditor.clickOnPublishButtonInPublishModal();
+    await explorationEditor.expectModalTitleToBe('Awesome!');
+    await explorationEditor.expectModalContentToContain(
+      "Now that you're a published Oppia teacher, you can share your creation."
+    );
+    // TODO: Verify the link.
+  });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
+});
