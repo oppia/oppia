@@ -1632,8 +1632,8 @@ export class CurriculumAdmin extends BaseUser {
       );
     } catch (error) {
       throw new Error(
-        `Failed to remove all questions from the skill "${skillName}"`,
-        error.stack
+        `Failed to remove all questions from the skill "${skillName}"` +
+          error.stack
       );
     }
   }
