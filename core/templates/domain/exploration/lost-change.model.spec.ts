@@ -26,15 +26,15 @@ describe('LostChange', () => {
 
   beforeEach(() => {
     mockUtilsService = {
-      isEmpty: (val: any) =>
+      isEmpty: (val: unknown) =>
         val === null ||
         val === undefined ||
-        (typeof val === 'object' && Object.keys(val).length === 0),
+        (typeof val === 'object' && Object.keys(val as object).length === 0),
     } as unknown as UtilsService;
   });
 
   it('should evaluate values from a Lost Change', () => {
-    const lostChange = LostChange.createNew({
+    const lostChange = LostChange.createNew(mockUtilsService, {
       cmd: 'add_state',
       state_name: 'State name',
       content_id_for_state_content: 'content_0',
@@ -46,7 +46,7 @@ describe('LostChange', () => {
   });
 
   it('should evaluate values from a renaming Lost Change', () => {
-    const lostChange = LostChange.createNew({
+    const lostChange = LostChange.createNew(mockUtilsService, {
       cmd: 'rename_state',
       old_state_name: 'Old state name',
       new_state_name: 'New state name',
@@ -276,8 +276,8 @@ it('should return false if any of the outcome dest are not present', () => {
   expect(lostChange.isOutcomeDestEqual()).toBeFalse();
 });
 
-it('should evaluate values from a Lost Change with equal outcomes', () => {
-  const lostChange = LostChange.createNew({
+it('should evaluate values from a Lost Change with equal outcomes and rules', () => {
+  const lostChange = LostChange.createNew(mockUtilsService, {
     cmd: 'edit_state_property',
     state_name: 'Edited state name',
     new_value: {
@@ -285,7 +285,7 @@ it('should evaluate values from a Lost Change with equal outcomes', () => {
         dest: 'outcome 2',
         dest_if_really_stuck: null,
         feedback: {
-          content_id: 'feedback_1',
+          content_id: 'feedback_2',
           html: 'Html',
         },
         labelled_as_correct: false,
@@ -293,16 +293,15 @@ it('should evaluate values from a Lost Change with equal outcomes', () => {
         refresher_exploration_id: null,
         missing_prerequisite_skill_id: null,
       }),
-      dest: 'dest2',
-      dest_if_really_stuck: null,
+      dest: 'default',
       feedback: new SubtitledHtml('<p>HTML</p>', '12'),
-      html: '',
+      html: '<p>Correct</p>',
       rules: [
         {
-          type: 'Type2',
+          type: 'Type1',
           inputs: {
-            input1: 'input3',
-            input2: 'input4',
+            input1: 'input1',
+            input2: 'input2',
           },
         },
       ],
@@ -312,7 +311,7 @@ it('should evaluate values from a Lost Change with equal outcomes', () => {
         dest: 'outcome 1',
         dest_if_really_stuck: null,
         feedback: {
-          content_id: 'feedback_1',
+          content_id: 'feedback_2',
           html: 'Html',
         },
         labelled_as_correct: false,
@@ -320,10 +319,10 @@ it('should evaluate values from a Lost Change with equal outcomes', () => {
         refresher_exploration_id: null,
         missing_prerequisite_skill_id: null,
       }),
-      dest: 'dest1',
+      dest: 'default',
       dest_if_really_stuck: null,
       feedback: new SubtitledHtml('<p>HTML</p>', '12'),
-      html: '',
+      html: '<p>Correct</p>',
       rules: [
         {
           type: 'Type1',
@@ -337,8 +336,8 @@ it('should evaluate values from a Lost Change with equal outcomes', () => {
     property_name: 'answer_groups',
   });
 
-  expect(lostChange.isFeedbackEqual()).toBeTrue();
-  expect(lostChange.isDestEqual()).toBeFalse();
+  expect(lostChange.isRulesEqual()).toBeTrue();
+  expect(lostChange.isOutcomeFeedbackEqual()).toBeTrue();
   expect(lostChange.isOutcomeDestEqual()).toBeFalse();
 });
 
