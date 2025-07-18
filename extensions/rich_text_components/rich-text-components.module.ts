@@ -45,7 +45,7 @@ import {
 } from './rte-output-display.component';
 
 import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
-import {NoninteractiveWorkedExample} from './WorkedExample/directives/oppia-non-interactive-workedexample.component';
+import {NoninteractiveWorkedExample} from './WorkedExample/directives/oppia-noninteractive-workedexample.component';
 
 @NgModule({
   imports: [

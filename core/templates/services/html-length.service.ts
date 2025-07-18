@@ -218,6 +218,7 @@ export class HtmlLengthService {
     switch (domId) {
       case 'oppia-noninteractive-math':
         return 1;
+      case 'oppia-noninteractive-workedexample':
       case 'oppia-noninteractive-collapsible':
       case 'oppia-noninteractive-tabs':
         return 1000;

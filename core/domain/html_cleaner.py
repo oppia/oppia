@@ -286,14 +286,15 @@ def _raise_validation_errors_for_unescaped_html_tag(
 
 
 def validate_rte_tags(
-    html_data: str, is_tag_nested_inside_tabs_or_collapsible: bool = False
+    html_data: str,
+    is_tag_nested_inside_tabs_or_collapsible_or_we: bool = False
 ) -> None:
     """Validate all the RTE tags.
 
     Args:
         html_data: str. The RTE content of the state.
-        is_tag_nested_inside_tabs_or_collapsible: bool. True when we
-            validate tags inside `Tabs` or `Collapsible` tag.
+        is_tag_nested_inside_tabs_or_collapsible_or_we: bool. True when
+            we validate tags inside `Tabs` or `Collapsible` tag.
 
     Raises:
         ValidationError. Image does not have alt-with-value attribute.
@@ -334,9 +335,12 @@ def validate_rte_tags(
             empty.
         ValidationError. Math svg_filename attribute does not have svg
             extension.
-        ValidationError. Tabs tag present inside another tabs or collapsible.
-        ValidationError. Collapsible tag present inside tabs or another
-            collapsible.
+        ValidationError. Tabs tag present inside another tabs, collapsible or
+            workedexample.
+        ValidationError. Collapsible tag present inside tabs, another
+            collapsible or workedexample.
+        ValidationError. Workedexample tag present inside tabs, collapsible
+            or another workedexample.
     """
     soup = bs4.BeautifulSoup(html_data, 'html.parser')
     for tag in soup.find_all('oppia-noninteractive-image'):
@@ -481,19 +485,26 @@ def validate_rte_tags(
                 'have svg extension.'
             )
 
-    if is_tag_nested_inside_tabs_or_collapsible:
+    if is_tag_nested_inside_tabs_or_collapsible_or_we:
         tabs_tags = soup.find_all('oppia-noninteractive-tabs')
         if len(tabs_tags) > 0:
             raise utils.ValidationError(
                 'Tabs tag should not be present inside another '
-                'Tabs or Collapsible tag.'
+                'Tabs, Collapsible or Workedexample tag.'
             )
 
         collapsible_tags = soup.find_all('oppia-noninteractive-collapsible')
         if len(collapsible_tags) > 0:
             raise utils.ValidationError(
-                'Collapsible tag should not be present inside another '
-                'Tabs or Collapsible tag.'
+                'Collapsible tag should not be present inside Tabs, '
+                'another Collapsible or Workedexample tag.'
+            )
+        
+        workedexample_tags = soup.find_all('oppia-noninteractive-workedexample')
+        if len(workedexample_tags) > 0:
+            raise utils.ValidationError(
+                'workedexample tag should not be present inside Tabs, '
+                'Collapsible or another Workedexample tag.'
             )
 
 
@@ -522,8 +533,10 @@ def _raise_validation_errors_for_empty_tabs_content(
         )
 
 
-def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
-    """Validates `Tabs` and `Collapsible` RTE tags
+def validate_tabs_collapsible_and_workedexample_rte_tags(
+        html_data: str
+    ) -> None:
+    """Validates `Tabs`, `Collapsible` and `Workedexample` RTE tags
 
     Args:
         html_data: str. The RTE content of the state.
@@ -541,6 +554,12 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
         ValidationError. Collapsible heading-with-value attribute is not
             present.
         ValidationError. Collapsible heading-with-value attribute is empty.
+        ValidationError. No workedexample question is present inside the tag.
+        ValidationError. Workedexample question-with-value attribute is not
+            present.
+        ValidationError. Workedexample answer-with-value attribute is not
+            present.
+        ValidationError. Workedexample answer-with-value attribute is empty.
     """
     soup = bs4.BeautifulSoup(html_data, 'html.parser')
     tabs_tags = soup.find_all('oppia-noninteractive-tabs')
@@ -566,7 +585,7 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
 
             validate_rte_tags(
                 tab_content['content'],
-                is_tag_nested_inside_tabs_or_collapsible=True
+                is_tag_nested_inside_tabs_or_collapsible_or_we=True
             )
 
     collapsibles_tags = soup.find_all('oppia-noninteractive-collapsible')
@@ -588,7 +607,7 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
 
         validate_rte_tags(
             collapsible_content,
-            is_tag_nested_inside_tabs_or_collapsible=True
+            is_tag_nested_inside_tabs_or_collapsible_or_we=True
         )
 
         if not tag.has_attr('heading-with-value'):
@@ -605,3 +624,44 @@ def validate_tabs_and_collapsible_rte_tags(html_data: str) -> None:
             raise utils.ValidationError(
                 'Heading attribute inside the collapsible tag is empty.'
             )
+    workedexample_tags = soup.find_all('oppia-noninteractive-workedexample')
+    for tag in workedexample_tags:
+        if not tag.has_attr('question-with-value'):
+            raise utils.ValidationError(
+                'No question attribute present in workedexample tag.'
+            )
+
+        workedexample_question_json = (
+            utils.unescape_html(tag['question-with-value'])
+        )
+        workedexample_question = json.loads(
+            workedexample_question_json).replace('\\"', '')
+        if is_html_empty(workedexample_question):
+            raise utils.ValidationError(
+                'No workedexample question is present inside the tag.'
+            )
+
+        validate_rte_tags(
+            workedexample_question,
+            is_tag_nested_inside_tabs_or_collapsible_or_we=True
+        )
+
+        if not tag.has_attr('answer-with-value'):
+            raise utils.ValidationError(
+                'No answer attribute present in workedexample tag.'
+            )
+
+        workedexample_answer_json = (
+            utils.unescape_html(tag['answer-with-value'])
+        )
+        workedexample_answer = json.loads(
+            workedexample_answer_json).replace('\\"', '')
+        if is_html_empty(workedexample_answer):
+            raise utils.ValidationError(
+                'No workedexample answer is present inside the tag.'
+            )
+
+        validate_rte_tags(
+            workedexample_answer,
+            is_tag_nested_inside_tabs_or_collapsible_or_we=True
+        )

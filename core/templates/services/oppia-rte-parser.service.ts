@@ -25,7 +25,7 @@ import {NoninteractiveMath} from 'rich_text_components/Math/directives/oppia-non
 import {NoninteractiveSkillreview} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
 import {NoninteractiveTabs} from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
 import {NoninteractiveVideo} from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
-import {NoninteractiveWorkedExample} from 'rich_text_components/WorkedExample/directives/oppia-non-interactive-workedexample.component';
+import {NoninteractiveWorkedExample} from 'rich_text_components/WorkedExample/directives/oppia-noninteractive-workedexample.component';
 
 const selectorToComponentClassMap = {
   'oppia-noninteractive-collapsible': NoninteractiveCollapsible,

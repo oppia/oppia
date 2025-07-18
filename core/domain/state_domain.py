@@ -3494,7 +3494,7 @@ class SubtitledHtml:
         self.html = html_cleaner.clean(self.html)
 
         html_cleaner.validate_rte_tags(self.html)
-        html_cleaner.validate_tabs_and_collapsible_rte_tags(self.html)
+        html_cleaner.validate_tabs_collapsible_and_workedexample_rte_tags(self.html)
 
     @classmethod
     def create_default_subtitled_html(cls, content_id: str) -> SubtitledHtml:
