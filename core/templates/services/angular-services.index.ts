@@ -119,7 +119,6 @@ import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-back
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {ChapterProgressService} from 'pages/exploration-player-page/services/chapter-progress.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
@@ -769,7 +768,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
   ['ReadOnlyExplorationBackendApiService',
     ReadOnlyExplorationBackendApiService],
-  ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
   ['RefresherExplorationConfirmationModalService',
     RefresherExplorationConfirmationModalService],
   ['ReleaseCoordinatorBackendApiService', ReleaseCoordinatorBackendApiService],

@@ -31,8 +31,8 @@ import {
 } from '../../../../domain/exploration/read-only-exploration-backend-api.service';
 import {
   ReadOnlyTopicBackendDict,
-  ReadOnlyTopicObjectFactory,
-} from '../../../../domain/topic_viewer/read-only-topic-object.factory';
+  ReadOnlyTopic,
+} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from '../../../../domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 import {PageContextService} from '../../../../services/page-context.service';
@@ -54,7 +54,6 @@ describe('Lesson player header component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let urlService: UrlService;
   let topicViewerBackendApiService: TopicViewerBackendApiService;
-  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let mobileMenuService: MobileMenuService;
 
@@ -70,7 +69,6 @@ describe('Lesson player header component', () => {
         UrlInterpolationService,
         UrlService,
         TopicViewerBackendApiService,
-        ReadOnlyTopicObjectFactory,
         MobileMenuService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -89,12 +87,11 @@ describe('Lesson player header component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     urlService = TestBed.inject(UrlService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
     mobileMenuService = TestBed.inject(MobileMenuService);
 
     spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.resolveTo(
-      readOnlyTopicObjectFactory.createFromBackendDict({
+      ReadOnlyTopic.createFromBackendDict({
         subtopics: [],
         skill_descriptions: {},
         uncategorized_skill_ids: [],

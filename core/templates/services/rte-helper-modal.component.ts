@@ -447,6 +447,34 @@ export class RteHelperModalComponent {
     return this.CHARACTER_LIMITS[componentId] || this.CHARACTER_LIMITS.default;
   }
 
+  /**
+   * Checks if the HTML content length exceeds the character limit for the specified component.
+   * @param content The HTML content to check
+   * @param componentId The ID of the component
+   * @returns True if the content length exceeds the limit, false otherwise
+   */
+  isContentLengthExceeded(content: string, componentId: string): boolean {
+    if (!content) {
+      return false;
+    }
+
+    return Boolean(
+      this.htmlLengthService.computeHtmlLength(
+        content,
+        CALCULATION_TYPE_CHARACTER
+      ) > this.getCharacterLimit(componentId)
+    );
+  }
+
+  /**
+   * Returns the character limit for the specified component type.
+   * @param componentId The ID of the component
+   * @returns The character limit for the component
+   */
+  getCharacterLimit(componentId: string): number {
+    return this.CHARACTER_LIMITS[componentId] || this.CHARACTER_LIMITS.default;
+  }
+
   isErrorMessageNonempty(): boolean {
     if (this.errorMessage && this.errorMessage !== '') {
       return true;

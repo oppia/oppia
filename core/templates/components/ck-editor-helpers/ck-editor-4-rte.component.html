@@ -13,14 +13,14 @@
         <button type="button"
                 class="oppia-rte-paste-confirm-btn oppia-rte-paste-yes-btn"
                 (click)="confirmSelectivePaste()"
-                aria-label="Paste valid content">
-          Yes, paste valid content
+                aria-label="Paste valid content"
+                [innerHTML]="'I18N_RTE_ACCEPT_VALID_CONTENT_PASTE' | translate">
         </button>
         <button type="button"
                 class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn"
                 (click)="rejectSelectivePaste()"
-                aria-label="Cancel paste">
-          No, cancel
+                aria-label="Cancel paste"
+                [innerHTML]="'I18N_RTE_CANCEL_VALID_CONTENT_PASTE' | translate">
         </button>
       </div>
     </div>
@@ -30,8 +30,8 @@
             type="button"
             class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn"
             (click)="dismissPasteError()"
-            aria-label="Dismiss error">
-      Dismiss
+            aria-label="Dismiss error"
+            [innerHTML]="'I18N_RTE_DISMISS_WARNING' | translate">
     </button>
   </div>
 
