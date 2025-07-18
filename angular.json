@@ -34,7 +34,8 @@
             ],
             "styles": [
               "core/templates/css/oppia.css",
-              "core/templates/css/oppia-material.css"
+              "core/templates/css/oppia-material.css",
+              "node_modules/ngx-toastr/toastr.css"
             ],
             "scripts": []
           },

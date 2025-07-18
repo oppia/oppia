@@ -108,11 +108,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             self.file_arr.append(msg)
 
         class MockFile:
-            def seek(self, start: int, stop: int) -> None: # pylint: disable=missing-docstring
+            def seek( # pylint: disable=missing-docstring
+                self, start: int, stop: int) -> None:
                 pass
             def read(self) -> str: # pylint: disable=missing-docstring
                 return ''
-            def write(self, buf: str) -> None: # pylint: disable=missing-docstring
+            def write( # pylint: disable=missing-docstring
+                self, buf: str) -> None:
                 mock_write(buf)
 
         class MockOpenFile:
@@ -211,7 +213,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             common, 'COMPILED_REQUIREMENTS_FILE_PATH',
             self.REQUIREMENTS_TEST_TXT_FILE_PATH)
 
-        def mock_find_distributions(paths: List[str]) -> List[Distribution]: # pylint: disable=unused-argument
+        def mock_find_distributions( # pylint: disable=unused-argument
+            paths: List[str]) -> List[Distribution]:
             return [
                 Distribution('dependency1', '1.5.1', {}),
                 Distribution('dependency2', '4.9.1.2', {}),
@@ -528,7 +531,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             'google_cloud_datastore-1.13.0.dist-info',
             'google'
         ]
-        def mock_list_dir(path: str) -> List[str]:  # pylint: disable=unused-argument
+        def mock_list_dir( # pylint: disable=unused-argument
+            path: str) -> List[str]:
             return directory_names
 
         paths_to_delete = []
@@ -629,8 +633,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return [
                 'dependency-1-1.5.1.dist-info',
                 'dependency2-5.0.0.egg-info',
-                'dependency-5-0.5.3-py3.9.egg-info',
-                'dependency_6-0.5.3-py3.9.egg-info',
+                'dependency-5-0.5.3-py3.10.egg-info',
+                'dependency_6-0.5.3-py3.10.egg-info',
             ]
 
         def mock_is_dir(unused_path: str) -> bool:

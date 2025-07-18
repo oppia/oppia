@@ -490,7 +490,8 @@ class ManagedProcessTests(test_utils.TestBase):
 
         old_os_path_exists = os.path.exists
 
-        def mock_os_remove_files(file_path: str) -> None: # pylint: disable=unused-argument
+        def mock_os_remove_files( # pylint: disable=unused-argument
+            file_path: str) -> None:
             check_function_calls['shutil_rmtree_is_called'] = True
 
         def mock_os_path_exists(file_path: str) -> bool: # pylint: disable=unused-argument

@@ -114,7 +114,7 @@
         </div>
       </div>
     </div>
-    <div *ngIf="isOnTerminalCard() && milestoneMessageIsToBeDisplayed && generateMilestoneMessage() && !setNextMilestoneAndCheckIfProgressBarIsShown()">
+    <div *ngIf="isOnTerminalCard() && getMilestoneMessageIsToBeDisplayed() && generateMilestoneMessage() && !setNextMilestoneAndCheckIfProgressBarIsShown()">
       <div class="conversation-skin-milestone-message">
         <div class="milestone-message-star-container">
           <img [src]="getStaticImageUrl('/general/milestone-message-star-icon.svg')" class="star-icon">
@@ -148,9 +148,7 @@
                                        [explorationIsInPreviewMode]="explorationIsInPreviewMode"
                                        [questionPlayerConfig]="questionPlayerConfig"
                                        [collectionSummary]="collectionSummary"
-                                       [isRefresherExploration]="isRefresherExploration"
                                        [recommendedExplorationSummaries]="recommendedExplorationSummaries"
-                                       [parentExplorationIds]="parentExplorationIds"
                                        [nextLessonLink]="nextLessonLink">
     </oppia-ratings-and-recommendations>
 

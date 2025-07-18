@@ -34,8 +34,8 @@ import {
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
 import {DateTimeFormatService} from 'services/date-time-format.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
+import {ProgressUrlService} from '../../services/progress-url.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 
@@ -103,7 +103,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private explorationEngineService: ExplorationEngineService,
     private playerTranscriptService: PlayerTranscriptService,
     private localStorageService: LocalStorageService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
+    private progressUrlService: ProgressUrlService,
     private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
     private playerPositionService: PlayerPositionService
   ) {
@@ -163,7 +163,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
       this.checkpointStatusArray[i] = CHECKPOINT_STATUS_INCOMPLETE;
     }
     this.loggedOutProgressUniqueUrlId =
-      this.explorationPlayerStateService.getUniqueProgressUrlId();
+      this.progressUrlService.getUniqueProgressUrlId();
     if (this.loggedOutProgressUniqueUrlId) {
       this.loggedOutProgressUniqueUrl =
         this.urlService.getOrigin() +
@@ -256,9 +256,9 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
 
   async saveLoggedOutProgress(): Promise<void> {
     if (!this.loggedOutProgressUniqueUrlId) {
-      this.explorationPlayerStateService.setUniqueProgressUrlId().then(() => {
+      this.progressUrlService.setUniqueProgressUrlId().then(() => {
         this.loggedOutProgressUniqueUrlId =
-          this.explorationPlayerStateService.getUniqueProgressUrlId();
+          this.progressUrlService.getUniqueProgressUrlId();
         this.loggedOutProgressUniqueUrl =
           this.urlService.getOrigin() +
           '/progress/' +

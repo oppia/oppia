@@ -331,6 +331,7 @@ describe('Router Service', () => {
       location: {
         hash: '#/gui/Introduction',
       },
+      scrollTo: () => {},
     });
 
     routerService.savePendingChanges();
@@ -339,6 +340,52 @@ describe('Router Service', () => {
     );
 
     routerService.navigateToMainTab('/Introduction');
+    flush();
+    discardPeriodicTasks();
+  }));
+
+  it('should fadeOut, navigate, and fadeIn when navigating to main tab', fakeAsync(() => {
+    const service = routerService as unknown as {
+      _savePendingChanges: () => void;
+      _getCurrentStateFromLocationPath: () => string;
+      _actuallyNavigate: (slug: string, state: string | null) => void;
+      _activeTabName: string;
+      TABS: {MAIN: {name: string}};
+      SLUG_GUI: string;
+      navigateToMainTab: (state: string | null) => void;
+    };
+
+    spyOn(service, '_savePendingChanges');
+    spyOn(service, '_getCurrentStateFromLocationPath').and.returnValue(
+      '/oldState'
+    );
+    const navigateSpy = spyOn(service, '_actuallyNavigate');
+
+    service._activeTabName = service.TABS.MAIN.name;
+
+    // Create a fake container.
+    const container = document.createElement('div');
+    container.className = 'oppia-editor-cards-container';
+    container.style.opacity = '1';
+    document.body.appendChild(container);
+
+    spyOn(window, 'requestAnimationFrame').and.callFake(
+      (cb: FrameRequestCallback) => {
+        setTimeout(() => cb(performance.now()), 0);
+        return 0;
+      }
+    );
+
+    service.navigateToMainTab('newState');
+
+    tick(200);
+    tick(150);
+    tick(200);
+
+    expect(navigateSpy).toHaveBeenCalledWith(service.SLUG_GUI, 'newState');
+    expect(container.style.opacity).toBe('1');
+
+    document.body.removeChild(container);
     flush();
     discardPeriodicTasks();
   }));

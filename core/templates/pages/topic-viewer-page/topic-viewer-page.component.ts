@@ -21,10 +21,10 @@ import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
 import {AppConstants} from 'app.constants';
-import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {Subtopic, SkillIdToDescriptionMap} from 'domain/topic/subtopic.model';
-import {DegreesOfMastery} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {DegreesOfMastery} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AlertsService} from 'services/alerts.service';

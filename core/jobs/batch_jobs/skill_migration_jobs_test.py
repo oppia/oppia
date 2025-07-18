@@ -52,7 +52,6 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
             id=self.SKILL_1_ID,
             description='description',
             misconception_count=0,
-            worked_examples_count=0,
             language_code='cs',
             skill_model_last_updated=datetime.datetime.utcnow(),
             skill_model_created_on=datetime.datetime.utcnow(),
@@ -65,7 +64,6 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
                 'content_id': 'content_id',
                 'html': '<b>bo ld</b>'
             },
-            'worked_examples': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
                     'content_id': {}
@@ -202,7 +200,6 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
                     'content_id': 'content_id',
                     'html': '<b>bo&nbsp;ld\n</b>'
                 },
-                'worked_examples': [],
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
                         'content_id': {}
@@ -253,7 +250,6 @@ class MigrateSkillJobTests(job_test_utils.JobTestBase):
                     'content_id': 'content_id',
                     'html': '<b>bo&nbsp;ld\n</b>'
                 },
-                'worked_examples': [],
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
                         'content_id': {}
@@ -401,7 +397,6 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
             id=self.SKILL_1_ID,
             description='description',
             misconception_count=0,
-            worked_examples_count=0,
             language_code='cs',
             skill_model_last_updated=datetime.datetime.utcnow(),
             skill_model_created_on=datetime.datetime.utcnow(),
@@ -414,7 +409,6 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
                 'content_id': 'content_id',
                 'html': '<b>bo ld</b>'
             },
-            'worked_examples': [],
             'recorded_voiceovers': {
                 'voiceovers_mapping': {
                     'content_id': {}
@@ -540,7 +534,6 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
                     'content_id': 'content_id',
                     'html': '<b>bo&nbsp;ld\n</b>'
                 },
-                'worked_examples': [],
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
                         'content_id': {}
@@ -584,7 +577,6 @@ class AuditSkillMigrationJobTests(job_test_utils.JobTestBase):
                     'content_id': 'content_id',
                     'html': '<b>bo&nbsp;ld\n</b>'
                 },
-                'worked_examples': [],
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
                         'content_id': {}

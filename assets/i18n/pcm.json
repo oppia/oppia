@@ -1429,7 +1429,6 @@
 	"I18N_TOPNAV_LEARNER_GROUP": "Learner Group",
 	"I18N_TOPNAV_LEARN_DESCRIPTION_1": "Foundational lessons wey you take start to learn math",
 	"I18N_TOPNAV_LEARN_HEADING": "How you go take learn more",
-	"I18N_TOPNAV_LEARN_LINK_1": "See all lessons",
 	"I18N_TOPNAV_LEARN_LINK_2": "Dey learn dey go",
 	"I18N_TOPNAV_LIBRARY": "Community LIbrary",
 	"I18N_TOPNAV_LIBRARY_DESCRIPTION": "More resources wey community make wen go helep you sabi more.",
@@ -1460,6 +1459,5 @@
 	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE_WHAT_WE": "Oppia's mission na to create effective and learning platform wey dey easy to use for students around the world so that dem go fit gain access to education. Our learning platform dey built and maintained by volunteer software developers wey share our mission to make education available to students of all backgrounds.",
 	"I18N_WARNING_MODAL_DESCRIPTION": "This go show the full solution.You dey sure?",
 	"I18N_WARNING_MODAL_TITLE": "Warning!",
-	"I18N_WORKED_EXAMPLE": "Example wey dey work",
 	"I18N_YES": "Yes"
 }

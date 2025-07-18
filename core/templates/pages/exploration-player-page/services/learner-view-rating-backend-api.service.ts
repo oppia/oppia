@@ -19,7 +19,7 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {ExplorationEngineService} from './exploration-engine.service';
+import {PageContextService} from 'services/page-context.service';
 
 interface LearnerViewRatingBackendResponse {
   user_rating: number;
@@ -34,9 +34,9 @@ export class LearnerViewRatingBackendApiService {
 
   constructor(
     private httpClient: HttpClient,
-    private explorationEngineService: ExplorationEngineService
+    private pageContextService: PageContextService
   ) {
-    this.explorationId = this.explorationEngineService.getExplorationId();
+    this.explorationId = this.pageContextService.getExplorationId();
     this.ratingsUrl = '/explorehandler/rating/' + this.explorationId;
   }
 

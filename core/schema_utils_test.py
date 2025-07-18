@@ -94,11 +94,22 @@ ALLOWED_CUSTOM_OBJ_TYPES = [
 # See - https://github.com/python/mypy/issues/731
 UI_CONFIG_SPECS: Dict[str, Dict[str, Any]] = {
     SCHEMA_TYPE_BOOL: {},
+    SCHEMA_TYPE_CUSTOM: {
+        'hide_complex_extensions': {
+            'type': SCHEMA_TYPE_BOOL,
+        },
+        'rte_components': {
+            'type': SCHEMA_TYPE_UNICODE_OR_NONE,
+        },
+    },
     SCHEMA_TYPE_DICT: {},
     SCHEMA_TYPE_FLOAT: {},
     SCHEMA_TYPE_HTML: {
         'hide_complex_extensions': {
             'type': SCHEMA_TYPE_BOOL,
+        },
+        'rte_components': {
+            'type': SCHEMA_TYPE_UNICODE_OR_NONE,
         },
         'placeholder': {
             'type': SCHEMA_TYPE_UNICODE,
@@ -367,7 +378,11 @@ def validate_schema(schema: Dict[str, Any]) -> None:
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
-            [SCHEMA_KEY_REPLACEMENT_UI_CONFIG, SCHEMA_KEY_VALIDATORS])
+            [
+                SCHEMA_KEY_REPLACEMENT_UI_CONFIG,
+                SCHEMA_KEY_UI_CONFIG,
+                SCHEMA_KEY_VALIDATORS
+            ])
         assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(

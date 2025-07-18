@@ -26,10 +26,10 @@ import {Skill} from 'domain/skill/SkillObjectFactory';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 import {Subscription} from 'rxjs';
 import {PageContextService} from 'services/page-context.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
@@ -44,8 +44,8 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
     private skillEditorStateService: SkillEditorStateService,
     private questionBackendApiService: QuestionBackendApiService,
     private pageContextService: PageContextService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
     private currentInteractionService: CurrentInteractionService,
+    private conversationFlowService: ConversationFlowService,
     private questionPlayerEngineService: QuestionPlayerEngineService,
     private questionObjectFactory: QuestionObjectFactory,
     private windowDimensionsService: WindowDimensionsService
@@ -108,7 +108,7 @@ export class SkillPreviewTabComponent implements OnInit, OnDestroy {
       this.skillEditorStateService.onSkillChange.subscribe(() => {})
     );
     this.currentInteractionService.setOnSubmitFn(() => {
-      this.explorationPlayerStateService.onOppiaFeedbackAvailable.emit();
+      this.conversationFlowService.onOppiaFeedbackAvailable.emit();
     });
   }
 

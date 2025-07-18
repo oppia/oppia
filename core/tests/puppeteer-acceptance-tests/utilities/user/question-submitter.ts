@@ -87,6 +87,8 @@ const addElementToTextInputInteraction = 'button.e2e-test-add-list-entry';
 const viewQuestionSuggestionModalHeader =
   '.e2e-test-question-suggestion-review-modal-header';
 const questionSuggestionModalDifficultySelector = '.oppia-difficulty-title';
+const questionDifficultySelectionModalSelector =
+  '.e2e-test-question-opportunity-difficulty';
 
 const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 
@@ -111,6 +113,8 @@ export class QuestionSubmitter extends BaseUser {
     const subheadingSelector = isMobile
       ? opportunitySubheadingTitleMobile
       : opportunitySubheadingTitle;
+    await this.isElementVisible(submitQuestionTab);
+
     await this.clickOn(submitQuestionTab);
     await this.page.waitForSelector(opportunityListItem, {visible: true});
     const opportunityListItems = await this.page.$$(opportunityListItem);
@@ -139,6 +143,8 @@ export class QuestionSubmitter extends BaseUser {
         await this.page.evaluate(button => {
           button.click();
         }, button);
+
+        await this.isElementVisible(questionDifficultySelectionModalSelector);
         return;
       }
     }
@@ -161,17 +167,21 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} text - The text to be added to the question.
    */
   async seedTextToQuestion(text: string): Promise<void> {
+    await this.isElementVisible(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.clickOn(stateContentInputField);
     await this.type(stateContentInputField, text);
     await this.clickOn(saveStateEditorContentButton);
+
+    await this.isElementVisible(saveStateEditorContentButton, false);
   }
 
   /**
    * Function to add a math expression to the question.
    */
   async addMathExpressionToQuestion(): Promise<void> {
+    await this.isElementVisible(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.clickOn(stateContentInputField);
@@ -189,12 +199,15 @@ export class QuestionSubmitter extends BaseUser {
     await this.waitForElementToBeClickable(closeRichTextEditorButton);
     await this.clickOn(closeRichTextEditorButton);
     await this.clickOn(saveStateEditorContentButton);
+
+    await this.isElementVisible(saveStateEditorContentButton, false);
   }
 
   /**
    * Function to add an image to the question.
    */
   async addImageToQuestion(): Promise<void> {
+    await this.isElementVisible(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
 
@@ -211,16 +224,22 @@ export class QuestionSubmitter extends BaseUser {
     await this.waitForElementToBeClickable(closeRichTextEditorButton);
     await this.clickOn(closeRichTextEditorButton);
     await this.clickOn(saveStateEditorContentButton);
+
+    await this.isElementVisible(saveStateEditorContentButton);
   }
 
   /**
    * Function to add a hint to the current state card.
    * @param {string} hint - The hint to be added to the current state card.
    */
+
   async addHintToStateInQuestionEditorPage(hint: string): Promise<void> {
+    await this.isElementVisible(addHintButton);
     await this.clickOn(addHintButton);
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintButton);
+
+    await this.isElementVisible(saveHintButton, false);
   }
 
   /**
@@ -234,10 +253,12 @@ export class QuestionSubmitter extends BaseUser {
     answerExplanation: string,
     isSolutionNumericInput: boolean
   ): Promise<void> {
+    await this.isElementVisible(addSolutionButton);
+    await this.clickOn(addSolutionButton);
+
     const solutionSelector = isSolutionNumericInput
       ? solutionInputNumeric
       : solutionInputTextArea;
-    await this.clickOn(addSolutionButton);
     await this.page.waitForSelector(solutionSelector, {visible: true});
     await this.type(solutionSelector, answer);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
@@ -245,6 +266,8 @@ export class QuestionSubmitter extends BaseUser {
     await this.type(stateContentInputField, answerExplanation);
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
+
+    await this.isElementVisible(submitSolutionButton, false);
   }
 
   /**
@@ -321,6 +344,8 @@ export class QuestionSubmitter extends BaseUser {
         await this.page.evaluate(button => {
           button.click();
         }, button);
+
+        await item.waitForSelector(suggestQuestionButton, {hidden: true});
         return;
       }
     }
@@ -365,9 +390,12 @@ export class QuestionSubmitter extends BaseUser {
    * using the options array.
    * @param {string[]} options - The options to be added to the multiple choice interaction.
    */
+
   async addMultipleChoiceInteractionInQuestionEditorPage(
     options: string[]
   ): Promise<void> {
+    await this.isElementVisible(addInteractionButton);
+
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(multipleChoiceInteractionButton, {
       visible: true,
@@ -396,15 +424,18 @@ export class QuestionSubmitter extends BaseUser {
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
 
+    await this.isElementVisible(addNewResponseButton, false);
     showMessage('Multiple Choice interaction has been added successfully.');
   }
 
   /**
    * Add a text input interaction to the card.
    */
+
   async addTextInputInteractionInQuestionEditorPage(
     answer: string
   ): Promise<void> {
+    await this.isElementVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(textInputInteractionButton, {
       visible: true,
@@ -426,6 +457,8 @@ export class QuestionSubmitter extends BaseUser {
     await this.type(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
+
+    await this.isElementVisible(addNewResponseButton, false);
     showMessage('Text input interaction has been added successfully.');
   }
 
@@ -433,9 +466,11 @@ export class QuestionSubmitter extends BaseUser {
    * Adds a math interaction to the current exploration.
    * @param {string} interactionToAdd - The interaction type to add to the exploration.
    */
+
   async addMathInteractionInQuestionEditorPage(
     interactionToAdd: string
   ): Promise<void> {
+    await this.isElementVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.clickOn(mathInteractionsTab);
     await this.clickOn(` ${interactionToAdd} `);
@@ -450,6 +485,7 @@ export class QuestionSubmitter extends BaseUser {
    * Adds an Image interaction to the current exploration.
    */
   async addImageInteractionInQuestionEditorPage(): Promise<void> {
+    await this.isElementVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.clickOn('Image Region');
     await this.clickOn(uploadImageButton);
@@ -500,10 +536,11 @@ export class QuestionSubmitter extends BaseUser {
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
 
+    await this.isElementVisible(addNewResponseButton, false);
     showMessage('Image interaction has been added successfully.');
   }
 
-  // TODO (#22539): This function has a duplicate in exploration-editor.ts.
+  // TODO(#22539): This function has a duplicate in exploration-editor.ts.
   // To avoid unexpected behavior, ensure that any modifications here are also
   // made in editDefaultResponseFeedbackInExplorationEditorPage() in exploration-editor.ts.
   /**
@@ -524,6 +561,20 @@ export class QuestionSubmitter extends BaseUser {
       await this.clickOn(stateContentInputField);
       await this.type(stateContentInputField, `${defaultResponseFeedback}`);
       await this.clickOn(saveOutcomeFeedbackButton);
+
+      // Check for text and add post check based on it.
+      const newDefaultResponseText = await this.page.$eval(
+        openOutcomeFeedBackEditor,
+        el => el.textContent?.trim()
+      );
+
+      if (newDefaultResponseText !== defaultResponseFeedback) {
+        throw new Error(
+          `Error updating default response. Found ${newDefaultResponseText}, expected ${defaultResponseFeedback}`
+        );
+      }
+
+      showMessage(`Default response feedback: ${newDefaultResponseText}`);
     }
 
     if (directToCard) {

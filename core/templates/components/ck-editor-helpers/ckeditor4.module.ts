@@ -22,9 +22,10 @@ import 'zone.js';
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {CkEditor4RteComponent} from './ck-editor-4-rte.component';
+import {TranslateModule} from '@ngx-translate/core';
 
 @NgModule({
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   declarations: [CkEditor4RteComponent],
   entryComponents: [CkEditor4RteComponent],
   exports: [CkEditor4RteComponent],

@@ -53,7 +53,8 @@
         "core.controllers.release_coordinator_test",
         "core.platform.secrets.dev_mode_secrets_services_test",
         "scripts.generate_root_files_mapping_test",
-        "core.jobs.batch_jobs.delete_voiceover_models_data_job_test"
+        "core.jobs.batch_jobs.delete_voiceover_models_data_job_test",
+        "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test"
     ],
     "2": [
         "core.domain.rights_manager_test",
@@ -362,6 +363,7 @@
         "core.controllers.contributor_dashboard_test",
         "core.platform.email.dev_mode_email_services_test",
         "core.jobs.types.blog_validation_errors_test",
+        "core.jobs.batch_jobs.missing_translation_images_repair_jobs_test",
         "core.jobs.batch_jobs.blog_validation_jobs_test",
         "core.jobs.batch_jobs.datastore_audit.base_validation_jobs_test",
         "core.jobs.transforms.validation.blog_validation_test",

@@ -80,6 +80,8 @@ describe('Exploration Editor', function () {
     );
     await voiceoverAdmin.enableAutogenerationForLanguageAccentPair('en-US');
 
+    await UserFactory.enableVoiceoverAutogenerationUsingCloudService();
+
     // Enable the feature flag.
     await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_can_modify_translations'
@@ -90,7 +92,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);

@@ -1761,7 +1761,6 @@
 	"I18N_TOPNAV_LEARNER_GROUP": "مجموعة المتعلمين",
 	"I18N_TOPNAV_LEARN_DESCRIPTION_1": "دروس للمبتدئين لمساعدتك بالبدأ في الرياضيات.",
 	"I18N_TOPNAV_LEARN_HEADING": "طرق لتعلم المزيد",
-	"I18N_TOPNAV_LEARN_LINK_1": "تصفح كل الدروس",
 	"I18N_TOPNAV_LEARN_LINK_2": "واصل التعلم",
 	"I18N_TOPNAV_LIBRARY": "المكتبة",
 	"I18N_TOPNAV_LIBRARY_DESCRIPTION": "المزيد من المصادر المحضرة من طرف المجموعة لمساعدتك في تعلم المزيد.",
@@ -1886,6 +1885,5 @@
 	"I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "يساعد عملك الطلاب المحرومين في جميع أنحاء العالم بشكل مباشر في الحصول على تعليم مجاني عالي الجودة.",
 	"I18N_WARNING_MODAL_DESCRIPTION": "هذا سيظهر الحل. هل أنت متأكد ؟",
 	"I18N_WARNING_MODAL_TITLE": "تحذير!",
-	"I18N_WORKED_EXAMPLE": "مثال على العمل",
 	"I18N_YES": "نعم"
 }
