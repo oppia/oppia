@@ -947,15 +947,23 @@ export class BaseUser {
   async expectTextContentToBe(selector: string, text: string): Promise<void> {
     await this.expectElementToBeVisible(selector);
 
-    await this.page.waitForFunction(
-      (selector: string, text: string) => {
-        const element = document.querySelector(selector);
-        return element?.textContent?.trim() === text.trim();
-      },
-      {},
-      selector,
-      text
-    );
+    try {
+      await this.page.waitForFunction(
+        (selector: string, text: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === text.trim();
+        },
+        {},
+        selector,
+        text
+      );
+
+      showMessage(`Text content of "${selector}" is "${text}".`);
+    } catch (error) {
+      throw new Error(
+        `Failed: Text content of "${selector}" is not "${text}".\nOriginal Error:\n${error.stack}`
+      );
+    }
   }
 
   /**
@@ -969,15 +977,23 @@ export class BaseUser {
   ): Promise<void> {
     await this.expectElementToBeVisible(selector);
 
-    await this.page.waitForFunction(
-      (selector: string, text: string) => {
-        const element = document.querySelector(selector);
-        return element?.textContent?.includes(text);
-      },
-      {},
-      selector,
-      text
-    );
+    try {
+      await this.page.waitForFunction(
+        (selector: string, text: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.includes(text);
+        },
+        {},
+        selector,
+        text
+      );
+
+      showMessage(`Text content of "${selector}" contains "${text}".`);
+    } catch (error) {
+      throw new Error(
+        `Failed: Text content of "${selector}" does not contain "${text}".\nOriginal Error:\n${error.stack}`
+      );
+    }
   }
 
   /**
