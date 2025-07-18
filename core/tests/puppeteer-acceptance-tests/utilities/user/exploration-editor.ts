@@ -24,6 +24,7 @@ import {error} from 'console';
 import fs from 'fs';
 import path from 'path';
 import {number} from 'yargs';
+import {GraphViz} from '../common/interactions/graph-viz';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -101,6 +102,7 @@ const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
 const stateEditSelector = '.e2e-test-state-edit-content';
+const stateContentSelector = '.e2e-test-actual-state-content';
 const stateContentInputField = 'div.e2e-test-rte';
 const uploadImageButton = '.e2e-test-upload-image';
 const useTheUploadImageButton = '.e2e-test-use-image';
@@ -650,6 +652,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.clickOn(feedbackEditorSelector);
     await this.type(stateContentInputField, feedback);
+    await this.expectTextContentToBe(stateContentInputField, feedback);
     // The '/' value is used to select the 'a new card called' option in the dropdown.
     if (destination) {
       await this.select(destinationCardSelector, '/');
@@ -775,6 +778,87 @@ export class ExplorationEditor extends BaseUser {
     await this.page.click(saveInteractionButton);
 
     await this.expectElementToBeVisible(saveInteractionButton, false);
+  }
+
+  /**
+   * Customizes the graph theory interaction.
+   */
+  async customizeGraphTheoryInteraction(): Promise<void> {
+    const graphViz = new GraphViz(this.page);
+
+    await graphViz.clearGraph();
+    await graphViz.addFourVerticesInCenter();
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage(`Customized graph theory interaction with four vertices.`);
+  }
+
+  /**
+   * Customizes the world map interaction.
+   * @param initialLat The initial latitude of the map.
+   * @param initialLong The initial longitude of the map.
+   * @param initialZoom The initial zoom level of the map.
+   */
+  async customizeWorldMapInteraction(
+    initialLat: number,
+    initialLong: number,
+    initialZoom: number
+  ): Promise<void> {
+    await this.expectElementToBeVisible(customizeInteractionBodySelector);
+    const customizeInteractionBodyElement = await this.page.$(
+      customizeInteractionBodySelector
+    );
+    if (!customizeInteractionBodyElement) {
+      throw new Error(
+        `Could not find element ${customizeInteractionBodySelector}`
+      );
+    }
+
+    const inputFields = await customizeInteractionBodyElement.$$('input');
+    if (!inputFields || inputFields.length !== 3) {
+      throw new Error(
+        `Could not find input fields ${customizeInteractionBodySelector}`
+      );
+    }
+
+    await inputFields[0].type(initialLat.toString());
+    await this.page.waitForFunction(
+      (element: HTMLInputElement, value: number) => {
+        return element.value.trim() === value.toString();
+      },
+      {},
+      inputFields[0],
+      initialLat
+    );
+
+    await inputFields[1].type(initialLong.toString());
+    await this.page.waitForFunction(
+      (element: HTMLInputElement, value: number) => {
+        return element.value.trim() === value.toString();
+      },
+      {},
+      inputFields[1],
+      initialLong
+    );
+
+    await inputFields[2].type(initialZoom.toString());
+    await this.page.waitForFunction(
+      (element: HTMLInputElement, value: number) => {
+        return element.value.trim() === value.toString();
+      },
+      {},
+      inputFields[2],
+      initialZoom
+    );
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage(`Customized World Map successfully.`);
   }
 
   /**
@@ -1226,6 +1310,16 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
+  /**
+   * Updates graph theory learner answer in response modal to be a simple star network.
+   */
+  async updateGraphTheoryLearnerAnswerInResponseModal(): Promise<void> {
+    const responseBox = await this.getRuleEditorModal();
+
+    const graphViz = new GraphViz(this.page, responseBox);
+    await graphViz.createASimpleStarNetwork();
+  }
+
   async updateMathEquationLearnerAnswerInResponseModal(
     rule: string,
     equation: string
@@ -1517,11 +1611,31 @@ export class ExplorationEditor extends BaseUser {
     await this.addSolutionExplanationAndSave(explaination);
   }
 
+  /**
+   * Updates the world map learner answer in the response modal
+   * @param rule The rule to update
+   * @param answer The answer to update
+   */
   async updateWorldMapLearnerAnswerInResponseModal(
-    rule: string,
-    answer: string[]
+    rule: 'is within ... km of ...' | 'is not within ... km of ...',
+    answer: number
   ): Promise<void> {
-    return;
+    await this.updateRuleInResponseModalTo(rule);
+
+    const responseBox = await this.getRuleEditorModal();
+    const inputFieldElement = await responseBox.$('input');
+
+    if (!inputFieldElement) throw new Error('Input field not found');
+    await inputFieldElement.type(answer.toString());
+
+    await this.page.waitForFunction(
+      (element: HTMLInputElement, value: number) => {
+        return element.value === value.toString();
+      },
+      {},
+      inputFieldElement,
+      answer
+    );
   }
 
   // New functions ends.
@@ -1622,6 +1736,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
   }
+
   /**
    * Function to publish exploration.
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
@@ -1808,6 +1923,8 @@ export class ExplorationEditor extends BaseUser {
     await this.type(stateContentInputField, `${content}`);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
+
+    await this.expectTextContentToContain(stateContentSelector, content);
     showMessage('Card content is updated successfully.');
   }
 
@@ -1864,6 +1981,8 @@ export class ExplorationEditor extends BaseUser {
 
     await this.waitForPageToFullyLoad();
 
+    await this.expectModalTitleToBe('Choose Interaction');
+
     // Change tab based on interaction.
     // Add more conditional tab changes here.
     if (
@@ -1904,10 +2023,15 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(addInteractionButton);
+
     await this.page.waitForSelector(multipleChoiceInteractionButton, {
       visible: true,
     });
     await this.clickOn(multipleChoiceInteractionButton);
+
+    await this.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Multiple Choice)'
+    );
 
     for (let i = 0; i < options.length - 1; i++) {
       await this.page.waitForSelector(addResponseOptionButton, {visible: true});

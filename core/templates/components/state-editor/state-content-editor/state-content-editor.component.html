@@ -20,7 +20,7 @@
        class="e2e-test-edit-content oppia-editable-section e2e-test-edit-content-pencil-button"
        (click)="openStateContentEditor()">
     <button class="fas fa-pen oppia-editor-edit-icon oppia-editor-edit-icon-position e2e-test-edit-content-pencil-button" title="Edit Card Content"></button>
-    <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200"
+    <div class="oppia-prevent-selection oppia-state-content-display oppia-transition-200 e2e-test-actual-state-content"
          title="Card Content">
       <span [hidden]="!stateContentService.savedMemento.isEmpty()" tabindex="0" class="oppia-placeholder">
         {{ stateContentPlaceholder }}
