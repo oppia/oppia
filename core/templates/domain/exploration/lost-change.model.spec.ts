@@ -19,55 +19,69 @@
 import {LostChange} from 'domain/exploration/lost-change.model';
 import {Outcome} from './outcome.model';
 import {SubtitledHtml} from './subtitled-html.model';
+import {UtilsService} from 'services/utils.service';
 
-it('should evaluate values from a Lost Change', () => {
-  const lostChange = LostChange.createNew({
-    cmd: 'add_state',
-    state_name: 'State name',
-    content_id_for_state_content: 'content_0',
-    content_id_for_default_outcome: 'default_outcome_1',
+describe('LostChange', () => {
+  let mockUtilsService: UtilsService;
+
+  beforeEach(() => {
+    mockUtilsService = {
+      isEmpty: (val: any) =>
+        val === null ||
+        val === undefined ||
+        (typeof val === 'object' && Object.keys(val).length === 0),
+    } as unknown as UtilsService;
   });
 
-  expect(lostChange.cmd).toBe('add_state');
-  expect(lostChange.stateName).toBe('State name');
-});
+  it('should evaluate values from a Lost Change', () => {
+    const lostChange = LostChange.createNew({
+      cmd: 'add_state',
+      state_name: 'State name',
+      content_id_for_state_content: 'content_0',
+      content_id_for_default_outcome: 'default_outcome_1',
+    });
 
-it('should evaluate values from a renaming Lost Change', () => {
-  const lostChange = LostChange.createNew({
-    cmd: 'rename_state',
-    old_state_name: 'Old state name',
-    new_state_name: 'New state name',
+    expect(lostChange.cmd).toBe('add_state');
+    expect(lostChange.stateName).toBe('State name');
   });
 
-  expect(lostChange.cmd).toBe('rename_state');
-  expect(lostChange.oldStateName).toBe('Old state name');
-  expect(lostChange.newStateName).toBe('New state name');
-});
+  it('should evaluate values from a renaming Lost Change', () => {
+    const lostChange = LostChange.createNew({
+      cmd: 'rename_state',
+      old_state_name: 'Old state name',
+      new_state_name: 'New state name',
+    });
 
-it('should evaluate values from a Lost Change with edition changes', () => {
-  const lostChange = LostChange.createNew({
-    cmd: 'edit_state_property',
-    state_name: 'Edited state name',
-    new_value: {
-      html: 'newValue',
-      content_id: '',
-    },
-    old_value: {
+    expect(lostChange.cmd).toBe('rename_state');
+    expect(lostChange.oldStateName).toBe('Old state name');
+    expect(lostChange.newStateName).toBe('New state name');
+  });
+
+  it('should evaluate values from a Lost Change with edition changes', () => {
+    const lostChange = LostChange.createNew(mockUtilsService, {
+      cmd: 'edit_state_property',
+      state_name: 'Edited state name',
+      new_value: {
+        html: 'newValue',
+        content_id: '',
+      },
+      old_value: {
+        html: 'oldValue',
+        content_id: '',
+      },
+      property_name: 'content',
+    });
+
+    expect(lostChange.getRelativeChangeToGroups()).toBe('edited');
+    expect(
+      lostChange.getStatePropertyValue(lostChange.oldValue as string[] | object)
+    ).toEqual({
       html: 'oldValue',
       content_id: '',
-    },
-    property_name: 'content',
+    });
+    expect(lostChange.isOutcomeFeedbackEqual()).toBeFalse();
+    expect(lostChange.isFeedbackEqual()).toBeFalse();
   });
-
-  expect(lostChange.getRelativeChangeToGroups()).toBe('edited');
-  expect(
-    lostChange.getStatePropertyValue(lostChange.oldValue as string[] | Object)
-  ).toEqual({
-    html: 'oldValue',
-    content_id: '',
-  });
-  expect(lostChange.isOutcomeFeedbackEqual()).toBeFalse();
-  expect(lostChange.isFeedbackEqual()).toBeFalse();
 });
 
 it('should get state property value when it is an array from a Lost Change', () => {

@@ -26,12 +26,19 @@ import {UtilsService} from 'services/utils.service';
 })
 export class ChangesInHumanReadableFormComponent implements OnInit {
   @Input() lostChanges!: LostChange[];
-
-  constructor(private utilsService: UtilsService) {}
+  @Input() utilsService!: UtilsService;
 
   ngOnInit(): void {
-    this.lostChanges = this.lostChanges.map(change =>
-      LostChange.createNew(this.utilsService, change)
-    );
+    if (!this.lostChanges || !Array.isArray(this.lostChanges)) {
+      this.lostChanges = [];
+    }
+
+    // If lostChanges are plain dicts, convert them to class instances.
+    this.lostChanges = this.lostChanges.map(change => {
+      if (change instanceof LostChange) {
+        return change;
+      }
+      return LostChange.createNew(this.utilsService, change);
+    });
   }
 }
