@@ -17,7 +17,6 @@
  */
 
 import {Component, ElementRef, Input, OnInit} from '@angular/core';
-
 import {LoggerService} from 'services/contextual/logger.service';
 import {UtilsService} from 'services/utils.service';
 import {LostChange} from 'domain/exploration/lost-change.model';
@@ -33,9 +32,6 @@ export class LostChangesModalComponent
   extends ConfirmOrCancelModal
   implements OnInit
 {
-  // The property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() lostChanges!: LostChange[];
   hasLostChanges: boolean = false;
 
@@ -43,7 +39,6 @@ export class LostChangesModalComponent
     private elRef: ElementRef,
     private windowRef: WindowRef,
     private loggerService: LoggerService,
-    private lostChange: LostChange,
     private ngbActiveModal: NgbActiveModal,
     private utilsService: UtilsService
   ) {
@@ -56,14 +51,12 @@ export class LostChangesModalComponent
       LostChange.createNew(this.utilsService, lostChange)
     );
   }
+
   cancel(): void {
     this.ngbActiveModal.dismiss();
   }
 
   exportChangesAndClose(): void {
-    // 'getElementsByClassName' returns null if the class name is not
-    // found, here we know that the class name is available, so we
-    // are explicitly typecasting it to remove type error.
     let lostChangesData = this.elRef.nativeElement.getElementsByClassName(
       'oppia-lost-changes'
     )[0] as HTMLInputElement;
