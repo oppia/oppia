@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview  Model class for creating new frontend instances of LostChange.
+ * @fileoverview Model class for creating new frontend instances of LostChange
+ * domain objects.
  */
 
 import {} from '@angular/upgrade/static';

@@ -16,14 +16,14 @@
  * @fileoverview Component for version mismatch modal.
  */
 
-import {Component, ElementRef, Input, OnInit} from '@angular/core';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {LoggerService} from 'services/contextual/logger.service';
-import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
-import {LostChange} from 'domain/exploration/lost-change.model';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {UtilsService} from 'services/utils.service';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
+import { LostChange } from 'domain/exploration/lost-change.model';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { UtilsService } from 'services/utils.service';
 
 @Component({
   selector: 'oppia-save-version-mismatch-modal',
@@ -35,6 +35,7 @@ export class SaveVersionMismatchModalComponent
 {
   MSECS_TO_REFRESH: number = 20;
   hasLostChanges: boolean = false;
+
   // The property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -45,7 +46,6 @@ export class SaveVersionMismatchModalComponent
     private elRef: ElementRef,
     private loggerService: LoggerService,
     private explorationDataService: ExplorationDataService,
-    private lostChange: LostChange,
     private ngbActiveModal: NgbActiveModal,
     private utilsService: UtilsService
   ) {
@@ -74,14 +74,10 @@ export class SaveVersionMismatchModalComponent
   }
 
   exportAndDiscardChanges(): void {
-    // 'getElementsByClassName' returns null if the class name is not
-    // found, here we know that the class name is available, so we
-    // are explicitly typecasting it to remove type error.
-    let lostChangesData = this.elRef.nativeElement.getElementsByClassName(
-      'oppia-lost-changes'
-    )[0] as HTMLInputElement;
-    let blob = new Blob([lostChangesData.innerText], {type: 'text/plain'});
-    var elem = document.createElement('a');
+    const lostChangesData = this.elRef.nativeElement
+      .getElementsByClassName('oppia-lost-changes')[0] as HTMLInputElement;
+    const blob = new Blob([lostChangesData.innerText], { type: 'text/plain' });
+    const elem = document.createElement('a');
     elem.href = URL.createObjectURL(blob);
     elem.download = 'lostChanges.txt';
     elem.click();

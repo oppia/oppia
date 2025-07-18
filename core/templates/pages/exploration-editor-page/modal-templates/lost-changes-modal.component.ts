@@ -43,6 +43,7 @@ export class LostChangesModalComponent
     private elRef: ElementRef,
     private windowRef: WindowRef,
     private loggerService: LoggerService,
+    private lostChange: LostChange,
     private ngbActiveModal: NgbActiveModal,
     private utilsService: UtilsService
   ) {
