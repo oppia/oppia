@@ -131,7 +131,7 @@ describe('Logged-Out Learner', function () {
       );
 
       await curriculumAdmin.createAndPublishStoryWithChapter(
-        'What are Plave values',
+        'What are Place values',
         'place-values',
         'Understanding Place Values',
         explorationId as string,
@@ -204,7 +204,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.navigateToClassroomPage('math');
     await loggedOutLearner.selectAndOpenTopic('Place Values');
     await loggedOutLearner.selectChapterWithinStoryToLearn(
-      'What are Plave values',
+      'What are Place values',
       'Understanding Place Values'
     );
 
@@ -219,7 +219,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectAudioExpandButtonToBeVisibleInLP();
 
     // Check audio (voiceover) avaibility.
-    // await loggedOutLearner.expectVoiceoverIsPlayable(false);
+    await loggedOutLearner.expectVoiceoverIsPlayable(false);
 
     // Check audio (voiceover) avaibility in next card.
     await loggedOutLearner.continueToNextCard();

@@ -274,6 +274,9 @@ const lessonTitleSelector = '.e2e-test-lesson-title';
 const circleProgressElementSelector = 'circle-progress';
 const resumeLessonButtonSelector = '.e2e-test-resume-lesson-btn';
 
+// Others
+const filledRatingStarSelector = '.fas.fa-star';
+
 export class LoggedInUser extends BaseUser {
   /**
    * Clicks on the given button in the remove activity modal.
@@ -641,6 +644,21 @@ export class LoggedInUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Waits for the given number of filled stars to be present on the page.
+   * @param rating The number of filled stars to wait for.
+   */
+  async expectStarRatingToBe(rating: number): Promise<void> {
+    await this.page.waitForFunction(
+      (rating: number) => {
+        const filledStars = document.querySelectorAll(filledRatingStarSelector);
+        return filledStars.length === rating;
+      },
+      {},
+      rating
+    );
   }
 
   /**
@@ -2798,6 +2816,19 @@ export class LoggedInUser extends BaseUser {
       return;
     }
     throw new Error(`Lesson not found: ${lessonTitle}`);
+  }
+
+  /**
+   * Function to verify if the learner dashboard is opened using URL.
+   */
+  async expectToBeOnLearnerDashboard(): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => {
+        return document.URL.includes(url);
+      },
+      {},
+      testConstants.URLs.LearnerDashboard
+    );
   }
 }
 

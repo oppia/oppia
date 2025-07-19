@@ -90,8 +90,8 @@ describe('Logged-In Learner', function () {
       );
 
       await curriculumAdmin.addStoryToTopic(
-        'Test Story 1',
-        'test-story-one',
+        'The Broken Calculator',
+        'the-broken-calculator',
         'Algebra I'
       );
       await curriculumAdmin.addChapter(
@@ -126,7 +126,6 @@ describe('Logged-In Learner', function () {
 
     // TODO(#22940): Home section should show lesson in "Lessons In Progress" section.
     // Once this feature/bug is fixed, update the test.
-    // TODO: I closed the issue, but there is still the bug, so reopen the issue.
     await loggedInLearner.navigateToGoalsSection();
     await loggedInLearner.startGoalFromGoalsSectionInRedesignedDashboard(
       'Algebra I'
@@ -177,6 +176,7 @@ describe('Logged-In Learner', function () {
     //   'Chapter 1: Negative Numbers',
     //   'Positive Numbers',
     //   'Negative Numbers',
+    //   'The Broken Calculator',
     // ]);
   });
 

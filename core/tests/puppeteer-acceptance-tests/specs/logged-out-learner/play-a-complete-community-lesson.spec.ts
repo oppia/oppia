@@ -16,6 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
+ * EL.CL. Learner can play a complete community lesson.
  */
 
 import testConstants from '../../utilities/common/test-constants';
