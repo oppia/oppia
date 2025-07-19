@@ -756,8 +756,8 @@ ALLOWED_RTE_EXTENSIONS = {
     'Video': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
-    'WorkedExample': {
-        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'WorkedExample')
+    'Workedexample': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Workedexample')
     }
 }
 

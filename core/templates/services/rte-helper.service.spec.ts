@@ -324,6 +324,44 @@ describe('Rte Helper Service', () => {
         tooltip: 'Insert video',
         requiresInternet: true,
       },
+      {
+        backendId: 'Workedexample',
+        customizationArgSpecs: [
+          {
+            name: 'question',
+            description: 'The question for the worked example',
+            schema: {
+              type: 'html',
+              ui_config: {
+                rte_components: 'ALL_COMPONENTS',
+                hide_complex_extensions: true,
+              },
+            },
+            default_value_obtainable_from_highlight: false,
+            default_value: 'Sample Question',
+          },
+          {
+            name: 'answer',
+            description: 'The answer for the worked example',
+            schema: {
+              type: 'html',
+              ui_config: {
+                rte_components: 'ALL_COMPONENTS',
+                hide_complex_extensions: true,
+              },
+            },
+            default_value_obtainable_from_highlight: false,
+            default_value: 'Sample Answer',
+          },
+        ],
+        id: 'workedexample',
+        iconDataUrl: '/rich_text_components/Workedexample/Workedexample.png',
+        isComplex: true,
+        isBlockElement: true,
+        requiresFs: false,
+        tooltip: 'Insert worked example',
+        requiresInternet: false,
+      },
     ]);
   });
 

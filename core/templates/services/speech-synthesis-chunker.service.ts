@@ -50,7 +50,7 @@ export class SpeechSynthesisChunkerService {
     Video: '',
     Skillreview: '',
     Svgdiagram: '',
-    WorkedExample: '',
+    Workedexample: '',
   };
 
   // Punctuation marks that should result in an audible pause when playing

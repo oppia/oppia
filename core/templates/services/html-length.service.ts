@@ -221,7 +221,7 @@ export class HtmlLengthService {
       case 'oppia-noninteractive-workedexample':
       case 'oppia-noninteractive-collapsible':
       case 'oppia-noninteractive-tabs':
-        return 1000;
+        return 0;
       case 'oppia-noninteractive-video':
         return 0;
       case 'oppia-noninteractive-link':

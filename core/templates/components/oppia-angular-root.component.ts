@@ -99,7 +99,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {UrlService} from 'services/contextual/url.service';
 import {I18nService} from 'i18n/i18n.service';
 import {RteHelperService} from 'services/rte-helper.service';
-import {NoninteractiveWorkedExample} from 'rich_text_components/WorkedExample/directives/oppia-noninteractive-workedexample.component';
+import {NoninteractiveWorkedexample} from 'rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
 
 const componentMap = {
   Collapsible: {
@@ -123,8 +123,8 @@ const componentMap = {
   Video: {
     component_class: NoninteractiveVideo,
   },
-  WorkedExample: {
-    component_class: NoninteractiveWorkedExample,
+  Workedexample: {
+    component_class: NoninteractiveWorkedexample,
   },
 };
 

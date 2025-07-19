@@ -45,6 +45,6 @@ require(
     'oppia-noninteractive-video.component.ts'
 );
 require(
-  'rich_text_components/WorkedExample/' +
+  'rich_text_components/Workedexample/' +
     'oppia-noninteractive-workedexample.component.ts'
 );

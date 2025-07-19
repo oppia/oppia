@@ -499,7 +499,7 @@ def validate_rte_tags(
                 'Collapsible tag should not be present inside Tabs, '
                 'another Collapsible or Workedexample tag.'
             )
-        
+
         workedexample_tags = soup.find_all('oppia-noninteractive-workedexample')
         if len(workedexample_tags) > 0:
             raise utils.ValidationError(

@@ -274,13 +274,13 @@ export default {
       "default_value": false
     }]
   },
-  "WorkedExample": {
-    "backend_id": "WorkedExample",
+  "Workedexample": {
+    "backend_id": "Workedexample",
     "category": "Basic Input",
     "description": "A worked example having a question and answer.",
     "frontend_id": "workedexample",
     "tooltip": "Insert worked example",
-    "icon_data_url": "/rich_text_components/WorkedExample/WorkedExample.png",
+    "icon_data_url": "/rich_text_components/Workedexample/Workedexample.png",
     "is_complex": true,
     "requires_internet": false,
     "requires_fs": false,

@@ -188,7 +188,7 @@ class Video(BaseRteComponent):
             raise utils.ValidationError('Video id length is not 11')
 
 
-class WorkedExample(BaseRteComponent):
+class Workedexample(BaseRteComponent):
     """Class for Worked Example component."""
 
     pass
