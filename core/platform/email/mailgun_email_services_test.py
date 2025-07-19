@@ -162,7 +162,7 @@ class EmailTests(test_utils.GenericTestBase):
         recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {
             'b@b.com': {'first': 'Bob', 'id': 1}}
         bcc = ['c@example.com']
-        cc = None
+        cc = ['cc@example.com']
         reply_to = 'abc'
         attachments = None
 
@@ -187,6 +187,7 @@ class EmailTests(test_utils.GenericTestBase):
             'recipient_variables': recipient_variables,
             'h:Reply-To': reply_to,
             'bcc': bcc[0],
+            'cc': cc[0]
         }
 
         mock_post.assert_called_once_with(
