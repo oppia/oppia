@@ -202,6 +202,34 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             updated_cloud_task_run.exception_messages_for_failed_runs,
             ['Timeout error occurred.'])
 
+    def test_should_not_update_for_incorrect_model_id(self) -> None:
+        new_model_id = cloud_task_models.CloudTaskRunModel.get_new_id()
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'test_queue_name'
+
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
+        )
+        function_id = 'delete_exps_from_user_models'
+
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id)
+
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id)
+
+        # Updating the ID for testing error handling.
+        cloud_task_run.task_run_id = 'incorrect_model_id'
+        with self.assertRaisesRegex(
+            ValueError,
+            'CloudTaskRunModel with id incorrect_model_id does not exist.'
+        ):
+            taskqueue_services.update_cloud_task_run_model(cloud_task_run)
+
     def test_should_fetch_cloud_task_run_model(self) -> None:
         new_model_id = cloud_task_models.CloudTaskRunModel.get_new_id()
         project_id = 'dev-project-id'

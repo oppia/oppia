@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import utils
 from core.platform import models
 from core.tests import test_utils
 
@@ -166,3 +167,28 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
             'tasks/task3'
         ]
         self.assertItemsEqual(fetched_task_names, expected_task_names)
+
+    def test_get_new_id_raises_error_after_too_many_failed_attempts(
+        self
+    ) -> None:
+        cloud_task_model = (
+            cloud_task_models.CloudTaskRunModel.create_cloud_task_run_model(
+                cloud_task_run_model_id=(
+                    cloud_task_models.CloudTaskRunModel.get_new_id()),
+                cloud_task_name=(
+                    'projects/dev-project-id/locations/us-central1/queues/'
+                    'queueA/tasks/task3'),
+                latest_job_state='FAILED_AND_AWAITING_RETRY',
+                function_id='update_stats',
+                current_retry_attempt=2
+            ))
+
+        collision_context = self.swap_to_always_return(
+            utils, 'convert_to_hash', value=cloud_task_model.id)
+
+        with collision_context:
+            with self.assertRaisesRegex(
+                RuntimeError,
+                r'Failed to generate a unique ID after \d+ attempts'
+            ):
+                cloud_task_models.CloudTaskRunModel.get_new_id()
