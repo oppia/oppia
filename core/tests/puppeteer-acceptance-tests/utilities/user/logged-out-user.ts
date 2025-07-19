@@ -545,6 +545,8 @@ const practiceSessionContainerSelector = 'practice-session-page';
 
 const backToClassroomLinkSelector = '.e2e-test-classroom-name';
 
+const storyTitleSelector = '.e2e-test-story-title';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -646,7 +648,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Navigates to the community library page using the navbar.
    */
-  async navigateToCommunityLibraryUsingNavbar(): Promise<void> {
+  async navigateToCommunityLibraryOnNavbar(): Promise<void> {
     // Open navigation menu for mobile view.
     await this.openNavMenuInMobile();
 
@@ -3577,6 +3579,16 @@ export class LoggedOutUser extends BaseUser {
     await this.isElementVisible(backToClassroomLinkSelector, false);
   }
 
+  async expectToBeInClassroomPage(classroomURLFragment: string): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => {
+        return window.location.href === url;
+      },
+      {},
+      `${testConstants.URLs.ClassroomsPage}/${classroomURLFragment}`
+    );
+  }
+
   /**
    * Clicks on the start here button in the classroom page.
    */
@@ -5560,10 +5572,6 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
-  // ================================================================================
-  // Common
-  // ================================================================================
-
   /**
    * Function to verify the dev mode label is visible or not.
    * @param {boolean} visible - Whether the dev mode label should be visible or not.
@@ -5592,10 +5600,6 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
-  // ================================================================================
-  // Home Page
-  // ================================================================================
-
   /**
    * Function to click the Browse Lessons button on the home page.
    */
@@ -5618,10 +5622,10 @@ export class LoggedOutUser extends BaseUser {
     ).toBe(title);
   }
 
-  // ================================================================================
-  // Learn Page (/learn)
-  // ================================================================================
-
+  /**
+   * Function to click on the classroom tile in the learn page.
+   * @param {string} classroomName - The name of the classroom.
+   */
   async clickOnClassroomTileInLearnPage(classroomName: string): Promise<void> {
     await this.isElementVisible(classroomTileContainerSelector);
 
@@ -5649,10 +5653,11 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
-  // ================================================================================
-  // Classroom Page
-  // ================================================================================
-
+  /**
+   * Function to verify the diagnostic test box is present.
+   * @param {string} expectedHeading - The expected heading of the diagnostic test box.
+   * @param {string} expectedButtonText - The expected button text of the diagnostic test box.
+   */
   async expectDiagnosticTestBoxToBePresent(
     expectedHeading: string,
     expectedButtonText: string
@@ -5737,10 +5742,6 @@ export class LoggedOutUser extends BaseUser {
 
     expect(heading).toBe(expectedHeading);
   }
-
-  // ================================================================================
-  // Topic Page
-  // ================================================================================
 
   /**
    * Starts a practice session for the given subtopics.
@@ -5827,10 +5828,6 @@ export class LoggedOutUser extends BaseUser {
     );
   }
 
-  // ================================================================================
-  // Diagnostic Test Player
-  // ================================================================================
-
   /**
    * Expects the user to be in the diagnostic test player.
    */
@@ -5839,10 +5836,6 @@ export class LoggedOutUser extends BaseUser {
 
     await this.isTextPresentOnPage('Learner Diagnostic Test');
   }
-
-  // ================================================================================
-  // Others
-  // ================================================================================
 
   /**
    * Function to close the save progress menu.
@@ -5892,6 +5885,22 @@ export class LoggedOutUser extends BaseUser {
     );
 
     expect(userNameInAltText).toBe(contributorName);
+  }
+
+  /**
+   * Function to verify if the user is on the story page.
+   * @param {string} storyTitle - The title of the story.
+   */
+  async expectToBeOnStoryPage(storyTitle: string) {
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() === value;
+      },
+      {},
+      storyTitleSelector,
+      storyTitle
+    );
   }
 }
 

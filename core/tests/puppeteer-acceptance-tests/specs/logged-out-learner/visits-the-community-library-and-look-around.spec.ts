@@ -51,7 +51,7 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should be able to discover the community library', async function () {
-    await loggedOutLearner.navigateToCommunityLibraryUsingNavbar();
+    await loggedOutLearner.navigateToCommunityLibraryOnNavbar();
     await loggedOutLearner.expectCommunityLibraryHeadingToBePresent(
       'Imagine what you could learn today...'
     );

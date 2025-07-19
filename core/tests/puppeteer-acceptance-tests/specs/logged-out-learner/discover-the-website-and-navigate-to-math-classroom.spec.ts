@@ -138,7 +138,7 @@ describe('Logged-Out Learner', function () {
     );
 
     await loggedOutLearner.navigateBackToClassroomFromTopicPage();
-    await loggedOutLearner.isTextPresentOnPage('The Math Classroom');
+    await loggedOutLearner.expectToBeInClassroomPage('math');
   });
 
   it('should be able to figure out which topic would be best for them', async function () {

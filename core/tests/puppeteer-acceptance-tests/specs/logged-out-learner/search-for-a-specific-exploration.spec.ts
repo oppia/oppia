@@ -60,7 +60,7 @@ describe('Logged-Out Learner', function () {
   });
 
   it('should be able to search for an exploration of an interest', async function () {
-    await loggedOutLearner.navigateToCommunityLibraryUsingNavbar();
+    await loggedOutLearner.navigateToCommunityLibraryOnNavbar();
 
     await loggedOutLearner.searchForLessonInSearchBar('Geometry');
     await loggedOutLearner.expectSearchResultsToContain(['Geometry']);

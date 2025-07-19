@@ -149,6 +149,7 @@ describe('Logged-Out Learner', function () {
       'Congratulations for completing this lesson!'
     );
     await loggedOutLearner.returnToStoryFromLastState();
+    await loggedOutLearner.expectToBeOnStoryPage('Learning Length Measurement');
   });
 
   it('should be able to reach checkpoint', async function () {
