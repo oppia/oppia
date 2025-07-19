@@ -2735,7 +2735,6 @@ def _generate_attachments_for_failed_voiceovers(
 
     filename = 'voiceover_regeneration_errors.txt'
 
-    # Add datetime.
     lines = [
         'Synthesis details for each piece of content are presented below.\n',
         'Date: %s\n' % date,
