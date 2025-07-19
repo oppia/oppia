@@ -20,8 +20,6 @@
  * Logs test progress and feedback messages with timestamp
  */
 export const showMessage = (message: string): void => {
-  const timestamp = Math.floor(Date.now() / 1000);
-
   // eslint-disable-next-line no-console
-  console.log(`[${timestamp}] [test-log]: ${message}`);
+  console.log('LOG: ' + message);
 };

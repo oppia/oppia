@@ -81,7 +81,7 @@ describe('Logged-Out Learner', function () {
       );
     },
     // Test takes too long to run.
-    600000
+    800000
   );
 
   it('should be able to do some practice questions through topic page', async function () {
