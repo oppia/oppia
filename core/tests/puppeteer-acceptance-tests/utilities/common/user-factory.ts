@@ -41,6 +41,7 @@ import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
 import {ModeratorFactory} from '../user/moderator';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import testConstants from './test-constants';
+import {showMessage} from './show-message';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
@@ -154,6 +155,15 @@ export class UserFactory {
 
     return user as TUser & MultipleRoleIntersection<typeof roles>;
   };
+
+  static enableVoiceoverAutogenerationUsingCloudService =
+    async function (): Promise<void> {
+      if (superAdminInstance === null) {
+        superAdminInstance = await UserFactory.createNewSuperAdmin('superAdm');
+      }
+      await superAdminInstance.enableTextToSpeechSynthesisUsingCloudService();
+      showMessage('Enabled text to speech synthesis using cloud service.');
+    };
 
   static createNewUser = async function <
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],

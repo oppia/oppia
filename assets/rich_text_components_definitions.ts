@@ -43,6 +43,7 @@ export default {
       "schema": {
         "type": "html",
         "ui_config": {
+          "rte_components": "ALL_COMPONENTS",
           "hide_complex_extensions": true
         }
       },
@@ -203,6 +204,10 @@ export default {
       "name": "tab_contents",
       "description": "The tab titles and contents.",
       "schema": {
+        "ui_config": {
+          "rte_components": "ALL_COMPONENTS",
+          "hide_complex_extensions": true
+        },
         "type": "custom",
         "obj_type": "ListOfTabs"
       },

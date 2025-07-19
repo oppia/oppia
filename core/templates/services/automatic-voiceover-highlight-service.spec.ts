@@ -196,7 +196,7 @@ describe('Automatic voiceover highlight service', () => {
 
   it('should pronounce correctly for superscripts', () => {
     // Mock AppConstants for math symbol pronunciations.
-    const mathSymbolPronounciations = {
+    const mathSymbolPronunciations = {
       '^2': 'squared',
       '^3': 'cubed',
       '^': 'to the power of',
@@ -207,7 +207,7 @@ describe('Automatic voiceover highlight service', () => {
     expect(
       automaticVoiceoverHighlightService.processSuperscriptInText(
         content,
-        mathSymbolPronounciations
+        mathSymbolPronunciations
       )
     ).toBe(expected);
 
@@ -216,7 +216,7 @@ describe('Automatic voiceover highlight service', () => {
     expect(
       automaticVoiceoverHighlightService.processSuperscriptInText(
         content,
-        mathSymbolPronounciations
+        mathSymbolPronunciations
       )
     ).toBe(expected);
 
@@ -225,7 +225,7 @@ describe('Automatic voiceover highlight service', () => {
     expect(
       automaticVoiceoverHighlightService.processSuperscriptInText(
         content,
-        mathSymbolPronounciations
+        mathSymbolPronunciations
       )
     ).toBe(expected);
   });
@@ -257,7 +257,7 @@ describe('Automatic voiceover highlight service', () => {
   });
 
   it('should pronounce correctly for factorials', () => {
-    const mathSymbolPronounciations = {
+    const mathSymbolPronunciations = {
       '!': 'factorial of',
     };
 
@@ -266,7 +266,7 @@ describe('Automatic voiceover highlight service', () => {
     expect(
       automaticVoiceoverHighlightService.processFactorialInText(
         content,
-        mathSymbolPronounciations
+        mathSymbolPronunciations
       )
     ).toBe(expected);
 
@@ -275,7 +275,7 @@ describe('Automatic voiceover highlight service', () => {
     expect(
       automaticVoiceoverHighlightService.processFactorialInText(
         content,
-        mathSymbolPronounciations
+        mathSymbolPronunciations
       )
     ).toBe(expected);
   });

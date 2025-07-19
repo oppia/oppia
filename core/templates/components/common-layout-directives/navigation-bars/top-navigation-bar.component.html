@@ -101,7 +101,11 @@
           </a>
           <ul ngbDropdownMenu
               [ngStyle]="{'left.px': learnDropdownOffset}"
-              class="dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled"
+              [ngClass]="{
+                'dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled': true,
+                'two-columns': classroomSummariesLength == 2,
+                'three-columns': classroomSummariesLength >= 3
+              }"
               (mouseover)="openSubmenu($event, 'learnMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
               role="menu">
@@ -192,6 +196,16 @@
                  rel="noopener">
                 <span class="link">
                   {{'I18N_TOPNAV_TEACH' | translate}}
+                </span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="dropdown-item nav-link oppia-navbar-tab-content about-link e2e-test-navbar-about-menu-blog-button"
+                 (click)="navigateToBlogPage()"
+                 (keydown)="onMenuKeypress($event, 'aboutMenu', {enter: ACTION_CLOSE})"
+                 rel="noopener">
+                <span class="link">
+                  {{ 'I18N_TOPNAV_BLOG' | translate }}
                 </span>
               </a>
             </li>
