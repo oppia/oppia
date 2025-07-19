@@ -221,6 +221,7 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
 
         cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
             new_model_id)
+        assert cloud_task_run is not None
 
         # Updating the ID for testing error handling.
         cloud_task_run.task_run_id = 'incorrect_model_id'
