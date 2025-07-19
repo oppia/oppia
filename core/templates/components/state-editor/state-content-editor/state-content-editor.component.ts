@@ -38,6 +38,7 @@ import {Subscription} from 'rxjs';
 interface HTMLSchema {
   type: string;
   ui_config: {
+    rte_components: 'ALL_COMPONENTS';
     hide_complex_extensions: boolean;
   };
 }
@@ -75,6 +76,7 @@ export class StateContentEditorComponent implements OnInit {
     this.HTML_SCHEMA = {
       type: 'html',
       ui_config: {
+        rte_components: 'ALL_COMPONENTS',
         hide_complex_extensions:
           this.pageContextService.getEntityType() === 'question',
       },

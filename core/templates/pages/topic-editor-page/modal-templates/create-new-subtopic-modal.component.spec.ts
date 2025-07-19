@@ -126,6 +126,7 @@ describe('create new subtopic modal', function () {
   let DefaultSubtopicPageSchema = {
     type: 'html',
     ui_config: {
+      rte_components: 'ALL_COMPONENTS',
       rows: 100,
     },
   };

@@ -54,6 +54,7 @@ export class AddMisconceptionModalComponent
   MISCONCEPTION_PROPERTY_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
+      rte_components: 'ALL_COMPONENTS',
       startupFocusEnabled: false,
     },
   };
@@ -61,6 +62,7 @@ export class AddMisconceptionModalComponent
   MISCONCEPTION_FEEDBACK_PROPERTY_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
+      rte_components: 'ALL_COMPONENTS',
       hide_complex_extensions: true,
       startupFocusEnabled: false,
     },
