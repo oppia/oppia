@@ -25,6 +25,7 @@ import fs from 'fs';
 import path from 'path';
 import {number} from 'yargs';
 import {GraphViz} from '../common/interactions/graph-viz';
+import {PencilCode} from '../common/interactions/pencil-code';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -321,6 +322,7 @@ const responseModalBodySelector = '.e2e-test-response-modal-body';
 const ruleEditorInResponseModalSeclector = 'oppia-rule-editor';
 const creatorDashboardContainerSelector =
   '.e2e-test-creator-dashboard-container';
+const commonMathExpressionInputField = '.e2e-test-guppy-div';
 
 const dragAndDropItemSelector = '.e2e-test-drag-and-drop-sort-item';
 const solutionModal = 'oppia-add-or-update-solution-modal';
@@ -352,6 +354,8 @@ const pencilCodeTextArea = `.ace_text-input`;
 const addMusicNodeInSolutionModal = `${newTabButtonSelector} button`;
 const musicNodeSelectSelector = 'oppia-music-input-valid-note-area select';
 
+const feedbackResponseRemoveSelector = '.e2e-test-close-help-card-button';
+
 // Editor Tab > Navigation Bar.
 const helpTabSelector = '.e2e-test-help-button';
 
@@ -379,9 +383,19 @@ const saveDraftTitleSelector = '.e2e-test-save-draft-heading';
 const publishMetadataExplorationHeaderSelector =
   '.e2e-test-metadata-modal-header';
 
+// Multiple Choice Interaction Selectors.
+const multipleChoiceOptionSelector = '.e2e-test-multiple-choice-option';
+const selectedMultipleChoiceOption = '.multiple-choice-option.selected';
+
+const textInputSelector = 'textarea.e2e-test-description-box';
+
+// Image Interaction Selectors.
+const imageContainerSelector = '.oppia-image-click-img';
+
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
+const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -447,6 +461,96 @@ const UNPUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
 const PUBLISHED_EXPLORATION_ZIP_FILE_PREFIX =
   'oppia-Publishwithaninteraction-v';
 export class ExplorationEditor extends BaseUser {
+  /**
+   * Remove feedback response in preview tab.
+   */
+  async removeFeedbackResponseInPreviewTab(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackResponseRemoveSelector);
+    await this.page.click(feedbackResponseRemoveSelector);
+
+    await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
+  }
+
+  /**
+   * Click on the submit answer button.
+   * @param skipVerification - If true, skips verification that the button is visible.
+   */
+  async clickOnSubmitAnswerButton(): Promise<void> {
+    await this.expectElementToBeClickable(submitAnswerButton);
+
+    const initialResponseElement = await this.page.$(
+      previousConversationToggleSelector
+    );
+    const initialResponse = await initialResponseElement?.evaluate(
+      element => element.textContent
+    );
+    await this.clickOn(submitAnswerButton);
+
+    // TODO: Fix post-check. First case where previous responses toggle doesn't change.
+    // await this.page.waitForFunction(
+    //   (selector: string, value: string | null) => {
+    //     const element = document.querySelector(selector);
+    //     return element?.textContent?.trim() !== value;
+    //   },
+    //   {},
+    //   previousConversationToggleSelector,
+    //   initialResponse ?? null
+    // );
+  }
+
+  async clickOnImageInInteractionPreviewCard(): Promise<void> {
+    await this.expectElementToBeVisible(imageContainerSelector);
+    await this.page.click(imageContainerSelector);
+  }
+
+  /**
+   * Selects a multiple choice option.
+   * @param {string} option - The option to select.
+   */
+  async selectMultipleChoiceOption(option: string): Promise<void> {
+    await this.expectElementToBeVisible(multipleChoiceOptionSelector);
+
+    const options = await this.page.$$(multipleChoiceOptionSelector);
+    for (const optionElement of options) {
+      const optionText = await optionElement.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (optionText === option) {
+        await optionElement.click();
+        break;
+      }
+    }
+
+    await this.expectElementToBeVisible(selectedMultipleChoiceOption);
+    await this.expectTextContentToContain(selectedMultipleChoiceOption, option);
+
+    await this.clickOnSubmitAnswerButton();
+  }
+
+  async selectItemSelectionOptions(options: string[]): Promise<void> {
+    const optionElementSelector = '.e2e-test-item-selection-input-item';
+
+    const optionElements = await this.page.$$(optionElementSelector);
+
+    for (const optionElement of optionElements) {
+      const optionText = await optionElement.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (!optionText) continue;
+      if (options.includes(optionText)) {
+        await optionElement.click();
+
+        const inputElement = await optionElement.$('input');
+        await this.page.waitForFunction(
+          element => {
+            return element.checked;
+          },
+          {},
+          inputElement
+        );
+      }
+    }
+  }
   /**
    * Clicks on the delete exploration button.
    */
@@ -1316,10 +1420,35 @@ export class ExplorationEditor extends BaseUser {
   async updateGraphTheoryLearnerAnswerInResponseModal(): Promise<void> {
     const responseBox = await this.getRuleEditorModal();
 
+    await this.waitForPageToFullyLoad();
     const graphViz = new GraphViz(this.page, responseBox);
     await graphViz.createASimpleStarNetwork();
   }
 
+  /**
+   * Creates a star network in the graph theory learner answer in response modal.
+   * @param {number} n - The number of vertices in the star network.
+   */
+  async submitGraphStarNetworkSolution(n: number): Promise<void> {
+    const graphViz = new GraphViz(this.page);
+
+    const vertices = await graphViz.getVertices();
+    if (vertices.length < n) {
+      throw new Error(
+        `Expected atleast ${n} vertices, but found ${vertices.length}`
+      );
+    }
+
+    for (let i = 1; i < n; i++) {
+      await graphViz.addEdge(vertices[0], vertices[i]);
+    }
+
+    await this.clickOnSubmitAnswerButton();
+  }
+
+  /**
+   * Updates math equation learner answer in response modal to be a simple equation.
+   */
   async updateMathEquationLearnerAnswerInResponseModal(
     rule: string,
     equation: string
@@ -1504,6 +1633,12 @@ export class ExplorationEditor extends BaseUser {
     }
 
     for (let i = 0; i < inputFields.length; i++) {
+      await inputFields[i].click();
+      await this.page.keyboard.down('Control');
+      await this.page.keyboard.press('KeyA');
+      await this.page.keyboard.up('Control');
+      await this.page.keyboard.press('Backspace');
+
       await inputFields[i].type(answer[i]);
     }
   }
@@ -1609,6 +1744,23 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(submitAnswerButton);
 
     await this.addSolutionExplanationAndSave(explaination);
+  }
+
+  /**
+   * Submits the answer to the set input question.
+   * @param answer The answer to submit.
+   */
+  async submitSetInputAnswer(answer: string[]): Promise<void> {
+    let firstOption = true;
+    for (const option of answer) {
+      if (!firstOption) {
+        await this.clickOn(addResponseOptionButton);
+        firstOption = false;
+      }
+      await this.type(`${solutionModal} ${textInputField}`, option);
+    }
+
+    await this.clickOnSubmitAnswerButton();
   }
 
   /**
@@ -2109,7 +2261,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async closeInteractionResponseModal(): Promise<void> {
     await this.page.waitForSelector(closeResponseModalButton, {visible: true});
-    await this.clickOn(closeResponseModalButton);
+    await this.page.click(closeResponseModalButton);
     await this.page.waitForSelector(closeResponseModalButton, {
       hidden: true,
     });
@@ -3447,28 +3599,35 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectPreviewCardContentToBe(
     cardName: string,
-    expectedCardContent: string
+    expectedCardContent: string,
+    matchCase: boolean = true
   ): Promise<void> {
     await this.page.waitForSelector(stateConversationContent, {
       visible: true,
     });
     const element = await this.page.$(stateConversationContent);
-    const cardContent = await this.page.evaluate(
-      element => element.textContent,
-      element
-    );
-    if (cardContent !== expectedCardContent) {
+    try {
+      await this.page.waitForFunction(
+        (element: HTMLElement, value: string, matchCase: boolean) => {
+          return (element.innerText.trim() === value.trim()) === matchCase;
+        },
+        {},
+        element,
+        expectedCardContent,
+        matchCase
+      );
+    } catch (error) {
       throw new Error(
-        `Preview is not on the ${cardName} card or is not loading correctly.`
+        `Card content ${matchCase ? 'did not' : 'did'} match expected content.\n` +
+          `Original Error: ${error.stack}`
       );
     }
-    showMessage(`Preview is on the ${cardName} card and is loading correctly.`);
   }
 
   /**
    * Function to navigate to the next card in the preview tab.
    */
-  async continueToNextCard(): Promise<void> {
+  async continueToNextCard(skipVerification: boolean = false): Promise<void> {
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
       await this.clickOn(nextCardButton);
@@ -3480,6 +3639,9 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
+    if (skipVerification) {
+      return;
+    }
     await this.page.waitForSelector(previousCardButton, {
       visible: true,
     });
@@ -3508,6 +3670,19 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.clickOn(submitAnswerButton);
+  }
+
+  /**
+   * Function to submit an text input answer.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitTextInputAnsswer(answer: string): Promise<void> {
+    await this.expectElementToBeVisible(textInputSelector);
+
+    await this.type(textInputSelector, answer);
+    await this.expectElementValueToBe(textInputSelector, answer);
+
+    await this.clickOnSubmitAnswerButton();
   }
 
   /**
@@ -4203,10 +4378,15 @@ export class ExplorationEditor extends BaseUser {
     endX: number,
     endY: number
   ): Promise<void> {
+    console.log(startX, startY, endX, endY);
     await this.page.mouse.move(startX, startY);
+    await this.page.waitForTimeout(1000);
     await this.page.mouse.down();
+    await this.page.waitForTimeout(1000);
     await this.page.mouse.move(endX, endY);
+    await this.page.waitForTimeout(1000);
     await this.page.mouse.up();
+    await this.page.waitForTimeout(1000);
   }
 
   /**
@@ -4244,6 +4424,10 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Option "${option}" not found.`);
       }
 
+      if (sourceElement === destinationElement) {
+        continue;
+      }
+
       const sourceBox = await sourceElement.boundingBox();
       const destBox = await destinationElement.boundingBox();
 
@@ -4265,6 +4449,52 @@ export class ExplorationEditor extends BaseUser {
 
     // Add explaination.
     await this.addSolutionExplanationAndSave(explaination);
+  }
+
+  async submitDragAndDropSortAnswer(answerItems: string[]): Promise<void> {
+    await this.page.waitForSelector(dragAndDropItemSelector, {visible: true});
+
+    for (let i = 0; i < answerItems.length - 1; i++) {
+      const option = answerItems[i];
+
+      const optionElements = await this.page.$$(dragAndDropItemSelector);
+      console.log(optionElements.length);
+      const destinationElement = optionElements[i];
+
+      let sourceElement: puppeteer.ElementHandle<Element> | null = null;
+
+      for (let j = 0; j < optionElements.length; j++) {
+        const optionText = await optionElements[j].evaluate(el =>
+          el.textContent?.trim()
+        );
+        if (optionText === option) {
+          sourceElement = optionElements[j];
+          break;
+        }
+      }
+
+      if (!sourceElement) {
+        throw new Error(`Option "${option}" not found.`);
+      }
+
+      const sourceBox = await sourceElement.boundingBox();
+      const destBox = await destinationElement.boundingBox();
+
+      if (!sourceBox || !destBox) {
+        throw new Error(
+          `Could not get bounding box for drag-and-drop operation.`
+        );
+      }
+
+      await this.dragAndDropItem(
+        sourceBox.x + sourceBox.width / 2,
+        sourceBox.y + sourceBox.height / 2,
+        destBox.x + destBox.width / 2,
+        destBox.y + destBox.height / 2
+      );
+    }
+
+    await this.clickOnSubmitAnswerButton();
   }
 
   /**
@@ -5097,6 +5327,58 @@ export class ExplorationEditor extends BaseUser {
 
     await this.page.click(joyrideDoneButtonSelector);
     await this.expectElementToBeVisible(joyrideDoneButtonSelector, false);
+  }
+
+  /**
+   * Function to submit an answer in the input field.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitAnswerInInputField(answer: string): Promise<void> {
+    await this.expectElementToBeVisible('input');
+    await this.type('input', answer);
+
+    await this.clickOnSubmitAnswerButton();
+  }
+
+  /**
+   * Function to submit an answer in the input field.
+   * @param {string} answer - The answer to submit.
+   */
+  async submitExpressionAnswer(answer: string): Promise<void> {
+    await this.expectElementToBeVisible(commonMathExpressionInputField);
+
+    const inputField = await this.page.$(commonMathExpressionInputField);
+    if (!inputField) {
+      throw new Error('Input field not found.');
+    }
+
+    await inputField.click();
+    await inputField.type(answer);
+
+    await this.clickOnSubmitAnswerButton();
+  }
+
+  async submitPencilCodeEditorAnswer(answer: string): Promise<void> {
+    const pencilCode = new PencilCode(this.page);
+    await pencilCode.typeCode(answer);
+    await pencilCode.runCode();
+  }
+
+  async submitCodeEditorAnswer(answer: string): Promise<void> {
+    const codeEditor = await this.page.$(codeEditorInSolutionModal);
+    if (!codeEditor) {
+      throw new Error(`Code editor not found.`);
+    }
+
+    await codeEditor.click();
+    await this.page.keyboard.down('Control');
+    await this.page.keyboard.press('KeyA');
+    await this.page.keyboard.up('Control');
+    await this.page.keyboard.press('Backspace');
+
+    await this.page.type(codeEditorInSolutionModal, answer);
+
+    await this.clickOnSubmitAnswerButton();
   }
 }
 

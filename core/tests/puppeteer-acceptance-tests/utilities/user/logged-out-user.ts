@@ -406,6 +406,10 @@ const blogPostTitleContainerSelector =
 const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 
+// Common Selectors.
+const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalBodySelector = '.e2e-test-modal-body';
+
 // Topic Viewer Page Selectors.
 const topicPageRevisionTabContentSelector =
   '.e2e-test-topic-viewer-revision-tab';
@@ -4045,7 +4049,10 @@ export class LoggedOutUser extends BaseUser {
    * Function to use a hint.
    */
   async viewHint(): Promise<void> {
-    await this.page.waitForSelector(hintButtonSelector);
+    await this.page.waitForSelector(hintButtonSelector, {
+      visible: true,
+      timeout: 60000,
+    });
     await this.clickOn(hintButtonSelector);
 
     await this.page.waitForSelector(gotItButtonSelector, {
@@ -4058,9 +4065,10 @@ export class LoggedOutUser extends BaseUser {
    */
   async closeHintModal(): Promise<void> {
     await this.page.waitForSelector(gotItButtonSelector, {visible: true});
-    await this.clickOn(gotItButtonSelector);
+    await this.page.click(gotItButtonSelector);
     await this.page.waitForSelector(gotItButtonSelector, {hidden: true});
   }
+
   /**
    * Simulates the action of viewing the solution by clicking on the view solution button and the continue to solution button.
    */
@@ -5224,6 +5232,20 @@ export class LoggedOutUser extends BaseUser {
     // Confirm new slide ID is different.
     const newSlideId = await this.page.$eval(activeItemSelector, el => el.id);
     expect(newSlideId).not.toBe(initialSlideId);
+  }
+
+  /**
+   * Function to verify the hint in the hint modal.
+   * @param {string} expectedHint - The expected hint.
+   */
+  async expectHintInHintModalToContain(expectedHint: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+
+    await this.expectTextContentToBe(commonModalTitleSelector, 'Hint');
+    await this.expectTextContentToContain(
+      commonModalBodySelector,
+      expectedHint
+    );
   }
 }
 

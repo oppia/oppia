@@ -996,16 +996,25 @@ export class BaseUser {
     text: string
   ): Promise<void> {
     await this.expectElementToBeVisible(selector);
-
-    await this.page.waitForFunction(
-      (selector: string, text: string) => {
+    try {
+      await this.page.waitForFunction(
+        (selector: string, text: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim().includes(text.trim());
+        },
+        {},
+        selector,
+        text
+      );
+    } catch (error) {
+      const actualText = await this.page.evaluate((selector: string) => {
         const element = document.querySelector(selector);
-        return element?.textContent?.trim().includes(text.trim());
-      },
-      {},
-      selector,
-      text
-    );
+        return element?.textContent?.trim();
+      }, selector);
+      throw new Error(
+        `Element ${selector} does not contain "${text}". It contains "${actualText}".`
+      );
+    }
   }
 
   /**

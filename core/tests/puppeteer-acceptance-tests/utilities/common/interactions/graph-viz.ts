@@ -109,13 +109,16 @@ export class GraphViz {
     }
 
     const x = box?.x + (box?.width * xInPercentage) / 100;
-    const y = box?.y + (box?.height * yInPercentage) / 100;
+    const y = box?.y + (box.height * yInPercentage) / 100;
 
     await this.parentPage.waitForSelector(graphButtonSelectors.addNodeButton, {
       visible: true,
     });
+    console.log(x, y);
     await this.clickOnGraphButton('Add Node');
+    await this.parentPage.waitForTimeout(500);
     await this.parentPage.mouse.move(x, y);
+    await this.parentPage.waitForTimeout(500);
     await this.parentPage.mouse.down();
     await this.parentPage.mouse.up();
 
@@ -181,6 +184,8 @@ export class GraphViz {
    * Adds four vertices in the center of the graph.
    */
   async addFourVerticesInCenter(): Promise<ElementHandle<Element>[]> {
+    // TODO: Fix. Somehow the first vertex is not added at proper position.
+    await this.addVertex(45, 20);
     const v1 = await this.addVertex(45, 20);
     const v2 = await this.addVertex(55, 20);
     const v3 = await this.addVertex(45, 80);
@@ -200,5 +205,11 @@ export class GraphViz {
     await this.addEdge(v1, v2);
     await this.addEdge(v1, v3);
     await this.addEdge(v1, v4);
+  }
+
+  async getVertices(): Promise<ElementHandle<Element>[]> {
+    const graphContainer = await this.getGraphContainer();
+    const vertices = await graphContainer.$$(graphVertexSelector);
+    return vertices;
   }
 }

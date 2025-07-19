@@ -105,6 +105,7 @@ const reportExplorationTextAreaSelector =
 const submitReportButtonSelector = '.e2e-test-submit-report-button';
 const feedbackThreadSelector = '.e2e-test-feedback-thread';
 const feedbackMessageSelector = '.e2e-test-feedback-message';
+const latestFeedbackMessageSelector = '.e2e-test-conversation-feedback-latest';
 const desktopCompletedLessonsSectionSelector =
   '.e2e-test-completed-community-lessons-section';
 const lessonTileTitleSelector =
@@ -1514,6 +1515,18 @@ export class LoggedInUser extends BaseUser {
         `Response does not match the expected value. Expected: ${expectedResponse}, Found: ${actualResponse}`
       );
     }
+  }
+
+  /**
+   * Verifies that the feedback and response match the expected values.
+   * @param {string} expectedFeedback - The expected feedback.
+   */
+  async expectResponseFeedbackToBe(expectedFeedback: string): Promise<void> {
+    await this.expectElementToBeVisible(latestFeedbackMessageSelector);
+    await this.expectTextContentToBe(
+      latestFeedbackMessageSelector,
+      expectedFeedback
+    );
   }
 
   /**

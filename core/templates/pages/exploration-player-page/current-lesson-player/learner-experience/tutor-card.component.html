@@ -32,7 +32,7 @@
     <div *ngIf="inputOutputHistoryIsShown && (displayedCard.getInputResponsePairs().length > 1 && isInteractionInline()) || (displayedCard.getInputResponsePairs().length > 0 && !isInteractionInline())">
       <h4 class="conversation-skin-responses-dropdown-container"
           (click)="toggleShowPreviousResponses()">
-        <span class="conversation-skin-responses-dropdown-text">
+        <span class="conversation-skin-responses-dropdown-text e2e-test-previous-responses-text">
           <span>
             {{ 'I18N_PLAYER_PREVIOUS_RESPONSES' | translate:{previousResponses: displayedCard.getInputResponsePairs().length - (isInteractionInline() ? 1 : 0)} }}
           </span>
