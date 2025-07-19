@@ -15,7 +15,6 @@
 /**
  * @fileoverview Component for lost changes modal.
  */
-
 import {Component, ElementRef, Input, OnInit} from '@angular/core';
 import {LoggerService} from 'services/contextual/logger.service';
 import {UtilsService} from 'services/utils.service';
@@ -46,10 +45,19 @@ export class LostChangesModalComponent
   }
 
   ngOnInit(): void {
-    this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
-    this.lostChanges = this.lostChanges.map(lostChange =>
-      LostChange.createNew(this.utilsService, lostChange)
-    );
+    this.hasLostChanges =
+      Array.isArray(this.lostChanges) && this.lostChanges.length > 0;
+
+    this.lostChanges = this.lostChanges
+      .filter(
+        change => !!change && typeof change === 'object' && 'cmd' in change
+      )
+      .map(lostChange => {
+        if (lostChange instanceof LostChange) {
+          return lostChange;
+        }
+        return LostChange.createNew(this.utilsService, lostChange);
+      });
   }
 
   cancel(): void {
@@ -57,14 +65,16 @@ export class LostChangesModalComponent
   }
 
   exportChangesAndClose(): void {
-    let lostChangesData = this.elRef.nativeElement.getElementsByClassName(
+    const lostChangesData = this.elRef.nativeElement.getElementsByClassName(
       'oppia-lost-changes'
     )[0] as HTMLInputElement;
-    let blob = new Blob([lostChangesData.innerText], {type: 'text/plain'});
-    let elem = this.windowRef.nativeWindow.document.createElement('a');
+
+    const blob = new Blob([lostChangesData.innerText], {type: 'text/plain'});
+    const elem = this.windowRef.nativeWindow.document.createElement('a');
     elem.href = URL.createObjectURL(blob);
     elem.download = 'lostChanges.txt';
     elem.click();
+
     this.ngbActiveModal.dismiss();
   }
 }

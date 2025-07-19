@@ -33,12 +33,15 @@ export class ChangesInHumanReadableFormComponent implements OnInit {
       this.lostChanges = [];
     }
 
-    // If lostChanges are plain dicts, convert them to class instances.
-    this.lostChanges = this.lostChanges.map(change => {
-      if (change instanceof LostChange) {
-        return change;
-      }
-      return LostChange.createNew(this.utilsService, change);
-    });
+    this.lostChanges = this.lostChanges
+      .filter(
+        change => !!change && typeof change === 'object' && 'cmd' in change
+      )
+      .map(change => {
+        if (change instanceof LostChange) {
+          return change;
+        }
+        return LostChange.createNew(this.utilsService, change);
+      });
   }
 }
