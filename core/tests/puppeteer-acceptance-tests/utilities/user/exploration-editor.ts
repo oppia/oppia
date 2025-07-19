@@ -285,6 +285,10 @@ const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 const previousCardButton = '.e2e-test-back-button';
 const mathInteractionButtonSelector = '.e2e-test-interaction-tab-math';
 
+const oppiaYouTubeVideoUrl = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
+const oppiaWebURL = 'https://www.oppia.org';
+const rteHelperModalSelector = 'oppia-rte-helper-modal';
+
 export enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
@@ -3243,7 +3247,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnRTEOptionWithTitle('Insert tabs');
 
     await this.waitForNetworkIdle();
-    const helperModel = await this.page.$('oppia-rte-helper-modal');
+    const helperModel = await this.page.$(rteHelperModalSelector);
 
     const tabTitleInputElements = await helperModel?.$$(textInputSelector);
     const tabContentInputElements = await helperModel?.$$(
@@ -3333,12 +3337,12 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('ArrowRight');
 
     // Video.
-    await this.addVideoRTE('https://www.youtube.com/watch?v=0tRc75S9MFU');
+    await this.addVideoRTE(oppiaYouTubeVideoUrl);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
     // Add LinkEnter.
-    await this.addTextWithLinkRTE('Oppia', 'https://www.oppia.org');
+    await this.addTextWithLinkRTE('Oppia', oppiaWebURL);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
@@ -3399,7 +3403,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnRTEOptionWithTitle('Insert link');
     await this.waitForNetworkIdle();
 
-    const helperModel = await this.page.$('oppia-rte-helper-modal');
+    const helperModel = await this.page.$(rteHelperModalSelector);
 
     // Get Fields.
     const inputs = await helperModel?.$$(textInputSelector);
@@ -3430,7 +3434,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnRTEOptionWithTitle('Insert image');
 
     await this.waitForNetworkIdle();
-    const helperModel = await this.page.$('oppia-rte-helper-modal');
+    const helperModel = await this.page.$(rteHelperModalSelector);
 
     // Get Fields.
     const imageDescriptionInput = await helperModel?.$(descriptionBoxSelector);
@@ -3459,7 +3463,7 @@ export class ExplorationEditor extends BaseUser {
   async addVideoRTE(videoUrl: string): Promise<void> {
     await this.clickOnRTEOptionWithTitle('Insert video');
 
-    const helperModel = await this.page.$('oppia-rte-helper-modal');
+    const helperModel = await this.page.$(rteHelperModalSelector);
 
     // Get Fields.
     const videoUrlInput = await helperModel?.$(textInputField);

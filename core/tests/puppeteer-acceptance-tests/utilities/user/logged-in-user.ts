@@ -2273,6 +2273,9 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * Function to click on the add goals button in the redesigned learner dashboard.
+   */
   async clickOnAddGoalsButtonInRedesignedLearnerDashboard(): Promise<void> {
     await this.page.waitForSelector(
       addGoalsButtonInRedesignedLearnerDashboard,
@@ -2288,6 +2291,11 @@ export class LoggedInUser extends BaseUser {
     });
   }
 
+  /**
+   * Function to click on the goal checkbox in the redesigned learner dashboard.
+   * @param {string} goal - The goal to click on.
+   * @param {boolean} checked - Whether the goal should be checked or not.
+   */
   async clickOnGoalCheckboxInRedesignedLearnerDashboard(
     goal: string,
     checked: boolean = true
@@ -2324,6 +2332,9 @@ export class LoggedInUser extends BaseUser {
     }
   }
 
+  /**
+   * Function to submit a goal in the redesigned learner dashboard.
+   */
   async submitGoalInRedesignedLearnerDashboard(): Promise<void> {
     await this.waitForElementToBeClickable(addNewGoalButtonSelector);
     await this.page.click(addNewGoalButtonSelector);
@@ -2333,6 +2344,10 @@ export class LoggedInUser extends BaseUser {
     });
   }
 
+  /**
+   * Function to add a goal in the redesigned learner dashboard.
+   * @param {string} goal - The goal to add.
+   */
   async addGoalInRedesignedLearnerDashboard(goal: string): Promise<void> {
     await this.waitForPageToFullyLoad();
 
@@ -2513,6 +2528,10 @@ export class LoggedInUser extends BaseUser {
     expect(headings).toContain(expectedHeadings);
   }
 
+  /**
+   * Function to verify the current goals section is empty or not.
+   * @param {boolean} empty - Whether the section should be empty or not.
+   */
   async expectCurrentGoalsSectionToBeEmpty(
     empty: boolean = true
   ): Promise<void> {
@@ -2775,6 +2794,10 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Function to verify the continue from where you left section in the redesigned learner dashboard is present or not.
+   * @param {boolean} visible - Whether the section should be visible or not.
+   */
   async expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(
     visible: boolean = true
   ): Promise<void> {

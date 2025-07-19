@@ -198,7 +198,6 @@ describe('Logged-Out Learner', function () {
     1000000
   );
 
-  explorationId = 'Sl6aHgSw1vjL';
   it('should be able to play/pause the audio', async function () {
     // Navigate to Lesson Player.
     await loggedOutLearner.navigateToClassroomPage('math');

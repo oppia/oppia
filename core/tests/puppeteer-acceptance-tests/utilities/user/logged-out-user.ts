@@ -4840,6 +4840,9 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if the voiceover is skippable.
+   */
   async expectVoiceoverIsSkippable(): Promise<void> {
     await this.waitForPageToFullyLoad();
     const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
@@ -5188,6 +5191,10 @@ export class LoggedOutUser extends BaseUser {
     await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
   }
 
+  /**
+   * Checks if the concept card link in the lesson works properly.
+   * @param {string} content - The expected content of the concept card.
+   */
   async expectConceptCardLinkInLessonToWorkProperly(
     content: string
   ): Promise<void> {
@@ -5271,6 +5278,10 @@ export class LoggedOutUser extends BaseUser {
     await this.isElementVisible(fractionInputSelector);
   }
 
+  /**
+   * Checks if the error message for wrong input is present.
+   * @param {string} errorMessage - The expected error message.
+   */
   async expectErrorMessageForWrongInputToBe(
     errorMessage: string
   ): Promise<void> {
