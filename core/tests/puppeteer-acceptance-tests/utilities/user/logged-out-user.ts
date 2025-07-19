@@ -4869,7 +4869,10 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the partner with us button is visible at the top of the partnerships page.
    */
   async expectPartnerWithUsButtonIsVisible(): Promise<void> {
-    await this.isElementVisible(partnerWithUsButtonAtTheTopOfPartnershipsPage);
+    const isVisible = await this.isElementVisible(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
+    expect(isVisible).toBe(true);
   }
 
   /**
