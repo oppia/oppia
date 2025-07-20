@@ -137,7 +137,7 @@ export class RteHelperModalComponent {
     link: 200,
     tabs_heading: 200,
     tabs_content: 500,
-    workedexample: 1000,
+    workedexample: 500,
     default: 500,
   };
 

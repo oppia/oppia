@@ -351,7 +351,8 @@ describe('Rte Helper Service', () => {
               },
             },
             default_value_obtainable_from_highlight: false,
-            default_value: 'Sample Answer',
+            default_value:
+              'You have revealed the answer for the worked example.',
           },
         ],
         id: 'workedexample',
