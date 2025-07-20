@@ -23,7 +23,6 @@ import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {SkillCreationService} from 'components/entity-creation-services/skill-creation.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {PageContextService} from 'services/page-context.service';
 import {CreateNewSkillModalComponent} from './create-new-skill-modal.component';
