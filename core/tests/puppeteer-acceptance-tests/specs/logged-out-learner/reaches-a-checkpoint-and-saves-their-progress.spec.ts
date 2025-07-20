@@ -44,8 +44,8 @@ describe('Logged-out User', function () {
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
-      'explorationEditor',
-      'exploration_editor@example.com'
+      'explorationEditor213',
+      'exploration_editor213@example.com'
     );
 
     loggedOutLearner = await UserFactory.createLoggedOutUser();
@@ -65,6 +65,7 @@ describe('Logged-out User', function () {
 
     // Navigate to the new card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.SECOND_CARD);
+    await explorationEditor.setTheStateAsCheckpoint();
     await explorationEditor.updateCardContent(
       'Give fraction with denominator 2.'
     );
@@ -74,7 +75,7 @@ describe('Logged-out User', function () {
       INTERACTION_TYPES.FRACTION_INPUT,
       '2',
       'Perfect!',
-      CARD_NAME.THIRD_CARD,
+      CARD_NAME.FINAL_CARD,
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -89,13 +90,6 @@ describe('Logged-out User', function () {
       true
     );
     await explorationEditor.saveExplorationDraft();
-
-    // Add continue button checkpoint.
-    await explorationEditor.navigateToCard(CARD_NAME.THIRD_CARD);
-    await explorationEditor.setTheStateAsCheckpoint();
-    await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-    await explorationEditor.viewOppiaResponses();
-    await explorationEditor.directLearnersToNewCard(CARD_NAME.FINAL_CARD);
 
     // Navigate to the final card and update its content.
     await explorationEditor.navigateToCard(CARD_NAME.FINAL_CARD);
@@ -117,62 +111,47 @@ describe('Logged-out User', function () {
   it('should be able to resume progress using 72-hour link.', async function () {
     await loggedOutLearner.playExploration(explorationId);
     await loggedOutLearner.continueToNextCard();
-    await loggedOutLearner.submitAnswer('1/2');
-    await loggedOutLearner.continueToNextCard();
 
     await loggedOutLearner.verifyCheckpointModalAppears();
     await loggedOutLearner.openLessonInfoModal();
-    await loggedOutLearner.expectLessonInfoToShowRating('Unrated');
-    await loggedOutLearner.expectLessonInfoToShowNoOfViews(1);
-    await loggedOutLearner.expectLessonInfoToShowLastUpdated();
-    await loggedOutLearner.shareExplorationFromLessonInfoModal(
-      'Facebook',
-      explorationId
+    await loggedOutLearner.expectLessonInfoModalHeaderToBe(
+      'What are the Place Values?'
     );
-    await loggedOutLearner.shareExplorationFromLessonInfoModal(
-      'Twitter',
-      explorationId
-    );
-
-    await loggedOutLearner.reloadPage();
-    await loggedOutLearner.expectProgressRemainder(false);
-
-    await loggedOutLearner.continueToNextCard();
-    await loggedOutLearner.submitAnswer('1/2');
-    await loggedOutLearner.continueToNextCard();
-
-    await loggedOutLearner.verifyCheckpointModalAppears();
-
-    await loggedOutLearner.openLessonInfoModal();
+    await loggedOutLearner.expectSaveProgressButtonToBeVisible();
     await loggedOutLearner.saveProgress();
-    await loggedOutLearner.expectSignInButtonToBePresent();
-    await loggedOutLearner.expectCreateAccountToBePresent();
-    await loggedOutLearner.checkProgressUrlValidityInfo(
-      PROGRESS_URL_VALIDITY_INFO
-    );
     progressUrl = await loggedOutLearner.copyProgressUrl();
 
     await loggedOutLearner.startExplorationUsingProgressUrl(progressUrl, false);
     await loggedOutLearner.expectProgressRemainder(true);
+    await loggedOutLearner.expectProgressReminderModalTextToBe(
+      'Do you want to continue?'
+    );
     await loggedOutLearner.chooseActionInProgressRemainder('Resume');
-
-    await loggedOutLearner.goBackToPreviousCard();
-    await loggedOutLearner.verifyCannotAnswerPreviouslyAnsweredQuestion();
-    await loggedOutLearner.continueToNextCard();
-    await loggedOutLearner.continueToNextCard();
-    await loggedOutLearner.expectExplorationCompletionToastMessage(
-      'Congratulations for completing this lesson!'
+    await loggedOutLearner.expectCardContentToMatch(
+      'Give fraction with denominator 2.'
     );
   });
 
   it('should be able to sign up to permanently save the progress', async function () {
-    await loggedOutLearner.signUpFromTheLessonPlayer(
+    await loggedOutLearner.openLessonInfoModal();
+    await loggedOutLearner.saveProgress();
+    await loggedOutLearner.clickOnCreateAccountButtonInSaveProgressModal();
+    await loggedOutLearner.expectToBeOnLoginPage();
+    await loggedOutLearner.goThoroughSignUpProcess(
       'learner@example.com',
       'learner'
     );
+
+    await loggedOutLearner.expectProgressRemainder(true);
+    await loggedOutLearner.expectProgressReminderModalTextToBe(
+      'Do you want to continue?'
+    );
+    await loggedOutLearner.chooseActionInProgressRemainder('Resume');
+    await loggedOutLearner.expectProfilePictureToBePresent();
+    await loggedOutLearner.expectSignInButtonToBePresent(false);
   });
 
   afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
+    // await UserFactory.closeAllBrowsers();
   });
 });

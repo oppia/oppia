@@ -136,7 +136,7 @@ export class BaseUser {
               'Mobile/15A372 Safari/604.1'
           );
         } else {
-          this.page.setViewport({width: 1920, height: 1080});
+          this.page.setViewport({width: 1280, height: 720});
         }
 
         // Enable Video Recording.
@@ -940,12 +940,15 @@ export class BaseUser {
     selector: string,
     textContent: string
   ): Promise<void> {
-    const currentTextContent = await this.getTextContent(selector);
-    if (currentTextContent !== textContent) {
-      throw new Error(
-        `Text did not match within the specified time. Actual text: "${currentTextContent}", expected text: "${textContent}"`
-      );
-    }
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() === value;
+      },
+      {},
+      selector,
+      textContent
+    );
   }
 
   /**

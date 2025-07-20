@@ -137,11 +137,8 @@ describe('Logged-In Learner', function () {
     // Even after completing the lesson, the node isn't marked as completed.
     // Once fixed, uncomment the below code.
 
-    // await loggedInLearner.expectContinueWhereYouLeftOffSectionToContainLessonCards(
-    //   ['Chapter 2: Positive Numbers']
-    // );
     // await loggedInLearner.expectLessonProgressInRedesignedDashboardToBe(
-    //   'Chapter 2: Positive Numbers',
+    //   'Chapter 2: Test Chapter 2',
     //   '50%'
     // );
 
@@ -152,6 +149,7 @@ describe('Logged-In Learner', function () {
     // await loggedInLearner.navigateToLearnerDashboard();
 
     // await loggedInLearner.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
+    // await loggedInLearner.expectLearnSomethingNewInLDToBeEmpty()
     // await loggedInLearner.expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(
     //   false
     // );
@@ -181,6 +179,6 @@ describe('Logged-In Learner', function () {
   });
 
   afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
+    // await UserFactory.closeAllBrowsers();
   });
 });

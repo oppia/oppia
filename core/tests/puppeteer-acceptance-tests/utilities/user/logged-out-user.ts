@@ -494,6 +494,12 @@ const contactUsSubheadingSelector = '.e2e-test-contact-subheading';
 const contactUsContentCard = '.e2e-test-contact-page-content';
 const contactUsContentCardHeadingSelector = `${contactUsContentCard} h2`;
 
+const lessonInfoModalHeaderSelector = '.e2e-test-lesson-info-modal-header';
+const progressReminderModalHeaderSelector =
+  '.e2e-test-progress-reminder-continue-text';
+const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
+const profilePictureSelector = '.e2e-test-profile-dropdown';
+
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -2100,6 +2106,18 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Click on create account button in save progress modal
+   */
+  async clickOnCreateAccountButtonInSaveProgressModal(): Promise<void> {
+    await this.page.waitForSelector(lessonInfoSignUpButtonSelector);
+    await this.page.click(lessonInfoSignUpButtonSelector);
+
+    await this.page.waitForSelector(lessonInfoSignUpButtonSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
    * Function to change the site language to the given language code.
    * @param langCode - The language code to change the site language to. Example: 'pt-br', 'en'
    */
@@ -3062,8 +3080,14 @@ export class LoggedOutUser extends BaseUser {
    * Function to verify that the user is on the login page.
    */
   async expectToBeOnLoginPage(): Promise<void> {
-    const currentUrl = new URL(this.page.url());
-    expect(currentUrl.pathname.startsWith('/login')).toBe(true);
+    await this.page.waitForFunction(
+      (url: string) => {
+        const currentURL = window.location.href;
+        return currentURL.includes(url);
+      },
+      {},
+      testConstants.URLs.Login
+    );
   }
 
   /**
@@ -4266,7 +4290,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if the sign-in button is present on the page.
    */
-  async expectSignInButtonToBePresent(): Promise<void> {
+  async expectSignInButtonToBePresent(present: boolean = true): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     try {
       await this.page.waitForSelector(signInButton, {timeout: 5000});
@@ -4275,11 +4299,23 @@ export class LoggedOutUser extends BaseUser {
         await this.page.waitForSelector(singInButtonInProgressModal, {
           timeout: 5000,
         });
+
+        showMessage('Sign-in button present.');
       } catch (error) {
-        throw new Error('Sign-in button not found.');
+        if (error instanceof puppeteer.errors.TimeoutError && !present) {
+          showMessage('Sign-in button not present.');
+          return;
+        }
+
+        throw new Error(
+          'Sign-in button not found.\n' + `Original error: ${error.message}`
+        );
       }
     }
-    showMessage('Sign-in button present.');
+
+    if (!present) {
+      throw new Error('Sign-in button is present, expected to be absent.');
+    }
   }
 
   /**
@@ -4571,18 +4607,17 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Signs up a new user from the lesson player.
-   * @param email - User's email
-   * @param username - User's chosen username
+   * Goes through the sign up process.
+   * @param {string} email - The email to sign up with.
+   * @param {string} username - The username to sign up with.
    */
-  async signUpFromTheLessonPlayer(
+  async goThoroughSignUpProcess(
     email: string,
     username: string
   ): Promise<void> {
-    await this.page.waitForSelector(loginButtonSelector, {
+    await this.page.waitForSelector(testConstants.SignInDetails.inputField, {
       visible: true,
     });
-    await this.clickOn('Sign in');
     await this.type(testConstants.SignInDetails.inputField, email);
     await this.clickOn('Sign In');
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
@@ -4596,6 +4631,23 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector('button.e2e-test-register-user', {
       hidden: true,
     });
+  }
+
+  /**
+   * Signs up a new user from the lesson player.
+   * @param email - User's email
+   * @param username - User's chosen username
+   */
+  async signUpFromTheLessonPlayer(
+    email: string,
+    username: string
+  ): Promise<void> {
+    await this.page.waitForSelector(loginButtonSelector, {
+      visible: true,
+    });
+    await this.clickOn('Sign in');
+
+    await this.goThoroughSignUpProcess(email, username);
   }
 
   /**
@@ -5724,6 +5776,47 @@ export class LoggedOutUser extends BaseUser {
     // Confirm new slide ID is different.
     const newSlideId = await this.page.$eval(activeItemSelector, el => el.id);
     expect(newSlideId).not.toBe(initialSlideId);
+  }
+
+  /**
+   * Checks if the lesson info modal header matches the expected header.
+   * @param header - The expected header.
+   */
+  async expectLessonInfoModalHeaderToBe(header: string): Promise<void> {
+    await this.isElementVisible(lessonInfoModalHeaderSelector);
+    await this.expectTextContentToMatch(lessonInfoModalHeaderSelector, header);
+  }
+
+  /**
+   * Checks if the save progress button is visible.
+   */
+  async expectSaveProgressButtonToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(saveProgressButton, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Checks if the progress reminder modal text matches the expected text.
+   * @param expectedText - The expected text.
+   */
+  async expectProgressReminderModalTextToBe(
+    expectedText: string
+  ): Promise<void> {
+    await this.isElementVisible(progressReminderModalHeaderSelector);
+    await this.expectTextContentToMatch(
+      progressReminderModalHeaderSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Expects the profile picture to be present.
+   */
+  async expectProfilePictureToBePresent(): Promise<void> {
+    await this.page.waitForSelector(profilePictureSelector, {
+      visible: true,
+    });
   }
 }
 
