@@ -4702,7 +4702,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
     def _fix_rte_tags(
         cls, html: str,
         *,
-        is_tags_nested_inside_tabs_or_collapsible_or_we: bool = False
+        is_tags_nested_inside_tabs_or_collapsible: bool = False
     ) -> str:
         """Handles all the invalid RTE tags, performs the following:
             - `oppia-noninteractive-image`
@@ -4853,7 +4853,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 tag.decompose()
                 continue
 
-        if is_tags_nested_inside_tabs_or_collapsible_or_we:
+        if is_tags_nested_inside_tabs_or_collapsible:
             tabs_tags = soup.find_all('oppia-noninteractive-tabs')
             if len(tabs_tags) > 0:
                 for tabs_tag in tabs_tags:
@@ -4863,11 +4863,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if len(collapsible_tags) > 0:
                 for collapsible_tag in collapsible_tags:
                     collapsible_tag.decompose()
-                    continue
-            workedexample_tags = soup.find_all('oppia-noninteractive-workedexample')
-            if len(workedexample_tags) > 0:
-                for workedexample_tag in workedexample_tags:
-                    workedexample_tag.decompose()
                     continue
 
         return str(soup).replace('<br/>', '<br>')
@@ -4936,7 +4931,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 for tab_content in tab_content_list:
                     tab_content['content'] = cls._fix_rte_tags(
                         tab_content['content'],
-                        is_tags_nested_inside_tabs_or_collapsible_or_we=True
+                        is_tags_nested_inside_tabs_or_collapsible=True
                     )
                     if html_cleaner.is_html_empty(tab_content['content']):
                         empty_tab_contents.append(tab_content)
@@ -4971,7 +4966,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
 
                 collapsible_content = cls._fix_rte_tags(
                     collapsible_content,
-                    is_tags_nested_inside_tabs_or_collapsible_or_we=True
+                    is_tags_nested_inside_tabs_or_collapsible=True
                 )
                 if cls._is_tag_removed_with_empty_content(
                     tag, collapsible_content, is_collapsible=True):
@@ -4988,59 +4983,6 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 tag, 'heading-with-value'):
                 continue
 
-        workedexample_tags = soup.find_all(
-            'oppia-noninteractive-workedexample')
-        for tag in workedexample_tags:
-            if tag.has_attr('question-with-value'):
-                workedexample_content_json = (
-                    utils.unescape_html(tag['question-with-value'])
-                )
-                workedexample_content = json.loads(
-                    workedexample_content_json)
-                if cls._is_tag_removed_with_empty_content(
-                    tag, workedexample_content, is_collapsible=False):
-                    continue
-
-                workedexample_content = cls._fix_rte_tags(
-                    workedexample_content,
-                    is_tags_nested_inside_tabs_or_collapsible_or_we=True
-                )
-                if cls._is_tag_removed_with_empty_content(
-                    tag, workedexample_content, is_collapsible=False):
-                    continue
-
-                workedexample_content_json = json.dumps(workedexample_content)
-                tag['question-with-value'] = utils.escape_html(
-                    workedexample_content_json)
-            else:
-                tag.decompose()
-                continue
-
-            if tag.has_attr('answer-with-value'):
-                workedexample_content_json = (
-                    utils.unescape_html(tag['answer-with-value'])
-                )
-                workedexample_content = json.loads(
-                    workedexample_content_json)
-                if cls._is_tag_removed_with_empty_content(
-                    tag, workedexample_content, is_collapsible=False):
-                    continue
-
-                workedexample_content = cls._fix_rte_tags(
-                    workedexample_content,
-                    is_tags_nested_inside_tabs_or_collapsible_or_we=True
-                )
-                if cls._is_tag_removed_with_empty_content(
-                    tag, workedexample_content, is_collapsible=False):
-                    continue
-
-                workedexample_content_json = json.dumps(workedexample_content)
-                tag['answer-with-value'] = utils.escape_html(
-                    workedexample_content_json)
-            else:
-                tag.decompose()
-                continue
-
         return str(soup).replace('<br/>', '<br>')
 
     @classmethod
@@ -5054,7 +4996,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             html: str. The fixed html data.
         """
         html = cls._fix_rte_tags(
-            html, is_tags_nested_inside_tabs_or_collapsible_or_we=False)
+            html, is_tags_nested_inside_tabs_or_collapsible=False)
         html = cls._fix_tabs_and_collapsible_tags(html)
         return html.replace('\xa0', '&nbsp;')
 
