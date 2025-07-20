@@ -66,7 +66,7 @@ class MockWindowRef {
   };
 }
 
-fdescribe('Subtopic viewer page', function () {
+describe('Subtopic viewer page', function () {
   let component: SubtopicViewerPageComponent;
   let fixture: ComponentFixture<SubtopicViewerPageComponent>;
   let pageTitleService: PageTitleService;
