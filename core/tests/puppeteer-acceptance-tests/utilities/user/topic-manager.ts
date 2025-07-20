@@ -245,6 +245,13 @@ const chapterEditorContainerSelector = '.e2e-test-chapter-editor';
 const chapterPreviewContainerSelector = '.e2e-test-thumbnail-container';
 const multiSelectionInputChipSelector = '.e2e-test-multi-selection-chip';
 
+const addSkillButton = 'button.e2e-test-add-skill-button';
+const skillNameInput = '.e2e-test-skill-name-input';
+const skillItem = '.e2e-test-skills-list-item';
+const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
+const deleteSkillButton = 'i.skill-delete-button';
+const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
+
 export class TopicManager extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -347,6 +354,39 @@ export class TopicManager extends BaseUser {
         `Text did not match within the specified time. Actual message: "${actualMessage}", expected message: "${expectedMessage}"`
       );
     }
+  }
+
+  /**
+   * Removes the attached skill from the current state card.
+   */
+  async removeSkillFromState(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addSkillButton);
+      // If the skill menu was collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(mobileToggleSkillCard);
+      }
+    }
+    await this.clickOn(deleteSkillButton);
+    await this.clickOn('Delete skill');
+  }
+
+  /**
+   * Adds a particular skill to the current state card.
+   * @param skillName - Name of the skill to be linked to state.
+   */
+  async addSkillToState(skillName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addSkillButton);
+      // If the skill menu was collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(mobileToggleSkillCard);
+      }
+    }
+    await this.clickOn(addSkillButton);
+    await this.type(skillNameInput, skillName);
+    await this.clickOn(skillItem);
+    await this.clickOn(confirmSkillButton);
   }
 
   /**

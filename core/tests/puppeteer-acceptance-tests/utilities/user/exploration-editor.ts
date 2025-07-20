@@ -153,13 +153,6 @@ const stateHintTab = '.e2e-test-hint-tab';
 const editStateHintSelector = '.e2e-test-open-hint-editor';
 const saveHintEditButton = 'button.e2e-test-save-hint-edit';
 
-const addSkillButton = '.e2e-test-add-skill-button';
-const skillNameInput = '.e2e-test-skill-name-input';
-const skillItem = '.e2e-test-skills-list-item';
-const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
-const deleteSkillButton = 'i.skill-delete-button';
-const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
-
 const misconceptionDiv = '.misconception-list-item';
 const misconceptionTitle = '.e2e-test-misconception-title';
 const optionalMisconceptionDiv = '.optional-misconception-list-item';
@@ -258,6 +251,9 @@ const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
 const regenerateAutomaticVoiceoverButton = '.e2e-test-regenerate-voiceover';
 const voiceoverConfirmationModalButton =
   '.e2e-test-voiceover-regeneration-confirm';
+
+const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
+const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
 
 enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
@@ -1085,10 +1081,7 @@ export class ExplorationEditor extends BaseUser {
       this.page.waitForNavigation({waitUntil: 'networkidle0'}),
     ]);
     await this.waitForStaticAssetsToLoad();
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsButton);
-      await this.clickOn(basicSettingsDropdown);
-    }
+    await this.expectElementToBeVisible(confirmDiscardButton, false);
   }
 
   /**
@@ -1246,12 +1239,7 @@ export class ExplorationEditor extends BaseUser {
         });
     } else {
       await this.clickOn(addAnotherResponseButton);
-      // The waitForNetworkIdle method waits for the response
-      // to the "Save Draft" request from change-list.service.ts
-      // to get executed, the Add Response modal to fully appear
-      // and all the fields in it to become clickable before
-      // moving on to next steps.
-      await this.waitForNetworkIdle();
+      await this.expectElementToBeClickable(addResponseOptionButton, false);
     }
   }
 
@@ -1276,12 +1264,14 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(stateContentInputField);
       await this.type(stateContentInputField, `${defaultResponseFeedback}`);
       await this.clickOn(saveOutcomeFeedbackButton);
+      await this.expectElementToBeVisible(saveOutcomeFeedbackButton, false);
     }
 
     if (directToCard) {
       await this.clickOn(openOutcomeDestButton);
       await this.page.select(destinationSelectorDropdown, directToCard);
-      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+      await this.page.click(saveDestinationButtonSelector);
+      await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
 
     if (directToCardWhenStuck) {
@@ -1289,7 +1279,11 @@ export class ExplorationEditor extends BaseUser {
       // The '4: /' value is used to select the 'a new card called' option in the dropdown.
       await this.select(destinationWhenStuckSelectorDropdown, '4: /');
       await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
-      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+      await this.page.click(saveStuckDestinationButtonSelector);
+      await this.expectElementToBeVisible(
+        saveStuckDestinationButtonSelector,
+        false
+      );
     }
   }
 
@@ -1354,24 +1348,6 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(editStateHintSelector);
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintEditButton);
-  }
-
-  /**
-   * Adds a particular skill to the current state card.
-   * @param skillName - Name of the skill to be linked to state.
-   */
-  async addSkillToState(skillName: string): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(addSkillButton);
-      // If the skill menu was collapsed in mobile view.
-      if (!element) {
-        await this.clickOn(mobileToggleSkillCard);
-      }
-    }
-    await this.clickOn(addSkillButton);
-    await this.type(skillNameInput, skillName);
-    await this.clickOn(skillItem);
-    await this.clickOn(confirmSkillButton);
   }
 
   /**
@@ -1616,21 +1592,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Removes the attached skill from the current state card.
-   */
-  async removeSkillFromState(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(addSkillButton);
-      // If the skill menu was collapsed in mobile view.
-      if (!element) {
-        await this.clickOn(mobileToggleSkillCard);
-      }
-    }
-    await this.clickOn(deleteSkillButton);
-    await this.clickOn('Delete skill');
-  }
-
-  /**
    * Function to navigate to the preview tab.
    */
   async navigateToPreviewTab(): Promise<void> {
@@ -1767,6 +1728,42 @@ export class ExplorationEditor extends BaseUser {
       fs.unlinkSync(path.join(downloadPath, downloadedFile));
     }
     return downloadedFile;
+  }
+
+  /**
+   * Expands the specified settings tab section.
+   * Currently it only expands Basic Settings, Advanced Features, Roles, and Voice Artists.
+   * @param section - The name of the section to expand.
+   */
+  async expandSettingsTabSection(
+    section: 'Basic Settings' | 'Advanced Features' | 'Roles' | 'Voice Artists'
+  ): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage(
+        `Skipped: Expanding ${section} section on desktop.\n` +
+          `Reason: Sections are already expanded on desktop.`
+      );
+      return;
+    }
+
+    // Generate the selectors for the section header and content.
+    const identifier = section.replace(' ', '-').toLowerCase();
+    const sectionContentSelector = `.e2e-test-${identifier}-content`;
+    const sectionHeaderSelector = `.e2e-test-${identifier}-header`;
+
+    // Skip if the section is already expanded.
+    if (await this.isElementVisible(sectionContentSelector)) {
+      showMessage(
+        `Skipped: Expanding ${section} section on desktop.\n` +
+          `Reason: Section is already expanded on desktop.`
+      );
+      return;
+    }
+
+    // Expand the section.
+    await this.expectElementToBeVisible(sectionHeaderSelector);
+    await this.page.click(sectionHeaderSelector);
+    await this.expectElementToBeVisible(sectionContentSelector);
   }
 
   /**
@@ -2113,7 +2110,7 @@ export class ExplorationEditor extends BaseUser {
   async playExploration(explorationId: string): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.page.goto(`${baseUrl}/explore/${explorationId}`),
+      this.goto(`${baseUrl}/explore/${explorationId}`),
     ]);
   }
 
@@ -2212,7 +2209,9 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Invalid content type: ${contentType}`);
     }
     await this.clickOn(saveTranslationButton);
+
     await this.waitForNetworkIdle();
+    await this.expectElementToBeClickable(saveTranslationButton, false);
   }
 
   /**
@@ -2658,6 +2657,11 @@ export class ExplorationEditor extends BaseUser {
 
     await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();
+
+    await this.expectElementToBeVisible(
+      explorationSummaryTileTitleSelector,
+      false
+    );
   }
 
   /**
@@ -2772,6 +2776,8 @@ export class ExplorationEditor extends BaseUser {
     }
     await this.select(feedbackStatusMenu, statusValue);
     await this.clickOn(sendButtonSelector);
+
+    await this.expectElementToBeClickable(sendButtonSelector, false);
   }
 
   /**
@@ -2788,13 +2794,6 @@ export class ExplorationEditor extends BaseUser {
         `Expected feedback status to be ${statusValue}, but found ${currentStatus}`
       );
     }
-  }
-
-  /**
-   * Presses the back button in the feedback thread tab.
-   */
-  async pressFeedbackThreadBackButton(): Promise<void> {
-    await this.clickOn(feedbackTabBackButtonSelector);
   }
 
   /**

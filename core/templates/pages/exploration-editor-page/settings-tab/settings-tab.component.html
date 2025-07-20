@@ -1,7 +1,7 @@
 <div class="oppia-settings-container e2e-test-exploration-editor-settings-tab">
   <mat-card class="oppia-editor-card oppia-settings-card-container oppia-basic-settings-card oppia-mobile-collapsible-card e2e-test-settings-card">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('settings')">
-      <h3 class="e2e-test-settings-container" tabindex="0">Basic Settings</h3>
+      <h3 class="e2e-test-settings-container e2e-test-basic-settings-header" tabindex="0">Basic Settings</h3>
       <i class="fa fa-caret-down"
          *ngIf="!basicSettingIsShown"
          aria-hidden="true">
@@ -12,7 +12,7 @@
       </i>
     </div>
 
-    <div class="oppia-mobile-collapsible-card-content" *ngIf="basicSettingIsShown">
+    <div class="oppia-mobile-collapsible-card-content e2e-test-basic-settings-content" *ngIf="basicSettingIsShown">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div *ngIf="editabilityService.isEditable()">
           <div role="form" class="form-horizontal">
@@ -207,7 +207,7 @@
 
   <mat-card class="oppia-settings-card-container oppia-advanced-features-card oppia-editor-card oppia-mobile-collapsible-card" *ngIf="editabilityService.isEditable()">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('advanced_features')">
-      <h3 class="e2e-test-advanced-settings-container" tabindex="0">Advanced Features</h3>
+      <h3 class="e2e-test-advanced-settings-container e2e-test-advanced-features-header" tabindex="0">Advanced Features</h3>
       <i class="fa fa-caret-down"
          *ngIf="!advancedFeaturesIsShown"
          aria-hidden="true">
@@ -218,7 +218,7 @@
       </i>
     </div>
 
-    <div *ngIf="advancedFeaturesIsShown" class="oppia-mobile-collapsible-card-content">
+    <div *ngIf="advancedFeaturesIsShown" class="oppia-mobile-collapsible-card-content e2e-test-advanced-features-content">
       <div role="form" class="form-horizontal" *ngIf="areParametersUsed()">
         <div class="oppia-features-header">
           <label for="enableParameters">
@@ -277,7 +277,7 @@
             class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('roles')">
-        <h3 class="e2e-test-roles-settings-container" tabindex="0">Roles</h3>
+        <h3 class="e2e-test-roles-settings-container e2e-test-roles-header" tabindex="0">Roles</h3>
         <i class="fa fa-caret-down"
            *ngIf="!rolesCardIsShown"
            aria-hidden="true">
@@ -287,7 +287,7 @@
            aria-hidden="true">
         </i>
       </div>
-      <div class="oppia-mobile-collapsible-card-content" *ngIf="rolesCardIsShown">
+      <div class="oppia-mobile-collapsible-card-content e2e-test-roles-content" *ngIf="rolesCardIsShown">
         <div *ngIf="canModifyRoles" [hidden]="isRolesFormOpen" class="oppia-edit-roles-btn-container">
           <span tabindex="0" (click)="openEditRolesForm()" (keydown.enter)="openEditRolesForm()" class="oppia-edit-roles-btn e2e-test-edit-roles">
             EDIT
@@ -377,7 +377,7 @@
             class="oppia-settings-card-container oppia-editor-card oppia-roles-editor-card oppia-mobile-collapsible-card">
     <div class="oppia-roles-container">
       <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('voice_artists')">
-        <h3 class="e2e-test-voice-artists-settings-container" tabindex="0">Voice Artists</h3>
+        <h3 class="e2e-test-voice-artists-settings-container e2e-test-voice-artists-header" tabindex="0">Voice Artists</h3>
         <i class="fa fa-caret-down e2e-test-voice-artist-collapsible-card-header"
            *ngIf="!voiceArtistsCardIsShown"
            aria-hidden="true">
@@ -387,7 +387,7 @@
            aria-hidden="true">
         </i>
       </div>
-      <div class="oppia-mobile-collapsible-card-content e2e-test-voice-artist-card" *ngIf="voiceArtistsCardIsShown">
+      <div class="oppia-mobile-collapsible-card-content e2e-test-voice-artist-card e2e-test-voice-artists-content" *ngIf="voiceArtistsCardIsShown">
         <div>
           <div [hidden]="isVoiceoverFormOpen" tabindex="0" class="oppia-no-voice-artist-message" *ngIf="!(explorationRightsService.voiceArtistNames && explorationRightsService.voiceArtistNames.length)">
             No voice artists are assigned to this exploration.
