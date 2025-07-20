@@ -87,7 +87,6 @@ describe('Contributions and review component', () => {
   var contributionAndReviewService: ContributionAndReviewService;
   var contributionOpportunitiesService: ContributionOpportunitiesService;
   var skillBackendApiService: SkillBackendApiService;
-  var skill: Skill;
   var translationTopicService: TranslationTopicService;
   var userService: UserService;
   let alertsService: AlertsService;

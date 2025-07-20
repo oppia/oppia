@@ -36,7 +36,6 @@ describe('Skill Description Editor Component', () => {
 
   let skillUpdateService: SkillUpdateService;
   let skillEditorStateService: SkillEditorStateService;
-  let skill: Skill;
 
   let sampleSkillRights: SkillRights;
   let skillRightsDict: SkillRightsBackendDict;

@@ -103,7 +103,6 @@ describe('Exploration editor tab component', () => {
   let stateObject: StateBackendDict;
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let skillBackendApiService: SkillBackendApiService;
-  let skill: Skill;
   let alertsService: AlertsService;
 
   class MockJoyrideService {

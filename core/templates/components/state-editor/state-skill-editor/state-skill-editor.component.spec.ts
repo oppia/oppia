@@ -65,7 +65,6 @@ describe('State Skill Editor Component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let userService: UserService;
   let skillBackendApiService: SkillBackendApiService;
-  let skill: Skill;
 
   let skillSummaryBackendDict: SkillSummaryBackendDict = {
     id: 'test_id',

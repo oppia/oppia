@@ -72,7 +72,6 @@ describe('Question Suggestion Review Modal component', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let suggestionModalService: SuggestionModalService;
   let skillBackendApiService: SkillBackendApiService;
-  let skill: Skill;
   let pageContextService: PageContextService;
   let cancelSuggestionSpy: jasmine.Spy;
   let threadDataBackendApiService: ThreadDataBackendApiService;

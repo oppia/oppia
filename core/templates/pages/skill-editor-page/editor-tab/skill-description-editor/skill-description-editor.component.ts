@@ -54,7 +54,6 @@ export class SkillDescriptionEditorComponent implements OnInit, OnDestroy {
     private validatorsService: ValidatorsService
   ) {}
 
-
   canEditSkillDescription(): boolean {
     return this.skillRights.canEditSkillDescription();
   }

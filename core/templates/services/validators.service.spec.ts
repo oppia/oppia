@@ -112,17 +112,17 @@ describe('Validators service', () => {
   });
 
   it('should validate description using hasValidDescription()', () => {
-  spyOn(vs, 'isValidEntityName').and.returnValue(true);
+    spyOn(vs, 'isValidEntityName').and.returnValue(true);
 
-  const result = vs.hasValidDescription('Skill name');
+    const result = vs.hasValidDescription('Skill name');
 
-  expect(result).toBe(true);
-  expect(vs.isValidEntityName).toHaveBeenCalledWith(
-    'Skill name',
-    false,
-    false
-  );
-});
+    expect(result).toBe(true);
+    expect(vs.isValidEntityName).toHaveBeenCalledWith(
+      'Skill name',
+      false,
+      false
+    );
+  });
 
   it('should correctly validate review message', () => {
     const longReviewText: string = 'a'.repeat(10001);

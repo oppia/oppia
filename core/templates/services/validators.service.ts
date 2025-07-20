@@ -29,7 +29,7 @@ import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-
 export class ValidatorsService {
   constructor(
     private alerts: AlertsService,
-    private whitespacefilter: NormalizeWhitespacePipe,
+    private whitespacefilter: NormalizeWhitespacePipe
   ) {}
 
   /**
