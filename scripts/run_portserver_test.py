@@ -36,25 +36,32 @@ class MockSocket:
     server_closed = False
     port: int = 8181
 
-    def setsockopt(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
+    def setsockopt( # pylint: disable=missing-docstring
+        self, *unused_args: str) -> None:
         pass
 
-    def bind(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
+    def bind( # pylint: disable=missing-docstring
+        self, *unused_args: str) -> None:
         pass
 
-    def listen(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
+    def listen( # pylint: disable=missing-docstring
+        self, *unused_args: str) -> None:
         pass
 
-    def getsockname(self, *unused_args: str) -> List[Union[str, int]]: # pylint: disable=missing-docstring
+    def getsockname( # pylint: disable=missing-docstring
+        self, *unused_args: str) -> List[Union[str, int]]:
         return ['Address', self.port]
 
-    def recv(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
+    def recv( # pylint: disable=missing-docstring
+        self, *unused_args: str) -> None:
         pass
 
-    def sendall(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
+    def sendall( # pylint: disable=missing-docstring
+        self, *unused_args: str) -> None:
         pass
 
-    def shutdown(self, *unused_args: str) -> None: # pylint: disable=missing-docstring
+    def shutdown( # pylint: disable=missing-docstring
+        self, *unused_args: str) -> None:
         raise socket.error('Some error occurred.')
 
     def close(self) -> None: # pylint: disable=missing-docstring

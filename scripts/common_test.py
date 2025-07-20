@@ -795,7 +795,8 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertEqual(common.get_personal_access_token(), 'token')
 
     def test_get_personal_access_token_with_token_as_none(self) -> None:
-        def mock_getpass(prompt: str) -> None:  # pylint: disable=unused-argument
+        def mock_getpass( # pylint: disable=unused-argument
+            prompt: str) -> None:
             return None
         getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         with getpass_swap, self.assertRaisesRegex(

@@ -47,7 +47,7 @@ describe('Exploration Creator', function () {
     'should draft, discard and publish the changes',
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
       await explorationEditor.dismissWelcomeModal();
 
       await explorationEditor.createMinimalExploration(

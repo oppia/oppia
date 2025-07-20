@@ -110,6 +110,10 @@ const grantSuperAdminButtonSelector = '.e2e-test-grant-super-admin-button';
 const usernameToGrantPrivilegeInput = '.e2e-test-username-to-grant-input';
 const revokeSuperAdminButton = '.e2e-test-revoke-super-admin-button';
 const usernameToRevokePrivilegeInput = '.e2e-test-username-to-revoke-input';
+const saveAutogenerationToggleButtonSelector =
+  '.e2e-test-save-autogeneration-toggle-button';
+const enableAutogenerationToggleSelector =
+  '.e2e-test-cloud-service-autogeneration-toggle';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -1164,6 +1168,23 @@ export class SuperAdmin extends BaseUser {
 
     await this.page.waitForSelector(updateBlogPostButtonSelector);
     await this.clickOn(updateBlogPostButtonSelector);
+  }
+
+  /**
+   * Enables text-to-speech synthesis for Oppia voiceovers using a cloud
+   * service.
+   */
+  async enableTextToSpeechSynthesisUsingCloudService(): Promise<void> {
+    await this.navigateToAdminPageMiscTab();
+    await this.scrollToBottomOfPage();
+    await this.page.waitForSelector(enableAutogenerationToggleSelector);
+    const toggle = await this.page.$(enableAutogenerationToggleSelector);
+    if (!toggle) {
+      throw new Error('Enable autogeneration toggle not found on the page.');
+    }
+    await toggle.click();
+    await this.page.waitForSelector(saveAutogenerationToggleButtonSelector);
+    await this.clickOn(saveAutogenerationToggleButtonSelector);
   }
 }
 

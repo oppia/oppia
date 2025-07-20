@@ -37,10 +37,13 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(builtins, 'print', mock_print)
         if os.path.isdir(os.path.join(os.getcwd(), 'dummy_dir')):
             shutil.rmtree('dummy_dir')
-        skip_files_list = (
-            'random_file.py\n'
-            '# This is a comment\n'
-            'new_file.py')
+        skip_files_list = '\n'.join(
+            [
+                'random_file.py',
+                '# This is a comment',
+                'new_file.py',
+            ]
+        )
         os.mkdir('dummy_dir', mode=0o777)
         os.mkdir('dummy_dir/dummy_dir2', mode=0o777)
         with open('dummy_dir/file1.py', 'w', encoding='utf-8') as f:
