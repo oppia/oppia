@@ -31,3 +31,8 @@
 oppia-new-conversation-skin {
   width: 100%;
 }
+
+.new-conversation-skin-cards-container-embedded {
+  position: absolute;
+  bottom: 0;
+}

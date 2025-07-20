@@ -22,7 +22,7 @@
     </a>
   </div>
   <div class="player-header-right">
-    <button class="header-menu-button" (click)="toggleMenu()">
+    <button class="header-menu-button" *ngIf= "!pageIsIframed" (click)="toggleMenu()">
       <i class="fa fa-lg fa-ellipsis-h"></i>
     </button>
   </div>
