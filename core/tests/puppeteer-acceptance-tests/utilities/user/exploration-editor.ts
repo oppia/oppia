@@ -403,6 +403,8 @@ export class ExplorationEditor extends BaseUser {
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
       await this.clickOn(closePublishedPopUpButton);
+
+      await this.expectElementToBeVisible(closePublishedPopUpButton, false);
       return explorationId;
     };
 
@@ -486,7 +488,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(dropdownToggleIcon);
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
+      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -828,6 +830,8 @@ export class ExplorationEditor extends BaseUser {
       await this.type(addTagsInputBox, tagNames[i].toLowerCase());
       await this.page.keyboard.press('Tab');
     }
+
+    await this.expectTagsToMatch(tagNames);
   }
 
   async expectTagsToMatch(expectedTags: string[]): Promise<void> {
