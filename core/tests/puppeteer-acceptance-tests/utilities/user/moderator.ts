@@ -48,8 +48,8 @@ export class Moderator extends BaseUser {
    * Function to navigate to the Featured Activities tab.
    */
   async navigateToFeaturedActivitiesTab(): Promise<void> {
+    await this.expectElementToBeVisible(featuredActivitiesTab);
     await this.clickOn(featuredActivitiesTab);
-
     await this.expectElementToBeVisible(featuredActivitiesHeaderSelector);
   }
 
@@ -75,6 +75,7 @@ export class Moderator extends BaseUser {
    * @param {number} commitIndex - The index of the commit to view.
    */
   private async getPropertiesOfCommit(commitIndex: number): Promise<object> {
+    await this.page.waitForSelector(commitRowSelector);
     const commitRows = await this.page.$$(commitRowSelector);
     if (commitRows.length === 0) {
       throw new Error('No recent commits found');
@@ -150,6 +151,19 @@ export class Moderator extends BaseUser {
   async openFeedbackTabFromLinkInExplorationTitle(
     title: string
   ): Promise<void> {
+    await this.page.waitForFunction(
+      (title: string) => {
+        const anchorElements = document.querySelectorAll(`a`);
+        for (const element of anchorElements) {
+          if (element.textContent?.trim() === title) {
+            return true;
+          }
+        }
+        return false;
+      },
+      {},
+      title
+    );
     await this.clickAndWaitForNavigation(title);
 
     await this.expectElementToBeVisible(
@@ -193,6 +207,7 @@ export class Moderator extends BaseUser {
    * @param {number} messageIndex - The index of the feedback message to fetch, starting from 1.
    */
   private async fetchFeedbackMessage(messageIndex: number): Promise<object> {
+    await this.page.waitForSelector(feedbackMessageRowSelector);
     const messageRows = await this.page.$$(feedbackMessageRowSelector);
     if (messageRows.length === 0) {
       throw new Error('No feedback messages found');
@@ -249,6 +264,19 @@ export class Moderator extends BaseUser {
   async openFeedbackTabFromLinkInExplorationId(
     explorationID: string | null
   ): Promise<void> {
+    await this.page.waitForFunction(
+      (explorationID: string) => {
+        const anchorElements = document.querySelectorAll('a');
+        for (const element of anchorElements) {
+          if (element.textContent?.trim() === explorationID) {
+            return true;
+          }
+        }
+        return false;
+      },
+      {},
+      explorationID
+    );
     await this.clickAndWaitForNavigation(` ${explorationID} ` as string);
 
     await this.expectElementToBeVisible(
@@ -260,6 +288,7 @@ export class Moderator extends BaseUser {
    * Function to navigate to recent feedback messages.
    */
   async navigateToRecentFeedbackMessagesTab(): Promise<void> {
+    await this.expectElementToBeVisible(feedbackMessagesTab);
     await this.clickOn(feedbackMessagesTab);
 
     await this.expectElementToBeVisible(feedbackMessagesHeaderSelector);

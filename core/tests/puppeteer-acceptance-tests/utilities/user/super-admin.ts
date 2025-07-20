@@ -114,6 +114,8 @@ const saveAutogenerationToggleButtonSelector =
   '.e2e-test-save-autogeneration-toggle-button';
 const enableAutogenerationToggleSelector =
   '.e2e-test-cloud-service-autogeneration-toggle';
+const assignedTopicSelector = '.e2e-test-assigned-topic';
+const selectedRoleHeadingSelector = '.e2e-test-active-role';
 
 export class SuperAdmin extends BaseUser {
   /**
@@ -238,6 +240,21 @@ export class SuperAdmin extends BaseUser {
         await this.waitForElementToBeClickable(button);
         await button.click();
 
+        await this.page.waitForFunction(
+          (selector: string, topic: string) => {
+            const assingedTopicElements = document.querySelectorAll(selector);
+            for (const element of assingedTopicElements) {
+              const textContent = element.textContent;
+              if (textContent === topic) {
+                return true;
+              }
+            }
+            return false;
+          },
+          {},
+          assignedTopicSelector,
+          topicName
+        );
         return;
       }
     }
@@ -330,6 +347,8 @@ export class SuperAdmin extends BaseUser {
     await this.navigateToAdminPageRolesTab();
     role = role.replace(/\b\w/g, char => char.toUpperCase());
     await this.clickOn(role);
+
+    await this.expectTextContentToMatch(selectedRoleHeadingSelector, role);
   }
 
   /**
@@ -838,6 +857,8 @@ export class SuperAdmin extends BaseUser {
 
       await this.waitForElementToBeClickable(paramValueInput);
       await this.page.type(paramValueInput, ruleValue);
+
+      await this.expectTextContentToMatch(paramValueInput, ruleValue);
       showMessage('Rule added successfully.');
     } catch (error) {
       console.error(
@@ -873,6 +894,13 @@ export class SuperAdmin extends BaseUser {
       await platformParameter.waitForSelector(paramValueInput, {visible: true});
       const valueInputs = await platformParameter.$$(paramValueInput);
       await valueInputs[1].type(value);
+      await this.page.waitForFunction(
+        (element: HTMLInputElement) => {
+          return element.value.trim() === value.trim();
+        },
+        {},
+        valueInputs[1]
+      );
       showMessage('Default value changed successfully.');
     } catch (error) {
       console.error(

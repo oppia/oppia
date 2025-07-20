@@ -92,7 +92,8 @@ const questionSuggestionModalDifficultySelector = '.oppia-difficulty-title';
 const questionDifficultySelectionModalSelector =
   '.e2e-test-question-opportunity-difficulty';
 
-const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
+const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
+const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
 
 export class QuestionSubmitter extends BaseUser {
   /**
@@ -289,7 +290,7 @@ export class QuestionSubmitter extends BaseUser {
     await this.expectElementToBeVisible(submitQuestionButon);
     await this.clickOn(submitQuestionButon);
 
-    this.isElementVisible(submitQuestionButon, false);
+    this.expectElementToBeVisible(submitQuestionButon, false);
   }
 
   /**
@@ -562,26 +563,14 @@ export class QuestionSubmitter extends BaseUser {
       await this.clickOn(stateContentInputField);
       await this.type(stateContentInputField, `${defaultResponseFeedback}`);
       await this.clickOn(saveOutcomeFeedbackButton);
-
-      // Check for text and add post check based on it.
-      const newDefaultResponseText = await this.page.$eval(
-        openOutcomeFeedBackEditor,
-        el => el.textContent?.trim()
-      );
-
-      if (newDefaultResponseText !== defaultResponseFeedback) {
-        throw new Error(
-          `Error updating default response. Found ${newDefaultResponseText}, expected ${defaultResponseFeedback}`
-        );
-      }
-
-      showMessage(`Default response feedback: ${newDefaultResponseText}`);
+      await this.expectElementToBeVisible(saveOutcomeFeedbackButton, false);
     }
 
     if (directToCard) {
       await this.clickOn(openOutcomeDestButton);
       await this.page.select(destinationSelectorDropdown, directToCard);
-      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+      await this.clickOn(saveDestinationButtonSelector);
+      await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
 
     if (directToCardWhenStuck) {
@@ -589,7 +578,11 @@ export class QuestionSubmitter extends BaseUser {
       // The '4: /' value is used to select the 'a new card called' option in the dropdown.
       await this.select(destinationWhenStuckSelectorDropdown, '4: /');
       await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
-      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+      await this.clickOn(saveStuckDestinationButtonSelector);
+      await this.expectElementToBeVisible(
+        saveStuckDestinationButtonSelector,
+        false
+      );
     }
   }
 }

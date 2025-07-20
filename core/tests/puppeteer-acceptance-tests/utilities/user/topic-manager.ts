@@ -15,6 +15,7 @@
 /**
  * @fileoverview Topic manager utility file.
  */
+import {doc} from 'prettier';
 import {BaseUser} from '../common/puppeteer-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
@@ -1313,6 +1314,16 @@ export class TopicManager extends BaseUser {
       await this.expectElementToBeVisible(questionTextInput);
       await this.type(questionTextInput, questionText);
       await this.page.keyboard.press('Enter');
+
+      await this.page.waitForFunction(
+        (selector: string, value: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === value;
+        },
+        {},
+        questionTextInput,
+        questionText
+      );
     } catch (error) {
       console.error(`Error previewing question: ${error.message}`);
       throw error;
@@ -1788,6 +1799,7 @@ export class TopicManager extends BaseUser {
     optional: boolean = false
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(addButtonSelector);
       const element = await this.page.$(addButtonSelector);
       // If the misconceptions were collapsed in mobile view.
       if (!element) {
@@ -1920,10 +1932,12 @@ export class TopicManager extends BaseUser {
    */
   async updateReviewMaterial(updatedMaterial: string): Promise<void> {
     try {
+      await this.expectElementToBeVisible(editConceptCardSelector);
       await this.clickOn(editConceptCardSelector);
       await this.clearAllTextFrom(rteSelector);
       await this.type(rteSelector, updatedMaterial);
       await this.clickOn(saveConceptCardSelector);
+      await this.expectElementToBeVisible(saveConceptCardSelector, false);
       showMessage('Updated review material');
     } catch (error) {
       console.error(error);
@@ -1960,6 +1974,7 @@ export class TopicManager extends BaseUser {
   async addPrerequisiteSkillInSkillEditor(skillName: string): Promise<void> {
     try {
       if (this.isViewportAtMobileWidth()) {
+        await this.page.waitForSelector(togglePrerequisiteSkillsDropdown);
         await this.clickOn(togglePrerequisiteSkillsDropdown);
       }
       await this.clickOn(addPrerequisiteSkillInSkillEditorButton);
@@ -2028,6 +2043,22 @@ export class TopicManager extends BaseUser {
           }
         }
       }
+
+      await this.page.waitForFunction(
+        (selector: string, skillName: string) => {
+          const skillElements = document.querySelectorAll(selector);
+          for (const skillElement of skillElements) {
+            const skillNameElement = skillElement.querySelector('span');
+            if (skillNameElement?.textContent?.trim() === skillName) {
+              return false;
+            }
+          }
+          return true;
+        },
+        {},
+        `${skillDescriptionCardSelector} a`,
+        skillName
+      );
 
       throw new Error(`The skill ${skillName} was not found`);
     } catch (error) {

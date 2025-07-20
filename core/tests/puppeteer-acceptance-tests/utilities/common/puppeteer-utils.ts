@@ -1028,6 +1028,20 @@ export class BaseUser {
   ): Promise<void> {
     expect(await this.isElementVisible(selector)).toBe(visible);
   }
+
+  /**
+   * This function checks if the page URL contains the given URL.
+   * @param {string} url - The URL to check.
+   */
+  async expectPageURLToContain(url: string): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => {
+        return window.location.href.includes(url);
+      },
+      {},
+      url
+    );
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();

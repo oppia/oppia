@@ -2081,12 +2081,27 @@ export class LoggedOutUser extends BaseUser {
     }
     await this.page.waitForSelector(languageDropdown);
     const languageDropdownElement = await this.page.$(languageDropdown);
-    if (languageDropdownElement) {
-      await languageDropdownElement.click();
+    if (!languageDropdownElement) {
+      throw new Error('Language dropdown element not found');
     }
+    const initialLanguage = await this.page.$eval(
+      languageDropdown,
+      el => el.textContent
+    );
+    await languageDropdownElement.click();
     await this.clickOn(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
+
+    await this.page.waitForFunction(
+      (selector: string, textContent: string) => {
+        const element = document.querySelector(selector);
+        return element && element.textContent !== textContent;
+      },
+      {},
+      languageOption,
+      initialLanguage
+    );
   }
 
   /**
@@ -2930,6 +2945,7 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForElementToBeClickable(newsletterEmailInputField);
     await this.type(newsletterEmailInputField, email);
     await this.clickOn(newsletterSubscribeButton);
+    await this.expectElementToBeVisible(newsletterSubscriptionThanksMessage);
   }
 
   /**
@@ -3128,6 +3144,17 @@ export class LoggedOutUser extends BaseUser {
 
     await this.clickOn(searchInputSelector);
     await this.page.keyboard.press('Enter');
+
+    await this.page.waitForFunction(
+      (categoryNames: string[]) => {
+        // Check if URL contains all the categories. Added %22 to remove false positives.
+        return categoryNames.every(category =>
+          window.location.href.includes(`%22${category}%22`)
+        );
+      },
+      {},
+      categoryNames
+    );
   }
 
   /**
@@ -3185,6 +3212,17 @@ export class LoggedOutUser extends BaseUser {
 
     await this.clickOn(searchInputSelector);
     await this.page.keyboard.press('Enter');
+
+    await this.page.waitForFunction(
+      (languageNames: string[]) => {
+        // Check if URL contains all the categories. Added %22 to remove false positives.
+        return languageNames.every(language =>
+          window.location.href.includes(`%22${language}%22`)
+        );
+      },
+      {},
+      languageNames
+    );
   }
 
   /**
@@ -3369,6 +3407,14 @@ export class LoggedOutUser extends BaseUser {
             this.waitForElementToBeClickable(name),
             name.click(),
           ]);
+
+          await this.page.waitForFunction(
+            (url: string) => {
+              return window.location.href.includes(url);
+            },
+            {},
+            testConstants.URLs.TopicAndSkillsDashboard
+          );
           return;
         }
       }
@@ -3427,6 +3473,10 @@ export class LoggedOutUser extends BaseUser {
                 this.waitForElementToBeClickable(chapter),
                 chapter.click(),
               ]);
+
+              await this.expectPageURLToContain(
+                testConstants.URLs.ExplorationPlayer
+              );
               return;
             }
           }
@@ -3470,6 +3520,10 @@ export class LoggedOutUser extends BaseUser {
             this.waitForElementToBeClickable(chapter),
             chapter.click(),
           ]);
+
+          await this.expectPageURLToContain(
+            testConstants.URLs.ExplorationPlayer
+          );
           return;
         }
       }
@@ -3554,6 +3608,11 @@ export class LoggedOutUser extends BaseUser {
             this.waitForElementToBeClickable(subtopicElements[i]),
             subtopicElements[i].click(),
           ]);
+
+          await this.expectElementToBeVisible(
+            subTopicTitleInLessTabSelector,
+            false
+          );
           return;
         }
       }
@@ -4078,11 +4137,13 @@ export class LoggedOutUser extends BaseUser {
    */
   async closeSolutionModal(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(closeSolutionModalButton, {visible: true});
+    await this.expectElementToBeVisible(closeSolutionModalButton);
     const closeSolutionModalButtonElement = await this.page.$(
       closeSolutionModalButton
     );
     await closeSolutionModalButtonElement?.click();
+
+    await this.expectElementToBeVisible(closeSolutionModalButton, false);
   }
   /**
    * Function to view previous responses in a state.

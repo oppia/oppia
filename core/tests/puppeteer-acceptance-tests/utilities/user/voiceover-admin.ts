@@ -91,13 +91,6 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
-   * Function to open voice artist dropdown in mobile view.
-   */
-  async openvoiceArtistDropdown(): Promise<void> {
-    await this.clickOn(voiceArtistSettingsDropdown);
-  }
-
-  /**
    * Function to dismiss welcome modal.
    */
   async dismissWelcomeModal(): Promise<void> {
@@ -142,7 +135,7 @@ export class VoiceoverAdmin extends BaseUser {
       await this.expectElementToBeVisible(mobileOptionsDropdown, false);
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
+      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -194,7 +187,10 @@ export class VoiceoverAdmin extends BaseUser {
         );
         showMessage(voiceArtists[i] + ' has been added as a voice artist.');
       } catch (error) {
-        showMessage(voiceArtists[i] + ' is not added.');
+        throw new Error(
+          `${voiceArtists[i]} is not added.\n` +
+            `Original Error: ${error.stack}`
+        );
       }
     }
   }
