@@ -33,7 +33,6 @@ describe('Skill Rubrics Editor Component', () => {
   let component: SkillRubricsEditorComponent;
   let fixture: ComponentFixture<SkillRubricsEditorComponent>;
   let skillEditorStateService: SkillEditorStateService;
-  let skill: Skill;
   let skillUpdateService: SkillUpdateService;
   let windowDimensionsService: WindowDimensionsService;
   let mockEventEmitter = new EventEmitter();

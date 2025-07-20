@@ -25,7 +25,6 @@ import {SkillEditorNavbarBreadcrumbComponent} from './skill-editor-navbar-breadc
 describe('SkillEditorNavbarBreadcrumbComponent', () => {
   let component: SkillEditorNavbarBreadcrumbComponent;
   let fixture: ComponentFixture<SkillEditorNavbarBreadcrumbComponent>;
-  let skill: Skill;
   let skillObject: Skill;
   let skillEditorStateService: SkillEditorStateService;
 

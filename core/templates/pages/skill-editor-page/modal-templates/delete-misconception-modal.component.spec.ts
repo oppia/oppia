@@ -31,7 +31,6 @@ class MockActiveModal {
 
 describe('Delete Misconception Modal Component', () => {
   let skillEditorStateService: SkillEditorStateService;
-  let skill: Skill;
   let skillObject: Skill;
   let index = 0;
   let component: DeleteMisconceptionModalComponent;

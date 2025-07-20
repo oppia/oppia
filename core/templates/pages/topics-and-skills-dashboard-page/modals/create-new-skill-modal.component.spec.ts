@@ -31,7 +31,6 @@ import {CreateNewSkillModalComponent} from './create-new-skill-modal.component';
 describe('Create new skill modal', () => {
   let fixture: ComponentFixture<CreateNewSkillModalComponent>;
   let componentInstance: CreateNewSkillModalComponent;
-  let skill: Skill;
   let pageContextService: PageContextService;
   let testObj: SubtitledHtml = SubtitledHtml.createDefault(
     'test_html',

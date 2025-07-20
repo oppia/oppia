@@ -41,7 +41,6 @@ describe('Add Misconception Modal Component', function () {
   let fixture: ComponentFixture<AddMisconceptionModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let skillEditorStateService: SkillEditorStateService;
-  let skill: Skill;
   let skillObject: Skill;
 
   beforeEach(waitForAsync(() => {

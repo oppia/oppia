@@ -210,7 +210,6 @@ describe('Skill editor state service', () => {
   let fakeSkillBackendApiService: FakeSkillBackendApiService;
   let fakeSkillRightsBackendApiService: FakeSkillRightsBackendApiService;
   let skillEditorStateService: SkillEditorStateService;
-  let skill: Skill;
   let skillRightsObject: SkillRightsBackendDict;
   let skillUpdateService: SkillUpdateService;
 

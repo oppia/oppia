@@ -28,7 +28,6 @@ describe('Skill question tab component', () => {
   let fixture: ComponentFixture<SkillQuestionsTabComponent>;
   let skillEditorStateService: SkillEditorStateService;
   let initEventEmitter = new EventEmitter();
-  let skill: Skill;
   let sampleSkill: Skill;
 
   beforeEach(() => {

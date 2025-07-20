@@ -85,7 +85,6 @@ const skillDict: SkillBackendDict = {
 
 describe('Skill editor staleness detection service', () => {
   let skillEditorStalenessDetectionService: SkillEditorStalenessDetectionService;
-  let skill: Skill;
   let skillEditorStateService: SkillEditorStateService;
   let localStorageService: LocalStorageService;
   let ngbModal: NgbModal;

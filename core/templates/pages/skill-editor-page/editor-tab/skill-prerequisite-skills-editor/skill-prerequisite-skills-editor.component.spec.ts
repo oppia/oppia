@@ -48,7 +48,6 @@ describe('Skill editor main tab Component', () => {
   let topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
   let ngbModal: NgbModal;
-  let skill: Skill;
 
   let topicAndSkillsDashboardDataBackendDict: TopicsAndSkillDashboardData;
   let sampleSkill: Skill;
