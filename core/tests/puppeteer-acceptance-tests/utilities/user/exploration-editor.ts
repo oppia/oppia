@@ -1870,7 +1870,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(previewTabButton);
     }
 
-    await this.isElementVisible(previewTabContainer);
+    await this.expectElementToBeVisible(previewTabContainer);
   }
 
   /**
@@ -1885,7 +1885,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(historyTabButton);
     }
 
-    await this.isElementVisible(historyTabContentContainerSelector);
+    await this.expectElementToBeVisible(historyTabContentContainerSelector);
   }
 
   /**
@@ -1937,6 +1937,7 @@ export class ExplorationEditor extends BaseUser {
     explorationVersion: number,
     isExplorationPublished: boolean
   ): Promise<void> {
+    await this.expectElementToBeVisible(historyListContent);
     const historyItems = await this.page.$$(historyListContent);
     for (const historyItem of historyItems) {
       const versionNumberElement = await historyItem.$(historyTableIndex);
@@ -2062,7 +2063,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickAndWaitForNavigation(translationTabButton);
     }
 
-    await this.isElementVisible(previewTabContainer);
+    await this.expectElementToBeVisible(previewTabContainer);
   }
 
   /**
@@ -2090,7 +2091,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(mainTabButton);
     }
 
-    await this.isElementVisible(mainTabContainerSelector);
+    await this.expectElementToBeVisible(mainTabContainerSelector);
   }
 
   /**
