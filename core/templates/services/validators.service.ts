@@ -46,6 +46,7 @@ export class ValidatorsService {
     allowEmpty: boolean
   ): boolean {
     input = this.whitespacefilter.transform(input);
+
     if (!input && !allowEmpty) {
       if (showWarnings) {
         this.alerts.addWarning('Please enter a non-empty name.');
@@ -74,6 +75,7 @@ export class ValidatorsService {
         return false;
       }
     }
+
     return true;
   }
 
