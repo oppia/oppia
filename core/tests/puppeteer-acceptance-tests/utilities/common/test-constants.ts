@@ -249,3 +249,30 @@ export default {
   ),
   TEST_DOWNLOAD_DIR: path.resolve('../oppia_acceptance_test_downloads'),
 };
+
+export const FILEPATHS = {
+  PROFILE_PHOTO_BMP: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.bmp'
+  ),
+  PROFILE_PHOTO_GIF: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.gif'
+  ),
+  PROFILE_PHOTO_JPEG: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.jpeg'
+  ),
+  PROFILE_PHOTO_JPG: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.jpg'
+  ),
+  PROFILE_PHOTO_PNG: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.png'
+  ),
+  PROFILE_PHOTO_SVG: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile.svg'
+  ),
+} as const;

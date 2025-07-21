@@ -4349,6 +4349,7 @@ class EmailMessageMock:
         subject: str,
         plaintext_body: str,
         html_body: str,
+        cc: Optional[Sequence[str]] = None,
         bcc: Optional[Sequence[str]] = None,
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
@@ -4368,6 +4369,8 @@ class EmailMessageMock:
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
+            cc: list(str)|None. Optional argument. List of cc emails. Emails
+                must be utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails. Emails
                 must be utf-8.
             reply_to: str|None. Optional argument. Reply address formatted like
@@ -4394,6 +4397,7 @@ class EmailMessageMock:
         self.subject = subject
         self.body = plaintext_body
         self.html = html_body
+        self.cc = cc
         self.bcc = bcc
         self.reply_to = reply_to
         self.recipient_variables = recipient_variables
@@ -4433,6 +4437,7 @@ class GenericEmailTestBase(GenericTestBase):
         subject: str,
         plaintext_body: str,
         html_body: str,
+        cc: Optional[List[str]] = None,
         bcc: Optional[List[str]] = None,
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
@@ -4452,6 +4457,8 @@ class GenericEmailTestBase(GenericTestBase):
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
+            cc: list(str)|None. Optional argument. List of cc emails. Must be
+                utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails. Must be
                 utf-8.
             reply_to: str|None. Optional Argument. Reply address formatted like
@@ -4476,13 +4483,17 @@ class GenericEmailTestBase(GenericTestBase):
         Returns:
             bool. Whether the emails are sent successfully.
         """
+        cc_emails = None
+        if cc:
+            cc_emails = cc[0] if len(cc) == 1 else cc
         bcc_emails = None
         if bcc:
             bcc_emails = bcc[0] if len(bcc) == 1 else bcc
 
         new_email = EmailMessageMock(
             sender_email, recipient_emails, subject, plaintext_body, html_body,
-            bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
+            cc=cc_emails, bcc=bcc_emails,
+            reply_to=(reply_to if reply_to else None),
             recipient_variables=(
                 recipient_variables if recipient_variables else None),
             attachments=attachments if attachments else None)
