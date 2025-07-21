@@ -37,6 +37,7 @@ describe('Exploration Editor', function () {
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+    await explorationEditor.dismissWelcomeModal();
   });
 
   it('should be able to save draft', async function () {
