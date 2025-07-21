@@ -241,6 +241,7 @@
 	"I18N_PREFERENCES_USERNAME": "نام کاربری",
 	"I18N_PREFERENCES_USERNAME_NOT_SELECTED": "هیچ داده‌ای انتخاب نشده",
 	"I18N_RESET_CODE": "بازنشانی کد",
+	"I18N_RTE_DISMISS_WARNING": "بگذریم",
 	"I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2": "از قبل حسابی دارید؟",
 	"I18N_SAVE_PROGRESS_TEXT": "ذخیره‌سازی پیشرفت",
 	"I18N_SHOW_LESS": "نشان دادن کمتر",
