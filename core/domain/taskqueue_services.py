@@ -66,6 +66,8 @@ FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: Final = (
 FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: Final = 'untag_deleted_misconceptions'
 FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: Final = (
     'remove_user_from_rights_models')
+FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_UPDATE: Final = (
+    'regenerate_voiceover_for_updated_exploration')
 
 
 # Here we use type Any because in defer() function '*args' points to the
@@ -95,6 +97,7 @@ def defer(
         ValueError. The arguments and keyword arguments that are passed in are
             not JSON serializable.
     """
+    print('Hello.....')
     payload = {
         'fn_identifier': fn_identifier,
         'args': (args if args else []),
@@ -110,6 +113,7 @@ def defer(
     # This is a workaround for a known python bug.
     # See https://bugs.python.org/issue7980
     datetime.datetime.strptime('', '')
+    print('Enqueuing task with function identifier: %s' % fn_identifier)
     platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
 

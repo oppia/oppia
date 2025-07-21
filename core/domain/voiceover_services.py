@@ -27,6 +27,7 @@ from core.domain import exp_domain
 from core.domain import state_domain
 from core.domain import user_services
 from core.domain import voiceover_domain
+from core.domain import voiceover_regeneration_services
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence, cast
@@ -34,8 +35,10 @@ from typing import Dict, List, Optional, Sequence, cast
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import voiceover_models
+    from mypy_imports import exp_models
 
-(voiceover_models,) = models.Registry.import_models([
+(exp_models, voiceover_models,) = models.Registry.import_models([
+    models.Names.EXPLORATION,
     models.Names.VOICEOVER])
 
 
@@ -886,3 +889,143 @@ def compute_voiceover_related_changes_upon_revert(
             )
         )
     return new_entity_voiceovers_models
+
+
+def get_autogeneratable_accents_by_language(
+    language_code: str
+) -> List[str]:
+    """Returns accent codes for a language where autogeneration is enabled for
+    Oppia's voiceovers.
+
+    Args:
+        language_code: str. The language code for which accent codes are to be
+            fetched.
+
+    Returns:
+        List[str]. A list of accent codes for the specified language where
+        autogeneration is enabled.
+    """
+    language_codes_mapping = get_all_language_accent_codes_for_voiceovers()
+    accent_codes_mapping = language_codes_mapping.get(language_code, {})
+    return [
+        accent_code
+        for accent_code, autogeneration_enabled in accent_codes_mapping.items()
+        if autogeneration_enabled
+    ]
+
+
+def regenerate_voiceover_for_updated_exploration(
+    exploration_id: str,
+    exploration_title: str,
+    exploration_version: int,
+    language_code: str,
+    author_id,
+    date_time
+):
+    """
+    Regenerates voiceovers for the updated exploration based on the changes
+    made in the exploration content (in English) or translations (in other
+    languages).
+
+    NOTE: Always invoke this method from a deferred task, as it is a
+    time-consuming operation (approximately 5 minutes) and should be performed
+    asynchronously.
+
+    Args:
+        exploration_id: str. The ID of the exploration for which voiceovers
+            need to be regenerated.
+        exploration_title: str. The title of the exploration.
+        exploration_version: int. The version of the exploration for which
+            voiceovers need to be regenerated.
+        language_code: str. The language code for which voiceovers need to be
+            regenerated.
+        author_id: str. The ID of the author who made the changes to the
+            exploration.
+        date_time: str. The date and time when the changes were
+            made to the exploration.
+
+    Raises:
+        Exception. If the voiceover regeneration fails for any of the content
+            IDs or language-accent codes.
+    """
+    # Fetches the exploration change diff for the given exploration ID and
+    # exploration version from the ExplorationCommitLogEntryModel.
+    exploration_commit_log_entry_model_id = (
+        'exploration-%s-%s' % (
+            str(exploration_id), str(exploration_version)))
+    exploration_change_diff = []
+    try:
+        exploration_change_diff = (
+        exp_models.ExplorationCommitLogEntryModel.get(
+            exploration_commit_log_entry_model_id)).commit_cmds
+    except Exception as e:
+        raise Exception(
+            'Could not fetch change diff for exploration %s, version %s during '
+            'voiceover regeneration.' %
+            (exploration_id, str(exploration_version)))
+
+    # A dictionary where each key is a language code, and each value is a
+    # content mapping dictionary. The content mapping dictionary contains
+    # content IDs as keys and their corresponding updated HTML content as
+    # values.
+    language_code_to_contents_mapping = {}
+
+    for change in exploration_change_diff:
+        cmd = change.get('cmd')
+        if cmd == exp_domain.CMD_EDIT_STATE_PROPERTY:
+            # CMD_EDIT_STATE_PROPERTY is used to fetch the updated content for
+            # the English language.
+            updated_content = change['new_value']['html']
+            content_id = change['new_value']['content_id']
+            language_code_to_contents_mapping.setdefault('en', {})[
+                content_id] = updated_content
+        elif cmd == exp_domain.CMD_EDIT_TRANSLATION:
+            # CMD_EDIT_TRANSLATION is used to fetch the updated content for
+            # the translations in other languages.
+            language_code = change['language_code']
+            updated_content = change['translation']['content_value']
+            content_id = change['content_id']
+            language_code_to_contents_mapping.setdefault(language_code, {})[
+                content_id] = updated_content
+
+    # A dictionary mapping each language code to a list of accent codes that
+    # support autogeneration.
+    language_code_to_autogeneratable_accent_codes = {}
+    for language_code in language_code_to_contents_mapping.keys():
+        language_accent_codes = (
+            get_autogeneratable_accents_by_language(
+                language_code))
+        if not language_accent_codes:
+            continue
+        language_code_to_autogeneratable_accent_codes[
+            language_code] = language_accent_codes
+
+    language_codes = list(language_code_to_contents_mapping.keys())
+
+    error_collections_during_voiceover_regeneration = []
+    count_errors = 0
+
+    for language_code in language_codes:
+        language_accent_codes = (
+            language_code_to_autogeneratable_accent_codes[language_code])
+
+        updated_content_ids_to_content_htmls = (
+            language_code_to_contents_mapping.get(language_code, {}))
+
+        for language_accent_code in language_accent_codes:
+            errors_while_voiceover_regeneration = (
+                voiceover_regeneration_services.
+                regenerate_voiceover_on_exploration_update(
+                    exploration_id,
+                    exploration_version,
+                    updated_content_ids_to_content_htmls,
+                    language_accent_code
+                )
+            )
+            if errors_while_voiceover_regeneration:
+                error_collections_during_voiceover_regeneration.extend(
+                    errors_while_voiceover_regeneration)
+                count_errors += len(errors_while_voiceover_regeneration)
+
+    # TODO: Send email to voiceover admins and voiceover tech leads with the
+    # generated errors and raise exception.

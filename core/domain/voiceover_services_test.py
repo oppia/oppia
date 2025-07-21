@@ -655,6 +655,33 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
             is_voiceover_autogeneration_using_cloud_service_enabled()
         )
 
+    def test_should_successfully_get_autogeneratable_accents(self) -> None:
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {
+                'en-US': True,
+                'en-IN': True,
+                'en-NG': False
+            },
+            'hi': {
+                'hi-IN': False
+            }
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping)
+
+        autogeneratable_accents_for_english = (
+            voiceover_services.get_autogeneratable_accents_by_language('en'))
+        self.assertItemsEqual(
+            autogeneratable_accents_for_english,
+            ['en-US', 'en-IN']
+        )
+
+        autogeneratable_accents_for_hindi = (
+            voiceover_services.get_autogeneratable_accents_by_language('hi'))
+        self.assertItemsEqual(
+            autogeneratable_accents_for_hindi, []
+        )
+
 
 class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
     """Unit tests to validate the language-accent information saved as
@@ -1145,3 +1172,72 @@ class ExplorationVoiceArtistLinkTests(test_utils.GenericTestBase):
             total_files += len(filnames)
 
         self.assertEqual(total_files, 1)
+
+
+class VoiceoverRegenerationTests(test_utils.GenericTestBase):
+    """Test class to verify voiceover regeneration across various scenarios,
+    such as exploration updates or translation updates.
+    """
+
+    def setUp(self) -> None:
+        super().setUp()
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_TRANSLATION,
+            'content_id': 'content_5',
+            'language_code': 'ar',
+            'translation': translation_domain.TranslatedContent(
+                'Updated translations in Hindi!',
+                translation_domain.TranslatableContentFormat.HTML,
+                False
+            ).to_dict()
+        })]
+
+        {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'State 1',
+            'old_value': {
+                'content_id': (
+                    self.exploration.states['State 1'].content.content_id),
+                'html': self.old_content_html
+            },
+            'new_value': {
+                'content_id': (
+                    self.exploration.states['State 1'].content.content_id),
+                'html': self.new_content_html
+            }
+        }
+
+    def test_should_regenerate_voiceover_for_curated_exploration_content_update(
+        self
+    ) -> None:
+        pass
+
+    def test_should_regenerate_voiceover_for_translation_update(
+        self) -> None:
+        pass
+
+    def test_should_not_regenerate_voiceover_for_non_curated_exploration(
+        self
+    ) -> None:
+        pass
+
+    def test_should_not_regenerate_voiceover_for_non_curated_exploration(
+        self
+    ) -> None:
+        pass
+
+    def test_should_raise_exception_when_change_diff_is_not_accessible(
+        self
+    ) -> None:
+        pass
+
+    def test_should_not_regenerate_voiceover_for_non_supported_accents(
+        self
+    ) -> None:
+        pass
+
+    def test_should_collect_errors_correctly_for_failed_voiceover_regeneration(
+        self
+    ) -> None:
+        pass

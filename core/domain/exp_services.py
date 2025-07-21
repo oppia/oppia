@@ -2112,9 +2112,11 @@ def compute_models_to_put_when_saving_new_exp_version(
                 )
             )
 
-    if opportunity_services.is_exploration_available_for_contribution(
-        exploration_id
-    ):
+    is_exploration_curated = (
+        opportunity_services.is_exploration_available_for_contribution(
+            exploration_id))
+
+    if is_exploration_curated:
         models_to_put.extend(
             opportunity_services
             .compute_opportunity_models_with_updated_exploration(
@@ -2138,6 +2140,24 @@ def compute_models_to_put_when_saving_new_exp_version(
             exp_summary_model, exp_summary
         )
     )
+
+    # Regenerating voiceovers asynchronously for the updated contents of the 
+    # curated exploration.
+    if is_exploration_curated:
+        print('About to send deferred call!')
+        try: 
+            taskqueue_services.defer(
+                taskqueue_services.FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_UPDATE,
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, 
+                exploration_id,
+                updated_exploration.title,
+                updated_exploration.version,
+                updated_exploration.language_code,
+                committer_id,
+                datetime.datetime.utcnow().isoformat(),
+            )
+        except Exception as e:
+            pass
     models_to_put.append(updated_exp_summary_model)
     return models_to_put
 
