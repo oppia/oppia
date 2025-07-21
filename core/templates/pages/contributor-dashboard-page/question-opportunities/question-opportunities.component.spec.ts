@@ -59,7 +59,6 @@ describe('Question opportunities component', () => {
   let ngbModal: NgbModal;
   let questionUndoRedoService: QuestionUndoRedoService;
   let siteAnalyticsService: SiteAnalyticsService;
-  let skill: Skill;
   let userService: UserService;
   let opportunitiesArray: SkillOpportunity[] = [];
 
