@@ -138,26 +138,26 @@ describe('Create new skill modal', () => {
       content_id: 'test_id',
     });
   });
-it('should create new skill modal', () => {
-  // Setup required values to pass validation.
-  componentInstance.skillDescriptionExists = false;
-  componentInstance.newSkillDescription = 'Test Skill Description';
-  componentInstance.bindableDict.displayedConceptCardExplanation = 'Explanation text';
+  it('should create new skill modal', () => {
+    // Setup required values to pass validation.
+    componentInstance.skillDescriptionExists = false;
+    componentInstance.newSkillDescription = 'Test Skill Description';
+    componentInstance.bindableDict.displayedConceptCardExplanation =
+      'Explanation text';
 
-  spyOn(ngbActiveModal, 'close');
+    spyOn(ngbActiveModal, 'close');
 
-  componentInstance.createNewSkill();
+    componentInstance.createNewSkill();
 
-  expect(ngbActiveModal.close).toHaveBeenCalledWith({
-    description: 'Test Skill Description',
-    rubrics: componentInstance.rubrics,
-    explanation: {
-      html: 'Explanation text',
-      content_id: 'explanation'
-    }
+    expect(ngbActiveModal.close).toHaveBeenCalledWith({
+      description: 'Test Skill Description',
+      rubrics: componentInstance.rubrics,
+      explanation: {
+        html: 'Explanation text',
+        content_id: 'explanation',
+      },
+    });
   });
-});
-
 
   it('should not create new skill modal when there is a error message', () => {
     spyOn(componentInstance, 'setErrorMessageIfNeeded');
