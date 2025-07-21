@@ -32,7 +32,7 @@ oppia-new-conversation-skin {
   width: 100%;
 }
 
-.new-conversation-skin-cards-container-embedded {
-  bottom: 0;
+.card-navigation-control {
   position: absolute;
+  width: 100% ;
 }
