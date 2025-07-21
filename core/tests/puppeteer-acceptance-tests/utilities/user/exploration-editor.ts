@@ -1953,6 +1953,9 @@ export class ExplorationEditor extends BaseUser {
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
       await this.clickOn(closePublishedPopUpButton);
+      if (!explorationId) {
+        throw new Error('Failed to get exploration ID.');
+      }
       return explorationId;
     };
 
@@ -4894,8 +4897,18 @@ export class ExplorationEditor extends BaseUser {
   }
 
   async clickOnPublishExplorationButton(): Promise<void> {
-    await this.expectElementToBeVisible(publishExplorationButtonSelector);
-    await this.clickOn(publishExplorationButtonSelector);
+    if (this.isViewportAtMobileWidth()) {
+      await this.openExplorationNavigationInMobileView();
+
+      await this.expectElementToBeVisible(mobileChangesDropdownSelector);
+      await this.clickOn(mobileChangesDropdownSelector);
+    }
+
+    const publishButtonSelector = this.isViewportAtMobileWidth()
+      ? mobilePublishButtonSelector
+      : publishExplorationButtonSelector;
+    await this.expectElementToBeVisible(publishButtonSelector);
+    await this.clickOn(publishButtonSelector);
 
     await this.expectElementToBeVisible(
       publishMetadataExplorationHeaderSelector
@@ -4939,12 +4952,38 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Opens the exploration navigation in mobile view.
+   */
+  async openExplorationNavigationInMobileView(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      return;
+    }
+
+    if (await this.isElementVisible(dropdownToggleIcon)) {
+      showMessage(
+        'Skipping opening exploration navigation in mobile view. Already opened.'
+      );
+      return;
+    }
+
+    await this.expectElementToBeVisible(mobileOptionsButtonSelector);
+    await this.page.click(mobileOptionsButtonSelector);
+
+    await this.expectElementToBeVisible(dropdownToggleIcon);
+  }
+
+  /**
    * Clicks on the save draft button.
    */
   async clickOnSaveDraftButton(): Promise<void> {
-    await this.expectElementToBeClickable(saveChangesButton);
+    await this.openExplorationNavigationInMobileView();
 
-    await this.page.click(saveChangesButton);
+    const saveButtonSelector = this.isViewportAtMobileWidth()
+      ? mobileSaveChangesButtonSelector
+      : saveChangesButton;
+    await this.expectElementToBeVisible(saveButtonSelector);
+
+    await this.page.click(saveButtonSelector);
     await this.expectElementToBeVisible(saveExplorationModalContainerSelector);
   }
 
@@ -5233,7 +5272,10 @@ export class ExplorationEditor extends BaseUser {
   async expectSaveDraftButtonToBeDisabled(
     disabled: boolean = true
   ): Promise<void> {
-    await this.expectElementToBeVisible(saveChangesButton);
+    const saveChangesButtonSelector = this.isViewportAtMobileWidth()
+      ? mobileSaveChangesButtonSelector
+      : saveChangesButton;
+    await this.expectElementToBeVisible(saveChangesButtonSelector);
 
     await this.page.waitForFunction(
       (selector: string, disabled: boolean) => {
