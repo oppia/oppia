@@ -1106,7 +1106,6 @@ export class BaseUser {
     if (present) {
       await this.page.waitForSelector(selector, {
         visible: true,
-        timeout: 10000,
       });
       showMessage(`Element with selector ${selector} was found (as expected).`);
     } else {
