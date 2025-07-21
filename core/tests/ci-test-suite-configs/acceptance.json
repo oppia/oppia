@@ -408,7 +408,30 @@
       "name": "exploration-editor/exploration-feedback",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-feedback.spec.ts"
     },
-    {"name": "exploration-editor/exploration-help", "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-help.spec.ts"}, {"name": "exploration-editor/exploration-navbar-header", "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-navbar-header.spec.ts"}, {"name": "exploration-editor/preview-all-exploration-interactions", "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/preview-all-exploration-interactions.spec.ts"}
+    {
+      "name": "exploration-editor/exploration-help",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-help.spec.ts"
+    },
+    {
+      "name": "exploration-editor/exploration-navbar-header",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-navbar-header.spec.ts"
+    },
+    {
+      "name": "exploration-editor/preview-all-exploration-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/preview-all-exploration-interactions.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/changes-site-language-to-rtl",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/changes-site-language-to-rtl.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/edit-the-profile",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/edit-the-profile.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/export-and-delete-account",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/export-and-delete-account.spec.ts"
+    }
   ],
   "docker_suites": []
 }

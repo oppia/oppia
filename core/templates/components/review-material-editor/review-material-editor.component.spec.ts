@@ -48,6 +48,9 @@ describe('Review Material Editor Component', () => {
   it('should set component properties on initialization', () => {
     expect(component.HTML_SCHEMA).toEqual({
       type: 'html',
+      ui_config: {
+        rte_components: 'ALL_COMPONENTS',
+      },
     });
     expect(component.editableExplanation).toBe('Explanation');
     expect(component.conceptCardExplanationEditorIsShown).toBe(false);

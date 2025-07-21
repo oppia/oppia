@@ -275,6 +275,7 @@ const partnerLearnMoreMobileButtonInAboutPage =
   '.e2e-test-about-page-partner-learn-more-mobile-button';
 const impactReportButtonInAboutPage =
   '.e2e-test-about-page-impact-report-button';
+const profileContainerSelector = '.e2e-test-profile-container';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -419,6 +420,9 @@ const learnerViewCardSelector = '.oppia-learner-view-card-content';
 const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const loginButtonSelector = '.e2e-mobile-test-login';
 
+const contributorIconInLessonInfoSelctor =
+  '.e2e-test-lesson-info-contributor-profile';
+
 // Splash page.
 const getAndroidAppButtonSelector = '.e2e-test-splash-android-app-button';
 
@@ -505,9 +509,10 @@ type KeyInput =
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
    */
-  async navigateToHome(): Promise<void> {
-    await this.goto(homeUrl);
+  async navigateToHome(verifyURL: boolean = true): Promise<void> {
+    await this.goto(homeUrl, verifyURL);
   }
 
   /**
@@ -4050,8 +4055,8 @@ export class LoggedOutUser extends BaseUser {
    */
   async viewHint(): Promise<void> {
     await this.page.waitForSelector(hintButtonSelector, {
-      visible: true,
-      timeout: 60000,
+      // Hint is shown after one minute.
+      timeout: 80000,
     });
     await this.clickOn(hintButtonSelector);
 
@@ -4357,6 +4362,23 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(progressUrl, verifyURL);
+  }
+
+  /**
+   * Clicks on first contributor in Lesson Info model.
+   */
+  async clickOnProfileIconInLessonInfoModel(): Promise<void> {
+    await this.page.waitForSelector(contributorIconInLessonInfoSelctor, {
+      visible: true,
+    });
+
+    await this.clickOn(contributorIconInLessonInfoSelctor);
+    const navigated = await this.isElementVisible(profileContainerSelector);
+    if (!navigated) {
+      throw new Error('Navigation to profile page failed.');
+    }
+
+    expect(this.page.url()).toContain('/profile');
   }
 
   /**
