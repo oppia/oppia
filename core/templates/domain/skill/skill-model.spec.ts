@@ -208,7 +208,7 @@ describe('Skill factory', () => {
         skill.getRubricExplanations('difficult');
       }).toThrowError(
         'Unable to get explanation: The given difficulty does ' +
-          'not match any difficulty in the rubrcs'
+          'not match any difficulty in the rubrics'
       );
     }
   );
