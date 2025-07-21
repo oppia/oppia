@@ -210,6 +210,7 @@ export class CardAnimationService {
         const progress = elapsedTime / duration;
         window.scrollTo(0, startY + difference * easingFunction(progress));
         requestAnimationFrame(step);
+        /* istanbul ignore else */
       } else {
         window.scrollTo(0, targetY);
       }

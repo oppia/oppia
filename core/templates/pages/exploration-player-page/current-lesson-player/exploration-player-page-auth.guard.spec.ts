@@ -133,6 +133,41 @@ describe('ExplorationPlayerPageAuthGuard', () => {
       });
   });
 
+  it(
+    'should redirect to /embed/lesson/:id if URL contains "embed" ' +
+      'and if new lesson player flag is enabled',
+    done => {
+      spyOn(
+        accessValidationBackendApiService,
+        'validateAccessToExplorationPlayerPage'
+      ).and.returnValue(Promise.resolve());
+
+      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+        NewLessonPlayer: {isEnabled: true},
+      });
+
+      const route = {
+        paramMap: convertToParamMap({exploration_id: 'exp123'}),
+        queryParams: {v: '1'},
+      } as unknown as ActivatedRouteSnapshot;
+
+      const routerNavigateSpy = spyOn(router, 'navigate');
+
+      guard
+        .canActivate(route, {
+          url: '/embed/exploration/exp123?v=1',
+        } as RouterStateSnapshot)
+        .then(result => {
+          expect(result).toBeFalse();
+          expect(routerNavigateSpy).toHaveBeenCalledWith(
+            ['/embed/lesson', 'exp123'],
+            {queryParams: {v: '1'}}
+          );
+          done();
+        });
+    }
+  );
+
   it('should redirect to embed error page if access is denied and URL includes embed', done => {
     spyOn(
       accessValidationBackendApiService,

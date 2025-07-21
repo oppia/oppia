@@ -32,6 +32,8 @@ describe('CardAnimationService', () => {
   let playerTranscriptService: jasmine.SpyObj<PlayerTranscriptService>;
   let playerPositionService: jasmine.SpyObj<PlayerPositionService>;
   let windowRef: WindowRef;
+  let windowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
+  let messengerService: jasmine.SpyObj<MessengerService>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -87,6 +89,12 @@ describe('CardAnimationService', () => {
       PlayerPositionService
     ) as jasmine.SpyObj<PlayerPositionService>;
     windowRef = TestBed.inject(WindowRef);
+    windowDimensionsService = TestBed.inject(
+      WindowDimensionsService
+    ) as jasmine.SpyObj<WindowDimensionsService>;
+    messengerService = TestBed.inject(
+      MessengerService
+    ) as jasmine.SpyObj<MessengerService>;
   });
 
   it('should animate to two cards and reset animation flag after timeout', fakeAsync(() => {
@@ -100,6 +108,22 @@ describe('CardAnimationService', () => {
     );
 
     expect(service.getIsAnimatingToTwoCards()).toBeFalse();
+  }));
+
+  it('should tell if window can show two cards', () => {
+    windowDimensionsService.getWidth.and.returnValue(
+      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX + 1
+    );
+
+    expect(service.canWindowShowTwoCards()).toBeTrue();
+  });
+
+  it('should adjust page height on scroll', fakeAsync(() => {
+    service.lastRequestedHeight = document.body.scrollHeight + 100;
+    service.adjustPageHeight();
+    tick(150);
+
+    expect(messengerService.sendMessage).toHaveBeenCalled();
   }));
 
   it('should animate to one card and update displayed card index after timeout', fakeAsync(() => {
