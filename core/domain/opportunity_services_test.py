@@ -1106,6 +1106,94 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 None
             )
 
+        def test_create_translation_opportunity_creates_model(self) -> None:
+            entity_types_and_ids = {
+                feconf.ENTITY_TYPE_EXPLORATION: ['0']
+            }
+
+            self.assertIsNone(
+                opportunity_models.TranslationOpportunityModel.get(
+                    '0', strict=False)
+            )
+
+            opportunity_services.create_translation_opportunity(
+                entity_types_and_ids)
+
+            model = opportunity_models.TranslationOpportunityModel.get('0')
+            self.assertIsNotNone(model)
+            self.assertEqual(model.entity_id, '0')
+            self.assertEqual(model.entity_type, feconf.ENTITY_TYPE_EXPLORATION)
+            self.assertIn(self.TOPIC_ID, model.topic_ids)
+            self.assertGreaterEqual(model.content_count, 1)
+            self.assertIsInstance(
+                model.incomplete_translation_language_codes, list)
+            self.assertIsInstance(model.translation_counts, dict)
+
+    def test_create_translation_opportunity_idempotency(self) -> None:
+        entity_types_and_ids = {
+            feconf.ENTITY_TYPE_EXPLORATION: ['0']
+        }
+
+        opportunity_services.create_translation_opportunity(entity_types_and_ids)
+        model_before = opportunity_models.TranslationOpportunityModel.get('0')
+        timestamp_before = model_before.last_updated
+
+        opportunity_services.create_translation_opportunity(entity_types_and_ids)
+        model_after = opportunity_models.TranslationOpportunityModel.get('0')
+        timestamp_after = model_after.last_updated
+
+        self.assertEqual(model_before.entity_id, model_after.entity_id)
+        self.assertEqual(timestamp_before, timestamp_after)
+
+    def test_compute_translation_opportunity_models_with_updated_entity(
+        self
+    ) -> None:
+        opportunity_models.TranslationOpportunityModel(
+            id='0',
+            entity_id='0',
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            topic_ids=[self.TOPIC_ID],
+            content_count=5,  # initial dummy value
+            incomplete_translation_language_codes=['en', 'fr'],
+            translation_counts={'en': 2, 'fr': 1}
+        ).put()
+
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+        entity_id = '0'
+        content_count = 10
+        translation_counts = {
+            'en': 10,
+            'hi': 6,
+            'fr': 10
+        }
+
+        # Make sure the original model exists.
+        model_before = opportunity_models.TranslationOpportunityModel.get(entity_id)
+        self.assertIsNotNone(model_before)
+
+        models = opportunity_services.compute_translation_opportunity_models_with_updated_entity(
+            entity_type, entity_id, content_count, translation_counts)
+
+        self.assertEqual(len(models), 1)
+        updated_model = models[0]
+
+        # Validate updated fields.
+        self.assertEqual(updated_model.entity_id, entity_id)
+        self.assertEqual(updated_model.entity_type, entity_type)
+        self.assertEqual(updated_model.content_count, content_count)
+        self.assertEqual(updated_model.translation_counts, translation_counts)
+
+        # Ensure correct incomplete language codes.
+        exploration = exp_fetchers.get_exploration_by_id(entity_id)
+        expected_incomplete = ['hi']
+        if exploration.language_code in expected_incomplete:
+            expected_incomplete.remove(exploration.language_code)
+
+        self.assertCountEqual(
+            updated_model.incomplete_translation_language_codes,
+            expected_incomplete
+        )
+
 
 class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
         test_utils.GenericTestBase):

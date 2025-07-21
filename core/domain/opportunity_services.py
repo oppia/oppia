@@ -36,7 +36,7 @@ from core.domain import topic_fetchers
 from core.domain import translation_services
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Set, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -300,6 +300,89 @@ def _create_exploration_opportunities(
     )
 
 
+def get_translation_opportunity_summary_from_model(
+    model: opportunity_models.TranslationOpportunityModel
+) -> opportunity_domain.TranslationOpportunity:
+    """Returns a domain object for a translation opportunity from the given model.
+
+    Args:
+        model: TranslationOpportunityModel. The model instance from the datastore.
+
+    Returns:
+        TranslationOpportunity. The corresponding domain object.
+    """
+    return opportunity_domain.TranslationOpportunity(
+        entity_type=model.entity_type,
+        entity_id=model.entity_id,
+        topic_ids=model.topic_ids,
+        content_count=model.content_count,
+        translation_counts=model.translation_counts
+    )
+
+
+def compute_translation_opportunity_models_with_updated_entity(
+    entity_type: str,
+    entity_id: str,
+    content_count: int,
+    translation_counts: Dict[str, int]
+) -> List[opportunity_models.TranslationOpportunityModel]:
+    """Returns translation opportunity domain objects for the given entity
+    with updated content and translation counts.
+
+    Args:
+        entity_type: str. The type of entity (e.g., 'exploration').
+        entity_id: str. The ID of the entity.
+        content_count: int. Total number of translatable content strings.
+        translation_counts: dict(str, int). Map of language code to number of
+            translated content strings.
+
+    Returns:
+        list(TranslationOpportunityModel). A list with one
+            TranslationOpportunityModel object.
+    """
+    topic_ids_by_entity = _compute_topic_ids_of_translation_opportunities({
+        entity_type: [entity_id]
+    })
+
+    topic_ids = topic_ids_by_entity.get(entity_id, [])
+
+    if not topic_ids:
+        raise ValueError(f'Missing topic id for {entity_type} with id {entity_id}')
+    
+    complete_translation_language_list = []
+    for language_code, translation_count in translation_counts.items():
+        if translation_count == content_count:
+            complete_translation_language_list.append(language_code)
+    
+    model = opportunity_models.TranslationOpportunityModel.get(entity_id)
+    translation_opportunity = get_translation_opportunity_summary_from_model(
+        model)
+    translation_opportunity.content_count = content_count
+    translation_opportunity.translation_counts = translation_counts
+    incomplete_translation_language_codes = (
+        _compute_exploration_incomplete_translation_languages(
+            complete_translation_language_list))
+
+    if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+        updated_entity = exp_fetchers.get_exploration_by_id(entity_id)
+        if (
+                updated_entity.language_code
+                in incomplete_translation_language_codes):
+            # Remove exploration language from incomplete translation languages list
+            # as an exploration does not need a translation in its own language.
+            incomplete_translation_language_codes.remove(
+                updated_entity.language_code)
+
+    translation_opportunity.incomplete_translation_language_codes = (
+        incomplete_translation_language_codes)
+    
+    translation_opportunity.validate()
+    
+    return _construct_new_translation_opportunity_models(
+        [translation_opportunity]
+    )
+
+
 def compute_opportunity_models_with_updated_exploration(
     exp_id: str,
     content_count: int,
@@ -454,6 +537,31 @@ def delete_exploration_opportunities(exp_ids: List[str]) -> None:
         if model is not None]
     opportunity_models.ExplorationOpportunitySummaryModel.delete_multi(
         exp_opportunity_models_to_be_deleted)
+
+
+def delete_translation_opportunities(
+    entity_types_and_ids: Dict[str, List[str]]
+) -> None:
+    """Deletes translation opportunities for the given entities.
+
+    Args:
+        entity_types_and_ids: A dictionary mapping entity types (e.g., 'story',
+            'exploration') to a list of their corresponding entity IDs.
+    """
+    opportunity_ids = [
+        f'{entity_type}.{entity_id}'
+        for entity_type, entity_ids in entity_types_and_ids.items()
+        for entity_id in entity_ids
+    ]
+
+    models_to_delete = [
+        model for model in
+        opportunity_models.TranslationOpportunityModel.get_multi(opportunity_ids)
+        if model is not None
+    ]
+
+    if models_to_delete:
+        opportunity_models.TranslationOpportunityModel.delete_multi(models_to_delete)
 
 
 def delete_exploration_opportunities_corresponding_to_topic(
@@ -1117,3 +1225,225 @@ def get_pinned_lesson(
 
     # If the model doesn't exist or has None as opportunity_id, return None.
     return None
+
+
+def create_translation_opportunity(
+    entity_types_and_ids: Dict[str, List[str]]
+) -> None:
+    """Creates and stores translation opportunities for the given entities.
+
+    This function generates translation opportunities for each entity provided,
+    using information such as available content, translation completion status,
+    and related topics. Currently, only explorations are supported.
+
+    Args:
+        entity_types_and_ids: dict(str, list(str)). A mapping of entity types
+            (e.g., 'exploration') to lists of entity IDs to process.
+
+    Returns:
+        None. The generated opportunities are saved to the datastore.
+    """
+    entity_to_topics = _compute_topic_ids_of_translation_opportunities(
+        entity_types_and_ids
+    )
+
+    opportunities_list = []
+
+    for entity_type, entity_ids in entity_types_and_ids.items():
+        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+            # Currently, only exploration-type entities are supported.
+            continue
+
+        exp_id_to_exploration = exp_fetchers.get_multiple_explorations_by_id(
+            list(set(entity_ids))
+        )
+
+        for exploration_id, exploration in exp_id_to_exploration.items():
+            complete_langs = (
+                translation_services.get_languages_with_complete_translation(
+                    exploration
+                )
+            )
+
+            incomplete_langs = (
+                _compute_exploration_incomplete_translation_languages(
+                    complete_langs
+                )
+            )
+
+            # Exclude the exploration's own language from translation targets.
+            incomplete_langs = [
+                lang for lang in incomplete_langs if (
+                    lang != exploration.language_code
+                )
+            ]
+
+            translation_counts = translation_services.get_translation_counts(
+                feconf.TranslatableEntityType.EXPLORATION, exploration
+            )
+
+            opportunity = opportunity_domain.TranslationOpportunity(
+                topic_ids=entity_to_topics[exploration_id],
+                entity_id=exploration_id,
+                content_count=exploration.get_content_count(),
+                incomplete_translation_language_codes=incomplete_langs,
+                translation_counts=translation_counts,
+                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            )
+
+            opportunities_list.append(opportunity)
+
+    if opportunities_list:
+        _save_multi_translation_opportunities(opportunities_list)
+
+
+def _save_multi_translation_opportunities(
+    translation_opportunity_list: List[
+        opportunity_domain.TranslationOpportunity
+    ]
+) -> None:
+    """Converts and saves a list of translation opportunity domain objects.
+
+    This function transforms domain-level TranslationOpportunity instances into
+    storage models and updates their timestamps before persisting them.
+
+    Args:
+        translation_opportunity_list: list(TranslationOpportunity). A list of
+            domain objects representing translation opportunities.
+
+    Returns:
+        None. The models are written to the datastore.
+    """
+    models = _construct_new_translation_opportunity_models(
+        translation_opportunity_list
+    )
+
+    if models:
+        opportunity_models.TranslationOpportunityModel.update_timestamps_multi(
+            models)
+
+
+def _construct_new_translation_opportunity_models(
+    translation_opportunity_list: List[opportunity_domain.TranslationOpportunity]
+) -> List[opportunity_models.TranslationOpportunityModel]:
+    """Create TranslationOpportunityModels from domain objects.
+
+    Args:
+        translation_opportunity_list: list(TranslationOpportunity). A list of
+            translation opportunity domain objects.
+
+    Returns:
+        list(TranslationOpportunityModel). A list of
+        TranslationOpportunityModel instances to be stored in the datastore.
+    """
+    translation_opportunity_model_list = []
+    for opportunity in translation_opportunity_list:
+        model = opportunity_models.TranslationOpportunityModel.create_new(
+            entity_type=opportunity.entity_type,
+            entity_id=opportunity.entity_id,
+            topic_ids=opportunity.topic_ids,
+            content_count=opportunity.content_count,
+            incomplete_translation_language_codes=(
+                opportunity.incomplete_translation_language_codes),
+            translation_counts=opportunity.translation_counts
+        )
+        translation_opportunity_model_list.append(model)
+
+    return translation_opportunity_model_list
+
+
+def _compute_topic_ids_of_translation_opportunities(
+    entity_types_and_ids: Dict[str, List[str]]
+) -> Dict[str, List[str]]:
+    """Returns the topic IDs associated with the given entity IDs.
+
+    This function supports efficient lookup of topic associations for the following
+    entity types:
+      - 'exploration': Mapped via published stories in topic summaries.
+      - 'story': Mapped via topic summaries that contain the given story IDs.
+      - 'skill': Mapped via full topic domain objects which contain the given skill IDs.
+
+    It avoids unnecessary full-scan computations when possible, especially when only
+    a small set of entity IDs is provided. The function short-circuits each lookup
+    once all matching entity IDs have been processed.
+
+    Args:
+        entity_types_and_ids: dict(str, list(str)). A dictionary keyed by entity type
+            ('exploration', 'story', or 'skill') with the value being a list of entity IDs.
+
+    Returns:
+        dict(str, list(str)). A dictionary mapping each provided entity ID to a list of
+        topic IDs it is associated with. If an entity has no associated topics, it will not
+        appear in the output.
+
+    Raises:
+        Exception. If an unsupported entity type is provided.
+    """
+    entity_id_to_topic_ids: Dict[str, List[str]] = {}
+
+    topic_summaries = []
+    if feconf.ENTITY_TYPE_EXPLORATION in entity_types_and_ids or (
+        feconf.ENTITY_TYPE_STORY in entity_types_and_ids
+    ):
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+
+    all_topics = []
+    if 'skill' in entity_types_and_ids:
+        all_topics = topic_fetchers.get_all_topics()
+
+    for entity_type, entity_ids in entity_types_and_ids.items():
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            exp_ids_set = set(entity_ids)
+            found_exp_ids: Set[str] = set()
+
+            for topic_summary in topic_summaries:
+                topic_id = topic_summary.id
+                for exp_ids in topic_summary.published_story_exploration_mapping.values():
+                    for exp_id in exp_ids:
+                        if exp_id in exp_ids_set and exp_id not in found_exp_ids:
+                            entity_id_to_topic_ids.setdefault(exp_id, []).append(topic_id)
+                            found_exp_ids.add(exp_id)
+                            if found_exp_ids == exp_ids_set:
+                                break
+                if found_exp_ids == exp_ids_set:
+                    break
+
+        elif entity_type == feconf.ENTITY_TYPE_STORY:
+            story_ids_set = set(entity_ids)
+            found_story_ids: Set[str] = set()
+
+            for topic_summary in topic_summaries:
+                topic_id = topic_summary.id
+                for story_id in topic_summary.published_story_exploration_mapping:
+                    if story_id in story_ids_set and story_id not in found_story_ids:
+                        entity_id_to_topic_ids.setdefault(story_id, []).append(topic_id)
+                        found_story_ids.add(story_id)
+                        if found_story_ids == story_ids_set:
+                            break
+                if found_story_ids == story_ids_set:
+                    break
+
+        elif entity_type == feconf.ENTITY_TYPE_SKILL:
+            skill_ids_set = set(entity_ids)
+            found_skill_ids: Set[str] = set()
+
+            for topic in all_topics:
+                topic_id = topic.id
+                for skill_id in topic.get_all_skill_ids():
+                    if skill_id in skill_ids_set and skill_id not in found_skill_ids:
+                        entity_id_to_topic_ids.setdefault(skill_id, []).append(topic_id)
+                        found_skill_ids.add(skill_id)
+                        if found_skill_ids == skill_ids_set:
+                            break
+                if found_skill_ids == skill_ids_set:
+                    break
+
+        elif entity_type == feconf.ENTITY_TYPE_TOPIC:
+            topic_ids_set = set(entity_ids)
+            for topic_id in topic_ids_set:
+                entity_id_to_topic_ids[topic_id] = [topic_id]
+
+        else:
+            raise Exception(f"Unsupported entity type: {entity_type}")
+
+    return entity_id_to_topic_ids

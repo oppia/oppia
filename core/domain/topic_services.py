@@ -1067,6 +1067,16 @@ def publish_story(
     linked_exp_ids = story.story_contents.get_all_linked_exp_ids()
     opportunity_services.add_new_exploration_opportunities(
         story_id, linked_exp_ids)
+    if feature_flag_services.is_feature_flag_enabled(
+        feature_flag_list.FeatureNames.
+        ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+        None
+    ):
+        opportunity_services.create_translation_opportunity(
+            {
+                feconf.ENTITY_TYPE_EXPLORATION: linked_exp_ids
+            }
+        )
 
 
 def unpublish_story(

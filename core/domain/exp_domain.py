@@ -30,11 +30,13 @@ import json
 import re
 import string
 
+from core import feature_flag_list
 from core import feconf
 from core import schema_utils
 from core import utils
 from core.constants import constants
 from core.domain import change_domain
+from core.domain import feature_flag_services
 from core.domain import param_domain
 from core.domain import state_domain
 from core.domain import translation_domain
@@ -1470,6 +1472,28 @@ class Exploration(translation_domain.BaseTranslatableObject):
                 translatable_contents_collection
                 .add_fields_from_translatable_object(state)
             )
+
+        if feature_flag_services.is_feature_flag_enabled(
+                feature_flag_list.FeatureNames.
+                ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value,
+                None
+        ):
+            translatable_contents_collection.add_translatable_field(
+                'title',
+                translation_domain.ContentType.EXPLORATION_METADATA,
+                translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                self.title)
+            translatable_contents_collection.add_translatable_field(
+                'objective',
+                translation_domain.ContentType.EXPLORATION_METADATA,
+                translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                self.objective)
+            for tag in self.tags:
+                translatable_contents_collection.add_translatable_field(
+                    'tag_' + tag,
+                    translation_domain.ContentType.EXPLORATION_METADATA,
+                    translation_domain.TranslatableContentFormat.UNICODE_STRING,
+                    tag)
         return translatable_contents_collection
 
     @classmethod
