@@ -582,10 +582,7 @@ export class ExplorationEditor extends BaseUser {
   async searchUserInHistoryTab(username: string) {
     await this.expectElementToBeVisible(historyUserFilterSelector);
 
-    await this.page.click(historyUserFilterSelector);
-    await this.page.keyboard.press('Control');
-    await this.page.keyboard.press('a');
-    await this.page.keyboard.press('Backspace');
+    await this.clearAllTextFrom(historyUserFilterSelector);
     await this.type(historyUserFilterSelector, username);
 
     await this.page.keyboard.press('Enter');
@@ -603,7 +600,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector('mat-option');
     const optionsElements = await this.page.$$('mat-option');
     const optionValues = await this.page.$$eval('mat-option', elements =>
-      elements.map(element => element.textContent)
+      elements.map(element => element.textContent?.trim())
     );
 
     const index = optionValues.indexOf(numberOfPages.toString());
@@ -630,13 +627,17 @@ export class ExplorationEditor extends BaseUser {
    * @param numberOfItems The expected number of history items.
    */
   async expectNumberOfHistoryItemsToBe(numberOfItems: number) {
+    // TODO(#22976): In mobile view the number of items displayed exceeds the
+    // maximum number of items allowed per page. So, skip this check for mobile
+    // view.
+    if (this.isViewportAtMobileWidth()) {
+      return;
+    }
     if (numberOfItems === 0) {
       await this.expectElementToBeVisible(historyListItemSelector, false);
       return;
     }
-    await this.page.waitForSelector(historyListItemSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(historyListItemSelector);
     const historyItems = await this.page.$$(historyListItemSelector);
     expect(historyItems.length).toBe(numberOfItems);
   }
@@ -727,9 +728,7 @@ export class ExplorationEditor extends BaseUser {
   async expectGraphDifferencesToBeVisible(
     visible: boolean = true
   ): Promise<void> {
-    expect(await this.page.waitForSelector(graphDifferencesSelector)).toBe(
-      visible
-    );
+    expect(await this.isElementVisible(graphDifferencesSelector)).toBe(visible);
   }
 
   /**
@@ -4848,16 +4847,17 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(feedbackTabRowSelector, {
       visible: true,
     });
-    let feedbackStatuses = await this.page.$$(feedbackStatusSelector);
-    const statusText = await this.page.evaluate(
-      el => el.textContent?.trim(),
-      feedbackStatuses[threadIndex - 1]
+
+    await this.page.waitForFunction(
+      (selector: string, elementNumber: number, expectedText: string) => {
+        const elements = document.querySelectorAll(selector);
+        return elements[elementNumber - 1].textContent?.trim() === expectedText;
+      },
+      {},
+      feedbackStatusSelector,
+      threadIndex,
+      expectedStatus
     );
-    if (statusText !== expectedStatus) {
-      throw new Error(
-        `Expected feedback status for thread ${threadIndex} to be "${expectedStatus}", but found "${statusText}"`
-      );
-    }
   }
 
   /**

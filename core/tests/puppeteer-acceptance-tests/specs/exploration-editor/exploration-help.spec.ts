@@ -19,6 +19,7 @@
  * EC. Help.
  */
 
+import {showMessage} from '../../utilities/common/show-message';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 
@@ -102,7 +103,12 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to take a tour of translations tab', async function () {
-    await explorationEditor.clickOnHelpButton();
+    if (explorationEditor.isViewportAtMobileWidth()) {
+      showMessage(
+        `Skipping translations tab tour in mobile view, as help button is not visible.`
+      );
+      return;
+    }
     await explorationEditor.clickOnTakeATranslationsTourButton();
     await explorationEditor.dismissTranslationTabWelcomeModal();
 

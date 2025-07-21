@@ -46,7 +46,6 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectFeedbackThreadToBePresent('Test Feedback');
 
     await explorationEditor.expectFeedbackStatusInList(1, 'Open');
-    // await explorationEditor.expectFeedbackAuthorToBe('explorationEditor');
     await explorationEditor.expectFeedbackAuthorToBe('explorationEditor');
 
     await explorationEditor.viewFeedbackThread(1);

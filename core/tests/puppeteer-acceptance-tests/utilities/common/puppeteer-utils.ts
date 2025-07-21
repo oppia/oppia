@@ -449,7 +449,10 @@ export class BaseUser {
     await this.page.waitForSelector('mat-option');
     const matOptionElements = await this.page.$$('mat-option');
     for (const matOptionElement of matOptionElements) {
-      if ((await matOptionElement.evaluate(el => el.textContent)) === value) {
+      if (
+        (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
+        value
+      ) {
         await matOptionElement.click();
         break;
       }
