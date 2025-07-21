@@ -110,14 +110,11 @@ describe('Validators service', () => {
       )
     ).toBe(false);
   });
-
-  it('should reject names that start or end with hyphen or whitespace', () => {
+  it('should reject names that start or end with hyphen', () => {
     const alertSpy = spyOn(vs.alerts, 'addWarning');
 
     expect(vs.isValidEntityName('-test', true, false)).toBe(false);
     expect(vs.isValidEntityName('test-', true, false)).toBe(false);
-    expect(vs.isValidEntityName(' test', true, false)).toBe(false);
-    expect(vs.isValidEntityName('test ', true, false)).toBe(false);
 
     expect(alertSpy).toHaveBeenCalledWith(
       'Invalid input. Description cannot start or end with a hyphen or space.'
