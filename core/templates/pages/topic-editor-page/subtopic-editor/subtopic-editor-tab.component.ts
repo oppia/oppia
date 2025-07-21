@@ -82,7 +82,13 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   selectedSkillEditOptionsIndex: number;
   maxCharsInSubtopicTitle!: number;
   MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
-  SUBTOPIC_PAGE_SCHEMA: {type: string; ui_config: {rows: number}};
+  SUBTOPIC_PAGE_SCHEMA: {
+    type: string;
+    ui_config: {
+      rte_components: string;
+      rows: number;
+    };
+  };
   generatedUrlPrefix: string;
 
   constructor(
@@ -428,6 +434,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     this.SUBTOPIC_PAGE_SCHEMA = {
       type: 'html',
       ui_config: {
+        rte_components: 'ALL_COMPONENTS',
         rows: 100,
       },
     };
