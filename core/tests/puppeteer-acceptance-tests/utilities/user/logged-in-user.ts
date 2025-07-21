@@ -79,6 +79,7 @@ const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
 const mobileProgressSectionButton = '.e2e-test-mobile-progress-section';
 const addProfilePictureButton = '.e2e-test-photo-upload-submit';
+const cancelProfileUploadButtonSelector = '.e2e-test-photo-upload-cancel';
 const editProfilePictureButton = '.e2e-test-photo-clickable';
 const bioTextareaSelector = '.e2e-test-user-bio';
 const saveChangesButtonSelector = '.e2e-test-save-changes-button';
@@ -99,6 +100,7 @@ const defaultProfilePicture =
 
 const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE =
   'Your data is currently being loaded and will be downloaded as a JSON formatted text file upon completion.';
+const ACCOUNT_EXPORT_CONFIRMATION_MESSAGE_2 = 'Please do not leave this page.';
 const reportExplorationButtonSelector = '.e2e-test-report-exploration-button';
 const reportExplorationTextAreaSelector =
   '.e2e-test-report-exploration-text-area';
@@ -208,6 +210,7 @@ const explorationLanguagePerferenceChipsSelector =
   '.e2e-test-exploration-language-preference-chips';
 const siteLanguageValueSelector = `${siteLanguageInputSelector} span.mat-select-min-line`;
 const audioLanguageValueSelector = `${audioLanguageInputSelector} span.mat-select-min-line`;
+const photoUploadErrorMessage = '.e2e-test-upload-error';
 
 // Profile Page selectors.
 const profileContainerSelector = '.e2e-test-profile-container';
@@ -244,8 +247,33 @@ const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
 
 // Community Library.
 const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
+const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
+const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
+const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
 
 export class LoggedInUser extends BaseUser {
+  /**
+   * Function for clicking on the profile dropdown.
+   */
+  async clickOnProfileDropdown(): Promise<void> {
+    await this.isElementVisible(profileDropdownToggleSelector);
+    await this.clickOn(profileDropdownToggleSelector);
+  }
+
+  async expectProfileDropdownToContainElementWithContent(
+    item: string
+  ): Promise<void> {
+    await this.isElementVisible(profileDropdownContainerSelector);
+
+    const elementsContents = await this.page.$$eval(
+      profileDropdownAnchorSelector,
+      elements =>
+        elements.map(el => (el as HTMLAnchorElement).textContent?.trim())
+    );
+
+    expect(elementsContents).toContain(item);
+  }
+
   /**
    * Function for navigating to the profile page for a given username.
    */
@@ -1124,6 +1152,26 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Checks if profile photo doesn't work.
+   */
+  async expectProfilePhotoDoNotUpdate(picturePath: string): Promise<void> {
+    await this.page.waitForSelector(editProfilePictureButton, {
+      visible: true,
+    });
+    await this.clickOn(editProfilePictureButton);
+    await this.uploadFile(picturePath);
+
+    await this.expectElementToBeClickable(addProfilePictureButton, false);
+    await this.page.waitForSelector(photoUploadErrorMessage, {
+      visible: true,
+    });
+    await this.clickOn(cancelProfileUploadButtonSelector);
+    await this.page.waitForSelector(addProfilePictureButton, {
+      hidden: true,
+    });
+  }
+
+  /**
    * Updates the user's bio in preference page.
    * @param {string} bio - The new bio to set for the user.
    */
@@ -1532,9 +1580,18 @@ export class LoggedInUser extends BaseUser {
         ACCOUNT_EXPORT_CONFIRMATION_MESSAGE
       );
 
+      const isTextPresent2 = await this.isTextPresentOnPage(
+        ACCOUNT_EXPORT_CONFIRMATION_MESSAGE_2
+      );
+
       if (!isTextPresent) {
         throw new Error(
           `Expected text not found on page: ${ACCOUNT_EXPORT_CONFIRMATION_MESSAGE}`
+        );
+      }
+      if (!isTextPresent2) {
+        throw new Error(
+          `Expected text not found on page: ${ACCOUNT_EXPORT_CONFIRMATION_MESSAGE_2}`
         );
       }
     } catch (error) {
