@@ -199,19 +199,14 @@ describe('Skill factory', () => {
     expect(skill.toBackendDict()).toEqual(skillDict);
   });
 
-  it(
-    'should throw error when there are no rubrics' +
-      ' for the given difficulty',
-    () => {
-      skill = Skill.createFromBackendDict(skillDict);
-      expect(() => {
-        skill.getRubricExplanations('difficult');
-      }).toThrowError(
-        'Unable to get explanation: The given difficulty does ' +
-          'not match any difficulty in the rubrics'
-      );
-    }
-  );
+  it('should throw error when there are no rubrics for the given difficulty', () => {
+    skill = Skill.createFromBackendDict(skillDict);
+    expect(() => {
+      skill.getRubricExplanations('difficult');
+    }).toThrowError(
+      'Unable to get explanation: The given difficulty does not match any difficulty in the rubrics.'
+    );
+  });
 
   it('should get misconception id', () => {
     skill = Skill.createFromBackendDict(skillDict);

@@ -188,14 +188,13 @@ export class Skill {
   }
 
   getRubricExplanations(difficulty: string): string[] {
-    for (var idx in this._rubrics) {
-      if (this._rubrics[idx].getDifficulty() === difficulty) {
-        return this._rubrics[idx].getExplanations();
+    for (const rubric of this._rubrics) {
+      if (rubric.getDifficulty() === difficulty) {
+        return rubric.getExplanations();
       }
     }
     throw new Error(
-      'Unable to get explanation: The given difficulty does ' +
-        'not match any difficulty in the rubrics.'
+      'Unable to get explanation: The given difficulty does not match any difficulty in the rubrics.'
     );
   }
 

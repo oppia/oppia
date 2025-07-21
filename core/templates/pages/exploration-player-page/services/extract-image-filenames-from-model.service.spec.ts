@@ -35,7 +35,6 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 describe('Extracting Image file names in the state service', () => {
   let eifms: ExtractImageFilenamesFromModelService;
   let eof: ExplorationObjectFactory;
-  let sof: Skill;
   let ecs: PageContextService;
   let explorationDict: ExplorationBackendDict;
   let ImageFilenamesInExploration: {[x: string]: string[]};
@@ -945,7 +944,7 @@ describe('Extracting Image file names in the state service', () => {
   });
 
   it('should get all the filenames of the images in a skill', () => {
-    let skill = sof.createFromBackendDict(skillDict);
+    let skill = Skill.createFromBackendDict(skillDict);
     let imageFilenamesInSkill = eifms.getImageFilenamesInSkill(skill).sort();
     expect(imageFilenamesInSkill).toEqual(expectedImageFilenamesInSkill.sort());
   });
