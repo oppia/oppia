@@ -290,4 +290,12 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
   }
+
+  checkNextSubtopicTitleLengthAndModify(): string {
+    let title: string = this.nextSubtopic.getTitle();
+    if (title.length >= 20) {
+      title = title.substring(0, 17) + '...';
+    }
+    return title;
+  }
 }
