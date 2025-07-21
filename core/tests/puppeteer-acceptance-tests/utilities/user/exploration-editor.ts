@@ -580,9 +580,12 @@ export class ExplorationEditor extends BaseUser {
    * @param username The username to be searched.
    */
   async searchUserInHistoryTab(username: string) {
-    await this.page.waitForSelector(historyUserFilterSelector);
+    await this.expectElementToBeVisible(historyUserFilterSelector);
 
-    await this.clearAllTextFrom(historyListItemSelector);
+    await this.page.click(historyUserFilterSelector);
+    await this.page.keyboard.press('Control');
+    await this.page.keyboard.press('a');
+    await this.page.keyboard.press('Backspace');
     await this.type(historyUserFilterSelector, username);
 
     await this.page.keyboard.press('Enter');
@@ -628,9 +631,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectNumberOfHistoryItemsToBe(numberOfItems: number) {
     if (numberOfItems === 0) {
-      await this.page.waitForSelector(historyListItemSelector, {
-        visible: false,
-      });
+      await this.expectElementToBeVisible(historyListItemSelector, false);
       return;
     }
     await this.page.waitForSelector(historyListItemSelector, {
@@ -4729,9 +4730,9 @@ export class ExplorationEditor extends BaseUser {
 
     // Check if button is disabled after clicking
     await this.page.waitForFunction(
-      selector => {
+      (selector: string) => {
         const btn = document.querySelector(selector);
-        return btn && !btn.disabled;
+        return btn && (btn as HTMLButtonElement).disabled;
       },
       {},
       sendButtonSelector
@@ -4783,7 +4784,24 @@ export class ExplorationEditor extends BaseUser {
       await this.type(responseTextareaSelector, statusValue);
     }
     await this.select(feedbackStatusMenu, statusValue);
+  }
+
+  /**
+   * Updates the feedback status. It updates the status and clicks on the send button.
+   * @param {string} statusValue - The new status value to set for the feedback.
+   */
+  async updateFeedbackStatus(statusValue: string): Promise<void> {
+    await this.changeFeedbackStatus(statusValue);
     await this.clickOn(sendButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const btn = document.querySelector(selector);
+        return btn && (btn as HTMLButtonElement).disabled;
+      },
+      {},
+      sendButtonSelector
+    );
   }
 
   /**
@@ -4924,7 +4942,7 @@ export class ExplorationEditor extends BaseUser {
    * Clicks on the save draft button.
    */
   async clickOnSaveDraftButton(): Promise<void> {
-    await this.expectElementToBeVisible(`${saveChangesButton}:not([disabled])`);
+    await this.expectElementToBeClickable(saveChangesButton);
 
     await this.page.click(saveChangesButton);
     await this.expectElementToBeVisible(saveExplorationModalContainerSelector);
@@ -4950,6 +4968,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.click(nextButtonSelector);
 
     await this.waitForPageToFullyLoad();
+    await this.page.waitForTimeout(1000);
     await this.page.waitForFunction(
       (selector: string, currentStep: string) => {
         const element = document.querySelector(selector);
