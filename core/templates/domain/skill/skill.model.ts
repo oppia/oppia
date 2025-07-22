@@ -272,8 +272,8 @@ export class Skill {
   static generateMisconceptionsFromBackendDict(
     misconceptionsBackendDicts: MisconceptionBackendDict[]
   ): Misconception[] {
-    return misconceptionsBackendDicts.map(misconceptionBackendDict => {
-      return Misconception.createFromBackendDict(misconceptionBackendDict);
+    return misconceptionsBackendDicts.map(misconceptionsBackendDict => {
+      return Misconception.createFromBackendDict(misconceptionsBackendDict);
     });
   }
 
