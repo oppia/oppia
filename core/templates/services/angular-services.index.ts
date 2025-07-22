@@ -67,7 +67,6 @@ import { EmailDashboardBackendApiService } from 'domain/email-dashboard/email-da
 import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFactory';
 import { InteractionObjectFactory } from 'domain/exploration/InteractionObjectFactory';
 import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
-import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
@@ -727,7 +726,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['OppiaRteParserService', OppiaRteParserService],
   ['PageHeadService', PageHeadService],
   ['PageTitleService', PageTitleService],
-  ['ParamChangeObjectFactory', ParamChangeObjectFactory],
   ['ParamChangesObjectFactory', ParamChangesObjectFactory],
   ['ParamSpecObjectFactory', ParamSpecObjectFactory],
   ['ParamSpecsObjectFactory', ParamSpecsObjectFactory],
