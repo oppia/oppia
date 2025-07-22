@@ -129,8 +129,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-workedexample>'
             ),
             (
-                '<oppia-noninteractive-workedexample answer-with-value="&amp;quot;'
-                'lorem ipsum&amp;quot;">'
+                '<oppia-noninteractive-workedexample '
+                'answer-with-value="&amp;quot;lorem ipsum&amp;quot;">'
                 '</oppia-noninteractive-workedexample>'
             )
         ]
@@ -151,15 +151,16 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     '</oppia-noninteractive-collapsible>'
                 ),
                 (
-                    '<oppia-noninteractive-workedexample question-with-value="&amp;'
+                    '<oppia-noninteractive-workedexample '
+                    'question-with-value="&amp;'
                     'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
                     'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
                     '&amp;quot;">'
                     '</oppia-noninteractive-workedexample>'
                 ),
                 (
-                    '<oppia-noninteractive-workedexample answer-with-value="&amp;quot;'
-                    'lorem ipsum&amp;quot;">'
+                    '<oppia-noninteractive-workedexample '
+                    'answer-with-value="&amp;quot;lorem ipsum&amp;quot;">'
                     '</oppia-noninteractive-workedexample>'
                 ),
                 (
@@ -184,7 +185,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     'quot;hello&amp;quot;}]\"></oppia-noninteractive-tabs>'
                 ),
                 (
-                    '<oppia-noninteractive-workedexample question-with-value="&amp;'
+                    '<oppia-noninteractive-workedexample '
+                    'question-with-value="&amp;'
                     'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
                     'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
                     '&amp;quot;" answer-with-value="&amp;quot;'
@@ -1356,29 +1358,39 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '\u2018 \u2014 \u200b \u2209</span></p>'
             },
             {
-                'html_string': '<oppia-noninteractive-workedexample question-with-value="&amp;'
-                               'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem \xc2ipsum&amp;'
+                'html_string': '<oppia-noninteractive-workedexample '
+                               'question-with-value="&amp;'
+                               'quot;&amp;lt;pre&amp;gt;&amp;'
+                               'lt;p&amp;gt;lorem \xc2ipsum&amp;'
                                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
                                '&amp;quot;" answer-with-value="&amp;quot;'
                                'lorem ipsum&amp;quot;">'
                                '</oppia-noninteractive-workedexample>',
-                'expected_output': '<oppia-noninteractive-workedexample answer-with-value="&amp;quot;'
-                                   'lorem ipsum&amp;quot;" question-with-value="&amp;'
-                                   'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+                'expected_output': '<oppia-noninteractive-workedexample '
+                                   'answer-with-value="&amp;quot;'
+                                   'lorem ipsum&amp;quot;" '
+                                   'question-with-value="&amp;'
+                                   'quot;&amp;lt;pre&amp;gt;&amp'
+                                   ';lt;p&amp;gt;lorem ipsum&amp;'
                                    'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
                                    '&amp;quot;">'
                                    '</oppia-noninteractive-workedexample>'
             },
             {
-                'html_string': '<oppia-noninteractive-workedexample question-with-value="&amp;'
-                               'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+                'html_string': '<oppia-noninteractive-workedexample '
+                               'question-with-value="&amp;'
+                               'quot;&amp;lt;pre&amp;gt;&amp;'
+                               'lt;p&amp;gt;lorem ipsum&amp;'
                                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
                                '&amp;quot;" answer-with-value="&amp;quot;'
                                'lorem \xc2ipsum&amp;quot;">'
                                '</oppia-noninteractive-workedexample>',
-                'expected_output': '<oppia-noninteractive-workedexample answer-with-value="&amp;quot;'
-                                   'lorem ipsum&amp;quot;" question-with-value="&amp;'
-                                   'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+                'expected_output': '<oppia-noninteractive-workedexample '
+                                   'answer-with-value="&amp;quot;'
+                                   'lorem ipsum&amp;quot;" '
+                                   'question-with-value="&amp;'
+                                   'quot;&amp;lt;pre&amp;gt;&amp;'
+                                   'lt;p&amp;gt;lorem ipsum&amp;'
                                    'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
                                    '&amp;quot;">'
                                    '</oppia-noninteractive-workedexample>'
