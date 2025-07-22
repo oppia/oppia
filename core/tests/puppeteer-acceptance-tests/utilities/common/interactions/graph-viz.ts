@@ -7,6 +7,7 @@ const graphEdgeSelector = '.e2e-test-graph-edge';
 
 const graphButtonSelectorPrefix = '.e2e-test';
 const graphButtonSelectorSuffix = 'button';
+const resetGraphButtonSelector = '.e2e-test-reset-graph-button';
 
 const graphButtonSelectors = {
   moveButton: '.e2e-test-Move-button',
@@ -248,8 +249,7 @@ export class GraphViz {
    */
   async addFourVerticesInCenter(): Promise<ElementHandle<Element>[]> {
     // TODO: Fix. Somehow the first vertex is not added at proper position.
-    await this.addNode(55, 20);
-    const v1 = await this.addNode(55, 20);
+    const v1 = await this.addNode(55, 50);
     const v2 = await this.addNode(65, 20);
     const v3 = await this.addNode(55, 90);
     const v4 = await this.addNode(65, 90);
@@ -272,9 +272,45 @@ export class GraphViz {
     await this.addEdge(v1, v4, mobileViewport);
   }
 
+  /**
+   * Gets the vertices of the graph.
+   * @returns The vertices of the graph.
+   */
   async getVertices(): Promise<ElementHandle<Element>[]> {
     const graphContainer = await this.getGraphContainer();
     const vertices = await graphContainer.$$(graphVertexSelector);
     return vertices;
+  }
+
+  /**
+   * Gets the edges of the graph.
+   * @returns The edges of the graph.
+   */
+  async getEdges(): Promise<ElementHandle<Element>[]> {
+    const graphContainer = await this.getGraphContainer();
+    const edges = await graphContainer.$$(graphEdgeSelector);
+    return edges;
+  }
+
+  /**
+   * Resets the graph.
+   */
+  async resetGraph(): Promise<void> {
+    await this.parentPage.waitForSelector(resetGraphButtonSelector, {
+      visible: true,
+    });
+    await this.parentPage.click(resetGraphButtonSelector);
+
+    await this.parentPage.waitForFunction(
+      (selector: string, parentSelector: string) => {
+        const container = document.querySelector(parentSelector);
+        if (!container) return false;
+        const elements = Array.from(container.querySelectorAll(selector));
+        return elements.length === 0;
+      },
+      {},
+      graphButtonSelectorPrefix,
+      graphContainerSelector
+    );
   }
 }

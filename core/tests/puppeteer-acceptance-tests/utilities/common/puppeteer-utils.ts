@@ -510,7 +510,9 @@ export class BaseUser {
   async clearAllTextFrom(selector: string): Promise<void> {
     await this.waitForElementToBeClickable(selector);
     // Clicking three times on a line of text selects all the text.
-    await this.page.click(selector, {clickCount: 3});
+    // await this.page.click(selector, {clickCount: 3});
+    const element = await this.$(selector);
+    await element.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
   }
 

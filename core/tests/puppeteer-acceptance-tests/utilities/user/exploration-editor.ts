@@ -326,8 +326,7 @@ const commonMathExpressionInputField = '.e2e-test-guppy-div';
 
 const dragAndDropItemSelector = '.e2e-test-drag-and-drop-sort-item';
 const solutionModal = 'oppia-add-or-update-solution-modal';
-const codeEditorInSolutionModal =
-  'oppia-interactive-code-repl .CodeMirror-scroll .CodeMirror-lines';
+const codeEditorInSolutionModal = '.CodeMirror-scroll .CodeMirror-lines';
 
 const deleteExplorationButton = '.e2e-test-delete-exploration-button';
 const deleteExplorationModal = 'oppia-delete-exploration-button';
@@ -464,8 +463,12 @@ export class ExplorationEditor extends BaseUser {
    */
   async removeFeedbackResponseInPreviewTab(): Promise<void> {
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector);
-    await this.page.click(feedbackResponseRemoveSelector);
-
+    // Wait for the response modal animation to finish, else it causes flakiness.
+    await this.page.waitForTimeout(2000);
+    const feedbackResponseRemoveButton = await this.$(
+      feedbackResponseRemoveSelector
+    );
+    await feedbackResponseRemoveButton.click();
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
 
@@ -784,6 +787,34 @@ export class ExplorationEditor extends BaseUser {
       // moving on to next steps.
       await this.waitForNetworkIdle();
     }
+  }
+
+  /**
+   * Submits the world map answer.
+   * @param zoomLevel The zoom level to increase the map to.
+   */
+  async submitWorldMapAnswer(zoomLevel: number) {
+    const zoomIncreaseSelctor = '.leaflet-control-zoom-in';
+    const interactiveMap = 'oppia-interactive-interactive-map';
+
+    for (let i = 0; i < zoomLevel; i++) {
+      await this.expectElementToBeVisible(zoomIncreaseSelctor);
+      await this.clickOn(zoomIncreaseSelctor);
+      await this.page.waitForTimeout(1000);
+    }
+
+    await this.expectElementToBeVisible(interactiveMap);
+    await this.page.waitForFunction(
+      sel => {
+        const element = document.querySelector(sel);
+        return element && element.getBoundingClientRect().width > 0;
+      },
+      {},
+      interactiveMap
+    );
+    await this.page.click(interactiveMap);
+
+    await this.clickOnSubmitAnswerButton();
   }
 
   /**
@@ -1342,7 +1373,13 @@ export class ExplorationEditor extends BaseUser {
     const solutionBox = await this.getSolutionModal();
     const pencilCodeEditor = new PencilCode(this.page, solutionBox);
     await pencilCodeEditor.typeCode(solution);
+
     await pencilCodeEditor.runCode();
+
+    // Retry if code didn't run properly.
+    if ((await this.isElementVisible(stateContentInputField)) === false) {
+      await pencilCodeEditor.runCode();
+    }
 
     await this.addSolutionExplanationAndSave(explaination);
   }
@@ -1443,6 +1480,7 @@ export class ExplorationEditor extends BaseUser {
   async submitGraphStarNetworkSolution(n: number): Promise<void> {
     const graphViz = new GraphViz(this.page);
 
+    await graphViz.resetGraph();
     const vertices = await graphViz.getVertices();
     if (vertices.length < n) {
       throw new Error(
@@ -1557,6 +1595,25 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(submitAnswerButton);
 
     await this.addSolutionExplanationAndSave(explaination);
+  }
+
+  /**
+   * Submits the music notes input answer.
+   * @param {string[]} musicNotes - The music notes to submit.
+   */
+  async submitMusicNotesInputAnswer(musicNotes: string[]): Promise<void> {
+    for (const note of musicNotes) {
+      await this.expectElementToBeVisible(addResponseOptionButton);
+      const addNoteButton = await this.page.$(addResponseOptionButton);
+      await addNoteButton?.click();
+
+      const nodeSelectElements = await this.page.$$('select');
+      const nodeSelectElement =
+        nodeSelectElements[nodeSelectElements.length - 1];
+      await nodeSelectElement.select(note);
+    }
+
+    await this.clickOnSubmitAnswerButton();
   }
 
   /**
@@ -2370,7 +2427,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
 
-    await this.expectElementToBeVisible(saveChangesButton, false);
+    await this.expectElementToBeVisible(addNewResponseButton, false);
 
     showMessage('Image interaction has been added successfully.');
   }
@@ -5490,17 +5547,18 @@ export class ExplorationEditor extends BaseUser {
   }
 
   async submitCodeEditorAnswer(answer: string): Promise<void> {
-    const codeEditor = await this.page.$(codeEditorInSolutionModal);
+    const codeEditor = await this.$(codeEditorInSolutionModal);
     if (!codeEditor) {
       throw new Error(`Code editor not found.`);
     }
 
-    await codeEditor.click();
+    await this.clickOn(codeEditorInSolutionModal);
+    // await this.page.click(codeEditorInSolutionModal);
     await this.page.keyboard.down('Control');
     await this.page.keyboard.press('KeyA');
     await this.page.keyboard.up('Control');
     await this.page.keyboard.press('Backspace');
-
+    // await this.clearAllTextFrom(codeEditorInSolutionModal);
     await this.page.type(codeEditorInSolutionModal, answer);
 
     await this.clickOnSubmitAnswerButton();

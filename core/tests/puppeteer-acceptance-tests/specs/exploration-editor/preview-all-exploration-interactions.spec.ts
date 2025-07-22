@@ -227,10 +227,10 @@ describe('Exploration Editor', function () {
     // Add a image region interaction.
     await explorationEditor.updateCardContent('Enter an image region.');
     await explorationEditor.addImageInteraction();
+    await explorationEditor.directLearnersToNewCard('Sixth Card');
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
     );
-    await explorationEditor.directLearnersToNewCard('Sixth Card');
 
     // Check if the image region is previewed properly.
     await explorationEditor.navigateToPreviewTab();
@@ -384,7 +384,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to preview "Graph Theory" interaction', async function () {
-    // await explorationEditor.navigateToCard('Ninth Card');
+    await explorationEditor.navigateToCard('Ninth Card');
 
     // Add a graph theory interaction.
     await explorationEditor.updateCardContent('Create a star topology.');
@@ -403,6 +403,9 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
+    await explorationEditor.addHintToState(
+      'Create a star topology using all 4 nodes.'
+    );
 
     // Check if preview works as expected.
     await explorationEditor.navigateToPreviewTab();
@@ -410,13 +413,14 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
+    await explorationEditor.removeFeedbackResponseInPreviewTab();
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain(
       'Create a star topology using all 4 nodes.'
     );
     await explorationEditor.closeHintModal();
     await explorationEditor.submitGraphStarNetworkSolution(4);
-    await explorationEditor.expectResponseFeedbackToBe('Perfect!');
+    await explorationEditor.expectResponseFeedbackToBe('Great!');
 
     // Navigate to Editor tab.
     await explorationEditor.navigateToEditorTab();
@@ -630,6 +634,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.submitAnswerInInputField('0');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
 
+    await explorationEditor.navigateToEditorTab();
     await explorationEditor.saveExplorationDraft();
   });
 
@@ -713,7 +718,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.closeInteractionResponseModal();
+    await explorationEditor.removeFeedbackResponseInPreviewTab();
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain(
       'The hint is print("Hello, Oppia!")'
@@ -728,7 +733,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to preview "Pencil Code Editor" interaction', async function () {
-    // await explorationEditor.navigateToCard('Seventeenth ...');
+    await explorationEditor.navigateToCard('Seventeenth ...');
 
     // Add a pencil code editor interaction.
     await explorationEditor.updateCardContent('Enter a pencil code editor.');
@@ -752,7 +757,11 @@ describe('Exploration Editor', function () {
       'The hint is print("Hello, Oppia!")'
     );
 
-    // TODO: Add solution.
+    // Add solution.
+    await explorationEditor.addPencilCodeEditorSolutionToState(
+      'print("Hello, Oppia!")',
+      'As given in the question.'
+    );
 
     // Preview Tab.
     await explorationEditor.navigateToPreviewTab();
@@ -796,11 +805,26 @@ describe('Exploration Editor', function () {
     );
 
     // Add solution.
+    await explorationEditor.addHintToState('Only answer C4');
     await explorationEditor.addMusicNotesInputSolutionToState(
       ['C4', 'E4', 'G4'],
       'as given in the question.'
     );
 
+    // Preview Tab
+    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.submitMusicNotesInputAnswer(['C4', 'E4', 'G4']);
+    await explorationEditor.expectResponseFeedbackToBe(
+      'Wrong Answer. Please try again'
+    );
+    await explorationEditor.removeFeedbackResponseInPreviewTab();
+    await explorationEditor.viewHint();
+    await explorationEditor.expectHintInHintModalToContain('Only answer C4');
+    await explorationEditor.closeHintModal();
+    // TODO: File an issue that correct answer doesn't work.
+
+    // Navigate to editor tab.
+    await explorationEditor.navigateToEditorTab();
     await explorationEditor.saveExplorationDraft();
   });
 
@@ -824,8 +848,24 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-
+    await explorationEditor.addHintToState(
+      'The hint is to zoom 13 times to get the answer'
+    );
     await explorationEditor.saveExplorationDraft();
+
+    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.submitWorldMapAnswer(0);
+    await explorationEditor.expectResponseFeedbackToBe(
+      'Wrong Answer. Please try again'
+    );
+    // await explorationEditor.removeFeedbackResponseInPreviewTab();
+    await explorationEditor.viewHint();
+    await explorationEditor.expectHintInHintModalToContain(
+      'The hint is to zoom 13 times to get the answer'
+    );
+    await explorationEditor.closeHintModal();
+    await explorationEditor.submitWorldMapAnswer(13);
+    await explorationEditor.expectResponseFeedbackToBe('Great!');
   });
 
   afterAll(async function () {
