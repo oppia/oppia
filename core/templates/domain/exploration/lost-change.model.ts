@@ -243,21 +243,26 @@ export class LostChange {
   }
   static createNew(
     utilsService: UtilsService,
-    lostChangeDict: ExplorationChange | LostChangeBackendDict
+    lostChangeDict: ExplorationChange | LostChangeBackendDict | undefined
   ): LostChange {
+    if (!lostChangeDict || typeof lostChangeDict !== 'object') {
+      throw new Error('Invalid lostChangeDict passed to createNew.');
+    }
+
     const dict = lostChangeDict as LostChangeBackendDict;
+
     return new LostChange(
       utilsService,
-      dict.cmd,
-      dict.new_state_name,
-      dict.old_state_name,
-      dict.state_name,
-      dict.new_value,
-      dict.old_value,
-      dict.property_name,
-      dict.content_id,
-      dict.language_code,
-      dict.translation_html
+      dict.cmd ?? '',
+      dict.new_state_name ?? '',
+      dict.old_state_name ?? '',
+      dict.state_name ?? '',
+      dict.new_value ?? null,
+      dict.old_value ?? null,
+      dict.property_name ?? '',
+      dict.content_id ?? '',
+      dict.language_code ?? '',
+      dict.translation_html ?? ''
     );
   }
 }
