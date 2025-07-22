@@ -26,7 +26,7 @@ import {
 import {
   ParamChangeBackendDict,
   ParamChange,
-} from 'domain/exploration/ParamChangeObjectFactory';
+} from 'domain/exploration/param-change.model';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {
   SubtitledHtmlBackendDict,

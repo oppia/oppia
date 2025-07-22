@@ -19,7 +19,7 @@
 import {Injectable} from '@angular/core';
 
 import {AlertsService} from 'services/alerts.service';
-import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model';
 import {
   StatePropertyService,
   // eslint-disable-next-line max-len

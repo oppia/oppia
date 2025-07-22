@@ -29,7 +29,7 @@ import {
 } from 'domain/exploration/subtitled-html.model';
 import {ExplorationChange} from './exploration-draft.model';
 import {InteractionBackendDict} from './InteractionObjectFactory';
-import {ParamChangeBackendDict} from './ParamChangeObjectFactory';
+import {ParamChangeBackendDict} from './param-change.model';
 import {ParamSpecBackendDict} from './ParamSpecObjectFactory';
 import {RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
 import {WrittenTranslationsBackendDict} from './WrittenTranslationsObjectFactory';
