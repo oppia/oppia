@@ -245,10 +245,6 @@ export class LostChange {
     utilsService: UtilsService,
     lostChangeDict: ExplorationChange | LostChangeBackendDict | undefined
   ): LostChange {
-    if (!lostChangeDict || typeof lostChangeDict !== 'object') {
-      throw new Error('Invalid lostChangeDict passed to createNew.');
-    }
-
     const dict = lostChangeDict as LostChangeBackendDict;
 
     return new LostChange(
