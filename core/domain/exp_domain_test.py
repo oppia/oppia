@@ -1597,7 +1597,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self._assert_validation_error(
             self.new_exploration, 'Tabs tag should not be present inside '
-            'another Tabs or Collapsible tag.')
+            'another Tabs, Collapsible or Workedexample tag.')
 
     def test_collapsible_rte_tag(self) -> None:
         """Validate Collapsible tag."""
@@ -1648,7 +1648,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self._assert_validation_error(
             self.new_exploration, 'Collapsible tag should not be present '
-            'inside another Tabs or Collapsible tag.')
+            'inside Tabs, another Collapsible or Workedexample tag.')
         self.state.content.html = 'Valid content'
 
     def test_continue_interaction(self) -> None:
