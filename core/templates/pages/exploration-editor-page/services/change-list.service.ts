@@ -39,7 +39,7 @@ import {
 import {
   ParamChange,
   ParamChangeBackendDict,
-} from 'domain/exploration/ParamChangeObjectFactory';
+} from 'domain/exploration/param-change.model';
 import {
   InteractionCustomizationArgs,
   InteractionCustomizationArgsBackendDict,
