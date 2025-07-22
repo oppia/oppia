@@ -348,11 +348,9 @@ const feedbackSubjectSelectorInNewFeedbackModal = `${newFeedbackThreadModalSelec
 const feedbackSelectorInNewFeedbackModal = `${newFeedbackThreadModalSelector} textarea`;
 const createThreadButtonSelector = '.e2e-test-create-new-feedback-btn';
 
-const pencilCodeIframe = '.pencil-code-editor-iframe';
-const pencilCodeTextArea = `.ace_text-input`;
-
-const addMusicNodeInSolutionModal = `${newTabButtonSelector} button`;
-const musicNodeSelectSelector = 'oppia-music-input-valid-note-area select';
+const explorationStateGraphModalSelector =
+  '.e2e-test-exploration-state-graph-modal';
+const closeModalButtonSelector = '.e2e-test-modal-close-button';
 
 const feedbackResponseRemoveSelector = '.e2e-test-close-help-card-button';
 
@@ -1048,9 +1046,7 @@ export class ExplorationEditor extends BaseUser {
     if (placeHolderText) {
       await inputElements[0].type(placeHolderText);
 
-      expect(
-        await inputElements[0].evaluate(el => (el as HTMLInputElement).value)
-      ).toBe(placeHolderText);
+      await this.expectElementValueToBe(inputElements[0], placeHolderText);
     }
 
     // Update height in rows.
@@ -1059,9 +1055,7 @@ export class ExplorationEditor extends BaseUser {
       await this.page.keyboard.press('Backspace');
       await inputElements[1].type(heightInRows);
 
-      expect(
-        await inputElements[1].evaluate(el => (el as HTMLInputElement).value)
-      ).toBe(heightInRows);
+      await this.expectElementValueToBe(inputElements[1], heightInRows);
     }
 
     // Update catch misspellings.
@@ -1230,8 +1224,6 @@ export class ExplorationEditor extends BaseUser {
         await this.page.type(floatFormInput, answer);
         break;
       case INTERACTION_TYPES.MULTIPLE_CHOICE:
-        // // TODO: Remove this timeout once the issue is fixed.
-        // break;
         await this.page.waitForSelector(multipleChoiceResponseDropdown, {
           visible: true,
           timeout: 5000,
@@ -1337,6 +1329,25 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Adds a pencil code editor solution to the current state card.
+   * @param {string} solution - The solution to add.
+   * @param {string} explaination - The explanation for the solution.
+   */
+  async addPencilCodeEditorSolutionToState(
+    solution: string,
+    explaination: string
+  ): Promise<void> {
+    await this.clickOnAddSolutionButton();
+
+    const solutionBox = await this.getSolutionModal();
+    const pencilCodeEditor = new PencilCode(this.page, solutionBox);
+    await pencilCodeEditor.typeCode(solution);
+    await pencilCodeEditor.runCode();
+
+    await this.addSolutionExplanationAndSave(explaination);
+  }
+
+  /**
    * TODO: Fix the function
    * This function updates the customization option of an interaction.
    * @param {string} optionLabel - The label of the option to update.
@@ -1422,7 +1433,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.waitForPageToFullyLoad();
     const graphViz = new GraphViz(this.page, responseBox);
-    await graphViz.createASimpleStarNetwork();
+    await graphViz.createASimpleStarNetwork(this.isViewportAtMobileWidth());
   }
 
   /**
@@ -1464,6 +1475,14 @@ export class ExplorationEditor extends BaseUser {
 
     await equationBox.click();
     await equationBox.type(equation);
+
+    if (this.isViewportAtMobileWidth()) {
+      const onScreenKeyboardSelector = '.e2e-test-osk-hide-button';
+      if (await this.isElementVisible(onScreenKeyboardSelector)) {
+        await this.page.click(onScreenKeyboardSelector);
+      }
+      await this.expectElementToBeVisible(onScreenKeyboardSelector, false);
+    }
   }
 
   async addMathEquationSolutionToState(
@@ -1560,6 +1579,31 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await numberWithUnitEditor.type(numberWithUnit);
+  }
+
+  /**
+   * Updates the answer in the response modal for a multiple choice rule.
+   * @param rule The rule to update.
+   * @param answer The answer to update.
+   */
+  async updateMultipleChoiceLearnersAnswerInResponseModal(
+    rule: 'is equal to',
+    answer: string
+  ): Promise<void> {
+    await this.updateRuleInResponseModalTo(rule);
+
+    const responseModal = await this.getRuleEditorModal();
+
+    const multipleChoiceDropdown = await this.$(
+      multipleChoiceResponseDropdown,
+      responseModal
+    );
+
+    await multipleChoiceDropdown.click();
+    await this.selectMatOption(answer);
+
+    // Check if the value has been updated.
+    await this.expectTextContentToBe(multipleChoiceResponseDropdown, answer);
   }
 
   /**
@@ -2273,7 +2317,7 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Adds an Image interaction to the current exploration.
    */
-  async addImageInteraction(): Promise<void> {
+  async addImageInteraction(nextCard?: string): Promise<void> {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
@@ -2322,11 +2366,11 @@ export class ExplorationEditor extends BaseUser {
     // The '/' value is used to select the 'a new card called' option
     // in the dropdown.
     await this.select(destinationCardSelector, '/');
-    await this.type(addStateInput, 'Last Card');
-    await this.clickOn(addNewResponseButton);
+    await this.type(addStateInput, nextCard ?? 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
+    await this.clickOn(addNewResponseButton);
 
-    await this.waitForElementToBeClickable(saveChangesButton);
+    await this.expectElementToBeVisible(saveChangesButton, false);
 
     showMessage('Image interaction has been added successfully.');
   }
@@ -2863,6 +2907,15 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(saveOutcomeDestButton, {
       hidden: true,
     });
+  }
+
+  /**
+   * Opens the exploration state graph in mobile view.
+   */
+  async openExplorationStateGraphInMobileView(): Promise<void> {
+    await this.expectElementToBeVisible(mobileStateGraphResizeButton);
+    await this.clickOn(mobileStateGraphResizeButton);
+    await this.expectElementToBeVisible(explorationStateGraphModalSelector);
   }
 
   /**
@@ -5126,14 +5179,30 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to check.
    */
   async expectExplorationGraphToContainCard(cardName: string): Promise<void> {
-    await this.page.waitForSelector(stateNodeSelector, {
-      visible: true,
-    });
-    const cardNames = await this.page.$$eval(stateNodeSelector, elements =>
-      elements.map(element => element.textContent?.trim())
+    if (this.isViewportAtMobileWidth()) {
+      await this.openExplorationStateGraphInMobileView();
+    }
+
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const elements = document.querySelectorAll(selector);
+        const cardValues = Array.from(elements).map(element =>
+          element.textContent?.trim()
+        );
+        return cardValues.includes(value);
+      },
+      {},
+      stateNodeSelector,
+      cardName
     );
 
-    expect(cardNames).toContain(cardName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.click(closeModalButtonSelector);
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
+    }
   }
 
   /**

@@ -32,21 +32,14 @@ export class PencilCode {
     type: 'editor' | 'preview' = 'editor'
   ): Promise<puppeteer.Frame> {
     const iframeSelector = `iframe[src*="${type === 'editor' ? IFRAME_URL : VIEW_IFRAME_URL}"]`;
-    await this.parentPage.waitForSelector(iframeSelector);
-    const iframes = this.parentPage.frames();
-    let iframe;
-    for (const frame of iframes) {
-      if (
-        frame.url().includes(type === 'editor' ? IFRAME_URL : VIEW_IFRAME_URL)
-      ) {
-        iframe = frame;
-        break;
-      }
+    await this.context.waitForSelector(iframeSelector, {visible: true});
+    const iframeAsElement = await this.context.$(iframeSelector);
+    if (!iframeAsElement) {
+      throw new Error('Pencil Code iframe not found.');
     }
+    const iframe = await iframeAsElement.contentFrame();
     if (!iframe) {
-      throw new Error(
-        'Pencil Code iframe not found.' + `Found: ${iframes.map(f => f.url())}`
-      );
+      throw new Error('Pencil Code iframe not found.');
     }
     return iframe;
   }

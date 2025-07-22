@@ -86,7 +86,7 @@ export class GraphViz {
    * @param {number} xInPercentage - The x coordinate of the vertex in percentage.
    * @param {number} yInPercentage - The y coordinate of the vertex in percentage.
    */
-  async addVertex(
+  async addNode(
     xInPercentage: number,
     yInPercentage: number
   ): Promise<ElementHandle<Element>> {
@@ -102,6 +102,15 @@ export class GraphViz {
     }
 
     const graphContainer = await this.getGraphContainer();
+    await this.parentPage.waitForFunction(
+      (element: HTMLElement) => {
+        const {width, height} = element.getBoundingClientRect();
+        return width > 0 && height > 0;
+      },
+      {},
+      graphContainer
+    );
+
     const initalVertices = await graphContainer.$$(graphVertexSelector);
     const box = await graphContainer?.boundingBox();
     if (!box) {
@@ -109,7 +118,7 @@ export class GraphViz {
     }
 
     const x = box?.x + (box?.width * xInPercentage) / 100;
-    const y = box?.y + (box.height * yInPercentage) / 100;
+    const y = box?.y + (box?.height * yInPercentage) / 100;
 
     await this.parentPage.waitForSelector(graphButtonSelectors.addNodeButton, {
       visible: true,
@@ -117,15 +126,57 @@ export class GraphViz {
     console.log(x, y);
     await this.clickOnGraphButton('Add Node');
     await this.parentPage.waitForTimeout(500);
-    await this.parentPage.mouse.move(x, y);
-    await this.parentPage.waitForTimeout(500);
-    await this.parentPage.mouse.down();
-    await this.parentPage.mouse.up();
+    await this.parentPage.mouse.click(x, y);
+    await this.parentPage.waitForTimeout(2000);
+
+    try {
+      await this.parentPage.waitForFunction(
+        (
+          selector: string,
+          numberOfElements: number,
+          parentElement: HTMLElement
+        ) => {
+          const elements = Array.from(parentElement.querySelectorAll(selector));
+          return elements.length === numberOfElements;
+        },
+        {},
+        graphVertexSelector,
+        initalVertices.length + 1,
+        graphContainer
+      );
+    } catch (error) {
+      const currentVertices = await graphContainer.$$(graphVertexSelector);
+      throw new Error(
+        `Expected ${initalVertices.length + 1} vertices, but found ${currentVertices.length}.\n` +
+          `Tried adding a node at position (${x}, ${y}).\n` +
+          `${error.type}: ${error.message}`
+      );
+    }
 
     const currentVertices = await graphContainer.$$(graphVertexSelector);
-    expect(currentVertices.length).toBe(initalVertices.length + 1);
-
     return currentVertices[currentVertices.length - 1];
+  }
+
+  /**
+   * Waits until the vertex is hovered.
+   * @param vertex The vertex to wait for.
+   */
+  async waitUntilVertexIsHovered(
+    vertex: ElementHandle<Element>
+  ): Promise<void> {
+    try {
+      await this.parentPage.waitForFunction(
+        (element: HTMLElement) => {
+          return element.style.fill === 'aqua';
+        },
+        {},
+        vertex
+      );
+    } catch (error) {
+      throw new Error(
+        `Vertex ${vertex} is not hovered.\n` + `${error.message}`
+      );
+    }
   }
 
   /**
@@ -136,7 +187,8 @@ export class GraphViz {
    */
   async addEdge(
     vertexA: puppeteer.ElementHandle<Element>,
-    vertexB: puppeteer.ElementHandle<Element>
+    vertexB: puppeteer.ElementHandle<Element>,
+    mobileViewport: boolean = false
   ): Promise<ElementHandle<Element>> {
     const boundingBoxA = await vertexA.boundingBox();
     const boundingBoxB = await vertexB.boundingBox();
@@ -156,27 +208,38 @@ export class GraphViz {
     const endY = boundingBoxB.y + boundingBoxB.height / 2;
 
     await this.clickOnGraphButton('Add Edge');
-    await this.parentPage.mouse.move(startX, startY);
-    await this.parentPage.mouse.down();
+    await vertexA.hover();
+    await this.waitUntilVertexIsHovered(vertexA);
+    // Wait alteast for 2 seconds as it takes time.
+    await this.parentPage.waitForTimeout(2000);
+    mobileViewport ? await vertexA.click() : await this.parentPage.mouse.down();
 
     // Smooth Drag.
-    const steps = 10;
-    for (let i = 1; i <= steps; i++) {
-      const x = startX + ((endX - startX) * i) / steps;
-      const y = startY + ((endY - startY) * i) / steps;
-      await this.parentPage.mouse.move(x, y);
-      await this.parentPage.waitForTimeout(10);
-    }
+    await vertexB.hover();
+    await this.waitUntilVertexIsHovered(vertexB);
+    mobileViewport ? await vertexB.click() : await this.parentPage.mouse.up();
+    await this.parentPage.waitForTimeout(2000);
     await this.parentPage.mouse.up();
-    await this.parentPage.waitForTimeout(100);
+
+    try {
+      await this.parentPage.waitForFunction(
+        (selector: string, numberOfElement: number) => {
+          const elements = document.querySelectorAll(selector);
+          return elements.length === numberOfElement;
+        },
+        {},
+        graphEdgeSelector,
+        initalEdges.length + 1
+      );
+    } catch (error) {
+      const currentEdges = await graphContainer.$$(graphEdgeSelector);
+      throw new Error(
+        `Expected ${initalEdges.length + 1} edges, but found ${currentEdges.length}.` +
+          `Tried creating an edge between (${startX}, ${startY}) and (${endX}, ${endY}).`
+      );
+    }
 
     const currentEdges = await graphContainer.$$(graphEdgeSelector);
-    showMessage((boundingBoxA.x + boundingBoxA.width / 2).toString());
-    showMessage((boundingBoxA.y + boundingBoxA.height / 2).toString());
-    showMessage((boundingBoxB.x + boundingBoxB.width / 2).toString());
-    showMessage((boundingBoxB.y + boundingBoxB.height / 2).toString());
-
-    expect(currentEdges.length).toBe(initalEdges.length + 1);
     return currentEdges[currentEdges.length - 1];
   }
 
@@ -185,11 +248,11 @@ export class GraphViz {
    */
   async addFourVerticesInCenter(): Promise<ElementHandle<Element>[]> {
     // TODO: Fix. Somehow the first vertex is not added at proper position.
-    await this.addVertex(45, 20);
-    const v1 = await this.addVertex(45, 20);
-    const v2 = await this.addVertex(55, 20);
-    const v3 = await this.addVertex(45, 80);
-    const v4 = await this.addVertex(55, 80);
+    await this.addNode(55, 20);
+    const v1 = await this.addNode(55, 20);
+    const v2 = await this.addNode(65, 20);
+    const v3 = await this.addNode(55, 90);
+    const v4 = await this.addNode(65, 90);
 
     return [v1, v2, v3, v4];
   }
@@ -197,14 +260,16 @@ export class GraphViz {
   /**
    * Creates a simple star network.
    */
-  async createASimpleStarNetwork(): Promise<void> {
+  async createASimpleStarNetwork(
+    mobileViewport: boolean = false
+  ): Promise<void> {
     await this.clearGraph();
 
     const [v1, v2, v3, v4] = await this.addFourVerticesInCenter();
 
-    await this.addEdge(v1, v2);
-    await this.addEdge(v1, v3);
-    await this.addEdge(v1, v4);
+    await this.addEdge(v1, v2, mobileViewport);
+    await this.addEdge(v1, v3, mobileViewport);
+    await this.addEdge(v1, v4, mobileViewport);
   }
 
   async getVertices(): Promise<ElementHandle<Element>[]> {

@@ -25,6 +25,29 @@ import {
   INTERACTION_TYPES,
 } from '../../utilities/user/exploration-editor';
 
+const CARD_NAMES = {
+  FIRST: 'Introduction',
+  SECOND: '2nd Card',
+  THIRD: '3rd Card',
+  FOURTH: '4th Card',
+  FIFTH: '5th Card',
+  SIXTH: '6th Card',
+  SEVENTH: '7th Card',
+  EIGHTH: '8th Card',
+  NINTH: '9th Card',
+  TENTH: '10th Card',
+  ELEVENTH: '11th Card',
+  TWELFTH: '12th Card',
+  THIRTEENTH: '13th Card',
+  FOURTEENTH: '14th Card',
+  FIFTEENTH: '15th Card',
+  SIXTEENTH: '16th Card',
+  SEVENTEENTH: '17th Card',
+  EIGHTEENTH: '18th Card',
+  NINETEENTH: '19th Card',
+  TWENTIETH: '20th Card',
+};
+
 describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
 
@@ -56,16 +79,20 @@ describe('Exploration Editor', function () {
 
     // Direct learners to new card.
     await explorationEditor.viewOppiaResponses();
-    await explorationEditor.directLearnersToNewCard('Second Card');
-    await explorationEditor.expectCurrentOutcomeDestinationToBe('Second Card');
+    await explorationEditor.directLearnersToNewCard(CARD_NAMES.SECOND);
+    await explorationEditor.expectCurrentOutcomeDestinationToBe(
+      CARD_NAMES.SECOND
+    );
     await explorationEditor.expectEditOutcomeDestPencilButtonToBeVisible();
-    await explorationEditor.expectExplorationGraphToContainCard('Second Card');
+    await explorationEditor.expectExplorationGraphToContainCard(
+      CARD_NAMES.SECOND
+    );
 
     await explorationEditor.saveExplorationDraft();
   });
 
   it('should be able to use "Multiple Choice" interaction', async function () {
-    await explorationEditor.navigateToCard('Second Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
 
     // Add a multiple choice interaction.
     await explorationEditor.updateCardContent('This is a multiple choice.');
@@ -77,18 +104,17 @@ describe('Exploration Editor', function () {
     ]);
     await explorationEditor.expectAddResponseModalHeaderToBe('Add Response');
 
-    // Add responses.
-
-    await explorationEditor.addResponsesToTheInteraction(
-      INTERACTION_TYPES.MULTIPLE_CHOICE,
-      'Correct Response',
-      'Great Job!',
-      'Third Card',
+    // Add responses and verify that correct response and rule is selected.
+    await explorationEditor.updateMultipleChoiceLearnersAnswerInResponseModal(
+      'is equal to',
+      'Correct Response'
+    );
+    await explorationEditor.addResponseDetailsInResponseModal(
+      'Great!',
+      CARD_NAMES.THIRD,
+      true,
       true
     );
-
-    // TODO: Verify "is equal to" is shown in option
-    // TODO: Correct option is selected under parameter.
 
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
@@ -100,7 +126,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "Number Input" interaction', async function () {
-    await explorationEditor.navigateToCard('Third Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
 
     // Add a number input interaction.
     await explorationEditor.updateCardContent('Enter number 100.');
@@ -110,7 +136,7 @@ describe('Exploration Editor', function () {
       INTERACTION_TYPES.NUMBER_INPUT,
       '100',
       'Perfect!',
-      'Fourth Card',
+      CARD_NAMES.FOURTH,
       true
     );
 
@@ -127,7 +153,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "text input" interaction', async function () {
-    await explorationEditor.navigateToCard('Fourth Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
 
     // Add a text input interaction.
     await explorationEditor.updateCardContent('Enter text "Hello, Oppia!".');
@@ -144,7 +170,7 @@ describe('Exploration Editor', function () {
       INTERACTION_TYPES.TEXT_INPUT,
       'Hello',
       'Perfect!',
-      'Fifth Card',
+      CARD_NAMES.FIFTH,
       true
     );
 
@@ -156,21 +182,21 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "Image Region" interaction', async function () {
-    await explorationEditor.navigateToCard('Fifth Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.FIFTH);
 
     // Add a image region interaction.
     await explorationEditor.updateCardContent('Enter an image region.');
     await explorationEditor.addImageInteraction();
+    await explorationEditor.directLearnersToNewCard(CARD_NAMES.SIXTH);
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
     );
-    await explorationEditor.directLearnersToNewCard('Sixth Card');
 
     await explorationEditor.saveExplorationDraft();
   });
 
   it('should be able to use "Item Selection" interaction', async function () {
-    await explorationEditor.navigateToCard('Sixth Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.SIXTH);
 
     // Add a item selection interaction.
     await explorationEditor.updateCardContent('Select correct item.');
@@ -189,7 +215,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Seventh Card',
+      CARD_NAMES.SEVENTH,
       true,
       true
     );
@@ -201,7 +227,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "Drag and Drop Sort" interaction', async function () {
-    await explorationEditor.navigateToCard('Seventh Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.SEVENTH);
 
     // Add a drag and drop sort interaction.
     await explorationEditor.updateCardContent('Arrange in Ascending Order');
@@ -220,7 +246,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Eighth Card',
+      CARD_NAMES.EIGHTH,
       true,
       true
     );
@@ -239,7 +265,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "Fraction Input" interaction', async function () {
-    await explorationEditor.navigateToCard('Eighth Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.EIGHTH);
 
     // Add a fraction input interaction.
     await explorationEditor.updateCardContent('Enter a fraction: 1/2.');
@@ -248,7 +274,7 @@ describe('Exploration Editor', function () {
       INTERACTION_TYPES.FRACTION_INPUT,
       '1/2',
       'Perfect!',
-      'Ninth Card',
+      CARD_NAMES.NINTH,
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -265,7 +291,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "Graph Theory" interaction', async function () {
-    await explorationEditor.navigateToCard('Ninth Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.NINTH);
 
     // Add a graph theory interaction.
     await explorationEditor.updateCardContent('Create a star topology.');
@@ -277,7 +303,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.updateGraphTheoryLearnerAnswerInResponseModal();
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Tenth Card',
+      CARD_NAMES.TENTH,
       true,
       true
     );
@@ -286,14 +312,14 @@ describe('Exploration Editor', function () {
     );
 
     // Add solution.
-    // TODO(#FILE_ISSUE): While adding solution, the graph viz in the solution
+    // TODO(#22978): While adding solution, the graph viz in the solution
     // modal is not visible.
 
     await explorationEditor.saveExplorationDraft();
   });
 
   it('should be able to use "Set Input" interaction', async function () {
-    await explorationEditor.navigateToCard('Tenth Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.TENTH);
 
     // Add a set input interaction.
     await explorationEditor.updateCardContent('Enter a set.');
@@ -304,7 +330,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Eleventh Card',
+      CARD_NAMES.ELEVENTH,
       true,
       true
     );
@@ -322,7 +348,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "Numeric Expression" interaction', async function () {
-    await explorationEditor.navigateToCard('Eleventh Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.ELEVENTH);
 
     // Add a numeric expression interaction.
     await explorationEditor.updateCardContent('Enter a numeric expression.');
@@ -335,7 +361,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Twelfth Card',
+      CARD_NAMES.TWELFTH,
       true,
       true
     );
@@ -353,7 +379,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "Algebric Expression" intreaction', async function () {
-    await explorationEditor.navigateToCard('Twelfth Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.TWELFTH);
 
     // Add a algebric expression interaction.
     await explorationEditor.updateCardContent('Enter a algebric expression.');
@@ -366,7 +392,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Thirteenth Card',
+      CARD_NAMES.THIRTEENTH,
       true,
       true
     );
@@ -382,7 +408,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "Math Equation" interaction', async function () {
-    await explorationEditor.navigateToCard('Thirteenth Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.THIRTEENTH);
 
     // Add a math equation interaction.
     await explorationEditor.updateCardContent('Enter a math equation.');
@@ -393,7 +419,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Fourteenth Card',
+      CARD_NAMES.FOURTEENTH,
       true,
       true
     );
@@ -409,7 +435,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "Number With Units" interaction', async function () {
-    await explorationEditor.navigateToCard('Fourteenth Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.FOURTEENTH);
 
     // Add a number with units input interaction.
     await explorationEditor.updateCardContent('Enter a number with units.');
@@ -485,7 +511,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Seventeenth Card',
+      CARD_NAMES.SEVENTEENTH,
       true,
       true
     );
@@ -503,7 +529,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "Pencil Code Editor" interaction', async function () {
-    await explorationEditor.navigateToCard('Seventeenth ...');
+    await explorationEditor.navigateToCard(CARD_NAMES.SEVENTEENTH);
 
     // Add a pencil code editor interaction.
     await explorationEditor.updateCardContent('Enter a pencil code editor.');
@@ -516,7 +542,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Eighteenth Card',
+      CARD_NAMES.EIGHTEENTH,
       true,
       true
     );
@@ -524,13 +550,16 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
 
-    // TODO: Add solution.
+    await explorationEditor.addPencilCodeEditorSolutionToState(
+      'print("Hello, Oppia!")',
+      'As given in the question.'
+    );
 
     await explorationEditor.saveExplorationDraft();
   });
 
   it('should be able to use "Music Notes Input" interaction', async function () {
-    await explorationEditor.navigateToCard('Eighteenth Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.EIGHTEENTH);
 
     // Add a music notes input interaction.
     await explorationEditor.updateCardContent('Enter a music notes input.');
@@ -541,7 +570,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Nineteenth Card',
+      CARD_NAMES.NINETEENTH,
       true,
       true
     );
@@ -559,7 +588,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to use "World Map" interaction', async function () {
-    await explorationEditor.navigateToCard('Nineteenth Card');
+    await explorationEditor.navigateToCard(CARD_NAMES.NINETEENTH);
 
     // Add a world map interaction.
     await explorationEditor.updateCardContent('Enter a world map.');
@@ -571,7 +600,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Twentieth Card',
+      CARD_NAMES.TWENTIETH,
       true,
       true
     );

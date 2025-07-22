@@ -1012,20 +1012,53 @@ export class BaseUser {
   }
 
   /**
-   * Verifies that the element value matches the expected value.
+   * Function to find an element by its CSS selector.
    * @param {string} selector - The CSS selector of the element.
+   * @param {ElementHandle<Element>} parentElement - The parent element to search in.
+   * @returns {Promise<ElementHandle<Element>>} The element handle.
+   */
+  async $(
+    selector: string,
+    parentElement?: ElementHandle<Element>
+  ): Promise<ElementHandle<Element>> {
+    const context = parentElement ?? this.page;
+    await context.waitForSelector(selector, {visible: true});
+    const element = await this.page.$(selector);
+    if (!element) {
+      throw new Error(`Element with selector ${selector} not found.`);
+    }
+    return element;
+  }
+
+  /**
+   * Verifies that the element value matches the expected value.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector of the element.
    * @param {string} value - The expected value.
    */
-  async expectElementValueToBe(selector: string, value: string): Promise<void> {
-    await this.page.waitForFunction(
-      (selector: string, value: string) => {
-        const element = document.querySelector(selector);
-        return (element as HTMLInputElement)?.value?.trim() === value.trim();
-      },
-      {},
-      selector,
-      value
-    );
+  async expectElementValueToBe(
+    selector: string | ElementHandle<Element>,
+    value: string
+  ): Promise<void> {
+    // Change the selector to the actual element.
+    selector = typeof selector === 'string' ? await this.$(selector) : selector;
+
+    // Wait until the element value matches the expected value.
+    try {
+      await this.page.waitForFunction(
+        (element: HTMLElement, value: string) => {
+          return (element as HTMLInputElement)?.value?.trim() === value.trim();
+        },
+        {},
+        selector,
+        value
+      );
+    } catch (error) {
+      throw new Error(
+        `Element ${selector} does not have the expected value "${value}". ` +
+          `Found "${await selector.evaluate(el => (el as HTMLInputElement).value)}".\n` +
+          `Original Error: ${error.stack}`
+      );
+    }
   }
 
   /**
