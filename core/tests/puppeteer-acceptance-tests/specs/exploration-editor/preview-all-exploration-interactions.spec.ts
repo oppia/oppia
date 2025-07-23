@@ -320,25 +320,34 @@ describe('Exploration Editor', function () {
       'As given in the question.'
     );
 
-    // TODO: Fix this test.
-    // // Preview tab.
-    // await ee.navigateToPreviewTab();
-    // await ee.expectPreviewCardContentToBe(
-    //   CARDS.SEVENTH_CARD,
-    //   'Arrange in Ascending Order'
-    // );
-    // await ee.submitDragAndDropSortAnswer(['Second', 'First', 'Third']);
-    // await ee.expectResponseFeedbackToBe('Try Again!');
-    // await ee.removeFeedbackResponseInPreviewTab();
-    // await ee.viewHint();
-    // await ee.expectHintInHintModalToContain('Arrange in Ascending Order');
-    // await ee.closeHintModal();
-    // await ee.submitDragAndDropSortAnswer(['First', 'Third', 'Second']);
-    // await ee.expectPreviewCardContentToBe(
-    //   CARDS.SEVENTH_CARD,
-    //   'Arrange in Ascending Order',
-    //   false
-    // );
+    // Preview tab.
+    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.expectPreviewCardContentToBe(
+      CARDS.SEVENTH_CARD,
+      'Arrange in Ascending Order'
+    );
+    await explorationEditor.submitDragAndDropSortAnswer([
+      'Second',
+      'First',
+      'Third',
+    ]);
+    await explorationEditor.expectResponseFeedbackToBe('Try Again!');
+    await explorationEditor.removeFeedbackResponseInPreviewTab();
+    await explorationEditor.viewHint();
+    await explorationEditor.expectHintInHintModalToContain(
+      'Arrange in Ascending Order'
+    );
+    await explorationEditor.closeHintModal();
+    await explorationEditor.submitDragAndDropSortAnswer([
+      'First',
+      'Third',
+      'Second',
+    ]);
+    await explorationEditor.expectPreviewCardContentToBe(
+      CARDS.SEVENTH_CARD,
+      'Arrange in Ascending Order',
+      false
+    );
 
     // Navigate to Editor tab.
     await explorationEditor.navigateToEditorTab();

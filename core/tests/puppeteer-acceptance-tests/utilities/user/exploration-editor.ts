@@ -528,9 +528,14 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnSubmitAnswerButton();
   }
 
+  /**
+   * Selects multiple options from the item selection input.
+   * @param options The options to select.
+   */
   async selectItemSelectionOptions(options: string[]): Promise<void> {
     const optionElementSelector = '.e2e-test-item-selection-input-item';
 
+    await this.expectElementToBeVisible(optionElementSelector);
     const optionElements = await this.page.$$(optionElementSelector);
 
     for (const optionElement of optionElements) {
@@ -552,6 +557,7 @@ export class ExplorationEditor extends BaseUser {
       }
     }
   }
+
   /**
    * Clicks on the delete exploration button.
    */
@@ -3733,6 +3739,7 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to navigate to the next card in the preview tab.
+   * @param skipVerification - Whether to skip verification of the card content.
    */
   async continueToNextCard(skipVerification: boolean = false): Promise<void> {
     try {
