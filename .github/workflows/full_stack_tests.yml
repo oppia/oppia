@@ -51,21 +51,14 @@ jobs:
         run: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         suite: 
           - name: exploration-editor/create-an-exploration-with-all-interactions
-            id: All Explorations
           - name: exploration-editor/preview-all-exploration-interactions
-            id: Preview All Explorations
           - name: exploration-editor/exploration-settings
-            id: Settings
           - name: exploration-editor/exploration-history
-            id: History
           - name: exploration-editor/exploration-feedback
-            id: Feedback
           - name: exploration-editor/exploration-help
-            id: Help
           - name: exploration-editor/exploration-navbar-header
-            id: Navbar
         mobile_args: ["--mobile", ""]
-    name: Acceptance (${{ matrix.suite.name }})${{ matrix.suite.id }} (#${{ matrix.run }}, ${{ matrix.mobile_args === '--mobile' && 'Mobile' || 'Desktop' }})
+    name: Acceptance (${{ matrix.suite.name }}) (#${{ matrix.run }}, ${{ matrix.mobile_args === '--mobile' && 'Mobile' || 'Desktop' }})
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
