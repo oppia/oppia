@@ -48,28 +48,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        run: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         suite: 
           - name: exploration-editor/create-an-exploration-with-all-interactions
+            id: All Explorations
           - name: exploration-editor/preview-all-exploration-interactions
+            id: Preview All Explorations
           - name: exploration-editor/exploration-settings
+            id: Settings
           - name: exploration-editor/exploration-history
+            id: History
           - name: exploration-editor/exploration-feedback
+            id: Feedback
           - name: exploration-editor/exploration-help
+            id: Help
           - name: exploration-editor/exploration-navbar-header
-    name: Acceptance (${{ matrix.suite.name }})
+            id: Navbar
+        mobile_args: ["--mobile", ""]
+    name: Acceptance (${{ matrix.suite.name }})${{ matrix.suite.id }} (#${{ matrix.run }}, ${{ matrix.mobile_args === '--mobile' && 'Mobile' || 'Desktop' }})
     steps:
-      - name: Check for broken suites
-        id: check_skip
-        # TODO(#22448): Remove once all suites are fixed.
-        run: |
-          broken_suites=("exploration-editor/manage-exploration-misconceptions" "exploration-editor/modify-translations-through-modal" "exploration-editor/publish-the-exploration-with-an-interaction" "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties")
-          for suite in "${broken_suites[@]}"; do
-            if [[ "${{ matrix.suite.name }}" == "$suite" ]]; then
-              echo "Suite '${{ matrix.suite.name }}' is marked to be skipped."
-              echo "SKIP_SUITE=true" >> $GITHUB_OUTPUT
-              break
-            fi
-          done
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
       - name: Merge develop and set up dependencies
@@ -80,17 +77,15 @@ jobs:
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
         run: |
-          SUITE_NAME=${{ matrix.suite.name }}
+          SUITE_NAME=${{ matrix.suite.name }}-${{ matrix.mobile_args === '--mobile' && 'mobile' || 'desktop' }}-${{ matrix.run }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
-      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
-        # TODO(#22448): Remove once all suites are fixed.
-        if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
+      - name: Run Acceptance Test
         run: >
           set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=0
+          VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
+          --skip-build --suite=${{ matrix.suite.name }} --prod_env ${{ matrix.mobile_args }}
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
           && exit 1
       - name: Upload desktop acceptance test logs
@@ -114,21 +109,6 @@ jobs:
           # Note: The path must be kept in sync with the one specified in
           # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
           path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
-      - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
-        if: ${{ failure() }}
-        run: >
-          set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=1
-          xvfb-run -a --server-args="-screen 0, 1920x1080x24"
-          python -m scripts.run_acceptance_tests
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
-          | tee desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Upload desktop acceptance retry test logs
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-acceptance-test-retry-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
-          path: desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Uploading Desktop test recordings as Artifacts
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -141,72 +121,3 @@ jobs:
         with:
           name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
-      - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
-        # TODO(#22448): Remove once all suites are fixed.
-        if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
-        run: >
-          set -o pipefail;
-          xvfb-run -a --server-args="-screen 0, 1920x1080x24"
-          python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }}
-          --prod_env --mobile --server_log_level=info
-          | tee mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Upload mobile acceptance test logs
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: mobile-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
-          path: mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Upload mobile test failure screenshots as artifacts
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
-      - name: Run Mobile Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
-        if: ${{ failure() }}
-        # We use xvfb-run to create a virtual screen to run tests without headless mode.
-        # Numbers in 1920x1080x24 represents screen width, height and color depth respectively.
-        run: >
-          set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=1
-          xvfb-run -a --server-args="-screen 0, 1920x1080x24"
-          python -m scripts.run_acceptance_tests --skip-build
-          --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info
-          | tee mobile_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Upload mobile acceptance test logs
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: mobile-acceptance-test-retry-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
-          path: mobile_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Uploading Mobile test recordings as Artifacts
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: mobile-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
-      - name: Uploading webpack bundles as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: webpack-bundles-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia/build
-      - name: Uploading diff screenshots as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: diff-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          # Note: The path must be kept in sync with the one specified in
-          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
-          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
-      - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{
-          failure() &&
-          github.event_name == 'push' &&
-          github.repository == 'oppia/oppia' &&
-          github.ref == 'refs/heads/develop'
-          }}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "An acceptance test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
