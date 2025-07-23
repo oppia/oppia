@@ -66,7 +66,7 @@ import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
 import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 
 describe('Settings Tab Component', () => {

@@ -13,11 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of LostChange
+ * @fileoverview Model class for creating new frontend instances of LostChange
  * domain objects.
  */
 
-import {Injectable} from '@angular/core';
 import {} from '@angular/upgrade/static';
 import {UtilsService} from 'services/utils.service';
 import isEqual from 'lodash/isEqual';
@@ -29,7 +28,7 @@ import {
 } from 'domain/exploration/subtitled-html.model';
 import {ExplorationChange} from './exploration-draft.model';
 import {InteractionBackendDict} from './interaction.model';
-import {ParamChangeBackendDict} from './ParamChangeObjectFactory';
+import {ParamChangeBackendDict} from './param-change.model';
 import {ParamSpecBackendDict} from './ParamSpecObjectFactory';
 import {RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
 import {WrittenTranslationsBackendDict} from './WrittenTranslationsObjectFactory';
@@ -242,39 +241,24 @@ export class LostChange {
     }
     return language;
   }
-}
-
-@Injectable({
-  providedIn: 'root',
-})
-export class LostChangeObjectFactory {
-  constructor(private utilsService: UtilsService) {
-    // The createNew function needs to be binded because it's used a lot in
-    // calbacks and then `this` would refer to window instead of the service
-    // itself.
-    this.createNew = this.createNew.bind(this);
-  }
-
-  /**
-   * @param {String} lostChangeDict - the name of the type to fetch.
-   * @returns {LostChange} - The associated type, if any.
-   */
-  createNew(
-    lostChangeDict: ExplorationChange | LostChangeBackendDict
+  static createNew(
+    utilsService: UtilsService,
+    lostChangeDict: ExplorationChange | LostChangeBackendDict | undefined
   ): LostChange {
-    lostChangeDict = lostChangeDict as LostChangeBackendDict;
+    const dict = lostChangeDict as LostChangeBackendDict;
+
     return new LostChange(
-      this.utilsService,
-      lostChangeDict.cmd,
-      lostChangeDict.new_state_name,
-      lostChangeDict.old_state_name,
-      lostChangeDict.state_name,
-      lostChangeDict.new_value,
-      lostChangeDict.old_value,
-      lostChangeDict.property_name,
-      lostChangeDict.content_id,
-      lostChangeDict.language_code,
-      lostChangeDict.translation_html
+      utilsService,
+      dict.cmd ?? '',
+      dict.new_state_name ?? '',
+      dict.old_state_name ?? '',
+      dict.state_name ?? '',
+      dict.new_value ?? null,
+      dict.old_value ?? null,
+      dict.property_name ?? '',
+      dict.content_id ?? '',
+      dict.language_code ?? '',
+      dict.translation_html ?? ''
     );
   }
 }
