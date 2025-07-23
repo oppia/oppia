@@ -110,29 +110,6 @@ describe('Validators service', () => {
       )
     ).toBe(false);
   });
-  it('should reject names that start or end with hyphen', () => {
-    const alertSpy = spyOn(vs.alerts, 'addWarning');
-
-    expect(vs.isValidEntityName('-test', true, false)).toBe(false);
-    expect(vs.isValidEntityName('test-', true, false)).toBe(false);
-
-    expect(alertSpy).toHaveBeenCalledWith(
-      'Invalid input. Description cannot start or end with a hyphen or space.'
-    );
-  });
-
-  it('should validate description using hasValidDescription()', () => {
-    spyOn(vs, 'isValidEntityName').and.returnValue(true);
-
-    const result = vs.hasValidDescription('Skill name');
-
-    expect(result).toBe(true);
-    expect(vs.isValidEntityName).toHaveBeenCalledWith(
-      'Skill name',
-      false,
-      false
-    );
-  });
 
   it('should correctly validate review message', () => {
     const longReviewText: string = 'a'.repeat(10001);

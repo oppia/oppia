@@ -139,6 +139,7 @@ describe('Create new skill modal', () => {
       content_id: 'test_id',
     });
   });
+
   it('should create new skill modal', () => {
     spyOn(ValidatorsService, 'hasValidDescription').and.returnValue(true);
     componentInstance.skillDescriptionExists = false;
