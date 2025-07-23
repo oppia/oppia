@@ -26,6 +26,7 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {PageContextService} from 'services/page-context.service';
 import {CreateNewSkillModalComponent} from './create-new-skill-modal.component';
+import {ValidatorsService} from 'services/validators.service';
 
 describe('Create new skill modal', () => {
   let fixture: ComponentFixture<CreateNewSkillModalComponent>;
@@ -139,23 +140,16 @@ describe('Create new skill modal', () => {
     });
   });
   it('should create new skill modal', () => {
-    // Setup required values to pass validation.
+    spyOn(ValidatorsService, 'isValidDescription').and.returnValue(true);
     componentInstance.skillDescriptionExists = false;
-    componentInstance.newSkillDescription = 'Test Skill Description';
-    componentInstance.bindableDict.displayedConceptCardExplanation =
-      'Explanation text';
-
     spyOn(ngbActiveModal, 'close');
 
     componentInstance.createNewSkill();
 
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
-      description: 'Test Skill Description',
+      description: componentInstance.newSkillDescription,
       rubrics: componentInstance.rubrics,
-      explanation: {
-        html: 'Explanation text',
-        content_id: 'explanation',
-      },
+      explanation: componentInstance.newExplanationObject,
     });
   });
 
