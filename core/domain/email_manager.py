@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import pathlib
 
 from core import feconf
 from core import utils
@@ -182,6 +183,59 @@ CURRICULUM_ADMIN_CHAPTER_NOTIFICATION_EMAIL_DATA: Dict[str, str] = {
     ) % constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS,
     'email_subject': 'Chapter Publication Notifications'
 }
+
+VOICEOVER_TECH_LEADS_REGENERATION_NOTIFICATION_EMAIL: Dict[str, str] = {
+    'email_body_template': (
+        'Hi Tech-Lead (cc Voiceover Admins),<br><br>'
+        'There were some errors when synthesizing automatic voiceovers for '
+        'the exploration <a href="%s">%s</a> in language %s, triggered on '
+        '%s at %s (UTC).<br><br>'
+        'The attached file contains detailed information about the errors. '
+        'Please look into these errors and fix them, as follows:<br><br>'
+        '<ul>'
+        '<li>If you see connection or timeout issues (e.g., ServiceTimeout, '
+        'ConnectionFailure, ServiceUnavailable, TooManyRequests, '
+        'ServiceRedirectTemporary), try <a href="%s">regenerating the '
+        'voiceovers</a> after 10-15 minutes.</li>'
+        '<li>If you see content-related issues (e.g., BadRequest, '
+        'EmbeddedModelError), analyze the error and collaborate with the '
+        'creator team to fix the relevant content in order to help address '
+        'the issue. Once resolved, proceed with regenerating the voiceovers.'
+        '</li>'
+        '<li>If you see Azure configuration issues (e.g., '
+        'AuthenticationFailure, ServiceError, RuntimeError, Forbidden), '
+        'follow the instructions in <a href="%s">this doc</a> for '
+        'troubleshooting.</li>'
+        '</ul><br>'
+        'Once the issue is resolved, attempt to <a href="%s">regenerating '
+        'the voiceovers</a> of this exploration for the failed content IDs '
+        'using <a href="%s">this guide</a>. Consider regenerating voiceovers '
+        'for the entire exploration if the majority of voiceover synthesis '
+        'fails.<br><br>'
+        'Thank you.'
+    ),
+    'email_subject': '[Attention needed] Automatic Voiceover Generation Failed'
+}
+
+VOICEOVER_ADMINS_REGENERATION_NOTIFICATION_EMAIL: Dict[str, str] = {
+    'email_body_template': (
+        'Hi Voiceover Admins,<br><br>'
+        '%s has initiated the generation of automatic voiceovers for the '
+        'exploration titled <a href="%s">%s</a> in language(s) %s.<br>'
+        'This generation was completed at %s %s. '
+        'Below is a summary of the voiceover synthesis status.<br><br>'
+        '<ul>'
+        '<li>Total contents for speech synthesis: %s.</li>'
+        '<li>Successfully generated voiceovers: %s.</li>'
+        '<li>Failed contents for voiceover generation: %s.</li>'
+        '</ul>%s'
+        'Thank you.'
+    ),
+    'email_subject': 'Report on Automatic Voiceovers Generated for %s'
+}
+
+VOICEOVER_ADMIN_GOOGLE_GROUP: Final = 'voiceovers-leads@oppia.org'
+VOICEOVER_TECH_LEADS_GOOGLE_GROUP: Final = 'voiceover-tech-support@oppia.org'
 
 HTML_FOR_SUGGESTION_DESCRIPTION: Dict[
     str, Dict[str, Union[str, Callable[[Dict[str, str]], Tuple[str, ...]]]]
@@ -424,6 +478,8 @@ SENDER_VALIDATORS: Dict[str, Union[bool, Callable[[str], bool]]] = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_ACCOUNT_DELETED: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_VOICEOVER_REGENERATION: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_MARKETING: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: (
@@ -487,6 +543,7 @@ def _send_email(
     email_html_body: str,
     sender_email: str,
     bcc_admin: bool = False,
+    cc_emails: Optional[List[str]] = None,
     sender_name: Optional[str] = None,
     recipient_email: Optional[str] = None,
     attachments: Optional[List[Dict[str, str]]] = None
@@ -508,6 +565,8 @@ def _send_email(
         sender_email: str. The sender's email address.
         bcc_admin: bool. Whether to send a copy of the email to the admin's
             email address.
+        cc_emails: list(str)|None. Optional argument. A list of email addresses
+            to be CCed in the email. If None, no emails will be CCed.
         sender_name: str or None. The name to be shown in the "sender" field of
             the email.
         recipient_email: str or None. Override for the recipient email.
@@ -563,8 +622,8 @@ def _send_email(
 
         email_services.send_mail(
             sender_name_email, recipient_email_address, email_subject,
-            cleaned_plaintext_body, cleaned_html_body, bcc_admin=bcc_admin,
-            attachments=attachments)
+            cleaned_plaintext_body, cleaned_html_body, cc_emails=cc_emails,
+            bcc_admin=bcc_admin, attachments=attachments)
         email_models.SentEmailModel.create(
             recipient_id, recipient_email_address, sender_id, sender_name_email,
             intent, email_subject, cleaned_html_body, datetime.datetime.utcnow()
@@ -2650,3 +2709,205 @@ def verify_mailchimp_secret(secret: str) -> bool:
         return False
 
     return secret == mailchimp_webhook_secret
+
+
+def _generate_attachments_for_failed_voiceovers(
+    date: str,
+    time: str,
+    voiceover_regeneration_error_messages: List[Dict[str, List[str]|str]]
+) -> List[Dict[str, str]]:
+    """Generates a text file containing details of failed voiceover
+    regeneration attempts.
+
+    Args:
+        date: str. The date when the voiceover regeneration was attempted.
+        time: str. The time when the voiceover regeneration was attempted.
+        voiceover_regeneration_error_messages: list(dict). A list of
+            dictionaries containing details of failed voiceover regeneration
+            attempts. Each dictionary should have keys 'exploration_id',
+            'language_accent', and 'error_message'.
+
+    Returns:
+        list(dict). A list of dictionaries with 'filename' and 'path' keys,
+        where 'filename' is the name of the generated file and 'path' is the
+        absolute path to the file.
+    """
+
+    filename = 'voiceover_regeneration_errors.txt'
+
+    lines = [
+        'Synthesis details for each piece of content are presented below.\n',
+        'Date: %s\n' % date,
+        'Time: %s\n\n' % time,
+    ]
+
+    for error_dict in voiceover_regeneration_error_messages:
+        exploration_id = error_dict.get('exploration_id', '')
+        language_accent = error_dict.get('language_accent', '')
+        error_messages = error_dict.get('error_messages', [])
+
+        lines.append('Exploration ID: %s\n' % exploration_id)
+        lines.append('Language Accent: %s\n' % language_accent)
+
+        for error_message in error_messages:
+            lines.append('\n----------------------------------------\n')
+            lines.append('Error Message: %s\n' % error_message)
+            lines.append('\n----------------------------------------\n')
+
+    file = open(filename, 'w', encoding='utf-8')
+    file.writelines(lines)
+    file.close()
+
+    file_path = pathlib.Path(filename).resolve()
+    return [{
+        'filename': filename,
+        'path': str(file_path)
+    }]
+
+
+def _delete_voiceover_error_attachments(
+    filename_to_path: List[Dict[str, str]]
+) -> None:
+    """Deletes the files created for voiceover regeneration notification emails.
+
+    Args:
+        filename_to_path: list(dict). A list of dictionaries containing
+            'filename' and 'path' keys for each file to be deleted.
+    """
+    for file_info in filename_to_path:
+        file_path = pathlib.Path(file_info['path'])
+        if file_path.exists():
+            file_path.unlink()
+
+
+def send_emails_to_voiceover_admins(
+    date: str,
+    time: str,
+    exploration_id: str,
+    exploration_title: str,
+    number_of_requested_voiceovers: int,
+    number_of_successful_voiceovers: int,
+    number_of_failed_voiceovers: int,
+    language_descriptions: List[str],
+    author_username: str,
+) -> None:
+    """Sends an email to the voiceover admins with details of the
+    voiceover regeneration attempt.
+
+    Args:
+        date: str. The date when the voiceover regeneration was attempted.
+        time: str. The time when the voiceover regeneration was attempted.
+        exploration_id: str. The ID of the exploration for which the
+            voiceover regeneration was attempted.
+        exploration_title: str. The title of the exploration.
+        number_of_requested_voiceovers: int. The total number of voiceovers
+            requested for regeneration.
+        number_of_successful_voiceovers: int. The number of voiceovers that
+            were successfully regenerated.
+        number_of_failed_voiceovers: int. The number of voiceovers that failed
+            to regenerate.
+        language_descriptions: list(str). A list of language descriptions for
+            which the voiceover regeneration was attempted.
+        author_username: str. The username of the author who triggered voiceover
+            regeneration.
+    """
+    exploration_link = 'https://www.oppia.org/create/%s' % exploration_id
+
+    optional_message = (
+        '<br>You have also been cc’d on a separate email, sent to the '
+        'voiceover tech lead, to address the failed voiceover synthesis. '
+        'Please follow up on that email as needed.<br><br>'
+    ) if number_of_failed_voiceovers > 0 else '<br>'
+
+    email_body = VOICEOVER_ADMINS_REGENERATION_NOTIFICATION_EMAIL[
+        'email_body_template'] % (
+            author_username, exploration_link, exploration_title,
+            ', '.join(language_descriptions), date, time,
+            number_of_requested_voiceovers, number_of_successful_voiceovers,
+            number_of_failed_voiceovers, optional_message
+        )
+
+    email_subject = VOICEOVER_ADMINS_REGENERATION_NOTIFICATION_EMAIL[
+        'email_subject'] % exploration_title
+
+    system_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+
+    receipient_id = 'voiceovers-leads'
+    _send_email(
+        receipient_id,
+        feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_VOICEOVER_REGENERATION,
+        email_subject,
+        email_body,
+        str(system_email_address),
+        recipient_email=VOICEOVER_ADMIN_GOOGLE_GROUP
+    )
+
+
+def send_emails_to_voiceover_tech_leads(
+    exploration_id: str,
+    exploration_title: str,
+    date: str,
+    time: str,
+    language_descriptions: List[str],
+    voiceover_regeneration_error_messages: List[Dict[str, List[str]|str]]
+) -> None:
+    """Sends an email to the voiceover tech leads with details of failed
+    voiceover regeneration attempts.
+
+    Args:
+        exploration_id: str. The ID of the exploration for which the
+            voiceover regeneration failed.
+        exploration_title: str. The title of the exploration.
+        date: str. The date when the voiceover regeneration was attempted.
+        time: str. The time when the voiceover regeneration was attempted.
+        language_descriptions: list(str). A list of language descriptions for
+            which the voiceover regeneration was attempted.
+        voiceover_regeneration_error_messages: list(dict). A list of
+            dictionaries containing details of failed voiceover regeneration
+            attempts. Each dictionary should have keys 'exploration_id',
+            'language_accent', and 'error_message'.
+    """
+    exploration_link = 'https://www.oppia.org/create/%s' % exploration_id
+    document_link_1 = (
+        'https://docs.google.com/document/d/1Wwd0Eg2jA3rnsiER6cf-ixOm3oh0T_c0'
+        'lXnaRwbSWH4/edit?tab=t.0#heading=h.uc9ozkinrt05'
+    )
+    document_link_2 = (
+        'https://docs.google.com/document/d/1Wwd0Eg2jA3rnsiER6cf-ixOm3oh0T_c0'
+        'lXnaRwbSWH4/edit?tab=t.0#heading=h.y85o1y4ceo9y'
+    )
+
+    email_body = VOICEOVER_TECH_LEADS_REGENERATION_NOTIFICATION_EMAIL[
+        'email_body_template'] % (
+            exploration_link, exploration_title,
+            ', '.join(language_descriptions), date, time,
+            document_link_1, document_link_2, document_link_1, document_link_2
+        )
+    email_subject = VOICEOVER_TECH_LEADS_REGENERATION_NOTIFICATION_EMAIL[
+        'email_subject']
+
+    system_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS.value))
+
+    filename_to_path = _generate_attachments_for_failed_voiceovers(
+        date, time, voiceover_regeneration_error_messages
+    )
+
+    receipient_id = 'voiceover-tech-support'
+    _send_email(
+        receipient_id,
+        feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_VOICEOVER_REGENERATION,
+        email_subject,
+        email_body,
+        str(system_email_address),
+        recipient_email=VOICEOVER_TECH_LEADS_GOOGLE_GROUP,
+        cc_emails=[VOICEOVER_ADMIN_GOOGLE_GROUP],
+        attachments=filename_to_path
+    )
+
+    _delete_voiceover_error_attachments(filename_to_path)
