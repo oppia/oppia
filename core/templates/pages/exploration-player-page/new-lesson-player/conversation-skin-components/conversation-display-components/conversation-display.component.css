@@ -183,7 +183,7 @@ oppia-conversation-display .conversation-skin-inline-interaction .form-control {
   padding: 0;
 }
 
-input.form-control:focus {
+oppia-conversation-display input.form-control:focus {
   border: none;
   box-shadow: none;
   outline: none;
