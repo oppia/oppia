@@ -66,6 +66,7 @@ describe('Exploration Editor', function () {
   it('should be able to preview "Continue Button" interaction', async function () {
     await explorationEditor.updateCardContent('Click on the button.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await explorationEditor.saveExplorationDraft();
 
     // Navigate to the preview tab and check the content of the first card.
     await explorationEditor.navigateToPreviewTab();
@@ -92,13 +93,23 @@ describe('Exploration Editor', function () {
       false
     );
 
+    // Restart from the beginning.
+    await explorationEditor.restartPreview();
+    await explorationEditor.expectPreviewCardContentToBe(
+      CARDS.FIRST_CARD,
+      'Click on the button.'
+    );
+
+    // Click on Lesson Info button.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.expectLessonInfoCardToContain(
+      'This exploration is private.'
+    );
   });
 
   it('should be able to preview "Multiple Choice" interaction', async function () {
+    await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARDS.SECOND_CARD);
-
     await explorationEditor.updateCardContent('This is a multiple choice.');
     await explorationEditor.addMultipleChoiceInteraction([
       'Option 1',
@@ -165,12 +176,22 @@ describe('Exploration Editor', function () {
       true
     );
 
-    // Check if the preview works as expected.
+    // Navigate to the preview tab.
     await explorationEditor.navigateToPreviewTab();
+
+    // Submit wrong answer.
     await explorationEditor.submitAnswer('10');
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
+
+    // Submit a blank answer.
+    await explorationEditor.submitAnswer('');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'Enter a number to continue'
+    );
+
+    // Check for hint.
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain(
       'All negative numbers are less than 0.'
@@ -213,6 +234,14 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectResponseFeedbackToBe(
       'No write "Hello, Oppia!"'
     );
+
+    // Submit a blank answer.
+    await explorationEditor.submitTextInputAnsswer('');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'Enter an answer to continue'
+    );
+
+    // Submit correct answer.
     await explorationEditor.submitTextInputAnsswer('Hello, Oppia!');
     await explorationEditor.expectResponseFeedbackToBe('Perfect!');
 
@@ -302,7 +331,7 @@ describe('Exploration Editor', function () {
       'Second',
     ]);
     await explorationEditor.updateDragAndDropSortLearnersAnswerInResponseModal(
-      'is equal to ordering',
+      'is equal to ordering ...',
       [1, 3, 2]
     );
     await explorationEditor.addResponseDetailsInResponseModal(
@@ -340,8 +369,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.closeHintModal();
     await explorationEditor.submitDragAndDropSortAnswer([
       'First',
-      'Third',
       'Second',
+      'Third',
     ]);
     await explorationEditor.expectPreviewCardContentToBe(
       CARDS.SEVENTH_CARD,
@@ -381,9 +410,21 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
+    // Submit answer with invalid characters.
+    await explorationEditor.submitAnswerInInputField('1/2a');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'Please only use numerical digits, spaces or forward slashes (/)'
+    );
+    // Submit a blank answer.
+    await explorationEditor.submitAnswerInInputField('');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'Please enter a valid fraction (e.g., 5/3 or 1 2/3)'
+    );
+    // View Hint.
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain('The hint is 1/2');
     await explorationEditor.closeHintModal();
+    // Submit correct answer.
     await explorationEditor.submitAnswerInInputField('1/2');
     await explorationEditor.expectResponseFeedbackToBe('Perfect!');
 
@@ -454,6 +495,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
+    await explorationEditor.addHintToState('The hint is [1, 2, 3]');
     await explorationEditor.addSetInputSolutionToState(
       ['1', '2', '3'],
       'as given in the question.'
@@ -464,6 +506,27 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectPreviewCardContentToBe(
       CARDS.TENTH_CARD,
       'Enter a set.'
+    );
+    // Submit wrong answer.
+    await explorationEditor.submitInputSetAnswer(['5', '6']);
+    await explorationEditor.expectResponseFeedbackToBe(
+      'Wrong Answer. Please try again'
+    );
+    // View Hint.
+    await explorationEditor.viewHint();
+    await explorationEditor.expectHintInHintModalToContain(
+      'The hint is [1, 2, 3]'
+    );
+    await explorationEditor.closeHintModal();
+    // Submit correct answer.
+    await explorationEditor.submitInputSetAnswer(['1', '2', '3']);
+    await explorationEditor.expectResponseFeedbackToBe('Great!');
+    // Submit an answer with duplicate values.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.submitInputSetAnswer(['1', '1']);
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'Oops, it looks like your answer has duplicates!'
     );
 
     // Navigate to Editor tab.

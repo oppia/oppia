@@ -394,6 +394,9 @@ const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
+const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
+const formErrorContainer = '.e2e-test-form-error-container';
+
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
   CODE_EDITOR = 'Code Editor',
@@ -1850,6 +1853,42 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(submitAnswerButton);
 
     await this.addSolutionExplanationAndSave(explaination);
+  }
+
+  /**
+   * Submits the answer to the input set.
+   * @param answer The answer to submit.
+   */
+  async submitInputSetAnswer(answer: string[]): Promise<void> {
+    let first = true;
+    for (let i = 0; i < answer.length; i++) {
+      if (!first) {
+        this.expectElementToBeVisible(addResponseOptionButton);
+        this.page.click(addResponseOptionButton);
+        first = false;
+      }
+      await this.page.waitForFunction(
+        (selector: string, numberOfElements: number) => {
+          return (
+            document.querySelectorAll(selector).length === numberOfElements
+          );
+        },
+        {},
+        textInputField,
+        i + 1
+      );
+
+      const inputField = await this.page.$$(textInputField);
+      await inputField[i].type(answer[i]);
+      await this.page.waitForFunction(
+        (element: HTMLInputElement, value: string) => {
+          return element.value === value;
+        },
+        {},
+        inputField[i],
+        answer[i]
+      );
+    }
   }
 
   /**
@@ -5568,6 +5607,22 @@ export class ExplorationEditor extends BaseUser {
     await this.page.type(codeEditorInSolutionModal, answer);
 
     await this.clickOnSubmitAnswerButton();
+  }
+
+  /**
+   * Expects the lesson info card to contain the given text.
+   * @param text The text to look for.
+   */
+  async expectLessonInfoCardToContain(text: string) {
+    await this.expectTextContentToContain(lessonInfoCardSelector, text);
+  }
+
+  /**
+   * Expects the answer error message to be the expected error.
+   * @param expectedError The expected error message.
+   */
+  async expectAnswerErrorMessageToBe(expectedError: string): Promise<void> {
+    await this.expectTextContentToContain(formErrorContainer, expectedError);
   }
 }
 

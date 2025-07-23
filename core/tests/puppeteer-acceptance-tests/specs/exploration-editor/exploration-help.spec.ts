@@ -109,6 +109,7 @@ describe('Exploration Editor', function () {
       );
       return;
     }
+    await explorationEditor.clickOnHelpButton();
     await explorationEditor.clickOnTakeATranslationsTourButton();
     await explorationEditor.dismissTranslationTabWelcomeModal();
 
