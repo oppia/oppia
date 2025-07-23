@@ -54,6 +54,16 @@ export class ValidatorsService {
       return false;
     }
 
+    // Reject names that start or end with a hyphen or whitespace.
+    if (/^[-\s]|[-\s]$/.test(input)) {
+      if (showWarnings) {
+        this.alerts.addWarning(
+          'Invalid input. Description cannot start or end with a hyphen or space.'
+        );
+      }
+      return false;
+    }
+
     for (var i = 0; i < AppConstants.INVALID_NAME_CHARS.length; i++) {
       if (input.indexOf(AppConstants.INVALID_NAME_CHARS[i]) !== -1) {
         if (showWarnings) {

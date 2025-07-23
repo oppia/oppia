@@ -39,12 +39,13 @@ describe('Create new skill modal', () => {
   let ngbActiveModal: NgbActiveModal;
   let skillEditorStateService: SkillEditorStateService;
   let skillCreationService: SkillCreationService;
+  let validatorsService: ValidatorsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, FormsModule],
       declarations: [CreateNewSkillModalComponent],
-      providers: [NgbActiveModal, ChangeDetectorRef],
+      providers: [NgbActiveModal, ChangeDetectorRef, ValidatorsService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -56,6 +57,7 @@ describe('Create new skill modal', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     skillCreationService = TestBed.inject(SkillCreationService);
+    validatorsService = TestBed.inject(ValidatorsService);
   });
 
   it('should create', () => {
@@ -141,7 +143,7 @@ describe('Create new skill modal', () => {
   });
 
   it('should create new skill modal', () => {
-    spyOn(ValidatorsService, 'hasValidDescription').and.returnValue(true);
+    spyOn(validatorsService, 'hasValidDescription').and.returnValue(true);
     componentInstance.skillDescriptionExists = false;
     spyOn(ngbActiveModal, 'close');
     componentInstance.createNewSkill();
