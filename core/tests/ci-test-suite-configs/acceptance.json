@@ -391,6 +391,18 @@
     {
       "name": "voiceover-admin/add-voiceover-artist-to-an-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/changes-site-language-to-rtl",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/changes-site-language-to-rtl.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/edit-the-profile",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/edit-the-profile.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/export-and-delete-account",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/export-and-delete-account.spec.ts"
     }
   ],
   "docker_suites": []
