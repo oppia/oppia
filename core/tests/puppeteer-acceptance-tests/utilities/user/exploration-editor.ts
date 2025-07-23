@@ -1076,7 +1076,6 @@ export class ExplorationEditor extends BaseUser {
     // Update placeholder text.
     if (placeHolderText) {
       await inputElements[0].type(placeHolderText);
-
       await this.expectElementValueToBe(inputElements[0], placeHolderText);
     }
 
@@ -4491,7 +4490,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForTimeout(1000);
     await this.page.mouse.down();
     await this.page.waitForTimeout(1000);
-    await this.page.mouse.move(endX, endY);
+    await this.page.mouse.move(endX, endY, {steps: 10});
     await this.page.waitForTimeout(1000);
     await this.page.mouse.up();
     await this.page.waitForTimeout(1000);
