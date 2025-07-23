@@ -67,10 +67,21 @@ export class OppiaFooterComponent {
     return '/blog';
   }
 
-  validateEmailAddress(): boolean {
-    let regex = new RegExp(AppConstants.EMAIL_REGEX);
-    return regex.test(String(this.emailAddress));
+validateEmailAddress(): boolean {
+  const email = String(this.emailAddress);
+  const regex = new RegExp(AppConstants.EMAIL_REGEX);
+
+  if (!regex.test(email)) {
+    return false;
   }
+
+  const [localPart] = email.split('@');
+  if (localPart.length > 64) {
+    return false;
+  }
+  return true;
+}
+
 
   disableNewsletterSubscription(): boolean {
     if (!this.subscriptionProcessing) {
