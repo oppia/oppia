@@ -21,7 +21,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
 import {AppConstants} from 'app.constants';
-import {ParamChangeBackendDict} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChangeBackendDict} from 'domain/exploration/param-change.model';
 import {ParamSpecsBackendDict} from 'domain/exploration/ParamSpecsObjectFactory';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';

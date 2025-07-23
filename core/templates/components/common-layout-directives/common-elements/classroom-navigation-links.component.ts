@@ -81,17 +81,15 @@ export class ClassroomNavigationLinksComponent implements OnInit {
       this.classroomBackendApiService
         .getAllClassroomsSummaryAsync()
         .then((data: ClassroomSummaryDict[]) => {
-          for (
-            let i = 0;
-            i < data.length && this.classroomSummaries.length < 2;
-            i++
-          ) {
-            if (data[i].is_published) {
-              this.classroomSummaries.push(data[i]);
-            }
-          }
+          data
+            .filter(classroom => classroom.is_published)
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .forEach(classroom => this.classroomSummaries.push(classroom));
           this.isLoading = false;
         });
     }
+  }
+  getClassroomCount(): number {
+    return this.classroomSummaries.length;
   }
 }

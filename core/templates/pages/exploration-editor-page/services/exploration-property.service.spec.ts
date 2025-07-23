@@ -28,7 +28,7 @@ import {
 } from 'domain/exploration/ParamSpecsObjectFactory';
 import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model';
 
 describe('Exploration Property Service', () => {
   let explorationPropertyService: ExplorationPropertyService;

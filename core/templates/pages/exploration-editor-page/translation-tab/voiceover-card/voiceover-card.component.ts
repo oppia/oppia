@@ -53,6 +53,7 @@ import {VoiceoverLanguageManagementService} from 'services/voiceover-language-ma
 import {AppConstants} from 'app.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 
 @Component({
   selector: 'oppia-voiceover-card',
@@ -96,8 +97,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   isAutomaticVoiceoverGenerating: boolean = false;
   isGenerateAutomaticVoiceoverOptionEnabled = false;
 
+  isVoiceoverAutogenerationEnabledByAdmins: boolean = false;
+
   constructor(
     private audioPlayerService: AudioPlayerService,
+    private adminBackendApiService: AdminBackendApiService,
     private pageContextService: PageContextService,
     private changeDetectorRef: ChangeDetectorRef,
     private translationLanguageService: TranslationLanguageService,
@@ -162,6 +166,13 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.voiceoversAreLoaded = true;
       })
     );
+
+    this.adminBackendApiService
+      .getAdminConfigForAutomaticVoiceoversAsync()
+      .then(isVoiceoverAutogenerationEnabledByAdmins => {
+        this.isVoiceoverAutogenerationEnabledByAdmins =
+          isVoiceoverAutogenerationEnabledByAdmins;
+      });
 
     setInterval(() => {
       if (
@@ -498,7 +509,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     return (
       this.isVoiceoverAutogenerationSupportedForSelectedAccent &&
       this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled() &&
-      this.isExplorationLinkedToStory()
+      this.isExplorationLinkedToStory() &&
+      this.isVoiceoverAutogenerationEnabledByAdmins
     );
   }
 

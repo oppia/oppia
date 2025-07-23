@@ -212,7 +212,7 @@ export class BlogPostEditor extends BaseUser {
     await this.isElementVisible(blogBodyInput);
     await this.type(blogBodyInput, newBodyText);
 
-    await this.expectTextContentToMatch(blogBodyInput, newBodyText);
+    await this.expectTextContentToBe(blogBodyInput, newBodyText);
   }
 
   /**
