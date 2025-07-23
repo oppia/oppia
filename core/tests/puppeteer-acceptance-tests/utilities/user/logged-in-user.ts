@@ -863,7 +863,10 @@ export class LoggedInUser extends BaseUser {
           `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
         );
       }
-      await this.page.waitForSelector(toastMessageSelector, {hidden: true});
+      if (this.isViewportAtMobileWidth()) {
+        await this.page.click(toastMessageSelector);
+      }
+      await this.expectElementToBeVisible(toastMessageSelector, false);
     } catch (error) {
       const newError = new Error(`Failed to match toast message: ${error}`);
       newError.stack = error.stack;

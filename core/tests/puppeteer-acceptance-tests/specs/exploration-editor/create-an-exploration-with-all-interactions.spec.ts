@@ -24,6 +24,8 @@ import {
   ExplorationEditor,
   INTERACTION_TYPES,
 } from '../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const CARD_NAMES = {
   FIRST: 'Introduction',
@@ -49,7 +51,7 @@ const CARD_NAMES = {
 };
 
 describe('Exploration Editor', function () {
-  let explorationEditor: ExplorationEditor;
+  let explorationEditor: ExplorationEditor & LoggedInUser & LoggedOutUser;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -583,10 +585,14 @@ describe('Exploration Editor', function () {
       // TODO(FILE_ISSUE#1): There is a bug that given any answer, the correct
       // answer changes to ['C4']. So, we are using ['C4'] as a solution even
       // though the correct answer is ['C4', 'E4', 'G4']. Once the bug is fixed,
-      // uncomment the following line.
+      // uncomment the following line. And toast message check in next step should
+      // be removed.
       // ['C4', 'E4', 'G4'],
       ['C4'],
       'as given in the question.'
+    );
+    await explorationEditor.expectToolTipMessage(
+      'The current solution does not lead to another card.'
     );
 
     await explorationEditor.saveExplorationDraft();
