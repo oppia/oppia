@@ -10,6 +10,11 @@ oppia-input-response-pair .conversation-skin-oppia-feedback-container {
   position: relative;
 }
 
+oppia-input-response-pair .conversation-skin-oppia-avatar {
+  left: -87px;
+}
+
+
 oppia-input-response-pair .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
   height: 100px;
   left: -87px;
@@ -110,8 +115,4 @@ oppia-input-response-pair .conversation-skin-oppia-feedback.ng-enter {
 
 oppia-input-response-pair .conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
   opacity: 1;
-}
-
-oppia-input-response-pair .conversation-skin-oppia-avatar {
-  left: -87px;
 }
