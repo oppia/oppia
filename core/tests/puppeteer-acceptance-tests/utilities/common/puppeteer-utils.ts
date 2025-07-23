@@ -932,14 +932,6 @@ export class BaseUser {
   }
 
   /**
-   * Checks if the element is visible or not.
-   * @param selector The selector of the element.
-   */
-  async expectElementToBeVisible(selector: string): Promise<void> {
-    expect(await this.isElementVisible(selector)).toBe(true);
-  }
-
-  /**
    * Verify text content inside an element
    * @param {string} selector - The selector of the element to get text from.
    * @param {string} text - The expected text content.
@@ -1117,7 +1109,7 @@ export class BaseUser {
     selector: string,
     visible: boolean = true
   ): Promise<void> {
-    expect(await this.isElementVisible(selector)).toBe(visible);
+    expect(await this.isElementVisible(selector, visible)).toBe(true);
   }
 }
 
