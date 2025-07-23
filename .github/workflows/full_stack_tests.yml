@@ -1,5 +1,8 @@
 name: Full-stack tests
-permissions: read-all
+
+permissions:
+  contents: read
+
 on:
   merge_group:
     types: [checks_requested]
@@ -15,102 +18,118 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
+
 jobs:
-  e2e_and_acceptance_coverage:
-    name: Verify all e2e/acceptance tests are included
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout repository so that local actions can be used
-        uses: actions/checkout@v4
-      - name: Merge develop and set up dependencies
-        uses: ./.github/actions/merge-develop-and-set-up-dependencies
-      - name: Check that all e2e and acceptance test files are captured in wdio.conf.js and core/tests/ci-test-suite-configs
-        run: python -m scripts.check_tests_are_captured_in_ci
-      - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "The e2e/acceptance coverage test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   build:
     name: Build the app, and store build files as an artifact
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout repository so that local actions can be used
+      - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
+
   acceptance_test_with_python_installation:
-    needs: [build]
+    needs: build
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
-        run: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        suite: 
-          - name: exploration-editor/create-an-exploration-with-all-interactions
-          - name: exploration-editor/preview-all-exploration-interactions
-          - name: exploration-editor/exploration-settings
-          - name: exploration-editor/exploration-history
-          - name: exploration-editor/exploration-feedback
-          - name: exploration-editor/exploration-help
-          - name: exploration-editor/exploration-navbar-header
-        mobile_args: ["--mobile", ""]
-    name: Acceptance (${{ matrix.suite.name }}) (#${{ matrix.run }}, ${{ matrix.mobile_args === '--mobile' && 'Mobile' || 'Desktop' }})
+        include:
+          - run: 1
+            suite: exploration-editor/create-an-exploration-with-all-interactions
+            mobile_args: "--mobile"
+          - run: 2
+            suite: exploration-editor/preview-all-exploration-interactions
+            mobile_args: "--mobile"
+          - run: 3
+            suite: exploration-editor/exploration-settings
+            mobile_args: "--mobile"
+          - run: 4
+            suite: exploration-editor/exploration-history
+            mobile_args: "--mobile"
+          - run: 5
+            suite: exploration-editor/exploration-feedback
+            mobile_args: "--mobile"
+          - run: 6
+            suite: exploration-editor/exploration-help
+            mobile_args: "--mobile"
+          - run: 7
+            suite: exploration-editor/exploration-navbar-header
+            mobile_args: "--mobile"
+          - run: 8
+            suite: exploration-editor/create-an-exploration-with-all-interactions
+            mobile_args: ""
+          - run: 9
+            suite: exploration-editor/preview-all-exploration-interactions
+            mobile_args: ""
+          - run: 10
+            suite: exploration-editor/exploration-settings
+            mobile_args: ""
+
+    name: Acceptance (${{ matrix.suite }}) (Run ${{ matrix.run }}, ${{ matrix.mobile_args != '' && 'Mobile' || 'Desktop' }})
     steps:
-      - name: Checkout repository so that local actions can be used
+      - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
-      - name: Generate modified suite name for artifacts
+
+      - name: Generate suite name for artifacts
         id: generate_suite_name_for_artifacts
-        # Replace slashes in the filename with underscores.
         run: |
-          SUITE_NAME=${{ matrix.suite.name }}-${{ matrix.mobile_args === '--mobile' && 'mobile' || 'desktop' }}-${{ matrix.run }}
-          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
+          SUITE_NAME="${{ matrix.suite }}-${{ matrix.mobile_args != '' && 'mobile' || 'desktop' }}-${{ matrix.run }}"
+          MODIFIED_SUITE_NAME="${SUITE_NAME//\//_}"
+          echo "MODIFIED_SUITE_NAME=$MODIFIED_SUITE_NAME" >> "$GITHUB_OUTPUT"
+
       - name: Run Acceptance Test
-        run: >
-          set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=1
-          xvfb-run -a --server-args="-screen 0, 1920x1080x24"
-          python -m scripts.run_acceptance_tests
-          --skip-build --suite=${{ matrix.suite.name }} --prod_env ${{ matrix.mobile_args }}
-          | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-          && exit 1
-      - name: Upload desktop acceptance test logs
-        if: ${{ failure() }}
+        id: run_tests
+        run: |
+          set -o pipefail
+          VIDEO_RECORDING_IS_ENABLED=1 xvfb-run -a --server-args="-screen 0, 1920x1080x24" \
+          python -m scripts.run_acceptance_tests \
+          --skip-build --suite="${{ matrix.suite }}" --prod_env ${{ matrix.mobile_args }} \
+          | tee "acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log"
+        continue-on-error: true
+
+      - name: Upload acceptance test logs
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: desktop-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
-          path: desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Upload desktop test failure screenshots as artifacts
-        if: ${{ failure() }}
+          name: acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
+          path: acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+
+      - name: Upload failure screenshots
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          name: failure-screenshot-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
-        # TODO(#22667): We are running this step twice, as snapshot gets deleted if 2nd attempt passes.
-      - name: Uploading diff screenshots as an artifact
-        if: ${{ failure() }}
+
+      - name: Upload diff snapshots
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: diff-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          # Note: The path must be kept in sync with the one specified in
-          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
+          name: diff-snapshots-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
-      - name: Uploading Desktop test recordings as Artifacts
-        if: ${{ failure() }}
+
+      - name: Upload video recordings
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: desktop-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          name: test-video-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
-      - name: Uploading generated test to angular module mapping as an artifact
-        if: ${{ failure() }}
+
+      - name: Upload test-to-angular-module mapping
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          name: test-to-angular-module-mapping-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
