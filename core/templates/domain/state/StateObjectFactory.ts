@@ -185,7 +185,7 @@ export class StateObjectFactory {
       stateDict.classifier_model_id,
       stateDict.linked_skill_id,
       SubtitledHtml.createFromBackendDict(stateDict.content),
-      this.interactionObject.createFromBackendDict(stateDict.interaction),
+      Interaction.createFromBackendDict(stateDict.interaction),
       this.paramchangesObject.createFromBackendList(stateDict.param_changes),
       stateDict.solicit_answer_details,
       stateDict.card_is_checkpoint,
