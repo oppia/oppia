@@ -122,7 +122,7 @@ describe('Logged-out User', function () {
     progressUrl = await loggedOutLearner.copyProgressUrl();
 
     await loggedOutLearner.startExplorationUsingProgressUrl(progressUrl, false);
-    await loggedOutLearner.expectProgressRemainder(true);
+    await loggedOutLearner.expectProgressReminder(true);
     await loggedOutLearner.expectProgressReminderModalTextToBe(
       'Do you want to continue?'
     );
@@ -142,7 +142,7 @@ describe('Logged-out User', function () {
       'learner'
     );
 
-    await loggedOutLearner.expectProgressRemainder(true);
+    await loggedOutLearner.expectProgressReminder(true);
     await loggedOutLearner.expectProgressReminderModalTextToBe(
       'Do you want to continue?'
     );
@@ -152,6 +152,6 @@ describe('Logged-out User', function () {
   });
 
   afterAll(async function () {
-    // await UserFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });

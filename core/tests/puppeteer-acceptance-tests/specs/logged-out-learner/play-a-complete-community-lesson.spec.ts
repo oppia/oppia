@@ -127,11 +127,11 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectCollapsibleRTEToBePresent();
 
     // Tab RTE.
-    await loggedOutLearner.expecttabElementInLessonCardToContain(
+    await loggedOutLearner.expectTabElementInLessonCardToContain(
       'Hint introduction',
       'This set of tabs shows some hints. Click on the other tabs to display the relevant hints.'
     );
-    await loggedOutLearner.expecttabElementInLessonCardToContain(
+    await loggedOutLearner.expectTabElementInLessonCardToContain(
       'Hint 1',
       'This is a first hint.'
     );

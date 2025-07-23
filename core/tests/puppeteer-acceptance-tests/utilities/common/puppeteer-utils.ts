@@ -136,7 +136,7 @@ export class BaseUser {
               'Mobile/15A372 Safari/604.1'
           );
         } else {
-          this.page.setViewport({width: 1280, height: 720});
+          this.page.setViewport({width: 1980, height: 1080});
         }
 
         // Enable Video Recording.
@@ -1018,6 +1018,18 @@ export class BaseUser {
       );
     }
     return;
+  }
+
+  /**
+   * Checks if an element is present on the page.
+   * @param {string} selector - The selector of the element to check.
+   * @param {boolean} present - Whether the element should be present or not.
+   */
+  async expectElementToBeVisible(
+    selector: string,
+    present: boolean = true
+  ): Promise<void> {
+    expect(await this.isElementVisible(selector)).toBe(present);
   }
 }
 

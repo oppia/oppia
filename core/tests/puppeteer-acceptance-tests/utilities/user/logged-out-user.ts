@@ -499,6 +499,7 @@ const progressReminderModalHeaderSelector =
   '.e2e-test-progress-reminder-continue-text';
 const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
 const profilePictureSelector = '.e2e-test-profile-dropdown';
+const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -4063,6 +4064,21 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if the lesson info text is present.
+   * @param lessonText - The expected lesson info text.
+   */
+  async expectLessonInfoTextToBe(lessonText: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage('Skipping lesson info text check on mobile viewport.');
+      return;
+    }
+    await this.expectTextContentInElementWithSelectorToBe(
+      lessonInfoTextSelector,
+      lessonText
+    );
+  }
+
   /*
    * Function to verify if the checkpoint modal appears on the screen.
    */
@@ -4342,7 +4358,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the progress remainder is found or not, based on the shouldBeFound parameter. (It can be found when the an already played exploration is revisited or an ongoing exploration is reloaded, but only if the first checkpoint is reached.)
    * @param {boolean} shouldBeFound - Whether the progress remainder should be found or not.
    */
-  async expectProgressRemainder(shouldBeFound: boolean): Promise<void> {
+  async expectProgressReminder(shouldBeFound: boolean): Promise<void> {
     await this.waitForPageToFullyLoad();
     try {
       await this.page.waitForSelector(progressRemainderModalSelector, {
@@ -4866,6 +4882,7 @@ export class LoggedOutUser extends BaseUser {
         el => parseInt(el.textContent?.trim() ?? '', 10)
       );
 
+      // Wait until value of audio slider is greater than to currentSliderValue.
       await this.page.waitForFunction(
         (selector: string, value: number) => {
           const element = document.querySelector(selector);
@@ -5233,6 +5250,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if all dropdowns in navbar open properly.
    */
   async expectDropdownsInNavbarToWorkProperly(): Promise<void> {
+    await this.expectElementToBeVisible(navbarLearnTab);
     await this.clickOn(navbarLearnTab);
     await this.isElementVisible(navbarLearnDropdownContainerSelector);
 
@@ -5240,7 +5258,9 @@ export class LoggedOutUser extends BaseUser {
     await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
 
     await this.clickOn(navbarGetInvolvedTab);
-    await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
+    await this.expectElementToBeVisible(
+      navbarGetInvolvedDropdownContainerSelector
+    );
   }
 
   /**
@@ -5274,7 +5294,7 @@ export class LoggedOutUser extends BaseUser {
    * @param tabHeading - The tab heading to check content for.
    * @param tabContent - The content of tab
    */
-  async expecttabElementInLessonCardToContain(
+  async expectTabElementInLessonCardToContain(
     tabHeading: string,
     tabContent: string
   ): Promise<void> {
@@ -5327,7 +5347,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if fraction input is visible.
    */
   async expectFractionInputToBeVisible(): Promise<void> {
-    await this.isElementVisible(fractionInputSelector);
+    await this.expectElementToBeVisible(fractionInputSelector);
   }
 
   /**

@@ -1659,23 +1659,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Click on checkbox of first current goal and remove it.
-   */
-  async clickOnCheckboxOfFirstCurrentGoalAndRemoveIt(): Promise<void> {
-    await this.page.waitForSelector(removeTopicFromCurrentGoalsButton, {
-      visible: true,
-    });
-    const removeGoalButton = await this.page.$(
-      removeTopicFromCurrentGoalsButton
-    );
-    if (!removeGoalButton) {
-      throw new Error('Remove goal button not found.');
-    }
-    await removeGoalButton?.click();
-    showMessage('Goal removed successfully.');
-  }
-
-  /**
    * Checks if the completed goals include the expected goals.
    * @param {string[]} expectedGoals - The expected goals.
    */
@@ -2390,9 +2373,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.click(addNewGoalButtonSelector);
     await this.clickOn('Remove');
 
-    await this.page.waitForSelector(removeModalContainerSelector, {
-      visible: false,
-    });
+    await this.expectElementToBeVisible(removeModalContainerSelector, false);
   }
 
   /**
@@ -2439,6 +2420,8 @@ export class LoggedInUser extends BaseUser {
         return;
       }
     }
+
+    throw new Error(`Goal not found: ${goal}`);
   }
 
   /**
@@ -2801,11 +2784,9 @@ export class LoggedInUser extends BaseUser {
   async expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(
     visible: boolean = true
   ): Promise<void> {
-    await this.page.waitForSelector(
+    await this.expectElementToBeVisible(
       continueFromWhereLeftOffSectionInRedesignedDashboardSelector,
-      {
-        visible: visible,
-      }
+      visible
     );
   }
 

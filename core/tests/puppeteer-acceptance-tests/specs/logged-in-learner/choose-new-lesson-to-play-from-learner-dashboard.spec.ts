@@ -148,7 +148,6 @@ describe('Logged-In Learner', function () {
     // await loggedInLearner.continueToNextCard();
     // await loggedInLearner.navigateToLearnerDashboard();
 
-    // await loggedInLearner.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
     // await loggedInLearner.expectLearnSomethingNewInLDToBeEmpty()
     // await loggedInLearner.expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(
     //   false

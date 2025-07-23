@@ -3271,6 +3271,7 @@ export class ExplorationEditor extends BaseUser {
       await tabContentInputElements?.[i]?.type(tabContents[i].content);
     }
     await this.clickOn(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -3373,6 +3374,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('ArrowRight');
 
     await this.clickOn(saveContentButton);
+    await this.expectElementToBeVisible(saveContentButton, false);
   }
 
   /**
@@ -3392,6 +3394,7 @@ export class ExplorationEditor extends BaseUser {
   async addCollapsibleBlockRTE(): Promise<void> {
     await this.clickOnRTEOptionWithTitle('collapsible block');
     await this.clickOn(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -3418,6 +3421,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.clickOn(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -3454,6 +3458,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(useTheUploadImageButton);
 
     await this.clickOn(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
