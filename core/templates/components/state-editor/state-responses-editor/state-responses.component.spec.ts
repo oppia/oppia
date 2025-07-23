@@ -25,7 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
-import {Interaction} from 'domain/exploration/in';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {Misconception} from 'domain/skill/misconception.model';

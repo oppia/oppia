@@ -23,7 +23,7 @@ import {fakeAsync, TestBed} from '@angular/core/testing';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {Interaction} from 'domain/exploration/interaction';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {LoggerService} from 'services/contextual/logger.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
