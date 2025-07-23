@@ -140,12 +140,10 @@ describe('Create new skill modal', () => {
     });
   });
   it('should create new skill modal', () => {
-    spyOn(ValidatorsService, 'isValidDescription').and.returnValue(true);
+    spyOn(ValidatorsService, 'hasValidDescription').and.returnValue(true);
     componentInstance.skillDescriptionExists = false;
     spyOn(ngbActiveModal, 'close');
-
     componentInstance.createNewSkill();
-
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
       description: componentInstance.newSkillDescription,
       rubrics: componentInstance.rubrics,
