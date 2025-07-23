@@ -35,7 +35,7 @@ jobs:
         run: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         suite:  ["create-an-exploration-with-all-interactions", "preview-all-exploration-interactions", "exploration-settings", "exploration-history", "exploration-feedback", "exploration-help", "exploration-navbar-header"]
         mobile_args: ["--mobile", ""]
-    name: Acceptance (${{ matrix.suite.name }}) (#${{ matrix.run }}, ${{ matrix.mobile_args === '--mobile' && 'Mobile' || 'Desktop' }})
+    name: Acceptance (${{ matrix.suite.name }}) (#${{ matrix.run }}, ${{ matrix.mobile_args }})
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
         run: |
-          SUITE_NAME=${{ matrix.suite.name }}-${{ matrix.mobile_args === '--mobile' && 'mobile' || 'desktop' }}-${{ matrix.run }}
+          SUITE_NAME=${{ matrix.suite.name }}-${{ matrix.mobile_args }}-${{ matrix.run }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
       - name: Run Acceptance Test
         run: >
