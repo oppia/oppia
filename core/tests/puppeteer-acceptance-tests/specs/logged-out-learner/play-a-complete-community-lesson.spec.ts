@@ -26,6 +26,11 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const ROLES = testConstants.Roles;
+const CARD_NAMES = {
+  FIRST_CARD: 'Introduction',
+  SECOND_CARD: '2nd Card',
+  THIRD_CARD: 'Last Card',
+};
 
 describe('Logged-Out Learner', function () {
   let loggedOutLearner: LoggedOutUser;
@@ -56,13 +61,30 @@ describe('Logged-Out Learner', function () {
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.addExplorationDescriptionContainingAllRTEComponents();
+    await explorationEditor.updateCardContent('Introduction to Fractions');
     await explorationEditor.addInteraction('Continue Button');
     await explorationEditor.viewOppiaResponses();
-    await explorationEditor.directLearnersToNewCard('Last Card');
+    await explorationEditor.directLearnersToNewCard(CARD_NAMES.SECOND_CARD);
     await explorationEditor.saveExplorationDraft();
 
-    await explorationEditor.navigateToCard('Last Card');
+    // Navigate to the second card and update its content.
+    await explorationEditor.navigateToCard(CARD_NAMES.SECOND_CARD);
+    await explorationEditor.addExplorationDescriptionContainingAllRTEComponents();
+    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.addInteraction('Fraction Input');
+    await explorationEditor.addResponsesToTheInteraction(
+      'Fraction Input',
+      '2',
+      'Prefect!',
+      CARD_NAMES.THIRD_CARD,
+      true
+    );
+    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Wrong Answer. Please try again'
+    );
+
+    // Navigate to the final card and update its content.
+    await explorationEditor.navigateToCard(CARD_NAMES.THIRD_CARD);
     await explorationEditor.updateCardContent(
       'I hope you enjoyed this exploration! '
     );
@@ -109,8 +131,14 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectToBeOnPage(
       `http://localhost:8181/explore/${explorationId}`
     );
-
     await loggedOutLearner.waitForPageToFullyLoad();
+
+    await loggedOutLearner.expectLessonInfoTextToBe('Lesson Info');
+
+    // Continue to next card.
+    await loggedOutLearner.continueToNextCard();
+    await loggedOutLearner.expectGoBackToPreviousCardButton(true);
+    await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
 
     // Concept Card RTE.
     await loggedOutLearner.expectConceptCardLinkInLessonToWorkProperly(

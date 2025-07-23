@@ -1029,7 +1029,8 @@ export class BaseUser {
     selector: string,
     present: boolean = true
   ): Promise<void> {
-    expect(await this.isElementVisible(selector)).toBe(present);
+    const option = present ? {visible: true} : {hidden: true};
+    await this.page.waitForSelector(selector, option);
   }
 }
 
