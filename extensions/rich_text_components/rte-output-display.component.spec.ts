@@ -464,6 +464,15 @@ describe('RTE display component', () => {
     expect(readableText).toBe(expectedString);
   });
 
+  it('should return space character for unknown tag', () => {
+    let node = document.createElement('span');
+    // eslint-disable-next-line oppia/no-inner-html
+    node.innerHTML = ' ';
+    let expectedString = ' ';
+    let readableText = component.getReadableTextFromNode(node.childNodes[0]);
+    expect(readableText).toBe(expectedString);
+  });
+
   it('should not change bg highlight color when prev and current element are same during voiceover playback', fakeAsync(() => {
     let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
     audioPlayingSpy.and.returnValue(true);

@@ -164,6 +164,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
+    } else {
+      return ' ';
     }
   }
 
@@ -244,7 +246,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
             ?.join('')
             ?.trim();
 
+          let spaceElement = document.createElement('span');
+          // eslint-disable-next-line oppia/no-inner-html
+          spaceElement.innerHTML = ' ';
           spanTagElement.appendChild(childNode);
+          spanTagElement.appendChild(spaceElement);
 
           if (sentence === currentSentenceToMatch) {
             spanNodeList.push(spanTagElement);
@@ -268,6 +274,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           for (let tempChildNode of spanNode.childNodes) {
             textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
           }
+
           this.highlighIdToSentenceText[elementId] = textInsideSpanTag;
           nodeTemp.appendChild(spanNode);
         });
