@@ -79,6 +79,7 @@ class SentEmailModel(base_models.BaseModel):
             feconf.EMAIL_INTENT_ADD_CONTRIBUTOR_DASHBOARD_REVIEWERS,
             feconf.EMAIL_INTENT_ACCOUNT_DELETED,
             feconf.BULK_EMAIL_INTENT_TEST,
+            feconf.EMAIL_INTENT_VOICEOVER_REGENERATION,
             (
                 feconf
                 .EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS),

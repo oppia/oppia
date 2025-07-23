@@ -108,6 +108,7 @@ describe('Solution explanation editor', () => {
     const schema = {
       type: 'html',
       ui_config: {
+        rte_components: 'ALL_COMPONENTS',
         hide_complex_extensions: true,
       },
     };
@@ -129,6 +130,7 @@ describe('Solution explanation editor', () => {
     const schema = {
       type: 'html',
       ui_config: {
+        rte_components: 'ALL_COMPONENTS',
         hide_complex_extensions: true,
       },
     };

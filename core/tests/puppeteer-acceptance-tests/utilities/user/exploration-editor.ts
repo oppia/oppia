@@ -1335,12 +1335,7 @@ export class ExplorationEditor extends BaseUser {
       const headingName = !cardName.trimEnd().endsWith('...')
         ? cardName
         : cardName.trimEnd().slice(0, -3);
-      await this.page.waitForFunction(
-        (selector: string, value: string) => {
-          const element = document.querySelector(selector);
-          return element?.textContent?.trim().includes(value);
-        },
-        {},
+      await this.expectTextContentToContain(
         currentCardNameSelector,
         headingName
       );
