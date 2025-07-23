@@ -17,7 +17,7 @@
  */
 
 /**
- * Logs test progress and feedback messages with timestamp
+ * Logs test progress and feedback messages.
  */
 export const showMessage = (message: string): void => {
   // eslint-disable-next-line no-console
