@@ -25,7 +25,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model';
 import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
@@ -89,7 +89,6 @@ describe('Preview Tab Component', () => {
   let routerService: RouterService;
   let stateEditorService: StateEditorService;
   let stateObjectFactory: StateObjectFactory;
-  let paramChangeObjectFactory: ParamChangeObjectFactory;
   let parameterMetadataService: ParameterMetadataService;
   let mockUpdateActiveStateIfInEditorEventEmitter = new EventEmitter();
   let mockPlayerStateChangeEventEmitter = new EventEmitter();
@@ -158,9 +157,7 @@ describe('Preview Tab Component', () => {
             getDataAsync: () =>
               Promise.resolve({
                 param_changes: [
-                  paramChangeObjectFactory
-                    .createEmpty(changeObjectName)
-                    .toBackendDict(),
+                  ParamChange.createEmpty(changeObjectName).toBackendDict(),
                 ],
                 states: [
                   stateObjectFactory.createDefaultState(
@@ -187,7 +184,6 @@ describe('Preview Tab Component', () => {
     component = fixture.componentInstance;
     numberAttemptsService = TestBed.inject(NumberAttemptsService);
     routerService = TestBed.inject(RouterService);
-    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
     editableExplorationBackendApiService = TestBed.inject(
@@ -223,7 +219,7 @@ describe('Preview Tab Component', () => {
       'fetchApplyDraftExplorationAsync'
     ).and.returnValue(Promise.resolve(exploration));
     explorationParamChangesService.savedMemento = [
-      paramChangeObjectFactory.createEmpty(changeObjectName).toBackendDict(),
+      ParamChange.createEmpty(changeObjectName).toBackendDict(),
     ];
     spyOnProperty(
       stateEditorService,

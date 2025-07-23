@@ -159,6 +159,7 @@
               "id": "has_subtitled_html_non_empty"
             }],
             "replacement_ui_config": {
+              "rte_components": "ALL_COMPONENTS",
               "html": {
                 "hide_complex_extensions": true,
                 "placeholder": "Enter an option for the learner to drag and drop."
@@ -257,6 +258,7 @@
               "id": "has_subtitled_html_non_empty"
             }],
             "replacement_ui_config": {
+              "rte_components": "ALL_COMPONENTS",
               "html": {
                 "hide_complex_extensions": true,
                 "placeholder": "Sample item answer"
@@ -649,6 +651,7 @@
               "id": "has_subtitled_html_non_empty"
             }],
             "replacement_ui_config": {
+              "rte_components": "ALL_COMPONENTS",
               "html": {
                 "hide_complex_extensions": true,
                 "placeholder": "Enter an option for the learner to select"

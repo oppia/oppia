@@ -29,8 +29,8 @@ import {
 import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   ParamChangeBackendDict,
-  ParamChangeObjectFactory,
-} from '../../../domain/exploration/ParamChangeObjectFactory';
+  ParamChange,
+} from '../../../domain/exploration/param-change.model';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
@@ -66,7 +66,6 @@ describe('Exploration engine service ', () => {
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
-  let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: TextInputRulesService;
   let translateService: TranslateService;
   let explorationDict: ExplorationBackendDict;
@@ -384,7 +383,6 @@ describe('Exploration engine service ', () => {
     statsReportingService = TestBed.inject(StatsReportingService);
     urlService = TestBed.inject(UrlService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     textInputService = TestBed.inject(TextInputRulesService);
     translateService = TestBed.inject(TranslateService);
   });
@@ -466,8 +464,7 @@ describe('Exploration engine service ', () => {
     'should load exploration when initialized in ' + 'exploration editor page',
     () => {
       let initSuccessCb = jasmine.createSpy('success');
-      let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+      let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
       // Setting exploration editor page.
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         true
@@ -1474,8 +1471,7 @@ describe('Exploration engine service ', () => {
       // Please note that 'initSettingsFromEditor' function is strictly
       // used for the exploration editor page before initialization.
       // This method should not be called from the exploration player page.
-      let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+      let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
 
       // Checking if we are currently in exploration editor preview mode.
       expect(pageContextService.isInExplorationEditorPage()).toBe(false);
@@ -1695,8 +1691,7 @@ describe('Exploration engine service ', () => {
         answer: 'val1, val2',
       };
 
-      let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+      let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
       const newParams = explorationEngineService.makeParams(
         oldParams,
         [paramChanges],
@@ -1711,8 +1706,7 @@ describe('Exploration engine service ', () => {
         paramChangeDict.customization_args.parse_with_jinja = true;
         let oldParams = {};
 
-        let paramChanges =
-          paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+        let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
         spyOn(expressionInterpolationService, 'processUnicode').and.returnValue(
           null
         );
@@ -1730,8 +1724,7 @@ describe('Exploration engine service ', () => {
         answer: 'val',
       };
 
-      let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+      let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
       const newParams = explorationEngineService.makeParams(
         oldParams,
         [paramChanges],
