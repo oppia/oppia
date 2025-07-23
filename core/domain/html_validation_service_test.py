@@ -442,6 +442,23 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-workedexample question-with-value='
             '"&amp;quot;lorem ipsum&amp;quot;" answer-with-value="34456">'
             '</oppia-noninteractive-workedexample>'
+        ), (
+            '<oppia-noninteractive-workedexample question-with-value="'
+            '&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-link '
+            'url-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+            'https://www.example.com&amp;amp;amp;quot;\\&amp;quot;&amp;gt;'
+            '&amp;lt;/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;'
+            '&amp;quot;" answer-with-value="&amp;quot;Hello&amp;quot;">'
+            '</oppia-noninteractive-workedexample>'
+        ), (
+            '<oppia-noninteractive-workedexample question-with-value="'
+            '&amp;quot;Hello&amp;quot;" answer-with-value="'
+            '&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-link '
+            'url-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+            'https://www.example.com&amp;amp;amp;quot;\\&amp;quot;&amp;gt;'
+            '&amp;lt;/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;'
+            '&amp;quot;">'
+            '</oppia-noninteractive-workedexample>'
         )]
 
         actual_output = html_validation_service.validate_customization_args(
@@ -525,6 +542,23 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'amp;amp;quot;https://www.oppia.org&amp;amp;amp;quot;\\&amp;'
                 'quot;&amp;gt;&amp;lt;/oppia-noninteractive-link&amp;gt;&amp;'
                 'lt;/p&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>'
+            ), (
+                '<oppia-noninteractive-workedexample question-with-value'
+                '="&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-'
+                'link url-with-value=\\&amp;quot;&amp;amp;amp;quot;https://'
+                'www.example.com&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;'
+                '/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;&amp;'
+                'quot;" answer-with-value="&amp;quot;Hello&amp;quot;">'
+                '</oppia-noninteractive-workedexample>'
+            ), (
+                '<oppia-noninteractive-workedexample question-with-value'
+                '="&amp;quot;Hello&amp;quot;" answer-with-value="'
+                '&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-'
+                'link url-with-value=\\&amp;quot;&amp;amp;amp;quot;https://'
+                'www.example.com&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;'
+                '/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;&amp;'
+                'quot;">'
+                '</oppia-noninteractive-workedexample>'
             )],
             'Expected bool, received hello': [(
                 '<oppia-noninteractive-video autoplay-with-value="&amp;quot;'
