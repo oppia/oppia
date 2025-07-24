@@ -403,6 +403,7 @@ const numberWithUnitsModalSelector =
   '.e2e-test-number-with-units-help-modal-header';
 const firstCardSettingsSelector = '.e2e-test-initial-state-select';
 const progressUIDSelector = '.e2e-test-progress-id';
+const customSelectedCharctersSelector = '.e2e-test-custom-letters';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -1061,6 +1062,128 @@ export class ExplorationEditor extends BaseUser {
       hidden: true,
     });
     showMessage(`Customized set input interaction with four vertices.`);
+  }
+
+  /**
+   * Waits for interaction customization box and returns it.
+   * @returns {Promise<ElementHandle<Element>>} Promise that resolves to the
+   *     element handle of the interaction customization box.
+   */
+  async getInteractionCustomizationBox(): Promise<ElementHandle<Element>> {
+    await this.expectElementToBeVisible(customizeInteractionBodySelector);
+    const customizationBox = await this.page.$(
+      customizeInteractionBodySelector
+    );
+
+    if (!customizationBox) {
+      throw new Error(
+        `Could not find the customization box for the interaction.`
+      );
+    }
+
+    return customizationBox;
+  }
+
+  /**
+   * Customizes the numeric expression input interaction.
+   * @param placeholderText The placeholder text of the input.
+   * @param representDivUsingFraction Whether to represent the division using
+   */
+  async customizeNumericExpressionInputInteraction(
+    placeholderText: string,
+    representDivUsingFraction: boolean
+  ): Promise<void> {
+    const customizationBox = await this.getInteractionCustomizationBox();
+    await customizationBox.waitForSelector('input');
+    const inputElements = await customizationBox.$$('input');
+
+    // Placeholder text.
+    await inputElements[0].click({clickCount: 3});
+    await inputElements[0].type(placeholderText);
+    await this.page.waitForFunction(
+      (element: Element, value: string) => {
+        return (element as HTMLInputElement).value === value;
+      },
+      {},
+      inputElements[0],
+      placeholderText
+    );
+
+    // Represt Divisions using Fractions.
+    if (representDivUsingFraction) {
+      await inputElements[1].click();
+      await this.page.waitForFunction(
+        (element: Element) => {
+          return (element as HTMLInputElement).checked;
+        },
+        {},
+        inputElements[1]
+      );
+    }
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage(`Customized World Map successfully.`);
+  }
+
+  /**
+   * Customizes the numeric expression input interaction.
+   * @param quickAccessCharcters The characters to be displayed in the quick
+   * @param representDivUsingFraction Whether to represent the division using
+   */
+  async customizeAlgebricExpressionInputInteraction(
+    quickAccessCharcters: string,
+    representDivUsingFraction: boolean
+  ): Promise<void> {
+    const customizationBox = await this.getInteractionCustomizationBox();
+    const quickAccessInput = await customizationBox.$(
+      customSelectedCharctersSelector
+    );
+    if (!quickAccessInput) {
+      throw new Error('Could not find quick access input');
+    }
+    await customizationBox.waitForSelector('input');
+    const inputElement = await customizationBox.$('input');
+    if (!inputElement) {
+      throw new Error('Could not find input element');
+    }
+
+    // Placeholder text.
+    await quickAccessInput.type(quickAccessCharcters);
+    try {
+      await this.page.waitForFunction(
+        (element: Element, value: string) => {
+          return (element as HTMLInputElement).textContent?.trim() === value;
+        },
+        {},
+        quickAccessInput,
+        quickAccessCharcters.split('').join('  ')
+      );
+    } catch {
+      throw new error(
+        `HEHE ${quickAccessCharcters.split('').join(' ')}` + ' HEHE '
+      );
+    }
+
+    // Represt Divisions using Fractions.
+    if (representDivUsingFraction) {
+      await inputElement.click();
+      await this.page.waitForFunction(
+        (element: Element) => {
+          return (element as HTMLInputElement).checked;
+        },
+        {},
+        inputElement
+      );
+    }
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage(`Customized World Map successfully.`);
   }
 
   /**
@@ -2468,6 +2591,9 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     await this.clickOn(selector);
     if (skipInteractionCustoization) {
+      await this.expectCustomizeInteractionTitleToBe(
+        `Customize Interaction (${interactionToAdd})`
+      );
       await this.page.waitForSelector(saveInteractionButton, {
         visible: true,
       });
