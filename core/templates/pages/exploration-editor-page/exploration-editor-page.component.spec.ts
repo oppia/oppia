@@ -29,7 +29,6 @@ import {
 import {BrowserDynamicTestingModule} from '@angular/platform-browser-dynamic/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
