@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 
 import {
   InteractionBackendDict,
-  Interaction
+  Interaction,
 } from 'domain/exploration/interaction.model';
 import {
   ParamChangeBackendDict,
