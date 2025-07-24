@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * EC. History.
+ * EC. Feedback.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
