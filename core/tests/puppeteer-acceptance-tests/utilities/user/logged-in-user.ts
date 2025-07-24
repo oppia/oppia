@@ -2539,7 +2539,7 @@ export class LoggedInUser extends BaseUser {
    * Checks if the suggestion container in Learner Dashboard is empty.
    */
   async expectLearnSomethingNewInLDToBeEmpty(): Promise<void> {
-    await this.isElementVisible(emptySuggestionSectionSelector);
+    await this.expectElementToBeVisible(emptySuggestionSectionSelector);
   }
 
   /**
@@ -2549,9 +2549,9 @@ export class LoggedInUser extends BaseUser {
   async expectContinueWhereYouLeftOffSectionInLDToBePresent(
     visible: boolean = true
   ): Promise<void> {
-    expect(
-      await this.isElementVisible(continueFromWhereLeftOffSectionSelector)
-    ).toBe(visible);
+    await this.expectElementToBeVisible(
+      continueFromWhereLeftOffSectionSelector
+    );
   }
 
   /**
@@ -2659,9 +2659,10 @@ export class LoggedInUser extends BaseUser {
   async expectSuggestedForYouSectionToBeEmpty(
     empty: boolean = true
   ): Promise<void> {
-    expect(
-      await this.isElementVisible(emptySuggestedForYouSectionSelector)
-    ).toBe(empty);
+    await this.expectElementToBeVisible(
+      emptySuggestedForYouSectionSelector,
+      empty
+    );
   }
 
   /**
@@ -2831,7 +2832,8 @@ export class LoggedInUser extends BaseUser {
   async expectLearnSomethingNewSectionInRedesignedDashboardToBePresent(
     visible: boolean = true
   ): Promise<void> {
-    expect(await this.isElementVisible(learnSomethingNewSectionSelector)).toBe(
+    await this.expectElementToBeVisible(
+      learnSomethingNewSectionSelector,
       visible
     );
   }

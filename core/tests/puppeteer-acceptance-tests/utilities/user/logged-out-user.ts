@@ -713,7 +713,7 @@ export class LoggedOutUser extends BaseUser {
    * Return to Learner Dashboard from exploration completion card.
    */
   async returnToLibraryFromExplorationCompletion(): Promise<void> {
-    await this.isElementVisible(returnToLibraryButtonSelector);
+    await this.expectElementToBeVisible(returnToLibraryButtonSelector);
     await this.clickOn(returnToLibraryButtonSelector);
   }
 
@@ -5276,10 +5276,10 @@ export class LoggedOutUser extends BaseUser {
   async expectDropdownsInNavbarToWorkProperly(): Promise<void> {
     await this.expectElementToBeVisible(navbarLearnTab);
     await this.clickOn(navbarLearnTab);
-    await this.isElementVisible(navbarLearnDropdownContainerSelector);
+    await this.expectElementToBeVisible(navbarLearnDropdownContainerSelector);
 
     await this.clickOn(navbarAboutTab);
-    await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
+    await this.expectElementToBeVisible(navbarAboutDropdownConatinaerSelector);
 
     await this.clickOn(navbarGetInvolvedTab);
     await this.expectElementToBeVisible(
@@ -5294,7 +5294,7 @@ export class LoggedOutUser extends BaseUser {
   async expectConceptCardLinkInLessonToWorkProperly(
     content: string
   ): Promise<void> {
-    await this.isElementVisible(conceptCardLinkSelector);
+    await this.expectElementToBeVisible(conceptCardLinkSelector);
 
     await this.clickOn(conceptCardLinkSelector);
     const conceptCardContent: string =
@@ -5310,7 +5310,7 @@ export class LoggedOutUser extends BaseUser {
     }
 
     await this.clickOn('Close');
-    await this.isElementVisible(conceptCardViewerSelector, false);
+    await this.expectElementToBeVisible(conceptCardViewerSelector, false);
   }
 
   /**
@@ -5322,7 +5322,7 @@ export class LoggedOutUser extends BaseUser {
     tabHeading: string,
     tabContent: string
   ): Promise<void> {
-    await this.isElementVisible(nonInteractiveTabsHeaderSelector);
+    await this.expectElementToBeVisible(nonInteractiveTabsHeaderSelector);
     const tabHeaders = await this.page.$$eval(
       nonInteractiveTabsHeaderSelector,
       elements => elements.map(element => element.textContent?.trim())
@@ -5351,7 +5351,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if audio expand button is visible in lesson player.
    */
   async expectAudioExpandButtonToBeVisibleInLP(): Promise<void> {
-    await this.isElementVisible(audioExpandButtonInLPSelector);
+    await this.expectElementToBeVisible(audioExpandButtonInLPSelector);
     showMessage('Audio Expand button is visible in lesson player.');
   }
 
@@ -5359,8 +5359,8 @@ export class LoggedOutUser extends BaseUser {
    * Checks if audio forward and backward buttons are visible in lesson player.
    */
   async expectAudioForwardBackwardButtonToBeVisible(): Promise<void> {
-    await this.isElementVisible(audioBackwardButtonSelector);
-    await this.isElementVisible(audioForwardButtonSelector);
+    await this.expectElementToBeVisible(audioBackwardButtonSelector);
+    await this.expectElementToBeVisible(audioForwardButtonSelector);
 
     showMessage(
       'Audio forward and backward buttons are visible in lesson player.'
@@ -5827,7 +5827,7 @@ export class LoggedOutUser extends BaseUser {
    * @param header - The expected header.
    */
   async expectLessonInfoModalHeaderToBe(header: string): Promise<void> {
-    await this.isElementVisible(lessonInfoModalHeaderSelector);
+    await this.expectElementToBeVisible(lessonInfoModalHeaderSelector);
     await this.expectTextContentToMatch(lessonInfoModalHeaderSelector, header);
   }
 
@@ -5847,7 +5847,7 @@ export class LoggedOutUser extends BaseUser {
   async expectProgressReminderModalTextToBe(
     expectedText: string
   ): Promise<void> {
-    await this.isElementVisible(progressReminderModalHeaderSelector);
+    await this.expectElementToBeVisible(progressReminderModalHeaderSelector);
     await this.expectTextContentToMatch(
       progressReminderModalHeaderSelector,
       expectedText
