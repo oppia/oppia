@@ -681,11 +681,12 @@ export class LoggedInUser extends BaseUser {
    */
   async expectStarRatingToBe(rating: number): Promise<void> {
     await this.page.waitForFunction(
-      (rating: number) => {
-        const filledStars = document.querySelectorAll(filledRatingStarSelector);
+      (selector: string, rating: number) => {
+        const filledStars = document.querySelectorAll(selector);
         return filledStars.length === rating;
       },
       {},
+      filledRatingStarSelector,
       rating
     );
   }
