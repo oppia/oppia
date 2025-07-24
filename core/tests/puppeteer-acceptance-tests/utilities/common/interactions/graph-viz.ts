@@ -33,6 +33,12 @@ export class GraphViz {
     this.context = context ?? this.parentPage;
   }
 
+  async expectGraphInteractionToBePresent(): Promise<void> {
+    await this.parentPage.waitForSelector(graphContainerSelector, {
+      visible: true,
+    });
+  }
+
   /**
    * Gets the graph container.
    * @returns The graph container.
@@ -49,7 +55,9 @@ export class GraphViz {
    * Clicks on a graph button.
    * @param buttonName The name of the button to click.
    */
-  async clickOnGraphButton(buttonName: 'Add Edge' | 'Add Node' | 'Delete') {
+  async clickOnGraphButton(
+    buttonName: 'Add Edge' | 'Add Node' | 'Delete' | 'Move'
+  ) {
     const graphContainer = await this.getGraphContainer();
     const button = await graphContainer.$(
       `${graphButtonSelectorPrefix}-${buttonName.replace(' ', '-')}-${graphButtonSelectorSuffix}`
@@ -124,7 +132,6 @@ export class GraphViz {
     await this.parentPage.waitForSelector(graphButtonSelectors.addNodeButton, {
       visible: true,
     });
-    console.log(x, y);
     await this.clickOnGraphButton('Add Node');
     await this.parentPage.waitForTimeout(500);
     await this.parentPage.mouse.click(x, y);
@@ -162,9 +169,7 @@ export class GraphViz {
    * Waits until the vertex is hovered.
    * @param vertex The vertex to wait for.
    */
-  async waitUntilVertexIsHovered(
-    vertex: ElementHandle<Element>
-  ): Promise<void> {
+  async waitUntilNodeIsHovered(vertex: ElementHandle<Element>): Promise<void> {
     try {
       await this.parentPage.waitForFunction(
         (element: HTMLElement) => {
@@ -210,14 +215,14 @@ export class GraphViz {
 
     await this.clickOnGraphButton('Add Edge');
     await vertexA.hover();
-    await this.waitUntilVertexIsHovered(vertexA);
+    await this.waitUntilNodeIsHovered(vertexA);
     // Wait alteast for 2 seconds as it takes time.
     await this.parentPage.waitForTimeout(2000);
     mobileViewport ? await vertexA.click() : await this.parentPage.mouse.down();
 
     // Smooth Drag.
     await vertexB.hover();
-    await this.waitUntilVertexIsHovered(vertexB);
+    await this.waitUntilNodeIsHovered(vertexB);
     mobileViewport ? await vertexB.click() : await this.parentPage.mouse.up();
     await this.parentPage.waitForTimeout(2000);
     await this.parentPage.mouse.up();
@@ -312,5 +317,53 @@ export class GraphViz {
       graphButtonSelectorPrefix,
       graphContainerSelector
     );
+  }
+
+  /**
+   * Moves the node to the given position.
+   * @param {ElementHandle<Element>} node - The node to move.
+   * @param {number} xInPercentage - The x coordinate of the node in percentage.
+   * @param {number} yInPercentage - The y coordinate of the node in percentage.
+   */
+  async moveNode(
+    node: ElementHandle<Element>,
+    xInPercentage: number,
+    yInPercentage: number
+  ): Promise<void> {
+    const graphContainer = await this.getGraphContainer();
+    const box = await graphContainer?.boundingBox();
+    if (!box) {
+      throw new Error('Graph container not found.');
+    }
+
+    const x = box?.x + (box?.width * xInPercentage) / 100;
+    const y = box?.y + (box?.height * yInPercentage) / 100;
+
+    await this.parentPage.waitForSelector(graphButtonSelectors.addNodeButton, {
+      visible: true,
+    });
+
+    await this.clickOnGraphButton('Move');
+    await node.hover();
+    await this.waitUntilNodeIsHovered(node);
+    await this.parentPage.mouse.down();
+    await this.parentPage.waitForTimeout(1000);
+    await this.parentPage.mouse.move(x, y);
+    await this.parentPage.mouse.up();
+    await this.parentPage.waitForTimeout(1000);
+  }
+
+  /**
+   * Gets the coordinates of the node.
+   * @param {ElementHandle<Element>} node - The node to get the coordinates of.
+   * @returns {Promise<number[]>} The coordinates of the node.
+   */
+  async getNodeCoordinates(node: ElementHandle<Element>): Promise<number[]> {
+    const boundingBox = await node.boundingBox();
+    if (!boundingBox) {
+      throw new Error('Node not found.');
+    }
+
+    return [boundingBox.x, boundingBox.y];
   }
 }

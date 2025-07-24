@@ -6067,6 +6067,24 @@ export class ExplorationEditor extends BaseUser {
   async expectCodeOutputToBe(expectedOutput: string): Promise<void> {
     await this.expectTextContentToBe(codeOutputSelector, expectedOutput);
   }
+
+  /**
+   * Moves the node in the graph.
+   */
+  async expectGraphNodeCanBeMoved(): Promise<void> {
+    // Check if the graph interaction is present.
+    const graphHelper = new GraphViz(this.page);
+    await graphHelper.expectGraphInteractionToBePresent();
+
+    // Move the node to the given position.
+    const node = await graphHelper.getVertices()[0];
+    const initalCoordinates = await graphHelper.getNodeCoordinates(node);
+    await graphHelper.moveNode(node, 50, 50);
+
+    // Check if the node is moved to the given position.
+    const newCoordinates = await graphHelper.getNodeCoordinates(node);
+    expect(newCoordinates).not.toEqual(initalCoordinates);
+  }
 }
 
 export let ExplorationEditorFactory = (): ExplorationEditor =>

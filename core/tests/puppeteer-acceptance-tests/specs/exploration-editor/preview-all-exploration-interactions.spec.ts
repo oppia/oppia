@@ -459,7 +459,8 @@ describe('Exploration Editor', function () {
       'Create a star topology using all 4 nodes.'
     );
 
-    // TODO: move node.
+    // Move node.
+    await explorationEditor.expectGraphNodeCanBeMoved();
     // TODO: add edge.
     // TODO: delete edge.
 
