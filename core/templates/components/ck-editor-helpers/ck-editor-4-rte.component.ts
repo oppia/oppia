@@ -785,7 +785,11 @@ export class CkEditor4RteComponent
       this.clearPasteError();
 
       const wrapperDiv = document.createElement('div');
-      wrapperDiv.innerHTML = ck.getData() || '';
+      const parser = new DOMParser();
+      const htmlString = ck.getData() || '';
+      const doc = parser.parseFromString(htmlString, 'text/html');
+
+      wrapperDiv.replaceChildren(...doc.body.childNodes);
 
       const textElt = wrapperDiv.childNodes;
       for (let i = textElt.length; i > 0; i--) {
@@ -814,8 +818,10 @@ export class CkEditor4RteComponent
           break;
         }
       }
-
-      let html = wrapperDiv.innerHTML;
+      const serializer = new XMLSerializer();
+      let html = Array.from(wrapperDiv.childNodes)
+        .map(node => serializer.serializeToString(node))
+        .join('');
       this.value = html;
       // Refer to the note at the top of the file for the reason behind replace.
       html = html.replace(

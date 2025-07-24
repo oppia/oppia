@@ -214,7 +214,7 @@ export class LibraryPageComponent {
 
     const newScrollPositionPx =
       scrollLeft +
-      this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction; // AppConstants.LIBRARY_TILE_WIDTH_PX  =208
+      this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction;
 
     const duration = 800;
     const start = carouselElem.scrollLeft;

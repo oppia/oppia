@@ -16,13 +16,7 @@
  * @fileoverview Unit tests for attribution guide component.
  */
 
-import {
-  TestBed,
-  async,
-  ComponentFixture,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing';
+import {TestBed, async, ComponentFixture} from '@angular/core/testing';
 
 import {AttributionGuideComponent} from './attribution-guide.component';
 import {PageContextService} from 'services/page-context.service';
