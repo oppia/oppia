@@ -31,13 +31,15 @@ from core.tests import test_utils
 
 from typing import Final, List, Tuple
 
-from . import clean
-from . import common
-from . import install_dependencies_json_packages
-from . import install_python_prod_dependencies
-from . import install_third_party_libs
-from . import pre_commit_hook
-from . import pre_push_hook
+from . import (
+    clean,
+    common,
+    install_dependencies_json_packages,
+    install_python_prod_dependencies,
+    install_third_party_libs,
+    pre_commit_hook,
+    pre_push_hook,
+)
 
 RELEASE_TEST_DIR: Final = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_TMP_UNZIP_PATH: Final = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.zip')
