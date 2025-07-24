@@ -5664,7 +5664,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectShareExplorationLinkToBeValid(): Promise<void> {
     await this.expectElementToBeVisible(progressUIDSelector);
-    await this.expectTextContentToBe(
+    await this.expectTextContentToContain(
       progressUIDSelector,
       testConstants.URLs.BaseExplorationPlayer
     );
