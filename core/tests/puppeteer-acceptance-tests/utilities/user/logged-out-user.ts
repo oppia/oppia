@@ -511,6 +511,8 @@ const nonInteractiveTabsHeaderSelector =
 const nonInteractiveTabContentSelector =
   '.e2e-test-non-interactive-tab-content';
 const closeButtonSelector = '.e2e-test-close-button';
+const backToClassroomBreadcrumbSelectorMobile =
+  '.e2e-test-mobile-breadcrumbs-classroom';
 
 // Learn Page (/learn).
 const classroomHeadingSelector = '.e2e-test-classroom-heading';
@@ -3578,10 +3580,13 @@ export class LoggedOutUser extends BaseUser {
    * Navigates back to the classroom from the topic page.
    */
   async navigateBackToClassroomFromTopicPage(): Promise<void> {
-    await this.isElementVisible(backToClassroomLinkSelector);
-    await this.clickOn(backToClassroomLinkSelector);
+    const selector = this.isViewportAtMobileWidth()
+      ? backToClassroomBreadcrumbSelectorMobile
+      : backToClassroomLinkSelector;
+    await this.isElementVisible(selector);
+    await this.clickOn(selector);
 
-    await this.isElementVisible(backToClassroomLinkSelector, false);
+    await this.isElementVisible(selector, false);
   }
 
   async expectToBeInClassroomPage(classroomURLFragment: string): Promise<void> {
