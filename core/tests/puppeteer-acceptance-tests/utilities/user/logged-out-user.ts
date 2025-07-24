@@ -499,17 +499,6 @@ const communityLibraryHeading = '.e2e-test-library-main-header';
 const communityLibraryGroupHeader = '.e2e-test-library-group-header';
 
 // Other Selectors.
-const youtubePlayerSelector = '.e2e-test-youtube-player';
-const collapsibleRTEHeaderSelector = 'e2e-test-collapsible-heading';
-const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
-
-const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
-const conceptCardLinkSelector = '.e2e-test-concept-card-link';
-const conceptCardViewerSelector = '.e2e-test-concept-card-viewer';
-const nonInteractiveTabsHeaderSelector =
-  '.e2e-test-non-interactive-tabs-headers';
-const nonInteractiveTabContentSelector =
-  '.e2e-test-non-interactive-tab-content';
 const closeButtonSelector = '.e2e-test-close-button';
 const backToClassroomBreadcrumbSelectorMobile =
   '.e2e-test-mobile-breadcrumbs-classroom';
@@ -521,7 +510,6 @@ const classroomNameSelector = '.e2e-test-classroom-name';
 
 // Classroom Page.
 const classroomContentHeadingSelector = '.e2e-test-classroom-content-heading';
-const topicSummaryTileSelector = '.e2e-test-topic-summary-tile';
 const diagnosticTestBoxSelector = '.e2e-test-diagnostic-test-box';
 const diagnosticTestHeadingSelector = `${diagnosticTestBoxSelector} h4`;
 const diagnosticTestButtonSelector = `${diagnosticTestBoxSelector} a`;
@@ -3562,7 +3550,7 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(practiceTabContainerSelector);
 
-    showMessage(`Navigated to practice tab in topic page.`);
+    showMessage('Navigated to practice tab in topic page.');
   }
 
   /**
@@ -4243,7 +4231,9 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the embed classroom in lesson info works properly.
    * @param explorationId The exploration id.
    */
-  async expectEmbedClassroomInLessonInfoToWorkProperly(explorationId: string) {
+  async expectEmbedClassroomInLessonInfoToWorkProperly(
+    explorationId: string
+  ): Promise<void> {
     const expectedCode = `<iframe src="http://localhost:8181/embed/exploration/${explorationId}" width="700" height="1000">`;
 
     await this.expectEmbedClassroomLinkToWorkProperly(expectedCode);
@@ -5576,7 +5566,9 @@ export class LoggedOutUser extends BaseUser {
    * Function to verify the community library group header is present.
    * @param {string[]} groupHeaders - The group headers to verify.
    */
-  async expectCommunityLibraryGroupHeaderToContain(groupHeaders: string[]) {
+  async expectCommunityLibraryGroupHeaderToContain(
+    groupHeaders: string[]
+  ): Promise<void> {
     await this.page.waitForSelector(communityLibraryGroupHeader, {
       visible: true,
     });
@@ -5636,7 +5628,7 @@ export class LoggedOutUser extends BaseUser {
   async clickBrowseLessonsButtonInHomePage(): Promise<void> {
     await this.expectElementToBeVisible(browseLessonButtonSelector);
     await this.page.click(browseLessonButtonSelector);
-    showMessage(`Clicked on browse lessons button.`);
+    showMessage('Clicked on browse lessons button.');
 
     await this.expectElementToBeVisible(browseLessonButtonSelector, false);
   }
@@ -5763,14 +5755,8 @@ export class LoggedOutUser extends BaseUser {
    * Function to verify the classroom heading.
    * @param {string} expectedHeading - The expected heading of the classroom.
    */
-  async expectClassroomHeadingToBe(expectedHeading: string) {
-    await this.expectElementToBeVisible(classroomHeadingSelector);
-    const heading = await this.page.$eval(
-      classroomHeadingSelector,
-      el => el.textContent
-    );
-
-    expect(heading).toBe(expectedHeading);
+  async expectClassroomHeadingToBe(expectedHeading: string): Promise<void> {
+    await this.expectTextContentToBe(classroomHeadingSelector, expectedHeading);
   }
 
   /**
@@ -5921,7 +5907,7 @@ export class LoggedOutUser extends BaseUser {
    * Function to verify if the user is on the story page.
    * @param {string} storyTitle - The title of the story.
    */
-  async expectToBeOnStoryPage(storyTitle: string) {
+  async expectToBeOnStoryPage(storyTitle: string): Promise<void> {
     await this.page.waitForFunction(
       (selector: string, value: string) => {
         const element = document.querySelector(selector);

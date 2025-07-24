@@ -156,7 +156,7 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addTextInputInteraction('Answer');
+      await questionSubmitter.addTextInputInteractionInQuestionEditor('Answer');
 
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
         'Wrong Answer'

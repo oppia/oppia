@@ -711,9 +711,9 @@ export class TopicManager extends BaseUser {
       await practiceTabToggleElement.click();
 
       await this.page.waitForFunction(
-        selector => {
+        (selector: string) => {
           const element = document.querySelector(selector);
-          return element.checked === true;
+          return (element as HTMLInputElement).checked === true;
         },
         {},
         practiceTabToggle
