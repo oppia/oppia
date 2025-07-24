@@ -27,7 +27,7 @@ import {
   ParamChangeBackendDict,
   ParamChange,
 } from 'domain/exploration/param-change.model';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {
   SubtitledHtmlBackendDict,
   SubtitledHtml,
@@ -136,10 +136,7 @@ export class State extends BaseTranslatableObject {
   providedIn: 'root',
 })
 export class StateObjectFactory {
-  constructor(
-    private interactionObject: InteractionObjectFactory,
-    private paramchangesObject: ParamChangesObjectFactory
-  ) {}
+  constructor(private interactionObject: InteractionObjectFactory) {}
 
   get NEW_STATE_TEMPLATE(): StateBackendDict {
     return AppConstants.NEW_STATE_TEMPLATE as StateBackendDict;
@@ -190,7 +187,7 @@ export class StateObjectFactory {
       stateDict.linked_skill_id,
       SubtitledHtml.createFromBackendDict(stateDict.content),
       this.interactionObject.createFromBackendDict(stateDict.interaction),
-      this.paramchangesObject.createFromBackendList(stateDict.param_changes),
+      ParamChanges.createFromBackendList(stateDict.param_changes),
       stateDict.solicit_answer_details,
       stateDict.card_is_checkpoint,
       stateDict.inapplicable_skill_misconception_ids

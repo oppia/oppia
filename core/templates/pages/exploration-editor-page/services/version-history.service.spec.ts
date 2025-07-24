@@ -18,14 +18,13 @@
 
 import {TestBed} from '@angular/core/testing';
 import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
 import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 import {VersionHistoryService} from './version-history.service';
 
 describe('Version history service', () => {
   let versionHistoryService: VersionHistoryService;
-  let paramSpecObjectFactory: ParamSpecObjectFactory;
   let stateObjectFactory: StateObjectFactory;
 
   beforeEach(() => {
@@ -48,7 +47,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}, ParamSpec),
       [],
       false,
       true
@@ -80,7 +79,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}, ParamSpec),
       [],
       false,
       true
@@ -239,7 +238,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}, ParamSpec),
       [],
       false,
       true
@@ -415,7 +414,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}, ParamSpec),
       [],
       false,
       true
@@ -513,7 +512,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}, ParamSpec),
       [],
       false,
       true
@@ -679,7 +678,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}, ParamSpec),
       [],
       false,
       true
@@ -716,7 +715,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}, ParamSpec),
       [],
       false,
       true
