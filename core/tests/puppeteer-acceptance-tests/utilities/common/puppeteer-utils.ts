@@ -1038,11 +1038,14 @@ export class BaseUser {
    * @param {string} value - The expected value.
    */
   async expectElementValueToBe(
-    selector: string | ElementHandle<Element>,
+    selector: string | ElementHandle,
     value: string
   ): Promise<void> {
     // Change the selector to the actual element.
-    selector = typeof selector === 'string' ? await this.$(selector) : selector;
+    if (typeof selector === 'string') {
+      await this.expectElementToBeVisible(selector);
+      selector = await this.$(selector);
+    }
 
     // Wait until the element value matches the expected value.
     try {

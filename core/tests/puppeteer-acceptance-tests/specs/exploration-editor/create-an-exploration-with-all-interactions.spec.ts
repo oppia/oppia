@@ -154,7 +154,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.saveExplorationDraft();
   });
 
-  it('should be able to use "text input" interaction', async function () {
+  it('should be able to use "Text Input" interaction', async function () {
     await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
 
     // Add a text input interaction.

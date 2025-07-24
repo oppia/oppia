@@ -396,6 +396,8 @@ const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
 const formErrorContainer = '.e2e-test-form-error-container';
+const numberWithUnitsModalSelector =
+  '.e2e-test-number-with-units-help-modal-header';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -1084,6 +1086,7 @@ export class ExplorationEditor extends BaseUser {
 
     // Update placeholder text.
     if (placeHolderText) {
+      await inputElements[0].click({clickCount: 3});
       await inputElements[0].type(placeHolderText);
       await this.expectElementValueToBe(inputElements[0], placeHolderText);
     }
@@ -1099,7 +1102,7 @@ export class ExplorationEditor extends BaseUser {
 
     // Update catch misspellings.
     if (catchMisspellings === true) {
-      inputElements[2].click();
+      await inputElements[2].click();
 
       await this.page.waitForFunction(
         (ele: HTMLInputElement) => {
@@ -5623,6 +5626,13 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectAnswerErrorMessageToBe(expectedError: string): Promise<void> {
     await this.expectTextContentToContain(formErrorContainer, expectedError);
+  }
+
+  /**
+   * Checks if the Number With Units help modal header is present.
+   */
+  async expectNumberWithUnitsHelpModalHeaderToBePresent(): Promise<void> {
+    await this.expectElementToBeVisible(numberWithUnitsModalSelector);
   }
 }
 
