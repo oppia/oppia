@@ -372,11 +372,7 @@ describe('Exploration Editor', function () {
       'Second',
       'Third',
     ]);
-    await explorationEditor.expectPreviewCardContentToBe(
-      CARDS.SEVENTH_CARD,
-      'Arrange in Ascending Order',
-      false
-    );
+    await explorationEditor.expectResponseFeedbackToBe('Great!');
 
     // Navigate to Editor tab.
     await explorationEditor.navigateToEditorTab();
