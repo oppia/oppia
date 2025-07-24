@@ -182,8 +182,10 @@ export class BaseUser {
             ],
           };
 
+          const fullScreenRecordingPath = path.join(outputDir, outputFileName);
+          showMessage(`Saving screen recording to ${fullScreenRecordingPath}`);
           this.screenRecorder = new PuppeteerScreenRecorder(this.page, config);
-          await this.screenRecorder.start(path.join(outputDir, outputFileName));
+          await this.screenRecorder.start(fullScreenRecordingPath);
 
           // Ensure recording is stopped when the test fails.
           process.on('SIGTERM', async () => {
