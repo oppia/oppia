@@ -44,7 +44,7 @@ import {
 } from '../modals/switch-content-language-refresh-required-modal.component';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
-import {InteractionObjectFactory} from '../../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
 import {PlatformFeatureService} from '../../../../services/platform-feature.service';
 import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';
@@ -109,7 +109,6 @@ describe('Content language selector component', () => {
   let fixture: ComponentFixture<ContentLanguageSelectorComponent>;
   let windowRef: MockWindowRef;
   let playerTranscriptService: PlayerTranscriptService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let entityVoiceoversService: EntityVoiceoversService;
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let audioPreloaderService: AudioPreloaderService;
@@ -154,7 +153,6 @@ describe('Content language selector component', () => {
     contentTranslationLanguageService = TestBed.get(
       ContentTranslationLanguageService
     );
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.get(PlayerTranscriptService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
@@ -279,7 +277,7 @@ describe('Content language selector component', () => {
       'State 1',
       '<p>Content</p>',
       '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict({
+      Interaction.createFromBackendDict({
         id: 'GraphInput',
         answer_groups: [
           {
@@ -368,7 +366,7 @@ describe('Content language selector component', () => {
         'State 1',
         '<p>Content</p>',
         '<interaction></interaction>',
-        interactionObjectFactory.createFromBackendDict({
+        Interaction.createFromBackendDict({
           id: 'GraphInput',
           answer_groups: [
             {
