@@ -461,7 +461,7 @@ export class BaseUser {
     }
 
     await this.page.waitForSelector('mat-option', {
-      visible: false,
+      hidden: true,
     });
   }
 
