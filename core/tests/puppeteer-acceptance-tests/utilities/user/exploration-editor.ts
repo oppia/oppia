@@ -400,6 +400,7 @@ const formErrorContainer = '.e2e-test-form-error-container';
 const numberWithUnitsModalSelector =
   '.e2e-test-number-with-units-help-modal-header';
 const firstCardSettingsSelector = '.e2e-test-initial-state-select';
+const progressUIDSelector = '.e2e-test-progress-id';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -5656,6 +5657,17 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectNumberWithUnitsHelpModalHeaderToBePresent(): Promise<void> {
     await this.expectElementToBeVisible(numberWithUnitsModalSelector);
+  }
+
+  /**
+   * Checks if the share exploration link is valid.
+   */
+  async expectShareExplorationLinkToBeValid(): Promise<void> {
+    await this.expectElementToBeVisible(progressUIDSelector);
+    await this.expectTextContentToBe(
+      progressUIDSelector,
+      testConstants.URLs.BaseExplorationPlayer
+    );
   }
 }
 

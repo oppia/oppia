@@ -100,7 +100,9 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectModalContentToContain(
       "Now that you're a published Oppia teacher, you can share your creation."
     );
-    // TODO: Verify the link.
+
+    // Verify the link.
+    await explorationEditor.expectShareExplorationLinkToBeValid();
   });
 
   afterAll(async function () {
