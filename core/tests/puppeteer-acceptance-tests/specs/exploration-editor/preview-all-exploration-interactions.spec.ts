@@ -101,13 +101,15 @@ describe('Exploration Editor', function () {
     );
 
     // Click on Lesson Info button.
-    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.openLessonInfoModal();
     await explorationEditor.expectLessonInfoCardToContain(
       'This exploration is private.'
     );
+    await explorationEditor.closeLessonInfoModal();
   });
 
   it('should be able to preview "Multiple Choice" interaction', async function () {
+    // Add a multiple choice interaction.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToCard(CARDS.SECOND_CARD);
     await explorationEditor.updateCardContent('This is a multiple choice.');
@@ -125,35 +127,36 @@ describe('Exploration Editor', function () {
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong.'
+      'Wrong Answer.'
     );
     await explorationEditor.addHintToState('Try Google Search.');
+    await explorationEditor.saveExplorationDraft();
 
-    // Check if preview works as expected.
+    // Navigate to the preview tab.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
       CARDS.SECOND_CARD,
       'This is a multiple choice.'
     );
+    // Submit a wrong answer.
     await explorationEditor.selectMultipleChoiceOption('Option 1');
-    await explorationEditor.expectResponseFeedbackToBe('Wrong.');
+    await explorationEditor.expectResponseFeedbackToBe('Wrong Answer.');
+    // View Hint.
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain(
       'Try Google Search.'
     );
     await explorationEditor.closeHintModal();
-
+    // Submit a correct answer.
     await explorationEditor.selectMultipleChoiceOption('Correct Response');
     await explorationEditor.expectResponseFeedbackToBe('Great Job!');
 
-    // Navigate back to Editor tab.
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.THIRD_CARD);
   });
 
   it('should be able to preview "Number Input" interaction', async function () {
-    await explorationEditor.navigateToCard(CARDS.THIRD_CARD);
-
     // Add a number input interaction.
     await explorationEditor.updateCardContent('Enter number less than 0.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
@@ -175,40 +178,36 @@ describe('Exploration Editor', function () {
       'As said in the question itself.',
       true
     );
+    await explorationEditor.saveExplorationDraft();
 
     // Navigate to the preview tab.
     await explorationEditor.navigateToPreviewTab();
-
     // Submit wrong answer.
     await explorationEditor.submitAnswer('10');
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
-
     // Submit a blank answer.
     await explorationEditor.submitAnswer('');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Enter a number to continue'
     );
-
     // Check for hint.
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain(
       'All negative numbers are less than 0.'
     );
     await explorationEditor.closeHintModal();
-
+    // Submit a correct answer.
     await explorationEditor.submitAnswer('-10');
     await explorationEditor.expectResponseFeedbackToBe('Perfect!');
 
-    // Navigate back to Editor tab.
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.FOURTH_CARD);
   });
 
   it('should be able to preview "Text Input" interaction', async function () {
-    await explorationEditor.navigateToCard('Fourth Card');
-
     // Add a text input interaction.
     await explorationEditor.updateCardContent('Enter text "Hello, Oppia!".');
     await explorationEditor.addInteraction(INTERACTION_TYPES.TEXT_INPUT, false);
@@ -227,32 +226,30 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'No write "Hello, Oppia!"'
     );
+    await explorationEditor.saveExplorationDraft();
 
-    // Check if the preview works as expected.
+    // Navigate to the preview tab.
     await explorationEditor.navigateToPreviewTab();
+    // Submit a incorrect answer.
     await explorationEditor.submitTextInputAnsswer('Hello, there!');
     await explorationEditor.expectResponseFeedbackToBe(
       'No write "Hello, Oppia!"'
     );
-
     // Submit a blank answer.
     await explorationEditor.submitTextInputAnsswer('');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Enter an answer to continue'
     );
-
     // Submit correct answer.
     await explorationEditor.submitTextInputAnsswer('Hello, Oppia!');
     await explorationEditor.expectResponseFeedbackToBe('Perfect!');
 
     // Navigate back to Editor tab.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.FIFTH_CARD);
   });
 
   it('should be able to preview "Image Region" interaction', async function () {
-    await explorationEditor.navigateToCard('Fifth Card');
-
     // Add a image region interaction.
     await explorationEditor.updateCardContent('Enter an image region.');
     await explorationEditor.addImageInteraction('Perfect!', 'Sixth Card');
@@ -260,22 +257,22 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
     );
+    await explorationEditor.saveExplorationDraft();
 
-    // Select wrong answer.
+    // Select a wrong point.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.selectImageAnswer(10, 10);
     await explorationEditor.removeFeedbackResponseInPreviewTab();
-    // Select correct answer.
+    // Select a correct point.
     await explorationEditor.selectImageAnswer(75, 75);
     await explorationEditor.expectResponseFeedbackToBe('Perfect!');
 
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.SIXTH_CARD);
   });
 
   it('should be able to preview "Item Selection" interaction', async function () {
-    await explorationEditor.navigateToCard('Sixth Card');
-
     // Add a item selection interaction.
     await explorationEditor.updateCardContent('Select correct item.');
     await explorationEditor.addInteraction(
@@ -300,7 +297,9 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
+    await explorationEditor.saveExplorationDraft();
 
+    // Choose a wrong answer.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.selectItemSelectionOptions([
       'Option 1',
@@ -310,6 +309,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
+    // Choose a correct answer.
     await explorationEditor.selectItemSelectionOptions([
       'Correct Option 1',
       'Correct Option 2',
@@ -317,12 +317,13 @@ describe('Exploration Editor', function () {
     await explorationEditor.clickOnSubmitAnswerButton();
     await explorationEditor.expectResponseFeedbackToBe('Great!');
 
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.SEVENTH_CARD);
   });
 
   it('should be able to preview "Drag and Drop Sort" interaction', async function () {
-    await explorationEditor.navigateToCard('Seventh Card');
+    // Add Drag and Drop Sort Interaction.
     await explorationEditor.updateCardContent('Arrange in Ascending Order');
     await explorationEditor.addInteraction(
       INTERACTION_TYPES.DRAG_AND_DROP_SORT,
@@ -351,8 +352,9 @@ describe('Exploration Editor', function () {
       ['First', 'Second', 'Third'],
       'As given in the question.'
     );
+    await explorationEditor.saveExplorationDraft();
 
-    // Preview tab.
+    // Sort items in wrong order.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
       CARDS.SEVENTH_CARD,
@@ -364,12 +366,14 @@ describe('Exploration Editor', function () {
       'Third',
     ]);
     await explorationEditor.expectResponseFeedbackToBe('Try Again!');
+    // View Hint.
     await explorationEditor.removeFeedbackResponseInPreviewTab();
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain(
       'Arrange in Ascending Order'
     );
     await explorationEditor.closeHintModal();
+    // Sort items in correct order.
     await explorationEditor.submitDragAndDropSortAnswer([
       'First',
       'Second',
@@ -377,13 +381,13 @@ describe('Exploration Editor', function () {
     ]);
     await explorationEditor.expectResponseFeedbackToBe('Great!');
 
-    // Navigate to Editor tab.
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.EIGHTH_CARD);
   });
 
   it('should be able to preview "Fraction Input" interaction', async function () {
-    await explorationEditor.navigateToCard('Eighth Card');
+    // Add Fraction Input Interaction.
     await explorationEditor.updateCardContent('Enter a fraction: 1/2.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
@@ -402,8 +406,9 @@ describe('Exploration Editor', function () {
       'As given in the question.',
       true
     );
+    await explorationEditor.saveExplorationDraft();
 
-    // Verify preview of interaction works as expected.
+    // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitAnswerInInputField('1/3');
     await explorationEditor.expectResponseFeedbackToBe(
@@ -427,14 +432,12 @@ describe('Exploration Editor', function () {
     await explorationEditor.submitAnswerInInputField('1/2');
     await explorationEditor.expectResponseFeedbackToBe('Perfect!');
 
-    // Navigate to Editor tab.
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.NINTH_CARD);
   });
 
   it('should be able to preview "Graph Theory" interaction', async function () {
-    await explorationEditor.navigateToCard('Ninth Card');
-
     // Add a graph theory interaction.
     await explorationEditor.updateCardContent('Create a star topology.');
     await explorationEditor.addInteraction(
@@ -456,29 +459,34 @@ describe('Exploration Editor', function () {
       'Create a star topology using all 4 nodes.'
     );
 
-    // Check if preview works as expected.
+    // TODO: move node.
+    // TODO: add edge.
+    // TODO: delete edge.
+
+    // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitGraphStarNetworkSolution(3);
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
+    // View Hint.
     await explorationEditor.removeFeedbackResponseInPreviewTab();
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain(
       'Create a star topology using all 4 nodes.'
     );
     await explorationEditor.closeHintModal();
+    // Submit a correct answer.
     await explorationEditor.submitGraphStarNetworkSolution(4);
     await explorationEditor.expectResponseFeedbackToBe('Great!');
 
-    // Navigate to Editor tab.
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.TENTH_CARD);
   });
 
   it('should be able to preview "Set Input" interaction', async function () {
-    // Pre-steps
-    await explorationEditor.navigateToCard('Tenth Card');
+    // Add Set Input Interaction.
     await explorationEditor.updateCardContent('Enter a set.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.SET_INPUT);
     await explorationEditor.updateSetInputLearnerAnswerInResponseModal(
@@ -506,7 +514,7 @@ describe('Exploration Editor', function () {
       CARDS.TENTH_CARD,
       'Enter a set.'
     );
-    // Submit wrong answer.
+    // Submit wrong answer. Also, verifies clicking on "Add Item" adds new item.
     await explorationEditor.submitInputSetAnswer(['5', '6']);
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
@@ -528,14 +536,12 @@ describe('Exploration Editor', function () {
       'Oops, it looks like your answer has duplicates!'
     );
 
-    // Navigate to Editor tab.
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.ELEVENTH_CARD);
   });
 
   it('should be able to preview "Numeric Expression" interaction', async function () {
-    await explorationEditor.navigateToCard('Eleventh Card');
-
     // Add a numeric expression interaction.
     await explorationEditor.updateCardContent('Enter a numeric expression.');
     await explorationEditor.addInteraction(
@@ -555,12 +561,12 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
     await explorationEditor.addHintToState('The hint is sqrt2');
-
     // Add solution.
     await explorationEditor.addNumbericInteractionSolutionToState(
       'sqrt2',
       'as given in the question.'
     );
+    await explorationEditor.saveExplorationDraft();
 
     // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();
@@ -583,18 +589,21 @@ describe('Exploration Editor', function () {
       'It looks like you have entered some variables. Please enter numbers only.'
     );
 
-    // Navigate to Editor tab.
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.TWELFTH_CARD);
   });
 
   it('should be able to preview "Algebric Expression" intreaction', async function () {
-    await explorationEditor.navigateToCard('Twelfth Card');
-
     // Add a algebric expression interaction.
     await explorationEditor.updateCardContent('Enter a algebric expression.');
     await explorationEditor.addInteraction(
-      INTERACTION_TYPES.ALGEBRAIC_EXPRESSION
+      INTERACTION_TYPES.ALGEBRAIC_EXPRESSION,
+      false
+    );
+    await explorationEditor.customizeAlgebricExpressionInputInteraction(
+      'ab',
+      false
     );
     await explorationEditor.updateAlgebricExpressionLearnerAnswerInResponseModal(
       'matches exactly with',
@@ -615,26 +624,40 @@ describe('Exploration Editor', function () {
       'a+b',
       'as given in the question.'
     );
+    await explorationEditor.saveExplorationDraft();
 
+    // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitExpressionAnswer('a-b');
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
+    // View Hint.
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain('The hint is a+b');
     await explorationEditor.closeHintModal();
+    // Submit a correct answer.
     await explorationEditor.submitExpressionAnswer('a+b');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
-
-    // Navigate to Editor tab.
+    // Submit a blank answer.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.submitExpressionAnswer('');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'Please enter an answer before submitting.'
+    );
+    // Submit an answer with invalid characters.
+    await explorationEditor.submitExpressionAnswer('a+y');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'You have entered an invalid variable: y. Please use only the variables a,b in your answer.'
+    );
+
+    // Navigate to next card.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToCard(CARDS.THIRTEENTH_CARD);
   });
 
   it('should be able to preview "Math Equation" interaction', async function () {
-    await explorationEditor.navigateToCard('Thirteenth Card');
-
     // Add a math equation interaction.
     await explorationEditor.updateCardContent('Enter a math equation.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.MATH_EQUATION);
@@ -652,12 +675,12 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
     await explorationEditor.addHintToState('The hint is 5x=2+3');
-
     // Add solution.
     await explorationEditor.addMathEquationSolutionToState(
       '5x=2+3',
       'as given in the question.'
     );
+    await explorationEditor.saveExplorationDraft();
 
     // Submit wrong answer.
     await explorationEditor.navigateToPreviewTab();
@@ -687,14 +710,12 @@ describe('Exploration Editor', function () {
       'It looks like you have entered an expression. Please enter an equation instead.'
     );
 
-    // Navigate to Editor tab.
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.FOURTEENTH_CARD);
   });
 
   it('should be able to preview "Number With Units" interaction', async function () {
-    await explorationEditor.navigateToCard('Fourteenth Card');
-
     // Add a number with units input interaction.
     await explorationEditor.updateCardContent('Enter a number with units.');
     await explorationEditor.addInteraction(
@@ -715,32 +736,41 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
     await explorationEditor.addHintToState('The hint is 100');
-
     // Add solution.
     await explorationEditor.addSolutionToState(
       '100km',
       'As given in the question.',
       true
     );
+    await explorationEditor.saveExplorationDraft();
 
+    // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitAnswerInInputField('200km');
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
+    // Submit a blank answer.
+    await explorationEditor.submitAnswerInInputField('');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'Enter an answer to continue'
+    );
+    // View Units Table.
+    await explorationEditor.expectUnitsTableToShowProperly();
+    // View Hint.
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain('The hint is 100');
     await explorationEditor.closeHintModal();
+    // Submit a correct answer.
     await explorationEditor.submitAnswerInInputField('0');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
 
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.FIFTEENTH_CARD);
   });
 
   it('should be able to preview "Ratio Expression Input" interaction', async function () {
-    await explorationEditor.navigateToCard('Fifteenth Card');
-
     // Add a ratio expression input interaction.
     await explorationEditor.updateCardContent('Enter a ratio expression.');
     await explorationEditor.addInteraction(
@@ -752,7 +782,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Sixteenth Card',
+      CARDS.SIXTEENTH_CARD,
       true,
       true
     );
@@ -760,13 +790,13 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
     await explorationEditor.addHintToState('The hint is 1:2');
-
     // Add solution.
     await explorationEditor.addSolutionToState(
       '1:2',
       'As given in the question.',
       true
     );
+    await explorationEditor.saveExplorationDraft();
 
     // Submit an answer not in ratio format.
     await explorationEditor.navigateToPreviewTab();
@@ -787,13 +817,12 @@ describe('Exploration Editor', function () {
     await explorationEditor.submitAnswerInInputField('1:2');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
 
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.SIXTEENTH_CARD);
   });
 
   it('should be able to preview "Code Editor" interaction', async function () {
-    await explorationEditor.navigateToCard('Sixteenth Card');
-
     // Add a code editor interaction.
     await explorationEditor.updateCardContent('Enter a code editor.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.CODE_EDITOR);
@@ -803,7 +832,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Seventeenth Card',
+      CARDS.SEVENTEENTH_CARD,
       true,
       true
     );
@@ -813,36 +842,39 @@ describe('Exploration Editor', function () {
     await explorationEditor.addHintToState(
       'The hint is print("Hello, Oppia!")'
     );
-
     // Add solution.
     await explorationEditor.addCodeEditorSolutionToState(
       'print("Hello, Oppia!")',
       'As given in the question.'
     );
+    await explorationEditor.saveExplorationDraft();
 
-    // Preview Tab
+    // Submit wrong answer.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitCodeEditorAnswer('print("Hello!")');
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
+    // Check code output.
+    await explorationEditor.expectCodeOutputToBe('Hello!');
+    // View Hint.
     await explorationEditor.removeFeedbackResponseInPreviewTab();
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain(
       'The hint is print("Hello, Oppia!")'
     );
     await explorationEditor.closeHintModal();
+    // Submit correct answer.
     await explorationEditor.submitCodeEditorAnswer('print("Hello, Oppia!")');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
 
-    // Navigate back to Editor Tab.
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.SEVENTEENTH_CARD);
   });
 
   it('should be able to preview "Pencil Code Editor" interaction', async function () {
-    await explorationEditor.navigateToCard('Seventeenth ...');
-
+    // TODO: REMOVE IT. IT USES THIRD-PARTY LIBRARY AND CAN BE REMOVED.
     // Add a pencil code editor interaction.
     await explorationEditor.updateCardContent('Enter a pencil code editor.');
     await explorationEditor.addInteraction(
@@ -854,7 +886,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Eighteenth Card',
+      CARDS.EIGHTEENTH_CARD,
       true,
       true
     );
@@ -864,12 +896,11 @@ describe('Exploration Editor', function () {
     await explorationEditor.addHintToState(
       'The hint is print("Hello, Oppia!")'
     );
-
-    // Add solution.
     await explorationEditor.addPencilCodeEditorSolutionToState(
       'print("Hello, Oppia!")',
       'As given in the question.'
     );
+    await explorationEditor.saveExplorationDraft();
 
     // Preview Tab.
     await explorationEditor.navigateToPreviewTab();
@@ -889,12 +920,10 @@ describe('Exploration Editor', function () {
 
     // Navigate back to Editor Tab.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.EIGHTEENTH_CARD);
   });
 
   it('should be able to preview "Music Notes Input" interaction', async function () {
-    await explorationEditor.navigateToCard('Eighteenth Card');
-
     // Add a music notes input interaction.
     await explorationEditor.updateCardContent('Enter a music notes input.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.MUSIC_NOTES_INPUT);
@@ -911,13 +940,13 @@ describe('Exploration Editor', function () {
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
-
     // Add solution.
     await explorationEditor.addHintToState('Only answer C4');
     await explorationEditor.addMusicNotesInputSolutionToState(
       ['C4', 'E4', 'G4'],
       'as given in the question.'
     );
+    await explorationEditor.saveExplorationDraft();
 
     // Submit wrong answer.
     await explorationEditor.navigateToPreviewTab();
@@ -925,21 +954,20 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
-    await explorationEditor.removeFeedbackResponseInPreviewTab();
     // View Hint.
+    await explorationEditor.removeFeedbackResponseInPreviewTab();
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain('Only answer C4');
     await explorationEditor.closeHintModal();
     // TODO: File an issue that correct answer doesn't work.
 
-    // Navigate to editor tab.
+    // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARDS.NINETEENTH_CARD);
   });
 
   it('should be able to preview "World Map" interaction', async function () {
-    await explorationEditor.navigateToCard('Nineteenth Card');
-
+    // TODO: REMOVE IT. IT USES THIRD-PARTY LIBRARY AND CAN BE REMOVED.
     // Add a world map interaction.
     await explorationEditor.updateCardContent('Enter a world map.');
     await explorationEditor.addInteraction(INTERACTION_TYPES.WORLD_MAP, false);

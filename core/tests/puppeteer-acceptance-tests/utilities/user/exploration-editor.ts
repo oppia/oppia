@@ -404,6 +404,8 @@ const numberWithUnitsModalSelector =
 const firstCardSettingsSelector = '.e2e-test-initial-state-select';
 const progressUIDSelector = '.e2e-test-progress-id';
 const customSelectedCharctersSelector = '.e2e-test-custom-letters';
+const showUnitFormatsButtonSelector = '.e2e-test-show-unit-formats';
+const codeOutputSelector = '.e2e-test-code-output';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -6039,8 +6041,12 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Checks if the Number With Units help modal header is present.
    */
-  async expectNumberWithUnitsHelpModalHeaderToBePresent(): Promise<void> {
+  async expectUnitsTableToShowProperly(): Promise<void> {
+    await this.expectElementToBeVisible(showUnitFormatsButtonSelector);
+    await this.page.click(showUnitFormatsButtonSelector);
     await this.expectElementToBeVisible(numberWithUnitsModalSelector);
+    await this.expectElementToBeVisible(closeModalButtonSelector);
+    await this.page.click(closeModalButtonSelector);
   }
 
   /**
@@ -6052,6 +6058,14 @@ export class ExplorationEditor extends BaseUser {
       progressUIDSelector,
       testConstants.URLs.BaseExplorationPlayer
     );
+  }
+
+  /**
+   * Checks if the code output is as expected.
+   * @param {string} expectedOutput - The expected output.
+   */
+  async expectCodeOutputToBe(expectedOutput: string): Promise<void> {
+    await this.expectTextContentToBe(codeOutputSelector, expectedOutput);
   }
 }
 
