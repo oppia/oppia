@@ -148,7 +148,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
   // The method returns the readable text from the node.
   getReadableTextFromNode(node: Node): string {
-    if (node.nodeType === Node.TEXT_NODE) {
+    if (
+      node.nodeType === Node.TEXT_NODE ||
+      node.nodeName === 'STRONG' ||
+      node.nodeName === 'EM'
+    ) {
       return node.textContent || '';
     } else if (
       node.nodeName === 'OPPIA-NONINTERACTIVE-SKILLREVIEW' ||
@@ -164,8 +168,6 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const decodedMathContent = this.decodeHtmlEntities(encodedMathContent);
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
-    } else {
-      return ' ';
     }
   }
 
@@ -246,13 +248,15 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
             ?.join('')
             ?.trim();
 
-          let spaceElement = document.createElement('span');
-          // eslint-disable-next-line oppia/no-inner-html
-          spaceElement.innerHTML = ' ';
           spanTagElement.appendChild(childNode);
-          spanTagElement.appendChild(spaceElement);
 
           if (sentence === currentSentenceToMatch) {
+            if (spanNodeList.length > 0) {
+              let spaceElement = document.createElement('span');
+              // eslint-disable-next-line oppia/no-inner-html
+              spaceElement.innerHTML = ' ';
+              spanNodeList.push(spaceElement);
+            }
             spanNodeList.push(spanTagElement);
             spanTagElement = document.createElement('span');
             nextSentenceOffset = '';
@@ -264,20 +268,25 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
         let nodeTemp = node.cloneNode();
 
-        spanNodeList.forEach(spanNode => {
-          let elementId = `highlightBlock${this.index}`;
-          spanNode.id = elementId;
-          this.index++;
-
+        for (let spanNode of spanNodeList) {
           let textInsideSpanTag = '';
 
           for (let tempChildNode of spanNode.childNodes) {
             textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
           }
 
+          if (textInsideSpanTag === ' ') {
+            nodeTemp.appendChild(spanNode);
+            continue;
+          }
+
+          let elementId = `highlightBlock${this.index}`;
+          spanNode.id = elementId;
+          this.index++;
+
           this.highlighIdToSentenceText[elementId] = textInsideSpanTag;
           nodeTemp.appendChild(spanNode);
-        });
+        }
 
         return nodeTemp;
       }
@@ -415,9 +424,16 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+    let automatedVoiceoversAudioOffsetsMsecs =
       this.entityVoiceoversService.getActiveEntityVoiceovers()
-        ?.automatedVoiceoversAudioOffsetsMsecs || {}
+        ?.automatedVoiceoversAudioOffsetsMsecs || {};
+
+    if (Object.keys(automatedVoiceoversAudioOffsetsMsecs).length === 0) {
+      return;
+    }
+
+    this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+      automatedVoiceoversAudioOffsetsMsecs
     );
     this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
 

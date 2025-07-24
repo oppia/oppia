@@ -289,7 +289,13 @@ describe('RTE display component', () => {
       automaticVoiceoverHighlightService,
       'setAutomatedVoiceoversAudioOffsets'
     );
-    spyOn(entityVoiceoversService, 'getActiveEntityVoiceovers');
+    let entityVoiceoverSpy = spyOn(
+      entityVoiceoversService,
+      'getActiveEntityVoiceovers'
+    );
+    entityVoiceoverSpy.and.returnValue({
+      automatedVoiceoversAudioOffsetsMsecs: {},
+    });
 
     regenerateVoiceoverFeatureSpy.and.returnValue(false);
     component.ngOnInit();
@@ -304,6 +310,18 @@ describe('RTE display component', () => {
       entityVoiceoversService.getActiveEntityVoiceovers
     ).not.toHaveBeenCalled();
 
+    entityVoiceoverSpy.and.returnValue({
+      automatedVoiceoversAudioOffsetsMsecs: {
+        content0: [
+          {token: 'Nic', audioOffsetMsecs: 0.0},
+          {token: 'took', audioOffsetMsecs: 100.0},
+          {token: 'Jaime', audioOffsetMsecs: 200.0},
+          {token: 'to', audioOffsetMsecs: 300.0},
+          {token: 'the', audioOffsetMsecs: 400.0},
+          {token: 'arcade', audioOffsetMsecs: 500.0},
+        ],
+      },
+    });
     regenerateVoiceoverFeatureSpy.and.returnValue(true);
     component.ngOnInit();
     tick(2000);
