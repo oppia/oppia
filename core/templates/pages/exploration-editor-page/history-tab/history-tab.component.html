@@ -1,4 +1,4 @@
-<div class="history-tab-container">
+<div class="history-tab-container e2e-test-exploration-history-tab">
   <mat-card class="oppia-editor-card history-table-card">
     <div class="oppia-mobile-collapsible-card-header">
       <h3 class="history-card-header-text" tabindex="0">History</h3>
@@ -7,7 +7,7 @@
       <div class="history-tab-header">
         <mat-paginator [length]="versionCheckboxArray.length"
                        [pageSize]="VERSIONS_PER_PAGE"
-                       class="pagination e2e-test-history-pagination"
+                       class="pagination e2e-test-desktop-history-pagination"
                        [pageSizeOptions]="versionChoices"
                        (page)="paginator($event)">
         </mat-paginator>
@@ -73,7 +73,8 @@
                        class="pagination"
                        [pageSize]="VERSIONS_PER_PAGE"
                        [pageSizeOptions]="versionChoices"
-                       (page)="paginator($event)">
+                       (page)="paginator($event)"
+                       class="e2e-test-mobile-history-pagination">
         </mat-paginator>
       </div>
     </div>

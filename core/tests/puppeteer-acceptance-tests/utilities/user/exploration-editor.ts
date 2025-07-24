@@ -336,8 +336,10 @@ const confirmExplorationDeletetionButton =
 
 const historyUserFilterSelector = 'oppia-history-tab input';
 const historyListItemSelector = '.e2e-test-history-list-item';
-const historyPaginationDropdownSelector =
-  '.e2e-test-history-pagination mat-select';
+const historyPaginationDesktopSelector =
+  '.e2e-test-desktop-history-pagination mat-select';
+const historyPaginationMobileSelector =
+  '.e2e-test-mobile-history-pagination mat-select';
 const versionComparasionSelect = '.e2e-test-version-comparasion-select';
 const graphDifferencesSelector = '.e2e-test-graph-diff-container';
 const resetGraphButton = '.e2e-test-reset-graph';
@@ -621,9 +623,12 @@ export class ExplorationEditor extends BaseUser {
    * @param numberOfPages The number of pages to change the pagination to.
    */
   async changePaginationInHistoryTabTo(numberOfPages: number) {
-    await this.page.waitForSelector(historyPaginationDropdownSelector);
+    const selector = this.isViewportAtMobileWidth()
+      ? historyPaginationDesktopSelector
+      : historyPaginationDesktopSelector;
+    await this.page.waitForSelector(selector);
 
-    await this.clickOn(historyPaginationDropdownSelector);
+    await this.clickOn(selector);
 
     await this.page.waitForSelector('mat-option');
     const optionsElements = await this.page.$$('mat-option');
@@ -642,12 +647,9 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector('mat-option', {
       visible: false,
     });
-    expect(
-      await this.page.$eval(
-        historyPaginationDropdownSelector,
-        el => el.textContent
-      )
-    ).toContain(numberOfPages.toString());
+    expect(await this.page.$eval(selector, el => el.textContent)).toContain(
+      numberOfPages.toString()
+    );
   }
 
   /**
@@ -3587,13 +3589,13 @@ export class ExplorationEditor extends BaseUser {
   async navigateToHistoryTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarDropdown);
-      await this.page.waitForSelector(mobileNavbarPane);
+      await this.expectElementToBeVisible(mobileHistoryTabButton);
       await this.clickOn(mobileHistoryTabButton);
     } else {
       await this.clickOn(historyTabButton);
     }
 
-    await this.isElementVisible(historyTabContentContainerSelector);
+    await this.expectElementToBeVisible(historyTabContentContainerSelector);
   }
 
   /**
