@@ -18,10 +18,12 @@
 
 from __future__ import annotations
 
-from core.domain import collection_domain
-from core.domain import exp_domain
-from core.domain import story_domain
-from core.domain import topic_domain
+from core.domain import (
+    collection_domain,
+    exp_domain,
+    story_domain,
+    topic_domain,
+)
 
 from typing import Dict, List
 
@@ -38,7 +40,7 @@ class LearnerProgressInTopicsAndStories:
         all_topic_summaries: List[topic_domain.TopicSummary],
         untracked_topic_summaries: List[topic_domain.TopicSummary],
         completed_to_incomplete_story_titles: List[str],
-        learnt_to_partially_learnt_topic_titles: List[str]
+        learnt_to_partially_learnt_topic_titles: List[str],
     ) -> None:
         """Constructs a LearnerProgress domain object.
 
@@ -72,9 +74,11 @@ class LearnerProgressInTopicsAndStories:
         self.all_topic_summaries = all_topic_summaries
         self.untracked_topic_summaries = untracked_topic_summaries
         self.completed_to_incomplete_stories = (
-            completed_to_incomplete_story_titles)
+            completed_to_incomplete_story_titles
+        )
         self.learnt_to_partially_learnt_topics = (
-            learnt_to_partially_learnt_topic_titles)
+            learnt_to_partially_learnt_topic_titles
+        )
 
 
 class LearnerProgressInCollections:
@@ -83,11 +87,12 @@ class LearnerProgressInCollections:
     def __init__(
         self,
         incomplete_collection_summaries: List[
-            collection_domain.CollectionSummary],
+            collection_domain.CollectionSummary
+        ],
         completed_collection_summaries: List[
-            collection_domain.CollectionSummary],
-        collection_playlist: List[
-            collection_domain.CollectionSummary],
+            collection_domain.CollectionSummary
+        ],
+        collection_playlist: List[collection_domain.CollectionSummary],
         completed_to_incomplete_collection_titles: List[str],
     ) -> None:
         """Constructs a LearnerProgress domain object.
@@ -109,7 +114,8 @@ class LearnerProgressInCollections:
         self.completed_collection_summaries = completed_collection_summaries
         self.collection_playlist_summaries = collection_playlist
         self.completed_to_incomplete_collections = (
-            completed_to_incomplete_collection_titles)
+            completed_to_incomplete_collection_titles
+        )
 
 
 class LearnerProgressInExplorations:
@@ -119,7 +125,7 @@ class LearnerProgressInExplorations:
         self,
         incomplete_exp_summaries: List[exp_domain.ExplorationSummary],
         completed_exp_summaries: List[exp_domain.ExplorationSummary],
-        exploration_playlist: List[exp_domain.ExplorationSummary]
+        exploration_playlist: List[exp_domain.ExplorationSummary],
     ) -> None:
         """Constructs a LearnerProgress domain object.
 
@@ -154,7 +160,7 @@ class ActivityIdsInLearnerDashboard:
         all_topic_ids: List[str],
         untracked_topic_ids: List[str],
         exploration_playlist_ids: List[str],
-        collection_playlist_ids: List[str]
+        collection_playlist_ids: List[str],
     ) -> None:
         """Constructs a ActivityIdsInLearnerDashboard domain object.
 

@@ -25,7 +25,7 @@ from core.platform import models
 from typing import Union
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
 
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
@@ -39,7 +39,7 @@ class DuplicateBlogTitleError(base_validation_errors.BaseValidationError):
         model: Union[
             blog_models.BlogPostModel,
             blog_models.BlogPostSummaryModel,
-        ]
+        ],
     ) -> None:
         message = 'title=%s is not unique' % utils.quoted(model.title)
         super().__init__(message, model)
@@ -53,7 +53,7 @@ class DuplicateBlogUrlError(base_validation_errors.BaseValidationError):
         model: Union[
             blog_models.BlogPostModel,
             blog_models.BlogPostSummaryModel,
-        ]
+        ],
     ) -> None:
         message = 'url=%s is not unique' % utils.quoted(model.url_fragment)
         super().__init__(message, model)
@@ -67,28 +67,31 @@ class InconsistentLastUpdatedTimestampsError(
     def __init__(
         self,
         model: Union[
-            blog_models.BlogPostModel,
-            blog_models.BlogPostSummaryModel
-        ]
+            blog_models.BlogPostModel, blog_models.BlogPostSummaryModel
+        ],
     ) -> None:
         message = 'created_on=%r is later than last_updated=%r' % (
-            model.created_on, model.last_updated)
+            model.created_on,
+            model.last_updated,
+        )
         super().__init__(message, model)
 
 
 class InconsistentPublishLastUpdatedTimestampsError(
-        base_validation_errors.BaseValidationError):
+    base_validation_errors.BaseValidationError
+):
     """Error class for models with inconsistent timestamps."""
 
     def __init__(
         self,
         model: Union[
-            blog_models.BlogPostModel,
-            blog_models.BlogPostSummaryModel
-        ]
+            blog_models.BlogPostModel, blog_models.BlogPostSummaryModel
+        ],
     ) -> None:
         message = 'published_on=%r is later than last_updated=%r' % (
-            model.published_on, model.last_updated)
+            model.published_on,
+            model.last_updated,
+        )
         super().__init__(message, model)
 
 
@@ -100,13 +103,13 @@ class ModelMutatedDuringJobErrorForLastUpdated(
     def __init__(
         self,
         model: Union[
-            blog_models.BlogPostModel,
-            blog_models.BlogPostSummaryModel
-        ]
+            blog_models.BlogPostModel, blog_models.BlogPostSummaryModel
+        ],
     ) -> None:
         message = (
-            'last_updated=%r is later than the audit job\'s start time' % (
-                model.last_updated))
+            'last_updated=%r is later than the audit job\'s start time'
+            % (model.last_updated)
+        )
         super().__init__(message, model)
 
 
@@ -118,22 +121,19 @@ class ModelMutatedDuringJobErrorForPublishedOn(
     def __init__(
         self,
         model: Union[
-            blog_models.BlogPostModel,
-            blog_models.BlogPostSummaryModel
-        ]
+            blog_models.BlogPostModel, blog_models.BlogPostSummaryModel
+        ],
     ) -> None:
         message = (
-            'published_on=%r is later than the audit job\'s start time' % (
-                model.published_on))
+            'published_on=%r is later than the audit job\'s start time'
+            % (model.published_on)
+        )
         super().__init__(message, model)
 
 
 class DuplicateBlogAuthorModelError(base_validation_errors.BaseValidationError):
     """Error class for blog author detail models with duplicate author ids."""
 
-    def __init__(
-        self,
-        model: blog_models.BlogAuthorDetailsModel
-    ) -> None:
+    def __init__(self, model: blog_models.BlogAuthorDetailsModel) -> None:
         message = 'author id=%s is not unique' % utils.quoted(model.author_id)
         super().__init__(message, model)

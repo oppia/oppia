@@ -60,20 +60,23 @@ class ChangeUserNullBiosToEmptyStringJobTests(job_test_utils.JobTestBase):
         user.update_timestamps()
         self.put_multi([user])
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult(
-                stdout=f"""Test Output - Username: {self.USER_USERNAME_1}, New Bio: """), # pylint: disable=line-too-long
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout=f"""Test Output - Username: {self.USER_USERNAME_1}, New Bio: """
+                ),  # pylint: disable=line-too-long
+            ]
+        )
         user_setting_model = user_models.UserSettingsModel.get_by_email(
-            'a@a.com')
+            'a@a.com'
+        )
         self.assertIsNotNone(
-            user_setting_model,
-            """retrieve user_setting model is None"""
+            user_setting_model, """retrieve user_setting model is None"""
         )
         assert user_setting_model is not None
         self.assertTrue(
             isinstance(user_setting_model.user_bio, str),
-            """user_bio is not type of string"""
+            """user_bio is not type of string""",
         )
 
     def test_user_with_not_null_bio(self) -> None:
@@ -82,17 +85,18 @@ class ChangeUserNullBiosToEmptyStringJobTests(job_test_utils.JobTestBase):
             id=self.USER_ID_2,
             username=self.USER_USERNAME_2,
             email='b@b.com',
-            user_bio='Test Bio'
+            user_bio='Test Bio',
         )
         user.update_timestamps()
         self.put_multi([user])
 
         self.assert_job_output_is_empty()
         user_setting_model = user_models.UserSettingsModel.get_by_email(
-            'b@b.com')
+            'b@b.com'
+        )
         assert user_setting_model is not None
         self.assertEqual(
             user_setting_model.user_bio,
             user.user_bio,
-            """user_bio is not same as expected"""
+            """user_bio is not same as expected""",
         )

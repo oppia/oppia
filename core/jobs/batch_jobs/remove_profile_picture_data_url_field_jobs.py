@@ -48,10 +48,10 @@ class RemoveProfilePictureFieldJob(base_jobs.JobBase):
             user_model: UserSettingsModel. The updated user settings model.
         """
         if (
-            'profile_picture_data_url' 
-            in user_model._properties # pylint: disable=protected-access
+            'profile_picture_data_url'
+            in user_model._properties  # pylint: disable=protected-access
         ):
-            del user_model._properties[ # pylint: disable=protected-access
+            del user_model._properties[  # pylint: disable=protected-access
                 'profile_picture_data_url'
             ]
         return user_model
@@ -59,17 +59,22 @@ class RemoveProfilePictureFieldJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         users_with_updated_fields = (
             self.pipeline
-            | 'Get all non-deleted UserSettingsModel' >> ndb_io.GetModels(
-                user_models.UserSettingsModel.get_all(include_deleted=True))
-            | 'Remove the profile_picture_data_url field' >> beam.Map(
-                self._remove_profile_field)
+            | 'Get all non-deleted UserSettingsModel'
+            >> ndb_io.GetModels(
+                user_models.UserSettingsModel.get_all(include_deleted=True)
+            )
+            | 'Remove the profile_picture_data_url field'
+            >> beam.Map(self._remove_profile_field)
         )
 
         count_user_models_updated = (
             users_with_updated_fields
-            | 'Total count for user models' >> (
+            | 'Total count for user models'
+            >> (
                 job_result_transforms.CountObjectsToJobRunResult(
-                    'USER MODELS ITERATED OR UPDATED'))
+                    'USER MODELS ITERATED OR UPDATED'
+                )
+            )
         )
 
         unused_put_results = (

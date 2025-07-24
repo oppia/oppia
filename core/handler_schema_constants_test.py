@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core import handler_schema_constants # pylint: disable=unused-import
+from core import handler_schema_constants  # pylint: disable=unused-import
 from core.tests import test_utils
 
 

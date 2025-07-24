@@ -22,7 +22,7 @@ from core.jobs.types import base_validation_errors
 from core.platform import models
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models
 
 (feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])

@@ -22,14 +22,16 @@ See cloud_translate_emulator.py for more details"""
 
 from __future__ import annotations
 
-from core.platform.translate import cloud_translate_emulator
-from core.platform.translate import cloud_translate_services
+from core.platform.translate import (
+    cloud_translate_emulator,
+    cloud_translate_services,
+)
 
 CLIENT = cloud_translate_emulator.CloudTranslateEmulator()
 
 
 def translate_text(
-        text: str, source_language: str, target_language: str
+    text: str, source_language: str, target_language: str
 ) -> str:
     """Translates text into the target language.
 

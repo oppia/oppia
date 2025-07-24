@@ -57,18 +57,22 @@ class JobRunResult:
 
         if len(self.stdout) > MAX_OUTPUT_CHARACTERS:
             self.stdout = '%s%s' % (
-                self.stdout[:MAX_OUTPUT_CHARACTERS], TRUNCATED_MARK
+                self.stdout[:MAX_OUTPUT_CHARACTERS],
+                TRUNCATED_MARK,
             )
         if len(self.stderr) > MAX_OUTPUT_CHARACTERS:
             self.stderr = '%s%s' % (
-                self.stderr[:MAX_OUTPUT_CHARACTERS], TRUNCATED_MARK
+                self.stderr[:MAX_OUTPUT_CHARACTERS],
+                TRUNCATED_MARK,
             )
 
     @classmethod
     def as_stdout(
         # NOTE: Here we use type Any because this function can operate on inputs
         # of any type.
-        cls, value: Any, use_repr: bool = False
+        cls,
+        value: Any,
+        use_repr: bool = False,
     ) -> JobRunResult:
         """Returns a new JobRunResult with a stdout value.
 
@@ -87,7 +91,9 @@ class JobRunResult:
     def as_stderr(
         # NOTE: Here we use type Any because this function can operate on inputs
         # of any type.
-        cls, value: Any, use_repr: bool = False
+        cls,
+        value: Any,
+        use_repr: bool = False,
     ) -> JobRunResult:
         """Returns a new JobRunResult with a stderr value.
 
@@ -125,7 +131,7 @@ class JobRunResult:
             # comparison operators, don't get compared with one another.
             heapq.heappush(
                 results_heap,
-                (len(result.stdout) + len(result.stderr), i, result)
+                (len(result.stdout) + len(result.stderr), i, result),
             )
 
         batches = []
@@ -158,7 +164,9 @@ class JobRunResult:
     def __repr__(self) -> str:
         return '%s(stdout=%s, stderr=%s)' % (
             self.__class__.__name__,
-            utils.quoted(self.stdout), utils.quoted(self.stderr))
+            utils.quoted(self.stdout),
+            utils.quoted(self.stderr),
+        )
 
     def __hash__(self) -> int:
         return hash((self.stdout, self.stderr))
@@ -168,8 +176,11 @@ class JobRunResult:
     # https://github.com/python/mypy/issues/363#issue-39383094
     def __eq__(self, other: Any) -> Any:
         return (
-            (self.stdout, self.stderr) == (other.stdout, other.stderr) # pylint: disable=protected-access
-            if self.__class__ is other.__class__ else NotImplemented)
+            (self.stdout, self.stderr)
+            == (other.stdout, other.stderr)  # pylint: disable=protected-access
+            if self.__class__ is other.__class__
+            else NotImplemented
+        )
 
     # NOTE: Here we use type Any because the function could also return
     # NotImplemented:
@@ -177,7 +188,9 @@ class JobRunResult:
     def __ne__(self, other: Any) -> Any:
         return (
             not (self == other)
-            if self.__class__ is other.__class__ else NotImplemented)
+            if self.__class__ is other.__class__
+            else NotImplemented
+        )
 
     def __getstate__(self) -> Tuple[str, str]:
         """Called by pickle to get the value that uniquely defines self."""

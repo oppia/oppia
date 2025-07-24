@@ -22,11 +22,12 @@ from core.jobs.types import base_validation_errors
 from core.platform import models
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import improvements_models
 
 (improvements_models,) = models.Registry.import_models(
-    [models.Names.IMPROVEMENTS])
+    [models.Names.IMPROVEMENTS]
+)
 
 
 class InvalidCompositeEntityError(base_validation_errors.BaseValidationError):
@@ -36,5 +37,6 @@ class InvalidCompositeEntityError(base_validation_errors.BaseValidationError):
         self, model: improvements_models.ExplorationStatsTaskEntryModel
     ) -> None:
         message = 'model has invalid composite entity %s' % (
-            model.composite_entity_id)
+            model.composite_entity_id
+        )
         super().__init__(message, model)

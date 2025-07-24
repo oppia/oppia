@@ -28,17 +28,15 @@ from core.platform import models
 import apache_beam as beam
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import voiceover_models
 
 datastore_services = models.Registry.import_datastore_services()
 
-(voiceover_models,) = models.Registry.import_models([
-    models.Names.VOICEOVER])
+(voiceover_models,) = models.Registry.import_models([models.Names.VOICEOVER])
 
 
-class DeleteInstanceofExplorationVoiceArtistsLinkModelJob(
-    base_jobs.JobBase):
+class DeleteInstanceofExplorationVoiceArtistsLinkModelJob(base_jobs.JobBase):
     """Jobs deletes the instances of ExplorationVoiceArtistsLinkModel."""
 
     DATASTORE_UPDATES_ALLOWED = True
@@ -53,17 +51,19 @@ class DeleteInstanceofExplorationVoiceArtistsLinkModelJob(
         """
         models_to_be_deleted = (
             self.pipeline
-            | 'Get all exploration voice artist link models' >>
-                ndb_io.GetModels(
-                    voiceover_models.ExplorationVoiceArtistsLinkModel.get_all()
-                )
+            | 'Get all exploration voice artist link models'
+            >> ndb_io.GetModels(
+                voiceover_models.ExplorationVoiceArtistsLinkModel.get_all()
+            )
         )
 
         deleted_models_report_pcollection = (
             models_to_be_deleted
-            | 'Report deleted model IDs' >> beam.Map(
+            | 'Report deleted model IDs'
+            >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
-                    'Deleted ExplorationVoiceArtistsLinkModel: %s' % model.id)
+                    'Deleted ExplorationVoiceArtistsLinkModel: %s' % model.id
+                )
             )
         )
 
@@ -92,17 +92,19 @@ class DeleteInstanceOfVoiceArtistMetadataModelJob(base_jobs.JobBase):
         """
         models_to_be_deleted = (
             self.pipeline
-            | 'Get all voice artist metadata models' >>
-                ndb_io.GetModels(
-                    voiceover_models.VoiceArtistMetadataModel.get_all()
-                )
+            | 'Get all voice artist metadata models'
+            >> ndb_io.GetModels(
+                voiceover_models.VoiceArtistMetadataModel.get_all()
+            )
         )
 
         deleted_models_report_pcollection = (
             models_to_be_deleted
-            | 'Report deleted model IDs' >> beam.Map(
+            | 'Report deleted model IDs'
+            >> beam.Map(
                 lambda model: job_run_result.JobRunResult.as_stdout(
-                    'Deleted VoiceArtistMetadataModel: %s' % model.id)
+                    'Deleted VoiceArtistMetadataModel: %s' % model.id
+                )
             )
         )
 
