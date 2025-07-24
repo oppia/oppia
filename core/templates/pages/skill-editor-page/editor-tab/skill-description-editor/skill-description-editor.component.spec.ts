@@ -47,7 +47,11 @@ describe('Skill Description Editor Component', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [SkillDescriptionEditorComponent],
-      providers: [SkillUpdateService, SkillEditorStateService, ValidatorsService],
+      providers: [
+        SkillUpdateService,
+        SkillEditorStateService,
+        ValidatorsService,
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
