@@ -25,10 +25,9 @@ import {
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
 import {
-  InteractionObjectFactory,
   Interaction,
   InteractionBackendDict,
-} from 'domain/exploration/InteractionObjectFactory';
+} from 'domain/exploration/interaction.model';
 import {OutcomeBackendDict, Outcome} from 'domain/exploration/outcome.model';
 import {SolutionBackendDict, Solution} from 'domain/exploration/solution.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
@@ -39,8 +38,7 @@ import {
   InteractionSpecsKey,
 } from 'pages/interaction-specs.constants';
 
-describe('Interaction object factory', () => {
-  let iof: InteractionObjectFactory;
+describe('Interaction', () => {
   let answerGroupsDict: AnswerGroupBackendDict[];
   let defaultOutcomeDict: OutcomeBackendDict;
   let solutionDict: SolutionBackendDict;
@@ -51,7 +49,6 @@ describe('Interaction object factory', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe],
     });
-    iof = TestBed.inject(InteractionObjectFactory);
     defaultOutcomeDict = {
       dest: 'dest_default',
       dest_if_really_stuck: null,
@@ -131,7 +128,8 @@ describe('Interaction object factory', () => {
 
   it('should correctly set customization arguments for TextInput', () => {
     const copyInteractionDict = {...interactionDict};
-    const testInteraction = iof.createFromBackendDict(copyInteractionDict);
+    const testInteraction =
+      Interaction.createFromBackendDict(copyInteractionDict);
 
     expect(testInteraction.customizationArgs).toEqual({
       placeholder: {
@@ -222,7 +220,7 @@ describe('Interaction object factory', () => {
       id: 'TextInput',
       solution: solutionDict,
     };
-    let testInteraction = iof.createFromBackendDict(interactionDict);
+    let testInteraction = Interaction.createFromBackendDict(interactionDict);
     let contentIdToHtml = testInteraction.getContentIdToContents();
 
     expect(contentIdToHtml).toEqual({
@@ -234,7 +232,7 @@ describe('Interaction object factory', () => {
       ca_placeholder_0: 'Enter text',
     });
 
-    testInteraction = iof.createFromBackendDict({
+    testInteraction = Interaction.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -272,7 +270,7 @@ describe('Interaction object factory', () => {
     'should correctly set customization arguments for ' +
       'AlgebraicExpressionInput',
     () => {
-      const testInteraction = iof.createFromBackendDict({
+      const testInteraction = Interaction.createFromBackendDict({
         answer_groups: answerGroupsDict,
         confirmed_unclassified_answers: [],
         customization_args: {},
@@ -287,7 +285,7 @@ describe('Interaction object factory', () => {
   );
 
   it('should correctly set customization arguments for ' + 'CodeRepl', () => {
-    const testInteraction = iof.createFromBackendDict({
+    const testInteraction = Interaction.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -311,7 +309,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set customization arguments for ' + 'CodeRepl', () => {
-    const testInteraction = iof.createFromBackendDict({
+    const testInteraction = Interaction.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -338,7 +336,7 @@ describe('Interaction object factory', () => {
     'should correctly set customization arguments for ' +
       'DragAndDropSortInput',
     () => {
-      const testInteraction = iof.createFromBackendDict({
+      const testInteraction = Interaction.createFromBackendDict({
         answer_groups: answerGroupsDict,
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -366,7 +364,7 @@ describe('Interaction object factory', () => {
   );
 
   it('should correctly set customization arguments for ' + 'GraphInput', () => {
-    const testInteraction = iof.createFromBackendDict({
+    const testInteraction = Interaction.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -400,7 +398,7 @@ describe('Interaction object factory', () => {
   it(
     'should correctly set customization arguments for ' + 'InteractiveMap',
     () => {
-      const testInteraction = iof.createFromBackendDict({
+      const testInteraction = Interaction.createFromBackendDict({
         answer_groups: answerGroupsDict,
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -425,7 +423,7 @@ describe('Interaction object factory', () => {
   it(
     'should correctly set customization arguments for ' + 'MathEquationInput',
     () => {
-      const testInteraction = iof.createFromBackendDict({
+      const testInteraction = Interaction.createFromBackendDict({
         answer_groups: answerGroupsDict,
         confirmed_unclassified_answers: [],
         customization_args: {},
@@ -442,7 +440,7 @@ describe('Interaction object factory', () => {
   it(
     'should correctly set customization arguments for ' + 'MusicNotesInput',
     () => {
-      const testInteraction = iof.createFromBackendDict({
+      const testInteraction = Interaction.createFromBackendDict({
         answer_groups: answerGroupsDict,
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -466,7 +464,7 @@ describe('Interaction object factory', () => {
     'should correctly set customization arguments for ' +
       'NumericExpressionInput',
     () => {
-      const testInteraction = iof.createFromBackendDict({
+      const testInteraction = Interaction.createFromBackendDict({
         answer_groups: answerGroupsDict,
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -499,7 +497,7 @@ describe('Interaction object factory', () => {
   it(
     'should correctly set customization arguments for ' + 'NumericInput',
     () => {
-      const testInteraction = iof.createFromBackendDict({
+      const testInteraction = Interaction.createFromBackendDict({
         answer_groups: answerGroupsDict,
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -523,7 +521,7 @@ describe('Interaction object factory', () => {
   it(
     'should correctly set customization arguments for ' + 'NumericInput',
     () => {
-      const testInteraction = iof.createFromBackendDict({
+      const testInteraction = Interaction.createFromBackendDict({
         answer_groups: answerGroupsDict,
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -548,7 +546,7 @@ describe('Interaction object factory', () => {
   it(
     'should correctly set customization arguments for ' + 'PencilCodeEditor',
     () => {
-      const testInteraction = iof.createFromBackendDict({
+      const testInteraction = Interaction.createFromBackendDict({
         answer_groups: answerGroupsDict,
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -567,7 +565,7 @@ describe('Interaction object factory', () => {
   );
 
   it('should correctly set customization arguments for ' + 'SetInput', () => {
-    const testInteraction = iof.createFromBackendDict({
+    const testInteraction = Interaction.createFromBackendDict({
       answer_groups: answerGroupsDict,
       confirmed_unclassified_answers: [],
       customization_args: {
@@ -594,7 +592,7 @@ describe('Interaction object factory', () => {
       'interaction id that does not exist',
     () => {
       expect(() => {
-        iof.createFromBackendDict({
+        Interaction.createFromBackendDict({
           answer_groups: answerGroupsDict,
           confirmed_unclassified_answers: [],
           customization_args: {},
@@ -611,13 +609,14 @@ describe('Interaction object factory', () => {
     const copyInteractionDict = {...interactionDict};
     copyInteractionDict.default_outcome = null;
 
-    const testInteraction = iof.createFromBackendDict(copyInteractionDict);
+    const testInteraction =
+      Interaction.createFromBackendDict(copyInteractionDict);
 
     expect(testInteraction.defaultOutcome).toBe(null);
   });
 
   it('should correctly set the new ID', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
+    const testInteraction = Interaction.createFromBackendDict(interactionDict);
 
     expect(testInteraction.id).toEqual('TextInput');
     testInteraction.setId('new_interaction_id');
@@ -625,7 +624,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set the new answer group', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
+    const testInteraction = Interaction.createFromBackendDict(interactionDict);
 
     const newAnswerGroupBackendDict: AnswerGroupBackendDict = {
       rule_specs: [],
@@ -675,7 +674,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set the new default outcome', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
+    const testInteraction = Interaction.createFromBackendDict(interactionDict);
 
     const newDefaultOutcomeDict = {
       dest: 'dest_default_new',
@@ -711,7 +710,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set the new customization args', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
+    const testInteraction = Interaction.createFromBackendDict(interactionDict);
 
     const newCustomizationArgs = {
       placeholder: {
@@ -733,7 +732,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set the new solution', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
+    const testInteraction = Interaction.createFromBackendDict(interactionDict);
 
     const newSolutionDict = {
       answer_is_exclusive: false,
@@ -759,7 +758,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly set the new hint', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
+    const testInteraction = Interaction.createFromBackendDict(interactionDict);
 
     const newHintDict = {
       hint_content: {
@@ -778,7 +777,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly copy from other interaction', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
+    const testInteraction = Interaction.createFromBackendDict(interactionDict);
 
     const newAnswerGroups = [
       {
@@ -852,14 +851,15 @@ describe('Interaction object factory', () => {
       id: 'MultipleChoiceInput',
       solution: newSolutionDict,
     };
-    const otherInteraction = iof.createFromBackendDict(otherInteractionDict);
+    const otherInteraction =
+      Interaction.createFromBackendDict(otherInteractionDict);
     testInteraction.copy(otherInteraction);
     expect(testInteraction).toEqual(otherInteraction);
     const args =
       otherInteraction.customizationArgs as MultipleChoiceInputCustomizationArgs;
     args.showChoicesInShuffledOrder.value = false;
     expect(testInteraction).toEqual(
-      iof.createFromBackendDict({
+      Interaction.createFromBackendDict({
         answer_groups: newAnswerGroups,
         confirmed_unclassified_answers: [],
         customization_args: {
@@ -888,7 +888,7 @@ describe('Interaction object factory', () => {
   });
 
   it('should correctly convert an Interaction to backend dict', () => {
-    const testInteraction = iof.createFromBackendDict(interactionDict);
+    const testInteraction = Interaction.createFromBackendDict(interactionDict);
 
     expect(testInteraction.toBackendDict()).toEqual(interactionDict);
   });
@@ -922,7 +922,8 @@ describe('Interaction object factory', () => {
         id: 'MultipleChoiceInput',
         solution: solutionDict,
       };
-      const testInteraction = iof.createFromBackendDict(mcInteractionDict);
+      const testInteraction =
+        Interaction.createFromBackendDict(mcInteractionDict);
 
       expect(testInteraction.toBackendDict()).toEqual(mcInteractionDict);
     }
@@ -1033,7 +1034,7 @@ describe('Interaction object factory', () => {
             defaultCa[caSpec.name] = {value: caSpec.default_value};
           });
 
-          iof.createFromBackendDict({
+          Interaction.createFromBackendDict({
             answer_groups: answerGroupsDict,
             confirmed_unclassified_answers: [],
             customization_args: defaultCa,

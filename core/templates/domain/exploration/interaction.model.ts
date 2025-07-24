@@ -17,7 +17,6 @@
  * domain objects.
  */
 import {} from '@angular/upgrade/static';
-import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -320,15 +319,8 @@ export class Interaction extends BaseTranslatableObject {
       solution: this.solution ? this.solution.toBackendDict() : null,
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class InteractionObjectFactory {
-  constructor() {}
-
-  _createFromContinueCustomizationArgsBackendDict(
+  static createFromContinueCustomizationArgsBackendDict(
     caBackendDict: ContinueCustomizationArgsBackendDict
   ): ContinueCustomizationArgs {
     const {buttonText} = caBackendDict;
@@ -339,7 +331,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromDragAndDropSortInputCustomizationArgsBackendDict(
+  static createFromDragAndDropSortInputCustomizationArgsBackendDict(
     caBackendDict: DragAndDropSortInputCustomizationArgsBackendDict
   ): DragAndDropSortInputCustomizationArgs {
     const {choices, allowMultipleItemsInSamePosition} = caBackendDict;
@@ -353,7 +345,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromFractionInputCustomizationArgsBackendDict(
+  static createFromFractionInputCustomizationArgsBackendDict(
     caBackendDict: FractionInputCustomizationArgsBackendDict
   ): FractionInputCustomizationArgs {
     const {
@@ -372,7 +364,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromItemSelectionInputCustomizationArgsBackendDict(
+  static createFromItemSelectionInputCustomizationArgsBackendDict(
     caBackendDict: ItemSelectionInputCustomizationArgsBackendDict
   ): ItemSelectionInputCustomizationArgs {
     const {choices, maxAllowableSelectionCount, minAllowableSelectionCount} =
@@ -388,7 +380,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromIMultipleChoiceInputCustomizationArgsBackendDict(
+  static createFromIMultipleChoiceInputCustomizationArgsBackendDict(
     caBackendDict: MultipleChoiceInputCustomizationArgsBackendDict
   ): MultipleChoiceInputCustomizationArgs {
     const {choices, showChoicesInShuffledOrder} = caBackendDict;
@@ -402,7 +394,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromSetInputCustomizationArgsBackendDict(
+  static createFromSetInputCustomizationArgsBackendDict(
     caBackendDict: SetInputCustomizationArgsBackendDict
   ): SetInputCustomizationArgs {
     const {buttonText} = caBackendDict;
@@ -413,7 +405,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromTextInputCustomizationArgsBackendDict(
+  static createFromTextInputCustomizationArgsBackendDict(
     caBackendDict: TextInputCustomizationArgsBackendDict
   ): TextInputCustomizationArgs {
     const {rows, placeholder} = caBackendDict;
@@ -428,7 +420,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromNumericExpressionInputCustomizationArgsBackendDict(
+  static createFromNumericExpressionInputCustomizationArgsBackendDict(
     caBackendDict: NumericExpressionInputCustomizationArgsBackendDict
   ): NumericExpressionInputCustomizationArgs {
     const {useFractionForDivision, placeholder} = caBackendDict;
@@ -440,7 +432,7 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromRatioExpressionInputCustomizationArgsBackendDict(
+  static createFromRatioExpressionInputCustomizationArgsBackendDict(
     caBackendDict: RatioExpressionInputCustomizationArgsBackendDict
   ): RatioExpressionInputCustomizationArgs {
     const {numberOfTerms, placeholder} = caBackendDict;
@@ -452,14 +444,14 @@ export class InteractionObjectFactory {
     };
   }
 
-  _createFromNumericInputCustomizationArgsBackendDict(
+  static createFromNumericInputCustomizationArgsBackendDict(
     caBackendDict: NumericInputCustomizationArgsBackendDict
   ): NumericInputCustomizationArgs {
     const {requireNonnegativeInput} = caBackendDict;
     return {requireNonnegativeInput};
   }
 
-  convertFromCustomizationArgsBackendDict(
+  static convertFromCustomizationArgsBackendDict(
     interactionId: string | null,
     caBackendDict: InteractionCustomizationArgsBackendDict
   ): InteractionCustomizationArgs {
@@ -474,17 +466,17 @@ export class InteractionObjectFactory {
       case 'CodeRepl':
         return cloneDeep(caBackendDict as CodeReplCustomizationArgs);
       case 'Continue':
-        return this._createFromContinueCustomizationArgsBackendDict(
+        return this.createFromContinueCustomizationArgsBackendDict(
           caBackendDict as ContinueCustomizationArgsBackendDict
         );
       case 'DragAndDropSortInput':
-        return this._createFromDragAndDropSortInputCustomizationArgsBackendDict(
+        return this.createFromDragAndDropSortInputCustomizationArgsBackendDict(
           caBackendDict as DragAndDropSortInputCustomizationArgsBackendDict
         );
       case 'EndExploration':
         return cloneDeep(caBackendDict as EndExplorationCustomizationArgs);
       case 'FractionInput':
-        return this._createFromFractionInputCustomizationArgsBackendDict(
+        return this.createFromFractionInputCustomizationArgsBackendDict(
           caBackendDict as FractionInputCustomizationArgsBackendDict
         );
       case 'GraphInput':
@@ -494,13 +486,13 @@ export class InteractionObjectFactory {
       case 'InteractiveMap':
         return cloneDeep(caBackendDict as InteractiveMapCustomizationArgs);
       case 'ItemSelectionInput':
-        return this._createFromItemSelectionInputCustomizationArgsBackendDict(
+        return this.createFromItemSelectionInputCustomizationArgsBackendDict(
           caBackendDict as ItemSelectionInputCustomizationArgsBackendDict
         );
       case 'MathEquationInput':
         return cloneDeep(caBackendDict as MathEquationInputCustomizationArgs);
       case 'MultipleChoiceInput':
-        return this._createFromIMultipleChoiceInputCustomizationArgsBackendDict(
+        return this.createFromIMultipleChoiceInputCustomizationArgsBackendDict(
           caBackendDict as MultipleChoiceInputCustomizationArgsBackendDict
         );
       case 'MusicNotesInput':
@@ -508,25 +500,25 @@ export class InteractionObjectFactory {
       case 'NumberWithUnits':
         return cloneDeep(caBackendDict as NumberWithUnitsCustomizationArgs);
       case 'NumericExpressionInput':
-        return this._createFromNumericExpressionInputCustomizationArgsBackendDict(
+        return this.createFromNumericExpressionInputCustomizationArgsBackendDict(
           caBackendDict as NumericExpressionInputCustomizationArgsBackendDict
         );
       case 'NumericInput':
-        return this._createFromNumericInputCustomizationArgsBackendDict(
+        return this.createFromNumericInputCustomizationArgsBackendDict(
           caBackendDict as NumericInputCustomizationArgsBackendDict
         );
       case 'PencilCodeEditor':
         return cloneDeep(caBackendDict as PencilCodeEditorCustomizationArgs);
       case 'RatioExpressionInput':
-        return this._createFromRatioExpressionInputCustomizationArgsBackendDict(
+        return this.createFromRatioExpressionInputCustomizationArgsBackendDict(
           caBackendDict as RatioExpressionInputCustomizationArgsBackendDict
         );
       case 'SetInput':
-        return this._createFromSetInputCustomizationArgsBackendDict(
+        return this.createFromSetInputCustomizationArgsBackendDict(
           caBackendDict as SetInputCustomizationArgsBackendDict
         );
       case 'TextInput':
-        return this._createFromTextInputCustomizationArgsBackendDict(
+        return this.createFromTextInputCustomizationArgsBackendDict(
           caBackendDict as TextInputCustomizationArgsBackendDict
         );
       default:
@@ -534,7 +526,9 @@ export class InteractionObjectFactory {
     }
   }
 
-  createFromBackendDict(interactionDict: InteractionBackendDict): Interaction {
+  static createFromBackendDict(
+    interactionDict: InteractionBackendDict
+  ): Interaction {
     return new Interaction(
       interactionDict.id
         ? this.createAnswerGroupsFromBackendDict(
@@ -558,7 +552,7 @@ export class InteractionObjectFactory {
     );
   }
 
-  createAnswerGroupsFromBackendDict(
+  static createAnswerGroupsFromBackendDict(
     answerGroupBackendDicts: readonly AnswerGroupBackendDict[],
     interactionId: string
   ): AnswerGroup[] {
@@ -570,7 +564,7 @@ export class InteractionObjectFactory {
     });
   }
 
-  createHintsFromBackendDict(
+  static createHintsFromBackendDict(
     hintBackendDicts: readonly HintBackendDict[]
   ): Hint[] {
     return hintBackendDicts.map(hintBackendDict => {
@@ -578,13 +572,13 @@ export class InteractionObjectFactory {
     });
   }
 
-  createOutcomeFromBackendDict(
+  static createOutcomeFromBackendDict(
     outcomeBackendDict: OutcomeBackendDict
   ): Outcome {
     return Outcome.createFromBackendDict(outcomeBackendDict);
   }
 
-  createSolutionFromBackendDict(
+  static createSolutionFromBackendDict(
     solutionBackendDict: SolutionBackendDict
   ): Solution {
     return Solution.createFromBackendDict(solutionBackendDict);
