@@ -127,7 +127,7 @@ export default {
       'https://www.linkedin.com/in/rita-santos-guimaraes-prof-matematica/',
     ReadBlogLink: 'https://medium.com/oppia-org',
     UserDocumentation: 'https://oppia.github.io/#/',
-    BaseExplorationPlayer: 'http:localhost:8181/explore',
+    BaseExplorationPlayer: 'http//:localhost:8181/explore',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',

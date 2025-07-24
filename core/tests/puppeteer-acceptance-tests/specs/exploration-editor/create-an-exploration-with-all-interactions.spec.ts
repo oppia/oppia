@@ -96,8 +96,10 @@ describe('Exploration Editor', function () {
   it('should be able to use "Multiple Choice" interaction', async function () {
     await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
 
-    // Add a multiple choice interaction.
+    // Update the card content.
     await explorationEditor.updateCardContent('This is a multiple choice.');
+    await explorationEditor.expectCardContentToBe('This is a multiple choice.');
+    // Add a multiple choice interaction. Also, checks if modal title is correct.
     await explorationEditor.addMultipleChoiceInteraction([
       'Option 1',
       'Option 2',
@@ -130,10 +132,24 @@ describe('Exploration Editor', function () {
   it('should be able to use "Number Input" interaction', async function () {
     await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
 
-    // Add a number input interaction.
+    // Update card content.
     await explorationEditor.updateCardContent('Enter number 100.');
     await explorationEditor.expectCardContentToBe('Enter number 100.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
+
+    // Add a number input interaction. Also, checks if modal title is correct.
+    await explorationEditor.addInteraction(
+      INTERACTION_TYPES.NUMBER_INPUT,
+      false
+    );
+    await explorationEditor.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Number Input)'
+    );
+
+    // Customize the number input interaction.
+    await explorationEditor.customizeNumberInputInteraction(true);
+    await explorationEditor.expectModalTitleToBe('Add Response');
+
+    // Add responses to the number input interaction.
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.NUMBER_INPUT,
       '100',
@@ -142,6 +158,7 @@ describe('Exploration Editor', function () {
       true
     );
 
+    // Add a solution to the state.
     await explorationEditor.addSolutionToState(
       '100',
       'As said in the question itself.',
@@ -151,23 +168,31 @@ describe('Exploration Editor', function () {
       'One solution is "100". As said in the question itself..'
     );
 
+    // Save the exploration draft and navigate to the next card.
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
   });
 
   it('should be able to use "Text Input" interaction', async function () {
-    await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
-
-    // Add a text input interaction.
+    // Update card content.
     await explorationEditor.updateCardContent('Enter text "Hello, Oppia!".');
     await explorationEditor.expectCardContentToBe(
       'Enter text "Hello, Oppia!".'
     );
+    // Add a text input interaction.
     await explorationEditor.addInteraction(INTERACTION_TYPES.TEXT_INPUT, false);
+    await explorationEditor.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Text Input)'
+    );
+    // Customize the text input interaction.
     await explorationEditor.customizeTextInputInteraction(
       'Hello, there!',
       '2',
       true
     );
+    await explorationEditor.expectModalTitleToBe('Add Response');
+
+    // Add responses to the text input interaction.
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.TEXT_INPUT,
       'Hello',
@@ -176,36 +201,45 @@ describe('Exploration Editor', function () {
       true
     );
 
+    // Add default response feedback.
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'No write "Hello, Oppia!"'
     );
 
+    // Save the exploration draft and navigate to the next card.
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARD_NAMES.FIFTH);
   });
 
   it('should be able to use "Image Region" interaction', async function () {
-    await explorationEditor.navigateToCard(CARD_NAMES.FIFTH);
-
-    // Add a image region interaction.
+    // Update card content.
     await explorationEditor.updateCardContent('Enter an image region.');
-    await explorationEditor.addImageInteraction();
+    // Add an image region interaction. Also, check for all modals -- Choose Interaction,
+    // Customize Interaction (Image Region), and Add Response.
+    await explorationEditor.addImageInteraction('Great!', CARD_NAMES.SIXTH);
     await explorationEditor.directLearnersToNewCard(CARD_NAMES.SIXTH);
+    // Edit default response feedback.
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
     );
-
+    // Save exploration draft and navigate to next card.
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARD_NAMES.SIXTH);
   });
 
   it('should be able to use "Item Selection" interaction', async function () {
-    await explorationEditor.navigateToCard(CARD_NAMES.SIXTH);
-
     // Add a item selection interaction.
     await explorationEditor.updateCardContent('Select correct item.');
+    // Add Item Selection interaction. Also, check for modal "Choose Interaction"
+    // and "Customize Interaction (Item Selection)".
     await explorationEditor.addInteraction(
       INTERACTION_TYPES.ITEM_SELECTION,
       false
     );
+    await this.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Item Selection)'
+    );
+    // Customize Item Selection interaction.
     await explorationEditor.customizeItemSelectionInteraction(
       ['Option 1', 'Option 2', 'Correct Option 1', 'Correct Option 2'],
       1,
@@ -215,33 +249,44 @@ describe('Exploration Editor', function () {
       'contains at least one of',
       ['Correct Option 1', 'Correct Option 2']
     );
+    await explorationEditor.expectModalTitleToBe('Add Response');
+    // Add feedback for correct response.
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
       CARD_NAMES.SEVENTH,
       true,
       true
     );
+    // Add default feedback for other responses.
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
 
+    // Save exploration draft and navigate to next card.
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARD_NAMES.SEVENTH);
   });
 
   it('should be able to use "Drag and Drop Sort" interaction', async function () {
-    await explorationEditor.navigateToCard(CARD_NAMES.SEVENTH);
-
-    // Add a drag and drop sort interaction.
+    // Update card content.
     await explorationEditor.updateCardContent('Arrange in Ascending Order');
+    // Add Drag and Drop Sort interaction. Also, check for modals "Choose Interaction"
+    // and "Customize Interaction (Drag and Drop Sort)".
     await explorationEditor.addInteraction(
       INTERACTION_TYPES.DRAG_AND_DROP_SORT,
       false
     );
+    await this.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Drag And Drop Sort)'
+    );
+    // Customize Drag and Drop Sort interaction.
     await explorationEditor.customizeDragAndDropSortInteraction([
       'First',
       'Third',
       'Second',
     ]);
+    await explorationEditor.expectModalTitleToBe('Add Response');
+    // Add feedback for correct response.
     await explorationEditor.updateDragAndDropSortLearnersAnswerInResponseModal(
       'is equal to ordering ...',
       [1, 3, 2]
@@ -253,25 +298,42 @@ describe('Exploration Editor', function () {
       true
     );
 
+    // Add default feedback for other responses.
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Try Again!'
     );
 
-    // Add solution.
+    // Add solution to the state.
     await explorationEditor.addDragAndDropSortSolution(
       ['First', 'Second', 'Third'],
       'As given in the question.'
     );
 
+    // Save exploration draft and navigate to next card.
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARD_NAMES.EIGHTH);
   });
 
   it('should be able to use "Fraction Input" interaction', async function () {
-    await explorationEditor.navigateToCard(CARD_NAMES.EIGHTH);
-
-    // Add a fraction input interaction.
+    // Update card content.
     await explorationEditor.updateCardContent('Enter a fraction: 1/2.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
+    // Add Fraction Input interaction. Also, check for modal "Choose Interaction"
+    // and "Customize Interaction (Fraction Input)".
+    await explorationEditor.addInteraction(
+      INTERACTION_TYPES.FRACTION_INPUT,
+      false
+    );
+    await this.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Fraction Input)'
+    );
+    // Customize Fraction Input interaction.
+    await explorationEditor.customizeFractionInputInteraction(
+      false,
+      false,
+      false
+    );
+    await explorationEditor.expectModalTitleToBe('Add Response');
+    // Add feedback for correct answer.
     await explorationEditor.addResponsesToTheInteraction(
       INTERACTION_TYPES.FRACTION_INPUT,
       '1/2',
@@ -279,29 +341,38 @@ describe('Exploration Editor', function () {
       CARD_NAMES.NINTH,
       true
     );
+    // Add default feedback for other responses.
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
 
+    // Add Solution to the state.
     await explorationEditor.addSolutionToState(
       '1/2',
       'As given in the question.',
       true
     );
 
+    // Save the exploration draft and navigate to next card.
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARD_NAMES.NINTH);
   });
 
   it('should be able to use "Graph Theory" interaction', async function () {
-    await explorationEditor.navigateToCard(CARD_NAMES.NINTH);
-
-    // Add a graph theory interaction.
+    // Update card content.
     await explorationEditor.updateCardContent('Create a star topology.');
+    // Add Graph Interaction.
     await explorationEditor.addInteraction(
       INTERACTION_TYPES.GRAPH_THEORY,
       false
     );
+    await explorationEditor.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Graph Theory)'
+    );
+    // Customize Graph Theory Interaction.
     await explorationEditor.customizeGraphTheoryInteraction();
+    await explorationEditor.expectModalTitleToBe('Add Response');
+    // Add feedback for correct answer.
     await explorationEditor.updateGraphTheoryLearnerAnswerInResponseModal();
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
@@ -309,6 +380,7 @@ describe('Exploration Editor', function () {
       true,
       true
     );
+    // Add default feedback for other responses.
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
@@ -317,15 +389,23 @@ describe('Exploration Editor', function () {
     // TODO(#22978): While adding solution, the graph viz in the solution
     // modal is not visible.
 
+    // Save the exploration draft and navigate to next card.
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARD_NAMES.TENTH);
   });
 
   it('should be able to use "Set Input" interaction', async function () {
-    await explorationEditor.navigateToCard(CARD_NAMES.TENTH);
-
-    // Add a set input interaction.
+    // Update card content.
     await explorationEditor.updateCardContent('Enter a set.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.SET_INPUT);
+    // Add Set Input Interaction.
+    await explorationEditor.addInteraction(INTERACTION_TYPES.SET_INPUT, false);
+    await explorationEditor.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Set Input)'
+    );
+    // Customize Set Input Interaction.
+    await explorationEditor.customizeSetInputInteraction('Add New Item');
+    await explorationEditor.expectModalTitleToBe('Add Response');
+    // Add feedback for correct answer.
     await explorationEditor.updateSetInputLearnerAnswerInResponseModal(
       'is equal to',
       ['1', '2', '3']
@@ -336,6 +416,7 @@ describe('Exploration Editor', function () {
       true,
       true
     );
+    // Add default feedback for other answers.
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong Answer. Please try again'
     );
@@ -346,12 +427,12 @@ describe('Exploration Editor', function () {
       'as given in the question.'
     );
 
+    // Save exploration draft and navigate to next card.
     await explorationEditor.saveExplorationDraft();
+    await explorationEditor.navigateToCard(CARD_NAMES.ELEVENTH);
   });
 
   it('should be able to use "Numeric Expression" interaction', async function () {
-    await explorationEditor.navigateToCard(CARD_NAMES.ELEVENTH);
-
     // Add a numeric expression interaction.
     await explorationEditor.updateCardContent('Enter a numeric expression.');
     await explorationEditor.addInteraction(

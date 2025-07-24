@@ -900,6 +900,92 @@ export class ExplorationEditor extends BaseUser {
     });
   }
 
+  /**
+   * Customizes the Fraction Input Interaction.
+   * @param simplestForm - Whether the Fraction Input Interaction should be
+   * customized to be a simplest form.
+   * @param improperFraction - Whether the Fraction Input Interaction should be
+   * customized to be an improper fraction.
+   * @param integerPart - Wheather the Fraction Input Interaction should have
+   * an integer part.
+   * @param placeholder - The placeholder of the Fraction Input Interaction.
+   */
+  async customizeFractionInputInteraction(
+    simplestForm: boolean,
+    improperFraction: boolean,
+    integerPart: boolean,
+    placeholder?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(customizeInteractionBodySelector);
+    await this.page.waitForFunction(
+      selector => {
+        const element = document.querySelector(selector);
+        return element.querySelectorAll('input').length === 4;
+      },
+      {},
+      customizeInteractionBodySelector
+    );
+
+    const inputFields = await this.page.$$(
+      `${customizeInteractionBodySelector} input`
+    );
+
+    // Simplest Form.
+    if (simplestForm) {
+      await inputFields[0].click();
+      await this.page.waitForFunction(
+        (element: Element) => {
+          return (element as HTMLInputElement).checked;
+        },
+        {},
+        inputFields[0]
+      );
+    }
+
+    // Improper Fractions.
+    if (improperFraction) {
+      await inputFields[1].click();
+      await this.page.waitForFunction(
+        (element: Element) => {
+          return (element as HTMLInputElement).checked;
+        },
+        {},
+        inputFields[1]
+      );
+    }
+
+    // Integer Part.
+    if (integerPart) {
+      await inputFields[2].click();
+      await this.page.waitForFunction(
+        (element: Element) => {
+          return (element as HTMLInputElement).checked;
+        },
+        {},
+        inputFields[2]
+      );
+    }
+
+    // Placeholder Text.
+    if (placeholder) {
+      await inputFields[3].click();
+      await inputFields[3].type(placeholder);
+      await this.page.waitForFunction(
+        (element: Element, value: string) => {
+          return (element as HTMLInputElement).value === value;
+        },
+        {},
+        inputFields[3],
+        placeholder
+      );
+    }
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+  }
+
   async customizeEndExplorationInteraction(
     explorationIds: string[]
   ): Promise<void> {
@@ -958,6 +1044,23 @@ export class ExplorationEditor extends BaseUser {
       hidden: true,
     });
     showMessage(`Customized graph theory interaction with four vertices.`);
+  }
+
+  /**
+   * Customizes the set input interaction.
+   * @param customLabel The custom label to set.
+   */
+  async customizeSetInputInteraction(customLabel: string): Promise<void> {
+    await this.expectElementToBeVisible(
+      `${customizeInteractionBodySelector} input`
+    );
+    await this.type(`${customizeInteractionBodySelector} input`, customLabel);
+
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage(`Customized set input interaction with four vertices.`);
   }
 
   /**
@@ -1132,6 +1235,46 @@ export class ExplorationEditor extends BaseUser {
         inputElements[2]
       );
     }
+
+    // Save the interaction.
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Customizes the number input interaction.
+   * @param allowOnlyPositiveInputs Whether to allow only positive inputs.
+   */
+  async customizeNumberInputInteraction(
+    allowOnlyPositiveInputs: boolean = false
+  ): Promise<void> {
+    await this.page.waitForSelector(customizeInteractionBodySelector);
+    await this.page.waitForSelector(
+      `${customizeInteractionBodySelector} input[type="checkbox"]`
+    );
+
+    const checked = await this.page.$eval(
+      `${customizeInteractionBodySelector} input[type="checkbox"]`,
+      el => (el as HTMLInputElement).checked
+    );
+    if (checked !== allowOnlyPositiveInputs) {
+      await this.page.click(
+        `${customizeInteractionBodySelector} input[type="checkbox"]`
+      );
+    }
+
+    // Verify that the checkbox is (un)checked.
+    await this.page.waitForFunction(
+      (selector: string, checked: boolean) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLInputElement)?.checked === checked;
+      },
+      {},
+      `${customizeInteractionBodySelector} input[type="checkbox"]`,
+      allowOnlyPositiveInputs
+    );
 
     // Save the interaction.
     await this.clickOn(saveInteractionButton);
@@ -2242,6 +2385,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(stateEditSelector);
+    await this.clearAllTextFrom(stateContentInputField);
     await this.type(stateContentInputField, `${content}`);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
@@ -2303,6 +2447,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.waitForPageToFullyLoad();
 
+    // Check if modal title is correct.
     await this.expectModalTitleToBe('Choose Interaction');
 
     // Change tab based on interaction.
@@ -2346,6 +2491,7 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOn(addInteractionButton);
 
+    await this.expectModalTitleToBe('Choose Interaction');
     await this.page.waitForSelector(multipleChoiceInteractionButton, {
       visible: true,
     });
@@ -2447,8 +2593,15 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
+    // Click on add interaction button.
     await this.clickOn(addInteractionButton);
+    await this.expectModalTitleToBe('Choose Interaction');
+
+    // Click on image region interaction.
     await this.clickOn('Image Region');
+    await this.expectCustomizeInteractionTitleToBe(
+      'Customize Interaction (Image Region)'
+    );
     await this.clickOn(uploadImageButton);
     await this.uploadFile(imageToUpload);
     await this.clickOn(useTheUploadImageButton);
@@ -2462,6 +2615,8 @@ export class ExplorationEditor extends BaseUser {
       hidden: true,
     });
 
+    // Update correct response.
+    await this.expectModalTitleToBe('Add Response');
     await this.addResponseDetailsInResponseModal(
       feedback,
       nextCard,
