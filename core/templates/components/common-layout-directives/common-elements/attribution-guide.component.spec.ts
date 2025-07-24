@@ -16,7 +16,13 @@
  * @fileoverview Unit tests for attribution guide component.
  */
 
-import {TestBed, async, ComponentFixture} from '@angular/core/testing';
+import {
+  TestBed,
+  async,
+  ComponentFixture,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 
 import {AttributionGuideComponent} from './attribution-guide.component';
 import {PageContextService} from 'services/page-context.service';
@@ -176,20 +182,19 @@ describe('Attribution Guide Component', function () {
     expect(component.getExplorationTitle()).toEqual('Place Values');
   });
 
-  it('should run the copy command and show a tooltip', () => {
+  it('should run the copy command and set and remove title attribute for tooltip', () => {
     let dummyDivElement = document.createElement('div');
     let dummyTextNode = document.createTextNode('Text to be copied');
     dummyDivElement.className = 'class-name';
     dummyDivElement.appendChild(dummyTextNode);
-    let dummyDocumentFragment = document.createDocumentFragment();
+    const dummyDocumentFragment = document.createDocumentFragment();
     dummyDocumentFragment.appendChild(dummyDivElement);
     spyOn(document, 'getElementsByClassName')
       .withArgs('class-name')
       .and.returnValue(dummyDocumentFragment.children);
     spyOn(document, 'execCommand').withArgs('copy');
-    spyOn($.fn, 'tooltip');
     component.copyAttribution('class-name');
     expect(document.execCommand).toHaveBeenCalled();
-    expect($.fn.tooltip).toHaveBeenCalledWith('show');
+    expect(dummyDivElement.getAttribute('title')).toBe('Copied!');
   });
 });

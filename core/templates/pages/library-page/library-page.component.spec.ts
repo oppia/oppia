@@ -649,6 +649,18 @@ describe('Library Page Component', () => {
         protractor_id: '',
       },
     ];
+
+    // When jQuery was used in the component, it could directly query DOM globally
+    // using $('.class-name'). In the updated version without jQuery, the component
+    // uses `this.el.nativeElement.querySelectorAll(...)` instead, which only sees
+    // elements appended to `el.nativeElement` (the component's local DOM).
+    //
+    // So here we manually create a div with the expected class and append it
+    // to the component's root element, so the native DOM queries can find it.
+
+    const tile = document.createElement('div');
+    tile.classList.add('oppia-library-carousel-tiles');
+    componentInstance.el.nativeElement.appendChild(tile);
     componentInstance.initCarousels();
     expect(componentInstance.leftmostCardIndices.length).toEqual(1);
   });
