@@ -92,6 +92,7 @@ describe('Create new skill modal', () => {
   });
 
   it('should set error message if needed', () => {
+    spyOn(validatorsService, 'hasValidDescription').and.returnValue(false);
     componentInstance.skillDescriptionExists = false;
     componentInstance.setErrorMessageIfNeeded();
     expect(componentInstance.errorMsg).toEqual(

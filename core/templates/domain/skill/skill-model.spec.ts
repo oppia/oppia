@@ -32,7 +32,7 @@ import {SkillBackendDict, Skill} from 'domain/skill/skill.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {AppConstants} from 'app.constants';
 
-describe('Skill factory', () => {
+describe('Skill', () => {
   let skill: Skill;
   let misconceptionDict1: MisconceptionBackendDict;
   let misconceptionDict2: MisconceptionBackendDict;

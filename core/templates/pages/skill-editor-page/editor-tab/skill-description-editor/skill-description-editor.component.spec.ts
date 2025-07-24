@@ -16,6 +16,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {ConceptCard} from 'domain/skill/concept-card.model';
+import {ValidatorsService} from 'services/validators.service';
 import {
   SkillRights,
   SkillRightsBackendDict,
@@ -40,12 +41,13 @@ describe('Skill Description Editor Component', () => {
   let sampleSkillRights: SkillRights;
   let skillRightsDict: SkillRightsBackendDict;
   let sampleSkill: Skill;
+  let validatorsService: ValidatorsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [SkillDescriptionEditorComponent],
-      providers: [SkillUpdateService, SkillEditorStateService],
+      providers: [SkillUpdateService, SkillEditorStateService, ValidatorsService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   });
@@ -56,6 +58,7 @@ describe('Skill Description Editor Component', () => {
 
     skillUpdateService = TestBed.inject(SkillUpdateService);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
+    validatorsService = TestBed.inject(ValidatorsService);
   });
 
   beforeEach(() => {
@@ -129,6 +132,7 @@ describe('Skill Description Editor Component', () => {
       'setSkillDescription'
     ).and.callThrough();
     spyOn(component.onSaveDescription, 'emit').and.callThrough();
+    spyOn(validatorsService, 'hasValidDescription').and.returnValue(true);
     component.ngOnInit();
     // Old Description.
     expect(component.tmpSkillDescription).toBe('Skill description loading');
@@ -156,6 +160,7 @@ describe('Skill Description Editor Component', () => {
       skillUpdateService,
       'setSkillDescription'
     ).and.callThrough();
+    spyOn(validatorsService, 'hasValidDescription').and.returnValue(false);
     component.ngOnInit();
     // Old Description.
     expect(component.tmpSkillDescription).toBe('Skill description loading');
