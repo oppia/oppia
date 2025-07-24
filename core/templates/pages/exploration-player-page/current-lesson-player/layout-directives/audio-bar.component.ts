@@ -243,7 +243,7 @@ export class AudioBarComponent {
     if (this.pageContextService.isInExplorationPlayerPage()) {
       return this.playerPositionService.getCurrentStateName();
     }
-    return this.stateEditorService.getActiveStateName();
+    return this.stateEditorService.getActiveStateName() as string;
   }
 
   onPlayButtonClicked(): void {

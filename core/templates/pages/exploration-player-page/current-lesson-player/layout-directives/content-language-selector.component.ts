@@ -120,7 +120,7 @@ export class ContentLanguageSelectorComponent implements OnInit {
     if (this.pageContextService.isInExplorationPlayerPage()) {
       return this.playerPositionService.getCurrentStateName();
     }
-    return this.stateEditorService.getActiveStateName();
+    return this.stateEditorService.getActiveStateName() as string;
   }
 
   onSelectLanguage(newLanguageCode: string): void {
