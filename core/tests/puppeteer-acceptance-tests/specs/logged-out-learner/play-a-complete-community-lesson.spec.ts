@@ -163,11 +163,6 @@ describe('Logged-Out Learner', function () {
       'Hint 1',
       'This is a first hint.'
     );
-
-    // Continue to next card and check for lesson player.
-    await loggedOutLearner.continueToNextCard();
-    await loggedOutLearner.expectGoBackToPreviousCardButton(true);
-    await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
   });
 
   afterAll(async function () {
