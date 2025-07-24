@@ -658,6 +658,17 @@ describe('Exploration Editor', function () {
     await explorationEditor.closeHintModal();
     await explorationEditor.submitExpressionAnswer('5x=2+3');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
+    // Submit an expression.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.submitExpressionAnswer('5x');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'It looks like you have entered an expression. Please enter an equation instead.'
+    );
+
+    // Navigate to Editor tab.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.saveExplorationDraft();
   });
 
   it('should be able to preview "Number With Units" interaction', async function () {
