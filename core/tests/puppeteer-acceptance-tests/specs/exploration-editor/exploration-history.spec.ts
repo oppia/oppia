@@ -25,32 +25,36 @@ import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
 
-  beforeAll(async function () {
-    explorationEditor = await UserFactory.createNewUser(
-      'explorationEditor',
-      'exploration_editor@example.com'
-    );
+  beforeAll(
+    async function () {
+      explorationEditor = await UserFactory.createNewUser(
+        'explorationEditor',
+        'exploration_editor@example.com'
+      );
 
-    await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+      await explorationEditor.dismissWelcomeModal();
 
-    await explorationEditor.updateCardContent('Introduction to Fractions');
-    await explorationEditor.addInteraction('Continue Button');
-    await explorationEditor.viewOppiaResponses();
-    await explorationEditor.directLearnersToNewCard('Second Card');
-    await explorationEditor.saveExplorationDraft();
-
-    await explorationEditor.navigateToCard('Second Card');
-    await explorationEditor.updateCardContent('Thanks for playing!');
-    await explorationEditor.addInteraction('End Exploration');
-    await explorationEditor.saveExplorationDraft();
-
-    for (let i = 0; i < 15; i++) {
-      await explorationEditor.updateCardContent(`Thanks for playing! ${i}`);
+      await explorationEditor.updateCardContent('Introduction to Fractions');
+      await explorationEditor.addInteraction('Continue Button');
+      await explorationEditor.viewOppiaResponses();
+      await explorationEditor.directLearnersToNewCard('Second Card');
       await explorationEditor.saveExplorationDraft();
-    }
-  });
+
+      await explorationEditor.navigateToCard('Second Card');
+      await explorationEditor.updateCardContent('Thanks for playing!');
+      await explorationEditor.addInteraction('End Exploration');
+      await explorationEditor.saveExplorationDraft();
+
+      for (let i = 0; i < 15; i++) {
+        await explorationEditor.updateCardContent(`Thanks for playing! ${i}`);
+        await explorationEditor.saveExplorationDraft();
+      }
+    },
+    // Test takes more time than default timeout.
+    600000
+  );
 
   it('should be able to view the history tab', async function () {
     await explorationEditor.navigateToHistoryTab();
