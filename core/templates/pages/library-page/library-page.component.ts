@@ -139,7 +139,12 @@ export class LibraryPageComponent {
       return;
     }
 
-    const width = window.innerWidth || 0;
+    // https://stackoverflow.com/questions/49518107
+    const width =
+      window.innerWidth ||
+      document.documentElement?.clientWidth ||
+      document.body?.clientWidth;
+
     const windowWidth = width * 0.85;
 
     this.tileDisplayCount = Math.min(
