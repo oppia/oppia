@@ -1085,6 +1085,107 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Customizes the Music Notes interaction.
+   * @param correctSquenceOfNotes The correct sequence of notes.
+   * @param startingNotes The starting notes.
+   */
+  async customizeMusicNotesInteraction(
+    correctSquenceOfNotes: string[],
+    startingNotes: string[]
+  ): Promise<void> {
+    const customizationBox = await this.getInteractionCustomizationBox();
+    const addListItemButtons = await customizationBox.$$(
+      addResponseOptionButton
+    );
+
+    for (let i = 0; i < correctSquenceOfNotes.length; i++) {
+      await addListItemButtons[0].click();
+    }
+    for (let i = 0; i < startingNotes.length; i++) {
+      await addListItemButtons[1].click();
+    }
+
+    const combinedNotes = correctSquenceOfNotes.concat(startingNotes);
+    const selectFields = await customizationBox.$$('select');
+    for (let i = 0; i < combinedNotes.length; i++) {
+      selectFields[i].select(combinedNotes[i]);
+    }
+
+    // Save.
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage(`Customized Music Notes successfully.`);
+  }
+
+  /**
+   * Customizes the code editor interaction.
+   * @param initalCode The initial code of the code editor.
+   * @param codeToPrepend The code to prepend to the code editor.
+   * @param codeToAppend The code to append to the code editor.
+   */
+  async customizeCodeEditorInteraction(
+    initalCode: string,
+    codeToPrepend?: string,
+    codeToAppend?: string
+  ): Promise<void> {
+    const selector = '.CodeMirror-scroll';
+    const customizationBox = await this.getInteractionCustomizationBox();
+
+    const codeInputs = await customizationBox.$$(selector);
+
+    // Initial Code.
+    await codeInputs[0].click();
+    await this.page.keyboard.down('Control');
+    await this.page.keyboard.press('KeyA');
+    await this.page.keyboard.up('Control');
+    await this.page.keyboard.press('Backspace');
+    await this.page.keyboard.type(initalCode);
+    await this.page.waitForFunction(
+      (element: Element, textContent: string) => {
+        return element.textContent?.trim().includes(textContent);
+      },
+      {},
+      codeInputs[0],
+      initalCode
+    );
+
+    // Code to prepend to the code input.
+    if (codeToPrepend) {
+      await codeInputs[1].type(codeToPrepend);
+      await this.page.waitForFunction(
+        (element: Element, textContent: string) => {
+          return element.textContent?.trim().includes(textContent);
+        },
+        {},
+        codeInputs[1],
+        codeToPrepend
+      );
+    }
+
+    // Code to append to the code input.
+    if (codeToAppend) {
+      await codeInputs[2].type(codeToAppend);
+      await this.page.waitForFunction(
+        (element: Element, textContent: string) => {
+          return element.textContent?.trim().includes(textContent);
+        },
+        {},
+        codeInputs[2],
+        codeToAppend
+      );
+    }
+
+    // Save.
+    await this.clickOn(saveInteractionButton);
+    await this.page.waitForSelector(addInteractionModalSelector, {
+      hidden: true,
+    });
+    showMessage(`Customized Code Editor / Preview Code Editor successfully.`);
+  }
+
+  /**
    * Customizes the numeric expression input interaction.
    * @param placeholderText The placeholder text of the input.
    * @param representDivUsingFraction Whether to represent the division using
