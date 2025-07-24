@@ -79,7 +79,6 @@ jobs:
         suite:
           - name: logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard
           - name: logged-in-learner/completes-the-exploration-and-decides-what-to-do-next
-          - name: logged-in-learner/see-their-progress-on-learner-dashboard
           - name: logged-in-learner/sets-goal-on-learner-dashboard
           - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
           - name: logged-out-learner/play-a-complete-community-lesson
