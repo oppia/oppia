@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 
 import {
   InteractionBackendDict,
-  Interaction,
+  Interaction
 } from 'domain/exploration/interaction.model';
 import {
   ParamChangeBackendDict,
@@ -183,6 +183,7 @@ export class StateObjectFactory {
       stateDict.classifier_model_id,
       stateDict.linked_skill_id,
       SubtitledHtml.createFromBackendDict(stateDict.content),
+      Interaction.createFromBackendDict(stateDict.interaction),
       ParamChanges.createFromBackendList(stateDict.param_changes),
       Interaction.createFromBackendDict(stateDict.interaction),
       stateDict.solicit_answer_details,
