@@ -337,8 +337,11 @@ export class BaseUser {
     }
     await this.clickOn('Sign in');
     await this.type(testConstants.SignInDetails.inputField, email);
+    const navigationPromise = this.page.waitForNavigation({
+      waitUntil: 'networkidle0',
+    });
     await this.clickOn('Sign In');
-    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    await navigationPromise;
   }
 
   /**
@@ -351,8 +354,11 @@ export class BaseUser {
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
+    const navigationPromise = this.page.waitForNavigation({
+      waitUntil: 'networkidle0',
+    });
     await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
-    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    await navigationPromise;
 
     this.username = username;
     this.email = email;

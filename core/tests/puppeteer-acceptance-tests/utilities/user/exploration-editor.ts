@@ -26,6 +26,7 @@ import path from 'path';
 import {number} from 'yargs';
 import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
+import {ImageAreaSelection} from '../common/interactions/image-area-selection';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -565,6 +566,19 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Selects the image answer by clicking on the point (xInPercent, yInPercent).
+   * @param xInPercent x coordinate of the point in percent.
+   * @param yInPercent y coordinate of the point in percent.
+   */
+  async selectImageAnswer(
+    xInPercent: number,
+    yInPercent: number
+  ): Promise<void> {
+    const imageInteraction = new ImageAreaSelection(this.page);
+    await imageInteraction.selectPoint(xInPercent, yInPercent);
+  }
+
+  /**
    * Clicks on the delete exploration button.
    */
   async clickOnDeleteExplorationButton(): Promise<void> {
@@ -668,9 +682,11 @@ export class ExplorationEditor extends BaseUser {
 
     const versionSelectElements = await this.page.$$(versionComparasionSelect);
 
+    await versionSelectElements[0].hover();
     await versionSelectElements[0].click();
     await this.selectMatOption(version1);
 
+    await versionSelectElements[0].hover();
     await versionSelectElements[1].click();
     await this.selectMatOption(version2);
 
@@ -1785,7 +1801,6 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    // expect(await selectInput?.evaluate(el => el.textContent)).toContain(rule);
     await this.page.waitForFunction(
       (ele: HTMLElement, value: string) => {
         return ele.textContent?.trim().includes(value);
@@ -2422,7 +2437,10 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Adds an Image interaction to the current exploration.
    */
-  async addImageInteraction(nextCard?: string): Promise<void> {
+  async addImageInteraction(
+    feedback: string = 'Correct!',
+    nextCard: string = 'Last Card'
+  ): Promise<void> {
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
@@ -2434,50 +2452,19 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector('.btn-danger', {visible: true});
 
-    // Select area of image by clicking and dragging.
-    const imageElement = await this.page.$(imageRegionSelector);
-
-    if (imageElement) {
-      const box = await imageElement.boundingBox();
-
-      if (box) {
-        // Calculate the start and end coordinates for a selection area. The selection starts from a point located at 25% from the top-left corner (both horizontally and vertically) and extends to a point located at 75% from the top-left corner (both horizontally and vertically).This effectively selects the central 50% area of the element.
-        const startX = box.x + box.width * 0.25;
-        const startY = box.y + box.height * 0.25;
-        const endX = box.x + box.width * 0.75;
-        const endY = box.y + box.height * 0.75;
-
-        // Click and drag to select an area.
-        await this.page.mouse.move(startX, startY);
-        await this.page.mouse.down();
-
-        // Add steps for smooth dragging.
-        await this.page.mouse.move(endX, endY, {steps: 10});
-
-        await this.page.mouse.up();
-      } else {
-        console.error('Unable to get bounding box for image element.');
-      }
-    } else {
-      console.error('Image element not found.');
-    }
-
+    const imageRegionHepler = new ImageAreaSelection(this.page);
+    await imageRegionHepler.selectArea(5, 50, 90, 45);
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
 
-    await this.waitForElementToBeClickable(destinationCardSelector);
-    // The '/' value is used to select the 'a new card called' option
-    // in the dropdown.
-    await this.select(destinationCardSelector, '/');
-    await this.type(addStateInput, nextCard ?? 'Last Card');
-    await this.clickOn(correctAnswerInTheGroupSelector);
-    await this.clickOn(addNewResponseButton);
-
-    await this.expectElementToBeVisible(addNewResponseButton, false);
-
-    showMessage('Image interaction has been added successfully.');
+    await this.addResponseDetailsInResponseModal(
+      feedback,
+      nextCard,
+      true,
+      true
+    );
   }
 
   /**

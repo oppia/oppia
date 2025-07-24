@@ -255,16 +255,19 @@ describe('Exploration Editor', function () {
 
     // Add a image region interaction.
     await explorationEditor.updateCardContent('Enter an image region.');
-    await explorationEditor.addImageInteraction();
-    await explorationEditor.directLearnersToNewCard('Sixth Card');
+    await explorationEditor.addImageInteraction('Perfect!', 'Sixth Card');
+    // await explorationEditor.directLearnersToNewCard('Sixth Card');
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
     );
 
-    // Check if the image region is previewed properly.
+    // Select wrong answer.
     await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.clickOnImageInInteractionPreviewCard();
-    await explorationEditor.expectResponseFeedbackToBe('Wrong.');
+    await explorationEditor.selectImageAnswer(10, 10);
+    await explorationEditor.removeFeedbackResponseInPreviewTab();
+    // Select correct answer.
+    await explorationEditor.selectImageAnswer(75, 75);
+    await explorationEditor.expectResponseFeedbackToBe('Perfect!');
 
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.saveExplorationDraft();

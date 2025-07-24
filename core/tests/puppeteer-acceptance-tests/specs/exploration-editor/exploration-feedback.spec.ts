@@ -55,6 +55,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.goBackToTheFeedbackTab();
     await explorationEditor.expectFeedbackStatusInList(1, 'Fixed');
   });
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });
