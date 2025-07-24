@@ -784,14 +784,12 @@ export class CkEditor4RteComponent
       // Clear paste errors when user types or makes changes.
       this.clearPasteError();
 
-      const wrapperDiv = document.createElement('div');
       const parser = new DOMParser();
-      const htmlString = ck.getData() || '';
-      const doc = parser.parseFromString(htmlString, 'text/html');
-
-      wrapperDiv.replaceChildren(...doc.body.childNodes);
+      const doc = parser.parseFromString(ck.getData(), 'text/html');
+      const wrapperDiv = doc.body;
 
       const textElt = wrapperDiv.childNodes;
+
       for (let i = textElt.length; i > 0; i--) {
         const parent = textElt[i - 1];
         for (let j = parent.childNodes.length; j > 0; j--) {
