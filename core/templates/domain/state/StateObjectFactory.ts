@@ -185,7 +185,6 @@ export class StateObjectFactory {
       SubtitledHtml.createFromBackendDict(stateDict.content),
       Interaction.createFromBackendDict(stateDict.interaction),
       ParamChanges.createFromBackendList(stateDict.param_changes),
-      Interaction.createFromBackendDict(stateDict.interaction),
       stateDict.solicit_answer_details,
       stateDict.card_is_checkpoint,
       stateDict.inapplicable_skill_misconception_ids
