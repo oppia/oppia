@@ -29,3 +29,6 @@ core/tests/wdio.conf.js
 core/tests/data/dummy_ci_tests/dummy_webdriverio.conf.js
 scripts/linters/test_files
 core/tests/services_sources
+
+# Re-include JSON files in /core/tests/ci-test-suite-configs, to be formatted by prettier.
+!core/tests/ci-test-suite-configs/*.json
