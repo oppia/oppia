@@ -398,6 +398,7 @@ const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
 const formErrorContainer = '.e2e-test-form-error-container';
 const numberWithUnitsModalSelector =
   '.e2e-test-number-with-units-help-modal-header';
+const firstCardSettingsSelector = '.e2e-test-initial-state-select';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -2634,6 +2635,10 @@ export class ExplorationEditor extends BaseUser {
     showMessage(`Language has been set to ${language}.`);
   }
 
+  async selectFirstCard(cardName: string): Promise<void> {
+    await this.updateMatOption(firstCardSettingsSelector, cardName);
+  }
+
   /**
    *  Verifies that the selected language matches the expected language.
    */
@@ -2658,6 +2663,17 @@ export class ExplorationEditor extends BaseUser {
     }
   }
 
+  /**
+   * Verifies that the first card name matches the expected first card name.
+   * @param {string} expectedCardName - The expected first card name.
+   */
+  async expectSelectedFirstCardToBe(expectedCardName: string): Promise<void> {
+    await this.expectElementToBeVisible(firstCardSettingsSelector);
+    await this.expectTextContentToBe(
+      firstCardSettingsSelector,
+      expectedCardName
+    );
+  }
   async addTags(tagNames: string[]): Promise<void> {
     await this.page.waitForSelector(addTagsInputBox, {
       visible: true,
@@ -2695,7 +2711,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Allows you to preview the summary of exploration.
+   * Clicks on "Preview Summary" button and waits for the preview summary to be visible.
    */
   async previewSummary(): Promise<void> {
     await this.page.waitForSelector(previewSummaryButton, {
@@ -2703,10 +2719,24 @@ export class ExplorationEditor extends BaseUser {
     });
     await this.clickOn(previewSummaryButton);
     await this.expectPreviewSummaryToBeVisible();
+  }
+
+  /**
+   * Closes preview summary modal by clicking on the "Return to editor" button.
+   */
+  async closePreviewSummary(): Promise<void> {
     await this.clickOn(dismissPreviewButton);
     await this.page.waitForSelector(dismissPreviewButton, {
       hidden: true,
     });
+  }
+
+  /**
+   * Allows you to preview the summary of exploration.
+   */
+  async previewAndCloseSummary(): Promise<void> {
+    await this.previewSummary();
+    await this.closePreviewSummary();
   }
 
   /**

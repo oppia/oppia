@@ -77,12 +77,15 @@ describe('Exploration Editor', function () {
     await explorationEditor.selectLanguage('Arabic');
     await explorationEditor.expectSelectedLanguageToBe('Arabic');
 
-    // TODO: First Card
+    await explorationEditor.selectFirstCard('Second Card');
+    await explorationEditor.expectSelectedFirstCardToBe('Second Card');
 
     await explorationEditor.addTags(['TagA', 'TagB', 'TagC']);
     await explorationEditor.expectTagsToMatch(['TagA', 'TagB', 'TagC']);
 
     await explorationEditor.previewSummary();
+    await explorationEditor.expectModalTitleToBe('Preview Summary Card');
+    await explorationEditor.closePreviewSummary();
   });
 
   it('should be able to change advanced settings', async function () {

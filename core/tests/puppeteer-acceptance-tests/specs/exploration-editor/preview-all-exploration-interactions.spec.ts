@@ -559,16 +559,26 @@ describe('Exploration Editor', function () {
       'as given in the question.'
     );
 
+    // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitExpressionAnswer('sqrt3');
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
+    // View Hint.
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain('The hint is sqrt2');
     await explorationEditor.closeHintModal();
+    // Submit correct answer.
     await explorationEditor.submitExpressionAnswer('sqrt2');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
+    // Submit an answer with non-numeric value.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.submitExpressionAnswer('hello');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'It looks like you have entered some variables. Please enter numbers only.'
+    );
 
     // Navigate to Editor tab.
     await explorationEditor.navigateToEditorTab();
@@ -646,16 +656,24 @@ describe('Exploration Editor', function () {
       'as given in the question.'
     );
 
+    // Submit wrong answer.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitExpressionAnswer('5x=2+1');
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
+    // Submit a blank answer.
+    await explorationEditor.submitExpressionAnswer('');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'Please enter an answer before submitting.'
+    );
+    // View Hint.
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain(
       'The hint is 5x=2+3'
     );
     await explorationEditor.closeHintModal();
+    // Submit correct answer.
     await explorationEditor.submitExpressionAnswer('5x=2+3');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
     // Submit an expression.
@@ -747,14 +765,22 @@ describe('Exploration Editor', function () {
       true
     );
 
+    // Submit an answer not in ratio format.
     await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.submitAnswerInInputField('1');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'Please enter a valid ratio (e.g. 1:2 or 1:2:3).'
+    );
+    // Submit wrong answer.
     await explorationEditor.submitAnswerInInputField('5:6');
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
+    // View Hint.
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain('The hint is 1:2');
     await explorationEditor.closeHintModal();
+    // Submit correct answer.
     await explorationEditor.submitAnswerInInputField('1:2');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
 
@@ -890,13 +916,14 @@ describe('Exploration Editor', function () {
       'as given in the question.'
     );
 
-    // Preview Tab
+    // Submit wrong answer.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitMusicNotesInputAnswer(['C4', 'E4', 'G4']);
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
     await explorationEditor.removeFeedbackResponseInPreviewTab();
+    // View Hint.
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain('Only answer C4');
     await explorationEditor.closeHintModal();

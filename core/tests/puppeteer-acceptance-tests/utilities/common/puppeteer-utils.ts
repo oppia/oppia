@@ -1192,6 +1192,46 @@ export class BaseUser {
 
     await newPage.close();
   }
+
+  /**
+   * Function to update the mat-option.
+   * @param {string} selector - The selector of the mat-option.
+   * @param {string} value - The value to be updated.
+   * @param {ElementHandle<Element>} parentElement - The parent element to search in.
+   */
+  async updateMatOption(
+    selector: string,
+    value: string,
+    parentElement?: ElementHandle<Element>
+  ) {
+    try {
+      // Get context where the selector is located.
+      const context = parentElement ?? this.page;
+      await context.waitForSelector(selector);
+
+      // Click on select element.
+      const selectElement = await this.$(selector, parentElement);
+      await selectElement.click();
+
+      // Select the option.
+      await this.page.waitForSelector('mat-option');
+      const options = await this.page.$$('mat-option');
+      for (const option of options) {
+        const optionText = await option.evaluate(el => el.textContent?.trim());
+        if (optionText === value) {
+          await option.click();
+          break;
+        }
+      }
+
+      // Verify the value of the select is updated.
+      await this.expectTextContentToBe(selector, value);
+    } catch (error) {
+      const newError = new Error(`Failed to update mat-option: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();
