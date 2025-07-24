@@ -5862,6 +5862,19 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
   }
+
+  /**
+   * Checks if the user is on the community library page.
+   */
+  async expectToBeOnCommunityLibraryPage(): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => {
+        return window.location.href.includes(url);
+      },
+      {},
+      testConstants.URLs.CommunityLibrary
+    );
+  }
 }
 
 export let LoggedOutUserFactory = (): LoggedOutUser => new LoggedOutUser();
