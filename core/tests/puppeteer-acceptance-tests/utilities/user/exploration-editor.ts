@@ -5182,7 +5182,13 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(`${saveDraftButton}:not([disabled])`);
     await this.page.click(saveDraftButton);
 
-    await this.expectElementToBeVisible(saveDraftButton, false);
+    // Toast message confirms that the draft has been saved.
+    await this.page.waitForSelector(toastMessage, {
+      visible: true,
+    });
+    await this.page.waitForSelector(toastMessage, {
+      hidden: true,
+    });
   }
 
   /**
