@@ -137,6 +137,7 @@ describe('Logged-Out Learner', function () {
       'BetaMaster Skills for Fractions'
     );
 
+    await loggedOutLearner.navigateToLessonsTabInTopic();
     await loggedOutLearner.navigateBackToClassroomFromTopicPage();
     await loggedOutLearner.expectToBeInClassroomPage('math');
   });
