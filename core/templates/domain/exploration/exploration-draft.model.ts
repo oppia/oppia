@@ -19,7 +19,7 @@
 
 import {ParamChangeBackendDict} from 'domain/exploration/param-change.model';
 import {ParamSpecBackendDict} from 'domain/exploration/ParamSpecObjectFactory';
-import {InteractionBackendDict} from 'domain/exploration/InteractionObjectFactory';
+import {InteractionBackendDict} from 'domain/exploration/interaction.model';
 import {WrittenTranslationsBackendDict} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {SubtitledHtmlBackendDict} from './subtitled-html.model';
 import {RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';

@@ -42,7 +42,7 @@ import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/edit
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {PageContextService} from 'services/page-context.service';
 import {AppConstants} from 'app.constants';
@@ -128,7 +128,6 @@ describe('Customize Interaction Modal Component', () => {
   let fixture: ComponentFixture<CustomizeInteractionModalComponent>;
   let generateContentIdService: GenerateContentIdService;
   let interactionDetailsCacheService: InteractionDetailsCacheService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let ngbActiveModal: NgbActiveModal;
   let ngbModal: NgbModal;
   let ratioExpressionInputValidationService: RatioExpressionInputValidationService;
@@ -143,7 +142,6 @@ describe('Customize Interaction Modal Component', () => {
       providers: [
         NgbActiveModal,
         StateInteractionIdService,
-        InteractionObjectFactory,
         EditorFirstTimeEventsService,
         InteractionDetailsCacheService,
         NgbModal,
@@ -181,7 +179,6 @@ describe('Customize Interaction Modal Component', () => {
     );
     ngbModal = TestBed.inject(NgbModal);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     stateCustomizationArgsService = TestBed.inject(
       StateCustomizationArgsService
     );
@@ -340,7 +337,7 @@ describe('Customize Interaction Modal Component', () => {
   it('should open save intreaction when user click on it', () => {
     spyOn(interactionDetailsCacheService, 'contains').and.returnValue(false);
     spyOn(
-      interactionObjectFactory,
+      Interaction,
       'convertFromCustomizationArgsBackendDict'
     ).and.returnValue(false);
 
