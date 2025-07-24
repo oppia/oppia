@@ -62,7 +62,7 @@ describe('Logged-In Learner', function () {
 
       // Return to learner dashboard.
       await loggedInUser.returnToLibraryFromExplorationCompletion();
-      await loggedInUser.expectToBeOnLearnerDashboard();
+      await loggedInUser.expectToBeOnCommunityLibraryPage();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
