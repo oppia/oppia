@@ -84,7 +84,7 @@ describe('Metadata version history modal', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, ParamSpec),
+      new ParamSpecs({}),
       [],
       false,
       true

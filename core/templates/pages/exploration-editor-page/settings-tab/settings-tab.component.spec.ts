@@ -1359,7 +1359,7 @@ describe('Settings Tab Component', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, ParamSpec),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -1431,7 +1431,7 @@ describe('Settings Tab Component', () => {
         '',
         55,
         'Introduction',
-        new ParamSpecs({}, ParamSpec),
+        new ParamSpecs({}),
         [],
         false,
         true

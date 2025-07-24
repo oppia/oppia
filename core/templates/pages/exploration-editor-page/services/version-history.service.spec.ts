@@ -47,7 +47,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, ParamSpec),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -79,7 +79,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, ParamSpec),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -238,7 +238,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, ParamSpec),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -414,7 +414,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, ParamSpec),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -512,7 +512,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, ParamSpec),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -678,7 +678,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, ParamSpec),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -715,7 +715,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, ParamSpec),
+      new ParamSpecs({}),
       [],
       false,
       true
