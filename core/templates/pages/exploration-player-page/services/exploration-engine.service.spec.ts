@@ -21,7 +21,7 @@ import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
-import {InteractionObjectFactory} from '../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../domain/exploration/interaction.model';
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
@@ -61,7 +61,6 @@ describe('Exploration engine service ', () => {
   let explorationEngineService: ExplorationEngineService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let learnerParamsService: LearnerParamsService;
   let playerTranscriptService: PlayerTranscriptService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
@@ -374,7 +373,6 @@ describe('Exploration engine service ', () => {
     expressionInterpolationService = TestBed.inject(
       ExpressionInterpolationService
     );
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
@@ -1116,54 +1114,53 @@ describe('Exploration engine service ', () => {
         'default_outcome'
       );
 
-      const lastCardInteraction =
-        interactionObjectFactory.createFromBackendDict({
-          id: 'TextInput',
-          answer_groups: [
-            {
-              outcome: {
-                missing_prerequisite_skill_id: null,
-                refresher_exploration_id: null,
-                labelled_as_correct: true,
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: '<p>Good Job</p>',
-                },
-                param_changes: [],
-                dest_if_really_stuck: null,
-                dest: 'Mid',
+      const lastCardInteraction = Interaction.createFromBackendDict({
+        id: 'TextInput',
+        answer_groups: [
+          {
+            outcome: {
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null,
+              labelled_as_correct: true,
+              feedback: {
+                content_id: 'feedback_1',
+                html: '<p>Good Job</p>',
               },
-              training_data: [],
-              rule_specs: [
-                {
-                  inputs: {
-                    x: {
-                      normalizedStrSet: ['answer'],
-                      contentId: 'rule_input_2',
-                    },
+              param_changes: [],
+              dest_if_really_stuck: null,
+              dest: 'Mid',
+            },
+            training_data: [],
+            rule_specs: [
+              {
+                inputs: {
+                  x: {
+                    normalizedStrSet: ['answer'],
+                    contentId: 'rule_input_2',
                   },
-                  rule_type: 'Equals',
                 },
-              ],
-              tagged_skill_misconception_id: null,
-            },
-          ],
-          default_outcome: defaultOutcomeDict,
-          confirmed_unclassified_answers: [],
-          customization_args: {
-            rows: {
-              value: true,
-            },
-            placeholder: {
-              value: 1,
-            },
-            catch_misspellings: {
-              value: true,
-            },
+                rule_type: 'Equals',
+              },
+            ],
+            tagged_skill_misconception_id: null,
           },
-          hints: [],
-          solution: null,
-        });
+        ],
+        default_outcome: defaultOutcomeDict,
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
+          },
+          catch_misspellings: {
+            value: true,
+          },
+        },
+        hints: [],
+        solution: null,
+      });
       const lastCard = StateCard.createNewCard(
         'Card 1',
         'Content html',
