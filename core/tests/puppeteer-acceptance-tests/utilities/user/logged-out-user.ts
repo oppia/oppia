@@ -416,6 +416,21 @@ const learnerViewCardSelector = '.oppia-learner-view-card-content';
 const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const loginButtonSelector = '.e2e-mobile-test-login';
 
+const youtubePlayerSelector = '.e2e-test-youtube-player';
+const collapsibleRTEHeaderSelector = 'e2e-test-collapsible-heading';
+const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
+
+const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
+const conceptCardLinkSelector = '.e2e-test-concept-card-link';
+const conceptCardViewerSelector = '.e2e-test-concept-card-viewer';
+const nonInteractiveTabsHeaderSelector =
+  '.e2e-test-non-interactive-tabs-headers';
+const nonInteractiveTabContentSelector =
+  '.e2e-test-non-interactive-tab-content';
+const communityLibraryLinkInNavbarSelector =
+  '.e2e-test-topnb-go-to-community-library-link';
+const communityLibraryContainerSelector = '.e2e-test-library-container';
+const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
 const contributorIconInLessonInfoSelctor =
   '.e2e-test-lesson-info-contributor-profile';
 
@@ -571,6 +586,35 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Navigates to the community library page on the navbar.
+   */
+  async navigateToCommunityLibraryOnNavbar(): Promise<void> {
+    // Open navigation menu for mobile view.
+    await this.openNavMenuInMobile();
+
+    // Click on "Learn" if in desktop view.
+    if (!this.isViewportAtMobileWidth()) {
+      if ((await this.isElementVisible(navbarLearnTab)) !== true) {
+        throw new Error('Learn tab is not visible in the navbar.');
+      }
+      await this.clickOn(navbarLearnTab);
+    }
+
+    // Click on Community Library link.
+    const selector = this.isViewportAtMobileWidth()
+      ? communityLibraryLinkInNavMenuSelector
+      : communityLibraryLinkInNavbarSelector;
+    await this.clickOn(selector);
+
+    // Verify navigated to Community Library.
+    if (
+      (await this.isElementVisible(communityLibraryContainerSelector)) !== true
+    ) {
+      throw new Error('Community Library container is not visible.');
+    }
+  }
+
+  /**
    * Function to navigate to the Parents and Teachers page.
    */
   async navigateToTeachPage(): Promise<void> {
@@ -674,6 +718,14 @@ export class LoggedOutUser extends BaseUser {
     if (!allPostsHaveTags) {
       throw new Error('Not all blog posts have tags');
     }
+  }
+
+  /**
+   * Return to Learner Dashboard from exploration completion card.
+   */
+  async returnToLibraryFromExplorationCompletion(): Promise<void> {
+    await this.isElementVisible(returnToLibraryButtonSelector);
+    await this.clickOn(returnToLibraryButtonSelector);
   }
 
   /**
@@ -901,6 +953,23 @@ export class LoggedOutUser extends BaseUser {
         'Math Classroom'
       );
     }
+  }
+
+  /**
+   * Open the navigation menu in mobile view.
+   */
+  async openNavMenuInMobile(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      return;
+    }
+    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
+      visible: true,
+    });
+    await this.clickOn(mobileNavbarOpenSidebarButton);
+    await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
+      visible: true,
+    });
+    showMessage('Opened Navigation Menu (mobile).');
   }
 
   /**
@@ -2092,6 +2161,29 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
+  }
+
+  /**
+   * Checks if the the language dropdown is available or not.
+   * @param status - Status of language dropdown.
+   */
+  async expectLanguageDropdownToBePresent(
+    status: boolean = true
+  ): Promise<void> {
+    const languageDropdownElement = await this.page.$(languageDropdown);
+    if (status && !languageDropdownElement) {
+      throw new Error(
+        'The language dropdown was expected to be present on the page, but it is not.'
+      );
+    } else if (!status && languageDropdownElement) {
+      throw new Error(
+        'The language dropdown was expected to be absent on the page, but it is present.'
+      );
+    } else {
+      showMessage(
+        `The language dropdown is ${status ? 'present' : 'not present'} on the page.`
+      );
+    }
   }
 
   /**
@@ -3881,7 +3973,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
    * @param {string | null} explorationId - The id of the exploration.
    */
-  async shareExploration(
+  async shareExplorationAndVerifyRedirect(
     platform: string,
     explorationId: string | null
   ): Promise<void> {
@@ -4180,7 +4272,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if the sign-in button is present on the page.
    */
-  async expectSignInButtonToBePresent(): Promise<void> {
+  async expectSignInButtonToBePresent(visible: boolean = true): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     try {
       await this.page.waitForSelector(signInButton, {timeout: 5000});
@@ -4189,8 +4281,16 @@ export class LoggedOutUser extends BaseUser {
         await this.page.waitForSelector(singInButtonInProgressModal, {
           timeout: 5000,
         });
+
+        if (!visible) {
+          throw new Error(
+            'Expected Sign-In button to be invisble, but found it visible.'
+          );
+        }
       } catch (error) {
-        throw new Error('Sign-in button not found.');
+        if (visible) {
+          throw new Error('Sign-in button not found.');
+        }
       }
     }
     showMessage('Sign-in button present.');
@@ -4637,7 +4737,7 @@ export class LoggedOutUser extends BaseUser {
     // Replace spaces in the expectedPage with hyphens.
     const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
 
-    if (!url.includes(expectedPageInUrl.toLowerCase())) {
+    if (!url.includes(expectedPageInUrl)) {
       throw new Error(
         `Expected to be on page ${expectedPage}, but found ${url}`
       );
@@ -4823,11 +4923,238 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if Video RTE is present in current lesson card.
+   */
+  async expectVideoRTEToBePresent(): Promise<void> {
+    await this.page.waitForSelector(youtubePlayerSelector, {visible: true});
+  }
+
+  /**
+   * Checks if there is link text RTE present in current lesson card.
+   * @param linkURL - The URL to which link text should redirect when clicked.
+   */
+  async expectLinkRTEToPresent(linkURL: string): Promise<void> {
+    const linkSelector = `oppia-noninteractive-link a.linkText[href="${linkURL}"]`;
+    await this.page.waitForSelector(linkSelector, {visible: true});
+  }
+
+  /**
+   * Check if colllapsible RTE element is present or not.
+   * @param header - The header of collapsible RTE element.
+   * @param content - The content collapsible RTE element should have.
+   */
+  async expectCollapsibleRTEToBePresent(
+    header: string = 'Sample Header',
+    content: string = 'You have opened the collapsible block.'
+  ): Promise<void> {
+    await this.page.waitForSelector(collapsibleRTEHeaderSelector, {
+      visible: true,
+    });
+    const collapsibleRTEHeader = await this.page.$(
+      collapsibleRTEHeaderSelector
+    );
+    const collapsibleRTEHeaderText = await this.page.evaluate(
+      element => element.textContent,
+      collapsibleRTEHeader
+    );
+    if (collapsibleRTEHeaderText !== header) {
+      throw new Error(
+        `Expected collapsible RTE header to be ${header}, but it was ${collapsibleRTEHeaderText}`
+      );
+    }
+
+    await this.clickOn(collapsibleRTEHeaderSelector);
+    await this.page.waitForSelector(collapsibleRTEContentSelector, {
+      visible: true,
+    });
+    const collapsibleRTEContent = await this.page.$(
+      collapsibleRTEContentSelector
+    );
+    const collapsibleRTEContentText = await this.page.evaluate(
+      element => element.textContent,
+      collapsibleRTEContent
+    );
+    if (collapsibleRTEContentText.contains(content)) {
+      throw new Error(
+        `Expected collapsible RTE content to be ${content}, but it was ${collapsibleRTEContentText}`
+      );
+    }
+  }
+
+  /**
+   * Checks if button with "left arrow" icon is present to move back to previous lesson card.
+   * @param visibility - Boolean value representing should be visible or not.
+   */
+  async expectGoBackToPreviousCardButton(
+    visibility: boolean = true
+  ): Promise<void> {
+    if (visibility) {
+      await this.page.waitForSelector(previousCardButton, {visible: true});
+    } else {
+      await this.page.waitForSelector(previousCardButton, {hidden: true});
+    }
+  }
+
+  /**
+   * Checks if "Stay Anonymous" checkbox is checked or not.
+   * @param status - Boolean value representing that checkbox should be checked or not.
+   */
+  async expectStayAnonymousCheckboxToBePresent(
+    status: boolean = true
+  ): Promise<void> {
+    if (status) {
+      await this.page.waitForSelector(stayAnonymousCheckbox, {visible: true});
+      showMessage('Stay anonymous checkbox is present.');
+      return;
+    } else {
+      try {
+        await this.page.waitForSelector(stayAnonymousCheckbox, {visible: true});
+        throw new Error(
+          'Stay anonymous checkbox is present, but it should not be.'
+        );
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          showMessage('Stay anonymous checkbox is not present, as expected.');
+        } else {
+          throw error;
+        }
+      }
+    }
+  }
+
+  /**
+   * Checks if "Continue" button is present in the lesson card.
+   * @param status - Boolean value representing that button should be present or not. Default is true (visible)
+   */
+  async expectContinueToNextCardButtonToBePresent(
+    status: boolean = true
+  ): Promise<void> {
+    if (status) {
+      await this.page.waitForSelector(nextCardButton, {visible: true});
+      showMessage('Continue button is present.');
+      return;
+    } else {
+      try {
+        await this.page.waitForSelector(nextCardButton, {visible: true});
+        throw new Error('Continue button is present, but it should not be.');
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          showMessage('Continue button is not present, as expected.');
+        } else {
+          throw error;
+        }
+      }
+    }
+  }
+
+  /**
+   * Checks if lesson info text is visible or not.
+   * @param status - Boolean value representing that info text should be visible or not.
+   */
+  async expectLessonInfoTextToBePresent(status: boolean = true): Promise<void> {
+    if (status) {
+      await this.page.waitForSelector(lessonInfoButton, {visible: true});
+      showMessage('Lesson info text is present.');
+      return;
+    } else {
+      try {
+        await this.page.waitForSelector(lessonInfoButton, {visible: true});
+        throw new Error('Lesson info text is present, but it should not be.');
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          showMessage('Lesson info text is not present, as expected.');
+        } else {
+          throw error;
+        }
+      }
+    }
+  }
+
+  /**
+   * Checks if concept card RTE link in Lesson Card works properly.
+   * @param content - The content that should be present in content card.
+   */
+  async expectConceptCardLinkInLessonToWorkProperly(
+    content: string
+  ): Promise<void> {
+    await this.isElementVisible(conceptCardLinkSelector);
+
+    await this.clickOn(conceptCardLinkSelector);
+    const conceptCardContent: string =
+      (await this.page.$eval(
+        conceptCardViewerSelector,
+        el => (el as HTMLElement).textContent
+      )) ?? '';
+
+    if (!conceptCardContent.includes(content)) {
+      throw new Error(
+        `Expected concept card content to be ${content}, but it was ${conceptCardContent}`
+      );
+    }
+  }
+
+  /**
+   * Checks if non-interactive tab with given heading contains expected content in lesson card.
+   * @param tabHeading - The tab heading to check content for.
+   * @param tabContent - The content of tab
+   */
+  async expecttabElementInLessonCardToContain(
+    tabHeading: string,
+    tabContent: string
+  ): Promise<void> {
+    const tabHeaderElements = await this.page.$$(
+      nonInteractiveTabsHeaderSelector
+    );
+
+    for (const element of tabHeaderElements) {
+      const text = await this.page.evaluate(el => el.textContent, element);
+      if (text?.trim() === tabHeading) {
+        // You found the right tab.
+        await element.click();
+        break;
+      }
+    }
+
+    const actualContent = await this.page.$eval(
+      nonInteractiveTabContentSelector,
+      el => el.textContent
+    );
+
+    if (actualContent?.trim() !== tabContent) {
+      throw new Error(
+        `Expected tab content to be ${tabContent}, but it was ${actualContent}`
+      );
+    }
+  }
+
+  /**
+   * Checks if Audio bar is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectVoiceoverBarToBePresent(visible: boolean = true): Promise<void> {
+    let isVisible = true;
+
+    try {
+      await this.page.waitForSelector(voiceoverDropdown);
+    } catch (error) {
+      isVisible = false;
+    }
+
+    if (!visible === isVisible) {
+      throw new Error(
+        `Expected voiceover bar to be ${
+          visible ? 'visible' : 'hidden'
+        }, but it was ${isVisible ? 'visible' : 'hidden'}`
+      );
+    }
+  }
+
+  /**
    * Checks if the text content of an element matches the expected value.
    * @param selector - The CSS selector to find the element.
    * @param value - The expected text content value.
    * @param exactMatch - If true, checks for exact match. If false, checks if value is contained in text content.
-\   */
+   */
   async expectTextContentInElementWithSelectorToBe(
     selector: string,
     value: string,
