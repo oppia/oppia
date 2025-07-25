@@ -496,28 +496,22 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeClickable(submitAnswerButton);
 
     // Get current status of old and latest responses to use it later.
-    const initalPreviousResponses = await this.page.$eval(
-      previousConversationToggleSelector,
-      element => element.textContent
-    );
-    const initialLatestResponse = await this.page.$eval(
-      feedbackSelector,
-      element => element.textContent
-    );
+    // Handle cases where elements might not exist.
+    const initialPreviousResponses = await this.page
+      .$eval(
+        previousConversationToggleSelector,
+        element => element?.textContent?.trim() || null
+      )
+      .catch(() => null);
+
+    const initialLatestResponse = await this.page
+      .$eval(feedbackSelector, element => element?.textContent?.trim() || null)
+      .catch(() => null);
 
     // Click on Submit Answer button.
     await this.clickOn(submitAnswerButton);
 
-    // TODO: Fix post-check. First case where previous responses toggle doesn't change.
-    // await this.page.waitForFunction(
-    //   (selector: string, value: string | null) => {
-    //     const element = document.querySelector(selector);
-    //     return element?.textContent?.trim() !== value;
-    //   },
-    //   {},
-    //   previousConversationToggleSelector,
-    //   initialResponse ?? null
-    // );
+    // Wait for either element to change content
     await this.page.waitForFunction(
       (
         selector1: string,
@@ -525,14 +519,18 @@ export class ExplorationEditor extends BaseUser {
         selector2: string,
         value2: string | null
       ) => {
-        return (
-          document.querySelector(selector1)?.textContent?.trim() !== value1 ||
-          document.querySelector(selector2)?.textContent?.trim() !== value2
-        );
+        const element1 = document.querySelector(selector1);
+        const element2 = document.querySelector(selector2);
+
+        const currentValue1 = element1?.textContent?.trim() || null;
+        const currentValue2 = element2?.textContent?.trim() || null;
+
+        // Return true if either value has changed
+        return currentValue1 !== value1 || currentValue2 !== value2;
       },
-      {},
+      {timeout: 10000}, // Add reasonable timeout
       previousConversationToggleSelector,
-      initalPreviousResponses,
+      initialPreviousResponses,
       feedbackSelector,
       initialLatestResponse
     );
