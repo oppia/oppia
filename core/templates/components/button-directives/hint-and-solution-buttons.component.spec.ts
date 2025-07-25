@@ -28,10 +28,7 @@ import {
 import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {
-  Interaction,
-  InteractionObjectFactory,
-} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
@@ -49,7 +46,6 @@ describe('HintAndSolutionButtonsComponent', () => {
   let fixture: ComponentFixture<HintAndSolutionButtonsComponent>;
   let playerPositionService: PlayerPositionService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let playerTranscriptService: PlayerTranscriptService;
   let hintAndSolutionModalService: HintAndSolutionModalService;
   let explorationModeService: ExplorationModeService;
@@ -135,7 +131,6 @@ describe('HintAndSolutionButtonsComponent', () => {
       HintsAndSolutionManagerService
     );
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     hintAndSolutionModalService = TestBed.inject(HintAndSolutionModalService);
     explorationModeService = TestBed.inject(ExplorationModeService);
@@ -163,9 +158,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       'State 2',
       '<p>Content</p>',
       '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict(
-        defaultInteractionBackendDict
-      ),
+      Interaction.createFromBackendDict(defaultInteractionBackendDict),
       RecordedVoiceovers.createEmpty(),
       'content'
     );
@@ -176,8 +169,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       JSON.stringify(defaultInteractionBackendDict)
     );
     interactionDict.solution = null;
-    const interaction =
-      interactionObjectFactory.createFromBackendDict(interactionDict);
+    const interaction = Interaction.createFromBackendDict(interactionDict);
     const card = StateCard.createNewCard(
       'Card 1',
       'Content html',
@@ -195,7 +187,7 @@ describe('HintAndSolutionButtonsComponent', () => {
   });
 
   it('should reset hints when solution exists', () => {
-    const interaction = interactionObjectFactory.createFromBackendDict(
+    const interaction = Interaction.createFromBackendDict(
       defaultInteractionBackendDict
     );
     const card = StateCard.createNewCard(
@@ -345,7 +337,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         'State 1',
         '<p>Content</p>',
         '<interaction></interaction>',
-        interactionObjectFactory.createFromBackendDict({
+        Interaction.createFromBackendDict({
           id: 'EndExploration',
           answer_groups: [],
           default_outcome: null,
