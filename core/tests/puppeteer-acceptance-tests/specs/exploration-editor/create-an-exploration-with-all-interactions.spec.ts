@@ -217,7 +217,6 @@ describe('Exploration Editor', function () {
     // Add an image region interaction. Also, check for all modals -- Choose Interaction,
     // Customize Interaction (Image Region), and Add Response.
     await explorationEditor.addImageInteraction('Great!', CARD_NAMES.SIXTH);
-    await explorationEditor.directLearnersToNewCard(CARD_NAMES.SIXTH);
     // Edit default response feedback.
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'

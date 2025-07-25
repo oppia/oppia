@@ -27,26 +27,26 @@ import {
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
-const CARDS = {
-  FIRST_CARD: 'Introduction',
-  SECOND_CARD: '2nd Card',
-  THIRD_CARD: '3rd Card',
-  FOURTH_CARD: '4th Card',
-  FIFTH_CARD: '5th Card',
-  SIXTH_CARD: '6th Card',
-  SEVENTH_CARD: '7th Card',
-  EIGHTH_CARD: '8th Card',
-  NINTH_CARD: '9th Card',
-  TENTH_CARD: '10th Card',
-  ELEVENTH_CARD: '11th Card',
-  TWELFTH_CARD: '12th Card',
-  THIRTEENTH_CARD: '13th Card',
-  FOURTEENTH_CARD: '14th Card',
-  FIFTEENTH_CARD: '15th Card',
-  SIXTEENTH_CARD: '16th Card',
-  SEVENTEENTH_CARD: '17th Card',
-  EIGHTEENTH_CARD: '18th Card',
-  NINETEENTH_CARD: '19th Card',
+const CARD_NAMES = {
+  FIRST: 'Introduction',
+  SECOND: '2nd Card',
+  THIRD: '3rd Card',
+  FOURTH: '4th Card',
+  FIFTH: '5th Card',
+  SIXTH: '6th Card',
+  SEVENTH: '7th Card',
+  EIGHTH: '8th Card',
+  NINTH: '9th Card',
+  TENTH: '10th Card',
+  ELEVENTH: '11th Card',
+  TWELFTH: '12th Card',
+  THIRTEENTH: '13th Card',
+  FOURTEENTH: '14th Card',
+  FIFTEENTH: '15th Card',
+  SIXTEENTH: '16th Card',
+  SEVENTEENTH: '17th Card',
+  EIGHTEENTH: '18th Card',
+  NINETEENTH: '19th Card',
 };
 
 describe('Exploration Editor', function () {
@@ -71,24 +71,24 @@ describe('Exploration Editor', function () {
     // Navigate to the preview tab and check the content of the first card.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARDS.FIRST_CARD,
+      CARD_NAMES.FIRST,
       'Click on the button.'
     );
     // It should display the same card as next card isn't created.
     await explorationEditor.continueToNextCard(true);
     await explorationEditor.expectPreviewCardContentToBe(
-      CARDS.FIRST_CARD,
+      CARD_NAMES.FIRST,
       'Click on the button.'
     );
 
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.directLearnersToNewCard(CARDS.SECOND_CARD);
+    await explorationEditor.directLearnersToNewCard(CARD_NAMES.SECOND);
 
     // It should change the card content when new card is created.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.continueToNextCard();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARDS.SECOND_CARD,
+      CARD_NAMES.SECOND,
       'Click on the button.',
       false
     );
@@ -96,7 +96,7 @@ describe('Exploration Editor', function () {
     // Restart from the beginning.
     await explorationEditor.restartPreview();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARDS.FIRST_CARD,
+      CARD_NAMES.FIRST,
       'Click on the button.'
     );
 
@@ -111,7 +111,7 @@ describe('Exploration Editor', function () {
   it('should be able to preview "Multiple Choice" interaction', async function () {
     // Add a multiple choice interaction.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.SECOND_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.SECOND);
     await explorationEditor.updateCardContent('This is a multiple choice.');
     await explorationEditor.addMultipleChoiceInteraction([
       'Option 1',
@@ -123,7 +123,7 @@ describe('Exploration Editor', function () {
       INTERACTION_TYPES.MULTIPLE_CHOICE,
       'Correct Response',
       'Great Job!',
-      CARDS.THIRD_CARD,
+      CARD_NAMES.THIRD,
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -135,7 +135,7 @@ describe('Exploration Editor', function () {
     // Navigate to the preview tab.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARDS.SECOND_CARD,
+      CARD_NAMES.SECOND,
       'This is a multiple choice.'
     );
     // Submit a wrong answer.
@@ -153,7 +153,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.THIRD_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.THIRD);
   });
 
   it('should be able to preview "Number Input" interaction', async function () {
@@ -164,7 +164,7 @@ describe('Exploration Editor', function () {
       INTERACTION_TYPES.NUMBER_INPUT,
       '0',
       'Perfect!',
-      'Fourth Card',
+      CARD_NAMES.FOURTH,
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -204,7 +204,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.FOURTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.FOURTH);
   });
 
   it('should be able to preview "Text Input" interaction', async function () {
@@ -220,7 +220,7 @@ describe('Exploration Editor', function () {
       INTERACTION_TYPES.TEXT_INPUT,
       'Hello, Oppia!',
       'Perfect!',
-      'Fifth Card',
+      CARD_NAMES.FIFTH,
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -246,13 +246,13 @@ describe('Exploration Editor', function () {
 
     // Navigate back to Editor tab.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.FIFTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.FIFTH);
   });
 
   it('should be able to preview "Image Region" interaction', async function () {
     // Add a image region interaction.
     await explorationEditor.updateCardContent('Enter an image region.');
-    await explorationEditor.addImageInteraction('Perfect!', 'Sixth Card');
+    await explorationEditor.addImageInteraction('Perfect!', CARD_NAMES.SIXTH);
     // await explorationEditor.directLearnersToNewCard('Sixth Card');
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
@@ -269,7 +269,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.SIXTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.SIXTH);
   });
 
   it('should be able to preview "Item Selection" interaction', async function () {
@@ -290,7 +290,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Seventh Card',
+      CARD_NAMES.SEVENTH,
       true,
       true
     );
@@ -319,7 +319,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.SEVENTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.SEVENTH);
   });
 
   it('should be able to preview "Drag and Drop Sort" interaction', async function () {
@@ -340,7 +340,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Eighth Card',
+      CARD_NAMES.EIGHTH,
       true,
       true
     );
@@ -357,7 +357,7 @@ describe('Exploration Editor', function () {
     // Sort items in wrong order.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARDS.SEVENTH_CARD,
+      CARD_NAMES.EIGHTH,
       'Arrange in Ascending Order'
     );
     await explorationEditor.submitDragAndDropSortAnswer([
@@ -383,7 +383,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.EIGHTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.EIGHTH);
   });
 
   it('should be able to preview "Fraction Input" interaction', async function () {
@@ -394,7 +394,7 @@ describe('Exploration Editor', function () {
       INTERACTION_TYPES.FRACTION_INPUT,
       '2',
       'Perfect!',
-      'Ninth Card',
+      CARD_NAMES.NINTH,
       true
     );
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
@@ -434,7 +434,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.NINTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.NINTH);
   });
 
   it('should be able to preview "Graph Theory" interaction', async function () {
@@ -448,7 +448,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.updateGraphTheoryLearnerAnswerInResponseModal();
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Tenth Card',
+      CARD_NAMES.TENTH,
       true,
       true
     );
@@ -483,7 +483,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.TENTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.TENTH);
   });
 
   it('should be able to preview "Set Input" interaction', async function () {
@@ -496,7 +496,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Eleventh Card',
+      CARD_NAMES.ELEVENTH,
       true,
       true
     );
@@ -512,7 +512,7 @@ describe('Exploration Editor', function () {
     // Preview tab.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARDS.TENTH_CARD,
+      CARD_NAMES.TENTH,
       'Enter a set.'
     );
     // Submit wrong answer. Also, verifies clicking on "Add Item" adds new item.
@@ -539,7 +539,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.ELEVENTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.ELEVENTH);
   });
 
   it('should be able to preview "Numeric Expression" interaction', async function () {
@@ -554,7 +554,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Twelfth Card',
+      CARD_NAMES.TWELFTH,
       true,
       true
     );
@@ -592,7 +592,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.TWELFTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.TWELFTH);
   });
 
   it('should be able to preview "Algebric Expression" intreaction', async function () {
@@ -612,7 +612,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Thirteenth Card',
+      CARD_NAMES.THIRTEENTH,
       true,
       true
     );
@@ -655,7 +655,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.THIRTEENTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.THIRTEENTH);
   });
 
   it('should be able to preview "Math Equation" interaction', async function () {
@@ -668,7 +668,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Fourteenth Card',
+      CARD_NAMES.FOURTEENTH,
       true,
       true
     );
@@ -713,7 +713,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.FOURTEENTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.FOURTEENTH);
   });
 
   it('should be able to preview "Number With Units" interaction', async function () {
@@ -729,7 +729,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Fifteenth Card',
+      CARD_NAMES.FIFTEENTH,
       true,
       true
     );
@@ -768,7 +768,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.FIFTEENTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.FIFTEENTH);
   });
 
   it('should be able to preview "Ratio Expression Input" interaction', async function () {
@@ -783,7 +783,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      CARDS.SIXTEENTH_CARD,
+      CARD_NAMES.SIXTEENTH,
       true,
       true
     );
@@ -820,7 +820,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.SIXTEENTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.SIXTEENTH);
   });
 
   it('should be able to preview "Code Editor" interaction', async function () {
@@ -833,7 +833,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      CARDS.SEVENTEENTH_CARD,
+      CARD_NAMES.SEVENTEENTH,
       true,
       true
     );
@@ -871,7 +871,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.SEVENTEENTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.SEVENTEENTH);
   });
 
   it('should be able to preview "Pencil Code Editor" interaction', async function () {
@@ -887,7 +887,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      CARDS.EIGHTEENTH_CARD,
+      CARD_NAMES.EIGHTEENTH,
       true,
       true
     );
@@ -921,7 +921,7 @@ describe('Exploration Editor', function () {
 
     // Navigate back to Editor Tab.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.EIGHTEENTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.EIGHTEENTH);
   });
 
   it('should be able to preview "Music Notes Input" interaction', async function () {
@@ -934,7 +934,7 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.addResponseDetailsInResponseModal(
       'Great!',
-      'Nineteenth Card',
+      CARD_NAMES.NINETEENTH,
       true,
       true
     );
@@ -965,7 +965,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARDS.NINETEENTH_CARD);
+    await explorationEditor.navigateToCard(CARD_NAMES.NINETEENTH);
   });
 
   it('should be able to preview "World Map" interaction', async function () {

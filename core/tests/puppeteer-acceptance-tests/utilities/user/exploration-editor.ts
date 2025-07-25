@@ -514,21 +514,30 @@ export class ExplorationEditor extends BaseUser {
     // Wait for either element to change content
     await this.page.waitForFunction(
       (
+        submitButtonSelector: string,
         selector1: string,
         value1: string | null,
         selector2: string,
         value2: string | null
       ) => {
+        const submitButton = document.querySelector(submitButtonSelector);
         const element1 = document.querySelector(selector1);
         const element2 = document.querySelector(selector2);
 
         const currentValue1 = element1?.textContent?.trim() || null;
         const currentValue2 = element2?.textContent?.trim() || null;
 
-        // Return true if either value has changed
-        return currentValue1 !== value1 || currentValue2 !== value2;
+        // Return true if either: submit button is disabled, or if number of
+        // previous responses has increased, or if there was no previous
+        // response and we got the first response.
+        return (
+          (submitButton as HTMLButtonElement)?.disabled ||
+          currentValue1 !== value1 ||
+          currentValue2 !== value2
+        );
       },
-      {timeout: 10000}, // Add reasonable timeout
+      {timeout: 10000},
+      submitAnswerButton,
       previousConversationToggleSelector,
       initialPreviousResponses,
       feedbackSelector,
