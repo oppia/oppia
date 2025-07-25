@@ -241,24 +241,23 @@ export class LostChange {
     }
     return language;
   }
+
   static createNew(
     utilsService: UtilsService,
-    lostChangeDict: ExplorationChange | LostChangeBackendDict | undefined
+    lostChangeDict: ExplorationChange | LostChangeBackendDict
   ): LostChange {
-    const dict = lostChangeDict as LostChangeBackendDict;
-
+    lostChangeDict = lostChangeDict as LostChangeBackendDict;
     return new LostChange(
       utilsService,
-      dict.cmd ?? '',
-      dict.new_state_name ?? '',
-      dict.old_state_name ?? '',
-      dict.state_name ?? '',
-      dict.new_value ?? null,
-      dict.old_value ?? null,
-      dict.property_name ?? '',
-      dict.content_id ?? '',
-      dict.language_code ?? '',
-      dict.translation_html ?? ''
+      lostChangeDict.cmd,
+      lostChangeDict.new_state_name,
+      lostChangeDict.old_state_name,
+      lostChangeDict.state_name,
+      lostChangeDict.new_value,
+      lostChangeDict.old_value,
+      lostChangeDict.property_name,
+      lostChangeDict.content_id,
+      lostChangeDict.language_code,
+      lostChangeDict.translation_html
     );
-  }
-}
+  }}

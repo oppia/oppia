@@ -16,14 +16,18 @@
  * @fileoverview Component for version mismatch modal.
  */
 
-import {Component, ElementRef, Input, OnInit} from '@angular/core';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {LoggerService} from 'services/contextual/logger.service';
-import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
-import {LostChange} from 'domain/exploration/lost-change.model';
-import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {UtilsService} from 'services/utils.service';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
+import {
+  LostChange,
+  LostChangeBackendDict
+} from 'domain/exploration/lost-change.model';
+import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { UtilsService } from 'services/utils.service';
 
 @Component({
   selector: 'oppia-save-version-mismatch-modal',
@@ -37,17 +41,16 @@ export class SaveVersionMismatchModalComponent
   hasLostChanges: boolean = false;
 
   // The property is initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() lostChanges!: LostChange[];
+  // and we need to do non-null assertion.
+  @Input() lostChanges!: (ExplorationChange | LostChangeBackendDict)[];
 
   constructor(
     private windowRef: WindowRef,
     private elRef: ElementRef,
     private loggerService: LoggerService,
     private explorationDataService: ExplorationDataService,
-    private ngbActiveModal: NgbActiveModal,
-    private utilsService: UtilsService
+    private utilsService: UtilsService,
+    private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }
@@ -55,8 +58,9 @@ export class SaveVersionMismatchModalComponent
   ngOnInit(): void {
     this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
     if (this.hasLostChanges) {
-      this.lostChanges = this.lostChanges.map(lostChange =>
-        LostChange.createNew(this.utilsService, lostChange)
+      this.lostChanges = this.lostChanges.map(
+        (change: ExplorationChange | LostChangeBackendDict) =>
+          LostChange.createNew(this.utilsService, change)
       );
     }
   }
@@ -74,10 +78,10 @@ export class SaveVersionMismatchModalComponent
   }
 
   exportAndDiscardChanges(): void {
-    const lostChangesData = this.elRef.nativeElement.getElementsByClassName(
+    let lostChangesData = this.elRef.nativeElement.getElementsByClassName(
       'oppia-lost-changes'
     )[0] as HTMLInputElement;
-    const blob = new Blob([lostChangesData.innerText], {type: 'text/plain'});
+    let blob = new Blob([lostChangesData.innerText], { type: 'text/plain' });
     const elem = document.createElement('a');
     elem.href = URL.createObjectURL(blob);
     elem.download = 'lostChanges.txt';

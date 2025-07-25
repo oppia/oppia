@@ -16,32 +16,16 @@
  * @fileoverview Component to get changes in human readable form.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {LostChange} from 'domain/exploration/lost-change.model';
-import {UtilsService} from 'services/utils.service';
 
 @Component({
   selector: 'oppia-changes-in-human-readable-form',
   templateUrl: './changes-in-human-readable-form.component.html',
 })
-export class ChangesInHumanReadableFormComponent implements OnInit {
+export class ChangesInHumanReadableFormComponent {
+  // This property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() lostChanges!: LostChange[];
-  @Input() utilsService!: UtilsService;
-
-  ngOnInit(): void {
-    if (!this.lostChanges || !Array.isArray(this.lostChanges)) {
-      this.lostChanges = [];
-    }
-
-    this.lostChanges = this.lostChanges
-      .filter(
-        change => !!change && typeof change === 'object' && 'cmd' in change
-      )
-      .map(change => {
-        if (change instanceof LostChange) {
-          return change;
-        }
-        return LostChange.createNew(this.utilsService, change);
-      });
-  }
 }
