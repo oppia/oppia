@@ -337,11 +337,7 @@ export class BaseUser {
     }
     await this.clickOn('Sign in');
     await this.type(testConstants.SignInDetails.inputField, email);
-    const navigationPromise = this.page.waitForNavigation({
-      waitUntil: 'networkidle0',
-    });
-    await this.clickOn('Sign In');
-    await navigationPromise;
+    await this.clickAndWaitForNavigation('Sign In');
   }
 
   /**
@@ -354,11 +350,7 @@ export class BaseUser {
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
-    const navigationPromise = this.page.waitForNavigation({
-      waitUntil: 'networkidle0',
-    });
-    await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
-    await navigationPromise;
+    await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
 
     this.username = username;
     this.email = email;
@@ -518,7 +510,6 @@ export class BaseUser {
   async clearAllTextFrom(selector: string): Promise<void> {
     await this.waitForElementToBeClickable(selector);
     // Clicking three times on a line of text selects all the text.
-    // await this.page.click(selector, {clickCount: 3});
     const element = await this.$(selector);
     await element.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');

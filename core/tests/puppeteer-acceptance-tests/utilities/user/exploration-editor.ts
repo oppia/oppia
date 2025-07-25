@@ -751,11 +751,6 @@ export class ExplorationEditor extends BaseUser {
     ).toContain(feedbackSubject);
   }
 
-  async expectFeedbackDetailsToBe(
-    author: string,
-    status: string
-  ): Promise<void> {}
-
   /**
    * Expects the graph differences to be visible or not.
    * @param visible Whether the graph differences should be visible or not.
@@ -1529,6 +1524,10 @@ export class ExplorationEditor extends BaseUser {
     return ruleEditor;
   }
 
+  /**
+   * Returns a modal element used to add solution.
+   * @returns {Promise<puppeteer.ElementHandle<Element>>}
+   */
   async getSolutionModal(): Promise<puppeteer.ElementHandle<Element>> {
     await this.page.waitForSelector(solutionModal);
 
@@ -1540,6 +1539,11 @@ export class ExplorationEditor extends BaseUser {
     return solutionBox;
   }
 
+  /**
+   * Updates the rule in the response modal to the given rule.
+   * @param {string} rule The rule to update the response modal to.
+   * @param {string} expression The algebric expression for which the feedback is being given.
+   */
   async updateAlgebricExpressionLearnerAnswerInResponseModal(
     rule: string,
     expression: string
@@ -1559,6 +1563,11 @@ export class ExplorationEditor extends BaseUser {
     await algebricExpressionEditor.type(expression);
   }
 
+  /**
+   * Adds algebric solution in solution modal.
+   * @param solution - The correct answer.
+   * @param explaination - Explanation of the solution.
+   */
   async addAlgebricExpressionSolutionToState(
     solution: string,
     explaination: string
@@ -1785,44 +1794,10 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * TODO: Fix the function
-   * This function updates the customization option of an interaction.
-   * @param {string} optionLabel - The label of the option to update.
-   * @param {string | boolean | number} value - The value to set for the option.
+   * Updates rule and options in response modal for Drag and Drop Sort interaction.
+   * @param rule Rule to update.
+   * @param optionsSelections Options selections to update.
    */
-  async updateInteractionCustomizationOption(
-    optionLabel: string,
-    value: string | boolean | number
-  ): Promise<void> {
-    await this.page.waitForSelector(customizeInteractionBodySelector, {
-      visible: true,
-    });
-
-    const labels = await this.page.$$eval(
-      customizeOptionLabelSelector,
-      elements => elements.map(element => element.textContent)
-    );
-
-    const optionIndex = labels.indexOf(optionLabel);
-
-    if (optionIndex === -1) {
-      throw new Error(`Option "${optionLabel}" not found.`);
-    }
-
-    const valueElements = await this.page.$$(customizeOptionValueSelector);
-    const valueElement = valueElements[optionIndex];
-
-    // const typeOfElement = await valueElement.getAttribute('name');
-
-    // TODO: remove it.
-    // showMessage(typeOfElement + 'TYPE OF MESSAGE');
-
-    // if (typeOfElement === 'unicodeEditor') {
-    //   const inputElement = await valueElement.$('input');
-    //   await inputElement.type(value as string);
-    // }
-  }
-
   async updateDragAndDropSortLearnersAnswerInResponseModal(
     rule: string,
     optionsSelections: string[] | number[]
@@ -2326,8 +2301,6 @@ export class ExplorationEditor extends BaseUser {
     );
   }
 
-  // New functions ends.
-
   /**
    * Function to navigate to creator dashboard page.
    */
@@ -2620,6 +2593,10 @@ export class ExplorationEditor extends BaseUser {
     showMessage('Card content is updated successfully.');
   }
 
+  /**
+   * Changes tab in interaction selection modal.
+   * @param interactionType Interaction type to change tab.
+   */
   async changeTabInInteractionSelectionModal(
     interactionType: string
   ): Promise<void> {

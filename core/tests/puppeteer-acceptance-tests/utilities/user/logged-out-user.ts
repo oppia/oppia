@@ -4070,7 +4070,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async closeHintModal(): Promise<void> {
     await this.page.waitForSelector(gotItButtonSelector, {visible: true});
-    await this.page.click(gotItButtonSelector);
+    await this.clickOn(gotItButtonSelector);
     await this.page.waitForSelector(gotItButtonSelector, {hidden: true});
   }
 
