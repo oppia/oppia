@@ -129,6 +129,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectCardContentToMatch(
       'Give fraction with denominator 2.'
     );
+    await loggedOutLearner.expectGoBackToPreviousCardButton(true);
     await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
     await loggedOutLearner.verifyCheckpointModalAppears();
     await loggedOutLearner.expectFractionInputToBeVisible();

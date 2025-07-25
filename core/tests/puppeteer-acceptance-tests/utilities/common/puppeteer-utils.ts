@@ -136,7 +136,7 @@ export class BaseUser {
               'Mobile/15A372 Safari/604.1'
           );
         } else {
-          this.page.setViewport({width: 1980, height: 1080});
+          this.page.setViewport({width: 1920, height: 1080});
         }
 
         // Enable Video Recording.

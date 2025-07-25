@@ -312,6 +312,10 @@ export class LoggedInUser extends BaseUser {
     await this.clickOn(profileDropdownToggleSelector);
   }
 
+  /**
+   * Checks if the profile dropdown contains the given element.
+   * @param item The element to check for.
+   */
   async expectProfileDropdownToContainElementWithContent(
     item: string
   ): Promise<void> {
@@ -2369,6 +2373,13 @@ export class LoggedInUser extends BaseUser {
           throw new Error(`Could not find goal checkbox for ${goal}`);
         }
         await goalCheckbox.click();
+        await this.page.waitForFunction(
+          (element: Element) => {
+            return (element as HTMLInputElement).checked;
+          },
+          {},
+          goalCheckbox
+        );
         break;
       }
     }
