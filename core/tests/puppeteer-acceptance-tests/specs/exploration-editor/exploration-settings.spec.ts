@@ -98,6 +98,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to change exploration control settings', async function () {
+    await explorationEditor.expandSettingsTabSection('Controls');
     await explorationEditor.clickOnDeleteExplorationButton();
     await explorationEditor.isTextPresentOnPage('Delete Exploration');
     await explorationEditor.confirmDeleteExplorationButton();

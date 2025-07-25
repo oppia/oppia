@@ -807,7 +807,7 @@ export class ExplorationEditor extends BaseUser {
   async expectGraphDifferencesToBeVisible(
     visible: boolean = true
   ): Promise<void> {
-    expect(await this.isElementVisible(graphDifferencesSelector)).toBe(visible);
+    await this.expectElementToBeVisible(graphDifferencesSelector, visible);
   }
 
   /**
@@ -2437,6 +2437,47 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     showMessage('Settings tab is opened successfully.');
+  }
+
+  /**
+   * Expands the specified settings tab section.
+   * Currently it only expands Basic Settings, Advanced Features, Roles, and Voice Artists.
+   * @param section - The name of the section to expand.
+   */
+  async expandSettingsTabSection(
+    section:
+      | 'Basic Settings'
+      | 'Advanced Features'
+      | 'Roles'
+      | 'Voice Artists'
+      | 'Controls'
+  ): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage(
+        `Skipped: Expanding ${section} section on desktop.\n` +
+          `Reason: Sections are already expanded on desktop.`
+      );
+      return;
+    }
+
+    // Generate the selectors for the section header and content.
+    const identifier = section.replace(' ', '-').toLowerCase();
+    const sectionContentSelector = `.e2e-test-${identifier}-content`;
+    const sectionHeaderSelector = `.e2e-test-${identifier}-header`;
+
+    // Skip if the section is already expanded.
+    if (await this.isElementVisible(sectionContentSelector)) {
+      showMessage(
+        `Skipped: Expanding ${section} section on desktop.\n` +
+          `Reason: Section is already expanded on desktop.`
+      );
+      return;
+    }
+
+    // Expand the section.
+    await this.expectElementToBeVisible(sectionHeaderSelector);
+    await this.page.click(sectionHeaderSelector);
+    await this.expectElementToBeVisible(sectionContentSelector);
   }
 
   /**
