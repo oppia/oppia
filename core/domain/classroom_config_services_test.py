@@ -298,13 +298,49 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
     def test_delete_classroom_model(self) -> None:
         self.assertIsNotNone(
-            classroom_config_services.get_classroom_by_id('math_classroom_id'))
+            classroom_config_services.get_classroom_by_id(
+                'math_classroom_id'))
 
         classroom_config_services.delete_classroom('math_classroom_id')
 
         self.assertIsNone(
             classroom_config_services.get_classroom_by_id(
                 'math_classroom_id', strict=False))
+
+        with self.assertRaisesRegex(
+            classroom_models.ClassroomModel.EntityNotFoundError,
+            (
+                'Entity for class ClassroomModel with id '
+                'non_existent_classroom_id not found'
+            )):
+            classroom_config_services.get_classroom_by_id(
+                'non_existent_classroom_id', strict=True)
+
+        with self.assertRaisesRegex(
+            Exception,
+            (
+                'Classroom with id '
+                'non_existent_classroom_id does not exist'
+            )):
+            classroom_config_services.delete_classroom(
+                'non_existent_classroom_id')
+
+    def test_delete_classroom_when_no_classrooms_exist_raises_error(
+        self) -> None:
+        for classroom in classroom_config_services.get_all_classrooms():
+            classroom_config_services.delete_classroom(classroom.classroom_id)
+
+        self.assertEqual(
+            classroom_config_services.get_all_classrooms(), [])
+
+        with self.assertRaisesRegex(
+            Exception,
+            (
+                'Classroom with id '
+                'non_existent_classroom_id does not exist'
+            )):
+            classroom_config_services.delete_classroom(
+                'non_existent_classroom_id')
 
     def test_create_new_default_classroom(self) -> None:
         classroom_id = classroom_config_services.get_new_classroom_id()

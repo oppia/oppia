@@ -61,7 +61,9 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   };
   STUDY_GUIDE_SECTION_CONTENT_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
-    ui_config: {},
+    ui_config: {
+      rte_components: 'ALL_COMPONENTS',
+    },
   };
 
   constructor(

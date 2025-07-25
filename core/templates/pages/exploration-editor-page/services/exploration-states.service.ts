@@ -24,7 +24,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import cloneDeep from 'lodash/cloneDeep';
 import isEqual from 'lodash/isEqual';
 
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import {PageContextService} from 'services/page-context.service';
 import {
@@ -54,7 +54,7 @@ import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
-import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model';
 import {
   SubtitledHtml,
   SubtitledHtmlBackendDict,

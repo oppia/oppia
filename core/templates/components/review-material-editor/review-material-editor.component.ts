@@ -29,6 +29,7 @@ import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
 interface HtmlSchema {
   type: 'html';
+  ui_config: object;
 }
 
 interface BindableDict {
@@ -52,6 +53,9 @@ export class ReviewMaterialEditorComponent implements OnInit {
   conceptCardExplanationEditorIsShown: boolean = false;
   HTML_SCHEMA: HtmlSchema = {
     type: 'html',
+    ui_config: {
+      rte_components: 'ALL_COMPONENTS',
+    },
   };
 
   constructor(private changeDetectorRef: ChangeDetectorRef) {}

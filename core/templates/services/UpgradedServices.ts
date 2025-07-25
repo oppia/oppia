@@ -135,7 +135,6 @@ import {
   InteractionDetailsCacheService,
   // eslint-disable-next-line max-len
 } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 import {InteractionSpecsService} from 'services/interaction-specs.service';
 import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
@@ -206,7 +205,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import {PageTitleService} from 'services/page-title.service';
-import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
 import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
@@ -238,7 +236,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {ReadOnlyCollectionBackendApiService} from 'domain/collection/read-only-collection-backend-api.service';
-import {ReadOnlyTopicObjectFactory} from 'domain/topic_viewer/read-only-topic-object.factory';
 import {ReviewTestBackendApiService} from 'domain/review_test/review-test-backend-api.service';
 import {ReviewTestEngineService} from 'pages/review-test-page/review-test-engine.service';
 import {SchemaDefaultValueService} from 'services/schema-default-value.service';
@@ -451,8 +448,6 @@ export class UpgradedServices {
       new NumericExpressionInputRulesService();
     upgradedServices['NumericInputRulesService'] =
       new NumericInputRulesService();
-    upgradedServices['ParamChangeObjectFactory'] =
-      new ParamChangeObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['RatioExpressionInputRulesService'] =
@@ -600,9 +595,7 @@ export class UpgradedServices {
       upgradedServices['Title']
     );
     upgradedServices['ParamChangesObjectFactory'] =
-      new ParamChangesObjectFactory(
-        upgradedServices['ParamChangeObjectFactory']
-      );
+      new ParamChangesObjectFactory();
     upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory();
     upgradedServices['PencilCodeEditorValidationService'] =
       new PencilCodeEditorValidationService(
@@ -937,8 +930,6 @@ export class UpgradedServices {
         upgradedServices['HttpClient'],
         upgradedServices['UrlInterpolationService']
       );
-    upgradedServices['ReadOnlyTopicObjectFactory'] =
-      new ReadOnlyTopicObjectFactory();
     upgradedServices['ReviewTestBackendApiService'] =
       new ReviewTestBackendApiService(
         upgradedServices['HttpClient'],
@@ -1114,21 +1105,15 @@ export class UpgradedServices {
       );
 
     // Topological level: 7.
-    upgradedServices['InteractionObjectFactory'] =
-      new InteractionObjectFactory();
-
-    // Topological level: 8.
     upgradedServices['InteractionAttributesExtractorService'] =
       new InteractionAttributesExtractorService(
-        upgradedServices['HtmlEscaperService'],
-        upgradedServices['InteractionObjectFactory']
+        upgradedServices['HtmlEscaperService']
       );
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
-      upgradedServices['InteractionObjectFactory'],
       upgradedServices['ParamChangesObjectFactory']
     );
 
-    // Topological level: 9.
+    // Topological level: 8.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']
     );
@@ -1136,7 +1121,7 @@ export class UpgradedServices {
       upgradedServices['StateObjectFactory']
     );
 
-    // Topological level: 10.
+    // Topological level: 9.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
       upgradedServices['LoggerService'],
       upgradedServices['ParamChangesObjectFactory'],

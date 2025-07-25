@@ -137,12 +137,14 @@ class PopulateStudyGuidesJobTests(job_test_utils.JobTestBase):
         # Verify sections content.
         expected_sections = [
             {
-                'content_id': 'section_heading_0',
-                'unicode_str': self.SUBTOPIC_TITLE
-            },
-            {
-                'content_id': 'section_content_1',
-                'html': '<p>Test subtopic content</p>'
+                'heading': {
+                    'content_id': 'section_heading_0',
+                    'unicode_str': self.SUBTOPIC_TITLE
+                },
+                'content': {
+                    'content_id': 'section_content_1',
+                    'html': '<p>Test subtopic content</p>'
+                }
             }
         ]
         self.assertEqual(study_guide_model.sections, expected_sections)

@@ -8178,3 +8178,213 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             feconf.EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS)
         self.assertEqual(
             sent_email_model.html_body, expected_email_html_body)
+
+
+class VoiceoverRegenerationNotificationEmailUnitTests(
+    test_utils.EmailTestBase):
+    """Tests for the voiceover regeneration notification emails."""
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+        ]
+    )
+    def test_sends_email_to_voiceover_admins_on_regeneration_failure(
+        self
+    ) -> None:
+        date = '10-10-2025'
+        time = '10:00 AM'
+        exploration_id = 'exp_id_123'
+        exploration_title = 'Test Exploration'
+        number_of_requested_voiceovers = 10
+        number_of_successful_voiceovers = 8
+        number_of_failed_voiceovers = 2
+        language_descriptions = ['English', 'Hindi']
+        author_username = 'test_author'
+
+        email_manager.send_emails_to_voiceover_admins(
+            date, time, exploration_id, exploration_title,
+            number_of_requested_voiceovers, number_of_successful_voiceovers,
+            number_of_failed_voiceovers, language_descriptions, author_username
+        )
+
+        optional_message = (
+            '<br>You have also been cc’d on a separate email, sent to the '
+            'voiceover tech lead, to address the failed voiceover synthesis. '
+            'Please follow up on that email as needed.<br><br>'
+        )
+
+        exploration_link = 'https://www.oppia.org/create/%s' % exploration_id
+
+        expected_email_body = (
+            email_manager.VOICEOVER_ADMINS_REGENERATION_NOTIFICATION_EMAIL[
+                'email_body_template'] % (
+                    author_username, exploration_link, exploration_title,
+                    ', '.join(language_descriptions), date, time,
+                    number_of_requested_voiceovers,
+                    number_of_successful_voiceovers,
+                    number_of_failed_voiceovers, optional_message))
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(
+            email_manager.VOICEOVER_ADMIN_GOOGLE_GROUP)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].html, expected_email_body)
+
+        # Make sure correct email model is stored.
+        all_models: Sequence[
+            email_models.SentEmailModel
+        ] = email_models.SentEmailModel.get_all().fetch()
+        sent_email_model = all_models[0]
+        self.assertEqual(
+            sent_email_model.subject,
+            'Report on Automatic Voiceovers Generated for Test Exploration')
+        self.assertEqual(
+            sent_email_model.recipient_email,
+            email_manager.VOICEOVER_ADMIN_GOOGLE_GROUP)
+        self.assertEqual(
+            sent_email_model.sender_id, 'admin')
+        self.assertEqual(
+            sent_email_model.html_body, expected_email_body)
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+        ]
+    )
+    def test_sends_correct_email_to_voiceover_admins_on_successful_regeneration(
+        self
+    ) -> None:
+        date = '10-10-2025'
+        time = '10:00 AM'
+        exploration_id = 'exp_id_123'
+        exploration_title = 'Test Exploration'
+        number_of_requested_voiceovers = 10
+        number_of_successful_voiceovers = 10
+        number_of_failed_voiceovers = 0
+        language_descriptions = ['English', 'Hindi']
+        author_username = 'test_author'
+
+        email_manager.send_emails_to_voiceover_admins(
+            date, time, exploration_id, exploration_title,
+            number_of_requested_voiceovers, number_of_successful_voiceovers,
+            number_of_failed_voiceovers, language_descriptions, author_username
+        )
+
+        optional_message = '<br>'
+
+        exploration_link = 'https://www.oppia.org/create/%s' % exploration_id
+
+        expected_email_body = (
+            email_manager.VOICEOVER_ADMINS_REGENERATION_NOTIFICATION_EMAIL[
+                'email_body_template'] % (
+                    author_username, exploration_link, exploration_title,
+                    ', '.join(language_descriptions), date, time,
+                    number_of_requested_voiceovers,
+                    number_of_successful_voiceovers,
+                    number_of_failed_voiceovers, optional_message))
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(
+            email_manager.VOICEOVER_ADMIN_GOOGLE_GROUP)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].html, expected_email_body)
+
+        # Make sure correct email model is stored.
+        all_models: Sequence[
+            email_models.SentEmailModel
+        ] = email_models.SentEmailModel.get_all().fetch()
+        sent_email_model = all_models[0]
+        self.assertEqual(
+            sent_email_model.subject,
+            'Report on Automatic Voiceovers Generated for Test Exploration')
+        self.assertEqual(
+            sent_email_model.recipient_email,
+            email_manager.VOICEOVER_ADMIN_GOOGLE_GROUP)
+        self.assertEqual(
+            sent_email_model.sender_id, 'admin')
+        self.assertEqual(
+            sent_email_model.html_body, expected_email_body)
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'Name'),
+        ]
+    )
+    def test_sends_email_to_tech_leads_on_regeneration_failure(self) -> None:
+        date = '10-10-2025'
+        time = '10:00 AM'
+        exploration_id = 'exp_id_123'
+        exploration_title = 'Test Exploration'
+        exploration_link = 'https://www.oppia.org/create/%s' % exploration_id
+        document_link_1 = (
+            'https://docs.google.com/document/d/1Wwd0Eg2jA3rnsiER6cf-'
+            'ixOm3oh0T_c0lXnaRwbSWH4/edit?tab=t.0#heading=h.uc9ozkinrt05'
+        )
+        document_link_2 = (
+            'https://docs.google.com/document/d/1Wwd0Eg2jA3rnsiER6cf-'
+            'ixOm3oh0T_c0lXnaRwbSWH4/edit?tab=t.0#heading=h.y85o1y4ceo9y'
+        )
+        language_descriptions = ['English', 'Hindi']
+
+        voiceover_regeneration_error_messages: List[
+            Dict[str, str|List[str]]] = [{
+                'exploration_id': 'exploration_id_1',
+                'language_accent': 'English (India)',
+                'error_messages': [
+                    'Error message 1 for English (India)',
+                    'Error message 2 for English (India)'
+                ]
+            }, {
+                'exploration_id': 'exploration_id_2',
+                'language_accent': 'Hindi (India)',
+                'error_messages': [
+                    'Error message 1 for Hindi (India)',
+                    'Error message 2 for Hindi (India)'
+                ]
+            }]
+
+        expected_email_body = (
+            email_manager.VOICEOVER_TECH_LEADS_REGENERATION_NOTIFICATION_EMAIL[
+            'email_body_template'] % (
+                exploration_link, exploration_title,
+                ', '.join(language_descriptions), date, time,
+                document_link_1, document_link_2, document_link_1,
+                document_link_2))
+
+        email_manager.send_emails_to_voiceover_tech_leads(
+            exploration_id, exploration_title, date, time,
+            language_descriptions, voiceover_regeneration_error_messages
+        )
+
+        # Make sure correct email is sent.
+        messages = self._get_sent_email_messages(
+            email_manager.VOICEOVER_TECH_LEADS_GOOGLE_GROUP)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].html, expected_email_body)
+
+        # Make sure correct email model is stored.
+        all_models: Sequence[
+            email_models.SentEmailModel
+        ] = email_models.SentEmailModel.get_all().fetch()
+        sent_email_model = all_models[0]
+
+        self.assertEqual(
+            sent_email_model.recipient_email,
+            email_manager.VOICEOVER_TECH_LEADS_GOOGLE_GROUP)
+        self.assertEqual(
+            sent_email_model.sender_id, 'admin')
+        self.assertEqual(
+            sent_email_model.html_body, expected_email_body)
+        self.assertEqual(
+            sent_email_model.subject,
+            '[Attention needed] Automatic Voiceover Generation Failed')

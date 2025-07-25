@@ -13,15 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview unit tests for ParamChangesObjectFactory.
+ * @fileoverview Unit tests for ParamChangesObjectFactory.
  */
 
 import {TestBed} from '@angular/core/testing';
 
-import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChange} from './param-change.model';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 
-describe('ParamChanges Object Factory', () => {
+describe('ParamChangesObjectFactory', () => {
   let pcsof: ParamChangesObjectFactory;
   const cArgs = {
     parse_with_jinja: true,
@@ -34,17 +34,17 @@ describe('ParamChanges Object Factory', () => {
       providers: [ParamChangesObjectFactory],
     });
 
-    pcsof = TestBed.get(ParamChangesObjectFactory);
+    pcsof = TestBed.inject(ParamChangesObjectFactory);
   });
 
   it('should create a ParamChange array from a list of dictionaries', () => {
-    let paramName = 'param_1';
-    let paramName2 = 'param_2';
-    let backendList = [
+    const paramName1 = 'param_1';
+    const paramName2 = 'param_2';
+    const backendList = [
       {
         customization_args: cArgs,
         generator_id: gId,
-        name: paramName,
+        name: paramName1,
       },
       {
         customization_args: cArgs,
@@ -53,12 +53,12 @@ describe('ParamChanges Object Factory', () => {
       },
     ];
 
-    let testOutcome: ParamChange[] = pcsof.createFromBackendList(backendList);
+    const testOutcome: ParamChange[] = pcsof.createFromBackendList(backendList);
 
     expect(testOutcome.length).toBe(2);
     expect(testOutcome[0].customizationArgs).toEqual(cArgs);
     expect(testOutcome[0].generatorId).toBe(gId);
-    expect(testOutcome[0].name).toBe(paramName);
+    expect(testOutcome[0].name).toBe(paramName1);
     expect(testOutcome[1].customizationArgs).toEqual(cArgs);
     expect(testOutcome[1].generatorId).toBe(gId);
     expect(testOutcome[1].name).toBe(paramName2);
