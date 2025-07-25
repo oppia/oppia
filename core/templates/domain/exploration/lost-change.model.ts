@@ -260,4 +260,5 @@ export class LostChange {
       lostChangeDict.language_code,
       lostChangeDict.translation_html
     );
-  }}
+  }
+}

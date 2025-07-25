@@ -16,18 +16,18 @@
  * @fileoverview Component for version mismatch modal.
  */
 
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ExplorationDataService } from 'pages/exploration-editor-page/services/exploration-data.service';
+import {Component, ElementRef, Input, OnInit} from '@angular/core';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {
   LostChange,
-  LostChangeBackendDict
+  LostChangeBackendDict,
 } from 'domain/exploration/lost-change.model';
-import { ExplorationChange } from 'domain/exploration/exploration-draft.model';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import { UtilsService } from 'services/utils.service';
+import {ExplorationChange} from 'domain/exploration/exploration-draft.model';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {UtilsService} from 'services/utils.service';
 
 @Component({
   selector: 'oppia-save-version-mismatch-modal',
@@ -81,7 +81,7 @@ export class SaveVersionMismatchModalComponent
     let lostChangesData = this.elRef.nativeElement.getElementsByClassName(
       'oppia-lost-changes'
     )[0] as HTMLInputElement;
-    let blob = new Blob([lostChangesData.innerText], { type: 'text/plain' });
+    let blob = new Blob([lostChangesData.innerText], {type: 'text/plain'});
     const elem = document.createElement('a');
     elem.href = URL.createObjectURL(blob);
     elem.download = 'lostChanges.txt';
