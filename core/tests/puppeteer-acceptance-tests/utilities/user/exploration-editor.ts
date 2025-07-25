@@ -396,6 +396,7 @@ const imageContainerSelector = '.oppia-image-click-img';
 const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
+const responsePairSelector = '.e2e-test-input-response-pair';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
 const formErrorContainer = '.e2e-test-form-error-container';
@@ -490,14 +491,21 @@ export class ExplorationEditor extends BaseUser {
    * @param skipVerification - If true, skips verification that the button is visible.
    */
   async clickOnSubmitAnswerButton(): Promise<void> {
+    const feedbackSelector = '.e2e-test-conversation-feedback-latest';
+
     await this.expectElementToBeClickable(submitAnswerButton);
 
-    const initialResponseElement = await this.page.$(
-      previousConversationToggleSelector
-    );
-    const initialResponse = await initialResponseElement?.evaluate(
+    // Get current status of old and latest responses to use it later.
+    const initalPreviousResponses = await this.page.$eval(
+      previousConversationToggleSelector,
       element => element.textContent
     );
+    const initialLatestResponse = await this.page.$eval(
+      feedbackSelector,
+      element => element.textContent
+    );
+
+    // Click on Submit Answer button.
     await this.clickOn(submitAnswerButton);
 
     // TODO: Fix post-check. First case where previous responses toggle doesn't change.
@@ -510,6 +518,24 @@ export class ExplorationEditor extends BaseUser {
     //   previousConversationToggleSelector,
     //   initialResponse ?? null
     // );
+    await this.page.waitForFunction(
+      (
+        selector1: string,
+        value1: string | null,
+        selector2: string,
+        value2: string | null
+      ) => {
+        return (
+          document.querySelector(selector1)?.textContent?.trim() !== value1 ||
+          document.querySelector(selector2)?.textContent?.trim() !== value2
+        );
+      },
+      {},
+      previousConversationToggleSelector,
+      initalPreviousResponses,
+      feedbackSelector,
+      initialLatestResponse
+    );
   }
 
   async clickOnImageInInteractionPreviewCard(): Promise<void> {
