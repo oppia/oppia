@@ -308,8 +308,7 @@ describe('Exploration Editor', function () {
       'As given in the question.'
     );
 
-    // Save exploration draft and navigate to next card.
-    await explorationEditor.saveExplorationDraft();
+    // Navigate to next card.
     await explorationEditor.navigateToCard(CARD_NAMES.EIGHTH);
   });
 
