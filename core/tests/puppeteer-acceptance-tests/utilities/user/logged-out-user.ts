@@ -442,6 +442,10 @@ const audioBackwardButtonSelector = '.e2e-test-audio-backward-button';
 
 const fractionInputSelector = '.e2e-test-fraction-input';
 const wrongInputErrorContainerSelector = '.oppia-form-error-container';
+const communityLibraryLinkInNavbarSelector =
+  '.e2e-test-topnb-go-to-community-library-link';
+const communityLibraryContainerSelector = '.e2e-test-library-container';
+const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
 const contributorIconInLessonInfoSelctor =
   '.e2e-test-lesson-info-contributor-profile';
 
@@ -601,6 +605,35 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(communityLibraryUrl, verifyURL);
+  }
+
+  /**
+   * Navigates to the community library page on the navbar.
+   */
+  async navigateToCommunityLibraryOnNavbar(): Promise<void> {
+    // Open navigation menu for mobile view.
+    await this.openNavMenuInMobile();
+
+    // Click on "Learn" if in desktop view.
+    if (!this.isViewportAtMobileWidth()) {
+      if ((await this.isElementVisible(navbarLearnTab)) !== true) {
+        throw new Error('Learn tab is not visible in the navbar.');
+      }
+      await this.clickOn(navbarLearnTab);
+    }
+
+    // Click on Community Library link.
+    const selector = this.isViewportAtMobileWidth()
+      ? communityLibraryLinkInNavMenuSelector
+      : communityLibraryLinkInNavbarSelector;
+    await this.clickOn(selector);
+
+    // Verify navigated to Community Library.
+    if (
+      (await this.isElementVisible(communityLibraryContainerSelector)) !== true
+    ) {
+      throw new Error('Community Library container is not visible.');
+    }
   }
 
   /**
@@ -942,6 +975,23 @@ export class LoggedOutUser extends BaseUser {
         'Math Classroom'
       );
     }
+  }
+
+  /**
+   * Open the navigation menu in mobile view.
+   */
+  async openNavMenuInMobile(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      return;
+    }
+    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
+      visible: true,
+    });
+    await this.clickOn(mobileNavbarOpenSidebarButton);
+    await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
+      visible: true,
+    });
+    showMessage('Opened Navigation Menu (mobile).');
   }
 
   /**
@@ -5223,7 +5273,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Checks if "Contine" button is present in the lesson card.
+   * Checks if "Continue" button is present in the lesson card.
    * @param status - Boolean value representing that button should be present or not. Default is true (visible)
    */
   async expectContinueToNextCardButtonToBePresent(
@@ -5389,6 +5439,28 @@ export class LoggedOutUser extends BaseUser {
     if (!actualErrorMessage?.includes(errorMessage)) {
       throw new Error(
         `Expected error message to be ${errorMessage}, but it was ${actualErrorMessage}`
+      );
+    }
+  }
+
+  /**
+   * Checks if Audio bar is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectVoiceoverBarToBePresent(visible: boolean = true): Promise<void> {
+    let isVisible = true;
+
+    try {
+      await this.page.waitForSelector(voiceoverDropdown);
+    } catch (error) {
+      isVisible = false;
+    }
+
+    if (!visible === isVisible) {
+      throw new Error(
+        `Expected voiceover bar to be ${
+          visible ? 'visible' : 'hidden'
+        }, but it was ${isVisible ? 'visible' : 'hidden'}`
       );
     }
   }

@@ -21,8 +21,7 @@ import {Injectable} from '@angular/core';
 import {
   InteractionBackendDict,
   Interaction,
-  InteractionObjectFactory,
-} from 'domain/exploration/InteractionObjectFactory';
+} from 'domain/exploration/interaction.model';
 import {
   ParamChangeBackendDict,
   ParamChange,
@@ -136,10 +135,7 @@ export class State extends BaseTranslatableObject {
   providedIn: 'root',
 })
 export class StateObjectFactory {
-  constructor(
-    private interactionObject: InteractionObjectFactory,
-    private paramchangesObject: ParamChangesObjectFactory
-  ) {}
+  constructor(private paramchangesObject: ParamChangesObjectFactory) {}
 
   get NEW_STATE_TEMPLATE(): StateBackendDict {
     return AppConstants.NEW_STATE_TEMPLATE as StateBackendDict;
@@ -189,7 +185,7 @@ export class StateObjectFactory {
       stateDict.classifier_model_id,
       stateDict.linked_skill_id,
       SubtitledHtml.createFromBackendDict(stateDict.content),
-      this.interactionObject.createFromBackendDict(stateDict.interaction),
+      Interaction.createFromBackendDict(stateDict.interaction),
       this.paramchangesObject.createFromBackendList(stateDict.param_changes),
       stateDict.solicit_answer_details,
       stateDict.card_is_checkpoint,

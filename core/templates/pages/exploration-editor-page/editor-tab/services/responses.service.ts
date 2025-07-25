@@ -30,7 +30,7 @@ import {
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {ItemSelectionInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionRuleInputs} from 'interactions/rule-input-defs';

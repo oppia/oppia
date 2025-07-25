@@ -17,7 +17,7 @@
  */
 
 import {Component} from '@angular/core';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {LearnerAnswerInfoService} from '../../services/learner-answer-info.service';
