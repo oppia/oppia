@@ -651,7 +651,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async changePaginationInHistoryTabTo(numberOfPages: number) {
     const selector = this.isViewportAtMobileWidth()
-      ? historyPaginationDesktopSelector
+      ? historyPaginationMobileSelector
       : historyPaginationDesktopSelector;
     await this.page.waitForSelector(selector);
 
