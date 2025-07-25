@@ -986,4 +986,54 @@ describe('RteHelperModalComponent', () => {
       flush();
     }));
   });
+
+  describe('when there are validation errors in workedexample form control', function () {
+    var customizationArgSpecs = [
+      {
+        name: 'question',
+        default_value: 'sample question',
+      },
+      {
+        name: 'answer',
+        default_value: 'sample answer',
+      },
+    ];
+
+    beforeEach(() => {
+      fixture = TestBed.createComponent(RteHelperModalComponent);
+      component = fixture.componentInstance;
+      (component.componentId = 'workedexample'),
+        (component.attrsCustomizationArgsDict = {
+          heading: 'sample question',
+          content: 'sample answer',
+        });
+      component.customizationArgSpecs = customizationArgSpecs;
+    });
+
+    it('should display error message when question length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] =
+        'sdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcom';
+      component.customizationArgsForm.value[1] = 'Hello!';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+
+    it('should display error message when answer length exceeds limit', fakeAsync(() => {
+      component.ngOnInit();
+      flush();
+      component.customizationArgsForm.value[0] = 'question 1';
+      component.customizationArgsForm.value[1] =
+        'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputatesdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcomsdfgsdfgsdfgasdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfgasdfasdfxzcvzxcvasdfsdafzxcvzxcvzxcvzxccvasdfasdfzxcvasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcom';
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+      expect(component.isErrorMessageNonempty()).toBe(true);
+      flush();
+    }));
+  });
 });

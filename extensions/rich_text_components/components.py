@@ -186,3 +186,9 @@ class Video(BaseRteComponent):
         assert isinstance(video_id, str)
         if len(video_id) != 11:
             raise utils.ValidationError('Video id length is not 11')
+
+
+class Workedexample(BaseRteComponent):
+    """Class for Worked Example component."""
+
+    pass

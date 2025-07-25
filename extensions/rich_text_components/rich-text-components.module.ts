@@ -45,6 +45,7 @@ import {
 } from './rte-output-display.component';
 
 import {CommonElementsModule} from 'components/common-layout-directives/common-elements/common-elements.module';
+import {NoninteractiveWorkedexample} from './Workedexample/directives/oppia-noninteractive-workedexample.component';
 
 @NgModule({
   imports: [
@@ -68,6 +69,7 @@ import {CommonElementsModule} from 'components/common-layout-directives/common-e
     NoninteractiveSkillreview,
     NoninteractiveTabs,
     NoninteractiveVideo,
+    NoninteractiveWorkedexample,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent,
     RteOutputDisplayComponent,
     OppiaRteTextNodeDirective,
@@ -80,6 +82,7 @@ import {CommonElementsModule} from 'components/common-layout-directives/common-e
     NoninteractiveSkillreview,
     NoninteractiveTabs,
     NoninteractiveVideo,
+    NoninteractiveWorkedexample,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent,
     RteOutputDisplayComponent,
   ],
@@ -92,6 +95,7 @@ import {CommonElementsModule} from 'components/common-layout-directives/common-e
     NoninteractiveSkillreview,
     NoninteractiveTabs,
     NoninteractiveVideo,
+    NoninteractiveWorkedexample,
     OppiaNoninteractiveSkillreviewConceptCardModalComponent,
     RteOutputDisplayComponent,
     OppiaRteTextNodeDirective,
