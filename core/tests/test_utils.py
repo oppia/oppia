@@ -3227,6 +3227,10 @@ version: 1
             expect_errors=expect_errors
         )
 
+    # Here we use type Any because the 'payload' argument can accept
+    # different types of dictionaries that need to be sent over to the handler,
+    # those dictionaries can contain any type of values. So, to allow different
+    # dictionaries, we used Any type here.
     def post_task(
         self,
         url: str,
