@@ -439,10 +439,8 @@ export class MusicNotesInputComponent
     this.repaintLedgerLines();
   }
 
-  // Creates a staff of droppable lines.
   buildDroppableStaff(): void {
     const lineValues = Object.keys(this.NOTE_NAMES_TO_MIDI_VALUES);
-
     const staffContainer = this.elementRef.nativeElement.querySelector(
       '.oppia-music-input-staff'
     );
@@ -456,6 +454,7 @@ export class MusicNotesInputComponent
         `${this.VERTICAL_GRID_SPACING}px`
       );
       staffLineDiv.dataset.lineValue = lv;
+
       staffLineDiv.addEventListener('dragenter', evt => {
         evt.preventDefault();
         const lineValue = staffLineDiv.dataset.lineValue!;
@@ -482,28 +481,35 @@ export class MusicNotesInputComponent
           dropEvent.dataTransfer?.getData('text/plain')!
         );
         if (!draggedElt) return;
+
         const noteType = draggedElt.dataset.noteType;
         let noteId = draggedElt.dataset.noteId;
         if (!noteId) {
           noteId = this.generateNoteId();
           draggedElt.dataset.noteId = noteId;
         }
+
         const leftPos = dropEvent.clientX;
-        const topPos = (
-          evt.currentTarget as HTMLElement
-        ).getBoundingClientRect().top;
+        const topPos = (evt.currentTarget as HTMLElement).offsetTop;
+        const lineValue = staffLineDiv.dataset.lineValue!;
+        const baseNoteMidiNumber =
+          this.NOTE_NAMES_TO_MIDI_VALUES[Number(lineValue)];
+
         const noteObj = {
-          baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[Number(lineValue)],
-          offset: parseInt(noteType || '0', 10),
+          baseNoteMidiNumber,
+          offset: Number.isFinite(+noteType) ? parseInt(noteType!, 10) : 0,
           noteId,
           noteStart:
             this.getNoteStartFromLeftPos(leftPos)?.note.noteStart ?? null,
         };
+
         this._removeNotesFromNoteSequenceWithId(noteId);
         this._addNoteToNoteSequence(noteObj);
         this._sortNoteSequence();
 
-        this.renderer.setStyle(draggedElt, 'position', 'absolute');
+        if (!draggedElt.classList.contains('oppia-music-input-on-staff')) {
+          this.renderer.setStyle(draggedElt, 'position', 'absolute');
+        }
         this.renderer.setStyle(draggedElt, 'left', `${leftPos}px`);
         this.renderer.setStyle(
           draggedElt,
@@ -511,9 +517,11 @@ export class MusicNotesInputComponent
           `${topPos - this.VERTICAL_GRID_SPACING / 2}px`
         );
         this.renderer.addClass(draggedElt, 'oppia-music-input-on-staff');
+
         this.playSequence([[this._convertNoteToMidiPitch(noteObj)]]);
         this.repaintLedgerLines();
       });
+
       if (this.NOTES_ON_LINES.includes(lv)) {
         const innerLine = this.renderer.createElement('div');
         this.renderer.addClass(innerLine, 'oppia-music-staff-line');
@@ -524,16 +532,17 @@ export class MusicNotesInputComponent
         );
         this.renderer.appendChild(staffLineDiv, innerLine);
       }
+
       this.renderer.appendChild(staffContainer, staffLineDiv);
+
       if (lv === lineValues[0]) {
-        const topPos = (staffLineDiv as HTMLElement).getBoundingClientRect()
-          .top;
+        const topPos = (staffLineDiv as HTMLElement).offsetTop;
         this.topPositionForCenterOfTopStaffLine =
           topPos + this.VERTICAL_GRID_SPACING;
       }
     }
   }
-  // Helper to hide the last ledger-line: similar to jQuery `.last().hide()`
+
   hideLastLedgerLine(): void {
     const all = Array.from(
       this.elementRef.nativeElement.querySelectorAll(
