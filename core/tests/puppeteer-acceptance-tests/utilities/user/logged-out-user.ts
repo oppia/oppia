@@ -3055,6 +3055,47 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if value of input is equal to the given value.
+   * @param {string} value - The value to check.
+   */
+  async expectInputValueToBe(value: string): Promise<void> {
+    await this.expectElementToBeVisible(submitResponseToInteractionInput);
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLInputElement)?.value === value;
+      },
+      {},
+      submitResponseToInteractionInput,
+      value
+    );
+  }
+
+  /**
+   * Checks if submit button is visible.
+   */
+  async expectSubmitButtonToBe(
+    state: 'Visible' | 'Hidden' | 'Disabled'
+  ): Promise<void> {
+    if (state === 'Disabled') {
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const submitButton: HTMLButtonElement | null =
+            document.querySelector(selector);
+          return submitButton?.disabled;
+        },
+        {},
+        submitAnswerButton
+      );
+    } else {
+      await this.expectElementToBeVisible(
+        submitAnswerButton,
+        state === 'Visible'
+      );
+    }
+  }
+
+  /**
    * Function to submit an email to the newsletter input field.
    * @param {string} email - The email to submit.
    */

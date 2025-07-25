@@ -133,6 +133,7 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectContinueToNextCardButtonToBePresent(false);
     await loggedOutLearner.verifyCheckpointModalAppears();
     await loggedOutLearner.expectFractionInputToBeVisible();
+    await loggedOutLearner.expectSubmitButtonToBe('Visible');
     await loggedOutLearner.expectScreenshotToMatch(
       'fractionInputInLessonPlayer',
       __dirname
@@ -149,6 +150,8 @@ describe('Logged-Out Learner', function () {
     await loggedOutLearner.expectErrorMessageForWrongInputToBe(
       ' Please only use numerical digits, spaces or forward slashes (/) '
     );
+    await loggedOutLearner.expectSubmitButtonToBe('Disabled');
+    await loggedOutLearner.expectInputValueToBe('');
 
     // View Hint for the first time.
     await loggedOutLearner.viewHint();
