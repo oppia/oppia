@@ -179,6 +179,7 @@ const explorationControlsSettingsDropdown =
 const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
+const greetingSelector = '.e2e-learner-dashboard-greeting';
 
 // Auth Pages selectors.
 const loginPage = '.e2e-test-login-page';
@@ -222,6 +223,30 @@ const explorationSuccessfullyFlaggedMessage =
 const feedbackUpdatesMainContentContainer =
   '.e2e-test-feedback-updates-main-content-container';
 
+const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
+const navbarLearnDropdownContainerSelector =
+  '.e2e-test-classroom-oppia-list-item';
+const navbarAboutDropdownConatinaerSelector = '.e2e-test-about-oppia-list-item';
+const navbarGetInvolvedDropdownContainerSelector =
+  '.e2e-test-navbar-get-involved-menu';
+const navbarAboutTab = 'a.e2e-test-navbar-about-menu';
+const navbarGetInvolvedTab = 'a.e2e-test-navbar-get-involved-menu';
+const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
+const mobileAboutMenuDropdownSelector =
+  '.e2e-mobile-test-sidebar-expand-about-menu';
+const mobileAboutPageButtonSelector = '.e2e-mobile-test-sidebar-about-button';
+const mobileGetInvolvedDropdownSelector =
+  '.e2e-mobile-test-sidebar-expand-get-involved-menu';
+const mobileGetInvolvedMenuContainerSelector =
+  '.e2e-mobile-test-sidebar-get-involved-menu';
+const mobileLearnDropdownSelector = '.e2e-mobile-test-learn';
+const mobileLearnSubMenuSelector = '.e2e-test-mobile-learn-submenu';
+
+const commonPlayLaterIconSelector = '.e2e-test-lesson-playlist-icon';
+const learnerDashboardIconsSelector = 'oppia-learner-dashboard-icons';
+
+// Community Library.
+const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
 const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
 const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
@@ -412,7 +437,7 @@ export class LoggedInUser extends BaseUser {
 
       try {
         await this.page.waitForSelector(homeSectionGreetingElement, {
-          timeout: 5000,
+          timeout: 10000,
         });
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
@@ -538,6 +563,17 @@ export class LoggedInUser extends BaseUser {
    */
   async playExploration(explorationId: string | null): Promise<void> {
     await this.goto(`${baseUrl}/explore/${explorationId as string}`);
+  }
+
+  /**
+   * Check if rating stars are displayed.
+   */
+  async expectRatingStarsToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(ratingsHeaderSelector);
+    const ratingStars = await this.page.$$(ratingStarSelector);
+    if (ratingStars.length !== 5) {
+      throw new Error('Rating stars are not visible.');
+    }
   }
 
   /**
@@ -809,16 +845,23 @@ export class LoggedInUser extends BaseUser {
       }
 
       if (isMobileViewport) {
-        await this.page.waitForSelector(mobileLessonCardOptionsDropdownButton);
-        const optionsDropdownButtons = await this.page.$$(
+        await this.page.waitForSelector(learnerDashboardIconsSelector);
+        const iconContainers = await this.page.$$(
+          learnerDashboardIconsSelector
+        );
+        const dropdownIcon = await iconContainers[lessonIndex].$(
           mobileLessonCardOptionsDropdownButton
         );
-        await optionsDropdownButtons[lessonIndex].click();
-        await this.page.waitForSelector(mobileAddToPlayLaterButton);
-        const mobileAddToPlayLaterButtons = await this.page.$$(
+        await dropdownIcon?.click();
+
+        await iconContainers[lessonIndex].waitForSelector(
           mobileAddToPlayLaterButton
         );
-        await mobileAddToPlayLaterButtons[lessonIndex].click();
+        const mobileAddToPlayLaterButtonElement = await iconContainers[
+          lessonIndex
+        ].$(mobileAddToPlayLaterButton);
+
+        await mobileAddToPlayLaterButtonElement?.click();
       } else {
         await this.page.waitForSelector(desktopAddToPlayLaterButton);
         const addToPlayLaterButtons = await this.page.$$(
@@ -842,6 +885,98 @@ export class LoggedInUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Removes a lesson from the 'Play Later' list in the community library.
+   * @param {string} lessonTitle - The title of the lesson to remove from the 'Play Later' list.
+   */
+  async removeLessonFromPlayLaterInlibrary(lessonTitle: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    const lessonCardTitleSelector = isMobileViewport
+      ? mobileLessonCardTitleSelector
+      : desktopLessonCardTitleSelector;
+
+    const lessonTitles = await this.page.$$eval(
+      lessonCardTitleSelector,
+      elements => elements.map(el => el.textContent?.trim())
+    );
+
+    const lessonIndex = lessonTitles.indexOf(lessonTitle);
+    if (lessonIndex === -1) {
+      throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
+    }
+
+    const playLaterButtons = await this.page.$$(commonPlayLaterIconSelector);
+    const playLaterButton = playLaterButtons[lessonIndex];
+
+    if (!playLaterButton) {
+      throw new Error('Play Later button not found');
+    }
+
+    await playLaterButton.click();
+
+    await this.page.waitForSelector(learnerPlaylistModalSelector, {
+      visible: true,
+    });
+
+    await this.isTextPresentOnPage("Remove from 'Play Later' list?");
+
+    await this.clickOn(confirmRemovalFromPlayLaterButton);
+    await this.page.waitForSelector(learnerPlaylistModalSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Expects the tooltip text of the 'Play Later' icon for the given lesson title to match the expected tooltip text.
+   * @param {string} lessonTitle - The title of the lesson to check the 'Play Later' icon tooltip text for.
+   * @param {string} expectedTooltip - The expected tooltip text for the 'Play Later' icon.
+   */
+  async expectPlayLaterIconToolTipToBe(
+    lessonTitle: string,
+    expectedTooltip: string
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage('Skipped tooltip message check in mobile view.');
+      return;
+    }
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(explorationCard, {
+      visible: true,
+    });
+
+    const lessonCards = await this.page.$$(explorationCard);
+    const lessonTitles = await Promise.all(
+      lessonCards.map(async card => {
+        const titleElement = await card.$(lessonCardTitleSelector);
+        const title = titleElement?.evaluate(el => el?.textContent?.trim());
+        return title;
+      })
+    );
+
+    const lessonIndex = lessonTitles.indexOf(lessonTitle);
+    if (lessonIndex === -1) {
+      throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
+    }
+
+    const playLaterButtons = await this.page.$$(commonPlayLaterIconSelector);
+    const playLaterButton = playLaterButtons[lessonIndex];
+
+    if (!playLaterButton) {
+      throw new Error('Play Later button not found');
+    }
+
+    await playLaterButton?.hover();
+
+    await this.page.waitForSelector('.tooltip', {
+      visible: true,
+    });
+
+    // Check the tooltip content.
+    const tooltipText = await this.page.$eval('.tooltip', el => el.textContent);
+    expect(tooltipText).toBe(expectedTooltip);
   }
 
   /**
@@ -2226,6 +2361,72 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(feedbackTextareaSelector, {
       hidden: true,
     });
+  }
+
+  /**
+   * Checks if Learner is on the learner dashboard page.
+   */
+  expectToBeOnLearnerDashboardPage(): void {
+    expect(this.page.url()).toBe(`${baseUrl}/learner-dashboard`);
+  }
+
+  /**
+   * Checks if greeting has name of the user
+   */
+  async expectGreetingToHaveNameOfUser(userName: string): Promise<void> {
+    const greetingElement = await this.page.$(greetingSelector);
+    const greetingText = await this.page.evaluate(
+      el => el.textContent,
+      greetingElement
+    );
+    expect(greetingText).toContain(userName);
+  }
+
+  /**
+   * Checks if navbar in mobile and desktop view open properly.
+   */
+  async expectNavbarToWorkProperly(): Promise<void> {
+    // Mobile view port.
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+      // Learn Dropdown.
+      await this.isElementVisible(mobileLearnDropdownSelector);
+      await this.isElementVisible(mobileLearnSubMenuSelector);
+      await this.clickOn(mobileLearnDropdownSelector);
+      await this.isElementVisible(mobileLearnSubMenuSelector, false);
+      await this.clickOn(mobileLearnDropdownSelector);
+
+      // About Dropdown.
+      await this.isElementVisible(mobileAboutMenuDropdownSelector);
+      await this.isElementVisible(mobileAboutPageButtonSelector, false);
+      await this.clickOn(mobileAboutMenuDropdownSelector);
+      await this.isElementVisible(mobileAboutPageButtonSelector);
+      await this.clickOn(mobileAboutMenuDropdownSelector);
+
+      // Get Involved Dropdown.
+      await this.isElementVisible(mobileGetInvolvedDropdownSelector);
+      await this.isElementVisible(
+        mobileGetInvolvedMenuContainerSelector,
+        false
+      );
+      await this.clickOn(mobileGetInvolvedDropdownSelector);
+      await this.isElementVisible(mobileGetInvolvedMenuContainerSelector);
+      await this.clickOn(mobileGetInvolvedDropdownSelector);
+
+      // Close Navmenu.
+      await this.clickOn(mobileNavbarOpenSidebarButton);
+    }
+    // Desktop view port.
+    else {
+      await this.clickOn(navbarLearnTab);
+      await this.isElementVisible(navbarLearnDropdownContainerSelector);
+
+      await this.clickOn(navbarAboutTab);
+      await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
+
+      await this.clickOn(navbarGetInvolvedTab);
+      await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
+    }
   }
 }
 

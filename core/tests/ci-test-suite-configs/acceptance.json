@@ -1,6 +1,14 @@
 {
   "suites": [
     {
+      "name": "logged-in-user/deny-access-to-pages-without-additional-roles",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
+    },
+    {
+      "name": "logged-in-user/save-an-exploration-to-play-later",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/save-an-exploration-to-play-later.spec.ts"
+    },
+    {
       "name": "interested-partner-organization/submit-a-partnership-application",
       "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/submit-a-partnership-application.spec.ts"
     },
@@ -129,10 +137,6 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/restart-or-continue-exploration-on-revisit.spec.ts"
     },
     {
-      "name": "logged-in-user/save-an-exploration-to-play-later",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/save-an-exploration-to-play-later.spec.ts"
-    },
-    {
       "name": "logged-in-user/edit-profile-preferences-and-export-their-account",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/edit-profile-preferences-and-export-their-account.spec.ts"
     },
@@ -159,10 +163,6 @@
     {
       "name": "logged-in-user/manage-exploration-progress-in-learner-dashboard",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-exploration-progress-in-learner-dashboard.spec.ts"
-    },
-    {
-      "name": "logged-in-user/deny-access-to-pages-without-additional-roles",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-about-page",
@@ -391,6 +391,42 @@
     {
       "name": "voiceover-admin/add-voiceover-artist-to-an-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/add-and-remove-exploration-from-play-later",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/add-and-remove-exploration-from-play-later.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/access-pages-that-require-higher-privileges",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/access-pages-that-require-higher-privileges.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/goes-through-the-sign-in-flow",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/goes-through-the-sign-in-flow.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/reaches-a-checkpoint-and-saves-their-progress",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/starts-from-beginning-after-completing-a-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/starts-from-beginning-after-completing-a-lesson.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/access-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/access-the-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/complete-the-embedded-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-the-embedded-lesson.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player.spec.ts"
     },
     {
       "name": "logged-in-learner/changes-site-language-to-rtl",
