@@ -3230,7 +3230,7 @@ version: 1
     def post_task(
         self,
         url: str,
-        payload: Dict[str, str],
+        payload: Dict[str, Any],
         headers: Dict[str, bytes] | Dict[str, str],
         csrf_token: Optional[str] = None,
         expect_errors: bool = False,

@@ -487,10 +487,11 @@ class TasksTests(test_utils.EmailTestBase):
             csrf_token=csrf_token, headers=headers
         )
 
-        cloud_task_run_model = (
+        cloud_task_run_model_obj = (
             taskqueue_services.get_cloud_task_run_by_model_id(
             new_model_id))
-        self.assertEqual(cloud_task_run_model.latest_job_state, 'SUCCEEDED')
+        assert cloud_task_run_model_obj is not None
+        self.assertEqual(cloud_task_run_model_obj.latest_job_state, 'SUCCEEDED')
 
     def test_should_raise_error_for_missing_cloud_task_model_id(self) -> None:
         url = feconf.TASK_URL_DEFERRED
@@ -584,10 +585,12 @@ class TasksTests(test_utils.EmailTestBase):
         )
         self.assertIn(error_message, response.body)
 
-        cloud_task_run_model = (
+        cloud_task_run_model_obj = (
             taskqueue_services.get_cloud_task_run_by_model_id(new_model_id))
+        assert cloud_task_run_model_obj is not None
         self.assertEqual(
-            cloud_task_run_model.latest_job_state, 'FAILED_AND_AWAITING_RETRY')
+            cloud_task_run_model_obj.latest_job_state,
+            'FAILED_AND_AWAITING_RETRY')
 
     def test_should_mark_permanently_failed_correctly(self) -> None:
         url = feconf.TASK_URL_DEFERRED
@@ -634,10 +637,11 @@ class TasksTests(test_utils.EmailTestBase):
             b'Error running deferred task: delete_explorations_from_user_models'
         )
         self.assertIn(error_message, response.body)
-        cloud_task_run_model = (
+        cloud_task_run_model_obj = (
             taskqueue_services.get_cloud_task_run_by_model_id(new_model_id))
+        assert cloud_task_run_model_obj is not None
         self.assertEqual(
-            cloud_task_run_model.latest_job_state, 'PERMANENTLY_FAILED')
+            cloud_task_run_model_obj.latest_job_state, 'PERMANENTLY_FAILED')
 
     def test_deferred_tasks_handler_handles_tasks_correctly(self) -> None:
         exp_id = '15'
