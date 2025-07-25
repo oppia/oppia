@@ -506,10 +506,6 @@ const contactUsContentCard = '.e2e-test-contact-page-content';
 const contactUsContentCardHeadingSelector = `${contactUsContentCard} h2`;
 
 // Community Library.
-const communityLibraryLinkInNavbarSelector =
-  '.e2e-test-topnb-go-to-community-library-link';
-const communityLibraryContainerSelector = '.e2e-test-library-container';
-const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
 const communityLibraryHeading = '.e2e-test-library-main-header';
 const communityLibraryGroupHeader = '.e2e-test-library-group-header';
 
@@ -1028,23 +1024,6 @@ export class LoggedOutUser extends BaseUser {
         'Math Classroom'
       );
     }
-  }
-
-  /**
-   * Open the navigation menu in mobile view.
-   */
-  async openNavMenuInMobile(): Promise<void> {
-    if (!this.isViewportAtMobileWidth()) {
-      return;
-    }
-    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
-      visible: true,
-    });
-    await this.clickOn(mobileNavbarOpenSidebarButton);
-    await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
-      visible: true,
-    });
-    showMessage('Opened Navigation Menu (mobile).');
   }
 
   /**
