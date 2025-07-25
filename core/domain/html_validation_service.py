@@ -455,6 +455,31 @@ def validate_rte_format(
                 if is_invalid:
                     err_dict['strings'].append(html_data)
 
+        for workedexample in soup.findAll(
+                name='oppia-noninteractive-workedexample'):
+            if 'question-with-value' not in workedexample.attrs or (
+                    workedexample['question-with-value'] == ''):
+                is_invalid = True
+            else:
+                question_html = json.loads(
+                    utils.unescape_html(workedexample['question-with-value']))
+                soup_for_workedexample = bs4.BeautifulSoup(
+                    question_html.replace('<br>', '<br/>'), 'html.parser')
+                is_invalid = validate_soup_for_rte(
+                    soup_for_workedexample, rte_format, err_dict)
+            if 'answer-with-value' not in workedexample.attrs or (
+                    workedexample['answer-with-value'] == ''):
+                is_invalid = True
+            else:
+                answer_html = json.loads(
+                    utils.unescape_html(workedexample['answer-with-value']))
+                soup_for_workedexample = bs4.BeautifulSoup(
+                    answer_html.replace('<br>', '<br/>'), 'html.parser')
+                is_invalid = validate_soup_for_rte(
+                    soup_for_workedexample, rte_format, err_dict)
+            if is_invalid:
+                err_dict['strings'].append(html_data)
+
     for key in err_dict:
         err_dict[key] = list(set(err_dict[key]))
 
@@ -594,6 +619,26 @@ def validate_customization_args_in_tag(tag: bs4.element.Tag) -> Iterator[str]:
                         for err_msg in validate_customization_args_in_tag(
                                 component_tag):
                             yield err_msg
+
+        elif tag_name == 'oppia-noninteractive-workedexample':
+            question_html = value_dict['question-with-value']
+            soup_for_workedexample = bs4.BeautifulSoup(
+                question_html, 'html.parser')
+            for component_name in simple_component_tag_names:
+                for component_tag in soup_for_workedexample.findAll(
+                        name=component_name):
+                    for err_msg in validate_customization_args_in_tag(
+                            component_tag):
+                        yield err_msg
+            answer_html = value_dict['answer-with-value']
+            soup_for_workedexample = bs4.BeautifulSoup(
+                answer_html, 'html.parser')
+            for component_name in simple_component_tag_names:
+                for component_tag in soup_for_workedexample.findAll(
+                        name=component_name):
+                    for err_msg in validate_customization_args_in_tag(
+                            component_tag):
+                        yield err_msg
     except Exception as e:
         yield str(e)
 
@@ -1048,5 +1093,26 @@ def _process_string_with_components(
                     '<br/>', '<br>'))
         tabs['tab_contents-with-value'] = utils.escape_html(
             json.dumps(tab_content_list))
+
+    for workedexample in soup.findAll(
+            name='oppia-noninteractive-workedexample'):
+        if 'question-with-value' in workedexample.attrs:
+            question_html = json.loads(
+                utils.unescape_html(workedexample['question-with-value']))
+            soup_for_workedexample = bs4.BeautifulSoup(
+                question_html.replace('<br>', '<br/>'), 'html.parser')
+            workedexample['question-with-value'] = utils.escape_html(
+                json.dumps(conversion_fn(
+                    soup_for_workedexample
+                ).replace('<br/>', '<br>')))
+        if 'answer-with-value' in workedexample.attrs:
+            answer_html = json.loads(
+                utils.unescape_html(workedexample['answer-with-value']))
+            soup_for_workedexample = bs4.BeautifulSoup(
+                answer_html.replace('<br>', '<br/>'), 'html.parser')
+            workedexample['answer-with-value'] = utils.escape_html(
+                json.dumps(conversion_fn(
+                    soup_for_workedexample
+                ).replace('<br/>', '<br>')))
 
     return conversion_fn(soup)

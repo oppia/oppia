@@ -135,7 +135,6 @@ import {
   InteractionDetailsCacheService,
   // eslint-disable-next-line max-len
 } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 import {InteractionSpecsService} from 'services/interaction-specs.service';
 import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
@@ -1106,21 +1105,15 @@ export class UpgradedServices {
       );
 
     // Topological level: 7.
-    upgradedServices['InteractionObjectFactory'] =
-      new InteractionObjectFactory();
-
-    // Topological level: 8.
     upgradedServices['InteractionAttributesExtractorService'] =
       new InteractionAttributesExtractorService(
-        upgradedServices['HtmlEscaperService'],
-        upgradedServices['InteractionObjectFactory']
+        upgradedServices['HtmlEscaperService']
       );
     upgradedServices['StateObjectFactory'] = new StateObjectFactory(
-      upgradedServices['InteractionObjectFactory'],
       upgradedServices['ParamChangesObjectFactory']
     );
 
-    // Topological level: 9.
+    // Topological level: 8.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']
     );
@@ -1128,7 +1121,7 @@ export class UpgradedServices {
       upgradedServices['StateObjectFactory']
     );
 
-    // Topological level: 10.
+    // Topological level: 9.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
       upgradedServices['LoggerService'],
       upgradedServices['ParamChangesObjectFactory'],

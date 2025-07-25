@@ -1,6 +1,6 @@
 <div class="home-tab e2e-test-learner-dash-home-tab">
   <ng-container *ngIf="!redesignFeatureFlag">
-    <div tabindex="0" class="greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
+    <div tabindex="0" class="greeting e2e-learner-dashboard-greeting" [ngStyle]="!windowIsNarrow && {'margin-top': '64px'}">
       {{ getTimeOfDay() | translate }}, {{ username }}!
     </div>
     <div tabindex="0" class="continue-where-you-left-off" *ngIf="isNonemptyObject(untrackedTopics) || continueWhereYouLeftOffList.length !== 0">

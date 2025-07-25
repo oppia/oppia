@@ -24,7 +24,7 @@ import {Subscription} from 'rxjs';
 import {PlayerPositionService} from './player-position.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StateCard} from '../../../domain/state_card/state-card.model';
-import {Interaction} from '../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Player position service', () => {
