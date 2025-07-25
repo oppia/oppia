@@ -27,7 +27,7 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {
   ParamChangeBackendDict,
   ParamChange,
-} from 'domain/exploration/ParamChangeObjectFactory';
+} from 'domain/exploration/param-change.model';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {
   ParamSpecsBackendDict,
