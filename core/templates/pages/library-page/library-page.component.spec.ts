@@ -952,4 +952,62 @@ describe('Library Page Component', () => {
 
     flush();
   }));
+
+  it('should not scroll if activity count is too small to allow scrolling', () => {
+    const ind = 0;
+    const isLeftScroll = false;
+
+    const mockCarouselElement = document.createElement('div');
+    mockCarouselElement.className = 'oppia-library-carousel-tiles';
+    mockCarouselElement.scrollLeft = 100;
+    spyOn(document, 'querySelectorAll').and.returnValue([
+      mockCarouselElement,
+    ] as unknown as NodeListOf<HTMLElement>);
+
+    componentInstance.tileDisplayCount = 4;
+    componentInstance.leftmostCardIndices = [0];
+    componentInstance.libraryGroups = [
+      {
+        activity_summary_dicts: new Array(2),
+        categories: [],
+        header_i18n_id: '',
+        has_full_results_page: false,
+        full_results_url: '',
+        protractor_id: '',
+      },
+    ];
+
+    componentInstance.scroll(ind, isLeftScroll);
+    expect(componentInstance.leftmostCardIndices[ind]).toBe(0);
+  });
+
+  it('should decrease leftmostCardIndices when scrolling left', () => {
+    const ind = 0;
+    const isLeftScroll = true;
+
+    const mockCarouselElement = document.createElement('div');
+    mockCarouselElement.className = 'oppia-library-carousel-tiles';
+    mockCarouselElement.scrollLeft = 200;
+
+    spyOn(document, 'querySelectorAll').and.returnValue([
+      mockCarouselElement,
+    ] as unknown as NodeListOf<HTMLElement>);
+
+    componentInstance.tileDisplayCount = 3;
+    componentInstance.leftmostCardIndices = [5];
+    componentInstance.libraryGroups = [
+      {
+        activity_summary_dicts: new Array(10),
+        categories: [],
+        header_i18n_id: '',
+        has_full_results_page: false,
+        full_results_url: '',
+        protractor_id: '',
+      },
+    ];
+
+    componentInstance.scroll(ind, isLeftScroll);
+
+    expect(componentInstance.leftmostCardIndices[ind]).toBe(2);
+  });
 });
