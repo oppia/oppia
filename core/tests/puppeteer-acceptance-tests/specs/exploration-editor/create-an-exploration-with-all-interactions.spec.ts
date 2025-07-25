@@ -756,7 +756,7 @@ describe('Exploration Editor', function () {
 
     // Add solution.
     await explorationEditor.addMusicNotesInputSolutionToState(
-      // TODO(FILE_ISSUE#1): There is a bug that given any answer, the correct
+      // TODO(#22998): There is a bug that given any answer, the correct
       // answer changes to ['C4']. So, we are using ['C4'] as a solution even
       // though the correct answer is ['C4', 'E4', 'G4']. Once the bug is fixed,
       // uncomment the following line. And toast message check in next step should

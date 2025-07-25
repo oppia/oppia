@@ -478,7 +478,7 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector);
     // Wait for the response modal animation to finish, else it causes flakiness.
     await this.page.waitForTimeout(2000);
-    const feedbackResponseRemoveButton = await this.$(
+    const feedbackResponseRemoveButton = await this.getElementInParent(
       feedbackResponseRemoveSelector
     );
     await feedbackResponseRemoveButton.click();
@@ -2026,7 +2026,7 @@ export class ExplorationEditor extends BaseUser {
 
     const responseModal = await this.getRuleEditorModal();
 
-    const multipleChoiceDropdown = await this.$(
+    const multipleChoiceDropdown = await this.getElementInParent(
       multipleChoiceResponseDropdown,
       responseModal
     );
@@ -5982,7 +5982,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   async submitCodeEditorAnswer(answer: string): Promise<void> {
-    const codeEditor = await this.$(codeEditorInSolutionModal);
+    const codeEditor = await this.getElementInParent(codeEditorInSolutionModal);
     if (!codeEditor) {
       throw new Error(`Code editor not found.`);
     }

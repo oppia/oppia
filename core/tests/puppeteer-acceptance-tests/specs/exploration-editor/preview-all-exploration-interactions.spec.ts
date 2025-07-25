@@ -960,7 +960,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.viewHint();
     await explorationEditor.expectHintInHintModalToContain('Only answer C4');
     await explorationEditor.closeHintModal();
-    // TODO: File an issue that correct answer doesn't work.
+    // TODO(#22998): The correct answer automatically changes to ['C4'].
+    // And even using C4 as awswer throws wrong answer feedback.
 
     // Navigate to next card.
     await explorationEditor.navigateToEditorTab();

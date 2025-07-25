@@ -510,7 +510,7 @@ export class BaseUser {
   async clearAllTextFrom(selector: string): Promise<void> {
     await this.waitForElementToBeClickable(selector);
     // Clicking three times on a line of text selects all the text.
-    const element = await this.$(selector);
+    const element = await this.getElementInParent(selector);
     await element.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
   }
@@ -1018,7 +1018,7 @@ export class BaseUser {
    * @param {ElementHandle<Element>} parentElement - The parent element to search in.
    * @returns {Promise<ElementHandle<Element>>} The element handle.
    */
-  async $(
+  async getElementInParent(
     selector: string,
     parentElement?: ElementHandle<Element>
   ): Promise<ElementHandle<Element>> {
@@ -1043,7 +1043,7 @@ export class BaseUser {
     // Change the selector to the actual element.
     if (typeof selector === 'string') {
       await this.expectElementToBeVisible(selector);
-      selector = await this.$(selector);
+      selector = await this.getElementInParent(selector);
     }
 
     // Wait until the element value matches the expected value.
@@ -1209,7 +1209,10 @@ export class BaseUser {
       await context.waitForSelector(selector);
 
       // Click on select element.
-      const selectElement = await this.$(selector, parentElement);
+      const selectElement = await this.getElementInParent(
+        selector,
+        parentElement
+      );
       await selectElement.click();
 
       // Select the option.
