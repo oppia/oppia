@@ -637,9 +637,6 @@ export class ExplorationEditor extends BaseUser {
    * Clicks on the delete exploration button.
    */
   async clickOnDeleteExplorationButton(): Promise<void> {
-    await this.page.waitForSelector(deleteExplorationButton, {
-      visible: true,
-    });
     await this.clickOn(deleteExplorationButton);
     await this.expectElementToBeVisible(deleteExplorationModal, false);
   }
@@ -814,8 +811,7 @@ export class ExplorationEditor extends BaseUser {
    * Resets the graph differences in the history tab.
    */
   async resetGraphDifferenceInHistoryTab(): Promise<void> {
-    await this.page.waitForSelector(resetGraphButton);
-    await this.page.click(resetGraphButton);
+    await this.clickOn(resetGraphButton);
 
     await this.expectGraphDifferencesToBeVisible(false);
   }
@@ -2426,6 +2422,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(voiceArtistSettingsDropdown);
       await this.clickOn(permissionSettingsDropdown);
       await this.clickOn(feedbackSettingsDropdown);
+      await this.expandSettingsTabSection('Controls');
     } else {
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
