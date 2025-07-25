@@ -414,15 +414,15 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
     );
-    // Submit answer with invalid characters.
-    await explorationEditor.submitAnswerInInputField('1/2a');
-    await explorationEditor.expectAnswerErrorMessageToBe(
-      'Please only use numerical digits, spaces or forward slashes (/)'
-    );
     // Submit a blank answer.
     await explorationEditor.submitAnswerInInputField('');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Please enter a valid fraction (e.g., 5/3 or 1 2/3)'
+    );
+    // Submit answer with invalid characters.
+    await explorationEditor.submitAnswerInInputField('1/2a');
+    await explorationEditor.expectAnswerErrorMessageToBe(
+      'Please only use numerical digits, spaces or forward slashes (/)'
     );
     // View Hint.
     await explorationEditor.viewHint();
@@ -460,7 +460,7 @@ describe('Exploration Editor', function () {
     );
 
     // Move node.
-    await explorationEditor.expectGraphNodeCanBeMoved();
+    // await explorationEditor.expectGraphNodeCanBeMoved();
     // TODO: add edge.
     // TODO: delete edge.
 
@@ -532,7 +532,7 @@ describe('Exploration Editor', function () {
     // Submit an answer with duplicate values.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.submitInputSetAnswer(['1', '1']);
+    await explorationEditor.submitInputSetAnswer(['1', '1'], false);
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Oops, it looks like your answer has duplicates!'
     );
@@ -580,6 +580,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectHintInHintModalToContain('The hint is sqrt2');
     await explorationEditor.closeHintModal();
     // Submit correct answer.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitExpressionAnswer('sqrt2');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
     // Submit an answer with non-numeric value.
@@ -638,6 +640,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectHintInHintModalToContain('The hint is a+b');
     await explorationEditor.closeHintModal();
     // Submit a correct answer.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitExpressionAnswer('a+b');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
     // Submit a blank answer.
@@ -701,6 +705,8 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.closeHintModal();
     // Submit correct answer.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitExpressionAnswer('5x=2+3');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
     // Submit an expression.

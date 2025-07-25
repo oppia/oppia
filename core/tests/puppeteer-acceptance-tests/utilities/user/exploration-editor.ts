@@ -531,6 +531,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForFunction(
       (
         submitButtonSelector: string,
+        formErrorContainer: string,
         selector1: string,
         value1: string | null,
         selector2: string,
@@ -548,12 +549,15 @@ export class ExplorationEditor extends BaseUser {
         // response and we got the first response.
         return (
           (submitButton as HTMLButtonElement)?.disabled ||
+          document.querySelector(formErrorContainer)?.textContent?.trim() !==
+            null ||
           currentValue1 !== value1 ||
           currentValue2 !== value2
         );
       },
       {timeout: 10000},
       submitAnswerButton,
+      formErrorContainer,
       previousConversationToggleSelector,
       initialPreviousResponses,
       feedbackSelector,
@@ -2269,14 +2273,17 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Submits the answer to the input set.
    * @param answer The answer to submit.
+   * @param submitAnswer Whether to submit the answer.
    */
-  async submitInputSetAnswer(answer: string[]): Promise<void> {
+  async submitInputSetAnswer(
+    answer: string[],
+    submitAnswer: boolean = true
+  ): Promise<void> {
     let first = true;
     for (let i = 0; i < answer.length; i++) {
       if (!first) {
         this.expectElementToBeVisible(addResponseOptionButton);
-        this.page.click(addResponseOptionButton);
-        first = false;
+        this.clickOn(addResponseOptionButton);
       }
       await this.page.waitForFunction(
         (selector: string, numberOfElements: number) => {
@@ -2299,6 +2306,11 @@ export class ExplorationEditor extends BaseUser {
         inputField[i],
         answer[i]
       );
+      first = false;
+    }
+
+    if (submitAnswer) {
+      await this.clickOnSubmitAnswerButton();
     }
   }
 
@@ -4331,10 +4343,10 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} answer - The answer to submit.
    */
   async submitTextInputAnsswer(answer: string): Promise<void> {
-    await this.expectElementToBeVisible(textInputSelector);
+    await this.expectElementToBeVisible(textAreaInputSelector);
 
-    await this.type(textInputSelector, answer);
-    await this.expectElementValueToBe(textInputSelector, answer);
+    await this.type(textAreaInputSelector, answer);
+    await this.expectElementValueToBe(textAreaInputSelector, answer);
 
     await this.clickOnSubmitAnswerButton();
   }
@@ -6074,6 +6086,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async submitAnswerInInputField(answer: string): Promise<void> {
     await this.expectElementToBeVisible('input');
+    await this.clearAllTextFrom('input');
     await this.type('input', answer);
 
     await this.clickOnSubmitAnswerButton();
@@ -6092,7 +6105,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await inputField.click();
-    await inputField.type(answer);
+    await this.page.keyboard.type(answer);
 
     await this.clickOnSubmitAnswerButton();
   }
@@ -6145,7 +6158,8 @@ export class ExplorationEditor extends BaseUser {
     await this.page.click(showUnitFormatsButtonSelector);
     await this.expectElementToBeVisible(numberWithUnitsModalSelector);
     await this.expectElementToBeVisible(closeModalButtonSelector);
-    await this.page.click(closeModalButtonSelector);
+    await this.clickOn(closeModalButtonSelector);
+    await this.expectElementToBeVisible(closeModalButtonSelector, false);
   }
 
   /**
