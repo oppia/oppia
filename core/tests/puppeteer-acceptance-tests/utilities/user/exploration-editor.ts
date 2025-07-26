@@ -1086,6 +1086,27 @@ export class ExplorationEditor extends BaseUser {
     await graphViz.clearGraph();
     await graphViz.addFourVerticesInCenter();
 
+    const customizeInteractionModal = await this.getElementInParent(
+      customizeInteractionBodySelector
+    );
+
+    const inputElements = await customizeInteractionModal.$$('input');
+    for (const inputElement of inputElements) {
+      const checked = await inputElement.evaluate(
+        el => (el as HTMLInputElement).checked
+      );
+      if (!checked) {
+        await inputElement.click();
+        await this.page.waitForFunction(
+          (element: Element) => {
+            return (element as HTMLInputElement).checked;
+          },
+          {},
+          inputElement
+        );
+      }
+    }
+
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,

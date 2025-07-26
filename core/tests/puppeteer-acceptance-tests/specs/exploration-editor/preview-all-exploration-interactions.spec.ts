@@ -461,8 +461,6 @@ describe('Exploration Editor', function () {
 
     // Move node.
     // await explorationEditor.expectGraphNodeCanBeMoved();
-    // TODO: add edge.
-    // TODO: delete edge.
 
     // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();

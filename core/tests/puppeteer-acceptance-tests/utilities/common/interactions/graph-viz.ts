@@ -1,5 +1,6 @@
 import puppeteer, {ElementHandle} from 'puppeteer';
 import {showMessage} from '../show-message';
+import isElementClickable from '../../../functions/is-element-clickable';
 
 const graphContainerSelector = '.e2e-test-graph-input-viz-container';
 const graphVertexSelector = '.e2e-test-graph-vertex';
@@ -301,9 +302,11 @@ export class GraphViz {
    * Resets the graph.
    */
   async resetGraph(): Promise<void> {
-    await this.parentPage.waitForSelector(resetGraphButtonSelector, {
-      visible: true,
-    });
+    await this.parentPage.waitForFunction(
+      isElementClickable,
+      {},
+      resetGraphButtonSelector
+    );
     await this.parentPage.click(resetGraphButtonSelector);
 
     await this.parentPage.waitForFunction(
@@ -314,8 +317,8 @@ export class GraphViz {
         return elements.length === 0;
       },
       {},
-      graphButtonSelectorPrefix,
-      graphContainerSelector
+      graphContainerSelector,
+      graphEdgeSelector
     );
   }
 
