@@ -41,7 +41,10 @@ import {TranslationTabActiveContentIdService} from '../../core/templates/pages/e
 import {VoiceoverPlayerService} from '../../core/templates/pages/exploration-player-page/services/voiceover-player.service';
 import {LocalStorageService} from '../../core/templates/services/local-storage.service';
 import {AudioPlayerService} from 'services/audio-player.service';
-import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
+import {
+  EntityVoiceovers,
+  EntityVoiceoversBackendDict,
+} from 'domain/voiceover/entity-voiceovers.model';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -271,6 +274,22 @@ describe('RTE display component', () => {
     let rteString = '<p>Hi<em>Hello</em>Hello</p>';
     let expectedOutputWrappedString =
       '<p><span id="highlightBlock1">Hi<em>Hello</em>Hello</span></p>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
+  it('should correctly wrap html multiple sentences inside span tag for highlighting', fakeAsync(() => {
+    let rteString = '<p>Hi world! I am a content creator.</p>';
+    let expectedOutputWrappedString =
+      '<p><span id="highlightBlock1">Hi world!</span>' +
+      '<span> </span>' +
+      '<span id="highlightBlock2">I am a content creator.</span></p>';
 
     spyOn(
       localStorageService,
@@ -635,7 +654,7 @@ describe('RTE display component', () => {
   });
 
   it('should be able to return manual voiceover status correctly', () => {
-    const manualVoiceover = {
+    const voiceover = {
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: false,
@@ -643,11 +662,11 @@ describe('RTE display component', () => {
     };
     let contentIdToVoiceoversMapping = {
       content0: {
-        manual: manualVoiceover,
-        auto: undefined,
+        manual: voiceover,
+        auto: voiceover,
       },
     };
-    let entityVoiceoversBackendDict = {
+    let entityVoiceoversBackendDict: EntityVoiceoversBackendDict = {
       entity_id: 'exp_1',
       entity_type: 'exploration',
       entity_version: 1,
