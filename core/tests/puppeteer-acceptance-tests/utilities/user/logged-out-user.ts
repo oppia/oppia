@@ -5473,6 +5473,7 @@ export class LoggedOutUser extends BaseUser {
   async expectErrorMessageForWrongInputToBe(
     errorMessage: string
   ): Promise<void> {
+    await this.page.waitForSelector(wrongInputErrorContainerSelector);
     const actualErrorMessage = await this.page.$eval(
       wrongInputErrorContainerSelector,
       el => el.textContent
