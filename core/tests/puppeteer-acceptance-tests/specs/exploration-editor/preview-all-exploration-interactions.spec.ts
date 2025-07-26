@@ -537,7 +537,7 @@ describe('Exploration Editor', function () {
     // Preview tab.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectPreviewCardContentToBe(
-      CARD_NAMES.TENTH,
+      CARD_NAMES.ELEVENTH,
       'Enter a set.'
     );
     // Submit wrong answer. Also, verifies clicking on "Add Item" adds new item.
