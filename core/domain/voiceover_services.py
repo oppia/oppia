@@ -34,8 +34,8 @@ from typing import Dict, List, Optional, Sequence, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import voiceover_models
     from mypy_imports import exp_models
+    from mypy_imports import voiceover_models
 
 (exp_models, voiceover_models,) = models.Registry.import_models([
     models.Names.EXPLORATION,
@@ -922,8 +922,7 @@ def regenerate_voiceover_for_updated_exploration(
     author_id,
     date_time
 ):
-    """
-    Regenerates voiceovers for the updated exploration based on the changes
+    """Regenerates voiceovers for the updated exploration based on the changes
     made in the exploration content (in English) or translations (in other
     languages).
 
@@ -962,7 +961,7 @@ def regenerate_voiceover_for_updated_exploration(
         raise Exception(
             'Could not fetch change diff for exploration %s, version %s during '
             'voiceover regeneration.' %
-            (exploration_id, str(exploration_version)))
+            (exploration_id, str(exploration_version))) from e
 
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains
@@ -991,7 +990,7 @@ def regenerate_voiceover_for_updated_exploration(
     # A dictionary mapping each language code to a list of accent codes that
     # support autogeneration.
     language_code_to_autogeneratable_accent_codes = {}
-    for language_code in language_code_to_contents_mapping.keys():
+    for language_code in language_code_to_contents_mapping:
         language_accent_codes = (
             get_autogeneratable_accents_by_language(
                 language_code))
@@ -1007,7 +1006,9 @@ def regenerate_voiceover_for_updated_exploration(
 
     for language_code in language_codes:
         language_accent_codes = (
-            language_code_to_autogeneratable_accent_codes[language_code])
+            language_code_to_autogeneratable_accent_codes.get(
+                language_code, [])
+        )
 
         updated_content_ids_to_content_htmls = (
             language_code_to_contents_mapping.get(language_code, {}))
