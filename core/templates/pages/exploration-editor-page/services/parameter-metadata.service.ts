@@ -24,7 +24,7 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
 import {State} from 'domain/state/StateObjectFactory';
-import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model';
 import cloneDeep from 'lodash/cloneDeep';
 
 interface GetUnsetParametersInfoResult {

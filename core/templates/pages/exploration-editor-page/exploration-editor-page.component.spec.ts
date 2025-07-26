@@ -36,7 +36,7 @@ import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
 import {AlertsService} from 'services/alerts.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {EditabilityService} from 'services/editability.service';
 import {
   ExplorationFeatures,
@@ -126,7 +126,7 @@ describe('Exploration editor page component', () => {
   let userService: UserService;
   let ueps: UserExplorationPermissionsService;
   let ics: InternetConnectivityService;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let mockEnterEditorForTheFirstTime: EventEmitter<void>;
   let registerAcceptTutorialModalEventSpy;
   let registerDeclineTutorialModalEventSpy;
@@ -274,7 +274,7 @@ describe('Exploration editor page component', () => {
         AutosaveInfoModalsService,
         ChangeListService,
         {
-          provide: ContextService,
+          provide: PageContextService,
           useValue: {
             getExplorationId: () => {
               return explorationId;
@@ -373,7 +373,7 @@ describe('Exploration editor page component', () => {
     entityBulkTranslationsBackendApiService = TestBed.inject(
       EntityBulkTranslationsBackendApiService
     );
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
 
     isLocationSetToNonStateEditorTabSpy = spyOn(
       rs,
@@ -1232,7 +1232,7 @@ describe('Exploration editor page component', () => {
   describe('voiceover tab', () => {
     it('should be shwon correctly', () => {
       let isExplorationLinkedToStorySpy = spyOn(
-        contextService,
+        pageContextService,
         'isExplorationLinkedToStory'
       );
 

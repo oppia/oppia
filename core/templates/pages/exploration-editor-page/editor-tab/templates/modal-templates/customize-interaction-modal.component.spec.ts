@@ -42,9 +42,9 @@ import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/edit
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {AppConstants} from 'app.constants';
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -123,12 +123,11 @@ class MockStateEditorService {
 
 describe('Customize Interaction Modal Component', () => {
   let component: CustomizeInteractionModalComponent;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let changeDetectorRef: ChangeDetectorRef;
   let fixture: ComponentFixture<CustomizeInteractionModalComponent>;
   let generateContentIdService: GenerateContentIdService;
   let interactionDetailsCacheService: InteractionDetailsCacheService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let ngbActiveModal: NgbActiveModal;
   let ngbModal: NgbModal;
   let ratioExpressionInputValidationService: RatioExpressionInputValidationService;
@@ -143,12 +142,11 @@ describe('Customize Interaction Modal Component', () => {
       providers: [
         NgbActiveModal,
         StateInteractionIdService,
-        InteractionObjectFactory,
         EditorFirstTimeEventsService,
         InteractionDetailsCacheService,
         NgbModal,
         RatioExpressionInputValidationService,
-        ContextService,
+        PageContextService,
         {
           provide: INTERACTION_SPECS,
           useValue: MockInteractionState,
@@ -175,13 +173,12 @@ describe('Customize Interaction Modal Component', () => {
     component = fixture.componentInstance;
 
     changeDetectorRef = TestBed.inject(ChangeDetectorRef);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     interactionDetailsCacheService = TestBed.inject(
       InteractionDetailsCacheService
     );
     ngbModal = TestBed.inject(NgbModal);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     stateCustomizationArgsService = TestBed.inject(
       StateCustomizationArgsService
     );
@@ -340,7 +337,7 @@ describe('Customize Interaction Modal Component', () => {
   it('should open save intreaction when user click on it', () => {
     spyOn(interactionDetailsCacheService, 'contains').and.returnValue(false);
     spyOn(
-      interactionObjectFactory,
+      Interaction,
       'convertFromCustomizationArgsBackendDict'
     ).and.returnValue(false);
 
@@ -437,7 +434,9 @@ describe('Customize Interaction Modal Component', () => {
       ' question mode and linked to story',
     fakeAsync(() => {
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
-      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+        true
+      );
       jasmine
         .createSpy('stateCustomizationArgsService.savedMemento.hasOwnProperty')
         .and.returnValue(false);
@@ -463,7 +462,7 @@ describe('Customize Interaction Modal Component', () => {
       ' question mode and not linked to story',
     fakeAsync(() => {
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
-      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(
+      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
         false
       );
 

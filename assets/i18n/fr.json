@@ -1759,7 +1759,6 @@
 	"I18N_TOPNAV_LEARNER_GROUP": "Groupes dʼélèves",
 	"I18N_TOPNAV_LEARN_DESCRIPTION_1": "Leçons fondamentales pour vous aider à démarrer en mathématiques.",
 	"I18N_TOPNAV_LEARN_HEADING": "Moyens d’en savoir plus",
-	"I18N_TOPNAV_LEARN_LINK_1": "Voir toutes les leçons",
 	"I18N_TOPNAV_LEARN_LINK_2": "Continuer à apprendre",
 	"I18N_TOPNAV_LIBRARY": "Bibliothèque de la communauté",
 	"I18N_TOPNAV_LIBRARY_DESCRIPTION": "Ressources supplémentaires réalisées par la communauté pour vous aider à en apprendre plus.",
@@ -1884,6 +1883,5 @@
 	"I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT": "Votre travail aide directement les étudiants mal desservis du monde entier à accéder à une éducation gratuite et de haute qualité.",
 	"I18N_WARNING_MODAL_DESCRIPTION": "Cela affichera toute la solution. Est-ce vraiment ce que vous souhaitez ?",
 	"I18N_WARNING_MODAL_TITLE": "Attention !",
-	"I18N_WORKED_EXAMPLE": "Exemple travaillé",
 	"I18N_YES": "Oui"
 }

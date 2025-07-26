@@ -21,11 +21,11 @@ import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.consta
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
-import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {
   I18nLanguageCodeService,
@@ -58,7 +58,7 @@ export class PlayerHeaderComponent {
   isMobileMenuVisible = false;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
     private statsReportingService: StatsReportingService,
@@ -87,7 +87,7 @@ export class PlayerHeaderComponent {
     }
 
     this.explorationId = explorationContext
-      ? this.contextService.getExplorationId()
+      ? this.pageContextService.getExplorationId()
       : 'test_id';
 
     this.explorationTitle = 'Loading...';

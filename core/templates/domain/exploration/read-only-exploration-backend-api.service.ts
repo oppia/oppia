@@ -21,7 +21,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 
 import {AppConstants} from 'app.constants';
-import {ParamChangeBackendDict} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChangeBackendDict} from 'domain/exploration/param-change.model';
 import {ParamSpecsBackendDict} from 'domain/exploration/ParamSpecsObjectFactory';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -226,7 +226,7 @@ export class ReadOnlyExplorationBackendApiService {
    */
   async loadExplorationAsync(
     explorationId: string,
-    version: number
+    version: number | null = null
   ): Promise<FetchExplorationBackendResponse> {
     return new Promise((resolve, reject) => {
       this._fetchExplorationAsync(explorationId, version).then(exploration => {

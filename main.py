@@ -987,6 +987,11 @@ URLS = [
         feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableSubtopicPageDataHandler),
     get_redirect_route(
+        r'%s/<topic_id>/<subtopic_id>' %
+        feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX,
+        topic_editor.EditableStudyGuideDataHandler
+    ),
+    get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_RIGHTS_URL_PREFIX,
         topic_editor.TopicRightsHandler),
     get_redirect_route(
@@ -1201,7 +1206,11 @@ URLS = [
     get_redirect_route(
         '/learner_groups_feature_status_handler',
         learner_group.LearnerGroupsFeatureStatusHandler),
-    get_redirect_route('/android_data', android.AndroidActivityHandler)
+    get_redirect_route('/android_data', android.AndroidActivityHandler),
+    get_redirect_route(
+        '/automatic_voiceover_regeneration_record/<start_date>/<end_date>',
+        voiceover.AutomaticVoiceoverRegenerationRecordHandler
+    )
 ]
 
 # Adding redirects for topic landing pages.

@@ -65,6 +65,11 @@ export default {
       "explanation": "For learners in Nigeria."
     }],
 
+    "RTE_COMPONENT_CONFIGS": {
+      "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
+      "BLOG_COMPONENTS": ["image", "link", "video"]
+    },
+
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
     "News", "International", "Educators", "Learners", "Community",
     "Partnerships", "Volunteer", "Stories", "Languages", "New features",
@@ -84,6 +89,8 @@ export default {
   "ACTIVITY_TYPE_STORY": "story",
   "ACTIVITY_TYPE_SKILL": "skill",
   "ACTIVITY_TYPE_SUBTOPIC": "subtopic",
+  "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION": "subtopic_with_study_guide_migration",
+  "ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE": "subtopic_with_study_guide",
   "ACTIVITY_TYPE_LEARN_TOPIC": "learntopic",
   "ACTIVITY_TYPE_CLASSROOM": "classroom",
   "DISABLED_EXPLORATION_IDS": ["5"],
@@ -5112,10 +5119,6 @@ export default {
     "Welcome": "#992a2b"
   },
 
-  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": [
-    "tabs", "math", "collapsible", "skillreview"
-  ],
-
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
@@ -6144,8 +6147,6 @@ export default {
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 
-  "ALLOWED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
-
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
   "MAX_CURRENT_GOALS_COUNT": 5,
@@ -6242,6 +6243,10 @@ export default {
   "MAX_CHARS_IN_TOPIC_URL_FRAGMENT": 20,
   "MAX_CHARS_IN_TOPIC_DESCRIPTION": 240,
   "MAX_CHARS_IN_SUBTOPIC_TITLE": 64,
+  "MAX_CHARS_IN_STUDY_GUIDE_SECTION_HEADING": 200,
+  "STUDY_GUIDE_SECTION_CHARACTER_LIMIT": 1000,
+  "DEFAULT_SECTION_HEADING_CONTENT_ID": "section_heading_0",
+  "DEFAULT_SECTION_CONTENT_CONTENT_ID": "section_content_1",
   "MAX_CHARS_IN_SKILL_DESCRIPTION": 100,
   "MAX_CHARS_IN_STORY_TITLE": 39,
   "MAX_CHARS_IN_STORY_DESCRIPTION": 1000,
@@ -7796,12 +7801,12 @@ export default {
       "-": "نَاقِصْ",
       "*": "ضَرْبْ",
       "×": "ضَرْبْ",
-      "÷": "تَقْسِيمْ",
+      "÷": "قِسْمَةْ عَلَى",
       "=": "يُسَاوِي",
-      "!": "عاملي",
-      "^": "للقوة",
-      "^2": "تربيع",
-      "^3": "تكعيب"
+      "!": "عَامِلِي",
+      "^": "لِلْقُوَّةِ",
+      "^2": "تَرْبِيعْ",
+      "^3": "تَكْعِيبْ"
     }
   },
   // Please consult the translation team before adding any entries here.

@@ -28,7 +28,7 @@ import {
 import {NO_ERRORS_SCHEMA, Pipe, EventEmitter} from '@angular/core';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {AudioPlayerService} from 'services/audio-player.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
@@ -48,6 +48,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 
 @Pipe({name: 'formatTime'})
 class MockFormatTimePipe {
@@ -78,7 +79,7 @@ describe('Voiceover card component', () => {
   let component: VoiceoverCardComponent;
   let fixture: ComponentFixture<VoiceoverCardComponent>;
   let ngbModal: NgbModal;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let audioPlayerService: AudioPlayerService;
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
@@ -90,6 +91,7 @@ describe('Voiceover card component', () => {
   let voiceoverLanguageManagementService: VoiceoverLanguageManagementService;
   let platformFeatureService: PlatformFeatureService;
   let explorationStatesService: ExplorationStatesService;
+  let adminBackendApiService: AdminBackendApiService;
   let sof: StateObjectFactory;
 
   beforeEach(waitForAsync(() => {
@@ -119,7 +121,7 @@ describe('Voiceover card component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(VoiceoverCardComponent);
     component = fixture.componentInstance;
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     ngbModal = TestBed.inject(NgbModal);
     audioPlayerService = TestBed.inject(AudioPlayerService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
@@ -136,6 +138,7 @@ describe('Voiceover card component', () => {
     );
     platformFeatureService = TestBed.inject(PlatformFeatureService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
+    adminBackendApiService = TestBed.inject(AdminBackendApiService);
     sof = TestBed.inject(StateObjectFactory);
 
     spyOn(
@@ -175,6 +178,10 @@ describe('Voiceover card component', () => {
     spyOn(entityVoiceoversService, 'isEntityVoiceoversLoaded').and.returnValue(
       true
     );
+    spyOn(
+      adminBackendApiService,
+      'getAdminConfigForAutomaticVoiceoversAsync'
+    ).and.returnValue(Promise.resolve());
 
     component.manualVoiceoverTotalDuration = 10;
     component.manualVoiceoverProgress = 0;
@@ -648,8 +655,8 @@ describe('Voiceover card component', () => {
   }));
 
   it('should be able to add manual voiceovers', fakeAsync(() => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
-    spyOn(contextService, 'getExplorationVersion').and.returnValue(1);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
 
     let result = {
       filename: 'a.mp3',
@@ -673,8 +680,8 @@ describe('Voiceover card component', () => {
   }));
 
   it('should not add manual voiceovers for reject handler', fakeAsync(() => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
-    spyOn(contextService, 'getExplorationVersion').and.returnValue(1);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
 
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
@@ -691,8 +698,8 @@ describe('Voiceover card component', () => {
   }));
 
   it('should be able to regenerate automatic voiceovers', fakeAsync(() => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
-    spyOn(contextService, 'getExplorationVersion').and.returnValue(1);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
     component.activeContentId = 'content0';
     component.languageAccentCode = 'en-US';
     spyOn(ngbModal, 'open').and.returnValue({
@@ -731,8 +738,8 @@ describe('Voiceover card component', () => {
   }));
 
   it('should not be able to regenerate automatic voiceovers if any error is raised', fakeAsync(() => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
-    spyOn(contextService, 'getExplorationVersion').and.returnValue(1);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
     component.activeContentId = 'content0';
     component.languageAccentCode = 'en-US';
     spyOn(ngbModal, 'open').and.returnValue({
@@ -760,8 +767,8 @@ describe('Voiceover card component', () => {
   }));
 
   it('should not regenerate automatic voiceovers for reject handler', fakeAsync(() => {
-    spyOn(contextService, 'getExplorationId').and.returnValue('exp_1');
-    spyOn(contextService, 'getExplorationVersion').and.returnValue(1);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
 
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
@@ -920,9 +927,10 @@ describe('Voiceover card component', () => {
 
   it('should show voiceover regeneration section', () => {
     let explorationLinkedToStorySpy = spyOn(
-      contextService,
+      pageContextService,
       'isExplorationLinkedToStory'
     );
+    component.isVoiceoverAutogenerationEnabledByAdmins = true;
     component.isVoiceoverAutogenerationSupportedForSelectedAccent = true;
     spyOn(
       component,

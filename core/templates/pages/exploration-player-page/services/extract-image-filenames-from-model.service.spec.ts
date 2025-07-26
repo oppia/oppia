@@ -19,7 +19,7 @@
 import {TestBed} from '@angular/core/testing';
 
 import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {ContextService} from '../../../services/context.service';
+import {PageContextService} from '../../../services/page-context.service';
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
@@ -39,7 +39,7 @@ describe('Extracting Image file names in the state service', () => {
   let eifms: ExtractImageFilenamesFromModelService;
   let eof: ExplorationObjectFactory;
   let sof: SkillObjectFactory;
-  let ecs: ContextService;
+  let ecs: PageContextService;
   let explorationDict: ExplorationBackendDict;
   let ImageFilenamesInExploration: {[x: string]: string[]};
   let skillDict: SkillBackendDict;
@@ -50,7 +50,7 @@ describe('Extracting Image file names in the state service', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     eof = TestBed.inject(ExplorationObjectFactory);
-    ecs = TestBed.inject(ContextService);
+    ecs = TestBed.inject(PageContextService);
     eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
     sof = TestBed.inject(SkillObjectFactory);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
@@ -894,48 +894,6 @@ describe('Extracting Image file names in the state service', () => {
       ],
     };
 
-    const example1 = {
-      question: {
-        html:
-          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
-          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
-          'filepath-with-value="&amp;quot;worked-example-1-question' +
-          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
-          'input.</p>',
-        content_id: 'worked_example_q_1',
-      },
-      explanation: {
-        html:
-          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
-          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
-          'filepath-with-value="&amp;quot;worked-example-1-explanation' +
-          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
-          'input.</p>',
-        content_id: 'worked_example_e_1',
-      },
-    };
-
-    const example2 = {
-      question: {
-        html:
-          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
-          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
-          'filepath-with-value="&amp;quot;worked-example-2-question' +
-          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
-          'input.</p>',
-        content_id: 'worked_example_q_2',
-      },
-      explanation: {
-        html:
-          '<p><oppia-noninteractive-image alt-with-value="&amp;' +
-          'quot;f&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"' +
-          'filepath-with-value="&amp;quot;worked-example-2-explanation' +
-          '.png&amp;quot;"></oppia-noninteractive-image>This is a text ' +
-          'input.</p>',
-        content_id: 'worked_example_e_2',
-      },
-    };
-
     const skillContentsDict = {
       explanation: {
         html:
@@ -946,14 +904,9 @@ describe('Extracting Image file names in the state service', () => {
           'input.</p>',
         content_id: 'explanation',
       },
-      worked_examples: [example1, example2],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_q_1: {},
-          worked_example_e_1: {},
-          worked_example_q_2: {},
-          worked_example_e_2: {},
         },
       },
     };
@@ -977,10 +930,6 @@ describe('Extracting Image file names in the state service', () => {
       'misconception-dict-2-notes.png',
       'misconception-dict-2-feedback.png',
       'rubric-dict-easy-explanation.png',
-      'worked-example-1-question.png',
-      'worked-example-1-explanation.png',
-      'worked-example-2-question.png',
-      'worked-example-2-explanation.png',
       'skill-concept-card-explanation.png',
     ];
   });

@@ -844,7 +844,6 @@
 	"I18N_TOPNAV_LEARNER_DASHBOARD": "শিক্ষার্থীর যতিফলক",
 	"I18N_TOPNAV_LEARN_DESCRIPTION_1": "গণিত শেখা আরম্ভ করতে সহায়ক ও অনভিজ্ঞ-বান্ধব পাঠ।",
 	"I18N_TOPNAV_LEARN_HEADING": "আরও শেখার উপায়",
-	"I18N_TOPNAV_LEARN_LINK_1": "সমস্ত পাঠ দেখুন",
 	"I18N_TOPNAV_LEARN_LINK_2": "পড়া চালিয়ে যান",
 	"I18N_TOPNAV_LIBRARY": "সম্প্রদায় পাঠাগার",
 	"I18N_TOPNAV_LIBRARY_DESCRIPTION": "আপনাকে আরও জানতে সাহায্য করার জন্য সম্প্রদায়ের তৈরি অতিরিক্ত বিষয়বস্তু।",
@@ -869,6 +868,5 @@
 	"I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION_SOFTWARE": "সফটওয়্যার",
 	"I18N_WARNING_MODAL_DESCRIPTION": "এটি সম্পূর্ণ সমাধান দেখাবে। আপনি কি নিশ্চিত?",
 	"I18N_WARNING_MODAL_TITLE": "সতর্কীকরণ!",
-	"I18N_WORKED_EXAMPLE": "কাজের উদাহরণ",
 	"I18N_YES": "হ্যাঁ"
 }

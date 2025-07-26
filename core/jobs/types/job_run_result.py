@@ -22,7 +22,7 @@ import heapq
 
 from core import utils
 
-from typing import Any, List, Tuple, Union # isort: skip
+from typing import Any, List, Tuple  # isort: skip
 
 # This is just to make sure that the output of the job have some reasonable
 # length. The maximum that model can hold is around 1 MB and this is much lower.
@@ -66,7 +66,9 @@ class JobRunResult:
 
     @classmethod
     def as_stdout(
-        cls, value: Union[str, int], use_repr: bool = False
+        # NOTE: Here we use type Any because this function can operate on inputs
+        # of any type.
+        cls, value: Any, use_repr: bool = False
     ) -> JobRunResult:
         """Returns a new JobRunResult with a stdout value.
 
@@ -83,7 +85,9 @@ class JobRunResult:
 
     @classmethod
     def as_stderr(
-        cls, value: Union[str, int], use_repr: bool = False
+        # NOTE: Here we use type Any because this function can operate on inputs
+        # of any type.
+        cls, value: Any, use_repr: bool = False
     ) -> JobRunResult:
         """Returns a new JobRunResult with a stderr value.
 

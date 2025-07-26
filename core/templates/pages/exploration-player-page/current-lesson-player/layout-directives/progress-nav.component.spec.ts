@@ -34,7 +34,7 @@ import {FocusManagerService} from '../../../../services/stateful/focus-manager.s
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {ExplorationPlayerConstants} from '../exploration-player-page.constants';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
-import {ExplorationPlayerStateService} from '../../services/exploration-player-state.service';
+import {ExplorationModeService} from '../../services/exploration-mode.service';
 import {
   HelpCardEventResponse,
   PlayerPositionService,
@@ -44,7 +44,8 @@ import {ProgressNavComponent} from './progress-nav.component';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {SchemaFormSubmittedService} from '../../../../services/schema-form-submitted.service';
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
-import {Interaction} from '../../../../domain/exploration/InteractionObjectFactory';
+import {ConversationFlowService} from '../../services/conversation-flow.service';
+import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Progress nav component', () => {
@@ -53,7 +54,8 @@ describe('Progress nav component', () => {
 
   let urlService: UrlService;
   let playerPositionService: PlayerPositionService;
-  let explorationPlayerStateService: ExplorationPlayerStateService;
+  let conversationFlowService: ConversationFlowService;
+  let explorationModeService: ExplorationModeService;
   let focusManagerService: FocusManagerService;
   let playerTranscriptService: PlayerTranscriptService;
   let windowDimensionsService: WindowDimensionsService;
@@ -85,7 +87,8 @@ describe('Progress nav component', () => {
       declarations: [ProgressNavComponent, MockTranslatePipe],
       providers: [
         ExplorationEngineService,
-        ExplorationPlayerStateService,
+        ExplorationModeService,
+        ConversationFlowService,
         FocusManagerService,
         PlayerPositionService,
         PlayerTranscriptService,
@@ -106,9 +109,8 @@ describe('Progress nav component', () => {
     componentInstance = fixture.componentInstance;
     urlService = TestBed.inject(UrlService);
     playerPositionService = TestBed.inject(PlayerPositionService);
-    explorationPlayerStateService = TestBed.inject(
-      ExplorationPlayerStateService
-    );
+    explorationModeService = TestBed.inject(ExplorationModeService);
+    conversationFlowService = TestBed.inject(ConversationFlowService);
     focusManagerService = TestBed.inject(FocusManagerService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
@@ -157,19 +159,13 @@ describe('Progress nav component', () => {
   }));
 
   it('should update displayed card info', fakeAsync(() => {
-    let transcriptLength = 10;
     let displayedCardIndex = 0;
 
-    spyOn(playerTranscriptService, 'getNumCards').and.returnValue(
-      transcriptLength
-    );
     spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(
       displayedCardIndex
     );
     spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
-    spyOn(explorationPlayerStateService, 'isInQuestionMode').and.returnValue(
-      true
-    );
+    spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(true);
     spyOn(focusManagerService, 'setFocusWithoutScroll');
 
     componentInstance.displayedCard = mockDisplayedCard;
@@ -178,7 +174,6 @@ describe('Progress nav component', () => {
     componentInstance.updateDisplayedCardInfo();
     tick();
 
-    expect(playerTranscriptService.getNumCards).toHaveBeenCalled();
     expect(playerPositionService.getDisplayedCardIndex).toHaveBeenCalled();
     expect(playerTranscriptService.isLastCard).toHaveBeenCalled();
     expect(componentInstance.helpCardHasContinueButton).toBeFalse();
@@ -239,19 +234,6 @@ describe('Progress nav component', () => {
     expect(componentInstance.shouldContinueButtonBeShown()).toBeFalse();
   });
 
-  it('should change card', () => {
-    componentInstance.transcriptLength = 5;
-    spyOn(componentInstance.changeCard, 'emit');
-
-    componentInstance.validateIndexAndChangeCard(0);
-
-    expect(componentInstance.changeCard.emit).toHaveBeenCalled();
-
-    expect(() => {
-      componentInstance.validateIndexAndChangeCard(-1);
-    }).toThrowError('Target card index out of bounds.');
-  });
-
   it('should be able to skip the question', () => {
     spyOn(componentInstance.skipQuestion, 'emit');
 
@@ -272,6 +254,17 @@ describe('Progress nav component', () => {
     }).toThrowError();
   });
 
+  it('should call moveForwardByOneCard on conversationFlowService', () => {
+    spyOn(conversationFlowService, 'moveForwardByOneCard');
+    componentInstance.moveForwardByOneCard();
+    expect(conversationFlowService.moveForwardByOneCard).toHaveBeenCalled();
+  });
+  it('should call moveBackByOneCard on conversationFlowService', () => {
+    spyOn(conversationFlowService, 'moveBackByOneCard');
+    componentInstance.moveBackByOneCard();
+    expect(conversationFlowService.moveBackByOneCard).toHaveBeenCalled();
+  });
+
   it('should update displayed card info when view updates', () => {
     spyOn(componentInstance, 'updateDisplayedCardInfo');
     componentInstance.lastDisplayedCard = mockDisplayedCard2;
@@ -281,5 +274,13 @@ describe('Progress nav component', () => {
 
     expect(componentInstance.lastDisplayedCard).toEqual(mockDisplayedCard);
     expect(componentInstance.updateDisplayedCardInfo).toHaveBeenCalled();
+  });
+
+  it('should show the upcoming card when continue button is clicked', () => {
+    spyOn(conversationFlowService, 'showUpcomingCard');
+
+    componentInstance.onClickContinueButton();
+
+    expect(conversationFlowService.showUpcomingCard).toHaveBeenCalled();
   });
 });

@@ -68,6 +68,9 @@ class FeatureNames(enum.Enum):
         'show_restructured_study_guides')
     ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS = (
         'enable_translation_opps_with_new_opp_models')
+    ENABLE_WORKED_EXAMPLES_RTE_COMPONENT = (
+        'enable_worked_examples_rte_component'
+     )
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -91,10 +94,9 @@ class FeatureNames(enum.Enum):
 DEV_FEATURES_LIST = [
     FeatureNames.SHOW_FEEDBACK_UPDATES_IN_PROFILE_PIC_DROPDOWN,
     FeatureNames.SHOW_TRANSLATION_SIZE,
-    FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
-    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
-    FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS
+    FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -106,7 +108,9 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW,
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
-    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP
+    FeatureNames.NEW_LESSON_PLAYER,
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -199,7 +203,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
     FeatureNames.NEW_LESSON_PLAYER.value: (
         (
             'This flag is to enable the exploration player redesign.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value: (
@@ -287,13 +291,20 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'and learners to access the updated study guide user interface '
             '(the actual content displayed by the study guides will be the '
             'same, just the user interface will be different).',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (
         (
             'This flag enables the new translation opportunity structure to '
             'the contributor dashboard.',
+            feature_flag_domain.ServerMode.DEV
+        )
+    ),
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT.value: (
+        (
+            'Allows creators to add worked examples to the review material '
+            'section of skills and explanation of the study guides.',
             feature_flag_domain.ServerMode.DEV
         )
     )
