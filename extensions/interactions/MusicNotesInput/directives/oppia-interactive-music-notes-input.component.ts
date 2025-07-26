@@ -267,43 +267,46 @@ export class MusicNotesInputComponent
   }
 
   // Removes all notes from staff.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   clearNotesFromStaff(): void {
-    $(
-      this.elementRef.nativeElement.querySelectorAll(
-        '.oppia-music-input-note-choices div'
-      )
-    ).remove();
+    const noteChoiceDivs = this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-note-choices > div'
+    );
+    noteChoiceDivs.forEach((div: Element) => {
+      if (div.parentNode) {
+        this.renderer.removeChild(div.parentNode, div);
+      }
+    });
   }
 
   // Removes all droppable staff lines.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   clearDroppableStaff(): void {
-    $(
-      this.elementRef.nativeElement.querySelectorAll(
-        '.oppia-music-input-staff div'
-      )
-    ).remove();
+    const staffDivs = this.elementRef.nativeElement.querySelectorAll(
+      '.oppia-music-input-staff div'
+    );
+    staffDivs.forEach((div: Element) => {
+      if (div.parentNode) {
+        this.renderer.removeChild(div.parentNode, div);
+      }
+    });
   }
 
   // Returns an Object containing the baseNoteMidiValues (81, 79, 77...)
   // as keys and the vertical positions of the staff lines as values.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   getStaffLinePositions(): Object {
-    let staffLinePositionsArray = [];
-    let staffLinePositions = {};
-    let elements = $(
+    const staffLinePositionsArray: number[] = [];
+    const staffLinePositions: {[key: string]: number} = {};
+    const elements: NodeListOf<HTMLElement> =
       this.elementRef.nativeElement.querySelectorAll(
         '.oppia-music-input-staff div.oppia-music-staff-position'
-      )
-    );
-    elements.each((el, val) => {
-      staffLinePositionsArray.push($(val).position().top);
+      );
+
+    elements.forEach((el: HTMLElement) => {
+      staffLinePositionsArray.push(el.offsetTop);
     });
     for (let i = 0; i < staffLinePositionsArray.length; i++) {
       staffLinePositions[this.verticalGridKeys[i]] = staffLinePositionsArray[i];
     }
-    return staffLinePositions;
+    return staffLinePositions as Object;
   }
 
   // Creates the notes and helper-clone notes for the noteChoices div.
@@ -443,9 +446,13 @@ export class MusicNotesInputComponent
     const lineValues = Object.keys(this.NOTE_NAMES_TO_MIDI_VALUES);
     const staffContainer = this.elementRef.nativeElement.querySelector(
       '.oppia-music-input-staff'
-    );
+    ) as HTMLElement;
+    if (!staffContainer) {
+      return;
+    }
 
-    for (const lv of lineValues) {
+    for (let i = 0; i < lineValues.length; i++) {
+      const noteName = lineValues[i];
       const staffLineDiv = this.renderer.createElement('div');
       this.renderer.addClass(staffLineDiv, 'oppia-music-staff-position');
       this.renderer.setStyle(
@@ -453,105 +460,139 @@ export class MusicNotesInputComponent
         'height',
         `${this.VERTICAL_GRID_SPACING}px`
       );
-      staffLineDiv.dataset.lineValue = lv;
+      this.renderer.setAttribute(staffLineDiv, 'data-line-value', noteName);
 
-      staffLineDiv.addEventListener('dragenter', evt => {
+      // DRAG OVER
+      this.renderer.listen(staffLineDiv, 'dragover', (evt: DragEvent) => {
         evt.preventDefault();
-        const lineValue = staffLineDiv.dataset.lineValue!;
-        if (this.isLedgerLineNote(Number(lineValue))) {
-          const rect = (
-            evt.currentTarget as HTMLElement
-          ).getBoundingClientRect();
-          this.drawLedgerLine(rect.top, (evt as DragEvent).clientX);
+        this.renderer.addClass(staffLineDiv, 'oppia-music-input-hovered');
+
+        const lineValue = staffLineDiv.getAttribute('data-line-value');
+        if (this.isLedgerLineNote(lineValue!)) {
+          const relativeCursorX =
+            evt.clientX - staffContainer.getBoundingClientRect().left;
+          const topPos = staffLineDiv.getBoundingClientRect().top;
+          this.drawLedgerLine(topPos, relativeCursorX);
         }
       });
 
-      staffLineDiv.addEventListener('dragleave', () => {
-        this.hideLastLedgerLine();
-      });
-
-      staffLineDiv.addEventListener('dragover', evt => evt.preventDefault());
-
-      staffLineDiv.addEventListener('drop', evt => {
-        evt.preventDefault();
-        this.hideLastLedgerLine();
-
-        const dropEvent = evt as DragEvent;
-        const draggedElt = document.getElementById(
-          dropEvent.dataTransfer?.getData('text/plain')!
+      // DRAG LEAVE
+      this.renderer.listen(staffLineDiv, 'dragleave', () => {
+        this.renderer.removeClass(staffLineDiv, 'oppia-music-input-hovered');
+        const ledgerLines = document.querySelectorAll(
+          '.oppia-music-input-ledger-line'
         );
-        if (!draggedElt) return;
+        if (ledgerLines.length > 0) {
+          const last = ledgerLines[ledgerLines.length - 1];
+          this.renderer.setStyle(last, 'display', 'none');
+        }
+      });
+      // DROP
+      this.renderer.listen(staffLineDiv, 'drop', (evt: DragEvent) => {
+        evt.preventDefault();
+        this.renderer.removeClass(staffLineDiv, 'oppia-music-input-hovered');
 
-        const noteType = draggedElt.dataset.noteType;
-        let noteId = draggedElt.dataset.noteId;
-        if (!noteId) {
-          noteId = this.generateNoteId();
-          draggedElt.dataset.noteId = noteId;
+        const ledgerLines = document.querySelectorAll(
+          '.oppia-music-input-ledger-line'
+        );
+        if (ledgerLines.length > 0) {
+          this.renderer.setStyle(
+            ledgerLines[ledgerLines.length - 1],
+            'display',
+            'none'
+          );
         }
 
-        const leftPos = dropEvent.clientX;
-        const topPos = (evt.currentTarget as HTMLElement).offsetTop;
-        const lineValue = staffLineDiv.dataset.lineValue!;
-        const baseNoteMidiNumber =
-          this.NOTE_NAMES_TO_MIDI_VALUES[Number(lineValue)];
+        const noteId =
+          evt.dataTransfer?.getData('note/id') || this.generateNoteId();
+        const noteType = evt.dataTransfer?.getData('note/type') || '0';
+        const oldLeftPos = evt.dataTransfer?.getData('note/oldLeftPos');
+        const startPos = oldLeftPos ? parseFloat(oldLeftPos) : undefined;
 
-        const noteObj = {
-          baseNoteMidiNumber,
-          offset: Number.isFinite(+noteType) ? parseInt(noteType!, 10) : 0,
+        let noteEl = document.getElementById(`note-${noteId}`) as HTMLElement;
+        if (!noteEl) {
+          noteEl = this.renderer.createElement('div');
+          this.renderer.addClass(noteEl, 'oppia-music-input-note');
+          this.renderer.setAttribute(noteEl, 'draggable', 'true');
+          this.renderer.setAttribute(noteEl, 'id', `note-${noteId}`);
+          this.renderer.setAttribute(noteEl, 'data-note-id', noteId);
+          this.renderer.setAttribute(noteEl, 'data-note-type', noteType);
+          this.renderer.appendChild(staffContainer, noteEl);
+        }
+
+        const leftPos =
+          evt.clientX - staffContainer.getBoundingClientRect().left;
+        const topPos = staffLineDiv.offsetTop;
+        const lineValue = staffLineDiv.getAttribute('data-line-value')!;
+
+        const note = {
+          baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[lineValue],
+          offset: parseInt(noteType, 10),
           noteId,
-          noteStart:
-            this.getNoteStartFromLeftPos(leftPos)?.note.noteStart ?? null,
+          noteStart: null,
         };
 
-        this._removeNotesFromNoteSequenceWithId(noteId);
-        this._addNoteToNoteSequence(noteObj);
-        this._sortNoteSequence();
+        this._removeNotesFromNoteSequenceWithId(note.noteId);
 
-        if (!draggedElt.classList.contains('oppia-music-input-on-staff')) {
-          this.renderer.setStyle(draggedElt, 'position', 'absolute');
+        let finalLeft = leftPos;
+        if (startPos !== finalLeft) {
+          while (this.checkIfNotePositionTaken(finalLeft)) {
+            finalLeft += this.HORIZONTAL_GRID_SPACING;
+          }
+
+          if (
+            Math.floor(finalLeft) >
+            Math.floor(
+              this.getHorizontalPosition(this.MAXIMUM_NOTES_POSSIBLE - 1)
+            )
+          ) {
+            this.renderer.removeChild(noteEl.parentNode!, noteEl);
+            this.repaintLedgerLines();
+            return;
+          }
         }
-        this.renderer.setStyle(draggedElt, 'left', `${leftPos}px`);
-        this.renderer.setStyle(
-          draggedElt,
-          'top',
-          `${topPos - this.VERTICAL_GRID_SPACING / 2}px`
-        );
-        this.renderer.addClass(draggedElt, 'oppia-music-input-on-staff');
 
-        this.playSequence([[this._convertNoteToMidiPitch(noteObj)]]);
+        this.renderer.setStyle(noteEl, 'position', 'absolute');
+        this.renderer.setStyle(noteEl, 'left', `${finalLeft}px`);
+        this.renderer.setStyle(
+          noteEl,
+          'top',
+          `${topPos - this.VERTICAL_GRID_SPACING / 2.0}px`
+        );
+        this.renderer.addClass(noteEl, 'oppia-music-input-on-staff');
+
+        const noteStartInfo = this.getNoteStartFromLeftPos(finalLeft);
+        if (!noteStartInfo) {
+          this.renderer.removeChild(noteEl.parentNode!, noteEl);
+          this.repaintLedgerLines();
+          return;
+        }
+
+        note.noteStart = noteStartInfo.note.noteStart;
+
+        this._addNoteToNoteSequence(note);
+        this._sortNoteSequence();
+        this.playSequence([[this._convertNoteToMidiPitch(note)]]);
         this.repaintLedgerLines();
       });
 
-      if (this.NOTES_ON_LINES.includes(lv)) {
-        const innerLine = this.renderer.createElement('div');
-        this.renderer.addClass(innerLine, 'oppia-music-staff-line');
+      this.renderer.appendChild(staffContainer, staffLineDiv);
+
+      if (i === 0) {
+        this.topPositionForCenterOfTopStaffLine =
+          staffLineDiv.offsetTop + this.VERTICAL_GRID_SPACING;
+      }
+
+      if (this.NOTES_ON_LINES.includes(noteName)) {
+        const staffLine = this.renderer.createElement('div');
+        this.renderer.addClass(staffLine, 'oppia-music-staff-line');
         this.renderer.setStyle(
-          innerLine,
+          staffLine,
           'margin-top',
           `${this.VERTICAL_GRID_SPACING / 2.5}px`
         );
-        this.renderer.appendChild(staffLineDiv, innerLine);
+        this.renderer.appendChild(staffLineDiv, staffLine);
       }
-
-      this.renderer.appendChild(staffContainer, staffLineDiv);
-
-      if (lv === lineValues[0]) {
-        const topPos = (staffLineDiv as HTMLElement).offsetTop;
-        this.topPositionForCenterOfTopStaffLine =
-          topPos + this.VERTICAL_GRID_SPACING;
-      }
-    }
-  }
-
-  hideLastLedgerLine(): void {
-    const all = Array.from(
-      this.elementRef.nativeElement.querySelectorAll(
-        '.oppia-music-input-ledger-line'
-      )
-    ) as HTMLElement[];
-    if (all.length) {
-      const last = all[all.length - 1];
-      this.renderer.setStyle(last, 'display', 'none');
     }
   }
 
@@ -647,12 +688,18 @@ export class MusicNotesInputComponent
    * Horizontal Position value and return the result.
    */
   getHorizontalPosition(noteStartAsFloat: number): number {
-    let lastHorizontalPositionOffset = $(
-      this.elementRef.nativeElement.querySelector(
-        '.oppia-music-input-note-choices div:first-child'
-      )
-    ).position().left;
-    let leftOffset =
+    const firstNoteDiv = this.elementRef.nativeElement.querySelector(
+      '.oppia-music-input-note-choices div:first-child'
+    ) as HTMLElement;
+
+    if (!firstNoteDiv) {
+      console.warn('First note div not found.');
+      return 0;
+    }
+
+    const lastHorizontalPositionOffset =
+      firstNoteDiv.getBoundingClientRect().left;
+    const leftOffset =
       lastHorizontalPositionOffset -
       (this.MAXIMUM_NOTES_POSSIBLE - 1) * this.HORIZONTAL_GRID_SPACING;
     return leftOffset + noteStartAsFloat * this.HORIZONTAL_GRID_SPACING;
