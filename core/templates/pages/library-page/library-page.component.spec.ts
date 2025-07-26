@@ -401,11 +401,9 @@ describe('Library Page Component', () => {
     spyOn(componentInstance, 'initCarousels');
     spyOn(loggerService, 'error');
     let actualWidth = 200;
-    spyOn(window, '$').and.returnValue({
-      width: () => {
-        return actualWidth;
-      },
-    } as JQLite);
+    spyOn(document, 'querySelector').and.returnValue({
+      clientWidth: 200,
+    } as HTMLElement);
     componentInstance.ngOnInit();
     tick();
     tick();
