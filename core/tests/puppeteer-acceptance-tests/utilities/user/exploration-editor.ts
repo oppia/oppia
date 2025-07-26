@@ -495,10 +495,7 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector);
     // Wait for the response modal animation to finish, else it causes flakiness.
     await this.page.waitForTimeout(2000);
-    const feedbackResponseRemoveButton = await this.getElementInParent(
-      feedbackResponseRemoveSelector
-    );
-    await feedbackResponseRemoveButton.click();
+    await this.clickOn(feedbackResponseRemoveSelector);
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
 
@@ -578,14 +575,20 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(multipleChoiceOptionSelector);
 
     const options = await this.page.$$(multipleChoiceOptionSelector);
+    let found = false;
     for (const optionElement of options) {
       const optionText = await optionElement.evaluate(el =>
         el.textContent?.trim()
       );
       if (optionText === option) {
         await optionElement.click();
+        found = true;
         break;
       }
+    }
+
+    if (!found) {
+      throw new Error(`Option ${option} not found.`);
     }
 
     await this.expectElementToBeVisible(selectedMultipleChoiceOption);
@@ -633,6 +636,10 @@ export class ExplorationEditor extends BaseUser {
     xInPercent: number,
     yInPercent: number
   ): Promise<void> {
+    // Scroll page fully so image is fully covered in mobile view.
+    await this.page.evaluate(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
     const imageInteraction = new ImageAreaSelection(this.page);
     await imageInteraction.selectPoint(xInPercent, yInPercent);
   }
@@ -4083,8 +4090,10 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForTimeout(500);
       await this.page.waitForSelector(mobileNavbarPane);
-      await this.clickOn(mobilePreviewTabButton);
+      await this.page.waitForTimeout(500);
+      await this.page.click(mobilePreviewTabButton);
     } else {
       await this.page.waitForSelector(previewTabButton, {
         visible: true,
@@ -4092,7 +4101,8 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(previewTabButton);
     }
 
-    await this.isElementVisible(previewTabContainer);
+    await this.expectElementToBeVisible(previewTabContainer);
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -5649,14 +5659,16 @@ export class ExplorationEditor extends BaseUser {
   /**
    * Opens the exploration navigation in mobile view.
    */
-  async openExplorationNavigationInMobileView(): Promise<void> {
+  async openExplorationNavigationInMobileView(
+    open: boolean = true
+  ): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
       return;
     }
 
-    if (await this.isElementVisible(dropdownToggleIcon)) {
+    if (await this.isElementVisible(dropdownToggleIcon, open)) {
       showMessage(
-        'Skipping opening exploration navigation in mobile view. Already opened.'
+        `Skipping ${open ? 'opening' : 'closing'} exploration navigation in mobile view. Already ${open ? 'opened' : 'closed'}.`
       );
       return;
     }
@@ -5664,7 +5676,7 @@ export class ExplorationEditor extends BaseUser {
     await this.expectElementToBeVisible(mobileOptionsButtonSelector);
     await this.page.click(mobileOptionsButtonSelector);
 
-    await this.expectElementToBeVisible(dropdownToggleIcon);
+    await this.expectElementToBeVisible(dropdownToggleIcon, open);
   }
 
   /**

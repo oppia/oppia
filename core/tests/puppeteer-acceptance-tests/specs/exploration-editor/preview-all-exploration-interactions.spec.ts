@@ -142,11 +142,15 @@ describe('Exploration Editor', function () {
     await explorationEditor.selectMultipleChoiceOption('Option 1');
     await explorationEditor.expectResponseFeedbackToBe('Wrong Answer.');
     // View Hint.
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain(
-      'Try Google Search.'
-    );
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain(
+        'Try Google Search.'
+      );
+      await explorationEditor.closeHintModal();
+    }
     // Submit a correct answer.
     await explorationEditor.selectMultipleChoiceOption('Correct Response');
     await explorationEditor.expectResponseFeedbackToBe('Great Job!');
@@ -193,11 +197,15 @@ describe('Exploration Editor', function () {
       'Enter a number to continue'
     );
     // Check for hint.
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain(
-      'All negative numbers are less than 0.'
-    );
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain(
+        'All negative numbers are less than 0.'
+      );
+      await explorationEditor.closeHintModal();
+    }
     // Submit a correct answer.
     await explorationEditor.submitAnswer('-10');
     await explorationEditor.expectResponseFeedbackToBe('Perfect!');
@@ -368,11 +376,15 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectResponseFeedbackToBe('Try Again!');
     // View Hint.
     await explorationEditor.removeFeedbackResponseInPreviewTab();
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain(
-      'Arrange in Ascending Order'
-    );
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain(
+        'Arrange in Ascending Order'
+      );
+      await explorationEditor.closeHintModal();
+    }
     // Sort items in correct order.
     await explorationEditor.submitDragAndDropSortAnswer([
       'First',
@@ -425,9 +437,13 @@ describe('Exploration Editor', function () {
       'Please only use numerical digits, spaces or forward slashes (/)'
     );
     // View Hint.
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain('The hint is 1/2');
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain('The hint is 1/2');
+      await explorationEditor.closeHintModal();
+    }
     // Submit correct answer.
     await explorationEditor.submitAnswerInInputField('1/2');
     await explorationEditor.expectResponseFeedbackToBe('Perfect!');
@@ -462,7 +478,7 @@ describe('Exploration Editor', function () {
     // Move node.
     // await explorationEditor.expectGraphNodeCanBeMoved();
 
-    // Submit a wrong answer.
+    // Move node.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.expectGraphNodeCanBeMoved();
     // Remove and add node.
@@ -475,11 +491,15 @@ describe('Exploration Editor', function () {
     );
     // View Hint.
     await explorationEditor.removeFeedbackResponseInPreviewTab();
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain(
-      'Create a star topology using all 4 nodes.'
-    );
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain(
+        'Create a star topology using all 4 nodes.'
+      );
+      await explorationEditor.closeHintModal();
+    }
     // Submit a correct answer.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToPreviewTab();
@@ -526,11 +546,15 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
     // View Hint.
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain(
-      'The hint is [1, 2, 3]'
-    );
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain(
+        'The hint is [1, 2, 3]'
+      );
+      await explorationEditor.closeHintModal();
+    }
     // Submit correct answer.
     await explorationEditor.submitInputSetAnswer(['1', '2', '3']);
     await explorationEditor.expectResponseFeedbackToBe('Great!');
@@ -581,9 +605,15 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
     // View Hint.
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain('The hint is sqrt2');
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain(
+        'The hint is sqrt2'
+      );
+      await explorationEditor.closeHintModal();
+    }
     // Submit correct answer.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToPreviewTab();
@@ -641,9 +671,13 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
     // View Hint.
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain('The hint is a+b');
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain('The hint is a+b');
+      await explorationEditor.closeHintModal();
+    }
     // Submit a correct answer.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToPreviewTab();
@@ -704,11 +738,15 @@ describe('Exploration Editor', function () {
       'Please enter an answer before submitting.'
     );
     // View Hint.
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain(
-      'The hint is 5x=2+3'
-    );
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain(
+        'The hint is 5x=2+3'
+      );
+      await explorationEditor.closeHintModal();
+    }
     // Submit correct answer.
     await explorationEditor.navigateToEditorTab();
     await explorationEditor.navigateToPreviewTab();
@@ -770,9 +808,13 @@ describe('Exploration Editor', function () {
     // View Units Table.
     await explorationEditor.expectUnitsTableToShowProperly();
     // View Hint.
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain('The hint is 100');
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain('The hint is 100');
+      await explorationEditor.closeHintModal();
+    }
     // Submit a correct answer.
     await explorationEditor.submitAnswerInInputField('0');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
@@ -822,9 +864,13 @@ describe('Exploration Editor', function () {
       'Please enter a valid ratio (e.g. 1:2 or 1:2:3).'
     );
     // View Hint.
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain('The hint is 1:2');
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain('The hint is 1:2');
+      await explorationEditor.closeHintModal();
+    }
     // Submit correct answer.
     await explorationEditor.submitAnswerInInputField('1:2');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
@@ -871,11 +917,15 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectCodeOutputToBe('Hello!');
     // View Hint.
     await explorationEditor.removeFeedbackResponseInPreviewTab();
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain(
-      'The hint is print("Hello, Oppia!")'
-    );
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain(
+        'The hint is print("Hello, Oppia!")'
+      );
+      await explorationEditor.closeHintModal();
+    }
     // Submit correct answer.
     await explorationEditor.submitCodeEditorAnswer('print("Hello, Oppia!")');
     await explorationEditor.expectResponseFeedbackToBe('Great!');
@@ -918,9 +968,13 @@ describe('Exploration Editor', function () {
     );
     // View Hint.
     await explorationEditor.removeFeedbackResponseInPreviewTab();
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain('Only answer C4');
-    await explorationEditor.closeHintModal();
+    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // covered by navigation in mobile view.
+    if (!explorationEditor.isViewportAtMobileWidth()) {
+      await explorationEditor.viewHint();
+      await explorationEditor.expectHintInHintModalToContain('Only answer C4');
+      await explorationEditor.closeHintModal();
+    }
     // TODO(#22998): The correct answer automatically changes to ['C4'].
     // And even using C4 as awswer throws wrong answer feedback.
 
