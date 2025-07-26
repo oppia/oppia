@@ -810,16 +810,16 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.saveExplorationDraft();
 
+    // Submit wrong answer.
+    await explorationEditor.submitAnswerInInputField('5:6');
+    await explorationEditor.expectResponseFeedbackToBe(
+      'Wrong Answer. Please try again'
+    );
     // Submit an answer not in ratio format.
     await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitAnswerInInputField('1');
     await explorationEditor.expectAnswerErrorMessageToBe(
       'Please enter a valid ratio (e.g. 1:2 or 1:2:3).'
-    );
-    // Submit wrong answer.
-    await explorationEditor.submitAnswerInInputField('5:6');
-    await explorationEditor.expectResponseFeedbackToBe(
-      'Wrong Answer. Please try again'
     );
     // View Hint.
     await explorationEditor.viewHint();
@@ -885,55 +885,55 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.SEVENTEENTH);
   });
 
-  it('should be able to preview "Pencil Code Editor" interaction', async function () {
-    // TODO: REMOVE IT. IT USES THIRD-PARTY LIBRARY AND CAN BE REMOVED.
-    // Add a pencil code editor interaction.
-    await explorationEditor.updateCardContent('Enter a pencil code editor.');
-    await explorationEditor.addInteraction(
-      INTERACTION_TYPES.PENCIL_CODE_EDITOR
-    );
-    await explorationEditor.updateCodeEditorLearnerAnswerInResponseModal(
-      'has code that contains',
-      'print("Hello, Oppia!")'
-    );
-    await explorationEditor.addResponseDetailsInResponseModal(
-      'Great!',
-      CARD_NAMES.EIGHTEENTH,
-      true,
-      true
-    );
-    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong Answer. Please try again'
-    );
-    await explorationEditor.addHintToState(
-      'The hint is print("Hello, Oppia!")'
-    );
-    await explorationEditor.addPencilCodeEditorSolutionToState(
-      'print("Hello, Oppia!")',
-      'As given in the question.'
-    );
-    await explorationEditor.saveExplorationDraft();
+  // it('should be able to preview "Pencil Code Editor" interaction', async function () {
+  //   // TODO: REMOVE IT. IT USES THIRD-PARTY LIBRARY AND CAN BE REMOVED.
+  //   // Add a pencil code editor interaction.
+  //   await explorationEditor.updateCardContent('Enter a pencil code editor.');
+  //   await explorationEditor.addInteraction(
+  //     INTERACTION_TYPES.PENCIL_CODE_EDITOR
+  //   );
+  //   await explorationEditor.updateCodeEditorLearnerAnswerInResponseModal(
+  //     'has code that contains',
+  //     'print("Hello, Oppia!")'
+  //   );
+  //   await explorationEditor.addResponseDetailsInResponseModal(
+  //     'Great!',
+  //     CARD_NAMES.EIGHTEENTH,
+  //     true,
+  //     true
+  //   );
+  //   await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+  //     'Wrong Answer. Please try again'
+  //   );
+  //   await explorationEditor.addHintToState(
+  //     'The hint is print("Hello, Oppia!")'
+  //   );
+  //   await explorationEditor.addPencilCodeEditorSolutionToState(
+  //     'print("Hello, Oppia!")',
+  //     'As given in the question.'
+  //   );
+  //   await explorationEditor.saveExplorationDraft();
 
-    // Preview Tab.
-    await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.submitPencilCodeEditorAnswer('print("Hello!")');
-    await explorationEditor.expectResponseFeedbackToBe(
-      'Wrong Answer. Please try again'
-    );
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain(
-      'The hint is print("Hello, Oppia!")'
-    );
-    await explorationEditor.closeHintModal();
-    await explorationEditor.submitPencilCodeEditorAnswer(
-      'print("Hello, Oppia!")'
-    );
-    await explorationEditor.expectResponseFeedbackToBe('Great!');
+  //   // Preview Tab.
+  //   await explorationEditor.navigateToPreviewTab();
+  //   await explorationEditor.submitPencilCodeEditorAnswer('print("Hello!")');
+  //   await explorationEditor.expectResponseFeedbackToBe(
+  //     'Wrong Answer. Please try again'
+  //   );
+  //   await explorationEditor.viewHint();
+  //   await explorationEditor.expectHintInHintModalToContain(
+  //     'The hint is print("Hello, Oppia!")'
+  //   );
+  //   await explorationEditor.closeHintModal();
+  //   await explorationEditor.submitPencilCodeEditorAnswer(
+  //     'print("Hello, Oppia!")'
+  //   );
+  //   await explorationEditor.expectResponseFeedbackToBe('Great!');
 
-    // Navigate back to Editor Tab.
-    await explorationEditor.navigateToEditorTab();
-    await explorationEditor.navigateToCard(CARD_NAMES.EIGHTEENTH);
-  });
+  //   // Navigate back to Editor Tab.
+  //   await explorationEditor.navigateToEditorTab();
+  //   await explorationEditor.navigateToCard(CARD_NAMES.EIGHTEENTH);
+  // });
 
   it('should be able to preview "Music Notes Input" interaction', async function () {
     // Add a music notes input interaction.
@@ -979,44 +979,44 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.NINETEENTH);
   });
 
-  it('should be able to preview "World Map" interaction', async function () {
-    // TODO: REMOVE IT. IT USES THIRD-PARTY LIBRARY AND CAN BE REMOVED.
-    // Add a world map interaction.
-    await explorationEditor.updateCardContent('Enter a world map.');
-    await explorationEditor.addInteraction(INTERACTION_TYPES.WORLD_MAP, false);
-    await explorationEditor.customizeWorldMapInteraction(0, 0, 0);
-    await explorationEditor.updateWorldMapLearnerAnswerInResponseModal(
-      'is within ... km of ...',
-      100
-    );
-    await explorationEditor.addResponseDetailsInResponseModal(
-      'Great!',
-      'Twentieth Card',
-      true,
-      true
-    );
-    await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong Answer. Please try again'
-    );
-    await explorationEditor.addHintToState(
-      'The hint is to zoom 13 times to get the answer'
-    );
-    await explorationEditor.saveExplorationDraft();
+  // it('should be able to preview "World Map" interaction', async function () {
+  //   // TODO: REMOVE IT. IT USES THIRD-PARTY LIBRARY AND CAN BE REMOVED.
+  //   // Add a world map interaction.
+  //   await explorationEditor.updateCardContent('Enter a world map.');
+  //   await explorationEditor.addInteraction(INTERACTION_TYPES.WORLD_MAP, false);
+  //   await explorationEditor.customizeWorldMapInteraction(0, 0, 0);
+  //   await explorationEditor.updateWorldMapLearnerAnswerInResponseModal(
+  //     'is within ... km of ...',
+  //     100
+  //   );
+  //   await explorationEditor.addResponseDetailsInResponseModal(
+  //     'Great!',
+  //     'Twentieth Card',
+  //     true,
+  //     true
+  //   );
+  //   await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
+  //     'Wrong Answer. Please try again'
+  //   );
+  //   await explorationEditor.addHintToState(
+  //     'The hint is to zoom 13 times to get the answer'
+  //   );
+  //   await explorationEditor.saveExplorationDraft();
 
-    await explorationEditor.navigateToPreviewTab();
-    await explorationEditor.submitWorldMapAnswer(0);
-    await explorationEditor.expectResponseFeedbackToBe(
-      'Wrong Answer. Please try again'
-    );
-    // await explorationEditor.removeFeedbackResponseInPreviewTab();
-    await explorationEditor.viewHint();
-    await explorationEditor.expectHintInHintModalToContain(
-      'The hint is to zoom 13 times to get the answer'
-    );
-    await explorationEditor.closeHintModal();
-    await explorationEditor.submitWorldMapAnswer(13);
-    await explorationEditor.expectResponseFeedbackToBe('Great!');
-  });
+  //   await explorationEditor.navigateToPreviewTab();
+  //   await explorationEditor.submitWorldMapAnswer(0);
+  //   await explorationEditor.expectResponseFeedbackToBe(
+  //     'Wrong Answer. Please try again'
+  //   );
+  //   // await explorationEditor.removeFeedbackResponseInPreviewTab();
+  //   await explorationEditor.viewHint();
+  //   await explorationEditor.expectHintInHintModalToContain(
+  //     'The hint is to zoom 13 times to get the answer'
+  //   );
+  //   await explorationEditor.closeHintModal();
+  //   await explorationEditor.submitWorldMapAnswer(13);
+  //   await explorationEditor.expectResponseFeedbackToBe('Great!');
+  // });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

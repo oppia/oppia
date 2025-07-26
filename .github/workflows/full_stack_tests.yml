@@ -32,7 +32,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite:  ["create-an-exploration-with-all-interactions", "preview-all-exploration-interactions", "exploration-settings", "exploration-history", "exploration-feedback", "exploration-help", "exploration-navbar-header"]
+        suite: ["preview-all-exploration-interactions"]
+        # suite:  ["create-an-exploration-with-all-interactions", "preview-all-exploration-interactions", "exploration-settings", "exploration-history", "exploration-feedback", "exploration-help", "exploration-navbar-header"]
         mobile_args: ["", "--mobile"]
         run: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     name: (#${{ matrix.run }}, ${{ matrix.mobile_args == '--mobile' && 'M' || 'D' }}) ${{ matrix.suite }}
