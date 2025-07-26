@@ -507,6 +507,7 @@ const progressReminderModalHeaderSelector =
 const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
 const profilePictureSelector = '.e2e-test-profile-dropdown';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
+const floatFormInput = '.e2e-test-float-form-input';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -3059,14 +3060,14 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} value - The value to check.
    */
   async expectInputValueToBe(value: string): Promise<void> {
-    await this.expectElementToBeVisible(submitResponseToInteractionInput);
+    await this.expectElementToBeVisible(floatFormInput);
     await this.page.waitForFunction(
       (selector: string, value: string) => {
         const element = document.querySelector(selector);
         return (element as HTMLInputElement)?.value === value;
       },
       {},
-      submitResponseToInteractionInput,
+      floatFormInput,
       value
     );
   }

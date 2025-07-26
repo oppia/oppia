@@ -31,8 +31,6 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 
 const ROLES = testConstants.Roles;
-const INTRO_CONTENT_VOICEOVER_IN_HI =
-  testConstants.data.IntroContentVoiceoverInHindi;
 const CONTINUE_INTERACTION_VOICEOVER_IN_HI =
   testConstants.data.ContinueInteractionVoiceoverInHindi;
 const LONG_VOICEOVER_IN_HI = testConstants.data.LongVoiceoverInHindi;
