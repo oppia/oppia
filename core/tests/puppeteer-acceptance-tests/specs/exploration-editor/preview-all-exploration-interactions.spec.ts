@@ -464,6 +464,11 @@ describe('Exploration Editor', function () {
 
     // Submit a wrong answer.
     await explorationEditor.navigateToPreviewTab();
+    await explorationEditor.expectGraphNodeCanBeMoved();
+    // Remove and add node.
+    await explorationEditor.expectGraphNodeCanBeRemoved();
+    await explorationEditor.expectGraphNodeCanBeAdded();
+    // Submit worng answer.
     await explorationEditor.submitGraphStarNetworkSolution(3);
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
@@ -476,6 +481,8 @@ describe('Exploration Editor', function () {
     );
     await explorationEditor.closeHintModal();
     // Submit a correct answer.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitGraphStarNetworkSolution(4);
     await explorationEditor.expectResponseFeedbackToBe('Great!');
 

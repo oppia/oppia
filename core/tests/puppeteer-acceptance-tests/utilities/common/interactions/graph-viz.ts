@@ -174,7 +174,7 @@ export class GraphViz {
     try {
       await this.parentPage.waitForFunction(
         (element: HTMLElement) => {
-          return element.style.fill === 'aqua';
+          return element.style.fill === 'aqua' || element.style.fill === 'red';
         },
         {},
         vertex
@@ -284,6 +284,7 @@ export class GraphViz {
    */
   async getVertices(): Promise<ElementHandle<Element>[]> {
     const graphContainer = await this.getGraphContainer();
+    await graphContainer.waitForSelector(graphVertexSelector);
     const vertices = await graphContainer.$$(graphVertexSelector);
     return vertices;
   }
@@ -302,10 +303,12 @@ export class GraphViz {
    * Resets the graph.
    */
   async resetGraph(): Promise<void> {
+    await this.parentPage.waitForSelector(resetGraphButtonSelector);
+    const resetGraphButton = await this.parentPage.$(resetGraphButtonSelector);
     await this.parentPage.waitForFunction(
       isElementClickable,
       {},
-      resetGraphButtonSelector
+      resetGraphButton
     );
     await this.parentPage.click(resetGraphButtonSelector);
 
@@ -313,12 +316,12 @@ export class GraphViz {
       (selector: string, parentSelector: string) => {
         const container = document.querySelector(parentSelector);
         if (!container) return false;
-        const elements = Array.from(container.querySelectorAll(selector));
+        const elements = container.querySelectorAll(selector);
         return elements.length === 0;
       },
       {},
-      graphContainerSelector,
-      graphEdgeSelector
+      graphEdgeSelector,
+      graphContainerSelector
     );
   }
 
@@ -352,6 +355,21 @@ export class GraphViz {
     await this.parentPage.mouse.down();
     await this.parentPage.waitForTimeout(1000);
     await this.parentPage.mouse.move(x, y);
+    await this.parentPage.mouse.up();
+    await this.parentPage.waitForTimeout(1000);
+  }
+
+  /**
+   * Removes a node from the graph.
+   * @param {ElementHandle<Element>} node - The node to remove.
+   */
+  async removeNode(node: ElementHandle<Element>): Promise<void> {
+    await this.clickOnGraphButton('Delete');
+    await node.hover();
+    await this.waitUntilNodeIsHovered(node);
+    await this.parentPage.waitForTimeout(1000);
+    await this.parentPage.mouse.down();
+    await this.parentPage.waitForTimeout(1000);
     await this.parentPage.mouse.up();
     await this.parentPage.waitForTimeout(1000);
   }

@@ -1091,7 +1091,8 @@ export class ExplorationEditor extends BaseUser {
     );
 
     const inputElements = await customizeInteractionModal.$$('input');
-    for (const inputElement of inputElements) {
+    for (let i = 0; i < 2; i++) {
+      const inputElement = inputElements[i];
       const checked = await inputElement.evaluate(
         el => (el as HTMLInputElement).checked
       );
@@ -6211,13 +6212,41 @@ export class ExplorationEditor extends BaseUser {
     await graphHelper.expectGraphInteractionToBePresent();
 
     // Move the node to the given position.
-    const node = await graphHelper.getVertices()[0];
-    const initalCoordinates = await graphHelper.getNodeCoordinates(node);
-    await graphHelper.moveNode(node, 50, 50);
+    const nodes = await graphHelper.getVertices();
+    const initalCoordinates = await graphHelper.getNodeCoordinates(nodes[0]);
+    await graphHelper.moveNode(nodes[0], 50, 50);
 
     // Check if the node is moved to the given position.
-    const newCoordinates = await graphHelper.getNodeCoordinates(node);
-    expect(newCoordinates).not.toEqual(initalCoordinates);
+    const updatedNodes = await graphHelper.getVertices();
+    let allNewCoordinates: number[][] = [];
+    for (const node of updatedNodes) {
+      const coordinates = await graphHelper.getNodeCoordinates(node);
+      allNewCoordinates.push(coordinates);
+    }
+    expect(allNewCoordinates).not.toContain(initalCoordinates);
+  }
+
+  /**
+   * Checks if graph node can be removed.
+   */
+  async expectGraphNodeCanBeRemoved(): Promise<void> {
+    const graphHelper = new GraphViz(this.page);
+
+    const nodes = await graphHelper.getVertices();
+    await graphHelper.removeNode(nodes[0]);
+    const newNodes = await graphHelper.getVertices();
+    expect(newNodes.length).toEqual(nodes.length - 1);
+  }
+
+  /**
+   * Checks if graph node can be added.
+   */
+  async expectGraphNodeCanBeAdded(): Promise<void> {
+    const graphHelper = new GraphViz(this.page);
+    const nodes = await graphHelper.getVertices();
+    await graphHelper.addNode(60, 60);
+    const newNodes = await graphHelper.getVertices();
+    expect(newNodes.length).toEqual(nodes.length + 1);
   }
 
   /**
