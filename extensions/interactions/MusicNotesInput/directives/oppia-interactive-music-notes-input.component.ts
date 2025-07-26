@@ -462,13 +462,16 @@ export class MusicNotesInputComponent
       );
       this.renderer.setAttribute(staffLineDiv, 'data-line-value', noteName);
 
-      // DRAG OVER
+      // Drag over.
       this.renderer.listen(staffLineDiv, 'dragover', (evt: DragEvent) => {
         evt.preventDefault();
         this.renderer.addClass(staffLineDiv, 'oppia-music-input-hovered');
 
         const lineValue = staffLineDiv.getAttribute('data-line-value');
-        if (this.isLedgerLineNote(lineValue!)) {
+        if (!lineValue) {
+          return;
+        }
+        if (this.isLedgerLineNote(lineValue)) {
           const relativeCursorX =
             evt.clientX - staffContainer.getBoundingClientRect().left;
           const topPos = staffLineDiv.getBoundingClientRect().top;
@@ -476,7 +479,7 @@ export class MusicNotesInputComponent
         }
       });
 
-      // DRAG LEAVE
+      // Drag Leave.
       this.renderer.listen(staffLineDiv, 'dragleave', () => {
         this.renderer.removeClass(staffLineDiv, 'oppia-music-input-hovered');
         const ledgerLines = document.querySelectorAll(
@@ -487,7 +490,7 @@ export class MusicNotesInputComponent
           this.renderer.setStyle(last, 'display', 'none');
         }
       });
-      // DROP
+      // Drop.
       this.renderer.listen(staffLineDiv, 'drop', (evt: DragEvent) => {
         evt.preventDefault();
         this.renderer.removeClass(staffLineDiv, 'oppia-music-input-hovered');
@@ -523,7 +526,10 @@ export class MusicNotesInputComponent
         const leftPos =
           evt.clientX - staffContainer.getBoundingClientRect().left;
         const topPos = staffLineDiv.offsetTop;
-        const lineValue = staffLineDiv.getAttribute('data-line-value')!;
+        const lineValue = staffLineDiv.getAttribute('data-line-value');
+        if (!lineValue) {
+          return;
+        }
 
         const note = {
           baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[lineValue],
@@ -546,7 +552,10 @@ export class MusicNotesInputComponent
               this.getHorizontalPosition(this.MAXIMUM_NOTES_POSSIBLE - 1)
             )
           ) {
-            this.renderer.removeChild(noteEl.parentNode!, noteEl);
+            const parent = noteEl.parentNode;
+            if (parent) {
+              this.renderer.removeChild(parent, noteEl);
+            }
             this.repaintLedgerLines();
             return;
           }
@@ -563,7 +572,10 @@ export class MusicNotesInputComponent
 
         const noteStartInfo = this.getNoteStartFromLeftPos(finalLeft);
         if (!noteStartInfo) {
-          this.renderer.removeChild(noteEl.parentNode!, noteEl);
+          const parent = noteEl.parentNode;
+          if (parent) {
+            this.renderer.removeChild(parent, noteEl);
+          }
           this.repaintLedgerLines();
           return;
         }
