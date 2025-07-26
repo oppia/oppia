@@ -2498,7 +2498,10 @@ export class LoggedInUser extends BaseUser {
         await goalCheckbox.click();
         await this.page.waitForFunction(
           (element: Element) => {
-            return (element as HTMLInputElement).checked;
+            const inputElement = (element as HTMLInputElement).querySelector(
+              'input'
+            );
+            return inputElement?.checked;
           },
           {},
           goalCheckbox
