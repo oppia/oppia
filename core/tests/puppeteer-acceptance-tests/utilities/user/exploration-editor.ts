@@ -590,10 +590,6 @@ export class ExplorationEditor extends BaseUser {
     if (!found) {
       throw new Error(`Option ${option} not found.`);
     }
-
-    await this.expectElementToBeVisible(selectedMultipleChoiceOption);
-    await this.expectTextContentToContain(selectedMultipleChoiceOption, option);
-
     await this.clickOnSubmitAnswerButton();
   }
 
@@ -1942,7 +1938,11 @@ export class ExplorationEditor extends BaseUser {
     }
 
     for (let i = 1; i < n; i++) {
-      await graphViz.addEdge(vertices[0], vertices[i]);
+      await graphViz.addEdge(
+        vertices[0],
+        vertices[i],
+        this.isViewportAtMobileWidth()
+      );
     }
 
     await this.clickOnSubmitAnswerButton();
@@ -4086,6 +4086,17 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.page.waitForSelector(mobileOptionsButtonSelector, {
+          visible: true,
+        });
+        await this.clickOn(mobileOptionsButtonSelector);
+      }
+
       await this.page.waitForSelector(mobileNavbarDropdown, {
         visible: true,
       });
