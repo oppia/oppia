@@ -273,5 +273,42 @@ export default {
       "default_value_obtainable_from_highlight": false,
       "default_value": false
     }]
+  },
+  "Workedexample": {
+    "backend_id": "Workedexample",
+    "category": "Basic Input",
+    "description": "A worked example having a question and answer.",
+    "frontend_id": "workedexample",
+    "tooltip": "Insert worked example",
+    "icon_data_url": "/rich_text_components/Workedexample/Workedexample.png",
+    "is_complex": true,
+    "requires_internet": false,
+    "requires_fs": false,
+    "is_block_element": true,
+    "customization_arg_specs": [{
+      "name": "question",
+      "description": "The question for the worked example",
+      "schema": {
+        "type": "html",
+        "ui_config": {
+          "rte_components": "ALL_COMPONENTS",
+          "hide_complex_extensions": true
+        }
+      },
+      "default_value_obtainable_from_highlight": false,
+      "default_value": "Sample Question"
+    }, {
+      "name": "answer",
+      "description": "The answer for the worked example",
+      "schema": {
+        "type": "html",
+        "ui_config": {
+          "rte_components": "ALL_COMPONENTS",
+          "hide_complex_extensions": true
+        }
+      },
+      "default_value_obtainable_from_highlight": false,
+      "default_value": "You have revealed the answer for the worked example."
+    }]
   }
 } as const;

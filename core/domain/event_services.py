@@ -111,7 +111,8 @@ class StatsEventsHandler(BaseEventHandler):
             return
         if cls._is_latest_version(exploration_id, exp_version):
             taskqueue_services.defer(
-                taskqueue_services.FUNCTION_ID_UPDATE_STATS,
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_UPDATE_STATS'],
                 taskqueue_services.QUEUE_NAME_STATS,
                 exploration_id,
                 exp_version, aggregated_stats)

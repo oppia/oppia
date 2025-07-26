@@ -61,7 +61,8 @@ ALLOWED_CUSTOM_OPPIA_RTE_TAGS = [
     'oppia-noninteractive-math',
     'oppia-noninteractive-video',
     'oppia-noninteractive-skillreview',
-    'oppia-noninteractive-tabs'
+    'oppia-noninteractive-tabs',
+    'oppia-noninteractive-workedexample'
 ]
 
 WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
