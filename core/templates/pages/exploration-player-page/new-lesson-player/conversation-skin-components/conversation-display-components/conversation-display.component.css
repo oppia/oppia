@@ -311,12 +311,6 @@ oppia-conversation-display .oppia-mcq-question-description-text {
   oppia-conversation-display .oppia-learner-view-card button.mat-button.mat-default-theme.instructions-button:hover {
     background-color: #115fd4;
   }
-
-  oppia-conversation-display .oppia-learner-view-card {
-    margin-left: 0;
-    padding-bottom: 0;
-    padding-left: 0;
-  }
 }
 
 /* ============================This comment has been placed to segregate the old code and the new CSS media queries=================================================== */

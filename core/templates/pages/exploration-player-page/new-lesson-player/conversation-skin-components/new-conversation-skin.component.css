@@ -123,10 +123,6 @@ oppia-new-conversation-skin .oppia-button-icon {
     top: 0;
   }
 
-  .new-supplemental-card-parent-container {
-    position: unset;
-  }
-
   .new-conversation-skin-supplemental-card-container {
     margin: 60px auto 0 auto;
     min-width: 320px;
@@ -159,7 +155,7 @@ oppia-new-conversation-skin .oppia-button-icon {
 @media (max-width: 480px) {
   .new-conversation-skin-cards-container {
     display: block;
-    padding: 0 40px 20px 8px;
+    padding: 0 50px 20px 8px;
     position: relative;
     width: 100%;
   }
@@ -169,7 +165,8 @@ oppia-new-conversation-skin .oppia-button-icon {
   .new-conversation-skin-cards-container {
     display: block;
     padding: 66px;
-    padding-right: 75px;
+    padding-right: 80px;
+    padding-left: 25px;
     position: relative;
     width: 100%;
   }

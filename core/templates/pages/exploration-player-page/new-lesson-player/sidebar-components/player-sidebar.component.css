@@ -182,7 +182,7 @@
   width: 24px;
 }
 
-@media screen and (max-width: 574px) {
+@media screen and (max-width: 767px) {
   .player-desktop-sidebar-menu {
     display: none;
   }

@@ -195,7 +195,7 @@ oppia-conversation-skin .oppia-button-icon {
     opacity: 0.8;
   }
 
-  .conversation-skin-oppia-avatar {
+  oppia-conversation-skin .conversation-skin-oppia-avatar {
     display: none;
   }
 }
