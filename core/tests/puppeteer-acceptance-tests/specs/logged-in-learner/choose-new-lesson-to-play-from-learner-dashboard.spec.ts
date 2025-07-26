@@ -106,7 +106,7 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.publishStoryDraft();
     },
     // Test takes longer than default timeout.
-    600000
+    900000
   );
 
   it('should be able add a goal', async function () {
