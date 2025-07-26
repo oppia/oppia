@@ -584,26 +584,28 @@ export class ClassroomAdminPageComponent implements OnInit {
       .getTopicIdToTopicNameAsync(topicIds)
       .then(topicIdsToTopicName => {
         this.topicNameToPrerequisiteTopicNames = {};
+        this.tempClassroomData.setTopicIdToTopicName(topicIdsToTopicName);
+        this.topicIdsToTopicName = topicIdsToTopicName;
+        this.topicNames = Object.values(this.topicIdsToTopicName);
 
         for (let currentTopicId in topicIdToPrerequisiteTopicIds) {
           let currentTopicName = topicIdsToTopicName[currentTopicId];
-
           let prerequisiteTopicIds =
             topicIdToPrerequisiteTopicIds[currentTopicId];
-          let prerequisiteTopicNames = [];
+          let prerequisiteTopicNames: string[] = [];
 
           for (let topicId of prerequisiteTopicIds) {
-            prerequisiteTopicNames.push(topicIdsToTopicName[topicId]);
+            if (topicIdsToTopicName[topicId]) {
+              prerequisiteTopicNames.push(topicIdsToTopicName[topicId]);
+            }
           }
 
-          this.tempClassroomData.setTopicIdToTopicName(topicIdsToTopicName);
-
-          this.topicNameToPrerequisiteTopicNames[currentTopicName] =
+          // Fallback to empty array if undefined.
+          this.topicNameToPrerequisiteTopicNames[currentTopicName || ''] =
             prerequisiteTopicNames;
-          this.topicIdsToTopicName = topicIdsToTopicName;
-          this.topicNames = Object.values(this.topicIdsToTopicName);
-          this.topicDependencyIsLoaded = true;
         }
+
+        this.topicDependencyIsLoaded = true;
       });
   }
 
