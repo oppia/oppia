@@ -35,10 +35,10 @@ class MockRouter {
   navigate(commands: string[]): Promise<boolean> {
     return Promise.resolve(true);
   }
-  navigateByUrl(_url): Promise<boolean> {
+  navigateByUrl(_url: string): Promise<boolean> {
     return Promise.resolve(true);
   }
-  createUrlTree(commands: string[], options?): string {
+  createUrlTree(commands: string[], _options?: object): string {
     return `/lesson/${commands[1]}`;
   }
 }
@@ -49,6 +49,19 @@ class MockPlatformFeatureService {
       NewLessonPlayer: {isEnabled: false},
     };
   }
+}
+
+function createMockRoute(explorationId: string): ActivatedRouteSnapshot {
+  const snapshot = new ActivatedRouteSnapshot();
+
+  Object.defineProperty(snapshot, 'paramMap', {
+    get: () => convertToParamMap({exploration_id: explorationId}),
+  });
+
+  snapshot.params = {exploration_id: explorationId}; // ✅ Add this line
+  snapshot.queryParams = {v: '1'};
+
+  return snapshot;
 }
 
 describe('ExplorationPlayerPageAuthGuard', () => {
@@ -81,6 +94,13 @@ describe('ExplorationPlayerPageAuthGuard', () => {
     location = TestBed.inject(Location) as jasmine.SpyObj<Location>;
   });
 
+  function createMockState(url: string): RouterStateSnapshot {
+    return {
+      url,
+      root: new ActivatedRouteSnapshot(),
+    };
+  }
+
   it('should allow access if validation passes and flag is disabled', done => {
     spyOn(
       accessValidationBackendApiService,
@@ -94,12 +114,12 @@ describe('ExplorationPlayerPageAuthGuard', () => {
     const route = {
       paramMap: convertToParamMap({exploration_id: 'exp123'}),
       queryParams: {},
-    } as unknown as ActivatedRouteSnapshot;
+    } as ActivatedRouteSnapshot;
 
     const routerSpy = spyOn(router, 'navigateByUrl');
 
     guard
-      .canActivate(route, {url: '/explore/exp123'} as RouterStateSnapshot)
+      .canActivate(route, createMockState('/explore/exp123'))
       .then(result => {
         expect(result).toBeTrue();
         expect(routerSpy).not.toHaveBeenCalled();
@@ -117,15 +137,12 @@ describe('ExplorationPlayerPageAuthGuard', () => {
       NewLessonPlayer: {isEnabled: true},
     });
 
-    const route = {
-      paramMap: convertToParamMap({exploration_id: 'exp123'}),
-      queryParams: {v: '1'},
-    } as unknown as ActivatedRouteSnapshot;
+    const route = createMockRoute('exp123');
 
     const navigateByUrlSpy = spyOn(router, 'navigateByUrl').and.callThrough();
 
     guard
-      .canActivate(route, {url: '/explore/exp123?v=1'} as RouterStateSnapshot)
+      .canActivate(route, createMockState('/explore/exp123?v=1'))
       .then(result => {
         expect(result).toBeFalse();
         expect(navigateByUrlSpy).toHaveBeenCalledWith('/lesson/exp123');
@@ -133,40 +150,30 @@ describe('ExplorationPlayerPageAuthGuard', () => {
       });
   });
 
-  it(
-    'should redirect to /embed/lesson/:id if URL contains "embed" ' +
-      'and if new lesson player flag is enabled',
-    done => {
-      spyOn(
-        accessValidationBackendApiService,
-        'validateAccessToExplorationPlayerPage'
-      ).and.returnValue(Promise.resolve());
+  it('should redirect to /embed/lesson/:id if URL contains "embed" and flag is enabled', done => {
+    spyOn(
+      accessValidationBackendApiService,
+      'validateAccessToExplorationPlayerPage'
+    ).and.returnValue(Promise.resolve());
 
-      spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
-        NewLessonPlayer: {isEnabled: true},
+    spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
+      NewLessonPlayer: {isEnabled: true},
+    });
+
+    const route = createMockRoute('exp123');
+    const routerNavigateSpy = spyOn(router, 'navigate');
+
+    guard
+      .canActivate(route, createMockState('/embed/exploration/exp123?v=1'))
+      .then(result => {
+        expect(result).toBeFalse();
+        expect(routerNavigateSpy).toHaveBeenCalledWith(
+          ['/embed/lesson', 'exp123'],
+          {queryParams: {v: '1'}}
+        );
+        done();
       });
-
-      const route = {
-        paramMap: convertToParamMap({exploration_id: 'exp123'}),
-        queryParams: {v: '1'},
-      } as unknown as ActivatedRouteSnapshot;
-
-      const routerNavigateSpy = spyOn(router, 'navigate');
-
-      guard
-        .canActivate(route, {
-          url: '/embed/exploration/exp123?v=1',
-        } as RouterStateSnapshot)
-        .then(result => {
-          expect(result).toBeFalse();
-          expect(routerNavigateSpy).toHaveBeenCalledWith(
-            ['/embed/lesson', 'exp123'],
-            {queryParams: {v: '1'}}
-          );
-          done();
-        });
-    }
-  );
+  });
 
   it('should redirect to embed error page if access is denied and URL includes embed', done => {
     spyOn(
@@ -179,18 +186,16 @@ describe('ExplorationPlayerPageAuthGuard', () => {
     const route = {
       paramMap: convertToParamMap({exploration_id: 'exp123'}),
       queryParams: {},
-    } as unknown as ActivatedRouteSnapshot;
+    } as ActivatedRouteSnapshot;
 
-    const state = {url: '/embed/explore/exp123'} as RouterStateSnapshot;
+    const state = createMockState('/embed/explore/exp123');
 
     guard.canActivate(route, state).then(result => {
       expect(result).toBeFalse();
       expect(navigateSpy).toHaveBeenCalledWith([
         `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE}`,
       ]);
-      expect(location.replaceState).toHaveBeenCalledWith(
-        '/embed/explore/exp123'
-      );
+      expect(location.replaceState).toHaveBeenCalledWith(state.url);
       done();
     });
   });
@@ -206,16 +211,16 @@ describe('ExplorationPlayerPageAuthGuard', () => {
     const route = {
       paramMap: convertToParamMap({exploration_id: 'exp123'}),
       queryParams: {},
-    } as unknown as ActivatedRouteSnapshot;
+    } as ActivatedRouteSnapshot;
 
-    const state = {url: '/explore/exp123'} as RouterStateSnapshot;
+    const state = createMockState('/explore/exp123');
 
     guard.canActivate(route, state).then(result => {
       expect(result).toBeFalse();
       expect(navigateSpy).toHaveBeenCalledWith([
         `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
       ]);
-      expect(location.replaceState).toHaveBeenCalledWith('/explore/exp123');
+      expect(location.replaceState).toHaveBeenCalledWith(state.url);
       done();
     });
   });
