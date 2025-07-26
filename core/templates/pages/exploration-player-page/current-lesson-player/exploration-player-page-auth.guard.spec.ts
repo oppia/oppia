@@ -58,7 +58,7 @@ function createMockRoute(explorationId: string): ActivatedRouteSnapshot {
     get: () => convertToParamMap({exploration_id: explorationId}),
   });
 
-  snapshot.params = {exploration_id: explorationId}; // ✅ Add this line
+  snapshot.params = {exploration_id: explorationId};
   snapshot.queryParams = {v: '1'};
 
   return snapshot;

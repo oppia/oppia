@@ -117,7 +117,6 @@ describe('PracticeSessionAccessGuard', () => {
 
     const routeSnapshot = new ActivatedRouteSnapshot();
 
-    // Set params and queryParams safely using Object.defineProperty
     Object.defineProperty(routeSnapshot, 'params', {
       get: () => ({
         classroom_url_fragment: 'math',
@@ -142,6 +141,6 @@ describe('PracticeSessionAccessGuard', () => {
         ]);
       });
 
-    tick(); // Resolve the promise
+    tick();
   }));
 });
