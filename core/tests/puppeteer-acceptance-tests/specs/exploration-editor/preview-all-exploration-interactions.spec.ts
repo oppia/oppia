@@ -485,6 +485,8 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectGraphNodeCanBeRemoved();
     await explorationEditor.expectGraphNodeCanBeAdded();
     // Submit worng answer.
+    await explorationEditor.navigateToEditorTab();
+    await explorationEditor.navigateToPreviewTab();
     await explorationEditor.submitGraphStarNetworkSolution(3);
     await explorationEditor.expectResponseFeedbackToBe(
       'Wrong Answer. Please try again'
@@ -957,6 +959,9 @@ describe('Exploration Editor', function () {
     await explorationEditor.addMusicNotesInputSolutionToState(
       ['C4', 'E4', 'G4'],
       'as given in the question.'
+    );
+    await explorationEditor.expectToolTipMessage(
+      'The current solution does not lead to another card.'
     );
     await explorationEditor.saveExplorationDraft();
 

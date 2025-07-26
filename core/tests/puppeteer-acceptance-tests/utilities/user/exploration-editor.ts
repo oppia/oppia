@@ -4102,9 +4102,12 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOn(mobileNavbarDropdown);
       await this.page.waitForTimeout(500);
-      await this.page.waitForSelector(mobileNavbarPane);
+      await this.page.waitForSelector(`${mobileNavbarPane}.show`);
       await this.page.waitForTimeout(500);
-      await this.page.click(mobilePreviewTabButton);
+      const previewButton = await this.page.waitForSelector(
+        mobilePreviewTabButton
+      );
+      await previewButton?.click();
     } else {
       await this.page.waitForSelector(previewTabButton, {
         visible: true,
