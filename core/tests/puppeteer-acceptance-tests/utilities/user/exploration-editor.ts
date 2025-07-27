@@ -4303,7 +4303,8 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(mainTabButton);
     }
 
-    await this.isElementVisible(mainTabContainerSelector);
+    await this.expectElementToBeVisible(mainTabContainerSelector);
+    await this.waitForPageToFullyLoad();
   }
 
   /**
