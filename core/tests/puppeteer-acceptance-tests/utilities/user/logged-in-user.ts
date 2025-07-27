@@ -126,8 +126,6 @@ const continueFromWhereLeftOffSectionSelector =
 const issueTypeSelector = '.e2e-test-report-exploration-radio-button';
 const addTopicToCurrentGoalsButton =
   '.e2e-test-add-topic-to-current-goals-button';
-const removeTopicFromCurrentGoalsButton =
-  '.e2e-test-remove-topic-from-current-goals-button';
 const mobileCompletedLessonSection = '.community-lessons-section';
 const currentGoalsSectionSelector = '.e2e-test-current-goals-section';
 const homeSectionGreetingElement = '.greeting';
@@ -277,7 +275,7 @@ const lessonTitleSelector = '.e2e-test-lesson-title';
 const circleProgressElementSelector = 'circle-progress';
 const resumeLessonButtonSelector = '.e2e-test-resume-lesson-btn';
 
-// Others
+// Others.
 const filledRatingStarSelector = '.fas.fa-star';
 const navbarLearnTab = 'a.e2e-test-navbar-learn-menu';
 const navbarLearnDropdownContainerSelector =

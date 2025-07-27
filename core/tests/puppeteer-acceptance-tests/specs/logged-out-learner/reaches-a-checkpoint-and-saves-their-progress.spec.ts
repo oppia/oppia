@@ -26,9 +26,6 @@ import {
   INTERACTION_TYPES,
 } from '../../utilities/user/exploration-editor';
 
-const PROGRESS_URL_VALIDITY_INFO =
-  'Use the link below to save progress for 72 hours.';
-
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   SECOND_CARD = 'Second Card',
@@ -40,7 +37,7 @@ describe('Logged-out User', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutLearner: LoggedOutUser;
   let progressUrl: string;
-  let explorationId: string | null;
+  let explorationId: string;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(

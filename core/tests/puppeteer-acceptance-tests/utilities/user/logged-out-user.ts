@@ -433,8 +433,6 @@ const conceptCardLinkSelector = '.e2e-test-concept-card-link';
 const conceptCardViewerSelector = '.e2e-test-concept-card-viewer';
 const nonInteractiveTabsHeaderSelector =
   '.e2e-test-non-interactive-tabs-headers';
-const nonInteractiveTabContentSelector =
-  '.e2e-test-non-interactive-tab-content';
 
 const audioExpandButtonInLPSelector = '.e2e-test-lp-audio-expand-button';
 const audioForwardButtonSelector = '.e2e-test-audio-forward-button';
@@ -5143,7 +5141,6 @@ export class LoggedOutUser extends BaseUser {
   async waitUntilAudioIsPlaying(timeout: number = 20000): Promise<void> {
     await this.page.waitForFunction((selector: string) => {
       const element = document.querySelector(selector);
-      console.log(element?.getAttribute('aria-valuemax'));
       return (
         element?.textContent?.trim() === element?.getAttribute('aria-valuemax')
       );

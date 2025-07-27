@@ -28,9 +28,6 @@ const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
-const oppiaLink = 'https://www.oppia.org';
-const oppiaYouTubeVideoLink = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
-
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 
 const createExplorationButtonSelector =

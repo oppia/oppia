@@ -37,7 +37,6 @@ enum CARD_NAME {
 describe('Logged-Out Learner', function () {
   let explorationEditor: ExplorationEditor;
   let loggedOutLearner: LoggedOutUser;
-  let explorationId: string;
 
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
@@ -98,7 +97,7 @@ describe('Logged-Out Learner', function () {
     // Navigate back to the introduction card and save the draft.
     await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.publishExplorationWithMetadata(
+    await explorationEditor.publishExplorationWithMetadata(
       'What are the Place Values?',
       'Learn basic Mathematics including Place Values',
       'Mathematics'
