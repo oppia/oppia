@@ -118,19 +118,17 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
-        # Generate content IDs properly
         state1.content.content_id = content_id_generator.generate(
             translation_domain.ContentType.CONTENT)
-        state2.content.content_id = state1.content.content_id  # Create duplicate
+        state2.content.content_id = state1.content.content_id
 
         exploration.next_content_id_index = (
             content_id_generator.next_content_id_index)
 
         exp_services.save_new_exploration('owner_id', exploration)
 
-        # Get the actual content ID that was generated
         original_content_id = state1.content.content_id
-        
+       
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
                 f'Fixed exploration exp_id (version 1) - regenerated content '
@@ -169,10 +167,9 @@ class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
-        # Generate content IDs properly
         state1.content.content_id = content_id_generator.generate(
             translation_domain.ContentType.CONTENT)
-        state2.content.content_id = state1.content.content_id  # Create duplicate
+        state2.content.content_id = state1.content.content_id
 
         exploration.next_content_id_index = (
             content_id_generator.next_content_id_index)
@@ -210,7 +207,6 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
-        # Generate content IDs properly
         state1.content.content_id = content_id_generator.generate(
             translation_domain.ContentType.CONTENT)
         state2.content.content_id = state1.content.content_id  # Create duplicate
@@ -220,7 +216,6 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
 
         exp_services.save_new_exploration('owner_id', exploration)
 
-        # Get the actual content ID that was generated
         original_content_id = state1.content.content_id
         
         self.assert_job_output_is([
