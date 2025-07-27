@@ -3590,6 +3590,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async selectReviewCardToLearn(subtopicName: string): Promise<void> {
     try {
+      await this.expectElementToBeVisible(subTopicTitleInLessTabSelector);
       const subtopicElements = await this.page.$$(
         subTopicTitleInLessTabSelector
       );

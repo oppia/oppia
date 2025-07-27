@@ -15,7 +15,6 @@
 /**
  * @fileoverview Topic manager utility file.
  */
-import {doc} from 'prettier';
 import {BaseUser} from '../common/puppeteer-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
@@ -388,6 +387,7 @@ export class TopicManager extends BaseUser {
     await this.type(skillNameInput, skillName);
     await this.clickOn(skillItem);
     await this.clickOn(confirmSkillButton);
+    await this.expectPageURLToContain(testConstants.URLs.SkillEditor);
   }
 
   /**

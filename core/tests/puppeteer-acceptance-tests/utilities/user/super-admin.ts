@@ -1196,6 +1196,10 @@ export class SuperAdmin extends BaseUser {
 
     await this.page.waitForSelector(updateBlogPostButtonSelector);
     await this.clickOn(updateBlogPostButtonSelector);
+
+    await this.expectActionStatusMessageToBe(
+      'Successfully updated blog post data'
+    );
   }
 
   /**
