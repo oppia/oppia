@@ -118,19 +118,23 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
-        duplicate_content_id = 'content_0'
-        state1.content.content_id = duplicate_content_id
-        state2.content.content_id = duplicate_content_id
+        # Generate content IDs properly
+        state1.content.content_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT)
+        state2.content.content_id = state1.content.content_id  # Create duplicate
 
         exploration.next_content_id_index = (
             content_id_generator.next_content_id_index)
 
         exp_services.save_new_exploration('owner_id', exploration)
 
+        # Get the actual content ID that was generated
+        original_content_id = state1.content.content_id
+        
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
-                'Fixed exploration exp_id (version 1) - regenerated content '
-                'IDs: [\'content_0 -> content_2 in State2\']'
+                f'Fixed exploration exp_id (version 1) - regenerated content '
+                f'IDs: [\'{original_content_id} -> content_2 in State2\']'
             )
         ])
 
@@ -138,7 +142,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state1_updated = updated_exploration.states['Introduction']
         state2_updated = updated_exploration.states['State2']
 
-        self.assertEqual(state1_updated.content.content_id, 'content_0')
+        self.assertEqual(state1_updated.content.content_id, original_content_id)
         self.assertEqual(state2_updated.content.content_id, 'content_2')
 
 
@@ -165,9 +169,10 @@ class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
-        duplicate_content_id = 'content_0'
-        state1.content.content_id = duplicate_content_id
-        state2.content.content_id = duplicate_content_id
+        # Generate content IDs properly
+        state1.content.content_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT)
+        state2.content.content_id = state1.content.content_id  # Create duplicate
 
         exploration.next_content_id_index = (
             content_id_generator.next_content_id_index)
@@ -205,19 +210,23 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
-        duplicate_content_id = 'content_0'
-        state1.content.content_id = duplicate_content_id
-        state2.content.content_id = duplicate_content_id
+        # Generate content IDs properly
+        state1.content.content_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT)
+        state2.content.content_id = state1.content.content_id  # Create duplicate
 
         exploration.next_content_id_index = (
             content_id_generator.next_content_id_index)
 
         exp_services.save_new_exploration('owner_id', exploration)
 
+        # Get the actual content ID that was generated
+        original_content_id = state1.content.content_id
+        
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
-                'Fixed exploration exp_id (version 1) - regenerated content '
-                'IDs: [\'content_0 -> content_2 in State2\']'
+                f'Fixed exploration exp_id (version 1) - regenerated content '
+                f'IDs: [\'{original_content_id} -> content_2 in State2\']'
             )
         ])
 
@@ -225,5 +234,9 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
         state1_updated = updated_exploration.states['Introduction']
         state2_updated = updated_exploration.states['State2']
 
-        self.assertEqual(state1_updated.content.content_id, 'content_0')
-        self.assertEqual(state2_updated.content.content_id, 'content_0')
+        self.assertEqual(
+            state1_updated.content.content_id, original_content_id
+        )
+        self.assertEqual(
+            state2_updated.content.content_id, original_content_id
+        )
