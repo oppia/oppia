@@ -4090,6 +4090,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.waitForPageToFullyLoad();
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
       // The option to save changes appears only in the mobile view after clicking on the mobile options button,
@@ -4101,11 +4102,21 @@ export class ExplorationEditor extends BaseUser {
         await this.clickOn(mobileOptionsButtonSelector);
       }
 
-      await this.page.waitForSelector(mobileNavbarDropdown, {
-        visible: true,
-      });
-      await this.clickOn(mobileNavbarDropdown);
-      await this.page.waitForTimeout(500);
+      // Check if dropdown is open or not, if open skip clicking on dropdown.
+      const isDropdownOpen = await this.isElementVisible(
+        `${mobileNavbarPane}.show`
+      );
+
+      // Open dropdown if not open.
+      if (!isDropdownOpen) {
+        await this.page.waitForSelector(mobileNavbarDropdown, {
+          visible: true,
+        });
+        await this.clickOn(mobileNavbarDropdown);
+        await this.page.waitForTimeout(500);
+      }
+
+      // Click on the "Preview" button.
       await this.page.waitForSelector(`${mobileNavbarPane}.show`);
       await this.page.waitForTimeout(500);
       const previewButton = await this.page.waitForSelector(
