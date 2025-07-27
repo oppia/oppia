@@ -235,7 +235,7 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
-   * This function selects two tags for the blog post.
+   * This function selects a tag for the blog post.
    */
   async selectTag(tag: string): Promise<void> {
     await this.expectElementToBeVisible(tagSelector);
