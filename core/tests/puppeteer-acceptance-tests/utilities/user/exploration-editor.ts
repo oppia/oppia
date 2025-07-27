@@ -31,8 +31,6 @@ const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 const oppiaLink = 'https://www.oppia.org';
 const oppiaYouTubeVideoLink = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
 
-const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
-
 const createExplorationButtonSelector =
   'button.e2e-test-create-new-exploration-button';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
@@ -318,16 +316,6 @@ export class ExplorationEditor extends BaseUser {
   async navigateToCreatorDashboardPage(): Promise<void> {
     await this.goto(creatorDashboardPage);
     showMessage('Creator dashboard page is opened successfully.');
-  }
-
-  /**
-   * Function to navigate to exploration editor from Creator Dashboard.
-   */
-  async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
-    await this.page.waitForSelector(createExplorationButtonSelector);
-    await this.clickAndWaitForNavigation(createExplorationButtonSelector);
-
-    expect(this.page.url()).toContain(`${baseUrl}/create/`);
   }
 
   /**
