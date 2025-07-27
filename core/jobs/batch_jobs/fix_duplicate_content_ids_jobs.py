@@ -301,9 +301,10 @@ def _replace_content_id_in_state(
                 state.interaction.solution.explanation.content_id = (
                     new_content_id)
 
-    # Here we use type Any because the customization arg value can be of
-    # various types including lists, dicts, or objects with content_id
-    # attributes, and we need to handle all these cases recursively.
+
+# Here we use type Any because the customization arg value can be of
+# various types including lists, dicts, or objects with content_id
+# attributes, and we need to handle all these cases recursively.
 def _replace_content_id_in_value(
     value: Any, old_content_id: str, new_content_id: str
 ) -> None:
