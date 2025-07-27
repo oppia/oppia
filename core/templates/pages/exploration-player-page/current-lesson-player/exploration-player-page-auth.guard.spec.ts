@@ -51,7 +51,7 @@ class MockPlatformFeatureService {
   }
 }
 
-function createMockRoute(explorationId: string): ActivatedRouteSnapshot {
+const createMockRoute = (explorationId: string): ActivatedRouteSnapshot => {
   const snapshot = new ActivatedRouteSnapshot();
 
   Object.defineProperty(snapshot, 'paramMap', {
@@ -62,7 +62,12 @@ function createMockRoute(explorationId: string): ActivatedRouteSnapshot {
   snapshot.queryParams = {v: '1'};
 
   return snapshot;
-}
+};
+
+const createMockState = (url: string): RouterStateSnapshot => ({
+  url,
+  root: new ActivatedRouteSnapshot(),
+});
 
 describe('ExplorationPlayerPageAuthGuard', () => {
   let guard: ExplorationPlayerPageAuthGuard;
@@ -93,13 +98,6 @@ describe('ExplorationPlayerPageAuthGuard', () => {
     router = TestBed.inject(Router);
     location = TestBed.inject(Location) as jasmine.SpyObj<Location>;
   });
-
-  function createMockState(url: string): RouterStateSnapshot {
-    return {
-      url,
-      root: new ActivatedRouteSnapshot(),
-    };
-  }
 
   it('should allow access if validation passes and flag is disabled', done => {
     spyOn(

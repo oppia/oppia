@@ -369,7 +369,7 @@ oppia-conversation-display .oppia-mcq-question-description-text {
     width: 64px;
   }
 
-    oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
+  oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
     height: 39px;
     left: -28px;
     position: absolute;
