@@ -170,7 +170,8 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
     def _check_and_fix_duplicate_content_ids(
         exploration: exp_domain.Exploration
         ) -> (
-        Dict[str, Union[str, int, List[str], 'exp_models.ExplorationModel']] | None
+        Dict[str, Union[str, int, List[str], 
+                       'exp_models.ExplorationModel']] | None
     ):
         """Check and fix duplicate content IDs in an exploration.
 
