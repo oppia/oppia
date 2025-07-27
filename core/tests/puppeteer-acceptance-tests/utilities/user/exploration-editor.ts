@@ -417,6 +417,7 @@ const progressUIDSelector = '.e2e-test-progress-id';
 const customSelectedCharctersSelector = '.e2e-test-custom-letters';
 const showUnitFormatsButtonSelector = '.e2e-test-show-unit-formats';
 const codeOutputSelector = '.e2e-test-code-output';
+const graphContainerSelector = '.e2e-test-graph-input-viz-container';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -1927,6 +1928,8 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} n - The number of vertices in the star network.
    */
   async submitGraphStarNetworkSolution(n: number): Promise<void> {
+    await this.page.waitForSelector(graphContainerSelector);
+    await this.waitForPageToFullyLoad();
     const graphViz = new GraphViz(this.page);
 
     await graphViz.resetGraph();

@@ -1,5 +1,4 @@
 import puppeteer, {ElementHandle} from 'puppeteer';
-import {showMessage} from '../show-message';
 import isElementClickable from '../../../functions/is-element-clickable';
 
 const graphContainerSelector = '.e2e-test-graph-input-viz-container';
@@ -45,7 +44,9 @@ export class GraphViz {
    * @returns The graph container.
    */
   async getGraphContainer(): Promise<ElementHandle<Element>> {
-    const graphContainer = await this.context.$(graphContainerSelector);
+    const graphContainer = await this.context.waitForSelector(
+      graphContainerSelector
+    );
     if (!graphContainer) {
       throw new Error('Graph container not found.');
     }
@@ -303,8 +304,9 @@ export class GraphViz {
    * Resets the graph.
    */
   async resetGraph(): Promise<void> {
-    await this.parentPage.waitForSelector(resetGraphButtonSelector);
-    const resetGraphButton = await this.parentPage.$(resetGraphButtonSelector);
+    const resetGraphButton = await this.parentPage.waitForSelector(
+      resetGraphButtonSelector
+    );
     await this.parentPage.waitForFunction(
       isElementClickable,
       {},
