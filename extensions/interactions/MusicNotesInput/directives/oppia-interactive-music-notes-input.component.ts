@@ -101,7 +101,7 @@ export class MusicNotesInputComponent
   NOTE_NAMES_TO_MIDI_VALUES =
     InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES;
 
-  staffContainerElt: JQuery<HTMLElement>;
+  staffContainerElt: HTMLElement | null;
 
   constructor(
     private interactionAttributesExtractorService: InteractionAttributesExtractorService,
@@ -134,9 +134,8 @@ export class MusicNotesInputComponent
     this.initialSequence = this.interactionIsActive
       ? initialSequence
       : this.lastAnswer;
-    // TODO(#14340): Remove some usages of jQuery from the codebase.
-    this.staffContainerElt = $(
-      this.elementRef.nativeElement.querySelectorAll('.oppia-music-input-staff')
+    this.staffContainerElt = this.elementRef.nativeElement.querySelector(
+      '.oppia-music-input-staff'
     );
 
     this.directiveSubscriptions.add(
@@ -211,7 +210,6 @@ export class MusicNotesInputComponent
   // Staff has to be reinitialized every time that the staff is resized or
   // displayed. The staffContainerElt and all subsequent measurements
   // must be recalculated in order for the grid to work properly.
-  // TODO(#14340): Remove some usages of jQuery from the codebase.
   reinitStaff(): void {
     var elem = document.querySelector('.oppia-music-input-valid-note-area');
 
@@ -226,7 +224,10 @@ export class MusicNotesInputComponent
   }
 
   init(): void {
-    this.CONTAINER_WIDTH = this.staffContainerElt.width();
+    if (this.staffContainerElt) {
+      this.CONTAINER_WIDTH =
+        this.staffContainerElt.getBoundingClientRect().width;
+    }
     this.CONTAINER_HEIGHT = 0.2 * this.CONTAINER_WIDTH;
 
     // The grid rectangle dimensions defining the grid which the notes
