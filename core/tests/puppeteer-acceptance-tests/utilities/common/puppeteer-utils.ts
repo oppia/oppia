@@ -932,18 +932,120 @@ export class BaseUser {
   }
 
   /**
+   * Verify text content inside an element, waiting until it matches expected text.
+   * @param selector - The selector of the element to get text from.
+   * @param expectedText - The expected text content.
+   */
+  async expectElementContentToBe(
+    selector: string,
+    expectedText: string
+  ): Promise<void> {
+    try {
+      await this.page.waitForFunction(
+        (sel: string, text: string) => {
+          const el = document.querySelector(sel);
+          return el && el.textContent?.trim() === text;
+        },
+        {timeout: 5000},
+        selector,
+        expectedText
+      );
+    } catch (err) {
+      const currentText = await this.getTextContent(selector);
+      throw new Error(
+        `Text did not match within timeout.\nSelector: "${selector}"\nExpected: "${expectedText}"\nActual: "${currentText}"`
+      );
+    }
+  }
+
+  /*
+   * Checks if the element is visible or not.
+   * @param selector The selector of the element.
+   */
+  async expectElementToBeVisible(selector: string): Promise<void> {
+    expect(await this.isElementVisible(selector)).toBe(true);
+  }
+
+  /**
    * Verify text content inside an element
    * @param {string} selector - The selector of the element to get text from.
-   * @param {string} textContent - The expected text content.
+   * @param {string} text - The expected text content.
    */
-  async expectTextContentToMatch(
-    selector: string,
-    textContent: string
-  ): Promise<void> {
-    const currentTextContent = await this.getTextContent(selector);
-    if (currentTextContent !== textContent) {
+  async expectTextContentToBe(selector: string, text: string): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+
+    try {
+      await this.page.waitForFunction(
+        (selector: string, text: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === text.trim();
+        },
+        {},
+        selector,
+        text
+      );
+
+      showMessage(`Text content of "${selector}" is "${text}".`);
+    } catch (error) {
       throw new Error(
-        `Text did not match within the specified time. Actual text: "${currentTextContent}", expected text: "${textContent}"`
+        `Failed: Text content of "${selector}" is not "${text}".\nOriginal Error:\n${error.stack}`
+      );
+    }
+  }
+
+  /**
+   * Verify text content inside an element, waiting until it matches expected text.
+   * @param selector - The selector of the element to get text from.
+   * @param expectedText - The expected text content.
+   */
+  async expectElementContentToContain(
+    selector: string,
+    expectedText: string
+  ): Promise<void> {
+    try {
+      await this.page.waitForFunction(
+        (sel: string, text: string) => {
+          const el = document.querySelector(sel);
+          return el && el.textContent?.includes(text);
+        },
+        {timeout: 5000},
+        selector,
+        expectedText
+      );
+    } catch (err) {
+      const currentText = await this.getTextContent(selector);
+      throw new Error(
+        `Text did not match within timeout.\nSelector: "${selector}"\nExpected: "${expectedText}"\nActual: "${currentText}"`
+      );
+    }
+  }
+
+  /*
+   * Checks if the text content of the element contains the given text.
+   * @param selector The selector of the element.
+   * @param text The text to check for.
+   */
+  async expectTextContentToContain(
+    selector: string,
+    text: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+
+    try {
+      await this.page.waitForFunction(
+        (selector: string, text: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.includes(text);
+        },
+        {},
+        selector,
+        text
+      );
+
+      showMessage(`Text content of "${selector}" contains "${text}".`);
+    } catch (error) {
+      throw new Error(
+        `Failed: Text content of "${selector}" does not contain "${text}".\nOriginal Error:\n${error.stack}`
       );
     }
   }
@@ -1018,18 +1120,6 @@ export class BaseUser {
   }
 
   /**
-   * This function checks if the element is visible or not.
-   * @param {string} selector - The selector of the element to check.
-   * @param {boolean} visible - Whether the element should be visible or not.
-   */
-  async expectElementToBeVisible(
-    selector: string,
-    visible: boolean = true
-  ): Promise<void> {
-    expect(await this.isElementVisible(selector)).toBe(visible);
-  }
-
-  /**
    * This function checks if the page URL contains the given URL.
    * @param {string} url - The URL to check.
    */
@@ -1059,6 +1149,30 @@ export class BaseUser {
       selector,
       value
     );
+  }
+  /**
+   * Verifies that the tooltip text matches the expected tooltip text.
+   * @param {string} selector - The selector of the element to hover over.
+   * @param {string} expectedToolTip - The expected tooltip text.
+   */
+  async expectToolTipTextToBe(
+    selector: string,
+    expectedToolTip: string
+  ): Promise<void> {
+    // Hover over element.
+    await this.page.waitForSelector(selector, {visible: true});
+    await this.page.hover(selector);
+
+    // Wait for the tooltip to appear.
+    await this.page.waitForSelector('.tooltip', {
+      visible: true,
+    });
+
+    // Check the tooltip content.
+    const tooltipText = await this.page.$eval('.tooltip', el => el.textContent);
+
+    // Verify Tooltip.
+    expect(tooltipText).toBe(expectedToolTip);
   }
 }
 

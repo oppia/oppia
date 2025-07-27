@@ -1,4 +1,4 @@
-<div class="classroom-cards-wrapper" *ngIf="publicClassroomsCount > 0">
+<div class="classroom-cards-wrapper e2e-test-community-library" *ngIf="publicClassroomsCount > 0">
   <div class="classroom-cards-inner-container"
        [ngClass]="{
          'classroom-width-1': publicClassroomsCount === 1,
@@ -76,7 +76,7 @@
     </div>
   </div>
 </div>
-<div class="oppia-library-container d-flex">
+<div class="oppia-library-container d-flex e2e-test-library-container e2e-test-community-library">
   <div class="oppia-library-container-inner m-auto">
     <div>
       <div class="oppia-exp-summary-tiles-container" *ngIf="pageMode === LIBRARY_PAGE_MODES.SEARCH">
@@ -108,8 +108,7 @@
                                             [ratings]="tile.ratings"
                                             [numViews]="tile.num_views"
                                             [thumbnailIconUrl]="tile.thumbnail_icon_url"
-                                            [thumbnailBgColor]="tile.thumbnail_bg_color"
-                                            class="e2e-test-exp-summary-tile">
+                                            [thumbnailBgColor]="tile.thumbnail_bg_color">
             </oppia-exploration-summary-tile>
           </div>
         </div>

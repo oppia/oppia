@@ -1648,7 +1648,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         self._assert_validation_error(
             self.new_exploration, 'Collapsible tag should not be present '
-            'inside another Tabs or Collapsible tag.')
+            'inside Tabs or another Collapsible tag.')
         self.state.content.html = 'Valid content'
 
     def test_continue_interaction(self) -> None:

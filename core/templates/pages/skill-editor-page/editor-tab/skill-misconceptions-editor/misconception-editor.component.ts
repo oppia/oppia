@@ -66,12 +66,15 @@ export class MisconceptionEditorComponent implements OnInit {
   feedbackEditorIsOpen: boolean = false;
   NOTES_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
-    ui_config: {},
+    ui_config: {
+      rte_components: 'ALL_COMPONENTS',
+    },
   };
 
   FEEDBACK_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
+      rte_components: 'ALL_COMPONENTS',
       hide_complex_extensions: 'true',
     },
   };
