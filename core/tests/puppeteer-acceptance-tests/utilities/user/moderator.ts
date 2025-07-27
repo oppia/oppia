@@ -154,7 +154,7 @@ export class Moderator extends BaseUser {
     await this.page.waitForFunction(
       (title: string) => {
         const anchorElements = document.querySelectorAll(`a`);
-        for (const element of anchorElements) {
+        for (const element of Array.from(anchorElements)) {
           if (element.textContent?.trim() === title) {
             return true;
           }
@@ -267,7 +267,7 @@ export class Moderator extends BaseUser {
     await this.page.waitForFunction(
       (explorationID: string) => {
         const anchorElements = document.querySelectorAll('a');
-        for (const element of anchorElements) {
+        for (const element of Array.from(anchorElements)) {
           if (element.textContent?.trim() === explorationID) {
             return true;
           }

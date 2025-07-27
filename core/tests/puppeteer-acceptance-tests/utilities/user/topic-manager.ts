@@ -2047,7 +2047,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForFunction(
         (selector: string, skillName: string) => {
           const skillElements = document.querySelectorAll(selector);
-          for (const skillElement of skillElements) {
+          for (const skillElement of Array.from(skillElements)) {
             const skillNameElement = skillElement.querySelector('span');
             if (skillNameElement?.textContent?.trim() === skillName) {
               return false;

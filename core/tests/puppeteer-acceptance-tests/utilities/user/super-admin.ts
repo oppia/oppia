@@ -243,7 +243,7 @@ export class SuperAdmin extends BaseUser {
         await this.page.waitForFunction(
           (selector: string, topic: string) => {
             const assingedTopicElements = document.querySelectorAll(selector);
-            for (const element of assingedTopicElements) {
+            for (const element of Array.from(assingedTopicElements)) {
               const textContent = element.textContent;
               if (textContent === topic) {
                 return true;
