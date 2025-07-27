@@ -271,6 +271,8 @@ const voiceoverConfirmationModalButton =
 const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
 const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
 const previousCardButton = '.e2e-test-back-button';
+const openExplorationEditorNavigationMobile =
+  '.oppia-exploration-editor-tabs-dropdown.show';
 
 enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
@@ -536,6 +538,12 @@ export class ExplorationEditor extends BaseUser {
         timeout: 5000,
       });
       await this.clickOn(dropdownToggleIcon);
+
+      await this.expectElementToBeVisible(
+        openExplorationEditorNavigationMobile,
+        false
+      );
+
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
       throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);

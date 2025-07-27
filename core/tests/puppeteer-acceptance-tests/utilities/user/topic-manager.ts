@@ -475,6 +475,7 @@ export class TopicManager extends BaseUser {
     if (topicName) {
       await this.clearAllTextFrom(topicNameField);
       await this.type(topicNameField, topicName);
+      await this.expectInputValueToBe(topicNameField, topicName);
     }
     if (urlFragment) {
       await this.page.waitForSelector(topicEditorUrlFragmentField, {
@@ -482,11 +483,13 @@ export class TopicManager extends BaseUser {
       });
       await this.clearAllTextFrom(topicEditorUrlFragmentField);
       await this.page.type(topicEditorUrlFragmentField, urlFragment);
+      await this.expectInputValueToBe(topicEditorUrlFragmentField, urlFragment);
     }
     await this.clearAllTextFrom(updateTopicWebFragmentField);
     await this.type(updateTopicWebFragmentField, titleFragments);
     await this.clearAllTextFrom(updateTopicDescriptionField);
     await this.type(updateTopicDescriptionField, description);
+    await this.expectInputValueToBe(updateTopicDescriptionField, description);
 
     await this.clickOn(photoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
@@ -500,14 +503,7 @@ export class TopicManager extends BaseUser {
     await this.clearAllTextFrom(topicMetaTagInput);
     await this.page.type(topicMetaTagInput, metaTags);
     await this.page.keyboard.press('Tab');
-
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsSelector);
-      await this.waitForElementToBeClickable(mobileSaveTopicButton);
-      await this.clickOn(mobileOptionsSelector);
-    } else {
-      await this.waitForElementToBeClickable(saveTopicButton);
-    }
+    await this.expectInputValueToBe(topicMetaTagInput, metaTags);
   }
 
   /**
@@ -1502,9 +1498,13 @@ export class TopicManager extends BaseUser {
       if (text === optionText) {
         await this.waitForElementToBeClickable(optionElement);
         await optionElement.click();
+
+        await this.expectElementToBeVisible(filterOptionSelector, false);
         break;
       }
     }
+
+    throw new Error(`Option ${optionText} not found.`);
   }
 
   /**
@@ -2721,7 +2721,10 @@ export class TopicManager extends BaseUser {
               await this.waitForElementToBeClickable(deleteButton);
               await deleteButton.click();
               await this.clickOn(confirmStoryDeletionButton);
-              await this.expectElementToBeVisible(confirmStoryDeletionButton);
+              await this.expectElementToBeVisible(
+                confirmStoryDeletionButton,
+                false
+              );
               showMessage(
                 `Story ${storyName} deleted from the topic ${topicName}.`
               );
