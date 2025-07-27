@@ -361,3 +361,19 @@ oppia-conversation-display .oppia-mcq-question-description-text {
     padding-bottom: 30px;
   }
 }
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  oppia-conversation-display .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
+    height: 64px;
+    left: -68px;
+    width: 64px;
+  }
+
+    oppia-conversation-display .oppia-learner-view-card-top-section .left-side-curve {
+    height: 39px;
+    left: -28px;
+    position: absolute;
+    top: -8px;
+    width: 29px;
+  }
+}

@@ -162,3 +162,36 @@ oppia-new-input-response-pair .conversation-skin-oppia-feedback.ng-enter.ng-ente
     width: 64px;
   }
 }
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  oppia-new-input-response-pair .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
+    height: 64px;
+    left: -68px;
+    top: 5px;
+    width: 64px;
+  }
+
+  oppia-new-input-response-pair .feedback-wrapper .left-side-curve {
+    height: 39px;
+    left: -27px;
+    position: absolute;
+    top: -8px;
+    width: 29px;
+  }
+
+  oppia-new-input-response-pair .answer-wrapper .right-side-curve {
+    height: 39px;
+    position: absolute;
+    right: -28px;
+    top: -8px;
+    transform: scaleX(-1);
+    width: 29px;
+  }
+
+  oppia-new-input-response-pair .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+    height: 64px;
+    right: -69px;
+    top: 3px;
+    width: 64px;
+  }
+}

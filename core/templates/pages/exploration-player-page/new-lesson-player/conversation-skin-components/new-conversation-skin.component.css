@@ -171,3 +171,10 @@ oppia-new-conversation-skin .oppia-button-icon {
     width: 100%;
   }
 }
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  .new-conversation-skin-cards-container {
+    padding-right: 80px;
+    padding-left: 80px;
+  }
+}
