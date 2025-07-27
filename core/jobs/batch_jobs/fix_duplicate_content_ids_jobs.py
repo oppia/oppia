@@ -27,7 +27,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Set, Union
+from typing import Any, Dict, List, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -265,13 +265,11 @@ def _replace_content_id_in_state(
 
     if state.interaction:
         for ca_value in state.interaction.customization_args.values():
-            if (hasattr(ca_value, 'value') and
-                    hasattr(ca_value.value, 'content_id')):
-                if ca_value.value.content_id == old_content_id:
-                    ca_value.value.content_id = new_content_id
-            elif (hasattr(ca_value, 'content_id') and
-                  ca_value.content_id == old_content_id):
-                ca_value.content_id = new_content_id
+            # Get all content IDs from this customization arg
+            content_ids = ca_value.get_content_ids()
+            if old_content_id in content_ids:
+                # Replace the content ID in the value
+                _replace_content_id_in_value(ca_value.value, old_content_id, new_content_id)
 
         for answer_group in state.interaction.answer_groups:
             if (hasattr(answer_group.outcome, 'feedback') and
@@ -301,6 +299,26 @@ def _replace_content_id_in_state(
                     old_content_id):
                 state.interaction.solution.explanation.content_id = (
                     new_content_id)
+
+
+def _replace_content_id_in_value(
+    value: Any, old_content_id: str, new_content_id: str
+) -> None:
+    """Replace a content ID in a customization arg value.
+
+    Args:
+        value: Any. The value to search and replace in.
+        old_content_id: str. The old content ID to replace.
+        new_content_id: str. The new content ID to use.
+    """
+    if hasattr(value, 'content_id') and value.content_id == old_content_id:
+        value.content_id = new_content_id
+    elif isinstance(value, list):
+        for item in value:
+            _replace_content_id_in_value(item, old_content_id, new_content_id)
+    elif isinstance(value, dict):
+        for item_value in value.values():
+            _replace_content_id_in_value(item_value, old_content_id, new_content_id)
 
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJob(
