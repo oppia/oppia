@@ -20,13 +20,14 @@ from __future__ import annotations
 
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -74,7 +75,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
     @staticmethod
     def _check_for_duplicate_content_ids(
         exploration: exp_domain.Exploration
-    ) -> Dict[str, str] | None:
+    ) -> Dict[str, Union[str, int, Dict[str, List[str]]]] | None:
         """Check if an exploration has duplicate content IDs.
 
         Args:
@@ -168,7 +169,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
     @staticmethod
     def _check_and_fix_duplicate_content_ids(
         exploration: exp_domain.Exploration
-    ) -> Dict[str, str] | None:
+    ) -> Dict[str, Union[str, int, List[str], 'exp_models.ExplorationModel']] | None:
         """Check and fix duplicate content IDs in an exploration.
 
         Args:
@@ -243,7 +244,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 
 
 def _replace_content_id_in_state(
-    state, old_content_id: str, new_content_id: str
+    state: state_domain.State, old_content_id: str, new_content_id: str
 ) -> None:
     """Replace a content ID in a state with a new one.
 
