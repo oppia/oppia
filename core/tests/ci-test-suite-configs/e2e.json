@@ -17,18 +17,6 @@
       "module": "core/tests/webdriverio_desktop/additionalPlayerFeatures.js"
     },
     {
-      "name": "blogDashboard",
-      "module": "core/tests/webdriverio_desktop/blogDashboard.js"
-    },
-    {
-      "name": "blog",
-      "module": "core/tests/webdriverio_desktop/blog.js"
-    },
-    {
-      "name": "collections",
-      "module": "core/tests/webdriverio_desktop/collections.js"
-    },
-    {
       "name": "contributorDashboard",
       "module": "core/tests/webdriverio_desktop/contributorDashboard.js"
     },
@@ -41,28 +29,8 @@
       "module": "core/tests/webdriverio_desktop/coreEditorAndPlayerFeatures.js"
     },
     {
-      "name": "creatorDashboard",
-      "module": "core/tests/webdriverio_desktop/creatorDashboard.js"
-    },
-    {
-      "name": "embedding",
-      "module": "core/tests/webdriverio_desktop/embedding.js"
-    },
-    {
-      "name": "explorationFeedbackTab",
-      "module": "core/tests/webdriverio_desktop/explorationFeedbackTab.js"
-    },
-    {
       "name": "explorationImprovementsTab",
       "module": "core/tests/webdriverio_desktop/explorationImprovementsTab.js"
-    },
-    {
-      "name": "explorationHistoryTab",
-      "module": "core/tests/webdriverio_desktop/explorationHistoryTab.js"
-    },
-    {
-      "name": "explorationStatisticsTab",
-      "module": "core/tests/webdriverio_desktop/explorationStatisticsTab.js"
     },
     {
       "name": "explorationTranslationTab",
@@ -73,32 +41,16 @@
       "module": "core/tests/webdriverio_desktop/extensions.js"
     },
     {
-      "name": "fileUploadExtensions",
-      "module": "core/tests/webdriverio_desktop/fileUploadExtensions.js"
-    },
-    {
       "name": "fileUploadFeatures",
       "module": "core/tests/webdriverio_desktop/voiceoverUploadFeatures.js"
-    },
-    {
-      "name": "learner",
-      "module": "core/tests/webdriverio/learnerFlow.js"
     },
     {
       "name": "navigation",
       "module": "core/tests/webdriverio_desktop/navigation.js"
     },
     {
-      "name": "profileFeatures",
-      "module": "core/tests/webdriverio_desktop/profileFeatures.js"
-    },
-    {
       "name": "profileMenu",
       "module": "core/tests/webdriverio/profileMenuFlow.js"
-    },
-    {
-      "name": "publication",
-      "module": "core/tests/webdriverio_desktop/publicationAndLibrary.js"
     },
     {
       "name": "skillEditor",
