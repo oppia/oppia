@@ -265,11 +265,12 @@ def _replace_content_id_in_state(
 
     if state.interaction:
         for ca_value in state.interaction.customization_args.values():
-            # Get all content IDs from this customization arg
+            # Get all content IDs from this customization arg.
             content_ids = ca_value.get_content_ids()
             if old_content_id in content_ids:
-                # Replace the content ID in the value
-                _replace_content_id_in_value(ca_value.value, old_content_id, new_content_id)
+                # Replace the content ID in the value.
+                _replace_content_id_in_value(
+                    ca_value.value, old_content_id, new_content_id)
 
         for answer_group in state.interaction.answer_groups:
             if (hasattr(answer_group.outcome, 'feedback') and
@@ -311,6 +312,9 @@ def _replace_content_id_in_value(
         old_content_id: str. The old content ID to replace.
         new_content_id: str. The new content ID to use.
     """
+    # Here we use type Any because the customization arg value can be of
+    # various types including lists, dicts, or objects with content_id
+    # attributes, and we need to handle all these cases recursively.
     if hasattr(value, 'content_id') and value.content_id == old_content_id:
         value.content_id = new_content_id
     elif isinstance(value, list):
@@ -318,7 +322,8 @@ def _replace_content_id_in_value(
             _replace_content_id_in_value(item, old_content_id, new_content_id)
     elif isinstance(value, dict):
         for item_value in value.values():
-            _replace_content_id_in_value(item_value, old_content_id, new_content_id)
+            _replace_content_id_in_value(
+                item_value, old_content_id, new_content_id)
 
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJob(
