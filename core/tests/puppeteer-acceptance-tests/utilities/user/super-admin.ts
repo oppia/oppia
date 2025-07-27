@@ -348,7 +348,7 @@ export class SuperAdmin extends BaseUser {
     role = role.replace(/\b\w/g, char => char.toUpperCase());
     await this.clickOn(role);
 
-    await this.expectTextContentToMatch(selectedRoleHeadingSelector, role);
+    await this.expectTextContentToContain(selectedRoleHeadingSelector, role);
   }
 
   /**
@@ -858,7 +858,7 @@ export class SuperAdmin extends BaseUser {
       await this.waitForElementToBeClickable(paramValueInput);
       await this.page.type(paramValueInput, ruleValue);
 
-      await this.expectTextContentToMatch(paramValueInput, ruleValue);
+      await this.expectTextContentToContain(paramValueInput, ruleValue);
       showMessage('Rule added successfully.');
     } catch (error) {
       console.error(

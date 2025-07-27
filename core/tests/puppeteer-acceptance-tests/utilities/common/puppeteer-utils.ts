@@ -958,12 +958,17 @@ export class BaseUser {
     }
   }
 
-  /*
+  /**
    * Checks if the element is visible or not.
    * @param selector The selector of the element.
+   * @param visible Whether the element should be visible or not. Default is true.
    */
-  async expectElementToBeVisible(selector: string): Promise<void> {
-    expect(await this.isElementVisible(selector)).toBe(true);
+  async expectElementToBeVisible(
+    selector: string,
+    visible: boolean = true
+  ): Promise<void> {
+    const option = visible ? {visible: true} : {hidden: true};
+    await this.page.waitForSelector(selector, option);
   }
 
   /**
