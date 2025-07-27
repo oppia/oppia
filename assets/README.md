@@ -1,8 +1,8 @@
-This folder contains various assets used in Oppia codebase.
+This folder contains various assets used in the Oppia codebase.
 
-- i18n: Contains the translations for supported languages.
-- images: Images used in various pages on Oppia website.
-- overrides: Overrides for third party.
-- pages: Attribution message.
-- scripts: Scripts for exploration embeddings & testing.
-- videos: Videos used in various pages on Oppia website.
+- `i18n`: Contains the translations for supported languages.
+- `images`: Images used across various pages of the Oppia website.
+- `overrides`: Overrides for third-party components.
+- `pages`: Attribution messages and static pages.
+- `scripts`: Scripts for exploration embeddings and testing.
+- `videos`: Videos used on various pages of the Oppia website.
