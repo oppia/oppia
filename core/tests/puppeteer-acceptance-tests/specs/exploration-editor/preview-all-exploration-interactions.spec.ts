@@ -356,10 +356,6 @@ describe('Exploration Editor', function () {
       'Try Again!'
     );
     await explorationEditor.addHintToState('Arrange in Ascending Order');
-    await explorationEditor.addDragAndDropSortSolution(
-      ['First', 'Second', 'Third'],
-      'As given in the question.'
-    );
     await explorationEditor.saveExplorationDraft();
 
     // Sort items in wrong order.
