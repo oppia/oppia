@@ -24,8 +24,8 @@ import html
 import io
 import json
 import logging
-import uuid
 import time
+import uuid
 
 from core import feconf
 from core import utils
@@ -34,7 +34,6 @@ from core.domain import fs_services
 from core.domain import state_domain
 from core.domain import translation_fetchers
 from core.domain import voiceover_services
-
 from core.platform import models
 
 import bs4

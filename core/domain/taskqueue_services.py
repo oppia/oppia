@@ -56,6 +56,7 @@ QUEUE_NAME_VOICEOVER_REGENERATION: Final = 'voiceover-regeneration'
 # total of 3 attempts to execute the task, including the first attempt.
 CLOUD_TASK_MAX_RETRIES = 2
 
+
 # Here we use type Any because in defer() function '*args' points to the
 # positional arguments of any other function and those arguments can be of
 # type str, list, int and other types too. Similarly, '**kwargs' points to
@@ -101,6 +102,7 @@ def defer(
     # This is a workaround for a known python bug.
     # See https://bugs.python.org/issue7980
     datetime.datetime.strptime('', '')
+
     task = platform_taskqueue_services.create_http_task(
         queue_name=queue_name, url=feconf.TASK_URL_DEFERRED, payload=payload)
     assert task.task_name is not None

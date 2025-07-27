@@ -18,11 +18,13 @@
 
 from __future__ import annotations
 
+import datetime
 import json
 import os
 
 from core import feconf
 from core import utils
+from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import state_domain
 from core.domain import user_services
@@ -487,6 +489,22 @@ def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
         return language_accent_master_list
 
 
+def get_language_accent_codes_to_descriptions() -> Dict[str, str]:
+    """The method returns a mapping of language accent codes to their
+    descriptions.
+
+    Returns:
+        Dict[str, str]. A dict mapping language accent codes to their
+        descriptions.
+    """
+    language_accent_codes_to_descriptions = {}
+    for language_accent_code_to_description in (
+            get_language_accent_master_list().values()):
+        language_accent_codes_to_descriptions.update(
+            language_accent_code_to_description)
+    return language_accent_codes_to_descriptions
+
+
 def get_language_code_from_language_accent_code(
     language_accent_code: str
 ) -> Optional[str]:
@@ -891,7 +909,7 @@ def compute_voiceover_related_changes_upon_revert(
     return new_entity_voiceovers_models
 
 
-def get_autogeneratable_accents_by_language(
+def get_supported_autogeneratable_accents_by_language(
     language_code: str
 ) -> List[str]:
     """Returns accent codes for a language where autogeneration is enabled for
@@ -918,7 +936,6 @@ def regenerate_voiceover_for_updated_exploration(
     exploration_id: str,
     exploration_title: str,
     exploration_version: int,
-    language_code: str,
     author_id,
     date_time
 ):
@@ -936,8 +953,6 @@ def regenerate_voiceover_for_updated_exploration(
         exploration_title: str. The title of the exploration.
         exploration_version: int. The version of the exploration for which
             voiceovers need to be regenerated.
-        language_code: str. The language code for which voiceovers need to be
-            regenerated.
         author_id: str. The ID of the author who made the changes to the
             exploration.
         date_time: str. The date and time when the changes were
@@ -992,7 +1007,7 @@ def regenerate_voiceover_for_updated_exploration(
     language_code_to_autogeneratable_accent_codes = {}
     for language_code in language_code_to_contents_mapping:
         language_accent_codes = (
-            get_autogeneratable_accents_by_language(
+            get_supported_autogeneratable_accents_by_language(
                 language_code))
         if not language_accent_codes:
             continue
@@ -1002,7 +1017,13 @@ def regenerate_voiceover_for_updated_exploration(
     language_codes = list(language_code_to_contents_mapping.keys())
 
     error_collections_during_voiceover_regeneration = []
-    count_errors = 0
+
+    language_accent_codes_to_descriptions = (
+        get_language_accent_codes_to_descriptions())
+    number_of_contents_for_voiceover_regeneration = 0
+    number_of_contents_failed_to_regenerate = 0
+
+    language_accents_used_for_voiceover_regeneration = []
 
     for language_code in language_codes:
         language_accent_codes = (
@@ -1014,6 +1035,14 @@ def regenerate_voiceover_for_updated_exploration(
             language_code_to_contents_mapping.get(language_code, {}))
 
         for language_accent_code in language_accent_codes:
+            language_accents_used_for_voiceover_regeneration.append(
+                language_accent_codes_to_descriptions.get(
+                    language_accent_code)
+            )
+
+            number_of_contents_for_voiceover_regeneration += (
+                len(updated_content_ids_to_content_htmls))
+
             errors_while_voiceover_regeneration = (
                 voiceover_regeneration_services.
                 regenerate_voiceover_on_exploration_update(
@@ -1024,9 +1053,90 @@ def regenerate_voiceover_for_updated_exploration(
                 )
             )
             if errors_while_voiceover_regeneration:
-                error_collections_during_voiceover_regeneration.extend(
+                error_collections_during_voiceover_regeneration.append({
+                    'exploration_id': exploration_id,
+                    'language_accent_code': language_accent_code,
+                    'error_messages': errors_while_voiceover_regeneration
+                })
+                number_of_contents_failed_to_regenerate += len(
                     errors_while_voiceover_regeneration)
-                count_errors += len(errors_while_voiceover_regeneration)
 
-    # TODO: Send email to voiceover admins and voiceover tech leads with the
-    # generated errors and raise exception.
+    send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
+        exploration_id,
+        exploration_title,
+        date_time,
+        language_accents_used_for_voiceover_regeneration,
+        error_collections_during_voiceover_regeneration,
+        number_of_contents_for_voiceover_regeneration,
+        number_of_contents_failed_to_regenerate,
+        author_id
+    )
+
+
+def send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
+    exploration_id: str,
+    exploration_title: str,
+    date_time: str,
+    language_accents_used_for_voiceover_regeneration: List[str],
+    error_collections_during_voiceover_regeneration: List[
+        Dict[str, List[str] | str]],
+    number_of_contents_for_voiceover_regeneration: int,
+    number_of_contents_failed_to_regenerate: int,
+    author_id: str
+) -> None:
+    """Sends an email to voiceover admins and tech leads after the
+    regeneration of voiceovers is complete.
+
+    Args:
+        exploration_id: str. The ID of the exploration for which voiceovers
+            were regenerated.
+        exploration_title: str. The title of the exploration for which
+            voiceovers were regenerated.
+        date_time: str. The date and time when the voiceovers were regenerated.
+        language_accents_used_for_voiceover_regeneration: List[str]. A list of
+            language accents used for the voiceover regeneration.
+        error_collections_during_voiceover_regeneration: List[Dict[str, Any]].
+            A list of dictionaries containing error messages during the
+            voiceover regeneration process.
+        number_of_contents_for_voiceover_regeneration: int. The total number of
+            contents for which voiceovers were regenerated.
+        number_of_contents_failed_to_regenerate: int. The number of contents
+            that failed to regenerate voiceovers.
+        author_id: str. The ID of the author who initiated the voiceover
+            regeneration.
+    """
+    date_time_object = datetime.datetime.fromisoformat(date_time)
+    date = date_time_object.date().isoformat()
+    time = date_time_object.time().replace(microsecond=0).isoformat()
+
+    user_settings = user_services.get_user_settings(author_id)
+    assert user_settings is not None
+    author_username = user_settings.username
+
+    number_of_successful_regenerations = (
+        number_of_contents_for_voiceover_regeneration -
+        number_of_contents_failed_to_regenerate)
+
+    # Email to voiceover tech leads should be sent only if there are voiceover
+    # regeneration errors.
+    if number_of_contents_failed_to_regenerate > 0:
+        email_manager.send_emails_to_voiceover_tech_leads(
+            exploration_id,
+            exploration_title,
+            date,
+            time,
+            language_accents_used_for_voiceover_regeneration,
+            error_collections_during_voiceover_regeneration
+        )
+
+    email_manager.send_emails_to_voiceover_admins(
+        date,
+        time,
+        exploration_id,
+        exploration_title,
+        number_of_contents_for_voiceover_regeneration,
+        number_of_successful_regenerations,
+        number_of_contents_failed_to_regenerate,
+        language_accents_used_for_voiceover_regeneration,
+        author_username
+    )
