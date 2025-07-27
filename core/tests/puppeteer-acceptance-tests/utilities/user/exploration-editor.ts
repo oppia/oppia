@@ -522,6 +522,7 @@ export class ExplorationEditor extends BaseUser {
       .$eval(feedbackSelector, element => element?.textContent?.trim() || null)
       .catch(() => null);
 
+    // Wait for 1 seconds
     // Click on Submit Answer button.
     await this.clickOn(submitAnswerButton);
 
@@ -6137,6 +6138,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} answer - The answer to submit.
    */
   async submitAnswerInInputField(answer: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible('input');
     await this.clearAllTextFrom('input');
     await this.type('input', answer);
