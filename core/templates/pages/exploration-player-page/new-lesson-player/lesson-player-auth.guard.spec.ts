@@ -58,6 +58,17 @@ class MockLocation {
   replaceState(_url: string): void {}
 }
 
+const createMockRoute = (explorationId: string): ActivatedRouteSnapshot => {
+  const route = new ActivatedRouteSnapshot();
+  Object.defineProperty(route, 'paramMap', {
+    get: () => convertToParamMap({exploration_id: explorationId}),
+  });
+  Object.defineProperty(route, 'queryParams', {
+    get: () => ({}),
+  });
+  return route;
+};
+
 describe('LessonPlayerPageAuthGuard', () => {
   let guard: LessonPlayerPageAuthGuard;
   let platformFeatureService: PlatformFeatureService;
@@ -85,17 +96,6 @@ describe('LessonPlayerPageAuthGuard', () => {
     router = TestBed.inject(Router);
     location = TestBed.inject(Location);
   });
-
-  function createMockRoute(explorationId: string): ActivatedRouteSnapshot {
-    const route = new ActivatedRouteSnapshot();
-    Object.defineProperty(route, 'paramMap', {
-      get: () => convertToParamMap({exploration_id: explorationId}),
-    });
-    Object.defineProperty(route, 'queryParams', {
-      get: () => ({}),
-    });
-    return route;
-  }
 
   it('should redirect to 404 when flag is disabled', done => {
     spyOnProperty(platformFeatureService, 'status', 'get').and.returnValue({
