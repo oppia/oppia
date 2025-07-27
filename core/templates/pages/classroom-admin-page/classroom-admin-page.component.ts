@@ -584,28 +584,26 @@ export class ClassroomAdminPageComponent implements OnInit {
       .getTopicIdToTopicNameAsync(topicIds)
       .then(topicIdsToTopicName => {
         this.topicNameToPrerequisiteTopicNames = {};
-        this.tempClassroomData.setTopicIdToTopicName(topicIdsToTopicName);
-        this.topicIdsToTopicName = topicIdsToTopicName;
-        this.topicNames = Object.values(this.topicIdsToTopicName);
 
         for (let currentTopicId in topicIdToPrerequisiteTopicIds) {
           let currentTopicName = topicIdsToTopicName[currentTopicId];
+
           let prerequisiteTopicIds =
             topicIdToPrerequisiteTopicIds[currentTopicId];
-          let prerequisiteTopicNames: string[] = [];
+          let prerequisiteTopicNames = [];
 
           for (let topicId of prerequisiteTopicIds) {
-            if (topicIdsToTopicName[topicId]) {
-              prerequisiteTopicNames.push(topicIdsToTopicName[topicId]);
-            }
+            prerequisiteTopicNames.push(topicIdsToTopicName[topicId]);
           }
 
-          // Fallback to empty array if undefined.
-          this.topicNameToPrerequisiteTopicNames[currentTopicName || ''] =
-            prerequisiteTopicNames;
-        }
+          this.tempClassroomData.setTopicIdToTopicName(topicIdsToTopicName);
 
-        this.topicDependencyIsLoaded = true;
+          this.topicNameToPrerequisiteTopicNames[currentTopicName] =
+            prerequisiteTopicNames;
+          this.topicIdsToTopicName = topicIdsToTopicName;
+          this.topicNames = Object.values(this.topicIdsToTopicName);
+          this.topicDependencyIsLoaded = true;
+        }
       });
   }
 
@@ -863,7 +861,7 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   getPrerequisiteLength(topicName: string): number {
-    return this.topicNameToPrerequisiteTopicNames[topicName].length;
+    return this.topicNameToPrerequisiteTopicNames[topicName]?.length;
   }
 
   ngOnDestory(): void {
