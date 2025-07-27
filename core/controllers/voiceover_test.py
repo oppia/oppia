@@ -16,10 +16,14 @@
 
 from __future__ import annotations
 
+import datetime
+import uuid
+
 from core import feconf
 from core.domain import rights_domain
 from core.domain import rights_manager
 from core.domain import state_domain
+from core.domain import taskqueue_services
 from core.domain import user_services
 from core.domain import voiceover_domain
 from core.domain import voiceover_services
@@ -455,4 +459,53 @@ class RegenerateAutomaticVoiceoverHandlerTests(test_utils.GenericTestBase):
             expected_sentence_tokens_with_durations)
         self.assertTrue(response_dict['filename'].startswith('content_0-en-US'))
 
+        self.logout()
+
+
+class AutomaticVoiceoverRegenerationRecordHandlerTests(
+    test_utils.GenericTestBase
+):
+    """Test to validate automatic voiceover regeneration record handler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL)
+
+    def test_get_automatic_voiceover_regeneration_records(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
+
+        new_model_id = 'random_model_id'
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'voiceover-regeneration'
+
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
+        )
+        function_id = 'delete_exps_from_user_models'
+
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id)
+
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id)
+        assert cloud_task_run is not None
+        start_date = cloud_task_run.created_on.strftime('%a %b %d %Y')
+        end_date = (
+            cloud_task_run.created_on + datetime.timedelta(days=1)
+        ).strftime('%a %b %d %Y')
+
+        url = '/automatic_voiceover_regeneration_record/%s/%s' % (
+            start_date, end_date)
+
+        json_response = self.get_json(url)
+        self.assertEqual(
+            json_response['automatic_voiceover_regeneration_records'],
+            [cloud_task_run.to_dict()])
         self.logout()

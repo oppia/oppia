@@ -80,7 +80,7 @@
   <div *ngIf="inStoryMode" class="conversation-skin-back-to-collection-container">
     <a [href]="storyViewerUrl" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_STORY"></a>
   </div>
-  <div *ngIf="!collectionSummary && !getIsRefresherExploration() && !inStoryMode" class="conversation-skin-back-to-collection-container">
+  <div *ngIf="!collectionSummary && !getIsRefresherExploration() && !inStoryMode" class="conversation-skin-back-to-collection-container e2e-test-exploration-return-to-library">
     <a href="/community-library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
   </div>
   <div *ngIf="collectionSummary && !getIsRefresherExploration()" class="conversation-skin-back-to-collection-container">
