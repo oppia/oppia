@@ -42,6 +42,7 @@ import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';
 import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.model';
 import {VoiceoverBackendDict} from '../../../../domain/exploration/voiceover.model';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 describe('Audio Bar Component', () => {
   let component: AudioBarComponent;
@@ -56,6 +57,7 @@ describe('Audio Bar Component', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let voiceoverPlayerService: VoiceoverPlayerService;
   let entityVoiceoversService: EntityVoiceoversService;
+  let stateEditorService: StateEditorService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -78,6 +80,7 @@ describe('Audio Bar Component', () => {
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
+    stateEditorService = TestBed.inject(StateEditorService);
     fixture.detectChanges();
 
     spyOn(voiceoverPlayerService, 'onActiveVoiceoverChanged').and.returnValue(
@@ -537,5 +540,26 @@ describe('Audio Bar Component', () => {
 
     component.onFinishedLoadingAudio('audio-en.mp3');
     expect(playCacheAudioSpy).toHaveBeenCalled();
+  });
+
+  it('should be able to get current state name', () => {
+    let explorationPlayerPageSpy = spyOn(
+      pageContextService,
+      'isInExplorationPlayerPage'
+    );
+
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'Introduction'
+    );
+    explorationPlayerPageSpy.and.returnValue(true);
+    let currentStateName = component.getCurrentStateName();
+    expect(currentStateName).toEqual('Introduction');
+
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+      'Second State'
+    );
+    explorationPlayerPageSpy.and.returnValue(false);
+    currentStateName = component.getCurrentStateName();
+    expect(currentStateName).toEqual('Second State');
   });
 });

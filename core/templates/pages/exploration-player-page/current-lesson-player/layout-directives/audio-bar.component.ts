@@ -37,6 +37,7 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 @Component({
   selector: 'oppia-audio-bar',
@@ -70,6 +71,7 @@ export class AudioBarComponent {
     private entityVoiceoversService: EntityVoiceoversService,
     private voiceoverPlayerService: VoiceoverPlayerService,
     private localStorageService: LocalStorageService,
+    private stateEditorService: StateEditorService,
     private cdRef: ChangeDetectorRef
   ) {
     this.explorationPlayerModeIsActive =
@@ -233,8 +235,15 @@ export class AudioBarComponent {
     this.audioPreloaderService.contentIdsToVoiceovers =
       this.entityVoiceoversService.getAllContentIdsToVoiceovers();
     this.audioPreloaderService.restartAudioPreloader(
-      this.playerPositionService.getCurrentStateName()
+      this.getCurrentStateName()
     );
+  }
+
+  getCurrentStateName(): string {
+    if (this.pageContextService.isInExplorationPlayerPage()) {
+      return this.playerPositionService.getCurrentStateName();
+    }
+    return this.stateEditorService.getActiveStateName() as string;
   }
 
   onPlayButtonClicked(): void {
