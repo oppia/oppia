@@ -49,14 +49,6 @@ var suites = {
     './core/tests/webdriverio_desktop/blogDashboard.js'
   ],
 
-  blog: [
-    './core/tests/webdriverio_desktop/blog.js'
-  ],
-
-  collections: [
-    './core/tests/webdriverio_desktop/collections.js'
-  ],
-
   contributorAdminDashboard: [
     './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
   ],
@@ -69,28 +61,8 @@ var suites = {
     './core/tests/webdriverio_desktop/coreEditorAndPlayerFeatures.js'
   ],
 
-  creatorDashboard: [
-    './core/tests/webdriverio_desktop/creatorDashboard.js'
-  ],
-
-  embedding: [
-    './core/tests/webdriverio_desktop/embedding.js'
-  ],
-
-  explorationFeedbackTab: [
-    './core/tests/webdriverio_desktop/explorationFeedbackTab.js'
-  ],
-
   explorationImprovementsTab: [
     './core/tests/webdriverio_desktop/explorationImprovementsTab.js'
-  ],
-
-  explorationHistoryTab: [
-    './core/tests/webdriverio_desktop/explorationHistoryTab.js'
-  ],
-
-  explorationStatisticsTab: [
-    './core/tests/webdriverio_desktop/explorationStatisticsTab.js'
   ],
 
   explorationTranslationTab: [
@@ -99,10 +71,6 @@ var suites = {
 
   extensions: [
     './core/tests/webdriverio_desktop/extensions.js'
-  ],
-
-  fileUploadExtensions: [
-    './core/tests/webdriverio_desktop/fileUploadExtensions.js'
   ],
 
   fileUploadFeatures: [
@@ -117,16 +85,8 @@ var suites = {
     './core/tests/webdriverio_desktop/navigation.js'
   ],
 
-  profileFeatures: [
-    './core/tests/webdriverio_desktop/profileFeatures.js'
-  ],
-
   profileMenu: [
     './core/tests/webdriverio/profileMenuFlow.js'
-  ],
-
-  publication: [
-    './core/tests/webdriverio_desktop/publicationAndLibrary.js'
   ],
 
   skillEditor: [
