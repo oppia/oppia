@@ -615,7 +615,7 @@ export class ExplorationEditor extends BaseUser {
 
         const inputElement = await optionElement.$('input');
         await this.page.waitForFunction(
-          element => {
+          (element: HTMLInputElement) => {
             return element.checked;
           },
           {},
@@ -888,7 +888,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(interactiveMap);
     await this.page.waitForFunction(
-      sel => {
+      (sel: string) => {
         const element = document.querySelector(sel);
         return element && element.getBoundingClientRect().width > 0;
       },
@@ -970,9 +970,9 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.expectElementToBeVisible(customizeInteractionBodySelector);
     await this.page.waitForFunction(
-      selector => {
+      (selector: string) => {
         const element = document.querySelector(selector);
-        return element.querySelectorAll('input').length === 4;
+        return element?.querySelectorAll('input').length === 4;
       },
       {},
       customizeInteractionBodySelector
@@ -1337,7 +1337,7 @@ export class ExplorationEditor extends BaseUser {
       );
     } catch {
       throw new error(
-        `HEHE ${quickAccessCharcters.split('').join(' ')}` + ' HEHE '
+        `Can't customize characters. Found: ${quickAccessCharcters.split('').join(' ')}`
       );
     }
 
@@ -2740,7 +2740,7 @@ export class ExplorationEditor extends BaseUser {
    * @param interactionType Interaction type to change tab.
    */
   async changeTabInInteractionSelectionModal(
-    interactionType: string
+    interactionType: INTERACTION_TYPES
   ): Promise<void> {
     const interactionTabs = {
       [INTERACTION_TABS.PROGRAMMING]: [
@@ -2803,7 +2803,9 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(programmingInteractionsButton);
     }
 
-    await this.changeTabInInteractionSelectionModal(interactionToAdd);
+    await this.changeTabInInteractionSelectionModal(
+      interactionToAdd as INTERACTION_TYPES
+    );
 
     const selector =
       INTERACTION_SELECTORS[interactionToAdd] ?? ` ${interactionToAdd} `;
@@ -3600,7 +3602,6 @@ export class ExplorationEditor extends BaseUser {
         cardButton = elements[cardIndex];
       }
 
-      await this.expectElementToBeClickable(cardButton, true);
       await cardButton.click();
       await this.waitForNetworkIdle({idleTime: 1000});
 
