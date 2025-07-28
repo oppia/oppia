@@ -5718,9 +5718,9 @@ export class ExplorationEditor extends BaseUser {
     const saveButtonSelector = this.isViewportAtMobileWidth()
       ? mobileSaveChangesButtonSelector
       : saveChangesButton;
-    await this.expectElementToBeVisible(saveButtonSelector);
+    await this.expectElementToBeClickable(saveButtonSelector);
 
-    await this.page.click(saveButtonSelector);
+    await this.clickOn(saveButtonSelector);
     await this.expectElementToBeVisible(saveExplorationModalContainerSelector);
   }
 
@@ -5744,6 +5744,7 @@ export class ExplorationEditor extends BaseUser {
    * Navigates to the next step in the joyride.
    */
   async continueToNextJoyrideStep(): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.expectJoyrideNextButtonToBeVisible();
 
     const currentStep = await this.getTextContent(joyrideStepSelector);
