@@ -3593,12 +3593,15 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Card name ${cardName} not found in the graph.`);
       }
 
+      let cardButton;
       if (this.isViewportAtMobileWidth()) {
-        await elements[cardIndex + elements.length / 2].click();
+        cardButton = elements[cardIndex + elements.length / 2];
       } else {
-        await elements[cardIndex].click();
+        cardButton = elements[cardIndex];
       }
 
+      await this.expectElementToBeClickable(cardButton, true);
+      await cardButton.click();
       await this.waitForNetworkIdle({idleTime: 1000});
 
       const headingName = !cardName.trimEnd().endsWith('...')

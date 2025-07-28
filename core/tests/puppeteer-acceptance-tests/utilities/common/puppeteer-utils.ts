@@ -1123,10 +1123,13 @@ export class BaseUser {
    * Checks if element is clickable or not.
    */
   async expectElementToBeClickable(
-    selector: string,
+    selector: string | ElementHandle<Element>,
     clickable: boolean = true
   ): Promise<void> {
-    const element = await this.page.$(selector);
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
     await this.page.waitForFunction(isElementClickable, {}, element, clickable);
   }
 
