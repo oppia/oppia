@@ -1255,7 +1255,7 @@ export class ExplorationEditor extends BaseUser {
       hidden: true,
     });
     showMessage('Exploration is saved successfully.');
-    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
