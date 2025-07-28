@@ -17,6 +17,10 @@
       "module": "core/tests/webdriverio_desktop/additionalPlayerFeatures.js"
     },
     {
+      "name": "blogDashboard",
+      "module": "core/tests/webdriverio_desktop/blogDashboard.js"
+    },
+    {
       "name": "contributorDashboard",
       "module": "core/tests/webdriverio_desktop/contributorDashboard.js"
     },
@@ -31,6 +35,10 @@
     {
       "name": "explorationImprovementsTab",
       "module": "core/tests/webdriverio_desktop/explorationImprovementsTab.js"
+    },
+    {
+      "name": "explorationStatisticsTab",
+      "module": "core/tests/webdriverio_desktop/explorationStatisticsTab.js"
     },
     {
       "name": "explorationTranslationTab",

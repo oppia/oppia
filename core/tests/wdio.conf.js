@@ -65,6 +65,10 @@ var suites = {
     './core/tests/webdriverio_desktop/explorationImprovementsTab.js'
   ],
 
+  explorationStatisticsTab: [
+    './core/tests/webdriverio_desktop/explorationStatisticsTab.js'
+  ],
+
   explorationTranslationTab: [
     './core/tests/webdriverio_desktop/explorationTranslationTab.js'
   ],
@@ -75,10 +79,6 @@ var suites = {
 
   fileUploadFeatures: [
     './core/tests/webdriverio_desktop/voiceoverUploadFeatures.js'
-  ],
-
-  learner: [
-    './core/tests/webdriverio/learnerFlow.js'
   ],
 
   navigation: [
