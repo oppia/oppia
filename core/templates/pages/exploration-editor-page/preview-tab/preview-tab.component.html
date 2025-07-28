@@ -4,13 +4,14 @@
       <div class="oppia-preview-state-warning">{{ previewWarning }}</div>
     </div>
     <oppia-loading-message [message]="'Loading'" *ngIf="!voiceoversAreLoaded"></oppia-loading-message>
-    <oppia-conversation-skin *ngIf="voiceoversAreLoaded"></oppia-conversation-skin>
-    <page-footer>
+    <oppia-conversation-skin *ngIf="voiceoversAreLoaded && !isNewLessonPlayerEnabled()"></oppia-conversation-skin>
+    <page-footer *ngIf="!isNewLessonPlayerEnabled()">
       <oppia-exploration-footer></oppia-exploration-footer>
     </page-footer>
+    <oppia-new-conversation-skin class="preview-conversation-skin" *ngIf="voiceoversAreLoaded && isNewLessonPlayerEnabled()"></oppia-new-conversation-skin>
   </div>
 
-  <div class="oppia-preview-bottom-right-container">
+  <div class="oppia-preview-bottom-right-container" [ngStyle]="isNewLessonPlayerEnabled() ? {bottom: '58px'} : {bottom: '42px'}">
     <div class="oppia-parameter-summary" *ngIf="showParameterSummary()">
       <strong>Parameters:</strong>
       <table>
@@ -49,7 +50,6 @@
 
   .oppia-preview-bottom-right-container {
     /* Fixed at bottom right corner (before footer) and appear on top of other div*/
-    bottom: 42px;
     display: block;
     position: fixed;
     right: 0;
@@ -104,5 +104,13 @@
   .oppia-restart-text {
     margin-left: 10px;
     padding-top: 20px;
+  }
+
+  .preview-conversation-skin {
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    z-index: 1010;
   }
 </style>

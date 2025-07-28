@@ -1,5 +1,5 @@
 <div>
-  <div class="skill-editor-preview">
+  <div class="skill-editor-preview e2e-test-skill-preview-container">
     <div class="content-box">
       <div class="question-filter-box">
         <div><span class="headings">Selection</span></div>
@@ -63,8 +63,7 @@
         <div><span class="headings">Preview</span></div>
         <div class="preview-box" *ngIf="displayCardIsInitialized">
           <oppia-tutor-card [displayedCard]="displayedCard"
-                            [avatarImageIsShown]="false"
-                            [startCardChangeAnimation]="false">
+                            [avatarImageIsShown]="false">
           </oppia-tutor-card>
           <div *ngIf="isCurrentSupplementalCardNonEmpty() && !canWindowShowTwoCards()">
             <oppia-supplemental-card [displayedCard]="displayedCard">

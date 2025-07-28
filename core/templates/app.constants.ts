@@ -146,10 +146,6 @@ export const AppConstants = {
   COMPONENT_NAME_RULE_INPUT: 'rule_input',
   COMPONENT_NAME_SOLUTION: 'solution',
   COMPONENT_NAME_EXPLANATION: 'explanation',
-  COMPONENT_NAME_WORKED_EXAMPLE: {
-    QUESTION: 'worked_example_question',
-    EXPLANATION: 'worked_example_explanation',
-  },
 
   VOICEOVER_TYPE_AUTO: 'auto',
   VOICEOVER_TYPE_MANUAL: 'manual',
@@ -432,4 +428,5 @@ export enum NavbarAndFooterGATrackingPages {
   VOLUNTEER = 'Volunteer',
   TEACH = 'Teach',
   DONATE = 'Donate',
+  BLOG = 'Blog',
 }

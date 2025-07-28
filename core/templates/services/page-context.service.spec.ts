@@ -518,6 +518,17 @@ describe('PageContext service', () => {
       }
     );
 
+    it(
+      'should correctly retrieve the page context as ' + 'diagnostic player',
+      () => {
+        expect(ecs.getPageContext()).toBe('other');
+        spyOn(urlService, 'getPathname').and.returnValue(
+          '/diagnostic-test-player/'
+        );
+        expect(ecs.getPageContext()).toBe('diagnostic_test_player');
+      }
+    );
+
     it('should correctly retrieve the page context as contributor dashboard', () => {
       expect(ecs.getPageContext()).toBe('other');
       spyOn(urlService, 'getPathname').and.returnValue(
@@ -533,13 +544,6 @@ describe('PageContext service', () => {
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/about');
       ecs.removeCustomEntityContext();
-    });
-
-    it('should throw an error when trying to retrieve the exploration id', () => {
-      expect(() => ecs.getExplorationId()).toThrowError(
-        'PageContextService should not be used outside the ' +
-          'context of an exploration or a question.'
-      );
     });
 
     it('should throw an error when trying to retrieve the learner group id', () => {

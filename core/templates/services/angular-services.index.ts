@@ -71,8 +71,6 @@ import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFa
 import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
 import { ParamSpecObjectFactory } from 'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
-import { ParamTypeObjectFactory } from 'domain/exploration/ParamTypeObjectFactory';
-import { SolutionObjectFactory } from 'domain/exploration/SolutionObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
@@ -121,8 +119,8 @@ import { EditableTopicBackendApiService } from 'domain/topic/editable-topic-back
 import { TopicCreationBackendApiService } from 'domain/topic/topic-creation-backend-api.service';
 import { TopicRightsBackendApiService } from 'domain/topic/topic-rights-backend-api.service';
 import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { ReadOnlyTopicObjectFactory } from 'domain/topic_viewer/read-only-topic-object.factory';
 import { TopicViewerBackendApiService } from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import {ChapterProgressService} from 'pages/exploration-player-page/services/chapter-progress.service';
 import { TopicsAndSkillsDashboardBackendApiService } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import { BrowserCheckerService } from 'domain/utilities/browser-checker.service';
 import { LanguageUtilService } from 'domain/utilities/language-util.service';
@@ -369,7 +367,6 @@ import { CollectionPlayerBackendApiService } from 'pages/collection-player-page/
 import { CollectionPlayerAuthGuard } from 'pages/collection-player-page/collection-player-auth.guard';
 import { CollectionEditorRoutingService } from 'pages/collection-editor-page/services/collection-editor-routing.service';
 import { I18nService } from 'i18n/i18n.service';
-import { QuestionPlayerStateService } from 'components/question-directives/question-player/services/question-player-state.service';
 import { SettingTabBackendApiService } from 'pages/exploration-editor-page/services/setting-tab-backend-api.service';
 import { HistoryTabBackendApiService } from 'pages/exploration-editor-page/services/history-tab-backend-api.service';
 import { ExplorationRightsService } from 'pages/exploration-editor-page/services/exploration-rights.service';
@@ -435,7 +432,7 @@ import { TopicEditorAuthGuard } from 'pages/topic-editor-page/topic-editor-auth.
 import { TopicsAndSkillsDashboardAuthGuard } from 'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-auth.guard';
 import { BlogAdminAuthGuard } from 'pages/blog-admin-page/blog-admin-auth.guard';
 import { EmailDashboardAuthGuard } from 'pages/email-dashboard-pages/email-dashboard-auth.guard';
-import { IsNewLessonPlayerGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-flag.guard';
+import { LessonPlayerPageAuthGuard } from 'pages/exploration-player-page/new-lesson-player/lesson-player-auth.guard';
 import { SkillEditorAccessGuard } from 'pages/skill-editor-page/skill-editor-access.guard';
 import { MobileMenuService } from 'pages/exploration-player-page/services/mobile-menu.service';
 import { CollectionEditorPageAuthGuard } from 'pages/collection-editor-page/collection-editor-page-auth.guard';
@@ -449,6 +446,7 @@ import { ExplorationModeService } from 'pages/exploration-player-page/services/e
 import { CheckpointProgressService } from 'pages/exploration-player-page/services/checkpoint-progress.service';
 import { ProgressUrlService } from 'pages/exploration-player-page/services/progress-url.service';
 import { ExplorationInitializationService } from 'pages/exploration-player-page/services/exploration-initialization.service';
+import { CardAnimationService } from 'pages/exploration-player-page/services/card-animation.service';
 
 
 export const angularServices: [string, Type<{}>][] = [
@@ -491,6 +489,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['BrowserCheckerService', BrowserCheckerService],
   ['CamelCaseToHyphensPipe', CamelCaseToHyphensPipe],
   ['CapitalizePipe', CapitalizePipe],
+  ['CardAnimationService', CardAnimationService],
   ['CheckpointCelebrationUtilityService', CheckpointCelebrationUtilityService],
   ['CkEditorCopyContentService', CkEditorCopyContentService],
   ['CkEditorInitializerService', CkEditorInitializerService],
@@ -550,6 +549,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['EditabilityService', EditabilityService],
   ['EditLearnerGroupPageAuthGuard', EditLearnerGroupPageAuthGuard],
   ['ClassroomsPageAuthGuard', ClassroomsPageAuthGuard],
+  ['ChapterProgressService', ChapterProgressService],
   ['CreateLearnerGroupPageAuthGuard', CreateLearnerGroupPageAuthGuard],
   ['EditableCollectionBackendApiService', EditableCollectionBackendApiService],
   ['EditableExplorationBackendApiService',
@@ -670,7 +670,7 @@ export const angularServices: [string, Type<{}>][] = [
   ['ItemSelectionInputRulesService', ItemSelectionInputRulesService],
   ['ItemSelectionInputValidationService', ItemSelectionInputValidationService],
   ['IsLoggedInGuard', IsLoggedInGuard],
-  ['IsNewLessonPlayerGuard', IsNewLessonPlayerGuard],
+  ['LessonPlayerPageAuthGuard', LessonPlayerPageAuthGuard],
   ['KeyboardShortcutService', KeyboardShortcutService],
   ['LanguageBannerService', LanguageBannerService],
   ['LanguageUtilService', LanguageUtilService],
@@ -731,7 +731,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ParamChangesObjectFactory', ParamChangesObjectFactory],
   ['ParamSpecObjectFactory', ParamSpecObjectFactory],
   ['ParamSpecsObjectFactory', ParamSpecsObjectFactory],
-  ['ParamTypeObjectFactory', ParamTypeObjectFactory],
   ['PencilCodeEditorRulesService', PencilCodeEditorRulesService],
   ['PencilCodeEditorValidationService', PencilCodeEditorValidationService],
   ['PlatformParameterAdminBackendApiService',
@@ -757,7 +756,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['EditableQuestionBackendApiService', EditableQuestionBackendApiService],
   ['QuestionObjectFactory', QuestionObjectFactory],
   ['QuestionBackendApiService', QuestionBackendApiService],
-  ['QuestionPlayerStateService', QuestionPlayerStateService],
   ['QuestionSuggestionBackendApiService', QuestionSuggestionBackendApiService],
   ['QuestionsListService', QuestionsListService],
   ['QuestionPlayerEngineService', QuestionPlayerEngineService],
@@ -770,7 +768,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['ReadOnlyCollectionBackendApiService', ReadOnlyCollectionBackendApiService],
   ['ReadOnlyExplorationBackendApiService',
     ReadOnlyExplorationBackendApiService],
-  ['ReadOnlyTopicObjectFactory', ReadOnlyTopicObjectFactory],
   ['RefresherExplorationConfirmationModalService',
     RefresherExplorationConfirmationModalService],
   ['ReleaseCoordinatorBackendApiService', ReleaseCoordinatorBackendApiService],
@@ -806,7 +803,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['SkillObjectFactory', SkillObjectFactory],
   ['SkillRightsBackendApiService', SkillRightsBackendApiService],
   ['SkillUpdateService', SkillUpdateService],
-  ['SolutionObjectFactory', SolutionObjectFactory],
   ['SolutionValidityService', SolutionValidityService],
   ['SolutionVerificationService', SolutionVerificationService],
   ['SpeechSynthesisChunkerService', SpeechSynthesisChunkerService],

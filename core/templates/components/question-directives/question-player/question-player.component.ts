@@ -34,12 +34,12 @@ import {QuestionPlayerConceptCardModalComponent} from './question-player-concept
 import {QuestionPlayerConstants} from 'components/question-directives/question-player/question-player.constants';
 import {SkillMasteryModalComponent} from './skill-mastery-modal.component';
 import {UserService} from 'services/user.service';
-import {QuestionPlayerStateService} from './services/question-player-state.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
 import {QuestionPlayerEngineService} from 'pages/exploration-player-page/services/question-player-engine.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UrlService} from 'services/contextual/url.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 export interface QuestionData {
   linkedSkillIds: string[];
@@ -118,10 +118,10 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     private ngbModal: NgbModal,
     private playerPositionService: PlayerPositionService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
-    private questionPlayerStateService: QuestionPlayerStateService,
     private skillMasteryBackendApiService: SkillMasteryBackendApiService,
     private userService: UserService,
     private windowRef: WindowRef,
+    private platformFeatureService: PlatformFeatureService,
     private _sanitizer: DomSanitizer,
     private siteAnalyticsService: SiteAnalyticsService,
     private urlService: UrlService
@@ -178,7 +178,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
     this.finalCorrect = this.totalScore;
     this.totalScore = Math.round((this.totalScore * 100) / totalQuestions);
     this.resultsLoaded = true;
-    this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+    this.questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit(
       this.resultsLoaded
     );
   }
@@ -559,7 +559,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       );
 
       this.componentSubscription.add(
-        this.questionPlayerStateService.onQuestionSessionCompleted.subscribe(
+        this.questionPlayerEngineService.onQuestionSessionCompleted.subscribe(
           result => {
             this.windowRef.nativeWindow.location.hash =
               QuestionPlayerConstants.HASH_PARAM +
@@ -613,7 +613,7 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
       // The initResults function is written separately since it is also
       // called in ngOnInit when some external events are triggered.
       this.initResults();
-      this.questionPlayerStateService.resultsPageIsLoadedEventEmitter.emit(
+      this.questionPlayerEngineService.resultsPageIsLoadedEventEmitter.emit(
         this.resultsLoaded
       );
       this.preventPageUnloadEventService.addListener(() => {
@@ -624,5 +624,9 @@ export class QuestionPlayerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.componentSubscription.unsubscribe();
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

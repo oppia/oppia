@@ -1,7 +1,7 @@
 <div class="volunteer-page e2e-test-volunteer-page">
   <div class="oppia-volunteer-banner">
     <div class="oppia-volunteer-banner-content flex-gt-sm">
-      <h1 class="oppia-volunteer-h1">{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_HEADING' | translate }}</h1>
+      <h1 class="oppia-volunteer-h1 e2e-test-volunteer-page-headings">{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_HEADING' | translate }}</h1>
 
       <div class="oppia-volunteer-content">
         <p class="oppia-volunteer-subtext">{{ 'I18N_VOLUNTEER_PAGE_SECTION_ONE_CONTENT' | translate }}</p>
@@ -29,7 +29,7 @@
 
   <div class="oppia-section-why-volunteer">
     <div class="container text-center">
-      <h2 class="section-heading mb-5">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION' | translate }}</h2>
+      <h2 class="section-heading mb-5 e2e-test-volunteer-page-headings">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION' | translate }}</h2>
       <div class="row mt-4">
         <div class="col-md-4">
           <img [src]="getStaticImageUrl('/icons/community-icon.svg')" alt="Community icon" class="m-3">
@@ -51,7 +51,7 @@
   </div>
 
   <div class="oppia-volunteer-body e2e-test-volunteer-page-tabs-section">
-    <h1 class="oppia-volunteer-h1">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION' | translate }}</h1>
+    <h1 class="oppia-volunteer-h1 e2e-test-volunteer-page-headings">{{ 'I18N_VOLUNTEER_PAGE_VOLUNTEER_SECTION' | translate }}</h1>
     <div class="oppia-volunteer-tabs">
       <button class="oppia-volunteer-tab-prev-btn e2e-test-volunteer-page-tabs-prev-btn"
               *ngIf="screenType !== 'desktop'"
