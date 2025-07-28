@@ -251,6 +251,8 @@ const skillItem = '.e2e-test-skills-list-item';
 const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
 const deleteSkillButton = 'i.skill-delete-button';
 const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
+const removeSkillModalHeaderSelector =
+  '.e2e-test-delete-state-skill-modal-header';
 
 export class TopicManager extends BaseUser {
   /**
@@ -369,6 +371,7 @@ export class TopicManager extends BaseUser {
     }
     await this.clickOn(deleteSkillButton);
     await this.clickOn('Delete skill');
+    await this.expectElementToBeVisible(removeSkillModalHeaderSelector, false);
   }
 
   /**

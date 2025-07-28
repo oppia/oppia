@@ -71,7 +71,10 @@ export class BlogAdmin extends BaseUser {
     await this.type(maximumTagLimitInput, limit.toString());
     await this.clickOn(LABEL_FOR_SAVE_BUTTON);
 
-    await this.expectActionStatusMessageToBe('Data saved successfully.');
+    await this.expectActionStatusMessageToBe(
+      'Data saved successfully.',
+      'Saving...'
+    );
     showMessage(`Successfully updated the tag limit to ${limit}!`);
   }
 

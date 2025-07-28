@@ -302,10 +302,7 @@ export class ReleaseCoordinator extends BaseUser {
     await this.page.waitForSelector(actionStatusMessageSelector, {
       visible: true,
     });
-    await this.expectTextContentToMatch(
-      actionStatusMessageSelector,
-      'Success!'
-    );
+    await this.expectTextContentToBe(actionStatusMessageSelector, 'Success!');
   }
 
   /**

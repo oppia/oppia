@@ -400,7 +400,9 @@ export class QuestionSubmitter extends BaseUser {
    * using the options array.
    * @param {string[]} options - The options to be added to the multiple choice interaction.
    */
-  async addMultipleChoiceInteraction(options: string[]): Promise<void> {
+  async addMultipleChoiceInteractionInQuestionEditor(
+    options: string[]
+  ): Promise<void> {
     await this.expectElementToBeVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(multipleChoiceInteractionButton, {
