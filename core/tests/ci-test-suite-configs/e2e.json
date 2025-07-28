@@ -25,6 +25,10 @@
       "module": "core/tests/webdriverio_desktop/blog.js"
     },
     {
+      "name": "collections",
+      "module": "core/tests/webdriverio_desktop/collections.js"
+    },
+    {
       "name": "contributorDashboard",
       "module": "core/tests/webdriverio_desktop/contributorDashboard.js"
     },
