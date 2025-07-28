@@ -3471,6 +3471,7 @@ export class ExplorationEditor extends BaseUser {
   async addVideoRTE(videoUrl: string): Promise<void> {
     await this.clickOnRTEOptionWithTitle('Insert video');
 
+    await this.expectElementToBeVisible(rteHelperModalSelector);
     const helperModel = await this.page.$(rteHelperModalSelector);
 
     // Get Fields.
