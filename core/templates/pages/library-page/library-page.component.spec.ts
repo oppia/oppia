@@ -953,7 +953,7 @@ describe('Library Page Component', () => {
 
   it('should not scroll if activity count is too small to allow scrolling', () => {
     const ind = 0;
-    const isLeftScroll = false;
+    const shouldScrollLeft = false;
 
     const mockCarouselElement = document.createElement('div');
     mockCarouselElement.className = 'oppia-library-carousel-tiles';
@@ -975,7 +975,7 @@ describe('Library Page Component', () => {
       },
     ];
 
-    componentInstance.scroll(ind, isLeftScroll);
+    componentInstance.scroll(ind, shouldScrollLeft);
     expect(componentInstance.leftmostCardIndices[ind]).toBe(0);
   });
 

@@ -139,7 +139,9 @@ export class LibraryPageComponent {
       return;
     }
 
-    // https://stackoverflow.com/questions/49518107
+    // Replacing jQuery's $(window).width() with vanilla JS.
+    // Using multiple fallbacks to avoid test failures in headless browsers,
+    // Reference: https://stackoverflow.com/a/11744120
     const width =
       window.innerWidth ||
       document.documentElement?.clientWidth ||
@@ -168,7 +170,7 @@ export class LibraryPageComponent {
     for (let i = 0; i < this.libraryGroups.length; i++) {
       const carouselTileElem = carouselTileElems[i] as HTMLElement;
       if (carouselTileElem) {
-        const scrollLeft = carouselTileElem.scrollLeft || 0;
+        const scrollLeft = carouselTileElem.scrollLeft;
         const index = Math.ceil(
           scrollLeft / AppConstants.LIBRARY_TILE_WIDTH_PX
         );
@@ -182,17 +184,17 @@ export class LibraryPageComponent {
       return;
     }
 
-    const carouselElems = document.querySelectorAll(
+    const carouselElements = document.querySelectorAll(
       '.oppia-library-carousel-tiles'
     );
-    const carouselElem = carouselElems[ind] as HTMLElement;
+    const carouselElement = carouselElements[ind] as HTMLElement;
 
-    if (!carouselElem) {
+    if (!carouselElement) {
       return;
     }
 
     const direction = isLeftScroll ? -1 : 1;
-    let scrollLeft = carouselElem.scrollLeft || 0;
+    let scrollLeft = carouselElement.scrollLeft;
 
     if (
       this.libraryGroups[ind].activity_summary_dicts.length <=
@@ -222,7 +224,7 @@ export class LibraryPageComponent {
       this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction;
 
     const duration = 800;
-    const start = carouselElem.scrollLeft;
+    const start = carouselElement.scrollLeft;
     const distance = newScrollPositionPx - start;
     const startTime = performance.now();
 
@@ -234,7 +236,7 @@ export class LibraryPageComponent {
           ? 2 * progress * progress
           : -1 + (4 - 2 * progress) * progress;
 
-      carouselElem.scrollLeft = start + distance * ease;
+      carouselElement.scrollLeft = start + distance * ease;
 
       if (progress < 1) {
         requestAnimationFrame(animateScroll);
