@@ -285,6 +285,9 @@ const openExplorationEditorNavigationMobile =
   '.oppia-exploration-editor-tabs-dropdown.show';
 const skillNameInput = '.e2e-test-skill-name-input';
 
+const openNavbarIconSelector = '.mobile-navbar-toggled';
+const stateChangesDropdownSelector = '.e2e-test-state-changes-dropdown';
+
 export enum INTERACTION_TYPES {
   CODE_EDITOR = 'Code Editor',
   CONTINUE_BUTTON = 'Continue Button',
@@ -407,6 +410,37 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
   }
+
+  /**
+   * Opens the navigation in mobile viewport properly.
+   * @param dropdown Dropdown to open. Currently, it only opens
+   * the state changes dropdown, but can be extended to open navigation dropdown.
+   */
+  async openExplorationNavigationInMobile(
+    dropdown: 'State Changes' | null
+  ): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage('Skipped: Open exploration navigation in mobile view');
+    }
+
+    // Open the navigation only if it is not open.
+    if (!(await this.isElementVisible(`${openNavbarIconSelector}.show`))) {
+      await this.clickOn(mobileOptionsButtonSelector);
+      await this.expectElementToBeVisible(`${openNavbarIconSelector}.show`);
+    }
+
+    // Open state changes dropdown only if required.
+    if (
+      dropdown === 'State Changes' &&
+      !(await this.isElementVisible(`${stateChangesDropdownSelector}.show`))
+    ) {
+      await this.clickOn(mobileChangesDropdownSelector);
+      await this.expectElementToBeVisible(
+        `${stateChangesDropdownSelector}.show`
+      );
+    }
+  }
+
   /**
    * Function to publish exploration.
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
@@ -423,18 +457,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<string | null> {
     const publishExploration = async () => {
       if (this.isViewportAtMobileWidth()) {
-        await this.waitForPageToFullyLoad();
-        await this.page.waitForSelector(mobileNavbarDropdown, {
-          visible: true,
-        });
-        const element = await this.page.$(mobileNavbarOptions);
-        // If the element is not present, it means the mobile navigation bar is not expanded.
-        // The option to save changes appears only in the mobile view after clicking on the mobile options button,
-        // which expands the mobile navigation bar.
-        if (!element) {
-          await this.clickOn(mobileOptionsButtonSelector);
-        }
-        await this.clickOn(mobileChangesDropdownSelector);
+        await this.openExplorationNavigationInMobile('State Changes');
         await this.clickOn(mobilePublishButtonSelector);
       } else {
         await this.page.waitForSelector(publishExplorationButtonSelector, {
