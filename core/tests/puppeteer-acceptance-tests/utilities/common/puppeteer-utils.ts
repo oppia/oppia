@@ -1023,7 +1023,7 @@ export class BaseUser {
           const el = document.querySelector(sel);
           return el && el.textContent?.includes(text);
         },
-        {timeout: 5000},
+        {},
         selector,
         expectedText
       );
