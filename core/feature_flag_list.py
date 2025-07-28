@@ -109,8 +109,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.ENABLE_MULTIPLE_CLASSROOMS,
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
-    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
-    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES
+    FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -125,7 +124,8 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
-    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD
+    FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
+    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -291,7 +291,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'and learners to access the updated study guide user interface '
             '(the actual content displayed by the study guides will be the '
             'same, just the user interface will be different).',
-            feature_flag_domain.ServerMode.TEST
+            feature_flag_domain.ServerMode.PROD
         )
     ),
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (
