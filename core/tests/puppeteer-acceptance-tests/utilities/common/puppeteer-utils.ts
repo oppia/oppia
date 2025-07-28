@@ -416,7 +416,13 @@ export class BaseUser {
           : selector;
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
-      throw new Error(`Element ${selector} took too long to be clickable.`);
+      if (error instanceof Error) {
+        error.message =
+          `Element with selector ${selector} took too long to be clickable.\n` +
+          `Original Error:\n` +
+          error.message;
+      }
+      throw error;
     }
   }
 
