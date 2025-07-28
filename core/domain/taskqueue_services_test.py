@@ -19,19 +19,24 @@
 from __future__ import annotations
 
 import datetime
+import uuid
 
 from core import feconf
 from core.domain import taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Optional, Set
+from typing import Dict, List, Optional, Set
 
 MYPY = False
 if MYPY: # pragma: no cover
+    from mypy_imports import cloud_task_models
     from mypy_imports import platform_taskqueue_services
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
+
+(cloud_task_models,) = models.Registry.import_models([
+    models.Names.CLOUD_TASK])
 
 
 class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
@@ -52,10 +57,12 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             ValueError,
             'The args or kwargs passed to the deferred call with '
             'function_identifier, %s, are not json serializable.' %
-            taskqueue_services.FUNCTION_ID_UPDATE_STATS)
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_UPDATE_STATS'])
         with serialization_exception:
             taskqueue_services.defer(
-                taskqueue_services.FUNCTION_ID_UPDATE_STATS,
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_UPDATE_STATS'],
                 taskqueue_services.QUEUE_NAME_DEFAULT, arg1)
 
     def test_exception_raised_when_email_task_params_is_not_serializable(
@@ -74,35 +81,21 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
                 0)
 
     def test_defer_makes_the_correct_request(self) -> None:
-        correct_fn_identifier = '/task/deferredtaskshandler'
+        correct_fn_identifier = 'delete_exps_from_activities'
         correct_args = (1, 2, 3)
         correct_kwargs = {'a': 'b', 'c': 'd'}
 
-        expected_queue_name = taskqueue_services.QUEUE_NAME_EMAILS
-        expected_url = feconf.TASK_URL_DEFERRED
-        expected_payload = {
-            'fn_identifier': correct_fn_identifier,
-            'args': correct_args,
-            'kwargs': correct_kwargs
-        }
-
-        create_http_task_swap = self.swap_with_checks(
-            platform_taskqueue_services,
-            'create_http_task',
-            lambda queue_name, url, payload=None, scheduled_for=None: None,
-            expected_kwargs=[{
-                'queue_name': expected_queue_name,
-                'url': expected_url,
-                'payload': expected_payload
-            }]
+        taskqueue_services.defer(
+            correct_fn_identifier,
+            taskqueue_services.QUEUE_NAME_EMAILS,
+            *correct_args, **correct_kwargs
         )
 
-        with create_http_task_swap:
-            taskqueue_services.defer(
-                correct_fn_identifier,
-                taskqueue_services.QUEUE_NAME_EMAILS,
-                *correct_args, **correct_kwargs
-            )
+        cloud_task_run_model: cloud_task_models.CloudTaskRunModel = (
+            cloud_task_models.CloudTaskRunModel.get_all().fetch())[0]
+        assert cloud_task_run_model is not None
+        self.assertEqual(
+            cloud_task_run_model.function_id, correct_fn_identifier)
 
     def test_enqueue_task_makes_the_correct_request(self) -> None:
         correct_payload = {
@@ -131,3 +124,164 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
         with swap_create_http_task:
             taskqueue_services.enqueue_task(
                 correct_url, correct_payload, 0)
+
+    def test_should_create_new_cloud_task_run_model(self) -> None:
+        new_model_id = cloud_task_models.CloudTaskRunModel.get_new_id()
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'test_queue_name'
+
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
+        )
+        function_id = 'delete_exps_from_user_models'
+
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id)
+
+        cloud_task_run_models: List[cloud_task_models.CloudTaskRunModel] = list(
+            cloud_task_models.CloudTaskRunModel.get_all().fetch())
+        self.assertIsNotNone(cloud_task_run_models)
+        self.assertEqual(len(cloud_task_run_models), 1)
+
+        self.assertEqual(
+            cloud_task_run_models[0].id, new_model_id)
+        self.assertEqual(
+            cloud_task_run_models[0].cloud_task_name, task_name)
+        self.assertEqual(
+            cloud_task_run_models[0].function_id, function_id)
+        self.assertEqual(
+            cloud_task_run_models[0].latest_job_state,
+            cloud_task_models.CloudTaskState.PENDING.value)
+        self.assertEqual(
+            cloud_task_run_models[0].current_retry_attempt, 0)
+
+    def test_should_update_cloud_task_run_model(self) -> None:
+        new_model_id = cloud_task_models.CloudTaskRunModel.get_new_id()
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'test_queue_name'
+
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
+        )
+        function_id = 'delete_exps_from_user_models'
+
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id)
+
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id)
+        assert cloud_task_run is not None
+        self.assertIsNotNone(cloud_task_run)
+
+        cloud_task_run.current_retry_attempt = 1
+        cloud_task_run.latest_job_state = (
+            cloud_task_models.CloudTaskState.SUCCEEDED.value)
+        cloud_task_run.exception_messages_for_failed_runs = (
+            ['Timeout error occurred.'])
+
+        taskqueue_services.update_cloud_task_run_model(cloud_task_run)
+
+        updated_cloud_task_run = (
+            taskqueue_services.get_cloud_task_run_by_model_id(new_model_id))
+        assert updated_cloud_task_run is not None
+
+        self.assertEqual(
+            updated_cloud_task_run.current_retry_attempt, 1)
+        self.assertEqual(
+            updated_cloud_task_run.latest_job_state,
+            cloud_task_models.CloudTaskState.SUCCEEDED.value)
+        self.assertEqual(
+            updated_cloud_task_run.exception_messages_for_failed_runs,
+            ['Timeout error occurred.'])
+
+    def test_should_not_update_for_incorrect_model_id(self) -> None:
+        new_model_id = cloud_task_models.CloudTaskRunModel.get_new_id()
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'test_queue_name'
+
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
+        )
+        function_id = 'delete_exps_from_user_models'
+
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id)
+
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id)
+        assert cloud_task_run is not None
+
+        # Updating the ID for testing error handling.
+        cloud_task_run.task_run_id = 'incorrect_model_id'
+        with self.assertRaisesRegex(
+            ValueError,
+            'CloudTaskRunModel with id incorrect_model_id does not exist.'
+        ):
+            taskqueue_services.update_cloud_task_run_model(cloud_task_run)
+
+    def test_should_fetch_cloud_task_run_model(self) -> None:
+        new_model_id = cloud_task_models.CloudTaskRunModel.get_new_id()
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'test_queue_name'
+
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
+        )
+        function_id = 'delete_exps_from_user_models'
+
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id)
+
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id)
+        self.assertIsNotNone(cloud_task_run)
+
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            'incorrect_model_id')
+        self.assertIsNone(cloud_task_run)
+
+    def test_should_get_cloud_task_run_models_by_params(self) -> None:
+        new_model_id = cloud_task_models.CloudTaskRunModel.get_new_id()
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'test_queue_name'
+
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
+        )
+        function_id = 'delete_exps_from_user_models'
+
+        taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id)
+
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id)
+        assert cloud_task_run is not None
+
+        start_datetime = cloud_task_run.last_updated
+        end_datetime = cloud_task_run.last_updated
+
+        cloud_task_run = taskqueue_services.get_cloud_task_run_by_given_params(
+            queue_name, start_datetime, end_datetime)[0]
+
+        self.assertEqual(cloud_task_run.cloud_task_name, task_name)
+        self.assertEqual(cloud_task_run.function_id, function_id)
