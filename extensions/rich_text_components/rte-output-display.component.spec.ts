@@ -666,7 +666,7 @@ describe('RTE display component', () => {
         auto: voiceover,
       },
     };
-    let entityVoiceoversBackendDict: EntityVoiceoversBackendDict = {
+    const entityVoiceoversBackendDict: EntityVoiceoversBackendDict = {
       entity_id: 'exp_1',
       entity_type: 'exploration',
       entity_version: 1,
