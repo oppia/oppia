@@ -3584,11 +3584,10 @@ export class ExplorationEditor extends BaseUser {
 
       const cardNames = await Promise.all(
         elements.map(element =>
-          element.$eval('tspan', node => node.textContent)
+          element.$eval('tspan', node => node.textContent.trim())
         )
       );
-      // The card name is suffixed with a space to match the format in the UI.
-      const cardIndex = cardNames.indexOf(cardName + ' ');
+      const cardIndex = cardNames.indexOf(cardName);
 
       if (cardIndex === -1) {
         throw new Error(`Card name ${cardName} not found in the graph.`);
@@ -3600,7 +3599,7 @@ export class ExplorationEditor extends BaseUser {
         await elements[cardIndex].click();
       }
 
-      await this.waitForNetworkIdle({idleTime: 700});
+      await this.waitForNetworkIdle({idleTime: 1000});
 
       const headingName = !cardName.trimEnd().endsWith('...')
         ? cardName
