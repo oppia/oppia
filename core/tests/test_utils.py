@@ -1223,7 +1223,7 @@ class TaskqueueServicesStub:
         payload: Optional[Dict[str, str]] = None,
         scheduled_for: Optional[datetime.datetime] = None,
         task_name: Optional[str] = None
-    ) -> None:
+    ) -> cloud_tasks_emulator.Task:
         """Creates a Task in the corresponding queue that will be executed when
         the 'scheduled_for' countdown expires using the cloud tasks emulator.
 
@@ -1235,12 +1235,15 @@ class TaskqueueServicesStub:
             scheduled_for: datetime|None. The naive datetime object for the time
                 to execute the task. Ignored by this stub.
             task_name: str|None. Optional. The name of the task.
+
+        Returns:
+            Task. The task that was created in the queue.
         """
         # Causes the task to execute immediately by setting the scheduled_for
         # time to 0. If we allow scheduled_for to be non-zero, then tests that
         # rely on the actions made by the task will become unreliable.
         scheduled_for = None
-        self._client.create_task(
+        return self._client.create_task(
             queue_name, url, payload, scheduled_for=scheduled_for,
             task_name=task_name)
 
@@ -3224,10 +3227,14 @@ version: 1
             expect_errors=expect_errors
         )
 
+    # Here we use type Any because the 'payload' argument can accept
+    # different types of dictionaries that need to be sent over to the handler,
+    # those dictionaries can contain any type of values. So, to allow different
+    # dictionaries, we used Any type here.
     def post_task(
         self,
         url: str,
-        payload: Dict[str, str],
+        payload: Dict[str, Any],
         headers: Dict[str, bytes] | Dict[str, str],
         csrf_token: Optional[str] = None,
         expect_errors: bool = False,

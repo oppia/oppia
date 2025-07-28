@@ -33,89 +33,93 @@ describe('Logged-In Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let explorationId: string | null;
 
-  beforeAll(async function () {
-    loggedInUser1 = await UserFactory.createNewUser(
-      'loggedInLearner',
-      'logged_in_learner@example.com'
-    );
+  beforeAll(
+    async function () {
+      loggedInUser1 = await UserFactory.createNewUser(
+        'loggedInLearner',
+        'logged_in_learner@example.com'
+      );
 
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculumAdmin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
-    );
+      curriculumAdmin = await UserFactory.createNewUser(
+        'curriculumAdm',
+        'curriculumAdmin@example.com',
+        [ROLES.CURRICULUM_ADMIN]
+      );
 
-    await curriculumAdmin.navigateToCreatorDashboardPage();
-    await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
-    await curriculumAdmin.dismissWelcomeModal();
-    await curriculumAdmin.updateCardContent('Introduction to Fractions');
-    await curriculumAdmin.addInteraction('Continue Button');
+      await curriculumAdmin.navigateToCreatorDashboardPage();
+      await curriculumAdmin.navigateToExplorationEditorFromCreatorDashboard();
+      await curriculumAdmin.dismissWelcomeModal();
+      await curriculumAdmin.updateCardContent('Introduction to Fractions');
+      await curriculumAdmin.addInteraction('Continue Button');
 
-    // Add a new card with a basic algebra problem.
-    await curriculumAdmin.viewOppiaResponses();
-    await curriculumAdmin.directLearnersToNewCard('Second Card');
-    await curriculumAdmin.saveExplorationDraft();
+      // Add a new card with a basic algebra problem.
+      await curriculumAdmin.viewOppiaResponses();
+      await curriculumAdmin.directLearnersToNewCard('Second Card');
+      await curriculumAdmin.saveExplorationDraft();
 
-    // Navigate to the new card and update its content.
-    await curriculumAdmin.navigateToCard('Second Card');
-    await curriculumAdmin.updateCardContent('Enter a negative number.');
-    await curriculumAdmin.addInteraction('Number Input');
+      // Navigate to the new card and update its content.
+      await curriculumAdmin.navigateToCard('Second Card');
+      await curriculumAdmin.updateCardContent('Enter a negative number.');
+      await curriculumAdmin.addInteraction('Number Input');
 
-    await curriculumAdmin.addResponsesToTheInteraction(
-      'Number Input',
-      '-1',
-      'Perfect!',
-      'Last Card',
-      true
-    );
-    await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
-      'Wrong, try again!'
-    );
-    await curriculumAdmin.addHintToState(
-      'Remember that negative numbers are less than 0.'
-    );
-    await curriculumAdmin.addSolutionToState(
-      '-99',
-      'The number -99 is a negative number.',
-      true
-    );
-    await curriculumAdmin.saveExplorationDraft();
+      await curriculumAdmin.addResponsesToTheInteraction(
+        'Number Input',
+        '-1',
+        'Perfect!',
+        'Last Card',
+        true
+      );
+      await curriculumAdmin.editDefaultResponseFeedbackInExplorationEditorPage(
+        'Wrong, try again!'
+      );
+      await curriculumAdmin.addHintToState(
+        'Remember that negative numbers are less than 0.'
+      );
+      await curriculumAdmin.addSolutionToState(
+        '-99',
+        'The number -99 is a negative number.',
+        true
+      );
+      await curriculumAdmin.saveExplorationDraft();
 
-    // Navigate to the new card and add Study Guide content.
-    await curriculumAdmin.navigateToCard('Last Card');
-    await curriculumAdmin.updateCardContent(
-      'Congratulations! You have completed the exploration.'
-    );
-    await curriculumAdmin.addInteraction('End Exploration');
+      // Navigate to the new card and add Study Guide content.
+      await curriculumAdmin.navigateToCard('Last Card');
+      await curriculumAdmin.updateCardContent(
+        'Congratulations! You have completed the exploration.'
+      );
+      await curriculumAdmin.addInteraction('End Exploration');
 
-    // Save the draft.
-    await curriculumAdmin.saveExplorationDraft();
-    explorationId = await curriculumAdmin.publishExplorationWithMetadata(
-      'What is a Fraction?',
-      'Learn the basics of Fractions',
-      'Algebra'
-    );
+      // Save the draft.
+      await curriculumAdmin.saveExplorationDraft();
+      explorationId = await curriculumAdmin.publishExplorationWithMetadata(
+        'What is a Fraction?',
+        'Learn the basics of Fractions',
+        'Algebra'
+      );
 
-    await curriculumAdmin.createAndPublishTopic(
-      'Fractions',
-      'Basics Of Fractions',
-      'fractions'
-    );
+      await curriculumAdmin.createAndPublishTopic(
+        'Fractions',
+        'Basics Of Fractions',
+        'fractions'
+      );
 
-    await curriculumAdmin.createAndPublishClassroom(
-      'Math',
-      'math',
-      'Fractions'
-    );
+      await curriculumAdmin.createAndPublishClassroom(
+        'Math',
+        'math',
+        'Fractions'
+      );
 
-    await curriculumAdmin.createAndPublishStoryWithChapter(
-      'Fraction Story',
-      'fraction-story',
-      'What is a Fraction?',
-      explorationId as string,
-      'Fractions'
-    );
-  });
+      await curriculumAdmin.createAndPublishStoryWithChapter(
+        'Fraction Story',
+        'fraction-story',
+        'What is a Fraction?',
+        explorationId as string,
+        'Fractions'
+      );
+    },
+    // Test takes longer than default timeout.
+    600000
+  );
 
   it('should be able to change the site language to an RTL language', async function () {
     await loggedInUser1.changeSiteLanguage('ar');

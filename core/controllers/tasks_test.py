@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import uuid
+
 from core import feconf
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -423,16 +425,15 @@ class TasksTests(test_utils.EmailTestBase):
 
     def test_deferred_tasks_handler_raises_correct_exceptions(self) -> None:
         incorrect_function_identifier = 'incorrect_function_id'
-        taskqueue_services.defer(
-            incorrect_function_identifier,
-            taskqueue_services.QUEUE_NAME_DEFAULT)
-
         raises_incorrect_function_id_exception = self.assertRaisesRegex(
             Exception,
-            'The function id, %s, is not valid.' %
-            incorrect_function_identifier)
+            'Value \'%s\' for property function_id is not an allowed choice'
+            % incorrect_function_identifier)
 
         with raises_incorrect_function_id_exception:
+            taskqueue_services.defer(
+                incorrect_function_identifier,
+                taskqueue_services.QUEUE_NAME_DEFAULT)
             self.process_and_flush_pending_tasks()
 
         headers = {
@@ -446,6 +447,201 @@ class TasksTests(test_utils.EmailTestBase):
         self.post_task(
             feconf.TASK_URL_DEFERRED, {}, headers,
             csrf_token=csrf_token, expect_errors=True, expected_status_int=500)
+
+    def test_should_handle_deferred_tasks_successfully(self) -> None:
+        url = feconf.TASK_URL_DEFERRED
+        csrf_token = self.get_new_csrf_token()
+        headers = {
+            'X-Appengine-QueueName': 'queue',
+            'X-Appengine-TaskName': 'None',
+            'X-AppEngine-Fake-Is-Admin': '1'
+        }
+        new_model_id = 'cloud_task_model_id'
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'test_queue_name'
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
+        )
+        function_id = 'delete_exps_from_user_models'
+
+        payload = {
+            'fn_identifier': function_id,
+            'cloud_task_model_id': new_model_id,
+            'args': [
+                ['exp1', 'exp2']
+            ],
+            'kwargs': {}
+        }
+
+        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id)
+        self.assertEqual(
+            cloud_task_run_model.latest_job_state, 'PENDING')
+
+        self.post_task(
+            url, payload, expect_errors=False, expected_status_int=200,
+            csrf_token=csrf_token, headers=headers
+        )
+
+        cloud_task_run_model_obj = (
+            taskqueue_services.get_cloud_task_run_by_model_id(
+            new_model_id))
+        assert cloud_task_run_model_obj is not None
+        self.assertEqual(cloud_task_run_model_obj.latest_job_state, 'SUCCEEDED')
+
+    def test_should_raise_error_for_missing_cloud_task_model_id(self) -> None:
+        url = feconf.TASK_URL_DEFERRED
+        csrf_token = self.get_new_csrf_token()
+        headers = {
+            'X-Appengine-QueueName': 'queue',
+            'X-Appengine-TaskName': 'None',
+            'X-AppEngine-Fake-Is-Admin': '1'
+        }
+        function_id = 'delete_exps_from_user_models'
+        payload = {
+            'fn_identifier': function_id,
+            'args': [
+                ['exp1', 'exp2']
+            ],
+            'kwargs': {}
+        }
+
+        response = self.post_task(
+            url, payload, expect_errors=True, expected_status_int=500,
+            csrf_token=csrf_token, headers=headers
+        )
+        self.assertIn(
+            b'The payload must contain a cloud_task_model_id attribute.',
+            response.body
+        )
+
+    def test_should_raise_error_for_invalid_function_id(self) -> None:
+        url = feconf.TASK_URL_DEFERRED
+        csrf_token = self.get_new_csrf_token()
+        headers = {
+            'X-Appengine-QueueName': 'queue',
+            'X-Appengine-TaskName': 'None',
+            'X-AppEngine-Fake-Is-Admin': '1'
+        }
+        payload = {
+            'fn_identifier': 'invalid_function_id',
+            'args': [
+                ['exp1', 'exp2']
+            ],
+            'kwargs': {}
+        }
+
+        response = self.post_task(
+            url, payload, expect_errors=True, expected_status_int=500,
+            csrf_token=csrf_token, headers=headers
+        )
+        self.assertIn(
+            b'The function id, invalid_function_id, is not valid.',
+            response.body
+        )
+
+    def test_should_mark_failed_and_awaiting_retry_correctly(self) -> None:
+        url = feconf.TASK_URL_DEFERRED
+        csrf_token = self.get_new_csrf_token()
+        headers = {
+            'X-Appengine-QueueName': 'queue',
+            'X-Appengine-TaskName': 'None',
+            'X-AppEngine-Fake-Is-Admin': '1'
+        }
+        new_model_id = 'cloud_task_model_id'
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'test_queue_name'
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
+        )
+        function_id = 'delete_exps_from_user_models'
+
+        payload = {
+            'fn_identifier': function_id,
+            'cloud_task_model_id': new_model_id,
+            'args': [],
+            'kwargs': {}
+        }
+
+        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id)
+        self.assertEqual(
+            cloud_task_run_model.latest_job_state, 'PENDING')
+
+        response = self.post_task(
+            url, payload, expect_errors=False, expected_status_int=500,
+            csrf_token=csrf_token, headers=headers
+        )
+        error_message = (
+            b'Error running deferred task: delete_explorations_from_user_models'
+        )
+        self.assertIn(error_message, response.body)
+
+        cloud_task_run_model_obj = (
+            taskqueue_services.get_cloud_task_run_by_model_id(new_model_id))
+        assert cloud_task_run_model_obj is not None
+        self.assertEqual(
+            cloud_task_run_model_obj.latest_job_state,
+            'FAILED_AND_AWAITING_RETRY')
+
+    def test_should_mark_permanently_failed_correctly(self) -> None:
+        url = feconf.TASK_URL_DEFERRED
+        csrf_token = self.get_new_csrf_token()
+        headers = {
+            'X-Appengine-QueueName': 'queue',
+            'X-Appengine-TaskName': 'None',
+            'X-AppEngine-Fake-Is-Admin': '1'
+        }
+        new_model_id = 'cloud_task_model_id'
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'voiceover-regeneration'
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
+        )
+        function_id = 'delete_exps_from_user_models'
+
+        payload = {
+            'fn_identifier': function_id,
+            'cloud_task_model_id': new_model_id,
+            'args': [],
+            'kwargs': {}
+        }
+
+        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id)
+        cloud_task_run_model.current_retry_attempt = 2
+        cloud_task_run_model.update_timestamps()
+        cloud_task_run_model.put()
+
+        self.assertEqual(
+            cloud_task_run_model.latest_job_state, 'PENDING')
+
+        response = self.post_task(
+            url, payload, expect_errors=False, expected_status_int=500,
+            csrf_token=csrf_token, headers=headers
+        )
+
+        error_message = (
+            b'Error running deferred task: delete_explorations_from_user_models'
+        )
+        self.assertIn(error_message, response.body)
+        cloud_task_run_model_obj = (
+            taskqueue_services.get_cloud_task_run_by_model_id(new_model_id))
+        assert cloud_task_run_model_obj is not None
+        self.assertEqual(
+            cloud_task_run_model_obj.latest_job_state, 'PERMANENTLY_FAILED')
 
     def test_deferred_tasks_handler_handles_tasks_correctly(self) -> None:
         exp_id = '15'

@@ -121,6 +121,7 @@ export class RteHelperModalComponent {
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
   COMPONENT_ID_COLLAPSIBLE_HEADING = 'collapsible_heading';
   COMPONENT_ID_COLLAPSIBLE_CONTENT = 'collapsible_content';
+  COMPONENT_ID_WORKEDEXAMPLE = 'workedexample';
   COMPONENT_ID_IMAGE = 'image';
   COMPONENT_ID_LINK = 'link';
   COMPONENT_ID_MATH = 'math';
@@ -136,6 +137,7 @@ export class RteHelperModalComponent {
     link: 200,
     tabs_heading: 200,
     tabs_content: 500,
+    workedexample: 500,
     default: 500,
   };
 
@@ -391,6 +393,26 @@ export class RteHelperModalComponent {
       ) {
         this.updateRteErrorMessage(
           `The content is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_COLLAPSIBLE_CONTENT)} characters.`
+        );
+        return;
+      }
+    } else if (this.componentId === this.COMPONENT_ID_WORKEDEXAMPLE) {
+      if (
+        value[0] &&
+        this.isContentLengthExceeded(value[0], this.COMPONENT_ID_WORKEDEXAMPLE)
+      ) {
+        this.updateRteErrorMessage(
+          `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
+        );
+        return;
+      }
+
+      if (
+        value[1] &&
+        this.isContentLengthExceeded(value[1], this.COMPONENT_ID_WORKEDEXAMPLE)
+      ) {
+        this.updateRteErrorMessage(
+          `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
         );
         return;
       }

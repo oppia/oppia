@@ -932,6 +932,33 @@ export class BaseUser {
   }
 
   /**
+   * Verify text content inside an element, waiting until it matches expected text.
+   * @param selector - The selector of the element to get text from.
+   * @param expectedText - The expected text content.
+   */
+  async expectElementContentToBe(
+    selector: string,
+    expectedText: string
+  ): Promise<void> {
+    try {
+      await this.page.waitForFunction(
+        (sel: string, text: string) => {
+          const el = document.querySelector(sel);
+          return el && el.textContent?.trim() === text;
+        },
+        {timeout: 5000},
+        selector,
+        expectedText
+      );
+    } catch (err) {
+      const currentText = await this.getTextContent(selector);
+      throw new Error(
+        `Text did not match within timeout.\nSelector: "${selector}"\nExpected: "${expectedText}"\nActual: "${currentText}"`
+      );
+    }
+  }
+
+  /*
    * Checks if the element is visible or not.
    * @param selector The selector of the element.
    */
@@ -967,6 +994,33 @@ export class BaseUser {
   }
 
   /**
+   * Verify text content inside an element, waiting until it matches expected text.
+   * @param selector - The selector of the element to get text from.
+   * @param expectedText - The expected text content.
+   */
+  async expectElementContentToContain(
+    selector: string,
+    expectedText: string
+  ): Promise<void> {
+    try {
+      await this.page.waitForFunction(
+        (sel: string, text: string) => {
+          const el = document.querySelector(sel);
+          return el && el.textContent?.includes(text);
+        },
+        {timeout: 5000},
+        selector,
+        expectedText
+      );
+    } catch (err) {
+      const currentText = await this.getTextContent(selector);
+      throw new Error(
+        `Text did not match within timeout.\nSelector: "${selector}"\nExpected: "${expectedText}"\nActual: "${currentText}"`
+      );
+    }
+  }
+
+  /*
    * Checks if the text content of the element contains the given text.
    * @param selector The selector of the element.
    * @param text The text to check for.
@@ -1063,6 +1117,31 @@ export class BaseUser {
       );
     }
     return;
+  }
+
+  /**
+   * Verifies that the tooltip text matches the expected tooltip text.
+   * @param {string} selector - The selector of the element to hover over.
+   * @param {string} expectedToolTip - The expected tooltip text.
+   */
+  async expectToolTipTextToBe(
+    selector: string,
+    expectedToolTip: string
+  ): Promise<void> {
+    // Hover over element.
+    await this.page.waitForSelector(selector, {visible: true});
+    await this.page.hover(selector);
+
+    // Wait for the tooltip to appear.
+    await this.page.waitForSelector('.tooltip', {
+      visible: true,
+    });
+
+    // Check the tooltip content.
+    const tooltipText = await this.page.$eval('.tooltip', el => el.textContent);
+
+    // Verify Tooltip.
+    expect(tooltipText).toBe(expectedToolTip);
   }
 }
 
