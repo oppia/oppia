@@ -21,7 +21,7 @@ from __future__ import annotations
 import datetime
 import json
 
-from core.domain import taskqueue_services
+from core import feconf
 from core.platform.taskqueue import cloud_taskqueue_services
 from core.tests import test_utils
 
@@ -49,7 +49,8 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         dummy_url = '/task/dummy_handler'
         payload = {
             'fn_identifier': (
-                taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS),
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']),
             'args': [['1', '2', '3']],
             'kwargs': {}
         }
@@ -93,7 +94,8 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
         dummy_url = '/task/dummy_handler'
         payload = {
             'fn_identifier': (
-                taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS),
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']),
             'args': [['1', '2', '3']],
             'kwargs': {}
         }
