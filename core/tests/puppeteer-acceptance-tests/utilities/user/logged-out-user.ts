@@ -4568,6 +4568,7 @@ export class LoggedOutUser extends BaseUser {
       ]);
 
       // Click on the copy button.
+      await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(copyProgressUrlButton, {visible: true});
       await this.page.click(copyProgressUrlButton);
 
@@ -4575,6 +4576,10 @@ export class LoggedOutUser extends BaseUser {
       const clipboardData = await this.page.evaluate(async () => {
         return await navigator.clipboard.readText();
       });
+
+      if (!clipboardData) {
+        throw new Error('Failed to copy the exploration URL.');
+      }
 
       return clipboardData;
     } catch (error) {
