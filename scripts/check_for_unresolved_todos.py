@@ -171,9 +171,11 @@ def main(args: Optional[List[str]] = None) -> None:
                     todos_associated_with_issue,
                     github_perma_link_url,
                     issue_number)
-    with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as o:
-        print(
-            f'unresolved_todos_found={str(todos_found).lower()}', file=o)
+    github_output = os.environ.get('GITHUB_OUTPUT')
+    if github_output:
+        with open(github_output, 'a', encoding='utf-8') as o:
+            print(
+                f'unresolved_todos_found={str(todos_found).lower()}', file=o)
     if todos_found:
         raise Exception(UNRESOLVED_TODOS_PRESENT_INDICATOR)
     print(UNRESOLVED_TODOS_NOT_PRESENT_INDICATOR)
