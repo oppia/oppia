@@ -958,14 +958,25 @@ export class BaseUser {
     }
   }
 
-  /*
-   * Checks if the element is visible or not.
-   * @param selector The selector of the element.
+  /**
+   * Verify text content inside an element
+   * @param {string} selector - The selector of the element to get text from.
+   * @param {string} text - The expected text content.
    */
-  async expectElementToBeVisible(selector: string): Promise<void> {
-    expect(await this.isElementVisible(selector)).toBe(true);
+  async expectTextContentToMatch(
+    selector: string,
+    textContent: string
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() === value;
+      },
+      {},
+      selector,
+      textContent
+    );
   }
-
   /**
    * Verify text content inside an element
    * @param {string} selector - The selector of the element to get text from.
@@ -1117,6 +1128,19 @@ export class BaseUser {
       );
     }
     return;
+  }
+
+  /**
+   * Checks if an element is present on the page.
+   * @param {string} selector - The selector of the element to check.
+   * @param {boolean} present - Whether the element should be present or not.
+   */
+  async expectElementToBeVisible(
+    selector: string,
+    present: boolean = true
+  ): Promise<void> {
+    const option = present ? {visible: true} : {hidden: true};
+    await this.page.waitForSelector(selector, option);
   }
 
   /**
