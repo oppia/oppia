@@ -3,9 +3,6 @@ name: Todo Check
 on:
   issues:
     types: [closed, reopened]
-  pull_request:
-    branches:
-      - develop
 permissions: read-all
 
 jobs:
