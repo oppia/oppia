@@ -393,6 +393,38 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
     },
     {
+      "name": "logged-in-learner/completes-the-exploration-and-decides-what-to-do-next",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/play-a-complete-community-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/reaches-a-checkpoint-and-saves-their-progress",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/use-the-feedback-and-help-cards",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/use-the-feedback-and-help-cards.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/share-the-lesson-from-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/share-the-lesson-from-the-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/sets-goal-on-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/sets-goal-on-learner-dashboard.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard.spec.ts"
+    },
+    {
       "name": "logged-in-learner/add-and-remove-exploration-from-play-later",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/add-and-remove-exploration-from-play-later.spec.ts"
     },
