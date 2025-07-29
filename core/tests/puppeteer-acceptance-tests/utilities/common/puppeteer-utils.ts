@@ -1216,7 +1216,7 @@ export class BaseUser {
    * Logs all the selectors in the page.
    */
   async logAllSelectorsInPage(): Promise<void> {
-    await this.page.evaluate(() => {
+    const result = await this.page.evaluate(() => {
       const allElements = document.querySelectorAll('*');
       const e2eTestClasses: string[] = [];
       const otherClasses: string[] = [];
@@ -1230,11 +1230,16 @@ export class BaseUser {
         }
       });
 
-      showMessage('E2E Test Classes:');
-      showMessage(e2eTestClasses.join(', '));
-      showMessage('Other Classes:');
-      showMessage(otherClasses.join(', '));
+      return {
+        e2eTestClasses,
+        otherClasses,
+      };
     });
+
+    showMessage('E2E Test Classes:');
+    showMessage(result.e2eTestClasses.join(', '));
+    showMessage('Other Classes:');
+    showMessage(result.otherClasses.join(', '));
   }
 }
 
