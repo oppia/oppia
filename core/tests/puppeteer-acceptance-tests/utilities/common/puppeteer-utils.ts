@@ -572,9 +572,6 @@ export class BaseUser {
    * This function closes the current Puppeteer browser instance.
    */
   async closeBrowser(): Promise<void> {
-    // Log all the selectors in the page.
-    await this.logAllSelectorsInPage();
-
     // Stop the screen recorder.
     if (this.screenRecorder) {
       await this.screenRecorder.stop();
@@ -1065,9 +1062,14 @@ export class BaseUser {
 
       showMessage(`Text content of "${selector}" contains "${text}".`);
     } catch (error) {
-      throw new Error(
-        `Failed: Text content of "${selector}" does not contain "${text}".\nOriginal Error:\n${error.stack}`
+      const actualTextContent = await this.page.$eval(selector, element =>
+        (element as HTMLElement).textContent?.trim()
       );
+      error.message =
+        `Failed: Text content of "${selector}" does not contain "${text}", it contains ${actualTextContent}.\n` +
+        'Original Error:\n' +
+        `${error.message}`;
+      throw error;
     }
   }
 
@@ -1127,17 +1129,10 @@ export class BaseUser {
       await this.waitForProgressMessageDisappear(progressMessage);
     }
 
-    const actualStatusMessage = await this.page.$eval(
+    await this.expectTextContentToContain(
       actionStatusMessageSelector,
-      el => el.textContent?.trim()
+      statusMessage
     );
-
-    if (!actualStatusMessage?.includes(statusMessage)) {
-      throw new Error(
-        `Action status message did not include the expected text. Actual status message: "${actualStatusMessage}", expected text: "${statusMessage}"`
-      );
-    }
-    return;
   }
 
   /**
@@ -1210,36 +1205,6 @@ export class BaseUser {
 
     // Verify Tooltip.
     expect(tooltipText).toBe(expectedToolTip);
-  }
-
-  /**
-   * Logs all the selectors in the page.
-   */
-  async logAllSelectorsInPage(): Promise<void> {
-    const result = await this.page.evaluate(() => {
-      const allElements = document.querySelectorAll('*');
-      const e2eTestClasses: string[] = [];
-      const otherClasses: string[] = [];
-
-      allElements.forEach(element => {
-        const classes = element.classList;
-        if (classes.contains('e2e-test')) {
-          e2eTestClasses.push(classes.toString());
-        } else {
-          otherClasses.push(classes.toString());
-        }
-      });
-
-      return {
-        e2eTestClasses,
-        otherClasses,
-      };
-    });
-
-    showMessage('E2E Test Classes:');
-    showMessage(result.e2eTestClasses.join(', '));
-    showMessage('Other Classes:');
-    showMessage(result.otherClasses.join(', '));
   }
 }
 

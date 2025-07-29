@@ -3391,15 +3391,13 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(searchInputSelector);
     await this.page.keyboard.press('Enter');
 
-    await this.page.waitForFunction(
-      (languageNames: string[]) => {
-        // Check if URL contains all the categories. Added %22 to remove false positives.
-        return languageNames.every(language =>
-          window.location.href.includes(`%22${language}%22`)
-        );
-      },
-      {},
-      languageNames
+    const buttonTextContent =
+      languageNames.length === 1
+        ? languageNames[0]
+        : `${languageNames.length} Languages`;
+    await this.expectTextContentToBe(
+      languageFilterDropdownToggler,
+      buttonTextContent
     );
   }
 

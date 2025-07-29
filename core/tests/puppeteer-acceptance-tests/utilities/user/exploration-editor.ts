@@ -277,6 +277,7 @@ const textInputSelector = 'input.e2e-test-text-input';
 const closeButtonForExtraModel = '.e2e-test-close-rich-text-component-editor';
 
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
+const translationTabContainer = '.e2e-test-translation-tab-container';
 
 const previousCardButton = '.e2e-test-back-button';
 const openExplorationEditorNavigationMobile =
@@ -2146,7 +2147,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickAndWaitForNavigation(translationTabButton);
     }
 
-    await this.expectElementToBeVisible(previewTabContainer);
+    await this.expectElementToBeVisible(translationTabContainer);
   }
 
   /**

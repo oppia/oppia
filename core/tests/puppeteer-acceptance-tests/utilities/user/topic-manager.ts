@@ -231,7 +231,7 @@ const confirmDeleteChapterButton = '.e2e-test-confirm-delete-chapter-button';
 const questionContainerSelector = '.e2e-test-skill-questions-container';
 const skillPreviewContainerSelector = '.e2e-test-skill-preview-container';
 const topicEditorContainerSelector = '.e2e-test-topic-editor-container';
-const topicEditorMainTabFormSelector = 'e2e-test-topic-editor-main-tab';
+const topicEditorMainTabFormSelector = '.e2e-test-topic-editor-main-tab';
 const topicEditorSaveModelSelector = 'oppia-topic-editor-save-modal';
 const topicPreviewContainerSelector = '.e2e-test-topic-preview-container';
 const subtopicEditorContainerSelector = '.e2e-test-subtopic-editor-container';
@@ -1309,24 +1309,11 @@ export class TopicManager extends BaseUser {
    * @param {string} questionText - The text of the question to preview.
    */
   async previewQuestion(questionText: string): Promise<void> {
-    try {
-      await this.expectElementToBeVisible(questionTextInput);
-      await this.type(questionTextInput, questionText);
-      await this.page.keyboard.press('Enter');
+    await this.expectElementToBeVisible(questionTextInput);
+    await this.type(questionTextInput, questionText);
+    await this.page.keyboard.press('Enter');
 
-      await this.page.waitForFunction(
-        (selector: string, value: string) => {
-          const element = document.querySelector(selector);
-          return element?.textContent?.trim() === value;
-        },
-        {},
-        questionTextInput,
-        questionText
-      );
-    } catch (error) {
-      console.error(`Error previewing question: ${error.message}`);
-      throw error;
-    }
+    await this.expectTextContentToBe(questionTextInput, questionText);
   }
 
   /**
@@ -1503,7 +1490,7 @@ export class TopicManager extends BaseUser {
         await optionElement.click();
 
         await this.expectElementToBeVisible(filterOptionSelector, false);
-        break;
+        return;
       }
     }
 
@@ -2782,7 +2769,19 @@ export class TopicManager extends BaseUser {
     await this.expectElementToBeVisible(createChapterButton);
     await this.clickOn(createChapterButton);
 
-    await this.expectElementToBeVisible(createChapterButton, false);
+    const saveChapterButtonHidden = await this.isElementVisible(
+      createChapterButton,
+      false
+    );
+    const errorSpanShown = await this.isElementVisible(
+      newChapterErrorMessageSelector
+    );
+    if (saveChapterButtonHidden || errorSpanShown) {
+      return;
+    }
+    throw new Error(
+      'Save chapter button is not visible, nor error span is shown.'
+    );
   }
 
   /**
