@@ -43,7 +43,7 @@ import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.s
 import {SchemaFormSubmittedService} from '../../../../services/schema-form-submitted.service';
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
-import {Interaction} from '../../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Progress nav component', () => {
