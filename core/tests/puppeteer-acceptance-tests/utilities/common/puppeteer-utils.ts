@@ -419,7 +419,7 @@ export class BaseUser {
       if (error instanceof Error) {
         error.message =
           `Element with selector ${selector} took too long to be clickable.\n` +
-          `Original Error:\n` +
+          'Original Error:\n' +
           error.message;
       }
       throw error;

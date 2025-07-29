@@ -19,7 +19,6 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {element} from 'angular';
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
@@ -44,10 +43,7 @@ const tagSelector = '.e2e-test-blog-post-tags';
 const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
 
 const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
-const LABEL_FOR_SAVE_BUTTON = 'Save';
-const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
-const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
 
 export class BlogPostEditor extends BaseUser {
   /**
@@ -270,9 +266,9 @@ export class BlogPostEditor extends BaseUser {
     await this.clickOn(saveDraftButtonSelector);
 
     await this.page.waitForFunction(
-      selector => {
+      (selector: string) => {
         const element = document.querySelector(selector);
-        return element?.disabled === true;
+        return (element as HTMLInputElement)?.disabled === true;
       },
       {},
       saveDraftButtonSelector

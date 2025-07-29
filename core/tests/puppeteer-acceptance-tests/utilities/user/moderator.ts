@@ -153,7 +153,7 @@ export class Moderator extends BaseUser {
   ): Promise<void> {
     await this.page.waitForFunction(
       (title: string) => {
-        const anchorElements = document.querySelectorAll(`a`);
+        const anchorElements = document.querySelectorAll('a');
         for (const element of Array.from(anchorElements)) {
           if (element.textContent?.trim() === title) {
             return true;

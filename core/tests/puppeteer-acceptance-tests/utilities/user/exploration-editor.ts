@@ -265,7 +265,6 @@ const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
 const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
-const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
 const regenerateAutomaticVoiceoverButton = '.e2e-test-regenerate-voiceover';
 const voiceoverConfirmationModalButton =
@@ -2097,7 +2096,7 @@ export class ExplorationEditor extends BaseUser {
     if (!this.isViewportAtMobileWidth()) {
       showMessage(
         `Skipped: Expanding ${section} section on desktop.\n` +
-          `Reason: Sections are already expanded on desktop.`
+          'Reason: Sections are already expanded on desktop.'
       );
       return;
     }
@@ -2111,7 +2110,7 @@ export class ExplorationEditor extends BaseUser {
     if (await this.isElementVisible(sectionContentSelector)) {
       showMessage(
         `Skipped: Expanding ${section} section on desktop.\n` +
-          `Reason: Section is already expanded on desktop.`
+          'Reason: Section is already expanded on desktop.'
       );
       return;
     }

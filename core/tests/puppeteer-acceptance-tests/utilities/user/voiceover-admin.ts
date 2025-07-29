@@ -43,8 +43,8 @@ const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
 const mobileVoiceoverArtistsHeader =
   '.e2e-test-voice-artist-collapsible-card-header';
-const voiceArtistSettingsDropdown =
-  'h3.e2e-test-voice-artists-settings-container';
+// const voiceArtistSettingsDropdown =
+//   'h3.e2e-test-voice-artists-settings-container';
 
 const languageAccentOptionSelector =
   '.e2e-test-language-accent-selector-option';
