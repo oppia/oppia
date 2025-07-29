@@ -340,7 +340,6 @@ const solutionModal = 'oppia-add-or-update-solution-modal';
 const codeEditorInSolutionModal = '.CodeMirror-scroll .CodeMirror-lines';
 
 const deleteExplorationButton = '.e2e-test-delete-exploration-button';
-const deleteExplorationModal = 'oppia-delete-exploration-button';
 const confirmExplorationDeletetionButton =
   '.e2e-test-really-delete-exploration-button';
 
@@ -646,8 +645,11 @@ export class ExplorationEditor extends BaseUser {
    * Clicks on the delete exploration button.
    */
   async clickOnDeleteExplorationButton(): Promise<void> {
+    await this.page.waitForSelector(deleteExplorationButton, {
+      visible: true,
+    });
     await this.clickOn(deleteExplorationButton);
-    await this.expectElementToBeVisible(deleteExplorationModal, false);
+    await this.expectElementToBeVisible(confirmExplorationDeletetionButton);
   }
 
   /**
@@ -3449,7 +3451,7 @@ export class ExplorationEditor extends BaseUser {
       hidden: true,
     });
     showMessage('Exploration is saved successfully.');
-    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**

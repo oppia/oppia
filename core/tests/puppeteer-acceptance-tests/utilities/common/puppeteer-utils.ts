@@ -433,9 +433,11 @@ export class BaseUser {
     // If we fail to find the element by its XPATH, then the button is undefined and
     // we try to find it by its CSS selector.
     if (button !== undefined) {
+      showMessage(`Clicking on button with text: ${selector}`);
       await this.waitForElementToBeClickable(button);
       await button.click();
     } else {
+      showMessage(`Clicking on button with selector: ${selector}`);
       await this.waitForElementToBeClickable(selector);
       await this.page.click(selector);
     }
@@ -1080,9 +1082,10 @@ export class BaseUser {
         const element = document.querySelector(selector);
         return element?.textContent?.trim();
       }, selector);
-      throw new Error(
-        `Element ${selector} does not contain "${text}". It contains "${actualText}".`
-      );
+      error.message =
+        `Element ${selector} does not contain "${text}". It contains "${actualText}".\n` +
+        error.message;
+      throw error;
     }
   }
 

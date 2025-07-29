@@ -305,6 +305,7 @@ const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
 const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
 const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
+const closeModalButton = '.e2e-test-close-modal-btn';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -1737,15 +1738,17 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(reportExplorationButtonSelector);
-    await this.page.waitForSelector(issueTypeSelector);
+    await this.expectElementToBeVisible(issueTypeSelector);
     const issueTypeElement = await this.page.$(issueTypeSelector);
-    await issueTypeElement?.click();
-    await this.clickOn(reportExplorationTextAreaSelector);
+    if (!issueTypeElement) {
+      throw new Error('Issue type element not found');
+    }
+    await issueTypeElement.click();
     await this.type(reportExplorationTextAreaSelector, issueDescription);
 
     await this.clickOn(submitReportButtonSelector);
 
-    await this.clickOn('Close');
+    await this.clickOn(closeModalButton);
 
     await this.page.waitForSelector(explorationSuccessfullyFlaggedMessage, {
       hidden: true,

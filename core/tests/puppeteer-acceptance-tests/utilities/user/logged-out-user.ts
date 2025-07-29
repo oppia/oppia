@@ -5479,17 +5479,11 @@ export class LoggedOutUser extends BaseUser {
   async expectErrorMessageForWrongInputToBe(
     errorMessage: string
   ): Promise<void> {
-    await this.page.waitForSelector(wrongInputErrorContainerSelector);
-    const actualErrorMessage = await this.page.$eval(
+    await this.expectElementToBeVisible(wrongInputErrorContainerSelector);
+    await this.expectTextContentToContain(
       wrongInputErrorContainerSelector,
-      el => el.textContent
+      errorMessage
     );
-
-    if (!actualErrorMessage?.includes(errorMessage)) {
-      throw new Error(
-        `Expected error message to be ${errorMessage}, but it was ${actualErrorMessage}`
-      );
-    }
   }
 
   /**
