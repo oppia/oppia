@@ -31,7 +31,7 @@ export class ImageAreaSelection {
     yInPercentage: number,
     widthInPercentage: number,
     heightInPercentage: number
-  ) {
+  ): Promise<void> {
     await this.context.waitForSelector(imageSelector);
     const image = await this.context.$(imageSelector);
     if (!image) {
@@ -59,7 +59,10 @@ export class ImageAreaSelection {
    * @param {number} xInPercentage - The x coordinate of the point in percentage to image width.
    * @param {number} yInPercentage - The y coordinate of the point in percentage to image height.
    */
-  async selectPoint(xInPercentage: number, yInPercentage: number) {
+  async selectPoint(
+    xInPercentage: number,
+    yInPercentage: number
+  ): Promise<void> {
     // Verify if the coordinates are within the percentange range.
     if (
       xInPercentage < 0 ||

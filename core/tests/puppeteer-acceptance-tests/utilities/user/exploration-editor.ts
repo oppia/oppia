@@ -16,14 +16,14 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import puppeteer, {ElementHandle, Puppeteer} from 'puppeteer';
+import puppeteer, {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {error} from 'console';
 import fs from 'fs';
 import path from 'path';
-import {number} from 'yargs';
+
 import {GraphViz} from '../common/interactions/graph-viz';
 import {PencilCode} from '../common/interactions/pencil-code';
 import {ImageAreaSelection} from '../common/interactions/image-area-selection';
@@ -91,7 +91,7 @@ const explorationCategoryDropdown =
   'mat-form-field.e2e-test-exploration-category-metadata-modal';
 const explorationLanguageSelector =
   '.e2e-test-exploration-language-select-modal';
-const languageOptionSelector = '.e2e-test-exploration-language-select-lan';
+
 const saveExplorationChangesButton = 'button.e2e-test-confirm-pre-publication';
 const explorationConfirmPublishButton = '.e2e-test-confirm-publish';
 const explorationIdElement = 'span.oppia-unique-progress-id';
@@ -111,7 +111,7 @@ const stateContentSelector = '.e2e-test-actual-state-content';
 const stateContentInputField = 'div.e2e-test-rte';
 const uploadImageButton = '.e2e-test-upload-image';
 const useTheUploadImageButton = '.e2e-test-use-image';
-const imageRegionSelector = '.e2e-test-svg';
+
 const correctAnswerInTheGroupSelector = '.e2e-test-editor-correctness-toggle';
 const addNewResponseButton = 'button.e2e-test-add-new-response';
 const floatFormInput = '.e2e-test-float-form-input';
@@ -301,14 +301,13 @@ const oppiaWebURL = 'https://www.oppia.org';
 const rteHelperModalSelector = 'oppia-rte-helper-modal';
 
 // Common Selectors.
-const inputFieldSelector = '.newTabButtonSelector';
+
 const addListEntryButtonSelector = '.e2e-test-add-list-entry';
 
 // Editor Tab Selectors.
 const addResponseModalHeaderSelector = '.e2e-test-add-response-modal-header';
 const algebricExpressionEditorSelector = '.e2e-test-guppy-div';
-const checkboxInInteractionCustomizationSelector =
-  '.e2e-test-interaction-editor .e2e-test-schema-based-bool-checkbox';
+
 const codeEditorStringEditorSelector = 'code-string-editor';
 const contentBoxSelector =
   '.e2e-test-state-editor .e2e-test-state-content-display';
@@ -320,15 +319,12 @@ const currentSolutionSummarySelector =
 const customizeInteractionBodySelector = '.e2e-test-customize-interaction-body';
 const customizeInteractionHeaderSelector =
   '.e2e-test-customize-interaction-header';
-const customizeOptionSelector = `${customizeInteractionBodySelector} .e2e-test-multiple-options`;
-const customizeOptionLabelSelector = `${customizeOptionSelector} .oppia-interaction-customization-label`;
-const customizeOptionValueSelector = `${customizeOptionSelector} .e2e-test-schema-based-editor`;
+
 const editCardContentButtonSelector = '.e2e-test-edit-content-pencil-button';
 const editOutcomeDestPencilButtonSelector =
   '.e2e-test-edit-outcome-dest-pencil-button';
 const interactionPreviewCardSelector = '.e2e-test-interaction-preview';
 const mathEquationEditorSelector = '.e2e-test-guppy-div';
-const newTabButtonSelector = '.oppia-new-tab-button-container';
 const numberWithUnitEditorSelector = 'number-with-units-editor';
 const numericExpressionEditorSelector = '.e2e-test-guppy-div';
 const outcomeFeedbackSelector = '.e2e-test-edit-outcome-feedback-button';
@@ -399,7 +395,6 @@ const publishMetadataExplorationHeaderSelector =
 
 // Multiple Choice Interaction Selectors.
 const multipleChoiceOptionSelector = '.e2e-test-multiple-choice-option';
-const selectedMultipleChoiceOption = '.multiple-choice-option.selected';
 
 const textAreaInputSelector = 'textarea.e2e-test-description-box';
 
@@ -410,7 +405,6 @@ const imageContainerSelector = '.oppia-image-click-img';
 const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
 const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
-const responsePairSelector = '.e2e-test-input-response-pair';
 
 const lessonInfoCardSelector = '.e2e-test-lesson-info-card';
 const formErrorContainer = '.e2e-test-form-error-container';
@@ -527,11 +521,10 @@ export class ExplorationEditor extends BaseUser {
       .$eval(feedbackSelector, element => element?.textContent?.trim() || null)
       .catch(() => null);
 
-    // Wait for 1 seconds
     // Click on Submit Answer button.
     await this.clickOn(submitAnswerButton);
 
-    // Wait for either element to change content
+    // Wait for either element to change content.
     await this.page.waitForFunction(
       (
         submitButtonSelector: string,
@@ -614,7 +607,9 @@ export class ExplorationEditor extends BaseUser {
       const optionText = await optionElement.evaluate(el =>
         el.textContent?.trim()
       );
-      if (!optionText) continue;
+      if (!optionText) {
+        continue;
+      }
       if (options.includes(optionText)) {
         await optionElement.click();
 
@@ -672,7 +667,7 @@ export class ExplorationEditor extends BaseUser {
    * Searches for a user in the history tab.
    * @param username The username to be searched.
    */
-  async searchUserInHistoryTab(username: string) {
+  async searchUserInHistoryTab(username: string): Promise<void> {
     await this.expectElementToBeVisible(historyUserFilterSelector);
 
     await this.clearAllTextFrom(historyUserFilterSelector);
@@ -685,7 +680,7 @@ export class ExplorationEditor extends BaseUser {
    * Changes the pagination in the history tab to the specified number of pages.
    * @param numberOfPages The number of pages to change the pagination to.
    */
-  async changePaginationInHistoryTabTo(numberOfPages: number) {
+  async changePaginationInHistoryTabTo(numberOfPages: number): Promise<void> {
     const selector = this.isViewportAtMobileWidth()
       ? historyPaginationMobileSelector
       : historyPaginationDesktopSelector;
@@ -701,7 +696,7 @@ export class ExplorationEditor extends BaseUser {
 
     const index = optionValues.indexOf(numberOfPages.toString());
 
-    if (index == -1) {
+    if (index === -1) {
       throw new Error(`Could not find option with value ${numberOfPages}`);
     }
 
@@ -719,7 +714,7 @@ export class ExplorationEditor extends BaseUser {
    * Expects the number of history items to be the specified number.
    * @param numberOfItems The expected number of history items.
    */
-  async expectNumberOfHistoryItemsToBe(numberOfItems: number) {
+  async expectNumberOfHistoryItemsToBe(numberOfItems: number): Promise<void> {
     // TODO(#22976): In mobile view the number of items displayed exceeds the
     // maximum number of items allowed per page. So, skip this check for mobile
     // view.
@@ -743,7 +738,7 @@ export class ExplorationEditor extends BaseUser {
   async compareExplorationVersionsInHistoryTab(
     version1: string,
     version2: string
-  ) {
+  ): Promise<void> {
     await this.page.waitForSelector(versionComparasionSelect);
 
     const versionSelectElements = await this.page.$$(versionComparasionSelect);
@@ -881,7 +876,7 @@ export class ExplorationEditor extends BaseUser {
    * Submits the world map answer.
    * @param zoomLevel The zoom level to increase the map to.
    */
-  async submitWorldMapAnswer(zoomLevel: number) {
+  async submitWorldMapAnswer(zoomLevel: number): Promise<void> {
     const zoomIncreaseSelctor = '.leaflet-control-zoom-in';
     const interactiveMap = 'oppia-interactive-interactive-map';
 
@@ -1122,7 +1117,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
-    showMessage(`Customized graph theory interaction with four vertices.`);
+    showMessage('Customized graph theory interaction with four vertices.');
   }
 
   /**
@@ -1139,7 +1134,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
-    showMessage(`Customized set input interaction with four vertices.`);
+    showMessage('Customized set input interaction with four vertices.');
   }
 
   /**
@@ -1155,7 +1150,7 @@ export class ExplorationEditor extends BaseUser {
 
     if (!customizationBox) {
       throw new Error(
-        `Could not find the customization box for the interaction.`
+        'Could not find the customization box for the interaction.'
       );
     }
 
@@ -1194,7 +1189,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
-    showMessage(`Customized Music Notes successfully.`);
+    showMessage('Customized Music Notes successfully.');
   }
 
   /**
@@ -1260,7 +1255,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
-    showMessage(`Customized Code Editor / Preview Code Editor successfully.`);
+    showMessage('Customized Code Editor / Preview Code Editor successfully.');
   }
 
   /**
@@ -1304,7 +1299,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
-    showMessage(`Customized World Map successfully.`);
+    showMessage('Customized World Map successfully.');
   }
 
   /**
@@ -1362,7 +1357,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
-    showMessage(`Customized World Map successfully.`);
+    showMessage('Customized World Map successfully.');
   }
 
   /**
@@ -1427,7 +1422,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,
     });
-    showMessage(`Customized World Map successfully.`);
+    showMessage('Customized World Map successfully.');
   }
 
   /**
@@ -1499,7 +1494,7 @@ export class ExplorationEditor extends BaseUser {
     placeHolderText?: string,
     heightInRows?: string,
     catchMisspellings?: boolean
-  ) {
+  ): Promise<void> {
     await this.page.waitForSelector(customizeInteractionBodySelector);
 
     await this.page.waitForSelector(
@@ -1738,7 +1733,7 @@ export class ExplorationEditor extends BaseUser {
   async updateAnswersInResponseModal(
     interactionType: INTERACTION_TYPES,
     answer: string
-  ) {
+  ): Promise<void> {
     switch (interactionType) {
       case INTERACTION_TYPES.NUMBER_INPUT:
         await this.page.waitForSelector(floatFormInput);
@@ -1832,7 +1827,7 @@ export class ExplorationEditor extends BaseUser {
     const solutionBox = await this.getSolutionModal();
     const codeEditor = await solutionBox.$(codeEditorInSolutionModal);
     if (!codeEditor) {
-      throw new Error(`Code editor not found.`);
+      throw new Error('Code editor not found.');
     }
 
     await codeEditor.click();
@@ -1914,7 +1909,7 @@ export class ExplorationEditor extends BaseUser {
         await selectBoxes[i].select(optionsSelections[i].toString());
       }
     } else {
-      throw new Error(`Rule currently not supported`);
+      throw new Error('Rule currently not supported');
     }
   }
 
@@ -2147,7 +2142,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('Response modal is not visible.');
     }
 
-    // Update Rule
+    // Update Rule.
     await this.updateRuleInResponseModalTo(rule);
 
     // Select given options.
@@ -2383,7 +2378,9 @@ export class ExplorationEditor extends BaseUser {
     const responseBox = await this.getRuleEditorModal();
     const inputFieldElement = await responseBox.$('input');
 
-    if (!inputFieldElement) throw new Error('Input field not found');
+    if (!inputFieldElement) {
+      throw new Error('Input field not found');
+    }
     await inputFieldElement.type(answer.toString());
 
     await this.page.waitForFunction(
@@ -2502,7 +2499,7 @@ export class ExplorationEditor extends BaseUser {
     if (!this.isViewportAtMobileWidth()) {
       showMessage(
         `Skipped: Expanding ${section} section on desktop.\n` +
-          `Reason: Sections are already expanded on desktop.`
+          'Reason: Sections are already expanded on desktop.'
       );
       return;
     }
@@ -2516,7 +2513,7 @@ export class ExplorationEditor extends BaseUser {
     if (await this.isElementVisible(sectionContentSelector)) {
       showMessage(
         `Skipped: Expanding ${section} section on desktop.\n` +
-          `Reason: Section is already expanded on desktop.`
+          'Reason: Section is already expanded on desktop.'
       );
       return;
     }
@@ -5127,7 +5124,6 @@ export class ExplorationEditor extends BaseUser {
     endX: number,
     endY: number
   ): Promise<void> {
-    console.log(startX, startY, endX, endY);
     await this.page.mouse.move(startX, startY);
     await this.page.waitForTimeout(1000);
     await this.page.mouse.down();
@@ -5182,7 +5178,7 @@ export class ExplorationEditor extends BaseUser {
 
       if (!sourceBox || !destBox) {
         throw new Error(
-          `Could not get bounding box for drag-and-drop operation.`
+          'Could not get bounding box for drag-and-drop operation.'
         );
       }
 
@@ -5207,7 +5203,6 @@ export class ExplorationEditor extends BaseUser {
       const option = answerItems[i];
 
       const optionElements = await this.page.$$(dragAndDropItemSelector);
-      console.log(optionElements.length);
       const destinationElement = optionElements[i];
 
       let sourceElement: puppeteer.ElementHandle<Element> | null = null;
@@ -5231,7 +5226,7 @@ export class ExplorationEditor extends BaseUser {
 
       if (!sourceBox || !destBox) {
         throw new Error(
-          `Could not get bounding box for drag-and-drop operation.`
+          'Could not get bounding box for drag-and-drop operation.'
         );
       }
 
@@ -6199,16 +6194,14 @@ export class ExplorationEditor extends BaseUser {
   async submitCodeEditorAnswer(answer: string): Promise<void> {
     const codeEditor = await this.getElementInParent(codeEditorInSolutionModal);
     if (!codeEditor) {
-      throw new Error(`Code editor not found.`);
+      throw new Error('Code editor not found.');
     }
 
     await this.clickOn(codeEditorInSolutionModal);
-    // await this.page.click(codeEditorInSolutionModal);
     await this.page.keyboard.down('Control');
     await this.page.keyboard.press('KeyA');
     await this.page.keyboard.up('Control');
     await this.page.keyboard.press('Backspace');
-    // await this.clearAllTextFrom(codeEditorInSolutionModal);
     await this.page.type(codeEditorInSolutionModal, answer);
 
     await this.clickOnSubmitAnswerButton();
@@ -6218,7 +6211,7 @@ export class ExplorationEditor extends BaseUser {
    * Expects the lesson info card to contain the given text.
    * @param text The text to look for.
    */
-  async expectLessonInfoCardToContain(text: string) {
+  async expectLessonInfoCardToContain(text: string): Promise<void> {
     await this.expectTextContentToContain(lessonInfoCardSelector, text);
   }
 

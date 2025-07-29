@@ -1,4 +1,4 @@
-import puppeteer, {ElementHandle} from 'puppeteer';
+import puppeteer from 'puppeteer';
 import {showMessage} from '../show-message';
 
 const IFRAME_URL = 'http://frame.pencilcode.net/edit/frame';
@@ -88,7 +88,7 @@ export class PencilCode {
       throw new Error('Preview iframe not found.');
     }
 
-    // Wait for the iframe content to load
+    // Wait for the iframe content to load.
     await this.parentPage.waitForTimeout(1000);
 
     await iframe.waitForFunction(

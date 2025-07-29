@@ -112,7 +112,7 @@ describe('Exploration Editor', function () {
   it('should be able to take a tour of translations tab', async function () {
     if (explorationEditor.isViewportAtMobileWidth()) {
       showMessage(
-        `Skipping translations tab tour in mobile view, as help button is not visible.`
+        'Skipping translations tab tour in mobile view, as help button is not visible.'
       );
       return;
     }

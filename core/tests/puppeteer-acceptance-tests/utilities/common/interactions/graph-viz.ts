@@ -59,7 +59,7 @@ export class GraphViz {
    */
   async clickOnGraphButton(
     buttonName: 'Add Edge' | 'Add Node' | 'Delete' | 'Move'
-  ) {
+  ): Promise<void> {
     const graphContainer = await this.getGraphContainer();
     const button = await graphContainer.$(
       `${graphButtonSelectorPrefix}-${buttonName.replace(' ', '-')}-${graphButtonSelectorSuffix}`
@@ -317,7 +317,9 @@ export class GraphViz {
     await this.parentPage.waitForFunction(
       (selector: string, parentSelector: string) => {
         const container = document.querySelector(parentSelector);
-        if (!container) return false;
+        if (!container) {
+          return false;
+        }
         const elements = container.querySelectorAll(selector);
         return elements.length === 0;
       },

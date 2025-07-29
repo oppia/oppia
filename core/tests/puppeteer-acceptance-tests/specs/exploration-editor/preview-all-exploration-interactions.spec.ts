@@ -258,10 +258,9 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to preview "Image Region" interaction', async function () {
-    // Add a image region interaction.
+    // Add an image region interaction.
     await explorationEditor.updateCardContent('Enter an image region.');
     await explorationEditor.addImageInteraction('Perfect!', CARD_NAMES.SIXTH);
-    // await explorationEditor.directLearnersToNewCard('Sixth Card');
     await explorationEditor.editDefaultResponseFeedbackInExplorationEditorPage(
       'Wrong.'
     );
@@ -281,7 +280,7 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to preview "Item Selection" interaction', async function () {
-    // Add a item selection interaction.
+    // Add an item selection interaction.
     await explorationEditor.updateCardContent('Select correct item.');
     await explorationEditor.addInteraction(
       INTERACTION_TYPES.ITEM_SELECTION,

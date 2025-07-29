@@ -445,7 +445,7 @@ export class BaseUser {
    * Selects the mat-option with the given value.
    * @param value The value of the mat-option to select.
    */
-  async selectMatOption(value: string) {
+  async selectMatOption(value: string): Promise<void> {
     await this.page.waitForSelector('mat-option');
     const matOptionElements = await this.page.$$('mat-option');
     for (const matOptionElement of matOptionElements) {
@@ -1216,7 +1216,10 @@ export class BaseUser {
    * @param {string} selector - The selector of the element to check.
    * @param {boolean} present - Whether the element should be present or not.
    */
-  async expectElementToBeVisible(selector: string, present: boolean = true) {
+  async expectElementToBeVisible(
+    selector: string,
+    present: boolean = true
+  ): Promise<void> {
     if (present) {
       await this.page.waitForSelector(selector, {
         visible: true,
@@ -1279,7 +1282,7 @@ export class BaseUser {
     selector: string,
     value: string,
     parentElement?: ElementHandle<Element>
-  ) {
+  ): Promise<void> {
     try {
       // Get context where the selector is located.
       const context = parentElement ?? this.page;
