@@ -328,7 +328,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to navigate to exploration editor.
+   * Function to navigate to exploration editor from Creator Dashboard.
    */
   async navigateToExplorationEditorFromCreatorDashboard(): Promise<void> {
     await this.page.waitForSelector(createExplorationButtonSelector);
