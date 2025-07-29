@@ -3582,53 +3582,50 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to navigate to.
    */
   async navigateToCard(cardName: string): Promise<void> {
-    try {
-      let elements;
-      if (this.isViewportAtMobileWidth()) {
-        await this.page.waitForSelector(mobileStateGraphResizeButton, {
-          visible: true,
-        });
-        await this.clickOn(mobileStateGraphResizeButton);
-      }
-
-      await this.page.waitForSelector(stateNodeSelector);
-      elements = await this.page.$$(stateNodeSelector);
-
-      const cardNames = await Promise.all(
-        elements.map(element =>
-          element.$eval('tspan', node => node.textContent.trim())
-        )
-      );
-      const cardIndex = cardNames.indexOf(cardName);
-
-      if (cardIndex === -1) {
-        throw new Error(`Card name ${cardName} not found in the graph.`);
-      }
-
-      let cardButton;
-      if (this.isViewportAtMobileWidth()) {
-        cardButton = elements[cardIndex + elements.length / 2];
-      } else {
-        cardButton = elements[cardIndex];
-      }
-
-      await cardButton.click();
-      await this.waitForNetworkIdle({idleTime: 1000});
-
-      const headingName = !cardName.trimEnd().endsWith('...')
-        ? cardName
-        : cardName.trimEnd().slice(0, -3);
-      await this.expectElementContentToContain(
-        currentCardNameSelector,
-        headingName
-      );
-    } catch (error) {
-      const newError = new Error(
-        `Error navigating to card ${cardName}: ${error.message}`
-      );
-      newError.stack = error.stack;
-      throw newError;
+    let elements;
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileStateGraphResizeButton, {
+        visible: true,
+      });
+      await this.clickOn(mobileStateGraphResizeButton);
     }
+
+    await this.page.waitForSelector(stateNodeSelector);
+    elements = await this.page.$$(stateNodeSelector);
+
+    const cardNames = await Promise.all(
+      elements.map(element =>
+        element.$eval('tspan', node => node.textContent.trim())
+      )
+    );
+    const cardIndex = cardNames.indexOf(cardName);
+
+    if (cardIndex === -1) {
+      throw new Error(`Card name ${cardName} not found in the graph.`);
+    }
+
+    let cardButton;
+    if (this.isViewportAtMobileWidth()) {
+      cardButton = elements[cardIndex + elements.length / 2];
+    } else {
+      cardButton = elements[cardIndex];
+    }
+
+    await cardButton.click();
+    await this.waitForNetworkIdle({idleTime: 1000});
+
+    const headingName = !cardName.trimEnd().endsWith('...')
+      ? cardName
+      : cardName.trimEnd().slice(0, -3);
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.includes(value);
+      },
+      {},
+      currentCardNameSelector,
+      headingName
+    );
   }
 
   /**
