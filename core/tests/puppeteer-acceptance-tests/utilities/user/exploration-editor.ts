@@ -107,8 +107,7 @@ const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
 const stateEditSelector = '.e2e-test-state-edit-content';
-// TODO(#23019): Required selector for the commented code below.
-// const stateContentSelector = '.e2e-test-actual-state-content';
+const stateContentSelector = '.e2e-test-actual-state-content';
 const stateContentInputField = 'div.e2e-test-rte';
 const uploadImageButton = '.e2e-test-upload-image';
 const useTheUploadImageButton = '.e2e-test-use-image';
@@ -416,9 +415,6 @@ const customSelectedCharctersSelector = '.e2e-test-custom-letters';
 const showUnitFormatsButtonSelector = '.e2e-test-show-unit-formats';
 const codeOutputSelector = '.e2e-test-code-output';
 const graphContainerSelector = '.e2e-test-graph-input-viz-container';
-const openNavbarIconSelector = '.mobile-navbar-toggled';
-const stateChangesDropdownSelector = '.e2e-test-state-changes-dropdown';
-const navigattionDropdownSelector = '.e2e-test-mobile-navigation-dropdown';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -2475,7 +2471,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(voiceArtistSettingsDropdown);
       await this.clickOn(permissionSettingsDropdown);
       await this.clickOn(feedbackSettingsDropdown);
-      await this.clickOn(explorationControlsSettingsDropdown);
+      await this.expandSettingsTabSection('Controls');
     } else {
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
@@ -2495,7 +2491,12 @@ export class ExplorationEditor extends BaseUser {
    * @param section - The name of the section to expand.
    */
   async expandSettingsTabSection(
-    section: 'Basic Settings' | 'Advanced Features' | 'Roles' | 'Voice Artists'
+    section:
+      | 'Basic Settings'
+      | 'Advanced Features'
+      | 'Roles'
+      | 'Voice Artists'
+      | 'Controls'
   ): Promise<void> {
     if (!this.isViewportAtMobileWidth()) {
       showMessage(
@@ -2734,10 +2735,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
 
-    // TODO(#23019): Currently, the content automatically changes spaces in the
-    // card content. So, skipping the post-check. Once the issue is resolved,
-    // uncomment the following line.
-    // await this.expectTextContentToContain(stateContentSelector, content);
+    await this.expectTextContentToContain(stateContentSelector, content);
     showMessage('Card content is updated successfully.');
   }
 
@@ -3622,28 +3620,15 @@ export class ExplorationEditor extends BaseUser {
     const headingName = !cardName.trimEnd().endsWith('...')
       ? cardName
       : cardName.trimEnd().slice(0, -3);
-    try {
-      await this.page.waitForFunction(
-        (selector: string, value: string) => {
-          const element = document.querySelector(selector);
-          return element?.textContent?.includes(value);
-        },
-        {},
-        currentCardNameSelector,
-        headingName
-      );
-    } catch (error) {
-      const actualTextContent = await this.page.$eval(
-        currentCardNameSelector,
-        element => element.textContent
-      );
-      error.message =
-        `Couldn't navigate to the card with the name ${headingName}.\n` +
-        `The actual text content of the element is ${actualTextContent}\n` +
-        'Original Error:\n' +
-        error.message;
-    }
-    throw error;
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.includes(value);
+      },
+      {},
+      currentCardNameSelector,
+      headingName
+    );
   }
 
   /**
@@ -4619,6 +4604,7 @@ export class ExplorationEditor extends BaseUser {
     await this.viewOppiaResponses();
     await this.directLearnersToNewCard('Card 1');
     await this.saveExplorationDraft();
+
     await this.navigateToCard('Card 1');
     await this.updateCardContent('Content 1');
     await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
@@ -6562,47 +6548,6 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForSelector(closeButtonForExtraModel, {
       hidden: true,
     });
-  }
-
-  /**
-   * Opens the navigation in mobile viewport properly.
-   * @param dropdown Dropdown to open. Currently, it only opens
-   * the state changes dropdown, but can be extended to open navigation dropdown.
-   */
-  async openExplorationNavigationInMobile(
-    dropdown: 'State Changes' | 'Navigation' | null
-  ): Promise<void> {
-    if (!this.isViewportAtMobileWidth()) {
-      showMessage('Skipped: Open exploration navigation in mobile view');
-    }
-
-    // Open the navigation only if it is not open.
-    if (!(await this.isElementVisible(openNavbarIconSelector))) {
-      await this.clickOn(mobileOptionsButtonSelector);
-      await this.expectElementToBeVisible(openNavbarIconSelector);
-    }
-
-    // Open state changes dropdown only if required.
-    if (
-      dropdown === 'State Changes' &&
-      !(await this.isElementVisible(`${stateChangesDropdownSelector}.show`))
-    ) {
-      await this.clickOn(mobileChangesDropdownSelector);
-      await this.expectElementToBeVisible(
-        `${stateChangesDropdownSelector}.show`
-      );
-    }
-
-    // Open navigation dropdown if required.
-    if (
-      dropdown === 'Navigation' &&
-      !(await this.isElementVisible(`${navigattionDropdownSelector}.show`))
-    ) {
-      await this.clickOn(dropdownToggleIcon);
-      await this.expectElementToBeVisible(
-        `${navigattionDropdownSelector}.show`
-      );
-    }
   }
 }
 
