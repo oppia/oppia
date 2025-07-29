@@ -56,10 +56,10 @@
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
             </a>
           </li>
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-history-button" [ngClass]="{'active': getActiveTabName() === 'history'}">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'history'}">
             <a href="#" ngbTooltip="History" placement="bottom" (click)="selectHistoryTab()"
                disabled="ExplorationRightsService.isCloned()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
+               class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-history-button">
               <i class="fa fa-clock oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">History</span>
             </a>

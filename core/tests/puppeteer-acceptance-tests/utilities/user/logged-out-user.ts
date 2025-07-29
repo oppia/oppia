@@ -3590,7 +3590,7 @@ export class LoggedOutUser extends BaseUser {
               return window.location.href.includes(url);
             },
             {},
-            testConstants.URLs.TopicAndSkillsDashboard
+            testConstants.URLs.TopicEditor
           );
           showMessage(`Topic ${topicName} is opened successfully.`);
           return;

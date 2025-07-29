@@ -430,9 +430,9 @@ export class ExplorationEditor extends BaseUser {
     }
 
     // Open the navigation only if it is not open.
-    if (!(await this.isElementVisible(`${openNavbarIconSelector}.show`))) {
+    if (!(await this.isElementVisible(`${openNavbarIconSelector}`))) {
       await this.clickOn(mobileOptionsButtonSelector);
-      await this.expectElementToBeVisible(`${openNavbarIconSelector}.show`);
+      await this.expectElementToBeVisible(`${openNavbarIconSelector}`);
     }
 
     // Open state changes dropdown only if required.
