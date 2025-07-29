@@ -140,19 +140,30 @@ export class ConsoleReporter {
         // Sometimes puppeteer returns a JSHandle error so we have to parse
         // it to get the message in this case.
         if (messageText.includes('JSHandle@error')) {
+          // Try to resolve each JSHandle's message.
           const messages = await Promise.all(
-            message.args().map((arg: JSHandle) =>
-              arg.executionContext().evaluate((arg: unknown) => {
-                if (arg instanceof Error) {
-                  return arg.message;
+            message.args().map(async (arg: JSHandle) => {
+              try {
+                const context = arg.executionContext();
+                return await context.evaluate((arg: unknown) => {
+                  if (arg instanceof Error) {
+                    return arg.message;
+                  }
+                  return String(arg);
+                }, arg);
+              } catch (err) {
+                try {
+                  // As a fallback, try to get string value directly from JSHandle.
+                  return await arg.jsonValue();
+                } catch {
+                  // If all fails, return fallback message.
+                  return '[Error message unavailable: Context destroyed]';
                 }
-                return null;
-              }, arg)
-            )
+              }
+            })
           );
-          messageText = messages.join(' ');
+          messageText = messages.join(' | ');
         }
-
         // Here we concat the message text with the message's source if it is present.
         const messageSource = message.location().url;
         messageText = messageSource

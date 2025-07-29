@@ -32,9 +32,6 @@ const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
 
-const oppiaLink = 'https://www.oppia.org';
-const oppiaYouTubeVideoLink = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
-
 const createExplorationButton = 'button.e2e-test-create-new-exploration-button';
 
 const createExplorationButtonSelector =
@@ -68,7 +65,8 @@ const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
 
-const programmingInteractionsButton = '.e2e-test-interaction-tab-programming';
+const programmingInteractionsButtonSelector =
+  '.e2e-test-interaction-tab-programming';
 
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
@@ -294,7 +292,13 @@ const textInputSelector = 'input.e2e-test-text-input';
 const closeButtonForExtraModel = '.e2e-test-close-rich-text-component-editor';
 
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
+
 const previousCardButton = '.e2e-test-back-button';
+const mathInteractionButtonSelector = '.e2e-test-interaction-tab-math';
+
+const oppiaYouTubeVideoUrl = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
+const oppiaWebURL = 'https://www.oppia.org';
+const rteHelperModalSelector = 'oppia-rte-helper-modal';
 
 // Common Selectors.
 const inputFieldSelector = '.newTabButtonSelector';
@@ -477,6 +481,7 @@ const INTERACTION_TABS_SELECTORS = {
 
 export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
+  [INTERACTION_TYPES.FRACTION_INPUT]: INTERACTION_TABS.MATHS,
 };
 
 interface TabContent {
@@ -2586,7 +2591,7 @@ export class ExplorationEditor extends BaseUser {
       }
     };
 
-    const confirmPublish = async () => {
+    const confirmPublish = async (): Promise<string> => {
       await this.clickOn(saveExplorationChangesButton);
       await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(explorationConfirmPublishButton, {
@@ -2784,6 +2789,7 @@ export class ExplorationEditor extends BaseUser {
     interactionToAdd: string,
     skipInteractionCustoization: boolean = true
   ): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(addInteractionButton, {
       visible: true,
     });
@@ -2800,7 +2806,11 @@ export class ExplorationEditor extends BaseUser {
     if (
       INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'PROGRAMMING'
     ) {
-      await this.clickOn(programmingInteractionsButton);
+      await this.clickOn(programmingInteractionsButtonSelector);
+    } else if (
+      INTERACTION_TABS_OF_INTERACTION_TYPE[interactionToAdd] === 'MATH'
+    ) {
+      await this.clickOn(mathInteractionButtonSelector);
     }
 
     await this.changeTabInInteractionSelectionModal(
@@ -4501,7 +4511,7 @@ export class ExplorationEditor extends BaseUser {
     title: string,
     category: string = 'Algebra',
     flag: boolean = true
-  ): Promise<string | null> {
+  ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
     if (flag) {
@@ -6304,7 +6314,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnRTEOptionWithTitle('Insert tabs');
 
     await this.waitForNetworkIdle();
-    const helperModel = await this.page.$('oppia-rte-helper-modal');
+    const helperModel = await this.page.$(rteHelperModalSelector);
 
     const tabTitleInputElements = await helperModel?.$$(textInputSelector);
     const tabContentInputElements = await helperModel?.$$(
@@ -6328,6 +6338,7 @@ export class ExplorationEditor extends BaseUser {
       await tabContentInputElements?.[i]?.type(tabContents[i].content);
     }
     await this.clickOn(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -6394,12 +6405,12 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('ArrowRight');
 
     // Video.
-    await this.addVideoRTE(oppiaYouTubeVideoLink);
+    await this.addVideoRTE(oppiaYouTubeVideoUrl);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
     // Add LinkEnter.
-    await this.addTextWithLinkRTE('Oppia', oppiaLink);
+    await this.addTextWithLinkRTE('Oppia', oppiaWebURL);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 
@@ -6430,6 +6441,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('ArrowRight');
 
     await this.clickOn(saveContentButton);
+    await this.expectElementToBeVisible(saveContentButton, false);
   }
 
   /**
@@ -6449,6 +6461,7 @@ export class ExplorationEditor extends BaseUser {
   async addCollapsibleBlockRTE(): Promise<void> {
     await this.clickOnRTEOptionWithTitle('collapsible block');
     await this.clickOn(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -6460,7 +6473,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnRTEOptionWithTitle('Insert link');
     await this.waitForNetworkIdle();
 
-    const helperModel = await this.page.$('oppia-rte-helper-modal');
+    const helperModel = await this.page.$(rteHelperModalSelector);
 
     // Get Fields.
     const inputs = await helperModel?.$$(textInputSelector);
@@ -6475,6 +6488,7 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.clickOn(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -6491,7 +6505,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnRTEOptionWithTitle('Insert image');
 
     await this.waitForNetworkIdle();
-    const helperModel = await this.page.$('oppia-rte-helper-modal');
+    const helperModel = await this.page.$(rteHelperModalSelector);
 
     // Get Fields.
     const imageDescriptionInput = await helperModel?.$(descriptionBoxSelector);
@@ -6511,6 +6525,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(useTheUploadImageButton);
 
     await this.clickOn(closeButtonForExtraModel);
+    await this.expectElementToBeVisible(closeButtonForExtraModel, false);
   }
 
   /**
@@ -6520,7 +6535,8 @@ export class ExplorationEditor extends BaseUser {
   async addVideoRTE(videoUrl: string): Promise<void> {
     await this.clickOnRTEOptionWithTitle('Insert video');
 
-    const helperModel = await this.page.$('oppia-rte-helper-modal');
+    await this.expectElementToBeVisible(rteHelperModalSelector);
+    const helperModel = await this.page.$(rteHelperModalSelector);
 
     // Get Fields.
     const videoUrlInput = await helperModel?.$(textInputField);
@@ -6531,7 +6547,8 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('Video URL input not found in the helper modal');
     }
 
-    await this.clickOn(closeButtonForExtraModel);
+    await this.page.waitForSelector(closeButtonForExtraModel);
+    await this.page.click(closeButtonForExtraModel);
     await this.page.waitForSelector(closeButtonForExtraModel, {
       hidden: true,
     });

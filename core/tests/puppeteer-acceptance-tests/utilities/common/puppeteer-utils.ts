@@ -986,6 +986,26 @@ export class BaseUser {
    * @param {string} selector - The selector of the element to get text from.
    * @param {string} text - The expected text content.
    */
+  async expectTextContentToMatch(
+    selector: string,
+    textContent: string
+  ): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() === value;
+      },
+      {},
+      selector,
+      textContent
+    );
+  }
+
+  /**
+   * Verify text content inside an element
+   * @param {string} selector - The selector of the element to get text from.
+   * @param {string} text - The expected text content.
+   */
   async expectTextContentToBe(selector: string, text: string): Promise<void> {
     await this.expectElementToBeVisible(selector);
 

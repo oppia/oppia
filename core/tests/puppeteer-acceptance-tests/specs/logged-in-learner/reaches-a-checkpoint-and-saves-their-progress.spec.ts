@@ -123,7 +123,7 @@ describe('Logged-in User', function () {
   it('should be able to resume the lesson from the last progress saved', async function () {
     // Again reload the page to check the 'Resume' exploration in the progress remainder as well.
     await loggedInUser.reloadPage();
-    await loggedInUser.expectProgressRemainder(true);
+    await loggedInUser.expectProgressReminder(true);
     await loggedInUser.chooseActionInProgressRemainder('Resume');
 
     await loggedInUser.continueToNextCard();
@@ -136,7 +136,7 @@ describe('Logged-in User', function () {
     // Reloading from the current progress.
     await loggedInUser.reloadPage();
 
-    await loggedInUser.expectProgressRemainder(true);
+    await loggedInUser.expectProgressReminder(true);
     // Continue the exploration from where they left off.
     await loggedInUser.chooseActionInProgressRemainder('Restart');
 
