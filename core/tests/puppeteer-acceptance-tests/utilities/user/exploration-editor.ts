@@ -446,7 +446,7 @@ export enum INTERACTION_TYPES {
   NUMERIC_INPUT = 'Number Input',
 }
 
-const INTERACTION_SELECTORS = {
+const INTERACTION_SELECTORS: Record<string, string> = {
   [INTERACTION_TYPES.DRAG_AND_DROP_SORT]:
     '.e2e-test-interaction-tile-DragAndDropSortInput',
   [INTERACTION_TYPES.SET_INPUT]: '.e2e-test-interaction-tile-SetInput',
@@ -463,7 +463,7 @@ const INTERACTION_SELECTORS = {
   [INTERACTION_TYPES.WORLD_MAP]: '.e2e-test-interaction-tile-InteractiveMap',
   [INTERACTION_TYPES.MUSIC_NOTES_INPUT]:
     '.e2e-test-interaction-tile-MusicNotesInput',
-};
+} as const;
 
 enum INTERACTION_TABS {
   PROGRAMMING = 'PROGRAMMING',
@@ -472,7 +472,7 @@ enum INTERACTION_TABS {
   GEOGRAPHY = 'GEOGRAPHY',
 }
 
-const INTERACTION_TABS_SELECTORS = {
+const INTERACTION_TABS_SELECTORS: Record<string, string> = {
   [INTERACTION_TABS.PROGRAMMING]: '.e2e-test-interaction-tab-programming',
   [INTERACTION_TABS.MATHS]: '.e2e-test-interaction-tab-math',
   [INTERACTION_TABS.GEOGRAPHY]: '.e2e-test-interaction-tab-geography',
@@ -482,7 +482,7 @@ const INTERACTION_TABS_SELECTORS = {
 export const INTERACTION_TABS_OF_INTERACTION_TYPE: Record<string, string> = {
   [INTERACTION_TYPES.CODE_EDITOR]: INTERACTION_TABS.PROGRAMMING,
   [INTERACTION_TYPES.FRACTION_INPUT]: INTERACTION_TABS.MATHS,
-};
+} as const;
 
 interface TabContent {
   title: string;
@@ -1341,7 +1341,7 @@ export class ExplorationEditor extends BaseUser {
         quickAccessCharcters.split('').join('  ')
       );
     } catch {
-      throw new error(
+      throw new Error(
         `Can't customize characters. Found: ${quickAccessCharcters.split('').join(' ')}`
       );
     }
@@ -2747,7 +2747,7 @@ export class ExplorationEditor extends BaseUser {
   async changeTabInInteractionSelectionModal(
     interactionType: INTERACTION_TYPES
   ): Promise<void> {
-    const interactionTabs = {
+    const interactionTabs: Record<string, INTERACTION_TYPES[]> = {
       [INTERACTION_TABS.PROGRAMMING]: [
         INTERACTION_TYPES.CODE_EDITOR,
         INTERACTION_TYPES.PENCIL_CODE_EDITOR,
@@ -3595,7 +3595,7 @@ export class ExplorationEditor extends BaseUser {
 
     const cardNames = await Promise.all(
       elements.map(element =>
-        element.$eval('tspan', node => node.textContent.trim())
+        element.$eval('tspan', node => node.textContent?.trim() || '')
       )
     );
     const cardIndex = cardNames.indexOf(cardName);
@@ -3609,6 +3609,10 @@ export class ExplorationEditor extends BaseUser {
       cardButton = elements[cardIndex + elements.length / 2];
     } else {
       cardButton = elements[cardIndex];
+    }
+
+    if (!cardButton) {
+      throw new Error(`Could not find card button for card: ${cardName}`);
     }
 
     await cardButton.click();
