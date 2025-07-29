@@ -1738,12 +1738,11 @@ export class LoggedInUser extends BaseUser {
       visible: true,
     });
     await this.clickOn(reportExplorationButtonSelector);
-    await this.expectElementToBeVisible(issueTypeSelector);
-    const issueTypeElement = await this.page.$(issueTypeSelector);
-    if (!issueTypeElement) {
-      throw new Error('Issue type element not found');
-    }
-    await issueTypeElement.click();
+    await this.page.waitForSelector(issueTypeSelector);
+    // Wait for checkbox to animate before clicking on it.
+    // This ensures that the checkbox is checked.
+    await this.page.waitForTimeout(100);
+    await this.page.click(issueTypeSelector);
     await this.type(reportExplorationTextAreaSelector, issueDescription);
 
     await this.clickOn(submitReportButtonSelector);

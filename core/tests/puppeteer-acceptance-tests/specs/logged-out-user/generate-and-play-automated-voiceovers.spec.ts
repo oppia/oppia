@@ -27,7 +27,7 @@ import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-const INTRODUCTION_CARD_CONTENT: string = 'Intro to negative numbers';
+const INTRODUCTION_CARD_CONTENT: string = 'Content 0';
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',

@@ -2166,8 +2166,10 @@ export class LoggedOutUser extends BaseUser {
    * Click on create account button in save progress modal
    */
   async clickOnCreateAccountButtonInSaveProgressModal(): Promise<void> {
-    await this.page.waitForSelector(lessonInfoSignUpButtonSelector);
-    await this.page.click(lessonInfoSignUpButtonSelector);
+    await this.page.waitForSelector(lessonInfoSignUpButtonSelector, {
+      visible: true,
+    });
+    await this.clickOn(lessonInfoSignUpButtonSelector);
 
     await this.page.waitForSelector(lessonInfoSignUpButtonSelector, {
       hidden: true,
@@ -3050,6 +3052,8 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} answer - The answer to submit.
    */
   async submitAnswer(answer: string): Promise<void> {
+    // Allow input elements to be rendered and ready for interaction.
+    await this.page.waitForTimeout(1000);
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
     await this.clearAllTextFrom(submitResponseToInteractionInput);
     await this.type(submitResponseToInteractionInput, answer);
