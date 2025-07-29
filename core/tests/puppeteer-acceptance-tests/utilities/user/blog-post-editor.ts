@@ -41,8 +41,9 @@ const publisedBlogsTabContainerSelector = '.e2e-test-published-blogs-tab';
 
 const tagSelector = '.e2e-test-blog-post-tags';
 const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
+const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
 
-const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
+// const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 
 export class BlogPostEditor extends BaseUser {
@@ -76,7 +77,7 @@ export class BlogPostEditor extends BaseUser {
     draftBlogPostTitle: string
   ): Promise<void> {
     await this.addUserBioInBlogDashboard();
-    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
+    await this.clickOn(newBlogPostButtonSelector);
     await this.updateBlogPostTitle(draftBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content');
     await this.saveBlogBodyChanges();
@@ -188,7 +189,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async openBlogEditorPage(): Promise<void> {
     await this.addUserBioInBlogDashboard();
-    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
+    await this.clickOn(newBlogPostButtonSelector);
     await this.expectPublishButtonToBeDisabled();
   }
 

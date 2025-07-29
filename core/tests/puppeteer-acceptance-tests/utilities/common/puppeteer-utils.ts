@@ -572,6 +572,10 @@ export class BaseUser {
    * This function closes the current Puppeteer browser instance.
    */
   async closeBrowser(): Promise<void> {
+    // Log all the selectors in the page.
+    await this.logAllSelectorsInPage();
+
+    // Stop the screen recorder.
     if (this.screenRecorder) {
       await this.screenRecorder.stop();
     }
@@ -1176,8 +1180,11 @@ export class BaseUser {
     selector: string,
     present: boolean = true
   ): Promise<void> {
-    const option = present ? {visible: true} : {hidden: true};
-    await this.page.waitForSelector(selector, option);
+    if (present) {
+      await this.page.waitForSelector(selector, {visible: true});
+    } else {
+      await this.page.waitForSelector(selector, {hidden: true});
+    }
   }
 
   /**
@@ -1203,6 +1210,31 @@ export class BaseUser {
 
     // Verify Tooltip.
     expect(tooltipText).toBe(expectedToolTip);
+  }
+
+  /**
+   * Logs all the selectors in the page.
+   */
+  async logAllSelectorsInPage(): Promise<void> {
+    await this.page.evaluate(() => {
+      const allElements = document.querySelectorAll('*');
+      const e2eTestClasses: string[] = [];
+      const otherClasses: string[] = [];
+
+      allElements.forEach(element => {
+        const classes = element.classList;
+        if (classes.contains('e2e-test')) {
+          e2eTestClasses.push(classes.toString());
+        } else {
+          otherClasses.push(classes.toString());
+        }
+      });
+
+      showMessage('E2E Test Classes:');
+      showMessage(e2eTestClasses.join(', '));
+      showMessage('Other Classes:');
+      showMessage(otherClasses.join(', '));
+    });
   }
 }
 
