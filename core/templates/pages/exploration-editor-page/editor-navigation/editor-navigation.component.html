@@ -8,7 +8,7 @@
           Options
         </a>
         <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-options-dropdown"></div>
-        <ul ngbDropdownMenu class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
+        <ul ngbDropdownMenu class="dropdown-menu oppia-exploration-editor-tabs-dropdown e2e-test-mobile-navigation-dropdown" aria-labelledby="dropdownMenuButton">
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'dropdown': countWarnings()}">
             <a href="#" ngbTooltip="Editor" placement="{{countWarnings() ? 'left' : 'bottom'}}" (click)="selectMainTab()"
                class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-main-tab">
