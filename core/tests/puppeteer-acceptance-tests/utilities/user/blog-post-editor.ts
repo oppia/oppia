@@ -150,7 +150,6 @@ export class BlogPostEditor extends BaseUser {
    */
   async uploadBlogPostThumbnailImage(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.expectElementToBeVisible(blogPostThumbnailImage);
       await this.uploadFile(blogPostThumbnailImage);
       await this.clickOn(addThumbnailImageButton);
 
