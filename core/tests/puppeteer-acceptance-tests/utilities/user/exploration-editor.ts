@@ -389,6 +389,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(voiceArtistSettingsDropdown);
       await this.clickOn(permissionSettingsDropdown);
       await this.clickOn(feedbackSettingsDropdown);
+      await this.clickOn(explorationControlsSettingsDropdown);
     } else {
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
