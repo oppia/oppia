@@ -4654,10 +4654,7 @@ export class LoggedOutUser extends BaseUser {
     });
 
     await this.clickOn(contributorIconInLessonInfoSelctor);
-    const navigated = await this.isElementVisible(profileContainerSelector);
-    if (!navigated) {
-      throw new Error('Navigation to profile page failed.');
-    }
+    await this.expectElementToBeVisible(profileContainerSelector);
 
     expect(this.page.url()).toContain('/profile');
   }

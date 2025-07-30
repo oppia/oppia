@@ -2373,6 +2373,7 @@ export class LoggedInUser extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.waitUntilClickFunctionIsAttached(closePublishedPopUpButton);
       await this.clickOn(closePublishedPopUpButton);
 
       await this.page.waitForSelector(closePublishedPopUpButton, {

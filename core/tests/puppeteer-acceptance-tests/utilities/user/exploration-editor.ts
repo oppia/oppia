@@ -485,9 +485,6 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(publishExplorationButtonSelector, {
           visible: true,
         });
-        await this.waitUntilClickFunctionIsAttached(
-          publishExplorationButtonSelector
-        );
         await this.clickOn(publishExplorationButtonSelector);
       }
     };
@@ -517,17 +514,21 @@ export class ExplorationEditor extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.waitUntilClickFunctionIsAttached(closePublishedPopUpButton);
       await this.clickOn(closePublishedPopUpButton);
 
       await this.expectElementToBeVisible(closePublishedPopUpButton, false);
       return explorationId;
     };
 
+    await publishExploration();
+    await fillExplorationMetadataDetails();
+
     try {
-      await publishExploration();
-      await fillExplorationMetadataDetails();
       return await confirmPublish();
     } catch (error) {
+      await this.captureScreenshotsForFailedTest();
+      showMessage('Failed to publish the exploration.\n' + error.stack);
       await this.waitForPageToFullyLoad();
 
       const errorSavingExplorationElement = await this.page.$(
