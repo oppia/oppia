@@ -431,9 +431,10 @@ export class ExplorationEditor extends BaseUser {
     }
 
     // Open the navigation only if it is not open.
-    if (!(await this.isElementVisible(`${openNavbarIconSelector}`))) {
+    if (!(await this.isElementVisible(openNavbarIconSelector))) {
       await this.clickOn(mobileOptionsButtonSelector);
       await this.expectElementToBeVisible(`${openNavbarIconSelector}`);
+      showMessage('Opened Navigation Menu (mobile).');
     }
 
     // Open state changes dropdown only if required.
@@ -445,7 +446,10 @@ export class ExplorationEditor extends BaseUser {
       await this.expectElementToBeVisible(
         `${stateChangesDropdownSelector}.show`
       );
+      showMessage('State Changes Dropdown Opened (mobile).');
     }
+
+    showMessage(`Opened Navigation Menu and ${dropdown} Dropdown.`);
   }
 
   /**
@@ -2552,11 +2556,9 @@ export class ExplorationEditor extends BaseUser {
     translation: string,
     feedbackIndex?: number
   ): Promise<void> {
-    await this.page.waitForSelector(voiceoverLanguageSelector, {
-      visible: true,
-    });
-    await this.clickOn(voiceoverLanguageSelector);
-    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+    await this.expectElementToBeVisible(voiceoverLanguageSelector);
+    await this.page.click(voiceoverLanguageSelector);
+    await this.expectElementToBeVisible(voiceoverLanguageOptionSelector);
     const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
 
     for (const option of languageOptions) {

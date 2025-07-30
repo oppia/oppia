@@ -575,8 +575,18 @@ export class BaseUser {
   async closeBrowser(): Promise<void> {
     // Stop the screen recorder.
     if (this.screenRecorder) {
-      await this.screenRecorder.stop();
+      try {
+        await this.screenRecorder.stop();
+        showMessage(
+          `Screen recording stopped for ${this.username ?? 'unknown user'}.`
+        );
+      } catch (error) {
+        showMessage(
+          `Error while stopping screen recording for ${this.username}: ${error}`
+        );
+      }
     }
+
     const CONFIG_FILE = path.resolve(
       __dirname,
       '../../jest-runtime-config.json'
@@ -585,14 +595,21 @@ export class BaseUser {
       fs.existsSync(CONFIG_FILE) &&
       !(process.env.VIDEO_RECORDING_IS_ENABLED === '1')
     ) {
-      const configData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
-      if (configData.testFailureDetected) {
-        fs.unlinkSync(CONFIG_FILE);
-        // Signal all BaseUser instances to take screenshots.
-        await this.captureScreenshotsForFailedTest();
+      try {
+        const configData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
+        if (configData.testFailureDetected) {
+          fs.unlinkSync(CONFIG_FILE);
+          // Signal all BaseUser instances to take screenshots.
+          await this.captureScreenshotsForFailedTest();
+        }
+      } catch (error) {
+        showMessage(
+          `Error while taking screenshot for ${this.username}:\n` + error
+        );
       }
     }
     await this.browserObject.close();
+    showMessage(`Browser closed for ${this.username ?? 'unknown user'}.`);
   }
 
   /**
