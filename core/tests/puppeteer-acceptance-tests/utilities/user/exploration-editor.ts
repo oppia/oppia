@@ -485,6 +485,9 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(publishExplorationButtonSelector, {
           visible: true,
         });
+        await this.waitUntilClickFunctionIsAttached(
+          publishExplorationButtonSelector
+        );
         await this.clickOn(publishExplorationButtonSelector);
       }
     };

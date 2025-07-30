@@ -1237,6 +1237,21 @@ export class BaseUser {
     // Verify Tooltip.
     expect(tooltipText).toBe(expectedToolTip);
   }
+
+  /**
+   * Waits until the click function is attached to the given selector.
+   * @param {string} selector - The selector of the element.
+   */
+  async waitUntilClickFunctionIsAttached(selector: string): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const el: HTMLInputElement | null = document.querySelector(selector);
+        return el?.click !== undefined || el?.addEventListener || el?.click;
+      },
+      {},
+      selector
+    );
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();
