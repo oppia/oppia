@@ -166,7 +166,8 @@ export class VoiceoverAdmin extends BaseUser {
    * @param voiceArtists - The username list of the voiceover artists to add.
    */
   async addVoiceoverArtistsToExploration(
-    voiceArtists: string[]
+    voiceArtists: string[],
+    verify: boolean = true
   ): Promise<void> {
     for (let i = 0; i < voiceArtists.length; i++) {
       await this.expectElementToBeVisible(editVoiceoverArtistButton);
@@ -180,17 +181,19 @@ export class VoiceoverAdmin extends BaseUser {
       await this.clickOn(saveVoiceoverArtistEditButton);
       // Adding try catch here to avoid unnecessary waiting for selector if
       // the added voice artist is not an user.
-      try {
-        await this.page.waitForSelector(
-          `div.e2e-test-voice-artist-${voiceArtists[i]}`,
-          {visible: true}
-        );
-        showMessage(voiceArtists[i] + ' has been added as a voice artist.');
-      } catch (error) {
-        throw new Error(
-          `${voiceArtists[i]} is not added.\n` +
-            `Original Error: ${error.stack}`
-        );
+      if (verify) {
+        try {
+          await this.page.waitForSelector(
+            `div.e2e-test-voice-artist-${voiceArtists[i]}`,
+            {visible: true}
+          );
+          showMessage(voiceArtists[i] + ' has been added as a voice artist.');
+        } catch (error) {
+          throw new Error(
+            `${voiceArtists[i]} is not added.\n` +
+              `Original Error: ${error.stack}`
+          );
+        }
       }
     }
   }

@@ -534,8 +534,8 @@ export class BaseUser {
    * This function uploads a file using the given file path.
    */
   async uploadFile(filePath: string): Promise<void> {
-    await this.expectElementToBeVisible('input[type=file]');
-    const inputUploadHandle = await this.page.$('input[type=file]');
+    const inputUploadHandle =
+      await this.page.waitForSelector('input[type=file]');
     if (inputUploadHandle === null) {
       throw new Error('No file input found while attempting to upload a file.');
     }

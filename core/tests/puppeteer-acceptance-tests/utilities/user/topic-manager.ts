@@ -253,6 +253,7 @@ const deleteSkillButton = 'i.skill-delete-button';
 const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
 const removeSkillModalHeaderSelector =
   '.e2e-test-delete-state-skill-modal-header';
+const addMisconceptionHeaderSelector = '.oppia-misconception-card-header';
 
 export class TopicManager extends BaseUser {
   /**
@@ -1313,7 +1314,7 @@ export class TopicManager extends BaseUser {
     await this.type(questionTextInput, questionText);
     await this.page.keyboard.press('Enter');
 
-    await this.expectTextContentToBe(questionTextInput, questionText);
+    await this.expectInputValueToBe(questionTextInput, questionText);
   }
 
   /**
@@ -1789,6 +1790,9 @@ export class TopicManager extends BaseUser {
     optional: boolean = false
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      if (!(await this.isElementVisible(addButtonSelector))) {
+        await this.clickOn(addMisconceptionHeaderSelector);
+      }
       await this.page.waitForSelector(addButtonSelector);
       const element = await this.page.$(addButtonSelector);
       // If the misconceptions were collapsed in mobile view.

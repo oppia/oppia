@@ -3073,17 +3073,8 @@ export class LoggedOutUser extends BaseUser {
    * Checks if value of input is equal to the given value.
    * @param {string} value - The value to check.
    */
-  async expectInputValueToBe(value: string): Promise<void> {
-    await this.expectElementToBeVisible(floatFormInput);
-    await this.page.waitForFunction(
-      (selector: string, value: string) => {
-        const element = document.querySelector(selector);
-        return (element as HTMLInputElement)?.value === value;
-      },
-      {},
-      floatFormInput,
-      value
-    );
+  async expectAnswerInputValueToBe(value: string): Promise<void> {
+    await this.expectInputValueToBe(floatFormInput, value);
   }
 
   /**

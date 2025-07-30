@@ -858,7 +858,7 @@ export class SuperAdmin extends BaseUser {
       await this.waitForElementToBeClickable(paramValueInput);
       await this.page.type(paramValueInput, ruleValue);
 
-      await this.expectTextContentToContain(paramValueInput, ruleValue);
+      await this.expectInputValueToBe(paramValueInput, ruleValue);
       showMessage('Rule added successfully.');
     } catch (error) {
       console.error(
