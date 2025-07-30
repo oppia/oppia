@@ -473,7 +473,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.isAutomaticVoiceoverPlaying = false;
         this.audioPlayerService.clear();
       }
-      this.flipVoiceoverPlayStatus(voiceoverType);
       this.automaticVoiceoverProgress = 0;
     }
 
@@ -482,7 +481,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.isManualVoiceoverPlaying = false;
         this.audioPlayerService.clear();
       }
-      this.flipVoiceoverPlayStatus(voiceoverType);
       this.manualVoiceoverProgress = 0;
     }
 
@@ -497,6 +495,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       this.currentVoiceoverLoadedType === voiceoverType
     ) {
       this.audioPlayerService.play();
+      this.flipVoiceoverPlayStatus(voiceoverType);
     } else {
       this.enableVoiceoverLoading(voiceoverType);
       this.audioPlayerService.loadAsync(filename).then(() => {
