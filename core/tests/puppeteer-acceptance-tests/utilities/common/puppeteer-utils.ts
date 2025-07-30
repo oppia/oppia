@@ -229,7 +229,6 @@ export class BaseUser {
    * This function takes the screenshot of all the instances of browser during a test failure.
    */
   async captureScreenshotsForFailedTest(): Promise<void> {
-    let i: number = 0;
     const specName = process.env.SPEC_NAME;
     const outputDir = testConstants.TEST_SCREENSHOT_DIR;
     const outputFileName = `${specName}-${new Date().toISOString()}`.replace(
@@ -239,17 +238,24 @@ export class BaseUser {
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, {recursive: true});
     }
-    for (const instance of BaseUser.instances) {
+
+    // Prepare an array of promises for screenshots.
+    const screenshotPromises = BaseUser.instances.map(async (instance, i) => {
       if (instance.page) {
-        await instance.page.screenshot({
-          path: path.join(outputDir, outputFileName + `-instance-${i}.png`),
-        });
-        showMessage(
-          `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
+        const screenshotPath = path.join(
+          outputDir,
+          `${outputFileName}-instance-${i}.png`
         );
-        i = i + 1;
+        await instance.page.screenshot({path: screenshotPath});
+        showMessage(
+          `Screenshot captured for test failure and saved as: ${screenshotPath}`
+        );
       }
-    }
+    });
+
+    // Await all screenshots to complete concurrently.
+    await Promise.all(screenshotPromises);
+    showMessage(`All screenshots captured for ${this.username}`);
   }
 
   /**
@@ -351,7 +357,6 @@ export class BaseUser {
       'button.e2e-test-register-user:not([disabled])'
     );
     await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
-
     this.username = username;
     this.email = email;
   }
@@ -591,8 +596,17 @@ export class BaseUser {
    * This function closes the current Puppeteer browser instance.
    */
   async closeBrowser(): Promise<void> {
-    if (this.screenRecorder) {
-      await this.screenRecorder.stop();
+    try {
+      if (this.screenRecorder) {
+        await this.screenRecorder.stop();
+        showMessage(
+          `Screen recording stopped for ${this.username ?? 'unknown user'}.`
+        );
+      }
+    } catch (error) {
+      showMessage(
+        `Error while stopping screen recording for ${this.username}: ${error}`
+      );
     }
     const CONFIG_FILE = path.resolve(
       __dirname,
@@ -610,6 +624,7 @@ export class BaseUser {
       }
     }
     await this.browserObject.close();
+    showMessage(`Browser closed for ${this.username ?? 'unknown user'}.`);
   }
 
   /**
