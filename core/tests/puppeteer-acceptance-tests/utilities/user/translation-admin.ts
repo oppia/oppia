@@ -133,7 +133,7 @@ export class TranslationAdmin extends BaseUser {
     await this.clickOn(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
-    await this.expectElementToBeVisible(userRightsTableSelector);
+    await this.expectElementToBeVisible(viewLanguageRoleUserResult);
   }
 
   /**

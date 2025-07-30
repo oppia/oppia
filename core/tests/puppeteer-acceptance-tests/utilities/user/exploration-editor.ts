@@ -468,7 +468,18 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<string> {
     const publishExploration = async () => {
       if (this.isViewportAtMobileWidth()) {
-        await this.openExplorationNavigationInMobile('State Changes');
+        await this.waitForPageToFullyLoad();
+        await this.page.waitForSelector(mobileNavbarDropdown, {
+          visible: true,
+        });
+        const element = await this.page.$(mobileNavbarOptions);
+        // If the element is not present, it means the mobile navigation bar is not expanded.
+        // The option to save changes appears only in the mobile view after clicking on the mobile options button,
+        // which expands the mobile navigation bar.
+        if (!element) {
+          await this.clickOn(mobileOptionsButtonSelector);
+        }
+        await this.clickOn(mobileChangesDropdownSelector);
         await this.clickOn(mobilePublishButtonSelector);
       } else {
         await this.page.waitForSelector(publishExplorationButtonSelector, {
@@ -2607,7 +2618,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOn(saveTranslationButton);
 
     await this.waitForNetworkIdle();
-    await this.expectElementToBeClickable(saveTranslationButton, false);
+    await this.expectElementToBeVisible(saveTranslationButton, false);
   }
 
   /**

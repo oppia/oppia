@@ -253,7 +253,8 @@ const deleteSkillButton = 'i.skill-delete-button';
 const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
 const removeSkillModalHeaderSelector =
   '.e2e-test-delete-state-skill-modal-header';
-const addMisconceptionHeaderSelector = '.oppia-misconception-card-header';
+const addMisconceptionHeaderSelector =
+  '.e2e-test-oppia-misconception-card-header';
 
 export class TopicManager extends BaseUser {
   /**
