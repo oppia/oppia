@@ -1,4 +1,4 @@
-<div class="card-navigation-control row space-between center">
+<div class="card-navigation-control row space-between center" [ngStyle]="isIframed?{'position': 'absolute'}: {}">
   <!-- Wrapping div on first button keeps the second button right-aligned
   even when the first button is not present. -->
   <div class="row-item row-item-previous-card">
