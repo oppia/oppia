@@ -242,7 +242,6 @@ jobs:
           message: "An acceptance test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
       - name: Upload all snapshots
-        if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
