@@ -440,10 +440,14 @@ export class BaseUser {
     // we try to find it by its CSS selector.
     if (button !== undefined) {
       await this.waitForElementToBeClickable(button);
+      showMessage(`Button (text: ${selector}) is clickable, as expected.`);
       await button.click();
+      showMessage(`Button (text: ${selector}) is clicked.`);
     } else {
       await this.waitForElementToBeClickable(selector);
+      showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
       await this.page.click(selector);
+      showMessage(`Element (selector: ${selector}) is clicked.`);
     }
   }
 
@@ -1195,8 +1199,10 @@ export class BaseUser {
   ): Promise<void> {
     if (present) {
       await this.page.waitForSelector(selector, {visible: true});
+      showMessage(`Element (${selector}) is visible, as expected.`);
     } else {
       await this.page.waitForSelector(selector, {hidden: true});
+      showMessage(`Element (${selector}) is hidden, as expected.`);
     }
   }
 

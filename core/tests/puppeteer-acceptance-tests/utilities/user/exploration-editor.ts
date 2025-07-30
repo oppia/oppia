@@ -2557,7 +2557,8 @@ export class ExplorationEditor extends BaseUser {
     feedbackIndex?: number
   ): Promise<void> {
     await this.expectElementToBeVisible(voiceoverLanguageSelector);
-    await this.page.click(voiceoverLanguageSelector);
+    await this.clickOn(voiceoverLanguageSelector);
+
     await this.expectElementToBeVisible(voiceoverLanguageOptionSelector);
     const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
 
