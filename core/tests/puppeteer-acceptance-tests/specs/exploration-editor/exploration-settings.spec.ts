@@ -64,6 +64,7 @@ describe('Exploration Editor', function () {
 
   it('should be able to change basic settings', async function () {
     await explorationEditor.navigateToSettingsTab();
+    await explorationEditor.openExplorationControlDropdown();
 
     await explorationEditor.updateTitleTo('A Simple Exploration');
     await explorationEditor.expectTitleToBe('A Simple Exploration');
