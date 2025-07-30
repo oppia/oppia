@@ -3582,7 +3582,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to a specific card in the exploration.
    * @param {string} cardName - The name of the card to navigate to.
    */
-  async navigateToCard(cardName: string): Promise<void> {
+  async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
     let elements;
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(mobileStateGraphResizeButton, {
@@ -3622,15 +3622,26 @@ export class ExplorationEditor extends BaseUser {
     const headingName = !cardName.trimEnd().endsWith('...')
       ? cardName
       : cardName.trimEnd().slice(0, -3);
-    await this.page.waitForFunction(
-      (selector: string, value: string) => {
-        const element = document.querySelector(selector);
-        return element?.textContent?.includes(value);
-      },
-      {},
-      currentCardNameSelector,
-      headingName
-    );
+    try {
+      await this.page.waitForFunction(
+        (selector: string, value: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.includes(value);
+        },
+        {},
+        currentCardNameSelector,
+        headingName
+      );
+    } catch (error) {
+      if (retry) {
+        showMessage(`Unable to navigate to the card ${cardName}. Retrying...`);
+        await this.navigateToCard(cardName, false);
+      } else {
+        error.message =
+          `Unable to navigate to the card ${cardName}\n.` + error.message;
+        throw error;
+      }
+    }
   }
 
   /**
