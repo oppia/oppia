@@ -506,6 +506,7 @@ const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
 const profilePictureSelector = '.e2e-test-profile-dropdown';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const floatFormInput = '.e2e-test-float-form-input';
+const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -3583,13 +3584,7 @@ export class LoggedOutUser extends BaseUser {
             name.click(),
           ]);
 
-          await this.page.waitForFunction(
-            (url: string) => {
-              return window.location.href.includes(url);
-            },
-            {},
-            testConstants.URLs.TopicEditor
-          );
+          await this.expectElementToBeVisible(topicViewerContainerSelector);
           showMessage(`Topic ${topicName} is opened successfully.`);
           return;
         }

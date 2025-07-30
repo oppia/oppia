@@ -307,6 +307,7 @@ const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
 const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
 const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
+const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -571,9 +572,7 @@ export class LoggedInUser extends BaseUser {
         }
       }
 
-      await this.page.waitForSelector(currentGoalsSectionSelector, {
-        timeout: 5000,
-      });
+      await this.expectElementToBeVisible(goalsSectionContainerSelector);
     } else {
       await this.page.waitForSelector(goalsSectionSelector);
       const goalSectionElement = await this.page.$(goalsSectionSelector);
@@ -584,9 +583,7 @@ export class LoggedInUser extends BaseUser {
     }
 
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(goalsTabSectionInLearnerDashboard, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(goalsSectionContainerSelector);
   }
 
   /**
@@ -2168,7 +2165,6 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(voiceArtistSettingsDropdown);
       await this.clickOn(permissionSettingsDropdown);
       await this.clickOn(feedbackSettingsDropdown);
-      await this.clickOn(explorationControlsSettingsDropdown);
     } else {
       await this.clickOn(settingsTab);
     }
