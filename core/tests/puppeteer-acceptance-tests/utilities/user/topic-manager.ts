@@ -1791,7 +1791,7 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       if (!(await this.isElementVisible(addButtonSelector))) {
-        await this.clickOn(addMisconceptionHeaderSelector);
+        await this.clickOn(addMisconceptionHeaderSelector, true);
       }
       await this.page.waitForSelector(addButtonSelector);
       const element = await this.page.$(addButtonSelector);

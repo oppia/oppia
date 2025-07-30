@@ -409,6 +409,7 @@ export class BaseUser {
   async waitForElementToBeClickable(
     selector: string | ElementHandle<Element>
   ): Promise<void> {
+    showMessage(`Checking if element ${selector} is clickable...`);
     try {
       const element =
         typeof selector === 'string'
@@ -424,12 +425,18 @@ export class BaseUser {
       }
       throw error;
     }
+    showMessage(`Element (${selector}) is clickable, as expected.`);
   }
 
   /**
    * The function clicks the element using the text on the button.
+   * @param selector The text of the button to click on.
+   * @param forceSelector If true, the function will try to find the element by its CSS selector.
    */
-  async clickOn(selector: string): Promise<void> {
+  async clickOn(
+    selector: string,
+    forceSelector: boolean = false
+  ): Promise<void> {
     /** Normalize-space is used to remove the extra spaces in the text.
      * Check the documentation for the normalize-space function here :
      * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
@@ -438,7 +445,7 @@ export class BaseUser {
     );
     // If we fail to find the element by its XPATH, then the button is undefined and
     // we try to find it by its CSS selector.
-    if (button !== undefined) {
+    if (button !== undefined && !forceSelector) {
       await this.waitForElementToBeClickable(button);
       showMessage(`Button (text: ${selector}) is clickable, as expected.`);
       await button.click();

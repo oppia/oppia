@@ -894,9 +894,11 @@ export class SuperAdmin extends BaseUser {
       await platformParameter.waitForSelector(paramValueInput, {visible: true});
       const valueInputs = await platformParameter.$$(paramValueInput);
       await valueInputs[1].type(value);
+      console.log('Checking is value is proper...');
+      console.log(typeof valueInputs[1]);
       await this.page.waitForFunction(
-        (element: HTMLInputElement) => {
-          return element.value.trim() === value.trim();
+        (element: Element) => {
+          return (element as HTMLInputElement).value.trim() === value.trim();
         },
         {},
         valueInputs[1]
@@ -904,7 +906,9 @@ export class SuperAdmin extends BaseUser {
       showMessage('Default value changed successfully.');
     } catch (error) {
       console.error(
-        `Failed to change default value of platform parameter "${platformParam}": ${error}`
+        `Failed to change default value of platform parameter "${platformParam}".\n` +
+          'Original Error:\n' +
+          error.stack
       );
       throw error;
     }

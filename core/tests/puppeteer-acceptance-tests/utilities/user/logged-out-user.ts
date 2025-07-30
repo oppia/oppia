@@ -4857,7 +4857,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(openMobileNavbarMenuButton);
+      await this.clickOn(openMobileNavbarMenuButton, true);
     }
 
     const isMobileViewport = this.isViewportAtMobileWidth();
