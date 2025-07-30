@@ -1,0 +1,56 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-hint-and-solution-display {
+  background-color: #f5da57;
+  margin-left: 40px;
+}
+
+.hint-solution-individual-container {
+  display: flex;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.25);
+  padding: 20px;
+  border-radius: 0 16px 16px 16px;
+  margin-bottom: 8px;
+  padding-bottom: 5px;
+  justify-content: space-between;
+}
+
+.oppia-learner-hint-solution-display-button {
+  width: 132px;
+  height: 44px;
+  padding: 10px;
+  border-radius: 4px;
+  background: #C55F45;
+  font-weight: 700;
+  font-style: Bold;
+  font-size: 18px;
+  color: #ffffff;
+}
+
+.hint-solution-individual-container > p {
+  width: 300px;
+  text-wrap: wrap;
+  padding-top: 10px;
+}
+
+.oppia-learner-hint-solution-display-button.viewed {
+  border: 1px solid #C55F45;
+  background-color: #ffffff;
+  color: #C55F45;
+}
+
+.solution-button {
+  background: #0D48A1;
+}
+
+.solution-button.viewed {
+  border: 1px solid #0D48A1;
+  background-color: #ffffff;
+  color: #0D48A1;
+}

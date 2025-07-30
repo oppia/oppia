@@ -215,6 +215,7 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
 import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
+import {HintAndSolutionDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-and-solution-display.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -297,6 +298,7 @@ import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-
     ExplorationEmbedButtonModalComponent,
     CheckpointCelebrationModalComponent,
     HintAndSolutionButtonsComponent,
+    HintAndSolutionDisplayComponent,
     HintEditorComponent,
     InputResponsePairComponent,
     NewInputResponsePairComponent,
@@ -444,6 +446,7 @@ import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
     FeedbackPopupComponent,
+    HintAndSolutionDisplayComponent,
     MultiSelectionFieldComponent,
     PracticeTabComponent,
     QuestionEditorSaveModalComponent,
