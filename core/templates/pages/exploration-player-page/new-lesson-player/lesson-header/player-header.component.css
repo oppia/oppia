@@ -25,7 +25,7 @@
   color: #fff;
 }
 
-@media screen and (max-width: 574px) {
+@media screen and (max-width: 767px) {
   .player-header-right {
     display: block;
   }
