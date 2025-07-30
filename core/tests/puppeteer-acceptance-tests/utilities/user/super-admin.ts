@@ -894,14 +894,13 @@ export class SuperAdmin extends BaseUser {
       await platformParameter.waitForSelector(paramValueInput, {visible: true});
       const valueInputs = await platformParameter.$$(paramValueInput);
       await valueInputs[1].type(value);
-      console.log('Checking is value is proper...');
-      console.log(typeof valueInputs[1]);
       await this.page.waitForFunction(
-        (element: Element) => {
+        (element: Element, value: string) => {
           return (element as HTMLInputElement).value.trim() === value.trim();
         },
         {},
-        valueInputs[1]
+        valueInputs[1],
+        value
       );
       showMessage('Default value changed successfully.');
     } catch (error) {
