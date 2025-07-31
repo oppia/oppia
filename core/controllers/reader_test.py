@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import logging
+from unittest import mock
 
 from core import feconf
 from core.constants import constants
@@ -45,10 +46,6 @@ from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-from core.domain import story_fetchers
-from core.storage.story import gae_models as story_models
-from unittest import mock
-
 
 from typing import Dict, Final, List, Optional, Union
 
@@ -1687,6 +1684,35 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [])
+        
+    def test_remove_topic_from_partially_learnt_list_handler(self) -> None:
+        """Test handler for removing topics from the partially learnt list."""
+        
+        self.login(self.VIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+
+        topic_id = 'topic_123'
+
+        # Add topic to the partially learnt list.
+        learner_progress_services.record_topic_started(
+            self.viewer_id, topic_id)
+        
+        # Verify topic is in the partially learnt list.
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.viewer_id), [topic_id])
+
+        # Remove topic using DELETE request to the handler.
+        self.delete_json(
+            '/learnerincompleteactivityhandler/%s/%s' % (
+            constants.ACTIVITY_TYPE_LEARN_TOPIC, topic_id),
+            params={'csrf_token':csrf_token}
+        )
+        
+        # Verify the topic was removed.
+        self.assertEqual(
+            learner_progress_services.get_all_partially_learnt_topic_ids(
+                self.viewer_id), [])
 
 
 class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
@@ -2802,15 +2828,12 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        
         # Initialize with demo exploration
         self.exp_id = '0'
         exp_services.delete_demo(self.exp_id)
         exp_services.load_demo(self.exp_id)
-        
         # Proper payload structure from handler schema
         self.base_payload = {
             'version': 1,
@@ -2838,7 +2861,7 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
 
         # Verify no leave events exist initially
         self.assertEqual(
-            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(), # pylint: disable=line-too-long
             0
         )
 
@@ -2852,7 +2875,7 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
 
         # Verify leave event was recorded
         self.assertEqual(
-            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(),
+            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(), # pylint: disable=line-too-long
             1
         )
 
@@ -2860,7 +2883,7 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
         if hasattr(self, 'user_id') and self.user_id:
             self.assertNotIn(
                 self.exp_id,
-                learner_progress_services.get_all_incomplete_exp_ids(self.user_id)
+                learner_progress_services.get_all_incomplete_exp_ids(self.user_id) # pylint: disable=line-too-long
             )
 
     def test_exp_maybe_leave_event_with_story_no_topic(self) -> None:
@@ -2883,15 +2906,15 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
             id=self.exp_id,
             story_id=story_id
         )
-        exp_models.ExplorationContextModel.update_timestamps_multi([exploration_context_model])
-        exp_models.ExplorationContextModel.put_multi([exploration_context_model])
+        exp_models.ExplorationContextModel.update_timestamps_multi([exploration_context_model]) # pylint: disable=line-too-long
+        exp_models.ExplorationContextModel.put_multi([exploration_context_model]) # pylint: disable=line-too-long
 
         # Get the real story and modify it OUTSIDE the mock to avoid recursion
         real_story = story_fetchers.get_story_by_id(story_id)
         real_story.corresponding_topic_id = None
 
         # Mock story_fetchers in the core.domain module where it's imported
-        with mock.patch('core.domain.story_fetchers.get_story_by_id', return_value=real_story):
+        with mock.patch('core.domain.story_fetchers.get_story_by_id', return_value=real_story): # pylint: disable=line-too-long
             payload = {
                 'version': 1,
                 'state_name': 'middle_state',
@@ -2901,17 +2924,17 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
                 'collection_id': None
             }
             self.post_json(
-                '/explorehandler/exploration_maybe_leave_event/%s' % self.exp_id,
+                '/explorehandler/exploration_maybe_leave_event/%s' % self.exp_id, # pylint: disable=line-too-long
                 payload, csrf_token=csrf_token)
 
             # Verify story progress was recorded
             self.assertEqual(
-                learner_progress_services.get_all_incomplete_story_ids(self.viewer_id), 
+                learner_progress_services.get_all_incomplete_story_ids(self.viewer_id), # pylint: disable=line-too-long
                 [story_id])
             
             # Verify NO topic progress was recorded
             self.assertEqual(
-                learner_progress_services.get_all_partially_learnt_topic_ids(self.viewer_id), 
+                learner_progress_services.get_all_partially_learnt_topic_ids(self.viewer_id), # pylint: disable=line-too-long
                 [])
     
 class LearnerProgressTest(test_utils.GenericTestBase):
@@ -2926,34 +2949,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-    def test_remove_topic_from_partially_learnt_list_handler(self) -> None:
-        """Test handler for removing topics from the partially learnt list."""
-        
-        self.login(self.VIEWER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        topic_id = 'topic_123'
-
-        # Add topic to the partially learnt list.
-        learner_progress_services.record_topic_started(
-            self.viewer_id, topic_id)
-        
-        # Verify topic is in the partially learnt list.
-        self.assertEqual(
-            learner_progress_services.get_all_partially_learnt_topic_ids(
-                self.viewer_id), [topic_id])
-
-        # Remove topic using DELETE request to the handler.
-        self.delete_json(
-            '/learnerincompleteactivityhandler/%s/%s' % (
-            constants.ACTIVITY_TYPE_LEARN_TOPIC, topic_id),
-            params={'csrf_token':csrf_token}
-        )
-        
-        # Verify the topic was removed.
-        self.assertEqual(
-            learner_progress_services.get_all_partially_learnt_topic_ids(
-                self.viewer_id), [])
+    
         
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
