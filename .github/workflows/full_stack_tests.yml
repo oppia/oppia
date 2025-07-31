@@ -79,7 +79,46 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
+        suite:
+          - name: blog-editor/create-and-publish-a-blog-post-with-required-details
+          - name: blog-editor/create-and-publish-a-blog-post-with-required-details
+          - name: blog-editor/create-and-publish-a-blog-post-with-required-details
+          - name: logged-in-user/manage-classroom-progress-in-learner-dashboard
+          - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
+          - name: logged-in-user/manage-classroom-progress-in-learner-dashboard
+          - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
+          - name: logged-in-user/manage-classroom-progress-in-learner-dashboard
+          - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
+          - name: logged-in-user/manage-classroom-progress-in-learner-dashboard
+          - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
+          - name: logged-in-user/manage-classroom-progress-in-learner-dashboard
+          - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
+          - name: logged-out-user/sign-in-and-save-exploration-progress
     name: Acceptance (${{ matrix.suite.name }})
     steps:
       - name: Check for broken suites
