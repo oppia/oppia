@@ -6044,6 +6044,21 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(toastMessageSelector);
     await this.page.hover(toastMessageSelector);
   }
+
+  /**
+   * Updates the toast style to make it visible.
+   */
+  async updateToastStyle(): Promise<void> {
+    await this.page.addStyleTag({
+      content: `
+        .e2e-test-toast-message {
+          opacity: 1 !important;
+          transition: none !important;
+          animation: none !important;
+        }
+      `,
+    });
+  }
 }
 
 export let LoggedOutUserFactory = (): LoggedOutUser => new LoggedOutUser();
