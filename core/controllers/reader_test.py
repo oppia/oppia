@@ -2749,15 +2749,12 @@ class ExplorationCompleteEventHandlerTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        
         # Initialize with demo exploration
         self.exp_id = '0'
         exp_services.delete_demo(self.exp_id)
         exp_services.load_demo(self.exp_id)
-        
         # Proper payload structure from handler schema
         self.base_payload = {
             'version': 1,
@@ -2936,9 +2933,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         topic_id = 'topic_123'
-        
-        # Debug: Print the actual value of the constant
-        print('ACTIVITY_TYPE_LEARN_TOPIC:', constants.ACTIVITY_TYPE_LEARN_TOPIC)
 
         # Add topic to the partially learnt list.
         learner_progress_services.record_topic_started(
