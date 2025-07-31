@@ -2904,10 +2904,9 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
                 learner_progress_services.get_all_incomplete_story_ids(self.viewer_id), # pylint: disable=line-too-long
                 [story_id])
             self.assertEqual(
-                learner_progress_services.get_all_partially_learnt_topic_ids(self.viewer_id), # pylint: disable=line-too-long
-                [])           
+                learner_progress_services.get_all_partially_learnt_topic_ids(self.viewer_id), []) # pylint: disable=line-too-long
 
-    
+
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
