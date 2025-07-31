@@ -21,7 +21,7 @@ python_linter_test.py. This file does not have period at the end of docstring.
 from __future__ import annotations
 
 
-class FakeClass():
+class FakeClass:
     """This is a fake docstring for valid syntax purposes"""
 
     def __init__(self, fake_arg):

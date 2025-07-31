@@ -21,6 +21,7 @@ class defintion but two newlines are required on line 26.
 
 from __future__ import annotations
 
+
 class FakeClass:
     """This is a fake docstring for valid syntax purposes."""
 

@@ -52,7 +52,7 @@ class TaskResult:
         name: str,
         failed: bool,
         trimmed_messages: List[str],
-        messages: List[str]
+        messages: List[str],
     ) -> None:
         """Constructs a TaskResult object.
 
@@ -78,11 +78,11 @@ class TaskResult:
             task.
         """
         all_messages = self.messages[:]
-        status_message = (
-            '%s %s check %s' % (
-                (FAILED_MESSAGE_PREFIX, self.name, 'failed')
-                if self.failed else (
-                    SUCCESS_MESSAGE_PREFIX, self.name, 'passed')))
+        status_message = '%s %s check %s' % (
+            (FAILED_MESSAGE_PREFIX, self.name, 'failed')
+            if self.failed
+            else (SUCCESS_MESSAGE_PREFIX, self.name, 'passed')
+        )
         all_messages.append(status_message)
         return all_messages
 
@@ -99,7 +99,7 @@ class TaskThread(threading.Thread):
         semaphore: threading.Semaphore,
         errors_to_retry_on: List[str],
         name: Optional[str],
-        report_enabled: bool
+        report_enabled: bool,
     ) -> None:
         super().__init__()
         self.func = func
@@ -129,33 +129,40 @@ class TaskThread(threading.Thread):
                                 log(
                                     'Report from %s check\n'
                                     '----------------------------------------\n'
-                                    '%s' % (
-                                        task_result.name, '\n'.join(
-                                            task_result.get_report())),
-                                    show_time=True)
+                                    '%s'
+                                    % (
+                                        task_result.name,
+                                        '\n'.join(task_result.get_report()),
+                                    ),
+                                    show_time=True,
+                                )
                             # The following section will print the output of
                             # backend tests.
                             else:
                                 log(
                                     'LOG %s:\n%s'
-                                    '----------------------------------------' %
-                                    (self.name, task_result.messages[0]),
-                                    show_time=True)
+                                    '----------------------------------------'
+                                    % (self.name, task_result.messages[0]),
+                                    show_time=True,
+                                )
 
                     log(
-                        'FINISHED %s: %.1f secs' % (
-                            self.name, time.time() - self.start_time),
-                        show_time=True)
+                        'FINISHED %s: %.1f secs'
+                        % (self.name, time.time() - self.start_time),
+                        show_time=True,
+                    )
                     return
                 except Exception as e:
                     log(
                         'Attempt {} of {} failed for {}'.format(
-                            self.num_attempts, MAX_ATTEMPTS, self.name))
+                            self.num_attempts, MAX_ATTEMPTS, self.name
+                        )
+                    )
 
                     is_last_attempt = self.num_attempts >= MAX_ATTEMPTS
                     should_retry = any(
-                        err in str(e)
-                        for err in self.errors_to_retry_on)
+                        err in str(e) for err in self.errors_to_retry_on
+                    )
 
                     if is_last_attempt or not should_retry:
                         # This is either the last attempt
@@ -166,9 +173,10 @@ class TaskThread(threading.Thread):
                             log(str(e))
                             log(
                                 'ERROR {} - {:.1f} secs'.format(
-                                    self.name,
-                                    time.time() - self.start_time),
-                                show_time=True)
+                                    self.name, time.time() - self.start_time
+                                ),
+                                show_time=True,
+                            )
                         break
                     log('Retrying {} - error: {}'.format(self.name, e))
         finally:
@@ -182,15 +190,17 @@ def _check_all_tasks(tasks: List[TaskThread]) -> None:
 
     for task in tasks:
         if task.is_alive():
-            running_tasks_data.append('  %s (started %s)' % (
-                task.name,
-                time.strftime('%H:%M:%S', time.localtime(task.start_time))
-            ))
+            running_tasks_data.append(
+                '  %s (started %s)'
+                % (
+                    task.name,
+                    time.strftime('%H:%M:%S', time.localtime(task.start_time)),
+                )
+            )
 
         if task.exception:
             stacktrace = (
-                task.stacktrace
-                if task.stacktrace else 'No stacktrace present.'
+                task.stacktrace if task.stacktrace else 'No stacktrace present.'
             )
             ALL_ERRORS.append(stacktrace)
 
@@ -244,7 +254,7 @@ def create_task(
     semaphore: threading.Semaphore,
     errors_to_retry_on: List[str],
     name: Optional[str] = None,
-    report_enabled: bool = True
+    report_enabled: bool = True,
 ) -> TaskThread:
     """Create a Task in its Thread.
 
@@ -264,5 +274,6 @@ def create_task(
         task: TaskThread object. Created task.
     """
     task = TaskThread(
-        func, verbose, semaphore, errors_to_retry_on, name, report_enabled)
+        func, verbose, semaphore, errors_to_retry_on, name, report_enabled
+    )
     return task

@@ -33,9 +33,12 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.print_arr: list[str] = []
+
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
+
         self.error_arr: list[str] = []
+
         def mock_error(msg: str) -> None:
             self.error_arr.append(msg)
 
@@ -44,13 +47,16 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         self.swap_exit = self.swap(sys, 'exit', lambda _: None)
 
     def test_checks_fail_when_a_backend_file_lacks_associated_test_file(
-            self) -> None:
+        self,
+    ) -> None:
         tempdir = tempfile.TemporaryDirectory(prefix=os.getcwd() + '/core/')
         backend_file = os.path.join(tempdir.name, 'backend_file.py')
         frontend_file = os.path.join(tempdir.name, 'frontend_file.ts')
         topmost_level_path_swap = self.swap(
-            check_backend_associated_test_file, 'TOPMOST_LEVEL_PATH',
-            tempdir.name)
+            check_backend_associated_test_file,
+            'TOPMOST_LEVEL_PATH',
+            tempdir.name,
+        )
         with open(backend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
         with open(frontend_file, 'w', encoding='utf8') as f:
@@ -62,54 +68,66 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
 
         tempdir.cleanup()
         self.assertIn(
-            'Backend associated test file checks failed.', self.print_arr)
+            'Backend associated test file checks failed.', self.print_arr
+        )
         self.assertIn(
-            '\033[1m{}\033[0m needs an associated backend test file.\n'
-            .format(os.path.relpath(backend_file, tempdir.name)),
-            self.error_arr
+            '\033[1m{}\033[0m needs an associated backend test file.\n'.format(
+                os.path.relpath(backend_file, tempdir.name)
+            ),
+            self.error_arr,
         )
         self.assertNotIn(
-            '\033[1m{}\033[0m needs an associated backend test file.\n'
-            .format(os.path.relpath(frontend_file, tempdir.name)),
-            self.error_arr
+            '\033[1m{}\033[0m needs an associated backend test file.\n'.format(
+                os.path.relpath(frontend_file, tempdir.name)
+            ),
+            self.error_arr,
         )
 
     def test_pass_when_file_in_exclusion_list_lacks_associated_test(
-            self) -> None:
+        self,
+    ) -> None:
         tempdir = tempfile.TemporaryDirectory(prefix=os.getcwd() + '/core/')
         backend_file = os.path.join(tempdir.name, 'backend_file.py')
         topmost_level_path_swap = self.swap(
-            check_backend_associated_test_file, 'TOPMOST_LEVEL_PATH',
-            tempdir.name)
+            check_backend_associated_test_file,
+            'TOPMOST_LEVEL_PATH',
+            tempdir.name,
+        )
         with open(backend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
         (
-            check_backend_associated_test_file.
-                FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(
-                    os.path.relpath(backend_file, tempdir.name)))
+            check_backend_associated_test_file.FILES_WITHOUT_ASSOCIATED_TEST_FILES.append(
+                os.path.relpath(backend_file, tempdir.name)
+            )
+        )
         with self.print_swap, self.swap_logging, self.swap_exit:
             with topmost_level_path_swap:
                 check_backend_associated_test_file.main()
 
         tempdir.cleanup()
         self.assertIn(
-            'Backend associated test file checks passed.', self.print_arr)
+            'Backend associated test file checks passed.', self.print_arr
+        )
         self.assertNotIn(
-            '\033[1m{}\033[0m needs an associated backend test file.\n'
-            .format(os.path.relpath(backend_file, tempdir.name)),
-            self.error_arr
+            '\033[1m{}\033[0m needs an associated backend test file.\n'.format(
+                os.path.relpath(backend_file, tempdir.name)
+            ),
+            self.error_arr,
         )
 
     def test_checks_pass_when_all_backend_files_have_an_associated_test_file(
-            self) -> None:
+        self,
+    ) -> None:
         tempdir = tempfile.TemporaryDirectory(
-            prefix=os.path.join(os.getcwd(), feconf.TESTS_DATA_DIR, ''))
+            prefix=os.path.join(os.getcwd(), feconf.TESTS_DATA_DIR, '')
+        )
         backend_file = os.path.join(tempdir.name, 'backend_file.py')
-        backend_test_file = os.path.join(
-            tempdir.name, 'backend_file_test.py')
+        backend_test_file = os.path.join(tempdir.name, 'backend_file_test.py')
         topmost_level_path_swap = self.swap(
-            check_backend_associated_test_file, 'TOPMOST_LEVEL_PATH',
-            tempdir.name)
+            check_backend_associated_test_file,
+            'TOPMOST_LEVEL_PATH',
+            tempdir.name,
+        )
 
         with open(backend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
@@ -121,10 +139,12 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
 
         tempdir.cleanup()
         self.assertIn(
-            'Backend associated test file checks passed.', self.print_arr)
+            'Backend associated test file checks passed.', self.print_arr
+        )
         self.assertEqual(self.error_arr, [])
         self.assertNotIn(
-            '\033[1m{}\033[0m needs an associated backend test file.\n'
-            .format(os.path.relpath(backend_file, tempdir.name)),
-            self.error_arr
+            '\033[1m{}\033[0m needs an associated backend test file.\n'.format(
+                os.path.relpath(backend_file, tempdir.name)
+            ),
+            self.error_arr,
         )
