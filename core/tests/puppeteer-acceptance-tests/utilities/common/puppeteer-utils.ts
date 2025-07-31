@@ -595,8 +595,8 @@ export class BaseUser {
    * This function closes the current Puppeteer browser instance.
    */
   async closeBrowser(): Promise<void> {
-    console.log(
-      `Started closing broswer for ${this.username ?? 'unknown user'} at ${new Date().toISOString()}`
+    showMessage(
+      `Started closing broswer for ${this.username ?? 'unknown user'}.`
     );
     // Stop the screen recorder.
     if (this.screenRecorder) {
@@ -635,9 +635,6 @@ export class BaseUser {
     }
     await this.browserObject.close();
     showMessage(`Browser closed for ${this.username ?? 'unknown user'}.`);
-    console.log(
-      `Finished closing broswer for ${this.username ?? 'unknown user'} at ${new Date().toISOString()}`
-    );
   }
 
   /**
@@ -1290,7 +1287,6 @@ export class BaseUser {
     while (Date.now() - startTime < timeout) {
       await this.page.waitForTimeout(100);
       const currentBox = await element.boundingBox();
-      console.log(`Current Position: ${currentBox?.x}, ${currentBox?.y}`);
 
       if (
         previousBox &&

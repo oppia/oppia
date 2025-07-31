@@ -43,7 +43,6 @@ const tagSelector = '.e2e-test-blog-post-tags';
 const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
 const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
 
-// const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 
 export class BlogPostEditor extends BaseUser {
