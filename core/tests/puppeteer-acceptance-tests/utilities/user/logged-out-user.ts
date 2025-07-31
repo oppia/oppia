@@ -507,6 +507,7 @@ const profilePictureSelector = '.e2e-test-profile-dropdown';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const floatFormInput = '.e2e-test-float-form-input';
 const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
+const toastMessageSelector = '.e2e-test-toast-message';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -6034,6 +6035,14 @@ export class LoggedOutUser extends BaseUser {
       {},
       testConstants.URLs.CommunityLibrary
     );
+  }
+
+  /**
+   * Hovers over the toast message to see the error message.
+   */
+  async hoverOverToastMessage(): Promise<void> {
+    await this.page.waitForSelector(toastMessageSelector);
+    await this.page.hover(toastMessageSelector);
   }
 }
 
