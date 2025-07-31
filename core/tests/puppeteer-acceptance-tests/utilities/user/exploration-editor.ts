@@ -590,6 +590,7 @@ export class ExplorationEditor extends BaseUser {
     if (!found) {
       throw new Error(`Option ${option} not found.`);
     }
+    await this.page.waitForNetworkIdle({idleTime: 1000});
     await this.clickOnSubmitAnswerButton();
   }
 
