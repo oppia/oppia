@@ -107,7 +107,7 @@ const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
 const mainTabButton = '.e2e-test-main-tab';
 const mobileMainTabButton = '.e2e-test-mobile-main-tab';
 const stateEditSelector = '.e2e-test-state-edit-content';
-// TODO(#23019): Required selector for TODO below.
+// TODO(#23019): Required selector for code below.
 // const stateContentSelector = '.e2e-test-actual-state-content';
 const stateContentInputField = 'div.e2e-test-rte';
 const uploadImageButton = '.e2e-test-upload-image';

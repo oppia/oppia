@@ -75,10 +75,6 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectInteractionPreviewCardToBeVisible();
     await explorationEditor.expectRemoveInteractionButtonToBeVisible();
 
-    // Update the default response feedback.
-    // INFO: You can't update the default reponse in Continue Button interaction.
-    // TODO: Update CUJv3 Doc with the same.
-
     // Direct learners to new card.
     await explorationEditor.viewOppiaResponses();
     await explorationEditor.directLearnersToNewCard(CARD_NAMES.SECOND);

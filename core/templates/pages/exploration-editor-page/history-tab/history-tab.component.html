@@ -70,11 +70,10 @@
       <br>
       <div class="pagination-mobile">
         <mat-paginator [length]="versionCheckboxArray.length"
-                       class="pagination"
+                       class="pagination e2e-test-mobile-history-pagination"
                        [pageSize]="VERSIONS_PER_PAGE"
                        [pageSizeOptions]="versionChoices"
-                       (page)="paginator($event)"
-                       class="e2e-test-mobile-history-pagination">
+                       (page)="paginator($event)">
         </mat-paginator>
       </div>
     </div>
@@ -91,7 +90,7 @@
         <div class="revision-select-container">
           <mat-form-field appearance="fill" class="e2e-test-history-version-dropdown-first">
             <mat-label>Revision #1 :</mat-label>
-            <mat-select [(value)]="firstVersion" 
+            <mat-select [(value)]="firstVersion"
                         class="e2e-test-version-comparasion-select" disableRipple>
               <mat-option *ngFor="let choice of totalExplorationVersionMetadata ; index as index"
                           [value]="choice"
@@ -103,7 +102,7 @@
         <div class="revision-select-container">
           <mat-form-field appearance="fill" class="e2e-test-history-version-dropdown-second">
             <mat-label>Revision #2 :</mat-label>
-            <mat-select [(value)]="secondVersion" 
+            <mat-select [(value)]="secondVersion"
                         class="e2e-test-version-comparasion-select" disableRipple>
               <mat-option *ngFor="let choice of totalExplorationVersionMetadata ; index as index"
                           [value]="choice"

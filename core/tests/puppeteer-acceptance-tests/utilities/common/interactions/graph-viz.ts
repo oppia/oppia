@@ -1,3 +1,21 @@
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Utility class to interact with Graph Interaction.
+ */
+
 import puppeteer, {ElementHandle} from 'puppeteer';
 import isElementClickable from '../../../functions/is-element-clickable';
 
@@ -255,7 +273,6 @@ export class GraphViz {
    * Adds four vertices in the center of the graph.
    */
   async addFourVerticesInCenter(): Promise<ElementHandle<Element>[]> {
-    // TODO: Fix. Somehow the first vertex is not added at proper position.
     const v1 = await this.addNode(55, 50);
     const v2 = await this.addNode(65, 20);
     const v3 = await this.addNode(55, 90);

@@ -27,7 +27,7 @@ describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
 
   beforeAll(async function () {
-    // (TODO#22991): Currently, the help button is not available in mobile viewport.
+    // TODO(#22991): Currently, the help button is not available in mobile viewport.
     // So, we skip the test in mobile viewport.
     if (process.env.MOBILE === 'true') {
       showMessage('Test skipped in mobile viewport');
