@@ -242,9 +242,16 @@ export class UserFactory {
    */
   static closeAllBrowsers = async function (): Promise<void> {
     showMessage(`Closing browsers for ${activeUsers.length} users.`);
-    for (let i = 0; i < activeUsers.length; i++) {
-      await activeUsers[i].closeBrowser();
-    }
+    // await Promise.all(
+    //   activeUsers.map(async user => {
+    //     await user.closeBrowser();
+    //   })
+    // );
+    await Promise.all(
+      activeUsers.map(async user => {
+        await user.closeBrowser();
+      })
+    );
 
     showMessage('All browsers closed.');
   };

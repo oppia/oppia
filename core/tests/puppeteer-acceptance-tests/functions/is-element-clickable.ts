@@ -197,7 +197,7 @@ export default function isElementClickable(
   };
 
   console.log(
-    `${selector} current positions: ${element.getBoundingClientRect()}`
+    `${element} current positions: ${element.getBoundingClientRect()}`
   );
 
   // Here we check if the element is clickable and if not, we scroll it into view
