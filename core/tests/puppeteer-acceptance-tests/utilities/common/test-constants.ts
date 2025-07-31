@@ -184,6 +184,10 @@ export default {
       __dirname,
       '../../data/last-card-hi.mp3'
     ),
+    LongVoiceoverInHindi: path.resolve(
+      __dirname,
+      '../../data/audio/voiceover_hindi_25secs.mp3'
+    ),
   },
   SocialsShare: {
     Facebook: {

@@ -122,7 +122,7 @@ export class VoiceoverAdmin extends BaseUser {
     if (!explorationId) {
       throw new Error('Cannot navigate to editor: explorationId is null');
     }
-    const editorUrl = `${baseURL}/create/${explorationId}`;
+    const editorUrl = `${baseURL}/create/${explorationId}#/`;
     await this.goto(editorUrl);
 
     showMessage('Navigation to exploration editor is successful.');
