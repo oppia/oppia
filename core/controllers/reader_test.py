@@ -1133,9 +1133,6 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             }, expected_status_int=400
         )
 
-
-
-
 class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
 
