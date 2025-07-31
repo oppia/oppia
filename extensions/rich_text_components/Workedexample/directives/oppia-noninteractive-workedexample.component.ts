@@ -55,7 +55,7 @@ export class NoninteractiveWorkedexample implements OnInit, OnChanges {
   @Input() questionWithValue!: string;
   @Input() answerWithValue!: string;
   @Input() allowSolutionToBeCollapsed!: boolean;
-  isSolutionCollapsed: boolean = true;
+  isSolutionCollapsed: boolean = this.allowSolutionToBeCollapsed;
   question: string = '';
   answer: string = '';
   constructor(private htmlEscaperService: HtmlEscaperService) {}

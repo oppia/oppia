@@ -7,9 +7,10 @@
 </div>
 
 <div class="solution-box">
-  <strong class="solution-title" (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null">
-    <i class="material-icons icon-expand-workedexample">expand_more</i>
+  <strong class="solution-title">
     Solution
+    <i *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed" class="material-icons icon-expand-workedexample" (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null">expand_more</i>
+    <i *ngIf="allowSolutionToBeCollapsed && !isSolutionCollapsed" class="material-icons icon-collapse-workedexample" (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null">expand_less</i>
   </strong>
   <div class="protractor-panel-body" *ngIf="!isSolutionCollapsed">
     <oppia-rte-output-display class="e2e-test-workedexample-answer" [rteString]="answer">
@@ -38,6 +39,13 @@
   }
 
   .solution-title {
+    align-items: center;
     color: #c55f45;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .icon-expand-workedexample .icon-collapse-workedexample {
+    margin-left: auto;
   }
 </style>
