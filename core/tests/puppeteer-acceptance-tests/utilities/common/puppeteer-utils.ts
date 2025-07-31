@@ -1279,7 +1279,7 @@ export class BaseUser {
     selector: string,
     timeout: number = 5000
   ): Promise<void> {
-    const element = await this.page.waitForSelector(selector);
+    const element = await this.page.waitForSelector(selector, {visible: true});
     if (!element) {
       throw new Error('Element not found');
     }
@@ -1290,7 +1290,7 @@ export class BaseUser {
     while (Date.now() - startTime < timeout) {
       await this.page.waitForTimeout(100);
       const currentBox = await element.boundingBox();
-      console.log(`Current Position: ${currentBox.x}, ${currentBox.y}`);
+      console.log(`Current Position: ${currentBox?.x}, ${currentBox?.y}`);
 
       if (
         previousBox &&

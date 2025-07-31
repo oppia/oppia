@@ -81,6 +81,7 @@ jobs:
       fail-fast: false
       matrix:
         runs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        runs2: [1, 2, 3, 4]
         suite: 
           - name: logged-out-user/sign-in-and-save-exploration-progress
     name: Acceptance (${{ matrix.suite.name }})
@@ -245,5 +246,5 @@ jobs:
       - name: Upload all snapshots
         uses: actions/upload-artifact@v4
         with:
-          name: snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-${{matrix.runs}}
+          name: snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-${{matrix.runs}}-${{matrix.runs2}}
           path: 'core/tests/puppeteer-acceptance-tests/specs/**/*.png'
