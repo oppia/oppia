@@ -81,7 +81,6 @@ describe('Logged-out User', function () {
 
       await loggedOutUser.filterLessonsByLanguage(['Ákán']);
       // No lessons are created in the Ákán language.
-      await loggedOutUser.expectSearchResultsToContain([]);
       await loggedOutUser.expectSearchResultsToContain(
         ['Algebra I', 'Algebra II'],
         false
