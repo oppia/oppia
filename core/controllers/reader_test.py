@@ -1684,7 +1684,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [])
-        
+
     def test_remove_topic_from_partially_learnt_list_handler(self) -> None:
         """Test handler for removing topics from the partially learnt list."""
         self.login(self.VIEWER_EMAIL)
@@ -2906,8 +2906,8 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 learner_progress_services.get_all_partially_learnt_topic_ids(self.viewer_id), # pylint: disable=line-too-long
                 [])           
-            
-             
+
+    
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
