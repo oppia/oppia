@@ -234,13 +234,17 @@ export class BaseUser {
       /[^a-z0-9.-]/gi,
       '_'
     );
+    const randomString = Math.random().toString(36).substring(2, 8);
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, {recursive: true});
     }
     for (const instance of BaseUser.instances) {
       if (instance.page) {
         await instance.page.screenshot({
-          path: path.join(outputDir, outputFileName + `-instance-${i}.png`),
+          path: path.join(
+            outputDir,
+            outputFileName + randomString + `-instance-${i}.png`
+          ),
         });
         showMessage(
           `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
