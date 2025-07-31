@@ -2382,9 +2382,9 @@ export class LoggedInUser extends BaseUser {
       return explorationId;
     };
 
+    await publishExploration();
+    await fillExplorationMetadataDetails();
     try {
-      await publishExploration();
-      await fillExplorationMetadataDetails();
       return await confirmPublish();
     } catch (error) {
       await this.waitForPageToFullyLoad();

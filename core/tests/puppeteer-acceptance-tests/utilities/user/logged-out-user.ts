@@ -2165,7 +2165,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnCreateAccountButtonInSaveProgressModal(): Promise<void> {
     await this.page.waitForSelector(lessonInfoSignUpButtonSelector);
-    await this.page.click(lessonInfoSignUpButtonSelector);
+    await this.clickOn(lessonInfoSignUpButtonSelector);
 
     await this.page.waitForSelector(lessonInfoSignUpButtonSelector, {
       hidden: true,

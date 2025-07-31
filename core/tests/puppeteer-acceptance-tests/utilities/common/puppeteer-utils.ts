@@ -584,6 +584,9 @@ export class BaseUser {
    * This function closes the current Puppeteer browser instance.
    */
   async closeBrowser(): Promise<void> {
+    console.log(
+      `Started closing broswer for ${this.username ?? 'unknown user'} at ${new Date().toISOString()}`
+    );
     // Stop the screen recorder.
     if (this.screenRecorder) {
       try {
@@ -615,12 +618,15 @@ export class BaseUser {
         }
       } catch (error) {
         showMessage(
-          `Error while taking screenshot for ${this.username}:\n` + error
+          `Error while taking screenshot for ${this.username ?? 'unknown user'}: ${error}`
         );
       }
     }
     await this.browserObject.close();
     showMessage(`Browser closed for ${this.username ?? 'unknown user'}.`);
+    console.log(
+      `Finished closing broswer for ${this.username ?? 'unknown user'} at ${new Date().toISOString()}`
+    );
   }
 
   /**
