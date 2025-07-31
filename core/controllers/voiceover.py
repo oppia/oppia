@@ -16,9 +16,12 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import feconf
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import taskqueue_services
 from core.domain import voiceover_regeneration_services
 from core.domain import voiceover_services
 
@@ -278,6 +281,58 @@ class EntityVoiceoversBulkHandler(
 
         self.values.update({
             'entity_voiceovers_list': entity_voiceovers_dicts
+        })
+        self.render_json(self.values)
+
+
+class AutomaticVoiceoverRegenerationRecordHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler class to retrieve automatic voiceover regeneration records
+    within a specified date range."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'start_date': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+        'end_date': {
+            'schema': {
+                'type': 'basestring'
+            }
+        },
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_voiceover_admin_page
+    def get(self, start_date: str, end_date: str) -> None:
+        """Retrieves automatic voiceover regeneration records within the
+        specified start and end dates.
+
+        Args:
+            start_date: str. The start date for filtering records.
+            end_date: str. The end date for filtering records.
+        """
+        # Convert start_date and end_date to datetime objects.
+        start_date_obj: datetime.datetime = datetime.datetime.strptime(
+            start_date, '%a %b %d %Y')
+        end_date_obj: datetime.datetime = datetime.datetime.strptime(
+            end_date, '%a %b %d %Y')
+
+        # Fetch only those records that are related to voiceover regeneration
+        # and are within the specified date range.
+        cloud_task_run_objects = (
+            taskqueue_services.get_cloud_task_run_by_given_params(
+                taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+                start_date_obj, end_date_obj))
+
+        self.values.update({
+            'automatic_voiceover_regeneration_records': [
+                cloud_task_run.to_dict()
+                for cloud_task_run in cloud_task_run_objects
+            ]
         })
         self.render_json(self.values)
 

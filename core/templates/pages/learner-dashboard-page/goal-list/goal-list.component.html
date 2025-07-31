@@ -4,7 +4,7 @@
       <img class="goal-list-img" [src]="imgUrl" alt="" >
       <div class="goal-list-stretch flex-grow-1">
         <div class="goal-list-details flex-grow-1">
-          <p class="goal-list-title">
+          <p class="goal-list-title e2e-test-goal-title">
             {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_TITLE' | translate: {title: goalTopic.getName()} }}
           </p>
           <div class="goal-list-center">
@@ -23,7 +23,7 @@
           </div>
             <!--TODO(#18384): Resume state, can only check if node is completed or not.-->
           <a *ngIf="story.getAllNodes().length !== story.getCompletedNodeTitles().length && !displayAllNodes"
-             class="oppia-learner-dash-button-sm oppia-learner-dash-button--default oppia-learner-dash-button--goals-list align-self-end"
+             class="oppia-learner-dash-button-sm oppia-learner-dash-button--default oppia-learner-dash-button--goals-list align-self-end e2e-test-start-lesson-button"
              [href]="getNodeLessonUrl(story, story.getAllNodes()[allCurrentNodes[i]])"
           >
             {{ 'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START' | translate }}

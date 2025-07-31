@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import json
 
+from core import feconf
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -226,24 +228,35 @@ class DeferredTasksHandler(
     names exists in 'core/domain/taskqueue_services.py' file.
     """
 
+    fn_ids_to_names = (
+        feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS)
+
     DEFERRED_TASK_FUNCTIONS: Dict[str, Callable[..., None]] = {
-        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS: (
-            exp_services.delete_explorations_from_user_models),
-        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES: (
-            exp_services.delete_explorations_from_activities),
-        taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED: (
-            wipeout_service.delete_users_pending_to_be_deleted),
-        taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION: (
-            wipeout_service.check_completion_of_user_deletion),
-        taskqueue_services.FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY: (
-            exp_services.regenerate_exploration_summary_with_new_contributor),
-        taskqueue_services.FUNCTION_ID_UPDATE_STATS: (
-            stats_services.update_stats),
-        taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS: (
-            question_services.untag_deleted_misconceptions),
-        taskqueue_services.FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS: (
-            wipeout_service
-            .remove_user_from_activities_with_associated_rights_models)
+        fn_ids_to_names[
+            'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']: (
+                exp_services.delete_explorations_from_user_models),
+        fn_ids_to_names[
+            'FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES']: (
+                exp_services.delete_explorations_from_activities),
+        fn_ids_to_names[
+            'FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED']: (
+                wipeout_service.delete_users_pending_to_be_deleted),
+        fn_ids_to_names[
+            'FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION']: (
+                wipeout_service.check_completion_of_user_deletion),
+        fn_ids_to_names[
+            'FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY']: (
+                exp_services.
+                regenerate_exploration_summary_with_new_contributor),
+        fn_ids_to_names[
+            'FUNCTION_ID_UPDATE_STATS']: stats_services.update_stats,
+        fn_ids_to_names[
+            'FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS']: (
+                question_services.untag_deleted_misconceptions),
+        fn_ids_to_names[
+            'FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS']: (
+                wipeout_service
+                .remove_user_from_activities_with_associated_rights_models)
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
@@ -267,7 +280,52 @@ class DeferredTasksHandler(
             raise Exception(
                 'The function id, %s, is not valid.' % payload['fn_identifier'])
 
-        deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
-            payload['fn_identifier']]
-        deferred_task_function(*payload['args'], **payload['kwargs'])
+        if 'cloud_task_model_id' not in payload:
+            raise Exception(
+                'The payload must contain a cloud_task_model_id attribute.')
+
+        cloud_task_model_id = payload['cloud_task_model_id']
+        cloud_task_run_domain_instance = (
+            taskqueue_services.get_cloud_task_run_by_model_id(
+                cloud_task_model_id))
+        assert cloud_task_run_domain_instance is not None
+        cloud_task_run_domain_instance.latest_job_state = 'RUNNING'
+
+        try:
+            deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
+                payload['fn_identifier']]
+            deferred_task_function(*payload['args'], **payload['kwargs'])
+
+            cloud_task_run_domain_instance.latest_job_state = 'SUCCEEDED'
+
+            taskqueue_services.update_cloud_task_run_model(
+                cloud_task_run_domain_instance)
+        except Exception as e:
+            # The maximum number of retries is enforced only for voiceover
+            # regeneration tasks, as these depend on a cloud service. Retrying
+            # indefinitely without investigating failures could result in
+            # unnecessary resource usage.
+            if (
+                cloud_task_run_domain_instance.current_retry_attempt ==
+                    taskqueue_services.CLOUD_TASK_MAX_RETRIES and
+                cloud_task_run_domain_instance.queue_id ==
+                    taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION
+            ):
+                cloud_task_run_domain_instance.latest_job_state = (
+                    'PERMANENTLY_FAILED')
+            else:
+                cloud_task_run_domain_instance.current_retry_attempt += 1
+                cloud_task_run_domain_instance.latest_job_state = (
+                    'FAILED_AND_AWAITING_RETRY')
+
+            (
+                cloud_task_run_domain_instance.
+                exception_messages_for_failed_runs.append(str(e))
+            )
+
+            taskqueue_services.update_cloud_task_run_model(
+                cloud_task_run_domain_instance)
+
+            raise Exception('Error running deferred task: %s' % e) from e
+
         self.render_json({})
