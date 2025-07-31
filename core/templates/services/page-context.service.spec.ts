@@ -479,6 +479,19 @@ describe('PageContext service', () => {
     });
   });
 
+  describe('behavior in the studyguide viewer page', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(PageContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/studyguide/example');
+      ecs.removeCustomEntityContext();
+    });
+
+    it('should correctly retrieve the studyguide viewer page context', () => {
+      expect(ecs.getPageContext()).toBe('studyguide');
+    });
+  });
+
   describe('behavior in different pages', () => {
     beforeEach(() => {
       ecs = TestBed.get(PageContextService);

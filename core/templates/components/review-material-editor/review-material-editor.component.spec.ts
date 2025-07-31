@@ -91,6 +91,14 @@ describe('Review Material Editor Component', () => {
     );
   });
 
+  it('should return true if there are more than 2 workedexamples', () => {
+    expect(
+      component.checkExtraWorkedexample(
+        '<oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample><oppia-noninteractive-workedexample>aasdfasdf</oppia-noninteractive-workedexample>'
+      )
+    ).toEqual(true);
+  });
+
   it('should get schema', () => {
     expect(component.getSchema()).toEqual(component.HTML_SCHEMA);
   });

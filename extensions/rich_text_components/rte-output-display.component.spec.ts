@@ -685,4 +685,24 @@ describe('RTE display component', () => {
 
     expect(component.isManualVoiceoverAvailableForActiveContent()).toBeTrue();
   });
+
+  it('should return true when page context is topic_editor', () => {
+    spyOn(pageContextService, 'getPageContext').and.returnValue('topic_editor');
+    const result = component.isSolutionCollapsedForWorkedexample();
+    expect(result).toBe(true);
+  });
+
+  it('should return true when page context is studyguide', () => {
+    spyOn(pageContextService, 'getPageContext').and.returnValue('studyguide');
+    const result = component.isSolutionCollapsedForWorkedexample();
+    expect(result).toBe(true);
+  });
+
+  it('should return false when page context is neither topic_editor nor studyguide', () => {
+    spyOn(pageContextService, 'getPageContext').and.returnValue(
+      'exploration_player'
+    );
+    const result = component.isSolutionCollapsedForWorkedexample();
+    expect(result).toBe(false);
+  });
 });
