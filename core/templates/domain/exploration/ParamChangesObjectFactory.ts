@@ -18,25 +18,20 @@
  */
 
 import {Injectable} from '@angular/core';
-
 import {
-  ParamChangeBackendDict,
   ParamChange,
-  ParamChangeObjectFactory,
-} from 'domain/exploration/ParamChangeObjectFactory';
+  ParamChangeBackendDict,
+} from 'domain/exploration/param-change.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ParamChangesObjectFactory {
-  constructor(private paramChangeObjectFactory: ParamChangeObjectFactory) {}
   createFromBackendList(
     paramChangeBackendList: readonly ParamChangeBackendDict[]
   ): ParamChange[] {
     return paramChangeBackendList.map(paramChangeBackendDict => {
-      return this.paramChangeObjectFactory.createFromBackendDict(
-        paramChangeBackendDict
-      );
+      return ParamChange.createFromBackendDict(paramChangeBackendDict);
     });
   }
 }

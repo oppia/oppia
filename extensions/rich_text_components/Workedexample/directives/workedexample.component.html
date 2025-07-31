@@ -1,0 +1,40 @@
+<div class="example-box">
+  <strong class="example-title">Example</strong><br>
+  <div class="protractor-panel-body">
+    <oppia-rte-output-display class="e2e-test-workedexample-question" [rteString]="question">
+    </oppia-rte-output-display>
+  </div>
+</div>
+
+<div class="solution-box">
+  <strong class="solution-title">Solution</strong>
+  <div class="protractor-panel-body">
+    <oppia-rte-output-display class="e2e-test-workedexample-answer" [rteString]="answer">
+    </oppia-rte-output-display>
+  </div>
+</div>
+
+<style>
+  .example-box {
+    background: rgba(13, 72, 161, 0.05);
+    border: 2px solid #0d48a1;
+    border-radius: 4px;
+    border-top: 8px solid #0d48a1;
+    margin-bottom: 12px;
+    padding: 10px;
+  }
+
+  .example-title {
+    color: #0d48a1;
+  }
+
+  .solution-box {
+    border: 1px solid #c55f45;
+    border-radius: 4px;
+    padding: 10px;
+  }
+
+  .solution-title {
+    color: #c55f45;
+  }
+</style>
