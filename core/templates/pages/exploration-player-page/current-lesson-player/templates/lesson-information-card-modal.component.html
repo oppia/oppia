@@ -3,10 +3,10 @@
     <img [src]="getStaticImageUrl(infoCardBackgroundImageUrl)"
          class="oppia-info-card-bg-image"
          alt="{{ expCategory }}">
-    <h2 class="oppia-info-card-title break-word" *ngIf="isHackyExpTitleTranslationDisplayed()" tabindex="0">
+    <h2 class="oppia-info-card-title break-word e2e-test-lesson-info-modal-header" *ngIf="isHackyExpTitleTranslationDisplayed()" tabindex="0">
       {{ expTitleTranslationKey | translate }}
     </h2>
-    <h2 class="oppia-info-card-title break-word"
+    <h2 class="oppia-info-card-title break-word e2e-test-lesson-info-modal-header"
         tabindex="0"
         *ngIf="!isHackyExpTitleTranslationDisplayed()">
       {{ expTitle }}
@@ -188,7 +188,7 @@
   <div class="sign-in-box">
     <p>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1' | translate }}</p>
     <button type="button"
-            class="btn btn-secondary create-account-btn"
+            class="btn btn-secondary create-account-btn e2e-test-sign-up-button"
             (click)="onLoginButtonClicked()">
           {{ 'I18N_CREATE_ACCOUNT' | translate }}
     </button>
