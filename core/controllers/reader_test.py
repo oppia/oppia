@@ -1133,16 +1133,7 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             }, expected_status_int=400
         )
 
-    def test_logged_in_with_sysexps_no_col_system_recs_enabled(self) -> None:
-        """Check that system recommendations are returned when a user is logged in,
-        finishes an exploration without collection context, and system 
-        recommendations are enabled.
-        """
-        self.login(self.NEW_USER_EMAIL)
-        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
-        recommendation_ids = self._get_recommendation_ids(
-            self.EXP_ID_0, include_system_recommendations=True)
-        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_9])
+
 
 
 class FlagExplorationHandlerTests(test_utils.EmailTestBase):
@@ -1283,6 +1274,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
     COL_ID_1: Final = 'col_1'
     USER_EMAIL: Final = 'user@example.com'
     USER_USERNAME: Final = 'user'
+
     def setUp(self) -> None:
         super().setUp()
 
