@@ -2773,11 +2773,9 @@ class ExplorationCompleteEventHandlerTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        # Initialize with demo exploration
         self.exp_id = '0'
         exp_services.delete_demo(self.exp_id)
         exp_services.load_demo(self.exp_id)
-        # Proper payload structure from handler schema
         self.base_payload = {
             'version': 1,
             'state_name': 'final_state',
@@ -2790,7 +2788,6 @@ class ExplorationCompleteEventHandlerTests(test_utils.GenericTestBase):
     def test_handler_with_anonymous_user(self) -> None:
         """Test handler for exploration completion by anonymous users."""
 
-        # No login for anonymous user test
         csrf_token = self.get_new_csrf_token()
 
         payload = {
@@ -2802,18 +2799,15 @@ class ExplorationCompleteEventHandlerTests(test_utils.GenericTestBase):
             'version': 1
         }
 
-        # Verify no completion events exist initially
         self.assertEqual(
             stats_models.CompleteExplorationEventLogEntryModel.query().count(),
             0
         )
 
-        # Anonymous user completes exploration
         self.post_json(
             '/explorehandler/exploration_complete_event/%s' % self.exp_id,
             payload, csrf_token=csrf_token)
 
-        # Verify completion event was recorded
         self.assertEqual(
             stats_models.CompleteExplorationEventLogEntryModel.query().count(),
             1
@@ -2826,11 +2820,9 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        # Initialize with demo exploration
         self.exp_id = '0'
         exp_services.delete_demo(self.exp_id)
         exp_services.load_demo(self.exp_id)
-        # Proper payload structure from handler schema
         self.base_payload = {
             'version': 1,
             'state_name': 'middle_state',  
@@ -2843,7 +2835,6 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
     def test_handler_with_anonymous_user(self) -> None:
         """Test handler for exploration leave events by anonymous users."""
 
-        # No login for anonymous user test
         csrf_token = self.get_new_csrf_token()
 
         payload = {
@@ -2854,28 +2845,18 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
             'state_name': 'middle_state',
             'version': 1
         }
-
-        # Verify no leave events exist initially
         self.assertEqual(
             stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(), # pylint: disable=line-too-long
             0
         )
-
-        # Anonymous user leaves exploration
         response = self.post_json(
             '/explorehandler/exploration_maybe_leave_event/%s' % self.exp_id,
             payload, csrf_token=csrf_token)
-
-        # Verify response contains only super_admin status
         self.assertEqual(response, {'is_super_admin': False})
-
-        # Verify leave event was recorded
         self.assertEqual(
             stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(), # pylint: disable=line-too-long
             1
         )
-
-        # Verify no progress was recorded (since user is anonymous)
         if hasattr(self, 'user_id') and self.user_id:
             self.assertNotIn(
                 self.exp_id,
@@ -2896,20 +2877,14 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
             'story-url'
         )
         story_services.save_new_story(self.owner_id, story)
-
-        # Link exploration to story using put_multi pattern
         exploration_context_model = exp_models.ExplorationContextModel(
             id=self.exp_id,
             story_id=story_id
         )
         exp_models.ExplorationContextModel.update_timestamps_multi([exploration_context_model]) # pylint: disable=line-too-long
         exp_models.ExplorationContextModel.put_multi([exploration_context_model]) # pylint: disable=line-too-long
-
-        # Get the real story and modify it OUTSIDE the mock to avoid recursion
         real_story = story_fetchers.get_story_by_id(story_id)
         real_story.corresponding_topic_id = None
-
-        # Mock story_fetchers in the core.domain module where it's imported
         with mock.patch('core.domain.story_fetchers.get_story_by_id', return_value=real_story): # pylint: disable=line-too-long
             payload = {
                 'version': 1,
@@ -2922,26 +2897,20 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
             self.post_json(
                 '/explorehandler/exploration_maybe_leave_event/%s' % self.exp_id, # pylint: disable=line-too-long
                 payload, csrf_token=csrf_token)
-
-            # Verify story progress was recorded
             self.assertEqual(
                 learner_progress_services.get_all_incomplete_story_ids(self.viewer_id), # pylint: disable=line-too-long
                 [story_id])
-            
-            # Verify NO topic progress was recorded
             self.assertEqual(
                 learner_progress_services.get_all_partially_learnt_topic_ids(self.viewer_id), # pylint: disable=line-too-long
-                [])
+                [])            
             
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
-
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_viewing_solution(self) -> None:
         self.login(self.VIEWER_EMAIL)
-        # Load demo exploration.
         exp_id = '6'
         exp_services.delete_demo(exp_id)
         exp_services.load_demo(exp_id)
