@@ -515,6 +515,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+
 class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student completing the exploration."""
 
@@ -602,6 +603,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
             'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
+
 
 class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a reader attempting to leave the
@@ -734,152 +736,6 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         leave_event_entity.update_timestamps()
         leave_event_entity.put()
-        return entity_id
-
-    @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
-        """Model does not contain user data."""
-        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
-
-    @classmethod
-    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
-        """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(cls, cls).get_export_policy(), **{
-            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'client_time_spent_in_secs':
-                base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
-
-
-class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
-    """An event triggered by a learner reaching a terminal state of an
-    exploration.
-
-    Event schema documentation
-    --------------------------
-    V1:
-        event_type: 'complete'.
-        exploration_id: ID of exploration currently being played.
-        exploration_version: version of exploration.
-        state_name: Name of the terminal state.
-        play_type: 'normal'.
-        event_schema_version: 1.
-        session_id: ID of current student's session.
-        params: Current parameter values, in the form of a map of parameter
-            name to value.
-        client_time_spent_in_secs: Time spent in this state before the event
-            was triggered.
-
-    Note: shortly after the release of v2.0.0.rc.3, some of these events
-    were migrated from MaybeLeaveExplorationEventLogEntryModel. These events
-    have the wrong 'last updated' timestamp. However, the 'created_on'
-    timestamp is the same as that of the original model.
-    """
-
-    # Which specific type of event this is.
-    event_type = datastore_services.StringProperty(indexed=True)
-    # Id of exploration currently being played.
-    exploration_id = datastore_services.StringProperty(indexed=True)
-    # Current version of exploration.
-    exploration_version = datastore_services.IntegerProperty(indexed=True)
-    # Name of current state.
-    state_name = datastore_services.StringProperty(indexed=True)
-    # ID of current student's session.
-    session_id = datastore_services.StringProperty(indexed=True)
-    # Time since start of this state before this event occurred (in sec).
-    # Note: Some of these events were migrated from StateHit event instances
-    # which did not record timestamp data. For this, we use a placeholder
-    # value of 0.0 for client_time_spent_in_secs.
-    client_time_spent_in_secs = datastore_services.FloatProperty(indexed=True)
-    # Current parameter values, map of parameter name to value.
-    params = datastore_services.JsonProperty(indexed=False)
-    # Which type of play-through this is (editor preview, or learner view).
-    # Note that the 'playtest' option is legacy, since editor preview
-    # playthroughs no longer emit events.
-    play_type = datastore_services.StringProperty(
-        indexed=True, choices=[
-            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
-    # The version of the event schema used to describe an event of this type.
-    event_schema_version = datastore_services.IntegerProperty(indexed=True)
-
-    @staticmethod
-    def get_deletion_policy() -> base_models.DELETION_POLICY:
-        """Model doesn't contain any data directly corresponding to a user."""
-        return base_models.DELETION_POLICY.NOT_APPLICABLE
-
-    @classmethod
-    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
-        """Generates entity ID for a new event based on its
-        exploration and session ID.
-
-        Args:
-            exp_id: str. ID of the exploration currently being played.
-            session_id: str. ID of current student's session.
-
-        Returns:
-            str. New unique ID for this entity class.
-        """
-        timestamp = datetime.datetime.utcnow()
-        return cls.get_new_id('%s:%s:%s' % (
-            utils.get_time_in_millisecs(timestamp),
-            exp_id,
-            session_id))
-
-    # In the type annotation below, Dict[str, str] is used for 'params'.
-    # This is due to lack of information about the possible values for 'params'.
-    # If you're working with this part of the code in the future and find that
-    # the type for 'params' is incorrect, please go ahead and change it, and
-    # feel free to remove this comment once you've done so.
-    @classmethod
-    def create(
-        cls,
-        exp_id: str,
-        exp_version: int,
-        state_name: str,
-        session_id: str,
-        client_time_spent_in_secs: float,
-        params: Dict[str, str],
-        play_type: str
-    ) -> str:
-        """Creates a new exploration completion event and then writes it
-        to the datastore.
-
-        Args:
-            exp_id: str. ID of the exploration currently being played.
-            exp_version: int. Version of exploration.
-            state_name: str. Name of current state.
-            session_id: str. ID of current student's session.
-            client_time_spent_in_secs: float. Time since start of this
-                state before this event occurred.
-            params: dict. Current parameter values, map of parameter name
-                to value.
-            play_type: str. Type of play-through.
-
-        Returns:
-            str. The ID of the entity.
-        """
-        entity_id = cls.get_new_event_entity_id(exp_id, session_id)
-        complete_event_entity = cls(
-            id=entity_id,
-            event_type=feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
-            exploration_id=exp_id,
-            exploration_version=exp_version,
-            state_name=state_name,
-            session_id=session_id,
-            client_time_spent_in_secs=client_time_spent_in_secs,
-            params=params,
-            play_type=play_type,
-            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
-        complete_event_entity.update_timestamps()
-        complete_event_entity.put()
         return entity_id
 
     @staticmethod

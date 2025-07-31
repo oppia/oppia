@@ -1684,6 +1684,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [])
+        
     def test_remove_topic_from_partially_learnt_list_handler(self) -> None:
         """Test handler for removing topics from the partially learnt list."""
         self.login(self.VIEWER_EMAIL)
@@ -1703,7 +1704,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.delete_json(
             '/learnerincompleteactivityhandler/%s/%s' % (
             constants.ACTIVITY_TYPE_LEARN_TOPIC, topic_id),
-            params={'csrf_token':csrf_token}
+            params={'csrf_token': csrf_token}
         )
         # Verify the topic was removed.
         self.assertEqual(
@@ -2766,6 +2767,7 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+
 class ExplorationCompleteEventHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
@@ -2812,6 +2814,7 @@ class ExplorationCompleteEventHandlerTests(test_utils.GenericTestBase):
             stats_models.CompleteExplorationEventLogEntryModel.query().count(),
             1
         )
+
 
 class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
@@ -2902,8 +2905,9 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
                 [story_id])
             self.assertEqual(
                 learner_progress_services.get_all_partially_learnt_topic_ids(self.viewer_id), # pylint: disable=line-too-long
-                [])            
+                [])           
             
+             
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
