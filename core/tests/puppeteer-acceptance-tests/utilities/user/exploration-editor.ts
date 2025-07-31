@@ -514,6 +514,7 @@ export class ExplorationEditor extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.waitForElementToStabilize(closePublishedPopUpButton);
       await this.clickOn(closePublishedPopUpButton);
 
       await this.expectElementToBeVisible(closePublishedPopUpButton, false);
@@ -526,7 +527,6 @@ export class ExplorationEditor extends BaseUser {
     try {
       return await confirmPublish();
     } catch (error) {
-      await this.captureScreenshotsForFailedTest();
       showMessage('Failed to publish the exploration.\n' + error.stack);
       await this.waitForPageToFullyLoad();
 

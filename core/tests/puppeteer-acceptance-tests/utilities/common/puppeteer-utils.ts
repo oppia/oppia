@@ -234,13 +234,17 @@ export class BaseUser {
       /[^a-z0-9.-]/gi,
       '_'
     );
+    const randomString = Math.random().toString(36).substring(2, 8);
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, {recursive: true});
     }
     for (const instance of BaseUser.instances) {
       if (instance.page) {
         await instance.page.screenshot({
-          path: path.join(outputDir, outputFileName + `-instance-${i}.png`),
+          path: path.join(
+            outputDir,
+            outputFileName + randomString + `-instance-${i}.png`
+          ),
         });
         showMessage(
           `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
@@ -452,12 +456,12 @@ export class BaseUser {
       showMessage(`Button (text: ${selector}) is clicked.`);
     } else {
       await this.waitForElementToBeClickable(selector);
-      const position = await this.page.evaluate((selector: string) => {
+      const elementDimensions = await this.page.evaluate((selector: string) => {
         const element = document.querySelector(selector);
         return element?.getBoundingClientRect();
       }, selector);
       showMessage(
-        `Debugging: Element is at position ${position?.x}, ${position?.y}`
+        `Debugging: Element is dimensions ${elementDimensions?.width}, ${elementDimensions?.height}, ${elementDimensions?.left}, ${elementDimensions?.top}`
       );
       showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
       await this.page.click(selector);
@@ -1275,7 +1279,7 @@ export class BaseUser {
     selector: string,
     timeout: number = 5000
   ): Promise<void> {
-    const element = await this.page.$(selector);
+    const element = await this.page.waitForSelector(selector, {visible: true});
     if (!element) {
       throw new Error('Element not found');
     }
@@ -1286,6 +1290,7 @@ export class BaseUser {
     while (Date.now() - startTime < timeout) {
       await this.page.waitForTimeout(100);
       const currentBox = await element.boundingBox();
+      console.log(`Current Position: ${currentBox?.x}, ${currentBox?.y}`);
 
       if (
         previousBox &&
