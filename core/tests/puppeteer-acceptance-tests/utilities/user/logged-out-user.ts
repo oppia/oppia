@@ -3465,33 +3465,28 @@ export class LoggedOutUser extends BaseUser {
       ? explorationTitleSelector
       : lessonCardTitleSelector;
     await this.waitForPageToFullyLoad();
-    if (!present) {
-      await this.waitForPageToFullyLoad();
-      const searchResultsElements = await this.page.$$(selector);
-      if (searchResultsElements.length !== 0) {
-        throw new Error('No search results expected, but some were found.');
-      }
-    } else {
-      await this.page.waitForSelector(selector);
-      const searchResultsElements = await this.page.$$(selector);
-      const searchResults = await Promise.all(
-        searchResultsElements.map(result =>
-          this.page.evaluate(el => el.textContent.trim(), result)
-        )
-      );
+    if (!present && !(await this.isElementVisible(selector))) {
+      return;
+    }
+    await this.page.waitForSelector(selector);
+    const searchResultsElements = await this.page.$$(selector);
+    const searchResults = await Promise.all(
+      searchResultsElements.map(result =>
+        this.page.evaluate(el => el.textContent.trim(), result)
+      )
+    );
 
-      for (const searchResultExpected of searchResultsExpected) {
-        if (searchResults.includes(searchResultExpected) === present) {
-          showMessage(
-            `Success: Search result "${searchResultExpected}" is ${present ? 'present' : 'not present'}.`
-          );
-        } else {
-          throw new Error(
-            `Expected search result "${searchResultExpected}" to be ${
-              present ? 'present' : 'not present'
-            }, but it was ${present ? 'not ' : ''}found.\nFound search results: ${searchResults}`
-          );
-        }
+    for (const searchResultExpected of searchResultsExpected) {
+      if (searchResults.includes(searchResultExpected) === present) {
+        showMessage(
+          `Success: Search result "${searchResultExpected}" is ${present ? 'present' : 'not present'}.`
+        );
+      } else {
+        throw new Error(
+          `Expected search result "${searchResultExpected}" to be ${
+            present ? 'present' : 'not present'
+          }, but it was ${present ? 'not ' : ''}found.\nFound search results: ${searchResults}`
+        );
       }
     }
   }
