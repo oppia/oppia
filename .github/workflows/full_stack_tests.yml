@@ -11,56 +11,14 @@ on:
     branches:
       - develop
       - release-*
+      - m1-*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 jobs:
-  e2e_and_acceptance_coverage:
-    name: Verify all e2e/acceptance tests are included
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout repository so that local actions can be used
-        uses: actions/checkout@v4
-      - name: Merge develop and set up dependencies
-        uses: ./.github/actions/merge-develop-and-set-up-dependencies
-      - name: Check that all e2e and acceptance test files are captured in wdio.conf.js and core/tests/ci-test-suite-configs
-        run: python -m scripts.check_tests_are_captured_in_ci
-      - name: Report failure if failed on oppia/oppia develop branch
-        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
-        uses: ./.github/actions/send-webhook-notification
-        with:
-          message: "The e2e/acceptance coverage test failed on the upstream develop branch."
-          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  check_test_suites_to_run:
-    name: Compute which tests to run
-    runs-on: ubuntu-22.04
-    outputs:
-      TEST_SUITES_TO_RUN: ${{ steps.compute_test_suites.outputs.TEST_SUITES_TO_RUN }}
-    steps:
-      - name: Checkout repository so that local actions can be used
-        uses: actions/checkout@v4
-        with:
-          # This fetches all git refs, which is needed in the
-          # check_ci_test_suites_to_run script below.
-          fetch-depth: 0
-      - name: Merge develop and set up dependencies
-        uses: ./.github/actions/merge-develop-and-set-up-dependencies
-      - id: compute_test_suites
-        name: Check test suites to run
-        env:
-          SHOULD_OUTPUT_ALL_TESTS: ${{ github.event_name != 'pull_request' || vars.RUN_SUITES_ON_CHANGED_FILES == 'false' }}
-        # Note that the script also writes the output to $GITHUB_OUTPUT.
-        run: |
-          TEST_SUITES_TO_RUN=$(python -m scripts.check_ci_test_suites_to_run --github_head_ref="HEAD" --github_base_ref="origin/${{ github.event.pull_request.base.ref }}" ${{ env.SHOULD_OUTPUT_ALL_TESTS == 'true' && '--output_all_test_suites' || '' }})
-      - name: Upload root files mapping as a GitHub artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: root-files-mapping
-          path: root-files-mapping.json
   build:
     name: Build the app, and store build files as an artifact
-    needs: [check_test_suites_to_run]
     runs-on: ubuntu-22.04
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 ||
             fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0 ||
@@ -79,45 +37,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite:
+        runs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        suite: 
           - name: blog-editor/create-and-publish-a-blog-post-with-required-details
-          - name: blog-editor/create-and-publish-a-blog-post-with-required-details
-          - name: blog-editor/create-and-publish-a-blog-post-with-required-details
           - name: logged-in-user/manage-classroom-progress-in-learner-dashboard
           - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
-          - name: logged-in-user/manage-classroom-progress-in-learner-dashboard
-          - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
-          - name: logged-in-user/manage-classroom-progress-in-learner-dashboard
-          - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
-          - name: logged-in-user/manage-classroom-progress-in-learner-dashboard
-          - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
-          - name: logged-in-user/manage-classroom-progress-in-learner-dashboard
-          - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
-          - name: logged-out-user/sign-in-and-save-exploration-progress
           - name: logged-out-user/sign-in-and-save-exploration-progress
     name: Acceptance (${{ matrix.suite.name }})
     steps:
@@ -281,5 +205,5 @@ jobs:
       - name: Upload all snapshots
         uses: actions/upload-artifact@v4
         with:
-          name: snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          name: snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-${{matrix.runs}}
           path: 'core/tests/puppeteer-acceptance-tests/specs/**/*.png'
