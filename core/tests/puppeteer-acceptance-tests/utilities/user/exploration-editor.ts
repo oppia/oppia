@@ -521,6 +521,8 @@ export class ExplorationEditor extends BaseUser {
       .$eval(feedbackSelector, element => element?.textContent?.trim() || null)
       .catch(() => null);
 
+    // Wait for 1s to ensure the selected answer is updated in Angular component.
+    await this.page.waitForTimeout(1000);
     // Click on Submit Answer button.
     await this.clickOn(submitAnswerButton);
 
@@ -572,6 +574,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} option - The option to select.
    */
   async selectMultipleChoiceOption(option: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(multipleChoiceOptionSelector);
 
     const options = await this.page.$$(multipleChoiceOptionSelector);
