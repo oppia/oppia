@@ -1133,6 +1133,17 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             }, expected_status_int=400
         )
 
+    def test_logged_in_with_sysexps_no_col_system_recs_enabled(self) -> None:
+        """Check that system recommendations are returned when a user is logged in,
+        finishes an exploration without collection context, and system 
+        recommendations are enabled.
+        """
+        self.login(self.NEW_USER_EMAIL)
+        self._set_recommendations(self.EXP_ID_0, [self.EXP_ID_1, self.EXP_ID_9])
+        recommendation_ids = self._get_recommendation_ids(
+            self.EXP_ID_0, include_system_recommendations=True)
+        self.assertEqual(recommendation_ids, [self.EXP_ID_1, self.EXP_ID_9])
+
 
 class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
@@ -1272,10 +1283,10 @@ class LearnerProgressTest(test_utils.GenericTestBase):
     COL_ID_1: Final = 'col_1'
     USER_EMAIL: Final = 'user@example.com'
     USER_USERNAME: Final = 'user'
-
     def setUp(self) -> None:
         super().setUp()
 
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -1286,6 +1297,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         # Save and publish explorations.
         self.save_new_valid_exploration(
@@ -1689,7 +1701,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """Test handler for removing topics from the partially learnt list."""
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-
         topic_id = 'topic_123'
 
         # Add topic to the partially learnt list.
