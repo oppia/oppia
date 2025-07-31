@@ -1486,7 +1486,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
         ]
     )
-    def test_should_be_send_emails_to_voiceover_admins_and_tech_leads(
+    def test_should_send_emails_to_voiceover_admins_and_tech_leads(
         self
     ) -> None:
         exploration_id = 'exp_id_1'
