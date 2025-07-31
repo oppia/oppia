@@ -1,8 +1,8 @@
-<div>
-  <div *ngIf="!learnerDashboardRedesignFeatureFlag" tabindex="0" class="oppia-goals-box e2e-test-current-goals-section" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}">
-    <p class="oppia-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION' | translate">
+<div class="e2e-test-goals-section">
+  <div *ngIf="!learnerDashboardRedesignFeatureFlag" tabindex="0" class="oppia-goals-box e2e-test-goals-section-inner" [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}">
+    <p class="oppia-goals-title e2e-test-goals-status-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_CURRENT_GOALS_SECTION' | translate">
     </p>
-    <div *ngIf="currentGoals.length > 0">
+    <div *ngIf="currentGoals.length > 0" class="e2e-test-current-goals-section e2e-test-non-empty-section">
       <div *ngFor="let topic of currentGoals; let i = index">
         <div class="oppia-current-goals-content e2e-test-topic-in-current-goals">
           <div class="oppia-arrow-button">
@@ -44,11 +44,11 @@
         </div>
       </div>
     </div>
-    <div *ngIf="currentGoals.length == 0" class="oppia-empty-goals-content">
+    <div *ngIf="currentGoals.length == 0" class="oppia-empty-goals-content e2e-test-current-goals-section e2e-test-empty-section">
       <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_CURRENT_GOALS_SECTION' | translate"></p>
     </div>
     <div tabindex="0" class="oppia-goals-box e2e-test-edit-goals-section">
-      <p class="oppia-edit-goals-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION' | translate"> </p>
+      <p class="oppia-edit-goals-title e2e-test-goals-status-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_ALL_GOALS_SECTION' | translate"> </p>
       <span class="oppia-input-box-subtitle">
         <em>
           <span [innerHTML]="'I18N_GOAL_LIMIT' | translate: { limit: MAX_CURRENT_GOALS_LENGTH }"></span>
@@ -74,14 +74,14 @@
                         (click)="this.currentGoals.length !== this.MAX_CURRENT_GOALS_LENGTH && addToLearnerGoals(topic, topic.id, i)"
                         [disabled]="this.currentGoals.length === this.MAX_CURRENT_GOALS_LENGTH">
           </mat-checkbox>
-          <mat-checkbox color="primary" *ngIf="editGoalsTopicClassification[i] == 0"  checked class="oppia-checkbox"
+          <mat-checkbox color="primary" *ngIf="editGoalsTopicClassification[i] == 0"  checked class="oppia-checkbox e2e-test-remove-topic-from-current-goals-button"
                         (click)="addToLearnerGoals(topic, topic.id, i)">
           </mat-checkbox>
         </div>
       </div>
     </div>
     <div tabindex="0" class="oppia-goals-box e2e-test-completed-goals-section">
-      <p class="oppia-goals-title"
+      <p class="oppia-goals-title e2e-test-goals-status-title"
         [innerHTML]="'I18N_LEARNER_DASHBOARD_COMPLETED_GOALS_SECTION' | translate">
       </p>
       <div *ngIf="completedGoals.length > 0">
@@ -109,7 +109,7 @@
     <div [ngStyle]="{'gap': '0px 4px'}" class="oppia-learner-dash-section d-flex justify-content-between">
       <p class="oppia-learner-dash-goals-text mb-0"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_INSTRUCTIONS' | translate }} </p>
       <!--TODO(#18384): Check to see if text is part of button (text changes when hover too)-->
-      <button aria-label="Add goals (open modal)" class="oppia-learner-dash-button--add-goals d-flex align-items-center justify-content-center flex-grow-1 bg-white border-0" (click)="openModal()">
+      <button aria-label="Add goals (open modal)" class="oppia-learner-dash-button--add-goals d-flex align-items-center justify-content-center flex-grow-1 bg-white border-0 e2e-test-add-goals-button" (click)="openModal()">
         <span class="oppia-learner-dash-goals-add-circle">
           <span aria-hidden="true" class="fas fa-plus"></span>
         </span>
@@ -117,22 +117,26 @@
       </button>
     </div>
     <ng-container *ngIf="currentGoals.length !== 0">
-      <p class="oppia-learner-dash-goals-heading"> {{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }} </p>
-      <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
-      <ng-container *ngFor="let goal of currentGoals">
-        <oppia-goal-list [goalTopic]="goal">
-          <button aria-label="Remove in-progress goal" (click)="removeGoal(goal.id, goal.name)" class="oppia-learner-dash-button-sm oppia-learner-dash-button-delete-goals border-0">
-            <span aria-hidden="true" class="fas fa-trash"></span>
-          </button>
-        </oppia-goal-list>
-      </ng-container>
+      <div class="e2e-test-current-goals-section">
+        <p class="oppia-learner-dash-goals-heading e2e-test-goals-heading"> {{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }} </p>
+        <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
+        <ng-container *ngFor="let goal of currentGoals">
+          <oppia-goal-list [goalTopic]="goal">
+            <button aria-label="Remove in-progress goal" (click)="removeGoal(goal.id, goal.name)" class="oppia-learner-dash-button-sm oppia-learner-dash-button-delete-goals border-0">
+              <span aria-hidden="true" class="fas fa-trash"></span>
+            </button>
+          </oppia-goal-list>
+        </ng-container>
+      </div>
     </ng-container>
     <ng-container *ngIf="completedGoals.length !== 0">
-      <p class="oppia-learner-dash-goals-heading"> {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }} </p>
-      <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
-      <ng-container *ngFor="let goal of completedGoals">
-        <oppia-goal-list [goalTopic]="goal"></oppia-goal-list>
-      </ng-container>
+      <div class="e2e-test-completed-goals-section">
+        <p class="oppia-learner-dash-goals-heading e2e-test-goals-heading"> {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }} </p>
+        <hr color="#00645c" class="mt-2 mb-4" size="2" width="100%">
+        <ng-container *ngFor="let goal of completedGoals">
+          <oppia-goal-list [goalTopic]="goal"></oppia-goal-list>
+        </ng-container>
+      </div>
     </ng-container>
   </div>
 </div>

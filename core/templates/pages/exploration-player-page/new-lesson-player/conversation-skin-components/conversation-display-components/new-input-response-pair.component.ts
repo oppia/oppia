@@ -29,7 +29,7 @@ import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatt
 import {ExplorationPlayerConstants} from '../../../current-lesson-player/exploration-player-page.constants';
 import {PlayerPositionService} from '../../../services/player-position.service';
 import {PlayerTranscriptService} from '../../../services/player-transcript.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {NumberConversionService} from 'services/number-conversion.service';
 import isNumber from 'lodash/isNumber';
 import isString from 'lodash/isString';

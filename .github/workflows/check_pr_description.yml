@@ -1,0 +1,58 @@
+name: Check PR description
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+permissions: read-all
+jobs:
+  check_pr_description:
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Run PR description check
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const prDescription = pr.body;
+
+            if (!prDescription) {
+              core.setFailed("The PR description is missing or does not meet the required format.");
+            }
+
+            const requiredSections = [
+                '## Overview',
+                '## Essential Checklist',
+                '## Proof that changes are correct',
+                '## PR Pointers'
+            ];
+
+            const missingSections = requiredSections.filter(
+                section => !prDescription.includes(section)
+            );
+
+            if (missingSections.length > 0) {
+                const username = pr.user.login;
+                const comment = `Hi @${username}, it looks like the description of this PR doesn't use our [template](https://github.com/oppia/oppia/blob/develop/.github/PULL_REQUEST_TEMPLATE.md), which is pre-populated when you open a new PR. Specifically, it's missing the following required sections:\n\n` + missingSections.map(s => `- ${s.replace(/^##\s*/, '')}`).join('\n') + `Please re-open this PR and fill in the template without deleting any required sections.`
+                await github.rest.issues.createComment({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: pr.number,
+                    body: comment
+                });
+
+                await github.rest.pulls.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: pr.number,
+                    state: 'closed'
+                });
+
+                core.setFailed("The PR description is missing required sections.");
+            }

@@ -4,7 +4,7 @@
          name="answer"
          [(ngModel)]="answer"
          (ngModelChange)="answerValueChanged()"
-         class="form-control"
+         class="form-control e2e-test-fraction-input e2e-test-float-form-input"
          (keyup.enter)="submitAnswer()"
          [oppiaFocusOn]="labelForFocusTarget"
          placeholder="{{customPlaceholder !== '' ? customPlaceholder : getPlaceholderText() | translate}}">

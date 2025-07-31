@@ -26,7 +26,7 @@ import {PlayerPositionService} from './player-position.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
 import {ExplorationEngineService} from './exploration-engine.service';
 import {StateObjectFactory} from '../../../domain/state/StateObjectFactory';
-import {InteractionObjectFactory} from '../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 
 describe('ConceptCardManager service', () => {
@@ -36,7 +36,6 @@ describe('ConceptCardManager service', () => {
   let stateObjectFactory: StateObjectFactory;
   let mockNewCardOpenedEmitter = new EventEmitter<StateCard>();
   let mockNewCardAvailableEmitter = new EventEmitter();
-  let interactionObjectFactory: InteractionObjectFactory;
   let stateCard: StateCard;
 
   const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 160000;
@@ -61,7 +60,6 @@ describe('ConceptCardManager service', () => {
     );
     spyOn(pps, 'onNewCardOpened').and.returnValue(mockNewCardOpenedEmitter);
     ccms = TestBed.inject(ConceptCardManagerService);
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
   }));
 
   beforeEach(() => {
@@ -69,7 +67,7 @@ describe('ConceptCardManager service', () => {
       'State 2',
       '<p>Content</p>',
       '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict({
+      Interaction.createFromBackendDict({
         id: 'TextInput',
         answer_groups: [
           {

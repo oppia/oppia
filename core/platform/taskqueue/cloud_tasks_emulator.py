@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import threading
 import time
+import uuid
 
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional
 
@@ -185,7 +186,7 @@ class Emulator:
             scheduled_for: Optional[datetime.datetime] = None,
             task_name: Optional[str] = None,
             retry: None = None  # pylint: disable=unused-argument
-    ) -> None:
+    ) -> Task:
         """Creates a Task in the corresponding queue that will be executed when
         the 'scheduled_for' time is reached. If the queue doesn't exist yet,
         it will be created.
@@ -200,6 +201,9 @@ class Emulator:
             task_name: str|None. Optional. The name of the task.
             retry: None. The retry mechanism that should be used. Here we ignore
                 the value and it is not used for anything.
+
+        Returns:
+            Task. The task that was created and added to the queue.
         """
         scheduled_for_time = (
             time.mktime(scheduled_for.timetuple())
@@ -210,6 +214,20 @@ class Emulator:
                 if self.automatic_task_handling:
                     self._launch_queue_thread(queue_name)
             queue = self._queues[queue_name]
+
+            # Reference documentation link: "https://cloud.google.com/tasks/
+            # docs/reference/rest/v2/projects.locations.queues.tasks#Task".
+            if task_name is None:
+                project_id = 'dev-project-id'
+                location_id = 'us-central'
+                task_id = uuid.uuid4().hex
+
+                task_name = (
+                    'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                        project_id, location_id, queue_name, task_id
+                    )
+                )
+
             task = Task(
                 queue_name, url, payload, scheduled_for=scheduled_for_time,
                 task_name=task_name)
@@ -220,6 +238,7 @@ class Emulator:
             # https://github.com/python/mypy/issues/9590
             k = lambda t: t.scheduled_for
             queue.sort(key=k)
+            return task
 
     def get_number_of_tasks(self, queue_name: Optional[str] = None) -> int:
         """Returns the total number of tasks in a single queue if a queue name
