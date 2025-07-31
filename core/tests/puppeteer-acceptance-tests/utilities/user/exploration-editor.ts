@@ -514,6 +514,7 @@ export class ExplorationEditor extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      this.waitForElementToStabilize(closePublishedPopUpButton);
       await this.clickOn(closePublishedPopUpButton);
 
       await this.expectElementToBeVisible(closePublishedPopUpButton, false);
