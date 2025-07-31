@@ -4,23 +4,23 @@
         <p>Need extra help solving the problem? Check out the hint.</p>
         <button mat-button class="oppia-learner-hint-solution-display-button"
                 [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
-                (click)="displayHintModal(hintIndex)"> View hint
+                (click)="displayNewHintModal(hintIndex)"> View hint
         </button>
       </div>
       <div class="hint-solution-individual-container" *ngIf="hintIndex && isHintButtonVisible(hintIndex)">
         <p>Don't worry! Here is another hint that might be helpful to you.</p>
         <button mat-button class="oppia-learner-hint-solution-display-button"
                 [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
-                (click)="displayHintModal(hintIndex)"> View hint {{hintIndex + 1}}
+                (click)="displayNewHintModal(hintIndex)"> View hint {{hintIndex + 1}}
         </button>
       </div>
     </div>
     <div *ngIf="isSolutionButtonVisible()" class="hint-solution-individual-container">
       <p>It seems like you are not sure how to continue. If you want, you can view the solution for this lesson.</p>
 
-      <button mat-button class="oppia-learner-hint-solution-button solution-button"
+      <button mat-button class="oppia-learner-hint-solution-display-button solution-button"
               [ngClass]="{'viewed': isSolutionConsumed()}"
-              (click)="onClickSolutionButton()"> View solution
+              (click)="onClickSolutionButton()"> View Solution
       </button>
     </div>
 </div>

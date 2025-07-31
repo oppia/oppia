@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the Conversation display.
+ * @fileoverview Component for the hint and solution display.
  */
 
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
@@ -49,8 +49,6 @@ export class HintAndSolutionDisplayComponent {
   iframed!: boolean;
   solutionModalIsActive: boolean = false;
   currentlyOnLatestCard: boolean = true;
-  isVisible: boolean = true;
-  isTooltipForSolutionVisible: boolean = true;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -59,7 +57,6 @@ export class HintAndSolutionDisplayComponent {
     private explorationModeService: ExplorationModeService,
     private hintAndSolutionModalService: HintAndSolutionModalService,
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
     private statsReportingService: StatsReportingService
@@ -111,10 +108,6 @@ export class HintAndSolutionDisplayComponent {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  isLanguageRTL(): boolean {
-    return this.i18nLanguageCodeService.isCurrentLanguageRTL();
-  }
-
   resetLocalHintsArray(): void {
     this.hintIndexes = [];
     let numHints = this.hintsAndSolutionManagerService.getNumHints();
@@ -135,13 +128,12 @@ export class HintAndSolutionDisplayComponent {
     return this.hintsAndSolutionManagerService.isSolutionViewable();
   }
 
-  displayHintModal(index: number): void {
+  displayNewHintModal(index: number): void {
     this.activeHintIndex = index;
-    let promise = this.hintAndSolutionModalService.displayHintModal(index);
+    let promise = this.hintAndSolutionModalService.displayNewHintModal(index);
     promise.result.then(null, () => {
       this.activeHintIndex = null;
     });
-    this.isVisible = false;
   }
 
   onClickSolutionButton(): void {
@@ -174,14 +166,6 @@ export class HintAndSolutionDisplayComponent {
     promise.result.then(null, () => {
       this.solutionModalIsActive = false;
     });
-  }
-
-  isTooltipVisible(): boolean {
-    return this.hintsAndSolutionManagerService.isHintTooltipOpen();
-  }
-
-  isSolutionTooltipVisible(): boolean {
-    return this.hintsAndSolutionManagerService.isSolutionTooltipOpen();
   }
 
   isHintConsumed(hintIndex: number): boolean {

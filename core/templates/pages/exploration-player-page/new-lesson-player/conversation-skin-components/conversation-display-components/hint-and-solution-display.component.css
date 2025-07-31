@@ -10,47 +10,69 @@
 }
 
 .hint-solution-individual-container {
-  display: flex;
-  width: 100%;
+  align-items: center;
   background-color: white;
-  box-shadow: 0px 2px 2px 0px rgba(0, 0, 0, 0.25);
-  padding: 20px;
   border-radius: 0 16px 16px 16px;
-  margin-bottom: 8px;
-  padding-bottom: 5px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.25);
+  display: flex;
   justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 20px;
+  padding-bottom: 5px;
+  width: 100%;
 }
 
 .oppia-learner-hint-solution-display-button {
-  width: 132px;
-  height: 44px;
-  padding: 10px;
-  border-radius: 4px;
   background: #C55F45;
+  border-radius: 4px;
+  color: #fff;
+  font-size: clamp(12px, 2vw, 18px);
   font-weight: 700;
-  font-style: Bold;
-  font-size: 18px;
-  color: #ffffff;
+  height: 44px;
+  padding: 0 !important;
+  outline: none !important;
+  width: 132px;
 }
 
 .hint-solution-individual-container > p {
-  width: 300px;
-  text-wrap: wrap;
+  font-size: clamp(12px, 2vw, 16px);
   padding-top: 10px;
+  text-wrap: wrap;
+  width: 300px;
 }
 
 .oppia-learner-hint-solution-display-button.viewed {
-  border: 1px solid #C55F45;
-  background-color: #ffffff;
-  color: #C55F45;
+  background-color: #fff;
+  border: 1px solid #c55f45;
+  color: #c55f45;
 }
 
 .solution-button {
-  background: #0D48A1;
+  background: #0d48a1;
 }
 
 .solution-button.viewed {
-  border: 1px solid #0D48A1;
-  background-color: #ffffff;
-  color: #0D48A1;
+  background-color: #fff;
+  border: 1px solid #0d48a1;
+  color: #0d48a1;
+}
+
+.solution-button.viewed:focus {
+  border: 1px solid #0d48a1;
+}
+
+@media (max-width: 480px) {
+  .hint-solution-individual-container {
+    padding: 15px 10px 0;
+  }
+
+  .hint-solution-individual-container > p {
+    width: 120px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-hint-solution-display-button {
+    width: 100px;
+  }  
 }

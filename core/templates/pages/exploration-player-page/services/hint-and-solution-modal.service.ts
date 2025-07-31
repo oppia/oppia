@@ -21,6 +21,7 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {DisplayHintModalComponent} from '../current-lesson-player/modals/display-hint-modal.component';
 import {DisplaySolutionInterstititalModalComponent} from '../current-lesson-player/modals/display-solution-interstitial-modal.component';
 import {DisplaySolutionModalComponent} from '../current-lesson-player/modals/display-solution-modal.component';
+import {DisplayNewHintModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/display-hint-modal.component';
 
 @Injectable({
   providedIn: 'root',
@@ -37,6 +38,23 @@ export class HintAndSolutionModalService {
   }
 
   displaySolutionModal(): NgbModalRef {
+    return this.ngbModal.open(DisplaySolutionModalComponent, {
+      backdrop: 'static',
+    });
+  }
+
+  displayNewHintModal(index: number): NgbModalRef {
+    let modalRef: NgbModalRef = this.ngbModal.open(
+      DisplayNewHintModalComponent,
+      {
+        backdrop: 'static',
+      }
+    );
+    modalRef.componentInstance.activeHintIndex = index;
+    return modalRef;
+  }
+
+  displayNewSolutionModal(): NgbModalRef {
     return this.ngbModal.open(DisplaySolutionModalComponent, {
       backdrop: 'static',
     });

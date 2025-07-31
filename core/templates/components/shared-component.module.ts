@@ -216,6 +216,7 @@ import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-le
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
 import {HintAndSolutionDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-and-solution-display.component';
+import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-hint-modal.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -289,6 +290,7 @@ import {HintAndSolutionDisplayComponent} from 'pages/exploration-player-page/new
     DisplaySolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
@@ -463,6 +465,7 @@ import {HintAndSolutionDisplayComponent} from 'pages/exploration-player-page/new
     DisplaySolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     SelectSkillModalComponent,
     SkillSelectorComponent,
     TakeBreakModalComponent,
@@ -624,6 +627,7 @@ import {HintAndSolutionDisplayComponent} from 'pages/exploration-player-page/new
     DisplaySolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FeedbackPopupComponent,
