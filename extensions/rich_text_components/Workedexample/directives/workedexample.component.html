@@ -7,8 +7,11 @@
 </div>
 
 <div class="solution-box">
-  <strong class="solution-title">Solution</strong>
-  <div class="protractor-panel-body">
+  <strong class="solution-title" (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null">
+    <i class="material-icons icon-expand-workedexample">expand_more</i>
+    Solution
+  </strong>
+  <div class="protractor-panel-body" *ngIf="!isSolutionCollapsed">
     <oppia-rte-output-display class="e2e-test-workedexample-answer" [rteString]="answer">
     </oppia-rte-output-display>
   </div>

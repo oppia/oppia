@@ -62,7 +62,7 @@ export class StudyGuideSectionEditorComponent implements OnInit {
   STUDY_GUIDE_SECTION_CONTENT_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {
-      rte_components: 'ALL_COMPONENTS',
+      rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
     },
   };
 

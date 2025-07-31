@@ -49,12 +49,13 @@ export class ReviewMaterialEditorComponent implements OnInit {
   @Input() bindableDict!: BindableDict;
   explanationMemento!: string;
   editableExplanation!: string;
+  workedExampleLimitExceeded!: boolean;
   COMPONENT_NAME_EXPLANATION!: string;
   conceptCardExplanationEditorIsShown: boolean = false;
   HTML_SCHEMA: HtmlSchema = {
     type: 'html',
     ui_config: {
-      rte_components: 'ALL_COMPONENTS',
+      rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
     },
   };
 
@@ -74,9 +75,26 @@ export class ReviewMaterialEditorComponent implements OnInit {
   }
 
   updateLocalExp($event: string): void {
-    if (this.editableExplanation !== $event) {
+    if (
+      this.editableExplanation !== $event &&
+      !this.checkExtraWorkedexample($event)
+    ) {
       this.editableExplanation = $event;
       this.changeDetectorRef.detectChanges();
+    }
+  }
+
+  checkExtraWorkedexample(html: string): boolean {
+    const workedexampleRegex =
+      /<oppia-noninteractive-workedexample.*?>.*?<\/oppia-noninteractive-workedexample>/g;
+    const matches = html.match(workedexampleRegex);
+
+    if (matches && matches.length > 2) {
+      this.workedExampleLimitExceeded = true;
+      return true;
+    } else {
+      this.workedExampleLimitExceeded = false;
+      return false;
     }
   }
 
