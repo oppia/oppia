@@ -40,9 +40,6 @@ jobs:
         runs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         suite: 
           - name: blog-editor/create-and-publish-a-blog-post-with-required-details
-          - name: logged-in-user/manage-classroom-progress-in-learner-dashboard
-          - name: logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player
-          - name: logged-out-user/sign-in-and-save-exploration-progress
     name: Acceptance (${{ matrix.suite.name }})
     steps:
       - name: Check for broken suites

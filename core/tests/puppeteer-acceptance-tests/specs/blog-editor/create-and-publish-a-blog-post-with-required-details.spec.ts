@@ -53,7 +53,7 @@ describe('Blog Editor', function () {
         'This is a test blog post'
       );
 
-      await blogPostEditor.page.waitForTimeout(1000);
+      await blogPostEditor.hoverOverToastMessage();
       await blogPostEditor.expectScreenshotToMatch(
         'blogEditorPageWithBlogPostDeletedMessage',
         __dirname
