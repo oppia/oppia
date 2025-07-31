@@ -3465,7 +3465,7 @@ export class LoggedOutUser extends BaseUser {
       ? explorationTitleSelector
       : lessonCardTitleSelector;
     await this.waitForPageToFullyLoad();
-    if (searchResultsExpected.length === 0) {
+    if (!present) {
       await this.waitForPageToFullyLoad();
       const searchResultsElements = await this.page.$$(selector);
       if (searchResultsElements.length !== 0) {
