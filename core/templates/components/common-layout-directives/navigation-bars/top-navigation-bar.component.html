@@ -115,7 +115,7 @@
                   <oppia-classroom-navigation-links></oppia-classroom-navigation-links>
                 </div>
                 <span class="nav-item-right d-flex flex-column">
-                  <a class="nav-content mb-5"
+                  <a class="nav-content mb-5 e2e-test-topnb-go-to-community-library-link"
                      tabindex="0"
                      href="/community-library">
                     <div class="nav-item-right-head">
@@ -428,7 +428,7 @@
         </div>
       </a>
       <ul ngbDropdownMenu
-          class="dropdown-menu dropdown-menu oppia-navbar-dropdown dropdn"
+          class="dropdown-menu dropdown-menu oppia-navbar-dropdown dropdn e2e-test-profile-dropdown-container"
           (mouseover)="openSubmenu($event, 'profileMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
         <li class="nav-item">

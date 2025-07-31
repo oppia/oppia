@@ -21,7 +21,7 @@ export const CALCULATION_TYPE_CHARACTER = 'character';
 
 // eslint-disable-next-line max-len
 const CUSTOM_TAG_REGEX =
-  /<oppia-noninteractive-(?:math|image|link|collapsible|video|skillreview|tabs)[^>]*>/g;
+  /<oppia-noninteractive-(?:math|image|link|collapsible|video|skillreview|tabs|workedexample)[^>]*>/g;
 
 type CalculationType =
   | typeof CALCULATION_TYPE_WORD
@@ -53,6 +53,7 @@ export class HtmlLengthService {
     'oppia-noninteractive-video',
     'oppia-noninteractive-tabs',
     'oppia-noninteractive-skillreview',
+    'oppia-noninteractive-workedexample',
   ];
 
   /**
@@ -217,9 +218,10 @@ export class HtmlLengthService {
     switch (domId) {
       case 'oppia-noninteractive-math':
         return 1;
+      case 'oppia-noninteractive-workedexample':
       case 'oppia-noninteractive-collapsible':
       case 'oppia-noninteractive-tabs':
-        return 1000;
+        return 0;
       case 'oppia-noninteractive-video':
         return 0;
       case 'oppia-noninteractive-link':
