@@ -1258,6 +1258,41 @@ export class BaseUser {
       selector
     );
   }
+
+  /**
+   * Waits for an element to stabilize.
+   * @param {string} selector - The selector of the element.
+   * @param {number} timeout - The timeout in milliseconds.
+   */
+  async waitForElementToStabilize(
+    selector: string,
+    timeout: number = 5000
+  ): Promise<void> {
+    const element = await this.page.$(selector);
+    if (!element) {
+      throw new Error('Element not found');
+    }
+
+    let previousBox = await element.boundingBox();
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeout) {
+      await this.page.waitForTimeout(100);
+      const currentBox = await element.boundingBox();
+
+      if (
+        previousBox &&
+        currentBox &&
+        Math.abs(previousBox.x - currentBox.x) < 1 &&
+        Math.abs(previousBox.y - currentBox.y) < 1
+      ) {
+        return;
+      }
+      previousBox = currentBox;
+    }
+
+    showMessage(`Element ${selector} did not stabilize within ${timeout} ms`);
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();
