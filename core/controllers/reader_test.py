@@ -1684,10 +1684,8 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [])
-        
     def test_remove_topic_from_partially_learnt_list_handler(self) -> None:
         """Test handler for removing topics from the partially learnt list."""
-        
         self.login(self.VIEWER_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
@@ -1696,7 +1694,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Add topic to the partially learnt list.
         learner_progress_services.record_topic_started(
             self.viewer_id, topic_id)
-        
         # Verify topic is in the partially learnt list.
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
@@ -1708,7 +1705,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             constants.ACTIVITY_TYPE_LEARN_TOPIC, topic_id),
             params={'csrf_token':csrf_token}
         )
-        
         # Verify the topic was removed.
         self.assertEqual(
             learner_progress_services.get_all_partially_learnt_topic_ids(
@@ -2837,9 +2833,9 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
         # Proper payload structure from handler schema
         self.base_payload = {
             'version': 1,
-            'state_name': 'middle_state',  # Non-terminal state for leave events
+            'state_name': 'middle_state',  
             'session_id': 'test_session_id_123',
-            'client_time_spent_in_secs': 50.0,  # Shorter time for incomplete
+            'client_time_spent_in_secs': 50.0,  
             'params': {},
             'collection_id': None
         }
@@ -2936,21 +2932,7 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
             self.assertEqual(
                 learner_progress_services.get_all_partially_learnt_topic_ids(self.viewer_id), # pylint: disable=line-too-long
                 [])
-    
-class LearnerProgressTest(test_utils.GenericTestBase):
-    """Tests for tracking learner progress."""
-
-    def setUp(self):
-        super(LearnerProgressTest, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-    
-        
+            
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
