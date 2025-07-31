@@ -380,7 +380,7 @@ def regenerate_voiceover_for_exploration_content(
 
 
 def fetch_voiceover_by_filename(
-    exploration_id, filename: str
+    exploration_id: str, filename: str
 ) -> state_domain.Voiceover:
     """Fetches the voiceover by filename from the GCS file system.
 
@@ -413,7 +413,7 @@ def regenerate_voiceover_on_exploration_update(
     exploration_version: int,
     content_id_to_content_html: Dict[str, str],
     language_accent_code: str
-):
+) -> List[Tuple[str, str]]:
     """Regenerates voiceovers for the updated content (in English or any
     other supported language) of a curated exploration.
 

@@ -32,7 +32,7 @@ from core.domain import voiceover_domain
 from core.domain import voiceover_regeneration_services
 from core.platform import models
 
-from typing import Dict, List, Optional, Sequence, cast
+from typing import Dict, List, Optional, Sequence, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -938,7 +938,7 @@ def send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
     date_time: str,
     language_accents_used_for_voiceover_regeneration: List[str],
     error_collections_during_voiceover_regeneration: List[
-        Dict[str, List[str] | str]],
+        Dict[str, List[Tuple[str, str]] | str]],
     number_of_contents_for_voiceover_regeneration: int,
     number_of_contents_failed_to_regenerate: int,
     author_id: str
@@ -971,6 +971,7 @@ def send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
     user_settings = user_services.get_user_settings(author_id)
     assert user_settings is not None
     author_username = user_settings.username
+    assert author_username is not None
 
     number_of_successful_regenerations = (
         number_of_contents_for_voiceover_regeneration -
@@ -1005,7 +1006,7 @@ def _regenerate_voiceovers_for_given_contents(
     exploration_id: str,
     exploration_title: str,
     exploration_version: int,
-    language_code_to_contents_mapping,
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]],
     date_time: str,
     author_id: str,
 ) -> None:
@@ -1033,7 +1034,8 @@ def _regenerate_voiceovers_for_given_contents(
 
     # A list of error collections that occurred during the
     # voiceover regeneration.
-    error_collections_during_voiceover_regeneration = []
+    error_collections_during_voiceover_regeneration: List[
+        Dict[str, List[Tuple[str, str]] | str]] = []
 
     # Get all language codes that need voiceover regeneration in this request.
     language_codes = list(language_code_to_contents_mapping.keys())
@@ -1075,7 +1077,7 @@ def _regenerate_voiceovers_for_given_contents(
         for language_accent_code in language_accent_codes:
             language_accents_used_for_voiceover_regeneration.append(
                 language_accent_codes_to_descriptions.get(
-                    language_accent_code))
+                    language_accent_code, ''))
 
             number_of_contents_for_voiceover_regeneration += (
                 len(content_ids_to_content_values))
@@ -1113,9 +1115,9 @@ def regenerate_voiceover_for_updated_exploration(
     exploration_id: str,
     exploration_title: str,
     exploration_version: int,
-    author_id,
-    date_time
-):
+    author_id: str,
+    date_time: str
+) -> None:
     """Regenerates voiceovers for the updated exploration based on the changes
     made in the exploration content (in English) or translations (in other
     languages) from the Exploration editor page.
@@ -1158,7 +1160,7 @@ def regenerate_voiceover_for_updated_exploration(
     # content mapping dictionary. The content mapping dictionary contains
     # content IDs as keys and their corresponding updated HTML content as
     # values.
-    language_code_to_contents_mapping = {}
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
 
     for change in exploration_change_diff:
         cmd = change.get('cmd')

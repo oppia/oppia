@@ -36,7 +36,7 @@ from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List, Sequence
+from typing import Dict, List, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -1207,33 +1207,9 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.committer_1_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.arabic_translation_change_list = [{
-            'cmd': exp_domain.CMD_EDIT_TRANSLATION,
-            'content_id': 'content_5',
-            'language_code': 'ar',
-            'translation': translation_domain.TranslatedContent(
-                'Updated translations in Hindi!',
-                translation_domain.TranslatableContentFormat.HTML,
-                False
-            ).to_dict()
-        }]
 
         self.old_content_html = '<p>old content html</p>'
         self.new_content_html = '<p>new content html</p>'
-
-        self.english_content_change_list = [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'State 1',
-            'old_value': {
-                'content_id': 'content_5',
-                'html': self.old_content_html
-            },
-            'new_value': {
-                'content_id': 'content_5',
-                'html': self.new_content_html
-            }
-        }]
 
         self.voiceover_autogeneration_policy_model = (
             voiceover_models.VoiceoverAutogenerationPolicyModel(
@@ -1265,12 +1241,12 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         exploration_title: str,
         date_time: str,
         language_accents_used_for_voiceover_regeneration: List[str],
-        error_collections_during_voiceover_regeneration: List[
-            Dict[str, List[str] | str]],
+        error_collections_during_voiceover_regeneration: List[Dict[
+            str, List[Tuple[str, str]] | str]],
         number_of_contents_for_voiceover_regeneration: int,
         number_of_contents_failed_to_regenerate: int,
         author_id: str
-    ):
+    ) -> None:
         """Mock function to simulate sending email to voiceover admins and
         tech leads after voiceover regeneration.
         """
@@ -1288,9 +1264,19 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         date_time = datetime.datetime.utcnow().isoformat()
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
-            exploration_id, 2, self.committer_1_id, 'msg', 'create',
-            self.english_content_change_list,
-            constants.ACTIVITY_STATUS_PRIVATE, False)
+            exploration_id, 2, self.committer_1_id, 'msg', 'create', [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 1',
+                'old_value': {
+                    'content_id': 'content_5',
+                    'html': self.old_content_html
+                },
+                'new_value': {
+                    'content_id': 'content_5',
+                    'html': self.new_content_html
+                }
+            }], constants.ACTIVITY_STATUS_PRIVATE, False)
 
         commit1.exploration_id = exploration_id
         commit1.update_timestamps()
@@ -1345,9 +1331,16 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         date_time = datetime.datetime.utcnow().isoformat()
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
-            exploration_id, 2, self.committer_1_id, 'msg', 'create',
-            self.arabic_translation_change_list,
-            constants.ACTIVITY_STATUS_PRIVATE, False)
+            exploration_id, 2, self.committer_1_id, 'msg', 'create', [{
+                'cmd': exp_domain.CMD_EDIT_TRANSLATION,
+                'content_id': 'content_5',
+                'language_code': 'ar',
+                'translation': translation_domain.TranslatedContent(
+                    'Updated translations in Hindi!',
+                    translation_domain.TranslatableContentFormat.HTML,
+                    False
+                ).to_dict()
+            }], constants.ACTIVITY_STATUS_PRIVATE, False)
 
         commit1.exploration_id = exploration_id
         commit1.update_timestamps()
@@ -1423,9 +1416,19 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         date_time = datetime.datetime.utcnow().isoformat()
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
-            exploration_id, 2, self.committer_1_id, 'msg', 'create',
-            self.english_content_change_list,
-            constants.ACTIVITY_STATUS_PRIVATE, False)
+            exploration_id, 2, self.committer_1_id, 'msg', 'create', [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 1',
+                'old_value': {
+                    'content_id': 'content_5',
+                    'html': self.old_content_html
+                },
+                'new_value': {
+                    'content_id': 'content_5',
+                    'html': self.new_content_html
+                }
+            }], constants.ACTIVITY_STATUS_PRIVATE, False)
 
         commit1.exploration_id = exploration_id
         commit1.update_timestamps()
@@ -1497,20 +1500,21 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.signup('tester@org.com', 'tester')
         author_id = self.get_user_id_from_email('tester@org.com')
 
-        error_collections_during_voiceover_regeneration = [{
-            'exploration_id': exploration_id,
-            'language_accent_code': 'en-US',
-            'error_messages': [
-                'Error 1 occurred',
-                'Error 2 occurred'
-            ]
-        }, {
-            'exploration_id': exploration_id,
-            'language_accent_code': 'en-IN',
-            'error_messages': [
-                'Error 3 occurred'
-            ]
-        }]
+        error_collections_during_voiceover_regeneration: List[Dict[
+            str, List[Tuple[str, str]] | str]] = [{
+                'exploration_id': exploration_id,
+                'language_accent_code': 'en-US',
+                'error_messages': [
+                    ('content0', 'Error 1 occurred'),
+                    ('content1', 'Error 2 occurred')
+                ]
+            }, {
+                'exploration_id': exploration_id,
+                'language_accent_code': 'en-IN',
+                'error_messages': [
+                    ('content2', 'Error 3 occurred')
+                ]
+            }]
 
         (
             voiceover_services.
