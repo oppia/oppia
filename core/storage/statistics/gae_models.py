@@ -515,6 +515,93 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
         })
 
+class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student completing the exploration."""
+
+    # Which specific type of event this is.
+    event_type = datastore_services.StringProperty(indexed=True)
+    # Id of exploration that was completed.
+    exploration_id = datastore_services.StringProperty(indexed=True)
+    # Version of exploration.
+    exploration_version = datastore_services.IntegerProperty(indexed=True)
+    # Name of final state.
+    state_name = datastore_services.StringProperty(indexed=True)
+    # ID of student's session.
+    session_id = datastore_services.StringProperty(indexed=True)
+    # Time spent in final state before completion (in sec).
+    client_time_spent_in_secs = datastore_services.FloatProperty(indexed=True)
+    # Parameter values at completion, map of parameter name to value.
+    params = datastore_services.JsonProperty(indexed=False)
+    # Type of play-through (editor preview or learner view).
+    play_type = datastore_services.StringProperty(
+        indexed=True, choices=[
+            feconf.PLAY_TYPE_PLAYTEST, feconf.PLAY_TYPE_NORMAL])
+    # Version of the event schema.
+    event_schema_version = datastore_services.IntegerProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id: str, session_id: str) -> str:
+        """Generates entity ID for a new completion event."""
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+            utils.get_time_in_millisecs(timestamp),
+            exp_id,
+            session_id))
+
+    @classmethod
+    def create(
+        cls,
+        exp_id: str,
+        exp_version: int,
+        state_name: str,
+        session_id: str,
+        client_time_spent_in_secs: float,
+        params: Dict[str, str],
+        play_type: str
+    ) -> str:
+        """Creates a new completion exploration event."""
+        entity_id = cls.get_new_event_entity_id(exp_id, session_id)
+        completion_event_entity = cls(
+            id=entity_id,
+            event_type=feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+            exploration_id=exp_id,
+            exploration_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            client_time_spent_in_secs=client_time_spent_in_secs,
+            params=params,
+            play_type=play_type,
+            event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
+        completion_event_entity.update_timestamps()
+        completion_event_entity.put()
+        return entity_id
+
+    @staticmethod
+    def get_model_association_to_user(
+    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(super(cls, cls).get_export_policy(), **{
+            'event_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'state_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'session_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'client_time_spent_in_secs':
+                base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'params': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'play_type': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            'event_schema_version': base_models.EXPORT_POLICY.NOT_APPLICABLE
+        })
 
 class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a reader attempting to leave the
