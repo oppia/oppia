@@ -162,13 +162,6 @@ const stateHintTab = '.e2e-test-hint-tab';
 const editStateHintSelector = '.e2e-test-open-hint-editor';
 const saveHintEditButton = 'button.e2e-test-save-hint-edit';
 
-const addSkillButton = '.e2e-test-add-skill-button';
-const skillNameInput = '.e2e-test-skill-name-input';
-const skillItem = '.e2e-test-skills-list-item';
-const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
-const deleteSkillButton = 'i.skill-delete-button';
-const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
-
 const misconceptionDiv = '.misconception-list-item';
 const misconceptionTitle = '.e2e-test-misconception-title';
 const optionalMisconceptionDiv = '.optional-misconception-list-item';
@@ -272,19 +265,27 @@ const feedbackTabRowSelector = '.e2e-test-oppia-feedback-tab-row';
 const feedbackStatusSelector = '.e2e-test-exploration-feedback-status';
 
 const downloadPath = testConstants.TEST_DOWNLOAD_DIR;
-const LABEL_FOR_SAVE_DESTINATION_BUTTON = ' Save Destination ';
 const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
 const regenerateAutomaticVoiceoverButton = '.e2e-test-regenerate-voiceover';
 const voiceoverConfirmationModalButton =
   '.e2e-test-voiceover-regeneration-confirm';
 
+const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
+const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
 const descriptionBoxSelector = 'textarea.e2e-test-description-box';
 const textInputSelector = 'input.e2e-test-text-input';
 const closeButtonForExtraModel = '.e2e-test-close-rich-text-component-editor';
 
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
+const translationTabContainer = '.e2e-test-translation-tab-container';
 
 const previousCardButton = '.e2e-test-back-button';
+const openExplorationEditorNavigationMobile =
+  '.oppia-exploration-editor-tabs-dropdown.show';
+const skillNameInput = '.e2e-test-skill-name-input';
+
+const openNavbarIconSelector = '.mobile-navbar-toggled';
+const stateChangesDropdownSelector = '.e2e-test-state-changes-dropdown';
 const mathInteractionButtonSelector = '.e2e-test-interaction-tab-math';
 
 const oppiaYouTubeVideoUrl = 'https://www.youtube.com/watch?v=0tRc75S9MFU';
@@ -416,6 +417,41 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
   }
+
+  /**
+   * Opens the navigation in mobile viewport properly.
+   * @param dropdown Dropdown to open. Currently, it only opens
+   * the state changes dropdown, but can be extended to open navigation dropdown.
+   */
+  async openExplorationNavigationInMobile(
+    dropdown: 'State Changes' | null
+  ): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage('Skipped: Open exploration navigation in mobile view');
+    }
+
+    // Open the navigation only if it is not open.
+    if (!(await this.isElementVisible(openNavbarIconSelector))) {
+      await this.clickOn(mobileOptionsButtonSelector);
+      await this.expectElementToBeVisible(`${openNavbarIconSelector}`);
+      showMessage('Opened Navigation Menu (mobile).');
+    }
+
+    // Open state changes dropdown only if required.
+    if (
+      dropdown === 'State Changes' &&
+      !(await this.isElementVisible(`${stateChangesDropdownSelector}.show`))
+    ) {
+      await this.clickOn(mobileChangesDropdownSelector);
+      await this.expectElementToBeVisible(
+        `${stateChangesDropdownSelector}.show`
+      );
+      showMessage('State Changes Dropdown Opened (mobile).');
+    }
+
+    showMessage(`Opened Navigation Menu and ${dropdown} Dropdown.`);
+  }
+
   /**
    * Function to publish exploration.
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
@@ -478,15 +514,20 @@ export class ExplorationEditor extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.waitForElementToStabilize(closePublishedPopUpButton);
       await this.clickOn(closePublishedPopUpButton);
+
+      await this.expectElementToBeVisible(closePublishedPopUpButton, false);
       return explorationId;
     };
 
+    await publishExploration();
+    await fillExplorationMetadataDetails();
+
     try {
-      await publishExploration();
-      await fillExplorationMetadataDetails();
       return await confirmPublish();
     } catch (error) {
+      showMessage('Failed to publish the exploration.\n' + error.stack);
       await this.waitForPageToFullyLoad();
 
       const errorSavingExplorationElement = await this.page.$(
@@ -572,9 +613,15 @@ export class ExplorationEditor extends BaseUser {
         timeout: 5000,
       });
       await this.clickOn(dropdownToggleIcon);
+
+      await this.expectElementToBeVisible(
+        openExplorationEditorNavigationMobile,
+        false
+      );
+
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
+      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -995,6 +1042,8 @@ export class ExplorationEditor extends BaseUser {
       await this.type(addTagsInputBox, tagNames[i].toLowerCase());
       await this.page.keyboard.press('Tab');
     }
+
+    await this.expectTagsToMatch(tagNames);
   }
 
   /**
@@ -1118,6 +1167,7 @@ export class ExplorationEditor extends BaseUser {
     await this.type(addUsernameInputBox, username);
     await this.clickOn(addRoleDropdown);
     await this.clickOn(collaboratorRoleOption);
+    await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOn(saveRoleButton);
     await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(`${username} has been added as collaboratorRole.`);
@@ -1236,7 +1286,7 @@ export class ExplorationEditor extends BaseUser {
       hidden: true,
     });
     showMessage('Exploration is saved successfully.');
-    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -1297,10 +1347,7 @@ export class ExplorationEditor extends BaseUser {
       this.page.waitForNavigation({waitUntil: 'networkidle0'}),
     ]);
     await this.waitForStaticAssetsToLoad();
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsButtonSelector);
-      await this.clickOn(basicSettingsDropdown);
-    }
+    await this.expectElementToBeVisible(confirmDiscardButton, false);
   }
 
   /**
@@ -1500,12 +1547,7 @@ export class ExplorationEditor extends BaseUser {
         });
     } else {
       await this.clickOn(addAnotherResponseButton);
-      // The waitForNetworkIdle method waits for the response
-      // to the "Save Draft" request from change-list.service.ts
-      // to get executed, the Add Response modal to fully appear
-      // and all the fields in it to become clickable before
-      // moving on to next steps.
-      await this.waitForNetworkIdle();
+      await this.expectElementToBeClickable(addResponseOptionButton, false);
     }
   }
 
@@ -1533,16 +1575,14 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(stateContentInputField);
       await this.type(stateContentInputField, `${defaultResponseFeedback}`);
       await this.clickOn(saveOutcomeFeedbackButton);
-
-      await this.page.waitForSelector(saveOutcomeDestButton, {
-        hidden: true,
-      });
+      await this.expectElementToBeVisible(saveOutcomeFeedbackButton, false);
     }
 
     if (directToCard) {
       await this.clickOn(openOutcomeDestButton);
       await this.page.select(destinationSelectorDropdown, directToCard);
-      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+      await this.page.click(saveDestinationButtonSelector);
+      await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
     }
 
     if (directToCardWhenStuck) {
@@ -1550,7 +1590,11 @@ export class ExplorationEditor extends BaseUser {
       // The '4: /' value is used to select the 'a new card called' option in the dropdown.
       await this.select(destinationWhenStuckSelectorDropdown, '4: /');
       await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
-      await this.clickOn(LABEL_FOR_SAVE_DESTINATION_BUTTON);
+      await this.page.click(saveStuckDestinationButtonSelector);
+      await this.expectElementToBeVisible(
+        saveStuckDestinationButtonSelector,
+        false
+      );
     }
   }
 
@@ -1654,30 +1698,6 @@ export class ExplorationEditor extends BaseUser {
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintEditButton);
     await this.page.waitForSelector(saveHintEditButton, {
-      hidden: true,
-    });
-  }
-
-  /**
-   * Adds a particular skill to the current state card.
-   * @param skillName - Name of the skill to be linked to state.
-   */
-  async addSkillToState(skillName: string): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(addSkillButton);
-      // If the skill menu was collapsed in mobile view.
-      if (!element) {
-        await this.clickOn(mobileToggleSkillCard);
-      }
-    }
-    await this.page.waitForSelector(addSkillButton, {
-      visible: true,
-    });
-    await this.clickOn(addSkillButton);
-    await this.type(skillNameInput, skillName);
-    await this.clickOn(skillItem);
-    await this.clickOn(confirmSkillButton);
-    await this.page.waitForSelector(confirmSkillButton, {
       hidden: true,
     });
   }
@@ -1936,24 +1956,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Removes the attached skill from the current state card.
-   */
-  async removeSkillFromState(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      const element = await this.page.$(addSkillButton);
-      // If the skill menu was collapsed in mobile view.
-      if (!element) {
-        await this.clickOn(mobileToggleSkillCard);
-      }
-    }
-    await this.page.waitForSelector(deleteSkillButton, {
-      visible: true,
-    });
-    await this.clickOn(deleteSkillButton);
-    await this.clickOn('Delete skill');
-  }
-
-  /**
    * Function to navigate to the preview tab.
    */
   async navigateToPreviewTab(): Promise<void> {
@@ -1971,7 +1973,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(previewTabButton);
     }
 
-    await this.isElementVisible(previewTabContainer);
+    await this.expectElementToBeVisible(previewTabContainer);
   }
 
   /**
@@ -1986,7 +1988,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(historyTabButton);
     }
 
-    await this.isElementVisible(historyTabContentContainerSelector);
+    await this.expectElementToBeVisible(historyTabContentContainerSelector);
   }
 
   /**
@@ -2038,6 +2040,7 @@ export class ExplorationEditor extends BaseUser {
     explorationVersion: number,
     isExplorationPublished: boolean
   ): Promise<void> {
+    await this.expectElementToBeVisible(historyListContent);
     const historyItems = await this.page.$$(historyListContent);
     for (const historyItem of historyItems) {
       const versionNumberElement = await historyItem.$(historyTableIndex);
@@ -2103,6 +2106,42 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Expands the specified settings tab section.
+   * Currently it only expands Basic Settings, Advanced Features, Roles, and Voice Artists.
+   * @param section - The name of the section to expand.
+   */
+  async expandSettingsTabSection(
+    section: 'Basic Settings' | 'Advanced Features' | 'Roles' | 'Voice Artists'
+  ): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage(
+        `Skipped: Expanding ${section} section on desktop.\n` +
+          'Reason: Sections are already expanded on desktop.'
+      );
+      return;
+    }
+
+    // Generate the selectors for the section header and content.
+    const identifier = section.replace(' ', '-').toLowerCase();
+    const sectionContentSelector = `.e2e-test-${identifier}-content`;
+    const sectionHeaderSelector = `.e2e-test-${identifier}-header`;
+
+    // Skip if the section is already expanded.
+    if (await this.isElementVisible(sectionContentSelector)) {
+      showMessage(
+        `Skipped: Expanding ${section} section on desktop.\n` +
+          'Reason: Section is already expanded on desktop.'
+      );
+      return;
+    }
+
+    // Expand the section.
+    await this.expectElementToBeVisible(sectionHeaderSelector);
+    await this.page.click(sectionHeaderSelector);
+    await this.expectElementToBeVisible(sectionContentSelector);
+  }
+
+  /**
    * Function to navigate to the translations tab.
    */
   async navigateToTranslationsTab(): Promise<void> {
@@ -2127,7 +2166,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickAndWaitForNavigation(translationTabButton);
     }
 
-    await this.isElementVisible(previewTabContainer);
+    await this.expectElementToBeVisible(translationTabContainer);
   }
 
   /**
@@ -2155,7 +2194,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(mainTabButton);
     }
 
-    await this.isElementVisible(mainTabContainerSelector);
+    await this.expectElementToBeVisible(mainTabContainerSelector);
   }
 
   /**
@@ -2480,7 +2519,7 @@ export class ExplorationEditor extends BaseUser {
   async playExploration(explorationId: string): Promise<void> {
     await Promise.all([
       this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']}),
-      this.page.goto(`${baseUrl}/explore/${explorationId}`),
+      this.goto(`${baseUrl}/explore/${explorationId}`),
     ]);
   }
 
@@ -2532,11 +2571,10 @@ export class ExplorationEditor extends BaseUser {
     translation: string,
     feedbackIndex?: number
   ): Promise<void> {
-    await this.page.waitForSelector(voiceoverLanguageSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(voiceoverLanguageSelector);
     await this.clickOn(voiceoverLanguageSelector);
-    await this.page.waitForSelector(voiceoverLanguageOptionSelector);
+
+    await this.expectElementToBeVisible(voiceoverLanguageOptionSelector);
     const languageOptions = await this.page.$$(voiceoverLanguageOptionSelector);
 
     for (const option of languageOptions) {
@@ -2582,7 +2620,9 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Invalid content type: ${contentType}`);
     }
     await this.clickOn(saveTranslationButton);
+
     await this.waitForNetworkIdle();
+    await this.expectElementToBeVisible(saveTranslationButton, false);
   }
 
   /**
@@ -3043,6 +3083,11 @@ export class ExplorationEditor extends BaseUser {
 
     await this.waitForNetworkIdle();
     await this.waitForPageToFullyLoad();
+
+    await this.expectElementToBeVisible(
+      explorationSummaryTileTitleSelector,
+      false
+    );
   }
 
   /**
@@ -3187,6 +3232,8 @@ export class ExplorationEditor extends BaseUser {
     }
     await this.select(feedbackStatusMenu, statusValue);
     await this.clickOn(sendButtonSelector);
+
+    await this.expectElementToBeClickable(sendButtonSelector, false);
   }
 
   /**
@@ -3203,19 +3250,6 @@ export class ExplorationEditor extends BaseUser {
         `Expected feedback status to be ${statusValue}, but found ${currentStatus}`
       );
     }
-  }
-
-  /**
-   * Presses the back button in the feedback thread tab.
-   */
-  async pressFeedbackThreadBackButton(): Promise<void> {
-    await this.page.waitForSelector(feedbackTabBackButtonSelector, {
-      visible: true,
-    });
-    await this.clickOn(feedbackTabBackButtonSelector);
-    // TODO(#22716): Add post check when this function is actually used or
-    // before closing the issue #22716.
-    // Add post check.
   }
 
   /**
