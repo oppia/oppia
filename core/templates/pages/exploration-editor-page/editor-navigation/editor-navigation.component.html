@@ -28,9 +28,9 @@
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
             </a>
           </li>
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-preview-button" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'preview'}">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" *ngIf="isUserLoggedIn()" [ngClass]="{'active': getActiveTabName() === 'preview'}">
             <a href="#" ngbTooltip="Preview" placement="bottom" (click)="selectPreviewTab()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
+               class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-preview-button">
               <i class="fa fa-play oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Preview</span>
             </a>
@@ -56,10 +56,10 @@
               <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
             </a>
           </li>
-          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-history-button" [ngClass]="{'active': getActiveTabName() === 'history'}">
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'active': getActiveTabName() === 'history'}">
             <a href="#" ngbTooltip="History" placement="bottom" (click)="selectHistoryTab()"
                disabled="ExplorationRightsService.isCloned()"
-               class="oppia-exploration-editor-tabs-dropdown-element">
+               class="oppia-exploration-editor-tabs-dropdown-element e2e-test-mobile-history-button">
               <i class="fa fa-clock oppia-mobile-exploration-editor-tabs-icon"></i>
               <span class="oppia-exploration-editor-tabs-dropdown-inner">History</span>
             </a>
@@ -114,7 +114,7 @@
 
         <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-changes-dropdown" id="discardButtonPopup" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></div>
 
-        <ul ngbDropdownMenu class="dropdown-menu discard-publish" aria-labelledby="discardButtonPopup">
+        <ul ngbDropdownMenu class="dropdown-menu discard-publish e2e-test-state-changes-dropdown" aria-labelledby="discardButtonPopup">
           <button ngbDropdownItem class="btn btn-light e2e-test-mobile-exploration-discard-tab" (click)="discardChanges()" [disabled]="autosaveIsInProgress">
             <i class="fa fa-pen oppia-mobile-exploration-editor-tabs-icon"></i>
             Discard
