@@ -139,7 +139,7 @@ describe('Blog Post Page service', () => {
     ).toHaveBeenCalled();
     expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
       'Blog Post Deleted Successfully.',
-      1000
+      10000
     );
     expect(blogDashboardPageService.activeTab).toBe('editor_tab');
   }));
