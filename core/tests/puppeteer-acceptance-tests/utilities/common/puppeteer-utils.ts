@@ -456,13 +456,6 @@ export class BaseUser {
       showMessage(`Button (text: ${selector}) is clicked.`);
     } else {
       await this.waitForElementToBeClickable(selector);
-      const elementDimensions = await this.page.evaluate((selector: string) => {
-        const element = document.querySelector(selector);
-        return element?.getBoundingClientRect();
-      }, selector);
-      showMessage(
-        `Debugging: Element is dimensions ${elementDimensions?.width}, ${elementDimensions?.height}, ${elementDimensions?.left}, ${elementDimensions?.top}`
-      );
       showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
       await this.page.click(selector);
       showMessage(`Element (selector: ${selector}) is clicked.`);
