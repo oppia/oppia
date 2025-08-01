@@ -18,7 +18,7 @@
 
 import {Component, OnInit} from '@angular/core';
 import {MobileMenuService} from '../../services/mobile-menu.service';
-import './player-sidebar.component.css';
+import './lesson-player-sidebar.component.css';
 import {PageContextService} from 'services/page-context.service';
 import {
   I18nLanguageCodeService,
@@ -28,14 +28,13 @@ import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only
 import {UrlService} from 'services/contextual/url.service';
 
 @Component({
-  selector: 'oppia-player-sidebar',
-  templateUrl: './player-sidebar.component.html',
-  styleUrls: ['./player-sidebar.component.css'],
+  selector: 'oppia-lesson-player-sidebar',
+  templateUrl: './lesson-player-sidebar.component.html',
+  styleUrls: ['./lesson-player-sidebar.component.css'],
 })
-export class PlayerSidebarComponent implements OnInit {
+export class LessonPlayerSidebarComponent implements OnInit {
   mobileMenuVisible: boolean = false;
   sidebarIsExpanded: boolean = false;
-  explorationId!: string;
   expDescription!: string;
   expDescTranslationKey!: string;
   avgRating!: number | null;
@@ -54,29 +53,12 @@ export class PlayerSidebarComponent implements OnInit {
     this.mobileMenuService.getMenuVisibility().subscribe(visibility => {
       this.mobileMenuVisible = visibility;
     });
-    let pathnameArray = this.urlService.getPathname().split('/');
-    let explorationContext = false;
 
-    for (let i = 0; i < pathnameArray.length; i++) {
-      if (
-        pathnameArray[i] === 'explore' ||
-        pathnameArray[i] === 'create' ||
-        pathnameArray[i] === 'skill_editor' ||
-        pathnameArray[i] === 'embed' ||
-        pathnameArray[i] === 'lesson'
-      ) {
-        explorationContext = true;
-        break;
-      }
-    }
-
-    this.explorationId = explorationContext
-      ? this.pageContextService.getExplorationId()
-      : 'test_id';
+    let explorationId = this.pageContextService.getExplorationId();
     this.expDescription = 'Loading...';
     this.readOnlyExplorationBackendApiService
       .fetchExplorationAsync(
-        this.explorationId,
+        explorationId,
         this.urlService.getExplorationVersionFromUrl(),
         this.urlService.getPidFromUrl()
       )
@@ -85,7 +67,7 @@ export class PlayerSidebarComponent implements OnInit {
       });
     this.expDescTranslationKey =
       this.i18nLanguageCodeService.getExplorationTranslationKey(
-        this.explorationId,
+        explorationId,
         TranslationKeyType.DESCRIPTION
       );
   }

@@ -48,13 +48,6 @@
           {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
         </div>
       </button>
-      <button class="player-sidebar-button">
-        <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-question-circle"></i>
-        <div *ngIf="sidebarIsExpanded">
-          <i class="fa fa-lg fa-question-circle"></i>
-          {{ 'I18N_LESSON_PLAYER_HELP_BUTTON' | translate }}
-        </div>
-      </button>
     </div>
   </div>
   <div *ngIf="mobileMenuVisible" class="player-mobile-menu-container">
@@ -78,10 +71,6 @@
         <button>
           <i class="fa fa-lg fa-flag"></i>
           {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
-        </button>
-        <button>
-          <i class="fa fa-lg fa-question-circle"></i>
-          {{ 'I18N_LESSON_PLAYER_HELP_BUTTON' | translate }}
         </button>
       </div>
     </div>

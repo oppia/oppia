@@ -24,7 +24,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {PlayerSidebarComponent} from './player-sidebar.component';
+import {LessonPlayerSidebarComponent} from './player-sidebar.component';
 import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
 import {MobileMenuService} from '../../services/mobile-menu.service';
 import './player-sidebar.component.css';
@@ -47,9 +47,9 @@ class MockTruncteAndCapitalizePipe {
   }
 }
 
-describe('PlayerSidebarComponent', () => {
-  let component: PlayerSidebarComponent;
-  let fixture: ComponentFixture<PlayerSidebarComponent>;
+describe('LessonPlayerSidebarComponent', () => {
+  let component: LessonPlayerSidebarComponent;
+  let fixture: ComponentFixture<LessonPlayerSidebarComponent>;
   let mockMobileMenuService: Partial<MobileMenuService>;
   let pageContextService: PageContextService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
@@ -65,7 +65,7 @@ describe('PlayerSidebarComponent', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [
-        PlayerSidebarComponent,
+        LessonPlayerSidebarComponent,
         MockTruncteAndCapitalizePipe,
         MockTranslatePipe,
       ],
@@ -88,7 +88,7 @@ describe('PlayerSidebarComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PlayerSidebarComponent);
+    fixture = TestBed.createComponent(LessonPlayerSidebarComponent);
     component = fixture.componentInstance;
     pageContextService = TestBed.inject(PageContextService);
     readOnlyExplorationBackendApiService = TestBed.inject(
