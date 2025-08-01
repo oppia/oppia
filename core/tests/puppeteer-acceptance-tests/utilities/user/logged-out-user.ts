@@ -301,6 +301,8 @@ const errorPageHeading = '.e2e-test-error-page-heading';
 const classroomTileContainer = '.oppia-classroom-tile-container';
 
 const submitResponseToInteractionInput = 'oppia-interaction-display input';
+const submitResponseToInteractionTextArea =
+  'oppia-interaction-display textarea';
 const nextCardButton = '.e2e-test-next-card-button';
 const nextCardArrowButton = '.e2e-test-next-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
@@ -371,6 +373,9 @@ const viewsContainerSelector = '.e2e-test-info-card-views';
 const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
 const tagsContainerSelector = '.exploration-tags span';
 const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
+const saveProgressCloseButtonSelector = '.e2e-test-save-progress-close-button';
+const recommendedNextChapterSelector =
+  '.e2e-test-recommended-next-chapter-button';
 
 const topicDescriptionSelector = '.e2e-test-topic-description';
 const storyViewerContainerSelector = '.e2e-test-story-viewer-container';
@@ -412,7 +417,21 @@ const blogPostTitleContainerSelector =
   '.e2e-test-blog-post-page-title-container';
 const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
+const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 
+const returnToStoryFromLastStateSelector =
+  '.e2e-test-end-chapter-return-to-story';
+const contributorsContainerSelector = '.e2e-test-contributors-container';
+const contributorIconPrefix = `${contributorsContainerSelector} .contributor-`;
+
+// Common Selectors.
+const devModeLabelSelector = '.e2e-test-dev-mode';
+
+// Home Page Selectors.
+const homePageHeadingSelector =
+  '.e2e-test-splash-page .e2e-test-home-page-title';
+const browseLessonButtonSelector =
+  '.e2e-test-splash-page .e2e-test-explore-lessons-btn';
 const audioSliderSelector = 'oppia-audio-slider mat-slider';
 
 // Topic Viewer Page Selectors.
@@ -499,6 +518,52 @@ const contactUsSubheadingSelector = '.e2e-test-contact-subheading';
 const contactUsContentCard = '.e2e-test-contact-page-content';
 const contactUsContentCardHeadingSelector = `${contactUsContentCard} h2`;
 
+// Community Library.
+const communityLibraryHeading = '.e2e-test-library-main-header';
+const communityLibraryGroupHeader = '.e2e-test-library-group-header';
+
+// Other Selectors.
+const closeButtonSelector = '.e2e-test-close-button';
+const backToClassroomBreadcrumbSelectorMobile =
+  '.e2e-test-mobile-breadcrumbs-classroom';
+
+// Learn Page (/learn).
+const classroomHeadingSelector = '.e2e-test-classroom-heading';
+const classroomTileContainerSelector = '.e2e-test-classroom-tile';
+const classroomNameSelector = '.e2e-test-classroom-name';
+
+// Classroom Page.
+const classroomContentHeadingSelector = '.e2e-test-classroom-content-heading';
+const diagnosticTestBoxSelector = '.e2e-test-diagnostic-test-box';
+const diagnosticTestHeadingSelector = `${diagnosticTestBoxSelector} h4`;
+const diagnosticTestButtonSelector = `${diagnosticTestBoxSelector} a`;
+
+const startHereButtonSelector = '.e2e-test-start-here-button';
+const takeQuizButtonSelector = '.e2e-test-take-diagnostic-test';
+
+const startDiagnosticTestButtonSelector = '.e2e-test-start-diagnostic-test';
+
+// Diagnostic Test Player.
+const diagnosticTestPlayerSelector = 'oppia-dignostic-test-player';
+const skipQuestionButton = '.e2e-test-skip-question-button';
+const currentProgessSelector = '.e2e-test-progress-container';
+
+// Topic Page.
+const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
+const practiceTabButtonSelector = '.e2e-test-practice-tab-link';
+const lessonsTabButtonSelector = '.e2e-test-lesson-tab-link';
+const revisionTabButtonSelector = '.e2e-test-study-tab-link';
+const practiceTabContainerSelector = '.e2e-test-practice-tab-container';
+const lessonsTabContainerSelector = '.e2e-test-lessons-tab-container';
+const revisionTabSelector = 'subtopics-list';
+
+const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
+const startPracticeButtonSelector = '.e2e-test-practice-start-button';
+const practiceSessionContainerSelector = 'practice-session-page';
+
+const backToClassroomLinkSelector = '.e2e-test-classroom-name';
+
+const storyTitleSelector = '.e2e-test-story-title';
 const lessonInfoModalHeaderSelector = '.e2e-test-lesson-info-modal-header';
 const progressReminderModalHeaderSelector =
   '.e2e-test-progress-reminder-continue-text';
@@ -609,7 +674,7 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Navigates to the community library page on the navbar.
+   * Navigates to the community library page using the navbar.
    */
   async navigateToCommunityLibraryOnNavbar(): Promise<void> {
     // Open navigation menu for mobile view.
@@ -677,6 +742,11 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToClassroomPage(urlFragment: string): Promise<void> {
     await this.goto(`${classroomsPageUrl}/${urlFragment}`);
+
+    await this.waitForPageToFullyLoad();
+    showMessage(
+      `Navigated to classroom page: ${classroomsPageUrl}/${urlFragment}`
+    );
   }
 
   /**
@@ -979,23 +1049,6 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Open the navigation menu in mobile view.
-   */
-  async openNavMenuInMobile(): Promise<void> {
-    if (!this.isViewportAtMobileWidth()) {
-      return;
-    }
-    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
-      visible: true,
-    });
-    await this.clickOn(mobileNavbarOpenSidebarButton);
-    await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
-      visible: true,
-    });
-    showMessage('Opened Navigation Menu (mobile).');
-  }
-
-  /**
    * Function to click the About button in the About Menu on navbar
    * and check if it opens the About page.
    */
@@ -1087,6 +1140,24 @@ export class LoggedOutUser extends BaseUser {
     if (url !== expectedUrl) {
       throw new Error(`Actual URL differs from expected. Found: ${url}.`);
     }
+  }
+
+  /**
+   * Open the navigation menu in mobile view.
+   */
+  async openNavMenuInMobile(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage('Skipped: Open Navigation Menu (mobile).');
+      return;
+    }
+    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
+      visible: true,
+    });
+    await this.clickOn(mobileNavbarOpenSidebarButton);
+    await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
+      visible: true,
+    });
+    showMessage('Opened Navigation Menu (mobile).');
   }
 
   /**
@@ -3060,6 +3131,16 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Clicks on continue button in continue button interaction.
+   */
+  async clickOnContinueButtonInInteractionCard(): Promise<void> {
+    await this.isElementVisible(nextCardButton);
+    await this.clickOn(nextCardButton);
+
+    await this.isElementVisible(nextCardButton, false);
+  }
+
+  /**
    * Function to submit an answer to a form input field.
    * @param {string} answer - The answer to submit.
    */
@@ -3067,6 +3148,12 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
     await this.clearAllTextFrom(submitResponseToInteractionInput);
     await this.type(submitResponseToInteractionInput, answer);
+    await this.clickOn(submitAnswerButton);
+  }
+
+  async submitAnswerInTextArea(answer: string): Promise<void> {
+    await this.waitForElementToBeClickable(submitResponseToInteractionTextArea);
+    await this.type(submitResponseToInteractionTextArea, answer);
     await this.clickOn(submitAnswerButton);
   }
 
@@ -3397,42 +3484,39 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if the search results contain a specific result.
    * @param {string[]} searchResultsExpected - The search result to check for.
+   * @param {boolean} present - Whether the search results should be present or not.
    */
   async expectSearchResultsToContain(
-    searchResultsExpected: string[]
+    searchResultsExpected: string[],
+    present: boolean = true
   ): Promise<void> {
     const selector = this.isViewportAtMobileWidth()
       ? explorationTitleSelector
       : lessonCardTitleSelector;
-    try {
-      if (searchResultsExpected.length === 0) {
-        await this.waitForPageToFullyLoad();
-        const searchResultsElements = await this.page.$$(selector);
-        if (searchResultsElements.length !== 0) {
-          throw new Error('No search results expected, but some were found.');
-        }
-      } else {
-        await this.page.waitForSelector(selector);
-        const searchResultsElements = await this.page.$$(selector);
-        const searchResults = await Promise.all(
-          searchResultsElements.map(result =>
-            this.page.evaluate(el => el.textContent.trim(), result)
-          )
-        );
+    await this.waitForPageToFullyLoad();
+    if (!present && !(await this.isElementVisible(selector))) {
+      return;
+    }
+    await this.page.waitForSelector(selector);
+    const searchResultsElements = await this.page.$$(selector);
+    const searchResults = await Promise.all(
+      searchResultsElements.map(result =>
+        this.page.evaluate(el => el.textContent.trim(), result)
+      )
+    );
 
-        for (const resultExpected of searchResultsExpected) {
-          if (!searchResults.includes(resultExpected)) {
-            throw new Error(
-              `Search result "${resultExpected}" not found in search results.`
-            );
-          }
-        }
-        showMessage('All expected search results found in search results.');
+    for (const searchResultExpected of searchResultsExpected) {
+      if (searchResults.includes(searchResultExpected) === present) {
+        showMessage(
+          `Success: Search result "${searchResultExpected}" is ${present ? 'present' : 'not present'}.`
+        );
+      } else {
+        throw new Error(
+          `Expected search result "${searchResultExpected}" to be ${
+            present ? 'present' : 'not present'
+          }, but it was ${present ? 'not ' : ''}found.\nFound search results: ${searchResults}`
+        );
       }
-    } catch (error) {
-      const newError = new Error(`Failed to check search results: ${error}`);
-      newError.stack = error.stack;
-      throw newError;
     }
   }
 
@@ -3588,6 +3672,156 @@ export class LoggedOutUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  async expectTopicToContainStories(storyNames: string[]): Promise<void> {
+    const selector = this.isViewportAtMobileWidth()
+      ? mobileStoryTitleSelector
+      : desktopStoryTitleSelector;
+
+    const storyElements = await this.getAllElementsBySelector(selector);
+    const storyNamesInPage =
+      await this.getTextContentsFromElements(storyElements);
+
+    for (const storyName of storyNames) {
+      expect(storyNamesInPage).toContain(storyName);
+    }
+  }
+
+  /**
+   * Navigates to the learn tab in the topic page.
+   */
+  async navigateToLessonsTabInTopic(): Promise<void> {
+    await this.expectElementToBeVisible(lessonsTabButtonSelector);
+    await this.clickOn(lessonsTabButtonSelector);
+
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(lessonsTabContainerSelector);
+  }
+
+  /**
+   * Navigates to the practice tab in the topic page.
+   */
+  async navigateToPracticeTabInTopic(): Promise<void> {
+    await this.expectElementToBeVisible(practiceTabButtonSelector);
+    await this.clickOn(practiceTabButtonSelector);
+
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(practiceTabContainerSelector);
+
+    showMessage('Navigated to practice tab in topic page.');
+  }
+
+  /**
+   * Navigates to the revision tab in the topic page.
+   */
+  async navigateToRevisionTabInTopic(): Promise<void> {
+    await this.isElementVisible(revisionTabButtonSelector);
+    await this.clickOn(revisionTabButtonSelector);
+
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(revisionTabSelector);
+  }
+
+  /**
+   * Navigates back to the classroom from the topic page.
+   */
+  async navigateBackToClassroomFromTopicPage(): Promise<void> {
+    const selector = this.isViewportAtMobileWidth()
+      ? backToClassroomBreadcrumbSelectorMobile
+      : backToClassroomLinkSelector;
+    await this.isElementVisible(selector);
+    await this.clickOn(selector);
+
+    await this.isElementVisible(selector, false);
+  }
+
+  async expectToBeInClassroomPage(classroomURLFragment: string): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => {
+        return window.location.href === url;
+      },
+      {},
+      `${testConstants.URLs.ClassroomsPage}/${classroomURLFragment}`
+    );
+  }
+
+  /**
+   * Clicks on the start here button in the classroom page.
+   */
+  async clickOnStartHereButtonInClassroomPage(): Promise<void> {
+    await this.isElementVisible(startHereButtonSelector);
+
+    await this.clickAndWaitForNavigation(startHereButtonSelector);
+    await this.isElementVisible(startHereButtonSelector, false);
+  }
+
+  /**
+   * Clicks on the take quiz button in the classroom page.
+   */
+  async clickOnTakeQuizButtonInClassroomPage(): Promise<void> {
+    await this.isElementVisible(takeQuizButtonSelector);
+
+    await this.clickOn(takeQuizButtonSelector);
+    await this.isElementVisible(takeQuizButtonSelector, false);
+  }
+
+  /**
+   * Starts a diagnostic test.
+   */
+  async startDiagnosticTest(): Promise<void> {
+    await this.isElementVisible(startDiagnosticTestButtonSelector);
+
+    await this.clickOn(startDiagnosticTestButtonSelector);
+    await this.isElementVisible(startDiagnosticTestButtonSelector, false);
+  }
+
+  /**
+   * Skips the current question in the diagnostic test.
+   */
+  async skipQuestionInDiagnosticTest(): Promise<void> {
+    const initialProgress =
+      (await this.page.$eval(currentProgessSelector, el =>
+        el.textContent?.trim()
+      )) ?? '';
+    await this.isElementVisible(skipQuestionButton);
+
+    await this.clickOn(skipQuestionButton);
+
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() !== value;
+      },
+      {},
+      currentProgessSelector,
+      initialProgress
+    );
+  }
+
+  async playChapterFromStory(chapterName: string): Promise<void> {
+    await this.skipLoginPrompt();
+
+    await this.page.waitForSelector(chapterTitleSelector);
+    const chapterTitles = await this.page.$$(chapterTitleSelector);
+    for (const chapter of chapterTitles) {
+      const chapterText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        chapter
+      );
+      if (chapterText.trim().includes(chapterName.trim())) {
+        await Promise.all([
+          this.page.waitForNavigation({
+            waitUntil: ['networkidle2', 'load'],
+          }),
+          this.waitForElementToBeClickable(chapter),
+          chapter.click(),
+        ]);
+        return;
+      }
+    }
+
+    throw new Error(`Chapter "${chapterName}" not found.`);
   }
 
   /**
@@ -3939,7 +4173,10 @@ export class LoggedOutUser extends BaseUser {
    * Returns to the story from the last state of an exploration.
    */
   async returnToStoryFromLastState(): Promise<void> {
-    await this.clickAndWaitForNavigation('Return to Story');
+    await this.page.waitForSelector(returnToStoryFromLastStateSelector, {
+      visible: true,
+    });
+    await this.page.click(returnToStoryFromLastStateSelector);
 
     await this.page.waitForSelector(storyViewerContainerSelector, {
       visible: true,
@@ -4159,6 +4396,16 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickOn(shareExplorationButtonSelector);
 
+    await this.expectEmbedClassroomLinkToWorkProperly(expectedCode);
+  }
+
+  /**
+   * Checks if embed button works properly, and shows correct embed code.
+   * @param {string} expectedCode - The expected embed code.
+   */
+  async expectEmbedClassroomLinkToWorkProperly(
+    expectedCode: string
+  ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     await this.clickOn(embedLessonButton);
     await this.page.waitForSelector(embedCodeSelector);
@@ -4174,9 +4421,20 @@ export class LoggedOutUser extends BaseUser {
           embedCode
       );
     }
-    await this.clickOn('Close');
-
+    await this.page.click(closeButtonSelector);
     await this.page.waitForSelector(embedCodeSelector, {hidden: true});
+  }
+
+  /**
+   * Checks if the embed classroom in lesson info works properly.
+   * @param explorationId The exploration id.
+   */
+  async expectEmbedClassroomInLessonInfoToWorkProperly(
+    explorationId: string
+  ): Promise<void> {
+    const expectedCode = `<iframe src="http://localhost:8181/embed/exploration/${explorationId}" width="700" height="1000">`;
+
+    await this.expectEmbedClassroomLinkToWorkProperly(expectedCode);
   }
 
   /**
@@ -4745,10 +5003,10 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Shares the exploration.
    * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
-   * @param {string} explorationId - The id of the exploration.
+   * @param {'FaceBook' | 'Twitter' | 'Classroom'} explorationId - The id of the exploration.
    */
   async shareExplorationFromLessonInfoModal(
-    platform: string,
+    platform: 'Facebook' | 'Twitter' | 'Classroom',
     explorationId: string | null
   ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
@@ -4773,6 +5031,10 @@ export class LoggedOutUser extends BaseUser {
         break;
       case 'Twitter':
         expectedUrl = testConstants.SocialsShare.Twitter.Domain + explorationId;
+        break;
+      case 'Classroom':
+        expectedUrl =
+          testConstants.SocialsShare.Classroom.Domain + explorationId;
         break;
       default:
         throw new Error(`Unsupported platform: ${platform}`);
@@ -5981,6 +6243,389 @@ export class LoggedOutUser extends BaseUser {
     // Confirm new slide ID is different.
     const newSlideId = await this.page.$eval(activeItemSelector, el => el.id);
     expect(newSlideId).not.toBe(initialSlideId);
+  }
+
+  /**
+   * Function to verify the community library heading is present.
+   * @param {string} heading - The heading to verify.
+   */
+  async expectCommunityLibraryHeadingToBePresent(
+    heading: string
+  ): Promise<void> {
+    await this.page.waitForSelector(communityLibraryHeading, {
+      visible: true,
+      timeout: 5000,
+    });
+
+    const communityLibraryHeadingText = await this.page.$eval(
+      communityLibraryHeading,
+      el => el.textContent
+    );
+
+    if (communityLibraryHeadingText?.trim() !== heading) {
+      throw new Error(
+        `Expected community library heading to be ${heading}, but found ${communityLibraryHeadingText}`
+      );
+    }
+
+    showMessage(`Success: Community library heading is ${heading}.`);
+  }
+
+  /**
+   * Function to verify the community library group header is present.
+   * @param {string[]} groupHeaders - The group headers to verify.
+   */
+  async expectCommunityLibraryGroupHeaderToContain(
+    groupHeaders: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(communityLibraryGroupHeader, {
+      visible: true,
+    });
+
+    const communityLibraryGroupHeaderText = await this.page.$$eval(
+      communityLibraryGroupHeader,
+      el => el.map(el => el.textContent)
+    );
+
+    for (const groupHeader of groupHeaders) {
+      if (
+        communityLibraryGroupHeaderText?.some(el =>
+          el?.trim().includes(groupHeader)
+        ) === false
+      ) {
+        throw new Error(
+          `Failed: Community library group header does not contain ${groupHeader}.\nActual: ${communityLibraryGroupHeaderText}`
+        );
+      }
+      showMessage(
+        `Success: Community library group header contains ${groupHeader}.`
+      );
+    }
+  }
+
+  /**
+   * Function to verify the dev mode label is visible or not.
+   * @param {boolean} visible - Whether the dev mode label should be visible or not.
+   */
+  async expectDevModeLabelToBeVisible(visible: boolean = true): Promise<void> {
+    try {
+      await this.page.waitForSelector(devModeLabelSelector, {
+        visible: true,
+      });
+
+      if (visible) {
+        showMessage('Verified: Dev mode label is visible.');
+      } else {
+        throw new Error('Dev mode label is visible.');
+      }
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        if (visible) {
+          throw new Error('Dev mode label is not visible.');
+        } else {
+          showMessage('Verified: Dev mode label is not visible.');
+        }
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Function to click the Browse Lessons button on the home page.
+   */
+  async clickBrowseLessonsButtonInHomePage(): Promise<void> {
+    await this.expectElementToBeVisible(browseLessonButtonSelector);
+    await this.page.click(browseLessonButtonSelector);
+    showMessage('Clicked on browse lessons button.');
+
+    await this.expectElementToBeVisible(browseLessonButtonSelector, false);
+  }
+
+  /**
+   * Function to verify the home page title.
+   * @param {string} title - The expected title of the home page.
+   */
+  async expectHomePageTitleToBe(title: string): Promise<void> {
+    await this.page.waitForSelector(homePageHeadingSelector);
+    expect(
+      await this.page.$eval(homePageHeadingSelector, el => el.textContent)
+    ).toBe(title);
+  }
+
+  /**
+   * Function to click on the classroom tile in the learn page.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async clickOnClassroomTileInLearnPage(classroomName: string): Promise<void> {
+    await this.isElementVisible(classroomTileContainerSelector);
+
+    const classroomTiles = await this.page.$$(classroomTileContainerSelector);
+
+    for (const classroomTile of classroomTiles) {
+      const classroomTileName = await classroomTile.$eval(
+        classroomNameSelector,
+        el => el.textContent
+      );
+
+      if (classroomTileName === classroomName) {
+        await classroomTile.click();
+        break;
+      }
+    }
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForFunction(
+      (url: string) => {
+        return url !== `${baseUrl}/learn`;
+      },
+      {},
+      this.page.url()
+    );
+  }
+
+  /**
+   * Function to verify the diagnostic test box is present.
+   * @param {string} expectedHeading - The expected heading of the diagnostic test box.
+   * @param {string} expectedButtonText - The expected button text of the diagnostic test box.
+   */
+  async expectDiagnosticTestBoxToBePresent(
+    expectedHeading: string,
+    expectedButtonText: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(diagnosticTestBoxSelector);
+    const headings = await this.page.$$eval(diagnosticTestHeadingSelector, el =>
+      el.map(el => el.textContent)
+    );
+
+    expect(headings).toContain(expectedHeading);
+    showMessage(`Success: Heading is ${expectedHeading}.`);
+
+    const buttons = await this.page.$$eval(diagnosticTestButtonSelector, el =>
+      el.map(el => el.textContent)
+    );
+
+    expect(buttons).toContain(expectedButtonText);
+    showMessage(`Success: Button is ${expectedButtonText}.`);
+  }
+
+  /**
+   * Function to verify the heading in classroom page.
+   * @param {string} expectedHeading - The expected heading of the classroom.
+   */
+  async expectHeadingInClassroomPageToContain(
+    expectedHeading: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(classroomContentHeadingSelector);
+    const headings = await this.page.$$eval(
+      classroomContentHeadingSelector,
+      el => el.map(el => el.textContent)
+    );
+
+    expect(headings).toContain(expectedHeading);
+    showMessage(`Success: Heading is ${expectedHeading}.`);
+  }
+
+  /**
+   * Checks if the views of a lesson card matches the expected views.
+   * @param {number} expectedViews - The expected views of the card.
+   * @param {string} explorationName - The name of the exploration.
+   */
+  async expectLessonViewsToBe(
+    expectedViews: number,
+    explorationName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(lessonCardSelector);
+    const cards = await this.page.$$(lessonCardSelector);
+    for (const card of cards) {
+      await card.waitForSelector(lessonCardTitleSelector);
+      const titleElement = await card.$(lessonCardTitleSelector);
+      const titleText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        titleElement
+      );
+      if (titleText === explorationName) {
+        await card.waitForSelector(explorationViewsSelector);
+        const views = await card.$eval(explorationViewsSelector, el =>
+          parseInt(el?.textContent?.trim() ?? '0', 10)
+        );
+
+        if (views !== expectedViews) {
+          throw new Error(
+            `Expected views to be ${expectedViews}, but found ${views}`
+          );
+        }
+        return;
+      }
+    }
+  }
+
+  /**
+   * Function to verify the classroom heading.
+   * @param {string} expectedHeading - The expected heading of the classroom.
+   */
+  async expectClassroomHeadingToBe(expectedHeading: string): Promise<void> {
+    await this.expectTextContentToBe(classroomHeadingSelector, expectedHeading);
+  }
+
+  /**
+   * Starts a practice session for the given subtopics.
+   * @param {string[]} subtopicNames - The names of the subtopics to start a practice session for.
+   */
+  async startPracticeSession(subtopicNames: string[]): Promise<void> {
+    await this.page.waitForSelector(subtopicListItemInPracticeTabSelector);
+
+    const subtopicElements = await this.page.$$(
+      subtopicListItemInPracticeTabSelector
+    );
+
+    const subtopicsAdded = new Set<string>();
+
+    for (const subtopicElement of subtopicElements) {
+      const subtopicName = await subtopicElement.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (!subtopicName) {
+        continue;
+      }
+      if (subtopicNames.includes(subtopicName)) {
+        const labelElement = await subtopicElement.$('label');
+
+        if (labelElement) {
+          await labelElement.click();
+          await this.page.waitForFunction(
+            (element: HTMLInputElement) => element.checked === true,
+            {},
+            await labelElement.$('input')
+          );
+
+          subtopicsAdded.add(subtopicName);
+        }
+      }
+    }
+
+    await this.page.waitForSelector(startPracticeButtonSelector);
+    await this.clickOn(startPracticeButtonSelector);
+    await this.page.waitForSelector(startPracticeButtonSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Expects the tab title in the topic page to be the expected tab title.
+   * @param expectedTabTitle The expected tab title.
+   */
+  async expectTabTitleInTopicPageToBe(expectedTabTitle: string): Promise<void> {
+    await this.page.waitForSelector(tabTitleInTopicPageSelector);
+
+    await this.page.waitForFunction(
+      (selector: string, expectedTabTitle: string) => {
+        const tabTitle = document.querySelector(selector)?.textContent?.trim();
+        return tabTitle === expectedTabTitle;
+      },
+      {},
+      tabTitleInTopicPageSelector,
+      expectedTabTitle
+    );
+  }
+
+  /**
+   * Expects the subtopics in the practice tab to contain the expected subtopics.
+   * @param subtopicNames The expected subtopics.
+   */
+  async expectSubtopicListInPracticeTabToContain(
+    subtopicNames: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(subtopicListItemInPracticeTabSelector);
+    const subtopicsInList = await this.page.$$eval(
+      subtopicListItemInPracticeTabSelector,
+      subtopics => subtopics.map(subtopic => subtopic.textContent?.trim())
+    );
+
+    for (const subtopicName of subtopicNames) {
+      expect(subtopicsInList).toContain(subtopicName);
+    }
+  }
+
+  async expectToBeInPracticeSession(): Promise<void> {
+    expect(await this.isElementVisible(practiceSessionContainerSelector)).toBe(
+      true
+    );
+  }
+
+  /**
+   * Expects the user to be in the diagnostic test player.
+   */
+  async expectToBeInDiagnosticTestPlayer(): Promise<void> {
+    await this.isElementVisible(diagnosticTestPlayerSelector);
+
+    await this.isTextPresentOnPage('Learner Diagnostic Test');
+  }
+
+  /**
+   * Function to close the save progress menu.
+   */
+  async closeSaveProgressMenu(): Promise<void> {
+    await this.page.waitForSelector(saveProgressCloseButtonSelector);
+    await this.clickOn(saveProgressCloseButtonSelector);
+
+    await this.page.waitForSelector(saveProgressCloseButtonSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Clicks on the next recommended chapter button.
+   */
+  async continueToNextRecommendedLesson(): Promise<void> {
+    await this.page.waitForSelector(recommendedNextChapterSelector);
+    await this.clickOn(recommendedNextChapterSelector);
+
+    await this.page.waitForSelector(recommendedNextChapterSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Verifies the contributor icon in the lesson info modal.
+   * @param {string} contributorName - The name of the contributor.
+   * @param {number} index - The 1-based index of the contributor.
+   */
+  async expectContributorsInLessonInfoModalToBe(
+    contributorName: string,
+    index: number
+  ): Promise<void> {
+    await this.page.waitForSelector(contributorsContainerSelector);
+    await this.page.waitForSelector(`${contributorIconPrefix}${index - 1}`);
+
+    const contributorIcon = await this.page.$(
+      `${contributorIconPrefix}${index - 1}`
+    );
+    if (!contributorIcon) {
+      throw new Error('Contributor icon not found');
+    }
+
+    const userNameInAltText = await contributorIcon.$eval('img', el =>
+      el.getAttribute('alt')
+    );
+
+    expect(userNameInAltText).toBe(contributorName);
+  }
+
+  /**
+   * Function to verify if the user is on the story page.
+   * @param {string} storyTitle - The title of the story.
+   */
+  async expectToBeOnStoryPage(storyTitle: string): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() === value;
+      },
+      {},
+      storyTitleSelector,
+      storyTitle
+    );
   }
 
   /**
