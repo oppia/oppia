@@ -861,6 +861,9 @@ export class ClassroomAdminPageComponent implements OnInit {
   }
 
   getPrerequisiteLength(topicName: string): number {
+    if (!this.topicNameToPrerequisiteTopicNames.hasOwnProperty(topicName)) {
+      return 0;
+    }
     return this.topicNameToPrerequisiteTopicNames[topicName].length;
   }
 
