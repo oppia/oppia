@@ -491,11 +491,11 @@ export class ExplorationEditor extends BaseUser {
 
     const fillExplorationMetadataDetails = async () => {
       await this.clickOn(explorationTitleInput);
-      await this.type(explorationTitleInput, `${title}`);
+      await this.type(explorationTitleInput, title);
       await this.clickOn(explorationGoalInput);
-      await this.type(explorationGoalInput, `${goal}`);
+      await this.type(explorationGoalInput, goal);
       await this.clickOn(explorationCategoryDropdown);
-      await this.clickOn(`${category}`);
+      await this.clickOn(category);
       if (tags) {
         await this.type(tagsField, tags);
       }
@@ -644,7 +644,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    await this.waitForStaticAssetsToLoad();
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });

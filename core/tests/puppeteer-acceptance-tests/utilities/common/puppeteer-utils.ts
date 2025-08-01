@@ -1002,6 +1002,19 @@ export class BaseUser {
   }
 
   /**
+   * Verify that element is visilbe or not.
+   * @param {string} selector - The selector of the element to get text from.
+   * @param {boolean} visibility - Whether the element should be visible or not.
+   */
+  async expectElementToBeVisible(
+    selector: string,
+    visibility: boolean = true
+  ): Promise<void> {
+    const options = visibility ? {visible: true} : {hidden: true};
+    await this.page.waitForSelector(selector, options);
+  }
+
+  /**
    * Verify text content inside an element
    * @param {string} selector - The selector of the element to get text from.
    * @param {string} text - The expected text content.
@@ -1202,22 +1215,48 @@ export class BaseUser {
       value
     );
   }
+
   /**
-   * Checks if an element is present on the page.
-   * @param {string} selector - The selector of the element to check.
-   * @param {boolean} present - Whether the element should be present or not.
+   * This function returns all elements matching the given selector.
+   * @param selector - The selector to find elements for.
+   * @param parentElement - The parent element to search within.
    */
-  async expectElementToBeVisible(
+  async getAllElementsBySelector(
     selector: string,
-    present: boolean = true
-  ): Promise<void> {
-    if (present) {
-      await this.page.waitForSelector(selector, {visible: true});
-      showMessage(`Element (${selector}) is visible, as expected.`);
-    } else {
-      await this.page.waitForSelector(selector, {hidden: true});
-      showMessage(`Element (${selector}) is hidden, as expected.`);
+    parentElement?: puppeteer.ElementHandle
+  ): Promise<puppeteer.ElementHandle[]> {
+    const context = parentElement ?? this.page;
+
+    await context.waitForSelector(selector, {
+      visible: true,
+    });
+
+    const elements = await context.$$(selector);
+
+    if (!elements) {
+      throw new Error(`No elements found for selector ${selector}`);
     }
+
+    return elements;
+  }
+
+  /**
+   * This function returns the text contents of the given elements.
+   * @param elements - The elements to get the text contents from.
+   */
+  async getTextContentsFromElements(
+    elements: ElementHandle[]
+  ): Promise<string[]> {
+    const textContents: string[] = [];
+
+    for (const element of elements) {
+      const textContent = await element.evaluate(element =>
+        element.textContent?.trim()
+      );
+      textContents.push(textContent ?? '');
+    }
+
+    return textContents;
   }
 
   /**
