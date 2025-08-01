@@ -160,16 +160,6 @@ export default function isElementClickable(
     const horizontalInView =
       elementDimensions.left <= windowWidth &&
       elementDimensions.left + elementDimensions.width > 0;
-
-    // eslint-disable-next-line no-console
-    console.log(
-      '[debug] isElementClickable:\n' +
-        `Element position: ${elementDimensions.top}, ${elementDimensions.left}\n` +
-        `Element dimensions: ${elementDimensions.width}, ${elementDimensions.height}\n` +
-        `Window position: ${windowHeight}, ${windowWidth}\n` +
-        `VerticalInView: ${verticalInView}\n` +
-        `HorizontalInView: ${horizontalInView}`
-    );
     return verticalInView && horizontalInView;
   };
 

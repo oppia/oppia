@@ -419,7 +419,11 @@ export class BaseUser {
         typeof selector === 'string'
           ? await this.page.waitForSelector(selector)
           : selector;
+      if (!element) {
+        throw new Error('Element not found');
+      }
       await this.page.waitForFunction(isElementClickable, {}, element);
+      await this.waitForElementToStabilize(element);
     } catch (error) {
       if (error instanceof Error) {
         error.message =
@@ -1266,10 +1270,13 @@ export class BaseUser {
    * @param {number} timeout - The timeout in milliseconds.
    */
   async waitForElementToStabilize(
-    selector: string,
+    selector: string | ElementHandle<Element>,
     timeout: number = 5000
   ): Promise<void> {
-    const element = await this.page.waitForSelector(selector, {visible: true});
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector, {visible: true})
+        : selector;
     if (!element) {
       throw new Error('Element not found');
     }
@@ -1289,6 +1296,12 @@ export class BaseUser {
       ) {
         return;
       }
+
+      showMessage(
+        `Waiting for element ${selector} to stabilize...\n` +
+          `Previous Position: ${previousBox?.x?.toFixed(4)}, ${previousBox?.y?.toFixed(4)}\n` +
+          `Current Position: ${currentBox?.x?.toFixed(4)}, ${currentBox?.y?.toFixed(4)}`
+      );
       previousBox = currentBox;
     }
 
