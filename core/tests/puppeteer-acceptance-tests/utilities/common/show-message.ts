@@ -16,10 +16,22 @@
  * @fileoverview Utility function for logging the progress of the tests.
  */
 
+type MessageType = 'log' | 'browser';
+
 /**
- * Logs test progress and feedback messages.
+ * Function to log the progress of the tests.
+ * @param {string} message - The message to log.
+ * @param {MessageType} messageType - The type of message to log.
  */
-export const showMessage = (message: string): void => {
+export let showMessage = function (
+  message: string,
+  messageType: MessageType = 'log'
+): void {
+  const messagePrefixes = {
+    log: '[test-log]',
+    browser: '[browser-log]',
+  };
+  // We use console statements to log the progress or feedback of the tests.
   // eslint-disable-next-line no-console
-  console.log('LOG: ' + message);
+  console.log(`${messagePrefixes[messageType]}: ` + message);
 };
