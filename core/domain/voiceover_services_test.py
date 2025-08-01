@@ -32,6 +32,7 @@ from core.domain import state_domain
 from core.domain import translation_domain
 from core.domain import user_services
 from core.domain import voiceover_domain
+from core.domain import voiceover_regeneration_services
 from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
@@ -1535,3 +1536,107 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             email_models.SentEmailModel
         ] = email_models.SentEmailModel.get_all().fetch()
         self.assertEqual(len(all_models), 3)
+
+    @test_utils.set_platform_parameters(
+        [
+            (param_list.ParamName.ADMIN_EMAIL_ADDRESS, 'admin@system.com'),
+            (param_list.ParamName.EMAIL_FOOTER, 'dummy_footer'),
+            (param_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
+            (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
+            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
+            (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'subject'),
+            (param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'),
+            (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
+        ]
+    )
+    def test_should_raise_error_while_regenerating_voiceover(self) -> None:
+        exploration_id = 'exp_id_1'
+        exploration_title = 'Test Exploration'
+        exploration_version = 2
+        self.signup('tester@org.com', 'tester')
+        author_id = self.get_user_id_from_email('tester@org.com')
+        date_time = '2025-08-01T08:35:05.864077'
+
+        commit1 = exp_models.ExplorationCommitLogEntryModel.create(
+            exploration_id, 2, self.committer_1_id, 'msg', 'create', [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'State 1',
+                'old_value': {
+                    'content_id': 'content_5',
+                    'html': self.old_content_html
+                },
+                'new_value': {
+                    'content_id': 'content_5',
+                    'html': self.new_content_html
+                }
+            }], constants.ACTIVITY_STATUS_PRIVATE, False)
+
+        commit1.exploration_id = exploration_id
+        commit1.update_timestamps()
+        commit1.put()
+
+        self.voiceover_autogeneration_policy_model.language_codes_mapping = {
+            'en': {
+                'en-US': True
+            }
+        }
+
+        entity_voiceovers_models = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id, 'exploration', exploration_version
+            )
+        )
+        self.assertEqual(
+            len(entity_voiceovers_models), 0
+        )
+
+        def mock_regenerate_voiceover_on_exploration_update(
+            _exploration_id: str,
+            _exploration_version: int,
+            _content_id_to_content_html: Dict[str, str],
+            _language_accent_code: str
+        ) -> List[Tuple[str, str]]:
+            errors_while_voiceover_regeneration = [
+                ('content5', 'Error 1 occurred'),
+            ]
+            return errors_while_voiceover_regeneration
+
+        with self.swap(
+            voiceover_regeneration_services,
+            'regenerate_voiceover_on_exploration_update',
+            mock_regenerate_voiceover_on_exploration_update
+        ):
+            voiceover_services.regenerate_voiceover_for_updated_exploration(
+                exploration_id=exploration_id,
+                exploration_title=exploration_title,
+                exploration_version=exploration_version,
+                author_id=author_id,
+                date_time=date_time
+            )
+
+        all_models: Sequence[
+            email_models.SentEmailModel
+        ] = email_models.SentEmailModel.get_all().fetch()
+        self.assertEqual(len(all_models), 3)
+
+        expected_html_body = (
+            'Hi Voiceover Admins,<br><br>tester has initiated the generation '
+            'of automatic voiceovers for the exploration titled '
+            '<a href="https://www.oppia.org/create/exp_id_1">Test Exploration'
+            '</a> in language(s) English (United States).<br>This generation '
+            'was completed at 2025-08-01 08:35:05. Below is a summary of the '
+            'voiceover synthesis status.<br><br><ul><li>Total contents for '
+            'speech synthesis: 1.</li><li>Successfully generated voiceovers: '
+            '0.</li><li>Failed contents for voiceover generation: 1.</li>'
+            '</ul><br>You have also been cc’d on a separate email, sent to the '
+            'voiceover tech lead, to address the failed voiceover synthesis. '
+            'Please follow up on that email as needed.<br><br>Thank you.'
+        )
+        for email_model in all_models:
+            if (
+                email_model.subject ==
+                'Report on Automatic Voiceovers Generated for Test Exploration'
+            ):
+                self.assertEqual(
+                    email_model.html_body, expected_html_body)

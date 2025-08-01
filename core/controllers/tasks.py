@@ -19,7 +19,6 @@ from __future__ import annotations
 import json
 
 from core import feconf
-
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -30,8 +29,8 @@ from core.domain import question_services
 from core.domain import stats_services
 from core.domain import suggestion_registry
 from core.domain import taskqueue_services
-from core.domain import wipeout_service
 from core.domain import voiceover_services
+from core.domain import wipeout_service
 
 from typing import Callable, Dict
 
