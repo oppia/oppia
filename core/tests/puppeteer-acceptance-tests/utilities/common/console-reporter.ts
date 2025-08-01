@@ -26,6 +26,7 @@ import {
 } from 'puppeteer';
 
 import escapeRegExp from 'lodash/escapeRegExp';
+import {showMessage} from './show-message';
 
 const HOST_URL = 'http://localhost:8181';
 
@@ -163,6 +164,9 @@ export class ConsoleReporter {
             })
           );
           messageText = messages.join(' | ');
+        }
+        if (messageText.toLowerCase().includes('debug')) {
+          showMessage(messageText, 'browser');
         }
         // Here we concat the message text with the message's source if it is present.
         const messageSource = message.location().url;

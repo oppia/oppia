@@ -234,13 +234,17 @@ export class BaseUser {
       /[^a-z0-9.-]/gi,
       '_'
     );
+    const randomString = Math.random().toString(36).substring(2, 8);
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, {recursive: true});
     }
     for (const instance of BaseUser.instances) {
       if (instance.page) {
         await instance.page.screenshot({
-          path: path.join(outputDir, outputFileName + `-instance-${i}.png`),
+          path: path.join(
+            outputDir,
+            outputFileName + randomString + `-instance-${i}.png`
+          ),
         });
         showMessage(
           `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
@@ -409,6 +413,7 @@ export class BaseUser {
   async waitForElementToBeClickable(
     selector: string | ElementHandle<Element>
   ): Promise<void> {
+    showMessage(`Checking if element ${selector} is clickable...`);
     try {
       const element =
         typeof selector === 'string'
@@ -416,14 +421,26 @@ export class BaseUser {
           : selector;
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
-      throw new Error(`Element ${selector} took too long to be clickable.`);
+      if (error instanceof Error) {
+        error.message =
+          `Element with selector ${selector} took too long to be clickable.\n` +
+          'Original Error:\n' +
+          error.message;
+      }
+      throw error;
     }
+    showMessage(`Element (${selector}) is clickable, as expected.`);
   }
 
   /**
    * The function clicks the element using the text on the button.
+   * @param selector The text of the button to click on.
+   * @param forceSelector If true, the function will try to find the element by its CSS selector.
    */
-  async clickOn(selector: string): Promise<void> {
+  async clickOn(
+    selector: string,
+    forceSelector: boolean = false
+  ): Promise<void> {
     /** Normalize-space is used to remove the extra spaces in the text.
      * Check the documentation for the normalize-space function here :
      * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
@@ -432,12 +449,16 @@ export class BaseUser {
     );
     // If we fail to find the element by its XPATH, then the button is undefined and
     // we try to find it by its CSS selector.
-    if (button !== undefined) {
+    if (button !== undefined && !forceSelector) {
       await this.waitForElementToBeClickable(button);
+      showMessage(`Button (text: ${selector}) is clickable, as expected.`);
       await button.click();
+      showMessage(`Button (text: ${selector}) is clicked.`);
     } else {
       await this.waitForElementToBeClickable(selector);
+      showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
       await this.page.click(selector);
+      showMessage(`Element (selector: ${selector}) is clicked.`);
     }
   }
 
@@ -528,7 +549,8 @@ export class BaseUser {
    * This function uploads a file using the given file path.
    */
   async uploadFile(filePath: string): Promise<void> {
-    const inputUploadHandle = await this.page.$('input[type=file]');
+    const inputUploadHandle =
+      await this.page.waitForSelector('input[type=file]');
     if (inputUploadHandle === null) {
       throw new Error('No file input found while attempting to upload a file.');
     }
@@ -566,9 +588,23 @@ export class BaseUser {
    * This function closes the current Puppeteer browser instance.
    */
   async closeBrowser(): Promise<void> {
+    showMessage(
+      `Started closing broswer for ${this.username ?? 'unknown user'}.`
+    );
+    // Stop the screen recorder.
     if (this.screenRecorder) {
-      await this.screenRecorder.stop();
+      try {
+        await this.screenRecorder.stop();
+        showMessage(
+          `Screen recording stopped for ${this.username ?? 'unknown user'}.`
+        );
+      } catch (error) {
+        showMessage(
+          `Error while stopping screen recording for ${this.username}: ${error}`
+        );
+      }
     }
+
     const CONFIG_FILE = path.resolve(
       __dirname,
       '../../jest-runtime-config.json'
@@ -577,14 +613,21 @@ export class BaseUser {
       fs.existsSync(CONFIG_FILE) &&
       !(process.env.VIDEO_RECORDING_IS_ENABLED === '1')
     ) {
-      const configData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
-      if (configData.testFailureDetected) {
-        fs.unlinkSync(CONFIG_FILE);
-        // Signal all BaseUser instances to take screenshots.
-        await this.captureScreenshotsForFailedTest();
+      try {
+        const configData = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
+        if (configData.testFailureDetected) {
+          fs.unlinkSync(CONFIG_FILE);
+          // Signal all BaseUser instances to take screenshots.
+          await this.captureScreenshotsForFailedTest();
+        }
+      } catch (error) {
+        showMessage(
+          `Error while taking screenshot for ${this.username ?? 'unknown user'}: ${error}`
+        );
       }
     }
     await this.browserObject.close();
+    showMessage(`Browser closed for ${this.username ?? 'unknown user'}.`);
   }
 
   /**
@@ -1055,9 +1098,14 @@ export class BaseUser {
 
       showMessage(`Text content of "${selector}" contains "${text}".`);
     } catch (error) {
-      throw new Error(
-        `Failed: Text content of "${selector}" does not contain "${text}".\nOriginal Error:\n${error.stack}`
+      const actualTextContent = await this.page.$eval(selector, element =>
+        (element as HTMLElement).textContent?.trim()
       );
+      error.message =
+        `Failed: Text content of "${selector}" does not contain "${text}", it contains ${actualTextContent}.\n` +
+        'Original Error:\n' +
+        `${error.message}`;
+      throw error;
     }
   }
 
@@ -1117,19 +1165,43 @@ export class BaseUser {
       await this.waitForProgressMessageDisappear(progressMessage);
     }
 
-    const actualStatusMessage = await this.page.$eval(
+    await this.expectTextContentToContain(
       actionStatusMessageSelector,
-      el => el.textContent?.trim()
+      statusMessage
     );
-
-    if (!actualStatusMessage?.includes(statusMessage)) {
-      throw new Error(
-        `Action status message did not include the expected text. Actual status message: "${actualStatusMessage}", expected text: "${statusMessage}"`
-      );
-    }
-    return;
   }
 
+  /**
+   * This function checks if the page URL contains the given URL.
+   * @param {string} url - The URL to check.
+   */
+  async expectPageURLToContain(url: string): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => {
+        return window.location.href.includes(url);
+      },
+      {},
+      url
+    );
+  }
+
+  /**
+   * Function to verify the value of the input field.
+   * @param {string} selector - The selector of the input field.
+   * @param {string} value - The expected value of the input field.
+   */
+  async expectInputValueToBe(selector: string, value: string): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element: HTMLInputElement | null =
+          document.querySelector(selector);
+        return element?.value === value;
+      },
+      {},
+      selector,
+      value
+    );
+  }
   /**
    * Checks if an element is present on the page.
    * @param {string} selector - The selector of the element to check.
@@ -1139,8 +1211,13 @@ export class BaseUser {
     selector: string,
     present: boolean = true
   ): Promise<void> {
-    const option = present ? {visible: true} : {hidden: true};
-    await this.page.waitForSelector(selector, option);
+    if (present) {
+      await this.page.waitForSelector(selector, {visible: true});
+      showMessage(`Element (${selector}) is visible, as expected.`);
+    } else {
+      await this.page.waitForSelector(selector, {hidden: true});
+      showMessage(`Element (${selector}) is hidden, as expected.`);
+    }
   }
 
   /**
@@ -1166,6 +1243,65 @@ export class BaseUser {
 
     // Verify Tooltip.
     expect(tooltipText).toBe(expectedToolTip);
+  }
+
+  /**
+   * Waits until the click function is attached to the given selector.
+   * @param {string} selector - The selector of the element.
+   */
+  async waitUntilClickFunctionIsAttached(selector: string): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const el: HTMLInputElement | null = document.querySelector(selector);
+        return el?.click !== undefined || el?.addEventListener || el?.click;
+      },
+      {},
+      selector
+    );
+  }
+
+  /**
+   * Waits for an element to stabilize.
+   * @param {string} selector - The selector of the element.
+   * @param {number} timeout - The timeout in milliseconds.
+   */
+  async waitForElementToStabilize(
+    selector: string | ElementHandle<Element>,
+    timeout: number = 5000
+  ): Promise<void> {
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector, {visible: true})
+        : selector;
+    if (!element) {
+      throw new Error('Element not found');
+    }
+
+    let previousBox = await element.boundingBox();
+    const startTime = Date.now();
+
+    while (Date.now() - startTime < timeout) {
+      await this.page.waitForTimeout(100);
+      const currentBox = await element.boundingBox();
+
+      if (
+        previousBox &&
+        currentBox &&
+        Math.abs(previousBox.x - currentBox.x) < 1 &&
+        Math.abs(previousBox.y - currentBox.y) < 1
+      ) {
+        return;
+      }
+
+      showMessage(
+        `Waiting for element ${selector} to stabilize...\n` +
+          `Previous Position: ${previousBox?.x?.toFixed(4)}, ${previousBox?.y?.toFixed(4)}\n` +
+          `Current Position: ${currentBox?.x?.toFixed(4)}, ${currentBox?.y?.toFixed(4)}`
+      );
+      previousBox = currentBox;
+    }
+
+    showMessage(`Element ${selector} did not stabilize within ${timeout} ms`);
   }
 }
 

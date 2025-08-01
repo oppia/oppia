@@ -43,8 +43,6 @@ const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
 const mobileVoiceoverArtistsHeader =
   '.e2e-test-voice-artist-collapsible-card-header';
-const voiceArtistSettingsDropdown =
-  'h3.e2e-test-voice-artists-settings-container';
 
 const languageAccentOptionSelector =
   '.e2e-test-language-accent-selector-option';
@@ -70,16 +68,16 @@ export class VoiceoverAdmin extends BaseUser {
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.isElementVisible(mobileNavToggelbutton);
+      await this.expectElementToBeVisible(mobileNavToggelbutton);
       await this.clickOn(mobileNavToggelbutton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
     } else {
-      await this.isElementVisible(explorationSettingsTab);
+      await this.expectElementToBeVisible(explorationSettingsTab);
       await this.clickOn(explorationSettingsTab);
     }
 
-    await this.isElementVisible(explorationEditorSettingsTabSelector);
+    await this.expectElementToBeVisible(explorationEditorSettingsTabSelector);
     showMessage('Navigation to settings tab is successful.');
   }
 
@@ -88,13 +86,6 @@ export class VoiceoverAdmin extends BaseUser {
    */
   async navigateToVoiceoverAdminPage(): Promise<void> {
     await this.goto(voiceoverAdminURL);
-  }
-
-  /**
-   * Function to open voice artist dropdown in mobile view.
-   */
-  async openvoiceArtistDropdown(): Promise<void> {
-    await this.clickOn(voiceArtistSettingsDropdown);
   }
 
   /**
@@ -139,10 +130,10 @@ export class VoiceoverAdmin extends BaseUser {
       });
       await this.clickOn(dropdownToggleIcon);
 
-      await this.isElementVisible(mobileOptionsDropdown, false);
+      await this.expectElementToBeVisible(mobileOptionsDropdown, false);
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
+      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -173,10 +164,11 @@ export class VoiceoverAdmin extends BaseUser {
    * @param voiceArtists - The username list of the voiceover artists to add.
    */
   async addVoiceoverArtistsToExploration(
-    voiceArtists: string[]
+    voiceArtists: string[],
+    verify: boolean = true
   ): Promise<void> {
     for (let i = 0; i < voiceArtists.length; i++) {
-      await this.isElementVisible(editVoiceoverArtistButton);
+      await this.expectElementToBeVisible(editVoiceoverArtistButton);
       await this.clickOn(editVoiceoverArtistButton);
       await this.clickOn(voiceArtistUsernameInputBox);
       await this.page.waitForSelector(voiceArtistUsernameInputBox, {
@@ -187,14 +179,19 @@ export class VoiceoverAdmin extends BaseUser {
       await this.clickOn(saveVoiceoverArtistEditButton);
       // Adding try catch here to avoid unnecessary waiting for selector if
       // the added voice artist is not an user.
-      try {
-        await this.page.waitForSelector(
-          `div.e2e-test-voice-artist-${voiceArtists[i]}`,
-          {visible: true}
-        );
-        showMessage(voiceArtists[i] + ' has been added as a voice artist.');
-      } catch (error) {
-        showMessage(voiceArtists[i] + ' is not added.');
+      if (verify) {
+        try {
+          await this.page.waitForSelector(
+            `div.e2e-test-voice-artist-${voiceArtists[i]}`,
+            {visible: true}
+          );
+          showMessage(voiceArtists[i] + ' has been added as a voice artist.');
+        } catch (error) {
+          throw new Error(
+            `${voiceArtists[i]} is not added.\n` +
+              `Original Error: ${error.stack}`
+          );
+        }
       }
     }
   }
@@ -224,10 +221,10 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to close toast message.
    */
   async closeToastMessage(): Promise<void> {
-    await this.isElementVisible(toastWarningContainer);
+    await this.expectElementToBeVisible(toastWarningContainer);
     await this.clickOn(closeToastMessageButton);
 
-    await this.isElementVisible(toastWarningContainer, false);
+    await this.expectElementToBeVisible(toastWarningContainer, false);
   }
 
   /**
@@ -308,7 +305,7 @@ export class VoiceoverAdmin extends BaseUser {
       if (textContent === languageAccentDescription) {
         await option.click();
 
-        await this.isElementVisible(addNewLanguageAccentButtonSelector);
+        await this.expectElementToBeVisible(addNewLanguageAccentButtonSelector);
         break;
       }
     }
