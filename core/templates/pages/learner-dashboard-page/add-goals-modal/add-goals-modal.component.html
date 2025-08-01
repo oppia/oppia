@@ -1,7 +1,7 @@
 <div class="align-items-center d-flex flex-column h-100">
   <h3 class="oppia-learner-dash-goals-modal-title" mat-dialog-title> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_HEADING' | translate }} </h3>
   <p class="oppia-learner-dash-goals-modal-info"> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_INSTRUCTIONS' | translate }}  </p>
-  <div class="oppia-learner-dash-goals-modal-content pt-1" mat-dialog-content>
+  <div class="oppia-learner-dash-goals-modal-content pt-1 e2e-test-new-goals-list" mat-dialog-content>
     <!--TODO(#18384): What if all the goals are completed, should they be disabled and checked?-->
     <!--TODO(#18384): Topic name translate keys-->
     <ng-container *ngFor="let topic of topics | keyvalue">
@@ -16,7 +16,7 @@
   </div>
   <div class="oppia-learner-dash-goals-modal-actions w-100" mat-dialog-actions>
     <button (click)="onClose()" class="oppia-learner-dash-button--inverse oppia-learner-dash-button-sm oppia-learner-dash-button--modal outline" mat-button> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_CANCEL' | translate }} </button>
-    <button (click)="onSubmit()" class="oppia-learner-dash-button--default oppia-learner-dash-button-sm oppia-learner-dash-button--modal" mat-button> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_SAVE' | translate }} </button>
+    <button (click)="onSubmit()" class="oppia-learner-dash-button--default oppia-learner-dash-button-sm oppia-learner-dash-button--modal e2e-test-add-new-goal-button" mat-button> {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_MODAL_SAVE' | translate }} </button>
   </div>
 </div>
 

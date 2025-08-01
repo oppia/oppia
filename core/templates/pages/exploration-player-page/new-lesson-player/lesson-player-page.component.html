@@ -4,9 +4,9 @@
     <oppia-loading-message [message]="'Loading'"></oppia-loading-message>
   </div>
   <div class="oppia-new-player-content">
-    <oppia-player-sidebar></oppia-player-sidebar>
+    <oppia-player-sidebar *ngIf="!pageIsIframed"></oppia-player-sidebar>
     <div class="oppia-new-player-main-content">
-      <oppia-new-audio-bar></oppia-new-audio-bar>
+      <oppia-new-audio-bar *ngIf="!pageIsIframed"></oppia-new-audio-bar>
       <div class="conversation-wrapper">
         <oppia-new-conversation-skin></oppia-new-conversation-skin>
       </div>
