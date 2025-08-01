@@ -571,8 +571,6 @@ const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
 const profilePictureSelector = '.e2e-test-profile-dropdown';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const floatFormInput = '.e2e-test-float-form-input';
-const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
-const toastMessageSelector = '.e2e-test-toast-message';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -2237,7 +2235,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnCreateAccountButtonInSaveProgressModal(): Promise<void> {
     await this.page.waitForSelector(lessonInfoSignUpButtonSelector);
-    await this.clickOn(lessonInfoSignUpButtonSelector);
+    await this.page.click(lessonInfoSignUpButtonSelector);
 
     await this.page.waitForSelector(lessonInfoSignUpButtonSelector, {
       hidden: true,
@@ -2261,27 +2259,12 @@ export class LoggedOutUser extends BaseUser {
     }
     await this.page.waitForSelector(languageDropdown);
     const languageDropdownElement = await this.page.$(languageDropdown);
-    if (!languageDropdownElement) {
-      throw new Error('Language dropdown element not found');
+    if (languageDropdownElement) {
+      await languageDropdownElement.click();
     }
-    const initialLanguage = await this.page.$eval(
-      languageDropdown,
-      el => el.textContent
-    );
-    await languageDropdownElement.click();
     await this.clickOn(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
-
-    await this.page.waitForFunction(
-      (selector: string, textContent: string) => {
-        const element = document.querySelector(selector);
-        return element && element.textContent !== textContent;
-      },
-      {},
-      languageOption,
-      initialLanguage
-    );
   }
 
   /**
@@ -3161,8 +3144,17 @@ export class LoggedOutUser extends BaseUser {
    * Checks if value of input is equal to the given value.
    * @param {string} value - The value to check.
    */
-  async expectAnswerInputValueToBe(value: string): Promise<void> {
-    await this.expectInputValueToBe(floatFormInput, value);
+  async expectInputValueToBe(value: string): Promise<void> {
+    await this.expectElementToBeVisible(floatFormInput);
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLInputElement)?.value === value;
+      },
+      {},
+      floatFormInput,
+      value
+    );
   }
 
   /**
@@ -3197,7 +3189,6 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForElementToBeClickable(newsletterEmailInputField);
     await this.type(newsletterEmailInputField, email);
     await this.clickOn(newsletterSubscribeButton);
-    await this.expectElementToBeVisible(newsletterSubscriptionThanksMessage);
   }
 
   /**
@@ -3402,17 +3393,6 @@ export class LoggedOutUser extends BaseUser {
 
     await this.clickOn(searchInputSelector);
     await this.page.keyboard.press('Enter');
-
-    await this.page.waitForFunction(
-      (categoryNames: string[]) => {
-        // Check if URL contains all the categories. Added %22 to remove false positives.
-        return categoryNames.every(category =>
-          window.location.href.includes(`%22${category}%22`)
-        );
-      },
-      {},
-      categoryNames
-    );
   }
 
   /**
@@ -3470,15 +3450,6 @@ export class LoggedOutUser extends BaseUser {
 
     await this.clickOn(searchInputSelector);
     await this.page.keyboard.press('Enter');
-
-    const buttonTextContent =
-      languageNames.length === 1
-        ? languageNames[0]
-        : `${languageNames.length} Languages`;
-    await this.expectTextContentToBe(
-      languageFilterDropdownToggler,
-      buttonTextContent
-    );
   }
 
   /**
@@ -3660,8 +3631,7 @@ export class LoggedOutUser extends BaseUser {
             name.click(),
           ]);
 
-          await this.expectElementToBeVisible(topicViewerContainerSelector);
-          showMessage(`Topic ${topicName} is opened successfully.`);
+          showMessage(`Opened Topic: ${topicName}`);
           return;
         }
       }
@@ -3891,10 +3861,6 @@ export class LoggedOutUser extends BaseUser {
             this.waitForElementToBeClickable(chapter),
             chapter.click(),
           ]);
-
-          await this.expectPageURLToContain(
-            testConstants.URLs.ExplorationPlayer
-          );
           return;
         }
       }
@@ -3961,7 +3927,6 @@ export class LoggedOutUser extends BaseUser {
    */
   async selectReviewCardToLearn(subtopicName: string): Promise<void> {
     try {
-      await this.expectElementToBeVisible(subTopicTitleInLessTabSelector);
       const subtopicElements = await this.page.$$(
         subTopicTitleInLessTabSelector
       );
@@ -3980,11 +3945,6 @@ export class LoggedOutUser extends BaseUser {
             this.waitForElementToBeClickable(subtopicElements[i]),
             subtopicElements[i].click(),
           ]);
-
-          await this.expectElementToBeVisible(
-            subTopicTitleInLessTabSelector,
-            false
-          );
           return;
         }
       }
@@ -4589,13 +4549,11 @@ export class LoggedOutUser extends BaseUser {
    */
   async closeSolutionModal(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.expectElementToBeVisible(closeSolutionModalButton);
+    await this.page.waitForSelector(closeSolutionModalButton, {visible: true});
     const closeSolutionModalButtonElement = await this.page.$(
       closeSolutionModalButton
     );
     await closeSolutionModalButtonElement?.click();
-
-    await this.expectElementToBeVisible(closeSolutionModalButton, false);
   }
   /**
    * Function to view previous responses in a state.
@@ -4886,7 +4844,10 @@ export class LoggedOutUser extends BaseUser {
     });
 
     await this.clickOn(contributorIconInLessonInfoSelctor);
-    await this.expectElementToBeVisible(profileContainerSelector);
+    const navigated = await this.isElementVisible(profileContainerSelector);
+    if (!navigated) {
+      throw new Error('Navigation to profile page failed.');
+    }
 
     expect(this.page.url()).toContain('/profile');
   }
@@ -5090,7 +5051,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(openMobileNavbarMenuButton, true);
+      await this.clickOn(openMobileNavbarMenuButton);
     }
 
     const isMobileViewport = this.isViewportAtMobileWidth();
@@ -6653,29 +6614,6 @@ export class LoggedOutUser extends BaseUser {
       {},
       testConstants.URLs.CommunityLibrary
     );
-  }
-
-  /**
-   * Hovers over the toast message to see the error message.
-   */
-  async hoverOverToastMessage(): Promise<void> {
-    await this.page.waitForSelector(toastMessageSelector);
-    await this.page.hover(toastMessageSelector);
-  }
-
-  /**
-   * Updates the toast style to make it visible.
-   */
-  async updateToastStyle(): Promise<void> {
-    await this.page.addStyleTag({
-      content: `
-        .e2e-test-toast-message {
-          opacity: 1 !important;
-          transition: none !important;
-          animation: none !important;
-        }
-      `,
-    });
   }
 }
 

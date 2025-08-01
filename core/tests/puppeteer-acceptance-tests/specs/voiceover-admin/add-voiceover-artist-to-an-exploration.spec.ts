@@ -85,10 +85,7 @@ describe('Voiceover Admin', function () {
       await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
         'invalidUserId'
       );
-      await voiceoverAdmin.addVoiceoverArtistsToExploration(
-        ['invalidUserId'],
-        false
-      );
+      await voiceoverAdmin.addVoiceoverArtistsToExploration(['invalidUserId']);
 
       await voiceoverAdmin.expectToSeeErrorToastMessage(
         invalidIdErrorToastMessage

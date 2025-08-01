@@ -70,7 +70,6 @@ describe('Exploration Creator', function () {
 
       await explorationEditor.updateTitleTo('New Title');
       await explorationEditor.discardCurrentChanges();
-      await explorationEditor.expandSettingsTabSection('Basic Settings');
       await explorationEditor.expectTitleToBe('Old Title');
 
       await explorationEditor.updateTitleTo('New Title');

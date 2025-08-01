@@ -122,7 +122,7 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addMultipleChoiceInteractionInQuestionEditor([
+      await questionSubmitter.addMultipleChoiceInteraction([
         'Option 1',
         'Option 2',
         'Option 3',

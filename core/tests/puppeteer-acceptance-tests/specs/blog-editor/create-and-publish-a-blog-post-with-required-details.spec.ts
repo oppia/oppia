@@ -19,13 +19,12 @@
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
 import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
-import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Blog Editor', function () {
-  let blogPostEditor: BlogPostEditor & LoggedOutUser;
+  let blogPostEditor: BlogPostEditor;
 
   beforeAll(async function () {
     blogPostEditor = await UserFactory.createNewUser(
@@ -52,8 +51,6 @@ describe('Blog Editor', function () {
       await blogPostEditor.deletePublishedBlogPostWithTitle(
         'This is a test blog post'
       );
-
-      await blogPostEditor.updateToastStyle();
       await blogPostEditor.expectScreenshotToMatch(
         'blogEditorPageWithBlogPostDeletedMessage',
         __dirname

@@ -140,7 +140,7 @@ export class BlogDashboardPageService {
         () => {
           this.alertsService.addSuccessMessage(
             'Blog Post Deleted Successfully.',
-            10000
+            5000
           );
           if (this.activeTab === 'editor_tab') {
             this.navigateToMainTab();

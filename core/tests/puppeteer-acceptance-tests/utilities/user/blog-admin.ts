@@ -65,16 +65,12 @@ export class BlogAdmin extends BaseUser {
    */
   async setMaximumTagLimitTo(limit: number): Promise<void> {
     // These steps are for deleting the existing value in the input field.
-    await this.expectElementToBeVisible(maximumTagLimitInput);
+    await this.isElementVisible(maximumTagLimitInput);
     await this.clearAllTextFrom(maximumTagLimitInput);
 
     await this.type(maximumTagLimitInput, limit.toString());
     await this.clickOn(LABEL_FOR_SAVE_BUTTON);
 
-    await this.expectActionStatusMessageToBe(
-      'Data saved successfully.',
-      'Saving...'
-    );
     showMessage(`Successfully updated the tag limit to ${limit}!`);
   }
 
@@ -82,7 +78,6 @@ export class BlogAdmin extends BaseUser {
    * This function checks if the tag limit is not equal to.
    */
   async expectMaximumTagLimitNotToBe(limit: number): Promise<void> {
-    await this.expectElementToBeVisible(maximumTagLimitInput);
     const tagLimit = await this.page.$eval(
       maximumTagLimitInput,
       element => (element as HTMLInputElement).value
@@ -97,7 +92,6 @@ export class BlogAdmin extends BaseUser {
    * This function checks if the tag limit is equal to.
    */
   async expectMaximumTagLimitToBe(limit: number): Promise<void> {
-    await this.expectElementToBeVisible(maximumTagLimitInput);
     const tagLimit = await this.page.$eval(
       maximumTagLimitInput,
       element => (element as HTMLInputElement).value

@@ -36,7 +36,7 @@ ConsoleReporter.setConsoleErrorsToIgnore([/.*404.*Not Found.*/]);
 
 describe('Exploration Creator', function () {
   let explorationEditor: ExplorationEditor;
-  let voiceoverAdmin: VoiceoverAdmin & ExplorationEditor;
+  let voiceoverAdmin: VoiceoverAdmin;
   let curriculumAdmin: CurriculumAdmin;
   let explorationId: string | null;
 
@@ -133,7 +133,7 @@ describe('Exploration Creator', function () {
       if (voiceoverAdmin.isViewportAtMobileWidth()) {
         await voiceoverAdmin.closeEditorNavigationDropdownOnMobile();
       }
-      await voiceoverAdmin.expandSettingsTabSection('Voice Artists');
+      await voiceoverAdmin.openvoiceArtistDropdown();
       await voiceoverAdmin.addVoiceoverArtistsToExploration([
         'guestUser1',
         'guestUser2',

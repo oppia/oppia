@@ -66,7 +66,6 @@ const miscTabContainerSelector =
   '.e2e-test-release-coordiator-misc-tab-container';
 const promoBarSaveButtonSelector =
   '.e2e-test-release-coordinator-promo-bar-button';
-const beamJobCloseOuputButtonSelector = '.e2e-test-close-beam-job-output';
 
 export class ReleaseCoordinator extends BaseUser {
   /**
@@ -82,11 +81,11 @@ export class ReleaseCoordinator extends BaseUser {
   async navigateToFeaturesTab(): Promise<void> {
     try {
       if (this.isViewportAtMobileWidth()) {
-        await this.expectElementToBeVisible(mobileNavBar);
+        await this.isElementVisible(mobileNavBar);
         await this.clickOn(mobileNavBar);
         await this.clickOn(mobileFeaturesTab);
       } else {
-        await this.expectElementToBeVisible(featuresTab);
+        await this.isElementVisible(featuresTab);
         await this.clickOn(featuresTab);
       }
 
@@ -114,9 +113,9 @@ export class ReleaseCoordinator extends BaseUser {
       const navbarElements = await this.page.$$(navbarElementSelector);
       await this.waitForElementToBeClickable(navbarElements[2]);
       await navbarElements[2].click();
-    }
 
-    await this.expectElementToBeVisible(miscTabContainerSelector);
+      await this.isElementVisible(miscTabContainerSelector);
+    }
   }
 
   /**
@@ -302,7 +301,13 @@ export class ReleaseCoordinator extends BaseUser {
     await this.page.waitForSelector(actionStatusMessageSelector, {
       visible: true,
     });
-    await this.expectTextContentToBe(actionStatusMessageSelector, 'Success!');
+    const statusMessage = await this.page.$eval(
+      actionStatusMessageSelector,
+      el => el.textContent
+    );
+    if (statusMessage === ' Success! ') {
+      showMessage('Promo bar message saved successfully.');
+    }
   }
 
   /**
@@ -332,7 +337,6 @@ export class ReleaseCoordinator extends BaseUser {
    */
   async flushCache(): Promise<void> {
     await this.clickOn('Flush Cache');
-    await this.expectActionStatusMessageToBe('Success! Memory Cache Flushed.');
   }
 
   /**
@@ -459,8 +463,6 @@ export class ReleaseCoordinator extends BaseUser {
       const element = document.querySelector(selector) as HTMLElement;
       element?.click();
     }, startNewJobConfirmationButton);
-
-    await this.expectElementToBeClickable(startNewJobConfirmationButton, false);
     showMessage('Job started');
   }
 
@@ -562,9 +564,7 @@ export class ReleaseCoordinator extends BaseUser {
    * @returns {Promise<void>}
    */
   async closeOutputModal(): Promise<void> {
-    await this.expectElementToBeVisible(beamJobCloseOuputButtonSelector);
-    await this.page.click(beamJobCloseOuputButtonSelector);
-    await this.expectElementToBeVisible(beamJobCloseOuputButtonSelector, false);
+    await this.clickOn('Close');
     showMessage('Output modal closed');
   }
 

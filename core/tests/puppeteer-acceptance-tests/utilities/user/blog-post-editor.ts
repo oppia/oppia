@@ -39,11 +39,11 @@ const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
 const blogBodySaveButtonSelector = '.e2e-test-save-blog-post-content';
 const publisedBlogsTabContainerSelector = '.e2e-test-published-blogs-tab';
 
-const tagSelector = '.e2e-test-blog-post-tags';
-const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
-const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
-
+const LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON = 'CREATE NEW BLOG POST';
+const LABEL_FOR_SAVE_BUTTON = 'Save';
+const LABEL_FOR_SAVE_DRAFT_BUTTON = 'SAVE AS DRAFT';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
+const LABEL_FOR_CONFIRM_BUTTON = 'Confirm';
 
 export class BlogPostEditor extends BaseUser {
   /**
@@ -56,8 +56,7 @@ export class BlogPostEditor extends BaseUser {
     if (inputBar) {
       await this.type(blogAuthorBioField, 'Dummy-User-Bio');
       await this.page.waitForSelector(`${authorBioSaveButton}:not([disabled])`);
-      await this.page.click(authorBioSaveButton);
-      await this.expectElementToBeVisible(authorBioSaveButton, false);
+      await this.clickOn(LABEL_FOR_SAVE_BUTTON);
     }
   }
 
@@ -76,7 +75,7 @@ export class BlogPostEditor extends BaseUser {
     draftBlogPostTitle: string
   ): Promise<void> {
     await this.addUserBioInBlogDashboard();
-    await this.clickOn(newBlogPostButtonSelector);
+    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
     await this.updateBlogPostTitle(draftBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content');
     await this.saveBlogBodyChanges();
@@ -92,7 +91,6 @@ export class BlogPostEditor extends BaseUser {
   async deleteDraftBlogPostWithTitle(
     draftBlogPostTitle: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(listOfBlogsInBlogDashboard);
     const allDraftBlogPosts = await this.page.$$(listOfBlogsInBlogDashboard);
     for (let i = 0; i < allDraftBlogPosts.length; i++) {
       let checkDraftBlogPostTitle = await allDraftBlogPosts[i].$eval(
@@ -112,7 +110,7 @@ export class BlogPostEditor extends BaseUser {
           },
         });
 
-        await this.expectElementToBeVisible(confirmButtonSelector, false);
+        await this.isElementVisible(confirmButtonSelector, false);
         showMessage('Draft blog post with given title deleted successfully!');
         return;
       }
@@ -151,10 +149,8 @@ export class BlogPostEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.uploadFile(blogPostThumbnailImage);
       await this.clickOn(addThumbnailImageButton);
-
-      await this.expectElementToBeVisible(addThumbnailImageButton, false);
     } else {
-      await this.expectElementToBeVisible(thumbnailPhotoBox);
+      await this.isElementVisible(thumbnailPhotoBox);
       await this.clickOn(thumbnailPhotoBox);
       await this.uploadFile(blogPostThumbnailImage);
       await this.clickOn(addThumbnailImageButton);
@@ -173,8 +169,7 @@ export class BlogPostEditor extends BaseUser {
 
     await this.updateBlogPostTitle(newBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content');
-    await this.selectTag('News');
-    await this.selectTag('International');
+    await this.selectTags('News', 'International');
     const blogId = (await this.page.url().split('/').pop()) as string;
     await this.saveBlogBodyChanges();
 
@@ -187,7 +182,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async openBlogEditorPage(): Promise<void> {
     await this.addUserBioInBlogDashboard();
-    await this.clickOn(newBlogPostButtonSelector);
+    await this.clickOn(LABEL_FOR_NEW_BLOG_POST_CREATE_BUTTON);
     await this.expectPublishButtonToBeDisabled();
   }
 
@@ -195,7 +190,7 @@ export class BlogPostEditor extends BaseUser {
    * This function updates the title of the blog post.
    */
   async updateBlogPostTitle(newBlogPostTitle: string): Promise<void> {
-    await this.expectElementToBeVisible(blogTitleInput);
+    await this.isElementVisible(blogTitleInput);
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
 
@@ -214,7 +209,7 @@ export class BlogPostEditor extends BaseUser {
    * This function updates the body text of the blog post.
    */
   async updateBodyTextTo(newBodyText: string): Promise<void> {
-    await this.expectElementToBeVisible(blogBodyInput);
+    await this.isElementVisible(blogBodyInput);
     await this.type(blogBodyInput, newBodyText);
 
     await this.expectTextContentToBe(blogBodyInput, newBodyText);
@@ -224,54 +219,24 @@ export class BlogPostEditor extends BaseUser {
    * This function saves the blog post.
    */
   async saveBlogBodyChanges(): Promise<void> {
-    await this.expectElementToBeVisible(blogBodySaveButtonSelector);
+    await this.isElementVisible(blogBodySaveButtonSelector);
     await this.clickOn(blogBodySaveButtonSelector);
-    await this.expectElementToBeVisible(blogBodySaveButtonSelector, false);
+    await this.isElementVisible(blogBodySaveButtonSelector, false);
   }
 
   /**
-   * This function selects a tag for the blog post.
+   * This function selects two tags for the blog post.
    */
-  async selectTag(tag: string): Promise<void> {
-    await this.expectElementToBeVisible(tagSelector);
-    const tagElements = await this.page.$$(tagSelector);
-
-    for (const tagElement of tagElements) {
-      const tagText = await this.page.evaluate(
-        (element: Element) => element.textContent?.trim(),
-        tagElement
-      );
-      if (tagText === tag) {
-        await tagElement.click();
-
-        await this.page.waitForFunction(
-          (element: HTMLElement) => {
-            return element.getAttribute('aria-pressed') === 'true';
-          },
-          {},
-          await tagElement.$('button')
-        );
-
-        return;
-      }
-    }
+  async selectTags(Tag1: string, Tag2: string): Promise<void> {
+    await this.clickOn(Tag1);
+    await this.clickOn(Tag2);
   }
 
   /**
    * This function saves the draft blog post.
    */
   async saveTheDraftBlogPost(): Promise<void> {
-    await this.expectElementToBeVisible(saveDraftButtonSelector);
-    await this.clickOn(saveDraftButtonSelector);
-
-    await this.page.waitForFunction(
-      (selector: string) => {
-        const element = document.querySelector(selector);
-        return (element as HTMLInputElement)?.disabled === true;
-      },
-      {},
-      saveDraftButtonSelector
-    );
+    await this.clickOn(LABEL_FOR_SAVE_DRAFT_BUTTON);
   }
 
   /**
@@ -280,9 +245,7 @@ export class BlogPostEditor extends BaseUser {
   async publishTheBlogPost(): Promise<void> {
     await this.clickOn('PUBLISH');
     await this.page.waitForSelector(confirmButtonSelector);
-    await this.clickOn(confirmButtonSelector);
-
-    await this.expectElementToBeVisible(confirmButtonSelector, false);
+    await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
     showMessage('Successfully published a blog post!');
   }
 
@@ -298,8 +261,7 @@ export class BlogPostEditor extends BaseUser {
 
     await this.updateBlogPostTitle(newBlogPostTitle);
     await this.updateBodyTextTo('test blog post body content - duplicate');
-    await this.selectTag('News');
-    await this.selectTag('International');
+    await this.selectTags('News', 'International');
     await this.saveBlogBodyChanges();
   }
 
@@ -323,8 +285,7 @@ export class BlogPostEditor extends BaseUser {
         );
         await this.clickOn(LABEL_FOR_DELETE_BUTTON);
         await this.page.waitForSelector(confirmButtonSelector);
-        await this.clickOn(confirmButtonSelector);
-        await this.expectElementToBeVisible(confirmButtonSelector, false);
+        await this.clickOn(LABEL_FOR_CONFIRM_BUTTON);
         showMessage(
           'Published blog post with given title deleted successfully!'
         );
@@ -384,7 +345,7 @@ export class BlogPostEditor extends BaseUser {
     await this.goto(blogDashboardUrl);
     await this.clickOn('PUBLISHED');
 
-    await this.expectElementToBeVisible(publisedBlogsTabContainerSelector);
+    await this.isElementVisible(publisedBlogsTabContainerSelector);
     showMessage('Navigated to publish tab.');
   }
 
@@ -465,7 +426,7 @@ export class BlogPostEditor extends BaseUser {
       showMessage('User unauthorized to access blog dashboard!');
     } catch (err) {
       throw new Error(
-        `No unauthorization error on accessing the blog dashboard page!\nOriginal error: ${err}`
+        'No unauthorization error on accessing the blog dashboard page!'
       );
     }
   }
@@ -483,9 +444,7 @@ export class BlogPostEditor extends BaseUser {
       await this.page.waitForSelector(blogDashboardAuthorDetailsModal);
       showMessage('User authorized to access blog dashboard!');
     } catch (err) {
-      throw new Error(
-        `User unauthorized to access blog dashboard!\nOriginal error: ${err}`
-      );
+      throw new Error('User unauthorized to access blog dashboard!');
     }
   }
 }

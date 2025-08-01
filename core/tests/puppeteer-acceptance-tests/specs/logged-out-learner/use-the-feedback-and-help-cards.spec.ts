@@ -150,7 +150,7 @@ describe('Logged-Out Learner', function () {
       ' Please only use numerical digits, spaces or forward slashes (/) '
     );
     await loggedOutLearner.expectSubmitButtonToBe('Disabled');
-    await loggedOutLearner.expectAnswerInputValueToBe('ABC');
+    await loggedOutLearner.expectInputValueToBe('ABC');
 
     // View Hint for the first time.
     await loggedOutLearner.viewHint();
