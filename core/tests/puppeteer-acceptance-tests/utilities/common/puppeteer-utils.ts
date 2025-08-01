@@ -419,11 +419,7 @@ export class BaseUser {
         typeof selector === 'string'
           ? await this.page.waitForSelector(selector)
           : selector;
-      if (!element) {
-        throw new Error('Element not found');
-      }
       await this.page.waitForFunction(isElementClickable, {}, element);
-      await this.waitForElementToStabilize(element);
     } catch (error) {
       if (error instanceof Error) {
         error.message =

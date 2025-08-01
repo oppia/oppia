@@ -514,6 +514,7 @@ export class ExplorationEditor extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.waitForElementToStabilize(closePublishedPopUpButton);
       await this.clickOn(closePublishedPopUpButton);
 
       await this.expectElementToBeVisible(closePublishedPopUpButton, false);
@@ -1166,6 +1167,7 @@ export class ExplorationEditor extends BaseUser {
     await this.type(addUsernameInputBox, username);
     await this.clickOn(addRoleDropdown);
     await this.clickOn(collaboratorRoleOption);
+    await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOn(saveRoleButton);
     await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(`${username} has been added as collaboratorRole.`);
