@@ -1611,4 +1611,26 @@ describe('Classroom Admin Page component ', () => {
 
     expect(component.existingClassroomNames).toEqual(['Classroom 1']);
   }));
+
+  it('should return 0 when topic name does not exist in prerequisites map', () => {
+    component.topicNameToPrerequisiteTopicNames = {
+      'Topic 1': ['Prerequisite 1'],
+      'Topic 2': ['Prerequisite 2', 'Prerequisite 3'],
+    };
+
+    const result = component.getPrerequisiteLength('Non-existent Topic');
+
+    expect(result).toBe(0);
+  });
+
+  it('should return correct length when topic exists in prerequisites map', () => {
+    component.topicNameToPrerequisiteTopicNames = {
+      'Topic 1': ['Prerequisite 1'],
+      'Topic 2': ['Prerequisite 2', 'Prerequisite 3'],
+    };
+
+    const result = component.getPrerequisiteLength('Topic 2');
+
+    expect(result).toBe(2);
+  });
 });
