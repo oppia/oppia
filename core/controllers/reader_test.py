@@ -2874,9 +2874,9 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
         """Test handler for exploration leave events by anonymous users."""
 
         csrf_token = self.get_new_csrf_token()
-        # Here we use type Any because the payload contains mixed value types: 
+        # Here we use type Any because the payload contains mixed value types:
         # str, float, None, dict, and int, so Any is the most flexible annotation #pylint: disable=line-too-long
-        payload: Dict[str, Any] = { 
+        payload: Dict[str, Any] = {
             'client_time_spent_in_secs': 50.0,
             'collection_id': None,
             'params': {},
