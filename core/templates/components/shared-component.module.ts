@@ -215,7 +215,7 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
 import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
-import {HintAndSolutionDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-and-solution-display.component';
+import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-and-solution-display.component';
 import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-hint-modal.component';
 @NgModule({
   imports: [
@@ -235,7 +235,6 @@ import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-le
     DynamicContentModule,
     FormsModule,
     ReactiveFormsModule,
-    RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
     OppiaCkEditorCopyToolBarModule,
@@ -300,7 +299,7 @@ import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-le
     ExplorationEmbedButtonModalComponent,
     CheckpointCelebrationModalComponent,
     HintAndSolutionButtonsComponent,
-    HintAndSolutionDisplayComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     HintEditorComponent,
     InputResponsePairComponent,
     NewInputResponsePairComponent,
@@ -448,7 +447,7 @@ import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-le
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
     FeedbackPopupComponent,
-    HintAndSolutionDisplayComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     MultiSelectionFieldComponent,
     PracticeTabComponent,
     QuestionEditorSaveModalComponent,

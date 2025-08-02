@@ -26,16 +26,17 @@ import {PlayerTranscriptService} from 'pages/exploration-player-page/services/pl
 import {StatsReportingService} from 'pages/exploration-player-page/services/stats-reporting.service';
 import {Subscription} from 'rxjs';
 import {PageContextService} from 'services/page-context.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {UrlService} from 'services/contextual/url.service';
 import './hint-and-solution-display.component.css';
+import {ConceptCardManagerService} from 'pages/exploration-player-page/services/concept-card-manager.service';
+import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 
 @Component({
-  selector: 'oppia-hint-and-solution-display',
+  selector: 'oppia-hint-solution-and-concept-card-display',
   templateUrl: './hint-and-solution-display.component.html',
   styleUrls: ['./hint-and-solution-display.component.css'],
 })
-export class HintAndSolutionDisplayComponent {
+export class HintSolutionAndConceptCardDisplayComponent {
   directiveSubscriptions = new Subscription();
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
@@ -59,7 +60,9 @@ export class HintAndSolutionDisplayComponent {
     private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
     private playerPositionService: PlayerPositionService,
     private playerTranscriptService: PlayerTranscriptService,
-    private statsReportingService: StatsReportingService
+    private statsReportingService: StatsReportingService,
+    private explorationEngineService: ExplorationEngineService,
+    private conceptCardManagerService: ConceptCardManagerService
   ) {}
 
   ngOnInit(): void {
@@ -76,6 +79,7 @@ export class HintAndSolutionDisplayComponent {
             newCard.getSolution()
           );
           this.resetLocalHintsArray();
+          this.conceptCardManagerService.reset(newCard);
         }
       )
     );
@@ -122,6 +126,22 @@ export class HintAndSolutionDisplayComponent {
       this.displayedCard &&
       this.displayedCard.doesInteractionSupportHints()
     );
+  }
+
+  isConceptCardButtonVisible(): boolean {
+    return this.conceptCardManagerService.isConceptCardViewable();
+  }
+
+  showConceptCard(): void {
+    let state = this.explorationEngineService.getState();
+    let linkedSkillId = state.linkedSkillId;
+    if (linkedSkillId) {
+      this.conceptCardManagerService.openConceptCardModal(linkedSkillId);
+    }
+  }
+
+  isConceptCardConsumed(): boolean {
+    return this.conceptCardManagerService.isConceptCardConsumed();
   }
 
   isSolutionButtonVisible(): boolean {

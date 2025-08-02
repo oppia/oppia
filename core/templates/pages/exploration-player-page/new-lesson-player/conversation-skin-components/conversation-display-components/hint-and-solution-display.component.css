@@ -4,7 +4,7 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-.oppia-hint-and-solution-display {
+.oppia-hint-solution-and-concept-card-display {
   background-color: #f5da57;
   margin-left: 40px;
 }
@@ -22,7 +22,7 @@
   width: 100%;
 }
 
-.oppia-learner-hint-solution-display-button {
+.oppia-learner-hint-solution-and-concept-card-display-button {
   background: #C55F45;
   border-radius: 4px;
   color: #fff;
@@ -41,7 +41,7 @@
   width: 300px;
 }
 
-.oppia-learner-hint-solution-display-button.viewed {
+.oppia-learner-hint-solution-and-concept-card-display-button.viewed {
   background-color: #fff;
   border: 1px solid #c55f45;
   color: #c55f45;
@@ -61,6 +61,20 @@
   border: 1px solid #0d48a1;
 }
 
+.concept-card-button {
+  font-size: 14px;
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-hint-solution-and-concept-card-display-button {
+    width: 100px;
+  }  
+
+  .concept-card-button {
+    font-size: 10px;
+  }
+}
+
 @media (max-width: 480px) {
   .hint-solution-individual-container {
     padding: 15px 10px 0;
@@ -69,10 +83,4 @@
   .hint-solution-individual-container > p {
     width: 120px;
   }
-}
-
-@media screen and (max-width: 768px) {
-  .oppia-learner-hint-solution-display-button {
-    width: 100px;
-  }  
 }

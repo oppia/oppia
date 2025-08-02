@@ -19,8 +19,6 @@
 import {NgModule} from '@angular/core';
 import {NgbModalModule, NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {CommonModule} from '@angular/common';
-import {ExplorationPlayerViewerCommonModule} from '../current-lesson-player/exploration-player-viewer-common.module';
-import {ExplorationPlayerPageModule} from '../current-lesson-player/exploration-player-page.module';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {MatButtonModule} from '@angular/material/button';
@@ -39,6 +37,7 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {PlayerHeaderComponent} from './lesson-header/player-header.component';
 import {PlayerSidebarComponent} from './sidebar-components/player-sidebar.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
+import {ConceptCardManagerService} from '../services/concept-card-manager.service';
 
 @NgModule({
   imports: [
@@ -49,8 +48,6 @@ import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
-    ExplorationPlayerViewerCommonModule,
-    ExplorationPlayerPageModule,
     SharedComponentsModule,
     ToastrModule,
     ToastrModule.forRoot(toastrConfig),
@@ -69,6 +66,10 @@ import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar
     PlayerSidebarComponent,
     NewAudioBarComponent,
   ],
-  providers: [HintAndSolutionModalService, FatigueDetectionService],
+  providers: [
+    HintAndSolutionModalService,
+    FatigueDetectionService,
+    ConceptCardManagerService,
+  ],
 })
 export class NewLessonPlayerPageModule {}
