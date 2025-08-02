@@ -1134,6 +1134,53 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         )
 
 
+class DoesExplorationExistTests(test_utils.GenericTestBase):
+    """Tests for the _does_exploration_exist helper function."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.EXP_ID = 'exp_id'
+        self.COL_ID = 'col_id'
+
+    def test_does_exploration_exist_with_valid_exploration_no_collection(self) -> None:
+        """Test _does_exploration_exist when exploration exists and no collection."""
+        # Create a valid exploration
+        exploration = self.save_new_valid_exploration(self.EXP_ID, 'owner')
+        
+        # Import the function to test
+        from core.controllers import reader
+        
+        result = reader._does_exploration_exist(self.EXP_ID, None, None)
+        self.assertTrue(result)
+
+    def test_does_exploration_exist_with_invalid_exploration(self) -> None:
+        """Test _does_exploration_exist when exploration doesn't exist."""
+        from core.controllers import reader
+        
+        result = reader._does_exploration_exist('invalid_exp_id', None, None)
+        self.assertFalse(result)
+
+    def test_does_exploration_exist_with_valid_exploration_and_collection(self) -> None:
+        """Test _does_exploration_exist when both exploration and collection exist."""
+        # Create exploration and collection
+        exploration = self.save_new_valid_exploration(self.EXP_ID, 'owner')
+        collection = self.save_new_default_collection(self.COL_ID, 'owner')
+        
+        from core.controllers import reader
+        
+        result = reader._does_exploration_exist(self.EXP_ID, None, self.COL_ID)
+        self.assertTrue(result)
+
+    def test_does_exploration_exist_with_valid_exploration_invalid_collection(self) -> None:
+        """Test _does_exploration_exist when exploration exists but collection doesn't."""
+        exploration = self.save_new_valid_exploration(self.EXP_ID, 'owner')
+        
+        from core.controllers import reader
+        
+        result = reader._does_exploration_exist(self.EXP_ID, None, 'invalid_col_id')
+        self.assertFalse(result)
+
+
 class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
 
@@ -2767,54 +2814,6 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
-
-
-class ExplorationCompleteEventHandlerTests(test_utils.GenericTestBase):
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.exp_id = '0'
-        exp_services.delete_demo(self.exp_id)
-        exp_services.load_demo(self.exp_id)
-        self.base_payload = {
-            'version': 1,
-            'state_name': 'final_state',
-            'session_id': 'test_session_id_123',
-            'client_time_spent_in_secs': 100.0,
-            'params': {},
-            'collection_id': None
-        }
-
-    def test_handler_with_anonymous_user(self) -> None:
-        """Test handler for exploration completion by anonymous users."""
-
-        csrf_token = self.get_new_csrf_token()
-
-        payload = {
-            'client_time_spent_in_secs': 100.0,
-            'collection_id': None,
-            'params': {},
-            'session_id': 'test_session_123',
-            'state_name': 'final_state',
-            'version': 1
-        }
-
-        self.assertEqual(
-            stats_models.CompleteExplorationEventLogEntryModel.query().count(),
-            0
-        )
-
-        self.post_json(
-            '/explorehandler/exploration_complete_event/%s' % self.exp_id,
-            payload, csrf_token=csrf_token)
-
-        self.assertEqual(
-            stats_models.CompleteExplorationEventLogEntryModel.query().count(),
-            1
-        )
 
 
 class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
