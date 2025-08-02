@@ -48,7 +48,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Optional, Union
+from typing import Any, Dict, Final, List, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -2803,6 +2803,54 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class ExplorationCompleteEventHandlerTests(test_utils.GenericTestBase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.exp_id = '0'
+        exp_services.delete_demo(self.exp_id)
+        exp_services.load_demo(self.exp_id)
+        self.base_payload = {
+            'version': 1,
+            'state_name': 'final_state',
+            'session_id': 'test_session_id_123',
+            'client_time_spent_in_secs': 100.0,
+            'params': {},
+            'collection_id': None
+        }
+
+    def test_handler_with_anonymous_user(self) -> None:
+        """Test handler for exploration completion by anonymous users."""
+
+        csrf_token = self.get_new_csrf_token()
+
+        payload = {
+            'client_time_spent_in_secs': 100.0,
+            'collection_id': None,
+            'params': {},
+            'session_id': 'test_session_123',
+            'state_name': 'final_state',
+            'version': 1
+        }
+
+        self.assertEqual(
+            stats_models.CompleteExplorationEventLogEntryModel.query().count(), # pylint: disable=line-too-long
+            0
+        )
+
+        self.post_json(
+            '/explorehandler/exploration_complete_event/%s' % self.exp_id,
+            payload, csrf_token=csrf_token)
+
+        self.assertEqual(
+            stats_models.CompleteExplorationEventLogEntryModel.query().count(), # pylint: disable=line-too-long
+            1
+        )
+
+
 class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
@@ -2827,7 +2875,7 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
 
-        payload = {
+        payload: Dict[str, Any] = {
             'client_time_spent_in_secs': 50.0,
             'collection_id': None,
             'params': {},
@@ -2847,10 +2895,10 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
             stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(), # pylint: disable=line-too-long
             1
         )
-        if hasattr(self, 'user_id') and self.user_id:
+        if hasattr(self, 'user_id') and getattr(self, 'user_id', None):
             self.assertNotIn(
                 self.exp_id,
-                learner_progress_services.get_all_incomplete_exp_ids(self.user_id) # pylint: disable=line-too-long
+                learner_progress_services.get_all_incomplete_exp_ids(getattr(self, 'user_id')) # pylint: disable=line-too-long
             )
 
     def test_exp_maybe_leave_event_with_story_no_topic(self) -> None:
@@ -2874,7 +2922,7 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
         exp_models.ExplorationContextModel.update_timestamps_multi([exploration_context_model]) # pylint: disable=line-too-long
         exp_models.ExplorationContextModel.put_multi([exploration_context_model]) # pylint: disable=line-too-long
         real_story = story_fetchers.get_story_by_id(story_id)
-        real_story.corresponding_topic_id = None
+        real_story.corresponding_topic_id = None  # type: ignore[assignment]
         with mock.patch('core.domain.story_fetchers.get_story_by_id', return_value=real_story): # pylint: disable=line-too-long
             payload = {
                 'version': 1,
