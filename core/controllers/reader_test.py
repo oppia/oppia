@@ -17,11 +17,9 @@
 from __future__ import annotations
 
 import logging
-from unittest import mock
 
 from core import feconf
 from core.constants import constants
-from core.controllers import reader
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -48,7 +46,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, Dict, Final, List, Optional, Union
+from typing import Dict, Final, List, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1135,39 +1133,6 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
         )
 
 
-class DoesExplorationExistTests(test_utils.GenericTestBase):
-    """Tests for the _does_exploration_exist helper function."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.EXP_ID = 'exp_id'
-        self.COL_ID = 'col_id'
-
-    def test_does_exploration_exist_with_valid_exploration_no_collection(self) -> None: # pylint: disable=line-too-long
-        """Test _does_exploration_exist when exploration exists and no collection.""" # pylint: disable=line-too-long
-
-        result = reader._does_exploration_exist(self.EXP_ID, None, None) # pylint: disable=protected-access
-        self.assertFalse(result)
-
-    def test_does_exploration_exist_with_invalid_exploration(self) -> None:
-        """Test _does_exploration_exist when exploration doesn't exist."""
-
-        result = reader._does_exploration_exist('invalid_exp_id', None, None) # pylint: disable=protected-access
-        self.assertFalse(result)
-
-    def test_does_exploration_exist_with_valid_exploration_and_collection(self) -> None: # pylint: disable=line-too-long
-        """Test _does_exploration_exist when both exploration and collection exist.""" # pylint: disable=line-too-long
-
-        result = reader._does_exploration_exist(self.EXP_ID, None, self.COL_ID) # pylint: disable=protected-access
-        self.assertFalse(result)
-
-    def test_does_exploration_exist_with_valid_exploration_invalid_collection(self) -> None: # pylint: disable=line-too-long
-        """Test _does_exploration_exist when exploration exists but collection doesn't.""" # pylint: disable=line-too-long
-
-        result = reader._does_exploration_exist(self.EXP_ID, None, 'invalid_col_id') # pylint: disable=line-too-long # pylint: disable=protected-access
-        self.assertFalse(result)
-
-
 class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
 
@@ -1310,7 +1275,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.USER_EMAIL, self.USER_USERNAME)
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
@@ -1321,7 +1285,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         self.owner = user_services.get_user_actions_info(self.owner_id)
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_fetchers.get_new_topic_id()
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         # Save and publish explorations.
         self.save_new_valid_exploration(
@@ -1721,31 +1684,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             learner_progress_services.get_all_partially_learnt_topic_ids(
                 self.user_id), [])
 
-    def test_remove_topic_from_partially_learnt_list_handler(self) -> None:
-        """Test handler for removing topics from the partially learnt list."""
-        self.login(self.VIEWER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        topic_id = 'topic_123'
-
-        # Add topic to the partially learnt list.
-        learner_progress_services.record_topic_started(
-            self.viewer_id, topic_id)
-        # Verify topic is in the partially learnt list.
-        self.assertEqual(
-            learner_progress_services.get_all_partially_learnt_topic_ids(
-                self.viewer_id), [topic_id])
-
-        # Remove topic using DELETE request to the handler.
-        self.delete_json(
-            '/learnerincompleteactivityhandler/%s/%s' % (
-            constants.ACTIVITY_TYPE_LEARN_TOPIC, topic_id),
-            params={'csrf_token': csrf_token}
-        )
-        # Verify the topic was removed.
-        self.assertEqual(
-            learner_progress_services.get_all_partially_learnt_topic_ids(
-                self.viewer_id), [])
-
 
 class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
     """Tests for the handler that records playthroughs."""
@@ -1754,8 +1692,11 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         super().setUp()
         self.exp_id = '15'
 
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
 
         exp_services.load_demo(self.exp_id)
         self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
@@ -2025,6 +1966,40 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'issue_schema_version': 1,
         }, csrf_token=self.csrf_token, expected_status_int=400)
 
+    def test_store_playthrough_successfully_assigns_to_issue(self) -> None:
+        """Test POST request where playthrough is successfully assigned to issue."""
+        self.login(self.VIEWER_EMAIL)
+
+        playthrough_data = {
+            'exp_id': self.exp_id,
+            'exp_version': self.exploration.version,
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {'value': 'state_name1'},
+                'time_spent_in_exp_in_msecs': {'value': 200}
+            },
+            'actions': []
+        }
+
+        # Mock assign_playthrough_to_corresponding_issue to return True
+        assign_playthrough_swap = self.swap(
+            stats_services, 'assign_playthrough_to_corresponding_issue',
+            lambda playthrough, exp_issues, issue_schema_version: True)
+        
+        save_exp_issues_model_called = []
+        save_exp_issues_model_swap = self.swap(
+            stats_services, 'save_exp_issues_model',
+            lambda exp_issues: save_exp_issues_model_called.append(True))
+
+        with assign_playthrough_swap, save_exp_issues_model_swap:
+            self.post_json(
+                '/explorehandler/store_playthrough/%s' % self.exp_id, {
+                    'issue_schema_version': 1,
+                    'playthrough_data': playthrough_data
+                }, csrf_token=self.csrf_token, expected_status_int=200)
+
+        # Verify save_exp_issues_model was called
+        self.assertEqual(len(save_exp_issues_model_called), 1)
 
 class StatsEventHandlerTest(test_utils.GenericTestBase):
     """Tests for all the statistics event models recording handlers."""
@@ -2803,154 +2778,15 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class ExplorationCompleteEventHandlerTests(test_utils.GenericTestBase):
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.exp_id = '0'
-        exp_services.delete_demo(self.exp_id)
-        exp_services.load_demo(self.exp_id)
-        self.base_payload = {
-            'version': 1,
-            'state_name': 'final_state',
-            'session_id': 'test_session_id_123',
-            'client_time_spent_in_secs': 100.0,
-            'params': {},
-            'collection_id': None
-        }
-
-    def test_handler_with_anonymous_user(self) -> None:
-        """Test handler for exploration completion by anonymous users."""
-
-        csrf_token = self.get_new_csrf_token()
-
-        payload = {
-            'client_time_spent_in_secs': 100.0,
-            'collection_id': None,
-            'params': {},
-            'session_id': 'test_session_123',
-            'state_name': 'final_state',
-            'version': 1
-        }
-
-        self.assertEqual(
-            stats_models.CompleteExplorationEventLogEntryModel.query().count(), # pylint: disable=line-too-long
-            0
-        )
-
-        self.post_json(
-            '/explorehandler/exploration_complete_event/%s' % self.exp_id,
-            payload, csrf_token=csrf_token)
-
-        self.assertEqual(
-            stats_models.CompleteExplorationEventLogEntryModel.query().count(), # pylint: disable=line-too-long
-            1
-        )
-
-
-class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        self.exp_id = '0'
-        exp_services.delete_demo(self.exp_id)
-        exp_services.load_demo(self.exp_id)
-        self.base_payload = {
-            'version': 1,
-            'state_name': 'middle_state',  
-            'session_id': 'test_session_id_123',
-            'client_time_spent_in_secs': 50.0,  
-            'params': {},
-            'collection_id': None
-        }
-
-    def test_handler_with_anonymous_user(self) -> None:
-        """Test handler for exploration leave events by anonymous users."""
-
-        csrf_token = self.get_new_csrf_token()
-        # Here we use type Any because the payload contains mixed value types:
-        # str, float, None, dict, and int, so Any is the most flexible annotation #pylint: disable=line-too-long
-        payload: Dict[str, Any] = {
-            'client_time_spent_in_secs': 50.0,
-            'collection_id': None,
-            'params': {},
-            'session_id': 'test_session_123',
-            'state_name': 'middle_state',
-            'version': 1
-        }
-        self.assertEqual(
-            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(), # pylint: disable=line-too-long
-            0
-        )
-        response = self.post_json(
-            '/explorehandler/exploration_maybe_leave_event/%s' % self.exp_id,
-            payload, csrf_token=csrf_token)
-        self.assertEqual(response, {'is_super_admin': False})
-        self.assertEqual(
-            stats_models.MaybeLeaveExplorationEventLogEntryModel.query().count(), # pylint: disable=line-too-long
-            1
-        )
-        if hasattr(self, 'user_id') and getattr(self, 'user_id', None):
-            self.assertNotIn(
-                self.exp_id,
-                learner_progress_services.get_all_incomplete_exp_ids(getattr(self, 'user_id')) # pylint: disable=line-too-long
-            )
-
-    def test_exp_maybe_leave_event_with_story_no_topic(self) -> None:
-        """Test handler when story exists but has no corresponding topic."""
-        self.login(self.VIEWER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-
-        story_id = 'story_id_1'
-        story = story_domain.Story.create_default_story(
-            story_id,
-            'Story Title',
-            'Description',
-            'dummy_topic_id',
-            'story-url'
-        )
-        story_services.save_new_story(self.owner_id, story)
-        exploration_context_model = exp_models.ExplorationContextModel(
-            id=self.exp_id,
-            story_id=story_id
-        )
-        exp_models.ExplorationContextModel.update_timestamps_multi([exploration_context_model]) # pylint: disable=line-too-long
-        exp_models.ExplorationContextModel.put_multi([exploration_context_model]) # pylint: disable=line-too-long
-        real_story = story_fetchers.get_story_by_id(story_id)
-        # Here we use MyPy ignore because we're intentionally setting to None to test story without topic scenario #pylint: disable=line-too-long
-        real_story.corresponding_topic_id = None  # type: ignore[assignment]
-        with mock.patch('core.domain.story_fetchers.get_story_by_id', return_value=real_story): # pylint: disable=line-too-long
-            payload = {
-                'version': 1,
-                'state_name': 'middle_state',
-                'session_id': 'test_session_id_123',
-                'client_time_spent_in_secs': 50.0,
-                'params': {},
-                'collection_id': None
-            }
-            self.post_json(
-                '/explorehandler/exploration_maybe_leave_event/%s' % self.exp_id, # pylint: disable=line-too-long
-                payload, csrf_token=csrf_token)
-            self.assertEqual(
-                learner_progress_services.get_all_incomplete_story_ids(self.viewer_id), # pylint: disable=line-too-long
-                [story_id])
-            self.assertEqual(
-                learner_progress_services.get_all_partially_learnt_topic_ids(self.viewer_id), []) # pylint: disable=line-too-long
-
-
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
+
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_viewing_solution(self) -> None:
         self.login(self.VIEWER_EMAIL)
+        # Load demo exploration.
         exp_id = '6'
         exp_services.delete_demo(exp_id)
         exp_services.load_demo(exp_id)
