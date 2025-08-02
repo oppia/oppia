@@ -943,4 +943,18 @@ describe('Voiceover card component', () => {
     explorationLinkedToStorySpy.and.returnValue(false);
     expect(component.shouldShowAutoVoiceoverRegenerationSection()).toBeFalse();
   });
+
+  it('should be able to enable and disable voiceovers loading correctly', () => {
+    expect(component.manualVoiceoverIsLoading).toBeFalse();
+    component.enableVoiceoverLoading(AppConstants.VOICEOVER_TYPE_MANUAL);
+    expect(component.manualVoiceoverIsLoading).toBeTrue();
+    component.disableVoiceoverLoading(AppConstants.VOICEOVER_TYPE_MANUAL);
+    expect(component.manualVoiceoverIsLoading).toBeFalse();
+
+    expect(component.automaticVoiceoverIsLoading).toBeFalse();
+    component.enableVoiceoverLoading(AppConstants.VOICEOVER_TYPE_AUTO);
+    expect(component.automaticVoiceoverIsLoading).toBeTrue();
+    component.disableVoiceoverLoading(AppConstants.VOICEOVER_TYPE_AUTO);
+    expect(component.automaticVoiceoverIsLoading).toBeFalse();
+  });
 });

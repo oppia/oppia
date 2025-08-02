@@ -393,6 +393,26 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
     },
     {
+      "name": "logged-out-learner/complete-some-practice-question",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-some-practice-question.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/discover-the-website-and-navigate-to-math-classroom",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/discover-the-website-and-navigate-to-math-classroom.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/pick-a-lesson-to-learn",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/pick-a-lesson-to-learn.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/search-for-a-specific-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/search-for-a-specific-exploration.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/visits-the-community-library-and-look-around",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/visits-the-community-library-and-look-around.spec.ts"
+    },
+    {
       "name": "logged-in-learner/completes-the-exploration-and-decides-what-to-do-next",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts"
     },
