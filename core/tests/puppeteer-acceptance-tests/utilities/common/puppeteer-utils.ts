@@ -1298,30 +1298,6 @@ export class BaseUser {
   }
 
   /**
-   * This function returns all elements matching the given selector.
-   * @param selector - The selector to find elements for.
-   * @param parentElement - The parent element to search within.
-   */
-  async getAllElementsBySelector(
-    selector: string,
-    present: boolean = true
-  ): Promise<void> {
-    if (present) {
-      await this.page.waitForSelector(selector, {
-        visible: true,
-      });
-      showMessage(`Element with selector ${selector} was found (as expected).`);
-    } else {
-      await this.page.waitForSelector(selector, {
-        hidden: true,
-      });
-      showMessage(
-        `Element with selector ${selector} was not found  (as expected).`
-      );
-    }
-  }
-
-  /**
    * Function to verify that the anchor opens the correct page.
    * @param {string} selector - The selector of the anchor.
    * @param {string} newPageURL - The expected page.
@@ -1502,6 +1478,24 @@ export class BaseUser {
     }
 
     showMessage(`Element ${selector} did not stabilize within ${timeout} ms`);
+  }
+
+  /**
+   * Returns all elements matching the given selector.
+   * @param selector - The selector to find elements for.
+   * @param parentElement - The parent element to search within.
+   * @returns An array of ElementHandles.
+   */
+  async getAllElementsBySelector(
+    selector: string,
+    parentElement?: ElementHandle<Element>
+  ): Promise<ElementHandle<Element>[]> {
+    const context = parentElement ?? this.page;
+    await context.waitForSelector(selector, {visible: true});
+
+    const elements = await this.page.$$(selector);
+
+    return elements;
   }
 }
 
