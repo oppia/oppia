@@ -2874,8 +2874,9 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
         """Test handler for exploration leave events by anonymous users."""
 
         csrf_token = self.get_new_csrf_token()
-
-        payload: Dict[str, Any] = {
+        # Here we use type Any because the payload contains mixed value types: 
+        # str, float, None, dict, and int, so Any is the most flexible annotation #pylint: disable=line-too-long
+        payload: Dict[str, Any] = { 
             'client_time_spent_in_secs': 50.0,
             'collection_id': None,
             'params': {},
@@ -2922,6 +2923,7 @@ class ExplorationMaybeLeaveHandlerTests(test_utils.GenericTestBase):
         exp_models.ExplorationContextModel.update_timestamps_multi([exploration_context_model]) # pylint: disable=line-too-long
         exp_models.ExplorationContextModel.put_multi([exploration_context_model]) # pylint: disable=line-too-long
         real_story = story_fetchers.get_story_by_id(story_id)
+        # Here we use MyPy ignore because we're intentionally setting to None to test story without topic scenario #pylint: disable=line-too-long
         real_story.corresponding_topic_id = None  # type: ignore[assignment]
         with mock.patch('core.domain.story_fetchers.get_story_by_id', return_value=real_story): # pylint: disable=line-too-long
             payload = {
