@@ -128,6 +128,9 @@ export default {
     ReadBlogLink: 'https://medium.com/oppia-org',
     UserDocumentation: 'https://oppia.github.io/#/',
     BaseExplorationPlayer: 'http://localhost:8181/explore',
+    ExplorationPlayer: 'http://localhost:8181/explore/',
+    SkillEditor: 'http://localhost:8181/skill_editor',
+    TopicEditor: 'http://localhost:8181/topic_editor',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',

@@ -160,7 +160,6 @@ export default function isElementClickable(
     const horizontalInView =
       elementDimensions.left <= windowWidth &&
       elementDimensions.left + elementDimensions.width > 0;
-
     return verticalInView && horizontalInView;
   };
 
