@@ -21,6 +21,7 @@ from unittest import mock
 
 from core import feconf
 from core.constants import constants
+from core.controllers import reader
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -46,7 +47,6 @@ from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
-from core.controllers import reader
 
 from typing import Dict, Final, List, Optional, Union
 
