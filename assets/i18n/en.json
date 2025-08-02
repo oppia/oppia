@@ -1416,6 +1416,7 @@
     "I18N_SAVE_PROGRESS_COPY_TOOLTIP": "Copied!",
     "I18N_SAVE_PROGRESS_TEXT": "Save Progress",
     "I18N_SHARE_LESSON": "Share this lesson",
+    "I18N_SHARE_TITLE": "Share \"<[explorationTitle]>\"",
     "I18N_SHOW_LESS": "Show Less",
     "I18N_SHOW_MORE": "Show More",
     "I18N_SHOW_SOLUTION_BUTTON": "Show Solution",

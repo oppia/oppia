@@ -26,6 +26,8 @@ import {
 } from 'services/i18n-language-code.service';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {ShareLessonModalComponent} from './share-lesson-modal.component';
 
 @Component({
   selector: 'oppia-lesson-player-sidebar',
@@ -37,6 +39,7 @@ export class LessonPlayerSidebarComponent implements OnInit {
   sidebarIsExpanded: boolean = false;
   expDescription!: string;
   expDescTranslationKey!: string;
+  explorationTitle!: string;
   avgRating!: number | null;
   fullStars: number = 0;
   blankStars: number = 5;
@@ -46,7 +49,8 @@ export class LessonPlayerSidebarComponent implements OnInit {
     private pageContextService: PageContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private ngbModal: NgbModal
   ) {}
 
   ngOnInit(): void {
@@ -56,6 +60,7 @@ export class LessonPlayerSidebarComponent implements OnInit {
 
     let explorationId = this.pageContextService.getExplorationId();
     this.expDescription = 'Loading...';
+    this.explorationTitle = 'Loading...';
     this.readOnlyExplorationBackendApiService
       .fetchExplorationAsync(
         explorationId,
@@ -64,12 +69,21 @@ export class LessonPlayerSidebarComponent implements OnInit {
       )
       .then(response => {
         this.expDescription = response.exploration.objective;
+        this.explorationTitle = response.exploration.title;
       });
     this.expDescTranslationKey =
       this.i18nLanguageCodeService.getExplorationTranslationKey(
         explorationId,
         TranslationKeyType.DESCRIPTION
       );
+  }
+
+  displayShareLessonModal(): NgbModalRef {
+    let modalRef: NgbModalRef = this.ngbModal.open(ShareLessonModalComponent, {
+      backdrop: 'static',
+    });
+    modalRef.componentInstance.explorationTitle = this.explorationTitle;
+    return modalRef;
   }
 
   toggleSidebar(): void {

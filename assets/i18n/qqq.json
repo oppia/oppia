@@ -1416,6 +1416,7 @@
 	"I18N_SAVE_PROGRESS_COPY_TOOLTIP": "Text that will be display in a tooltip for a second when the user clicks the copy button.",
 	"I18N_SAVE_PROGRESS_TEXT": "Text which appears on the save progress button and the save progress menu in the exploration lesson info modal.",
 	"I18N_SHARE_LESSON": "Text displayed before the buttons to share an exploration.",
+	"I18N_SHARE_TITLE": "Text displayed in the share lesson modal. - Text shown as the title of the share lesson modal.",
 	"I18N_SHOW_LESS": "Text, which when clicked on, contracts the section it is a part of.",
 	"I18N_SHOW_MORE": "Text, which when clicked on, expands the section it is a part of.",
 	"I18N_SHOW_SOLUTION_BUTTON": "Button displayed in the warning modal that shows the solution of the question, when clicked.",

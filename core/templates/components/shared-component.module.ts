@@ -215,6 +215,7 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
 import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
+import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesson-player/sidebar-components/share-lesson-modal.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -323,6 +324,7 @@ import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-
     ScoreRingComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     StateContentEditorComponent,
@@ -449,6 +451,7 @@ import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-
     QuestionEditorSaveModalComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillMasteryViewerComponent,
     AttributionGuideComponent,
     LazyLoadingComponent,
@@ -658,6 +661,7 @@ import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-
     StateSkillEditorComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillSelectorComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
