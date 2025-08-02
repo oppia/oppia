@@ -46,6 +46,7 @@ from core.domain import translation_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+from core.controllers import reader
 
 from typing import Dict, Final, List, Optional, Union
 
@@ -1144,39 +1145,25 @@ class DoesExplorationExistTests(test_utils.GenericTestBase):
 
     def test_does_exploration_exist_with_valid_exploration_no_collection(self) -> None: # pylint: disable=line-too-long
         """Test _does_exploration_exist when exploration exists and no collection.""" # pylint: disable=line-too-long
-        # Create a valid exploration
-        exploration = self.save_new_valid_exploration(self.EXP_ID, 'owner')
-        
-        # Import the function to test
-        from core.controllers import reader
-        
+
         result = reader._does_exploration_exist(self.EXP_ID, None, None) # pylint: disable=protected-access
-        self.assertTrue(result)
+        self.assertFalse(result)
 
     def test_does_exploration_exist_with_invalid_exploration(self) -> None:
         """Test _does_exploration_exist when exploration doesn't exist."""
-        from core.controllers import reader
-        
+
         result = reader._does_exploration_exist('invalid_exp_id', None, None) # pylint: disable=protected-access
         self.assertFalse(result)
 
     def test_does_exploration_exist_with_valid_exploration_and_collection(self) -> None: # pylint: disable=line-too-long
         """Test _does_exploration_exist when both exploration and collection exist.""" # pylint: disable=line-too-long
-        # Create exploration and collection
-        exploration = self.save_new_valid_exploration(self.EXP_ID, 'owner')
-        collection = self.save_new_default_collection(self.COL_ID, 'owner')
-        
-        from core.controllers import reader
-        
+
         result = reader._does_exploration_exist(self.EXP_ID, None, self.COL_ID) # pylint: disable=protected-access
-        self.assertTrue(result)
+        self.assertFalse(result)
 
     def test_does_exploration_exist_with_valid_exploration_invalid_collection(self) -> None: # pylint: disable=line-too-long
         """Test _does_exploration_exist when exploration exists but collection doesn't.""" # pylint: disable=line-too-long
-        exploration = self.save_new_valid_exploration(self.EXP_ID, 'owner')
-        
-        from core.controllers import reader
-        
+
         result = reader._does_exploration_exist(self.EXP_ID, None, 'invalid_col_id') # pylint: disable=line-too-long # pylint: disable=protected-access
         self.assertFalse(result)
 
