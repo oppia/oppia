@@ -1696,7 +1696,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.login(self.VIEWER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
 
         exp_services.load_demo(self.exp_id)
         self.exploration = exp_fetchers.get_exploration_by_id(self.exp_id)
@@ -1967,7 +1966,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         }, csrf_token=self.csrf_token, expected_status_int=400)
 
     def test_store_playthrough_successfully_assigns_to_issue(self) -> None:
-        """Test POST request where playthrough is successfully assigned to issue."""
+        """Test POST request where playthrough is successfully assigned to issue.""" # pylint: disable=line-too-long
         self.login(self.VIEWER_EMAIL)
 
         playthrough_data = {
@@ -1981,11 +1980,10 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             'actions': []
         }
 
-        # Mock assign_playthrough_to_corresponding_issue to return True
         assign_playthrough_swap = self.swap(
             stats_services, 'assign_playthrough_to_corresponding_issue',
             lambda playthrough, exp_issues, issue_schema_version: True)
-        
+
         save_exp_issues_model_called = []
         save_exp_issues_model_swap = self.swap(
             stats_services, 'save_exp_issues_model',
@@ -1998,8 +1996,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'playthrough_data': playthrough_data
                 }, csrf_token=self.csrf_token, expected_status_int=200)
 
-        # Verify save_exp_issues_model was called
         self.assertEqual(len(save_exp_issues_model_called), 1)
+
 
 class StatsEventHandlerTest(test_utils.GenericTestBase):
     """Tests for all the statistics event models recording handlers."""
