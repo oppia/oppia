@@ -160,8 +160,6 @@ const stateEditSelector = '.e2e-test-state-edit-content';
 const stateContentInputField = 'div.e2e-test-rte';
 const addSkillreviewComponentButton = '.cke_button__oppiaskillreview';
 const skillInSkillreviewModal = '.e2e-test-rte-skill-selector-item';
-const skillInSkillreviewModalSelected =
-  '.e2e-test-rte-skill-selector-item .list-group-item-success';
 const saveRteComponentAndCloseCustomizationModalButton =
   '.e2e-test-close-rich-text-component-editor';
 const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
@@ -2266,9 +2264,6 @@ export class LoggedInUser extends BaseUser {
     await this.type(stateContentInputField, `${content}`);
     await this.clickOn(addSkillreviewComponentButton);
     await this.clickOn(skillInSkillreviewModal);
-    await this.page.waitForSelector(skillInSkillreviewModalSelected, {
-      visible: true,
-    });
     await this.clickOn(saveRteComponentAndCloseCustomizationModalButton);
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});

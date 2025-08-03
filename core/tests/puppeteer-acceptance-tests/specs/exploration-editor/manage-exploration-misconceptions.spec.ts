@@ -154,7 +154,11 @@ describe('Exploration Editor', function () {
       'Test Topic 1'
     );
 
-    await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
+    await curriculumAdmin.createSkillForTopic(
+      'Test Skill 1',
+      'Test Topic 1',
+      false
+    );
     await curriculumAdmin.createQuestionsForSkill('Test Skill 1', 3);
     await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
       'Test Skill 1',

@@ -48,9 +48,8 @@ describe('Logged-in User', function () {
       'enable_worked_examples_rte_component'
     );
 
-    await curriculumAdmin.createAndPublishTopic(
+    await curriculumAdmin.createTopicWithSkill(
       'Addition and Subtraction',
-      'Adding Numbers',
       'skill1'
     );
 
@@ -65,6 +64,7 @@ describe('Logged-in User', function () {
   it(
     'should be able to add a concept card with workedexample to an exploration and preview it',
     async function () {
+      await loggedInUser1.navigateToCreatorDashboard();
       await loggedInUser1.navigateToExplorationEditorPageFromCreatorDashboard();
       await loggedInUser1.dismissWelcomeModal();
       await loggedInUser1.updateCardContentWithConceptCard('hello ');

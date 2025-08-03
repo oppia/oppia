@@ -37,8 +37,12 @@ describe('Topic Manager', function () {
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Mathematics', 'math');
-    await curriculumAdmin.createSkillForTopic('Addition', 'Mathematics');
-    await curriculumAdmin.createSkillForTopic('Subtraction', 'Mathematics');
+    await curriculumAdmin.createSkillForTopic('Addition', 'Mathematics', false);
+    await curriculumAdmin.createSkillForTopic(
+      'Subtraction',
+      'Mathematics',
+      false
+    );
 
     topicManager = await UserFactory.createNewUser(
       'topicManager',

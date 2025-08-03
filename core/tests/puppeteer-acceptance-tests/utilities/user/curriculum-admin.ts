@@ -288,10 +288,16 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Create a skill for a particular topic.
+   * @param {string} description - The description of the skill to be created.
+   * @param {string} topicName - The name of the topic for which the skill is
+   * to be created.
+   * @param {boolean} addWorkedexample - True if the skill should have a
+   * workedexample, false otherwise.
    */
   async createSkillForTopic(
     description: string,
-    topicName: string
+    topicName: string,
+    addWorkedexample: boolean
   ): Promise<void> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
@@ -307,6 +313,21 @@ export class CurriculumAdmin extends BaseUser {
       richTextAreaField,
       `Review material text content for ${description}.`
     );
+    if (addWorkedexample) {
+      await this.clickOn(insertWorkedexampleButton);
+      await this.page.waitForSelector(editWorkedexampleModalQuestionRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedexampleModalQuestionRte);
+      await this.type(editWorkedexampleModalQuestionRte, 'Type the number one');
+      await this.page.waitForSelector(editWorkedexampleModalAnswerRte, {
+        visible: true,
+      });
+      await this.clearAllTextFrom(editWorkedexampleModalAnswerRte);
+      await this.waitForElementToStabilize(editWorkedexampleModalAnswerRte);
+      await this.type(editWorkedexampleModalAnswerRte, '1');
+      await this.clickOn(rteComponentSaveButton);
+    }
     await this.page.waitForSelector(
       `${confirmSkillCreationButton}:not([disabled])`
     );
@@ -2097,7 +2118,7 @@ export class CurriculumAdmin extends BaseUser {
       topicName
     );
 
-    await this.createSkillForTopic(skillName, topicName);
+    await this.createSkillForTopic(skillName, topicName, true);
     await this.createQuestionsForSkill(skillName, 3);
     await this.assignSkillToSubtopicInTopicEditor(
       skillName,
@@ -2107,6 +2128,22 @@ export class CurriculumAdmin extends BaseUser {
     await this.addSkillToDiagnosticTest(skillName, topicName);
 
     await this.publishDraftTopic(topicName);
+  }
+
+  /**
+   * Creates a topic with a skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} skillName - The name of the skill.
+   */
+  async createTopicWithSkill(
+    topicName: string,
+    skillName: string
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(/ /g, '-')
+    );
+    await this.createSkillForTopic(skillName, topicName, true);
   }
 
   /**
@@ -2139,7 +2176,7 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.saveTopicDraft(topicName);
 
-    await this.createSkillForTopic(skillName, topicName);
+    await this.createSkillForTopic(skillName, topicName, true);
     await this.createQuestionsForSkill(skillName, 3);
     await this.assignSkillToSubtopicInTopicEditor(
       skillName,
@@ -2158,7 +2195,7 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.saveTopicDraft(topicName);
 
-    await this.createSkillForTopic('Skill 2', topicName);
+    await this.createSkillForTopic('Skill 2', topicName, false);
     await this.assignSkillToSubtopicInTopicEditor(
       'Skill 2',
       'Subtracting Numbers',

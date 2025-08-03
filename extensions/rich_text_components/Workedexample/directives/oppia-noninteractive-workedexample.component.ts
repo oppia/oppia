@@ -78,6 +78,9 @@ export class NoninteractiveWorkedexample implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this._updateViewOnInputChange();
+    if (!this.allowSolutionToBeCollapsed) {
+      this.isSolutionCollapsed = false;
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
