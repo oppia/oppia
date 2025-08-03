@@ -36,6 +36,13 @@ const toastMessage = 'div.e2e-test-toast-warning-message';
 const blogPostTitlePage = '.e2e-test-blog-post-title';
 const listOfBlogsInBlogDashboard = '.blog-dashboard-tile-content';
 
+const usernameInputSelector = '.e2e-test-blog-author-name-field';
+const updateUsernameIconSelector = '.e2e-test-update-blog-editor-username';
+const updateBioIconSelector = '.e2e-test-update-blog-editor-bio';
+
+const usernameInBlogDashboardSelector = '.e2e-test-username-visible';
+const bioInBlogDashboardSelector = '.e2e-test-bio-visible';
+
 const blogBodySaveButtonSelector = '.e2e-test-save-blog-post-content';
 const publisedBlogsTabContainerSelector = '.e2e-test-published-blogs-tab';
 
@@ -59,6 +66,85 @@ export class BlogPostEditor extends BaseUser {
       await this.page.click(authorBioSaveButton);
       await this.expectElementToBeVisible(authorBioSaveButton, false);
     }
+  }
+
+  /**
+   * Fills the bio in register modal shown when visiting blog dashboard for the
+   * first time.
+   * @param {string} bio: The bio to update with.
+   */
+  async updateUserBioInRegisterModal(bio: string): Promise<void> {
+    await this.expectElementToBeVisible(blogAuthorBioField);
+    await this.clearAllTextFrom(blogAuthorBioField);
+    await this.type(blogAuthorBioField, bio);
+    await this.expectInputValueToBe(blogAuthorBioField, bio);
+  }
+
+  /**
+   * Fills username in register modal shown when visiting blog dashboard for
+   * the first time.
+   * @param {string} username: Username to enter.
+   */
+  async updateUsernameInRegisterModal(username: string): Promise<void> {
+    await this.expectElementToBeVisible(usernameInputSelector);
+    await this.type(usernameInputSelector, username);
+
+    await this.expectInputValueToBe(usernameInputSelector, username);
+  }
+
+  /**
+   * Checks the status of the "Save" button in the first time register modal.
+   * @param status - The status of the button.
+   */
+  async expectRegisterButtonToBe(
+    status: 'disabled' | 'enabled' | 'hidden'
+  ): Promise<void> {
+    if (status === 'hidden') {
+      await this.expectElementToBeVisible(authorBioSaveButton, false);
+    } else if (status === 'disabled') {
+      await this.expectElementToBeClickable(authorBioSaveButton, false);
+    } else {
+      await this.expectElementToBeClickable(authorBioSaveButton);
+    }
+  }
+
+  /**
+   * Clicks on the update username icon.
+   */
+  async clickOnUpdateUsernameIcon(): Promise<void> {
+    await this.clickOn(updateUsernameIconSelector);
+    await this.expectModalTitleToBe('Add your Author Name and Biography:');
+  }
+
+  async clickOnUpdateBioIcon(): Promise<void> {
+    await this.clickOn(updateBioIconSelector);
+    await this.expectModalTitleToBe('Add your Author Name and Biography:');
+  }
+
+  /**
+   * Clicks on the save profile button.
+   */
+  async clickOnSaveProfileButton(): Promise<void> {
+    await this.clickOn(authorBioSaveButton);
+    await this.expectElementToBeVisible(authorBioSaveButton, false);
+  }
+
+  /**
+   * Checks if the username is present in the blog dashboard.
+   * @param username - The username to check.
+   */
+  async expectUsernameInBlogDashboardToBe(username: string): Promise<void> {
+    await this.page.waitForSelector(usernameInBlogDashboardSelector);
+    await this.expectTextContentToBe(usernameInBlogDashboardSelector, username);
+  }
+
+  /**
+   * Checks if the bio is present in the blog dashboard.
+   * @param bio - The bio to check.
+   */
+  async expectBioInBlogDashboardToBe(bio: string): Promise<void> {
+    await this.page.waitForSelector(bioInBlogDashboardSelector);
+    await this.expectTextContentToBe(bioInBlogDashboardSelector, bio);
   }
 
   /**

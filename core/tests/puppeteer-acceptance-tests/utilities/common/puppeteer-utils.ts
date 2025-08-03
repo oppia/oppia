@@ -64,6 +64,7 @@ export type ModalUserInteractions = (
 ) => Promise<void>;
 
 const actionStatusMessageSelector = '.e2e-test-status-message';
+const commonModalTitleSelector = '.e2e-test-modal-header';
 
 export class BaseUser {
   page!: Page;
@@ -436,15 +437,18 @@ export class BaseUser {
    * The function clicks the element using the text on the button.
    * @param selector The text of the button to click on.
    * @param forceSelector If true, the function will try to find the element by its CSS selector.
+   * @param parentElement The parent element to search within.
    */
   async clickOn(
     selector: string,
-    forceSelector: boolean = false
+    forceSelector: boolean = false,
+    parentElement?: puppeteer.ElementHandle
   ): Promise<void> {
+    const context = parentElement ?? this.page;
     /** Normalize-space is used to remove the extra spaces in the text.
      * Check the documentation for the normalize-space function here :
      * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const [button] = await this.page.$x(
+    const [button] = await context.$x(
       `\/\/*[contains(text(), normalize-space('${selector}'))]`
     );
     // If we fail to find the element by its XPATH, then the button is undefined and
@@ -455,9 +459,13 @@ export class BaseUser {
       await button.click();
       showMessage(`Button (text: ${selector}) is clicked.`);
     } else {
-      await this.waitForElementToBeClickable(selector);
+      const element = await context.waitForSelector(selector, {visible: true});
+      if (!element) {
+        throw new Error(`Element not found for selector ${selector}`);
+      }
+      await this.waitForElementToBeClickable(element);
       showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
-      await this.page.click(selector);
+      await element.click();
       showMessage(`Element (selector: ${selector}) is clicked.`);
     }
   }
@@ -1341,6 +1349,15 @@ export class BaseUser {
     }
 
     showMessage(`Element ${selector} did not stabilize within ${timeout} ms`);
+  }
+
+  /**
+   * Checks if the modal title matches the expected title.
+   * @param expectedTitle The expected title of the modal.
+   */
+  async expectModalTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToBe(commonModalTitleSelector, expectedTitle);
   }
 }
 

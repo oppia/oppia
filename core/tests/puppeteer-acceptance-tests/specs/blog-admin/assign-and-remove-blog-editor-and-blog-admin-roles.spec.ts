@@ -65,7 +65,7 @@ describe('Blog Admin', function () {
       BLOG_RIGHTS.BLOG_POST_EDITOR
     );
     await blogAdmin.expectActionStatusMessageToBe(
-      `Role of ${guestUser1.username} successfully updated to ${BLOG_RIGHTS.BLOG_POST_EDITOR}.`
+      `Role of ${guestUser1.username} successfully updated to ${BLOG_RIGHTS.BLOG_POST_EDITOR}`
     );
 
     // Assign blog admin role to guestUser1.
@@ -74,7 +74,7 @@ describe('Blog Admin', function () {
       BLOG_RIGHTS.BLOG_ADMIN
     );
     await blogAdmin.expectActionStatusMessageToBe(
-      `Role of ${guestUser1.username} successfully updated to ${BLOG_RIGHTS.BLOG_ADMIN}.`
+      `Role of ${guestUser1.username} successfully updated to ${BLOG_RIGHTS.BLOG_ADMIN}`
     );
   });
 
@@ -94,5 +94,9 @@ describe('Blog Admin', function () {
     await guestUser2.openBlogEditorPage();
     await guestUser2.expectTagLimitTextToBe(5);
     await guestUser2.expectRemainingTagsLimitTextToBe(5);
+  });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
   });
 });

@@ -468,6 +468,23 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the given page using the profile dropdown.
+   * @param page The page or dashboard to navigate to.
+   */
+  async navigateToPageUsingProfileMenu(page: 'Blog Dashboard'): Promise<void> {
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOn(profileDropdown);
+
+    const dropDownContainer = await this.page.waitForSelector(
+      profileDropdownContainerSelector
+    );
+    if (!dropDownContainer) {
+      throw new Error('Profile dropdown container not found.');
+    }
+    await this.clickOn(page, false, dropDownContainer);
+  }
+
+  /**
    * Navigates to the progress section of the learner dashboard.
    */
   async navigateToProgressSection(): Promise<void> {

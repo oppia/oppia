@@ -11,7 +11,7 @@
       <mat-card-title class="w-100 d-flex justify-content-between">
         <span class="blog-dashboard-card-title e2e-test-username-visible">
           {{ authorName }}
-          <button class="fas fa-pen oppia-editor-edit-icon"
+          <button class="fas fa-pen oppia-editor-edit-icon e2e-test-update-blog-editor-username"
                   title="Edit Author Name"
                   (click)="showAuthorDetailsEditor()">
           </button>
@@ -29,10 +29,10 @@
       <mat-card-subtitle class="mt-2">
         <div class="blog-author-bio-container">
           <span class="d-flex">
-            <span class="blog-author-bio">
+            <span class="blog-author-bio e2e-test-bio-visible">
               {{ authorBio }}
             </span>
-            <button class="fas fa-pen oppia-editor-edit-icon mb-auto"
+            <button class="fas fa-pen oppia-editor-edit-icon mb-auto e2e-test-update-blog-editor-bio"
                     title="Edit Author Name"
                     (click)="showAuthorDetailsEditor()">
             </button>
