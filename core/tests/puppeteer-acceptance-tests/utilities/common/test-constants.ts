@@ -126,6 +126,9 @@ export default {
     LessonCreatorLinkedInUrl:
       'https://www.linkedin.com/in/rita-santos-guimaraes-prof-matematica/',
     ReadBlogLink: 'https://medium.com/oppia-org',
+    ExplorationPlayer: 'http://localhost:8181/explore/',
+    SkillEditor: 'http://localhost:8181/skill_editor',
+    TopicEditor: 'http://localhost:8181/topic_editor',
   },
   Dashboard: {
     MainDashboard: '.e2e-test-splash-page',
@@ -183,6 +186,10 @@ export default {
     LastCardContentVoiceoverInHindi: path.resolve(
       __dirname,
       '../../data/last-card-hi.mp3'
+    ),
+    LongVoiceoverInHindi: path.resolve(
+      __dirname,
+      '../../data/audio/voiceover_hindi_25secs.mp3'
     ),
   },
   SocialsShare: {
