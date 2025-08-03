@@ -50,7 +50,7 @@ export class BlogPostEditor extends BaseUser {
    * Function for adding blog post author bio in blog dashboard.
    */
   async addUserBioInBlogDashboard(): Promise<void> {
-    const inputBar = await this.page.$(blogAuthorBioField);
+    const inputBar = await this.page.waitForSelector(blogAuthorBioField);
     // It is used here to avoid filling the user bio each time. We fill it only once when
     // the user is accessing the blog dashboard for the first time.
     if (inputBar) {
@@ -487,6 +487,31 @@ export class BlogPostEditor extends BaseUser {
         `User unauthorized to access blog dashboard!\nOriginal error: ${err}`
       );
     }
+  }
+
+  /**
+   * Checks if the tag limit text is present on the page.
+   * @param {number} tagLimit - The tag limit to check.
+   */
+  async expectTagLimitTextToBe(tagLimit: number): Promise<void> {
+    const tagLimitTextSelector = '.e2e-test-tag-limit-text';
+    await this.expectTextContentToBe(
+      tagLimitTextSelector,
+      `Limit of ${tagLimit}`
+    );
+  }
+
+  /**
+   * Checks if the remaining tags limit text is present on the page.
+   * @param {number} tagLimit - The remaining tag limit to check.
+   */
+  async expectRemainingTagsLimitTextToBe(tagLimit: number): Promise<void> {
+    const remainingTagsLimitTextSelector =
+      '.e2e-test-remaining-tags-limit-text';
+    await this.expectTextContentToBe(
+      remainingTagsLimitTextSelector,
+      `${tagLimit} more tags can still be added.`
+    );
   }
 }
 

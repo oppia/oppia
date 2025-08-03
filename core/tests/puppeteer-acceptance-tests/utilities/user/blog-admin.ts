@@ -17,10 +17,8 @@
  */
 
 import {BaseUser} from '../common/puppeteer-utils';
-import testConstants from '../common/test-constants';
+import testConstants, {BlogRoles} from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-
-const BLOG_RIGHTS = testConstants.BlogRights;
 
 const roleUpdateUsernameInput = 'input#label-target-update-form-name';
 const blogEditorUsernameInput = 'input#label-target-form-reviewer-username';
@@ -35,13 +33,19 @@ const LABEL_FOR_SAVE_BUTTON = 'Save';
 
 export class BlogAdmin extends BaseUser {
   /**
+   * Navigates to the blog admin page.
+   */
+  async navigateToBlogAdminPage(): Promise<void> {
+    await this.goto(blogAdminUrl);
+  }
+
+  /**
    * This function assigns a user with a role from the blog admin page.
    */
   async assignUserToRoleFromBlogAdminPage(
     username: string,
-    role: keyof typeof BLOG_RIGHTS
+    role: BlogRoles
   ): Promise<void> {
-    await this.goto(blogAdminUrl);
     await this.page.select('select#label-target-update-form-role-select', role);
     await this.type(roleUpdateUsernameInput, username);
     await this.clickOn(updateRoleButtonSelector);
