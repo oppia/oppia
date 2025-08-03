@@ -131,7 +131,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.selectMultipleChoiceOption('Option 1');
     await explorationEditor.expectResponseFeedbackToBe('Wrong Answer.');
     // View Hint.
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();
@@ -186,7 +186,7 @@ describe('Exploration Editor', function () {
       'Enter a number to continue'
     );
     // Check for hint.
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();
@@ -360,7 +360,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectResponseFeedbackToBe('Try Again!');
     // View Hint.
     await explorationEditor.removeFeedbackResponseInPreviewTab();
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();

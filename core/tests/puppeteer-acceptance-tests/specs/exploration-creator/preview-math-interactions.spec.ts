@@ -92,7 +92,7 @@ describe('Exploration Editor', function () {
       'Please only use numerical digits, spaces or forward slashes (/)'
     );
     // View Hint.
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();
@@ -146,7 +146,7 @@ describe('Exploration Editor', function () {
     );
     // View Hint.
     await explorationEditor.removeFeedbackResponseInPreviewTab();
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();
@@ -199,7 +199,7 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
     // View Hint.
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();
@@ -258,7 +258,7 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
     // View Hint.
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();
@@ -324,7 +324,7 @@ describe('Exploration Editor', function () {
       'Wrong Answer. Please try again'
     );
     // View Hint.
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();
@@ -391,7 +391,7 @@ describe('Exploration Editor', function () {
       'Please enter an answer before submitting.'
     );
     // View Hint.
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();
@@ -461,7 +461,7 @@ describe('Exploration Editor', function () {
     // View Units Table.
     await explorationEditor.expectUnitsTableToShowProperly();
     // View Hint.
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();
@@ -517,7 +517,7 @@ describe('Exploration Editor', function () {
       'Please enter a valid ratio (e.g. 1:2 or 1:2:3).'
     );
     // View Hint.
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();

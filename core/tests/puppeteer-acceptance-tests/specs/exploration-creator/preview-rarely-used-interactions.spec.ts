@@ -84,7 +84,7 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectCodeOutputToBe('Hello!');
     // View Hint.
     await explorationEditor.removeFeedbackResponseInPreviewTab();
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();
@@ -138,7 +138,7 @@ describe('Exploration Editor', function () {
     );
     // View Hint.
     await explorationEditor.removeFeedbackResponseInPreviewTab();
-    // TODO(): Skip hint check for mobile, as hint button in mobile view gets
+    // TODO(#22766): Skip hint check for mobile, as hint button in mobile view gets
     // covered by navigation in mobile view.
     if (!explorationEditor.isViewportAtMobileWidth()) {
       await explorationEditor.viewHint();
