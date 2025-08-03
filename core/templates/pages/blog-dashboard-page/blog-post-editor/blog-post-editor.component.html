@@ -164,7 +164,7 @@
                                        *ngFor="let tag of defaultTagsList"
                                        multiple="true"
                                        class="mx-2 my-2 tag">
-                <mat-button-toggle class="text-wrap"
+                <mat-button-toggle class="text-wrap e2e-test-blog-post-tags"
                                    (change)="onTagChange($event.value)"
                                    [value]="tag"
                                    [disabled]="!((blogPostData.tags).includes(tag)) && (blogPostData.tags.length === maxAllowedTags)">

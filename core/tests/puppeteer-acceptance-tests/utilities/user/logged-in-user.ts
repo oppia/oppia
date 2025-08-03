@@ -185,8 +185,6 @@ const voiceArtistSettingsDropdown =
   'h3.e2e-test-voice-artists-settings-container';
 const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
 const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
-const explorationControlsSettingsDropdown =
-  'h3.e2e-test-controls-bar-settings-container';
 const tagsField = '.e2e-test-chip-list-tags';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
@@ -201,7 +199,8 @@ const communityLessonsSectionInLearnerDashboard =
 const homeTabSectionInLearnerDashboard = '.e2e-test-learner-dash-home-tab';
 const progressTabSectionInLearnerDashboard =
   '.e2e-test-learner-dash-progress-tab';
-const goalsTabSectionInLearnerDashboard = '.e2e-test-goals-section';
+const learnerDashboardContainerSelector = '.e2e-test-learner-dashboard-page';
+
 const emptySuggestionSectionSelector = '.e2e-test-home-tab-empty-suggestions';
 const emptyCurrentGoalsSectionSelector =
   '.e2e-test-goals-section .e2e-test-current-goals-section.e2e-test-empty-section';
@@ -315,6 +314,7 @@ const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
 const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
 const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
+const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -428,14 +428,11 @@ export class LoggedInUser extends BaseUser {
         visible: true,
       });
       await this.page.click(communityLessonsSectionButton);
-
-      await this.page.waitForSelector(
-        communityLessonsSectionInLearnerDashboard,
-        {
-          visible: true,
-        }
-      );
     }
+
+    await this.page.waitForSelector(communityLessonsSectionInLearnerDashboard, {
+      visible: true,
+    });
   }
 
   /**
@@ -502,6 +499,10 @@ export class LoggedInUser extends BaseUser {
         }
       }
       await this.clickOn('Stories');
+
+      await this.page.waitForSelector(progressTabSectionInLearnerDashboard, {
+        visible: true,
+      });
     } else {
       await this.page.waitForSelector(progressSectionSelector);
       const progressSection = await this.page.$(progressSectionSelector);
@@ -537,6 +538,10 @@ export class LoggedInUser extends BaseUser {
           throw error;
         }
       }
+
+      await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
+        visible: true,
+      });
     } else {
       await this.page.waitForSelector(homeSectionSelector);
       const homeSectionElement = await this.page.$(homeSectionSelector);
@@ -573,6 +578,8 @@ export class LoggedInUser extends BaseUser {
           throw error;
         }
       }
+
+      await this.expectElementToBeVisible(goalsSectionContainerSelector);
     } else {
       await this.page.waitForSelector(goalsSectionSelector);
       const goalSectionElement = await this.page.$(goalsSectionSelector);
@@ -583,9 +590,7 @@ export class LoggedInUser extends BaseUser {
     }
 
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(goalsTabSectionInLearnerDashboard, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(goalsSectionContainerSelector);
   }
 
   /**
@@ -810,8 +815,14 @@ export class LoggedInUser extends BaseUser {
     if (!invalidUsernameErrorContainerElement) {
       await this.clickOn(agreeToTermsCheckbox);
       await this.page.waitForSelector(registerNewUserButton);
-      await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
-      await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+      await Promise.all([
+        this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+        this.clickOn(LABEL_FOR_SUBMIT_BUTTON),
+      ]);
+
+      await this.page.waitForSelector(learnerDashboardContainerSelector, {
+        visible: true,
+      });
     } else if (verifyLogin) {
       // If the username is invalid, we throw an error.
       throw new Error(
@@ -1970,13 +1981,17 @@ export class LoggedInUser extends BaseUser {
           await this.waitForElementToBeClickable(lessonTileTitle),
           lessonTileTitle.click(),
         ]);
+
+        await this.page.waitForSelector(
+          continueFromWhereLeftOffSectionSelector,
+          {
+            hidden: true,
+          }
+        );
         return;
       }
     }
 
-    await this.page.waitForSelector(continueFromWhereLeftOffSectionSelector, {
-      hidden: true,
-    });
     throw new Error(`Lesson not found: ${lessonName}`);
   }
 
@@ -2157,7 +2172,6 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(voiceArtistSettingsDropdown);
       await this.clickOn(permissionSettingsDropdown);
       await this.clickOn(feedbackSettingsDropdown);
-      await this.clickOn(explorationControlsSettingsDropdown);
     } else {
       await this.clickOn(settingsTab);
     }
@@ -2356,7 +2370,7 @@ export class LoggedInUser extends BaseUser {
       hidden: true,
     });
     showMessage('Exploration is saved successfully.');
-    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -2416,6 +2430,7 @@ export class LoggedInUser extends BaseUser {
         element => (element as HTMLElement).innerText
       );
       const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.waitUntilClickFunctionIsAttached(closePublishedPopUpButton);
       await this.clickOn(closePublishedPopUpButton);
 
       await this.page.waitForSelector(closePublishedPopUpButton, {
@@ -2424,9 +2439,9 @@ export class LoggedInUser extends BaseUser {
       return explorationId;
     };
 
+    await publishExploration();
+    await fillExplorationMetadataDetails();
     try {
-      await publishExploration();
-      await fillExplorationMetadataDetails();
       return await confirmPublish();
     } catch (error) {
       await this.waitForPageToFullyLoad();
