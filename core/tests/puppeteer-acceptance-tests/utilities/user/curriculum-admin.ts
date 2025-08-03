@@ -672,10 +672,12 @@ export class CurriculumAdmin extends BaseUser {
       await this.page.waitForSelector(editWorkedexampleModalQuestionRte, {
         visible: true,
       });
+      await this.clearAllTextFrom(editWorkedexampleModalQuestionRte);
       await this.type(editWorkedexampleModalQuestionRte, 'Type the number one');
       await this.page.waitForSelector(editWorkedexampleModalAnswerRte, {
         visible: true,
       });
+      await this.clearAllTextFrom(editWorkedexampleModalAnswerRte);
       await this.type(editWorkedexampleModalAnswerRte, '1');
       await this.clickOn(rteComponentSaveButton);
     }
