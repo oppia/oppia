@@ -130,6 +130,7 @@ export class UserFactory {
 
       switch (role) {
         case ROLES.BLOG_POST_EDITOR:
+          await superAdminInstance.navigateToBlogAdminPage();
           await superAdminInstance.assignUserToRoleFromBlogAdminPage(
             user.username,
             BLOG_RIGHTS.BLOG_POST_EDITOR
