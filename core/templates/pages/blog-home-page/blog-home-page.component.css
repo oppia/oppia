@@ -36,6 +36,10 @@
 .clickable {
   cursor: pointer;
 }
+a.no-underline {
+  text-decoration: none;
+  color: inherit;
+}
 
 oppia-blog-home-page .posts-display-heading {
   color: #555;

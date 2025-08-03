@@ -3,9 +3,7 @@
     <navbar-breadcrumb class="blog-homepage">
       <div class="nav navbar-nav oppia-navbar-breadcrumb main-blog-homepage-mobile-breadcrumb">
         <span class="mx-3 oppia-navbar-breadcrumb-separator"></span>
-        <span class="oppia-blog-home-breadcrumb" (click)="navigateToBlogHome()">
-          <span class="clickable">BLOG</span>
-        </span>
+        <a class="clickable no-underline" [smartRouterLink]="['/blog']">BLOG</a>
       </div>
     </navbar-breadcrumb>
     <content>

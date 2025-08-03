@@ -25,7 +25,6 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 import {LoaderService} from 'services/loader.service';
 import {PageHeadService} from 'services/page-head.service';
 import {UserService} from 'services/user.service';
-import {Router} from '@angular/router';
 
 @Component({
   selector: 'oppia-blog-home-page-root',
@@ -40,13 +39,9 @@ export class BlogHomePageRootComponent implements OnDestroy, OnInit {
     private accessValidationBackendApiService: AccessValidationBackendApiService,
     private loaderService: LoaderService,
     private pageHeadService: PageHeadService,
-    private router: Router,
     private translateService: TranslateService,
     private userService: UserService
   ) {}
-  navigateToBlogHome(): void {
-    this.router.navigate(['/blog']);
-  }
 
   ngOnInit(): void {
     this.setPageTitleAndMetaTags();
