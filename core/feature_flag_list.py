@@ -305,7 +305,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'Allows creators to add worked examples to the review material '
             'section of skills and explanation of the study guides.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     )
 }

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for Creating, Updating and Deleting Subtopic Study Guides with multiple sections by a Curriculum Admin.
+ * @fileoverview Acceptance Test for Creating Skills with multiple workedexamples by a Curriculum Admin.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -43,21 +43,16 @@ describe('Curriculum Admin', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    // Enable the feature flags.
-    await releaseCoordinator.enableFeatureFlag(
-      'show_restructured_study_guides'
-    );
+    // Enable the feature flag.
     await releaseCoordinator.enableFeatureFlag(
       'enable_worked_examples_rte_component'
     );
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.createTopic('Addition and Subtraction', 'addsub');
-
     // Setup taking longer than 300000 ms.
   }, 480000);
 
-  it('should create a study guide with multiple sections containing workedexamples.', async function () {
+  it('should create a skill with multiple workedexamples.', async function () {
     await curriculumAdmin.createSubtopicWithStudyGuideForTopic(
       'subtopic1',
       'abcd',

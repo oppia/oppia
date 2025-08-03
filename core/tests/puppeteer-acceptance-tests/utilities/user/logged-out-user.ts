@@ -506,6 +506,8 @@ const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
 const profilePictureSelector = '.e2e-test-profile-dropdown';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const floatFormInput = '.e2e-test-float-form-input';
+const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
+const collapseWorkedExampleButton = '.e2e-test-collapse-workedexample';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -3834,6 +3836,16 @@ export class LoggedOutUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Click on the expand workedexample button.
+   */
+  async clickOnExpandWorkedexampleButton(): Promise<void> {
+    await this.clickOn(expandWorkedExampleButton);
+    await this.page.waitForSelector(collapseWorkedExampleButton, {
+      visible: true,
+    });
   }
 
   /**

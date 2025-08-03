@@ -171,6 +171,11 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     }
   }
 
+  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
+      .isEnabled;
+  }
+
   updateSubtopicTitle(title: string): void {
     if (title === this.subtopic.getTitle()) {
       return;
@@ -431,13 +436,23 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.SUBTOPIC_PAGE_SCHEMA = {
-      type: 'html',
-      ui_config: {
-        rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
-        rows: 100,
-      },
-    };
+    if (this.isEnableWorkedexamplesRteComponentFeatureEnabled()) {
+      this.SUBTOPIC_PAGE_SCHEMA = {
+        type: 'html',
+        ui_config: {
+          rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+          rows: 100,
+        },
+      };
+    } else {
+      this.SUBTOPIC_PAGE_SCHEMA = {
+        type: 'html',
+        ui_config: {
+          rte_components: 'ALL_COMPONENTS',
+          rows: 100,
+        },
+      };
+    }
     this.htmlData = '';
     this.sections = [];
     this.sectionsListIsShown = !this.windowDimensionsService.isWindowNarrow();

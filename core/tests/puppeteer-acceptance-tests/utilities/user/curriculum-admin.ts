@@ -262,6 +262,14 @@ const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
 const settingsContainerSelector =
   '.oppia-editor-card.oppia-settings-card-container';
 const deleteButtonSelector = 'button.oppia-delete-button';
+const insertWorkedexampleButton = '.cke_button__oppiaworkedexample';
+const editWorkedexampleModalQuestionRte =
+  '.e2e-test-arg-editor-inner-0 .e2e-test-rte';
+const editWorkedexampleModalAnswerRte =
+  '.e2e-test-arg-editor-inner-1 .e2e-test-rte';
+const rteComponentSaveButton = '.e2e-test-close-rich-text-component-editor';
+const topicPreviewTab = '.e2e-test-topic-preview-tab';
+const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -625,13 +633,16 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} heading - The heading of the initial Subtopic Study Guide Section.
    * @param {string} content - The content of the initial Subtopic Study Guide Section.
    * @param {string} topicName - The name of the Topic which storing the new Subtopic.
+   * @param {boolean} addWorkedexample - True if the study guide should have a workedexample,
+   * false otherwise.
    */
   async createSubtopicWithStudyGuideForTopic(
     title: string,
     urlFragment: string,
     heading: string,
     content: string,
-    topicName: string
+    topicName: string,
+    addWorkedexample: boolean
   ): Promise<void> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
@@ -648,6 +659,18 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(subtopicStudyGuideContentField);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.type(richTextAreaField, content);
+    if (addWorkedexample) {
+      await this.clickOn(insertWorkedexampleButton);
+      await this.page.waitForSelector(editWorkedexampleModalQuestionRte, {
+        visible: true,
+      });
+      await this.type(editWorkedexampleModalQuestionRte, 'Type the number one');
+      await this.page.waitForSelector(editWorkedexampleModalAnswerRte, {
+        visible: true,
+      });
+      await this.type(editWorkedexampleModalAnswerRte, '1');
+      await this.clickOn(rteComponentSaveButton);
+    }
 
     await this.clickOn(subtopicPhotoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
@@ -698,6 +721,116 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(deleteStudyGuideSectionButton, {
       visible: true,
     });
+  }
+
+  /**
+   * Add a section with a workedexample to the subtopic study guide. Make sure you are
+   * on the subtopic editor tab for this to work.
+   * @param {string} sectionHeading - The heading of the Section to be added.
+   * @param {string} sectionContent - The content of the Section to be added.
+   * @param {number} currentNumberOfSections - The number of the Sections currently in the Study Guide.
+   * @param {string} workedexampleQuestion - The workedexample question.
+   * @param {string} workedexampleAnswer - The workedexample answer.
+   */
+  async addSubtopicStudyGuideSectionWithWorkedexample(
+    sectionHeading: string,
+    sectionContent: string,
+    currentNumberOfSections: number,
+    workedexampleQuestion: string,
+    workedexampleAnswer: string
+  ): Promise<void> {
+    await this.clickOn(addStudyGuideSectionButton);
+    await this.type(addStudyGuideSectionModalHeading, sectionHeading);
+    await this.clickOn(addStudyGuideSectionModalContent);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(richTextAreaField, sectionContent);
+    await this.clickOn(insertWorkedexampleButton);
+    await this.page.waitForSelector(editWorkedexampleModalQuestionRte, {
+      visible: true,
+    });
+    await this.type(editWorkedexampleModalQuestionRte, workedexampleQuestion);
+    await this.page.waitForSelector(editWorkedexampleModalAnswerRte, {
+      visible: true,
+    });
+    await this.type(editWorkedexampleModalAnswerRte, workedexampleAnswer);
+    await this.clickOn(rteComponentSaveButton);
+    await this.clickOn(addStudyGuideSectionModalSaveButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
+    await this.page.waitForSelector(
+      `.e2e-test-study-guide-section-${currentNumberOfSections}`,
+      {
+        visible: true,
+      }
+    );
+    await this.page.waitForSelector(deleteStudyGuideSectionButton, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Navigates to the study guide Previews tab.
+   */
+  async previewStudyGuide(): Promise<void> {
+    await this.clickOn(topicPreviewTab);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Verifies if the subtopic study guide has the expected title and sections.
+   * @param {string} studyGuideTitle - The expected title of the study guide.
+   * @param {string[][]} studyGuideSections - The expected sections of the study guide.
+   * It is a list of sections. Sections are a list of strings having length of 2 - heading and content.
+   * @param {boolean} expectWorkedexample - If the sections have a workedexample or not.
+   */
+  async expectSubtopicStudyGuideToHaveTitleAndSections(
+    studyGuideTitle: string,
+    studyGuideSections: string[][],
+    expectWorkedexample: boolean
+  ): Promise<void> {
+    try {
+      const isTitlePresent = await this.isTextPresentOnPage(studyGuideTitle);
+
+      if (!isTitlePresent) {
+        throw new Error(
+          'Expected study guide title to be present, but it was not found.'
+        );
+      }
+
+      for (var i = 0; i < studyGuideSections.length; i++) {
+        for (var j = 0; j < 2; j++) {
+          const isHeadingPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
+          );
+          if (!isHeadingPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} heading to be present on the page, but it was not found`
+            );
+          }
+          j++;
+          const isContentPresent = await this.isTextPresentOnPage(
+            studyGuideSections[i][j]
+          );
+          if (!isContentPresent) {
+            throw new Error(
+              `Expected study guide section ${i + 1} content to be present on the page, but it was not found`
+            );
+          }
+        }
+      }
+      if (expectWorkedexample) {
+        await this.page.waitForSelector(expandWorkedExampleButton, {
+          visible: true,
+        });
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify sections of study guide: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
   }
 
   /**
@@ -1952,7 +2085,8 @@ export class CurriculumAdmin extends BaseUser {
       subtopicName.toLowerCase().replace(/ /g, '-'),
       'Adding With Your Fingers',
       'One way to add is using your...',
-      topicName
+      topicName,
+      true
     );
     await this.addSubtopicStudyGuideSection(
       'Using an Addition Table',
@@ -1975,7 +2109,8 @@ export class CurriculumAdmin extends BaseUser {
       'subtract-nos',
       'Common Mistakes',
       'Some common mistakes students make are...',
-      topicName
+      topicName,
+      true
     );
     await this.saveTopicDraft(topicName);
 

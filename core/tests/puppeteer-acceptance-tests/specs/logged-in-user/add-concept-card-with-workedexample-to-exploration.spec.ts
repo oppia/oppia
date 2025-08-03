@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance Test for the user journey of accessing the study guides through the
- * subtopic viewer page.
+ * @fileoverview Acceptance Test for the user journey of adding a concept card with workedexample to an exploration.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -45,25 +44,14 @@ describe('Logged-in User', function () {
       'release_coordinator@example.com',
       [ROLES.RELEASE_COORDINATOR]
     );
-
-    // Enable the feature flags.
-    await releaseCoordinator.enableFeatureFlag(
-      'show_restructured_study_guides'
-    );
     await releaseCoordinator.enableFeatureFlag(
       'enable_worked_examples_rte_component'
     );
 
-    await curriculumAdmin.createAndPublishTopicWithSubtopicsAndStudyGuides(
+    await curriculumAdmin.createAndPublishTopic(
       'Addition and Subtraction',
       'Adding Numbers',
-      'Skill 1'
-    );
-
-    await curriculumAdmin.createAndPublishClassroom(
-      'Math',
-      'math',
-      'Addition and Subtraction'
+      'skill1'
     );
 
     loggedInUser1 = await UserFactory.createNewUser(
@@ -75,41 +63,18 @@ describe('Logged-in User', function () {
   }, 420000);
 
   it(
-    'should be able to view the updated study guides',
+    'should be able to add a concept card with workedexample to an exploration and preview it',
     async function () {
-      await loggedInUser1.navigateToClassroomPage('math');
-      await loggedInUser1.selectAndOpenTopic('Addition and Subtraction');
-      await loggedInUser1.navigateToStudyTab();
-      await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
-      await loggedInUser1.expectSubtopicStudyGuideToHaveTitleAndSections(
-        'Adding Numbers',
-        [
-          ['Adding With Your Fingers', 'One way to add is using your...'],
-          ['Using an Addition Table', 'To add two single-digit...'],
-        ]
-      );
+      await loggedInUser1.navigateToExplorationEditorPageFromCreatorDashboard();
+      await loggedInUser1.dismissWelcomeModal();
+      await loggedInUser1.updateCardContentWithConceptCard('hello ');
+      await loggedInUser1.saveExplorationDraft();
+      await loggedInUser1.navigateToExplorationEditorPreviewTab();
+      await loggedInUser1.clickOnSkillreviewComponent();
       await loggedInUser1.expectScreenshotToMatch(
-        'finalSubtopicViewerView',
+        'finalExplorationEditorPreview',
         __dirname
       );
-      await loggedInUser1.clickOnExpandWorkedexampleButton();
-      await loggedInUser1.expectScreenshotToMatch(
-        'finalSubtopicViewerView2',
-        __dirname
-      );
-      await loggedInUser1.clickOnNextStudyGuideButton();
-      await loggedInUser1.expectSubtopicStudyGuideToHaveTitleAndSections(
-        'Subtracting Numbers',
-        [['Common Mistakes', 'Some common mistakes students make are...']]
-      );
-      await loggedInUser1.clickOnStudyGuideMenuButton();
-      await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
-      await loggedInUser1.clickOnPracticeButton();
-      await loggedInUser1.expectToBeOnPage('practice');
-      await loggedInUser1.navigateToStudyTab();
-      await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
-      await loggedInUser1.clickOnBackToTopicButton();
-      await loggedInUser1.expectToBeOnPage('story');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

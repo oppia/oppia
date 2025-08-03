@@ -9,8 +9,8 @@
 <div class="solution-box">
   <strong class="solution-title">
     Solution
-    <i *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed" class="material-icons icon-expand-workedexample" (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null">expand_more</i>
-    <i *ngIf="allowSolutionToBeCollapsed && !isSolutionCollapsed" class="material-icons icon-collapse-workedexample" (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null">expand_less</i>
+    <i *ngIf="allowSolutionToBeCollapsed && isSolutionCollapsed" class="material-icons e2e-test-expand-workedexample icon-expand-workedexample" (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null">expand_more</i>
+    <i *ngIf="allowSolutionToBeCollapsed && !isSolutionCollapsed" class="material-icons e2e-test-collapse-workedexample icon-collapse-workedexample" (click)="allowSolutionToBeCollapsed ? changeSolutionState() : null">expand_less</i>
   </strong>
   <div class="protractor-panel-body" *ngIf="!isSolutionCollapsed">
     <oppia-rte-output-display class="e2e-test-workedexample-answer" [rteString]="answer">
