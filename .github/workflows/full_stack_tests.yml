@@ -34,6 +34,8 @@ jobs:
       matrix:
         suite:
           - name: blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles
+          - name: blog-post-writer/register-and-update-blog-profile
+          - name: blog-post-writer/create-and-edit-blog-post
         runs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     name: Acceptance (${{ matrix.suite.name }})
     steps:
