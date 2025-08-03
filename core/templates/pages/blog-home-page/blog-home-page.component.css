@@ -33,6 +33,10 @@
   }
 }
 
+.clickable {
+  cursor: pointer;
+}
+
 oppia-blog-home-page .posts-display-heading {
   color: #555;
   font-family: 'Roboto', Arial, sans-serif;
