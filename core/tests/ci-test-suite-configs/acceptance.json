@@ -393,40 +393,40 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
     },
     {
-      "name": "exploration-editor/create-an-exploration-with-all-interactions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-an-exploration-with-all-interactions.spec.ts"
+      "name": "exploration-creator/create-an-exploration-with-all-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/create-an-exploration-with-all-interactions.spec.ts"
     },
     {
-      "name": "exploration-editor/exploration-history",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-history.spec.ts"
+      "name": "exploration-creator/exploration-history",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-history.spec.ts"
     },
     {
-      "name": "exploration-editor/exploration-settings",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-settings.spec.ts"
+      "name": "exploration-creator/exploration-settings",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-settings.spec.ts"
     },
     {
-      "name": "exploration-editor/exploration-feedback",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-feedback.spec.ts"
+      "name": "exploration-creator/exploration-feedback",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-feedback.spec.ts"
     },
     {
-      "name": "exploration-editor/exploration-help",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-help.spec.ts"
+      "name": "exploration-creator/exploration-help",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-help.spec.ts"
     },
     {
-      "name": "exploration-editor/exploration-navbar-header",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/exploration-navbar-header.spec.ts"
+      "name": "exploration-creator/exploration-navbar-header",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-navbar-header.spec.ts"
     },
     {
-      "name": "exploration-editor/preview-commonly-used-interactions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/preview-commonly-used-interactions.spec.ts"
+      "name": "exploration-creator/preview-commonly-used-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-commonly-used-interactions.spec.ts"
     },
     {
-      "name": "exploration-editor/preview-math-interactions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/preview-math-interactions.spec.ts"
+      "name": "exploration-creator/preview-math-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-math-interactions.spec.ts"
     },
     {
-      "name": "exploration-editor/preview-rarely-used-interactions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/preview-rarely-used-interactions.spec.ts"
+      "name": "exploration-creator/preview-rarely-used-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-rarely-used-interactions.spec.ts"
     },
     {
       "name": "logged-out-learner/complete-some-practice-question",
