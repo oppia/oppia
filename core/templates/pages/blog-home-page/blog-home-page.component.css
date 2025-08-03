@@ -37,8 +37,8 @@
   cursor: pointer;
 }
 a.no-underline {
-  text-decoration: none;
   color: inherit;
+  text-decoration: none;
 }
 
 oppia-blog-home-page .posts-display-heading {
