@@ -1107,25 +1107,19 @@ export class LoggedInUser extends BaseUser {
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
   async expectToolTipMessage(expectedMessage: string): Promise<void> {
-    try {
-      await this.page.waitForSelector(toastMessageSelector, {visible: true});
-      const toastMessageElement = await this.page.$(toastMessageSelector);
-      const toastMessage = await this.page.evaluate(
-        el => el.textContent.trim(),
-        toastMessageElement
-      );
+    await this.page.waitForSelector(toastMessageSelector, {visible: true});
+    const toastMessageElement = await this.page.$(toastMessageSelector);
+    const toastMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      toastMessageElement
+    );
 
-      if (toastMessage !== expectedMessage) {
-        throw new Error(
-          `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
-        );
-      }
-      await this.page.waitForSelector(toastMessageSelector, {hidden: true});
-    } catch (error) {
-      const newError = new Error(`Failed to match toast message: ${error}`);
-      newError.stack = error.stack;
-      throw newError;
+    if (toastMessage !== expectedMessage) {
+      throw new Error(
+        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+      );
     }
+    await this.page.waitForSelector(toastMessageSelector, {hidden: true});
   }
 
   /**

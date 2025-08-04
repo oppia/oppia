@@ -53,8 +53,15 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.clickOn(LABELS.CREATE_NEW_BLOG_POST_BTN);
     await blogPostWriter.expectToBeOnBlogEditorPage();
 
-    // Upload large thumbnail image.
+    // Check license terms for image uploads.
     await blogPostWriter.clickOnThumbnailImage();
+    await blogPostWriter.clickLinkAnchorToNewTab(
+      'license terms',
+      'localhost:8181/license'
+    );
+    await blogPostWriter.expectScreenshotToMatch('licensePage', __dirname);
+
+    // Upload large thumbnail image.
     await blogPostWriter.uploadFile(FILEPATHS.BANNER_HIGH_RES);
     await blogPostWriter.expectPhotoUploadErrorMessageToBe(
       'The maximum allowed file size is 1024 KB'
@@ -78,14 +85,16 @@ describe('Blog Post Writer', function () {
 
     // Upload SVG format thumbnail image.
     await blogPostWriter.uploadBlogPostThumbnailImage(FILEPATHS.BANNER_SVG);
+    await blogPostWriter.expectToolTipMessage('Thumbnail saved successfully');
 
-    // Check license terms for image uploads.
-    await blogPostWriter.clickOnThumbnailImage();
-    await blogPostWriter.clickLinkAnchorToNewTab(
-      'license terms',
-      'localhost:8181/license'
+    // Update blog title of less than 5 characters.
+    await blogPostWriter.updateBlogPostTitle('Test');
+    await blogPostWriter.expectBlogTitleHelpToContain(
+      'Blog Post title should have at least 5 characters.'
     );
-    await blogPostWriter.cancelPhotoUpload();
+
+    // Update blog title of more than 5 characters.
+    await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
   });
 
   afterAll(async () => {

@@ -55,6 +55,8 @@ const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
 
 const blogPostEditorContainerSelector = '.e2e-test-blog-post-editor-container';
 
+const blogTitleHelpSelector = '.e2e-test-blog-title-help';
+
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 
 export class BlogPostEditor extends BaseUser {
@@ -92,6 +94,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async updateUsernameInRegisterModal(username: string): Promise<void> {
     await this.expectElementToBeVisible(usernameInputSelector);
+    await this.clearAllTextFrom(usernameInputSelector);
     await this.type(usernameInputSelector, username);
 
     await this.expectInputValueToBe(usernameInputSelector, username);
@@ -177,6 +180,20 @@ export class BlogPostEditor extends BaseUser {
    */
   async expectToBeOnBlogEditorPage(): Promise<void> {
     await this.expectElementToBeVisible(blogPostEditorContainerSelector);
+  }
+
+  /**
+   * Checks if the blog title help text is present on the page.
+   * @param {string} helpText - The help text to check.
+   */
+  async expectBlogTitleHelpToContain(helpText: string): Promise<void> {
+    await this.expectElementToBeVisible(blogTitleHelpSelector);
+
+    const blogTitleHelpContents = await this.page.$$eval(
+      blogTitleHelpSelector,
+      elements => elements.map(element => element.textContent)
+    );
+    expect(blogTitleHelpContents).toContain(helpText);
   }
 
   /**
