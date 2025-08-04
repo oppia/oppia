@@ -408,7 +408,7 @@ def fetch_voiceover_by_filename(
         filename, audio_size_bytes, False, duration_secs)
 
 
-def regenerate_voiceover_on_exploration_update(
+def regenerate_voiceovers_of_exploration(
     exploration_id: str,
     exploration_version: int,
     content_id_to_content_html: Dict[str, str],

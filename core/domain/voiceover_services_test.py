@@ -1591,7 +1591,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             len(entity_voiceovers_models), 0
         )
 
-        def mock_regenerate_voiceover_on_exploration_update(
+        def mock_regenerate_voiceovers_of_exploration(
             _exploration_id: str,
             _exploration_version: int,
             _content_id_to_content_html: Dict[str, str],
@@ -1604,8 +1604,8 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
 
         with self.swap(
             voiceover_regeneration_services,
-            'regenerate_voiceover_on_exploration_update',
-            mock_regenerate_voiceover_on_exploration_update
+            'regenerate_voiceovers_of_exploration',
+            mock_regenerate_voiceovers_of_exploration
         ):
             voiceover_services.regenerate_voiceover_for_updated_exploration(
                 exploration_id=exploration_id,

@@ -493,7 +493,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             sentence_tokens_with_durations,
             expected_sentence_tokens_with_durations)
 
-    def test_should_regenerate_voiceover_on_exploration_update(self) -> None:
+    def test_should_regenerate_voiceovers_of_exploration(self) -> None:
         editor_email = 'editor1@example.com'
         editor_username = 'editor1'
         self.signup(editor_email, editor_username)
@@ -515,7 +515,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         errors_while_voiceover_regeneration = (
             voiceover_regeneration_services.
-            regenerate_voiceover_on_exploration_update(
+            regenerate_voiceovers_of_exploration(
                 exploration_id,
                 exploration_version,
                 {content_id: content_html},
@@ -560,7 +560,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         ):
             errors_while_voiceover_regeneration = (
                 voiceover_regeneration_services.
-                regenerate_voiceover_on_exploration_update(
+                regenerate_voiceovers_of_exploration(
                     exploration_id,
                     exploration_version,
                     {content_id: content_html},

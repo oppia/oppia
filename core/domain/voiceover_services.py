@@ -1084,7 +1084,7 @@ def _regenerate_voiceovers_for_given_contents(
 
             errors_while_voiceover_regeneration = (
                 voiceover_regeneration_services.
-                regenerate_voiceover_on_exploration_update(
+                regenerate_voiceovers_of_exploration(
                     exploration_id,
                     exploration_version,
                     content_ids_to_content_values,
