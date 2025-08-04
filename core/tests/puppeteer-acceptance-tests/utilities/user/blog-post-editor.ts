@@ -19,6 +19,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {RTEEditor} from '../common/rte-editor';
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
@@ -54,6 +55,7 @@ const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
 const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
 
 const blogPostEditorContainerSelector = '.e2e-test-blog-post-editor-container';
+const editBlogBodySelector = '.e2e-test-ck-editor';
 
 const blogTitleHelpSelector = '.e2e-test-blog-title-help';
 
@@ -460,6 +462,17 @@ export class BlogPostEditor extends BaseUser {
     await this.selectTag('News');
     await this.selectTag('International');
     await this.saveBlogBodyChanges();
+  }
+
+  async updateBlogBodyUsingAllRTEFeatures(): Promise<void> {
+    const editBlogBodyElement =
+      await this.page.waitForSelector(editBlogBodySelector);
+    if (!editBlogBodyElement) {
+      throw new Error('Edit blog body element not found.');
+    }
+    const rteEditor = new RTEEditor(this.page, editBlogBodyElement);
+
+    await rteEditor.changeFormatTo('heading');
   }
 
   /**

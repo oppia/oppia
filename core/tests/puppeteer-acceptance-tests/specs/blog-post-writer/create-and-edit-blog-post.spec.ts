@@ -43,6 +43,7 @@ describe('Blog Post Writer', function () {
 
   it('should be able to create a blog post and save it as draft', async function () {
     // Navigate to blog dashboard.
+    await blogPostWriter.reloadPage();
     await blogPostWriter.navigateToPageUsingProfileMenu('Blog Dashboard');
     await blogPostWriter.updateUserBioInRegisterModal('I am the test user.');
     await blogPostWriter.clickOnSaveProfileButton();
