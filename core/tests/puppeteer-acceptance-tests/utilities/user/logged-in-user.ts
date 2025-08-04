@@ -1295,6 +1295,29 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Checks if the photo upload error message is visible.
+   * @param expectedText - The expected text of the error message.
+   */
+  async expectPhotoUploadErrorMessageToBe(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(photoUploadErrorMessage);
+    await this.expectTextContentToContain(
+      photoUploadErrorMessage,
+      expectedText
+    );
+  }
+
+  /**
+   * Cancels the photo upload.
+   */
+  async cancelPhotoUpload(): Promise<void> {
+    await this.clickOn(cancelProfileUploadButtonSelector);
+    await this.expectElementToBeVisible(
+      cancelProfileUploadButtonSelector,
+      false
+    );
+  }
+
+  /**
    * Updates the user's bio in preference page.
    * @param {string} bio - The new bio to set for the user.
    */

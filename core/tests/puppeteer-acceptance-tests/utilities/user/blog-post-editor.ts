@@ -43,12 +43,17 @@ const updateBioIconSelector = '.e2e-test-update-blog-editor-bio';
 const usernameInBlogDashboardSelector = '.e2e-test-username-visible';
 const bioInBlogDashboardSelector = '.e2e-test-bio-visible';
 
+const firstPostButtonSelector = '.e2e-test-first-post-button';
+const newPostButtonSelector = '.e2e-test-new-post-button';
+
 const blogBodySaveButtonSelector = '.e2e-test-save-blog-post-content';
 const publisedBlogsTabContainerSelector = '.e2e-test-published-blogs-tab';
 
 const tagSelector = '.e2e-test-blog-post-tags';
 const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
 const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
+
+const blogPostEditorContainerSelector = '.e2e-test-blog-post-editor-container';
 
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 
@@ -148,6 +153,33 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
+   * Checks if the "+ Blog Post" button is visible.
+   * @param visible - Visibility of the button.
+   */
+  async expectNewBlogPostButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(newPostButtonSelector, visible);
+  }
+
+  /**
+   * Checks if the "Create new blog post" button is visible.
+   * @param visible - Visibility of the button.
+   */
+  async expectFirstBlogPostButtonToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(firstPostButtonSelector, visible);
+  }
+
+  /**
+   * Checks if blog editor page is visible.
+   */
+  async expectToBeOnBlogEditorPage(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostEditorContainerSelector);
+  }
+
+  /**
    * Function for navigating to the blog dashboard page.
    */
   async navigateToBlogDashboardPage(): Promise<void> {
@@ -231,18 +263,42 @@ export class BlogPostEditor extends BaseUser {
   }
 
   /**
-   * This function uploads a blog post thumbnail image.
+   * Clicks on the thumbnail image if on desktop view.
    */
-  async uploadBlogPostThumbnailImage(): Promise<void> {
+  async clickOnThumbnailImage(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.uploadFile(blogPostThumbnailImage);
+      showMessage('Skipped: Click on thumbnail image (mobile).');
+      return;
+    }
+
+    await this.expectElementToBeVisible(thumbnailPhotoBox);
+    await this.clickOn(thumbnailPhotoBox);
+    await this.expectModalTitleToBe('Add a thumbnail');
+  }
+
+  /**
+   * Checks if the "Add Thumbnail Image" button is clickable.
+   */
+  async expectAddThumbnailImageButtonToBeClickable(): Promise<void> {
+    await this.expectElementToBeClickable(addThumbnailImageButton);
+  }
+
+  /**
+   * This function uploads a blog post thumbnail image.
+   * @param imagePath - The path of the image to upload.
+   */
+  async uploadBlogPostThumbnailImage(
+    imagePath: string = blogPostThumbnailImage
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.uploadFile(imagePath);
       await this.clickOn(addThumbnailImageButton);
 
       await this.expectElementToBeVisible(addThumbnailImageButton, false);
     } else {
       await this.expectElementToBeVisible(thumbnailPhotoBox);
       await this.clickOn(thumbnailPhotoBox);
-      await this.uploadFile(blogPostThumbnailImage);
+      await this.uploadFile(imagePath);
       await this.clickOn(addThumbnailImageButton);
       await this.page.waitForSelector('body.modal-open', {hidden: true});
     }
