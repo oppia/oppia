@@ -272,7 +272,6 @@ export class AudioBarComponent {
       return;
     }
 
-    console.log('isInPreviewPage: ', isInPreviewPage);
     this.changeListService.getVoiceoverChangeList().forEach(changeDict => {
       changeDict = changeDict as ExplorationChangeEditVoiceovers;
       let contentId = changeDict.content_id;
@@ -299,7 +298,6 @@ export class AudioBarComponent {
         languageAccentCode,
         entityVoiceovers
       );
-      console.log(changeDict);
     });
 
     return entityVoiceovers;
