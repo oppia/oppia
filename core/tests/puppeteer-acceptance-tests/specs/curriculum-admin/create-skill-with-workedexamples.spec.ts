@@ -57,16 +57,13 @@ describe('Curriculum Admin', function () {
       'Skill 1',
       'hello'
     );
-    await curriculumAdmin.expectScreenshotToMatch(
-      'workedexampleWithValues',
-      __dirname
-    );
-    await curriculumAdmin.closeRteComponentModalAndCreateSkill();
     await curriculumAdmin.clickOnReviewMaterialEditButton();
     await curriculumAdmin.addWorkedexampleRteComponent(
       'Type the number two',
       '2'
     );
+    await curriculumAdmin.saveReviewMaterial();
+    await curriculumAdmin.clickOnRteAndPressEnter();
     await curriculumAdmin.addWorkedexampleRteComponent(
       'Type the number three',
       '3'

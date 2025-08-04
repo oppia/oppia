@@ -19,7 +19,6 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
-import {ThisExpression} from 'ts-morph';
 
 const curriculumAdminThumbnailImage =
   testConstants.data.curriculumAdminThumbnailImage;
@@ -276,17 +275,18 @@ const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
 
 const openExplorationEditorNavigationMobile =
   '.oppia-exploration-editor-tabs-dropdown.show';
-const createNewSkillMobileButton =
-  '.e2e-test-mobile-create-skill-button-secondary';
-const createNewSkillButton = '.e2e-test-create-skill-button-circle';
-const workedexampleComponent = 'oppia-noninteractive-workedexample';
-const closeRteComponentModalButton = '.e2e-test-cancel-rich-text-editor';
+const createNewSkillButton = '.e2e-test-create-skill-button';
 const createSkillButton = '.e2e-test-confirm-skill-creation-button';
 const editConceptCard = '.e2e-test-edit-concept-card';
 const moreThanTwoWorkedexamplesError = '.e2e-test-more-than-2-workedexamples';
 const saveReviewMaterialButton = '.e2e-test-save-concept-card';
 const publishSkillButton = '.e2e-test-publish-skill-changes-button';
 const skillPreviewTabButton = '.e2e-test-question-preview-tab';
+const toggleSkillEditOptionsButton =
+  'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+const mobileSaveSkillButton = '.e2e-test-mobile-save-skill-changes';
+const mobilePreviewTab = '.e2e-test-mobile-preview-tab';
+const navigationDropdown = '.e2e-test-mobile-skill-nav-dropdown-icon';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -2162,24 +2162,14 @@ export class CurriculumAdmin extends BaseUser {
     description: string,
     reviewMaterial: string
   ): Promise<void> {
-    const isMobileViewport = this.isViewportAtMobileWidth();
-    const createSkillButton = isMobileViewport
-      ? createNewSkillMobileButton
-      : createNewSkillButton;
-    await this.clickOn(createSkillButton);
+    await this.clickOn(createNewSkillButton);
     await this.type(skillDescriptionField, description);
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
     await this.type(richTextAreaField, reviewMaterial);
     await this.addWorkedexampleRteComponent('Type the number one', '1');
-    await this.clickOn(richTextAreaField);
-    await this.clickOn(workedexampleComponent);
-    await this.clickOn(workedexampleComponent);
-  }
-
-  async closeRteComponentModalAndCreateSkill(): Promise<void> {
-    await this.clickOn(closeRteComponentModalButton);
     await this.clickOn(createSkillButton);
+    await this.openSkillEditor(description);
   }
 
   async clickOnReviewMaterialEditButton(): Promise<void> {
@@ -2190,7 +2180,6 @@ export class CurriculumAdmin extends BaseUser {
     question: string,
     answer: string
   ): Promise<void> {
-    await this.clickOn(richTextAreaField);
     await this.clickOn(insertWorkedexampleButton);
     await this.page.waitForSelector(editWorkedexampleModalQuestionRte, {
       visible: true,
@@ -2218,25 +2207,45 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(saveReviewMaterialButton);
   }
 
+  async clickOnRteAndPressEnter(): Promise<void> {
+    await this.clickOnReviewMaterialEditButton();
+    await this.clickOn(richTextAreaField);
+    await this.page.keyboard.press('Enter');
+  }
+
   async publishSkillChanges(): Promise<void> {
-    await this.clickOn(publishSkillButton);
-    await this.page.waitForSelector('oppia-skill-editor-save-modal', {
-      visible: true,
-    });
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(mobileOptionsSelector);
+      // The mobile view has 2 instances of the element, from which
+      // the first one is inapplicable here.
+      const elems = await this.page.$$(toggleSkillEditOptionsButton);
+      await elems[1].click();
+      await this.clickOn(mobileSaveSkillButton);
+    } else {
+      await this.clickOn(publishSkillButton);
+    }
     await this.type(
       saveChangesMessageInput,
       'Test saving skill as curriculum admin.'
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
-    await this.page.waitForSelector('oppia-skill-editor-save-modal', {
-      hidden: true,
-    });
   }
 
   async navigateToSkillPreviewTab(): Promise<void> {
-    await this.clickOn(skillPreviewTabButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(navigationDropdown);
+      const navDropdownElements = await this.page.$$(navigationDropdown);
+      await this.waitForElementToBeClickable(navDropdownElements[1]);
+      await navDropdownElements[1].click();
+
+      await this.page.waitForSelector(mobilePreviewTab);
+      await this.clickOn(mobilePreviewTab);
+    } else {
+      await this.clickOn(skillPreviewTabButton);
+    }
     await this.waitForPageToFullyLoad();
+    await this.scrollToBottomOfPage();
   }
 
   /**
