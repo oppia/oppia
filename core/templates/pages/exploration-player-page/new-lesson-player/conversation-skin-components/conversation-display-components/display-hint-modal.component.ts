@@ -56,6 +56,9 @@ export class DisplayNewHintModalComponent {
   private subscriptions = new Subscription();
 
   constructor(
+    // @Optional() is used because at a time only one
+    // modal service will be injected based upon the
+    // screen size, other will be null.
     @Optional() private ngbActiveModal: NgbActiveModal,
     @Optional() private bottomSheetRef: MatBottomSheetRef,
     @Optional() @Inject(MAT_BOTTOM_SHEET_DATA) private data: HintModalData,

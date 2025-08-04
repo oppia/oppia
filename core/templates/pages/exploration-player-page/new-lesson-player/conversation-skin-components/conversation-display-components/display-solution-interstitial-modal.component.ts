@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,6 +28,9 @@ import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 })
 export class DisplayNewSolutionInterstititalModalComponent {
   constructor(
+    // @Optional() is used because at a time only one
+    // modal service will be injected based upon the
+    // screen size, other will be null.
     @Optional() private ngbActiveModal: NgbActiveModal,
     @Optional() private bottomSheetRef: MatBottomSheetRef
   ) {}

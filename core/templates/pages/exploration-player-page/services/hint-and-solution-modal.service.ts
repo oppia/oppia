@@ -37,6 +37,9 @@ const MOBILE_SCREEN_BREAKPOINT = 480;
 })
 export class HintAndSolutionModalService {
   constructor(
+    // @Optional() is used because at a time only one
+    // modal service will be injected based upon the
+    // screen size, other will be null.
     @Optional() private ngbModal: NgbModal,
     @Optional() private bottomSheet: MatBottomSheet,
     private windowDimensionsService: WindowDimensionsService

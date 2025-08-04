@@ -50,6 +50,9 @@ export class DisplayNewSolutionModalComponent {
   solutionExplanationHtml!: string;
 
   constructor(
+    // @Optional() is used because at a time only one
+    // modal service will be injected based upon the
+    // screen size, other will be null.
     @Optional() private ngbActiveModal: NgbActiveModal,
     @Optional() private bottomSheetRef: MatBottomSheetRef,
     private audioPlayerService: AudioPlayerService,

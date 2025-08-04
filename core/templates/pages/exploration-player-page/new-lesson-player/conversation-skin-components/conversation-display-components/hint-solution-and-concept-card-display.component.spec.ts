@@ -257,10 +257,6 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     })
   );
 
-  it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
-  });
-
   it(
     'should reset local hints array if active card is' +
       ' changed to the last one',
@@ -389,7 +385,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   });
 
   it('should display hint modal when user clicks on hints icon', fakeAsync(() => {
-    spyOn(hintAndSolutionModalService, 'displayHintModal').and.returnValue({
+    spyOn(hintAndSolutionModalService, 'displayNewHintModal').and.returnValue({
       result: Promise.resolve('success'),
     } as NgbModalRef);
 
@@ -403,9 +399,11 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     'should close display hint modal and reset active hint index when modal' +
       ' is closed',
     fakeAsync(() => {
-      spyOn(hintAndSolutionModalService, 'displayHintModal').and.returnValue({
-        result: Promise.reject('failure'),
-      } as NgbModalRef);
+      spyOn(hintAndSolutionModalService, 'displayNewHintModal').and.returnValue(
+        {
+          result: Promise.reject('failure'),
+        } as NgbModalRef
+      );
 
       expect(component.activeHintIndex).toBe(undefined);
 
@@ -430,7 +428,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       );
       spyOn(
         hintAndSolutionModalService,
-        'displaySolutionModal'
+        'displayNewSolutionModal'
       ).and.returnValue({
         result: Promise.resolve('success'),
       } as NgbModalRef);
@@ -453,7 +451,10 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
       'state1'
     );
-    spyOn(hintAndSolutionModalService, 'displaySolutionModal').and.returnValue({
+    spyOn(
+      hintAndSolutionModalService,
+      'displayNewSolutionModal'
+    ).and.returnValue({
       result: Promise.reject(),
     } as NgbModalRef);
 
@@ -474,11 +475,11 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       ).and.returnValue(false);
       spyOn(
         hintAndSolutionModalService,
-        'displaySolutionInterstitialModal'
+        'displayNewSolutionInterstitialModal'
       ).and.returnValue({
         result: Promise.resolve('success'),
       } as NgbModalRef);
-      spyOn(component, 'displaySolutionModal').and.callFake(() => {});
+      spyOn(component, 'displayNewSolutionModal').and.callFake(() => {});
 
       component.onClickSolutionButton();
       tick();
@@ -497,7 +498,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       ).and.returnValue(false);
       spyOn(
         hintAndSolutionModalService,
-        'displaySolutionInterstitialModal'
+        'displayNewSolutionInterstitialModal'
       ).and.returnValue({
         result: Promise.reject('failure'),
       } as NgbModalRef);

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the hint and solution display.
+ * @fileoverview Component for the hint, solution and concept card display.
  */
 
 import {ChangeDetectorRef, Component, OnDestroy, OnInit} from '@angular/core';
