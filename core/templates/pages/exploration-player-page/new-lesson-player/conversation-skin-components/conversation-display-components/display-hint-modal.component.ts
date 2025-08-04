@@ -56,7 +56,6 @@ export class DisplayNewHintModalComponent {
   private subscriptions = new Subscription();
 
   constructor(
-    //
     @Optional() private ngbActiveModal: NgbActiveModal,
     @Optional() private bottomSheetRef: MatBottomSheetRef,
     @Optional() @Inject(MAT_BOTTOM_SHEET_DATA) private data: HintModalData,

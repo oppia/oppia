@@ -24,7 +24,7 @@ import {PlayerPositionService} from 'pages/exploration-player-page/services/play
 import {ExplorationEngineService} from './exploration-engine.service';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {PlayerTranscriptService} from './player-transcript.service';
-import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
+import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from '../../../../../extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Injectable({

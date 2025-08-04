@@ -36,7 +36,9 @@ import {ExplorationEngineService} from 'pages/exploration-player-page/services/e
   templateUrl: './hint-solution-and-concept-card-display.component.html',
   styleUrls: ['./hint-solution-and-concept-card-display.component.css'],
 })
-export class HintSolutionAndConceptCardDisplayComponent {
+export class HintSolutionAndConceptCardDisplayComponent
+  implements OnInit, OnDestroy
+{
   directiveSubscriptions = new Subscription();
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see

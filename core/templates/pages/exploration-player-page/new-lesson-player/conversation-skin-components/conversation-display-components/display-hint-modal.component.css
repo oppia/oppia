@@ -9,8 +9,8 @@ oppia-new-display-hint-modal .oppia-learner-hint-and-solution-modal-title {
   font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
   font-size: 1.25em;
   font-weight: 400;
-  text-align: center;
   margin-top: 20px;
+  text-align: center;
 }
 
 oppia-new-display-hint-modal .oppia-learner-hint-and-solution-modal-body {

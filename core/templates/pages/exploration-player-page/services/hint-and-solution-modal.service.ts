@@ -16,7 +16,7 @@
  * @fileoverview Service for showing the hint and solution modals.
  */
 
-import {Injectable} from '@angular/core';
+import {Injectable, Optional} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {DisplayHintModalComponent} from '../current-lesson-player/modals/display-hint-modal.component';
 import {DisplaySolutionInterstititalModalComponent} from '../current-lesson-player/modals/display-solution-interstitial-modal.component';
@@ -37,8 +37,8 @@ const MOBILE_SCREEN_BREAKPOINT = 480;
 })
 export class HintAndSolutionModalService {
   constructor(
-    private ngbModal: NgbModal,
-    private bottomSheet: MatBottomSheet,
+    @Optional() private ngbModal: NgbModal,
+    @Optional() private bottomSheet: MatBottomSheet,
     private windowDimensionsService: WindowDimensionsService
   ) {}
 

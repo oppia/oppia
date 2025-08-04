@@ -18,7 +18,6 @@
 
 import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import './display-solution-interstitial-modal.component.css';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
