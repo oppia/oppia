@@ -1,4 +1,4 @@
-// Copyright 2021 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,22 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for DisplaySolutionInterstitialModalComponent.
+ * @fileoverview Unit tests for DisplayNewSolutionInterstitialModalComponent.
  */
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {DisplaySolutionInterstititalModalComponent} from './display-solution-interstitial-modal.component';
-import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
+import {DisplayNewSolutionInterstititalModalComponent} from './display-solution-interstitial-modal.component';
+import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
 
 describe('Display Interstitial Solution Modal', () => {
-  let fixture: ComponentFixture<DisplaySolutionInterstititalModalComponent>;
-  let componentInstance: DisplaySolutionInterstititalModalComponent;
+  let fixture: ComponentFixture<DisplayNewSolutionInterstititalModalComponent>;
+  let componentInstance: DisplayNewSolutionInterstititalModalComponent;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
-        DisplaySolutionInterstititalModalComponent,
+        DisplayNewSolutionInterstititalModalComponent,
         MockTranslatePipe,
       ],
       providers: [NgbActiveModal],
@@ -37,7 +37,7 @@ describe('Display Interstitial Solution Modal', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(
-      DisplaySolutionInterstititalModalComponent
+      DisplayNewSolutionInterstititalModalComponent
     );
     componentInstance = fixture.componentInstance;
   });
