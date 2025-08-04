@@ -23,7 +23,6 @@ import {FormsModule} from '@angular/forms';
 import {ReactiveFormsModule} from '@angular/forms';
 import {TranslateModule} from '@ngx-translate/core';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 
 import {BlogHomePageRootComponent} from './blog-home-page-root.component';
 import {BlogHomePageComponent} from './blog-home-page.component';
@@ -42,7 +41,6 @@ import {SharedBlogComponentsModule} from 'pages/blog-dashboard-page/shared-blog-
     BlogHomePageRoutingModule,
     FormsModule,
     NgbModule,
-    SmartRouterModule,
     StringUtilityPipesModule,
     TranslateModule,
     ReactiveFormsModule,
