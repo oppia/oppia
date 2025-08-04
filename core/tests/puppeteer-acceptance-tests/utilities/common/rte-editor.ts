@@ -1,5 +1,7 @@
 import puppeteer from 'puppeteer';
 
+const rteTextAreaSelector = '.e2e-test-rte';
+
 export class RTEEditor {
   parentPage: puppeteer.Page;
   context: puppeteer.Page | puppeteer.ElementHandle;
@@ -50,5 +52,17 @@ export class RTEEditor {
       throw new Error(`Format ${format} not found.`);
     }
     await element.click();
+  }
+
+  /**
+   * Clicks on the text area of the editor.
+   */
+  async clickOnTextArea(): Promise<void> {
+    const textAreaElement =
+      await this.context.waitForSelector(rteTextAreaSelector);
+    if (!textAreaElement) {
+      throw new Error('Text area element not found.');
+    }
+    await textAreaElement.click();
   }
 }

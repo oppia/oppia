@@ -58,7 +58,7 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.clickOnThumbnailImage();
     await blogPostWriter.clickLinkAnchorToNewTab(
       'license terms',
-      'localhost:8181/license'
+      'http://localhost:8181/license'
     );
     await blogPostWriter.expectScreenshotToMatch('licensePage', __dirname);
 
@@ -96,6 +96,26 @@ describe('Blog Post Writer', function () {
 
     // Update blog title of more than 5 characters.
     await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
+
+    // Update blog body using all the available RTE features.
+    await blogPostWriter.updateBlogBodyUsingAllRTEFeatures();
+
+    // Preview the blog post.
+    await blogPostWriter.previewBlogPost();
+    await blogPostWriter.expectScreenshotToMatch('blogPostPreview', __dirname);
+
+    // Verify link in blog preview modal.
+    await blogPostWriter.clickLinkAnchorToNewTab(
+      '( link  )',
+      'http://localhost:8181/blog'
+    );
+
+    // Close preview modal.
+    await blogPostWriter.closePreviewModal();
+
+    // Save blog post draft.
+    await blogPostWriter.saveTheDraftBlogPost();
+    await blogPostWriter.expectToolTipMessage('Blog Post Saved Successfully.');
   });
 
   afterAll(async () => {

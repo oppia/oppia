@@ -58,6 +58,8 @@ const blogPostEditorContainerSelector = '.e2e-test-blog-post-editor-container';
 const editBlogBodySelector = '.e2e-test-ck-editor';
 
 const blogTitleHelpSelector = '.e2e-test-blog-title-help';
+const previewBlogPostButtonSelector = '.e2e-test-blog-card-preview-button';
+const closePreivewModalButtonSelector = '.e2e-test-close-preview-button';
 
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 
@@ -75,6 +77,23 @@ export class BlogPostEditor extends BaseUser {
       await this.page.click(authorBioSaveButton);
       await this.expectElementToBeVisible(authorBioSaveButton, false);
     }
+  }
+
+  /**
+   * Closes the preview modal.
+   */
+  async closePreviewModal(): Promise<void> {
+    await this.clickOn(closePreivewModalButtonSelector);
+    await this.expectElementToBeVisible(closePreivewModalButtonSelector, false);
+  }
+
+  /**
+   * Opens blog post preview by clicking on "Preview" button.
+   */
+  async previewBlogPost(): Promise<void> {
+    await this.expectElementToBeVisible(previewBlogPostButtonSelector);
+    await this.clickOn(previewBlogPostButtonSelector);
+    await this.expectModalTitleToBe('Blog Card Preview');
   }
 
   /**
@@ -464,6 +483,9 @@ export class BlogPostEditor extends BaseUser {
     await this.saveBlogBodyChanges();
   }
 
+  /**
+   * Updates the blog body using all the available RTE features.
+   */
   async updateBlogBodyUsingAllRTEFeatures(): Promise<void> {
     const editBlogBodyElement =
       await this.page.waitForSelector(editBlogBodySelector);
@@ -472,7 +494,51 @@ export class BlogPostEditor extends BaseUser {
     }
     const rteEditor = new RTEEditor(this.page, editBlogBodyElement);
 
+    // Heading Paragraph.
+    await rteEditor.clickOnTextArea();
     await rteEditor.changeFormatTo('heading');
+    await this.page.keyboard.type('Test Heading\n');
+
+    // Normal paragraph.
+    await rteEditor.changeFormatTo('normal');
+    await this.page.keyboard.type('Test Normal Paragraph\n');
+
+    // Bold text.
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
+    await this.page.keyboard.type('Test Bold Text\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Bold');
+
+    // Italic text.
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
+    await this.page.keyboard.type('Test Italic Text\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Italic');
+
+    // Numbered list, Increase Indent, and Decrease Indent.
+    await rteEditor.clickOnRTEOptionWithTitle('Numbered List');
+    await this.page.keyboard.type('Numbered List Item 1\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Increase Indent');
+    await this.page.keyboard.type('Numbered List Item 1.1\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Decrease Indent');
+    await this.page.keyboard.type('Numbered List Item 2\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Numbered List');
+
+    // Bulleted list.
+    await rteEditor.clickOnRTEOptionWithTitle('Bulleted List');
+    await this.page.keyboard.type('Bulleted List Item 1\n');
+    await this.page.keyboard.type('Bulleted List Item 2\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Bulleted List');
+
+    // Pre formatted text.
+    await rteEditor.clickOnRTEOptionWithTitle('Pre');
+    await this.page.keyboard.type('Pre formatted text\n');
+
+    // Block quote.
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
+    await this.page.keyboard.type('Block Quote text\n');
+    await rteEditor.clickOnRTEOptionWithTitle('Block Quote');
+
+    // Save changes.
+    await this.saveBlogBodyChanges();
   }
 
   /**
