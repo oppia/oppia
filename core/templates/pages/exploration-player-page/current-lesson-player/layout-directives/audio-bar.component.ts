@@ -225,8 +225,19 @@ export class AudioBarComponent {
       this.entityVoiceoversService.getActiveEntityVoiceovers();
 
     let contentId = this.voiceoverPlayerService.activeContentId;
-    entityVoiceovers =
-      this.updateManualVoiceoverWithChangeList(entityVoiceovers);
+
+    const isInPreviewPage =
+      this.pageContextService.isInExplorationEditorPage() &&
+      this.pageContextService.getEditorTabContext() ===
+        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW;
+
+    // Update the manual voiceover using changeListService only when the user
+    // is in preview mode.
+    if (isInPreviewPage) {
+      entityVoiceovers =
+        this.updateManualVoiceoverWithChangeList(entityVoiceovers);
+    }
+
     let manualVoiceover = entityVoiceovers.getManualVoiceover(
       contentId
     ) as Voiceover;
@@ -261,17 +272,6 @@ export class AudioBarComponent {
   updateManualVoiceoverWithChangeList(
     entityVoiceovers: EntityVoiceovers
   ): EntityVoiceovers {
-    const isInPreviewPage =
-      this.pageContextService.isInExplorationEditorPage() &&
-      this.pageContextService.getEditorTabContext() ===
-        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW;
-
-    // Update the manual voiceover using changeListService only when the user
-    // is in preview mode.
-    if (!isInPreviewPage) {
-      return;
-    }
-
     this.changeListService.getVoiceoverChangeList().forEach(changeDict => {
       changeDict = changeDict as ExplorationChangeEditVoiceovers;
       let contentId = changeDict.content_id;

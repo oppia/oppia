@@ -572,6 +572,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     if (!this.isVoiceoverAutogenerationEnabledByAdmins) {
       return 'Voiceover autogeneration via cloud services is currently disabled. Please contact the admins for more information.';
     }
+
+    return '';
   }
 
   deleteManualVoiceover(): void {
