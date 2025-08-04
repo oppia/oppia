@@ -477,7 +477,7 @@ export class LoggedInUser extends BaseUser {
 
     const selector = `.e2e-test-${page.toLowerCase().replace(/ /g, '-')}-link`;
     await this.clickOn(selector);
-    await this.expectElementToBeVisible(`${profileDropdown}.show`);
+    await this.expectElementToBeVisible(`${profileDropdown}.show`, false);
   }
 
   /**
