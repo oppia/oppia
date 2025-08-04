@@ -11,6 +11,7 @@ oppia-new-display-hint-modal .oppia-learner-hint-and-solution-modal-title {
   font-weight: bold;
   text-align: center;
   font-size: 20px;
+  margin-top: 40px;
 }
 
 oppia-new-display-hint-modal .oppia-learner-hint-and-solution-modal-body {

@@ -1,6 +1,6 @@
-<div class="oppia-learner-hint-and-solution-modal-title">
-  <span [innerHTML]="'I18N_HINT_TITLE' | translate"></span> {{activeHintIndex + 1}}
-</div>
+<p class="oppia-learner-hint-and-solution-modal-title">
+  {{ 'I18N_HINT_TITLE' | translate: { hintIndex: activeHintIndex + 1 } }}
+</p>
 
 <div class="modal-body">
   <span>
@@ -12,20 +12,22 @@
 
 <div class="oppia-learner-solution-container" [ngStyle]="activeHintIndex === 0 ? {'justify-content': 'flex-end'} : {}">
   <button mat-button class="hint-modal-control-btn" *ngIf="activeHintIndex > 0"
-          (click)="updateHintModal(this.activeHintIndex - 1)"> Previous
+          (click)="updateHintModal(this.activeHintIndex - 1)"> {{ 'I18N_HINT_PREVIOUS_BUTTON_TEXT' | translate }}
   </button>
 
 	<p *ngIf="numHintsReleased > 1">
-		Hints ({{activeHintIndex + 1}}/{{numHintsReleased}})
+    {{ 'I18N_HINTS_COUNT' | translate: {
+      hintIndex: activeHintIndex + 1,
+      totalHints: numHintsReleased
+    } }}
 	</p>
 
 	<button mat-button class="hint-modal-control-btn" *ngIf="activeHintIndex < numHintsReleased - 1"
-          (click)="updateHintModal(this.activeHintIndex + 1)"> Next
+          (click)="updateHintModal(this.activeHintIndex + 1)"> {{ 'I18N_HINT_NEXT_BUTTON_TEXT' | translate }}
   </button>
 
   <button mat-button class="hint-display-modal-got-it-button e2e-test-learner-got-it-button" *ngIf="activeHintIndex === numHintsReleased - 1"
-          (click)="closeModal()">
-    <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
+          (click)="closeModal()"> {{ 'I18N_GOT_IT' | translate }}
   </button>
 </div>
 <span class="clearfix"></span>
