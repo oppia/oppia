@@ -38,6 +38,7 @@ import {PlayerHeaderComponent} from './lesson-header/player-header.component';
 import {PlayerSidebarComponent} from './sidebar-components/player-sidebar.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 
 @NgModule({
   imports: [
@@ -45,6 +46,7 @@ import {ConceptCardManagerService} from '../services/concept-card-manager.servic
     NewLessonPlayerPageRoutingModule,
     InteractionExtensionsModule,
     MatButtonModule,
+    MatBottomSheetModule,
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,

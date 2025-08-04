@@ -150,10 +150,13 @@ export class HintSolutionAndConceptCardDisplayComponent {
 
   displayNewHintModal(index: number): void {
     this.activeHintIndex = index;
-    let promise = this.hintAndSolutionModalService.displayNewHintModal(index);
-    promise.result.then(null, () => {
-      this.activeHintIndex = null;
-    });
+    let modalOrSheetRef =
+      this.hintAndSolutionModalService.displayNewHintModal(index);
+    if ('result' in modalOrSheetRef) {
+      modalOrSheetRef.result.then(null, () => {
+        this.activeHintIndex = null;
+      });
+    }
   }
 
   onClickSolutionButton(): void {

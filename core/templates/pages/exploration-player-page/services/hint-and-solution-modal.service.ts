@@ -22,12 +22,23 @@ import {DisplayHintModalComponent} from '../current-lesson-player/modals/display
 import {DisplaySolutionInterstititalModalComponent} from '../current-lesson-player/modals/display-solution-interstitial-modal.component';
 import {DisplaySolutionModalComponent} from '../current-lesson-player/modals/display-solution-modal.component';
 import {DisplayNewHintModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/display-hint-modal.component';
+import {
+  MatBottomSheet,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+
+const MOBILE_SCREEN_BREAKPOINT = 480;
 
 @Injectable({
   providedIn: 'root',
 })
 export class HintAndSolutionModalService {
-  constructor(private ngbModal: NgbModal) {}
+  constructor(
+    private ngbModal: NgbModal,
+    private bottomSheet: MatBottomSheet,
+    private windowDimensionsService: WindowDimensionsService
+  ) {}
 
   displayHintModal(index: number): NgbModalRef {
     let modalRef: NgbModalRef = this.ngbModal.open(DisplayHintModalComponent, {
@@ -43,15 +54,29 @@ export class HintAndSolutionModalService {
     });
   }
 
-  displayNewHintModal(index: number): NgbModalRef {
-    let modalRef: NgbModalRef = this.ngbModal.open(
-      DisplayNewHintModalComponent,
-      {
-        backdrop: 'static',
-      }
-    );
-    modalRef.componentInstance.activeHintIndex = index;
-    return modalRef;
+  displayNewHintModal(
+    index: number
+  ): NgbModalRef | MatBottomSheetRef<DisplayNewHintModalComponent> {
+    if (this.windowDimensionsService.getWidth() > MOBILE_SCREEN_BREAKPOINT) {
+      const modalRef: NgbModalRef = this.ngbModal.open(
+        DisplayNewHintModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
+      modalRef.componentInstance.activeHintIndex = index;
+      return modalRef;
+    } else {
+      const bottomSheetRef = this.bottomSheet.open(
+        DisplayNewHintModalComponent,
+        {
+          data: {activeHintIndex: index},
+          disableClose: true,
+        }
+      );
+
+      return bottomSheetRef;
+    }
   }
 
   displayNewSolutionModal(): NgbModalRef {
