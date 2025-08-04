@@ -135,48 +135,47 @@ export class LibraryPageComponent {
       return;
     }
 
-    // This prevents unnecessary execution of this method immediately
-    // after a window resize event is fired.
     if (!this.libraryGroups) {
       return;
     }
 
-    // The number 0 here is just to make sure that the type of width is number,
-    // it is never assigned as the width will never be undefined.
-    let width = $(window).width() || 0;
+    // Replacing jQuery's $(window).width() with vanilla JS.
+    // Using multiple fallbacks to avoid test failures in headless browsers,
+    // Reference: https://stackoverflow.com/a/11744120
+    const width =
+      window.innerWidth ||
+      document.documentElement?.clientWidth ||
+      document.body?.clientWidth;
 
-    let windowWidth = width * 0.85;
-    // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to
-    // compensate for padding and margins. 20 is just an arbitrary
-    // number.
+    const windowWidth = width * 0.85;
+
     this.tileDisplayCount = Math.min(
       Math.floor(windowWidth / (AppConstants.LIBRARY_TILE_WIDTH_PX + 20)),
       this.MAX_NUM_TILES_PER_ROW
     );
 
-    let maxWidth =
+    const maxWidth =
       this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX + 'px';
-    let carouselElem = this.el.nativeElement.querySelector(
+
+    const carouselElem = this.el.nativeElement.querySelector(
       '.oppia-library-carousel'
     );
 
     if (carouselElem) {
       this.renderer.setStyle(carouselElem, 'max-width', maxWidth);
     }
-
-    // The following determines whether to enable left scroll after
-    // resize.
+    const carouselTileElems = this.el.nativeElement.querySelectorAll(
+      '.oppia-library-carousel-tiles'
+    );
     for (let i = 0; i < this.libraryGroups.length; i++) {
-      let carouselJQuerySelector =
-        '.oppia-library-carousel-tiles:eq(n)'.replace('n', String(i));
-      // The number 0 here is just to make sure that the type of width is
-      // number, it is never assigned as the selector will never be undefined.
-      let carouselScrollPositionPx =
-        $(carouselJQuerySelector).scrollLeft() || 0;
-      let index = Math.ceil(
-        carouselScrollPositionPx / AppConstants.LIBRARY_TILE_WIDTH_PX
-      );
-      this.leftmostCardIndices[i] = index;
+      const carouselTileElem = carouselTileElems[i] as HTMLElement;
+      if (carouselTileElem) {
+        const scrollLeft = carouselTileElem.scrollLeft;
+        const index = Math.ceil(
+          scrollLeft / AppConstants.LIBRARY_TILE_WIDTH_PX
+        );
+        this.leftmostCardIndices[i] = index;
+      }
     }
   }
 
@@ -188,10 +187,14 @@ export class LibraryPageComponent {
     const carouselElements = document.querySelectorAll(
       '.oppia-library-carousel-tiles'
     );
-
     const carouselElement = carouselElements[ind] as HTMLElement;
 
-    let direction = isLeftScroll ? -1 : 1;
+    if (!carouselElement) {
+      return;
+    }
+
+    const direction = isLeftScroll ? -1 : 1;
+    let scrollLeft = carouselElement.scrollLeft;
 
     if (
       this.libraryGroups[ind].activity_summary_dicts.length <=
@@ -200,8 +203,7 @@ export class LibraryPageComponent {
       return;
     }
 
-    let currentScrollPosition = carouselElement?.scrollLeft || 0;
-    currentScrollPosition = Math.max(0, currentScrollPosition);
+    scrollLeft = Math.max(0, scrollLeft);
 
     if (isLeftScroll) {
       this.leftmostCardIndices[ind] = Math.max(
@@ -217,36 +219,34 @@ export class LibraryPageComponent {
       );
     }
 
-    let newScrollPositionPx =
-      currentScrollPosition +
+    const newScrollPositionPx =
+      scrollLeft +
       this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction;
 
-    if (carouselElement) {
-      const scrollDistance = newScrollPositionPx - currentScrollPosition;
-      const duration = 800;
+    const duration = 800;
+    const start = carouselElement.scrollLeft;
+    const distance = newScrollPositionPx - start;
+    const startTime = performance.now();
 
-      let startTime: number;
+    const animateScroll = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease =
+        progress < 0.5
+          ? 2 * progress * progress
+          : -1 + (4 - 2 * progress) * progress;
 
-      const scrollStep = (timestamp: number) => {
-        if (!startTime) {
-          startTime = timestamp;
-        }
-        const timeElapsed = timestamp - startTime;
-        const progress = Math.min(timeElapsed / duration, 1);
+      carouselElement.scrollLeft = start + distance * ease;
 
-        carouselElement.scrollLeft =
-          currentScrollPosition + scrollDistance * progress;
+      if (progress < 1) {
+        requestAnimationFrame(animateScroll);
+      } else {
+        this.isAnyCarouselCurrentlyScrolling = false;
+      }
+    };
 
-        if (timeElapsed < duration) {
-          requestAnimationFrame(scrollStep);
-        } else {
-          this.isAnyCarouselCurrentlyScrolling = false;
-        }
-      };
-
-      this.isAnyCarouselCurrentlyScrolling = true;
-      requestAnimationFrame(scrollStep);
-    }
+    this.isAnyCarouselCurrentlyScrolling = true;
+    requestAnimationFrame(animateScroll);
   }
 
   // The carousels do not work when the width is 1 card long, so we need
@@ -470,7 +470,18 @@ export class LibraryPageComponent {
           // Check if actual and expected widths are the same.
           // If not produce an error that would be caught by e2e tests.
           setTimeout(() => {
-            let actualWidth = $('oppia-exploration-summary-tile').width();
+            let actualWidth = 0;
+            const el = document.querySelector(
+              'oppia-exploration-summary-tile'
+            ) as HTMLElement | null;
+
+            if (el) {
+              actualWidth =
+                el.clientWidth ||
+                el.offsetWidth ||
+                parseFloat(getComputedStyle(el).getPropertyValue('width')) ||
+                0;
+            }
             if (
               actualWidth &&
               actualWidth !== AppConstants.LIBRARY_TILE_WIDTH_PX &&
