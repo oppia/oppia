@@ -32,6 +32,8 @@ expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
+const currentMatTabHeaderSelector = '.mat-tab-label-active';
+
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -1358,6 +1360,18 @@ export class BaseUser {
   async expectModalTitleToBe(expectedTitle: string): Promise<void> {
     await this.expectElementToBeVisible(commonModalTitleSelector);
     await this.expectTextContentToBe(commonModalTitleSelector, expectedTitle);
+  }
+
+  /**
+   * Checks if the current mat tab header matches the expected header.
+   * @param expectedHeader The expected header of the mat tab.
+   */
+  async expectCurrentMatTabHeaderToBe(expectedHeader: string): Promise<void> {
+    await this.expectElementToBeVisible(currentMatTabHeaderSelector);
+    await this.expectTextContentToBe(
+      currentMatTabHeaderSelector,
+      expectedHeader
+    );
   }
 }
 

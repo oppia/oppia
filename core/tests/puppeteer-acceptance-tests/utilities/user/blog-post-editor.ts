@@ -60,6 +60,10 @@ const editBlogBodySelector = '.e2e-test-ck-editor';
 const blogTitleHelpSelector = '.e2e-test-blog-title-help';
 const previewBlogPostButtonSelector = '.e2e-test-blog-card-preview-button';
 const closePreivewModalButtonSelector = '.e2e-test-close-preview-button';
+const gridViewButtonSelector = '.e2e-test-tiles-view-button';
+const listViewButtonSelector = '.e2e-test-list-view-button';
+
+const editBlogLabel = 'Edit';
 
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 
@@ -240,6 +244,29 @@ export class BlogPostEditor extends BaseUser {
 
     showMessage('Successfully created a draft blog post!');
     await this.goto(blogDashboardUrl);
+  }
+
+  /**
+   * This function edits a draft blog post with given title.
+   * @param draftBlogPostTitle - The title of the draft blog post to edit.
+   */
+  async editDraftBlogPostWithTitle(draftBlogPostTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(listOfBlogsInBlogDashboard);
+    const allDraftBlogPosts = await this.page.$$(listOfBlogsInBlogDashboard);
+    for (let i = 0; i < allDraftBlogPosts.length; i++) {
+      let checkDraftBlogPostTitle = await allDraftBlogPosts[i].$eval(
+        blogPostTitlePage,
+        element => (element as HTMLElement).innerText
+      );
+      if (draftBlogPostTitle === checkDraftBlogPostTitle) {
+        await allDraftBlogPosts[i].$eval(
+          '.e2e-test-blog-post-edit-box',
+          element => (element as HTMLElement).click()
+        );
+
+        await this.clickOn(editBlogLabel);
+      }
+    }
   }
 
   /**
@@ -750,6 +777,14 @@ export class BlogPostEditor extends BaseUser {
       remainingTagsLimitTextSelector,
       `${tagLimit} more tags can still be added.`
     );
+  }
+
+  /**
+   * Checks if the grid view and list view buttons are present.
+   */
+  async expectGridViewAndListViewButtonsArePresent(): Promise<void> {
+    await this.expectElementToBeVisible(gridViewButtonSelector);
+    await this.expectElementToBeVisible(listViewButtonSelector);
   }
 }
 

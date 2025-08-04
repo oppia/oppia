@@ -118,6 +118,18 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.expectToolTipMessage('Blog Post Saved Successfully.');
   });
 
+  it('should be able to edit draft blog post', async function () {
+    // Navigate to blog dashboard.
+    await blogPostWriter.navigateToPageUsingProfileMenu('Blog Dashboard');
+    await blogPostWriter.expectCurrentMatTabHeaderToBe('DRAFTS (1)');
+
+    // Verify grid view and list view buttons are present.
+    await blogPostWriter.expectGridViewAndListViewButtonsArePresent();
+
+    // Check if "three dots" menu works properly.
+    await blogPostWriter.editDraftBlogPostWithTitle('Test Blog Post Title');
+  });
+
   afterAll(async () => {
     await UserFactory.closeAllBrowsers();
   });

@@ -475,13 +475,9 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(profileDropdown);
     await this.clickOn(profileDropdown);
 
-    const dropDownContainer = await this.page.waitForSelector(
-      profileDropdownContainerSelector
-    );
-    if (!dropDownContainer) {
-      throw new Error('Profile dropdown container not found.');
-    }
-    await this.clickOn(page, false, dropDownContainer);
+    const selector = `.e2e-test-${page.toLowerCase().replace(/ /g, '-')}-link`;
+    await this.clickOn(selector);
+    await this.expectElementToBeVisible(`${profileDropdown}.show`);
   }
 
   /**
