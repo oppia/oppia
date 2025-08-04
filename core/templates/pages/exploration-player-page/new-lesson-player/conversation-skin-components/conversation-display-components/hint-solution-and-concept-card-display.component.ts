@@ -27,14 +27,14 @@ import {StatsReportingService} from 'pages/exploration-player-page/services/stat
 import {Subscription} from 'rxjs';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
-import './hint-and-solution-display.component.css';
+import './hint-solution-and-concept-card-display.component.css';
 import {ConceptCardManagerService} from 'pages/exploration-player-page/services/concept-card-manager.service';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 
 @Component({
   selector: 'oppia-hint-solution-and-concept-card-display',
-  templateUrl: './hint-and-solution-display.component.html',
-  styleUrls: ['./hint-and-solution-display.component.css'],
+  templateUrl: './hint-solution-and-concept-card-display.component.html',
+  styleUrls: ['./hint-solution-and-concept-card-display.component.css'],
 })
 export class HintSolutionAndConceptCardDisplayComponent {
   directiveSubscriptions = new Subscription();
