@@ -22,14 +22,14 @@
 }
 
 .oppia-learner-hint-solution-and-concept-card-display-button {
-  background: #C55F45;
+  background: #c55f45;
   border-radius: 4px;
   color: #fff;
   font-size: clamp(12px, 2vw, 18px);
   font-weight: 700;
   height: 44px;
-  padding: 0 !important;
   outline: none !important;
+  padding: 0 !important;
   width: 132px;
 }
 

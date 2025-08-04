@@ -1,28 +1,28 @@
 <div *ngIf="currentlyOnLatestCard && isHintButtonVisible(0)" class="oppia-hint-solution-and-concept-card-display">
-    <div *ngFor="let hintIndex of hintIndexes; index as idx">
-      <div class="hint-solution-individual-container" *ngIf="hintIndex === 0 && isHintButtonVisible(hintIndex)">
-        <p>Need extra help solving the problem? Check out the hint.</p>
-        <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button"
-                [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
-                (click)="displayHintModal(hintIndex)"> View hint
-        </button>
-      </div>
-      <div class="hint-solution-individual-container" *ngIf="hintIndex && isHintButtonVisible(hintIndex)">
-        <p>Don't worry! Here is another hint that might be helpful to you.</p>
-        <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button"
-                [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
-                (click)="displayHintModal(hintIndex)"> View hint {{hintIndex + 1}}
-        </button>
-      </div>
-    </div>
-    <div *ngIf="isSolutionButtonVisible()" class="hint-solution-individual-container">
-      <p>It seems like you are not sure how to continue. If you want, you can view the solution for this lesson.</p>
-
-      <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button solution-button"
-              [ngClass]="{'viewed': isSolutionConsumed()}"
-              (click)="onClickSolutionButton()"> View Solution
+  <div *ngFor="let hintIndex of hintIndexes; index as idx">
+    <div class="hint-solution-individual-container" *ngIf="hintIndex === 0 && isHintButtonVisible(hintIndex)">
+      <p>Need extra help solving the problem? Check out the hint.</p>
+      <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button"
+              [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
+              (click)="displayHintModal(hintIndex)"> View hint
       </button>
     </div>
+    <div class="hint-solution-individual-container" *ngIf="hintIndex && isHintButtonVisible(hintIndex)">
+      <p>Don't worry! Here is another hint that might be helpful to you.</p>
+      <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button"
+              [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
+              (click)="displayHintModal(hintIndex)"> View hint {{hintIndex + 1}}
+      </button>
+    </div>
+  </div>
+  <div *ngIf="isSolutionButtonVisible()" class="hint-solution-individual-container">
+    <p>It seems like you are not sure how to continue. If you want, you can view the solution for this lesson.</p>
+
+    <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button solution-button"
+            [ngClass]="{'viewed': isSolutionConsumed()}"
+            (click)="onClickSolutionButton()"> View Solution
+    </button>
+  </div>
 </div>
 
 <div *ngIf="isConceptCardButtonVisible()" class="oppia-hint-solution-and-concept-card-display">
