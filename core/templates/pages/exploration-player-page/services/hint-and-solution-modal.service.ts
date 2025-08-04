@@ -27,6 +27,8 @@ import {
   MatBottomSheetRef,
 } from '@angular/material/bottom-sheet';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {DisplayNewSolutionModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/display-solution-modal.component';
+import {DisplayNewSolutionInterstititalModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/display-solution-interstitial-modal.component';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
 
@@ -54,6 +56,30 @@ export class HintAndSolutionModalService {
     });
   }
 
+  displayNewSolutionModal():
+    | NgbModalRef
+    | MatBottomSheetRef<DisplayNewSolutionModalComponent> {
+    if (this.windowDimensionsService.getWidth() > MOBILE_SCREEN_BREAKPOINT) {
+      const modalRef: NgbModalRef = this.ngbModal.open(
+        DisplayNewSolutionModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
+      return modalRef;
+    } else {
+      const bottomSheetRef = this.bottomSheet.open(
+        DisplayNewSolutionModalComponent,
+        {
+          data: {},
+          disableClose: true,
+        }
+      );
+
+      return bottomSheetRef;
+    }
+  }
+
   displayNewHintModal(
     index: number
   ): NgbModalRef | MatBottomSheetRef<DisplayNewHintModalComponent> {
@@ -79,15 +105,33 @@ export class HintAndSolutionModalService {
     }
   }
 
-  displayNewSolutionModal(): NgbModalRef {
-    return this.ngbModal.open(DisplaySolutionModalComponent, {
-      backdrop: 'static',
-    });
-  }
-
   displaySolutionInterstitialModal(): NgbModalRef {
     return this.ngbModal.open(DisplaySolutionInterstititalModalComponent, {
       backdrop: 'static',
     });
+  }
+
+  displayNewSolutionInterstitialModal():
+    | NgbModalRef
+    | MatBottomSheetRef<DisplayNewSolutionInterstititalModalComponent> {
+    if (this.windowDimensionsService.getWidth() > MOBILE_SCREEN_BREAKPOINT) {
+      const modalRef: NgbModalRef = this.ngbModal.open(
+        DisplayNewSolutionInterstititalModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
+      return modalRef;
+    } else {
+      const bottomSheetRef = this.bottomSheet.open(
+        DisplayNewSolutionInterstititalModalComponent,
+        {
+          data: {},
+          disableClose: true,
+        }
+      );
+
+      return bottomSheetRef;
+    }
   }
 }

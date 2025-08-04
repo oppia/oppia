@@ -217,6 +217,8 @@ import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-le
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
 import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-solution-and-concept-card-display.component';
 import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-hint-modal.component';
+import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-solution-modal.component';
+import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-solution-interstitial-modal.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -287,7 +289,9 @@ import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-le
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
     DisplayNewHintModalComponent,
     ExplorationFooterComponent,
@@ -462,7 +466,9 @@ import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-le
     // These elements will remain here even after migration.
     DeleteAnswerGroupModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
     DisplayNewHintModalComponent,
     SelectSkillModalComponent,
@@ -624,7 +630,9 @@ import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-le
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
     DisplayNewHintModalComponent,
     ExplorationFooterComponent,

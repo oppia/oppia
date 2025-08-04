@@ -148,7 +148,7 @@ export class HintSolutionAndConceptCardDisplayComponent {
     return this.hintsAndSolutionManagerService.isSolutionViewable();
   }
 
-  displayNewHintModal(index: number): void {
+  displayHintModal(index: number): void {
     this.activeHintIndex = index;
     let modalOrSheetRef =
       this.hintAndSolutionModalService.displayNewHintModal(index);
@@ -161,19 +161,31 @@ export class HintSolutionAndConceptCardDisplayComponent {
 
   onClickSolutionButton(): void {
     this.solutionModalIsActive = true;
+
     if (this.hintsAndSolutionManagerService.isSolutionConsumed()) {
       this.displaySolutionModal();
     } else {
-      let interstitialModalPromise =
-        this.hintAndSolutionModalService.displaySolutionInterstitialModal();
-      interstitialModalPromise.result.then(
-        () => {
-          this.displaySolutionModal();
-        },
-        () => {
-          this.solutionModalIsActive = false;
-        }
-      );
+      const modalOrSheetRef =
+        this.hintAndSolutionModalService.displayNewSolutionInterstitialModal();
+
+      if ('result' in modalOrSheetRef) {
+        modalOrSheetRef.result.then(
+          () => {
+            this.displaySolutionModal();
+          },
+          () => {
+            this.solutionModalIsActive = false;
+          }
+        );
+      } else if ('afterDismissed' in modalOrSheetRef) {
+        modalOrSheetRef.afterDismissed().subscribe((result: string) => {
+          if (result === 'confirm') {
+            this.displaySolutionModal();
+          } else {
+            this.solutionModalIsActive = false;
+          }
+        });
+      }
     }
   }
 
@@ -185,10 +197,13 @@ export class HintSolutionAndConceptCardDisplayComponent {
         this.playerPositionService.getCurrentStateName()
       );
     }
-    let promise = this.hintAndSolutionModalService.displaySolutionModal();
-    promise.result.then(null, () => {
-      this.solutionModalIsActive = false;
-    });
+    let modalOrSheetRef =
+      this.hintAndSolutionModalService.displayNewSolutionModal();
+    if ('result' in modalOrSheetRef) {
+      modalOrSheetRef.result.then(null, () => {
+        this.solutionModalIsActive = false;
+      });
+    }
   }
 
   isHintConsumed(hintIndex: number): boolean {

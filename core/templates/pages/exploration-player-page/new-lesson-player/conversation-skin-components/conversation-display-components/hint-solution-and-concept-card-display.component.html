@@ -4,14 +4,14 @@
         <p>Need extra help solving the problem? Check out the hint.</p>
         <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button"
                 [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
-                (click)="displayNewHintModal(hintIndex)"> View hint
+                (click)="displayHintModal(hintIndex)"> View hint
         </button>
       </div>
       <div class="hint-solution-individual-container" *ngIf="hintIndex && isHintButtonVisible(hintIndex)">
         <p>Don't worry! Here is another hint that might be helpful to you.</p>
         <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button"
                 [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
-                (click)="displayNewHintModal(hintIndex)"> View hint {{hintIndex + 1}}
+                (click)="displayHintModal(hintIndex)"> View hint {{hintIndex + 1}}
         </button>
       </div>
     </div>
