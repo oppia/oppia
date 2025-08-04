@@ -499,6 +499,10 @@
     {
       "name": "blog-post-writer/register-and-update-blog-profile",
       "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/register-and-update-blog-profile.spec.ts"
+    },
+    {
+      "name": "blog-post-writer/create-and-edit-blog-post",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts"
     }
   ],
   "docker_suites": []
