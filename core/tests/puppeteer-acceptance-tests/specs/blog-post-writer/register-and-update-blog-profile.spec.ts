@@ -41,6 +41,7 @@ describe('Blog Post Writer', function () {
 
   it('should be able to register on the blog platfrom', async function () {
     // Navigate to blog dashboard.
+    await blogPostWriter.reloadPage();
     await blogPostWriter.navigateToPageUsingProfileMenu('Blog Dashboard');
     await blogPostWriter.expectPageURLToContain(URLS.BlogDashboard);
 
