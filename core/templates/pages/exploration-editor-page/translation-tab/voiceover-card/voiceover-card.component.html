@@ -18,8 +18,10 @@
       <h4 class="voiceover-type-heading">Manual Voiceovers</h4>
       <div class="voiceovers-component" *ngIf="manualVoiceover">
         <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(manualVoiceover.filename, 'manual')">
-          <mat-icon *ngIf="!isManualVoiceoverPlaying" matTooltip="Play">play_arrow</mat-icon>
-          <mat-icon *ngIf="isManualVoiceoverPlaying" matTooltip="Pause">pause_arrow</mat-icon>
+          <mat-icon *ngIf="!isManualVoiceoverPlaying && !manualVoiceoverIsLoading" matTooltip="Play">play_arrow</mat-icon>
+          <mat-icon *ngIf="isManualVoiceoverPlaying && !manualVoiceoverIsLoading" matTooltip="Pause">pause_arrow</mat-icon>
+          <mat-spinner class="mx-auto" [diameter]="30" *ngIf="manualVoiceoverIsLoading"></mat-spinner>
+
         </button>
 
         <mat-progress-bar mode="determinate"
@@ -69,8 +71,9 @@
       <h4 class="voiceover-type-heading">Automatic Voiceovers (generated using cloud service)</h4>
       <div class="voiceovers-component" *ngIf="automaticVoiceover">
         <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'auto')">
-          <mat-icon *ngIf="!isAutomaticVoiceoverPlaying" matTooltip="Play">play_arrow</mat-icon>
-          <mat-icon *ngIf="isAutomaticVoiceoverPlaying" matTooltip="Pause">pause_arrow</mat-icon>
+          <mat-icon *ngIf="!isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Play">play_arrow</mat-icon>
+          <mat-icon *ngIf="isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Pause">pause_arrow</mat-icon>
+          <mat-spinner class="mx-auto" [diameter]="30" *ngIf="automaticVoiceoverIsLoading"></mat-spinner>
         </button>
         <mat-progress-bar mode="determinate"
                           [value]="automaticVoiceoverProgress"
@@ -164,6 +167,8 @@
   }
   .voiceover-timer {
     margin: 10px;
+    text-align: center;
+    width: 14%;
   }
   .audio-button {
     background-color: #009688;
