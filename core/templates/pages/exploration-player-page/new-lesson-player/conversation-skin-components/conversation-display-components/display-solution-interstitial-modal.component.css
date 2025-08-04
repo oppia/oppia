@@ -1,7 +1,13 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
 .oppia-learner-solution-interstitial-modal-title {
-  color: #00786d;
+  color: #0D48A1;
   font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
-  font-size: 1.75em;
+  font-size: 1.25em;
   font-weight: bold;
   padding-top: 20px;
   text-align: center;

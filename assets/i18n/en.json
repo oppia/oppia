@@ -787,7 +787,7 @@
     "I18N_GOAL_LIMIT": "Limit of <[limit]> goals",
     "I18N_GOT_IT": "Got It",
     "I18N_HEADING_VOLUNTEER": "Volunteer",
-    "I18N_HINTS_COUNT": "Hints ( <[hintIndex]> / <[totalHints]> )",
+    "I18N_HINTS_COUNT": "Hints (<[hintIndex]> / <[totalHints]>)",
     "I18N_HINT_NEED_HELP": "Need help? View a hint for this problem!",
     "I18N_HINT_NEXT_BUTTON_TEXT": "Next",
     "I18N_HINT_PREVIOUS_BUTTON_TEXT": "Previous",

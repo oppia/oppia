@@ -1,18 +1,20 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
 .oppia-learner-hint-and-solution-modal-title {
-	color: #00786d;
+	color: #0D48A1;
 	font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
-	font-size: 1.75em;
-	font-weight: bold;
+	font-size: 1.25em;
+	font-weight: 400;
 	padding-top: 20px;
 	text-align: center;
 }
 
 .oppia-learner-hint-and-solution-modal-body {
 	word-wrap: break-word;
-}
-
-.modal-body {
-	padding: 0 20px;
 }
 
 .oppia-learner-solution-container {

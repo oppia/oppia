@@ -97,7 +97,6 @@ export class HintAndSolutionModalService {
         DisplayNewHintModalComponent,
         {
           data: {activeHintIndex: index},
-          disableClose: true,
         }
       );
 
