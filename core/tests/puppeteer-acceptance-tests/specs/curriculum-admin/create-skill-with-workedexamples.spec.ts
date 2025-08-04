@@ -53,71 +53,42 @@ describe('Curriculum Admin', function () {
   }, 480000);
 
   it('should create a skill with multiple workedexamples.', async function () {
-    await curriculumAdmin.createSubtopicWithStudyGuideForTopic(
-      'subtopic1',
-      'abcd',
-      'abcd',
-      '1234567',
-      'Addition and Subtraction',
-      false
+    await curriculumAdmin.createSkillFromTopicsAndSkillsDashboard(
+      'Skill 1',
+      'hello'
     );
     await curriculumAdmin.expectScreenshotToMatch(
-      'subtopicWithSingleSection',
+      'workedexampleWithValues',
       __dirname
     );
-    await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
-    await curriculumAdmin.checkAddSectionModalShowsLengthError();
-    await curriculumAdmin.expectScreenshotToMatch(
-      'sectionContentLengthError',
-      __dirname
+    await curriculumAdmin.closeRteComponentModalAndCreateSkill();
+    await curriculumAdmin.clickOnReviewMaterialEditButton();
+    await curriculumAdmin.addWorkedexampleRteComponent(
+      'Type the number two',
+      '2'
     );
-    await curriculumAdmin.clearContentFieldAndCloseAddSectionModal();
-    await curriculumAdmin.addSubtopicStudyGuideSection(
-      'Section heading',
-      'Section content',
-      1
+    await curriculumAdmin.addWorkedexampleRteComponent(
+      'Type the number three',
+      '3'
     );
     await curriculumAdmin.expectScreenshotToMatch(
-      'subtopicWithTwoSections',
+      'workedexampleLimitError',
       __dirname
     );
-    await curriculumAdmin.addSubtopicStudyGuideSectionWithWorkedexample(
-      'Section heading 2',
-      'Section content 2',
-      2,
+    await curriculumAdmin.clearRteAndCheckIfErrorDisappears();
+    await curriculumAdmin.addWorkedexampleRteComponent(
       'Type the number one',
       '1'
     );
-    await curriculumAdmin.expandStudyGuideSectionTile(0);
-    await curriculumAdmin.expectScreenshotToMatch(
-      'sectionTileOneExpanded',
-      __dirname
+    await curriculumAdmin.addWorkedexampleRteComponent(
+      'Type the number two',
+      '2'
     );
-    await curriculumAdmin.expandStudyGuideSectionTile(2);
+    await curriculumAdmin.publishSkillChanges();
+    await curriculumAdmin.navigateToSkillPreviewTab();
     await curriculumAdmin.expectScreenshotToMatch(
-      'sectionTileThreeExpanded',
+      'skillWithWorkedexamplePreview',
       __dirname
-    );
-    await curriculumAdmin.openSectionHeadingEditor();
-    await curriculumAdmin.expectScreenshotToMatch(
-      'sectionTileThreeHeadingEditable',
-      __dirname
-    );
-    await curriculumAdmin.openSectionContentEditor();
-    await curriculumAdmin.expectScreenshotToMatch(
-      'sectionTileThreeContentEditable',
-      __dirname
-    );
-    await curriculumAdmin.deleteStudyGuideSection(1);
-    await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
-    await curriculumAdmin.previewStudyGuide();
-    await curriculumAdmin.expectSubtopicStudyGuideToHaveTitleAndSections(
-      'subtopic1',
-      [
-        ['abcd', '1234567'],
-        ['Section 2 heading', 'Section 2 content'],
-      ],
-      true
     );
   });
 
