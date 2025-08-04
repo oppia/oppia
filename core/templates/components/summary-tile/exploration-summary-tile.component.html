@@ -81,7 +81,7 @@
             <span class="far fa-eye" [ngbTooltip]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate" placement="top" container="body">
               <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate"></span>
             </span>
-            <span *ngIf="numViews">
+            <span *ngIf="numViews" class="e2e-test-exp-summary-tile-views">
               {{ numViews | summarizeNonnegativeNumber }}
             </span>
             <span *ngIf="!numViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">

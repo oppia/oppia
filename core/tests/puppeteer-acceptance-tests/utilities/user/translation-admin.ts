@@ -73,7 +73,7 @@ export class TranslationAdmin extends BaseUser {
     username: string,
     languageCode: string
   ): Promise<void> {
-    await this.isElementVisible(addContributorUsernameInput);
+    await this.expectElementToBeVisible(addContributorUsernameInput);
     await this.type(addContributorUsernameInput, username);
     await this.select(
       addContributonRightsCategorySelect,
@@ -95,7 +95,7 @@ export class TranslationAdmin extends BaseUser {
     username: string,
     languageCode: string
   ): Promise<void> {
-    await this.isElementVisible(removeContributorUsernameInput);
+    await this.expectElementToBeVisible(removeContributorUsernameInput);
     await this.type(removeContributorUsernameInput, username);
     await this.select(
       removeContributonRightsCategorySelect,
@@ -111,13 +111,13 @@ export class TranslationAdmin extends BaseUser {
    * Function to display contribution rights by user.
    */
   async viewContributionRightsForUser(username: string): Promise<void> {
-    await this.isElementVisible(viewContributorFilterMethodSelect);
+    await this.expectElementToBeVisible(viewContributorFilterMethodSelect);
     await this.select(viewContributorFilterMethodSelect, usernameMethodValue);
     await this.type(viewContributerUsernameInput, username);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
-    await this.isElementVisible(userRightsTableSelector);
+    await this.expectElementToBeVisible(userRightsTableSelector);
   }
 
   /**
@@ -126,14 +126,14 @@ export class TranslationAdmin extends BaseUser {
   async viewContributorTranslationRightsByLanguageCode(
     languageCode: string
   ): Promise<void> {
-    await this.isElementVisible(viewContributorFilterMethodSelect);
+    await this.expectElementToBeVisible(viewContributorFilterMethodSelect);
     await this.select(viewContributorFilterMethodSelect, roleMethodValue);
     await this.select(viewContributorCategorySelect, translationRightValue);
     await this.select(viewContributorLanguageSelect, languageCode);
     await this.clickOn(viewContributorSubmitButton);
 
     await this.waitForNetworkIdle();
-    await this.isElementVisible(userRightsTableSelector);
+    await this.expectElementToBeVisible(viewLanguageRoleUserResult);
   }
 
   /**

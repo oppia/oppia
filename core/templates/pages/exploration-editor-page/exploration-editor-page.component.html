@@ -186,7 +186,7 @@
     <oppia-translation-tab *ngIf="getActiveTabName() === 'translation'">
     </oppia-translation-tab>
     <!-- This is an *ngIf, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
-    <oppia-preview-tab *ngIf="getActiveTabName() === 'preview'" class="e2e-test-preview-tab e2e-test-preview-tab-container">
+    <oppia-preview-tab *ngIf="getActiveTabName() === 'preview'" class="e2e-test-preview-tab">
     </oppia-preview-tab>
 
     <oppia-statistics-tab *ngIf="getActiveTabName() === 'stats'">
@@ -198,11 +198,11 @@
 
     <oppia-settings-tab [hidden]="!(getActiveTabName() === 'settings')"
                         [currentUserIsCurriculumAdmin]="currentUserIsCurriculumAdmin"
-                        [currentUserIsModerator]="currentUserIsModerator"
-                        class="e2e-test-exploration-history-tab">
+                        [currentUserIsModerator]="currentUserIsModerator">
     </oppia-settings-tab>
 
-    <oppia-history-tab [hidden]="!(getActiveTabName() === 'history')">
+    <oppia-history-tab [hidden]="!(getActiveTabName() === 'history')"
+                       class="e2e-test-exploration-history-tab">
     </oppia-history-tab>
 
     <oppia-feedback-tab [hidden]="!(getActiveTabName() === 'feedback')">

@@ -154,7 +154,7 @@
           <div class="oppia-library-group-header-container">
             <h2 [ngClass]="{'active': !libraryWindowIsNarrow && activeGroupIndex === idx}" class="oppia-library-group-header">
               <a *ngIf="group.has_full_results_page"
-                 class="e2e-test-library-{{group.protractor_id}}"
+                 class="e2e-test-library-{{group.protractor_id}} e2e-test-library-group-header"
                  (keydown.enter)="showFullResultsPage(group.categories, group.full_results_url)"
                  (click)="showFullResultsPage(group.categories, group.full_results_url)"
                  tabindex="0">
