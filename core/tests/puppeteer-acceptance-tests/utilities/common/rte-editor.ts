@@ -24,7 +24,7 @@ export class RTEEditor {
    * @param title - The title of RTE option.
    */
   async clickOnRTEOptionWithTitle(title: string): Promise<void> {
-    const optionSelector = `a.cke_button[title*="${title}"]`;
+    const optionSelector = `a[title*="${title}"]`;
     await this.context.waitForSelector(optionSelector);
     const optionElement = await this.context.$(optionSelector);
     if (!optionElement) {
@@ -45,7 +45,16 @@ export class RTEEditor {
       throw new Error('RTE iframe not found.');
     }
 
-    const selector = `a[title="${format}"]`;
+    const selector = `a[title*="${format}"]`;
+    // List all childs of iframe.
+    const childs = await iframe.$x('//body/child::*');
+    if (!childs) {
+      throw new Error('No childs found.');
+    }
+    // Log all childs.
+    childs.forEach((child) => {
+      console.log(child.evaluate((node) => (node as HTMLElement).title));
+    });
     await iframe.waitForSelector(selector);
     const element = await iframe.$(selector);
     if (!element) {

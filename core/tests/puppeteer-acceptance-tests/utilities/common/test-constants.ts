@@ -277,14 +277,14 @@ export const FILEPATHS = {
     __dirname,
     '../../data/profile-pictures/profile.svg'
   ),
-  BANNER_BMP: path.resolve(__dirname, '../../data/banner/banner.bmp'),
-  BANNER_GIF: path.resolve(__dirname, '../../data/banner/banner.gif'),
-  BANNER_JPG: path.resolve(__dirname, '../../data/banner/banner.jpg'),
-  BANNER_PNG: path.resolve(__dirname, '../../data/banner/banner.png'),
-  BANNER_SVG: path.resolve(__dirname, '../../data/banner/banner-small.svg'),
+  BANNER_BMP: path.resolve(__dirname, '../../data/banners/banner.bmp'),
+  BANNER_GIF: path.resolve(__dirname, '../../data/banners/banner.gif'),
+  BANNER_JPG: path.resolve(__dirname, '../../data/banners/banner.jpg'),
+  BANNER_PNG: path.resolve(__dirname, '../../data/banners/banner.png'),
+  BANNER_SVG: path.resolve(__dirname, '../../data/banners/banner-small.svg'),
   BANNER_HIGH_RES: path.resolve(
     __dirname,
-    '../../data/banner/banner-HiRes.png'
+    '../../data/banners/banner-HiRes.png'
   ),
 } as const;
 

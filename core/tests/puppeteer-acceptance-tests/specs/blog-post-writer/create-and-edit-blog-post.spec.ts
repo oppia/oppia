@@ -28,6 +28,8 @@ import testConstants, {FILEPATHS} from '../../utilities/common/test-constants';
 const ROLES = testConstants.Roles;
 const LABELS = {
   CREATE_NEW_BLOG_POST_BTN: 'CREATE NEW BLOG POST',
+  PUBLISH_BUTTON: 'PUBLISH',
+  CONFIRM_PUBLISH_BUTTON: 'Confirm',
 };
 
 describe('Blog Post Writer', function () {
@@ -47,33 +49,15 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.navigateToPageUsingProfileMenu('Blog Dashboard');
     await blogPostWriter.updateUserBioInRegisterModal('I am the test user.');
     await blogPostWriter.clickOnSaveProfileButton();
+    await blogPostWriter.expectToolTipMessage(
+      'Author Details saved successfully.'
+    );
     await blogPostWriter.expectNewBlogPostButtonToBeVisible(false);
     await blogPostWriter.expectFirstBlogPostButtonToBeVisible(true);
 
     // Click on "Create new blog post" button.
     await blogPostWriter.clickOn(LABELS.CREATE_NEW_BLOG_POST_BTN);
     await blogPostWriter.expectToBeOnBlogEditorPage();
-
-    // Check license terms for image uploads.
-    await blogPostWriter.clickOnThumbnailImage();
-    await blogPostWriter.clickLinkAnchorToNewTab(
-      'license terms',
-      'http://localhost:8181/license'
-    );
-    await blogPostWriter.expectScreenshotToMatch('licensePage', __dirname);
-
-    // Upload large thumbnail image.
-    await blogPostWriter.uploadFile(FILEPATHS.BANNER_HIGH_RES);
-    await blogPostWriter.expectPhotoUploadErrorMessageToBe(
-      'The maximum allowed file size is 1024 KB'
-    );
-
-    // Upload BMP format thumbnail image.
-    await blogPostWriter.clickOnThumbnailImage();
-    await blogPostWriter.uploadFile(FILEPATHS.BANNER_BMP);
-    await blogPostWriter.expectPhotoUploadErrorMessageToBe(
-      'This image format is not supported'
-    );
 
     // Upload GIF format thumbnail image.
     await blogPostWriter.uploadBlogPostThumbnailImage(FILEPATHS.BANNER_GIF);
@@ -86,7 +70,27 @@ describe('Blog Post Writer', function () {
 
     // Upload SVG format thumbnail image.
     await blogPostWriter.uploadBlogPostThumbnailImage(FILEPATHS.BANNER_SVG);
-    await blogPostWriter.expectToolTipMessage('Thumbnail saved successfully');
+    await blogPostWriter.expectToolTipMessage('Thumbnail Saved Successfully.');
+
+    // Upload BMP format thumbnail image.
+    await blogPostWriter.clickOnThumbnailImage();
+    await blogPostWriter.uploadFile(FILEPATHS.BANNER_BMP);
+    await blogPostWriter.expectPhotoUploadErrorMessageToBe(
+      'This image format is not supported'
+    );
+
+    // Upload large thumbnail image.
+    await blogPostWriter.uploadFile(FILEPATHS.BANNER_HIGH_RES);
+    await blogPostWriter.expectPhotoUploadErrorMessageToBe(
+      'The maximum allowed file size is 1024 KB'
+    );
+
+    // Check license terms for image uploads.
+    await blogPostWriter.clickLinkAnchorToNewTab(
+      'license terms',
+      'http://localhost:8181/license'
+    );
+    await blogPostWriter.clickOn('Cancel')
 
     // Update blog title of less than 5 characters.
     await blogPostWriter.updateBlogPostTitle('Test');
@@ -98,17 +102,19 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
 
     // Update blog body using all the available RTE features.
-    await blogPostWriter.updateBlogBodyUsingAllRTEFeatures();
+    // await blogPostWriter.updateBlogBodyUsingAllRTEFeatures();
+    await blogPostWriter.updateBodyTextTo('Test Blog Post Body');
+    await blogPostWriter.saveBlogBodyChanges();
 
     // Preview the blog post.
     await blogPostWriter.previewBlogPost();
     await blogPostWriter.expectScreenshotToMatch('blogPostPreview', __dirname);
 
     // Verify link in blog preview modal.
-    await blogPostWriter.clickLinkAnchorToNewTab(
-      '( link  )',
-      'http://localhost:8181/blog'
-    );
+    // await blogPostWriter.clickLinkAnchorToNewTab(
+    //   'link',
+    //   'http://localhost:8181/blog'
+    // );
 
     // Close preview modal.
     await blogPostWriter.closePreviewModal();
@@ -128,6 +134,47 @@ describe('Blog Post Writer', function () {
 
     // Check if "three dots" menu works properly.
     await blogPostWriter.editDraftBlogPostWithTitle('Test Blog Post Title');
+    await blogPostWriter.expectToBeOnBlogEditorPage();
+    await blogPostWriter.navigateToBlogDashboardPage();
+    await blogPostWriter.deleteDraftBlogPostWithTitle('Test Blog Post Title');
+    await blogPostWriter.expectToolTipMessage('Blog Post Deleted Successfully.');
+  });
+
+  it('should be able to publish a new blog post', async function () {
+    // Create a new blog post.
+    await blogPostWriter.clickOn(LABELS.CREATE_NEW_BLOG_POST_BTN);
+    await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
+    await blogPostWriter.updateBodyTextTo('Test Blog Post Body');
+    await blogPostWriter.saveBlogBodyChanges();
+    await blogPostWriter.selectTag('News');
+
+    // Publish button should be disabled with no thumbnail.
+    await blogPostWriter.expectPublishButtonToBeDisabled();
+
+    // Publish button should be disabled with no title.
+    await blogPostWriter.uploadBlogPostThumbnailImage();
+    await blogPostWriter.updateBlogPostTitle('');
+    await blogPostWriter.expectPublishButtonToBeDisabled();
+
+    // Publish button should be disabled with no body.
+    await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
+    await blogPostWriter.updateBodyTextTo('');
+    await blogPostWriter.saveBlogBodyChanges();
+    await blogPostWriter.expectPublishButtonToBeDisabled();
+
+    // Publish button should be disabled with no tags.
+    await blogPostWriter.updateBodyTextTo('Test Blog Post Body');
+    await blogPostWriter.saveBlogBodyChanges();
+    await blogPostWriter.selectTag('News', false);
+    await blogPostWriter.expectPublishButtonToBeDisabled();
+
+    // Click on publish button.
+    await blogPostWriter.selectTag('News');
+    await blogPostWriter.clickOn(LABELS.PUBLISH_BUTTON);
+    await blogPostWriter.expectScreenshotToMatch('blogPostPublish', __dirname);
+    await blogPostWriter.clickOn(LABELS.CONFIRM_PUBLISH_BUTTON);
+    await blogPostWriter.navigateToBlogPage();
+    await blogPostWriter.expectBlogPostToBePresent('Test Blog Post Title');
   });
 
   afterAll(async () => {

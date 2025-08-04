@@ -264,9 +264,14 @@ export class BlogPostEditor extends BaseUser {
           element => (element as HTMLElement).click()
         );
 
-        await this.clickOn(editBlogLabel);
+        await this.clickOn('.e2e-test-edit-blog-post-button');
+        return;
       }
     }
+
+    throw new Error(
+      `Draft blog post with title ${draftBlogPostTitle} not found.`
+    );
   }
 
   /**
@@ -288,6 +293,10 @@ export class BlogPostEditor extends BaseUser {
           element => (element as HTMLElement).click()
         );
         await this.clickOn(LABEL_FOR_DELETE_BUTTON);
+        await this.expectModalTitleToBe('DELETE BLOG POST');
+        await this.expectModalBodyToContain(
+          'This action is irreversible and will permanently delete the blog post. Are you sure?'
+        );
         await this.doWithinModal({
           selector: 'div.modal-dialog',
           whenOpened: async (_this: BaseUser, container: string) => {
@@ -364,6 +373,7 @@ export class BlogPostEditor extends BaseUser {
       await this.expectElementToBeVisible(thumbnailPhotoBox);
       await this.clickOn(thumbnailPhotoBox);
       await this.uploadFile(imagePath);
+      await this.waitForElementToStabilize(addThumbnailImageButton);
       await this.clickOn(addThumbnailImageButton);
       await this.page.waitForSelector('body.modal-open', {hidden: true});
     }
@@ -403,6 +413,7 @@ export class BlogPostEditor extends BaseUser {
    */
   async updateBlogPostTitle(newBlogPostTitle: string): Promise<void> {
     await this.expectElementToBeVisible(blogTitleInput);
+    await this.clearAllTextFrom(blogTitleInput);
     await this.type(blogTitleInput, newBlogPostTitle);
     await this.page.keyboard.press('Tab');
 
@@ -439,7 +450,7 @@ export class BlogPostEditor extends BaseUser {
   /**
    * This function selects a tag for the blog post.
    */
-  async selectTag(tag: string): Promise<void> {
+  async selectTag(tag: string, shouldBePresent: boolean = true): Promise<void> {
     await this.expectElementToBeVisible(tagSelector);
     const tagElements = await this.page.$$(tagSelector);
 
@@ -452,11 +463,12 @@ export class BlogPostEditor extends BaseUser {
         await tagElement.click();
 
         await this.page.waitForFunction(
-          (element: HTMLElement) => {
-            return element.getAttribute('aria-pressed') === 'true';
+          (element: HTMLElement, shouldBePresent: string) => {
+            return element.getAttribute('aria-pressed') === shouldBePresent;
           },
           {},
-          await tagElement.$('button')
+          await tagElement.$('button'),
+          shouldBePresent ? 'true' : 'false'
         );
 
         return;

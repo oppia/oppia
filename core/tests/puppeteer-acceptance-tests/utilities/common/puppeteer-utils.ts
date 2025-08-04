@@ -67,6 +67,8 @@ export type ModalUserInteractions = (
 
 const actionStatusMessageSelector = '.e2e-test-status-message';
 const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalBodySelector = '.e2e-test-modal-body';
+const imageUploadLabelSelector = '.e2e-test-image-upload-label';
 
 export class BaseUser {
   page!: Page;
@@ -417,14 +419,15 @@ export class BaseUser {
     selector: string | ElementHandle<Element>
   ): Promise<void> {
     showMessage(`Checking if element ${selector} is clickable...`);
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
     try {
-      const element =
-        typeof selector === 'string'
-          ? await this.page.waitForSelector(selector)
-          : selector;
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       if (error instanceof Error) {
+        await this.page.evaluate(isElementClickable, element, true, true);
         error.message =
           `Element with selector ${selector} took too long to be clickable.\n` +
           'Original Error:\n' +
@@ -559,6 +562,7 @@ export class BaseUser {
    * This function uploads a file using the given file path.
    */
   async uploadFile(filePath: string): Promise<void> {
+    await this.expectElementToBeVisible(imageUploadLabelSelector);
     const inputUploadHandle =
       await this.page.waitForSelector('input[type=file]');
     if (inputUploadHandle === null) {
@@ -918,7 +922,9 @@ export class BaseUser {
     anchorInnerText: string,
     expectedDestinationPageUrl: string
   ): Promise<void> {
-    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
+    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`, {
+      visible: true,
+    });
     const pageTarget = this.page.target();
     await this.clickOn(anchorInnerText);
     const newTarget = await this.browserObject.waitForTarget(
@@ -1360,6 +1366,18 @@ export class BaseUser {
   async expectModalTitleToBe(expectedTitle: string): Promise<void> {
     await this.expectElementToBeVisible(commonModalTitleSelector);
     await this.expectTextContentToBe(commonModalTitleSelector, expectedTitle);
+  }
+
+  /**
+   * Checks if the modal body contains the expected text.
+   * @param expectedText The expected text of the modal body.
+   */
+  async expectModalBodyToContain(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalBodySelector);
+    await this.expectTextContentToContain(
+      commonModalBodySelector,
+      expectedText
+    );
   }
 
   /**
