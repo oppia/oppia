@@ -2,6 +2,8 @@
 line-length = 80
 skip-string-normalization = true
 exclude = '''
-.*/third_party/.*|
-.*/scripts/linters/test_files/.*
+(
+    ^/scripts/linters/test_files
+)
 '''
+
