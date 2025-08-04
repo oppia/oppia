@@ -441,7 +441,7 @@ describe('Voiceover backend API service', function () {
     let languageAccentCode: string = 'en-US';
 
     voiceoverBackendApiService
-      .generateAutotmaticVoiceoverAsync(
+      .generateAutomaticVoiceoverAsync(
         explorationId,
         explorationVersion,
         stateName,
@@ -505,7 +505,7 @@ describe('Voiceover backend API service', function () {
     let languageAccentCode: string = 'en-US';
 
     voiceoverBackendApiService
-      .generateAutotmaticVoiceoverAsync(
+      .generateAutomaticVoiceoverAsync(
         explorationId,
         explorationVersion,
         stateName,

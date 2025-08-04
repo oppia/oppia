@@ -315,29 +315,11 @@ export class TranslatorOverviewComponent implements OnInit {
 
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
 
-    this.voiceoverBackendApiService
-      .fetchVoiceoverAdminDataAsync()
-      .then(response => {
-        this.voiceoverLanguageManagementService.init(
-          response.languageAccentMasterList,
-          response.autoGeneratableLanguageAccentCodes,
-          response.languageCodesMapping
-        );
-
-        this.languageAccentMasterList = response.languageAccentMasterList;
-        this.languageCodesMapping = response.languageCodesMapping;
-
-        this.voiceoverPlayerService.languageAccentMasterList =
-          this.languageAccentMasterList;
-        this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
-          this.languageCode,
-          this.entityVoiceoversService.getLanguageAccentCodes()
-        );
-
-        this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
-          this.updateLanguageAccentCodesDropdownOptions();
-        });
-      });
+    this.languageAccentMasterList =
+      this.voiceoverLanguageManagementService.languageAccentMasterList;
+    this.languageCodesMapping =
+      this.voiceoverLanguageManagementService.languageCodesMapping;
+    this.updateLanguageAccentCodesDropdownOptions();
   }
 
   updateLanguageAccentCodesDropdownOptions(): void {

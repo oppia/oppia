@@ -13,8 +13,21 @@
   </p>
 </div>
 <div class="modal-footer">
-  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success e2e-test-voiceover-regeneration-confirm" (click)="close()">
-    <span>Regenerate</span>
+  <button class="btn btn-secondary"
+          (click)="cancel()"
+          [disabled]="isAutomaticVoiceoverGenerating"
+          [matTooltip]="isAutomaticVoiceoverGenerating ? 'Regenerating voiceover, please wait.' : null">
+    Cancel
+  </button>
+
+  <button class="btn btn-success e2e-test-voiceover-regeneration-confirm"
+          (click)="regenerateAndClose()"
+          [disabled]="isAutomaticVoiceoverGenerating"
+          [matTooltip]="isAutomaticVoiceoverGenerating ? 'Regenerating voiceover, please wait.' : null">
+    <span *ngIf="!isAutomaticVoiceoverGenerating">Regenerate</span>
+    <span *ngIf="isAutomaticVoiceoverGenerating">
+      Regenerating
+      <loading-dots></loading-dots>
+    </span>
   </button>
 </div>

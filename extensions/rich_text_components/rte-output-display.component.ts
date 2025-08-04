@@ -451,7 +451,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     const activeContentId = this.getActiveContentId();
     const entityVoiceovers =
       this.entityVoiceoversService.getActiveEntityVoiceovers();
-    const manualVoiceover = entityVoiceovers.getManualVoiceover(
+    const manualVoiceover = entityVoiceovers?.getManualVoiceover(
       activeContentId
     ) as Voiceover;
 

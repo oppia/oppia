@@ -159,7 +159,10 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       )
     );
 
-    if (!this.entityVoiceoversService.getActiveLanguageAccentCode()) {
+    if (
+      this.entityVoiceoversService.isEntityVoiceoversLoaded() &&
+      !this.translationLanguageService.getActiveLanguageAccentCode()
+    ) {
       this.voiceoversAreLoaded = true;
       this.unsupportedLanguageCode = true;
     }
@@ -167,6 +170,20 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     this.directiveSubscriptions.add(
       this.entityVoiceoversService.onVoiceoverLoad.subscribe(() => {
         this.voiceoversAreLoaded = true;
+        this.changeDetectorRef.detectChanges();
+        this.isVoiceoverSupportedForSelectedLanguage =
+          this.voiceoverLanguageManagementService.canVoiceoverForLanguage(
+            this.languageCode
+          );
+        if (this.isVoiceoverSupportedForSelectedLanguage) {
+          this.voiceoverLanguageManagementService.setCloudSupportedLanguageAccents(
+            this.languageCode
+          );
+          this.isVoiceoverAutogenerationSupportedForSelectedAccent =
+            this.voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
+              this.languageAccentCode
+            );
+        }
       })
     );
 
@@ -729,71 +746,63 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       }
     );
 
+    modalRef.componentInstance.explorationId =
+      this.pageContextService.getExplorationId();
+    modalRef.componentInstance.explorationVersion =
+      this.pageContextService.getExplorationVersion() as number;
+    modalRef.componentInstance.stateName =
+      this.stateEditorService.getActiveStateName() as string;
+    modalRef.componentInstance.contentId = this.activeContentId;
+    modalRef.componentInstance.languageAccentCode = this.languageAccentCode;
+    this.isAutomaticVoiceoverGenerating = true;
+
     modalRef.result.then(
-      () => {
-        this.isAutomaticVoiceoverGenerating = true;
+      ({voiceover, sentenceTokenWithDurations}) => {
+        if (voiceover === undefined) {
+          return;
+        }
 
-        this.voiceoverBackendApiService
-          .generateAutotmaticVoiceoverAsync(
+        if (this.activeEntityVoiceoversInstance === undefined) {
+          this.activeEntityVoiceoversInstance = new EntityVoiceovers(
             this.pageContextService.getExplorationId(),
+            'exploration',
             this.pageContextService.getExplorationVersion() as number,
-            this.stateEditorService.getActiveStateName() as string,
-            this.activeContentId,
-            this.languageAccentCode
+            this.languageAccentCode,
+            {},
+            {}
+          );
+        }
+
+        this.automaticVoiceover = voiceover;
+        this.automaticVoiceoverTotalDuration = Math.round(
+          voiceover.durationSecs
+        );
+
+        if (
+          !this.activeEntityVoiceoversInstance.voiceoversMapping.hasOwnProperty(
+            this.activeContentId
           )
-          .then(response => {
-            let voiceover = new Voiceover(
-              response.filename,
-              response.fileSizeBytes,
-              response.needsUpdate,
-              response.durationSecs
-            );
-            if (this.activeEntityVoiceoversInstance === undefined) {
-              this.activeEntityVoiceoversInstance = new EntityVoiceovers(
-                this.pageContextService.getExplorationId(),
-                'exploration',
-                this.pageContextService.getExplorationVersion() as number,
-                this.languageAccentCode,
-                {},
-                {}
-              );
-            }
+        ) {
+          this.activeEntityVoiceoversInstance.voiceoversMapping[
+            this.activeContentId
+          ] = {};
+        }
 
-            this.automaticVoiceover = voiceover;
-            this.automaticVoiceoverTotalDuration = Math.round(
-              voiceover.durationSecs
-            );
+        this.activeEntityVoiceoversInstance.voiceoversMapping[
+          this.activeContentId
+        ].auto = this.automaticVoiceover;
 
-            if (
-              !this.activeEntityVoiceoversInstance.voiceoversMapping.hasOwnProperty(
-                this.activeContentId
-              )
-            ) {
-              this.activeEntityVoiceoversInstance.voiceoversMapping[
-                this.activeContentId
-              ] = {};
-            }
+        this.activeEntityVoiceoversInstance.automatedVoiceoversAudioOffsetsMsecs[
+          this.activeContentId
+        ] = sentenceTokenWithDurations;
 
-            this.activeEntityVoiceoversInstance.voiceoversMapping[
-              this.activeContentId
-            ].auto = this.automaticVoiceover;
+        this.entityVoiceoversService.addEntityVoiceovers(
+          this.languageAccentCode,
+          this.activeEntityVoiceoversInstance
+        );
 
-            this.activeEntityVoiceoversInstance.automatedVoiceoversAudioOffsetsMsecs[
-              this.activeContentId
-            ] = response.sentenceTokenWithDurations;
-
-            this.entityVoiceoversService.addEntityVoiceovers(
-              this.languageAccentCode,
-              this.activeEntityVoiceoversInstance
-            );
-
-            this.updateStatusGraph();
-            this.isAutomaticVoiceoverGenerating = false;
-          })
-          .catch(errorResponse => {
-            this.alertsService.addWarning(errorResponse.error);
-            this.isAutomaticVoiceoverGenerating = false;
-          });
+        this.updateStatusGraph();
+        this.isAutomaticVoiceoverGenerating = false;
       },
       () => {
         // Note to developers:

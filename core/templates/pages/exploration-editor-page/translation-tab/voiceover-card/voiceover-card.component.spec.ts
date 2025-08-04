@@ -722,7 +722,7 @@ describe('Voiceover card component', () => {
 
     spyOn(
       voiceoverBackendApiService,
-      'generateAutotmaticVoiceoverAsync'
+      'generateAutomaticVoiceoverAsync'
     ).and.returnValue(Promise.resolve(response));
 
     expect(component.automaticVoiceover).toBeUndefined();
@@ -748,7 +748,7 @@ describe('Voiceover card component', () => {
     } as NgbModalRef);
     spyOn(
       voiceoverBackendApiService,
-      'generateAutotmaticVoiceoverAsync'
+      'generateAutomaticVoiceoverAsync'
     ).and.returnValue(Promise.reject({error: 'Voiceover regenration failed'}));
     spyOn(alertsService, 'addWarning');
 

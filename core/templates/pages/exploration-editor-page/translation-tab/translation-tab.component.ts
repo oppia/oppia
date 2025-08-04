@@ -38,6 +38,11 @@ import {RouterService} from '../services/router.service';
 import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
 import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
 import {TranslationTabActiveModeService} from './services/translation-tab-active-mode.service';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
+import {TranslationLanguageService} from './services/translation-language.service';
 
 @Component({
   selector: 'oppia-translation-tab',
@@ -61,6 +66,8 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
   permissions!: {
     canVoiceover: boolean;
   };
+  voiceoversAreLoading!: boolean;
+  languageAccentsLoading: boolean = false;
 
   constructor(
     private pageContextService: PageContextService,
@@ -74,7 +81,12 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,
-    private joyride: JoyrideService
+    private joyride: JoyrideService,
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService,
+    private entityVoiceoversService: EntityVoiceoversService,
+    private voiceoverPlayerService: VoiceoverPlayerService,
+    private translationLanguageService: TranslationLanguageService
   ) {}
 
   initTranslationTab(): void {
@@ -179,8 +191,31 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
         () => this.showWelcomeTranslationModal()
       )
     );
-  }
+    this.showTranslationTabSubDirectives = false;
+    this.languageAccentsLoading = true;
+    this.loaderService.showLoadingScreen('Loading');
+    this.voiceoverBackendApiService
+      .fetchVoiceoverAdminDataAsync()
+      .then(response => {
+        this.loaderService.hideLoadingScreen();
+        this.voiceoverLanguageManagementService.init(
+          response.languageAccentMasterList,
+          response.autoGeneratableLanguageAccentCodes,
+          response.languageCodesMapping
+        );
+        const languageCode =
+          this.translationLanguageService.getActiveLanguageCode();
 
+        this.voiceoverPlayerService.languageAccentMasterList =
+          response.languageAccentMasterList;
+
+        this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+          languageCode,
+          this.entityVoiceoversService.getLanguageAccentCodes()
+        );
+        this.languageAccentsLoading = false;
+      });
+  }
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
