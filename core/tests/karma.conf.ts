@@ -59,9 +59,8 @@ module.exports = function (config) {
     frameworks: ['jasmine'],
     files: [
       // Constants must be loaded before everything else.
-      // Since jquery, angular-mocks and math-expressions
+      // Since angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
-      'third_party/static/jquery-3.5.1/jquery.min.js',
       'third_party/static/angularjs-1.8.2/angular.js',
       'core/templates/karma.module.ts',
       'third_party/static/angularjs-1.8.2/angular-mocks.js',

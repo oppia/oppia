@@ -94,29 +94,6 @@
       "targetDirPrefix": "angular-simple-logger-",
       "files": ["angular-simple-logger.min.js"]
     },
-    "jquery": {
-      "version": "3.5.1",
-      "downloadFormat": "files",
-      "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1",
-      "rootDirPrefix": "jquery-",
-      "targetDirPrefix": "jquery-",
-      "files": ["jquery.js", "jquery.min.js"]
-    },
-    "jqueryUI": {
-      "version": "1.12.1",
-      "downloadFormat": "files",
-      "url": "https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1",
-      "rootDirPrefix": "jqueryui-",
-      "targetDirPrefix": "jqueryui-",
-      "files": ["jquery-ui.min.js"]
-    },
-    "jqueryUITouchPunch": {
-      "version": "0.3.1",
-      "downloadFormat": "zip",
-      "url": "https://github.com/Bantam/jquery-ui-touch-punch-improved/archive/0.3.1.zip",
-      "rootDirPrefix": "jquery-ui-touch-punch-improved-",
-      "targetDirPrefix": "jquery-ui-touch-punch-"
-    },
     "mathJax": {
       "version": "2.7.5",
       "downloadFormat": "zip",

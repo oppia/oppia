@@ -214,9 +214,7 @@ module.exports = {
       },
     ],
   },
-  externals: {
-    jquery: 'jQuery',
-  },
+  externals: {},
   optimization: {
     runtimeChunk: 'single',
     sideEffects: true,
