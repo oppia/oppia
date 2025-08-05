@@ -1,5 +1,5 @@
 <!-- This outer div is needed, otherwise the textarea will overlap the footer of the page. -->
-<div class="text-input-container">
+<div class="text-input-container e2e-test-text-input-container">
   <!-- This form is needed for submitting the answer on hitting enter. -->
   <form (ngSubmit)="submitAnswer(answer)" role="form" class="form-horizontal">
     <schema-based-editor [schema]="getSchema()"
@@ -8,7 +8,7 @@
                          [labelForFocusTarget]="getLabelForFocusTarget()">
     </schema-based-editor>
   </form>
-  <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container">
+  <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container e2e-test-form-error-container">
     {{errorMessageI18nKey | translate}}
   </div>
 </div>

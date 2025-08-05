@@ -182,8 +182,10 @@ export class BaseUser {
             ],
           };
 
+          const fullScreenRecordingPath = path.join(outputDir, outputFileName);
+          showMessage(`Saving screen recording to ${fullScreenRecordingPath}`);
           this.screenRecorder = new PuppeteerScreenRecorder(this.page, config);
-          await this.screenRecorder.start(path.join(outputDir, outputFileName));
+          await this.screenRecorder.start(fullScreenRecordingPath);
 
           // Ensure recording is stopped when the test fails.
           process.on('SIGTERM', async () => {
@@ -227,7 +229,6 @@ export class BaseUser {
    * This function takes the screenshot of all the instances of browser during a test failure.
    */
   async captureScreenshotsForFailedTest(): Promise<void> {
-    let i: number = 0;
     const specName = process.env.SPEC_NAME;
     const outputDir = testConstants.TEST_SCREENSHOT_DIR;
     const outputFileName = `${specName}-${new Date().toISOString()}`.replace(
@@ -238,7 +239,9 @@ export class BaseUser {
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, {recursive: true});
     }
-    for (const instance of BaseUser.instances) {
+
+    // Prepare an array of promises for screenshots.
+    const screenshotPromises = BaseUser.instances.map(async (instance, i) => {
       if (instance.page) {
         await instance.page.screenshot({
           path: path.join(
@@ -249,9 +252,12 @@ export class BaseUser {
         showMessage(
           `Screenshot captured for test failure and saved as : ${path.join(outputDir, outputFileName + `-instance-${i}.png`)}`
         );
-        i = i + 1;
       }
-    }
+    });
+
+    // Await all screenshots to complete concurrently.
+    await Promise.all(screenshotPromises);
+    showMessage(`All screenshots captured for ${this.username}`);
   }
 
   /**
@@ -339,8 +345,7 @@ export class BaseUser {
     }
     await this.clickOn('Sign in');
     await this.type(testConstants.SignInDetails.inputField, email);
-    await this.clickOn('Sign In');
-    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    await this.clickAndWaitForNavigation('Sign In');
   }
 
   /**
@@ -353,9 +358,7 @@ export class BaseUser {
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
-    await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
-    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-
+    await this.clickAndWaitForNavigation(LABEL_FOR_SUBMIT_BUTTON);
     this.username = username;
     this.email = email;
   }
@@ -455,11 +458,34 @@ export class BaseUser {
       await button.click();
       showMessage(`Button (text: ${selector}) is clicked.`);
     } else {
+      showMessage(`Clicking on button with selector: ${selector}`);
       await this.waitForElementToBeClickable(selector);
       showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
       await this.page.click(selector);
       showMessage(`Element (selector: ${selector}) is clicked.`);
     }
+  }
+
+  /**
+   * Selects the mat-option with the given value.
+   * @param value The value of the mat-option to select.
+   */
+  async selectMatOption(value: string): Promise<void> {
+    await this.page.waitForSelector('mat-option');
+    const matOptionElements = await this.page.$$('mat-option');
+    for (const matOptionElement of matOptionElements) {
+      if (
+        (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
+        value
+      ) {
+        await matOptionElement.click();
+        break;
+      }
+    }
+
+    await this.page.waitForSelector('mat-option', {
+      hidden: true,
+    });
   }
 
   /**
@@ -509,7 +535,8 @@ export class BaseUser {
   async clearAllTextFrom(selector: string): Promise<void> {
     await this.waitForElementToBeClickable(selector);
     // Clicking three times on a line of text selects all the text.
-    await this.page.click(selector, {clickCount: 3});
+    const element = await this.getElementInParent(selector);
+    await element.click({clickCount: 3});
     await this.page.keyboard.press('Backspace');
   }
 
@@ -1033,6 +1060,7 @@ export class BaseUser {
       textContent
     );
   }
+
   /**
    * Verify text content inside an element
    * @param {string} selector - The selector of the element to get text from.
@@ -1075,7 +1103,7 @@ export class BaseUser {
           const el = document.querySelector(sel);
           return el && el.textContent?.includes(text);
         },
-        {timeout: 5000},
+        {},
         selector,
         expectedText
       );
@@ -1097,28 +1125,78 @@ export class BaseUser {
     text: string
   ): Promise<void> {
     await this.expectElementToBeVisible(selector);
-
     try {
       await this.page.waitForFunction(
         (selector: string, text: string) => {
           const element = document.querySelector(selector);
-          return element?.textContent?.includes(text);
+          return element?.textContent?.trim().includes(text.trim());
         },
         {},
         selector,
         text
       );
-
-      showMessage(`Text content of "${selector}" contains "${text}".`);
     } catch (error) {
-      const actualTextContent = await this.page.$eval(selector, element =>
-        (element as HTMLElement).textContent?.trim()
-      );
+      const actualText = await this.page.evaluate((selector: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim();
+      }, selector);
       error.message =
-        `Failed: Text content of "${selector}" does not contain "${text}", it contains ${actualTextContent}.\n` +
-        'Original Error:\n' +
-        `${error.message}`;
+        `Element ${selector} does not contain "${text}". It contains "${actualText}".\n` +
+        error.message;
       throw error;
+    }
+  }
+
+  /**
+   * Function to find an element by its CSS selector.
+   * @param {string} selector - The CSS selector of the element.
+   * @param {ElementHandle<Element>} parentElement - The parent element to search in.
+   * @returns {Promise<ElementHandle<Element>>} The element handle.
+   */
+  async getElementInParent(
+    selector: string,
+    parentElement?: ElementHandle<Element>
+  ): Promise<ElementHandle<Element>> {
+    const context = parentElement ?? this.page;
+    await context.waitForSelector(selector, {visible: true});
+    const element = await this.page.$(selector);
+    if (!element) {
+      throw new Error(`Element with selector ${selector} not found.`);
+    }
+    return element;
+  }
+
+  /**
+   * Verifies that the element value matches the expected value.
+   * @param {string | ElementHandle<Element>} selector - The CSS selector of the element.
+   * @param {string} value - The expected value.
+   */
+  async expectElementValueToBe(
+    selector: string | ElementHandle,
+    value: string
+  ): Promise<void> {
+    // Change the selector to the actual element.
+    if (typeof selector === 'string') {
+      await this.expectElementToBeVisible(selector);
+      selector = await this.getElementInParent(selector);
+    }
+
+    // Wait until the element value matches the expected value.
+    try {
+      await this.page.waitForFunction(
+        (element: HTMLElement, value: string) => {
+          return (element as HTMLInputElement)?.value?.trim() === value.trim();
+        },
+        {},
+        selector,
+        value
+      );
+    } catch (error) {
+      throw new Error(
+        `Element ${selector} does not have the expected value "${value}". ` +
+          `Found "${await selector.evaluate(el => (el as HTMLInputElement).value)}".\n` +
+          `Original Error: ${error.stack}`
+      );
     }
   }
 
@@ -1126,10 +1204,13 @@ export class BaseUser {
    * Checks if element is clickable or not.
    */
   async expectElementToBeClickable(
-    selector: string,
+    selector: string | ElementHandle<Element>,
     clickable: boolean = true
   ): Promise<void> {
-    const element = await this.page.$(selector);
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
     await this.page.waitForFunction(isElementClickable, {}, element, clickable);
   }
 
@@ -1217,27 +1298,83 @@ export class BaseUser {
   }
 
   /**
-   * This function returns all elements matching the given selector.
-   * @param selector - The selector to find elements for.
-   * @param parentElement - The parent element to search within.
+   * Function to verify that the anchor opens the correct page.
+   * @param {string} selector - The selector of the anchor.
+   * @param {string} newPageURL - The expected page.
    */
-  async getAllElementsBySelector(
+  async expectAnchorToOpenCorrectPage(
     selector: string,
-    parentElement?: puppeteer.ElementHandle
-  ): Promise<puppeteer.ElementHandle[]> {
-    const context = parentElement ?? this.page;
+    newPageURL: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
 
-    await context.waitForSelector(selector, {
-      visible: true,
+    const newPagePromise: Promise<Page> = new Promise<Page>(resolve => {
+      this.browserObject.once(
+        'targetcreated',
+        async (target: puppeteer.Target) => {
+          const newTab = await target.page();
+          if (newTab) {
+            await newTab.bringToFront();
+            resolve(newTab);
+          }
+        }
+      );
     });
+    await this.page.click(selector);
+    const newPage = await newPagePromise;
 
-    const elements = await context.$$(selector);
+    await newPage.waitForFunction(
+      (expectedURL: string) => {
+        return document.URL.includes(expectedURL);
+      },
+      {},
+      newPageURL
+    );
 
-    if (!elements) {
-      throw new Error(`No elements found for selector ${selector}`);
+    await newPage.close();
+  }
+
+  /**
+   * Function to update the mat-option.
+   * @param {string} selector - The selector of the mat-option.
+   * @param {string} value - The value to be updated.
+   * @param {ElementHandle<Element>} parentElement - The parent element to search in.
+   */
+  async updateMatOption(
+    selector: string,
+    value: string,
+    parentElement?: ElementHandle<Element>
+  ): Promise<void> {
+    try {
+      // Get context where the selector is located.
+      const context = parentElement ?? this.page;
+      await context.waitForSelector(selector);
+
+      // Click on select element.
+      const selectElement = await this.getElementInParent(
+        selector,
+        parentElement
+      );
+      await selectElement.click();
+
+      // Select the option.
+      await this.page.waitForSelector('mat-option');
+      const options = await this.page.$$('mat-option');
+      for (const option of options) {
+        const optionText = await option.evaluate(el => el.textContent?.trim());
+        if (optionText === value) {
+          await option.click();
+          break;
+        }
+      }
+
+      // Verify the value of the select is updated.
+      await this.expectTextContentToBe(selector, value);
+    } catch (error) {
+      const newError = new Error(`Failed to update mat-option: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
     }
-
-    return elements;
   }
 
   /**
@@ -1341,6 +1478,24 @@ export class BaseUser {
     }
 
     showMessage(`Element ${selector} did not stabilize within ${timeout} ms`);
+  }
+
+  /**
+   * Returns all elements matching the given selector.
+   * @param selector - The selector to find elements for.
+   * @param parentElement - The parent element to search within.
+   * @returns An array of ElementHandles.
+   */
+  async getAllElementsBySelector(
+    selector: string,
+    parentElement?: ElementHandle<Element>
+  ): Promise<ElementHandle<Element>[]> {
+    const context = parentElement ?? this.page;
+    await context.waitForSelector(selector, {visible: true});
+
+    const elements = await this.page.$$(selector);
+
+    return elements;
   }
 }
 
