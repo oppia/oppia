@@ -10,25 +10,25 @@
     </music-phrase-editor>
     <div class="oppia-music-input-note-choices">
       <div *ngFor="let noteType of NOTE_TYPES"
-          class="note-choice"
-          [ngClass]="getNoteClass(noteType)"
-          cdkDrag
-          [cdkDragData]="{ noteType: noteType, isPalette: true }"
-          (cdkDragStarted)="onDragStart()"
-          (cdkDragEnded)="onDragEnd()">
+            class="note-choice"
+            [ngClass]="getNoteClass(noteType)"
+            cdkDrag
+            [cdkDragData]="{ noteType: noteType, isPalette: true }"
+            (cdkDragStarted)="onDragStart()"
+            (cdkDragEnded)="onDragEnd()">
       </div>
     </div>
-    <div class="oppia-music-input-staff" 
+    <div class="oppia-music-input-staff"
         #staffArea
-        cdkDropList 
+        cdkDropList
         [cdkDropListConnectedTo]="[]"
         (cdkDropListDropped)="onNoteDropped($event)">
       <div *ngFor="let note of placedNotes"
-          class="placed-note"
-          [ngClass]="getNoteClass(note.type)"
-          cdkDrag
-          [cdkDragData]="{ ...note, isPalette: false }"
-          (cdkDragEnded)="onPlacedNoteDragEnd($event, note)">
+            class="placed-note"
+            [ngClass]="getNoteClass(note.type)"
+            cdkDrag
+            [cdkDragData]="{ ...note, isPalette: false }"
+            (cdkDragEnded)="onPlacedNoteDragEnd($event, note)">
       </div>
     </div>
   </div>
@@ -65,8 +65,8 @@
 
   .placed-note {
   position: absolute;
-  top: 0;
   left: 0;
+  top: 0;
   transform: translate(0, 0);
   }
 

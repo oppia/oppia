@@ -69,6 +69,13 @@ interface Note {
   position?: {x: number; y: number};
 }
 
+interface DraggedNoteData {
+  id?: string;
+  type?: string;
+  noteType?: number;
+  isPalette: boolean;
+}
+
 @Component({
   selector: 'oppia-interactive-music-notes-input',
   templateUrl: './music-notes-input-interaction.component.html',
@@ -211,7 +218,7 @@ export class MusicNotesInputComponent
   updateNoteSequenceFromPlacedNotes(): void {
     this.noteSequence = this.placedNotes.map(note => ({
       note: {
-        baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES['C4'], // Use actual mapping logic here
+        baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES.C4,
         offset: 0,
         noteId: note.id,
         noteStart: {
@@ -331,9 +338,10 @@ export class MusicNotesInputComponent
     return staffLinePositions as Object;
   }
 
-  // Creates the notes and helper-clone notes for the noteChoices div.
-  onNoteDropped(event: CdkDragDrop<any>) {
-    if (!this.interactionIsActive) return;
+  onNoteDropped(event: CdkDragDrop<DraggedNoteData>): void {
+    if (!this.interactionIsActive) {
+      return;
+    }
 
     const data = event.item.data;
 
