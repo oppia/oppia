@@ -26,7 +26,8 @@ class Ret:
     def __init__(self) -> None:
         self.returncode = 0
 
-
+# TODO(#23058): Skipping as not in Docker environment, 
+# but needs to be fixed when using Docker again.
 class GenerateBuildDirectoryTests(test_utils.GenericTestBase):
     """Test the methods for generate build directory."""
 
