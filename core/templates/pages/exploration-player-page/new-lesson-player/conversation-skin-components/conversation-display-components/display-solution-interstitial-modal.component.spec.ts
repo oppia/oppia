@@ -18,20 +18,29 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {DisplayNewSolutionInterstititalModalComponent} from './display-solution-interstitial-modal.component';
 import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
 
 describe('Display Interstitial Solution Modal', () => {
   let fixture: ComponentFixture<DisplayNewSolutionInterstititalModalComponent>;
   let componentInstance: DisplayNewSolutionInterstititalModalComponent;
+  let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
+  let matBottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
 
   beforeEach(waitForAsync(() => {
+    const ngbSpy = jasmine.createSpyObj('NgbActiveModal', ['close', 'dismiss']);
+    const matSpy = jasmine.createSpyObj('MatBottomSheetRef', ['dismiss']);
+
     TestBed.configureTestingModule({
       declarations: [
         DisplayNewSolutionInterstititalModalComponent,
         MockTranslatePipe,
       ],
-      providers: [NgbActiveModal],
+      providers: [
+        {provide: NgbActiveModal, useValue: ngbSpy},
+        {provide: MatBottomSheetRef, useValue: matSpy},
+      ],
     }).compileComponents();
   }));
 
@@ -40,9 +49,67 @@ describe('Display Interstitial Solution Modal', () => {
       DisplayNewSolutionInterstititalModalComponent
     );
     componentInstance = fixture.componentInstance;
+    ngbActiveModal = TestBed.inject(
+      NgbActiveModal
+    ) as jasmine.SpyObj<NgbActiveModal>;
+    matBottomSheetRef = TestBed.inject(
+      MatBottomSheetRef
+    ) as jasmine.SpyObj<MatBottomSheetRef>;
   });
 
   it('should create', () => {
     expect(componentInstance).toBeDefined();
+  });
+
+  describe('confirm', () => {
+    it('should close NgbActiveModal when available', () => {
+      componentInstance.confirm();
+      expect(ngbActiveModal.close).toHaveBeenCalled();
+    });
+
+    it('should dismiss MatBottomSheetRef with "confirm" when NgbActiveModal is not available', () => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        declarations: [
+          DisplayNewSolutionInterstititalModalComponent,
+          MockTranslatePipe,
+        ],
+        providers: [{provide: MatBottomSheetRef, useValue: matBottomSheetRef}],
+      });
+
+      const newFixture = TestBed.createComponent(
+        DisplayNewSolutionInterstititalModalComponent
+      );
+      const newComponentInstance = newFixture.componentInstance;
+
+      newComponentInstance.confirm();
+      expect(matBottomSheetRef.dismiss).toHaveBeenCalledWith('confirm');
+    });
+  });
+
+  describe('cancel', () => {
+    it('should dismiss NgbActiveModal when available', () => {
+      componentInstance.cancel();
+      expect(ngbActiveModal.dismiss).toHaveBeenCalled();
+    });
+
+    it('should dismiss MatBottomSheetRef with "cancel" when NgbActiveModal is not available', () => {
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        declarations: [
+          DisplayNewSolutionInterstititalModalComponent,
+          MockTranslatePipe,
+        ],
+        providers: [{provide: MatBottomSheetRef, useValue: matBottomSheetRef}],
+      });
+
+      const newFixture = TestBed.createComponent(
+        DisplayNewSolutionInterstititalModalComponent
+      );
+      const newComponentInstance = newFixture.componentInstance;
+
+      newComponentInstance.cancel();
+      expect(matBottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+    });
   });
 });

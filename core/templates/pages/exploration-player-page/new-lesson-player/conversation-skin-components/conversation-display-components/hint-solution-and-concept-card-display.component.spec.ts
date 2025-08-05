@@ -40,6 +40,10 @@ import {StatsReportingService} from '../../../../../pages/exploration-player-pag
 import {HintSolutionAndConceptCardDisplayComponent} from './hint-solution-and-concept-card-display.component';
 import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
 import {I18nLanguageCodeService} from '../../../../../services/i18n-language-code.service';
+import {ConceptCardManagerService} from '../../../../../pages/exploration-player-page/services/concept-card-manager.service';
+import {ExplorationEngineService} from '../../../../../pages/exploration-player-page/services/exploration-engine.service';
+import {PageContextService} from '../../../../../services/page-context.service';
+import {UrlService} from '../../../../../services/contextual/url.service';
 
 describe('HintSolutionAndConceptCardDisplayComponent', () => {
   let component: HintSolutionAndConceptCardDisplayComponent;
@@ -51,6 +55,10 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   let explorationModeService: ExplorationModeService;
   let statsReportingService: StatsReportingService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
+  let conceptCardManagerService: ConceptCardManagerService;
+  let explorationEngineService: ExplorationEngineService;
+  let pageContextService: PageContextService;
+  let urlService: UrlService;
 
   let newCard: StateCard;
 
@@ -135,11 +143,16 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     hintsAndSolutionManagerService = TestBed.inject(
       HintsAndSolutionManagerService
     );
+    conceptCardManagerService = TestBed.inject(ConceptCardManagerService);
+    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     hintAndSolutionModalService = TestBed.inject(HintAndSolutionModalService);
     explorationModeService = TestBed.inject(ExplorationModeService);
     statsReportingService = TestBed.inject(StatsReportingService);
+    explorationEngineService = TestBed.inject(ExplorationEngineService);
+    pageContextService = TestBed.inject(PageContextService);
+    urlService = TestBed.inject(UrlService);
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
       new EventEmitter<StateCard>()
@@ -158,6 +171,12 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       true
     );
 
+    spyOn(conceptCardManagerService, 'reset').and.stub();
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      false
+    );
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+
     // A StateCard which supports hints.
     newCard = StateCard.createNewCard(
       'State 2',
@@ -167,6 +186,51 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       RecordedVoiceovers.createEmpty(),
       'content'
     );
+  });
+
+  afterEach(() => {
+    if (fixture) {
+      fixture.destroy();
+    }
+  });
+
+  it('should initialize component properties on ngOnInit', () => {
+    spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(2);
+
+    component.ngOnInit();
+
+    expect(component._editorPreviewMode).toBe(false);
+    expect(component.iframed).toBe(false);
+    expect(component.hintIndexes).toEqual([0, 1]);
+  });
+
+  it('should initialize component with editor preview mode', () => {
+    pageContextService.isInExplorationEditorPage = jasmine
+      .createSpy()
+      .and.returnValue(true);
+    urlService.isIframed = jasmine.createSpy().and.returnValue(true);
+    spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(0);
+
+    component.ngOnInit();
+
+    expect(component._editorPreviewMode).toBe(true);
+    expect(component.iframed).toBe(true);
+  });
+
+  it('should unsubscribe on destroy', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
+
+  it('should reset local hints array correctly', () => {
+    spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(3);
+
+    component.resetLocalHintsArray();
+
+    expect(component.hintIndexes).toEqual([0, 1, 2]);
   });
 
   it("should reset hints when solution doesn't exist", () => {
@@ -246,6 +310,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
         'content'
       );
       spyOn(hintsAndSolutionManagerService, 'getNumHints').and.returnValue(1);
+      spyOn(hintsAndSolutionManagerService, 'reset');
 
       component.displayedCard = oldCard;
 
@@ -254,6 +319,11 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       tick();
 
       expect(component.displayedCard).toEqual(newCard);
+      expect(hintsAndSolutionManagerService.reset).toHaveBeenCalledWith(
+        newCard.getHints(),
+        newCard.getSolution()
+      );
+      expect(conceptCardManagerService.reset).toHaveBeenCalledWith(newCard);
     })
   );
 
@@ -261,6 +331,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     'should reset local hints array if active card is' +
       ' changed to the last one',
     fakeAsync(() => {
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(2);
       spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
       spyOn(component, 'resetLocalHintsArray');
 
@@ -268,6 +339,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       playerPositionService.onActiveCardChanged.emit();
       tick();
 
+      expect(component.currentlyOnLatestCard).toBe(true);
       expect(component.resetLocalHintsArray).toHaveBeenCalledTimes(2);
       component.ngOnDestroy();
     })
@@ -277,6 +349,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     'should not reset local hints array if new active card is' +
       ' not the last one',
     fakeAsync(() => {
+      spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
       spyOn(playerTranscriptService, 'isLastCard').and.returnValue(false);
       spyOn(component, 'resetLocalHintsArray');
 
@@ -284,6 +357,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       playerPositionService.onActiveCardChanged.emit();
       tick();
 
+      expect(component.currentlyOnLatestCard).toBe(false);
       expect(component.resetLocalHintsArray).toHaveBeenCalledTimes(1);
       component.ngOnDestroy();
     })
@@ -360,12 +434,65 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     }
   );
 
-  it('should show solution button if solution is released', () => {
-    spyOn(hintsAndSolutionManagerService, 'isSolutionViewable').and.returnValue(
+  // it('should not show hint button when displayedCard is null', () => {
+  //   spyOn(hintsAndSolutionManagerService, 'isHintViewable').and.returnValue(true);
+  //   component.displayedCard = null;
+
+  //   expect(component.isHintButtonVisible(0)).toBe(false);
+  // });
+
+  it('should show concept card button if concept card is viewable', () => {
+    spyOn(conceptCardManagerService, 'isConceptCardViewable').and.returnValue(
       true
     );
 
-    expect(component.isSolutionButtonVisible()).toBe(true);
+    expect(component.isConceptCardButtonVisible()).toBe(true);
+  });
+
+  it('should not show concept card button if concept card is not viewable', () => {
+    spyOn(conceptCardManagerService, 'isConceptCardViewable').and.returnValue(
+      false
+    );
+
+    expect(component.isConceptCardButtonVisible()).toBe(false);
+  });
+
+  it('should show concept card when showConceptCard is called', () => {
+    const mockState = {
+      linkedSkillId: 'skill123',
+    };
+    spyOn(explorationEngineService, 'getState').and.returnValue(mockState);
+    spyOn(conceptCardManagerService, 'openConceptCardModal');
+
+    component.showConceptCard();
+
+    expect(conceptCardManagerService.openConceptCardModal).toHaveBeenCalledWith(
+      'skill123'
+    );
+  });
+
+  it('should not open concept card modal when linkedSkillId is null', () => {
+    const mockState = {
+      linkedSkillId: null,
+    };
+    spyOn(explorationEngineService, 'getState').and.returnValue(mockState);
+    spyOn(conceptCardManagerService, 'openConceptCardModal');
+
+    component.showConceptCard();
+
+    expect(
+      conceptCardManagerService.openConceptCardModal
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should return concept card consumed status', () => {
+    spyOn(conceptCardManagerService, 'isConceptCardConsumed').and.returnValues(
+      true,
+      false
+    );
+
+    expect(component.isConceptCardConsumed()).toBe(true);
+    expect(component.isConceptCardConsumed()).toBe(false);
   });
 
   it('should show solution button if solution is released', () => {
@@ -414,6 +541,17 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     })
   );
 
+  it('should handle hint modal without result property', () => {
+    const mockModalRef = {};
+    spyOn(hintAndSolutionModalService, 'displayNewHintModal').and.returnValue(
+      mockModalRef
+    );
+
+    component.displayHintModal(0);
+
+    expect(component.activeHintIndex).toBe(0);
+  });
+
   it(
     'should display solution modal if solution is' + ' already consumed',
     fakeAsync(() => {
@@ -441,6 +579,46 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       expect(component.solutionModalIsActive).toBe(true);
     })
   );
+
+  it('should not record solution hit in editor preview mode', fakeAsync(() => {
+    component._editorPreviewMode = true;
+    spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
+      true
+    );
+    spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(false);
+    spyOn(statsReportingService, 'recordSolutionHit');
+    spyOn(
+      hintAndSolutionModalService,
+      'displayNewSolutionModal'
+    ).and.returnValue({
+      result: Promise.resolve('success'),
+    } as NgbModalRef);
+
+    component.onClickSolutionButton();
+    tick();
+
+    expect(statsReportingService.recordSolutionHit).not.toHaveBeenCalled();
+  }));
+
+  it('should not record solution hit in question mode', fakeAsync(() => {
+    component._editorPreviewMode = false;
+    spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
+      true
+    );
+    spyOn(explorationModeService, 'isInQuestionMode').and.returnValue(true);
+    spyOn(statsReportingService, 'recordSolutionHit');
+    spyOn(
+      hintAndSolutionModalService,
+      'displayNewSolutionModal'
+    ).and.returnValue({
+      result: Promise.resolve('success'),
+    } as NgbModalRef);
+
+    component.onClickSolutionButton();
+    tick();
+
+    expect(statsReportingService.recordSolutionHit).not.toHaveBeenCalled();
+  }));
 
   it('should close solution modal', fakeAsync(() => {
     spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
@@ -479,7 +657,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       ).and.returnValue({
         result: Promise.resolve('success'),
       } as NgbModalRef);
-      spyOn(component, 'displayNewSolutionModal').and.callFake(() => {});
+      spyOn(component, 'displaySolutionModal').and.callFake(() => {});
 
       component.onClickSolutionButton();
       tick();
@@ -512,6 +690,56 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       expect(component.displaySolutionModal).not.toHaveBeenCalled();
     })
   );
+
+  it('should handle interstitial modal with afterDismissed method and confirm result', fakeAsync(() => {
+    spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
+      false
+    );
+    const mockAfterDismissed = jasmine.createSpy().and.returnValue({
+      subscribe: (callback: (result: string) => void) => {
+        setTimeout(() => callback('confirm'), 0);
+      },
+    });
+    const mockModalRef = {
+      afterDismissed: mockAfterDismissed,
+    };
+    spyOn(
+      hintAndSolutionModalService,
+      'displayNewSolutionInterstitialModal'
+    ).and.returnValue(mockModalRef);
+    spyOn(component, 'displaySolutionModal');
+
+    component.onClickSolutionButton();
+    tick();
+
+    expect(component.displaySolutionModal).toHaveBeenCalled();
+  }));
+
+  it('should handle interstitial modal with afterDismissed method and cancel result', fakeAsync(() => {
+    spyOn(hintsAndSolutionManagerService, 'isSolutionConsumed').and.returnValue(
+      false
+    );
+    const mockAfterDismissed = jasmine.createSpy().and.returnValue({
+      subscribe: (callback: (result: string) => void) => {
+        setTimeout(() => callback('cancel'), 0);
+      },
+    });
+    const mockModalRef = {
+      afterDismissed: mockAfterDismissed,
+    };
+    spyOn(
+      hintAndSolutionModalService,
+      'displayNewSolutionInterstitialModal'
+    ).and.returnValue(mockModalRef);
+    spyOn(component, 'displaySolutionModal');
+
+    component.solutionModalIsActive = true;
+    component.onClickSolutionButton();
+    tick();
+
+    expect(component.solutionModalIsActive).toBe(false);
+    expect(component.displaySolutionModal).not.toHaveBeenCalled();
+  }));
 
   it('should show if hint is consumed or not', () => {
     spyOn(hintsAndSolutionManagerService, 'isHintConsumed').and.returnValues(
