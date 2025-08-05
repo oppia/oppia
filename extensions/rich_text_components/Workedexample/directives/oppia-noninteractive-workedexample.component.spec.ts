@@ -93,6 +93,12 @@ describe('NoninteractiveWorkedexample', () => {
     expect(component.answer).toBe('');
   });
 
+  it('should set isSolutionCollapsed based on allowSolutionToBeCollapsed', () => {
+    component.allowSolutionToBeCollapsed = false;
+    component.ngOnInit();
+    expect(component.isSolutionCollapsed).toEqual(false);
+  });
+
   it('should update collapsible status when changeSolutionState method is called', () => {
     component.isSolutionCollapsed = false;
     component.changeSolutionState();
