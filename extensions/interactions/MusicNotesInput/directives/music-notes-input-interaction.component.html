@@ -10,12 +10,12 @@
     </music-phrase-editor>
     <div class="oppia-music-input-note-choices">
       <div *ngFor="let noteType of NOTE_TYPES"
-            class="note-choice"
-            [ngClass]="getNoteClass(noteType)"
-            cdkDrag
-            [cdkDragData]="{ noteType: noteType, isPalette: true }"
-            (cdkDragStarted)="onDragStart()"
-            (cdkDragEnded)="onDragEnd()">
+           class="note-choice"
+           [ngClass]="getNoteClass(noteType)"
+           cdkDrag
+           [cdkDragData]="{ noteType: noteType, isPalette: true }"
+           (cdkDragStarted)="onDragStart()"
+           (cdkDragEnded)="onDragEnd()">
       </div>
     </div>
     <div class="oppia-music-input-staff"
@@ -24,11 +24,11 @@
         [cdkDropListConnectedTo]="[]"
         (cdkDropListDropped)="onNoteDropped($event)">
       <div *ngFor="let note of placedNotes"
-            class="placed-note"
-            [ngClass]="getNoteClass(note.type)"
-            cdkDrag
-            [cdkDragData]="{ ...note, isPalette: false }"
-            (cdkDragEnded)="onPlacedNoteDragEnd($event, note)">
+           class="placed-note"
+           [ngClass]="getNoteClass(note.type)"
+           cdkDrag
+           [cdkDragData]="{ ...note, isPalette: false }"
+           (cdkDragEnded)="onPlacedNoteDragEnd($event, note)">
       </div>
     </div>
   </div>
