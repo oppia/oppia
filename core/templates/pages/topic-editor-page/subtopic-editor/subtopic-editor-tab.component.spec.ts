@@ -78,6 +78,9 @@ class MockPlatformFeatureService {
     ShowRestructuredStudyGuides: {
       isEnabled: false,
     },
+    EnableWorkedExamplesRteComponent: {
+      isEnabled: false,
+    },
   };
 }
 
@@ -336,6 +339,19 @@ describe('Subtopic editor tab', () => {
     expect(component.getSkillEditorUrl(skillId)).toEqual(
       '/skill_editor/' + skillId
     );
+  });
+
+  it('should show SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS schema when feature flag is enabled', () => {
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      true;
+    component.ngOnInit();
+    expect(component.SUBTOPIC_PAGE_SCHEMA).toEqual({
+      type: 'html',
+      ui_config: {
+        rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+        rows: 100,
+      },
+    });
   });
 
   it('should show schema editor', () => {
