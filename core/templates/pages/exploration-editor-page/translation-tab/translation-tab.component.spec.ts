@@ -37,6 +37,7 @@ import {RouterService} from '../services/router.service';
 import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
 import {TranslationTabComponent} from './translation-tab.component';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {
   JoyrideDirective,
   JoyrideOptionsService,
@@ -77,6 +78,7 @@ describe('Translation tab component', () => {
   let stateEditorService: StateEditorService;
   let stateTutorialFirstTimeService: StateTutorialFirstTimeService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
+  let voiceoverBackendApiService: VoiceoverBackendApiService;
   let refreshTranslationTabEmitter = new EventEmitter<void>();
   let enterTranslationForTheFirstTimeEmitter = new EventEmitter<string>();
 
@@ -167,6 +169,7 @@ describe('Translation tab component', () => {
     stateTutorialFirstTimeService = TestBed.inject(
       StateTutorialFirstTimeService
     );
+    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
@@ -181,6 +184,34 @@ describe('Translation tab component', () => {
     );
     let element = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue(element as HTMLElement);
+
+    let languageAccentMasterList = {
+      en: {
+        'en-IN': 'English (India)',
+        'en-US': 'English (United State)',
+      },
+      hi: {
+        'hi-IN': 'Hindi (India)',
+      },
+    };
+    let languageCodesMapping = {
+      en: {
+        'en-US': true,
+      },
+      hi: {
+        'hi-IN': true,
+      },
+    };
+
+    let voiceoverAdminDataResponse = {
+      languageAccentMasterList: languageAccentMasterList,
+      languageCodesMapping: languageCodesMapping,
+    };
+
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchVoiceoverAdminDataAsync'
+    ).and.resolveTo(Promise.resolve(voiceoverAdminDataResponse));
 
     explorationStatesService.init(
       {

@@ -171,19 +171,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       this.entityVoiceoversService.onVoiceoverLoad.subscribe(() => {
         this.voiceoversAreLoaded = true;
         this.changeDetectorRef.detectChanges();
-        this.isVoiceoverSupportedForSelectedLanguage =
-          this.voiceoverLanguageManagementService.canVoiceoverForLanguage(
-            this.languageCode
-          );
-        if (this.isVoiceoverSupportedForSelectedLanguage) {
-          this.voiceoverLanguageManagementService.setCloudSupportedLanguageAccents(
-            this.languageCode
-          );
-          this.isVoiceoverAutogenerationSupportedForSelectedAccent =
-            this.voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
-              this.languageAccentCode
-            );
-        }
+        this.setLanguageAccentConfigsAfterVoiceoverLoad();
       })
     );
 
@@ -355,22 +343,26 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     this.languageCode = newLanguageCode;
 
     if (this.voiceoversAreLoaded) {
-      this.isVoiceoverSupportedForSelectedLanguage =
-        this.voiceoverLanguageManagementService.canVoiceoverForLanguage(
-          this.languageCode
-        );
-      if (this.isVoiceoverSupportedForSelectedLanguage) {
-        this.voiceoverLanguageManagementService.setCloudSupportedLanguageAccents(
-          this.languageCode
-        );
-        this.isVoiceoverAutogenerationSupportedForSelectedAccent =
-          this.voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
-            this.languageAccentCode
-          );
-      }
+      this.setLanguageAccentConfigsAfterVoiceoverLoad();
     }
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
     this.updateContentAvailabilityStatusForVoiceovers();
+  }
+
+  setLanguageAccentConfigsAfterVoiceoverLoad(): void {
+    this.isVoiceoverSupportedForSelectedLanguage =
+      this.voiceoverLanguageManagementService.canVoiceoverForLanguage(
+        this.languageCode
+      );
+    if (this.isVoiceoverSupportedForSelectedLanguage) {
+      this.voiceoverLanguageManagementService.setCloudSupportedLanguageAccents(
+        this.languageCode
+      );
+      this.isVoiceoverAutogenerationSupportedForSelectedAccent =
+        this.voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
+          this.languageAccentCode
+        );
+    }
   }
 
   updateLanguageAccentCode(languageAccentCode: string): void {
@@ -393,19 +385,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     );
 
     if (this.voiceoversAreLoaded) {
-      this.isVoiceoverSupportedForSelectedLanguage =
-        this.voiceoverLanguageManagementService.canVoiceoverForLanguage(
-          this.languageCode
-        );
-      if (this.isVoiceoverSupportedForSelectedLanguage) {
-        this.voiceoverLanguageManagementService.setCloudSupportedLanguageAccents(
-          this.languageCode
-        );
-        this.isVoiceoverAutogenerationSupportedForSelectedAccent =
-          this.voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
-            this.languageAccentCode
-          );
-      }
+      this.setLanguageAccentConfigsAfterVoiceoverLoad();
     }
 
     this.updateContentAvailabilityStatusForVoiceovers();

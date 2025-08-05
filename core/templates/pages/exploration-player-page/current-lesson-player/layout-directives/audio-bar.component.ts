@@ -245,19 +245,15 @@ export class AudioBarComponent {
       contentId
     ) as Voiceover;
 
-    const showRegeneratedVoiceoversToLearners =
-      this.platformFeatureService.status.ShowRegeneratedVoiceoversToLearners
-        .isEnabled && this.pageContextService.isInExplorationPlayerPage();
-
     if (
       (manualVoiceover && manualVoiceover.needsUpdate === false) ||
       !automaticVoiceover
     ) {
       this.voiceoverToBePlayed = manualVoiceover;
     } else if (
+      this.isAutoVoiceoversEnabled() &&
       automaticVoiceover &&
-      automaticVoiceover.needsUpdate === false &&
-      showRegeneratedVoiceoversToLearners
+      automaticVoiceover.needsUpdate === false
     ) {
       this.voiceoverToBePlayed = automaticVoiceover;
     }
@@ -267,6 +263,20 @@ export class AudioBarComponent {
     this.audioPreloaderService.restartAudioPreloader(
       this.getCurrentStateName()
     );
+  }
+
+  isAutoVoiceoversEnabled(): boolean {
+    const showToLearners =
+      this.platformFeatureService.status.ShowRegeneratedVoiceoversToLearners
+        .isEnabled;
+    const showToEditors =
+      this.platformFeatureService.status.AutomaticVoiceoverRegenerationFromExp
+        .isEnabled;
+
+    const onPlayerPage = this.pageContextService.isInExplorationPlayerPage();
+    const onEditorPage = this.pageContextService.isInExplorationEditorPage();
+
+    return (onPlayerPage && showToLearners) || (onEditorPage && showToEditors);
   }
 
   updateManualVoiceoverWithChangeList(
