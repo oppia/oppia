@@ -23,10 +23,7 @@ import {fakeAsync, TestBed} from '@angular/core/testing';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {
-  Interaction,
-  InteractionObjectFactory,
-} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {LoggerService} from 'services/contextual/logger.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
@@ -45,7 +42,6 @@ describe('Responses Service', () => {
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let interactionData: Interaction;
   let interactionDataWithRules: Interaction;
-  let interactionObjectFactory: InteractionObjectFactory;
   let loggerService: LoggerService;
   let responsesService: ResponsesService;
   let savedMemento: Solution;
@@ -63,7 +59,6 @@ describe('Responses Service', () => {
     );
     loggerService = TestBed.get(LoggerService);
     responsesService = TestBed.get(ResponsesService);
-    interactionObjectFactory = TestBed.get(InteractionObjectFactory);
     stateEditorService = TestBed.get(StateEditorService);
     stateInteractionIdService = TestBed.get(StateInteractionIdService);
     stateSolutionService = TestBed.get(StateSolutionService);
@@ -74,7 +69,7 @@ describe('Responses Service', () => {
       new SubtitledHtml('', 'tesster')
     );
 
-    interactionData = interactionObjectFactory.createFromBackendDict({
+    interactionData = Interaction.createFromBackendDict({
       id: 'TextInput',
       answer_groups: [
         {
@@ -130,7 +125,7 @@ describe('Responses Service', () => {
       },
     });
 
-    interactionDataWithRules = interactionObjectFactory.createFromBackendDict({
+    interactionDataWithRules = Interaction.createFromBackendDict({
       id: 'TextInput',
       answer_groups: [
         {

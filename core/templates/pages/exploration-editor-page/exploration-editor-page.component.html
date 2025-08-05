@@ -155,7 +155,7 @@
            tabindex="0"
            (keydown.enter)="!connectedToInternet || showUserHelpModal()"
            placement="bottom"
-           class="nav-link oppia-editor-navbar-tab-anchor"
+           class="nav-link oppia-editor-navbar-tab-anchor e2e-test-help-button"
            role="button"
            aria-label="Exploration Help Button">
           <i class="fas fa-question-circle navbar-tab-icon"></i>
@@ -178,7 +178,9 @@
       </div>
     </div>
 
-    <oppia-exploration-editor-tab *ngIf="getActiveTabName() === 'main'" [explorationIsLinkedToStory]="explorationIsLinkedToStory">
+    <oppia-exploration-editor-tab *ngIf="getActiveTabName() === 'main'"
+                                  [explorationIsLinkedToStory]="explorationIsLinkedToStory"
+                                  class="e2e-test-exploration-main-tab">
     </oppia-exploration-editor-tab>
 
     <oppia-translation-tab *ngIf="getActiveTabName() === 'translation'">
@@ -199,7 +201,8 @@
                         [currentUserIsModerator]="currentUserIsModerator">
     </oppia-settings-tab>
 
-    <oppia-history-tab [hidden]="!(getActiveTabName() === 'history')">
+    <oppia-history-tab [hidden]="!(getActiveTabName() === 'history')"
+                       class="e2e-test-exploration-history-tab">
     </oppia-history-tab>
 
     <oppia-feedback-tab [hidden]="!(getActiveTabName() === 'feedback')">

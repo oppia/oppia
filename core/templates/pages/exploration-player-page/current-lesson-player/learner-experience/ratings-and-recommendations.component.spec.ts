@@ -43,7 +43,7 @@ import {StoryViewerBackendApiService} from '../../../../domain/story_viewer/stor
 import {TopicViewerBackendApiService} from '../../../../domain/topic_viewer/topic-viewer-backend-api.service';
 import {StoryPlaythrough} from '../../../../domain/story_viewer/story-playthrough.model';
 import {ReadOnlyStoryNode} from '../../../../domain/story_viewer/read-only-story-node.model';
-import {ReadOnlyTopic} from '../../../../domain/topic_viewer/read-only-topic-object.factory';
+import {ReadOnlyTopic} from '../../../../domain/topic_viewer/read-only-topic.model';
 import {LearnerExplorationSummary} from '../../../../domain/summary/learner-exploration-summary.model';
 import {SiteAnalyticsService} from '../../../../services/site-analytics.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
@@ -82,6 +82,7 @@ describe('Ratings and recommendations component', () => {
   }
 
   class MockPageContextService {
+    private pageContext = 'EXPLORATION_PLAYER';
     getExplorationId(): string {
       return 'test_id';
     }
@@ -93,6 +94,9 @@ describe('Ratings and recommendations component', () => {
     }
     isInQuestionPlayerMode(): boolean {
       return false;
+    }
+    getPageContext(): string {
+      return this.pageContext;
     }
     setExplorationVersion(_version: number): void {}
   }

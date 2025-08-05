@@ -1,0 +1,197 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+oppia-new-input-response-pair .conversation-skin-learner-answer-container,
+oppia-new-input-response-pair .conversation-skin-oppia-feedback-container {
+  padding: 0 20px;
+  position: relative;
+}
+
+oppia-new-input-response-pair .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
+  height: 100px;
+  left: -104px;
+  top: 2px;
+  width: 100px;
+}
+
+oppia-new-input-response-pair .conversation-skin-oppia-feedback-container {
+  background-color: #fff;
+  border-radius: 0 16px 16px;
+  margin-top: 10px;
+  width: 70%;
+}
+
+oppia-new-input-response-pair .conversation-skin-learner-answer-content {
+  border-bottom-right-radius: 0;
+}
+
+oppia-new-input-response-pair .conversation-skin-oppia-feedback-content,
+oppia-new-input-response-pair .conversation-skin-learner-answer-content {
+  padding: 12px;
+  word-wrap: break-word;
+}
+
+oppia-new-input-response-pair .conversation-skin-oppia-feedback-content,
+oppia-new-input-response-pair .conversation-skin-help-card-content {
+  border-top-left-radius: 0;
+}
+
+oppia-new-input-response-pair .conversation-skin-learner-answer-container {
+  background-color: #fff8e5;
+  border-radius: 16px 0 16px 16px;
+  margin-top: 10px;
+  text-align: left;
+  width: 70%;
+}
+
+oppia-new-input-response-pair .answer-wrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+oppia-new-input-response-pair .answer-wrapper .right-side-curve {
+  height: 49px;
+  position: absolute;
+  right: -36px;
+  top: -9px;
+  transform: scaleX(-1);
+  width: 39px;
+}
+
+oppia-new-input-response-pair .feedback-wrapper .left-side-curve {
+  height: 49px;
+  left: -37px;
+  position: absolute;
+  top: -9px;
+  width: 39px;
+}
+
+oppia-new-input-response-pair .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+  border: 2px solid #094142;
+  height: 100px;
+  right: -104px;
+  top: 3px;
+  width: 100px;
+}
+
+oppia-new-input-response-pair .oppia-popover {
+  cursor: pointer;
+  display: inline-block;
+}
+oppia-new-input-response-pair .oppia-answer-popup-container .oppia-answer-popup {
+  max-height: 300px;
+  max-width: 300px;
+}
+
+oppia-new-input-response-pair .conversation-skin-oppia-feedback.ng-enter {
+  opacity: 0;
+  -webkit-transition: all .5s;
+  transition: all .5s;
+}
+
+oppia-new-input-response-pair .conversation-skin-oppia-feedback.ng-enter.ng-enter-active {
+  opacity: 1;
+}
+
+@media (max-width: 480px) {
+  oppia-new-input-response-pair .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
+    height: 34px;
+    left: -37px;
+    top: 5px;
+    width: 34px;
+  }
+
+  oppia-new-input-response-pair .answer-wrapper .right-side-curve {
+    height: 29px;
+    position: absolute;
+    right: -17px;
+    top: -7px;
+    transform: scaleX(-1);
+    width: 19px;
+  }
+
+  oppia-new-input-response-pair .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+    border: 2px solid #094142;
+    height: 34px;
+    right: -39px;
+    top: 6px;
+    width: 34px;
+  }
+
+  oppia-new-input-response-pair .feedback-wrapper .left-side-curve {
+    height: 29px;
+    left: -18px;
+    position: absolute;
+    top: -7px;
+    width: 19px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  oppia-new-input-response-pair .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
+    height: 64px;
+    left: -68px;
+    top: 5px;
+    width: 64px;
+  }
+
+  oppia-new-input-response-pair .feedback-wrapper .left-side-curve {
+    height: 39px;
+    left: -27px;
+    position: absolute;
+    top: -8px;
+    width: 29px;
+  }
+
+  oppia-new-input-response-pair .answer-wrapper .right-side-curve {
+    height: 39px;
+    position: absolute;
+    right: -28px;
+    top: -8px;
+    transform: scaleX(-1);
+    width: 29px;
+  }
+
+  oppia-new-input-response-pair .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+    height: 64px;
+    right: -69px;
+    top: 3px;
+    width: 64px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  oppia-new-input-response-pair .conversation-skin-oppia-feedback-container .conversation-skin-oppia-avatar {
+    height: 64px;
+    left: -68px;
+    top: 5px;
+    width: 64px;
+  }
+
+  oppia-new-input-response-pair .feedback-wrapper .left-side-curve {
+    height: 39px;
+    left: -27px;
+    position: absolute;
+    top: -8px;
+    width: 29px;
+  }
+
+  oppia-new-input-response-pair .answer-wrapper .right-side-curve {
+    height: 39px;
+    position: absolute;
+    right: -28px;
+    top: -8px;
+    transform: scaleX(-1);
+    width: 29px;
+  }
+
+  oppia-new-input-response-pair .conversation-skin-learner-answer-container .conversation-skin-user-avatar {
+    height: 64px;
+    right: -69px;
+    top: 3px;
+    width: 64px;
+  }
+}

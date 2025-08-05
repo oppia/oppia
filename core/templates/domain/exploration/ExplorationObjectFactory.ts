@@ -27,7 +27,7 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {
   ParamChangeBackendDict,
   ParamChange,
-} from 'domain/exploration/ParamChangeObjectFactory';
+} from 'domain/exploration/param-change.model';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {
   ParamSpecsBackendDict,
@@ -38,7 +38,7 @@ import {
   EndExplorationCustomizationArgs,
   InteractionCustomizationArgs,
 } from 'interactions/customization-args-defs';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {State} from 'domain/state/StateObjectFactory';
 import {
   StateObjectsBackendDict,

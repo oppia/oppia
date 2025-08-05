@@ -44,3 +44,7 @@ require(
   'rich_text_components/Video/directives/' +
     'oppia-noninteractive-video.component.ts'
 );
+require(
+  'rich_text_components/Workedexample/directives/' +
+    'oppia-noninteractive-workedexample.component.ts'
+);

@@ -1209,8 +1209,13 @@ URLS = [
         learner_group.LearnerGroupsFeatureStatusHandler),
     get_redirect_route('/android_data', android.AndroidActivityHandler),
     get_redirect_route(
+        '/automatic_voiceover_regeneration_record/<start_date>/<end_date>',
+        voiceover.AutomaticVoiceoverRegenerationRecordHandler
+    ),
+     get_redirect_route(
         '/firebase_config',
-        firebase_config.FirebaseConfigValuesHandler)
+        firebase_config.FirebaseConfigValuesHandler
+     )
 ]
 
 # Adding redirects for topic landing pages.

@@ -41,6 +41,7 @@ import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
 import {ModeratorFactory} from '../user/moderator';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import testConstants from './test-constants';
+import {showMessage} from './show-message';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
@@ -155,6 +156,15 @@ export class UserFactory {
     return user as TUser & MultipleRoleIntersection<typeof roles>;
   };
 
+  static enableVoiceoverAutogenerationUsingCloudService =
+    async function (): Promise<void> {
+      if (superAdminInstance === null) {
+        superAdminInstance = await UserFactory.createNewSuperAdmin('superAdm');
+      }
+      await superAdminInstance.enableTextToSpeechSynthesisUsingCloudService();
+      showMessage('Enabled text to speech synthesis using cloud service.');
+    };
+
   static createNewUser = async function <
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],
   >(
@@ -231,9 +241,14 @@ export class UserFactory {
    * This function closes all the browsers opened by different users.
    */
   static closeAllBrowsers = async function (): Promise<void> {
-    for (let i = 0; i < activeUsers.length; i++) {
-      await activeUsers[i].closeBrowser();
-    }
+    showMessage(`Closing browsers for ${activeUsers.length} users.`);
+    await Promise.all(
+      activeUsers.map(async user => {
+        await user.closeBrowser();
+      })
+    );
+
+    showMessage('All browsers closed.');
   };
 
   /**

@@ -40,11 +40,20 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {HttpErrorResponse} from '@angular/common/http';
 import {AlertsService} from 'services/alerts.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {PlatformFeatureService} from '../../services/platform-feature.service';
 
 class MockTranslateService {
   instant(key: string, interpolateParams?: Object): string {
     return key;
   }
+}
+
+class MockPlatformFeatureService {
+  status = {
+    NewLessonPlayer: {
+      isEnabled: false,
+    },
+  };
 }
 
 class MockWindowRef {
@@ -151,6 +160,7 @@ describe('Diagnostic test player component', () => {
   let preventPageUnloadEventService: PreventPageUnloadEventService;
   let classroomBackendApiService: ClassroomBackendApiService;
   let translateService: TranslateService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let sessionCompleteEmitter = new EventEmitter<string[]>();
   let progressEmitter = new EventEmitter<number>();
   let router: Router;
@@ -181,6 +191,10 @@ describe('Diagnostic test player component', () => {
           useClass: MockDiagnosticTestPlayerStatusService,
         },
         {provide: Router, useClass: MockRouter},
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -227,6 +241,11 @@ describe('Diagnostic test player component', () => {
     expect(component.classroomUrlFragment).toEqual('math');
     expect(component.classroomData.getName()).toEqual('math');
   }));
+
+  it('should check new lesson player feature flag is enabled', () => {
+    mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
+    expect(component.isNewLessonPlayerEnabled()).toBe(true);
+  });
 
   it('should redirect to the 404 page if the classroom url fragment is not present', fakeAsync(() => {
     const navigateSpy = spyOn(router, 'navigate').and.returnValue(

@@ -63,7 +63,7 @@ describe('Voiceover Admin', function () {
     'should be able to see error while adding an invalid user as a voiceover artist to an exploration',
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
       await explorationEditor.dismissWelcomeModal();
 
       await explorationEditor.createMinimalExploration(
@@ -85,7 +85,10 @@ describe('Voiceover Admin', function () {
       await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(
         'invalidUserId'
       );
-      await voiceoverAdmin.addVoiceoverArtistsToExploration(['invalidUserId']);
+      await voiceoverAdmin.addVoiceoverArtistsToExploration(
+        ['invalidUserId'],
+        false
+      );
 
       await voiceoverAdmin.expectToSeeErrorToastMessage(
         invalidIdErrorToastMessage
@@ -104,7 +107,7 @@ describe('Voiceover Admin', function () {
         'voiceoverartist@example.com'
       );
       await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
 
       await explorationEditor.createMinimalExploration(
         'Exploration two',

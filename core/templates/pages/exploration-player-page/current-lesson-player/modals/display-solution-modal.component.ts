@@ -18,7 +18,7 @@
 
 import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {ShortAnswerResponse, Solution} from 'domain/exploration/solution.model';
 import {StateCard} from 'domain/state_card/state-card.model';
