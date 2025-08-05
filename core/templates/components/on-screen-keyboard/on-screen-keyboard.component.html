@@ -7,7 +7,7 @@
       <button [ngClass]="(currentTab === functionsTab) ? 'oppia-osk-btn-tab-active' : 'oppia-osk-btn-tab-inactive'" (click)="changeTab(functionsTab)">
         f(x)
       </button>
-      <button class="oppia-osk-btn-hide" (click)="hideOSK()">
+      <button class="oppia-osk-btn-hide e2e-test-osk-hide-button" (click)="hideOSK()">
         HIDE <i class="fa fa-angle-down"></i>
       </button>
     </div>
