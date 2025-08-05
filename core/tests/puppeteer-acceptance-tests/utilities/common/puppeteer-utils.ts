@@ -960,13 +960,48 @@ export class BaseUser {
     targetPageUrl: string,
     context: puppeteer.Page = this.page
   ): Promise<void> {
-    const anchor = await context.waitForSelector(`a[href*="${targetPageUrl}"]`);
+    const anchor = await context.waitForSelector(`a[href="${targetPageUrl}"]`);
     expect(anchor).toBeTruthy();
     const anchorText = await anchor?.evaluate(el =>
       (el as HTMLAnchorElement).innerText.trim()
     );
     expect(anchorText).toEqual(anchorInnerText);
   }
+
+  // async clickAndVerifyAnchorWithInnerText(
+  //   anchorInnerText: string,
+  //   targetPageUrl: string,
+  //   closePage: boolean = true,
+  //   context: puppeteer.Page = this.page
+  // ): Promise<puppeteer.Page | null> {
+  //   await context.waitForSelector('a');
+  //   const anchorElements = await context.$$('a');
+  //   let element: puppeteer.ElementHandle<Element> | null = null;
+  //   for (const anchorElement of anchorElements) {
+  //     const innerText = await anchorElement.evaluate(el =>
+  //       (el as HTMLAnchorElement).innerText.trim()
+  //     );
+  //     if (innerText === anchorInnerText) {
+  //       element = anchorElement;
+  //       break;
+  //     }
+  //   }
+  //   if (!element) {
+  //     throw new Error(`Anchor with inner text ${anchorInnerText} not found.`);
+  //   }
+  //   const pageTarget = context.target();
+  //   await element.click();
+  //   const newTarget = await this.browserObject.waitForTarget(
+  //     target => target.opener() === pageTarget
+  //   );
+  //   const newTabPage = await newTarget.page();
+  //   expect(newTabPage).toBeDefined();
+  //   expect(newTabPage?.url()).toBe(targetPageUrl);
+  //   if (closePage) {
+  //     await newTabPage?.close();
+  //   }
+  //   return newTabPage;
+  // }
 
   /**
    * Creates a new tab in the browser and switches to it.
