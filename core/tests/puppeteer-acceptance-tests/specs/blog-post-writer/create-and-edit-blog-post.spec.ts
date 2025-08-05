@@ -86,10 +86,28 @@ describe('Blog Post Writer', function () {
     );
 
     // Check license terms for image uploads.
-    await blogPostWriter.clickLinkAnchorToNewTab(
+    const licensePage = await blogPostWriter.clickAndVerifyAnchorWithInnerText(
       'license terms',
-      'http://localhost:8181/license'
+      'http://localhost:8181/license',
+      false
     );
+    if (!licensePage) {
+      throw new Error('License page not found.');
+    }
+    await blogPostWriter.expectScreenshotToMatch('licensePage', __dirname);
+    await blogPostWriter.clickAndVerifyAnchorWithInnerText(
+      'CC-BY-SA 4.0',
+      'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
+      true,
+      licensePage
+    );
+    await blogPostWriter.clickAndVerifyAnchorWithInnerText(
+      'Apache 2.0',
+      'https://www.apache.org/licenses/',
+      true,
+      licensePage
+    );
+    await licensePage?.close();
     await blogPostWriter.clickOn('Cancel');
 
     // Update blog title of less than 5 characters.
@@ -109,10 +127,10 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.expectScreenshotToMatch('blogPostPreview', __dirname);
 
     // Verify link in blog preview modal.
-    // await blogPostWriter.clickLinkAnchorToNewTab(
-    //   'link',
-    //   'http://localhost:8181/blog'
-    // );
+    await blogPostWriter.clickAndVerifyAnchorWithInnerText(
+      '( link )',
+      'http://localhost:8181/blog'
+    );
 
     // Close preview modal.
     await blogPostWriter.closePreviewModal();

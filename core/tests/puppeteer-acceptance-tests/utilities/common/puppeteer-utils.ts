@@ -947,8 +947,18 @@ export class BaseUser {
     closePage: boolean = true,
     context: puppeteer.Page = this.page
   ): Promise<puppeteer.Page | null> {
-    const selector = `a[innerText="${anchorInnerText}"]`;
-    const element = await context.waitForSelector(selector);
+    await context.waitForSelector('a');
+    const anchorElements = await context.$$('a');
+    let element: puppeteer.ElementHandle<Element> | null = null;
+    for (const anchorElement of anchorElements) {
+      const innerText = await anchorElement.evaluate(el =>
+        (el as HTMLAnchorElement).innerText.trim()
+      );
+      if (innerText === anchorInnerText) {
+        element = anchorElement;
+        break;
+      }
+    }
     if (!element) {
       throw new Error(`Anchor with inner text ${anchorInnerText} not found.`);
     }
