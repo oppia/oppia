@@ -80,6 +80,6 @@
   }
 
   .hint-solution-individual-container > p {
-    width: 120px;
+    max-width: 120px;
   }
 }

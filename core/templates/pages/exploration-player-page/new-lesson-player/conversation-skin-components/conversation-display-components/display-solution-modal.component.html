@@ -1,6 +1,6 @@
-<div class="oppia-learner-hint-and-solution-modal-title">
-  <span [innerHTML]="'I18N_SOLUTION_TITLE' | translate"></span>
-</div>
+<p class="oppia-learner-hint-and-solution-modal-title">
+  {{ 'I18N_SOLUTION_TITLE' | translate }}
+</p>
 
 <div class="modal-body">
   <label>{{ shortAnswerHtml.prefix }} solution is: &nbsp; </label>
@@ -22,6 +22,6 @@
 <div class="oppia-learner-solution-container">
   <button mat-button class="oppia-learner-got-it-button e2e-test-learner-got-it-button"
           (click)="closeModal()">
-    <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
+    {{ 'I18N_GOT_IT' | translate }}
   </button>
 </div>

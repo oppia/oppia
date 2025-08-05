@@ -1,5 +1,5 @@
 <div *ngIf="currentlyOnLatestCard && isHintButtonVisible(0)" class="oppia-hint-solution-and-concept-card-display">
-  <div *ngFor="let hintIndex of hintIndexes; index as idx">
+  <ng-container *ngFor="let hintIndex of hintIndexes; index as idx">
     <div class="hint-solution-individual-container" *ngIf="hintIndex === 0 && isHintButtonVisible(hintIndex)">
       <p>{{'I18N_FIRST_HINT_DESCRIPTION' | translate}}</p>
       <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button"
@@ -14,7 +14,7 @@
               (click)="displayHintModal(hintIndex)"> {{ 'I18N_VIEW_HINT_WITH_INDEX_BUTTON_TEXT' | translate: { index: hintIndex + 1 } }}
       </button>
     </div>
-  </div>
+  </ng-container>
   <div *ngIf="isSolutionButtonVisible()" class="hint-solution-individual-container">
     <p>{{'I18N_SOLUTION_INTRO_PARAGRAPH' | translate}}</p>
 
