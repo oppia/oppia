@@ -723,14 +723,19 @@ export class BaseUser {
           visible: true,
           timeout: timeout,
         });
+        showMessage(`Element (selector: ${selector}) is visible.`);
       } else {
         await this.page.waitForSelector(selector, {
           hidden: true,
           timeout: timeout,
         });
+        showMessage(`Element (selector: ${selector}) is hidden.`);
       }
       return true;
     } catch {
+      showMessage(
+        `Element (selector: ${selector}) is not ${visible ? 'visible' : 'hidden'}.`
+      );
       return false;
     }
   }
@@ -936,6 +941,31 @@ export class BaseUser {
     await newTabPage?.close();
   }
 
+  async clickAndVerifyAnchorWithInnerText(
+    anchorInnerText: string,
+    targetPageUrl: string,
+    closePage: boolean = true,
+    context: puppeteer.Page = this.page
+  ): Promise<puppeteer.Page | null> {
+    const selector = `a[innerText="${anchorInnerText}"]`;
+    const element = await context.waitForSelector(selector);
+    if (!element) {
+      throw new Error(`Anchor with inner text ${anchorInnerText} not found.`);
+    }
+    const pageTarget = context.target();
+    await element.click();
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    expect(newTabPage?.url()).toBe(targetPageUrl);
+    if (closePage) {
+      await newTabPage?.close();
+    }
+    return newTabPage;
+  }
+
   /**
    * Creates a new tab in the browser and switches to it.
    */
@@ -1028,6 +1058,7 @@ export class BaseUser {
   ): Promise<void> {
     const options = visibility ? {visible: true} : {hidden: true};
     await this.page.waitForSelector(selector, options);
+    showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 
   /**

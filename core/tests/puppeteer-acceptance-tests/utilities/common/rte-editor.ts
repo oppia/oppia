@@ -40,23 +40,22 @@ export class RTEEditor {
   async changeFormatTo(format: 'heading' | 'normal'): Promise<void> {
     await this.clickOnRTEOptionWithTitle('Format');
 
-    const iframe = await this.parentPage.waitForSelector('iframe');
+    const iframes = this.parentPage.frames();
+
+    let iframe: puppeteer.Frame | null = null;
+    for (const frame of iframes) {
+      if (frame.name().includes('cke')) {
+        iframe = frame;
+        break;
+      }
+    }
+
     if (!iframe) {
       throw new Error('RTE iframe not found.');
     }
 
     const selector = `a[title*="${format}"]`;
-    // List all childs of iframe.
-    const childs = await iframe.$x('//body/child::*');
-    if (!childs) {
-      throw new Error('No childs found.');
-    }
-    // Log all childs.
-    childs.forEach((child) => {
-      console.log(child.evaluate((node) => (node as HTMLElement).title));
-    });
-    await iframe.waitForSelector(selector);
-    const element = await iframe.$(selector);
+    const element = await iframe.waitForSelector(selector);
     if (!element) {
       throw new Error(`Format ${format} not found.`);
     }

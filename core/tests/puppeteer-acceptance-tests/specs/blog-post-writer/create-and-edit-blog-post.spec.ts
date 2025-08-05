@@ -90,7 +90,7 @@ describe('Blog Post Writer', function () {
       'license terms',
       'http://localhost:8181/license'
     );
-    await blogPostWriter.clickOn('Cancel')
+    await blogPostWriter.clickOn('Cancel');
 
     // Update blog title of less than 5 characters.
     await blogPostWriter.updateBlogPostTitle('Test');
@@ -102,9 +102,7 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
 
     // Update blog body using all the available RTE features.
-    // await blogPostWriter.updateBlogBodyUsingAllRTEFeatures();
-    await blogPostWriter.updateBodyTextTo('Test Blog Post Body');
-    await blogPostWriter.saveBlogBodyChanges();
+    await blogPostWriter.updateBlogBodyUsingAllRTEFeatures();
 
     // Preview the blog post.
     await blogPostWriter.previewBlogPost();
@@ -137,7 +135,9 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.expectToBeOnBlogEditorPage();
     await blogPostWriter.navigateToBlogDashboardPage();
     await blogPostWriter.deleteDraftBlogPostWithTitle('Test Blog Post Title');
-    await blogPostWriter.expectToolTipMessage('Blog Post Deleted Successfully.');
+    await blogPostWriter.expectToolTipMessage(
+      'Blog Post Deleted Successfully.'
+    );
   });
 
   it('should be able to publish a new blog post', async function () {

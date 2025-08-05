@@ -63,8 +63,7 @@ const closePreivewModalButtonSelector = '.e2e-test-close-preview-button';
 const gridViewButtonSelector = '.e2e-test-tiles-view-button';
 const listViewButtonSelector = '.e2e-test-list-view-button';
 
-const editBlogLabel = 'Edit';
-
+const editBlogSelector = '.e2e-test-content-button';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 
 export class BlogPostEditor extends BaseUser {
@@ -432,6 +431,10 @@ export class BlogPostEditor extends BaseUser {
    * This function updates the body text of the blog post.
    */
   async updateBodyTextTo(newBodyText: string): Promise<void> {
+    if (!this.isElementVisible(blogBodyInput)) {
+      await this.expectElementToBeVisible(editBlogSelector);
+      await this.clickOn(editBlogSelector);
+    }
     await this.expectElementToBeVisible(blogBodyInput);
     await this.type(blogBodyInput, newBodyText);
 
