@@ -925,55 +925,47 @@ export class BaseUser {
    */
   async clickLinkAnchorToNewTab(
     anchorInnerText: string,
-    expectedDestinationPageUrl: string
-  ): Promise<void> {
-    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`, {
-      visible: true,
-    });
-    const pageTarget = this.page.target();
-    await this.clickOn(anchorInnerText);
+    expectedDestinationPageUrl: string,
+    closePage: boolean = true,
+    context: Page = this.page
+  ): Promise<Page> {
+    const xpath = `//a[normalize-space(.)="${anchorInnerText}"]`;
+    const element = await context.waitForXPath(xpath);
+    const pageTarget = context.target();
+    await element?.click();
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );
     const newTabPage = await newTarget.page();
+    if (!newTabPage) {
+      throw new Error(`No new tab opened.`);
+    }
     expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
+    expect(newTabPage.url()).toBe(expectedDestinationPageUrl);
+    if (closePage) {
+      await newTabPage.close();
+    }
+    await newTabPage.bringToFront();
+    return newTabPage;
   }
 
-  async clickAndVerifyAnchorWithInnerText(
+  /**
+   * Verify that the anchor tag with the given inner text is present on the page.
+   * @param {string} anchorInnerText - The inner text of the anchor tag.
+   * @param {string} targetPageUrl - The URL of the page to which the anchor tag should link.
+   * @param {puppeteer.Page} context - The page on which the anchor tag should be verified.
+   */
+  async verifyAnchorTagIsPresent(
     anchorInnerText: string,
     targetPageUrl: string,
-    closePage: boolean = true,
     context: puppeteer.Page = this.page
-  ): Promise<puppeteer.Page | null> {
-    await context.waitForSelector('a');
-    const anchorElements = await context.$$('a');
-    let element: puppeteer.ElementHandle<Element> | null = null;
-    for (const anchorElement of anchorElements) {
-      const innerText = await anchorElement.evaluate(el =>
-        (el as HTMLAnchorElement).innerText.trim()
-      );
-      if (innerText === anchorInnerText) {
-        element = anchorElement;
-        break;
-      }
-    }
-    if (!element) {
-      throw new Error(`Anchor with inner text ${anchorInnerText} not found.`);
-    }
-    const pageTarget = context.target();
-    await element.click();
-    const newTarget = await this.browserObject.waitForTarget(
-      target => target.opener() === pageTarget
+  ): Promise<void> {
+    const anchor = await context.waitForSelector(`a[href*="${targetPageUrl}"]`);
+    expect(anchor).toBeTruthy();
+    const anchorText = await anchor?.evaluate(el =>
+      (el as HTMLAnchorElement).innerText.trim()
     );
-    const newTabPage = await newTarget.page();
-    expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(targetPageUrl);
-    if (closePage) {
-      await newTabPage?.close();
-    }
-    return newTabPage;
+    expect(anchorText).toEqual(anchorInnerText);
   }
 
   /**

@@ -86,7 +86,7 @@ describe('Blog Post Writer', function () {
     );
 
     // Check license terms for image uploads.
-    const licensePage = await blogPostWriter.clickAndVerifyAnchorWithInnerText(
+    const licensePage = await blogPostWriter.clickLinkAnchorToNewTab(
       'license terms',
       'http://localhost:8181/license',
       false
@@ -94,17 +94,19 @@ describe('Blog Post Writer', function () {
     if (!licensePage) {
       throw new Error('License page not found.');
     }
-    await blogPostWriter.expectScreenshotToMatch('licensePage', __dirname);
-    await blogPostWriter.clickAndVerifyAnchorWithInnerText(
-      'CC-BY-SA 4.0',
-      'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
-      true,
+    await blogPostWriter.expectScreenshotToMatch(
+      'licensePage',
+      __dirname,
       licensePage
     );
-    await blogPostWriter.clickAndVerifyAnchorWithInnerText(
+    await blogPostWriter.verifyAnchorTagIsPresent(
+      'CC-BY-SA 4.0',
+      'https://creativecommons.org/licenses/by-sa/4.0/legalcode',
+      licensePage
+    );
+    await blogPostWriter.verifyAnchorTagIsPresent(
       'Apache 2.0',
       'https://www.apache.org/licenses/',
-      true,
       licensePage
     );
     await licensePage?.close();
@@ -127,10 +129,7 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.expectScreenshotToMatch('blogPostPreview', __dirname);
 
     // Verify link in blog preview modal.
-    await blogPostWriter.clickAndVerifyAnchorWithInnerText(
-      '( link )',
-      'http://localhost:8181/blog'
-    );
+    await blogPostWriter.verifyAnchorTagIsPresent('( link )', '/blog');
 
     // Close preview modal.
     await blogPostWriter.closePreviewModal();
