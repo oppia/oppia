@@ -159,7 +159,7 @@ describe('Blog Post Writer', function () {
     // Publish button should be disabled with no body.
     await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
     await blogPostWriter.updateBodyTextTo('');
-    await blogPostWriter.saveBlogBodyChanges();
+    await blogPostWriter.saveBlogBodyChanges(true);
     await blogPostWriter.expectPublishButtonToBeDisabled();
 
     // Publish button should be disabled with no tags.

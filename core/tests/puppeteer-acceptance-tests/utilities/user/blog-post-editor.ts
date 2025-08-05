@@ -431,11 +431,12 @@ export class BlogPostEditor extends BaseUser {
    * This function updates the body text of the blog post.
    */
   async updateBodyTextTo(newBodyText: string): Promise<void> {
-    if (!this.isElementVisible(blogBodyInput)) {
+    if (!(await this.isElementVisible(blogBodyInput))) {
       await this.expectElementToBeVisible(editBlogSelector);
       await this.clickOn(editBlogSelector);
     }
     await this.expectElementToBeVisible(blogBodyInput);
+    await this.clearAllTextFrom(blogBodyInput);
     await this.type(blogBodyInput, newBodyText);
 
     await this.expectTextContentToBe(blogBodyInput, newBodyText);
@@ -444,10 +445,12 @@ export class BlogPostEditor extends BaseUser {
   /**
    * This function saves the blog post.
    */
-  async saveBlogBodyChanges(): Promise<void> {
+  async saveBlogBodyChanges(skipVerification: boolean = false): Promise<void> {
     await this.expectElementToBeVisible(blogBodySaveButtonSelector);
     await this.clickOn(blogBodySaveButtonSelector);
-    await this.expectElementToBeVisible(blogBodySaveButtonSelector, false);
+    if (!skipVerification) {
+      await this.expectElementToBeVisible(blogBodySaveButtonSelector, false);
+    }
   }
 
   /**

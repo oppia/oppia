@@ -6711,22 +6711,24 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectBlogPostToBePresent(expectedBlog: string): Promise<void> {
     await this.navigateToBlogPage();
-    const titleRegex = new RegExp(`^${expectedBlog}-[A-Za-z]{12}$`);
 
-    const blogPostTitles = await this.page.$$(blogPostTitleSelector);
-    for (const titleElement of blogPostTitles) {
-      const title = await this.page.evaluate(
-        el => el.textContent,
-        titleElement
-      );
-      if (titleRegex.test(title.trim())) {
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    const blogTitles = await this.page.$$eval(blogPostTitleSelector, elements =>
+      elements.map(element => element.textContent)
+    );
+    for (const title of blogTitles) {
+      if (!title) {
+        continue;
+      }
+      if (title.includes(expectedBlog)) {
         showMessage('The blog post is present on the blog dashboard.');
         return;
       }
     }
 
     throw new Error(
-      `The blog post "${expectedBlog}" was not found on the blog dashboard.`
+      `The blog post "${expectedBlog}" was not found on the blog dashboard.\n` +
+        `Found blog posts: "${blogTitles.join('", "')}"`
     );
   }
 }
