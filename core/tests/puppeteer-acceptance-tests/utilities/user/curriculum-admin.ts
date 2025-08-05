@@ -2130,7 +2130,7 @@ export class CurriculumAdmin extends BaseUser {
       topicName
     );
 
-    await this.createSkillForTopic(skillName, topicName, true);
+    await this.createSkillForTopic(skillName, topicName, false);
     await this.createQuestionsForSkill(skillName, 3);
     await this.assignSkillToSubtopicInTopicEditor(
       skillName,
