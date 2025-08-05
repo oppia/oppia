@@ -27,7 +27,7 @@
 
 <div *ngIf="isConceptCardButtonVisible()" class="oppia-hint-solution-and-concept-card-display">
   <div class="hint-solution-individual-container">
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Non, sit.</p>
+    <p>{{'I18N_CONCEPT_CARD_INTRO_PARAGRAPH' | translate}}</p>
 
     <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button concept-card-button"
             [ngClass]="{'viewed': isConceptCardConsumed()}"

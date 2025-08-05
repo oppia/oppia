@@ -434,13 +434,6 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     }
   );
 
-  // it('should not show hint button when displayedCard is null', () => {
-  //   spyOn(hintsAndSolutionManagerService, 'isHintViewable').and.returnValue(true);
-  //   component.displayedCard = null;
-
-  //   expect(component.isHintButtonVisible(0)).toBe(false);
-  // });
-
   it('should show concept card button if concept card is viewable', () => {
     spyOn(conceptCardManagerService, 'isConceptCardViewable').and.returnValue(
       true

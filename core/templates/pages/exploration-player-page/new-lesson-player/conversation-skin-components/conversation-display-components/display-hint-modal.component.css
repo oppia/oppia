@@ -55,10 +55,6 @@ oppia-new-display-hint-modal .hint-modal-control-btn {
   outline: none !important;
 }
 
-oppia-new-display-hint-modal .clearfix {
-  clear: both;
-}
-
 @media (max-width: 480px) {
   oppia-new-display-hint-modal .oppia-learner-solution-container > p {
     margin-left: 10px;
