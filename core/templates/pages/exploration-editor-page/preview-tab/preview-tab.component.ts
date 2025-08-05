@@ -22,10 +22,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {
-  ParamChange,
-  ParamChangeObjectFactory,
-} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model';
 import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {
@@ -46,6 +43,7 @@ import {ParameterMetadataService} from '../services/parameter-metadata.service';
 import {RouterService} from '../services/router.service';
 import {PreviewSetParametersModalComponent} from './templates/preview-set-parameters-modal.component';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-preview-tab',
@@ -54,9 +52,6 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 export class PreviewTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  // These properties below are initialized using Angular lifecycle hooks
-  // where we need to do non-null assertion. For more information see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   previewWarning!: string;
   isExplorationPopulated!: boolean;
   allParams: ExplorationParams | object = {};
@@ -71,11 +66,11 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private explorationParamChangesService: ExplorationParamChangesService,
     private explorationStatesService: ExplorationStatesService,
+    private platformFeatureService: PlatformFeatureService,
     private graphDataService: GraphDataService,
     private learnerParamsService: LearnerParamsService,
     private ngbModal: NgbModal,
     private numberAttemptsService: NumberAttemptsService,
-    private paramChangeObjectFactory: ParamChangeObjectFactory,
     private parameterMetadataService: ParameterMetadataService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
@@ -92,16 +87,14 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         initStateNameForPreview,
       ]);
 
-    // Construct array to hold required parameter changes.
     let manualParamChanges: ParamChange[] = [];
     for (let i = 0; i < unsetParametersInfo.length; i++) {
-      let newParamChange = this.paramChangeObjectFactory.createEmpty(
+      let newParamChange = ParamChange.createEmpty(
         unsetParametersInfo[i].paramName
       );
       manualParamChanges.push(newParamChange);
     }
 
-    // Use modal to populate parameter change values.
     if (manualParamChanges.length > 0) {
       this.showSetParamsModal(manualParamChanges, () => {
         return Promise.resolve(manualParamChanges);
@@ -270,5 +263,9 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

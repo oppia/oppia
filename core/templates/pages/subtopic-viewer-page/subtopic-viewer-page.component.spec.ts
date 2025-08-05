@@ -39,7 +39,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -601,5 +601,26 @@ describe('Subtopic viewer page', function () {
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalledWith(
       imagePath
     );
+  });
+
+  it('should modify next subtopic title based on length', () => {
+    const longTitle =
+      'This is a very long subtopic title that exceeds twenty characters';
+    component.nextSubtopic = {
+      getTitle: () => longTitle,
+      getUrlFragment: () => 'test-fragment',
+    };
+    const result1 = component.checkNextSubtopicTitleLengthAndModify();
+    expect(result1).toBe('This is a very lo...');
+    expect(result1.length).toBe(20);
+
+    const shortTitle = 'Short title';
+    component.nextSubtopic = {
+      getTitle: () => shortTitle,
+      getUrlFragment: () => 'test-fragment',
+    };
+    const result2 = component.checkNextSubtopicTitleLengthAndModify();
+    expect(result2).toBe(shortTitle);
+    expect(result2).toBe('Short title');
   });
 });

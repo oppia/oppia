@@ -27,8 +27,7 @@ import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-const INTRODUCTION_CARD_CONTENT: string =
-  'This exploration will test your understanding of negative numbers.';
+const INTRODUCTION_CARD_CONTENT: string = 'Content 0';
 enum INTERACTION_TYPES {
   CONTINUE_BUTTON = 'Continue Button',
   END_EXPLORATION = 'End Exploration',
@@ -80,6 +79,8 @@ describe('Exploration Editor', function () {
     );
     await voiceoverAdmin.enableAutogenerationForLanguageAccentPair('en-US');
 
+    await UserFactory.enableVoiceoverAutogenerationUsingCloudService();
+
     // Enable the feature flag.
     await releaseCoordinator.enableFeatureFlag(
       'exploration_editor_can_modify_translations'
@@ -90,7 +91,7 @@ describe('Exploration Editor', function () {
 
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorPage();
+    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
     await explorationEditor.dismissWelcomeModal();
     await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
@@ -200,5 +201,5 @@ describe('Exploration Editor', function () {
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  });
+  }, 450000);
 });

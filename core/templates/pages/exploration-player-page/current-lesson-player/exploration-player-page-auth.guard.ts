@@ -26,6 +26,7 @@ import {
 } from '@angular/router';
 
 import {AppConstants} from 'app.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 @Injectable({
@@ -33,6 +34,7 @@ import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access
 })
 export class ExplorationPlayerPageAuthGuard implements CanActivate {
   constructor(
+    private platformFeatureService: PlatformFeatureService,
     private accessValidationBackendApiService: AccessValidationBackendApiService,
     private router: Router,
     private location: Location
@@ -48,7 +50,24 @@ export class ExplorationPlayerPageAuthGuard implements CanActivate {
       this.accessValidationBackendApiService
         .validateAccessToExplorationPlayerPage(explorationId, version)
         .then(() => {
-          resolve(true);
+          if (this.platformFeatureService.status.NewLessonPlayer.isEnabled) {
+            if (state.url.includes('embed')) {
+              this.router.navigate(['/embed/lesson', explorationId], {
+                queryParams: route.queryParams,
+              });
+              resolve(false);
+            } else {
+              const tree = this.router.createUrlTree(
+                ['/lesson', explorationId],
+                {
+                  queryParams: route.queryParams,
+                }
+              );
+              this.router.navigateByUrl(tree).then(() => resolve(false));
+            }
+          } else {
+            resolve(true);
+          }
         })
         .catch(err => {
           let currentUrl = state.url;

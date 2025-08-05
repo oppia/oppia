@@ -21,7 +21,7 @@ import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.consta
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
-import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic-object.factory';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
@@ -56,6 +56,7 @@ export class PlayerHeaderComponent {
   expInfo!: LearnerExplorationSummaryBackendDict;
   directiveSubscriptions: Subscription = new Subscription();
   isMobileMenuVisible = false;
+  pageIsIframed: boolean = false;
 
   constructor(
     private pageContextService: PageContextService,
@@ -72,6 +73,7 @@ export class PlayerHeaderComponent {
   ngOnInit(): void {
     let pathnameArray = this.urlService.getPathname().split('/');
     let explorationContext = false;
+    this.pageIsIframed = this.urlService.isIframed();
 
     for (let i = 0; i < pathnameArray.length; i++) {
       if (

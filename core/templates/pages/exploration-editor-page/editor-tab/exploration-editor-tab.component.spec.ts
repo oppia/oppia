@@ -65,7 +65,7 @@ import {
   StateBackendDict,
   StateObjectFactory,
 } from 'domain/state/StateObjectFactory';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationNextContentIdIndexService} from '../services/exploration-next-content-id-index.service';
@@ -682,7 +682,6 @@ describe('Exploration editor tab component', () => {
               html: 'test explanation',
               content_id: 'explanation',
             },
-            worked_examples: [],
             recorded_voiceovers: {
               voiceovers_mapping: {},
             },

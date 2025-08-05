@@ -211,6 +211,8 @@ const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
 const publishClassroomButton =
   '.e2e-test-toggle-classroom-publication-status-btn';
+const enableDiagnosticTestButton =
+  '.e2e-test-toggle-diagnostic-test-status-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
 const deleteClassroomButton = '.e2e-test-delete-classroom-button';
@@ -259,6 +261,12 @@ const saveRubricExplanationButton = '.e2e-test-save-rubric-explanation-button';
 const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
 const commitMessageInputSelector = '.e2e-test-commit-message-input';
 const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+const settingsContainerSelector =
+  '.oppia-editor-card.oppia-settings-card-container';
+const deleteButtonSelector = 'button.oppia-delete-button';
+
+const openExplorationEditorNavigationMobile =
+  '.oppia-exploration-editor-tabs-dropdown.show';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -281,6 +289,7 @@ export class CurriculumAdmin extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(subtopicReassignHeader);
     }
+    await this.page.waitForSelector(addSkillButton);
     await this.clickOn(addSkillButton);
     await this.type(skillDescriptionField, description);
     await this.page.waitForSelector(skillReviewMaterialHeader);
@@ -294,6 +303,10 @@ export class CurriculumAdmin extends BaseUser {
       `${confirmSkillCreationButton}:not([disabled])`
     );
     await this.clickOn(confirmSkillCreationButton);
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(confirmSkillCreationButton, {
+      hidden: true,
+    });
     await this.page.bringToFront();
   }
 
@@ -307,6 +320,9 @@ export class CurriculumAdmin extends BaseUser {
       : desktopSkillQuestionTab;
 
     if (isMobileWidth) {
+      await this.page.waitForFunction(() =>
+        window.location.href.includes('skill_editor')
+      );
       const currentUrl = new URL(this.page.url());
       const hashParts = currentUrl.hash.split('/');
 
@@ -319,6 +335,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.goto(currentUrl.toString());
       await this.page.reload({waitUntil: 'networkidle0'});
     } else {
+      await this.page.waitForSelector(skillQuestionTab, {visible: true});
       await this.clickAndWaitForNavigation(skillQuestionTab);
     }
   }
@@ -404,6 +421,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     await this.clickOn(saveQuestionButton);
+
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
   /**
@@ -484,6 +504,8 @@ export class CurriculumAdmin extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
+
+    expect(this.page.url()).toContain('/topic_editor/');
   }
 
   /**
@@ -518,6 +540,8 @@ export class CurriculumAdmin extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
+
+    expect(this.page.url()).toContain('/skill_editor/');
   }
 
   /**
@@ -777,6 +801,11 @@ export class CurriculumAdmin extends BaseUser {
       `.e2e-test-study-guide-section-${index} ${deleteStudyGuideSectionButton}`
     );
     await this.clickOn(studyGuideSectionDeleteConfirmButton);
+
+    await this.expectElementToBeVisible(
+      studyGuideSectionDeleteConfirmButton,
+      false
+    );
   }
 
   /**
@@ -878,6 +907,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
     await this.type(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
+
+    await this.page.waitForSelector(saveRubricExplanationButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -899,6 +932,10 @@ export class CurriculumAdmin extends BaseUser {
       visible: true,
     });
     await this.clickOn(closeSaveModalButtonSelector);
+
+    await this.page.waitForSelector(closeSaveModalButtonSelector, {
+      hidden: true,
+    });
     showMessage('Skill updated successful');
   }
 
@@ -956,8 +993,11 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(mobileSaveTopicDropdown);
       await this.page.waitForSelector(mobilePublishTopicButton);
       await this.clickOn(mobilePublishTopicButton);
+      await this.page.waitForSelector(mobilePublishTopicButton, {hidden: true});
     } else {
       await this.clickOn(publishTopicButton);
+
+      await this.page.waitForSelector(publishTopicButton, {hidden: true});
     }
   }
 
@@ -1089,12 +1129,15 @@ export class CurriculumAdmin extends BaseUser {
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavToggleButton, {visible: true});
       await this.clickOn(mobileNavToggleButton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
     } else {
+      await this.page.waitForSelector(explorationSettingsTab, {visible: true});
       await this.clickOn(explorationSettingsTab);
     }
+    await this.page.waitForSelector(settingsContainerSelector, {visible: true});
     showMessage('Navigation to settings tab is successful.');
   }
 
@@ -1106,6 +1149,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.waitForStaticAssetsToLoad();
     await this.clickOn(deleteExplorationButton);
     await this.clickOn(confirmDeletionButton);
+
+    await this.page.waitForSelector(confirmDeleteClassroomButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -1113,9 +1160,10 @@ export class CurriculumAdmin extends BaseUser {
    */
   async dismissWelcomeModal(): Promise<void> {
     try {
+      await this.page.waitForNetworkIdle();
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
-        timeout: 5000,
+        timeout: 10000,
       });
       await this.clickOn(dismissWelcomeModalSelector);
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
@@ -1138,9 +1186,14 @@ export class CurriculumAdmin extends BaseUser {
         timeout: 5000,
       });
       await this.clickOn(dropdownToggleIcon);
+
+      await this.expectElementToBeVisible(
+        openExplorationEditorNavigationMobile,
+        false
+      );
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
+      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -1149,7 +1202,14 @@ export class CurriculumAdmin extends BaseUser {
    * in mobile view.
    */
   async openExplorationControlDropdown(): Promise<void> {
+    await this.page.waitForSelector(explorationControlsSettingsDropdown, {
+      visible: true,
+    });
     await this.clickOn(explorationControlsSettingsDropdown);
+
+    await this.page.waitForSelector(deleteButtonSelector, {
+      visible: true,
+    });
   }
 
   /**
@@ -1266,6 +1326,9 @@ export class CurriculumAdmin extends BaseUser {
         await this.clickOn(mobileChapterCollapsibleCard);
       }
     }
+    await this.page.waitForSelector(addChapterButton, {
+      visible: true,
+    });
     await this.clickOn(addChapterButton);
     await this.type(newChapterTitleField, chapterName);
     await this.type(newChapterExplorationIdField, explorationId);
@@ -1292,8 +1355,12 @@ export class CurriculumAdmin extends BaseUser {
       if (!isMobileSaveButtonVisible) {
         await this.clickOn(mobileOptionsSelector);
       }
+      await this.page.waitForSelector(mobileSaveStoryChangesButton, {
+        visible: true,
+      });
       await this.clickOn(mobileSaveStoryChangesButton);
     } else {
+      await this.page.waitForSelector(saveStoryButton, {visible: true});
       await this.clickOn(saveStoryButton);
     }
     await this.type(
@@ -1310,9 +1377,21 @@ export class CurriculumAdmin extends BaseUser {
    */
   async publishStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
+        visible: true,
+      });
       await this.clickOn(mobileSaveStoryChangesDropdown);
       await this.page.waitForSelector(mobilePublishStoryButton);
       await this.clickOn(mobilePublishStoryButton);
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === 'Unpublish Story';
+        },
+        {},
+        mobilePublishStoryButton
+      );
     } else {
       await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
       await this.clickOn(publishStoryButton);
@@ -1407,6 +1486,10 @@ export class CurriculumAdmin extends BaseUser {
           } else {
             throw new Error('Confirm button not found');
           }
+
+          await this.page.waitForSelector(confirmTopicDeletionButton, {
+            hidden: true,
+          });
           break;
         }
       }
@@ -1509,6 +1592,10 @@ export class CurriculumAdmin extends BaseUser {
           } else {
             throw new Error('Confirm button not found');
           }
+
+          await this.page.waitForSelector(confirmSkillDeletionButton, {
+            hidden: true,
+          });
           break;
         }
       }
@@ -1606,9 +1693,9 @@ export class CurriculumAdmin extends BaseUser {
         `All questions have been successfully removed from the skill "${skillName}".`
       );
     } catch (error) {
-      console.error(
-        `Failed to remove all questions from the skill "${skillName}"`,
-        error.stack
+      throw new Error(
+        `Failed to remove all questions from the skill "${skillName}"` +
+          error.stack
       );
     }
   }
@@ -1706,6 +1793,8 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(saveClassroomButton);
 
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
     showMessage(`Updated ${classroomName} classroom.`);
   }
 
@@ -1726,6 +1815,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
     await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
 
     showMessage(`Added ${topicName} topic to the ${classroomName} classroom.`);
   }
@@ -1748,13 +1838,30 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Function for publishing a classroom.
+   * @param {string} classroomName - The name of the classroom.
    */
   async publishClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
     await this.clickOn(publishClassroomButton);
     await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
     showMessage(`Published ${classroomName} classroom.`);
+  }
+
+  /**
+   * Enables diagnostic test for a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async enableDiagnosticTestForClassroom(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom(classroomName);
+    await this.clickOn(enableDiagnosticTestButton);
+    await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
+    showMessage(`Enabled diagnostic test for ${classroomName} classroom.`);
   }
 
   /**
@@ -1791,7 +1898,7 @@ export class CurriculumAdmin extends BaseUser {
 
         await this.page.waitForSelector(deleteClassroomModal, {visible: true});
         await this.clickOn(confirmDeleteClassroomButton);
-        await this.page.waitForSelector(deleteClassroomModal, {visible: false});
+        await this.page.waitForSelector(deleteClassroomModal, {hidden: true});
 
         showMessage(`Deleted ${classroomName} classroom.`);
         foundClassroom = true;

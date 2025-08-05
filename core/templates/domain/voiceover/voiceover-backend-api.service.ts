@@ -25,6 +25,10 @@ import {
   EntityVoiceovers,
   EntityVoiceoversBackendDict,
 } from './entity-voiceovers.model';
+import {
+  CloudTaskRun,
+  CloudTaskRunBackendDict,
+} from 'domain/cloud-task/cloud-task-run.model';
 
 interface VoiceoverAdminDataBackendDict {
   language_accent_master_list: {
@@ -42,6 +46,10 @@ interface VoiceoverAdminDataBackendDict {
 
 interface EntityVoiceoversBulkBackendDict {
   entity_voiceovers_list: EntityVoiceoversBackendDict[];
+}
+
+interface CloudTaskRunBackendResponseDict {
+  automatic_voiceover_regeneration_records: CloudTaskRunBackendDict[];
 }
 
 interface ExplorationIdToFilenamesBackendDict {
@@ -336,6 +344,40 @@ export class VoiceoverBackendApiService {
               );
             }
             resolve(entityVoiceoversList);
+          },
+          errorResponse => {
+            reject(errorResponse?.error);
+          }
+        );
+    });
+  }
+
+  async fetchVoiceoverRegenerationRecordAsync(
+    stateDate: string,
+    endDate: string
+  ): Promise<CloudTaskRun[]> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<CloudTaskRunBackendResponseDict>(
+          this.urlInterpolationService.interpolateUrl(
+            VoiceoverDomainConstants.AUTOMATIC_VOICEOVER_REGENERATION_RECORD_URL,
+            {
+              start_date: stateDate,
+              end_date: endDate,
+            }
+          )
+        )
+        .toPromise()
+        .then(
+          response => {
+            let cloudTaskRunList = [];
+
+            for (let cloudTaskRunBackendDict of response.automatic_voiceover_regeneration_records) {
+              cloudTaskRunList.push(
+                CloudTaskRun.createFromBackendDict(cloudTaskRunBackendDict)
+              );
+            }
+            resolve(cloudTaskRunList);
           },
           errorResponse => {
             reject(errorResponse?.error);

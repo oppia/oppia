@@ -696,25 +696,26 @@ def reassign_ticket(
     new_ticket_model = (
         app_feedback_report_models.AppFeedbackReportTicketModel.get_by_id(
             new_ticket_id))
-    new_ticket_obj = get_ticket_from_model(new_ticket_model)
-    new_ticket_obj.reports.append(report.report_id)
-    if (new_ticket_obj.newest_report_creation_timestamp and
-        report.submitted_on_timestamp > (
-            new_ticket_obj.newest_report_creation_timestamp)
-    ):
-        new_ticket_obj.newest_report_creation_timestamp = (
-            report.submitted_on_timestamp)
-    _save_ticket(new_ticket_obj)
+    if new_ticket_model is not None:
+        new_ticket_obj = get_ticket_from_model(new_ticket_model)
+        new_ticket_obj.reports.append(report.report_id)
+        if (new_ticket_obj.newest_report_creation_timestamp and
+            report.submitted_on_timestamp > (
+                new_ticket_obj.newest_report_creation_timestamp)
+        ):
+            new_ticket_obj.newest_report_creation_timestamp = (
+                report.submitted_on_timestamp)
+        _save_ticket(new_ticket_obj)
 
-    # Update the stats model for the new ticket.
-    platform = report.platform
-    stats_date = report.submitted_on_timestamp.date()
-    _update_report_stats_model_in_transaction(
-        new_ticket_id, platform, stats_date, report, 1)
+        # Update the stats model for the new ticket.
+        platform = report.platform
+        stats_date = report.submitted_on_timestamp.date()
+        _update_report_stats_model_in_transaction(
+            new_ticket_id, platform, stats_date, report, 1)
 
-    # Update the report model to the new ticket id.
-    report.ticket_id = new_ticket_id
-    save_feedback_report_to_storage(report)
+        # Update the report model to the new ticket id.
+        report.ticket_id = new_ticket_id
+        save_feedback_report_to_storage(report)
 
 
 def edit_ticket_name(

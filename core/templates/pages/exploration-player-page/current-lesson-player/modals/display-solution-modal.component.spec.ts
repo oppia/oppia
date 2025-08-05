@@ -27,7 +27,7 @@ import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {DisplaySolutionModalComponent} from './display-solution-modal.component';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
-import {Interaction} from '../../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {InteractionDisplayComponent} from '../../../../components/interaction-display/interaction-display.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
