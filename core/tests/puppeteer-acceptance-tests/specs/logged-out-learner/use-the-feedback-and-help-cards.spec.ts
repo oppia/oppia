@@ -147,7 +147,7 @@ describe('Logged-Out Learner', function () {
   it('should be able to get a hint or solution when user gets stuck', async function () {
     await loggedOutLearner.submitAnswer('ABC');
     await loggedOutLearner.expectErrorMessageForWrongInputToBe(
-      ' Please only use numerical digits, spaces or forward slashes (/) '
+      'Please only use numerical digits, spaces or forward slashes (/)'
     );
     await loggedOutLearner.expectSubmitButtonToBe('Disabled');
     await loggedOutLearner.expectAnswerInputValueToBe('ABC');

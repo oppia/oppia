@@ -125,7 +125,7 @@
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing e2e-test-open-outcome-dest-editor"
            *ngIf="isEditable" (click)="openDestinationEditor()">
-        <i *ngIf="isEditable" tabindex="0" class="fas fa-pen oppia-editor-edit-icon float-right"
+        <i *ngIf="isEditable" tabindex="0" class="fas fa-pen oppia-editor-edit-icon float-right e2e-test-edit-outcome-dest-pencil-button"
            title="Edit Destination" (keydown.enter)="openDestinationEditor()">
         </i>
       </div>
@@ -134,7 +134,7 @@
         <strong class="oppia-outcome-heading" *ngIf="displayFeedback" tabindex="0">And afterwards, directs the learner
         to ... </strong>
         <strong class="oppia-outcome-heading" *ngIf="!displayFeedback" tabindex="0">Oppia directs the learner to ... </strong>
-        <span *ngIf="outcome && !isSelfLoop(outcome)" class="position-relative" tabindex="0">
+        <span *ngIf="outcome && !isSelfLoop(outcome)" class="position-relative e2e-test-current-outcome-dest" tabindex="0">
           {{ outcome.dest }}
         </span>
         <span tabindex="0" *ngIf="isSelfLoop(outcome)" class="position-relative">
