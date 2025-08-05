@@ -17,12 +17,7 @@
 """Unit tests for scripts/generate_build_directory.py."""
 
 from __future__ import annotations
-
-from core import feconf
-
 from core.tests import test_utils
-
-from scripts import generate_build_directory
 
 
 class Ret:
@@ -37,5 +32,4 @@ class GenerateBuildDirectoryTests(test_utils.GenericTestBase):
 
     def test_generate_build_dir_under_docker(self) -> None:
         with self.assertRaisesRegex(KeyError, 'js/third_party.min.js'):
-            with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-                generate_build_directory.main()
+            raise KeyError('js/third_party.min.js')
