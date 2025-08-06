@@ -30,7 +30,7 @@ import {
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {ItemSelectionInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionRuleInputs} from 'interactions/rule-input-defs';
@@ -47,6 +47,8 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {Rule} from 'domain/exploration/rule.model';
 import {InitializeAnswerGroups} from 'components/state-editor/state-interaction-editor/state-interaction-editor.component';
 import isEqual from 'lodash/isEqual';
+import {ShortAnswerResponse, Solution} from 'domain/exploration/solution.model';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
@@ -115,7 +117,8 @@ export class ResponsesService {
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
-    private stateSolutionService: StateSolutionService
+    private stateSolutionService: StateSolutionService,
+    private explorationHtmlFormatterService: ExplorationHtmlFormatterService
   ) {}
 
   private _verifySolution = () => {
@@ -334,6 +337,23 @@ export class ResponsesService {
 
   getActiveAnswerGroupIndex(): number {
     return this._activeAnswerGroupIndex;
+  }
+
+  getOppiaShortAnswerResponseHtml(
+    interaction: Interaction,
+    solution: Solution
+  ): ShortAnswerResponse {
+    if (interaction.id === null) {
+      throw new Error('Interaction id is possibly null.');
+    }
+    return {
+      prefix: solution.answerIsExclusive ? 'The only' : 'One',
+      answer: this.explorationHtmlFormatterService.getShortAnswerHtml(
+        solution.correctAnswer,
+        interaction.id,
+        interaction.customizationArgs
+      ),
+    };
   }
 
   onInteractionIdChanged(

@@ -21,7 +21,6 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core.domain import taskqueue_services
 from core.platform.taskqueue import dev_mode_taskqueue_services
 from core.tests import test_utils
 
@@ -39,7 +38,8 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
         dummy_url = '/dummy_handler'
         correct_payload = {
             'fn_identifier': (
-                taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS),
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']),
             'args': [['1', '2', '3']],
             'kwargs': {}
         }
@@ -53,7 +53,9 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
                 queue_name: str,
                 url: str,
                 payload: Dict[str, Any],
-                scheduled_for: Optional[datetime.datetime] = None, # pylint: disable=unused-argument
+                scheduled_for: Optional[ # pylint: disable=unused-argument
+                    datetime.datetime
+                ] = None,
                 task_name: Optional[str] = None,
         ) -> None:
             self.assertEqual(queue_name, correct_queue_name)
@@ -74,7 +76,8 @@ class DevModeTaskqueueServicesUnitTests(test_utils.TestBase):
         correct_port = dev_mode_taskqueue_services.GOOGLE_APP_ENGINE_PORT
         correct_payload = {
             'fn_identifier': (
-                taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS),
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']),
             'args': [['1', '2', '3']],
             'kwargs': {}
         }

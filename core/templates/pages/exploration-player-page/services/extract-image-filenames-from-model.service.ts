@@ -207,12 +207,6 @@ export class ExtractImageFilenamesFromModelService {
     for (let misconception of skill.getMisconceptions()) {
       htmlList.push(misconception.getFeedback(), misconception.getNotes());
     }
-    for (let workedExample of skill.getConceptCard().getWorkedExamples()) {
-      htmlList.push(
-        workedExample.getExplanation().html,
-        workedExample.getQuestion().html
-      );
-    }
     htmlList.push(skill.getConceptCard().getExplanation().html);
     skill.getRubrics().forEach(rubric => {
       htmlList.push(...rubric.getExplanations());

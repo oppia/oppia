@@ -19,7 +19,6 @@ from __future__ import annotations
 import re
 import textwrap
 
-from core import feconf
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_services
 from core.platform import models
@@ -84,6 +83,7 @@ def send_mail(
     subject: str,
     plaintext_body: str,
     html_body: str,
+    cc_emails: Optional[List[str]] = None,
     bcc_admin: bool = False,
     attachments: Optional[List[Dict[str, str]]] = None
 ) -> None:
@@ -103,7 +103,9 @@ def send_mail(
             utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Format must be utf-8.
-        bcc_admin: bool. Whether to bcc feconf.ADMIN_EMAIL_ADDRESS on the email.
+        cc_emails: list(str)|None. Optional argument. List of cc emails.
+            Format must be utf-8.
+        bcc_admin: bool. Whether to bcc ADMIN_EMAIL_ADDRESS on the email.
         attachments: list(dict)|None. Optional argument. A list of
             dictionaries, where each dictionary includes the keys `filename`
             and `path` with their corresponding values.
@@ -132,10 +134,14 @@ def send_mail(
     if not _is_sender_email_valid(sender_email):
         raise ValueError(
             'Malformed sender email address: %s' % sender_email)
-    bcc = [feconf.ADMIN_EMAIL_ADDRESS] if bcc_admin else None
+    admin_email_address = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS.value))
+    assert isinstance(admin_email_address, str)
+    bcc = [admin_email_address] if bcc_admin else None
     response = email_services.send_email_to_recipients(
         sender_email, [recipient_email], subject,
-        plaintext_body, html_body, bcc, '', None, attachments)
+        plaintext_body, html_body, cc_emails, bcc, '', None, attachments)
 
     if not response:
         raise Exception((
@@ -214,6 +220,7 @@ def convert_email_to_loggable_string(
         subject: str,
         plaintext_body: str,
         html_body: str,
+        cc: Optional[List[str]] = None,
         bcc: Optional[List[str]] = None,
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
@@ -234,6 +241,8 @@ def convert_email_to_loggable_string(
             be utf-8.
         html_body: str. The HTML body of the email. Must fit in a datastore
             entity. Format must be utf-8.
+        cc: list(str)|None. Optional argument. List of cc emails. Format must
+            be utf-8.
         bcc: list(str)|None. Optional argument. List of bcc emails. Format must
             be utf-8.
         reply_to: str|None. Optional argument. Reply address formatted like
@@ -271,6 +280,12 @@ def convert_email_to_loggable_string(
         for attachment in attachments:
             filenames.append(attachment['filename'])
 
+    if cc:
+        cc_email_list_str = ' '.join(
+            ['%s' % (cc_email,) for cc_email in cc[:3]])
+        if len(cc) > 3:
+            cc_email_list_str += '... Total: %s emails.' % str(len(cc))
+
     # Show the first 3 emails in bcc email list.
     if bcc:
         bcc_email_list_str = ' '.join(
@@ -291,16 +306,19 @@ def convert_email_to_loggable_string(
         Body:
             Content-type: text/html
             Data length: %d
+            Html content: %s
         """ % (
             sender_email, recipient_email_list_str, subject,
-            len(plaintext_body), len(html_body)))
+            len(plaintext_body), len(html_body), textwrap.dedent(html_body)))
     optional_msg_description = (
         """
+        Cc: %s
         Bcc: %s
         Reply_to: %s
         Recipient Variables:
             Length: %d
         """ % (
+            cc_email_list_str if cc else 'None',
             bcc_email_list_str if bcc else 'None',
             reply_to if reply_to else 'None',
             len(recipient_variables) if recipient_variables else 0))

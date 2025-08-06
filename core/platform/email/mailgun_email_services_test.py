@@ -22,7 +22,7 @@ import os
 import textwrap
 from unittest import mock
 
-from core import feconf
+from core.domain import platform_parameter_list
 from core.platform import models
 from core.platform.email import mailgun_email_services
 from core.tests import test_utils
@@ -51,6 +51,9 @@ class EmailTests(test_utils.GenericTestBase):
             ]
         )
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+    )
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_without_bcc_reply_to_and_recipients(
         self, mock_post: mock.Mock
@@ -68,9 +71,7 @@ class EmailTests(test_utils.GenericTestBase):
         html_body = 'Hi abc,<br> 😂'
         attachments = None
 
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-
-        with self.swap_api_key_secrets_return_secret, swap_domain:
+        with self.swap_api_key_secrets_return_secret:
             resp = mailgun_email_services.send_email_to_recipients(
                 sender_email,
                 recipient_emails,
@@ -97,6 +98,9 @@ class EmailTests(test_utils.GenericTestBase):
         )
         self.assertTrue(resp)
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+    )
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_file_attachments(
             self, mock_post: mock.Mock) -> None:
@@ -115,9 +119,7 @@ class EmailTests(test_utils.GenericTestBase):
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write('This is a test file.')
 
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-
-        with self.swap_api_key_secrets_return_secret, swap_domain:
+        with self.swap_api_key_secrets_return_secret:
             resp = mailgun_email_services.send_email_to_recipients(
                 sender_email,
                 recipient_emails,
@@ -141,6 +143,9 @@ class EmailTests(test_utils.GenericTestBase):
         self.assertIn('files', kwargs)
         self.assertEqual(kwargs['files'][0][1][0], 'test_file.txt')
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+    )
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_bcc_and_recipient(
             self, mock_post: mock.Mock) -> None:
@@ -157,18 +162,18 @@ class EmailTests(test_utils.GenericTestBase):
         recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {
             'b@b.com': {'first': 'Bob', 'id': 1}}
         bcc = ['c@example.com']
+        cc = ['cc@example.com']
         reply_to = 'abc'
         attachments = None
 
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-
-        with self.swap_api_key_secrets_return_secret, swap_domain:
+        with self.swap_api_key_secrets_return_secret:
             resp = mailgun_email_services.send_email_to_recipients(
                 sender_email,
                 recipient_emails,
                 subject,
                 plaintext_body,
                 html_body,
+                cc,
                 bcc,
                 reply_to,
                 recipient_variables)
@@ -182,6 +187,7 @@ class EmailTests(test_utils.GenericTestBase):
             'recipient_variables': recipient_variables,
             'h:Reply-To': reply_to,
             'bcc': bcc[0],
+            'cc': cc[0]
         }
 
         mock_post.assert_called_once_with(
@@ -193,6 +199,9 @@ class EmailTests(test_utils.GenericTestBase):
         )
         self.assertTrue(resp)
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+    )
     @mock.patch('requests.post')
     def test_send_email_to_mailgun_with_bcc_and_recipients(
             self, mock_post: mock.Mock) -> None:
@@ -212,16 +221,16 @@ class EmailTests(test_utils.GenericTestBase):
         bcc = ['c@example.com', 'd@example.com']
         reply_to = 'abc'
         attachments = None
+        cc = None
 
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-
-        with self.swap_api_key_secrets_return_secret, swap_domain:
+        with self.swap_api_key_secrets_return_secret:
             resp = mailgun_email_services.send_email_to_recipients(
                 sender_email,
                 recipient_emails,
                 subject,
                 plaintext_body,
                 html_body,
+                cc,
                 bcc,
                 reply_to,
                 recipient_variables
@@ -247,6 +256,9 @@ class EmailTests(test_utils.GenericTestBase):
         )
         self.assertTrue(resp)
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+    )
     @mock.patch('requests.post')
     def test_batch_send_to_mailgun(self, mock_post: mock.Mock) -> None:
         """Test for sending HTTP POST request."""
@@ -261,9 +273,7 @@ class EmailTests(test_utils.GenericTestBase):
         html_body = 'Hi abc,<br> 😂'
         attachments = None
 
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-
-        with self.swap_api_key_secrets_return_secret, swap_domain:
+        with self.swap_api_key_secrets_return_secret:
             resp = mailgun_email_services.send_email_to_recipients(
                 sender_email,
                 recipient_emails,
@@ -307,7 +317,9 @@ class EmailTests(test_utils.GenericTestBase):
             Body:
                 Content-type: text/html
                 Data length: 13
+                Html content: Hi abc,<br> 😂
 
+            Cc: None
             Bcc: None
             Reply_to: None
             Recipient Variables:
@@ -345,7 +357,9 @@ class EmailTests(test_utils.GenericTestBase):
             Body:
                 Content-type: text/html
                 Data length: 13
+                Html content: Hi abc,<br> 😂
 
+            Cc: None
             Bcc: None
             Reply_to: None
             Recipient Variables:
@@ -369,6 +383,9 @@ class EmailTests(test_utils.GenericTestBase):
                     logs
                 )
 
+    @test_utils.set_platform_parameters(
+        [(platform_parameter_list.ParamName.MAILGUN_DOMAIN_NAME, 'domain')]
+    )
     @mock.patch('requests.post')
     def test_invalid_status_code_returns_false(
             self, mock_post: mock.Mock) -> None:
@@ -383,9 +400,7 @@ class EmailTests(test_utils.GenericTestBase):
         html_body = 'Hi abc,<br> 😂'
         attachments = None
 
-        swap_domain = self.swap(feconf, 'MAILGUN_DOMAIN_NAME', 'domain')
-
-        with self.swap_api_key_secrets_return_secret, swap_domain:
+        with self.swap_api_key_secrets_return_secret:
             resp = mailgun_email_services.send_email_to_recipients(
                 sender_email,
                 recipient_emails,

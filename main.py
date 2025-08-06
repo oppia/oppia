@@ -263,7 +263,11 @@ URLS = [
         access_validators.BlogHomePageAccessValidationHandler),
 
     get_redirect_route(
-        r'%s/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>' % # pylint: disable=line-too-long
+        '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision/<subtopic_url_fragment>', # pylint: disable=line-too-long
+        access_validators.SubtopicViewerPageRevisionRedirectHandler),
+
+    get_redirect_route(
+        r'%s/can_access_subtopic_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/studyguide/<subtopic_url_fragment>' % # pylint: disable=line-too-long
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.SubtopicViewerPageAccessValidationHandler),
 
@@ -354,8 +358,13 @@ URLS = [
     ),
 
     get_redirect_route(
+        '/learn/<classroom_url_fragment>/<topic_url_fragment>/revision',
+        access_validators.TopicViewerPageRevisionRedirectHandler
+    ),
+
+    get_redirect_route(
         r'%s/can_access_topic_viewer_page/<classroom_url_fragment>'
-        r'/<topic_url_fragment>/revision' %
+        r'/<topic_url_fragment>/studyguide' %
         feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.TopicViewerPageAccessValidationHandler
     ),
@@ -978,6 +987,11 @@ URLS = [
         feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableSubtopicPageDataHandler),
     get_redirect_route(
+        r'%s/<topic_id>/<subtopic_id>' %
+        feconf.STUDY_GUIDE_EDITOR_DATA_URL_PREFIX,
+        topic_editor.EditableStudyGuideDataHandler
+    ),
+    get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_RIGHTS_URL_PREFIX,
         topic_editor.TopicRightsHandler),
     get_redirect_route(
@@ -1192,7 +1206,11 @@ URLS = [
     get_redirect_route(
         '/learner_groups_feature_status_handler',
         learner_group.LearnerGroupsFeatureStatusHandler),
-    get_redirect_route('/android_data', android.AndroidActivityHandler)
+    get_redirect_route('/android_data', android.AndroidActivityHandler),
+    get_redirect_route(
+        '/automatic_voiceover_regeneration_record/<start_date>/<end_date>',
+        voiceover.AutomaticVoiceoverRegenerationRecordHandler
+    )
 ]
 
 # Adding redirects for topic landing pages.
@@ -1262,7 +1280,7 @@ URLS.extend((
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(
-        r'%s/revision' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        r'%s/studyguide' % feconf.TOPIC_VIEWER_URL_PREFIX,
         oppia_root.OppiaRootPage
     ),
     get_redirect_route(

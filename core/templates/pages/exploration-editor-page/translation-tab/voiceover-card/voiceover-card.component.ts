@@ -18,6 +18,7 @@
 
 import {
   Component,
+  ChangeDetectorRef,
   ElementRef,
   OnInit,
   ViewChild,
@@ -28,7 +29,7 @@ import {Subscription} from 'rxjs';
 import {AddAudioTranslationModalComponent} from '../modal-templates/add-audio-translation-modal.component';
 import {AlertsService} from 'services/alerts.service';
 import {AudioPlayerService} from 'services/audio-player.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {IdGenerationService} from 'services/id-generation.service';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
@@ -52,6 +53,7 @@ import {VoiceoverLanguageManagementService} from 'services/voiceover-language-ma
 import {AppConstants} from 'app.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 
 @Component({
   selector: 'oppia-voiceover-card',
@@ -95,9 +97,16 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   isAutomaticVoiceoverGenerating: boolean = false;
   isGenerateAutomaticVoiceoverOptionEnabled = false;
 
+  isVoiceoverAutogenerationEnabledByAdmins: boolean = false;
+
+  manualVoiceoverIsLoading: boolean = false;
+  automaticVoiceoverIsLoading: boolean = false;
+
   constructor(
     private audioPlayerService: AudioPlayerService,
-    private contextService: ContextService,
+    private adminBackendApiService: AdminBackendApiService,
+    private pageContextService: PageContextService,
+    private changeDetectorRef: ChangeDetectorRef,
     private translationLanguageService: TranslationLanguageService,
     private translationTabActiveContentIdService: TranslationTabActiveContentIdService,
     private ngbModal: NgbModal,
@@ -149,10 +158,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         }
       )
     );
-    this.voiceoversAreLoaded =
-      Object.keys(
-        this.entityVoiceoversService.languageAccentCodeToEntityVoiceovers
-      ).length !== 0;
 
     if (!this.entityVoiceoversService.getActiveLanguageAccentCode()) {
       this.voiceoversAreLoaded = true;
@@ -164,6 +169,13 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.voiceoversAreLoaded = true;
       })
     );
+
+    this.adminBackendApiService
+      .getAdminConfigForAutomaticVoiceoversAsync()
+      .then(isVoiceoverAutogenerationEnabledByAdmins => {
+        this.isVoiceoverAutogenerationEnabledByAdmins =
+          isVoiceoverAutogenerationEnabledByAdmins;
+      });
 
     setInterval(() => {
       if (
@@ -199,7 +211,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.isAutomaticVoiceoverPlaying = false;
         this.isManualVoiceoverPlaying = false;
       }
-    }, 500);
+    }, 300);
     this.updateActiveContent();
   }
 
@@ -212,6 +224,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     } else {
       this.isGenerateAutomaticVoiceoverOptionEnabled = false;
     }
+    this.isVoiceoverAutogenerationSupportedForSelectedAccent =
+      this.voiceoverLanguageManagementService.isAutogenerationSupportedGivenLanguageAccent(
+        this.languageAccentCode
+      );
+    this.changeDetectorRef.detectChanges();
   }
 
   isAutomaticVoiceoverRegenerationFromExpFeatureEnabled(): boolean {
@@ -456,7 +473,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.isAutomaticVoiceoverPlaying = false;
         this.audioPlayerService.clear();
       }
-      this.isManualVoiceoverPlaying = !this.isManualVoiceoverPlaying;
       this.automaticVoiceoverProgress = 0;
     }
 
@@ -465,11 +481,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.isManualVoiceoverPlaying = false;
         this.audioPlayerService.clear();
       }
-      this.isAutomaticVoiceoverPlaying = !this.isAutomaticVoiceoverPlaying;
       this.manualVoiceoverProgress = 0;
     }
 
     if (this.audioPlayerService.isPlaying()) {
+      this.flipVoiceoverPlayStatus(voiceoverType);
       this.audioPlayerService.pause();
       return;
     }
@@ -479,12 +495,53 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       this.currentVoiceoverLoadedType === voiceoverType
     ) {
       this.audioPlayerService.play();
+      this.flipVoiceoverPlayStatus(voiceoverType);
     } else {
+      this.enableVoiceoverLoading(voiceoverType);
       this.audioPlayerService.loadAsync(filename).then(() => {
+        this.disableVoiceoverLoading(voiceoverType);
+        this.flipVoiceoverPlayStatus(voiceoverType);
         this.currentVoiceoverLoadedType = voiceoverType;
         this.audioPlayerService.play();
       });
     }
+  }
+
+  enableVoiceoverLoading(voiceoverType: string): void {
+    if (voiceoverType === AppConstants.VOICEOVER_TYPE_MANUAL) {
+      this.manualVoiceoverIsLoading = true;
+    } else {
+      this.automaticVoiceoverIsLoading = true;
+    }
+  }
+
+  disableVoiceoverLoading(voiceoverType: string): void {
+    if (voiceoverType === AppConstants.VOICEOVER_TYPE_MANUAL) {
+      this.manualVoiceoverIsLoading = false;
+    } else {
+      this.automaticVoiceoverIsLoading = false;
+    }
+  }
+
+  flipVoiceoverPlayStatus(voiceoverType: string): void {
+    if (voiceoverType === AppConstants.VOICEOVER_TYPE_MANUAL) {
+      this.isManualVoiceoverPlaying = !this.isManualVoiceoverPlaying;
+    } else {
+      this.isAutomaticVoiceoverPlaying = !this.isAutomaticVoiceoverPlaying;
+    }
+  }
+
+  isExplorationLinkedToStory(): boolean {
+    return this.pageContextService.isExplorationLinkedToStory();
+  }
+
+  shouldShowAutoVoiceoverRegenerationSection(): boolean {
+    return (
+      this.isVoiceoverAutogenerationSupportedForSelectedAccent &&
+      this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled() &&
+      this.isExplorationLinkedToStory() &&
+      this.isVoiceoverAutogenerationEnabledByAdmins
+    );
   }
 
   deleteManualVoiceover(): void {
@@ -591,9 +648,9 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
         if (this.activeEntityVoiceoversInstance === undefined) {
           this.activeEntityVoiceoversInstance = new EntityVoiceovers(
-            this.contextService.getExplorationId(),
+            this.pageContextService.getExplorationId(),
             'exploration',
-            this.contextService.getExplorationVersion() as number,
+            this.pageContextService.getExplorationVersion() as number,
             this.languageAccentCode,
             {},
             {}
@@ -665,8 +722,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
         this.voiceoverBackendApiService
           .generateAutotmaticVoiceoverAsync(
-            this.contextService.getExplorationId(),
-            this.contextService.getExplorationVersion() as number,
+            this.pageContextService.getExplorationId(),
+            this.pageContextService.getExplorationVersion() as number,
             this.stateEditorService.getActiveStateName() as string,
             this.activeContentId,
             this.languageAccentCode
@@ -680,9 +737,9 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
             );
             if (this.activeEntityVoiceoversInstance === undefined) {
               this.activeEntityVoiceoversInstance = new EntityVoiceovers(
-                this.contextService.getExplorationId(),
+                this.pageContextService.getExplorationId(),
                 'exploration',
-                this.contextService.getExplorationVersion() as number,
+                this.pageContextService.getExplorationVersion() as number,
                 this.languageAccentCode,
                 {},
                 {}

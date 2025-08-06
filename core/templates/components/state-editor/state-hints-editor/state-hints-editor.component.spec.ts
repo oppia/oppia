@@ -30,7 +30,7 @@ import {StateSolutionService} from '../state-editor-properties-services/state-so
 import {AlertsService} from 'services/alerts.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Hint, HintBackendDict} from 'domain/exploration/hint-object.model';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Solution} from 'domain/exploration/solution.model';
 import {CdkDragSortEvent} from '@angular/cdk/drag-drop';
 
 class MockStateHintsService {
@@ -101,7 +101,6 @@ describe('StateHintsEditorComponent', () => {
   let stateInteractionIdService: StateInteractionIdService;
   let stateSolutionService: StateSolutionService;
   let alertsService: AlertsService;
-  let solutionObjectFactory: SolutionObjectFactory;
   let ngbModalSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
@@ -119,7 +118,6 @@ describe('StateHintsEditorComponent', () => {
         StateInteractionIdService,
         StateSolutionService,
         AlertsService,
-        SolutionObjectFactory,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -136,9 +134,8 @@ describe('StateHintsEditorComponent', () => {
     stateSolutionService = TestBed.inject(StateSolutionService);
     ngbModal = TestBed.inject(NgbModal);
     alertsService = TestBed.inject(AlertsService);
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
 
-    stateSolutionService.savedMemento = solutionObjectFactory.createNew(
+    stateSolutionService.savedMemento = Solution.createNew(
       true,
       'correct_answer',
       '<p> Hint Index 0 </p>',

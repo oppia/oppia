@@ -24,7 +24,7 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {InteractionAnswer, ItemSelectionAnswer} from 'interactions/answer-defs';
@@ -520,5 +520,23 @@ describe('oppiaInteractiveItemSelectionInput', function () {
         ]);
       }
     );
+  });
+
+  it('should call submitAnswer when Enter key is pressed', () => {
+    component.userSelections = {
+      'choice 1': true,
+    };
+    component.choices = ['choice 1', 'choice 2'];
+    component.choicesValue = [
+      SubtitledHtml.createDefault('choice 1', 'content_id_1'),
+    ];
+    spyOn(component, 'submitAnswer').and.callThrough();
+    spyOn(currentInteractionService, 'onSubmit').and.callThrough();
+    const event = new KeyboardEvent('keydown', {key: 'Enter'});
+
+    component.handleEnterKey(event);
+
+    expect(component.submitAnswer).toHaveBeenCalled();
+    expect(currentInteractionService.onSubmit).toHaveBeenCalled();
   });
 });

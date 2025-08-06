@@ -16,7 +16,10 @@
  * @fileoverview Utility function to check if an element is clickable.
  */
 
-export default function isElementClickable(element: Element): boolean {
+export default function isElementClickable(
+  element: Element,
+  clickable: boolean = true
+): boolean {
   /**
    * This function gets the overlapping element if any by checking the
    * element that is present in the center of the target element's position.
@@ -157,7 +160,6 @@ export default function isElementClickable(element: Element): boolean {
     const horizontalInView =
       elementDimensions.left <= windowWidth &&
       elementDimensions.left + elementDimensions.width > 0;
-
     return verticalInView && horizontalInView;
   };
 
@@ -197,9 +199,7 @@ export default function isElementClickable(element: Element): boolean {
   // and check again.
   if (!isClickable(element)) {
     element.scrollIntoView({block: 'center', inline: 'center'});
-
-    return isClickable(element);
   }
 
-  return true;
+  return isClickable(element) === clickable;
 }

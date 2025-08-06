@@ -29,7 +29,7 @@ import {EventBusGroup, EventBusService} from 'app-events/event-bus.service';
 import {AppConstants} from 'app.constants';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillBackendDict} from 'domain/skill/SkillObjectFactory';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'skill-selector-editor',
@@ -50,7 +50,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   eventBusGroup: EventBusGroup;
   skillFilterText: string = '';
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private eventBusService: EventBusService,
     private skillBackendApiService: SkillBackendApiService
   ) {
@@ -70,7 +70,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   }
 
   selectSkill(skillId: string, skillDescription: string): void {
-    this.contextService.setCustomEntityContext(
+    this.pageContextService.setCustomEntityContext(
       AppConstants.ENTITY_TYPE.SKILL,
       skillId
     );
@@ -87,10 +87,10 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.showLoading = true;
     this.skills = [];
-    this.initialEntityId = this.contextService.getEntityId();
-    this.initialEntityType = this.contextService.getEntityType();
+    this.initialEntityId = this.pageContextService.getEntityId();
+    this.initialEntityType = this.pageContextService.getEntityType();
     if (this.value) {
-      this.contextService.setCustomEntityContext(
+      this.pageContextService.setCustomEntityContext(
         AppConstants.ENTITY_TYPE.SKILL,
         this.value
       );
@@ -114,7 +114,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.contextService.removeCustomEntityContext();
+    this.pageContextService.removeCustomEntityContext();
     /**
      * Restore the entity context to that of the state before the skill selector
      * editor was initialized. This prevents change of context issues in calling
@@ -123,7 +123,7 @@ export class SkillSelectorEditorComponent implements OnInit, OnDestroy {
      * See issue #16985 for detailed discussion.
      */
     if (this.initialEntityId && this.initialEntityType) {
-      this.contextService.setCustomEntityContext(
+      this.pageContextService.setCustomEntityContext(
         this.initialEntityType,
         this.initialEntityId
       );

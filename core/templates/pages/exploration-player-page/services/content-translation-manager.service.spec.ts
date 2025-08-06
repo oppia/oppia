@@ -24,22 +24,21 @@ import {
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
-import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
-import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {ImagePreloaderService} from 'pages/exploration-player-page/services/image-preloader.service';
+import {Interaction} from '../../../domain/exploration/interaction.model.ts';
+import {SubtitledUnicode} from '../../../domain/exploration/subtitled-unicode.model.ts';
+import {StateCard} from '../../../domain/state_card/state-card.model';
+import {ContentTranslationManagerService} from './content-translation-manager.service';
+import {PlayerTranscriptService} from './player-transcript.service';
+import {InteractionSpecsConstants} from '../../../pages/interaction-specs.constants';
+import {ExplorationHtmlFormatterService} from '../../../services/exploration-html-formatter.service';
+import {EntityTranslationBackendApiService} from '../../../pages/exploration-editor-page/services/entity-translation-backend-api.service';
+import {EntityTranslation} from '../../../domain/translation/EntityTranslationObjectFactory';
+import {TranslatedContent} from '../../../domain/exploration/TranslatedContentObjectFactory';
+import {ImagePreloaderService} from './image-preloader.service';
 
 describe('Content translation manager service', () => {
   let ctms: ContentTranslationManagerService;
   let ehfs: ExplorationHtmlFormatterService;
-  let iof: InteractionObjectFactory;
   let pts: PlayerTranscriptService;
   let etbs: EntityTranslationBackendApiService;
   let entityTranslation: EntityTranslation;
@@ -51,7 +50,6 @@ describe('Content translation manager service', () => {
     }).compileComponents();
     ctms = TestBed.inject(ContentTranslationManagerService);
     ehfs = TestBed.inject(ExplorationHtmlFormatterService);
-    iof = TestBed.inject(InteractionObjectFactory);
     pts = TestBed.inject(PlayerTranscriptService);
     etbs = TestBed.inject(EntityTranslationBackendApiService);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
@@ -186,7 +184,7 @@ describe('Content translation manager service', () => {
       solution: solutionDict,
     };
 
-    const interaction = iof.createFromBackendDict(interactionDict);
+    const interaction = Interaction.createFromBackendDict(interactionDict);
 
     pts.addNewCard(
       StateCard.createNewCard(
@@ -389,7 +387,8 @@ describe('Content translation manager service', () => {
     };
 
     pts.init();
-    const newInteraction = iof.createFromBackendDict(newInteractionDict);
+    const newInteraction =
+      Interaction.createFromBackendDict(newInteractionDict);
     pts.addNewCard(
       StateCard.createNewCard(
         'State 1',

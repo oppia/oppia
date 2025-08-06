@@ -27,7 +27,7 @@ import {
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {TopicsAndSkillsDashboardPageConstants} from '../topics-and-skills-dashboard-page.constants';
 
@@ -47,7 +47,12 @@ export class CreateNewSkillModalComponent {
   skillDescriptionExists: boolean = true;
   conceptCardExplanationEditorIsShown: boolean = false;
   bindableDict = {displayedConceptCardExplanation: ''};
-  HTML_SCHEMA: {type: string} = {type: 'html'};
+  HTML_SCHEMA = {
+    type: 'html',
+    ui_config: {
+      rte_components: 'ALL_COMPONENTS',
+    },
+  };
   MAX_CHARS_IN_SKILL_DESCRIPTION = AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION;
 
   // This property is initialized using Angular lifecycle hooks
@@ -57,7 +62,7 @@ export class CreateNewSkillModalComponent {
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private imageLocalStorageService: ImageLocalStorageService,
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
@@ -66,7 +71,7 @@ export class CreateNewSkillModalComponent {
   ) {}
 
   ngOnInit(): void {
-    this.contextService.setImageSaveDestinationToLocalStorage();
+    this.pageContextService.setImageSaveDestinationToLocalStorage();
   }
 
   updateExplanation($event: string): void {

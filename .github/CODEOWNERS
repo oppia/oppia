@@ -98,6 +98,7 @@
 /core/templates/services/entity-translations.services.ts @oppia/lace-frontend-reviewers
 /core/templates/services/entity-voiceovers.services.ts @oppia/lace-frontend-reviewers
 /core/templates/services/voiceover-language-management-service.ts @oppia/lace-frontend-reviewers
+/core/templates/services/automatic-voiceover-highlight-service.ts @oppia/lace-frontend-reviewers
 
 
 # Audio Voiceover project
@@ -242,7 +243,7 @@
 /core/templates/components/state-editor/ @oppia/lace-frontend-reviewers
 /core/templates/services/blog-search.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/compute-graph.service.ts @oppia/lace-frontend-reviewers
-/core/templates/services/context.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/page-context.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/editability.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/exploration-features*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/exploration-html-formatter.service*.ts @oppia/lace-frontend-reviewers
@@ -461,6 +462,8 @@
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
 /core/controllers/classroom*.py @oppia/lace-backend-reviewers
 /core/controllers/topic_*.py @oppia/lace-backend-reviewers
+/core/domain/study_guide_domain*.py @oppia/lace-backend-reviewers
+/core/domain/study_guide_services*.py @oppia/lace-backend-reviewers
 /core/domain/subtopic_page_domain*.py @oppia/lace-backend-reviewers
 /core/domain/subtopic_page_services*.py @oppia/lace-backend-reviewers
 /core/domain/topic*.py @oppia/lace-backend-reviewers
@@ -497,6 +500,10 @@
 /core/templates/domain/jobs/ @oppia/lace-frontend-reviewers
 /core/controllers/beam_jobs*.py @oppia/lace-backend-reviewers
 /core/domain/beam_job*.py @oppia/lace-backend-reviewers
+
+# Cloud task run.
+/core/domain/cloud_task_domain*.py @oppia/lace-backend-reviewers
+/core/templates/domain/cloud-task/cloud-task-run.model*.ts @oppia/lace-frontend-reviewers
 
 # Infrastructure.
 /core/controllers/cron*.py @oppia/lace-backend-reviewers
@@ -561,6 +568,7 @@
 /core/templates/pages/blog-admin-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/classroom-admin-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/voiceover-admin-page/ @oppia/lace-frontend-reviewers
+
 
 
 # Release team.

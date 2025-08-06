@@ -781,12 +781,9 @@
 	"I18N_TOPIC_VIEWER_COMING_SOON_LESSONS": "Поверніться пізніше, коли будуть доступні уроки з цієї теми.",
 	"I18N_TOPIC_VIEWER_COMING_SOON_PRACTICE": "Поверніться пізніше, коли будуть доступні практичні запитання для цієї теми.",
 	"I18N_TOPIC_VIEWER_DESCRIPTION": "Опис",
-	"I18N_TOPIC_VIEWER_LESSON": "Урок",
-	"I18N_TOPIC_VIEWER_LESSONS": "Уроки",
 	"I18N_TOPIC_VIEWER_MASTER_SKILLS": "Майстерні навички для <[topicName]>",
 	"I18N_TOPIC_VIEWER_NO_QUESTION_WARNING": "Для вибраних підтем ще не створено жодних запитань.",
 	"I18N_TOPIC_VIEWER_PRACTICE": "Практика",
-	"I18N_TOPIC_VIEWER_REVISION": "Редакція",
 	"I18N_TOPIC_VIEWER_SELECT_SKILLS": "Виберіть навички з уроків <[topicName]>, які б ви хотіли відпрацювати.",
 	"I18N_TOPIC_VIEWER_SKILL": "Вміння",
 	"I18N_TOPIC_VIEWER_SKILLS": "Навички",
@@ -817,7 +814,6 @@
 	"I18N_TOPNAV_LEARNER_DASHBOARD": "Інформаційна панель для учнів",
 	"I18N_TOPNAV_LEARN_DESCRIPTION_1": "Дружні уроки для початківців, які допоможуть вам розпочати роботу з математики.",
 	"I18N_TOPNAV_LEARN_HEADING": "Способи навчитися більше",
-	"I18N_TOPNAV_LEARN_LINK_1": "Переглянути усі уроки",
 	"I18N_TOPNAV_LEARN_LINK_2": "Продовжити навчання",
 	"I18N_TOPNAV_LIBRARY": "Бібліотека спільноти",
 	"I18N_TOPNAV_LIBRARY_DESCRIPTION": "Додаткові ресурси, створені спільнотою, щоб допомогти вам навчатися більше.",
@@ -838,6 +834,5 @@
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Відписатися",
 	"I18N_VOLUNTEER_PAGE_BREADCRUMB": "Волонтер",
 	"I18N_WARNING_MODAL_DESCRIPTION": "Це покаже повне рішення. Ти впевнений?",
-	"I18N_WARNING_MODAL_TITLE": "Увага!",
-	"I18N_WORKED_EXAMPLE": "Опрацьований приклад"
+	"I18N_WARNING_MODAL_TITLE": "Увага!"
 }

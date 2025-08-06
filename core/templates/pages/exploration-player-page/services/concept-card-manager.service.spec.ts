@@ -20,14 +20,14 @@ import {EventEmitter} from '@angular/core';
 import {TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {StateCard} from '../../../domain/state_card/state-card.model';
+import {PlayerPositionService} from './player-position.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
 import {ExplorationEngineService} from './exploration-engine.service';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {StateObjectFactory} from '../../../domain/state/StateObjectFactory';
+import {Interaction} from '../../../domain/exploration/interaction.model';
+import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 
 describe('ConceptCardManager service', () => {
   let ccms: ConceptCardManagerService;
@@ -36,7 +36,6 @@ describe('ConceptCardManager service', () => {
   let stateObjectFactory: StateObjectFactory;
   let mockNewCardOpenedEmitter = new EventEmitter<StateCard>();
   let mockNewCardAvailableEmitter = new EventEmitter();
-  let interactionObjectFactory: InteractionObjectFactory;
   let stateCard: StateCard;
 
   const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 160000;
@@ -61,7 +60,6 @@ describe('ConceptCardManager service', () => {
     );
     spyOn(pps, 'onNewCardOpened').and.returnValue(mockNewCardOpenedEmitter);
     ccms = TestBed.inject(ConceptCardManagerService);
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
   }));
 
   beforeEach(() => {
@@ -69,7 +67,7 @@ describe('ConceptCardManager service', () => {
       'State 2',
       '<p>Content</p>',
       '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict({
+      Interaction.createFromBackendDict({
         id: 'TextInput',
         answer_groups: [
           {
