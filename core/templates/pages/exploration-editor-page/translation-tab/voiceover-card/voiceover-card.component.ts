@@ -739,10 +739,14 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     this.isAutomaticVoiceoverGenerating = true;
 
     modalRef.result.then(
-      ({voiceover, sentenceTokenWithDurations}) => {
-        if (voiceover === undefined) {
+      response => {
+        this.isAutomaticVoiceoverGenerating = false;
+
+        if (response === undefined) {
           return;
         }
+        const voiceover = response.voiceover;
+        const sentenceTokenWithDurations = response.sentenceTokenWithDurations;
 
         if (this.activeEntityVoiceoversInstance === undefined) {
           this.activeEntityVoiceoversInstance = new EntityVoiceovers(
@@ -784,7 +788,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         );
 
         this.updateStatusGraph();
-        this.isAutomaticVoiceoverGenerating = false;
       },
       () => {
         // Note to developers:

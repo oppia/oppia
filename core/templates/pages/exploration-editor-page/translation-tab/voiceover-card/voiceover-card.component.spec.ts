@@ -750,10 +750,7 @@ describe('Voiceover card component', () => {
 
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: {},
-      result: Promise.resolve({
-        voiceover: undefined,
-        sentenceTokenWithDurations: undefined,
-      }),
+      result: Promise.resolve(),
     } as NgbModalRef);
 
     expect(component.automaticVoiceover).toBeUndefined();

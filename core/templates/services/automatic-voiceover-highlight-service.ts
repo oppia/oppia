@@ -224,9 +224,9 @@ export class AutomaticVoiceoverHighlightService {
     let maxOffsetMsecs = 0.0;
     this.sentenceHighlightIntervalList = [];
 
-    let hightlightIds = Object.keys(this.highlightIdToSentenceWithoutSpacesMap);
+    let highlightIds = Object.keys(this.highlightIdToSentenceWithoutSpacesMap);
 
-    let currentHighlightId = hightlightIds.shift();
+    let currentHighlightId = highlightIds.shift();
     let currentSentence =
       this.highlightIdToSentenceWithoutSpacesMap[currentHighlightId as string];
 
@@ -255,7 +255,7 @@ export class AutomaticVoiceoverHighlightService {
           endTimeInSecs: Math.round(maxOffsetMsecs / 1000),
         });
 
-        currentHighlightId = hightlightIds.shift();
+        currentHighlightId = highlightIds.shift();
 
         if (currentHighlightId === undefined) {
           return;

@@ -28,6 +28,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
+import {EventEmitter} from '@angular/core';
 import {OppiaRteParserService} from 'services/oppia-rte-parser.service';
 import {RichTextComponentsModule} from './rich-text-components.module';
 import {RteOutputDisplayComponent} from './rte-output-display.component';
@@ -94,6 +95,11 @@ describe('RTE display component', () => {
     localStorageService = TestBed.inject(LocalStorageService);
     audioplayerService = TestBed.inject(AudioPlayerService);
     component = fixture.componentInstance;
+
+    spyOn(
+      entityVoiceoversService,
+      'onLanguageAccentCodeChange'
+    ).and.returnValue(new EventEmitter<string>());
   }));
 
   // NOTE: Debugging might be a bit confusing sometimes, especially if this the
@@ -348,7 +354,9 @@ describe('RTE display component', () => {
     });
     regenerateVoiceoverFeatureSpy.and.returnValue(true);
     component.ngOnInit();
-    tick(2000);
+    entityVoiceoversService.onLanguageAccentCodeChange.emit();
+
+    tick(5000);
     flush();
     discardPeriodicTasks();
 
@@ -520,6 +528,7 @@ describe('RTE display component', () => {
       component,
       'isManualVoiceoverAvailableForActiveContent'
     ).and.returnValue(false);
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
     let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
     audioPlayingSpy.and.returnValue(true);
 
@@ -559,6 +568,7 @@ describe('RTE display component', () => {
         component,
         'isManualVoiceoverAvailableForActiveContent'
       ).and.returnValue(false);
+      spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
       let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
       audioPlayingSpy.and.returnValue(true);
 
@@ -615,6 +625,7 @@ describe('RTE display component', () => {
       component,
       'isManualVoiceoverAvailableForActiveContent'
     ).and.returnValue(false);
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
     let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
     audioPlayingSpy.and.returnValue(false);
 

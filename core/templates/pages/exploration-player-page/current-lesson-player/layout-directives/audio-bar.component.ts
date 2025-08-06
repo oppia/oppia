@@ -223,6 +223,7 @@ export class AudioBarComponent {
     );
     let entityVoiceovers =
       this.entityVoiceoversService.getActiveEntityVoiceovers();
+    this.entityVoiceoversService.languageAccentCodeChangeEventEmitter.emit();
 
     let contentId = this.voiceoverPlayerService.activeContentId;
 
