@@ -28,6 +28,7 @@ const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const baseURL = testConstants.URLs.BaseURL;
 
 const richTextAreaField = 'div.e2e-test-rte';
+const richTextParagraphTag = 'div.e2e-test-rte p';
 const floatTextField = '.e2e-test-rule-details .e2e-test-float-form-input';
 const solutionFloatTextField =
   'oppia-add-or-update-solution-modal .e2e-test-float-form-input';
@@ -2158,6 +2159,11 @@ export class CurriculumAdmin extends BaseUser {
     await this.createSkillForTopic(skillName, topicName, true);
   }
 
+  /**
+   * Creates a skill from the topics and skills dashboard.
+   * @param description - The description of the skill.
+   * @param reviewMaterial - the content of the skill.
+   */
   async createSkillFromTopicsAndSkillsDashboard(
     description: string,
     reviewMaterial: string
@@ -2172,10 +2178,48 @@ export class CurriculumAdmin extends BaseUser {
     await this.openSkillEditor(description);
   }
 
+  /**
+   * Click on the edit button of the review material section of
+   * a skill that opens up the rich text editor.
+   */
   async clickOnReviewMaterialEditButton(): Promise<void> {
     await this.clickOn(editConceptCard);
   }
 
+  /**
+   * Copies all the content from the review material rich text
+   * editor.
+   */
+  async copyContentFromReviewMaterialRte(): Promise<void> {
+    // OverridePermissions is used to allow clipboard access.
+    const context = this.page.browser().defaultBrowserContext();
+    await context.overridePermissions('http://localhost:8181', [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
+    await this.copyAllTextFrom(richTextParagraphTag);
+  }
+
+  /**
+   * Copies the workedexample from the review material rich text
+   * editor.
+   */
+  async copyWorkedexampleFromReviewMaterialRte(): Promise<void> {
+    // OverridePermissions is used to allow clipboard access.
+    const context = this.page.browser().defaultBrowserContext();
+    await context.overridePermissions('http://localhost:8181', [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
+    await this.copyTextFrom(richTextAreaField);
+  }
+
+  /**
+   * Adds a workedexample rich text editor component to a
+   * supporting rich text editor.
+   * @param question - The question of the workedexample
+   * @param answer - The solution of the workedexample.
+   */
   async addWorkedexampleRteComponent(
     question: string,
     answer: string
@@ -2195,6 +2239,18 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(rteComponentSaveButton);
   }
 
+  /**
+   * Clears all the content from a rich text editor.
+   */
+  async clearRte(): Promise<void> {
+    await this.clickOn(richTextAreaField);
+    await this.clearAllTextFrom(richTextAreaField);
+  }
+
+  /**
+   * Clears all the content from a rich text editor and checks if the
+   * limit of workedexamples error disappears.
+   */
   async clearRteAndCheckIfErrorDisappears(): Promise<void> {
     await this.clickOn(richTextAreaField);
     await this.clearAllTextFrom(richTextAreaField);
@@ -2203,16 +2259,35 @@ export class CurriculumAdmin extends BaseUser {
     });
   }
 
+  /**
+   * Saves the changes made to the review material.
+   */
   async saveReviewMaterial(): Promise<void> {
     await this.clickOn(saveReviewMaterialButton);
   }
 
+  /**
+   * Clicks on the rich text editor and presses enter
+   * to go to the next line.
+   */
   async clickOnRteAndPressEnter(): Promise<void> {
     await this.clickOnReviewMaterialEditButton();
     await this.clickOn(richTextAreaField);
     await this.page.keyboard.press('Enter');
   }
 
+  /**
+   * Types the given text in the review material rich text editor.
+   * @param text - The text to be typed in the rich text editor.
+   */
+  async typeTextInReviewMaterialEditor(text: string): Promise<void> {
+    await this.clickOn(richTextAreaField);
+    await this.type(richTextAreaField, text);
+  }
+
+  /**
+   * Publish the changes made to the skill.
+   */
   async publishSkillChanges(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileOptionsSelector);
@@ -2232,6 +2307,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(closeSaveModalButton);
   }
 
+  /**
+   * Navigate to the skill preview tab.
+   */
   async navigateToSkillPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(navigationDropdown);
