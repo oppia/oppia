@@ -494,7 +494,7 @@ export class MusicNotesInputComponent
           this.renderer.setAttribute(noteEl, 'data-note-type', noteType);
           this.renderer.appendChild(staffContainer, noteEl);
         }
-        
+
         const leftPos =
           evt.clientX - staffContainer.getBoundingClientRect().left;
         const topPos = staffLineDiv.offsetTop;
