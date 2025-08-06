@@ -19,9 +19,10 @@
 import {LostChange} from 'domain/exploration/lost-change.model';
 import {Outcome} from './outcome.model';
 import {SubtitledHtml} from './subtitled-html.model';
+import {UtilsService} from 'services/utils.service';
 
 it('should evaluate values from a Lost Change', () => {
-  const lostChange = LostChange.createNew({
+  const lostChange = LostChange.createNew(UtilsService, {
     cmd: 'add_state',
     state_name: 'State name',
     content_id_for_state_content: 'content_0',
@@ -33,7 +34,7 @@ it('should evaluate values from a Lost Change', () => {
 });
 
 it('should evaluate values from a renaming Lost Change', () => {
-  const lostChange = LostChange.createNew({
+  const lostChange = LostChange.createNew(UtilsService, {
     cmd: 'rename_state',
     old_state_name: 'Old state name',
     new_state_name: 'New state name',
@@ -45,7 +46,7 @@ it('should evaluate values from a renaming Lost Change', () => {
 });
 
 it('should evaluate values from a Lost Change with edition changes', () => {
-  const lostChange = LostChange.createNew({
+  const lostChange = LostChange.createNew(UtilsService, {
     cmd: 'edit_state_property',
     state_name: 'Edited state name',
     new_value: {
@@ -71,7 +72,7 @@ it('should evaluate values from a Lost Change with edition changes', () => {
 });
 
 it('should get state property value when it is an array from a Lost Change', () => {
-  const lostChange = LostChange.createNew({
+  const lostChange = LostChange.createNew(UtilsService, {
     cmd: 'edit_state_property',
     state_name: 'Edited state name',
     new_value: ['value 1', 'value 2'],
@@ -90,8 +91,8 @@ it('should get state property value when it is an array from a Lost Change', () 
   ).toEqual('value 1');
 });
 
-it('should get relative changes when changes is awways from a Lost Change', () => {
-  const lostChange = LostChange.createNew({
+it('should get relative changes when changes is always from a Lost Change', () => {
+  const lostChange = LostChange.createNew(UtilsService, {
     cmd: 'edit_state_property',
     state_name: 'Edited state name',
     new_value: ['value 1', 'value 2', 'value 3'],
@@ -103,7 +104,7 @@ it('should get relative changes when changes is awways from a Lost Change', () =
   expect(lostChange.isOldValueEmpty()).toBeFalse();
   expect(lostChange.isNewValueEmpty()).toBeFalse();
 
-  const lostChange2 = LostChange.createNew({
+  const lostChange2 = LostChange.createNew(UtilsService, {
     cmd: 'edit_state_property',
     state_name: 'Edited state name',
     new_value: ['value 1'],
@@ -117,12 +118,10 @@ it('should get relative changes when changes is awways from a Lost Change', () =
 });
 
 it('should evaluate values from a EndExploration Lost Change', () => {
-  const lostChange = LostChange.createNew({
+  const lostChange = LostChange.createNew(UtilsService, {
     cmd: 'edit_state_property',
     state_name: 'Edited state name',
     new_value: 'EndExploration',
-    // 'old_value' will be null when the EndExploration
-    // is newly added.
     old_value: null,
     property_name: 'widget_id',
   });
@@ -135,11 +134,9 @@ it('should evaluate values from a EndExploration Lost Change', () => {
 });
 
 it('should evaluate values from a Lost Change with deleted changes', () => {
-  const lostChange = LostChange.createNew({
+  const lostChange = LostChange.createNew(UtilsService, {
     cmd: 'edit_state_property',
     state_name: 'Edited state name',
-    // 'new_value' will be null when the EndExploration
-    // is deleted or removed.
     new_value: null,
     old_value: 'EndExploration',
     property_name: 'widget_id',
@@ -152,77 +149,73 @@ it('should evaluate values from a Lost Change with deleted changes', () => {
   expect(lostChange.isNewValueEmpty()).toBeTrue();
 });
 
-it(
-  'should evaluate values from a Lost Change with equal outcomes and' +
-    ' rules',
-  () => {
-    const lostChange = LostChange.createNew({
-      cmd: 'edit_state_property',
-      state_name: 'Edited state name',
-      new_value: {
-        outcome: Outcome.createFromBackendDict({
-          dest: 'outcome 2',
-          dest_if_really_stuck: null,
-          feedback: {
-            content_id: 'feedback_2',
-            html: 'Html',
-          },
-          labelled_as_correct: false,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null,
-        }),
-        dest: 'default',
-        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
-        html: '<p>Correct</p>',
-        rules: [
-          {
-            type: 'Type1',
-            inputs: {
-              input1: 'input1',
-              input2: 'input2',
-            },
-          },
-        ],
-      },
-      old_value: {
-        outcome: Outcome.createFromBackendDict({
-          dest: 'outcome 1',
-          dest_if_really_stuck: null,
-          feedback: {
-            content_id: 'feedback_2',
-            html: 'Html',
-          },
-          labelled_as_correct: false,
-          param_changes: [],
-          refresher_exploration_id: null,
-          missing_prerequisite_skill_id: null,
-        }),
-        dest: 'default',
+it('should evaluate values from a Lost Change with equal outcomes and rules', () => {
+  const lostChange = LostChange.createNew(UtilsService, {
+    cmd: 'edit_state_property',
+    state_name: 'Edited state name',
+    new_value: {
+      outcome: Outcome.createFromBackendDict({
+        dest: 'outcome 2',
         dest_if_really_stuck: null,
-        feedback: new SubtitledHtml('<p>HTML</p>', '12'),
-        html: '<p>Correct</p>',
-        rules: [
-          {
-            type: 'Type1',
-            inputs: {
-              input1: 'input1',
-              input2: 'input2',
-            },
+        feedback: {
+          content_id: 'feedback_2',
+          html: 'Html',
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
+      }),
+      dest: 'default',
+      feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+      html: '<p>Correct</p>',
+      rules: [
+        {
+          type: 'Type1',
+          inputs: {
+            input1: 'input1',
+            input2: 'input2',
           },
-        ],
-      },
-      property_name: 'answer_groups',
-    });
+        },
+      ],
+    },
+    old_value: {
+      outcome: Outcome.createFromBackendDict({
+        dest: 'outcome 1',
+        dest_if_really_stuck: null,
+        feedback: {
+          content_id: 'feedback_2',
+          html: 'Html',
+        },
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null,
+      }),
+      dest: 'default',
+      dest_if_really_stuck: null,
+      feedback: new SubtitledHtml('<p>HTML</p>', '12'),
+      html: '<p>Correct</p>',
+      rules: [
+        {
+          type: 'Type1',
+          inputs: {
+            input1: 'input1',
+            input2: 'input2',
+          },
+        },
+      ],
+    },
+    property_name: 'answer_groups',
+  });
 
-    expect(lostChange.isRulesEqual()).toBeTrue();
-    expect(lostChange.isOutcomeFeedbackEqual()).toBeTrue();
-    expect(lostChange.isOutcomeDestEqual()).toBeFalse();
-  }
-);
+  expect(lostChange.isRulesEqual()).toBeTrue();
+  expect(lostChange.isOutcomeFeedbackEqual()).toBeTrue();
+  expect(lostChange.isOutcomeDestEqual()).toBeFalse();
+});
 
 it('should return false if any of the outcome dest are not present', () => {
-  const lostChange = LostChange.createNew({
+  const lostChange = LostChange.createNew(UtilsService, {
     cmd: 'edit_state_property',
     state_name: 'Edited state name',
     new_value: {
@@ -259,11 +252,12 @@ it('should return false if any of the outcome dest are not present', () => {
     },
     property_name: 'answer_groups',
   });
+
   expect(lostChange.isOutcomeDestEqual()).toBeFalse();
 });
 
 it('should evaluate values from a Lost Change with equal outcomes', () => {
-  const lostChange = LostChange.createNew({
+  const lostChange = LostChange.createNew(UtilsService, {
     cmd: 'edit_state_property',
     state_name: 'Edited state name',
     new_value: {
@@ -329,14 +323,16 @@ it('should evaluate values from a Lost Change with equal outcomes', () => {
 });
 
 it('should return the language name from language code', () => {
-  const lostChange = LostChange.createNew({
+  const lostChange = LostChange.createNew(UtilsService, {
     cmd: 'edit_exploration_property',
     new_value: 'bn',
     old_value: 'en',
     property_name: 'language_code',
   });
+
   expect(lostChange.getLanguage()).toBe('বাংলা (Bangla)');
-  const lostChange2 = LostChange.createNew({
+
+  const lostChange2 = LostChange.createNew(UtilsService, {
     language_code: 'en',
     cmd: 'add_written_translation',
     content_id: 'content',
@@ -344,5 +340,6 @@ it('should return the language name from language code', () => {
     state_name: 'Introduction',
     content_html: 'N/A',
   });
+
   expect(lostChange2.getLanguage()).toBe('English');
 });
