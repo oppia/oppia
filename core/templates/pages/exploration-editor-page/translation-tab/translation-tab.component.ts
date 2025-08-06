@@ -66,8 +66,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
   permissions!: {
     canVoiceover: boolean;
   };
-  voiceoversAreLoading!: boolean;
-  languageAccentsLoading: boolean = false;
+  languageAccentsAreLoading: boolean = false;
 
   constructor(
     private pageContextService: PageContextService,
@@ -191,18 +190,22 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
         () => this.showWelcomeTranslationModal()
       )
     );
+
     this.showTranslationTabSubDirectives = false;
-    this.languageAccentsLoading = true;
+    this.languageAccentsAreLoading = true;
     this.loaderService.showLoadingScreen('Loading');
+
     this.voiceoverBackendApiService
       .fetchVoiceoverAdminDataAsync()
       .then(response => {
         this.loaderService.hideLoadingScreen();
+
         this.voiceoverLanguageManagementService.init(
           response.languageAccentMasterList,
           response.autoGeneratableLanguageAccentCodes,
           response.languageCodesMapping
         );
+
         const languageCode =
           this.translationLanguageService.getActiveLanguageCode();
 
@@ -213,7 +216,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
           languageCode,
           this.entityVoiceoversService.getLanguageAccentCodes()
         );
-        this.languageAccentsLoading = false;
+        this.languageAccentsAreLoading = false;
       });
   }
   ngOnDestroy(): void {

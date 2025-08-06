@@ -192,21 +192,12 @@ describe('Translator Overview component', () => {
         'hi-IN': true,
       },
     };
-
-    let voiceoverAdminDataResponse = {
-      languageAccentMasterList: languageAccentMasterList,
-      languageCodesMapping: languageCodesMapping,
-    };
     voiceoverLanguageManagementService.languageCodesMapping =
       languageCodesMapping;
     voiceoverLanguageManagementService.languageAccentMasterList =
       languageAccentMasterList;
 
     spyOn(translationLanguageService, 'setActiveLanguageAccentCode');
-    spyOn(
-      voiceoverBackendApiService,
-      'fetchVoiceoverAdminDataAsync'
-    ).and.resolveTo(Promise.resolve(voiceoverAdminDataResponse));
     spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
 
     explorationLanguageCodeService.init(explorationLanguageCode);
