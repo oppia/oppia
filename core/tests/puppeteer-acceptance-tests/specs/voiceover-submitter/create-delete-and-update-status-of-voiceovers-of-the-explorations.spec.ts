@@ -49,12 +49,17 @@ describe('Voiceover Submitter', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    // Create an exploration for the voiceover submitter.
+    // Enable required feature flags.
     await releaseCoordinator.enableFeatureFlag('enable_voiceover_contribution');
+    await releaseCoordinator.enableFeatureFlag(
+      'show_voiceover_tab_for_non_curated_explorations'
+    );
+
+    // Create an exploration for the voiceover submitter.
     explorationId = await curriculumAdm.createAndPublishExplorationWithCards(
       'Exploration for voiceover submitter'
     );
-    await curriculumAdm.addSupportedLanguageAccentPair('Hindi (India)');
+    await curriculumAdm.addSupportedLanguageAccentPair('English (India)');
 
     // Create a voiceover submitter.
     voiceoverSubmitter = await UserFactory.createNewUser(
@@ -67,8 +72,26 @@ describe('Voiceover Submitter', function () {
   }, 450000);
 
   it('should be able to add and remove voiceovers to explorations', async function () {
+    // Navigate to the exploration editor.
     await voiceoverSubmitter.navigateToExplorationEditorUsingID(explorationId);
     await voiceoverSubmitter.dismissWelcomeModal();
+
+    // Navigate to translation tab.
+    await voiceoverSubmitter.navigateToTranslationsTab();
+    await voiceoverSubmitter.dismissTranslationTabWelcomeModal();
+
+    // Add voiceover in English (India).
+    await voiceoverSubmitter.addVoiceoverToContent(
+      'English',
+      'English (India)',
+      'Content',
+      testConstants.data.VoiceoverEnglishIndia
+    );
+    await voiceoverSubmitter.expectScreenshotToMatch(
+      'voiceoverPageWithOneVoiceoverAddEnIndia',
+      __dirname
+    );
+    await voiceoverSubmitter.expectVoiceoverIsPlayableInTranslationTab();
   });
 
   afterAll(async function () {

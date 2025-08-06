@@ -18,7 +18,48 @@
 
 import {BaseUser} from '../common/puppeteer-utils';
 
-export class VoiceoverSubmitter extends BaseUser {}
+const voiceoverPlayPauseBtnSelector = '.e2e-test-play-audio-button';
+const voiceoverPlayBtnSelector = `${voiceoverPlayPauseBtnSelector}.e2e-test-play`;
+const voiceoverPauseBtnSelector = `${voiceoverPlayPauseBtnSelector}.e2e-test-pause`;
+const voiceoverProgressBarSelector = '.e2e-test-voiceover-progress-bar';
+
+export class VoiceoverSubmitter extends BaseUser {
+  /**
+   * Checks if the voiceover is playable in the translation tab by playing and pausing it.
+   */
+  async expectVoiceoverIsPlayableInTranslationTab(): Promise<void> {
+    // Get current voiceover progress.
+    await this.expectElementToBeVisible(voiceoverProgressBarSelector);
+    const initialVoiceoverProgress = parseInt(
+      (await this.page.$eval(voiceoverProgressBarSelector, el =>
+        el.getAttribute('aria-valuenow')
+      )) ?? ''
+    );
+
+    // Play the voiceover.
+    await this.expectElementToBeVisible(voiceoverPlayBtnSelector);
+    await this.clickOn(voiceoverPlayBtnSelector);
+
+    // Wait for the voiceover to finish playing.
+    await this.page.waitForFunction(
+      (selector: string, initialProgress: number) => {
+        const element = document.querySelector(selector);
+        return (
+          parseInt(element?.getAttribute('aria-valuenow') ?? '') >
+          initialProgress
+        );
+      },
+      {},
+      voiceoverProgressBarSelector,
+      initialVoiceoverProgress
+    );
+
+    // Stop the voiceover.
+    await this.expectElementToBeVisible(voiceoverPauseBtnSelector);
+    await this.clickOn(voiceoverPauseBtnSelector);
+    await this.expectElementToBeVisible(voiceoverPlayBtnSelector);
+  }
+}
 
 export let VoiceoverSubmitterFactory = (): VoiceoverSubmitter =>
   new VoiceoverSubmitter();
