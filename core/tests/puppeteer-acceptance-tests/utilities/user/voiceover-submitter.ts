@@ -18,10 +18,13 @@
 
 import {BaseUser} from '../common/puppeteer-utils';
 
-const voiceoverPlayPauseBtnSelector = '.e2e-test-play-audio-button';
-const voiceoverPlayBtnSelector = `${voiceoverPlayPauseBtnSelector}.e2e-test-play`;
-const voiceoverPauseBtnSelector = `${voiceoverPlayPauseBtnSelector}.e2e-test-pause`;
+const voiceoverPlayPauseBtnSelector = '.e2e-test-play-voiceover-button';
+const voiceoverPlayIconSelector = `${voiceoverPlayPauseBtnSelector} .e2e-test-play`;
+const voiceoverPauseIconSelector = `${voiceoverPlayPauseBtnSelector} .e2e-test-pause`;
 const voiceoverProgressBarSelector = '.e2e-test-voiceover-progress-bar';
+
+const voiceoverPlayBtnInAudioBarSelector = '.e2e-test-play-circle';
+const voiceoverPauseBtnInAudioBarSelector = '.e2e-test-pause-circle';
 
 export class VoiceoverSubmitter extends BaseUser {
   /**
@@ -37,8 +40,8 @@ export class VoiceoverSubmitter extends BaseUser {
     );
 
     // Play the voiceover.
-    await this.expectElementToBeVisible(voiceoverPlayBtnSelector);
-    await this.clickOn(voiceoverPlayBtnSelector);
+    await this.expectElementToBeVisible(voiceoverPlayIconSelector);
+    await this.clickOn(voiceoverPlayPauseBtnSelector);
 
     // Wait for the voiceover to finish playing.
     await this.page.waitForFunction(
@@ -55,9 +58,29 @@ export class VoiceoverSubmitter extends BaseUser {
     );
 
     // Stop the voiceover.
-    await this.expectElementToBeVisible(voiceoverPauseBtnSelector);
-    await this.clickOn(voiceoverPauseBtnSelector);
-    await this.expectElementToBeVisible(voiceoverPlayBtnSelector);
+    await this.expectElementToBeVisible(voiceoverPauseIconSelector);
+    await this.clickOn(voiceoverPlayPauseBtnSelector);
+    await this.expectElementToBeVisible(voiceoverPlayIconSelector);
+  }
+
+  /**
+   * Checks if the voiceover play button is visible, enabled, or hidden.
+   * @param status - The status of the voiceover play button.
+   */
+  async expectVoiceoverPlayButtonToBe(
+    status: 'enabled' | 'disabled' | 'hidden'
+  ): Promise<void> {
+    if (status === 'hidden') {
+      await this.expectElementToBeVisible(
+        voiceoverPlayBtnInAudioBarSelector,
+        false
+      );
+    } else {
+      await this.expectElementToBeClickable(
+        voiceoverPlayBtnInAudioBarSelector,
+        status === 'enabled'
+      );
+    }
   }
 }
 

@@ -6572,6 +6572,17 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.goto(`${baseUrl}/create/${explorationId}#/`);
   }
+
+  // async republishTheExploration(descriptionOfChanges: string): Promise<void> {
+  //   // Click on save changes button.
+  //   await this.expectElementToBeVisible(saveChangesButton);
+  //   await this.clickOn(saveChangesButton);
+
+  //   // Add description of changes.
+  //   await this.expectElementToBeVisible(saveDraftTitleSelector);
+  //   await this.type('textarea', descriptionOfChanges);
+
+  // }
 }
 
 export let ExplorationEditorFactory = (): ExplorationEditor =>

@@ -11,12 +11,12 @@
         <div *ngFor="let filename of element.value">
           <li>
             <div>
-              <button class="btn btn-secondary audio-button e2e-test-play-audio-button e2e-test-play"
+              <button class="btn btn-secondary audio-button"
                       (click)="playAudio(filename, element.key)"
                       *ngIf="currentFilename === '' || currentFilename !== filename">
                 <mat-icon>play_arrow</mat-icon>
               </button>
-              <button class="btn btn-secondary audio-button e2e-test-play-audio-button e2e-test-pause"
+              <button class="btn btn-secondary audio-button"
                       (click)="pauseAudio()"
                       *ngIf="currentFilename !== '' && currentFilename === filename">
                 <mat-icon>pause</mat-icon>

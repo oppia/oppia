@@ -5283,14 +5283,32 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Expands the voiceover bar by clicking on the dropdown.
+   */
+  async expandVoiceoverBar(): Promise<void> {
+    const dropdownVisible = await this.isElementVisible(voiceoverDropdown);
+    if (dropdownVisible) {
+      await this.clickOn(voiceoverDropdown);
+    }
+    await this.expectElementToBeVisible(voiceoverDropdown, false);
+  }
+
+  /**
+   * Checks if the current voiceover language matches the expected language.
+   * @param language - The expected language.
+   */
+  async expectCurrentVoiceoverLanguageToBe(language: string): Promise<void> {
+    const voiceoverSelectSelector = '.e2e-test-audio-lang-select';
+    await this.expectElementToBeVisible(voiceoverSelectSelector);
+    await this.expectElementValueToBe(voiceoverSelectSelector, language);
+  }
+
+  /**
    * Starts the voiceover by clicking on the audio bar (dropdown) and the play circle.
    */
   async startVoiceover(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
-    if (voiceoverDropdownElement) {
-      await this.clickOn(voiceoverDropdown);
-    }
+    await this.expandVoiceoverBar();
     await this.page.waitForSelector(playVoiceoverButton, {
       visible: true,
     });
@@ -5752,9 +5770,9 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Checks if audio expand button is visible in lesson player.
+   * Checks if audio expand button is visible in lesson player and in exploration preview.
    */
-  async expectAudioExpandButtonToBeVisibleInLP(): Promise<void> {
+  async expectAudioExpandButtonToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(audioExpandButtonInLPSelector);
     showMessage('Audio Expand button is visible in lesson player.');
   }

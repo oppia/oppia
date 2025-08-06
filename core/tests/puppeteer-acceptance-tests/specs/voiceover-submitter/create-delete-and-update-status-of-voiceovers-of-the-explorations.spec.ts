@@ -23,6 +23,7 @@ import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 import {VoiceoverSubmitter} from '../../utilities/user/voiceover-submitter';
@@ -30,7 +31,9 @@ import {VoiceoverSubmitter} from '../../utilities/user/voiceover-submitter';
 const ROLES = testConstants.Roles;
 
 describe('Voiceover Submitter', function () {
-  let voiceoverSubmitter: VoiceoverSubmitter & ExplorationEditor;
+  let voiceoverSubmitter: VoiceoverSubmitter &
+    ExplorationEditor &
+    LoggedOutUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & VoiceoverAdmin;
   let releaseCoordinator: ReleaseCoordinator;
   let explorationId: string;
@@ -87,14 +90,34 @@ describe('Voiceover Submitter', function () {
       'Content',
       testConstants.data.VoiceoverEnglishIndia
     );
+    await voiceoverSubmitter.navigateToCard('Card 1');
+    await voiceoverSubmitter.addVoiceoverToContent(
+      'English',
+      'English (India)',
+      'Content',
+      testConstants.data.VoiceoverEnglishIndia
+    );
+    await voiceoverSubmitter.navigateToCard('Introduction');
     await voiceoverSubmitter.expectScreenshotToMatch(
       'voiceoverPageWithOneVoiceoverAddEnIndia',
       __dirname
     );
     await voiceoverSubmitter.expectVoiceoverIsPlayableInTranslationTab();
+
+    // Check voiceover is visible in the preivew tab.
+    await voiceoverSubmitter.saveExplorationDraft();
+    await voiceoverSubmitter.navigateToPreviewTab();
+    await voiceoverSubmitter.expectAudioExpandButtonToBeVisible();
+    await voiceoverSubmitter.expandVoiceoverBar();
+    await voiceoverSubmitter.expectCurrentVoiceoverLanguageToBe(
+      'English (India)'
+    );
+    await voiceoverSubmitter.expectVoiceoverIsPlayable();
+
+    // Remove voiceover.
   });
 
   afterAll(async function () {
-    // await UserFactory.closeAllBrowsers();
+    await UserFactory.closeAllBrowsers();
   });
 });
