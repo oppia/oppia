@@ -565,7 +565,7 @@
 
   <mat-card class="oppia-settings-card-container oppia-editor-card oppia-mobile-collapsible-card" *ngIf="canDelete || canReleaseOwnership">
     <div class="oppia-basic-settings-header oppia-mobile-collapsible-card-header" (click)="toggleCards('controls')">
-      <h3 class="e2e-test-controls-bar-settings-container" tabindex="0">Controls</h3>
+      <h3 class="e2e-test-controls-bar-settings-container e2e-test-controls-header" tabindex="0">Controls</h3>
       <i class="fa fa-caret-down"
          *ngIf="!controlsCardIsShown"
          aria-hidden="true">
@@ -575,7 +575,7 @@
          aria-hidden="true">
       </i>
     </div>
-    <div class="oppia-mobile-collapsible-card-content" *ngIf="controlsCardIsShown">
+    <div class="oppia-mobile-collapsible-card-content e2e-test-controls-content" *ngIf="controlsCardIsShown">
       <p *ngIf="canReleaseOwnership" class="oppia-exploration-ctrl" [hidden]="explorationRightsService.isCommunityOwned()">
         <button type="button" class="btn btn-secondary" (click)="showTransferExplorationOwnershipModal()" [disabled]="isExplorationLockedForEditing()">
           Transfer ownership to the community
@@ -587,7 +587,7 @@
       </p>
       <p *ngIf="canDelete" class="oppia-exploration-ctrl">
         <button type="button" *ngIf="explorationRightsService.isPrivate()"
-                class="btn oppia-delete-button" (click)="deleteExploration()"
+                class="btn oppia-delete-button e2e-test-delete-exploration-button" (click)="deleteExploration()"
                 title="Delete this exploration">
           DELETE EXPLORATION
         </button>

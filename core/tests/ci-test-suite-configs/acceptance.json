@@ -393,6 +393,42 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
     },
     {
+      "name": "exploration-creator/create-an-exploration-with-all-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/create-an-exploration-with-all-interactions.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-history",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-history.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-settings",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-settings.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-feedback",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-feedback.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-help",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-help.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-navbar-header",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-navbar-header.spec.ts"
+    },
+    {
+      "name": "exploration-creator/preview-commonly-used-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-commonly-used-interactions.spec.ts"
+    },
+    {
+      "name": "exploration-creator/preview-math-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-math-interactions.spec.ts"
+    },
+    {
+      "name": "exploration-creator/preview-rarely-used-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-rarely-used-interactions.spec.ts"
+    },
+    {
       "name": "logged-out-learner/complete-some-practice-question",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-some-practice-question.spec.ts"
     },

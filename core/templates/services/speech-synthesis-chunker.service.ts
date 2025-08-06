@@ -185,89 +185,77 @@ export class SpeechSynthesisChunkerService {
     const rteCompSpecsKeys = Object.keys(
       ServicesConstants.RTE_COMPONENT_SPECS
     ) as RTEComponentSpecsKey[];
+
     rteCompSpecsKeys.forEach(componentSpec => {
       this.RTE_COMPONENT_NAMES[componentSpec] =
         ServicesConstants.RTE_COMPONENT_SPECS[componentSpec].frontend_id;
     });
+
     interface MathExpressionContent {
       raw_latex: string;
       svg_filename: string;
     }
-    var elt = $('<div>' + html + '</div>');
-    // Convert links into speakable text by extracting the readable value.
-    elt
-      .find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
-      .replaceWith(function () {
-        // TODO(#13015): Remove use of unknown as a type.
-        // Unknown has been used here becuase of use of jQuery.
-        var element = this as unknown as HTMLElement;
-        const _newTextAttr = element.attributes[
-          'text-with-value' as keyof NamedNodeMap
-        ] as Attr;
-        // 'Node.textContent' only returns 'null' if the Node is a
-        // 'document' or a 'DocType'. '_newTextAttr' is neither.
-        const newTextContent = _newTextAttr.textContent?.replace(/&quot;/g, '');
-        // Variable newTextContent ends with a " character, so this is being
-        // ignored in the condition below.
-        return newTextContent && newTextContent !== '"'
-          ? newTextContent + ' '
-          : '';
-      });
 
-    var _this = this;
-    // Convert LaTeX to speakable text.
-    elt
-      .find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
-      .replaceWith(function () {
-        // TODO(#13015): Remove use of unknown as a type.
-        // Unknown has been used here becuase of use of jQuery.
-        var element = this as unknown as HTMLElement;
-        const _mathContentAttr = element.attributes[
-          'math_content-with-value' as keyof NamedNodeMap
-        ] as Attr;
-        var mathContent = _this.htmlEscaper.escapedJsonToObj(
-          // 'Node.textContent' only returns 'null' if the Node is a
-          // 'document' or a 'DocType'. '_mathContentAttr' is neither.
-          _mathContentAttr.textContent as string
+    const parser = new DOMParser();
+    const containerDoc = parser.parseFromString(html, 'text/html');
+    const container = containerDoc.body;
+
+    const linkElements = Array.from(
+      container.querySelectorAll(
+        `oppia-noninteractive-${this.RTE_COMPONENT_NAMES.Link}`
+      )
+    );
+    for (const element of linkElements) {
+      const attr = element.getAttribute('text-with-value');
+      const newTextContent = attr?.replace(/&quot;/g, '');
+      const replacementText =
+        newTextContent && newTextContent !== '"' ? newTextContent + ' ' : '';
+      element.replaceWith(replacementText);
+    }
+
+    const mathElements = Array.from(
+      container.querySelectorAll(
+        `oppia-noninteractive-${this.RTE_COMPONENT_NAMES.Math}`
+      )
+    );
+    for (const element of mathElements) {
+      const attr = element.getAttribute('math_content-with-value');
+      if (attr) {
+        const mathContent = this.htmlEscaper.escapedJsonToObj(
+          attr
         ) as MathExpressionContent;
-        const latexSpeakableText = _this._formatLatexToSpeakableText(
+        const latexSpeakableText = this._formatLatexToSpeakableText(
           mathContent.raw_latex
         );
-        return latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : '';
-      });
+        element.replaceWith(
+          latexSpeakableText.length > 0 ? latexSpeakableText + ' ' : ''
+        );
+      }
+    }
+    const serializer = new XMLSerializer();
+    let processedHtml = Array.from(container.childNodes)
+      .map(node => serializer.serializeToString(node))
+      .join('');
+    processedHtml = processedHtml.replace(/<\/li>/g, '.').trim();
 
-    html = elt.html();
-    // Replace certain HTML elements with periods to indicate
-    // pauses in speaking. Also, for some reason, there's a lot
-    // of whitespace (like hundreds of characters) so we trim
-    // it off to avoid blank chunks.
-    html = html.replace(new RegExp('</li>', 'g'), '.').trim();
-    // Strip away HTML tags.
-    var tmp = $('<div></div>');
-    tmp.html(html);
-    var textToSpeakWithoutPauses = tmp.text();
-    var textToSpeak = '';
-    // Insert a space after punctuation marks to ensure that chunking will
-    // end on the desired punctuation marks so that SpeechSynthesis will
-    // pause more naturally. Remove any punctuation marks that have no
-    // effect on speaking.
-    for (var i = 0; i < textToSpeakWithoutPauses.length; i++) {
-      if (
-        this.PUNCTUATION_MARKS_TO_IGNORE.indexOf(
-          textToSpeakWithoutPauses.charAt(i)
-        ) > -1
-      ) {
+    const processedDoc = parser.parseFromString(processedHtml, 'text/html');
+    const textToSpeakWithoutPauses = processedDoc.body.textContent || '';
+
+    let textToSpeak = '';
+
+    for (let i = 0; i < textToSpeakWithoutPauses.length; i++) {
+      const char = textToSpeakWithoutPauses.charAt(i);
+      if (this.PUNCTUATION_MARKS_TO_IGNORE.includes(char)) {
         continue;
       }
-      textToSpeak += textToSpeakWithoutPauses.charAt(i);
-      if (
-        this.PUNCTUATION_MARKS_TO_END_CHUNKS.indexOf(
-          textToSpeakWithoutPauses.charAt(i)
-        ) > -1
-      ) {
+
+      textToSpeak += char;
+
+      if (this.PUNCTUATION_MARKS_TO_END_CHUNKS.includes(char)) {
         textToSpeak += ' ';
       }
     }
+
     return textToSpeak;
   }
 
