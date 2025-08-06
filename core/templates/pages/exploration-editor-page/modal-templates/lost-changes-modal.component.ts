@@ -47,13 +47,20 @@ export class LostChangesModalComponent
     super(ngbActiveModal);
   }
 
-  ngOnInit(): void {
-    this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
-    this.lostChanges = this.lostChanges.map(
-      (change: ExplorationChange | LostChangeBackendDict) =>
+ ngOnInit(): void {
+  this.hasLostChanges = Array.isArray(this.lostChanges) && this.lostChanges.length > 0;
+
+  if (this.hasLostChanges) {
+    this.lostChanges = this.lostChanges
+      .filter((change: ExplorationChange | LostChangeBackendDict) =>
+        change && typeof change === 'object' && 'cmd' in change
+      )
+      .map((change: ExplorationChange | LostChangeBackendDict) =>
         LostChange.createNew(this.utilsService, change)
-    );
+      );
   }
+}
+
 
   cancel(): void {
     this.ngbActiveModal.dismiss();

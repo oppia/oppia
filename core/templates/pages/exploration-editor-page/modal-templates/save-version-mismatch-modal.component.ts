@@ -54,14 +54,19 @@ export class SaveVersionMismatchModalComponent
   }
 
   ngOnInit(): void {
-    this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
-    if (this.hasLostChanges) {
-      this.lostChanges = this.lostChanges.map(
-        (change: ExplorationChange | LostChangeBackendDict) =>
-          LostChange.createNew(this.utilsService, change)
+  this.hasLostChanges = Array.isArray(this.lostChanges) && this.lostChanges.length > 0;
+
+  if (this.hasLostChanges) {
+    this.lostChanges = this.lostChanges
+      .filter((change: ExplorationChange | LostChangeBackendDict) =>
+        change && typeof change === 'object' && 'cmd' in change
+      )
+      .map((change: ExplorationChange | LostChangeBackendDict) =>
+        LostChange.createNew(this.utilsService, change)
       );
-    }
   }
+}
+
 
   private _refreshPage(delay: number): void {
     setTimeout(() => {

@@ -243,22 +243,28 @@ export class LostChange {
   }
 
   static createNew(
-    utilsService: UtilsService,
-    lostChangeDict: ExplorationChange | LostChangeBackendDict
-  ): LostChange {
-    lostChangeDict = lostChangeDict as LostChangeBackendDict;
-    return new LostChange(
-      utilsService,
-      lostChangeDict.cmd,
-      lostChangeDict.new_state_name,
-      lostChangeDict.old_state_name,
-      lostChangeDict.state_name,
-      lostChangeDict.new_value,
-      lostChangeDict.old_value,
-      lostChangeDict.property_name,
-      lostChangeDict.content_id,
-      lostChangeDict.language_code,
-      lostChangeDict.translation_html
-    );
+  utilsService: UtilsService,
+  lostChangeDict: ExplorationChange | LostChangeBackendDict
+): LostChange {
+  if (!lostChangeDict || typeof lostChangeDict !== 'object' || !('cmd' in lostChangeDict)) {
+    throw new Error('Invalid lostChangeDict passed to LostChange.createNew');
   }
+
+  lostChangeDict = lostChangeDict as LostChangeBackendDict;
+
+  return new LostChange(
+    utilsService,
+    lostChangeDict.cmd,
+    lostChangeDict.new_state_name,
+    lostChangeDict.old_state_name,
+    lostChangeDict.state_name,
+    lostChangeDict.new_value,
+    lostChangeDict.old_value,
+    lostChangeDict.property_name,
+    lostChangeDict.content_id,
+    lostChangeDict.language_code,
+    lostChangeDict.translation_html
+  );
+}
+
 }
