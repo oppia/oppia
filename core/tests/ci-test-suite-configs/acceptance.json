@@ -393,6 +393,94 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
     },
     {
+      "name": "exploration-creator/create-an-exploration-with-all-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/create-an-exploration-with-all-interactions.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-history",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-history.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-settings",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-settings.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-feedback",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-feedback.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-help",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-help.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-navbar-header",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-navbar-header.spec.ts"
+    },
+    {
+      "name": "exploration-creator/preview-commonly-used-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-commonly-used-interactions.spec.ts"
+    },
+    {
+      "name": "exploration-creator/preview-math-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-math-interactions.spec.ts"
+    },
+    {
+      "name": "exploration-creator/preview-rarely-used-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-rarely-used-interactions.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/complete-some-practice-question",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-some-practice-question.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/discover-the-website-and-navigate-to-math-classroom",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/discover-the-website-and-navigate-to-math-classroom.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/pick-a-lesson-to-learn",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/pick-a-lesson-to-learn.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/search-for-a-specific-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/search-for-a-specific-exploration.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/visits-the-community-library-and-look-around",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/visits-the-community-library-and-look-around.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/completes-the-exploration-and-decides-what-to-do-next",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/play-a-complete-community-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/reaches-a-checkpoint-and-saves-their-progress",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/use-the-feedback-and-help-cards",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/use-the-feedback-and-help-cards.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/share-the-lesson-from-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/share-the-lesson-from-the-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/sets-goal-on-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/sets-goal-on-learner-dashboard.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard.spec.ts"
+    },
+    {
       "name": "logged-in-learner/add-and-remove-exploration-from-play-later",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/add-and-remove-exploration-from-play-later.spec.ts"
     },

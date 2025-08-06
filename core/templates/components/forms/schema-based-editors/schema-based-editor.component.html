@@ -4,14 +4,16 @@
                                [schema]="schema"
                                [choices]="schema.choices"
                                [disabled]="disabled"
-                               name="choicesEditor">
+                               name="choicesEditor"
+                               class="e2e-test-schema-based-editor">
   </schema-based-choices-editor>
 
   <schema-based-bool-editor *ngIf="schema.type === 'bool' && !schema['choices']"
                             [(ngModel)]="localValue"
                             [disabled]="disabled"
                             [labelForFocusTarget]="labelForFocusTarget"
-                            name="boolEditor">
+                            name="boolEditor"
+                            class="e2e-test-schema-based-editor">
   </schema-based-bool-editor>
 
   <schema-based-int-editor *ngIf="schema.type === 'int' && !schema.choices"
@@ -22,7 +24,8 @@
                            [labelForFocusTarget]="labelForFocusTarget"
                            (inputBlur)="inputBlur.emit()"
                            (inputFocus)="inputFocus.emit()"
-                           name="intEditor">
+                           name="intEditor"
+                           class="e2e-test-schema-based-editor">
   </schema-based-int-editor>
 
   <schema-based-float-editor *ngIf="schema.type === 'float' && !schema.choices"
@@ -33,7 +36,8 @@
                              [labelForFocusTarget]="labelForFocusTarget"
                              (inputBlur)="inputBlur.emit()"
                              (inputFocus)="inputFocus.emit()"
-                             name="floatEditor">
+                             name="floatEditor"
+                             class="e2e-test-schema-based-editor">
   </schema-based-float-editor>
 
   <schema-based-unicode-editor *ngIf="schema.type === 'unicode' && !schema.choices"
@@ -44,7 +48,8 @@
                                [labelForFocusTarget]="labelForFocusTarget"
                                (inputBlur)="inputBlur.emit()"
                                (inputFocus)="inputFocus.emit()"
-                               name="unicodeEditor">
+                               name="unicodeEditor"
+                               class="e2e-test-schema-based-editor">
   </schema-based-unicode-editor>
 
   <schema-based-html-editor *ngIf="schema.type === 'html' && !schema.choices"
@@ -52,7 +57,8 @@
                             [disabled]="disabled"
                             [labelForFocusTarget]="labelForFocusTarget"
                             [uiConfig]="schema.ui_config"
-                            name="htmlEditor">
+                            name="htmlEditor"
+                            class="e2e-test-schema-based-editor">
   </schema-based-html-editor>
 
   <schema-based-list-editor *ngIf="schema.type === 'list' && !schema['choices']"
@@ -64,7 +70,8 @@
                             [uiConfig]="schema.ui_config"
                             [validators]="schema.validators"
                             [labelForFocusTarget]="labelForFocusTarget"
-                            name="listEditor">
+                            name="listEditor"
+                            class="e2e-test-schema-based-editor">
   </schema-based-list-editor>
 
   <schema-based-dict-editor *ngIf="schema.type === 'dict' && !schema['choices']"
@@ -72,12 +79,14 @@
                             [disabled]="disabled"
                             [propertySchemas]="schema.properties"
                             [labelForFocusTarget]="labelForFocusTarget"
-                            name="dictEditor">
+                            name="dictEditor"
+                            class="e2e-test-schema-based-editor">
   </schema-based-dict-editor>
 
   <schema-based-custom-editor *ngIf="schema.type === 'custom' && !schema['choices']"
                               [(ngModel)]="localValue"
                               [schema]="schema"
-                              name="customEditor">
+                              name="customEditor"
+                              class="e2e-test-schema-based-editor">
   </schema-based-custom-editor>
 </form>
