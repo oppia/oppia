@@ -245,6 +245,7 @@ const chapterEditorContainerSelector = '.e2e-test-chapter-editor';
 const chapterPreviewContainerSelector = '.e2e-test-thumbnail-container';
 const multiSelectionInputChipSelector = '.e2e-test-multi-selection-chip';
 
+const subtopicExpandHeaderSelector = '.e2e-test-show-subtopics-list';
 const addSkillButton = 'button.e2e-test-add-skill-button';
 const skillNameInput = '.e2e-test-skill-name-input';
 const skillItem = '.e2e-test-skills-list-item';
@@ -728,6 +729,36 @@ export class TopicManager extends BaseUser {
         throw new Error('Topics are not in the expected order.');
       }
       showMessage('Topics are in the expected order.');
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
+   * Toggles the "Show practice tab to learners" in Topic Editor.
+   */
+  async togglePracticeTabCheckbox(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicExpandHeaderSelector);
+    }
+    try {
+      await this.page.waitForSelector(practiceTabToggle);
+      const practiceTabToggleElement = await this.page.$(practiceTabToggle);
+      if (!practiceTabToggleElement) {
+        throw new Error('Practice tab toggle not found.');
+      }
+      await this.waitForElementToBeClickable(practiceTabToggleElement);
+      await practiceTabToggleElement.click();
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return (element as HTMLInputElement).checked === true;
+        },
+        {},
+        practiceTabToggle
+      );
     } catch (error) {
       console.error(error.stack);
       throw error;

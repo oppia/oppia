@@ -784,36 +784,42 @@ export class CkEditor4RteComponent
       // Clear paste errors when user types or makes changes.
       this.clearPasteError();
 
-      // TODO(#12882): Remove the use of jQuery.
-      var elt = $('<div>' + ck.getData() + '</div>');
-      var textElt = elt[0].childNodes;
-      for (var i = textElt.length; i > 0; i--) {
-        for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(ck.getData(), 'text/html');
+      const wrapperDiv = doc.body;
+
+      const textElt = wrapperDiv.childNodes;
+
+      for (let i = textElt.length; i > 0; i--) {
+        const parent = textElt[i - 1];
+        for (let j = parent.childNodes.length; j > 0; j--) {
+          const node = parent.childNodes[j - 1];
           if (
-            textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
-            (textElt[i - 1].childNodes[j - 1].nodeName === '#text' &&
-              textElt[i - 1].childNodes[j - 1].nodeValue.trim() === '')
+            node.nodeName === 'BR' ||
+            (node.nodeName === '#text' && node.nodeValue.trim() === '')
           ) {
-            textElt[i - 1].childNodes[j - 1].remove();
+            node.remove();
           } else {
             break;
           }
         }
-        if (textElt[i - 1].childNodes.length === 0) {
+        if (parent.childNodes.length === 0) {
           if (
-            textElt[i - 1].nodeName === 'BR' ||
-            (textElt[i - 1].nodeName === '#text' &&
-              textElt[i - 1].nodeValue.trim() === '') ||
-            textElt[i - 1].nodeName === 'P'
+            parent.nodeName === 'BR' ||
+            (parent.nodeName === '#text' && parent.nodeValue.trim() === '') ||
+            parent.nodeName === 'P'
           ) {
-            textElt[i - 1].remove();
+            parent.remove();
             continue;
           }
         } else {
           break;
         }
       }
-      let html = elt.html();
+      const serializer = new XMLSerializer();
+      let html = Array.from(wrapperDiv.childNodes)
+        .map(node => serializer.serializeToString(node))
+        .join('');
       this.value = html;
       // Refer to the note at the top of the file for the reason behind replace.
       html = html.replace(
