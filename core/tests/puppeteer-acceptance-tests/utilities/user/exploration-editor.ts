@@ -6565,13 +6565,19 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Navigates to the exploration editor page using the exploration ID.
-   * @param explorationId - The ID of the exploration to navigate to.
+   * Function to navigate to exploration editor.
+   * @param explorationUrl - url of the exploration.
    */
-  async navigateToExplorationEditorUsingID(
-    explorationId: string
+  async navigateToExplorationEditor(
+    explorationId: string | null
   ): Promise<void> {
-    await this.goto(`${baseUrl}/create/${explorationId}#/`);
+    if (!explorationId) {
+      throw new Error('Cannot navigate to editor: explorationId is null');
+    }
+    const editorUrl = `${baseUrl}/create/${explorationId}#/`;
+    await this.goto(editorUrl);
+
+    showMessage('Navigation to exploration editor is successful.');
   }
 
   /**

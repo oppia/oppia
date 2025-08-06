@@ -34,6 +34,7 @@ jobs:
       matrix:
         suite: 
           - name: voiceover-submitter/create-delete-and-update-status-of-voiceovers-of-the-explorations
+          - name: voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration
         runs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     name: Acceptance (${{ matrix.suite.name }})
     steps:

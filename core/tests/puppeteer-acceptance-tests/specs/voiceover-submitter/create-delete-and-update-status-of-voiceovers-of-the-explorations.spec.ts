@@ -76,7 +76,7 @@ describe('Voiceover Submitter', function () {
 
   it('should be able to add and remove voiceovers to explorations', async function () {
     // Navigate to the exploration editor.
-    await voiceoverSubmitter.navigateToExplorationEditorUsingID(explorationId);
+    await voiceoverSubmitter.navigateToExplorationEditor(explorationId);
     await voiceoverSubmitter.dismissWelcomeModal();
 
     // Navigate to translation tab.

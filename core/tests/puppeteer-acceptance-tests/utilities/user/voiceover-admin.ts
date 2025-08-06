@@ -197,6 +197,32 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
+   * Function to remove voiceover artist from an exploration.
+   * @param voiceArtistUsername - The username of the voiceover artist to remove.
+   */
+  async removeVoiceoverArtist(voiceArtistUsername: string): Promise<void> {
+    const removeVoiceoverArtistBtnSelector =
+      '.e2e-test-remove-voice-artist-button';
+    await this.expectElementToBeVisible(editVoiceoverArtistButton);
+    await this.clickOn(editVoiceoverArtistButton);
+
+    const selector = `div.e2e-test-voiceover-artist-${voiceArtistUsername}`;
+    await this.expectElementToBeVisible(selector);
+
+    const removeBtn = await this.page.waitForSelector(
+      `${selector} ${removeVoiceoverArtistBtnSelector}`,
+      {
+        visible: true,
+      }
+    );
+    if (!removeBtn) {
+      throw new Error('Remove button not found.');
+    }
+    await removeBtn.click();
+    await this.clickButtonInModal('Are you sure?', 'confirm');
+  }
+
+  /**
    * Function to add voiceover artist to an exploration.
    * @param explorationId - The exploration id.
    * @param voiceArtistUsername - The username of the voiceover artist to add.

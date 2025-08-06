@@ -389,8 +389,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-subtopic-and-story.spec.ts"
     },
     {
-      "name": "voiceover-admin/add-voiceover-artist-to-an-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
+      "name": "voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration.spec.ts"
     },
     {
       "name": "exploration-creator/create-an-exploration-with-all-interactions",
