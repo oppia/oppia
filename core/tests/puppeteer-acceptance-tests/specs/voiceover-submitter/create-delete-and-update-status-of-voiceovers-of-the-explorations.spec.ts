@@ -115,6 +115,9 @@ describe('Voiceover Submitter', function () {
     await voiceoverSubmitter.expectVoiceoverIsPlayable();
 
     // Remove voiceover.
+    await voiceoverSubmitter.navigateToTranslationsTab();
+    await voiceoverSubmitter.deleteVoiceoverInCurrentCard();
+    await voiceoverSubmitter.saveExplorationDraft();
   });
 
   afterAll(async function () {

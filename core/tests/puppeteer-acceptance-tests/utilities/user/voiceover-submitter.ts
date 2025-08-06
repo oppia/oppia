@@ -22,6 +22,7 @@ const voiceoverPlayPauseBtnSelector = '.e2e-test-play-voiceover-button';
 const voiceoverPlayIconSelector = `${voiceoverPlayPauseBtnSelector} .e2e-test-play`;
 const voiceoverPauseIconSelector = `${voiceoverPlayPauseBtnSelector} .e2e-test-pause`;
 const voiceoverProgressBarSelector = '.e2e-test-voiceover-progress-bar';
+const deleteVoiceoverBtnSelector = '.e2e-test-delete-voiceover-button';
 
 const voiceoverPlayBtnInAudioBarSelector = '.e2e-test-play-circle';
 const voiceoverPauseBtnInAudioBarSelector = '.e2e-test-pause-circle';
@@ -81,6 +82,18 @@ export class VoiceoverSubmitter extends BaseUser {
         status === 'enabled'
       );
     }
+  }
+
+  /**
+   * Deletes current voiceover in the current card.
+   */
+  async deleteVoiceoverInCurrentCard(): Promise<void> {
+    await this.expectElementToBeVisible(deleteVoiceoverBtnSelector);
+    await this.clickOn(deleteVoiceoverBtnSelector);
+    await this.clickButtonInModal(
+      'Are you sure you want to remove this voiceover?',
+      'confirm'
+    );
   }
 }
 

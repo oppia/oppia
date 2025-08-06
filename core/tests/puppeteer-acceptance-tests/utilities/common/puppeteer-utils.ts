@@ -1497,6 +1497,31 @@ export class BaseUser {
 
     return elements;
   }
+
+  /**
+   * Clicks on the button in the modal with the given title and action.
+   * @param title - The title of the modal.
+   * @param action - The action to click on the button in the modal.
+   */
+  async clickButtonInModal(
+    title: string,
+    action: 'confirm' | 'cancel'
+  ): Promise<void> {
+    const commonModalHeaderSelector = '.e2e-test-modal-header';
+    const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
+    const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
+    await this.expectElementToBeVisible(commonModalHeaderSelector);
+    await this.expectTextContentToBe(commonModalHeaderSelector, title);
+
+    const currentActionBtnSelector =
+      action === 'confirm'
+        ? commonModalConfirmBtnSelector
+        : commonModalCancelBtnSelector;
+    await this.expectElementToBeVisible(currentActionBtnSelector);
+    await this.clickOn(currentActionBtnSelector);
+
+    await this.expectElementToBeVisible(currentActionBtnSelector, false);
+  }
 }
 
 export const BaseUserFactory = (): BaseUser => new BaseUser();
