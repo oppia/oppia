@@ -41,6 +41,10 @@ import {TranslationTabActiveContentIdService} from '../../core/templates/pages/e
 import {VoiceoverPlayerService} from '../../core/templates/pages/exploration-player-page/services/voiceover-player.service';
 import {LocalStorageService} from '../../core/templates/services/local-storage.service';
 import {AudioPlayerService} from 'services/audio-player.service';
+import {
+  EntityVoiceovers,
+  EntityVoiceoversBackendDict,
+} from 'domain/voiceover/entity-voiceovers.model';
 
 class MockPlatformFeatureService {
   get status(): object {
@@ -280,7 +284,27 @@ describe('RTE display component', () => {
     expect(outputWrappedString).toBe(expectedOutputWrappedString);
   }));
 
+  it('should correctly wrap html multiple sentences inside span tag for highlighting', fakeAsync(() => {
+    let rteString = '<p>Hi world! I am a content creator.</p>';
+    let expectedOutputWrappedString =
+      '<p><span id="highlightBlock1">Hi world!</span>' +
+      '<span> </span>' +
+      '<span id="highlightBlock2">I am a content creator.</span></p>';
+
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+    let outputWrappedString =
+      component.wrapSentencesInSpansForHighlighting(rteString);
+    expect(outputWrappedString).toBe(expectedOutputWrappedString);
+  }));
+
   it('should correctly set data for sentence highlighting during voiceover playback in ngOnInit', fakeAsync(() => {
+    spyOn(
+      component,
+      'isManualVoiceoverAvailableForActiveContent'
+    ).and.returnValue(false);
     let regenerateVoiceoverFeatureSpy = spyOn(
       component,
       'isAutomaticVoiceoverRegenerationFromExpFeatureEnabled'
@@ -289,7 +313,13 @@ describe('RTE display component', () => {
       automaticVoiceoverHighlightService,
       'setAutomatedVoiceoversAudioOffsets'
     );
-    spyOn(entityVoiceoversService, 'getActiveEntityVoiceovers');
+    let entityVoiceoverSpy = spyOn(
+      entityVoiceoversService,
+      'getActiveEntityVoiceovers'
+    );
+    entityVoiceoverSpy.and.returnValue({
+      automatedVoiceoversAudioOffsetsMsecs: {},
+    });
 
     regenerateVoiceoverFeatureSpy.and.returnValue(false);
     component.ngOnInit();
@@ -304,6 +334,18 @@ describe('RTE display component', () => {
       entityVoiceoversService.getActiveEntityVoiceovers
     ).not.toHaveBeenCalled();
 
+    entityVoiceoverSpy.and.returnValue({
+      automatedVoiceoversAudioOffsetsMsecs: {
+        content0: [
+          {token: 'Nic', audioOffsetMsecs: 0.0},
+          {token: 'took', audioOffsetMsecs: 100.0},
+          {token: 'Jaime', audioOffsetMsecs: 200.0},
+          {token: 'to', audioOffsetMsecs: 300.0},
+          {token: 'the', audioOffsetMsecs: 400.0},
+          {token: 'arcade', audioOffsetMsecs: 500.0},
+        ],
+      },
+    });
     regenerateVoiceoverFeatureSpy.and.returnValue(true);
     component.ngOnInit();
     tick(2000);
@@ -464,7 +506,20 @@ describe('RTE display component', () => {
     expect(readableText).toBe(expectedString);
   });
 
+  it('should return space character for unknown tag', () => {
+    let node = document.createElement('span');
+    // eslint-disable-next-line oppia/no-inner-html
+    node.innerHTML = ' ';
+    let expectedString = ' ';
+    let readableText = component.getReadableTextFromNode(node.childNodes[0]);
+    expect(readableText).toBe(expectedString);
+  });
+
   it('should not change bg highlight color when prev and current element are same during voiceover playback', fakeAsync(() => {
+    spyOn(
+      component,
+      'isManualVoiceoverAvailableForActiveContent'
+    ).and.returnValue(false);
     let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
     audioPlayingSpy.and.returnValue(true);
 
@@ -500,6 +555,10 @@ describe('RTE display component', () => {
     'should highlight the current element and remove highlighting from ' +
       'previous element during voiceover playback',
     fakeAsync(() => {
+      spyOn(
+        component,
+        'isManualVoiceoverAvailableForActiveContent'
+      ).and.returnValue(false);
       let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
       audioPlayingSpy.and.returnValue(true);
 
@@ -552,6 +611,10 @@ describe('RTE display component', () => {
   );
 
   it('should remove highlight when audio is not playing', fakeAsync(() => {
+    spyOn(
+      component,
+      'isManualVoiceoverAvailableForActiveContent'
+    ).and.returnValue(false);
     let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
     audioPlayingSpy.and.returnValue(false);
 
@@ -578,4 +641,48 @@ describe('RTE display component', () => {
         .backgroundColor
     ).toBe('');
   }));
+
+  it('should not highlight sentence when manual voiceover is available', () => {
+    component.previousHighlightedElementId = '';
+    spyOn(
+      component,
+      'isManualVoiceoverAvailableForActiveContent'
+    ).and.returnValue(true);
+    component.highlightSentenceDuringVoiceoverPlay();
+    // No updates were made to the previously highlighted element ID.
+    expect(component.previousHighlightedElementId).toBe('');
+  });
+
+  it('should be able to return manual voiceover status correctly', () => {
+    const voiceover = {
+      filename: 'a.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
+    let contentIdToVoiceoversMapping = {
+      content0: {
+        manual: voiceover,
+        auto: voiceover,
+      },
+    };
+    const entityVoiceoversBackendDict: EntityVoiceoversBackendDict = {
+      entity_id: 'exp_1',
+      entity_type: 'exploration',
+      entity_version: 1,
+      language_accent_code: 'en-US',
+      voiceovers_mapping: contentIdToVoiceoversMapping,
+      automated_voiceovers_audio_offsets_msecs: {},
+    };
+    const entityVoiceovers = EntityVoiceovers.createFromBackendDict(
+      entityVoiceoversBackendDict
+    );
+
+    spyOn(component, 'getActiveContentId').and.returnValue('content0');
+    spyOn(entityVoiceoversService, 'getActiveEntityVoiceovers').and.returnValue(
+      entityVoiceovers
+    );
+
+    expect(component.isManualVoiceoverAvailableForActiveContent()).toBeTrue();
+  });
 });

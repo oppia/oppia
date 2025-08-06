@@ -117,6 +117,7 @@ export class MusicNotesInputComponent
     InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES;
 
   staffContainerElt: HTMLElement | null;
+
   placedNotes: Note[] = [];
 
   @ViewChild('staffArea') staffAreaRef!: ElementRef;
@@ -493,7 +494,7 @@ export class MusicNotesInputComponent
           this.renderer.setAttribute(noteEl, 'data-note-type', noteType);
           this.renderer.appendChild(staffContainer, noteEl);
         }
-
+        
         const leftPos =
           evt.clientX - staffContainer.getBoundingClientRect().left;
         const topPos = staffLineDiv.offsetTop;

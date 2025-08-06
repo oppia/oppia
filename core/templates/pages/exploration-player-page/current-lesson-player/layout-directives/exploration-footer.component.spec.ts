@@ -57,10 +57,7 @@ import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceo
 import {UserInfo} from '../../../../domain/user/user-info.model';
 import {QuestionPlayerEngineService} from '../../services/question-player-engine.service';
 import {UserService} from '../../../../services/user.service';
-import {
-  Interaction,
-  InteractionObjectFactory,
-} from '../../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
 import {CheckpointCelebrationUtilityService} from '../../services/checkpoint-celebration-utility.service';
@@ -135,7 +132,6 @@ describe('ExplorationFooterComponent', () => {
   let checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService;
   let ngbModal: NgbModal;
   let conceptCardManagerService: ConceptCardManagerService;
-  let interactionObjectFactory: InteractionObjectFactory;
 
   const sampleExpInfo = {
     category: 'dummy_category',
@@ -224,7 +220,6 @@ describe('ExplorationFooterComponent', () => {
     conceptCardManagerService = TestBed.inject(ConceptCardManagerService);
     fixture = TestBed.createComponent(ExplorationFooterComponent);
     ngbModal = TestBed.inject(NgbModal);
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     component = fixture.componentInstance;
     fixture.detectChanges();
 
@@ -304,7 +299,7 @@ describe('ExplorationFooterComponent', () => {
         'State 2',
         '<p>Content</p>',
         '<interaction></interaction>',
-        interactionObjectFactory.createFromBackendDict({
+        Interaction.createFromBackendDict({
           id: 'TextInput',
           answer_groups: [
             {

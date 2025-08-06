@@ -53,6 +53,7 @@ from core.storage.beam_job import gae_models as beam_job_models
 from core.storage.blog import gae_models as blog_models
 from core.storage.blog_statistics import gae_models as blog_stats_models
 from core.storage.classroom import gae_models as classroom_models
+from core.storage.cloud_task import gae_models as cloud_task_models
 from core.storage.collection import gae_models as collection_models
 from core.storage.config import gae_models as config_models
 from core.storage.email import gae_models as email_models
@@ -86,6 +87,7 @@ __all__ = [
     'blog_stats_models',
     'bulk_email_services',
     'classroom_models',
+    'cloud_task_models',
     'collection_models',
     'config_models',
     'datastore_services',

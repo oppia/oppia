@@ -11,8 +11,7 @@
         </span>
       </span>
     </p>
-    <a class="oppia-topic-title" *ngIf="isLinkedToTopic == true"
-       [href]="getTopicUrl()">
+    <a class="oppia-topic-title" *ngIf="isLinkedToTopic == true" [href]="getTopicUrl()">
       <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
         {{ topicName }}
       </span>
@@ -22,7 +21,7 @@
     </a>
   </div>
   <div class="player-header-right">
-    <button class="header-menu-button" (click)="toggleMenu()">
+    <button class="header-menu-button" *ngIf="!pageIsIframed" (click)="toggleMenu()" aria-label="Toggle main menu">
       <i class="fa fa-lg fa-ellipsis-h"></i>
     </button>
   </div>

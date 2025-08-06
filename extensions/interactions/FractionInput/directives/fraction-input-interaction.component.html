@@ -4,12 +4,12 @@
          name="answer"
          [(ngModel)]="answer"
          (ngModelChange)="answerValueChanged()"
-         class="form-control"
+         class="form-control e2e-test-fraction-input e2e-test-float-form-input"
          (keyup.enter)="submitAnswer()"
          [oppiaFocusOn]="labelForFocusTarget"
          placeholder="{{customPlaceholder !== '' ? customPlaceholder : getPlaceholderText() | translate}}">
 
-  <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container">
+  <div *ngIf="errorMessageI18nKey" class="oppia-form-error-container e2e-test-form-error-container">
     {{errorMessageI18nKey | translate}}
   </div>
 </form>

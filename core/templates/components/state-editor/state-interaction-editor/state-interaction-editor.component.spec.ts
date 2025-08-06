@@ -28,7 +28,7 @@ import {StateEditorService} from '../state-editor-properties-services/state-edit
 import {StateInteractionEditorComponent} from './state-interaction-editor.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {State} from 'domain/state/StateObjectFactory';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {EditabilityService} from 'services/editability.service';
