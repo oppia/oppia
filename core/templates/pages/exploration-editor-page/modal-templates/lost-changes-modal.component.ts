@@ -17,8 +17,6 @@
  */
 
 import {Component, ElementRef, Input, OnInit} from '@angular/core';
-
-import {LoggerService} from 'services/contextual/logger.service';
 import {
   LostChange,
   LostChangeBackendDict,
@@ -44,7 +42,6 @@ export class LostChangesModalComponent
     private utilsService: UtilsService,
     private elRef: ElementRef,
     private windowRef: WindowRef,
-    private loggerService: LoggerService,
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);

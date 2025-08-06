@@ -18,7 +18,6 @@
 
 import {Component, ElementRef, Input, OnInit} from '@angular/core';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {LoggerService} from 'services/contextual/logger.service';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {
   LostChange,
@@ -47,7 +46,6 @@ export class SaveVersionMismatchModalComponent
   constructor(
     private windowRef: WindowRef,
     private elRef: ElementRef,
-    private loggerService: LoggerService,
     private explorationDataService: ExplorationDataService,
     private utilsService: UtilsService,
     private ngbActiveModal: NgbActiveModal
