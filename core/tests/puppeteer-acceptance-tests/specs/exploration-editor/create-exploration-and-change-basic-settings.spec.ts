@@ -116,7 +116,7 @@ describe('Exploration Creator', function () {
       await explorationEditor.addTags(['TagA', 'TagB', 'TagC']);
       await explorationEditor.expectTagsToMatch(['TagA', 'TagB', 'TagC']);
 
-      await explorationEditor.previewSummary();
+      await explorationEditor.previewAndCloseSummary();
 
       await explorationEditor.enableAutomaticTextToSpeech();
 

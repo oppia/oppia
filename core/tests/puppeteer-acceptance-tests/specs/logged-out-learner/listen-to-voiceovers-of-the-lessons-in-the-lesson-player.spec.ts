@@ -253,5 +253,5 @@ describe('Logged-Out Learner', function () {
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  });
+  }, 600000);
 });

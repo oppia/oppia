@@ -93,7 +93,7 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addImageInteraction();
+      await questionSubmitter.addImageInteractionInQuestionEditor();
 
       await questionSubmitter.addHintToState('Test Hint 1');
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
@@ -122,7 +122,7 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addMultipleChoiceInteractionInQuestionEditor([
+      await questionSubmitter.addMultipleChoiceInteractionByQuestionSubmitter([
         'Option 1',
         'Option 2',
         'Option 3',

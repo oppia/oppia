@@ -419,6 +419,9 @@ const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 
+// Common Selectors.
+const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalBodySelector = '.e2e-test-modal-body';
 const returnToStoryFromLastStateSelector =
   '.e2e-test-end-chapter-return-to-story';
 const contributorsContainerSelector = '.e2e-test-contributors-container';
@@ -2236,12 +2239,10 @@ export class LoggedOutUser extends BaseUser {
    * Click on create account button in save progress modal
    */
   async clickOnCreateAccountButtonInSaveProgressModal(): Promise<void> {
-    await this.page.waitForSelector(lessonInfoSignUpButtonSelector);
+    await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector);
     await this.clickOn(lessonInfoSignUpButtonSelector);
 
-    await this.page.waitForSelector(lessonInfoSignUpButtonSelector, {
-      hidden: true,
-    });
+    await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector, false);
   }
 
   /**
@@ -3145,6 +3146,8 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} answer - The answer to submit.
    */
   async submitAnswer(answer: string): Promise<void> {
+    // Allow input elements to be rendered and ready for interaction.
+    await this.page.waitForTimeout(1000);
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
     await this.clearAllTextFrom(submitResponseToInteractionInput);
     await this.type(submitResponseToInteractionInput, answer);
@@ -4596,6 +4599,7 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(gotItButtonSelector);
     await this.page.waitForSelector(gotItButtonSelector, {hidden: true});
   }
+
   /**
    * Simulates the action of viewing the solution by clicking on the view solution button and the continue to solution button.
    */
@@ -5781,17 +5785,11 @@ export class LoggedOutUser extends BaseUser {
   async expectErrorMessageForWrongInputToBe(
     errorMessage: string
   ): Promise<void> {
-    await this.page.waitForSelector(wrongInputErrorContainerSelector);
-    const actualErrorMessage = await this.page.$eval(
+    await this.expectElementToBeVisible(wrongInputErrorContainerSelector);
+    await this.expectTextContentToContain(
       wrongInputErrorContainerSelector,
-      el => el.textContent
+      errorMessage
     );
-
-    if (!actualErrorMessage?.includes(errorMessage)) {
-      throw new Error(
-        `Expected error message to be ${errorMessage}, but it was ${actualErrorMessage}`
-      );
-    }
   }
 
   /**
@@ -6245,6 +6243,19 @@ export class LoggedOutUser extends BaseUser {
     expect(newSlideId).not.toBe(initialSlideId);
   }
 
+  /**
+   * Function to verify the hint in the hint modal.
+   * @param {string} expectedHint - The expected hint.
+   */
+  async expectHintInHintModalToContain(expectedHint: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+
+    await this.expectTextContentToBe(commonModalTitleSelector, 'Hint');
+    await this.expectTextContentToContain(
+      commonModalBodySelector,
+      expectedHint
+    );
+  }
   /**
    * Function to verify the community library heading is present.
    * @param {string} heading - The heading to verify.
