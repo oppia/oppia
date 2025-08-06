@@ -1864,47 +1864,22 @@ export class LoggedInUser extends BaseUser {
   async expectElementsToBePresent(
     expectedTexts: string[],
     selector: string,
-    root: puppeteer.Page | puppeteer.ElementHandle | undefined = this.page
+    root: puppeteer.Page | puppeteer.ElementHandle | null = this.page
   ): Promise<void> {
     await this.page.waitForSelector(learnerDashSelectors[selector].heading);
     const allElements = await root?.$$(learnerDashSelectors[selector].heading);
-    const sectionHeadingTexts = await Promise.all(
-      allElements.map(
-        async card => await card.evaluate(el => el.textContent?.trim())
-      )
-    );
-    expect(sectionHeadingTexts).toEqual(expectedTexts);
-  }
-
-  /**
-   * Finds child element in parent by matching text values.
-   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
-   * @param {Record<string, string>} selectors - Relevant selectors.
-   * @param {string} criteria - Title value to match.
-   */
-  async findElement(
-    parentElement: puppeteer.Page | puppeteer.ElementHandle | undefined,
-    selectors: Record<string, string>,
-    criteria: string
-  ): Promise<puppeteer.ElementHandle | undefined> {
-    let targetElement;
-    const allElements = await parentElement?.$$(selectors.content);
-    for (const h of allElements || []) {
-      const targetHeadingElement = await h.$(selectors.heading);
-      const targetHeadingText = await targetHeadingElement?.evaluate(ele =>
-        ele.textContent?.trim()
+    if (allElements) {
+      const sectionHeadingTexts = await Promise.all(
+        allElements.map(
+          async card => await card.evaluate(el => el.textContent?.trim())
+        )
       );
-      if (targetHeadingText === criteria) {
-        targetElement = h;
-        break;
-      }
-    }
-    if (!targetElement) {
+      expect(sectionHeadingTexts).toEqual(expectedTexts);
+    } else {
       throw new Error(
-        `Element with selectors: ${selectors.toString()} and criteria: ${criteria} is not found`
+        `Can not find element of ${learnerDashSelectors[selector].heading}`
       );
     }
-    return targetElement;
   }
 
   /**
@@ -1912,25 +1887,25 @@ export class LoggedInUser extends BaseUser {
    * in progress tab because the subsections are titled the same.
    * @param {string} criteria - Subsection title value to match.
    * @param {string} section - Overarching section.
+   * @returns {Promise<puppeteer.ElementHandle | null>} - Found subsection element or null.
    */
   async findSubsectionElement(
     criteria: string,
     section: string = 'N/A'
-  ): Promise<puppeteer.ElementHandle | undefined> {
-    let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
+  ): Promise<puppeteer.ElementHandle | null> {
+    let sectionElement: puppeteer.Page | puppeteer.ElementHandle | null =
       this.page;
     if (section === 'In Progress' || section === 'Completed') {
-      sectionElement = await this.findElement(
-        this.page,
+      sectionElement = await this.findElementByXPath(
         learnerDashSelectors.tabSection,
         section
       );
     }
 
-    const subsectionElement = await this.findElement(
-      sectionElement,
+    const subsectionElement = await this.findElementByXPath(
       learnerDashSelectors.cardDisplay,
-      criteria
+      criteria,
+      sectionElement
     );
 
     return subsectionElement;
@@ -1941,16 +1916,6 @@ export class LoggedInUser extends BaseUser {
    * @param {string} topic - Classroom topic.
    */
   async navigateToTopicPageByCard(topic: string): Promise<void> {
-    await this.page.waitForFunction(
-      (c: string) => {
-        return Array.from(document.querySelectorAll(c))
-          .map(h => h.textContent?.trim())
-          .includes("Topics available in Oppia's Classroom");
-      },
-      {},
-      learnerDashSelectors.cardDisplay.heading
-    );
-
     const topicsAvailableInClassroomElement = await this.findElementByXPath(
       learnerDashSelectors.cardDisplay,
       "Topics available in Oppia's Classroom"
@@ -1960,19 +1925,6 @@ export class LoggedInUser extends BaseUser {
       topic,
       topicsAvailableInClassroomElement
     );
-    /*const topicsAvailableInClassroomElement = await this.findElement(
-      this.page,
-      learnerDashSelectors.cardDisplay,
-      "Topics available in Oppia's Classroom"
-    );
-
-    const topicCardElement = await this.findElement(
-      topicsAvailableInClassroomElement,
-      learnerDashSelectors.topicCard,
-      topic
-    );*/
-    console.log(topicsAvailableInClassroomElement);
-    console.log(topicCardElement);
 
     if (topicCardElement) {
       await topicCardElement.click();
@@ -2049,10 +2001,10 @@ export class LoggedInUser extends BaseUser {
       section
     );
 
-    const lessonCardElement = await this.findElement(
-      subsectionElement,
+    const lessonCardElement = await this.findElementByXPath(
       learnerDashSelectors.lessonCard,
-      lessonTitle
+      lessonTitle,
+      subsectionElement
     );
 
     if (lessonCardElement) {
@@ -2085,6 +2037,13 @@ export class LoggedInUser extends BaseUser {
     showMessage(`Navigated to ${lessonTitle}`);
   }
 
+  /**
+   * Takes in a parent element and retrieves an element based on class and its text.
+   * @param {Record<string,string>} selectors - Element and associated class.
+   * @param {string} targetText - Text the element should have.
+   * @param {puppeteer.Page | puppeteer.ElementHandle | null} parentElement - Element to go through.
+   * @returns {Promise<puppeteer.ElementHandle | null>} - Found element or null.
+   */
   async findElementByXPath(
     selectors: Record<string, string>,
     targetText: string,

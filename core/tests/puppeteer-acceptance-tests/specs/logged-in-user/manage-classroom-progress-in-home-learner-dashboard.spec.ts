@@ -100,7 +100,7 @@ describe('Logged-in User', function () {
     );
   }, 480000);
 
-  /*it(
+  it(
     'should have the correct tab title and available sections on landing',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
@@ -125,7 +125,7 @@ describe('Logged-in User', function () {
       showMessage('Navigated to math classroom from learner dashboard.');
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );*/
+  );
 
   it(
     'should navigate directly to the Place Values topic in the math classroom',
@@ -138,8 +138,8 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  /*it(
-    'should display in-progress and recommended lessons after starting a lesson',
+  it(
+    'should display in-progress and recommended lessons after starting lessons',
     async function () {
       await loggedInUser.navigateToClassroomPage('math');
       await loggedInUser.selectAndOpenTopic('Place Values');
@@ -171,19 +171,7 @@ describe('Logged-in User', function () {
         'Chapter 1: What are the Place Values',
         chapterIds[0]
       );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
 
-  it(
-    'should not recommend any lessons if currently on last lesson',
-    async function () {
-      await loggedInUser.navigateToClassroomPage('math');
-      await loggedInUser.selectAndOpenTopic('Place Values');
-      await loggedInUser.selectChapterWithinStoryToLearn(
-        "Jamie's Adventures in the Arcade",
-        'What are the Place Values'
-      );
       await loggedInUser.continueToNextCard();
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
@@ -197,12 +185,11 @@ describe('Logged-in User', function () {
         'Chapter 3: Comparing Numbers',
       ]);
 
-      await loggedInUser.navigateToClassroomPage('math');
-      await loggedInUser.selectAndOpenTopic('Place Values');
-      await loggedInUser.selectChapterWithinStoryToLearn(
-        "Jamie's Adventures in the Arcade",
-        'Find the Value of a Number'
+      await loggedInUser.navigateToLessonByCard(
+        'Lessons in progress',
+        'Chapter 2: Find the Value of a Number'
       );
+
       await loggedInUser.continueToNextCard();
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
@@ -215,7 +202,7 @@ describe('Logged-in User', function () {
       ]);
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
-  );*/
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
