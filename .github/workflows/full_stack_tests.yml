@@ -29,7 +29,6 @@ jobs:
   acceptance_test_with_python_installation:
     needs: [build]
     runs-on: ubuntu-22.04
-    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
     strategy:
       fail-fast: false
       matrix:
