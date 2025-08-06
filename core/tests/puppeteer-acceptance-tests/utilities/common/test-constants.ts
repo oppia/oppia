@@ -152,6 +152,7 @@ export default {
     MODERATOR: 'moderator',
     RELEASE_COORDINATOR: 'release coordinator',
     COLLECTION_EDITOR: 'collection editor',
+    VOICEOVER_SUBMITTER: 'voiceover submitter',
   } as const,
 
   BlogRights: {

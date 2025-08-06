@@ -197,6 +197,21 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
+   * Function to add voiceover artist to an exploration.
+   * @param explorationId - The exploration id.
+   * @param voiceArtistUsername - The username of the voiceover artist to add.
+   */
+  async addVoiceoverArtistToExplorationWithID(
+    explorationId: string,
+    voiceArtistUsername: string
+  ): Promise<void> {
+    await this.navigateToExplorationEditor(explorationId);
+    await this.dismissWelcomeModal();
+    await this.navigateToExplorationSettingsTab();
+    await this.addVoiceoverArtistsToExploration([voiceArtistUsername]);
+  }
+
+  /**
    * Function to expect to see error toast message
    * @param expectedErrorMessage - expected error message.
    */
