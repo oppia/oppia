@@ -60,6 +60,8 @@ const enableAutogenerationOptionSelector =
 const explorationEditorSettingsTabSelector =
   '.e2e-test-exploration-editor-settings-tab';
 const toastWarningContainer = '.e2e-test-toast-warning';
+const voiceArtistSectionHeaderSelector = '.e2e-test-voice-artists-header';
+const voiceArtistSectionBodySelector = '.e2e-test-voice-artists-content';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
@@ -167,6 +169,10 @@ export class VoiceoverAdmin extends BaseUser {
     voiceArtists: string[],
     verify: boolean = true
   ): Promise<void> {
+    if (!(await this.isElementVisible(voiceArtistSectionBodySelector))) {
+      await this.clickOn(voiceArtistSectionHeaderSelector);
+      await this.expectElementToBeVisible(voiceArtistSectionBodySelector);
+    }
     for (let i = 0; i < voiceArtists.length; i++) {
       await this.expectElementToBeVisible(editVoiceoverArtistButton);
       await this.clickOn(editVoiceoverArtistButton);
