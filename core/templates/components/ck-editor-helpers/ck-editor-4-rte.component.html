@@ -1,8 +1,46 @@
-<div>
+<div *ngIf="!configError">
   <div class="d-flex flex-column-reverse">
     <span class="oppia-cke-offline-warning" *ngIf="!connectedToInternet">* Tools with dark background can not be used when offline.</span>
   </div>
+
+  <!-- Paste error message display with selective paste option -->
+  <div *ngIf="getPasteError()" class="oppia-rte-paste-error-box">
+    <div>
+      <span>{{ getPasteError() }}</span>
+
+      <!-- Show confirmation buttons only when selective paste is available -->
+      <div *ngIf="shouldShowPasteConfirmation()" class="oppia-rte-paste-confirmation-buttons">
+        <button type="button"
+                class="oppia-rte-paste-confirm-btn oppia-rte-paste-yes-btn"
+                (click)="confirmSelectivePaste()"
+                aria-label="Paste valid content"
+                [innerHTML]="'I18N_RTE_ACCEPT_VALID_CONTENT_PASTE' | translate">
+        </button>
+        <button type="button"
+                class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn"
+                (click)="rejectSelectivePaste()"
+                aria-label="Cancel paste"
+                [innerHTML]="'I18N_RTE_CANCEL_VALID_CONTENT_PASTE' | translate">
+        </button>
+      </div>
+    </div>
+
+    <!-- Show dismiss button only when no confirmation is needed -->
+    <button *ngIf="!shouldShowPasteConfirmation()"
+            type="button"
+            class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn"
+            (click)="dismissPasteError()"
+            aria-label="Dismiss error"
+            [innerHTML]="'I18N_RTE_DISMISS_WARNING' | translate">
+    </button>
+  </div>
+
   <div contenteditable="true" class="oppia-rte-resizer oppia-rte e2e-test-rte" #oppiaRTE></div>
+</div>
+
+<!-- Error message box shown when configuration is missing -->
+<div *ngIf="configError" class="oppia-rte-error-box">
+  Rich-text editor error: {{ configError }}
 </div>
 
 <style>
@@ -10,6 +48,7 @@
     max-height: 500px;
     overflow-y: auto;
   }
+
   .oppia-cke-offline-warning {
     background: #eee;
     border: 1px solid #ddd;
@@ -19,9 +58,103 @@
     font-size: small;
     padding: 0 3px;
   }
+
+  .oppia-rte-error-box {
+    background-color: #ff8d70;
+    border: 1px solid #ff3c00;
+    border-radius: 4px;
+    color: #7a4f01;
+    margin: 8px 0;
+    padding: 12px;
+  }
+
+  .oppia-rte-paste-error-box {
+    animation: fadeIn 0.3s ease-in;
+    background-color: #ffe6e6;
+    border: 1px solid #f99;
+    border-radius: 4px;
+    color: #c00;
+    font-size: 14px;
+    margin: 4px 0 8px 0;
+    padding: 8px 12px;
+  }
+
+  .oppia-rte-paste-confirmation-buttons {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .oppia-rte-paste-confirm-btn {
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    min-width: 80px;
+    padding: 6px 12px;
+    transition: all 0.2s ease;
+  }
+
+  .oppia-rte-paste-yes-btn {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .oppia-rte-paste-yes-btn:hover {
+    background-color: #218838;
+  }
+
+  .oppia-rte-paste-yes-btn:active {
+    background-color: #1e7e34;
+  }
+
+  .oppia-rte-paste-no-btn {
+    background-color: #fff;
+    color: rgb(0, 0, 0);
+  }
+
+  .oppia-rte-paste-no-btn:hover {
+    background-color: #5a6268;
+  }
+
+  .oppia-rte-paste-no-btn:active {
+    background-color: #545b62;
+  }
+
+  .oppia-rte-paste-confirm-btn:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   @media screen and (max-width: 700px) {
     .oppia-rte {
       font-size: 16px;
+    }
+    .oppia-rte-paste-error-box {
+      font-size: 13px;
+      padding: 6px 10px;
+    }
+    .oppia-rte-paste-confirmation-buttons {
+      align-items: stretch;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .oppia-rte-paste-confirm-btn {
+      font-size: 11px;
+      width: 100%;
     }
   }
 </style>

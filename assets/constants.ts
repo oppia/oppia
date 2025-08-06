@@ -65,6 +65,11 @@ export default {
       "explanation": "For learners in Nigeria."
     }],
 
+    "RTE_COMPONENT_CONFIGS": {
+      "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
+      "BLOG_COMPONENTS": ["image", "link", "video"]
+    },
+
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
     "News", "International", "Educators", "Learners", "Community",
     "Partnerships", "Volunteer", "Stories", "Languages", "New features",
@@ -5114,10 +5119,6 @@ export default {
     "Welcome": "#992a2b"
   },
 
-  "INVALID_RTE_COMPONENTS_FOR_BLOG_POST_EDITOR": [
-    "tabs", "math", "collapsible", "skillreview"
-  ],
-
   // This is linked to VALID_RTE_COMPONENTS in android_validation_constants.
   "VALID_RTE_COMPONENTS_FOR_ANDROID": ["image", "math", "skillreview"],
 
@@ -6907,6 +6908,15 @@ export default {
     },
     "EXPLORATION_PLAYER_EMBED": {
       "ROUTE": "embed/exploration/:exploration_id",
+      "TITLE": "",
+      // Some routes contain url fragments, as syntax for url fragments are
+      // different for angular router and backend. They have to be registered
+      // manually in the backend. Please use angular router syntax here.
+      "MANUALLY_REGISTERED_WITH_BACKEND": true,
+      "META": []
+    },
+    "LESSON_PLAYER_EMBED": {
+      "ROUTE": "embed/lesson/:exploration_id",
       "TITLE": "",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered

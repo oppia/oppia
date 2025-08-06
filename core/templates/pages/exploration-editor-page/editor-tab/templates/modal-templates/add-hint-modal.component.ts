@@ -54,6 +54,7 @@ export class AddHintModalComponent
   HINT_FORM_SCHEMA: HintFormSchema = {
     type: 'html',
     ui_config: {
+      rte_components: 'ALL_COMPONENTS',
       hide_complex_extensions:
         this.pageContextService.getEntityType() === 'question',
     },

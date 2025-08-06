@@ -21,7 +21,7 @@ import {fakeAsync, TestBed, tick} from '@angular/core/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {AnswerClassificationResult} from '../../../domain/classifier/answer-classification-result.model';
-import {InteractionObjectFactory} from '../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../domain/exploration/interaction.model';
 import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
@@ -29,8 +29,8 @@ import {
 import {Outcome} from '../../../domain/exploration/outcome.model';
 import {
   ParamChangeBackendDict,
-  ParamChangeObjectFactory,
-} from '../../../domain/exploration/ParamChangeObjectFactory';
+  ParamChange,
+} from '../../../domain/exploration/param-change.model';
 import {
   FetchExplorationBackendResponse,
   ReadOnlyExplorationBackendApiService,
@@ -61,13 +61,11 @@ describe('Exploration engine service ', () => {
   let explorationEngineService: ExplorationEngineService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let imagePreloaderService: ImagePreloaderService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let learnerParamsService: LearnerParamsService;
   let playerTranscriptService: PlayerTranscriptService;
   let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let statsReportingService: StatsReportingService;
   let urlService: UrlService;
-  let paramChangeObjectFactory: ParamChangeObjectFactory;
   let textInputService: TextInputRulesService;
   let translateService: TranslateService;
   let explorationDict: ExplorationBackendDict;
@@ -375,7 +373,6 @@ describe('Exploration engine service ', () => {
     expressionInterpolationService = TestBed.inject(
       ExpressionInterpolationService
     );
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     imagePreloaderService = TestBed.inject(ImagePreloaderService);
     learnerParamsService = TestBed.inject(LearnerParamsService);
     explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
@@ -386,7 +383,6 @@ describe('Exploration engine service ', () => {
     statsReportingService = TestBed.inject(StatsReportingService);
     urlService = TestBed.inject(UrlService);
     explorationEngineService = TestBed.inject(ExplorationEngineService);
-    paramChangeObjectFactory = TestBed.inject(ParamChangeObjectFactory);
     textInputService = TestBed.inject(TextInputRulesService);
     translateService = TestBed.inject(TranslateService);
   });
@@ -468,8 +464,7 @@ describe('Exploration engine service ', () => {
     'should load exploration when initialized in ' + 'exploration editor page',
     () => {
       let initSuccessCb = jasmine.createSpy('success');
-      let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+      let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
       // Setting exploration editor page.
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         true
@@ -1119,54 +1114,53 @@ describe('Exploration engine service ', () => {
         'default_outcome'
       );
 
-      const lastCardInteraction =
-        interactionObjectFactory.createFromBackendDict({
-          id: 'TextInput',
-          answer_groups: [
-            {
-              outcome: {
-                missing_prerequisite_skill_id: null,
-                refresher_exploration_id: null,
-                labelled_as_correct: true,
-                feedback: {
-                  content_id: 'feedback_1',
-                  html: '<p>Good Job</p>',
-                },
-                param_changes: [],
-                dest_if_really_stuck: null,
-                dest: 'Mid',
+      const lastCardInteraction = Interaction.createFromBackendDict({
+        id: 'TextInput',
+        answer_groups: [
+          {
+            outcome: {
+              missing_prerequisite_skill_id: null,
+              refresher_exploration_id: null,
+              labelled_as_correct: true,
+              feedback: {
+                content_id: 'feedback_1',
+                html: '<p>Good Job</p>',
               },
-              training_data: [],
-              rule_specs: [
-                {
-                  inputs: {
-                    x: {
-                      normalizedStrSet: ['answer'],
-                      contentId: 'rule_input_2',
-                    },
+              param_changes: [],
+              dest_if_really_stuck: null,
+              dest: 'Mid',
+            },
+            training_data: [],
+            rule_specs: [
+              {
+                inputs: {
+                  x: {
+                    normalizedStrSet: ['answer'],
+                    contentId: 'rule_input_2',
                   },
-                  rule_type: 'Equals',
                 },
-              ],
-              tagged_skill_misconception_id: null,
-            },
-          ],
-          default_outcome: defaultOutcomeDict,
-          confirmed_unclassified_answers: [],
-          customization_args: {
-            rows: {
-              value: true,
-            },
-            placeholder: {
-              value: 1,
-            },
-            catch_misspellings: {
-              value: true,
-            },
+                rule_type: 'Equals',
+              },
+            ],
+            tagged_skill_misconception_id: null,
           },
-          hints: [],
-          solution: null,
-        });
+        ],
+        default_outcome: defaultOutcomeDict,
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
+          },
+          catch_misspellings: {
+            value: true,
+          },
+        },
+        hints: [],
+        solution: null,
+      });
       const lastCard = StateCard.createNewCard(
         'Card 1',
         'Content html',
@@ -1477,8 +1471,7 @@ describe('Exploration engine service ', () => {
       // Please note that 'initSettingsFromEditor' function is strictly
       // used for the exploration editor page before initialization.
       // This method should not be called from the exploration player page.
-      let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+      let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
 
       // Checking if we are currently in exploration editor preview mode.
       expect(pageContextService.isInExplorationEditorPage()).toBe(false);
@@ -1698,8 +1691,7 @@ describe('Exploration engine service ', () => {
         answer: 'val1, val2',
       };
 
-      let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+      let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
       const newParams = explorationEngineService.makeParams(
         oldParams,
         [paramChanges],
@@ -1714,8 +1706,7 @@ describe('Exploration engine service ', () => {
         paramChangeDict.customization_args.parse_with_jinja = true;
         let oldParams = {};
 
-        let paramChanges =
-          paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+        let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
         spyOn(expressionInterpolationService, 'processUnicode').and.returnValue(
           null
         );
@@ -1733,8 +1724,7 @@ describe('Exploration engine service ', () => {
         answer: 'val',
       };
 
-      let paramChanges =
-        paramChangeObjectFactory.createFromBackendDict(paramChangeDict);
+      let paramChanges = ParamChange.createFromBackendDict(paramChangeDict);
       const newParams = explorationEngineService.makeParams(
         oldParams,
         [paramChanges],

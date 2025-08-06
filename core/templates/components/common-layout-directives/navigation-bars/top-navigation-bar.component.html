@@ -101,7 +101,11 @@
           </a>
           <ul ngbDropdownMenu
               [ngStyle]="{'left.px': learnDropdownOffset}"
-              class="dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled"
+              [ngClass]="{
+                'dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled': true,
+                'two-columns': classroomSummariesLength == 2,
+                'three-columns': classroomSummariesLength >= 3
+              }"
               (mouseover)="openSubmenu($event, 'learnMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)"
               role="menu">
@@ -111,7 +115,7 @@
                   <oppia-classroom-navigation-links></oppia-classroom-navigation-links>
                 </div>
                 <span class="nav-item-right d-flex flex-column">
-                  <a class="nav-content mb-5"
+                  <a class="nav-content mb-5 e2e-test-topnb-go-to-community-library-link"
                      tabindex="0"
                      href="/community-library">
                     <div class="nav-item-right-head">
@@ -122,7 +126,7 @@
                     </div>
                     <div (keydown)="onMenuKeypress($event, 'learnMenu', {enter: ACTION_CLOSE})"
                          class="nav-item-bottom-link">
-                      <a class="underline nav-item-bottom-link" tabindex="0" href="/community-library">
+                      <a class="underline nav-item-bottom-link e2e-test-topnb-go-to-community-library-link" tabindex="0" href="/community-library">
                         <span class="link">
                           {{ 'I18N_TOPNAV_LIBRARY' | translate }}
                         </span>
@@ -424,7 +428,7 @@
         </div>
       </a>
       <ul ngbDropdownMenu
-          class="dropdown-menu dropdown-menu oppia-navbar-dropdown dropdn"
+          class="dropdown-menu dropdown-menu oppia-navbar-dropdown dropdn e2e-test-profile-dropdown-container"
           (mouseover)="openSubmenu($event, 'profileMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
         <li class="nav-item">
