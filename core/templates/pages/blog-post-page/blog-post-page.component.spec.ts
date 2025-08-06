@@ -132,15 +132,20 @@ describe('Blog home page component', () => {
     let dummyTextNode = document.createTextNode('Text to be copied');
     dummyDivElement.className = 'class-name';
     dummyDivElement.appendChild(dummyTextNode);
-    let dummyDocumentFragment = document.createDocumentFragment();
-    dummyDocumentFragment.appendChild(dummyDivElement);
+
+    const mockElementList = {
+      0: dummyDivElement,
+      length: 1,
+      item: (index: number) => dummyDivElement,
+    };
+
     spyOn(document, 'getElementsByClassName')
       .withArgs('class-name')
-      .and.returnValue(dummyDocumentFragment.children);
-    spyOn(document, 'execCommand').withArgs('copy');
-    spyOn($.fn, 'tooltip');
+      .and.returnValue(mockElementList as unknown as HTMLCollectionOf<Element>);
+
+    spyOn(document, 'execCommand').and.returnValue(true);
     component.copyLink('class-name');
-    expect(document.execCommand).toHaveBeenCalled();
+    expect(document.execCommand).toHaveBeenCalledWith('copy');
   });
 
   it('should get formatted date string from the timestamp in milliseconds', () => {
