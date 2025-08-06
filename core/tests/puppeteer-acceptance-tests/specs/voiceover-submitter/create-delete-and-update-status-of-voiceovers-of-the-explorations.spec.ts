@@ -24,13 +24,14 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 import {VoiceoverSubmitter} from '../../utilities/user/voiceover-submitter';
 
 const ROLES = testConstants.Roles;
 
 describe('Voiceover Submitter', function () {
-  let voiceoverSubmitter: VoiceoverSubmitter;
-  let curriculumAdm: CurriculumAdmin & ExplorationEditor;
+  let voiceoverSubmitter: VoiceoverSubmitter & ExplorationEditor;
+  let curriculumAdm: CurriculumAdmin & ExplorationEditor & VoiceoverAdmin;
   let releaseCoordinator: ReleaseCoordinator;
   let explorationId: string;
 
@@ -39,7 +40,7 @@ describe('Voiceover Submitter', function () {
     curriculumAdm = await UserFactory.createNewUser(
       'curriculumAdm',
       'curriculum_admin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
+      [ROLES.CURRICULUM_ADMIN, ROLES.VOICEOVER_ADMIN]
     );
 
     releaseCoordinator = await UserFactory.createNewUser(
@@ -49,9 +50,11 @@ describe('Voiceover Submitter', function () {
     );
 
     // Create an exploration for the voiceover submitter.
+    await releaseCoordinator.enableFeatureFlag('enable_voiceover_contribution');
     explorationId = await curriculumAdm.createAndPublishExplorationWithCards(
       'Exploration for voiceover submitter'
     );
+    await curriculumAdm.addSupportedLanguageAccentPair('Hindi (India)');
 
     // Create a voiceover submitter.
     voiceoverSubmitter = await UserFactory.createNewUser(
@@ -61,9 +64,14 @@ describe('Voiceover Submitter', function () {
       null,
       explorationId
     );
+  }, 450000);
+
+  it('should be able to add and remove voiceovers to explorations', async function () {
+    await voiceoverSubmitter.navigateToExplorationEditorUsingID(explorationId);
+    await voiceoverSubmitter.dismissWelcomeModal();
   });
 
   afterAll(async function () {
-    await UserFactory.closeAllBrowsers();
+    // await UserFactory.closeAllBrowsers();
   });
 });

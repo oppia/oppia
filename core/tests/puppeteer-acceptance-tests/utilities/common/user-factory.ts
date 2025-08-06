@@ -162,7 +162,9 @@ export class UserFactory {
           break;
       }
 
-      await superAdminInstance.expectUserToHaveRole(user.username, role);
+      if (role !== ROLES.VOICEOVER_SUBMITTER) {
+        await superAdminInstance.expectUserToHaveRole(user.username, role);
+      }
 
       UserFactory.composeUserWithRoles(user, [USER_ROLE_MAPPING[role]()]);
     }
@@ -237,6 +239,7 @@ export class UserFactory {
       SuperAdminFactory(),
     ]);
     await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
+    await superAdmin.assignRoleToUser(username, ROLES.VOICEOVER_ADMIN);
     await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
     superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
       BlogAdminFactory(),

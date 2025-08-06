@@ -77,3 +77,6 @@ firebase-debug.log
 debug.log
 # development logs and status entries
 .dev
+
+# Puppeteer acceptance tests.
+jest-runtime-config.json

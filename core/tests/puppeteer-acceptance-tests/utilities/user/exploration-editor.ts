@@ -6562,6 +6562,16 @@ export class ExplorationEditor extends BaseUser {
       hidden: true,
     });
   }
+
+  /**
+   * Navigates to the exploration editor page using the exploration ID.
+   * @param explorationId - The ID of the exploration to navigate to.
+   */
+  async navigateToExplorationEditorUsingID(
+    explorationId: string
+  ): Promise<void> {
+    await this.goto(`${baseUrl}/create/${explorationId}#/`);
+  }
 }
 
 export let ExplorationEditorFactory = (): ExplorationEditor =>
