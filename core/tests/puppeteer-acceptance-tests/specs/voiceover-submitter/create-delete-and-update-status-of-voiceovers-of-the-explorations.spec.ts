@@ -118,6 +118,14 @@ describe('Voiceover Submitter', function () {
     await voiceoverSubmitter.navigateToTranslationsTab();
     await voiceoverSubmitter.deleteVoiceoverInCurrentCard();
     await voiceoverSubmitter.saveExplorationDraft();
+    await voiceoverSubmitter.navigateToPreviewTab();
+    await voiceoverSubmitter.expandVoiceoverBar();
+    await voiceoverSubmitter.expectVoiceoverPlayButtonToBe('disabled');
+  });
+
+  it('should not be able to upload a non-audio file', async function () {
+    await voiceoverSubmitter.navigateToTranslationsTab();
+    await voiceoverSubmitter.clickOnAddManualVoiceoverButton();
   });
 
   afterAll(async function () {

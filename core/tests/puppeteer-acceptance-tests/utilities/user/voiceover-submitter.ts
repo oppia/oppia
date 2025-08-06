@@ -26,6 +26,9 @@ const deleteVoiceoverBtnSelector = '.e2e-test-delete-voiceover-button';
 
 const voiceoverPlayBtnInAudioBarSelector = '.e2e-test-play-circle';
 const voiceoverPauseBtnInAudioBarSelector = '.e2e-test-pause-circle';
+const audioNotAvailableIconSelector = '.audio-controls-audio-not-available';
+
+const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
 
 export class VoiceoverSubmitter extends BaseUser {
   /**
@@ -69,19 +72,13 @@ export class VoiceoverSubmitter extends BaseUser {
    * @param status - The status of the voiceover play button.
    */
   async expectVoiceoverPlayButtonToBe(
-    status: 'enabled' | 'disabled' | 'hidden'
+    status: 'enabled' | 'disabled'
   ): Promise<void> {
-    if (status === 'hidden') {
-      await this.expectElementToBeVisible(
-        voiceoverPlayBtnInAudioBarSelector,
-        false
-      );
-    } else {
-      await this.expectElementToBeClickable(
-        voiceoverPlayBtnInAudioBarSelector,
-        status === 'enabled'
-      );
-    }
+    await this.expectElementToBeVisible(voiceoverPlayBtnInAudioBarSelector);
+    await this.expectElementToBeVisible(
+      audioNotAvailableIconSelector,
+      status === 'disabled'
+    );
   }
 
   /**
@@ -94,6 +91,15 @@ export class VoiceoverSubmitter extends BaseUser {
       'Are you sure you want to remove this voiceover?',
       'confirm'
     );
+  }
+
+  /**
+   * Clicks on the add manual voiceover button.
+   */
+  async clickOnAddManualVoiceoverButton(): Promise<void> {
+    await this.expectElementToBeVisible(addManualVoiceoverButton);
+    await this.clickOn(addManualVoiceoverButton);
+    await this.expectModalTitleToBe('Add Voiceover');
   }
 }
 
