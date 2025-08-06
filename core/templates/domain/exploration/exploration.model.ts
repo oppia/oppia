@@ -199,7 +199,6 @@ export class Exploration extends BaseTranslatableObject {
     return this.languageCode;
   }
 
-
   static createFromBackendDict(
     explorationBackendDict: ExplorationBackendDict,
     logger: LoggerService,
@@ -216,9 +215,7 @@ export class Exploration extends BaseTranslatableObject {
       paramSpecsObjectFactory.createFromBackendDict(
         explorationBackendDict.param_specs
       ),
-      statesObjectFactory.createFromBackendDict(
-        explorationBackendDict.states
-      ),
+      statesObjectFactory.createFromBackendDict(explorationBackendDict.states),
       explorationBackendDict.title,
       explorationBackendDict.next_content_id_index,
       explorationBackendDict.language_code,
