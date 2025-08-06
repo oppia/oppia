@@ -126,6 +126,36 @@ describe('Voiceover Submitter', function () {
   it('should not be able to upload a non-audio file', async function () {
     await voiceoverSubmitter.navigateToTranslationsTab();
     await voiceoverSubmitter.clickOnAddManualVoiceoverButton();
+    await voiceoverSubmitter.uploadFile(testConstants.data.profilePicture);
+    await voiceoverSubmitter.expectUploadErrorMessageToBe(
+      'This file is not recognized as an audio file.'
+    );
+  });
+
+  it('should not be able to upload audio file larger than 5 minutes', async function () {
+    await voiceoverSubmitter.uploadFile(
+      testConstants.data.VoiceoverEnglishIndiaOver5Min
+    );
+    await voiceoverSubmitter.clickOnSaveUploadVoiceoverButton();
+    await voiceoverSubmitter.expectUploadErrorMessageToBe(
+      'Audio files must be under 300 seconds in length.'
+    );
+  });
+
+  it('should be able to mark/unmark voiceover as stale', async function () {
+    // Mark voiceover as stale.
+    await voiceoverSubmitter.uploadFile(
+      testConstants.data.VoiceoverEnglishIndia
+    );
+    await voiceoverSubmitter.clickOnSaveUploadVoiceoverButton();
+    await voiceoverSubmitter.toggleAudioNeedsUpdateButton();
+    await voiceoverSubmitter.expectCurrentVoiceStatusButtonToBe('needs update');
+    await voiceoverSubmitter.expectTranslationNumericalStatusToBe('2/3');
+    await voiceoverSubmitter.expectNodeWariningSignToBeVisible(true);
+
+    // Mark voiceover as upto date.
+    await voiceoverSubmitter.toggleAudioNeedsUpdateButton();
+    await voiceoverSubmitter.expectCurrentVoiceStatusButtonToBe('upto date');
   });
 
   afterAll(async function () {

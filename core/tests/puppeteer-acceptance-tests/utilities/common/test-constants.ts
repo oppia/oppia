@@ -198,6 +198,10 @@ export default {
       __dirname,
       '../../data/audio/voiceover_english_india_15secs.mp3'
     ),
+    VoiceoverEnglishIndiaOver5Min: path.resolve(
+      __dirname,
+      '../../data/audio/voiceover_en_in_over5m.mp3'
+    ),
   },
   SocialsShare: {
     Facebook: {

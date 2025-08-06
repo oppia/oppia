@@ -417,6 +417,7 @@ const customSelectedCharctersSelector = '.e2e-test-custom-letters';
 const showUnitFormatsButtonSelector = '.e2e-test-show-unit-formats';
 const codeOutputSelector = '.e2e-test-code-output';
 const graphContainerSelector = '.e2e-test-graph-input-viz-container';
+const nodeWarningSignSelector = '.e2e-test-node-warning-sign';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebric Expression Input',
@@ -6571,6 +6572,16 @@ export class ExplorationEditor extends BaseUser {
     explorationId: string
   ): Promise<void> {
     await this.goto(`${baseUrl}/create/${explorationId}#/`);
+  }
+
+  /**
+   * Expects the node warning sign to be visible or not visible.
+   * @param visible - Whether the node warning sign should be visible or not.
+   */
+  async expectNodeWariningSignToBeVisible(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(nodeWarningSignSelector, visible);
   }
 
   // async republishTheExploration(descriptionOfChanges: string): Promise<void> {

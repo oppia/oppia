@@ -27,8 +27,14 @@ const deleteVoiceoverBtnSelector = '.e2e-test-delete-voiceover-button';
 const voiceoverPlayBtnInAudioBarSelector = '.e2e-test-play-circle';
 const voiceoverPauseBtnInAudioBarSelector = '.e2e-test-pause-circle';
 const audioNotAvailableIconSelector = '.audio-controls-audio-not-available';
+const saveUploadedAudioBtnSelector = '.e2e-test-save-uploaded-audio-button';
 
-const addManualVoiceoverButton = '.e2e-test-voiceover-upload-audio';
+const addManualVoiceoverBtnSelector = '.e2e-test-voiceover-upload-audio';
+const audioStatusUpdateBtnSelector = '.e2e-test-audio-status-update-button';
+const audioNeedsUpdateIconSelector = '.needs-update-button-icon';
+const audioDoesNotNeedUpdateIconSelector = '.does-not-needs-update-button-icon';
+const translationNumericalStatusSelector =
+  '.e2e-test-translation-numerical-status';
 
 export class VoiceoverSubmitter extends BaseUser {
   /**
@@ -97,9 +103,60 @@ export class VoiceoverSubmitter extends BaseUser {
    * Clicks on the add manual voiceover button.
    */
   async clickOnAddManualVoiceoverButton(): Promise<void> {
-    await this.expectElementToBeVisible(addManualVoiceoverButton);
-    await this.clickOn(addManualVoiceoverButton);
+    await this.expectElementToBeVisible(addManualVoiceoverBtnSelector);
+    await this.clickOn(addManualVoiceoverBtnSelector);
     await this.expectModalTitleToBe('Add Voiceover');
+  }
+
+  /**
+   * Clicks on the save uploaded audio button.
+   */
+  async clickOnSaveUploadVoiceoverButton(): Promise<void> {
+    await this.expectElementToBeVisible(saveUploadedAudioBtnSelector);
+    await this.clickOn(saveUploadedAudioBtnSelector);
+    await this.expectElementToBeClickable(saveUploadedAudioBtnSelector, false);
+  }
+
+  /**
+   * Toggles the audio status update button.
+   */
+  async toggleAudioNeedsUpdateButton(): Promise<void> {
+    await this.expectElementToBeVisible(audioStatusUpdateBtnSelector);
+    const currentStatus = await this.isElementVisible(
+      `${audioStatusUpdateBtnSelector}.${audioNeedsUpdateIconSelector}`
+    );
+
+    await this.clickOn(audioStatusUpdateBtnSelector);
+
+    await this.expectElementToBeVisible(
+      `${audioStatusUpdateBtnSelector}.${audioDoesNotNeedUpdateIconSelector}`,
+      !currentStatus
+    );
+  }
+
+  /**
+   * Checks if the current voice status button is upto date or needs update.
+   * @param status - The status of the current voice status button.
+   */
+  async expectCurrentVoiceStatusButtonToBe(
+    status: 'upto date' | 'needs update'
+  ): Promise<void> {
+    const statusSelector =
+      status === 'upto date'
+        ? `${audioStatusUpdateBtnSelector}.${audioDoesNotNeedUpdateIconSelector}`
+        : `${audioStatusUpdateBtnSelector}.${audioNeedsUpdateIconSelector}`;
+    await this.expectElementToBeVisible(statusSelector);
+  }
+
+  /**
+   * Checks if the translation numerical status is upto date or needs update.
+   * @param status - The status of the translation numerical status.
+   */
+  async expectTranslationNumericalStatusToBe(status: string): Promise<void> {
+    await this.expectTextContentToBe(
+      translationNumericalStatusSelector,
+      status
+    );
   }
 }
 

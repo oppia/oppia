@@ -36,6 +36,7 @@ const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
 const commonModalConfirmBtnSelector = '.e2e-test-confirm-action-button';
 const commonModalCancelBtnSelector = '.e2e-test-cancel-action-button';
+const uploadErrorMessageDivSelector = '.e2e-test-upload-error-message';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
@@ -1543,6 +1544,20 @@ export class BaseUser {
     await this.expectTextContentToContain(
       commonModalBodySelector,
       expectedText
+    );
+  }
+
+  /**
+   * Checks if the upload error message contains the expected text.
+   * @param expectedErrorMessage The expected text of the upload error message.
+   */
+  async expectUploadErrorMessageToBe(
+    expectedErrorMessage: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(uploadErrorMessageDivSelector);
+    await this.expectTextContentToContain(
+      uploadErrorMessageDivSelector,
+      expectedErrorMessage
     );
   }
 }

@@ -42,6 +42,7 @@
         <button (click)="toggleAudioNeedsUpdate()"
                 mat-icon-button
                 mat-button
+                class="e2e-test-audio-status-update-button"
                 [ngClass]="manualVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
           <mat-icon matTooltip="Audio needs update"
                     *ngIf="manualVoiceover.needsUpdate"
