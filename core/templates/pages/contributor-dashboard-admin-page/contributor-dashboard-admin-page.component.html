@@ -13,26 +13,26 @@
   <mat-card class="oppia-page-card oppia-long-text e2e-test-view-contribution-rights-form">
     <form class="form-horizontal" (ngSubmit)="submitViewContributorUsersForm(formData.viewContributionReviewers)">
       <legend class="text-center">View Contributor Dashboard Users</legend>
-      <div class="d-xl-inline-flex form-group">
+      <div class="d-xl-inline-flex mb-3">
         <label class="col-md-4 col-lg-4 col-sm-4 col-form-label" for="view-contributor-filter-method-select">
           Select Method
         </label>
-        <div class="col-md-8 ml-auto">
+        <div class="col-md-8 ms-auto">
           <select id="view-contributor-filter-method-select"
                   [(ngModel)]="formData.viewContributionReviewers.filterCriterion"
-                  class="form-control e2e-test-view-contribution-rights-method" (change)="clearResults()"
+                  class="form-select e2e-test-view-contribution-rights-method" (change)="clearResults()"
                   [ngModelOptions]="{standalone: true}">
             <option [value]="USER_FILTER_CRITERION_USERNAME">By Username</option>
             <option [value]="USER_FILTER_CRITERION_ROLE">By Role</option>
           </select>
         </div>
       </div>
-      <div class="d-xl-inline-flex form-group"
+      <div class="d-xl-inline-flex mb-3"
         *ngIf="formData.viewContributionReviewers.filterCriterion===USER_FILTER_CRITERION_ROLE">
         <label for="view-contributor-category-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
-        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+        <div class="col-md-8 col-lg-8 col-sm-8 ms-auto">
           <select id="view-contributor-category-select"
-                  class="form-control e2e-test-form-contribution-rights-category-select"
+                  class="form-select e2e-test-form-contribution-rights-category-select"
                   [(ngModel)]="formData.viewContributionReviewers.category" (change)="clearResults()"
                   [ngModelOptions]="{standalone: true}">
             <option *ngFor="let roleName of CD_USER_RIGHTS_CATEGORIES | keyvalue" [value]="roleName.value">{{ roleName.key }}</option>
@@ -40,21 +40,21 @@
         </div>
       </div>
 
-      <div class="d-xl-inline-flex form-group"
+      <div class="d-xl-inline-flex mb-3"
         *ngIf="isLanguageSpecificReviewCategory(formData.viewContributionReviewers.category) && formData.viewContributionReviewers.filterCriterion===USER_FILTER_CRITERION_ROLE">
         <label for="view-contributor-language-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
-        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+        <div class="col-md-8 col-lg-8 col-sm-8 ms-auto">
           <select id="view-contributor-language-select" [(ngModel)]="formData.viewContributionReviewers.languageCode"
-            [ngModelOptions]="{standalone: true}" class="form-control e2e-test-form-language-select">
+            [ngModelOptions]="{standalone: true}" class="form-select e2e-test-form-language-select">
             <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id">{{ language.description }}</option>
           </select>
         </div>
       </div>
 
-      <div class="d-xl-inline-flex form-group"
+      <div class="d-xl-inline-flex mb-3"
         *ngIf="formData.viewContributionReviewers.filterCriterion===USER_FILTER_CRITERION_USERNAME">
         <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
-        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+        <div class="col-md-8 col-lg-8 col-sm-8 ms-auto">
           <input id="view-contributor-username-input" type="text" name="username" placeholder="Enter username"
                  [(ngModel)]="formData.viewContributionReviewers.username"
                  class="form-control e2e-test-form-contributor-username">
@@ -111,20 +111,20 @@
   <mat-card class="oppia-page-card oppia-long-text e2e-test-add-contribution-rights-form">
     <form class="form-horizontal" (ngSubmit)="submitAddContributionRightsForm(formData.addContributionReviewer)">
       <legend class="text-center">Add Contribution Rights</legend>
-      <div class="d-xl-inline-flex form-group">
+      <div class="d-xl-inline-flex mb-3">
         <label for="add-contribution-rights-user-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
-        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+        <div class="col-md-8 col-lg-8 col-sm-8 ms-auto">
           <input type="text" id="add-contribution-rights-user-input" placeholder="Enter username"
                  [(ngModel)]="formData.addContributionReviewer.username" [ngModelOptions]="{standalone: true}"
                  class="form-control e2e-test-form-contributor-username">
         </div>
       </div>
 
-      <div class="d-xl-inline-flex form-group">
+      <div class="d-xl-inline-flex mb-3">
         <label for="add-contribution-rights-category-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Rights</label>
-        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+        <div class="col-md-8 col-lg-8 col-sm-8 ms-auto">
           <select id="add-contribution-rights-category-select"
-                  class="form-control e2e-test-form-contribution-rights-category-select"
+                  class="form-select e2e-test-form-contribution-rights-category-select"
                   [(ngModel)]="formData.addContributionReviewer.category" [ngModelOptions]="{standalone: true}">
             <option *ngFor="let category of CD_USER_RIGHTS_CATEGORIES | keyvalue" [value]="category.value">
               {{ category.key }}
@@ -133,15 +133,15 @@
         </div>
       </div>
 
-      <div class="d-xl-inline-flex form-group"
+      <div class="d-xl-inline-flex mb-3"
         *ngIf="isLanguageSpecificReviewCategory(formData.addContributionReviewer.category)">
         <label for="add-contribution-rights-language-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">
           Select language
         </label>
-        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+        <div class="col-md-8 col-lg-8 col-sm-8 ms-auto">
           <select id="add-contribution-rights-language-select"
                   [(ngModel)]="formData.addContributionReviewer.languageCode" [ngModelOptions]="{standalone: true}"
-                  class="form-control e2e-test-form-language-select">
+                  class="form-select e2e-test-form-language-select">
             <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id">{{ language.description }}</option>
           </select>
         </div>
@@ -156,23 +156,23 @@
   <mat-card class="oppia-page-card oppia-long-text e2e-test-remove-reviewer-form">
     <form class="form-horizontal" (ngSubmit)="submitRemoveContributionRightsForm(formData.removeContributionReviewer)">
       <legend class="text-center">Remove Contribution Rights</legend>
-      <div class="d-xl-inline-flex form-group">
+      <div class="d-xl-inline-flex mb-3">
         <label for="remove-contribution-rights-user-input" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
-        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+        <div class="col-md-8 col-lg-8 col-sm-8 ms-auto">
           <input type="text" id="remove-contribution-rights-user-input"
                  class="form-control e2e-test-form-contributor-username" placeholder="Enter username"
                  [(ngModel)]="formData.removeContributionReviewer.username" [ngModelOptions]="{standalone: true}">
         </div>
       </div>
 
-      <div class="d-xl-inline-flex form-group">
+      <div class="d-xl-inline-flex mb-3">
         <label for="remove-contribution-rights-category-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">
           Remove from
         </label>
-        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+        <div class="col-md-8 col-lg-8 col-sm-8 ms-auto">
           <select id="remove-contribution-rights-category-select"
                   [(ngModel)]="formData.removeContributionReviewer.category" [ngModelOptions]="{standalone: true}"
-                  class="form-control">
+                  class="form-select">
             <option *ngFor="let category of CD_USER_RIGHTS_CATEGORIES | keyvalue" [value]="category.value">
               {{ category.key }}
             </option>
@@ -180,15 +180,15 @@
         </div>
       </div>
 
-      <div class="d-xl-inline-flex form-group"
+      <div class="d-xl-inline-flex mb-3"
         *ngIf="isLanguageSpecificReviewCategory(formData.removeContributionReviewer.category)">
         <label for="remove-contribution-rights-language-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">
           Select language
         </label>
-        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+        <div class="col-md-8 col-lg-8 col-sm-8 ms-auto">
           <select id="remove-contribution-rights-language-select"
             [(ngModel)]="formData.removeContributionReviewer.languageCode"
-            [ngModelOptions]="{standalone: true}" class="form-control e2e-test-form-language-select">
+            [ngModelOptions]="{standalone: true}" class="form-select e2e-test-form-language-select">
             <option *ngFor="let language of languageCodesAndDescriptions" [value]="language.id">
               {{ language.description }}
             </option>
@@ -206,9 +206,9 @@
     <form class="form-horizontal"
           (ngSubmit)="submitViewTranslationContributionStatsForm(formData.viewTranslationContributionStats)">
       <legend class="text-center">View Translation Contribution Stats</legend>
-      <div class="d-xl-inline-flex form-group">
+      <div class="d-xl-inline-flex mb-3">
         <label for="label-target-form-translation-contributor-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
-        <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+        <div class="col-md-8 col-lg-8 col-sm-8 ms-auto">
           <input type="text" id="label-target-form-translation-contributor-username"
                  class="form-control e2e-test-username-value" placeholder="Enter username"
                  [(ngModel)]="formData.viewTranslationContributionStats.username" [ngModelOptions]="{standalone: true}">

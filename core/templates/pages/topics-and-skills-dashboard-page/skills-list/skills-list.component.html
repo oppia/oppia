@@ -11,9 +11,9 @@
       <th *ngFor="let key of SKILL_HEADINGS"
           class="dashboard-table-headings">
         <p *ngIf="key === 'index'" class="text-center"></p>
-        <p *ngIf="key === 'description'" class="text-left">Skill Description</p>
+        <p *ngIf="key === 'description'" class="text-start">Skill Description</p>
         <p *ngIf="key === 'misconception_count'" class="text-center">Misconceptions</p>
-        <p *ngIf="key === 'status'" class="text-right skill-status-heading">Status</p>
+        <p *ngIf="key === 'status'" class="text-end skill-status-heading">Status</p>
       </th>
     </tr>
     <tr *ngFor="let skill of skillSummaries; index as idx"
@@ -40,7 +40,7 @@
           <span> {{skill.misconceptionCount}} </span>
         </span>
       </td>
-      <td class="text-right">
+      <td class="text-end">
         <span>
           <span *ngIf="skill.topicNames.length">
             Assigned

@@ -49,10 +49,10 @@
         </div>
         <div class="history-table-options e2e-test-history-list-options">
           <div ngbDropdown class="dropdown">
-            <button ngbDropdownToggle class="history-table-option e2e-test-history-table-option" type="button" id="{{ 'dropdownMenuButton-' + index }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" role="button" aria-label="options">
+            <button ngbDropdownToggle class="history-table-option e2e-test-history-table-option" type="button" id="{{ 'dropdownMenuButton-' + index }}" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" tabindex="0" role="button" aria-label="options">
               <i class="fa fa-ellipsis-v"></i>
             </button>
-            <div ngbDropdownMenu class="dropdown-menu dropdown-menu-left" [attr.aria-label]="'dropdownMenuButton-' + index">
+            <div ngbDropdownMenu class="dropdown-menu dropdown-menu-start" [attr.aria-label]="'dropdownMenuButton-' + index">
               <a ngbDropdownItem class="dropdown-item e2e-test-revert-version"
                  href="#"
                  *ngIf="metadata.versionNumber !== currentVersion && isEditable()"

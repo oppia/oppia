@@ -18,14 +18,14 @@
   <h3>Extract Data</h3>
   <div class="oppia-query-form">
     <form class="form" (submit)="submitQuery()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Exploration ID:</label>
         <input type="text"
                [(ngModel)]="expId"
                [ngModelOptions]="{standalone: true}"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Exploration version:</label>
         <input type="number"
                min="0"
@@ -33,14 +33,14 @@
                [ngModelOptions]="{standalone: true}"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>State name:</label>
         <input type="text"
                [(ngModel)]="stateName"
                [ngModelOptions]="{standalone: true}"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Number of answers:</label>
         <input type="number"
                min="0"
@@ -48,7 +48,7 @@
                [ngModelOptions]="{standalone: true}"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="submit query">
         <input type="reset" value="reset">
       </div>
@@ -62,7 +62,7 @@
   <h3>Regenerate contribution opportunities for a topic:</h3>
   <div class="oppia-query-form">
     <form class="form" (submit)="regenerateOpportunitiesRelatedToTopic()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Topic ID:</label>
         <input type="text"
                [(ngModel)]="topicIdForRegeneratingOpportunities"
@@ -70,7 +70,7 @@
                class="e2e-test-topic-id-input"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="Regenerate" class="e2e-test-regenerate-opportunities-button">
         <input type="reset" value="reset">
       </div>
@@ -85,7 +85,7 @@
   </p>
   <div class="oppia-query-form">
     <form class="form" (submit)="regenerateTopicSummaries()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="Regenerate" class="e2e-test-regenerate-topic-summaries-button">
       </div>
     </form>
@@ -100,7 +100,7 @@
   </em>
   <div class="oppia-query-form">
     <form class="form" (submit)="rollbackExploration()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Exploration ID:</label>
         <input type="text"
                [(ngModel)]="expIdToRollback"
@@ -108,7 +108,7 @@
                class="e2e-test-exploration-id-input"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="Rollback Exploration" class="e2e-test-rollback-exploration-button">
         <input type="reset" value="reset">
       </div>
@@ -120,7 +120,7 @@
   <h3>Send a Test Mail to Admin</h3>
   <div class="oppia-query-form">
     <form class="form" (submit)="sendDummyMailToAdmin()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="Send" class="e2e-test-send-test-mail-button">
       </div>
     </form>
@@ -131,7 +131,7 @@
   <h3>Update username</h3>
   <div class="oppia-query-form">
     <form class="form" (submit)="updateUsername()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Old username:</label>
         <input type="text"
                [(ngModel)]="oldUsername"
@@ -139,7 +139,7 @@
                class="e2e-test-old-username-input"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>New username:</label>
         <input type="text"
                [(ngModel)]="newUsername"
@@ -148,7 +148,7 @@
                class="e2e-test-new-username-input"
                [maxlength]="MAX_USERNAME_LENGTH">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="Update" class="e2e-test-update-username-button">
       </div>
     </form>
@@ -160,7 +160,7 @@
   <div class="oppia-query-form">
     <form class="form"
           (submit)="getNumberOfPendingDeletionRequestModels()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit"
                value="Get number of users whose deletion is currently in-progress"
                class="e2e-test-get-deletion-request-button">
@@ -173,14 +173,14 @@
   <h3>Get models related to a user</h3>
   <div class="oppia-query-form">
     <form class="form" (submit)="getModelsRelatedToUser()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>User ID:</label>
         <input type="text"
                [(ngModel)]="userIdToGet"
                [ngModelOptions]="{standalone: true}"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="Get">
       </div>
     </form>
@@ -191,21 +191,21 @@
   <h3>Delete user</h3>
   <div class="oppia-query-form">
     <form class="form" (submit)="deleteUser()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>User ID:</label>
         <input type="text"
                [(ngModel)]="userIdToDelete"
                [ngModelOptions]="{standalone: true}"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Username:</label>
         <input type="text"
                [(ngModel)]="usernameToDelete"
                [ngModelOptions]="{standalone: true}"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="Delete">
       </div>
     </form>
@@ -218,7 +218,7 @@
   <p>This operation is idempotent.</p>
   <div class="oppia-query-form">
     <form class="form" (submit)="grantSuperAdminPrivileges()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Username:</label>
         <input type="text"
                [(ngModel)]="usernameToGrant"
@@ -226,7 +226,7 @@
                class="e2e-test-username-to-grant-input"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="Grant" class="e2e-test-grant-super-admin-button">
       </div>
     </form>
@@ -238,7 +238,7 @@
   <h3>Update Blog Post Data</h3>
   <div class="oppia-query-form">
     <form class="form" (submit)="updateBlogPostData()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Blog Post Id:</label>
         <input type="text"
                [(ngModel)]="blogPostId"
@@ -246,7 +246,7 @@
                class="e2e-test-blog-id-input"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Author Username:</label>
         <input type="text"
                [(ngModel)]="authorUsername"
@@ -254,7 +254,7 @@
                class="e2e-test-blog-author-name-input"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Published On:</label>
         <input type="text"
                [(ngModel)]="publishedOn"
@@ -263,7 +263,7 @@
                class="e2e-test-blog-published-on-input"
                placeholder="Enter in mm/dd/yyyy">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="Update" class="e2e-test-update-blog-post-button">
       </div>
     </form>
@@ -276,7 +276,7 @@
   <p>This operation is idempotent.</p>
   <div class="oppia-query-form">
     <form class="form" (submit)="revokeSuperAdminPrivileges()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Username:</label>
         <input type="text"
                [(ngModel)]="usernameToRevoke"
@@ -284,7 +284,7 @@
                class="e2e-test-username-to-revoke-input"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="Revoke" class="e2e-test-revoke-super-admin-button">
       </div>
     </form>
@@ -295,7 +295,7 @@
   <h3>Lookup exploration interactions</h3>
   <div class="oppia-query-form">
     <form class="form" (submit)="retrieveExplorationInteractionIds()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <label>Exploration ID:</label>
         <input type="text"
                [(ngModel)]="expIdToGetInteractionIdsFor"
@@ -303,7 +303,7 @@
                class="e2e-test-exploration-id-to-get-interactions-input"
                required="true">
       </div>
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" value="Get" class="e2e-test-get-interactions-button">
       </div>
     </form>
@@ -336,7 +336,7 @@
 
   <div class="oppia-query-form">
     <form class="form" (submit)="updateAutomaticVoiceoverSynthesisUsingAzure()">
-      <div class="form-group row">
+      <div class="mb-3 row">
         <input type="submit" class="e2e-test-save-autogeneration-toggle-button" value="Save">
       </div>
     </form>

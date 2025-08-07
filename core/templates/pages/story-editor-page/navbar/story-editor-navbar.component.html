@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right" *ngIf="!isSerialChapterFeatureFlagEnabled()">
+<ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-end" *ngIf="!isSerialChapterFeatureFlagEnabled()">
   <li class="oppia-dropdown-menu-container">
     <div ngbDropdown>
       <span [matTooltip]="getAllStoryWarnings()"
@@ -6,7 +6,7 @@
             [matTooltipDisabled]="isWarningTooltipDisabled()"
             aria-label="List that shows issues preventing to save story as draft"
             class="w-100">
-        <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
+        <button class="btn btn-light dropdown oppia-save-changes-button float-start e2e-test-save-story-button"
                 [ngClass]="{'btn-success': isStorySaveable()}"
                 (click)="saveChanges()"
                 [disabled]="!isStorySaveable()">
@@ -18,10 +18,10 @@
             <i class="fas fa-exclamation-triangle oppia-save-draft-warning"
                *ngIf="!isWarningTooltipDisabled()">
             </i>
-            <span class="oppia-save-publish-button-label float-left">
+            <span class="oppia-save-publish-button-label float-start">
               Save Draft
             </span>
-            <span class="d-none d-md-block float-left oppia-changes-count"
+            <span class="d-none d-md-block float-start oppia-changes-count"
                   *ngIf="getChangeListLength() > 0">
               ({{ getChangeListLength() }})
             </span>
@@ -80,7 +80,7 @@
 
 <div  *ngIf="isSerialChapterFeatureFlagEnabled()">
   <div *ngIf="currentTab === 'story_editor'">
-    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
+    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-end">
       <li class="oppia-dropdown-menu-container">
         <div ngbDropdown>
           <span [matTooltip]="getAllStoryWarnings()"
@@ -88,7 +88,7 @@
                 [matTooltipDisabled]="isWarningTooltipDisabled()"
                 aria-label="List that shows issues preventing to save story as draft"
                 class="w-100">
-            <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
+            <button class="btn btn-light dropdown oppia-save-changes-button float-start e2e-test-save-story-button"
                     [ngClass]="{'btn-success': isStorySaveable() && !isChapterStatusBeingChanged()}"
                     (click)="saveChanges()"
                     [disabled]="!isStorySaveable() || isChapterStatusBeingChanged()">
@@ -100,10 +100,10 @@
                 <i class="fas fa-exclamation-triangle oppia-save-draft-warning"
                   *ngIf="!isWarningTooltipDisabled()">
                 </i>
-                <span class="oppia-save-publish-button-label float-left">
+                <span class="oppia-save-publish-button-label float-start">
                   Save Changes
                 </span>
-                <span class="d-none d-md-block float-left oppia-changes-count"
+                <span class="d-none d-md-block float-start oppia-changes-count"
                       *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
                   ({{ getChangeListLength() }})
                 </span>
@@ -155,19 +155,19 @@
     </ul>
   </div>
   <div *ngIf="currentTab === 'chapter_editor' && storyNode && storyNode.getStatus() === 'Draft'">
-    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
+    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-end">
       <li class="oppia-dropdown-menu-container">
         <div ngbDropdown>
           <span class="w-100">
-            <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
+            <button class="btn btn-light dropdown oppia-save-changes-button float-start e2e-test-save-story-button"
                     [ngClass]="{'btn-success': getChangeListLength() && !isChapterStatusBeingChanged()}"
                     (click)="saveChanges()"
                     [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()">
               <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
-                <span class="oppia-save-publish-button-label float-left">
+                <span class="oppia-save-publish-button-label float-start">
                   Save Draft
                 </span>
-                <span class="d-none d-md-block float-left oppia-changes-count"
+                <span class="d-none d-md-block float-start oppia-changes-count"
                       *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
                   ({{ getChangeListLength() }})
                 </span>
@@ -220,19 +220,19 @@
     </ul>
   </div>
   <div *ngIf="currentTab === 'chapter_editor' && storyNode && storyNode.getStatus() === 'Ready To Publish'">
-    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
+    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-end">
       <li class="oppia-dropdown-menu-container">
         <div ngbDropdown>
           <span class="w-100">
-            <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-save-story-button"
+            <button class="btn btn-light dropdown oppia-save-changes-button float-start e2e-test-save-story-button"
                     [ngClass]="{'btn-success': getChangeListLength() && !isChapterStatusBeingChanged()}"
                     (click)="saveChangesInReadyToPublishChapter()"
                     [disabled]="!getChangeListLength() || isChapterStatusBeingChanged()">
               <span *ngIf="!isSaveInProgress() || isChapterStatusBeingChanged()">
-                <span class="oppia-save-publish-button-label float-left">
+                <span class="oppia-save-publish-button-label float-start">
                   Save Changes
                 </span>
-                <span class="d-none d-md-block float-left oppia-changes-count"
+                <span class="d-none d-md-block float-start oppia-changes-count"
                       *ngIf="getChangeListLength() > 0 && !isChapterStatusBeingChanged()">
                   ({{ getChangeListLength() }})
                 </span>
@@ -278,7 +278,7 @@
     </ul>
   </div>
   <div *ngIf="currentTab === 'chapter_editor' && storyNode && storyNode.getStatus() === 'Published'">
-    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-right">
+    <ul class="nav navbar-nav oppia-navbar-nav navbar-desktop float-end">
       <li class="oppia-dropdown-menu-container">
         <div ngbDropdown>
           <span [matTooltip]="'Chapter Publication Checklist should be fulfilled'"
@@ -286,7 +286,7 @@
                 [matTooltipDisabled]="isChapterPublishable()"
                 aria-label="List that shows issues preventing to publish changes"
                 class="w-100">
-            <button class="btn btn-light dropdown oppia-save-changes-button float-left e2e-test-publish-changes-button"
+            <button class="btn btn-light dropdown oppia-save-changes-button float-start e2e-test-publish-changes-button"
                     [ngClass]="{'btn-success': getChangeListLength() && isChapterPublishable()}"
                     (click)="saveChanges()"
                     [disabled]="!getChangeListLength() || !isChapterPublishable()">
@@ -298,10 +298,10 @@
                 <i class="fas fa-exclamation-triangle oppia-save-draft-warning"
                   *ngIf="!isChapterPublishable()">
                 </i>
-                <span class="oppia-save-publish-button-label float-left">
+                <span class="oppia-save-publish-button-label float-start">
                   Publish Changes
                 </span>
-                <span class="d-none d-md-block float-left oppia-changes-count"
+                <span class="d-none d-md-block float-start oppia-changes-count"
                       *ngIf="getChangeListLength() > 0">
                   ({{ getChangeListLength() }})
                 </span>

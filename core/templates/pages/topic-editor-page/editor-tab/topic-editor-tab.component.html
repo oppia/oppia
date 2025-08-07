@@ -412,7 +412,7 @@
         </mat-list-item>
         <mat-list-item [hidden]="!diagnosticTestSkillsDropdownIsShown">
           <select [formControl]="skillForDiagnosticTestFormControl"
-                  class="form-control oppia-diagnostic-test-skill-items oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
+                  class="form-select oppia-diagnostic-test-skill-items oppia-diagnostic-test-dropdown e2e-test-diagnostic-test-skill-selector"
                   (change)="addSkillForDiagnosticTest()"
                   aria-label="selection dropdown">
             <option [ngValue]="null">Please select a skill...</option>

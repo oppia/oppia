@@ -6,7 +6,7 @@
     <div class="oppia-transition-200">
       <div class="oppia-click-to-start-editing e2e-test-open-misconception-editor"
            *ngIf="isEditable" (click)="editMisconception()">
-        <i *ngIf="isEditable" class="fas fa-pen oppia-editor-edit-icon float-right"
+        <i *ngIf="isEditable" class="fas fa-pen oppia-editor-edit-icon float-end"
            title="Edit Misconception">
         </i>
       </div>
@@ -25,7 +25,7 @@
                                          [selectedMisconceptionSkillId]="selectedMisconceptionSkillId"
                                          [taggedSkillMisconceptionId]="taggedSkillMisconceptionId">
   </oppia-question-misconception-selector>
-  <button class="btn btn-success float-right" [disabled]="selectedMisconception === null" (click)="updateMisconception()">Save Misconception</button>
+  <button class="btn btn-success float-end" [disabled]="selectedMisconception === null" (click)="updateMisconception()">Save Misconception</button>
 </div>
 <button type="button"
         *ngIf="!misconceptionName && isEditable && rules && !outcome.labelledAsCorrect && containsMisconceptions()"

@@ -8,7 +8,7 @@
         <picture>
           <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
           <source type="image/png" [srcset]="authorProfilePicPngUrl">
-          <img mat-card-avatar class="mr-2 e2e-test-author-profile-photo"
+          <img mat-card-avatar class="me-2 e2e-test-author-profile-photo"
                [src]="authorProfilePicPngUrl"
                alt="Profile image of the author of the blog post"
                (click)="navigateToAuthorProfilePage()">
@@ -16,24 +16,24 @@
         <mat-card-subtitle class="blog-author-name e2e-test-author-name" (click)="navigateToAuthorProfilePage()">
           {{ blogPost.displayedAuthorName }}
         </mat-card-subtitle>
-        <mat-card-subtitle class="pt-2 font-weight-light mobile-published-date" (click)="navigateToAuthorProfilePage()">
+        <mat-card-subtitle class="pt-2 fw-light mobile-published-date" (click)="navigateToAuthorProfilePage()">
           {{ publishedDateString }}
         </mat-card-subtitle>
-        <button class="mr-0 mt-auto ml-auto mb-2"
+        <button class="me-0 mt-auto ms-auto mb-2"
                 mat-icon-button
                 [matMenuTriggerFor]="menu"
                 aria-label="Button to open sharing links menu.">
           <mat-icon class="share-blog-post-button">share</mat-icon>
         </button>
         <mat-menu #menu="matMenu">
-          <div class="d-flex ml-1 mr-1">
-            <div class="url-link text-monospace text-nowrap border border-secondary p-1 overflow-auto">
+          <div class="d-flex ms-1 me-1">
+            <div class="url-link font-monospace text-nowrap border border-secondary p-1 overflow-auto">
                 {{ getPageUrl() }}
             </div>
             <button mat-flat-button
                     (click)="$event.stopPropagation(); copyLink('url-link'); tooltip.show()"
                     #tooltip="matTooltip"
-                    class="copy-button float-right mb-auto pl-2 pr-0"
+                    class="copy-button float-end mb-auto ps-2 pe-0"
                     (mouseenter)="$event.stopImmediatePropagation()"
                     (mouseleave)="$event.stopImmediatePropagation()"
                     matTooltip="Copied"
@@ -65,7 +65,7 @@
     </div>
   </mat-card>
   <div class="d-flex blog-card-tag-container flex-wrap pt-2 mx-auto mb-5 oppia-blog-post-page-card">
-    <h4 class="blog-post-sub-heading-font my-auto mr-2">
+    <h4 class="blog-post-sub-heading-font my-auto me-2">
       {{ 'I18N_BLOG_POST_PAGE_TAGS_HEADING' | translate }}:
     </h4>
     <div *ngFor="let tag of blogPost.tags"

@@ -47,7 +47,7 @@
     <!-- Mobile -->
       <div class="oppia-click-to-start-editing e2e-test-open-outcome-feedback-editor"
            *ngIf="onMobile && isEditable" (click)="openFeedbackEditorModal()">
-        <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
+        <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-end"
            title="Edit Feedback">&#xE254;
         </i>
       </div>
@@ -56,7 +56,7 @@
       <div class="oppia-click-to-start-editing e2e-test-open-outcome-feedback-editor"
            *ngIf="!onMobile && isEditable" (click)="openFeedbackEditor()">
         <i *ngIf="isEditable" tabindex="0" (keydown.enter)="openFeedbackEditor()"
-           class="fas fa-pen oppia-editor-edit-icon float-right"
+           class="fas fa-pen oppia-editor-edit-icon float-end"
            title="Edit Feedback" type="button">
         </i>
       </div>
@@ -86,7 +86,7 @@
 
 <div *ngIf="!onMobile && isEditable && feedbackEditorIsOpen">
   <form role="form"
-        class="form-inline e2e-test-edit-outcome-feedback"
+        class="d-flex align-items-center e2e-test-edit-outcome-feedback"
         name="editOutcomeForm.editFeedbackForm">
     <oppia-outcome-feedback-editor [outcome]="outcome">
     </oppia-outcome-feedback-editor>
@@ -97,9 +97,9 @@
   </div>
 
   <div class="oppia-rule-save-cancel-buttons">
-    <div class="float-right">
+    <div class="float-end">
       <button type="button"
-              class="btn btn-secondary mr-2"
+              class="btn btn-secondary me-2"
               (click)="cancelThisFeedbackEdit()">
         Cancel
       </button>
@@ -125,7 +125,7 @@
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing e2e-test-open-outcome-dest-editor"
            *ngIf="isEditable" (click)="openDestinationEditor()">
-        <i *ngIf="isEditable" tabindex="0" class="fas fa-pen oppia-editor-edit-icon float-right e2e-test-edit-outcome-dest-pencil-button"
+        <i *ngIf="isEditable" tabindex="0" class="fas fa-pen oppia-editor-edit-icon float-end e2e-test-edit-outcome-dest-pencil-button"
            title="Edit Destination" (keydown.enter)="openDestinationEditor()">
         </i>
       </div>
@@ -154,7 +154,7 @@
 
 <div *ngIf="isEditable && destinationEditorIsOpen && !isInQuestionMode()">
   <form role="form"
-        class="form-inline e2e-test-edit-outcome-dest"
+        class="d-flex align-items-center e2e-test-edit-outcome-dest"
         name="editOutcomeForm.editDestForm"
         (submit)="saveThisDestination()">
     <oppia-outcome-destination-editor [outcome]="outcome"
@@ -164,9 +164,9 @@
   </form>
 
   <div class="oppia-rule-save-cancel-buttons">
-    <div class="float-right">
+    <div class="float-end">
       <button type="button"
-              class="btn btn-secondary mr-2 e2e-test-cancel-outcome-dest"
+              class="btn btn-secondary me-2 e2e-test-cancel-outcome-dest"
               (click)="cancelThisDestinationEdit()">
         Cancel
       </button>
@@ -190,7 +190,7 @@
     <div class="oppia-rule-preview oppia-transition-200">
       <div class="oppia-click-to-start-editing protractor-test-open-outcome-dest-if-stuck-editor"
            *ngIf="isEditable" (click)="openDestinationIfStuckEditor()">
-        <i *ngIf="isEditable" (keydown.enter)="openDestinationIfStuckEditor()" class="fas fa-pen oppia-editor-edit-icon float-right"
+        <i *ngIf="isEditable" (keydown.enter)="openDestinationIfStuckEditor()" class="fas fa-pen oppia-editor-edit-icon float-end"
            title="Edit If Stuck Destination" tabindex="0">
         </i>
       </div>
@@ -209,7 +209,7 @@
 
 <div *ngIf="isEditable && destinationIfStuckEditorIsOpen && !isInQuestionMode() && outcome">
   <form role="form"
-        class="form-inline protractor-test-edit-outcome-dest-if-stuck"
+        class="d-flex align-items-center protractor-test-edit-outcome-dest-if-stuck"
         name="editOutcomeForm.editDestIfStuckForm"
         (submit)="saveThisIfStuckDestination()">
     <oppia-outcome-if-stuck-destination-editor [outcome]="outcome"
@@ -218,9 +218,9 @@
   </form>
 
   <div class="oppia-rule-save-cancel-buttons">
-    <div class="float-right">
+    <div class="float-end">
       <button type="button"
-              class="btn btn-secondary mr-2 protractor-test-cancel-outcome-dest-if-stuck"
+              class="btn btn-secondary me-2 protractor-test-cancel-outcome-dest-if-stuck"
               (click)="cancelThisIfStuckDestinationEdit()">
         Cancel
       </button>
@@ -244,7 +244,7 @@
       <div class="oppia-rule-details-header">
         <div class="oppia-click-to-start-editing"
              *ngIf="isEditable" (click)="openCorrectnessLabelEditor()">
-          <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-right"
+          <i *ngIf="isEditable" class="material-icons oppia-editor-edit-icon float-end"
              title="Edit Correctness setting">&#xE254;
           </i>
         </div>
@@ -264,7 +264,7 @@
   <div class="oppia-outcome-container" *ngIf="isEditable">
     <div *ngIf="outcome">
       <input id="labelledAsCorrect"
-             class="mr-2 e2e-test-editor-correctness-toggle"
+             class="me-2 e2e-test-editor-correctness-toggle"
              type="checkbox"
              [disabled]="isSelfLoop(savedOutcome)"
              [(ngModel)]="outcome.labelledAsCorrect"

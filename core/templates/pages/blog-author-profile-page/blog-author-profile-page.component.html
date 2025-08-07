@@ -1,6 +1,6 @@
 <div class="oppia-blog-author-page justify-content-center">
   <mat-card class="oppia-blog-author-page-card oppia-page-card py-5 mb-5">
-    <mat-card-header class="blog-author-page-header mr-0"
+    <mat-card-header class="blog-author-page-header me-0"
                      [ngClass]="{'d-flex flex-column align-items-center': isSmallScreenViewActive()}">
       <picture>
         <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
@@ -35,7 +35,7 @@
                         [pageSize]="MAX_NUM_CARD_TO_DISPLAY_ON_PAGE"
                         [rotate]="true"
                         (pageChange)="onPageChange()"
-                        class="ml-auto">
+                        class="ms-auto">
           <ng-template ngbPaginationPrevious>
             <i class="fa fa-angle-left text-center w-100 align-middle"
                aria-hidden="true"
@@ -83,7 +83,7 @@
                       [pageSize]="MAX_NUM_CARD_TO_DISPLAY_ON_PAGE"
                       [rotate]="true"
                       (pageChange)="onPageChange()"
-                      class="ml-auto">
+                      class="ms-auto">
         <ng-template ngbPaginationPrevious >
           <i class="fa fa-angle-left text-center w-100 align-middle"
              aria-hidden="true"

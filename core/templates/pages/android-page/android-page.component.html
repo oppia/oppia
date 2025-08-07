@@ -1,6 +1,6 @@
 <div class="oppia-android-page-container overflow-hidden">
   <div class="oppia-android-page">
-    <div class="container pl-0">
+    <div class="container ps-0">
       <div class="row">
         <div class="col-sm-6 col-8">
           <div class="oppia-android-main-body">
@@ -111,7 +111,7 @@
             class="oppia-android-features-main-text row">
       </span>
       <div class="oppia-android-key-feature-container row">
-        <div class="oppia-android-key-feature-description col-md-5 pl-0">
+        <div class="oppia-android-key-feature-description col-md-5 ps-0">
           <div class="oppia-android-key-feature">
             <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_1' | translate }}</div>
             <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_1' | translate }}</div>
@@ -137,7 +137,7 @@
         <div class="oppia-android-key-feature-image-container oppia-web-only col-md-7">
           <div class="row oppia-android-carousel-direction">
             <button class="col-md-2 align-self-center oppia-android-carousel-button" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
-              <i class="fas fa-chevron-left oppia-android-carousel-chevron float-right "></i>
+              <i class="fas fa-chevron-left oppia-android-carousel-chevron float-end "></i>
             </button>
             <div class="oppia-android-key-feature-image-container col-md-8">
               <img *ngIf="featuresShown === 0" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="Image showing the story page">
@@ -165,7 +165,7 @@
             <div class="oppia-android-updates-main-text"
                  [innerHTML]="'I18N_ANDROID_PAGE_UPDATES_MAIN_TEXT' | translate">
             </div>
-            <div class="oppia-android-sub-text oppia-android-updates-sub-text mb-5 pr-5"
+            <div class="oppia-android-sub-text oppia-android-updates-sub-text mb-5 pe-5"
                  [innerHTML]="'I18N_ANDROID_PAGE_UPDATES_SUBTEXT' | translate">
             </div>
           </div>

@@ -7,7 +7,7 @@
                                 (onSelectionChange)="onSelectNewRuleType($event)">
       </oppia-rule-type-selector>
 
-      <span *ngFor="let item of ruleDescriptionFragments" class="form-group oppia-rule-editor-span e2e-test-answer-description-fragment">
+      <span *ngFor="let item of ruleDescriptionFragments" class="mb-3 oppia-rule-editor-span e2e-test-answer-description-fragment">
         <span *ngIf="item.type == 'select'" class="text-dark">
           <span *ngIf="ruleDescriptionChoices.length === 1">
             {{ ruleDescriptionChoices[0].val | convertToPlainText | truncate }}
@@ -70,7 +70,7 @@
   </form>
 
   <div class="oppia-rule-save-cancel-buttons" *ngIf="isEditingRuleInline">
-    <div class="float-right">
+    <div class="float-end">
       <button type="button" class="btn btn-default cancel-button" (click)="cancelThisEdit()">Cancel</button>
       <button type="button" class="btn btn-success e2e-test-save-answer save-button" [disabled]="isInvalid" (click)="saveThisRule()">Save Answer</button>
     </div>

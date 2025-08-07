@@ -11,14 +11,14 @@
 </i>
 <div *ngIf="canActivityBeAddedToLearnerPlaylist(activityId) && isContainerNarrow && isAddToPlaylistIconShown">
   <div class="dropdown oppia-learner-dashboard-icon" ngbDropdown>
-    <ul class=" dropdown-menu dropdown-menu-right" ngbDropdownMenu>
+    <ul class=" dropdown-menu dropdown-menu-end" ngbDropdownMenu>
       <li ngbDropdownItem (click)="addToLearnerPlaylist(activityId, activityType)">
         <a [innerHTML]="'I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate"
            class="e2e-test-mobile-add-to-playlist-btn">
         </a>
       </li>
     </ul>
-    <i class="fas fa-ellipsis-v e2e-test-mobile-lesson-card-dropdown" ngbDropdownToggle data-toggle="dropdown"></i>
+    <i class="fas fa-ellipsis-v e2e-test-mobile-lesson-card-dropdown" ngbDropdownToggle data-bs-toggle="dropdown"></i>
   </div>
 </div>
 <i class="oppia-learner-dashboard-icon far fa-clock e2e-test-remove-from-play-later"
