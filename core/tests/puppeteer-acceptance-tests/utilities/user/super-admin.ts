@@ -43,6 +43,7 @@ const userRoleDescriptionSelector = '.oppia-user-role-description';
 
 // Blog Post.
 const generateBlogPostButton = '.e2e-test-generate-blog-post';
+const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 
 // Community Library.
 const searchFieldCommunityLibrary = 'input.e2e-test-search-input';
@@ -697,6 +698,28 @@ export class SuperAdmin extends BaseUser {
     await this.navigateToAdminPageActivitiesTab();
     for (let i = 0; i < numBlogs; i++) {
       await this.generateDummyBlogPost();
+    }
+  }
+
+  /**
+   * Checks if the blog post is present.
+   * @param {string} expectedBlog - the title of the expected blog post.
+   */
+  async expectBlogPostToBePresent(expectedBlog: string): Promise<void> {
+    await this.navigateToBlogPage();
+
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    const blogTitles = await this.page.$$eval(blogPostTitleSelector, elements =>
+      elements.map(element => element.textContent)
+    );
+    for (const title of blogTitles) {
+      if (!title) {
+        continue;
+      }
+      if (title.includes(expectedBlog)) {
+        showMessage('The blog post is present on the blog dashboard.');
+        return;
+      }
     }
   }
 
