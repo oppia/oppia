@@ -25,13 +25,3 @@ class Ret:
 
     def __init__(self) -> None:
         self.returncode = 0
-
-
-# TODO(#23058): Skipping as not in Docker environment,
-# but needs to be fixed when using Docker again.
-class GenerateBuildDirectoryTests(test_utils.GenericTestBase):
-    """Test the methods for generate build directory."""
-
-    def test_generate_build_dir_under_docker(self) -> None:
-        with self.assertRaisesRegex(KeyError, 'js/third_party.min.js'):
-            raise KeyError('js/third_party.min.js')
