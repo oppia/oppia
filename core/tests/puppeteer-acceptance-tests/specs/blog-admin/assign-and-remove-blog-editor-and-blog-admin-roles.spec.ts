@@ -85,15 +85,24 @@ describe('Blog Admin', function () {
   });
 
   it('should be able to update tag limit', async function () {
-    // Update tag limit to 5.
-    await blogAdmin.setMaximumTagLimitTo(5);
+    // Update tag limit to 7.
+    await blogAdmin.setMaximumTagLimitTo(7);
     await blogAdmin.expectActionStatusMessageToBe('Data saved successfully.');
 
     // Verify tag limit text in blog editor page.
     await guestUser2.navigateToBlogDashboardPage();
     await guestUser2.openBlogEditorPage();
-    await guestUser2.expectTagLimitTextToBe(5);
-    await guestUser2.expectRemainingTagsLimitTextToBe(5);
+    await guestUser2.expectTagLimitTextToBe(7);
+    await guestUser2.expectRemainingTagsLimitTextToBe(7);
+
+    // Update tag limit to 6.
+    await blogAdmin.setMaximumTagLimitTo(7);
+    await blogAdmin.expectActionStatusMessageToBe('Data saved successfully.');
+
+    // Verify tag limit text in blog editor page.
+    await guestUser2.reloadPage();
+    await guestUser2.expectTagLimitTextToBe(6);
+    await guestUser2.expectRemainingTagsLimitTextToBe(6);
   });
 
   afterAll(async function () {

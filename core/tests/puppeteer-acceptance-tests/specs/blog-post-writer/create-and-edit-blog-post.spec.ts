@@ -110,6 +110,8 @@ describe('Blog Post Writer', function () {
       licensePage
     );
     await licensePage?.close();
+
+    // Close the thumbnail image upload modal.
     await blogPostWriter.clickOn('Cancel');
 
     // Update blog title of less than 5 characters.
