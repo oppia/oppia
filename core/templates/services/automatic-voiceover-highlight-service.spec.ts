@@ -75,7 +75,7 @@ describe('Automatic voiceover highlight service', () => {
     ).toEqual({});
 
     automaticVoiceoverHighlightService.languageCode = 'en';
-    automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap(
+    automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
       highlightIdToSentenceMap
     );
 
@@ -136,7 +136,7 @@ describe('Automatic voiceover highlight service', () => {
     automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
       automatedVoiceoversAudioOffsetsMsecs
     );
-    automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap(
+    automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
       highlightIdToSentenceMap
     );
     automaticVoiceoverHighlightService.setActiveContentId('content0');

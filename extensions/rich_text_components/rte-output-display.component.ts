@@ -83,7 +83,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   show = false;
   portalTree: PortalTree = [];
 
-  highlighIdToSentenceText = {};
+  highlightIdToSentenceText = {};
   wrapped = false;
   previousHighlightedElementId!: string;
   // The background color of the sentence being played in the audio player.
@@ -287,8 +287,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           spanNode.id = elementId;
           this.index++;
 
-          this.highlighIdToSentenceText[elementId] = textInsideSpanTag;
           nodeTemp.appendChild(spanNode);
+          this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
         }
 
         return nodeTemp;
@@ -307,7 +307,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     }
     this.wrapped = true;
     this.index = 1;
-    this.highlighIdToSentenceText = {};
+    this.highlightIdToSentenceText = {};
     this.previousHighlightedElementId = undefined;
 
     let languageCode =
@@ -502,8 +502,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       // If previous highlighted sentence and current sentence are same, then
       // do not highlight the sentence again.
       if (
+        this.previousHighlightedElementId === currentElementIdToHighlight &&
         previousHighlightedElement?.textContent ===
-        this.highlighIdToSentenceText[currentElementIdToHighlight]
+          this.highlightIdToSentenceText[currentElementIdToHighlight]
       ) {
         return;
       }
@@ -629,8 +630,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         );
         this.automaticVoiceoverHighlightService.languageCode =
           this.localStorageService.getLastSelectedTranslationLanguageCode();
-        this.automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap(
-          this.highlighIdToSentenceText
+        this.automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
+          this.highlightIdToSentenceText
         );
         this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
       }

@@ -32,7 +32,7 @@ LANGUAGE_CODE_TO_VOICEOVER_FILENAMES: Dict[str, str] = {
     'ar': 'arabic.mp3',
     'en': 'english.mp3',
     'hi': 'hindi.mp3',
-    'pt': 'portueguese.mp3'
+    'pt': 'portuguese.mp3'
 }
 
 
