@@ -22,6 +22,7 @@ import {showMessage} from '../common/show-message';
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
+const mobileBlogBodyInputWithText = 'div.e2e-test-rte p';
 const thumbnailPhotoBox = 'div.e2e-test-photo-clickable';
 const unauthErrorContainer = 'div.e2e-test-error-container';
 const blogDashboardAuthorDetailsModal = 'div.modal-dialog';
@@ -115,7 +116,11 @@ export class BlogPostEditor extends BaseUser {
       'clipboard-read',
       'clipboard-write',
     ]);
-    await this.pasteTextTo(blogBodyInput);
+    if (this.isViewportAtMobileWidth()) {
+      await this.pasteTextTo(mobileBlogBodyInputWithText);
+    } else {
+      await this.pasteTextTo(blogBodyInput);
+    }
   }
 
   /**

@@ -120,7 +120,7 @@ describe('Curriculum Admin', function () {
       'subtopic1',
       [
         ['abcd', '1234567'],
-        ['Section 2 heading', 'Section 2 content'],
+        ['Section heading 2', 'Section content 2'],
       ],
       true
     );
