@@ -44,7 +44,6 @@ import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.m
 import {VoiceoverBackendDict} from '../../../../domain/exploration/voiceover.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {ServicesConstants} from 'services/services.constants';
 
 class MockPlatformFeatureService {
@@ -73,7 +72,6 @@ describe('Audio Bar Component', () => {
   let entityVoiceoversService: EntityVoiceoversService;
   let stateEditorService: StateEditorService;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
-  let changeListService: ChangeListService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -102,7 +100,6 @@ describe('Audio Bar Component', () => {
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
     stateEditorService = TestBed.inject(StateEditorService);
-    changeListService = TestBed.inject(ChangeListService);
     fixture.detectChanges();
 
     spyOn(voiceoverPlayerService, 'onActiveVoiceoverChanged').and.returnValue(
@@ -380,32 +377,6 @@ describe('Audio Bar Component', () => {
         entityVoiceoversBackendDict
       );
       let languageAccentDecriptions = ['en-US', 'en-IN'];
-      let voiceover1: VoiceoverBackendDict = {
-        filename: 'b.mp3',
-        file_size_bytes: 100000,
-        needs_update: false,
-        duration_secs: 12.0,
-      };
-      let changeDicts = [
-        {
-          cmd: 'update_voiceovers',
-          language_accent_code: 'en-US',
-          content_id: 'content1',
-          voiceovers: {
-            manual: voiceover1,
-          },
-        },
-        {
-          cmd: 'update_voiceovers',
-          language_accent_code: 'en-US',
-          content_id: 'content2',
-          voiceovers: {},
-        },
-      ];
-
-      spyOn(changeListService, 'getVoiceoverChangeList').and.returnValue(
-        changeDicts
-      );
 
       spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
         true

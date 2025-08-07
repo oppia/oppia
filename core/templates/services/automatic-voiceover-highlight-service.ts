@@ -246,7 +246,7 @@ export class AutomaticVoiceoverHighlightService {
         ? currentSentence.slice(token.length)
         : currentSentence;
 
-      if (currentSentence.length === 0) {
+      if (currentSentence?.length === 0) {
         maxOffsetMsecs = audioOffsetMsecs;
 
         this.sentenceHighlightIntervalList.push({

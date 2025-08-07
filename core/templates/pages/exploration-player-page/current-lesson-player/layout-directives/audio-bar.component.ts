@@ -38,11 +38,7 @@ import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
-import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-draft.model';
-import {ServicesConstants} from 'services/services.constants';
 import {PlatformFeatureService} from 'services/platform-feature.service';
-import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 
 @Component({
   selector: 'oppia-audio-bar',
@@ -78,7 +74,6 @@ export class AudioBarComponent {
     private localStorageService: LocalStorageService,
     private stateEditorService: StateEditorService,
     private cdRef: ChangeDetectorRef,
-    private changeListService: ChangeListService,
     private platformFeatureService: PlatformFeatureService
   ) {
     this.explorationPlayerModeIsActive =
@@ -227,18 +222,6 @@ export class AudioBarComponent {
 
     let contentId = this.voiceoverPlayerService.activeContentId;
 
-    const isInPreviewPage =
-      this.pageContextService.isInExplorationEditorPage() &&
-      this.pageContextService.getEditorTabContext() ===
-        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW;
-
-    // Update the manual voiceover using changeListService only when the user
-    // is in preview mode.
-    if (isInPreviewPage) {
-      entityVoiceovers =
-        this.updateManualVoiceoverWithChangeList(entityVoiceovers);
-    }
-
     let manualVoiceover = entityVoiceovers.getManualVoiceover(
       contentId
     ) as Voiceover;
@@ -246,17 +229,19 @@ export class AudioBarComponent {
       contentId
     ) as Voiceover;
 
-    if (
-      (manualVoiceover && manualVoiceover.needsUpdate === false) ||
-      !automaticVoiceover
-    ) {
+    const hasValidManualVoiceover =
+      manualVoiceover && manualVoiceover.needsUpdate === false;
+    const hasOutdatedOrMissingManualVoiceover =
+      manualVoiceover === undefined ||
+      (manualVoiceover && manualVoiceover.needsUpdate === true);
+
+    if (hasValidManualVoiceover) {
       this.voiceoverToBePlayed = manualVoiceover;
-    } else if (
-      this.isAutoVoiceoversEnabled() &&
-      automaticVoiceover &&
-      automaticVoiceover.needsUpdate === false
-    ) {
-      this.voiceoverToBePlayed = automaticVoiceover;
+    } else if (hasOutdatedOrMissingManualVoiceover) {
+      this.voiceoverToBePlayed =
+        this.isAutoVoiceoversEnabled() && automaticVoiceover
+          ? automaticVoiceover
+          : manualVoiceover;
     }
 
     this.audioPreloaderService.contentIdsToVoiceovers =
@@ -278,40 +263,6 @@ export class AudioBarComponent {
     const onEditorPage = this.pageContextService.isInExplorationEditorPage();
 
     return (onPlayerPage && showToLearners) || (onEditorPage && showToEditors);
-  }
-
-  updateManualVoiceoverWithChangeList(
-    entityVoiceovers: EntityVoiceovers
-  ): EntityVoiceovers {
-    this.changeListService.getVoiceoverChangeList().forEach(changeDict => {
-      changeDict = changeDict as ExplorationChangeEditVoiceovers;
-      let contentId = changeDict.content_id;
-      let voiceovers = changeDict.voiceovers;
-      let languageAccentCode = changeDict.language_accent_code;
-
-      if (!entityVoiceovers.voiceoversMapping.hasOwnProperty(contentId)) {
-        entityVoiceovers.voiceoversMapping[contentId] = {};
-      }
-
-      if (voiceovers.hasOwnProperty('manual')) {
-        let manualVoiceover = Voiceover.createFromBackendDict(
-          voiceovers.manual
-        );
-        entityVoiceovers.voiceoversMapping[contentId].manual = manualVoiceover;
-      } else {
-        entityVoiceovers.voiceoversMapping[contentId].manual = undefined;
-        if (entityVoiceovers.voiceoversMapping[contentId].auto === undefined) {
-          delete entityVoiceovers.voiceoversMapping[contentId];
-        }
-      }
-
-      this.entityVoiceoversService.addEntityVoiceovers(
-        languageAccentCode,
-        entityVoiceovers
-      );
-    });
-
-    return entityVoiceovers;
   }
 
   getCurrentStateName(): string {
