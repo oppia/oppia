@@ -30,6 +30,14 @@ oppia-new-display-hint-modal .oppia-learner-solution-container {
   padding: 16px 20px;
 }
 
+oppia-new-display-hint-modal .oppia-learner-solution-container > p {
+  color: #c55f45;
+  left: 50%;
+  margin-top: 10px;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
 oppia-new-display-hint-modal .mat-button.hint-display-modal-got-it-button {
   background-color: #00645c !important;
   color: white;
@@ -38,14 +46,6 @@ oppia-new-display-hint-modal .mat-button.hint-display-modal-got-it-button {
 
 oppia-new-display-hint-modal .mat-button.hint-display-modal-got-it-button:focus {
   outline: none !important;
-}
-
-oppia-new-display-hint-modal .oppia-learner-solution-container > p {
-  color: #c55f45;
-  left: 50%;
-  margin-top: 10px;
-  position: absolute;
-  transform: translateX(-50%);
 }
 
 oppia-new-display-hint-modal .hint-modal-control-btn {

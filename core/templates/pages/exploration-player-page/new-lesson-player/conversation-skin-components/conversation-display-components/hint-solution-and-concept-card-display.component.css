@@ -46,21 +46,21 @@
   color: #c55f45;
 }
 
-.solution-button {
+.oppia-learner-hint-solution-and-concept-card-display-button .solution-button {
   background: #0d48a1;
 }
 
-.solution-button.viewed {
+.oppia-learner-hint-solution-and-concept-card-display-button .solution-button.viewed {
   background-color: #fff;
   border: 1px solid #0d48a1;
   color: #0d48a1;
 }
 
-.solution-button.viewed:focus {
+.oppia-learner-hint-solution-and-concept-card-display-button .solution-button.viewed:focus {
   border: 1px solid #0d48a1;
 }
 
-.concept-card-button {
+.oppia-learner-hint-solution-and-concept-card-display-button .concept-card-button {
   font-size: 14px;
 }
 
