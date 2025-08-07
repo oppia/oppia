@@ -62,7 +62,7 @@ const previewBlogPostButtonSelector = '.e2e-test-blog-card-preview-button';
 const closePreivewModalButtonSelector = '.e2e-test-close-preview-button';
 const gridViewButtonSelector = '.e2e-test-tiles-view-button';
 const listViewButtonSelector = '.e2e-test-list-view-button';
-
+const editBlogPostBtnSelector = '.e2e-test-edit-blog-post-button';
 const editBlogSelector = '.e2e-test-content-button';
 const LABEL_FOR_DELETE_BUTTON = 'Delete';
 
@@ -86,6 +86,7 @@ export class BlogPostEditor extends BaseUser {
    * Closes the preview modal.
    */
   async closePreviewModal(): Promise<void> {
+    await this.expectElementToBeVisible(closePreivewModalButtonSelector);
     await this.clickOn(closePreivewModalButtonSelector);
     await this.expectElementToBeVisible(closePreivewModalButtonSelector, false);
   }
@@ -120,7 +121,6 @@ export class BlogPostEditor extends BaseUser {
     await this.expectElementToBeVisible(usernameInputSelector);
     await this.clearAllTextFrom(usernameInputSelector);
     await this.type(usernameInputSelector, username);
-
     await this.expectInputValueToBe(usernameInputSelector, username);
   }
 
@@ -144,6 +144,7 @@ export class BlogPostEditor extends BaseUser {
    * Clicks on the update username icon.
    */
   async clickOnUpdateUsernameIcon(): Promise<void> {
+    await this.expectElementToBeVisible(updateUsernameIconSelector);
     await this.clickOn(updateUsernameIconSelector);
     await this.expectModalTitleToBe('Add your Author Name and Biography:');
   }
@@ -263,7 +264,7 @@ export class BlogPostEditor extends BaseUser {
           element => (element as HTMLElement).click()
         );
 
-        await this.clickOn('.e2e-test-edit-blog-post-button');
+        await this.clickOn(editBlogPostBtnSelector);
         return;
       }
     }
@@ -444,6 +445,7 @@ export class BlogPostEditor extends BaseUser {
 
   /**
    * This function saves the blog post.
+   * @param skipVerification - Whether to skip verification of the blog post body.
    */
   async saveBlogBodyChanges(skipVerification: boolean = false): Promise<void> {
     await this.expectElementToBeVisible(blogBodySaveButtonSelector);
@@ -455,6 +457,8 @@ export class BlogPostEditor extends BaseUser {
 
   /**
    * This function selects a tag for the blog post.
+   * @param tag - The tag to select.
+   * @param shouldBePresent - Whether the tag should be selected or not after click.
    */
   async selectTag(tag: string, shouldBePresent: boolean = true): Promise<void> {
     await this.expectElementToBeVisible(tagSelector);

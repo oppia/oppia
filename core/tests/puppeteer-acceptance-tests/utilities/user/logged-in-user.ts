@@ -1122,11 +1122,6 @@ export class LoggedInUser extends BaseUser {
     }
     await this.expectElementToBeVisible(toastMessageSelector, false);
   }
-  catch(error) {
-    const newError = new Error(`Failed to match toast message: ${error}`);
-    newError.stack = error.stack;
-    throw newError;
-  }
 
   /**
    * Function to play a specific lesson from the community library tab in learner dashboard.
@@ -1310,6 +1305,7 @@ export class LoggedInUser extends BaseUser {
    * Cancels the photo upload.
    */
   async cancelPhotoUpload(): Promise<void> {
+    await this.expectElementToBeVisible(cancelProfileUploadButtonSelector);
     await this.clickOn(cancelProfileUploadButtonSelector);
     await this.expectElementToBeVisible(
       cancelProfileUploadButtonSelector,
