@@ -17,7 +17,6 @@
 """Unit tests for scripts/generate_build_directory.py."""
 
 from __future__ import annotations
-from core.tests import test_utils
 
 
 class Ret:
