@@ -35,7 +35,6 @@ import {LoaderService} from 'services/loader.service';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {
   ExplorationChangeEditTranslation,
   ExplorationChangeMarkTranslationsNeedsUpdate,
@@ -48,10 +47,8 @@ import {
   LanguageAccentMasterList,
   LanguageAccentToDescription,
   LanguageCodesMapping,
-  VoiceoverBackendApiService,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
-import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 
 @Component({
@@ -96,11 +93,8 @@ export class TranslatorOverviewComponent implements OnInit {
     private translationLanguageService: TranslationLanguageService,
     private translationStatusService: TranslationStatusService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
-    private platformFeatureService: PlatformFeatureService,
-    private voiceoverBackendApiService: VoiceoverBackendApiService,
     private localStorageService: LocalStorageService,
     private windowRef: WindowRef,
-    private voiceoverPlayerService: VoiceoverPlayerService,
     private voiceoverLanguageManagementService: VoiceoverLanguageManagementService
   ) {}
 

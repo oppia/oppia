@@ -140,20 +140,29 @@ def get_text_with_delimiters(soup: bs4.BeautifulSoup, delimiter: str) -> str:
         'oppia-noninteractive-skillreview',
         'oppia-noninteractive-link'
     ]
+    list_tags = ['ul', 'ol']
 
     text_segments = []
 
     for element in soup.body.children if soup.body else soup.children:
         if isinstance(element, bs4.Tag):
-            text = element.get_text(separator=' ', strip=True)
-            if text:
-                text_segments.append(text)
-                if element.name in block_tags_for_delimiter:
-                    text_segments.append(delimiter)
+            if element.name in list_tags:
+                for li in element.find_all('li', recursive=False):
+                    li_text = li.get_text(separator=' ', strip=True)
+                    if li_text:
+                        text_segments.append(li_text)
+                        text_segments.append(delimiter)
+            else:
+                text = element.get_text(separator=' ', strip=True)
+                if text:
+                    text_segments.append(text)
+                    if element.name in block_tags_for_delimiter:
+                        text_segments.append(delimiter)
         elif isinstance(element, bs4.NavigableString):
             text = str(element).strip()
             if text:
                 text_segments.append(text)
+                text_segments.append(delimiter)
 
     # Remove trailing delimiters, if any.
     while text_segments and text_segments[-1] == delimiter:
