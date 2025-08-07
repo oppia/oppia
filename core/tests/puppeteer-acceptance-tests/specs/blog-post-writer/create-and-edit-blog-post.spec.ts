@@ -113,8 +113,11 @@ describe('Blog Post Writer', function () {
     await licensePage.close();
     await blogPostWriter.page.bringToFront();
 
-    // Close the thumbnail image upload modal.
-    await blogPostWriter.clickOn('Cancel');
+    // Close the thumbnail image upload modal. If the viewport is mobile, the
+    // cancel button isn't visible as the modal is embedded in page itself.
+    if (!blogPostWriter.isViewportAtMobileWidth()) {
+      await blogPostWriter.clickOn('Cancel');
+    }
 
     // Update blog title of less than 5 characters.
     await blogPostWriter.updateBlogPostTitle('Test');

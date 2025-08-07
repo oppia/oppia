@@ -42,7 +42,6 @@ const rolesSelectDropdown = 'div.mat-select-trigger';
 const userRoleDescriptionSelector = '.oppia-user-role-description';
 
 // Blog Post.
-const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const generateBlogPostButton = '.e2e-test-generate-blog-post';
 
 // Community Library.

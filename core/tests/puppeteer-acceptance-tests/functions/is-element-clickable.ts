@@ -40,11 +40,11 @@ export default function isElementClickable(
     const y = elementDimensions.top + element.clientHeight / 2;
 
     if (showDebugLogs) {
+      // eslint-disable-next-line no-console
       console.log(
-        `[debug]: Element ${element.tagName} dimensions: ${elementDimensions.left}, ${elementDimensions.top}, ${elementDimensions.width}, ${elementDimensions.height}`
-      );
-      console.log(
-        `[debug]: Element ${element.tagName} center point: ${x}, ${y}`
+        `[debug]: Element ${element.tagName}\n` +
+          `Dimensions: ${elementDimensions.left}, ${elementDimensions.top}, ${elementDimensions.width}, ${elementDimensions.height}\n` +
+          `Center point: ${x}, ${y}`
       );
     }
     return rootElement.elementFromPoint(x, y);
@@ -143,6 +143,7 @@ export default function isElementClickable(
     );
 
     if (showDebugLogs) {
+      // eslint-disable-next-line no-console
       console.log(
         `[debug]: Element ${element.tagName} shadow elements: ${shadowElements.length}`
       );
@@ -177,6 +178,7 @@ export default function isElementClickable(
       elementDimensions.left + elementDimensions.width > 0;
 
     if (showDebugLogs) {
+      // eslint-disable-next-line no-console
       console.log(
         `[debug]: Element ${element.tagName} is in viewport: ${verticalInView}, ${horizontalInView}`
       );
@@ -194,6 +196,7 @@ export default function isElementClickable(
         element instanceof HTMLButtonElement) &&
       element.disabled;
     if (showDebugLogs) {
+      // eslint-disable-next-line no-console
       console.log(
         `[debug]: Element ${element.tagName} is disabled: ${isDisabled}`
       );

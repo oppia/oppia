@@ -961,7 +961,7 @@ export class BaseUser {
     );
     const newTabPage = await newTarget.page();
     if (!newTabPage) {
-      throw new Error(`No new tab opened.`);
+      throw new Error('No new tab opened.');
     }
     await newTabPage.bringToFront();
     expect(newTabPage).toBeDefined();
