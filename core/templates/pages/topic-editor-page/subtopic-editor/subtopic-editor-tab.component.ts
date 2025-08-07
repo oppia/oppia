@@ -436,23 +436,14 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    if (this.isEnableWorkedexamplesRteComponentFeatureEnabled()) {
-      this.SUBTOPIC_PAGE_SCHEMA = {
-        type: 'html',
-        ui_config: {
-          rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
-          rows: 100,
-        },
-      };
-    } else {
-      this.SUBTOPIC_PAGE_SCHEMA = {
-        type: 'html',
-        ui_config: {
-          rte_components: 'ALL_COMPONENTS',
-          rows: 100,
-        },
-      };
-    }
+    const rteComponents =
+      this.isEnableWorkedexamplesRteComponentFeatureEnabled()
+        ? 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS'
+        : 'ALL_COMPONENTS';
+    this.SUBTOPIC_PAGE_SCHEMA = {
+      type: 'html',
+      ui_config: {rte_components: rteComponents, rows: 100},
+    };
     this.htmlData = '';
     this.sections = [];
     this.sectionsListIsShown = !this.windowDimensionsService.isWindowNarrow();

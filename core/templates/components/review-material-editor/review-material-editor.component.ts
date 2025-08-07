@@ -101,13 +101,8 @@ export class ReviewMaterialEditorComponent implements OnInit {
       /<oppia-noninteractive-workedexample.*?>.*?<\/oppia-noninteractive-workedexample>/g;
     const matches = html.match(workedexampleRegex);
 
-    if (matches && matches.length > 2) {
-      this.workedExampleLimitExceeded = true;
-      return true;
-    } else {
-      this.workedExampleLimitExceeded = false;
-      return false;
-    }
+    this.workedExampleLimitExceeded = !!(matches && matches.length > 2);
+    return this.workedExampleLimitExceeded;
   }
 
   isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {

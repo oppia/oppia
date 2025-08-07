@@ -530,14 +530,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   isSolutionCollapsedForWorkedexample(): boolean {
-    if (
+    return (
       this.pageContextService.getPageContext() === 'topic_editor' ||
       this.pageContextService.getPageContext() === 'studyguide'
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+    );
   }
 
   ngAfterViewInit(): void {
