@@ -41,7 +41,7 @@
           {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
         </div>
       </button>
-      <button class="player-sidebar-button">
+      <button class="player-sidebar-button" (click)="showFlagExplorationModal()">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-flag"></i>
         <div *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-flag"></i>
@@ -68,7 +68,7 @@
           <i class="fa fa-lg fa-comments"></i>
           {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
         </button>
-        <button>
+        <button (click)="showFlagExplorationModal()">
           <i class="fa fa-lg fa-flag"></i>
           {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
         </button>

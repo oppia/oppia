@@ -28,6 +28,13 @@ import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only
 import {UrlService} from 'services/contextual/url.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ShareLessonModalComponent} from './share-lesson-modal.component';
+import {
+  FlagExplorationModalResult,
+  NewFlagExplorationModalComponent,
+} from './flag-exploration-modal.component';
+import {LearnerLocalNavBackendApiService} from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
+import {AlertsService} from 'services/alerts.service';
+import {NewExplorationSuccessfullyFlaggedModalComponent} from './exploration-successfully-flagged-modal.component';
 
 @Component({
   selector: 'oppia-lesson-player-sidebar',
@@ -40,6 +47,7 @@ export class LessonPlayerSidebarComponent implements OnInit {
   expDescription!: string;
   expDescTranslationKey!: string;
   explorationTitle!: string;
+  explorationId: string;
   avgRating!: number | null;
   fullStars: number = 0;
   blankStars: number = 5;
@@ -50,7 +58,9 @@ export class LessonPlayerSidebarComponent implements OnInit {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService,
+    private alertsService: AlertsService
   ) {}
 
   ngOnInit(): void {
@@ -58,12 +68,12 @@ export class LessonPlayerSidebarComponent implements OnInit {
       this.mobileMenuVisible = visibility;
     });
 
-    let explorationId = this.pageContextService.getExplorationId();
+    this.explorationId = this.pageContextService.getExplorationId();
     this.expDescription = 'Loading...';
     this.explorationTitle = 'Loading...';
     this.readOnlyExplorationBackendApiService
       .fetchExplorationAsync(
-        explorationId,
+        this.explorationId,
         this.urlService.getExplorationVersionFromUrl(),
         this.urlService.getPidFromUrl()
       )
@@ -73,7 +83,7 @@ export class LessonPlayerSidebarComponent implements OnInit {
       });
     this.expDescTranslationKey =
       this.i18nLanguageCodeService.getExplorationTranslationKey(
-        explorationId,
+        this.explorationId,
         TranslationKeyType.DESCRIPTION
       );
   }
@@ -96,5 +106,42 @@ export class LessonPlayerSidebarComponent implements OnInit {
         this.expDescTranslationKey
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  showFlagExplorationModal(): void {
+    this.ngbModal
+      .open(NewFlagExplorationModalComponent, {
+        backdrop: 'static',
+      })
+      .result.then(
+        (result: FlagExplorationModalResult) => {
+          this.learnerLocalNavBackendApiService
+            .postReportAsync(this.explorationId, result)
+            .then(
+              () => {},
+              error => {
+                this.alertsService.addWarning(error);
+              }
+            );
+
+          this.ngbModal
+            .open(NewExplorationSuccessfullyFlaggedModalComponent, {
+              backdrop: true,
+            })
+            .result.then(
+              () => {},
+              () => {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              }
+            );
+        },
+        () => {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
+        }
+      );
   }
 }

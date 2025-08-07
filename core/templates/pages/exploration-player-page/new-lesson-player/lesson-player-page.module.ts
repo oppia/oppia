@@ -39,6 +39,8 @@ import {toastrConfig} from 'pages/oppia-root/app.module';
 import {PlayerHeaderComponent} from './lesson-header/player-header.component';
 import {LessonPlayerSidebarComponent} from './sidebar-components/lesson-player-sidebar.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
+import {NewFlagExplorationModalComponent} from './sidebar-components/flag-exploration-modal.component';
+import {NewExplorationSuccessfullyFlaggedModalComponent} from './sidebar-components/exploration-successfully-flagged-modal.component';
 
 @NgModule({
   imports: [
@@ -61,8 +63,12 @@ import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar
     PlayerHeaderComponent,
     LessonPlayerSidebarComponent,
     NewAudioBarComponent,
+    NewFlagExplorationModalComponent,
+    NewExplorationSuccessfullyFlaggedModalComponent,
   ],
   entryComponents: [
+    NewFlagExplorationModalComponent,
+    NewExplorationSuccessfullyFlaggedModalComponent,
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
     PlayerHeaderComponent,

@@ -1,5 +1,5 @@
 <div class="oppia-share-lesson-modal-title">
-  <span [innerHTML]="'I18N_SHARE_TITLE' | translate: { explorationTitle: explorationTitle }"></span>
+  {{'I18N_SHARE_TITLE' | translate: { explorationTitle: explorationTitle } }} 
 </div>
 
 <div class="modal-body">
@@ -8,7 +8,6 @@
 <div class="oppia-learner-solution-container">
   <button mat-button class="oppia-learner-got-it-button e2e-test-learner-got-it-button"
           (click)="closeModal()">
-    <span [innerHTML]="'I18N_GOT_IT' | translate"></span>
+    {{'I18N_GOT_IT' | translate}}"
   </button>
 </div>
-<span class="clearfix"></span>
