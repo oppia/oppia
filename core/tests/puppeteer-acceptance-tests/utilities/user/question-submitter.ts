@@ -488,7 +488,7 @@ export class QuestionSubmitter extends BaseUser {
    * Adds an Image interaction to the current exploration.
    */
   async addImageInteractionInQuestionEditor(): Promise<void> {
-    await this.isElementVisible(addInteractionButton);
+    await this.expectElementToBeVisible(addInteractionButton);
 
     await this.clickOn(addInteractionButton);
     await this.clickOn('Image Region');

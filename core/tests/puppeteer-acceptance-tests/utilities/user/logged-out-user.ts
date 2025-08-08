@@ -576,6 +576,8 @@ const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const floatFormInput = '.e2e-test-float-form-input';
 const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
 const toastMessageSelector = '.e2e-test-toast-message';
+const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
+const formErrorContainer = '.e2e-test-form-error-container';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -3116,9 +3118,80 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Click on the submit answer button.
+   * @param skipVerification - If true, skips verification that the button is visible.
+   */
+  async clickOnSubmitAnswerButton(): Promise<void> {
+    const feedbackSelector = '.e2e-test-conversation-feedback-latest';
+
+    await this.expectElementToBeClickable(submitAnswerButton);
+
+    // Get current status of old and latest responses to use it later.
+    // Handle cases where elements might not exist.
+    const initialPreviousResponses = await this.page
+      .$eval(
+        previousConversationToggleSelector,
+        element => element?.textContent?.trim() || null
+      )
+      .catch(() => null);
+
+    const initialLatestResponse = await this.page
+      .$eval(feedbackSelector, element => element?.textContent?.trim() || null)
+      .catch(() => null);
+
+    // Wait for 1s to ensure the selected answer is updated in Angular component.
+    await this.page.waitForTimeout(1000);
+    // Click on Submit Answer button.
+    await this.clickOn(submitAnswerButton);
+
+    // Wait for either element to change content.
+    await this.page.waitForFunction(
+      (
+        submitButtonSelector: string,
+        formErrorContainer: string,
+        selector1: string,
+        value1: string | null,
+        selector2: string,
+        value2: string | null
+      ) => {
+        const submitButton = document.querySelector(submitButtonSelector);
+        const element1 = document.querySelector(selector1);
+        const element2 = document.querySelector(selector2);
+
+        const currentValue1 = element1?.textContent?.trim() || null;
+        const currentValue2 = element2?.textContent?.trim() || null;
+
+        // Return true if either: submit button is disabled, or if number of
+        // previous responses has increased, or if there was no previous
+        // response and we got the first response.
+        return (
+          (submitButton as HTMLButtonElement)?.disabled ||
+          document.querySelector(formErrorContainer)?.textContent?.trim() !==
+            null ||
+          currentValue1 !== value1 ||
+          currentValue2 !== value2
+        );
+      },
+      {timeout: 10000},
+      submitAnswerButton,
+      formErrorContainer,
+      previousConversationToggleSelector,
+      initialPreviousResponses,
+      feedbackSelector,
+      initialLatestResponse
+    );
+  }
+
+  /**
    * Function to navigate to the next card in the preview tab.
    */
   async continueToNextCard(): Promise<void> {
+    const currentCardContentSelector = `${stateConversationContent} p`;
+    await this.page.waitForSelector(currentCardContentSelector);
+    const currentCardContent = await this.page.$eval(
+      currentCardContentSelector,
+      el => el.textContent
+    );
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
       await this.clickOn(nextCardButton);
@@ -3129,16 +3202,27 @@ export class LoggedOutUser extends BaseUser {
         throw error;
       }
     }
+
+    // Wait until card content changes.
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent !== value;
+      },
+      {},
+      currentCardContentSelector,
+      currentCardContent
+    );
   }
 
   /**
    * Clicks on continue button in continue button interaction.
    */
   async clickOnContinueButtonInInteractionCard(): Promise<void> {
-    await this.isElementVisible(nextCardButton);
+    await this.expectElementToBeVisible(nextCardButton);
     await this.clickOn(nextCardButton);
 
-    await this.isElementVisible(nextCardButton, false);
+    await this.expectElementToBeVisible(nextCardButton, false);
   }
 
   /**
@@ -3151,13 +3235,17 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
     await this.clearAllTextFrom(submitResponseToInteractionInput);
     await this.type(submitResponseToInteractionInput, answer);
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnSubmitAnswerButton();
   }
 
+  /**
+   * Submits the answer in the text area.
+   * @param answer - The answer to submit.
+   */
   async submitAnswerInTextArea(answer: string): Promise<void> {
     await this.waitForElementToBeClickable(submitResponseToInteractionTextArea);
     await this.type(submitResponseToInteractionTextArea, answer);
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnSubmitAnswerButton();
   }
 
   /**
@@ -3719,7 +3807,7 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the revision tab in the topic page.
    */
   async navigateToRevisionTabInTopic(): Promise<void> {
-    await this.isElementVisible(revisionTabButtonSelector);
+    await this.expectElementToBeVisible(revisionTabButtonSelector);
     await this.clickOn(revisionTabButtonSelector);
 
     await this.waitForPageToFullyLoad();
@@ -3733,10 +3821,10 @@ export class LoggedOutUser extends BaseUser {
     const selector = this.isViewportAtMobileWidth()
       ? backToClassroomBreadcrumbSelectorMobile
       : backToClassroomLinkSelector;
-    await this.isElementVisible(selector);
+    await this.expectElementToBeVisible(selector);
     await this.clickOn(selector);
 
-    await this.isElementVisible(selector, false);
+    await this.expectElementToBeVisible(selector, false);
   }
 
   async expectToBeInClassroomPage(classroomURLFragment: string): Promise<void> {
@@ -3753,30 +3841,33 @@ export class LoggedOutUser extends BaseUser {
    * Clicks on the start here button in the classroom page.
    */
   async clickOnStartHereButtonInClassroomPage(): Promise<void> {
-    await this.isElementVisible(startHereButtonSelector);
+    await this.expectElementToBeVisible(startHereButtonSelector);
 
     await this.clickAndWaitForNavigation(startHereButtonSelector);
-    await this.isElementVisible(startHereButtonSelector, false);
+    await this.expectElementToBeVisible(startHereButtonSelector, false);
   }
 
   /**
    * Clicks on the take quiz button in the classroom page.
    */
   async clickOnTakeQuizButtonInClassroomPage(): Promise<void> {
-    await this.isElementVisible(takeQuizButtonSelector);
+    await this.expectElementToBeVisible(takeQuizButtonSelector);
 
     await this.clickOn(takeQuizButtonSelector);
-    await this.isElementVisible(takeQuizButtonSelector, false);
+    await this.expectElementToBeVisible(takeQuizButtonSelector, false);
   }
 
   /**
    * Starts a diagnostic test.
    */
   async startDiagnosticTest(): Promise<void> {
-    await this.isElementVisible(startDiagnosticTestButtonSelector);
+    await this.expectElementToBeVisible(startDiagnosticTestButtonSelector);
 
     await this.clickOn(startDiagnosticTestButtonSelector);
-    await this.isElementVisible(startDiagnosticTestButtonSelector, false);
+    await this.expectElementToBeVisible(
+      startDiagnosticTestButtonSelector,
+      false
+    );
   }
 
   /**
@@ -3787,7 +3878,7 @@ export class LoggedOutUser extends BaseUser {
       (await this.page.$eval(currentProgessSelector, el =>
         el.textContent?.trim()
       )) ?? '';
-    await this.isElementVisible(skipQuestionButton);
+    await this.expectElementToBeVisible(skipQuestionButton);
 
     await this.clickOn(skipQuestionButton);
 
@@ -5825,7 +5916,7 @@ export class LoggedOutUser extends BaseUser {
     value: string,
     exactMatch: boolean = false
   ): Promise<void> {
-    await this.isElementVisible(selector);
+    await this.expectElementToBeVisible(selector);
 
     const actualTextContent = await this.page.$eval(
       selector,
@@ -5886,7 +5977,9 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the partner with us button is visible at the top of the partnerships page.
    */
   async expectPartnerWithUsButtonIsVisible(): Promise<void> {
-    await this.isElementVisible(partnerWithUsButtonAtTheTopOfPartnershipsPage);
+    await this.expectElementToBeVisible(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
   }
 
   /**
@@ -5914,7 +6007,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the partnerships page contains the expected image.
    */
   async expectPartneringWithUsImageToBePresent(): Promise<void> {
-    await this.isElementVisible(partneringWithUsImageSelector);
+    await this.expectElementToBeVisible(partneringWithUsImageSelector);
   }
 
   /**
@@ -5966,14 +6059,16 @@ export class LoggedOutUser extends BaseUser {
    * Checks if explore button is visible in about page.
    */
   async expectExploreLessonsButtonInAboutPageToBePresent(): Promise<void> {
-    await this.isElementVisible(exploreLessonsButtonInAboutUsPageSelector);
+    await this.expectElementToBeVisible(
+      exploreLessonsButtonInAboutUsPageSelector
+    );
   }
 
   /**
    * Checks if android app button is visible in about page.
    */
   async expectAndroidAppButtonInAboutPageToBePresent(): Promise<void> {
-    await this.isElementVisible(androidAppButtonInAboutUsPageSelector);
+    await this.expectElementToBeVisible(androidAppButtonInAboutUsPageSelector);
   }
 
   /**
@@ -6033,14 +6128,14 @@ export class LoggedOutUser extends BaseUser {
    * Checks if "Our Impact" section is visible in donation page.
    */
   async expectOurImpactSectionInDonationPageToBePresent(): Promise<void> {
-    await this.isElementVisible(ourImpactSectionSelector);
+    await this.expectElementToBeVisible(ourImpactSectionSelector);
   }
 
   /**
    * Checks if "Our Learners" section is visible in donation page.
    */
   async expectOurLearnersSectionInDonationPageToBePresent(): Promise<void> {
-    await this.isElementVisible(ourLearnersSectionSelector);
+    await this.expectElementToBeVisible(ourLearnersSectionSelector);
   }
 
   /**
@@ -6068,22 +6163,22 @@ export class LoggedOutUser extends BaseUser {
    * Checks if "Our Network" section is visible in donation page.
    */
   async expectOurNetworkSectionInDonationPageToBePresent(): Promise<void> {
-    await this.isElementVisible(ourNetworkHeadingSelector);
+    await this.expectElementToBeVisible(ourNetworkHeadingSelector);
 
     await this.expectTextContentInElementWithSelectorToBe(
       ourNetworkHeadingSelector,
       'Our Network'
     );
 
-    await this.isElementVisible(ourNetworkSectionSelector);
-    await this.isElementVisible(donationHighlightsSelector);
+    await this.expectElementToBeVisible(ourNetworkSectionSelector);
+    await this.expectElementToBeVisible(donationHighlightsSelector);
   }
 
   /**
    * Checks that the "View Report" button on the About page is visible.
    */
   async expectViewReportButtonInAboutPageToBeVisible(): Promise<void> {
-    await this.isElementVisible(impactReportButtonInAboutPage);
+    await this.expectElementToBeVisible(impactReportButtonInAboutPage);
   }
 
   /**
@@ -6105,7 +6200,7 @@ export class LoggedOutUser extends BaseUser {
    * to the correct Google Play Store URL for the Oppia Android app.
    */
   async clickOnPlayStoreImageInAndroidPageAndVerifyNavigation(): Promise<void> {
-    await this.isElementVisible(redirectToPlayStoreImageSelector);
+    await this.expectElementToBeVisible(redirectToPlayStoreImageSelector);
 
     await this.clickLinkButtonToNewTab(
       redirectToPlayStoreImageSelector,
@@ -6198,7 +6293,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async verifyLearnerStoriesCarouselInPartnershipPageWorksProperly(): Promise<void> {
     const activeItemSelector = `${learnerStoriesCarouselContainerSelector} .carousel-item.active`;
-    await this.isElementVisible(learnerStoriesHeadingSelector);
+    await this.expectElementToBeVisible(learnerStoriesHeadingSelector);
 
     // Verify Coursal Heading.
     const subHeading = await this.page.$eval(
@@ -6369,7 +6464,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} classroomName - The name of the classroom.
    */
   async clickOnClassroomTileInLearnPage(classroomName: string): Promise<void> {
-    await this.isElementVisible(classroomTileContainerSelector);
+    await this.expectElementToBeVisible(classroomTileContainerSelector);
 
     const classroomTiles = await this.page.$$(classroomTileContainerSelector);
 
@@ -6568,7 +6663,7 @@ export class LoggedOutUser extends BaseUser {
    * Expects the user to be in the diagnostic test player.
    */
   async expectToBeInDiagnosticTestPlayer(): Promise<void> {
-    await this.isElementVisible(diagnosticTestPlayerSelector);
+    await this.expectElementToBeVisible(diagnosticTestPlayerSelector);
 
     await this.isTextPresentOnPage('Learner Diagnostic Test');
   }

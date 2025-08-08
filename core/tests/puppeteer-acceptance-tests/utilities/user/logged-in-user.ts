@@ -332,7 +332,7 @@ export class LoggedInUser extends BaseUser {
    * Function for clicking on the profile dropdown.
    */
   async clickOnProfileDropdown(): Promise<void> {
-    await this.isElementVisible(profileDropdownToggleSelector);
+    await this.expectElementToBeVisible(profileDropdownToggleSelector);
     await this.clickOn(profileDropdownToggleSelector);
   }
 
@@ -343,7 +343,7 @@ export class LoggedInUser extends BaseUser {
   async expectProfileDropdownToContainElementWithContent(
     item: string
   ): Promise<void> {
-    await this.isElementVisible(profileDropdownContainerSelector);
+    await this.expectElementToBeVisible(profileDropdownContainerSelector);
 
     const elementsContents = await this.page.$$eval(
       profileDropdownAnchorSelector,
@@ -3073,27 +3073,29 @@ export class LoggedInUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(mobileNavbarOpenSidebarButton);
       // Learn Dropdown.
-      await this.isElementVisible(mobileLearnDropdownSelector);
-      await this.isElementVisible(mobileLearnSubMenuSelector);
+      await this.expectElementToBeVisible(mobileLearnDropdownSelector);
+      await this.expectElementToBeVisible(mobileLearnSubMenuSelector);
       await this.clickOn(mobileLearnDropdownSelector);
-      await this.isElementVisible(mobileLearnSubMenuSelector, false);
+      await this.expectElementToBeVisible(mobileLearnSubMenuSelector, false);
       await this.clickOn(mobileLearnDropdownSelector);
 
       // About Dropdown.
-      await this.isElementVisible(mobileAboutMenuDropdownSelector);
-      await this.isElementVisible(mobileAboutPageButtonSelector, false);
+      await this.expectElementToBeVisible(mobileAboutMenuDropdownSelector);
+      await this.expectElementToBeVisible(mobileAboutPageButtonSelector, false);
       await this.clickOn(mobileAboutMenuDropdownSelector);
-      await this.isElementVisible(mobileAboutPageButtonSelector);
+      await this.expectElementToBeVisible(mobileAboutPageButtonSelector);
       await this.clickOn(mobileAboutMenuDropdownSelector);
 
       // Get Involved Dropdown.
-      await this.isElementVisible(mobileGetInvolvedDropdownSelector);
-      await this.isElementVisible(
+      await this.expectElementToBeVisible(mobileGetInvolvedDropdownSelector);
+      await this.expectElementToBeVisible(
         mobileGetInvolvedMenuContainerSelector,
         false
       );
       await this.clickOn(mobileGetInvolvedDropdownSelector);
-      await this.isElementVisible(mobileGetInvolvedMenuContainerSelector);
+      await this.expectElementToBeVisible(
+        mobileGetInvolvedMenuContainerSelector
+      );
       await this.clickOn(mobileGetInvolvedDropdownSelector);
 
       // Close Navmenu.
@@ -3102,13 +3104,17 @@ export class LoggedInUser extends BaseUser {
     // Desktop view port.
     else {
       await this.clickOn(navbarLearnTab);
-      await this.isElementVisible(navbarLearnDropdownContainerSelector);
+      await this.expectElementToBeVisible(navbarLearnDropdownContainerSelector);
 
       await this.clickOn(navbarAboutTab);
-      await this.isElementVisible(navbarAboutDropdownConatinaerSelector);
+      await this.expectElementToBeVisible(
+        navbarAboutDropdownConatinaerSelector
+      );
 
       await this.clickOn(navbarGetInvolvedTab);
-      await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
+      await this.expectElementToBeVisible(
+        navbarGetInvolvedDropdownContainerSelector
+      );
     }
   }
 }

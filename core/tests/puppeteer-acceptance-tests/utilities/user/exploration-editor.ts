@@ -565,6 +565,9 @@ export class ExplorationEditor extends BaseUser {
     );
   }
 
+  /**
+   * Clicks on the image in the interaction preview card.
+   */
   async clickOnImageInInteractionPreviewCard(): Promise<void> {
     await this.expectElementToBeVisible(imageContainerSelector);
     await this.page.click(imageContainerSelector);
@@ -4438,7 +4441,7 @@ export class ExplorationEditor extends BaseUser {
         throw new Error(`Unsupported input type: ${inputType}`);
     }
 
-    await this.clickOn(submitAnswerButton);
+    await this.clickOnSubmitAnswerButton();
   }
 
   /**
@@ -5678,14 +5681,14 @@ export class ExplorationEditor extends BaseUser {
    * Navigates to the tour tab in the exploration editor.
    */
   async clickOnTakeATourButton(): Promise<void> {
-    await this.isElementVisible(takeATourButtonSelector);
+    await this.expectElementToBeVisible(takeATourButtonSelector);
     await this.clickOn(takeATourButtonSelector);
 
     await this.expectElementToBeVisible(joyrideBodySelector);
   }
 
   async clickOnTakeATranslationsTourButton(): Promise<void> {
-    await this.isElementVisible(translationTourButtonSelector);
+    await this.expectElementToBeVisible(translationTourButtonSelector);
     await this.clickOn(translationTourButtonSelector);
 
     await this.expectElementToBeVisible(joyrideBodySelector);
