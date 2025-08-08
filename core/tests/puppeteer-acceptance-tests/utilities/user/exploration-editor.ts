@@ -6422,7 +6422,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.keyboard.press('ArrowRight');
 
     // Add LinkEnter.
-    await this.addTextWithLinkRTE('Oppia', oppiaWebURL);
+    await this.addTextWithLinkRTE('Go to Oppia.org website', oppiaWebURL);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
 

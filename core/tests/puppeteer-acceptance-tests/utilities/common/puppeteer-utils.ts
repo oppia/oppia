@@ -1268,9 +1268,13 @@ export class BaseUser {
   /**
    * This function checks if the page URL contains the given URL.
    * @param {string} url - The URL to check.
+   * @param {Page} context - The context in which the URL is checked.
    */
-  async expectPageURLToContain(url: string): Promise<void> {
-    await this.page.waitForFunction(
+  async expectPageURLToContain(
+    url: string,
+    context: Page = this.page
+  ): Promise<void> {
+    await context.waitForFunction(
       (url: string) => {
         return window.location.href.includes(url);
       },
@@ -1496,6 +1500,58 @@ export class BaseUser {
     const elements = await this.page.$$(selector);
 
     return elements;
+  }
+
+  /**
+   * Clicks on an anchor element with the given inner text and verifies that the
+   * target page URL contains the given URL.
+   * @param anchorInnerText The inner text of the anchor element.
+   * @param targetPageUrl The URL of the target page.
+   * @param context The context in which the anchor element is located.
+   */
+  async clickAndVerifyAnchorWithInnerText(
+    anchorInnerText: string,
+    targetPageUrl: string,
+    context: Page = this.page
+  ): Promise<void> {
+    // Get an anchor element with the given inner text.
+    await context.waitForSelector('a');
+    const anchorElements = await context.$$('a');
+    let element: puppeteer.ElementHandle<Element> | null = null;
+    for (const anchorElement of anchorElements) {
+      const innerText = await anchorElement.evaluate(el =>
+        (el as HTMLAnchorElement).innerText.trim()
+      );
+      if (innerText === anchorInnerText) {
+        element = anchorElement;
+        break;
+      }
+    }
+    if (!element) {
+      throw new Error(`Anchor with inner text ${anchorInnerText} not found.`);
+    }
+
+    // Check if anchor target is the same as the current page.
+    const isTargetSamePage = await element.evaluate(el => {
+      return (el as HTMLAnchorElement).target !== '_blank';
+    });
+    if (!isTargetSamePage) {
+      showMessage('Anchor target is not the same as the current page.');
+      const pageTarget = context.target();
+      await element.click();
+      const newTarget = await this.browserObject.waitForTarget(
+        target => target.opener() === pageTarget
+      );
+      const newTabPage = await newTarget.page();
+      expect(newTabPage).toBeDefined();
+      expect(newTabPage?.url()).toBe(targetPageUrl);
+      await newTabPage?.close();
+    } else {
+      showMessage('Anchor target is the same as the current page.');
+      await element.click();
+      await this.expectPageURLToContain(targetPageUrl, context);
+      await context.goBack();
+    }
   }
 }
 

@@ -284,4 +284,8 @@ export const FILEPATHS = {
     __dirname,
     '../../data/profile-pictures/profile.svg'
   ),
+  PROFILE_PHOTO_HIRES: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile-1920.png'
+  ),
 } as const;
