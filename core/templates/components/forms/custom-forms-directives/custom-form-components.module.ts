@@ -28,6 +28,7 @@ import {SharedPipesModule} from 'filters/shared-pipes.module';
 import {ImageReceiverComponent} from './image-receiver.component';
 import {TranslateModule} from '@ngx-translate/core';
 import {SmartRouterModule} from 'hybrid-router-module-provider';
+import {RouterModule} from '@angular/router';
 
 @NgModule({
   imports: [
@@ -36,6 +37,7 @@ import {SmartRouterModule} from 'hybrid-router-module-provider';
     DynamicContentModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
+    RouterModule,
     SmartRouterModule,
     NgbTooltipModule,
     NgbModalModule,
