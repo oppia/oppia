@@ -56,6 +56,7 @@ export class PlayerHeaderComponent {
   expInfo!: LearnerExplorationSummaryBackendDict;
   directiveSubscriptions: Subscription = new Subscription();
   isMobileMenuVisible = false;
+  pageIsIframed: boolean = false;
 
   constructor(
     private pageContextService: PageContextService,
@@ -72,6 +73,7 @@ export class PlayerHeaderComponent {
   ngOnInit(): void {
     let pathnameArray = this.urlService.getPathname().split('/');
     let explorationContext = false;
+    this.pageIsIframed = this.urlService.isIframed();
 
     for (let i = 0; i < pathnameArray.length; i++) {
       if (

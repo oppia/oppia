@@ -10,7 +10,7 @@
   <ul>
     <li *ngFor="let topicId of managedTopicIds">
       <div class="d-flex justify-content-between">
-        <span>{{ topicIdToName[topicId] }}</span>
+        <span class="e2e-test-assigned-topic">{{ topicIdToName[topicId] }}</span>
         <div class="mat-icon-button oppia-progress-spinner" *ngIf="topicIdInUpdate === topicId">
           <mat-spinner [diameter]="24"></mat-spinner>
         </div>
