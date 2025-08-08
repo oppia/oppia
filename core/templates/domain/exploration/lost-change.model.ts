@@ -249,25 +249,25 @@ export class LostChange {
     if (
       !lostChangeDict ||
       typeof lostChangeDict !== 'object' ||
-      !('cmd' in lostChangeDict)
+      typeof lostChangeDict.cmd !== 'string'
     ) {
       throw new Error('Invalid lostChangeDict passed to LostChange.createNew');
     }
 
-    lostChangeDict = lostChangeDict as LostChangeBackendDict;
+    const dict = lostChangeDict as Partial<LostChangeBackendDict>;
 
     return new LostChange(
       utilsService,
-      lostChangeDict.cmd,
-      lostChangeDict.new_state_name,
-      lostChangeDict.old_state_name,
-      lostChangeDict.state_name,
-      lostChangeDict.new_value,
-      lostChangeDict.old_value,
-      lostChangeDict.property_name,
-      lostChangeDict.content_id,
-      lostChangeDict.language_code,
-      lostChangeDict.translation_html
+      dict.cmd ?? '',
+      dict.new_state_name ?? null,
+      dict.old_state_name ?? null,
+      dict.state_name ?? null,
+      dict.new_value ?? null,
+      dict.old_value ?? null,
+      dict.property_name ?? null,
+      dict.content_id ?? null,
+      dict.language_code ?? null,
+      dict.translation_html ?? null
     );
   }
 }
