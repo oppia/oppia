@@ -1,7 +1,7 @@
 <nav ngbNav #nav="ngbNav" class="nav-tabs">
   <ng-container ngbNavItem *ngFor="let tabContent of tabContents; let idx = index">
     <div class="e2e-test-non-interactive-tabs-headers">
-      <a ngbNavLink>{{ tabContent.title }}</a>
+      <a ngbNavLink [class]="'e2e-test-element-' + idx">{{ tabContent.title }}</a>
     </div>
     <ng-template ngbNavContent>
       <span>

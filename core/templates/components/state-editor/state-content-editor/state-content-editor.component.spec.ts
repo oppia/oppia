@@ -173,4 +173,12 @@ describe('StateHintsEditorComponent', () => {
     expect(component.cardHeightLimitReached).toBeTrue();
     expect(component.isCardHeightLimitReached).toHaveBeenCalled();
   });
+
+  it('should return false if shadow preview card is not present', () => {
+    spyOn(document, 'querySelector').and.returnValue(null);
+
+    const result = component.isCardHeightLimitReached();
+
+    expect(result).toBeFalse();
+  });
 });

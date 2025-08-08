@@ -17,17 +17,16 @@
  */
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {
+  ExplorationEditor,
+  INTERACTION_TYPES,
+} from '../../utilities/user/exploration-editor';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS: number =
   testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const INTRODUCTION_CARD_CONTENT: string =
   'This exploration will test your understanding of negative numbers.';
-enum INTERACTION_TYPES {
-  CONTINUE_BUTTON = 'Continue Button',
-  NUMERIC_INPUT = 'Number Input',
-  END_EXPLORATION = 'End Exploration',
-}
+
 enum CARD_NAME {
   INTRODUCTION = 'Introduction',
   TEST_QUESTION = 'Test Question',
@@ -59,9 +58,9 @@ describe('Exploration Editor', function () {
     await explorationEditor.updateCardContent(
       'Enter a negative number greater than -100.'
     );
-    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMERIC_INPUT);
+    await explorationEditor.addInteraction(INTERACTION_TYPES.NUMBER_INPUT);
     await explorationEditor.addResponsesToTheInteraction(
-      INTERACTION_TYPES.NUMERIC_INPUT,
+      INTERACTION_TYPES.NUMBER_INPUT,
       '-99',
       'Prefect!',
       CARD_NAME.FINAL_CARD,

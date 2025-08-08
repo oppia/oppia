@@ -54,6 +54,8 @@ import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {ExplorationObjectFactory} from '../../../../domain/exploration/ExplorationObjectFactory';
 import {AutomaticVoiceoverHighlightService} from '../../../../services/automatic-voiceover-highlight-service';
+import {PageContextService} from '../../../../services/page-context.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;
@@ -116,6 +118,8 @@ describe('Content language selector component', () => {
   let playerPositionService: PlayerPositionService;
   let explorationObjectFactory: ExplorationObjectFactory;
   let automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService;
+  let pageContextService: PageContextService;
+  let stateEditorService: StateEditorService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -165,6 +169,8 @@ describe('Content language selector component', () => {
     automaticVoiceoverHighlightService = TestBed.inject(
       AutomaticVoiceoverHighlightService
     );
+    stateEditorService = TestBed.inject(StateEditorService);
+    pageContextService = TestBed.inject(PageContextService);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
@@ -433,4 +439,25 @@ describe('Content language selector component', () => {
       expect(setCurrentContentLanguageCodeSpy).not.toHaveBeenCalled();
     })
   );
+
+  it('should be able to get current state name', () => {
+    let explorationPlayerPageSpy = spyOn(
+      pageContextService,
+      'isInExplorationPlayerPage'
+    );
+
+    spyOn(playerPositionService, 'getCurrentStateName').and.returnValue(
+      'Introduction'
+    );
+    explorationPlayerPageSpy.and.returnValue(true);
+    let currentStateName = component.getCurrentStateName();
+    expect(currentStateName).toEqual('Introduction');
+
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
+      'Second State'
+    );
+    explorationPlayerPageSpy.and.returnValue(false);
+    currentStateName = component.getCurrentStateName();
+    expect(currentStateName).toEqual('Second State');
+  });
 });
