@@ -16,15 +16,17 @@
  * @fileoverview Component for the exploration successfully flagged modal.
  */
 
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
-  selector: 'oppia-exploration-successfully-flagged-modal',
-  templateUrl: './exploration-successfully-flagged-modal.component.html',
+  selector: 'oppia-customizable-thank-you-modal',
+  templateUrl: './customizable-thank-you-modal.component.html',
 })
-export class NewExplorationSuccessfullyFlaggedModalComponent extends ConfirmOrCancelModal {
+export class CustomizableThankYouModalComponent extends ConfirmOrCancelModal {
+  @Input() modalMessageI18nKey!: string;
+
   constructor(private ngbActiveModal: NgbActiveModal) {
     super(ngbActiveModal);
   }

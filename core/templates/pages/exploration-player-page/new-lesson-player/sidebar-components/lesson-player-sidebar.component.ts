@@ -34,7 +34,8 @@ import {
 } from './flag-exploration-modal.component';
 import {LearnerLocalNavBackendApiService} from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
-import {NewExplorationSuccessfullyFlaggedModalComponent} from './exploration-successfully-flagged-modal.component';
+import {CustomizableThankYouModalComponent} from './customizable-thank-you-modal.component';
+import {LessonFeedbackModalComponent} from './lesson-feedback-modal.component';
 
 @Component({
   selector: 'oppia-lesson-player-sidebar',
@@ -109,39 +110,53 @@ export class LessonPlayerSidebarComponent implements OnInit {
   }
 
   showFlagExplorationModal(): void {
-    this.ngbModal
-      .open(NewFlagExplorationModalComponent, {
-        backdrop: 'static',
-      })
-      .result.then(
-        (result: FlagExplorationModalResult) => {
-          this.learnerLocalNavBackendApiService
-            .postReportAsync(this.explorationId, result)
-            .then(
-              () => {},
-              error => {
-                this.alertsService.addWarning(error);
-              }
-            );
+    const modalRef = this.ngbModal.open(NewFlagExplorationModalComponent, {
+      backdrop: 'static',
+    });
 
-          this.ngbModal
-            .open(NewExplorationSuccessfullyFlaggedModalComponent, {
-              backdrop: true,
-            })
-            .result.then(
-              () => {},
-              () => {
-                // Note to developers:
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
-              }
-            );
-        },
-        () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        }
-      );
+    modalRef.result.then(
+      (result: FlagExplorationModalResult) => {
+        this.learnerLocalNavBackendApiService
+          .postReportAsync(this.explorationId, result)
+          .then(
+            () => {},
+            error => {
+              this.alertsService.addWarning(error);
+            }
+          );
+
+        const thankYouModalRef = this.ngbModal.open(
+          CustomizableThankYouModalComponent,
+          {
+            backdrop: true,
+          }
+        );
+
+        thankYouModalRef.componentInstance.modalMessageI18nKey =
+          'I18N_PLAYER_REPORT_SUCCESS_MODAL_BODY';
+      },
+      () => {}
+    );
+  }
+
+  showFeedbackModal(): void {
+    const modalRef = this.ngbModal.open(LessonFeedbackModalComponent, {
+      backdrop: 'static',
+    });
+
+    modalRef.result.then(
+      () => {
+        const thankYouModalRef = this.ngbModal.open(
+          CustomizableThankYouModalComponent,
+          {
+            backdrop: true,
+          }
+        );
+
+        thankYouModalRef.componentInstance.modalMessageI18nKey =
+          'I18N_PLAYER_THANK_FEEDBACK';
+      },
+      () => {}
+    );
   }
 }

@@ -40,7 +40,8 @@ import {PlayerHeaderComponent} from './lesson-header/player-header.component';
 import {LessonPlayerSidebarComponent} from './sidebar-components/lesson-player-sidebar.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
 import {NewFlagExplorationModalComponent} from './sidebar-components/flag-exploration-modal.component';
-import {NewExplorationSuccessfullyFlaggedModalComponent} from './sidebar-components/exploration-successfully-flagged-modal.component';
+import {CustomizableThankYouModalComponent} from './sidebar-components/customizable-thank-you-modal.component';
+import {LessonFeedbackModalComponent} from './sidebar-components/lesson-feedback-modal.component';
 
 @NgModule({
   imports: [
@@ -64,16 +65,18 @@ import {NewExplorationSuccessfullyFlaggedModalComponent} from './sidebar-compone
     LessonPlayerSidebarComponent,
     NewAudioBarComponent,
     NewFlagExplorationModalComponent,
-    NewExplorationSuccessfullyFlaggedModalComponent,
+    CustomizableThankYouModalComponent,
+    LessonFeedbackModalComponent,
   ],
   entryComponents: [
     NewFlagExplorationModalComponent,
-    NewExplorationSuccessfullyFlaggedModalComponent,
+    CustomizableThankYouModalComponent,
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
     PlayerHeaderComponent,
     LessonPlayerSidebarComponent,
     NewAudioBarComponent,
+    LessonFeedbackModalComponent,
   ],
   providers: [HintAndSolutionModalService, FatigueDetectionService],
 })
