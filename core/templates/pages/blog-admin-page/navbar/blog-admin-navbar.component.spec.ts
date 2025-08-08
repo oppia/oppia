@@ -28,7 +28,6 @@ import {APP_BASE_HREF} from '@angular/common';
 
 import {UserService} from 'services/user.service';
 import {BlogAdminNavbarComponent} from 'pages/blog-admin-page/navbar/blog-admin-navbar.component';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {UserInfo} from 'domain/user/user-info.model';
 
 describe('Blog Admin navbar component', () => {
@@ -44,13 +43,7 @@ describe('Blog Admin navbar component', () => {
   let fixture: ComponentFixture<BlogAdminNavbarComponent>;
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        // TODO(#13443): Remove hybrid router module provider once all pages are
-        // migrated to angular router.
-        SmartRouterModule,
-        RouterModule.forRoot([]),
-      ],
+      imports: [HttpClientTestingModule, RouterModule.forRoot([])],
       declarations: [BlogAdminNavbarComponent],
       providers: [
         {

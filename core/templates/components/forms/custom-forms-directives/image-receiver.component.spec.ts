@@ -21,7 +21,6 @@ import {MatIconModule} from '@angular/material/icon';
 import {APP_BASE_HREF} from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {IdGenerationService} from 'services/id-generation.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -53,9 +52,6 @@ describe('ImageReceiverComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         MatIconModule,
-        // TODO(#13443): Remove hybrid router module provider once all pages are
-        // migrated to angular router.
-        SmartRouterModule,
         HttpClientTestingModule,
         RouterModule.forRoot([]),
       ],

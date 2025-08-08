@@ -40,8 +40,6 @@ import {CollectionEditorPageRootComponent} from './collection-editor-page-root.c
 
 @NgModule({
   imports: [
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
     SharedComponentsModule,
     FormsModule,
     ToastrModule.forRoot(toastrConfig),

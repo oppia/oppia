@@ -27,7 +27,6 @@ import {
 import {APP_BASE_HREF} from '@angular/common';
 import {RouterModule} from '@angular/router';
 import {UserInfo} from 'domain/user/user-info.model';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 
 import {UserService} from 'services/user.service';
 import {AdminRouterService} from '../services/admin-router.service';
@@ -50,13 +49,7 @@ describe('Admin Navbar component', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        // TODO(#13443): Remove hybrid router module provider once all pages are
-        // migrated to angular router.
-        SmartRouterModule,
-        RouterModule.forRoot([]),
-      ],
+      imports: [HttpClientTestingModule, RouterModule.forRoot([])],
       declarations: [AdminNavbarComponent],
       providers: [
         {

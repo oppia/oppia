@@ -22,15 +22,13 @@ import {SharedComponentsModule} from 'components/shared-component.module';
 import {PlaybookPageRootComponent} from './playbook-page-root.component';
 import {CommonModule} from '@angular/common';
 import {PlaybookPageRoutingModule} from './playbook-page-routing.module';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
+import {RouterModule} from '@angular/router';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedComponentsModule,
-    // TODO(#13443): Remove hybrid router module provider once all pages are
-    // migrated to angular router.
-    SmartRouterModule,
+    RouterModule,
     PlaybookPageRoutingModule,
   ],
   declarations: [PlaybookPageComponent, PlaybookPageRootComponent],

@@ -39,8 +39,6 @@ import {StoryEditorNavbarBreadcrumbComponent} from './navbar/story-editor-navbar
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
     SharedComponentsModule,
     ToastrModule.forRoot(toastrConfig),
     RouterModule.forChild([

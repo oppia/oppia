@@ -35,8 +35,6 @@ import {DiagnosticTestPlayerPageAuthGuard} from './diagnostic-test-player-page-a
   imports: [
     CommonModule,
     FormsModule,
-    // TODO(#13443): Remove smart router module provider once all pages are
-    // migrated to angular router.
     MatCardModule,
     MatTooltipModule,
     ReactiveFormsModule,

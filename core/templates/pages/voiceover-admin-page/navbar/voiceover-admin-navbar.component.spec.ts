@@ -28,7 +28,6 @@ import {APP_BASE_HREF} from '@angular/common';
 
 import {UserService} from 'services/user.service';
 import {VoiceoverAdminNavbarComponent} from './voiceover-admin-navbar.component';
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {UserInfo} from 'domain/user/user-info.model';
 
 describe('Voiceover Admin navbar component', () => {
@@ -42,13 +41,7 @@ describe('Voiceover Admin navbar component', () => {
   let fixture: ComponentFixture<VoiceoverAdminNavbarComponent>;
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule,
-        // TODO(#13443): Remove hybrid router module provider once all pages are
-        // migrated to angular router.
-        SmartRouterModule,
-        RouterModule.forRoot([]),
-      ],
+      imports: [HttpClientTestingModule, RouterModule.forRoot([])],
       declarations: [VoiceoverAdminNavbarComponent],
       providers: [
         {

@@ -28,7 +28,6 @@ import {
 import {APP_BASE_HREF} from '@angular/common';
 import {RouterModule} from '@angular/router';
 
-import {SmartRouterModule} from 'hybrid-router-module-provider';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -75,9 +74,6 @@ describe('Side Navigation Bar Component', () => {
       imports: [
         HttpClientModule,
         HttpClientTestingModule,
-        // TODO(#13443): Remove hybrid router module provider once all pages are
-        // migrated to angular router.
-        SmartRouterModule,
         RouterModule.forRoot([]),
       ],
       declarations: [SideNavigationBarComponent, MockTranslatePipe],
