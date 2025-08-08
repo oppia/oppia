@@ -401,11 +401,9 @@ describe('Library Page Component', () => {
     spyOn(componentInstance, 'initCarousels');
     spyOn(loggerService, 'error');
     let actualWidth = 200;
-    spyOn(window, '$').and.returnValue({
-      width: () => {
-        return actualWidth;
-      },
-    } as JQLite);
+    spyOn(document, 'querySelector').and.returnValue({
+      clientWidth: 200,
+    } as HTMLElement);
     componentInstance.ngOnInit();
     tick();
     tick();
@@ -649,6 +647,18 @@ describe('Library Page Component', () => {
         protractor_id: '',
       },
     ];
+
+    // When jQuery was used in the component, it could directly query DOM globally
+    // using $('.class-name'). In the updated version without jQuery, the component
+    // uses `this.el.nativeElement.querySelectorAll(...)` instead, which only sees
+    // elements appended to `el.nativeElement` (the component's local DOM).
+    //
+    // So here we manually create a div with the expected class and append it
+    // to the component's root element, so the native DOM queries can find it.
+
+    const tile = document.createElement('div');
+    tile.classList.add('oppia-library-carousel-tiles');
+    componentInstance.el.nativeElement.appendChild(tile);
     componentInstance.initCarousels();
     expect(componentInstance.leftmostCardIndices.length).toEqual(1);
   });
@@ -940,4 +950,62 @@ describe('Library Page Component', () => {
 
     flush();
   }));
+
+  it('should not scroll if activity count is too small to allow scrolling', () => {
+    const ind = 0;
+    const shouldScrollLeft = false;
+
+    const mockCarouselElement = document.createElement('div');
+    mockCarouselElement.className = 'oppia-library-carousel-tiles';
+    mockCarouselElement.scrollLeft = 100;
+    spyOn(document, 'querySelectorAll').and.returnValue([
+      mockCarouselElement,
+    ] as unknown as NodeListOf<HTMLElement>);
+
+    componentInstance.tileDisplayCount = 4;
+    componentInstance.leftmostCardIndices = [0];
+    componentInstance.libraryGroups = [
+      {
+        activity_summary_dicts: new Array(2),
+        categories: [],
+        header_i18n_id: '',
+        has_full_results_page: false,
+        full_results_url: '',
+        protractor_id: '',
+      },
+    ];
+
+    componentInstance.scroll(ind, shouldScrollLeft);
+    expect(componentInstance.leftmostCardIndices[ind]).toBe(0);
+  });
+
+  it('should decrease leftmostCardIndices when scrolling left', () => {
+    const ind = 0;
+    const isLeftScroll = true;
+
+    const mockCarouselElement = document.createElement('div');
+    mockCarouselElement.className = 'oppia-library-carousel-tiles';
+    mockCarouselElement.scrollLeft = 200;
+
+    spyOn(document, 'querySelectorAll').and.returnValue([
+      mockCarouselElement,
+    ] as unknown as NodeListOf<HTMLElement>);
+
+    componentInstance.tileDisplayCount = 3;
+    componentInstance.leftmostCardIndices = [5];
+    componentInstance.libraryGroups = [
+      {
+        activity_summary_dicts: new Array(10),
+        categories: [],
+        header_i18n_id: '',
+        has_full_results_page: false,
+        full_results_url: '',
+        protractor_id: '',
+      },
+    ];
+
+    componentInstance.scroll(ind, isLeftScroll);
+
+    expect(componentInstance.leftmostCardIndices[ind]).toBe(2);
+  });
 });
