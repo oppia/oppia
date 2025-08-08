@@ -31,8 +31,8 @@ describe('Logged-In Learner', function () {
 
   beforeAll(async function () {
     loggedInLearner = await UserFactory.createNewUser(
-      'learner8',
-      'learner8@example.com'
+      'learner',
+      'learner@example.com'
     );
 
     explorationEditor = await UserFactory.createNewUser(
@@ -50,7 +50,7 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.clickOnProfileDropdown();
 
     await loggedInLearner.expectProfileDropdownToContainElementWithContent(
-      'learner8'
+      'learner'
     );
     await loggedInLearner.expectProfileDropdownToContainElementWithContent(
       'Learner Dashboard'

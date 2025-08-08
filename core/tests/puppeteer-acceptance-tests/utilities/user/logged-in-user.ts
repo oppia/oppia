@@ -3100,6 +3100,7 @@ export class LoggedInUser extends BaseUser {
 
       // Close Navmenu.
       await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.expectElementToBeVisible(mobileLearnDropdownSelector, false);
     }
     // Desktop view port.
     else {
