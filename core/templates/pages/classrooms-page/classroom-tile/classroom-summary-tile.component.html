@@ -1,4 +1,4 @@
-<div class="oppia-classroom-tile-container"
+<div class="oppia-classroom-tile-container e2e-test-classroom-tile"
      [ngClass]="{'classroom-tile-dropshadow': isPublished()}"
      [ngStyle]="{'background-color': classroomSummary.is_published ? '#FFFFFF' : '#EEEEEE'}"
     >
@@ -10,7 +10,7 @@
          class="classroom-thumbnail"
          [src]="classroomThumbnailUrl">
     <div class="classroom-text-container">
-      <h3 class="classroom-name">{{getName()}}</h3>
+      <h3 class="classroom-name e2e-test-classroom-name">{{getName()}}</h3>
       <p class="classroom-teaser-text"
          [ngClass]="{'private-classroom-teaser-text': !isPublished()}"
       >{{getTeaserText()}}</p>

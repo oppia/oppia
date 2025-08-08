@@ -99,6 +99,9 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
   isVoiceoverAutogenerationEnabledByAdmins: boolean = false;
 
+  manualVoiceoverIsLoading: boolean = false;
+  automaticVoiceoverIsLoading: boolean = false;
+
   constructor(
     private audioPlayerService: AudioPlayerService,
     private adminBackendApiService: AdminBackendApiService,
@@ -208,7 +211,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.isAutomaticVoiceoverPlaying = false;
         this.isManualVoiceoverPlaying = false;
       }
-    }, 500);
+    }, 300);
     this.updateActiveContent();
   }
 
@@ -470,7 +473,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.isAutomaticVoiceoverPlaying = false;
         this.audioPlayerService.clear();
       }
-      this.isManualVoiceoverPlaying = !this.isManualVoiceoverPlaying;
       this.automaticVoiceoverProgress = 0;
     }
 
@@ -479,11 +481,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.isManualVoiceoverPlaying = false;
         this.audioPlayerService.clear();
       }
-      this.isAutomaticVoiceoverPlaying = !this.isAutomaticVoiceoverPlaying;
       this.manualVoiceoverProgress = 0;
     }
 
     if (this.audioPlayerService.isPlaying()) {
+      this.flipVoiceoverPlayStatus(voiceoverType);
       this.audioPlayerService.pause();
       return;
     }
@@ -493,11 +495,39 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       this.currentVoiceoverLoadedType === voiceoverType
     ) {
       this.audioPlayerService.play();
+      this.flipVoiceoverPlayStatus(voiceoverType);
     } else {
+      this.enableVoiceoverLoading(voiceoverType);
       this.audioPlayerService.loadAsync(filename).then(() => {
+        this.disableVoiceoverLoading(voiceoverType);
+        this.flipVoiceoverPlayStatus(voiceoverType);
         this.currentVoiceoverLoadedType = voiceoverType;
         this.audioPlayerService.play();
       });
+    }
+  }
+
+  enableVoiceoverLoading(voiceoverType: string): void {
+    if (voiceoverType === AppConstants.VOICEOVER_TYPE_MANUAL) {
+      this.manualVoiceoverIsLoading = true;
+    } else {
+      this.automaticVoiceoverIsLoading = true;
+    }
+  }
+
+  disableVoiceoverLoading(voiceoverType: string): void {
+    if (voiceoverType === AppConstants.VOICEOVER_TYPE_MANUAL) {
+      this.manualVoiceoverIsLoading = false;
+    } else {
+      this.automaticVoiceoverIsLoading = false;
+    }
+  }
+
+  flipVoiceoverPlayStatus(voiceoverType: string): void {
+    if (voiceoverType === AppConstants.VOICEOVER_TYPE_MANUAL) {
+      this.isManualVoiceoverPlaying = !this.isManualVoiceoverPlaying;
+    } else {
+      this.isAutomaticVoiceoverPlaying = !this.isAutomaticVoiceoverPlaying;
     }
   }
 

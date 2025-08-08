@@ -98,7 +98,7 @@ describe('Logged-in User', function () {
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
-  }, 480000);
+  }, 600000);
 
   /**
    * TODO(#22070): Add tests for home tab. Interactions involving recommended

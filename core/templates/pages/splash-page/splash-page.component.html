@@ -1,13 +1,13 @@
-<div class="splash-page">
+<div class="splash-page e2e-test-splash-page">
   <div class="oppia-splash-section-one" dir="auto">
     <div class="oppia-splash-section-one-left" tabindex="0">
-      <h1 class="oppia-splash-h1" [innerHTML]="'I18N_SPLASH_TITLE' | translate"></h1>
+      <h1 class="oppia-splash-h1 e2e-test-home-page-title" [innerHTML]="'I18N_SPLASH_TITLE' | translate"></h1>
       <div class="oppia-splash-h2-container">
         <h2 class="oppia-splash-h2 oppia-splash-h2-text" [innerHTML]="'I18N_SPLASH_SUBTITLE' | translate"></h2>
       </div>
       <div class="oppia-splash-button-container">
         <button type="submit" (click)="onClickBrowseLessonsButton()"
-                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200">
+                class="btn oppia-splash-button oppia-splash-button-browse oppia-splash-browse-button-position oppia-transition-200 e2e-test-explore-lessons-btn">
           {{ 'I18N_EXPLORE_OPPIA_CLASSROOM' | translate }}
         </button>
       </div>

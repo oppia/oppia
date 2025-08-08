@@ -101,7 +101,7 @@
             </mat-list-item>
           </mat-list>
         </mat-tab>
-        <mat-tab class="e2e-test-published-blogs-tab">
+        <mat-tab>
           <ng-template mat-tab-label class="e2e-test-publish-tab-button">
             {{ 'I18N_BLOG_DASHBOARD_TAB_PUBLISHED' | translate | uppercase }} ({{ blogDashboardData.numOfPublishedBlogPosts }})
           </ng-template>
@@ -121,7 +121,7 @@
               </i>
             </button>
           </div>
-          <div class="blog-dashboard-tiles-container e2e-test-published-blog-post-table"
+          <div class="blog-dashboard-tiles-container e2e-test-published-blog-post-table e2e-test-published-blogs-tab"
                *ngIf="activeView === 'gridView'">
             <div *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
@@ -133,7 +133,7 @@
               </oppia-blog-dashboard-tile>
             </div>
           </div>
-          <mat-list class="blog-dashboard-tiles-container e2e-test-published-blog-post-table"
+          <mat-list class="blog-dashboard-tiles-container e2e-test-published-blog-post-table e2e-test-published-blogs-tab"
                     *ngIf="activeView === 'listView'">
             <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.publishedBlogPostSummaryDicts; last as last">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
