@@ -19,7 +19,19 @@
 import {LostChange} from 'domain/exploration/lost-change.model';
 import {Outcome} from './outcome.model';
 import {SubtitledHtml} from './subtitled-html.model';
-import {UtilsService} from 'services/utils.service';
+
+const UtilsService = {
+  isEmpty: (value: unknown) => {
+    return (
+      value === null ||
+      value === undefined ||
+      (Array.isArray(value) && value.length === 0) ||
+      (typeof value === 'object' &&
+        value !== null &&
+        Object.keys(value).length === 0)
+    );
+  },
+};
 
 it('should evaluate values from a Lost Change', () => {
   const lostChange = LostChange.createNew(UtilsService, {
