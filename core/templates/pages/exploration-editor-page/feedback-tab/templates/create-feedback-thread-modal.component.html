@@ -8,8 +8,8 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-success" (click)="create(newThreadSubject, newThreadText)" [disabled]="!newThreadSubject || !newThreadText">Create Thread</button>
+  <button class="btn btn-secondary e2e-test-cancel-new-feedback-btn" (click)="cancel()">Cancel</button>
+  <button class="btn btn-success e2e-test-create-new-feedback-btn" (click)="create(newThreadSubject, newThreadText)" [disabled]="!newThreadSubject || !newThreadText">Create Thread</button>
 </div>
 
 <style>
