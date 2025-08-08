@@ -461,6 +461,15 @@ export class BlogPostEditor extends BaseUser {
    * @param shouldBePresent - Whether the tag should be selected or not after click.
    */
   async selectTag(tag: string, shouldBePresent: boolean = true): Promise<void> {
+    // If the viewport is mobile and the blog body is not in edit mode,
+    // click on the edit button to open the edit mode, so tags can be added.
+    if (
+      this.isViewportAtMobileWidth() &&
+      !(await this.isElementVisible(blogBodyInput))
+    ) {
+      await this.expectElementToBeVisible(editBlogSelector);
+      await this.clickOn(editBlogSelector);
+    }
     await this.expectElementToBeVisible(tagSelector);
     const tagElements = await this.page.$$(tagSelector);
 
