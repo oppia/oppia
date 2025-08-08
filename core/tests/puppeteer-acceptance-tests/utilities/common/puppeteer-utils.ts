@@ -1026,6 +1026,7 @@ export class BaseUser {
       return (el as HTMLAnchorElement).target !== '_blank';
     });
     if (!isTargetSamePage) {
+      showMessage('Anchor target is not the same as the current page.');
       const pageTarget = context.target();
       await element.click();
       const newTarget = await this.browserObject.waitForTarget(
@@ -1036,6 +1037,7 @@ export class BaseUser {
       expect(newTabPage?.url()).toBe(targetPageUrl);
       await newTabPage?.close();
     } else {
+      showMessage('Anchor target is the same as the current page.');
       await element.click();
       await this.expectPageURLToContain(targetPageUrl, context);
       await context.goBack();

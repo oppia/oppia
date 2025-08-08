@@ -474,6 +474,9 @@ export class LoggedInUser extends BaseUser {
    * @param page The page or dashboard to navigate to.
    */
   async navigateToPageUsingProfileMenu(page: 'Blog Dashboard'): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
     await this.expectElementToBeVisible(profileDropdown);
     await this.clickOn(profileDropdown);
 
