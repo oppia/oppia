@@ -804,6 +804,12 @@ export class BlogPostEditor extends BaseUser {
    * Checks if the grid view and list view buttons are present.
    */
   async expectGridViewAndListViewButtonsArePresent(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage(
+        'Skipped: Grid view and list view buttons are not present on mobile viewport.'
+      );
+      return;
+    }
     await this.expectElementToBeVisible(gridViewButtonSelector);
     await this.expectElementToBeVisible(listViewButtonSelector);
   }
