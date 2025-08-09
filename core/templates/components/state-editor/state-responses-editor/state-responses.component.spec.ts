@@ -25,10 +25,7 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
-import {
-  Interaction,
-  InteractionObjectFactory,
-} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
 import {Misconception} from 'domain/skill/misconception.model';
@@ -107,7 +104,6 @@ describe('State Responses Component', () => {
   let responsesService: ResponsesService;
   let stateInteractionIdService: StateInteractionIdService;
   let stateCustomizationArgsService: StateCustomizationArgsService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let interactionData: Interaction;
   let externalSaveService: ExternalSaveService;
   let stateSolicitAnswerDetailsService: StateSolicitAnswerDetailsService;
@@ -163,7 +159,6 @@ describe('State Responses Component', () => {
         ExternalSaveService,
         StateSolicitAnswerDetailsService,
         AlertsService,
-        InteractionObjectFactory,
         {
           provide: NgbModal,
           useClass: MockNgbModal,
@@ -189,7 +184,6 @@ describe('State Responses Component', () => {
     fixture = TestBed.createComponent(StateResponsesComponent);
     component = fixture.componentInstance;
 
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     ngbModal = TestBed.inject(NgbModal);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     stateEditorService = TestBed.inject(StateEditorService);
@@ -204,7 +198,7 @@ describe('State Responses Component', () => {
     );
     externalSaveService = TestBed.inject(ExternalSaveService);
 
-    interactionData = interactionObjectFactory.createFromBackendDict({
+    interactionData = Interaction.createFromBackendDict({
       id: 'TextInput',
       answer_groups: [
         {

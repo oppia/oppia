@@ -211,6 +211,8 @@ const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
 const publishClassroomButton =
   '.e2e-test-toggle-classroom-publication-status-btn';
+const enableDiagnosticTestButton =
+  '.e2e-test-toggle-diagnostic-test-status-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
 const deleteClassroomButton = '.e2e-test-delete-classroom-button';
@@ -274,6 +276,10 @@ const mobileSkillNavToggle =
   'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
 const mobileSaveOrPublishSkillSelector = '.e2e-test-mobile-save-skill-changes';
 
+const openExplorationEditorNavigationMobile =
+  '.oppia-exploration-editor-tabs-dropdown.show';
+
+
 export class CurriculumAdmin extends BaseUser {
   /**
    * Navigate to the topic and skills dashboard page.
@@ -326,6 +332,9 @@ export class CurriculumAdmin extends BaseUser {
       : desktopSkillQuestionTab;
 
     if (isMobileWidth) {
+      await this.page.waitForFunction(() =>
+        window.location.href.includes('skill_editor')
+      );
       const currentUrl = new URL(this.page.url());
       const hashParts = currentUrl.hash.split('/');
 
@@ -806,6 +815,11 @@ export class CurriculumAdmin extends BaseUser {
       `.e2e-test-study-guide-section-${index} ${deleteStudyGuideSectionButton}`
     );
     await this.clickOn(studyGuideSectionDeleteConfirmButton);
+
+    await this.expectElementToBeVisible(
+      studyGuideSectionDeleteConfirmButton,
+      false
+    );
   }
 
   /**
@@ -1205,9 +1219,14 @@ export class CurriculumAdmin extends BaseUser {
         timeout: 5000,
       });
       await this.clickOn(dropdownToggleIcon);
+
+      await this.expectElementToBeVisible(
+        openExplorationEditorNavigationMobile,
+        false
+      );
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
+      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -1397,6 +1416,15 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(mobileSaveStoryChangesDropdown);
       await this.page.waitForSelector(mobilePublishStoryButton);
       await this.clickOn(mobilePublishStoryButton);
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === 'Unpublish Story';
+        },
+        {},
+        mobilePublishStoryButton
+      );
     } else {
       await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
       await this.clickOn(publishStoryButton);
@@ -1698,9 +1726,9 @@ export class CurriculumAdmin extends BaseUser {
         `All questions have been successfully removed from the skill "${skillName}".`
       );
     } catch (error) {
-      console.error(
-        `Failed to remove all questions from the skill "${skillName}"`,
-        error.stack
+      throw new Error(
+        `Failed to remove all questions from the skill "${skillName}"` +
+          error.stack
       );
     }
   }
@@ -1843,6 +1871,7 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Function for publishing a classroom.
+   * @param {string} classroomName - The name of the classroom.
    */
   async publishClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
@@ -1852,6 +1881,20 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(saveClassroomButton, {hidden: true});
 
     showMessage(`Published ${classroomName} classroom.`);
+  }
+
+  /**
+   * Enables diagnostic test for a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async enableDiagnosticTestForClassroom(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom(classroomName);
+    await this.clickOn(enableDiagnosticTestButton);
+    await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
+    showMessage(`Enabled diagnostic test for ${classroomName} classroom.`);
   }
 
   /**

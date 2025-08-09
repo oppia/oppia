@@ -93,7 +93,8 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addImageInteractionInQuestionEditorPage();
+
+      await questionSubmitter.addImageInteractionInQuestionEditor();
 
       await questionSubmitter.addHintToStateInQuestionEditorPage('Test Hint 1');
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
@@ -122,7 +123,8 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addMultipleChoiceInteractionInQuestionEditorPage([
+
+      await questionSubmitter.addMultipleChoiceInteractionByQuestionSubmitter([
         'Option 1',
         'Option 2',
         'Option 3',
@@ -156,9 +158,8 @@ describe('Question Submitter', function () {
       await questionSubmitter.addMathExpressionToQuestion();
       await questionSubmitter.addImageToQuestion();
 
-      await questionSubmitter.addTextInputInteractionInQuestionEditorPage(
-        'Answer'
-      );
+
+      await questionSubmitter.addTextInputInteractionInQuestionEditor('Answer');
 
       await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
         'Wrong Answer'

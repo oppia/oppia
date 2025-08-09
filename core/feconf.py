@@ -148,6 +148,7 @@ class ValidModelNames(enum.Enum):
     BLOG = 'blog'
     BLOG_STATISTICS = 'blog_statistics'
     CLASSROOM = 'classroom'
+    CLOUD_TASK = 'cloud_task'
     COLLECTION = 'collection'
     CONFIG = 'CONFIG'
     EMAIL = 'email'
@@ -618,6 +619,8 @@ EMAIL_INTENT_NOTIFY_CONTRIBUTOR_DASHBOARD_ACHIEVEMENTS = (
 EMAIL_INTENT_NOTIFY_CURRICULUM_ADMINS_CHAPTERS = (
     'notify_curriculum_admins_chapters'
 )
+EMAIL_INTENT_VOICEOVER_REGENERATION = 'voiceover_regeneration'
+
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -756,6 +759,9 @@ ALLOWED_RTE_EXTENSIONS = {
     'Video': {
         'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
     },
+    'Workedexample': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Workedexample')
+    }
 }
 
 # The list of interaction IDs which correspond to interactions that set their
@@ -1242,7 +1248,8 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
             'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-workedexample': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
@@ -1260,7 +1267,8 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-workedexample'
         ]
     },
     'RTE_TYPE_CKEDITOR': {
@@ -1282,7 +1290,10 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
                 'blockquote', 'li', '[document]'
             ],
             'oppia-noninteractive-video': ['blockquote', 'li', '[document]'],
-            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]']
+            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-workedexample': [
+                'blockquote', 'li', '[document]'
+            ]
         },
         # Valid html tags in CKEditor.
         'ALLOWED_TAG_LIST': [
@@ -1300,7 +1311,8 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
             'oppia-noninteractive-image',
             'oppia-noninteractive-collapsible',
             'oppia-noninteractive-video',
-            'oppia-noninteractive-tabs'
+            'oppia-noninteractive-tabs',
+            'oppia-noninteractive-workedexample'
         ]
 
     }
@@ -1666,3 +1678,32 @@ class VoiceoverType(enum.Enum):
 
     AUTO = 'auto'
     MANUAL = 'manual'
+
+
+# Function identifiers inform the deferred task handler of which deferred
+# function should be run for the relevant task.
+# NOTE for developers: If you want to defer a function (i.e. run it
+# asynchronously), please visit the file core/controllers/tasks.py, and check
+# the DeferredTasksHandler.
+# 1. If the function you want to defer already exists in the handler, choose the
+#    correct FUNCTION_ID and defer the function using that FUNCTION_ID.
+# 2. If the function does not exist in the handler, add it to the handler and
+#    add another FUNCTION_ID to this list.
+FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
+    'FUNCTION_ID_UPDATE_STATS': 'update_stats',
+    'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS': (
+        'delete_exps_from_user_models'),
+    'FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES': 'delete_exps_from_activities',
+    'FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED': (
+        'delete_users_pending_to_be_deleted'),
+    'FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION': (
+        'check_completion_of_user_deletion'),
+    'FUNCTION_ID_REGENERATE_EXPLORATION_SUMMARY': (
+        'regenerate_exploration_summary'),
+    'FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS': (
+        'untag_deleted_misconceptions'),
+    'FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS': (
+        'remove_user_from_rights_models'),
+    'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_UPDATE': (
+        'regenerate_voiceover_for_updated_exploration')
+}

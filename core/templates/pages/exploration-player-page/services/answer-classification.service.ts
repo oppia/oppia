@@ -23,7 +23,7 @@ import {AnswerClassificationResult} from 'domain/classifier/answer-classificatio
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
 import {InteractionAnswer, TextInputAnswer} from 'interactions/answer-defs';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {InteractionSpecsService} from 'services/interaction-specs.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {State} from 'domain/state/StateObjectFactory';

@@ -45,7 +45,7 @@
          (cdkDropListDropped)="dropItemInSameList($event)"
          cdkDropList>
       <div tabindex="0"
-           class="child-dnd-item-box"
+           class="child-dnd-item-box e2e-test-drag-and-drop-sort-item"
            *ngFor="let item of singleItemInSamePositionArray; let i = index"
            cdkDrag
            role="listitem"

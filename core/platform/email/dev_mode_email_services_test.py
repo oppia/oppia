@@ -63,6 +63,7 @@ class EmailTests(test_utils.GenericTestBase):
                 Data length: %d
                 Html content: %s
 
+            Cc: None
             Bcc: None
             Reply_to: None
             Recipient Variables:
@@ -102,6 +103,7 @@ class EmailTests(test_utils.GenericTestBase):
 
         recipient_email_list_str = 'a@a.com b@b.com c@c.com... Total: 4 emails.'
         bcc_email_list_str = 'e@e.com f@f.com g@g.com... Total: 4 emails.'
+        cc_email_list_str = 'a@n.com b@n.com c@n.com... Total: 5 emails.'
         recipient_variables: Dict[str, Dict[str, Union[str, float]]] = (
             {
                 'a@a.com': {'first': 'Bob', 'id': 1},
@@ -123,6 +125,7 @@ class EmailTests(test_utils.GenericTestBase):
                 Data length: %d
                 Html content: %s
 
+            Cc: %s
             Bcc: %s
             Reply_to: %s
             Recipient Variables:
@@ -131,8 +134,8 @@ class EmailTests(test_utils.GenericTestBase):
             Attachments: %s
             """ % (
                 self.system_email_address, recipient_email_list_str,
-                'subject', 4, 4, 'html', bcc_email_list_str, '123',
-                len(recipient_variables), 'attachment.txt'))
+                'subject', 4, 4, 'html', cc_email_list_str, bcc_email_list_str,
+                '123', len(recipient_variables), 'attachment.txt'))
         logging_info_email_body = textwrap.dedent(msg_body)
         logging_info_notification = (
             'You are not currently sending out real emails since this is a '
@@ -144,6 +147,7 @@ class EmailTests(test_utils.GenericTestBase):
                 self.system_email_address,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],
                 'subject', 'body', 'html',
+                cc=['a@n.com', 'b@n.com', 'c@n.com', 'd@n.com', 'e@n.com'],
                 bcc=['e@e.com', 'f@f.com', 'g@g.com', 'h@h.com'],
                 reply_to='123',
                 recipient_variables=recipient_variables,
