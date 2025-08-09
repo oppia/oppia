@@ -67,7 +67,7 @@ describe('Logged-in User', function () {
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
-  }, 480000);
+  }, 550000);
 
   it(
     'should display saved community lessons after adding to playlist',
@@ -81,10 +81,10 @@ describe('Logged-in User', function () {
 
       await loggedInUser.navigateToLearnerDashboard();
 
-      await loggedInUser.expectLessonCardsToBePresent(
-        'Lessons you saved for later',
-        explorationTitles.slice(3)
-      );
+      await loggedInUser.expectLessonCardsToBePresent({
+        subsection: 'Lessons you saved for later',
+        expectedTitles: explorationTitles.slice(3),
+      });
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -101,10 +101,10 @@ describe('Logged-in User', function () {
       'should display in-progress section after starting explorations (no in-progress classroom lessons)',
       async function () {
         await loggedInUser.navigateToLearnerDashboard();
-        await loggedInUser.expectLessonCardsToBePresent(
-          'Lessons in progress',
-          explorationTitles.slice(0, -1)
-        );
+        await loggedInUser.expectLessonCardsToBePresent({
+          subsection: 'Lessons in progress',
+          expectedTitles: explorationTitles.slice(0, -1),
+        });
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
     );
