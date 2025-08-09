@@ -3163,41 +3163,50 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies elements' existence.
-   * @param {string[]} expectedTexts - Text content expected in elements.
-   * @param {string} selector - Selector type.
-   * @param {ParentNode} root - Page or element type we're verifying.
+   * Verifies elements' existence and what should not be included.
+   * @param {Object} options - The options object.
+   * @param {string[]} [options.expectedTexts = []] - Text content expected in elements.
+   * @param {string[]} [options.excludedTexts = []] - Text content not expected in elements.
+   * @param {string} options.selector - Selector type.
+   * @param {puppeteer.Page | puppeteer.ElementHandle | null} [root = this.page] - Element we're searching through.
    */
-  async expectElementsToBePresent(
-    expectedTexts: string[],
-    selector: string,
-    root: puppeteer.Page | puppeteer.ElementHandle | null = this.page
-  ): Promise<void> {
-    await this.page.waitForSelector(learnerDashSelectors[selector].heading);
-    const allElements = await root?.$$(learnerDashSelectors[selector].heading);
-    if (allElements) {
-      const sectionHeadingTexts = await Promise.all(
-        allElements.map(
-          async card => await card.evaluate(el => el.textContent?.trim())
-        )
-      );
-      expect(sectionHeadingTexts).toEqual(expectedTexts);
-    } else {
-      throw new Error(
-        `Can not find element of ${learnerDashSelectors[selector].heading}`
-      );
+  async expectElementsPresence({
+    expectedTexts = [],
+    excludedTexts = [],
+    selector,
+    parentElement = this.page,
+  }: {
+    expectedTexts?: string[];
+    excludedTexts?: string[];
+    selector: string;
+    parentElement?: puppeteer.Page | puppeteer.ElementHandle | null;
+  }): Promise<void> {
+    if (!parentElement) {
+      throw new Error('parentElement does not exist');
     }
+
+    await this.page.waitForSelector(learnerDashSelectors[selector].heading);
+    const allElements = await parentElement?.$$(
+      learnerDashSelectors[selector].heading
+    );
+    const allElementsText = await Promise.all(
+      allElements.map(
+        async element => await element.evaluate(el => el.textContent?.trim())
+      )
+    );
+    expect(allElementsText).toEqual(expectedTexts);
+    excludedTexts.forEach(t => expect(allElementsText).not.toContain(t));
   }
 
   /**
    * Gets subsection element based on title. We need to differentiate parent elements
    * in progress tab because the subsections are titled the same.
-   * @param {string} criteria - Subsection title value to match.
+   * @param {string} subsection - Subsection title value to match.
    * @param {string} section - Overarching section.
    * @returns {Promise<puppeteer.ElementHandle | null>} - Found subsection element or null.
    */
   async findSubsectionElement(
-    criteria: string,
+    subsection: string,
     section: string = 'N/A'
   ): Promise<puppeteer.ElementHandle | null> {
     let sectionElement: puppeteer.Page | puppeteer.ElementHandle | null =
@@ -3211,7 +3220,7 @@ export class LoggedInUser extends BaseUser {
 
     const subsectionElement = await this.findElementByXPath(
       learnerDashSelectors.cardDisplay,
-      criteria,
+      subsection,
       sectionElement
     );
 
@@ -3270,41 +3279,44 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Verifies lesson cards are in correct section.
-   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
-   * @param {string} criteria - Subsection title value to match.
+   * @param {string} subsection - Subsection title value to match.
    * @param {string[]} expectedTitles - Lesson card titles expected.
-   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   * @param {string} [section] - Overarching section, only needed to differentiate same title subsections in progress tab.
    */
-  async expectLessonCardsToBePresent(
-    criteria: string,
-    expectedTitles: string[],
-    section: string = 'N/A'
-  ): Promise<void> {
+  async expectLessonCardsToBePresent({
+    subsection,
+    expectedTitles,
+    section,
+  }: {
+    subsection: string;
+    expectedTitles: string[];
+    section?: string;
+  }): Promise<void> {
     const subsectionElement = await this.findSubsectionElement(
-      criteria,
+      subsection,
       section
     );
 
-    await this.expectElementsToBePresent(
-      expectedTitles,
-      'lessonCard',
-      subsectionElement
-    );
+    await this.expectElementsPresence({
+      expectedTexts: expectedTitles,
+      selector: 'lessonCard',
+      parentElement: subsectionElement ?? this.page,
+    });
   }
 
   /**
    * Navigates to lesson using lesson card.
-   * @param {string} criteria - Subsection title value to match.
+   * @param {string} subsection - Subsection title value to match.
    * @param {string} lessonTitle - Lesson card title expected.
    * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
    */
   async navigateToLessonByCard(
-    criteria: string,
+    subsection: string,
     lessonTitle: string,
     section: string = 'N/A'
   ): Promise<void> {
     const subsectionElement = await this.findSubsectionElement(
-      criteria,
+      subsection,
       section
     );
 
@@ -3324,7 +3336,7 @@ export class LoggedInUser extends BaseUser {
       }
     } else {
       throw new Error(
-        `${lessonTitle} is not a valid lesson in ${criteria} of ${section} section`
+        `${lessonTitle} is not a valid lesson in ${subsection} of ${section} section`
       );
     }
   }
