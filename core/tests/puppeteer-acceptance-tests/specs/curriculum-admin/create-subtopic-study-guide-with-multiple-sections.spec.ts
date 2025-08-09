@@ -86,7 +86,7 @@ describe('Curriculum Admin', function () {
       'subtopicWithTwoSections',
       __dirname
     );
-    await curriculumAdmin.addSubtopicStudyGuideSectionWithWorkedexample(
+    await curriculumAdmin.addSubtopicStudyGuideSectionWithWorkedExample(
       'Section heading 2',
       'Section content 2',
       2,

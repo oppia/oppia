@@ -265,10 +265,10 @@ const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
 const settingsContainerSelector =
   '.oppia-editor-card.oppia-settings-card-container';
 const deleteButtonSelector = 'button.oppia-delete-button';
-const insertWorkedexampleButton = '.cke_button__oppiaworkedexample';
-const editWorkedexampleModalQuestionRte =
+const insertWorkedExampleButton = '.cke_button__oppiaworkedexample';
+const editWorkedExampleModalQuestionRte =
   '.e2e-test-arg-editor-inner-0 .e2e-test-rte';
-const editWorkedexampleModalAnswerRte =
+const editWorkedExampleModalAnswerRte =
   '.e2e-test-arg-editor-inner-1 .e2e-test-rte';
 const rteComponentSaveButton = '.e2e-test-close-rich-text-component-editor';
 const topicPreviewTab = '.e2e-test-topic-preview-tab';
@@ -279,7 +279,7 @@ const openExplorationEditorNavigationMobile =
 const createNewSkillButton = '.e2e-test-create-skill-button';
 const createSkillButton = '.e2e-test-confirm-skill-creation-button';
 const editConceptCard = '.e2e-test-edit-concept-card';
-const moreThanTwoWorkedexamplesError = '.e2e-test-more-than-2-workedexamples';
+const moreThanTwoWorkedExamplesError = '.e2e-test-more-than-2-workedexamples';
 const saveReviewMaterialButton = '.e2e-test-save-concept-card';
 const publishSkillButton = '.e2e-test-publish-skill-changes-button';
 const skillPreviewTabButton = '.e2e-test-question-preview-tab';
@@ -304,13 +304,13 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} description - The description of the skill to be created.
    * @param {string} topicName - The name of the topic for which the skill is
    * to be created.
-   * @param {boolean} addWorkedexample - True if the skill should have a
-   * workedexample, false otherwise.
+   * @param {boolean} addWorkedExample - True if the skill should have a
+   * WorkedExample, false otherwise.
    */
   async createSkillForTopic(
     description: string,
     topicName: string,
-    addWorkedexample: boolean
+    addWorkedExample: boolean = false
   ): Promise<void> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
@@ -326,19 +326,19 @@ export class CurriculumAdmin extends BaseUser {
       richTextAreaField,
       `Review material text content for ${description}.`
     );
-    if (addWorkedexample) {
-      await this.clickOn(insertWorkedexampleButton);
-      await this.page.waitForSelector(editWorkedexampleModalQuestionRte, {
+    if (addWorkedExample) {
+      await this.clickOn(insertWorkedExampleButton);
+      await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
         visible: true,
       });
-      await this.clearAllTextFrom(editWorkedexampleModalQuestionRte);
-      await this.type(editWorkedexampleModalQuestionRte, 'Type the number one');
-      await this.page.waitForSelector(editWorkedexampleModalAnswerRte, {
+      await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+      await this.type(editWorkedExampleModalQuestionRte, 'Type the number one');
+      await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
         visible: true,
       });
-      await this.clearAllTextFrom(editWorkedexampleModalAnswerRte);
-      await this.waitForElementToStabilize(editWorkedexampleModalAnswerRte);
-      await this.type(editWorkedexampleModalAnswerRte, '1');
+      await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+      await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
+      await this.type(editWorkedExampleModalAnswerRte, '1');
       await this.clickOn(rteComponentSaveButton);
     }
     await this.page.waitForSelector(
@@ -675,7 +675,7 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} heading - The heading of the initial Subtopic Study Guide Section.
    * @param {string} content - The content of the initial Subtopic Study Guide Section.
    * @param {string} topicName - The name of the Topic which storing the new Subtopic.
-   * @param {boolean} addWorkedexample - True if the study guide should have a workedexample,
+   * @param {boolean} addWorkedExample - True if the study guide should have a WorkedExample,
    * false otherwise.
    */
   async createSubtopicWithStudyGuideForTopic(
@@ -684,7 +684,7 @@ export class CurriculumAdmin extends BaseUser {
     heading: string,
     content: string,
     topicName: string,
-    addWorkedexample: boolean
+    addWorkedExample: boolean = false
   ): Promise<void> {
     await this.openTopicEditor(topicName);
     if (this.isViewportAtMobileWidth()) {
@@ -701,18 +701,18 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(subtopicStudyGuideContentField);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.type(richTextAreaField, content);
-    if (addWorkedexample) {
-      await this.clickOn(insertWorkedexampleButton);
-      await this.page.waitForSelector(editWorkedexampleModalQuestionRte, {
+    if (addWorkedExample) {
+      await this.clickOn(insertWorkedExampleButton);
+      await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
         visible: true,
       });
-      await this.clearAllTextFrom(editWorkedexampleModalQuestionRte);
-      await this.type(editWorkedexampleModalQuestionRte, 'Type the number one');
-      await this.page.waitForSelector(editWorkedexampleModalAnswerRte, {
+      await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+      await this.type(editWorkedExampleModalQuestionRte, 'Type the number one');
+      await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
         visible: true,
       });
-      await this.clearAllTextFrom(editWorkedexampleModalAnswerRte);
-      await this.type(editWorkedexampleModalAnswerRte, '1');
+      await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+      await this.type(editWorkedExampleModalAnswerRte, '1');
       await this.clickOn(rteComponentSaveButton);
     }
 
@@ -768,35 +768,36 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Add a section with a workedexample to the subtopic study guide. Make sure you are
+   * Add a section with a WorkedExample to the subtopic study guide. Make sure you are
    * on the subtopic editor tab for this to work.
    * @param {string} sectionHeading - The heading of the Section to be added.
    * @param {string} sectionContent - The content of the Section to be added.
    * @param {number} currentNumberOfSections - The number of the Sections currently in the Study Guide.
-   * @param {string} workedexampleQuestion - The workedexample question.
-   * @param {string} workedexampleAnswer - The workedexample answer.
+   * @param {string} WorkedExampleQuestion - The WorkedExample question.
+   * @param {string} WorkedExampleAnswer - The WorkedExample answer.
    */
-  async addSubtopicStudyGuideSectionWithWorkedexample(
+  async addSubtopicStudyGuideSectionWithWorkedExample(
     sectionHeading: string,
     sectionContent: string,
     currentNumberOfSections: number,
-    workedexampleQuestion: string,
-    workedexampleAnswer: string
+    WorkedExampleQuestion: string,
+    WorkedExampleAnswer: string
   ): Promise<void> {
+    await this.expectElementToBeVisible(addStudyGuideSectionButton);
     await this.clickOn(addStudyGuideSectionButton);
     await this.type(addStudyGuideSectionModalHeading, sectionHeading);
     await this.clickOn(addStudyGuideSectionModalContent);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.type(richTextAreaField, sectionContent);
-    await this.clickOn(insertWorkedexampleButton);
-    await this.page.waitForSelector(editWorkedexampleModalQuestionRte, {
+    await this.clickOn(insertWorkedExampleButton);
+    await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
       visible: true,
     });
-    await this.type(editWorkedexampleModalQuestionRte, workedexampleQuestion);
-    await this.page.waitForSelector(editWorkedexampleModalAnswerRte, {
+    await this.type(editWorkedExampleModalQuestionRte, WorkedExampleQuestion);
+    await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
       visible: true,
     });
-    await this.type(editWorkedexampleModalAnswerRte, workedexampleAnswer);
+    await this.type(editWorkedExampleModalAnswerRte, WorkedExampleAnswer);
     await this.clickOn(rteComponentSaveButton);
     await this.clickOn(addStudyGuideSectionModalSaveButton);
     if (this.isViewportAtMobileWidth()) {
@@ -826,12 +827,12 @@ export class CurriculumAdmin extends BaseUser {
    * @param {string} studyGuideTitle - The expected title of the study guide.
    * @param {string[][]} studyGuideSections - The expected sections of the study guide.
    * It is a list of sections. Sections are a list of strings having length of 2 - heading and content.
-   * @param {boolean} expectWorkedexample - If the sections have a workedexample or not.
+   * @param {boolean} expectWorkedExample - If the sections have a WorkedExample or not.
    */
   async expectSubtopicStudyGuideToHaveTitleAndSections(
     studyGuideTitle: string,
     studyGuideSections: string[][],
-    expectWorkedexample: boolean
+    expectWorkedExample: boolean
   ): Promise<void> {
     try {
       const isTitlePresent = await this.isTextPresentOnPage(studyGuideTitle);
@@ -863,7 +864,7 @@ export class CurriculumAdmin extends BaseUser {
           }
         }
       }
-      if (expectWorkedexample) {
+      if (expectWorkedExample) {
         await this.page.waitForSelector(expandWorkedExampleButton, {
           visible: true,
         });
@@ -2168,12 +2169,13 @@ export class CurriculumAdmin extends BaseUser {
     description: string,
     reviewMaterial: string
   ): Promise<void> {
+    await this.expectElementToBeVisible(createNewSkillButton);
     await this.clickOn(createNewSkillButton);
     await this.type(skillDescriptionField, description);
     await this.clickOn(skillReviewMaterialHeader);
     await this.clickOn(richTextAreaField);
     await this.type(richTextAreaField, reviewMaterial);
-    await this.addWorkedexampleRteComponent('Type the number one', '1');
+    await this.addWorkedExampleRteComponent('Type the number one', '1');
     await this.clickOn(createSkillButton);
     await this.openSkillEditor(description);
   }
@@ -2183,7 +2185,9 @@ export class CurriculumAdmin extends BaseUser {
    * a skill that opens up the rich text editor.
    */
   async clickOnReviewMaterialEditButton(): Promise<void> {
+    await this.expectElementToBeVisible(editConceptCard);
     await this.clickOn(editConceptCard);
+    await this.expectElementToBeVisible(rteSelector);
   }
 
   /**
@@ -2201,10 +2205,10 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Copies the workedexample from the review material rich text
+   * Copies the WorkedExample from the review material rich text
    * editor.
    */
-  async copyWorkedexampleFromReviewMaterialRte(): Promise<void> {
+  async copyWorkedExampleFromReviewMaterialRte(): Promise<void> {
     // OverridePermissions is used to allow clipboard access.
     const context = this.page.browser().defaultBrowserContext();
     await context.overridePermissions('http://localhost:8181', [
@@ -2215,27 +2219,28 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Adds a workedexample rich text editor component to a
+   * Adds a WorkedExample rich text editor component to a
    * supporting rich text editor.
-   * @param question - The question of the workedexample
-   * @param answer - The solution of the workedexample.
+   * @param question - The question of the WorkedExample
+   * @param answer - The solution of the WorkedExample.
    */
-  async addWorkedexampleRteComponent(
+  async addWorkedExampleRteComponent(
     question: string,
     answer: string
   ): Promise<void> {
-    await this.clickOn(insertWorkedexampleButton);
-    await this.page.waitForSelector(editWorkedexampleModalQuestionRte, {
+    await this.expectElementToBeVisible(insertWorkedExampleButton);
+    await this.clickOn(insertWorkedExampleButton);
+    await this.page.waitForSelector(editWorkedExampleModalQuestionRte, {
       visible: true,
     });
-    await this.clearAllTextFrom(editWorkedexampleModalQuestionRte);
-    await this.type(editWorkedexampleModalQuestionRte, question);
-    await this.page.waitForSelector(editWorkedexampleModalAnswerRte, {
+    await this.clearAllTextFrom(editWorkedExampleModalQuestionRte);
+    await this.type(editWorkedExampleModalQuestionRte, question);
+    await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
       visible: true,
     });
-    await this.clearAllTextFrom(editWorkedexampleModalAnswerRte);
-    await this.waitForElementToStabilize(editWorkedexampleModalAnswerRte);
-    await this.type(editWorkedexampleModalAnswerRte, answer);
+    await this.clearAllTextFrom(editWorkedExampleModalAnswerRte);
+    await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
+    await this.type(editWorkedExampleModalAnswerRte, answer);
     await this.clickOn(rteComponentSaveButton);
   }
 
@@ -2243,18 +2248,20 @@ export class CurriculumAdmin extends BaseUser {
    * Clears all the content from a rich text editor.
    */
   async clearRte(): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
     await this.clickOn(richTextAreaField);
     await this.clearAllTextFrom(richTextAreaField);
   }
 
   /**
    * Clears all the content from a rich text editor and checks if the
-   * limit of workedexamples error disappears.
+   * limit of WorkedExamples error disappears.
    */
   async clearRteAndCheckIfErrorDisappears(): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
     await this.clickOn(richTextAreaField);
     await this.clearAllTextFrom(richTextAreaField);
-    await this.page.waitForSelector(moreThanTwoWorkedexamplesError, {
+    await this.page.waitForSelector(moreThanTwoWorkedExamplesError, {
       visible: false,
     });
   }
@@ -2263,6 +2270,7 @@ export class CurriculumAdmin extends BaseUser {
    * Saves the changes made to the review material.
    */
   async saveReviewMaterial(): Promise<void> {
+    await this.expectElementToBeVisible(saveReviewMaterialButton);
     await this.clickOn(saveReviewMaterialButton);
   }
 
@@ -2281,6 +2289,7 @@ export class CurriculumAdmin extends BaseUser {
    * @param text - The text to be typed in the rich text editor.
    */
   async typeTextInReviewMaterialEditor(text: string): Promise<void> {
+    await this.expectElementToBeVisible(richTextAreaField);
     await this.clickOn(richTextAreaField);
     await this.type(richTextAreaField, text);
   }
@@ -2290,6 +2299,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async publishSkillChanges(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileOptionsSelector);
       await this.clickOn(mobileOptionsSelector);
       // The mobile view has 2 instances of the element, from which
       // the first one is inapplicable here.
@@ -2297,6 +2307,7 @@ export class CurriculumAdmin extends BaseUser {
       await elems[1].click();
       await this.clickOn(mobileSaveSkillButton);
     } else {
+      await this.expectElementToBeVisible(publishSkillButton);
       await this.clickOn(publishSkillButton);
     }
     await this.type(

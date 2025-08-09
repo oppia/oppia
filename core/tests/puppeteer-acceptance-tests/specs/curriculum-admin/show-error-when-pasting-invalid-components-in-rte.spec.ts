@@ -58,7 +58,7 @@ describe('Blog Editor and curriculum admin', function () {
       ''
     );
     await curriculumAdmin.clickOnReviewMaterialEditButton();
-    await curriculumAdmin.copyWorkedexampleFromReviewMaterialRte();
+    await curriculumAdmin.copyWorkedExampleFromReviewMaterialRte();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
@@ -74,7 +74,7 @@ describe('Blog Editor and curriculum admin', function () {
 
       await curriculumAdmin.clearRte();
       await curriculumAdmin.typeTextInReviewMaterialEditor('Sample Text');
-      await curriculumAdmin.addWorkedexampleRteComponent(
+      await curriculumAdmin.addWorkedExampleRteComponent(
         'Type the number one.',
         '1'
       );

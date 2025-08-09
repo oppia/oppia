@@ -2306,7 +2306,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(previewTabButton);
     }
 
-    await this.isElementVisible(previewTabContainer);
+    await this.expectElementToBeVisible(previewTabContainer);
   }
 
   /**

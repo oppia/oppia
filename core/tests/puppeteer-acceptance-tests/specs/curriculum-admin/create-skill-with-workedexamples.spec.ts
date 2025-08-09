@@ -58,33 +58,33 @@ describe('Curriculum Admin', function () {
       'hello'
     );
     await curriculumAdmin.clickOnReviewMaterialEditButton();
-    await curriculumAdmin.addWorkedexampleRteComponent(
+    await curriculumAdmin.addWorkedExampleRteComponent(
       'Type the number two',
       '2'
     );
     await curriculumAdmin.saveReviewMaterial();
     await curriculumAdmin.clickOnRteAndPressEnter();
-    await curriculumAdmin.addWorkedexampleRteComponent(
+    await curriculumAdmin.addWorkedExampleRteComponent(
       'Type the number three',
       '3'
     );
     await curriculumAdmin.expectScreenshotToMatch(
-      'workedexampleLimitError',
+      'workedExampleLimitError',
       __dirname
     );
     await curriculumAdmin.clearRteAndCheckIfErrorDisappears();
-    await curriculumAdmin.addWorkedexampleRteComponent(
+    await curriculumAdmin.addWorkedExampleRteComponent(
       'Type the number one',
       '1'
     );
-    await curriculumAdmin.addWorkedexampleRteComponent(
+    await curriculumAdmin.addWorkedExampleRteComponent(
       'Type the number two',
       '2'
     );
     await curriculumAdmin.publishSkillChanges();
     await curriculumAdmin.navigateToSkillPreviewTab();
     await curriculumAdmin.expectScreenshotToMatch(
-      'skillWithWorkedexamplePreview',
+      'skillWithWorkedExamplePreview',
       __dirname
     );
   });
