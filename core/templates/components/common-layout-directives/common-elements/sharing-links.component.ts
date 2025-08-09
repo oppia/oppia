@@ -26,7 +26,6 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 import {ExplorationEmbedButtonModalComponent} from 'components/button-directives/exploration-embed-button-modal.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'sharing-links',
@@ -53,7 +52,6 @@ export class SharingLinksComponent implements OnInit {
   constructor(
     private nbgModal: NgbModal,
     private urlInterpolationService: UrlInterpolationService,
-    private pageContextService: PageContextService,
     private siteAnalyticsService: SiteAnalyticsService,
     private htmlEscaperService: HtmlEscaperService,
     private windowRef: WindowRef
@@ -61,7 +59,6 @@ export class SharingLinksComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.shareType === 'exploration') {
-      this.explorationId = this.pageContextService.getExplorationId();
       this.activityId = this.explorationId;
       this.activityUrlFragment = 'explore';
     } else if (this.shareType === 'collection') {

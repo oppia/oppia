@@ -89,7 +89,7 @@ export class LessonPlayerSidebarComponent implements OnInit {
       );
   }
 
-  displayShareLessonModal(): NgbModalRef {
+  showShareLessonModal(): NgbModalRef {
     let modalRef: NgbModalRef = this.ngbModal.open(ShareLessonModalComponent, {
       backdrop: 'static',
     });

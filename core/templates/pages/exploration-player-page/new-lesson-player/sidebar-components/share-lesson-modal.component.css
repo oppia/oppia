@@ -122,11 +122,3 @@ oppia-share-lesson-modal .cc-attribution-text {
 	display: flex;
 	justify-content: space-between;
 }
-
-.back-btn-visible {
-  display: block;
-}
-
-.back-btn-hidden {
-  display: none;
-}
