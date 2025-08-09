@@ -26,19 +26,7 @@
 }
 
 .mat-button.oppia-modal-cancel-button {
-  align-items: center;
   background: #9a9a9a;
-  border: none !important;
-  border-radius: 4px !important;
-  box-shadow: none !important;
-  color: #fff;
-  display: inline-flex;
-  font-weight: 500;
-  height: 35px;
-  min-width: 0;
-  outline: none !important;
-  padding: 6px 12px;
-  text-transform: uppercase;
 }
 
 .mat-button.oppia-modal-cancel-button:focus,
@@ -47,8 +35,16 @@
 }
 
 .mat-button.oppia-learner-got-it-button {
-  align-items: center;
   background: #00786d;
+}
+
+.mat-button.oppia-learner-got-it-button:focus,
+.mat-button.oppia-learner-got-it-button:hover {
+  background: #00655a;
+}
+
+.oppia-learner-solution-interstitial-modal-btn {
+  align-items: center;
   border: none !important;
   border-radius: 4px !important;
   box-shadow: none !important;
@@ -60,9 +56,4 @@
   outline: none !important;
   padding: 6px 12px;
   text-transform: uppercase;
-}
-
-.mat-button.oppia-learner-got-it-button:focus,
-.mat-button.oppia-learner-got-it-button:hover {
-  background: #00655a;
 }
