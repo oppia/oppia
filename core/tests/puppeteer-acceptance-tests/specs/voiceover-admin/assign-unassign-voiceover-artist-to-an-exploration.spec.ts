@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utility functions for voiceover admin page if voiceover admin
- * can add voiceover artist to an exploration
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ * VA.MA. Assign, unassign voiceover artists to an exploration
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -83,6 +85,7 @@ describe('Voiceover Admin', function () {
     await voiceoverAdmin.navigateToExplorationEditor(explorationId);
     await voiceoverAdmin.dismissWelcomeModal();
     await voiceoverAdmin.navigateToExplorationSettingsTab();
+    await voiceoverAdmin.expectVoiceoverArtistsListToBeEmpty();
 
     // Add invalid user as a voiceover artist.
     await voiceoverAdmin.expectVoiceoverArtistsListDoesNotContain(

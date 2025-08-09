@@ -294,6 +294,16 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
+   * Checks if the voice artist list is empty.
+   */
+  async expectVoiceoverArtistsListToBeEmpty(): Promise<void> {
+    await this.expectElementToBeVisible(updatedVoiceoverArtist, false);
+    showMessage(
+      `No voice artists added as voiceover artist! Current voice artists for this exploration are: ${allVoiceoverArtists}`
+    );
+  }
+
+  /**
    * Function to get all voiceover artists.
    * @returns {Promise<string[]>} - list of voiceover artists.
    */
