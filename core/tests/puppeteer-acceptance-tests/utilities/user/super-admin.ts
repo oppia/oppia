@@ -721,6 +721,10 @@ export class SuperAdmin extends BaseUser {
         return;
       }
     }
+
+    throw new Error(
+      `Blog post with title ${expectedBlog} not found on the blog dashboard.`
+    );
   }
 
   /**

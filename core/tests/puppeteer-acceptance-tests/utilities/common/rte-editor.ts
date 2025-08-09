@@ -19,6 +19,9 @@
 import puppeteer from 'puppeteer';
 
 const rteTextAreaSelector = '.e2e-test-rte';
+const ckeBtnOnSelector = '.cke_button_on';
+const paragraphFormatOptionSelector = `a[title*="Format"]`;
+const bodyFocusedSelector = '.cke_focus';
 
 export class RTEEditor {
   parentPage: puppeteer.Page;
@@ -48,7 +51,22 @@ export class RTEEditor {
     if (!optionElement) {
       throw new Error(`Option with title ${title} not found.`);
     }
+
+    // Check if element is active or not to use in post check.
+    const classList = await optionElement.evaluate(el => el.classList);
+    const isActive = classList.contains(ckeBtnOnSelector);
+
     await optionElement.click();
+
+    await this.parentPage.waitForFunction(
+      (selector: string, present: boolean) => {
+        const element = document.querySelector(selector);
+        return element?.classList.contains(ckeBtnOnSelector) === present;
+      },
+      {},
+      optionSelector,
+      !isActive
+    );
   }
 
   /**
@@ -56,7 +74,12 @@ export class RTEEditor {
    * @param {'heading' | 'normal'} format - The format to change to.
    */
   async changeFormatTo(format: 'heading' | 'normal'): Promise<void> {
-    await this.clickOnRTEOptionWithTitle('Format');
+    await this.context.waitForSelector(paragraphFormatOptionSelector);
+    const optionElement = await this.context.$(paragraphFormatOptionSelector);
+    if (!optionElement) {
+      throw new Error(`Format option not found.`);
+    }
+    await optionElement.click();
 
     const iframes = this.parentPage.frames();
 
@@ -78,6 +101,16 @@ export class RTEEditor {
       throw new Error(`Format ${format} not found.`);
     }
     await element.click();
+
+    await this.parentPage.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return (element as HTMLAnchorElement).innerText.trim() === value;
+      },
+      {},
+      selector,
+      format
+    );
   }
 
   /**
@@ -90,5 +123,9 @@ export class RTEEditor {
       throw new Error('Text area element not found.');
     }
     await textAreaElement.click();
+
+    await this.parentPage.waitForSelector(
+      `${rteTextAreaSelector}${bodyFocusedSelector}`
+    );
   }
 }

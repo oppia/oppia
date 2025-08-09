@@ -150,6 +150,7 @@ export class BlogPostEditor extends BaseUser {
   }
 
   async clickOnUpdateBioIcon(): Promise<void> {
+    await this.expectElementToBeVisible(updateBioIconSelector);
     await this.clickOn(updateBioIconSelector);
     await this.expectModalTitleToBe('Add your Author Name and Biography:');
   }
@@ -158,6 +159,7 @@ export class BlogPostEditor extends BaseUser {
    * Clicks on the save profile button.
    */
   async clickOnSaveProfileButton(): Promise<void> {
+    await this.expectElementToBeVisible(authorBioSaveButton);
     await this.clickOn(authorBioSaveButton);
     await this.expectElementToBeVisible(authorBioSaveButton, false);
   }
