@@ -66,7 +66,6 @@ start-devserver: ## Starts the development server
 	@printf 'Please wait while the development server starts...\n\n'
 	@while [[ $$(curl -s -o .dev/status_code.txt -w '%{http_code}' http://localhost:8181) != "200" ]] || [[ $$(curl -s -o .dev/status_code.txt -w '%{http_code}' http://localhost:8181/community-library) != "200" ]]; do \
 		printf "▓"; \
-		fi; \
 		sleep 1; \
 	done
 	@printf '\n\n'
