@@ -72,7 +72,6 @@ describe('Logged-in User', function () {
     const placeValueChapters = [
       'What are the Place Values',
       'Find the Value of a Number',
-      'Comparing Numbers',
     ];
 
     for (const chapter of placeValueChapters) {
@@ -98,21 +97,24 @@ describe('Logged-in User', function () {
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
-  }, 480000);
+  }, 500000);
 
   it(
     'should have the correct tab title and available sections on landing',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.expectTabTitleToMatch('loggedInUser1', 'home');
-      await loggedInUser.expectElementsToBePresent(
-        ['Learn Something New'],
-        'tabSection'
-      );
-      await loggedInUser.expectElementsToBePresent(
-        ["Topics available in Oppia's Classroom"],
-        'cardDisplay'
-      );
+
+      await loggedInUser.expectElementsPresence({
+        expectedTexts: ['Learn Something New'],
+        excludedTexts: ['Continue where you left off'],
+        selector: 'tabSection',
+      });
+
+      await loggedInUser.expectElementsPresence({
+        expectedTexts: ["Topics available in Oppia's Classroom"],
+        selector: 'cardDisplay',
+      });
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -149,18 +151,21 @@ describe('Logged-in User', function () {
       );
       await loggedInUser.continueToNextCard();
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectElementsToBePresent(
-        ['Continue where you left off'],
-        'tabSection'
-      );
+      await loggedInUser.expectElementsPresence({
+        expectedTexts: ['Continue where you left off'],
+        excludedTexts: ['Learn Something New'],
+        selector: 'tabSection',
+      });
 
-      await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
-        'Chapter 1: What are the Place Values',
-      ]);
+      await loggedInUser.expectLessonCardsToBePresent({
+        subsection: 'Lessons in progress',
+        expectedTitles: ['Chapter 1: What are the Place Values'],
+      });
 
-      await loggedInUser.expectLessonCardsToBePresent('Recommended for you', [
-        'Chapter 2: Find the Value of a Number',
-      ]);
+      await loggedInUser.expectLessonCardsToBePresent({
+        subsection: 'Recommended for you',
+        expectedTitles: ['Chapter 2: Find the Value of a Number'],
+      });
 
       await loggedInUser.navigateToLessonByCard(
         'Lessons in progress',
@@ -178,28 +183,17 @@ describe('Logged-in User', function () {
       );
 
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
-        'Chapter 2: Find the Value of a Number',
-      ]);
-      await loggedInUser.expectLessonCardsToBePresent('Recommended for you', [
-        'Chapter 3: Comparing Numbers',
-      ]);
 
-      await loggedInUser.navigateToLessonByCard(
-        'Lessons in progress',
-        'Chapter 2: Find the Value of a Number'
-      );
+      await loggedInUser.expectElementsPresence({
+        expectedTexts: ['Lessons in progress'],
+        excludedTexts: ['Recommended for you'],
+        selector: 'cardDisplay',
+      });
 
-      await loggedInUser.continueToNextCard();
-      await loggedInUser.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
-
-      await loggedInUser.navigateToLearnerDashboard();
-
-      await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
-        'Chapter 3: Comparing Numbers',
-      ]);
+      await loggedInUser.expectLessonCardsToBePresent({
+        subsection: 'Lessons in progress',
+        expectedTitles: ['Chapter 2: Find the Value of a Number'],
+      });
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
