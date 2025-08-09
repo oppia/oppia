@@ -79,7 +79,7 @@
               </i>
             </button>
           </div>
-          <div class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table"
+          <div class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table e2e-test-tiles-view-dashboard"
                *ngIf="activeView === 'gridView'">
             <div *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
@@ -90,7 +90,7 @@
               </oppia-blog-dashboard-tile>
             </div>
           </div>
-          <mat-list class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table"
+          <mat-list class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table e2e-test-list-view-dashboard"
                     *ngIf="activeView === 'listView'">
             <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts; last as last">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"

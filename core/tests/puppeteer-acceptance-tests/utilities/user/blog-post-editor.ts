@@ -814,7 +814,7 @@ export class BlogPostEditor extends BaseUser {
   /**
    * Checks if the grid view and list view buttons are present.
    */
-  async expectGridViewAndListViewButtonsArePresent(): Promise<void> {
+  async expectTilesViewAndListViewButtonsArePresent(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       showMessage(
         'Skipped: Grid view and list view buttons are not present on mobile viewport.'
@@ -823,6 +823,18 @@ export class BlogPostEditor extends BaseUser {
     }
     await this.expectElementToBeVisible(gridViewButtonSelector);
     await this.expectElementToBeVisible(listViewButtonSelector);
+  }
+
+  /**
+   * Changes the view of the blog post to tiles or list.
+   * @param {'tiles' | 'list'} view - The view to change to.
+   */
+  async changeBlogPostViewTo(view: 'tiles' | 'list'): Promise<void> {
+    const selector = `.e2e-test-${view}-view-button`;
+    const viewContainerSelector = `.e2e-test-${view}-view-dashboard`;
+    await this.expectElementToBeVisible(selector);
+    await this.clickOn(selector);
+    await this.expectElementToBeVisible(viewContainerSelector);
   }
 }
 
