@@ -4,49 +4,129 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 
-.oppia-share-lesson-modal-title {
+oppia-share-lesson-modal .oppia-share-lesson-modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+oppia-share-lesson-modal .oppia-share-lesson-modal-title {
 	color: #00645C;
 	font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;	
 	font-size: 1.25em;
 	font-weight: 400;
-	padding-top: 20px;
 	text-align: center;	
 }
 
-.modal-body {
-	margin-top: 24px;
+oppia-share-lesson-modal .modal-body {
+	display: flex;
+	flex-direction: column;
+	padding: 24px;
 }
 
-
-/* ================================================== */
-
-.oppia-learner-solution-container {
+oppia-share-lesson-modal .oppia-share-lesson-modal-footer {
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-between;
+	align-items: center;
 	padding: 16px 20px;
 }
 
-.mat-button.oppia-learner-got-it-button {
-	align-items: center;
-	background-color: #00786d;
-	border: none !important;
-	border-radius: 4px !important;
-	box-shadow: none !important;
-	color: white;
+oppia-share-lesson-modal .cancel-button {
+	border: 1px solid #00645C;
+	font-weight: 700;
+	color: #00645C;
+}
+
+oppia-share-lesson-modal .lesson-attribution-text {
+	text-decoration: underline;
+	color: #00645C;
+	font-weight: 700;
+	font-size: 20px;
+}
+
+oppia-share-lesson-modal .share-icon-container svg {
+	margin-right: 12px;
+	margin-bottom: 40px;
 	cursor: pointer;
-	display: inline-flex;
-	font-weight: 500;
-	height: 35px;
-	min-width: 0;
-	outline: none !important;
-	padding: 6px 12px;
-	text-transform: uppercase;
 }
 
-.mat-button.oppia-learner-got-it-button:hover {
-	background-color: #00655a;
+oppia-share-lesson-modal .share-modal-btn {
+	border: 1px solid #205D86;
+	color: #205D86;
+	font-weight: 700;
+	border-radius: 4px;
+	padding: 8px 16px;
+	margin-right: 12px;
+	width: 210px;
 }
 
-.clearfix {
-	clear: both;
+oppia-share-lesson-modal .share-modal-btn p {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+oppia-share-lesson-modal .success-message {
+	background-color: #323232;
+	color: white;
+	padding: 12px 16px;
+	border-radius: 4px;	
+	margin: auto;
+	width: 200px;
+}
+
+oppia-share-lesson-modal .success-message p {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+oppia-share-lesson-modal .copy-modal-body {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+oppia-share-lesson-modal .cc-attribution-header {
+	font-family: Roboto;
+	font-weight: 400;
+	font-size: 20px;;
+	color: #0D48A1;
+	margin-bottom: 32px;
+	text-align: center;
+}
+
+oppia-share-lesson-modal .cc-attribution-input {
+	border: 1px solid #0D48A1;
+	width: 49%;
+	border-radius: 4px;
+	padding: 10px;
+}
+
+oppia-share-lesson-modal .copy-cc-btn {
+	width: 49%;
+	border-radius: 4px;
+	border: 1px solid #205D86;
+	padding: 10px;
+}
+
+oppia-share-lesson-modal .copy-cc-btn p {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	color: #205D86;
+	font-weight: 700;
+}
+
+oppia-share-lesson-modal .cc-attribution-text {
+	display: flex;
+	justify-content: space-between;
+}
+
+.back-btn-visible {
+  display: block;
+}
+
+.back-btn-hidden {
+  display: none;
 }

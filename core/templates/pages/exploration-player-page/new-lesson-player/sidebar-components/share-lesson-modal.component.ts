@@ -19,6 +19,23 @@
 import {Component} from '@angular/core';
 import './share-lesson-modal.component.css';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AlertsService} from 'services/alerts.service';
+import {UrlService} from 'services/contextual/url.service';
+import {AttributionService} from 'services/attribution.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {PageContextService} from 'services/page-context.service';
+
+enum SuccessMessages {
+  LINK_COPIED = 'Link Copied',
+  EMBED_CODE_COPIED = 'HTML Code Copied',
+  ATTRIBUTION_COPIED = 'Attribution Copied',
+}
+
+enum ModalStates {
+  COPY = 'copy',
+  EMBED = 'embed',
+  ATTRIBUTION = 'attribution',
+}
 
 @Component({
   selector: 'oppia-share-lesson-modal',
@@ -26,10 +43,128 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./share-lesson-modal.component.css'],
 })
 export class ShareLessonModalComponent {
+  modalStates = ModalStates;
   explorationTitle!: string;
-  constructor(private ngbActiveModal: NgbActiveModal) {}
+  backBtnIsVisible: boolean = false;
+  successMessageIsVisible: boolean = false;
+  successMessage: string = '';
+  ccAttributionText: string = '';
+  embedCode: string = '';
+  modalState: ModalStates = ModalStates.COPY;
+
+  constructor(
+    private ngbActiveModal: NgbActiveModal,
+    private alertsService: AlertsService,
+    private urlService: UrlService,
+    private attributionService: AttributionService,
+    private windowRef: WindowRef,
+    private pageContextService: PageContextService
+  ) {}
+
+  ngOnInit(): void {
+    this.ccAttributionText = this.attributionService.generateAttributionText();
+    this.generateEmbedCode();
+  }
 
   closeModal(): void {
     this.ngbActiveModal.dismiss('cancel');
+  }
+
+  copyLessonLink(): void {
+    const lessonLink = this.getPageUrl();
+    navigator.clipboard.writeText(lessonLink).then(
+      () => {
+        this.showSuccessMessage(SuccessMessages.LINK_COPIED);
+      },
+      () => {
+        this.alertsService.addWarning('Failed to copy lesson link.');
+      }
+    );
+  }
+
+  showModal(state: ModalStates) {
+    this.modalState = state;
+  }
+
+  copyAttribution(): void {
+    navigator.clipboard.writeText(this.ccAttributionText).then(
+      () => {
+        this.showSuccessMessage(SuccessMessages.ATTRIBUTION_COPIED);
+      },
+      () => {
+        this.alertsService.addWarning('Failed to copy attribution text.');
+      }
+    );
+  }
+
+  copyEmbedCode(): void {
+    navigator.clipboard.writeText(this.embedCode).then(
+      () => {
+        this.showSuccessMessage(SuccessMessages.EMBED_CODE_COPIED);
+      },
+      () => {
+        this.alertsService.addWarning('Failed to copy embed code.');
+      }
+    );
+  }
+
+  showSuccessMessage(message: string): void {
+    this.successMessage = message;
+    this.successMessageIsVisible = true;
+
+    setTimeout(() => {
+      this.successMessageIsVisible = false;
+    }, 3000);
+  }
+
+  showAttributionModal(): void {
+    this.backBtnIsVisible = true;
+    this.showModal(ModalStates.ATTRIBUTION);
+  }
+
+  showEmbedModal(): void {
+    this.backBtnIsVisible = true;
+    this.showModal(ModalStates.EMBED);
+  }
+
+  goBackToCopyModal(): void {
+    this.backBtnIsVisible = false;
+    this.showModal(ModalStates.COPY);
+  }
+
+  shareWithNetwork(network: string): string {
+    let queryString: string;
+    let url = this.getPageUrl();
+    switch (network) {
+      case 'facebook':
+        queryString =
+          'sdk=joey&' +
+          `u=${url}&` +
+          'display=popup&' +
+          'ref=plugin&' +
+          'src=share_button';
+
+        return `https://www.facebook.com/sharer/sharer.php?${queryString}`;
+      case 'classroom':
+        queryString = `url=${url}`;
+        return `https://classroom.google.com/share?${queryString}`;
+    }
+  }
+
+  getPageUrl(): string {
+    return this.urlService.getCurrentLocation().href;
+  }
+
+  getAuthors(): string {
+    return this.attributionService.getAuthors().join(', ');
+  }
+
+  generateEmbedCode(): void {
+    const explorationId = this.pageContextService.getExplorationId();
+    const serverName =
+      this.windowRef.nativeWindow.location.protocol +
+      '//' +
+      this.windowRef.nativeWindow.location.host;
+    this.embedCode = `<iframe src="${serverName}/embed/exploration/${explorationId}" width="700" height="1000"></iframe>`;
   }
 }

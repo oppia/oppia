@@ -21,6 +21,7 @@ import {ApplicationRef, Injectable} from '@angular/core';
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
 import {HumanReadableContributorsSummary} from 'domain/summary/creator-exploration-summary.model';
 import {PageContextService} from 'services/page-context.service';
+import {UrlService} from './contextual/url.service';
 
 @Injectable({
   providedIn: 'root',
@@ -32,7 +33,8 @@ export class AttributionService {
   constructor(
     private applicationRef: ApplicationRef,
     private pageContextService: PageContextService,
-    private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService
+    private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
+    private urlService: UrlService
   ) {}
 
   init(): void {
@@ -84,5 +86,13 @@ export class AttributionService {
 
   getExplorationTitle(): string {
     return this.explorationTitle;
+  }
+
+  getPageUrl(): string {
+    return this.urlService.getCurrentLocation().href;
+  }
+
+  generateAttributionText(): string {
+    return `"${this.explorationTitle}" by ${this.getAuthors()}. Oppia. ${this.getPageUrl()}`;
   }
 }
