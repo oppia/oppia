@@ -236,15 +236,6 @@ oppia-blog-home-page .blog-post-card {
 }
 
 @media(max-width:500px) {
-  .mobile-navbar-blog-homepage {
-    color: inherit;
-    cursor: pointer;
-    font-size: 14px;
-    line-height: 0px;
-    text-decoration: none;
-    vertical-align: text-top;
-  }
-
   .oppia-navbar-breadcrumb.main-blog-homepage-mobile-breadcrumb {
     line-height: 12px;
     padding-top: 15px;
