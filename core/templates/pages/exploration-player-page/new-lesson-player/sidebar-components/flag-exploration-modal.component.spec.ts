@@ -20,18 +20,20 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {SharedPipesModule} from '../../../../filters/shared-pipes.module';
 import {FocusManagerService} from '../../../../services/stateful/focus-manager.service';
 import {PlayerPositionService} from '../../services/player-position.service';
-import {FlagExplorationModalComponent} from './flag-exploration-modal.component';
+import {NewFlagExplorationModalComponent} from './flag-exploration-modal.component';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 
 describe('Flag Exploration modal', () => {
-  let component: FlagExplorationModalComponent;
-  let fixture: ComponentFixture<FlagExplorationModalComponent>;
+  let component: NewFlagExplorationModalComponent;
+  let fixture: ComponentFixture<NewFlagExplorationModalComponent>;
   let stateName: string = 'test_state';
   let focusManagerService: FocusManagerService;
   let ngbActiveModal: NgbActiveModal;
+  let bottomSheetRef: MatBottomSheetRef;
 
   class MockPlayerPositionService {
     getCurrentStateName(): string {
@@ -39,10 +41,14 @@ describe('Flag Exploration modal', () => {
     }
   }
 
+  class MockMatBottomSheetRef {
+    dismiss(): void {}
+  }
+
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, SharedPipesModule, FormsModule],
-      declarations: [FlagExplorationModalComponent, MockTranslatePipe],
+      declarations: [NewFlagExplorationModalComponent, MockTranslatePipe],
       providers: [
         NgbActiveModal,
         FocusManagerService,
@@ -50,15 +56,20 @@ describe('Flag Exploration modal', () => {
           provide: PlayerPositionService,
           useClass: MockPlayerPositionService,
         },
+        {
+          provide: MatBottomSheetRef,
+          useClass: MockMatBottomSheetRef,
+        },
       ],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FlagExplorationModalComponent);
+    fixture = TestBed.createComponent(NewFlagExplorationModalComponent);
     component = fixture.componentInstance;
     focusManagerService = TestBed.inject(FocusManagerService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
+    bottomSheetRef = TestBed.inject(MatBottomSheetRef);
   });
 
   it('should create', () => {
@@ -69,20 +80,86 @@ describe('Flag Exploration modal', () => {
     spyOn(focusManagerService, 'setFocus');
     component.showFlagMessageTextarea(true);
     expect(component.flagMessageTextareaIsShown).toBeTrue();
-    expect(focusManagerService.setFocus).toHaveBeenCalled();
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      'flagMessageTextarea'
+    );
   });
 
-  it('should submit report', () => {
+  it('should not show flag message textarea when value is false', () => {
+    spyOn(focusManagerService, 'setFocus');
+    component.showFlagMessageTextarea(false);
+    expect(component.flagMessageTextareaIsShown).toBeFalse();
+    expect(focusManagerService.setFocus).not.toHaveBeenCalled();
+  });
+
+  it('should submit report with NgbActiveModal when textarea is shown', () => {
     let flag = true;
-    let flagMessageTextareaIsShown = true;
+    let flagMessage = 'test message';
     spyOn(ngbActiveModal, 'close');
-    component.flagMessageTextareaIsShown = flagMessageTextareaIsShown;
+    // Ensure bottomSheetRef is null so ngbActiveModal is used
+    const componentRef = component as unknown as {
+      bottomSheetRef: MatBottomSheetRef | null;
+    };
+    componentRef.bottomSheetRef = null;
+    component.flagMessageTextareaIsShown = true;
     component.flag = flag;
+    component.flagMessage = flagMessage;
     component.submitReport();
     expect(ngbActiveModal.close).toHaveBeenCalledWith({
       report_type: flag,
-      report_text: flagMessageTextareaIsShown,
+      report_text: flagMessage,
       state: stateName,
     });
+  });
+
+  it('should submit report with MatBottomSheetRef when textarea is shown', () => {
+    let flag = true;
+    let flagMessage = 'test message';
+    spyOn(bottomSheetRef, 'dismiss');
+    // Mock the component to use bottomSheetRef instead of ngbActiveModal
+    const componentRef = component as unknown as {
+      ngbActiveModal: NgbActiveModal | null;
+    };
+    componentRef.ngbActiveModal = null;
+    component.flagMessageTextareaIsShown = true;
+    component.flag = flag;
+    component.flagMessage = flagMessage;
+    component.submitReport();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith({
+      report_type: flag,
+      report_text: flagMessage,
+      state: stateName,
+    });
+  });
+
+  it('should not submit report when textarea is not shown', () => {
+    spyOn(ngbActiveModal, 'close');
+    spyOn(bottomSheetRef, 'dismiss');
+    component.flagMessageTextareaIsShown = false;
+    component.submitReport();
+    expect(ngbActiveModal.close).not.toHaveBeenCalled();
+    expect(bottomSheetRef.dismiss).not.toHaveBeenCalled();
+  });
+
+  it('should close modal with NgbActiveModal', () => {
+    spyOn(ngbActiveModal, 'dismiss');
+    // Ensure bottomSheetRef is null so ngbActiveModal is used
+    const componentRef = component as unknown as {
+      bottomSheetRef: MatBottomSheetRef | null;
+    };
+    componentRef.bottomSheetRef = null;
+    component.closeModal();
+    expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
+  });
+
+  it('should close modal with MatBottomSheetRef', () => {
+    spyOn(bottomSheetRef, 'dismiss');
+    // Mock the component to use bottomSheetRef instead of ngbActiveModal
+    const componentRef = component as unknown as {
+      ngbActiveModal: NgbActiveModal | null;
+    };
+    componentRef.ngbActiveModal = null;
+    component.closeModal();
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith();
   });
 });

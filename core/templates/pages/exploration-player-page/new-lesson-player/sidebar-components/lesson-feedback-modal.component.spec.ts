@@ -13,76 +13,316 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for FlagExplorationModalComponent.
+ * @fileoverview Unit tests for LessonFeedbackModalComponent.
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {SharedPipesModule} from '../../../../filters/shared-pipes.module';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
+import {Directive, Input} from '@angular/core';
+import {FeedbackPopupBackendApiService} from '../../../../pages/exploration-player-page/services/feedback-popup-backend-api.service';
+import {UserService} from '../../../../services/user.service';
+import {PlayerPositionService} from '../../../../pages/exploration-player-page/services/player-position.service';
 import {FocusManagerService} from '../../../../services/stateful/focus-manager.service';
-import {PlayerPositionService} from '../../services/player-position.service';
-import {NewFlagExplorationModalComponent} from './flag-exploration-modal.component';
+import {LessonFeedbackModalComponent} from './lesson-feedback-modal.component';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 
-describe('Flag Exploration modal', () => {
-  let component: FlagExplorationModalComponent;
-  let fixture: ComponentFixture<FlagExplorationModalComponent>;
-  let stateName: string = 'test_state';
-  let focusManagerService: FocusManagerService;
+@Directive({
+  selector: '[oppiaFocusOn]',
+})
+class MockFocusOnDirective {
+  @Input() oppiaFocusOn: string = '';
+}
+
+describe('LessonFeedbackModalComponent', () => {
+  let component: LessonFeedbackModalComponent;
+  let fixture: ComponentFixture<LessonFeedbackModalComponent>;
   let ngbActiveModal: NgbActiveModal;
+  let bottomSheetRef: MatBottomSheetRef;
+  let focusManagerService: FocusManagerService;
+  let playerPositionService: PlayerPositionService;
+  let userService: UserService;
+  let feedbackPopupBackendApiService: FeedbackPopupBackendApiService;
+
+  const mockUserInfo = {
+    isLoggedIn: () => true,
+  };
+
+  const mockUserInfoLoggedOut = {
+    isLoggedIn: () => false,
+  };
+
+  class MockUserService {
+    getUserInfoAsync(): Promise<any> {
+      return Promise.resolve(mockUserInfo);
+    }
+  }
 
   class MockPlayerPositionService {
     getCurrentStateName(): string {
-      return stateName;
+      return 'test_state';
     }
+  }
+
+  class MockFocusManagerService {
+    setFocus(elementId: string): void {}
+  }
+
+  class MockFeedbackPopupBackendApiService {
+    submitFeedbackAsync(
+      title: string,
+      text: string,
+      includeAuthor: boolean,
+      state: string
+    ): Promise<void> {
+      return Promise.resolve();
+    }
+  }
+
+  class MockMatBottomSheetRef {
+    dismiss(): void {}
   }
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, SharedPipesModule, FormsModule],
-      declarations: [FlagExplorationModalComponent, MockTranslatePipe],
+      imports: [HttpClientTestingModule, FormsModule],
+      declarations: [
+        LessonFeedbackModalComponent,
+        MockTranslatePipe,
+        MockFocusOnDirective,
+      ],
       providers: [
         NgbActiveModal,
-        FocusManagerService,
+        {
+          provide: FocusManagerService,
+          useClass: MockFocusManagerService,
+        },
+        {
+          provide: UserService,
+          useClass: MockUserService,
+        },
         {
           provide: PlayerPositionService,
           useClass: MockPlayerPositionService,
+        },
+        {
+          provide: FeedbackPopupBackendApiService,
+          useClass: MockFeedbackPopupBackendApiService,
+        },
+        {
+          provide: MatBottomSheetRef,
+          useClass: MockMatBottomSheetRef,
         },
       ],
     }).compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FlagExplorationModalComponent);
+    fixture = TestBed.createComponent(LessonFeedbackModalComponent);
     component = fixture.componentInstance;
-    focusManagerService = TestBed.inject(FocusManagerService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
+    bottomSheetRef = TestBed.inject(MatBottomSheetRef);
+    focusManagerService = TestBed.inject(FocusManagerService);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    userService = TestBed.inject(UserService);
+    feedbackPopupBackendApiService = TestBed.inject(
+      FeedbackPopupBackendApiService
+    );
   });
 
   it('should create', () => {
     expect(component).toBeDefined();
   });
 
-  it('should show flag message textarea', () => {
+  it('should initialize component with logged in user', async () => {
     spyOn(focusManagerService, 'setFocus');
-    component.showFlagMessageTextarea(true);
-    expect(component.flagMessageTextareaIsShown).toBeTrue();
+    spyOn(Math, 'random').and.returnValue(0.123456789);
+
+    await component.ngOnInit();
+
+    expect(component.isLoggedIn).toBeTrue();
+    expect(component.feedbackModalId).toContain('feedbackPopover');
+    expect(component.feedbackTitle).toBe(
+      'Feedback when the user was at card "test_state"'
+    );
+    expect(focusManagerService.setFocus).toHaveBeenCalledWith(
+      component.feedbackModalId
+    );
+  });
+
+  it('should initialize component with logged out user', async () => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(mockUserInfoLoggedOut)
+    );
+    spyOn(focusManagerService, 'setFocus');
+
+    await component.ngOnInit();
+
+    expect(component.isLoggedIn).toBeFalse();
     expect(focusManagerService.setFocus).toHaveBeenCalled();
   });
 
-  it('should submit report', () => {
-    let flag = true;
-    let flagMessageTextareaIsShown = true;
+  it('should save feedback with NgbActiveModal when user is logged in and not anonymized', async () => {
+    component.feedbackText = 'test feedback';
+    component.isLoggedIn = true;
+    component.isSubmitterAnonymized = false;
+    // Ensure bottomSheetRef is null so ngbActiveModal is used
+    const componentRef = component as unknown as {
+      bottomSheetRef: MatBottomSheetRef | null;
+    };
+    componentRef.bottomSheetRef = null;
+
+    spyOn(
+      feedbackPopupBackendApiService,
+      'submitFeedbackAsync'
+    ).and.returnValue(Promise.resolve());
     spyOn(ngbActiveModal, 'close');
-    component.flagMessageTextareaIsShown = flagMessageTextareaIsShown;
-    component.flag = flag;
-    component.submitReport();
-    expect(ngbActiveModal.close).toHaveBeenCalledWith({
-      report_type: flag,
-      report_text: flagMessageTextareaIsShown,
-      state: stateName,
-    });
+
+    await component.saveFeedback();
+
+    expect(
+      feedbackPopupBackendApiService.submitFeedbackAsync
+    ).toHaveBeenCalledWith(
+      component.feedbackTitle,
+      'test feedback',
+      true,
+      'test_state'
+    );
+    expect(ngbActiveModal.close).toHaveBeenCalled();
+  });
+
+  it('should save feedback with MatBottomSheetRef when user is logged in and not anonymized', async () => {
+    component.feedbackText = 'test feedback';
+    component.isLoggedIn = true;
+    component.isSubmitterAnonymized = false;
+    // Mock the component to use bottomSheetRef instead of ngbActiveModal
+    const componentRef = component as unknown as {
+      ngbActiveModal: NgbActiveModal | null;
+    };
+    componentRef.ngbActiveModal = null;
+
+    spyOn(
+      feedbackPopupBackendApiService,
+      'submitFeedbackAsync'
+    ).and.returnValue(Promise.resolve());
+    spyOn(bottomSheetRef, 'dismiss');
+
+    await component.saveFeedback();
+
+    expect(
+      feedbackPopupBackendApiService.submitFeedbackAsync
+    ).toHaveBeenCalledWith(
+      component.feedbackTitle,
+      'test feedback',
+      true,
+      'test_state'
+    );
+    expect(bottomSheetRef.dismiss).toHaveBeenCalled();
+  });
+
+  it('should save feedback anonymously when user is logged in but anonymized', async () => {
+    component.feedbackText = 'test feedback';
+    component.isLoggedIn = true;
+    component.isSubmitterAnonymized = true;
+    const componentRef = component as unknown as {
+      bottomSheetRef: MatBottomSheetRef | null;
+    };
+    componentRef.bottomSheetRef = null;
+
+    spyOn(
+      feedbackPopupBackendApiService,
+      'submitFeedbackAsync'
+    ).and.returnValue(Promise.resolve());
+    spyOn(ngbActiveModal, 'close');
+
+    await component.saveFeedback();
+
+    expect(
+      feedbackPopupBackendApiService.submitFeedbackAsync
+    ).toHaveBeenCalledWith(
+      component.feedbackTitle,
+      'test feedback',
+      false,
+      'test_state'
+    );
+  });
+
+  it('should save feedback anonymously when user is logged out', async () => {
+    component.feedbackText = 'test feedback';
+    component.isLoggedIn = false;
+    component.isSubmitterAnonymized = false;
+    const componentRef = component as unknown as {
+      bottomSheetRef: MatBottomSheetRef | null;
+    };
+    componentRef.bottomSheetRef = null;
+
+    spyOn(
+      feedbackPopupBackendApiService,
+      'submitFeedbackAsync'
+    ).and.returnValue(Promise.resolve());
+    spyOn(ngbActiveModal, 'close');
+
+    await component.saveFeedback();
+
+    expect(
+      feedbackPopupBackendApiService.submitFeedbackAsync
+    ).toHaveBeenCalledWith(
+      component.feedbackTitle,
+      'test feedback',
+      false,
+      'test_state'
+    );
+  });
+
+  it('should not save feedback when feedback text is empty', () => {
+    component.feedbackText = '';
+
+    spyOn(feedbackPopupBackendApiService, 'submitFeedbackAsync');
+    spyOn(ngbActiveModal, 'close');
+
+    component.saveFeedback();
+
+    expect(
+      feedbackPopupBackendApiService.submitFeedbackAsync
+    ).not.toHaveBeenCalled();
+    expect(ngbActiveModal.close).not.toHaveBeenCalled();
+  });
+
+  it('should not save feedback when feedback text is null', () => {
+    const nullValue: string = null as unknown as string;
+    component.feedbackText = nullValue;
+
+    spyOn(feedbackPopupBackendApiService, 'submitFeedbackAsync');
+    spyOn(ngbActiveModal, 'close');
+
+    component.saveFeedback();
+
+    expect(
+      feedbackPopupBackendApiService.submitFeedbackAsync
+    ).not.toHaveBeenCalled();
+    expect(ngbActiveModal.close).not.toHaveBeenCalled();
+  });
+
+  it('should close modal with MatBottomSheetRef', () => {
+    spyOn(bottomSheetRef, 'dismiss');
+
+    component.closeModal();
+
+    expect(bottomSheetRef.dismiss).toHaveBeenCalledWith('cancel');
+  });
+
+  it('should close modal with NgbActiveModal when bottomSheetRef is not available', () => {
+    // Mock the component to use ngbActiveModal instead of bottomSheetRef
+    const componentRef = component as unknown as {
+      bottomSheetRef: MatBottomSheetRef | null;
+    };
+    componentRef.bottomSheetRef = null;
+    spyOn(ngbActiveModal, 'dismiss');
+
+    component.closeModal();
+
+    expect(ngbActiveModal.dismiss).toHaveBeenCalledWith('cancel');
   });
 });

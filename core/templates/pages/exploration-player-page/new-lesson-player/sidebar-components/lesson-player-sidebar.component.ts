@@ -55,7 +55,7 @@ export class LessonPlayerSidebarComponent implements OnInit {
   expDescription!: string;
   expDescTranslationKey!: string;
   explorationTitle!: string;
-  explorationId: string;
+  explorationId!: string;
   avgRating!: number | null;
   fullStars: number = 0;
   blankStars: number = 5;

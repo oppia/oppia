@@ -87,8 +87,4 @@ export class AttributionService {
   getExplorationTitle(): string {
     return this.explorationTitle;
   }
-
-  getPageUrl(): string {
-    return this.urlService.getCurrentLocation().href;
-  }
 }

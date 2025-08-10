@@ -29,6 +29,7 @@ import {
   MAT_BOTTOM_SHEET_DATA,
   MatBottomSheetRef,
 } from '@angular/material/bottom-sheet';
+import {error} from 'console';
 
 enum SuccessMessages {
   LINK_COPIED = 'Link Copied',
@@ -171,6 +172,7 @@ export class ShareLessonModalComponent {
         queryString = `url=${url}`;
         return `https://classroom.google.com/share?${queryString}`;
     }
+    return '';
   }
 
   getPageUrl(): string {
