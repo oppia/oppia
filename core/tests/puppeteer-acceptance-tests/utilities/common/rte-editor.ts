@@ -53,8 +53,12 @@ export class RTEEditor {
     }
 
     // Check if element is active or not to use in post check.
-    const classList = await optionElement.evaluate(el => el.classList);
-    const isActive = classList.contains(ckeBtnOnSelector);
+    const isActive = await optionElement.evaluate(
+      (el: Element, cls: string) => {
+        return el.classList.contains(cls);
+      },
+      ckeBtnOnSelector
+    );
 
     await optionElement.click();
 
