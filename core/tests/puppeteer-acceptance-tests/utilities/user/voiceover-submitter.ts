@@ -143,8 +143,8 @@ export class VoiceoverSubmitter extends BaseUser {
   ): Promise<void> {
     const statusSelector =
       status === 'upto date'
-        ? `${audioStatusUpdateBtnSelector}.${audioDoesNotNeedUpdateIconSelector}`
-        : `${audioStatusUpdateBtnSelector}.${audioNeedsUpdateIconSelector}`;
+        ? `${audioStatusUpdateBtnSelector}${audioDoesNotNeedUpdateIconSelector}`
+        : `${audioStatusUpdateBtnSelector}${audioNeedsUpdateIconSelector}`;
     await this.expectElementToBeVisible(statusSelector);
   }
 
