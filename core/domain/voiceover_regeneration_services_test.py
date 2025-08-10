@@ -22,14 +22,16 @@ import os
 from unittest import mock
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import translation_domain
-from core.domain import translation_services
-from core.domain import voiceover_regeneration_services
-from core.domain import voiceover_services
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    fs_services,
+    translation_domain,
+    translation_services,
+    voiceover_regeneration_services,
+    voiceover_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

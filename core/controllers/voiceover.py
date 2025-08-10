@@ -19,11 +19,12 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import taskqueue_services
-from core.domain import voiceover_regeneration_services
-from core.domain import voiceover_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    taskqueue_services,
+    voiceover_regeneration_services,
+    voiceover_services,
+)
 
 from typing import Dict, TypedDict
 
