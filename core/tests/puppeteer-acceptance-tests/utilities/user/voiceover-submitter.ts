@@ -129,7 +129,7 @@ export class VoiceoverSubmitter extends BaseUser {
     await this.clickOn(audioStatusUpdateBtnSelector);
 
     await this.expectElementToBeVisible(
-      `${audioStatusUpdateBtnSelector}${audioDoesNotNeedUpdateIconSelector}`,
+      `${audioStatusUpdateBtnSelector}${audioNeedsUpdateIconSelector}`,
       !currentStatus
     );
   }

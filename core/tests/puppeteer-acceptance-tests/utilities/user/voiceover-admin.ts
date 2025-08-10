@@ -62,6 +62,20 @@ const explorationEditorSettingsTabSelector =
 const toastWarningContainer = '.e2e-test-toast-warning';
 const voiceArtistSectionHeaderSelector = '.e2e-test-voice-artists-header';
 const voiceArtistSectionBodySelector = '.e2e-test-voice-artists-content';
+const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
+const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
+const mobileSettingsBarSelector = 'li.e2e-test-mobile-settings-button';
+const basicSettingsDropdown = 'h3.e2e-test-settings-container';
+const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
+const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
+const voiceArtistSettingsDropdown =
+  'h3.e2e-test-voice-artists-settings-container';
+const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
+const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
+('h3.e2e-test-controls-bar-settings-container');
+const settingsContainerSelector =
+  '.oppia-editor-card.oppia-settings-card-container';
+const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
@@ -70,17 +84,40 @@ export class VoiceoverAdmin extends BaseUser {
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.expectElementToBeVisible(mobileNavToggelbutton);
-      await this.clickOn(mobileNavToggelbutton);
-      await this.clickOn(mobileOptionsDropdown);
-      await this.clickOn(mobileSettingsButton);
+      const element = await this.page.$(mobileNavbarDropdown);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to settings tab appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.page.waitForSelector(mobileOptionsButtonSelector, {
+          visible: true,
+        });
+        await this.clickOn(mobileOptionsButtonSelector);
+      }
+      await this.page.waitForSelector(mobileNavbarDropdown, {
+        visible: true,
+      });
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(mobileSettingsBarSelector);
+
+      // Open all dropdowns because by default all dropdowns are closed in mobile view.
+      await this.clickOn(basicSettingsDropdown);
+      await this.clickOn(advanceSettingsDropdown);
+      await this.clickOn(rolesSettingsDropdown);
+      await this.clickOn(voiceArtistSettingsDropdown);
+      await this.clickOn(permissionSettingsDropdown);
+      await this.clickOn(feedbackSettingsDropdown);
     } else {
-      await this.expectElementToBeVisible(explorationSettingsTab);
-      await this.clickOn(explorationSettingsTab);
+      await this.page.waitForSelector(settingsTabSelector, {
+        visible: true,
+      });
+      await this.clickOn(settingsTabSelector);
     }
 
-    await this.expectElementToBeVisible(explorationEditorSettingsTabSelector);
-    showMessage('Navigation to settings tab is successful.');
+    await this.page.waitForSelector(settingsContainerSelector, {
+      visible: true,
+    });
+    showMessage('Settings tab is opened successfully.');
   }
 
   /**
@@ -146,7 +183,11 @@ export class VoiceoverAdmin extends BaseUser {
   async expectVoiceoverArtistsListDoesNotContain(
     artistUsername: string
   ): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
+    // Expand the section if it is not expanded in mobile view.
+    if (
+      this.isViewportAtMobileWidth() &&
+      (await this.isElementVisible(mobileVoiceoverArtistsHeader))
+    ) {
       await this.clickOn(mobileVoiceoverArtistsHeader);
     }
     const allVoiceoverArtists = await this.getAllVoiceoverArtists();
