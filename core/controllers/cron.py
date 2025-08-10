@@ -79,7 +79,9 @@ class CronUserDeletionHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     def get(self) -> None:
         """Handles GET requests."""
         taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_DELETE_USERS_PENDING_TO_BE_DELETED'
+            ],
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
         )
         return self.render_json({})
@@ -98,7 +100,9 @@ class CronFullyCompleteUserDeletionHandler(
     def get(self) -> None:
         """Handles GET requests."""
         taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_CHECK_COMPLETION_OF_USER_DELETION'
+            ],
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
         )
         return self.render_json({})

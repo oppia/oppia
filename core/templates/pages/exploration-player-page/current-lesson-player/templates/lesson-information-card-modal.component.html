@@ -1,12 +1,12 @@
-<mat-card class="oppia-lesson-info-card">
+<mat-card class="oppia-lesson-info-card e2e-test-lesson-info-card">
   <div [ngStyle]="infoCardBackgroundCss" class="oppia-info-card-logo-thumbnail">
     <img [src]="getStaticImageUrl(infoCardBackgroundImageUrl)"
          class="oppia-info-card-bg-image"
          alt="{{ expCategory }}">
-    <h2 class="oppia-info-card-title break-word" *ngIf="isHackyExpTitleTranslationDisplayed()" tabindex="0">
+    <h2 class="oppia-info-card-title break-word e2e-test-lesson-info-modal-header" *ngIf="isHackyExpTitleTranslationDisplayed()" tabindex="0">
       {{ expTitleTranslationKey | translate }}
     </h2>
-    <h2 class="oppia-info-card-title break-word"
+    <h2 class="oppia-info-card-title break-word e2e-test-lesson-info-modal-header"
         tabindex="0"
         *ngIf="!isHackyExpTitleTranslationDisplayed()">
       {{ expTitle }}
@@ -114,12 +114,12 @@
             <span class="oppia-icon-accessibility-label">
               {{ 'I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate }}
             </span>
-            <div class="named-contributors-container">
+            <div class="named-contributors-container e2e-test-contributors-container">
               <li *ngFor="let name of (contributorNames | limitTo: 2); index as idx"
                   (click)="cancel()"
                   [ngbTooltip]="name"
                   placement="top"
-                  class="contributor-{{idx}}">
+                  class="contributor-{{idx}} e2e-test-contributor-icon">
                 <profile-link-image [username]="name"></profile-link-image>
               </li>
             </div>
@@ -188,7 +188,7 @@
   <div class="sign-in-box">
     <p>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1' | translate }}</p>
     <button type="button"
-            class="btn btn-secondary create-account-btn"
+            class="btn btn-secondary create-account-btn e2e-test-sign-up-button"
             (click)="onLoginButtonClicked()">
           {{ 'I18N_CREATE_ACCOUNT' | translate }}
     </button>
@@ -207,7 +207,7 @@
       <oppia-copy-url [urlToCopy]="loggedOutProgressUniqueUrl"></oppia-copy-url>
     </div>
   </div>
-  <button type="button" class="save-progress-close-button" (click)="closeSaveProgressMenu()">
+  <button type="button" class="save-progress-close-button e2e-test-save-progress-close-button" (click)="closeSaveProgressMenu()">
     <i class="material-icons md-24">&#xE5CD;</i>
     <span class="oppia-icon-accessibility-label">Close</span>
   </button>

@@ -144,6 +144,12 @@ class _Gae(Platform):
                 )
 
                 returned_models.append(classroom_models)
+            elif name == Names.CLOUD_TASK:
+                from core.storage.cloud_task import (
+                    gae_models as cloud_task_models,
+                )
+
+                returned_models.append(cloud_task_models)
             elif name == Names.COLLECTION:
                 from core.storage.collection import (
                     gae_models as collection_models,

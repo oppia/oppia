@@ -22,15 +22,14 @@ import os
 from unittest import mock
 
 from core import feconf
-from core.domain import (
-    exp_domain,
-    exp_fetchers,
-    exp_services,
-    fs_services,
-    translation_domain,
-    translation_services,
-    voiceover_regeneration_services,
-)
+from core.domain import exp_domain
+from core.domain import exp_fetchers
+from core.domain import exp_services
+from core.domain import fs_services
+from core.domain import translation_domain
+from core.domain import translation_services
+from core.domain import voiceover_regeneration_services
+from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -517,4 +516,69 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.assertEqual(
             sentence_tokens_with_durations,
             expected_sentence_tokens_with_durations,
+        )
+
+    def test_should_regenerate_voiceovers_of_exploration(self) -> None:
+        editor_email = 'editor1@example.com'
+        editor_username = 'editor1'
+        self.signup(editor_email, editor_username)
+
+        exploration_id = 'exp_id'
+        exploration_version = 2
+        content_id = 'content_0'
+        language_accent_code = 'en-US'
+        exploration_id = 'exp_id'
+        content_html = '<p> This is a test text </p>'
+
+        entity_voiceovers_models = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id, 'exploration', exploration_version
+            )
+        )
+        self.assertEqual(len(entity_voiceovers_models), 0)
+        errors_while_voiceover_regeneration = voiceover_regeneration_services.regenerate_voiceovers_of_exploration(
+            exploration_id,
+            exploration_version,
+            {content_id: content_html},
+            language_accent_code,
+        )
+        self.assertEqual(errors_while_voiceover_regeneration, [])
+        entity_voiceovers_models = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                exploration_id, 'exploration', exploration_version
+            )
+        )
+        self.assertEqual(len(entity_voiceovers_models), 1)
+
+    def test_should_return_errors_if_voiceover_regeneration_fails(self) -> None:
+        exploration_id = 'exp_id'
+        exploration_version = 2
+        content_id = 'content_0'
+        language_accent_code = 'en-US'
+        exploration_id = 'exp_id'
+        content_html = '<p> This is a test text </p>'
+
+        # Mock the voiceover synthesis function to raise an exception.
+        def mock_synthesize_voiceover_for_html_string(
+            exploration_id: str,
+            content_html: str,
+            language_accent_code: str,
+            voiceover_filename: str,
+        ) -> List[Dict[str, Union[str, float]]]:
+            raise Exception('Mocked exception during voiceover regeneration')
+
+        with self.swap(
+            voiceover_regeneration_services,
+            'synthesize_voiceover_for_html_string',
+            mock_synthesize_voiceover_for_html_string,
+        ):
+            errors_while_voiceover_regeneration = voiceover_regeneration_services.regenerate_voiceovers_of_exploration(
+                exploration_id,
+                exploration_version,
+                {content_id: content_html},
+                language_accent_code,
+            )
+        self.assertEqual(
+            errors_while_voiceover_regeneration,
+            [('content_0', 'Mocked exception during voiceover regeneration')],
         )

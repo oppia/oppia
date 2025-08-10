@@ -317,8 +317,8 @@ def validate_rte_tags(
 
     Args:
         html_data: str. The RTE content of the state.
-        is_tag_nested_inside_tabs_or_collapsible: bool. True when we
-            validate tags inside `Tabs` or `Collapsible` tag.
+        is_tag_nested_inside_tabs_or_collapsible: bool. True when
+            we validate tags inside `Tabs` or `Collapsible` tag.
 
     Raises:
         ValidationError. Image does not have alt-with-value attribute.
@@ -513,8 +513,8 @@ def validate_rte_tags(
         collapsible_tags = soup.find_all('oppia-noninteractive-collapsible')
         if len(collapsible_tags) > 0:
             raise utils.ValidationError(
-                'Collapsible tag should not be present inside another '
-                'Tabs or Collapsible tag.'
+                'Collapsible tag should not be present inside Tabs '
+                'or another Collapsible tag.'
             )
 
 

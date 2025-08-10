@@ -114,6 +114,26 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
                 '</oppia-noninteractive-collapsible>'
             ),
+            (
+                '<oppia-noninteractive-workedexample question-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;" answer-with-value="&amp;quot;'
+                'lorem ipsum&amp;quot;">'
+                '</oppia-noninteractive-workedexample>'
+            ),
+            (
+                '<oppia-noninteractive-workedexample question-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;">'
+                '</oppia-noninteractive-workedexample>'
+            ),
+            (
+                '<oppia-noninteractive-workedexample '
+                'answer-with-value="&amp;quot;lorem ipsum&amp;quot;">'
+                '</oppia-noninteractive-workedexample>'
+            ),
         ]
 
         actual_output_for_ckeditor = (
@@ -132,6 +152,19 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     'heading-with-value="&amp;quot;'
                     'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
                     '</oppia-noninteractive-collapsible>'
+                ),
+                (
+                    '<oppia-noninteractive-workedexample '
+                    'question-with-value="&amp;'
+                    'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+                    'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                    '&amp;quot;">'
+                    '</oppia-noninteractive-workedexample>'
+                ),
+                (
+                    '<oppia-noninteractive-workedexample '
+                    'answer-with-value="&amp;quot;lorem ipsum&amp;quot;">'
+                    '</oppia-noninteractive-workedexample>'
                 ),
                 (
                     '<pre>Hello this is <b> testing '
@@ -153,6 +186,15 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     'gt;&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;gt;&amp;lt;'
                     '/p&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;'
                     'quot;hello&amp;quot;}]\"></oppia-noninteractive-tabs>'
+                ),
+                (
+                    '<oppia-noninteractive-workedexample '
+                    'question-with-value="&amp;'
+                    'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+                    'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                    '&amp;quot;" answer-with-value="&amp;quot;'
+                    'lorem ipsum&amp;quot;">'
+                    '</oppia-noninteractive-collapsible>'
                 ),
             ],
         }
@@ -426,6 +468,35 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '&amp;lt;/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;&amp;'
                 'quot;}]"></oppia-noninteractive-tabs>'
             ),
+            (
+                '<oppia-noninteractive-workedexample question-with-value='
+                '"34455" answer-with-value="&amp;quot;lorem ipsum&amp;quot;">'
+                '</oppia-noninteractive-workedexample>'
+            ),
+            (
+                '<oppia-noninteractive-workedexample question-with-value='
+                '"&amp;quot;lorem ipsum&amp;quot;" answer-with-value="34456">'
+                '</oppia-noninteractive-workedexample>'
+            ),
+            (
+                '<oppia-noninteractive-workedexample question-with-value="'
+                '&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-link '
+                'url-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+                'https://www.example.com&amp;amp;amp;quot;\\&amp;quot;&amp;gt;'
+                '&amp;lt;/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;'
+                '&amp;quot;" answer-with-value="&amp;quot;Hello&amp;quot;">'
+                '</oppia-noninteractive-workedexample>'
+            ),
+            (
+                '<oppia-noninteractive-workedexample question-with-value="'
+                '&amp;quot;Hello&amp;quot;" answer-with-value="'
+                '&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-link '
+                'url-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+                'https://www.example.com&amp;amp;amp;quot;\\&amp;quot;&amp;gt;'
+                '&amp;lt;/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;'
+                '&amp;quot;">'
+                '</oppia-noninteractive-workedexample>'
+            ),
         ]
 
         actual_output = html_validation_service.validate_customization_args(
@@ -523,6 +594,25 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     'quot;&amp;gt;&amp;lt;/oppia-noninteractive-link&amp;gt;&amp;'
                     'lt;/p&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>'
                 ),
+                (
+                    '<oppia-noninteractive-workedexample question-with-value'
+                    '="&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-'
+                    'link url-with-value=\\&amp;quot;&amp;amp;amp;quot;https://'
+                    'www.example.com&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;'
+                    '/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;&amp;'
+                    'quot;" answer-with-value="&amp;quot;Hello&amp;quot;">'
+                    '</oppia-noninteractive-workedexample>'
+                ),
+                (
+                    '<oppia-noninteractive-workedexample question-with-value'
+                    '="&amp;quot;Hello&amp;quot;" answer-with-value="'
+                    '&amp;quot;&amp;lt;p&amp;gt;&amp;lt;oppia-noninteractive-'
+                    'link url-with-value=\\&amp;quot;&amp;amp;amp;quot;https://'
+                    'www.example.com&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp;lt;'
+                    '/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;&amp;'
+                    'quot;">'
+                    '</oppia-noninteractive-workedexample>'
+                ),
             ],
             'Expected bool, received hello': [
                 (
@@ -607,6 +697,20 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                     '<oppia-noninteractive-video autoplay-with-value="false" '
                     'end-with-value="0" start-with-value="0" video_id-with-value="'
                     '&amp;quot;lorem&amp;quot;"></oppia-noninteractive-video>'
+                )
+            ],
+            'Expected unicode HTML string, received 34455': [
+                (
+                    '<oppia-noninteractive-workedexample question-with-value='
+                    '"34455" answer-with-value="&amp;quot;lorem ipsum&amp;quot;">'
+                    '</oppia-noninteractive-workedexample>'
+                )
+            ],
+            'Expected unicode HTML string, received 34456': [
+                (
+                    '<oppia-noninteractive-workedexample question-with-value='
+                    '"&amp;quot;lorem ipsum&amp;quot;" answer-with-value="34456">'
+                    '</oppia-noninteractive-workedexample>'
                 )
             ],
         }
@@ -1478,6 +1582,44 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'expected_output': '<p>Hello this is <span>testing \u2192 '
                 '\u201c \u2209 \u2158 \u2019 \u221a \u2208 \u2155 \u2159 '
                 '\u2018 \u2014 \u200b \u2209</span></p>',
+            },
+            {
+                'html_string': '<oppia-noninteractive-workedexample '
+                'question-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp;'
+                'lt;p&amp;gt;lorem \xc2ipsum&amp;'
+                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;" answer-with-value="&amp;quot;'
+                'lorem ipsum&amp;quot;">'
+                '</oppia-noninteractive-workedexample>',
+                'expected_output': '<oppia-noninteractive-workedexample '
+                'answer-with-value="&amp;quot;'
+                'lorem ipsum&amp;quot;" '
+                'question-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp'
+                ';lt;p&amp;gt;lorem ipsum&amp;'
+                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;">'
+                '</oppia-noninteractive-workedexample>',
+            },
+            {
+                'html_string': '<oppia-noninteractive-workedexample '
+                'question-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp;'
+                'lt;p&amp;gt;lorem ipsum&amp;'
+                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;" answer-with-value="&amp;quot;'
+                'lorem \xc2ipsum&amp;quot;">'
+                '</oppia-noninteractive-workedexample>',
+                'expected_output': '<oppia-noninteractive-workedexample '
+                'answer-with-value="&amp;quot;'
+                'lorem ipsum&amp;quot;" '
+                'question-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp;'
+                'lt;p&amp;gt;lorem ipsum&amp;'
+                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;">'
+                '</oppia-noninteractive-workedexample>',
             },
         ]
         for test_case in test_cases:

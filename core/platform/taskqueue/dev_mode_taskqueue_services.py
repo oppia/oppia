@@ -79,7 +79,7 @@ def create_http_task(
     payload: Optional[Dict[str, Any]] = None,
     scheduled_for: Optional[datetime.datetime] = None,
     task_name: Optional[str] = None,
-) -> None:
+) -> cloud_tasks_emulator.Task:
     """Creates a Task in the corresponding queue that will be executed when
     the 'scheduled_for' countdown expires using the cloud tasks emulator.
 
@@ -91,8 +91,11 @@ def create_http_task(
         scheduled_for: datetime|None. The naive datetime object for the
             time to execute the task. Pass in None for immediate execution.
         task_name: str|None. Optional. The name of the task.
+
+    Returns:
+        Task. The task that was created.
     """
-    CLIENT.create_task(
+    return CLIENT.create_task(
         queue_name,
         url,
         payload=payload,

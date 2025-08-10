@@ -28,7 +28,7 @@ import {
   StateBackendDict,
   StateObjectFactory,
 } from 'domain/state/StateObjectFactory';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {LoggerService} from 'services/contextual/logger.service';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
@@ -38,7 +38,6 @@ describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
   let sof: StateObjectFactory;
   let exploration: Exploration;
-  let iof: InteractionObjectFactory;
   let ls: LoggerService;
   let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
   let firstState: StateBackendDict;
@@ -51,7 +50,6 @@ describe('Exploration object factory', () => {
     });
     eof = TestBed.get(ExplorationObjectFactory);
     sof = TestBed.get(StateObjectFactory);
-    iof = TestBed.get(InteractionObjectFactory);
     ls = TestBed.get(LoggerService);
 
     firstState = {
@@ -223,10 +221,10 @@ describe('Exploration object factory', () => {
 
   it('should correctly get the interaction from an exploration', () => {
     expect(exploration.getInteraction('first state')).toEqual(
-      iof.createFromBackendDict(firstState.interaction)
+      Interaction.createFromBackendDict(firstState.interaction)
     );
     expect(exploration.getInteraction('second state')).toEqual(
-      iof.createFromBackendDict(secondState.interaction)
+      Interaction.createFromBackendDict(secondState.interaction)
     );
 
     expect(exploration.getInteraction('invalid state')).toBeNull();
@@ -332,10 +330,10 @@ describe('Exploration object factory', () => {
 
       expect(responseExploration.getLanguageCode()).toBe('en');
       expect(responseExploration.getInteraction('first state')).toEqual(
-        iof.createFromBackendDict(firstState.interaction)
+        Interaction.createFromBackendDict(firstState.interaction)
       );
       expect(responseExploration.getInteraction('second state')).toEqual(
-        iof.createFromBackendDict(secondState.interaction)
+        Interaction.createFromBackendDict(secondState.interaction)
       );
       expect(responseExploration.getInteraction('invalid state')).toBeNull();
     }

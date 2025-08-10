@@ -31,10 +31,7 @@ import {ConceptCard} from '../../../domain/skill/concept-card.model';
 import {StateCard} from '../../../domain/state_card/state-card.model';
 import {FatigueDetectionService} from './fatigue-detection.service';
 import {SubtitledHtml} from '../../../domain/exploration/subtitled-html.model';
-import {
-  Interaction,
-  InteractionObjectFactory,
-} from '../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../domain/exploration/interaction.model';
 import {ConceptCardBackendApiService} from '../../../domain/skill/concept-card-backend-api.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {TranslateService} from '@ngx-translate/core';
@@ -107,7 +104,6 @@ describe('Conversation flow service', () => {
   let conceptCardManagerService: ConceptCardManagerService;
   let fatigueDetectionService: FatigueDetectionService;
   let pageContextService: PageContextService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let playerPositionService: PlayerPositionService;
   let explorationEngineService: ExplorationEngineService;
 
@@ -151,7 +147,6 @@ describe('Conversation flow service', () => {
     conversationFlowService = TestBed.inject(ConversationFlowService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
     pageContextService = TestBed.inject(PageContextService);
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     userService = TestBed.inject(UserService);
     fatigueDetectionService = TestBed.inject(FatigueDetectionService);
     progressUrlService = TestBed.inject(ProgressUrlService);
@@ -810,7 +805,7 @@ describe('Conversation flow service', () => {
       false
     );
     spyOn(fatigueDetectionService, 'displayTakeBreakMessage');
-    let lastCardInteraction = interactionObjectFactory.createFromBackendDict({
+    let lastCardInteraction = Interaction.createFromBackendDict({
       id: 'TextInput',
       answer_groups: [],
       default_outcome: {

@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import logging
 
+from core import feconf
 from core import utils
 from core.constants import constants
 from core.domain import (
@@ -1684,7 +1685,9 @@ def unpublish_exploration(
         committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION
     )
     taskqueue_services.defer(
-        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
+        feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES'
+        ],
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
         [exploration_id],
     )
