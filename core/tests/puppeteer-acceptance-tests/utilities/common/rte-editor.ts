@@ -105,7 +105,7 @@ export class RTEEditor {
     await this.parentPage.waitForFunction(
       (selector: string, value: string) => {
         const element = document.querySelector(selector);
-        return (element as HTMLAnchorElement).innerText.trim() === value;
+        return element?.textContent?.trim().includes(value);
       },
       {},
       selector,

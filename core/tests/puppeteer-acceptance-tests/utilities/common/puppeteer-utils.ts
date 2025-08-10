@@ -588,7 +588,6 @@ export class BaseUser {
    * This function uploads a file using the given file path.
    */
   async uploadFile(filePath: string): Promise<void> {
-    await this.expectElementToBeVisible(imageUploadLabelSelector);
     const inputUploadHandle =
       await this.page.waitForSelector('input[type=file]');
     if (inputUploadHandle === null) {

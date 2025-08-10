@@ -71,7 +71,7 @@ export class BlogPostEditor extends BaseUser {
    * Function for adding blog post author bio in blog dashboard.
    */
   async addUserBioInBlogDashboard(): Promise<void> {
-    const inputBar = await this.page.waitForSelector(blogAuthorBioField);
+    const inputBar = await this.isElementVisible(blogAuthorBioField);
     // It is used here to avoid filling the user bio each time. We fill it only once when
     // the user is accessing the blog dashboard for the first time.
     if (inputBar) {
@@ -546,8 +546,12 @@ export class BlogPostEditor extends BaseUser {
    * Updates the blog body using all the available RTE features.
    */
   async updateBlogBodyUsingAllRTEFeatures(): Promise<void> {
-    const editBlogBodyElement =
-      await this.page.waitForSelector(editBlogBodySelector);
+    const editBlogBodyElement = await this.page.waitForSelector(
+      editBlogBodySelector,
+      {
+        visible: true,
+      }
+    );
     if (!editBlogBodyElement) {
       throw new Error('Edit blog body element not found.');
     }
