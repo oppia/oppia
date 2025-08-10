@@ -4915,7 +4915,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(contributorIconInLessonInfoSelctor, {
       visible: true,
     });
-
+    await this.waitForElementToStabilize(contributorIconInLessonInfoSelctor);
     await this.clickOn(contributorIconInLessonInfoSelctor);
     await this.expectElementToBeVisible(profileContainerSelector);
 
