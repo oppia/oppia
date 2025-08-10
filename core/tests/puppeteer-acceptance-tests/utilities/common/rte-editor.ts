@@ -19,7 +19,7 @@
 import puppeteer from 'puppeteer';
 
 const rteTextAreaSelector = '.e2e-test-rte';
-const ckeBtnOnSelector = '.cke_button_on';
+const ckeBtnOnClass = 'cke_button_on';
 const paragraphFormatOptionSelector = `a[title*="Format"]`;
 const bodyFocusedSelector = '.cke_focus';
 
@@ -57,7 +57,7 @@ export class RTEEditor {
       (el: Element, cls: string) => {
         return el.classList.contains(cls);
       },
-      ckeBtnOnSelector
+      ckeBtnOnClass
     );
 
     await optionElement.click();
@@ -69,7 +69,7 @@ export class RTEEditor {
       },
       {},
       optionSelector,
-      ckeBtnOnSelector,
+      ckeBtnOnClass,
       !isActive
     );
   }
