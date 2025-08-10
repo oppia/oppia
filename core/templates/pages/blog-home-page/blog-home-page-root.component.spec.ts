@@ -185,13 +185,8 @@ describe('Blog Home Page Root', () => {
   });
 
   it('should render blog homepage breadcrumb link with correct href when viewport is wider than 600px', () => {
-    Object.defineProperty(window, 'innerWidth', {
-      writable: true,
-      configurable: true,
-      value: 1024,
-    });
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1024);
     window.dispatchEvent(new Event('resize'));
-
     fixture.detectChanges();
 
     const linkEl = fixture.debugElement.query(
