@@ -1,8 +1,8 @@
 oppia-lesson-feedback-modal textarea {
-  width: 100%;
-  padding: 8px;
   margin-bottom: 10px;
+  padding: 8px;
   resize: none;
+  width: 100%;
 }
 
 oppia-lesson-feedback-modal input[type="checkbox"] {
