@@ -63,12 +63,13 @@ export class RTEEditor {
     await optionElement.click();
 
     await this.parentPage.waitForFunction(
-      (selector: string, present: boolean) => {
+      (selector: string, cls: string, present: boolean) => {
         const element = document.querySelector(selector);
-        return element?.classList.contains(ckeBtnOnSelector) === present;
+        return element?.classList.contains(cls) === present;
       },
       {},
       optionSelector,
+      ckeBtnOnSelector,
       !isActive
     );
   }
