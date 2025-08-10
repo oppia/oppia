@@ -306,6 +306,7 @@ const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
 const closeModalButton = '.e2e-test-close-modal-btn';
 const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
+const usernameSelector = '.e2e-test-username';
 
 export class LoggedInUser extends BaseUser {
   /**
@@ -3110,6 +3111,14 @@ export class LoggedInUser extends BaseUser {
       await this.clickOn(navbarGetInvolvedTab);
       await this.isElementVisible(navbarGetInvolvedDropdownContainerSelector);
     }
+  }
+
+  /**
+   * Checks if the username matches the expected username.
+   * @param expectedUsername - The expected username.
+   */
+  async expectUsernameToBe(expectedUsername: string): Promise<void> {
+    await this.expectTextContentToBe(usernameSelector, expectedUsername);
   }
 }
 

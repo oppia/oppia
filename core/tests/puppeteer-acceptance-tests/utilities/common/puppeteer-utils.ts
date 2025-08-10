@@ -1062,7 +1062,8 @@ export class BaseUser {
   }
 
   /**
-   * Verify text content inside an element
+   * Waits for the given element to be visible, and then checks if the text
+   * content matches the expected text.
    * @param {string} selector - The selector of the element to get text from.
    * @param {string} text - The expected text content.
    */

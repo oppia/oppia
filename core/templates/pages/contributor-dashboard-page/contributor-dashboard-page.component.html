@@ -2,8 +2,8 @@
   <div class="oppia-contributor-home e2e-test-oppia-contributor-home">
     <div class="oppia-opportunities-tabs">
       <ul class="oppia-opportunities-tabs-list" *ngIf="tabsDetails">
-        <li [ngClass]="{'oppia-active-opportunities-tab': item.key === activeTabName}"
-            class="oppia-opportunities-tab-item"
+        <li [ngClass]="{'oppia-active-opportunities-tab e2e-test-active-tab': item.key === activeTabName}"
+            class="oppia-opportunities-tab-item e2e-test-contribution-tab"
             *ngFor="let item of tabsDetails | keyvalue"
             [attr.aria-label]="item.value.ariaLabel">
           <div *ngIf="item.value.enabled"
