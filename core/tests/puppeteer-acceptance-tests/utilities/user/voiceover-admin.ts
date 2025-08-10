@@ -212,7 +212,7 @@ export class VoiceoverAdmin extends BaseUser {
     await this.expectElementToBeVisible(editVoiceoverArtistButton);
     await this.clickOn(editVoiceoverArtistButton);
 
-    const selector = `div.e2e-test-voiceover-artist-${voiceArtistUsername}`;
+    const selector = `div.e2e-test-voice-artist-${voiceArtistUsername}`;
     await this.expectElementToBeVisible(selector);
 
     const removeBtn = await this.page.waitForSelector(

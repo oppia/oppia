@@ -123,13 +123,13 @@ export class VoiceoverSubmitter extends BaseUser {
   async toggleAudioNeedsUpdateButton(): Promise<void> {
     await this.expectElementToBeVisible(audioStatusUpdateBtnSelector);
     const currentStatus = await this.isElementVisible(
-      `${audioStatusUpdateBtnSelector}.${audioNeedsUpdateIconSelector}`
+      `${audioStatusUpdateBtnSelector}${audioNeedsUpdateIconSelector}`
     );
 
     await this.clickOn(audioStatusUpdateBtnSelector);
 
     await this.expectElementToBeVisible(
-      `${audioStatusUpdateBtnSelector}.${audioDoesNotNeedUpdateIconSelector}`,
+      `${audioStatusUpdateBtnSelector}${audioDoesNotNeedUpdateIconSelector}`,
       !currentStatus
     );
   }
