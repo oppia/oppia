@@ -184,8 +184,12 @@ describe('Blog Home Page Root', () => {
     expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 
-  it('should render breadcrumb link to blog homepage with correct href', () => {
-    (window as any).innerWidth = 1024;
+  it('should render blog homepage breadcrumb link with correct href when viewport is wider than 600px', () => {
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 1024,
+    });
     window.dispatchEvent(new Event('resize'));
 
     fixture.detectChanges();
