@@ -108,7 +108,7 @@ export class RTEEditor {
         return element?.textContent?.trim().includes(value);
       },
       {},
-      selector,
+      paragraphFormatOptionSelector,
       format
     );
   }
