@@ -16,7 +16,7 @@
  * @fileoverview Component for share lesson modal in the new lesson player.
  */
 
-import {Component} from '@angular/core';
+import {Component, Inject, Optional} from '@angular/core';
 import './share-lesson-modal.component.css';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
@@ -24,6 +24,11 @@ import {UrlService} from 'services/contextual/url.service';
 import {AttributionService} from 'services/attribution.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {PageContextService} from 'services/page-context.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {
+  MAT_BOTTOM_SHEET_DATA,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 
 enum SuccessMessages {
   LINK_COPIED = 'Link Copied',
@@ -36,6 +41,8 @@ enum ModalStates {
   EMBED = 'embed',
   ATTRIBUTION = 'attribution',
 }
+
+const MOBILE_SCREEN_BREAKPOINT = 480;
 
 @Component({
   selector: 'oppia-share-lesson-modal',
@@ -53,21 +60,36 @@ export class ShareLessonModalComponent {
   modalState: ModalStates = ModalStates.COPY;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional() private bottomSheetRef: MatBottomSheetRef,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    private data: {
+      explorationTitle: string;
+    },
     private alertsService: AlertsService,
     private urlService: UrlService,
     private attributionService: AttributionService,
     private windowRef: WindowRef,
-    private pageContextService: PageContextService
+    private pageContextService: PageContextService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   ngOnInit(): void {
-    this.ccAttributionText = this.attributionService.generateAttributionText();
+    if (this.data?.explorationTitle !== undefined) {
+      this.explorationTitle = this.data.explorationTitle;
+    }
+
+    this.generateAttributionText();
     this.generateEmbedCode();
   }
 
   closeModal(): void {
-    this.ngbActiveModal.dismiss('cancel');
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss();
+    } else {
+      this.ngbActiveModal.dismiss('cancel');
+    }
   }
 
   copyLessonLink(): void {
@@ -166,5 +188,13 @@ export class ShareLessonModalComponent {
       '//' +
       this.windowRef.nativeWindow.location.host;
     this.embedCode = `<iframe src="${serverName}/embed/exploration/${explorationId}" width="700" height="1000"></iframe>`;
+  }
+
+  generateAttributionText(): void {
+    this.ccAttributionText = `"${this.explorationTitle}" by ${this.getAuthors()}. Oppia. ${this.getPageUrl()}`;
+  }
+
+  isWindowNarrow(): boolean {
+    return this.windowDimensionsService.getWidth() > MOBILE_SCREEN_BREAKPOINT;
   }
 }

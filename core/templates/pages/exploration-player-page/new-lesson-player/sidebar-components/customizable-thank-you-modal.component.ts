@@ -16,18 +16,41 @@
  * @fileoverview Component for the display of a customizable thank you modal.
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, Inject, Input, OnInit, Optional} from '@angular/core';
+import {
+  MAT_BOTTOM_SHEET_DATA,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 
 @Component({
   selector: 'oppia-customizable-thank-you-modal',
   templateUrl: './customizable-thank-you-modal.component.html',
 })
-export class CustomizableThankYouModalComponent extends ConfirmOrCancelModal {
+export class CustomizableThankYouModalComponent implements OnInit {
   @Input() modalMessageI18nKey!: string;
 
-  constructor(private ngbActiveModal: NgbActiveModal) {
-    super(ngbActiveModal);
+  constructor(
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional() private bottomSheetRef: MatBottomSheetRef,
+    @Optional()
+    @Inject(MAT_BOTTOM_SHEET_DATA)
+    private data: {
+      modalMessageI18nKey: string;
+    }
+  ) {}
+
+  ngOnInit(): void {
+    if (this.data?.modalMessageI18nKey !== undefined) {
+      this.modalMessageI18nKey = this.data.modalMessageI18nKey;
+    }
+  }
+
+  closeModal(): void {
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss();
+    } else if (this.ngbActiveModal) {
+      this.ngbActiveModal.dismiss('cancel');
+    }
   }
 }

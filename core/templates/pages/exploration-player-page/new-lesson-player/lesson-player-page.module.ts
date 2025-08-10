@@ -42,6 +42,10 @@ import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar
 import {NewFlagExplorationModalComponent} from './sidebar-components/flag-exploration-modal.component';
 import {CustomizableThankYouModalComponent} from './sidebar-components/customizable-thank-you-modal.component';
 import {LessonFeedbackModalComponent} from './sidebar-components/lesson-feedback-modal.component';
+import {
+  MatBottomSheet,
+  MatBottomSheetModule,
+} from '@angular/material/bottom-sheet';
 
 @NgModule({
   imports: [
@@ -56,6 +60,7 @@ import {LessonFeedbackModalComponent} from './sidebar-components/lesson-feedback
     ExplorationPlayerPageModule,
     SharedComponentsModule,
     ToastrModule,
+    MatBottomSheetModule,
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [

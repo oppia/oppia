@@ -51,7 +51,7 @@
       </a>
     </div>
 
-    <div class="copy-modal-body">
+    <div class="copy-modal-body copy-modal-body-btn">
       <button 
         mat-button 
         class="share-modal-btn" 
@@ -137,7 +137,7 @@
     aria-label="Learn how to attribute this lesson">
     {{'How to attribute this lesson' | translate}}
   </span>
-  <button 
+  <button *ngIf="isWindowNarrow()"
     mat-button 
     class="cancel-button" 
     (click)="closeModal()" 

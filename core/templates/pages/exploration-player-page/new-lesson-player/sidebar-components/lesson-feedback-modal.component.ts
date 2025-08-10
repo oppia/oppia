@@ -16,22 +16,22 @@
  * @fileoverview Component for flag exploration modal.
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import './lesson-feedback-modal.component.css';
 import {FeedbackPopupBackendApiService} from 'pages/exploration-player-page/services/feedback-popup-backend-api.service';
 import {UserService} from 'services/user.service';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {AppConstants} from 'app.constants';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
 @Component({
   selector: 'oppia-lesson-feedback-modal',
   templateUrl: './lesson-feedback-modal.component.html',
   styleUrls: ['./lesson-feedback-modal.component.css'],
 })
-export class LessonFeedbackModalComponent extends ConfirmOrCancelModal {
+export class LessonFeedbackModalComponent {
   feedbackModalId!: string;
   feedbackTitle!: string;
   feedbackText: string = '';
@@ -40,14 +40,13 @@ export class LessonFeedbackModalComponent extends ConfirmOrCancelModal {
   MAX_REVIEW_MESSAGE_LENGTH = AppConstants.MAX_REVIEW_MESSAGE_LENGTH;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional() private bottomSheetRef: MatBottomSheetRef,
     private focusManagerService: FocusManagerService,
     private playerPositionService: PlayerPositionService,
     private userService: UserService,
     private feedbackPopupBackendApiService: FeedbackPopupBackendApiService
-  ) {
-    super(ngbActiveModal);
-  }
+  ) {}
 
   ngOnInit(): void {
     this.userService.getUserInfoAsync().then(userInfo => {
@@ -73,8 +72,20 @@ export class LessonFeedbackModalComponent extends ConfirmOrCancelModal {
           this.playerPositionService.getCurrentStateName()
         )
         .then(() => {
-          this.ngbActiveModal.close();
+          if (this.ngbActiveModal) {
+            this.ngbActiveModal.close();
+          } else {
+            this.bottomSheetRef.dismiss();
+          }
         });
+    }
+  }
+
+  closeModal(): void {
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss('cancel');
+    } else if (this.ngbActiveModal) {
+      this.ngbActiveModal.dismiss('cancel');
     }
   }
 }

@@ -91,8 +91,4 @@ export class AttributionService {
   getPageUrl(): string {
     return this.urlService.getCurrentLocation().href;
   }
-
-  generateAttributionText(): string {
-    return `"${this.explorationTitle}" by ${this.getAuthors()}. Oppia. ${this.getPageUrl()}`;
-  }
 }

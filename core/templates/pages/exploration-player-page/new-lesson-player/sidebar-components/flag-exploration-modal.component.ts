@@ -16,12 +16,13 @@
  * @fileoverview Component for flag exploration modal.
  */
 
-import {Component} from '@angular/core';
+import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import './flag-exploration-modal.component.css';
+import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
 export interface FlagExplorationModalResult {
   report_type: boolean;
@@ -34,7 +35,7 @@ export interface FlagExplorationModalResult {
   templateUrl: './flag-exploration-modal.component.html',
   styleUrls: ['./flag-exploration-modal.component.css'],
 })
-export class NewFlagExplorationModalComponent extends ConfirmOrCancelModal {
+export class NewFlagExplorationModalComponent {
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -43,12 +44,11 @@ export class NewFlagExplorationModalComponent extends ConfirmOrCancelModal {
   flag: boolean = false;
 
   constructor(
-    private ngbActiveModal: NgbActiveModal,
+    @Optional() private ngbActiveModal: NgbActiveModal,
+    @Optional() private bottomSheetRef: MatBottomSheetRef,
     private focusManagerService: FocusManagerService,
     private playerPositionService: PlayerPositionService
-  ) {
-    super(ngbActiveModal);
-  }
+  ) {}
 
   showFlagMessageTextarea(value: boolean): void {
     if (value) {
@@ -59,11 +59,27 @@ export class NewFlagExplorationModalComponent extends ConfirmOrCancelModal {
 
   submitReport(): void {
     if (this.flagMessageTextareaIsShown) {
-      this.ngbActiveModal.close({
-        report_type: this.flag,
-        report_text: this.flagMessageTextareaIsShown,
-        state: this.playerPositionService.getCurrentStateName(),
-      });
+      if (this.bottomSheetRef) {
+        this.bottomSheetRef.dismiss({
+          report_type: this.flag,
+          report_text: this.flagMessage,
+          state: this.playerPositionService.getCurrentStateName(),
+        });
+      } else if (this.ngbActiveModal) {
+        this.ngbActiveModal.close({
+          report_type: this.flag,
+          report_text: this.flagMessage,
+          state: this.playerPositionService.getCurrentStateName(),
+        });
+      }
+    }
+  }
+
+  closeModal(): void {
+    if (this.bottomSheetRef) {
+      this.bottomSheetRef.dismiss();
+    } else if (this.ngbActiveModal) {
+      this.ngbActiveModal.dismiss('cancel');
     }
   }
 }

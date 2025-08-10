@@ -16,7 +16,7 @@
  * @fileoverview Component for the new lesson player sidebar
  */
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Optional} from '@angular/core';
 import {MobileMenuService} from '../../services/mobile-menu.service';
 import './lesson-player-sidebar.component.css';
 import {PageContextService} from 'services/page-context.service';
@@ -36,6 +36,13 @@ import {LearnerLocalNavBackendApiService} from 'pages/exploration-player-page/se
 import {AlertsService} from 'services/alerts.service';
 import {CustomizableThankYouModalComponent} from './customizable-thank-you-modal.component';
 import {LessonFeedbackModalComponent} from './lesson-feedback-modal.component';
+import {
+  MatBottomSheet,
+  MatBottomSheetRef,
+} from '@angular/material/bottom-sheet';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+
+const MOBILE_SCREEN_BREAKPOINT = 480;
 
 @Component({
   selector: 'oppia-lesson-player-sidebar',
@@ -59,9 +66,11 @@ export class LessonPlayerSidebarComponent implements OnInit {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private urlService: UrlService,
-    private ngbModal: NgbModal,
+    @Optional() private ngbModal: NgbModal,
+    @Optional() private bottomSheet: MatBottomSheet,
     private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   ngOnInit(): void {
@@ -89,14 +98,6 @@ export class LessonPlayerSidebarComponent implements OnInit {
       );
   }
 
-  showShareLessonModal(): NgbModalRef {
-    let modalRef: NgbModalRef = this.ngbModal.open(ShareLessonModalComponent, {
-      backdrop: 'static',
-    });
-    modalRef.componentInstance.explorationTitle = this.explorationTitle;
-    return modalRef;
-  }
-
   toggleSidebar(): void {
     this.sidebarIsExpanded = !this.sidebarIsExpanded;
   }
@@ -109,54 +110,130 @@ export class LessonPlayerSidebarComponent implements OnInit {
     );
   }
 
-  showFlagExplorationModal(): void {
-    const modalRef = this.ngbModal.open(NewFlagExplorationModalComponent, {
-      backdrop: 'static',
-    });
-
-    modalRef.result.then(
-      (result: FlagExplorationModalResult) => {
-        this.learnerLocalNavBackendApiService
-          .postReportAsync(this.explorationId, result)
-          .then(
-            () => {},
-            error => {
-              this.alertsService.addWarning(error);
-            }
-          );
-
-        const thankYouModalRef = this.ngbModal.open(
-          CustomizableThankYouModalComponent,
-          {
-            backdrop: true,
-          }
-        );
-
-        thankYouModalRef.componentInstance.modalMessageI18nKey =
-          'I18N_PLAYER_REPORT_SUCCESS_MODAL_BODY';
-      },
-      () => {}
-    );
+  showShareLessonModal():
+    | NgbModalRef
+    | MatBottomSheetRef<ShareLessonModalComponent> {
+    if (this.isMobileScreenSize()) {
+      const bottomSheetRef = this.bottomSheet.open(ShareLessonModalComponent, {
+        data: {
+          explorationTitle: this.explorationTitle,
+        },
+      });
+      return bottomSheetRef;
+    } else {
+      let modalRef: NgbModalRef = this.ngbModal.open(
+        ShareLessonModalComponent,
+        {
+          backdrop: 'static',
+        }
+      );
+      modalRef.componentInstance.explorationTitle = this.explorationTitle;
+      return modalRef;
+    }
   }
 
-  showFeedbackModal(): void {
-    const modalRef = this.ngbModal.open(LessonFeedbackModalComponent, {
-      backdrop: 'static',
-    });
-
-    modalRef.result.then(
-      () => {
-        const thankYouModalRef = this.ngbModal.open(
-          CustomizableThankYouModalComponent,
-          {
-            backdrop: true,
+  showFlagExplorationModal():
+    | NgbModalRef
+    | MatBottomSheetRef<NewFlagExplorationModalComponent> {
+    if (this.isMobileScreenSize()) {
+      const bottomSheetRef = this.bottomSheet.open(
+        NewFlagExplorationModalComponent
+      );
+      bottomSheetRef
+        .afterDismissed()
+        .subscribe((result: FlagExplorationModalResult) => {
+          if (result) {
+            this.learnerLocalNavBackendApiService
+              .postReportAsync(this.explorationId, result)
+              .then(
+                () => {
+                  this.showThankYouModal(
+                    'I18N_PLAYER_REPORT_SUCCESS_MODAL_BODY'
+                  );
+                },
+                error => {
+                  this.alertsService.addWarning(error);
+                }
+              );
           }
-        );
+        });
+      return bottomSheetRef;
+    } else {
+      const modalRef = this.ngbModal.open(NewFlagExplorationModalComponent, {
+        backdrop: 'static',
+      });
 
-        thankYouModalRef.componentInstance.modalMessageI18nKey =
-          'I18N_PLAYER_THANK_FEEDBACK';
-      },
-      () => {}
-    );
+      modalRef.result.then(
+        (result: FlagExplorationModalResult) => {
+          this.learnerLocalNavBackendApiService
+            .postReportAsync(this.explorationId, result)
+            .then(
+              () => {},
+              error => {
+                this.alertsService.addWarning(error);
+              }
+            );
+
+          this.showThankYouModal('I18N_PLAYER_REPORT_SUCCESS_MODAL_BODY');
+        },
+        () => {}
+      );
+      return modalRef;
+    }
+  }
+
+  showFeedbackModal():
+    | NgbModalRef
+    | MatBottomSheetRef<LessonFeedbackModalComponent> {
+    if (this.isMobileScreenSize()) {
+      const bottomSheetRef = this.bottomSheet.open(
+        LessonFeedbackModalComponent
+      );
+      bottomSheetRef.afterDismissed().subscribe(result => {
+        if (result != 'cancel') {
+          this.showThankYouModal('I18N_PLAYER_THANK_FEEDBACK');
+        }
+      });
+      return bottomSheetRef;
+    } else {
+      const modalRef = this.ngbModal.open(LessonFeedbackModalComponent, {
+        backdrop: 'static',
+      });
+
+      modalRef.result.then(
+        () => {
+          this.showThankYouModal('I18N_PLAYER_THANK_FEEDBACK');
+        },
+        () => {}
+      );
+      return modalRef;
+    }
+  }
+
+  showThankYouModal(
+    i18nKey: string
+  ): NgbModalRef | MatBottomSheetRef<CustomizableThankYouModalComponent> {
+    if (this.isMobileScreenSize()) {
+      const bottomSheetRef = this.bottomSheet.open(
+        CustomizableThankYouModalComponent,
+        {
+          data: {
+            modalMessageI18nKey: i18nKey,
+          },
+        }
+      );
+      return bottomSheetRef;
+    } else {
+      const modalRef = this.ngbModal.open(CustomizableThankYouModalComponent, {
+        backdrop: true,
+      });
+
+      modalRef.componentInstance.modalMessageI18nKey = i18nKey;
+      return modalRef;
+    }
+  }
+
+  isMobileScreenSize(): boolean {
+    return this.windowDimensionsService.getWidth() < MOBILE_SCREEN_BREAKPOINT;
   }
 }
