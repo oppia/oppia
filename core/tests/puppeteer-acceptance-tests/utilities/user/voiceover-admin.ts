@@ -298,9 +298,7 @@ export class VoiceoverAdmin extends BaseUser {
    */
   async expectVoiceoverArtistsListToBeEmpty(): Promise<void> {
     await this.expectElementToBeVisible(updatedVoiceoverArtist, false);
-    showMessage(
-      `No voice artists added as voiceover artist! Current voice artists for this exploration are: ${allVoiceoverArtists}`
-    );
+    showMessage('No voiceover artists are added to the exploration!');
   }
 
   /**
