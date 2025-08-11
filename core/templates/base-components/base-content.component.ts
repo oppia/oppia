@@ -59,7 +59,12 @@ export class BaseContentComponent {
     private cookieService: CookieService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private router: Router
-  ) {}
+  ) {
+    this.router.events.subscribe(event => {
+      console.log('Router Event:', event);
+      console.log('Current routes:', this.router.config);
+    });
+  }
 
   ngOnInit(): void {
     /**

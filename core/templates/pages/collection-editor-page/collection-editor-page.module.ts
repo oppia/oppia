@@ -31,12 +31,12 @@ import {CollectionEditorTabComponent} from './editor-tab/collection-editor-tab.c
 import {CollectionEditorSaveModalComponent} from './modals/collection-editor-save-modal.component';
 import {CollectionEditorPrePublishModalComponent} from './modals/collection-editor-pre-publish-modal.component';
 import {ToastrModule} from 'ngx-toastr';
-import {toastrConfig} from 'pages/lightweight-oppia-root/app.module';
 import {FormsModule} from '@angular/forms';
 import {NgModule} from '@angular/core';
 import {CollectionEditorPageComponent} from './collection-editor-page.component';
 import {CollectionEditorPageAuthGuard} from './collection-editor-page-auth.guard';
 import {CollectionEditorPageRootComponent} from './collection-editor-page-root.component';
+import {toastrConfig} from 'pages/oppia-root/app.module';
 
 @NgModule({
   imports: [

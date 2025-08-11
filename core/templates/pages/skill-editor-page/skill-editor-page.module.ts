@@ -38,11 +38,11 @@ import {SkillPreviewTabComponent} from './skill-preview-tab/skill-preview-tab.co
 import {SkillEditorMainTabComponent} from './editor-tab/skill-editor-main-tab.component';
 import {SkillEditorPageComponent} from './skill-editor-page.component';
 import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
-import {toastrConfig} from 'pages/lightweight-oppia-root/app.module';
 import {SkillEditorAccessGuard} from './skill-editor-access.guard';
 import {SkillEditorPageRootComponent} from './skill-editor-page-root.component';
 import {SkillEditorStalenessDetectionService} from './services/skill-editor-staleness-detection.service';
 import {RteHelperService} from 'services/rte-helper.service';
+import {toastrConfig} from 'pages/oppia-root/app.module';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],

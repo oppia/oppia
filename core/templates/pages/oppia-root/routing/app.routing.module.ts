@@ -23,6 +23,7 @@ import {AppConstants} from 'app.constants';
 import {IsLoggedInGuard} from 'pages/lightweight-oppia-root/routing/guards/is-logged-in.guard';
 import {LessonPlayerPageAuthGuard} from 'pages/exploration-player-page/new-lesson-player/lesson-player-auth.guard';
 import {NormalizeUrlCaseGuard} from 'pages/oppia-root/routing/normalize-url-case.guard';
+import {CanAccessSplashPageGuard} from 'pages/lightweight-oppia-root/routing/guards/can-access-splash-page.guard';
 
 // All paths must be defined in constants.ts file.
 // Otherwise pages will have false 404 status code.
@@ -39,6 +40,15 @@ const routes: Route[] = [
     loadChildren: () =>
       import('pages/subtopic-viewer-page/subtopic-viewer-page.module').then(
         m => m.SubtopicViewerPageModule
+      ),
+  },
+  {
+    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
+    pathMatch: 'full',
+    canLoad: [CanAccessSplashPageGuard],
+    loadChildren: () =>
+      import('pages/splash-page/splash-page.module').then(
+        m => m.SplashPageModule
       ),
   },
   {

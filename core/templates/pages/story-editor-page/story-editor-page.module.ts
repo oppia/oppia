@@ -31,11 +31,11 @@ import {StoryEditorComponent} from './editor-tab/story-editor.component';
 import {StoryEditorPageComponent} from './story-editor-page.component';
 import {DeleteChapterModalComponent} from './modal-templates/delete-chapter-modal.component';
 import {NewChapterTitleModalComponent} from './modal-templates/new-chapter-title-modal.component';
-import {toastrConfig} from 'pages/lightweight-oppia-root/app.module';
 import {StoryEditorPageAuthGuard} from './story-editor-page-auth.guard';
 import {StoryEditorPageRootComponent} from './story-editor-page-root.component';
 import {StoryEditorNavbarComponent} from './navbar/story-editor-navbar.component';
 import {StoryEditorNavbarBreadcrumbComponent} from './navbar/story-editor-navbar-breadcrumb.component';
+import {toastrConfig} from 'pages/oppia-root/app.module';
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [

@@ -19,12 +19,12 @@
 import 'pages/common-imports';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {enableProdMode} from '@angular/core';
-import {LighweightAppModule} from 'pages/lightweight-oppia-root/app.module';
+import {SplashPageModule} from 'pages/splash-page/splash-page.module';
 
 enableProdMode();
 
 platformBrowserDynamic()
-  .bootstrapModule(LighweightAppModule)
+  .bootstrapModule(SplashPageModule)
   .catch(err => console.error(err));
 
 // This prevents angular pages causing side effects to hybrid pages.
