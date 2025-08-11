@@ -54,7 +54,7 @@ describe('Translation Submitter', function () {
     await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
-      'Understanding Numerators & Denominators',
+      'Understanding Numerators and Denominators',
       'Recognize equivalent fractions'
     );
     await curriculumAdm.createAndPublishStoryWithChapter(
