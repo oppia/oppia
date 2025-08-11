@@ -32,11 +32,13 @@ if MYPY:  # pragma: no cover
 class ExplorationStart(base.BaseLearnerActionSpec):
     """Learner action that's recorded when a learner starts an exploration."""
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'state_name',
-        'description': 'Initial state name',
-        'schema': {
-            'type': 'unicode',
-        },
-        'default_value': ''
-    }]
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'state_name',
+            'description': 'Initial state name',
+            'schema': {
+                'type': 'unicode',
+            },
+            'default_value': '',
+        }
+    ]

@@ -19,7 +19,9 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.interactions.NumberWithUnits import NumberWithUnits # pylint: disable=unused-import # isort: skip
+from extensions.interactions.NumberWithUnits import (  # pylint: disable=unused-import
+    NumberWithUnits,
+)
 
 
 class NumberWithUnitsTests(test_utils.GenericTestBase):

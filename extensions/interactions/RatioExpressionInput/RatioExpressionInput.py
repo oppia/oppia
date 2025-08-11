@@ -40,34 +40,35 @@ class RatioExpressionInput(base.BaseInteraction):
     can_have_solution: bool = True
     show_generic_submit_button: bool = True
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'placeholder',
-        'description': 'Custom placeholder text (optional)',
-        'schema': {
-            'type': 'custom',
-            'obj_type': 'SubtitledUnicode'
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'placeholder',
+            'description': 'Custom placeholder text (optional)',
+            'schema': {'type': 'custom', 'obj_type': 'SubtitledUnicode'},
+            'default_value': {'content_id': None, 'unicode_str': ''},
         },
-        'default_value': {
-            'content_id': None,
-            'unicode_str': ''
-        }
-    }, {
-        'name': 'numberOfTerms',
-        'description': (
-            'The number of elements that the answer must have.'
-            ' If set to 0, a ratio of any length will be accepted.'
-            ' The number of elements should not be greater than 10.'),
-        'schema': {
-            'type': 'int',
-            'validators': [{
-                'id': 'is_at_least',
-                'min_value': 0,
-            }, {
-                'id': 'is_at_most',
-                'max_value': 10,
-            }],
+        {
+            'name': 'numberOfTerms',
+            'description': (
+                'The number of elements that the answer must have.'
+                ' If set to 0, a ratio of any length will be accepted.'
+                ' The number of elements should not be greater than 10.'
+            ),
+            'schema': {
+                'type': 'int',
+                'validators': [
+                    {
+                        'id': 'is_at_least',
+                        'min_value': 0,
+                    },
+                    {
+                        'id': 'is_at_most',
+                        'max_value': 10,
+                    },
+                ],
+            },
+            'default_value': 0,
         },
-        'default_value': 0,
-    }]
+    ]
 
     _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = []

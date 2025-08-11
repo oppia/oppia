@@ -48,33 +48,38 @@ class ImageClickInput(base.BaseInteraction):
 
     _image_and_regions_default_value: domain.ImageAndRegionDict = {
         'imagePath': '',
-        'labeledRegions': _labeled_regions_list
+        'labeledRegions': _labeled_regions_list,
     }
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'imageAndRegions',
-        'description': 'Image',
-        'schema': {
-            'type': 'custom',
-            'obj_type': 'ImageWithRegions',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'imageAndRegions',
+            'description': 'Image',
+            'schema': {
+                'type': 'custom',
+                'obj_type': 'ImageWithRegions',
+            },
+            'default_value': _image_and_regions_default_value,
         },
-        'default_value': _image_and_regions_default_value,
-    }, {
-        'name': 'highlightRegionsOnHover',
-        'description': 'Highlight regions when the learner hovers over them',
-        'schema': {
-            'type': 'bool',
+        {
+            'name': 'highlightRegionsOnHover',
+            'description': 'Highlight regions when the learner hovers over them',
+            'schema': {
+                'type': 'bool',
+            },
+            'default_value': False,
         },
-        'default_value': False
-    }]
+    ]
 
-    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
-        # Bar chart with answer counts.
-        'id': 'ClickHexbins',
-        'options': {},
-        'calculation_id': 'AnswerFrequencies',
-        # Adding addressed info for hexbins needs more design work, but
-        # conceptually should be possible by highlighting which hexagons are
-        # explicitly addressed.
-        'addressed_info_is_supported': False,
-    }]
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [
+        {
+            # Bar chart with answer counts.
+            'id': 'ClickHexbins',
+            'options': {},
+            'calculation_id': 'AnswerFrequencies',
+            # Adding addressed info for hexbins needs more design work, but
+            # conceptually should be possible by highlighting which hexagons are
+            # explicitly addressed.
+            'addressed_info_is_supported': False,
+        }
+    ]

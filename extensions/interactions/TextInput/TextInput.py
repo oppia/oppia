@@ -49,59 +49,61 @@ class TextInput(base.BaseInteraction):
     # of collisions, do not add a new parameter with this name to this list.
     # TODO(#20445): Migrate old definitions which still contain the 'columns'
     # parameter.
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'placeholder',
-        'description': 'Placeholder text (optional)',
-        'schema': {
-            'type': 'custom',
-            'obj_type': 'SubtitledUnicode'
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'placeholder',
+            'description': 'Placeholder text (optional)',
+            'schema': {'type': 'custom', 'obj_type': 'SubtitledUnicode'},
+            'default_value': {'content_id': None, 'unicode_str': ''},
         },
-        'default_value': {
-            'content_id': None,
-            'unicode_str': ''
-        }
-    }, {
-        'name': 'rows',
-        'description': 'Height (in rows)',
-        'schema': {
-            'type': 'int',
-            'validators': [{
-                'id': 'is_at_least',
-                'min_value': 1,
-            }, {
-                'id': 'is_at_most',
-                'max_value': 10,
-            }]
+        {
+            'name': 'rows',
+            'description': 'Height (in rows)',
+            'schema': {
+                'type': 'int',
+                'validators': [
+                    {
+                        'id': 'is_at_least',
+                        'min_value': 1,
+                    },
+                    {
+                        'id': 'is_at_most',
+                        'max_value': 10,
+                    },
+                ],
+            },
+            'default_value': 1,
         },
-        'default_value': 1,
-    }, {
-        'name': 'catchMisspellings',
-        'description': (
-            'Catch Misspellings (Detect if answer is misspelled'
-            ' and nudge the learner to correct the misspelling)'
-        ),
-        'schema': {
-            'type': 'bool'
+        {
+            'name': 'catchMisspellings',
+            'description': (
+                'Catch Misspellings (Detect if answer is misspelled'
+                ' and nudge the learner to correct the misspelling)'
+            ),
+            'schema': {'type': 'bool'},
+            'default_value': False,
         },
-        'default_value': False,
-    }]
+    ]
 
-    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
-        # Table with answer counts for top N answers.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top answers',
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [
+        {
+            # Table with answer counts for top N answers.
+            'id': 'FrequencyTable',
+            'options': {
+                'column_headers': ['Answer', 'Count'],
+                'title': 'Top answers',
+            },
+            'calculation_id': 'Top10AnswerFrequencies',
+            'addressed_info_is_supported': True,
         },
-        'calculation_id': 'Top10AnswerFrequencies',
-        'addressed_info_is_supported': True,
-    }, {
-        # Table with answer counts for top N unresolved answers.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top unresolved answers',
+        {
+            # Table with answer counts for top N unresolved answers.
+            'id': 'FrequencyTable',
+            'options': {
+                'column_headers': ['Answer', 'Count'],
+                'title': 'Top unresolved answers',
+            },
+            'calculation_id': 'TopNUnresolvedAnswersByFrequency',
+            'addressed_info_is_supported': True,
         },
-        'calculation_id': 'TopNUnresolvedAnswersByFrequency',
-        'addressed_info_is_supported': True,
-    }]
+    ]

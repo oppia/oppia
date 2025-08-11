@@ -32,46 +32,53 @@ if MYPY:  # pragma: no cover
 class AnswerSubmit(base.BaseLearnerActionSpec):
     """Learner action that's recorded when an answer is submitted."""
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'state_name',
-        'description': 'State name',
-        'schema': {
-            'type': 'unicode',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'state_name',
+            'description': 'State name',
+            'schema': {
+                'type': 'unicode',
+            },
+            'default_value': '',
         },
-        'default_value': ''
-    }, {
-        'name': 'dest_state_name',
-        'description': 'Destination state name',
-        'schema': {
-            'type': 'unicode',
+        {
+            'name': 'dest_state_name',
+            'description': 'Destination state name',
+            'schema': {
+                'type': 'unicode',
+            },
+            'default_value': '',
         },
-        'default_value': ''
-    }, {
-        'name': 'interaction_id',
-        'description': 'ID of the interaction',
-        'schema': {
-            'type': 'unicode',
+        {
+            'name': 'interaction_id',
+            'description': 'ID of the interaction',
+            'schema': {
+                'type': 'unicode',
+            },
+            'default_value': '',
         },
-        'default_value': ''
-    }, {
-        'name': 'submitted_answer',
-        'description': 'Submitted answer',
-        'schema': {
-            'type': 'unicode',
+        {
+            'name': 'submitted_answer',
+            'description': 'Submitted answer',
+            'schema': {
+                'type': 'unicode',
+            },
+            'default_value': '',
         },
-        'default_value': ''
-    }, {
-        'name': 'feedback',
-        'description': 'Feedback for the submitted answer',
-        'schema': {
-            'type': 'unicode',
+        {
+            'name': 'feedback',
+            'description': 'Feedback for the submitted answer',
+            'schema': {
+                'type': 'unicode',
+            },
+            'default_value': '',
         },
-        'default_value': ''
-    }, {
-        'name': 'time_spent_state_in_msecs',
-        'description': 'Time spent in state in milliseconds',
-        'schema': {
-            'type': 'int',
+        {
+            'name': 'time_spent_state_in_msecs',
+            'description': 'Time spent in state in milliseconds',
+            'schema': {
+                'type': 'int',
+            },
+            'default_value': 0,
         },
-        'default_value': 0
-    }]
+    ]

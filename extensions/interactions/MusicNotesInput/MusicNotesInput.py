@@ -33,7 +33,8 @@ class MusicNotesInput(base.BaseInteraction):
     name: str = 'Music Notes Input'
     description: str = (
         'Allows learners to drag and drop notes onto the lines of a music '
-        'staff.')
+        'staff.'
+    )
     display_mode: str = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids: List[str] = ['midijs']
     answer_type: str = 'MusicPhrase'
@@ -43,31 +44,36 @@ class MusicNotesInput(base.BaseInteraction):
     can_have_solution: bool = True
     show_generic_submit_button: bool = True
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'sequenceToGuess',
-        'description': 'Correct sequence of notes',
-        'schema': {
-            'type': 'custom',
-            'obj_type': 'MusicPhrase',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'sequenceToGuess',
+            'description': 'Correct sequence of notes',
+            'schema': {
+                'type': 'custom',
+                'obj_type': 'MusicPhrase',
+            },
+            'default_value': [],
         },
-        'default_value': [],
-    }, {
-        'name': 'initialSequence',
-        'description': 'Starting notes on the staff',
-        'schema': {
-            'type': 'custom',
-            'obj_type': 'MusicPhrase',
+        {
+            'name': 'initialSequence',
+            'description': 'Starting notes on the staff',
+            'schema': {
+                'type': 'custom',
+                'obj_type': 'MusicPhrase',
+            },
+            'default_value': [],
         },
-        'default_value': [],
-    }]
+    ]
 
-    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
-        # Table with answer counts for top N answers.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top 10 answers',
-        },
-        'calculation_id': 'Top10AnswerFrequencies',
-        'addressed_info_is_supported': True,
-    }]
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [
+        {
+            # Table with answer counts for top N answers.
+            'id': 'FrequencyTable',
+            'options': {
+                'column_headers': ['Answer', 'Count'],
+                'title': 'Top 10 answers',
+            },
+            'calculation_id': 'Top10AnswerFrequencies',
+            'addressed_info_is_supported': True,
+        }
+    ]

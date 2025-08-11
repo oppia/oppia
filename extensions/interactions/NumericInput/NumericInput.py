@@ -32,7 +32,8 @@ class NumericInput(base.BaseInteraction):
 
     name: str = 'Number Input'
     description: str = (
-        'Allows learners to enter integers and floating point numbers.')
+        'Allows learners to enter integers and floating point numbers.'
+    )
     display_mode: str = base.DISPLAY_MODE_INLINE
     is_trainable: bool = False
     _dependency_ids: List[str] = []
@@ -43,23 +44,24 @@ class NumericInput(base.BaseInteraction):
     can_have_solution: bool = True
     show_generic_submit_button: bool = True
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'requireNonnegativeInput',
-        'description': (
-            'Allow only input greater than or equal to zero.'),
-        'schema': {
-            'type': 'bool'
-        },
-        'default_value': False
-    }]
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'requireNonnegativeInput',
+            'description': ('Allow only input greater than or equal to zero.'),
+            'schema': {'type': 'bool'},
+            'default_value': False,
+        }
+    ]
 
-    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
-        # Table with answer counts for top N answers.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top 10 answers',
-        },
-        'calculation_id': 'Top10AnswerFrequencies',
-        'addressed_info_is_supported': True,
-    }]
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [
+        {
+            # Table with answer counts for top N answers.
+            'id': 'FrequencyTable',
+            'options': {
+                'column_headers': ['Answer', 'Count'],
+                'title': 'Top 10 answers',
+            },
+            'calculation_id': 'Top10AnswerFrequencies',
+            'addressed_info_is_supported': True,
+        }
+    ]

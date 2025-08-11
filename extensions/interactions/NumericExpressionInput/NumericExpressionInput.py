@@ -39,23 +39,22 @@ class NumericExpressionInput(base.BaseInteraction):
     can_have_solution: bool = True
     show_generic_submit_button: bool = True
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'placeholder',
-        'description': 'Placeholder text',
-        'schema': {
-            'type': 'custom',
-            'obj_type': 'SubtitledUnicode'
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'placeholder',
+            'description': 'Placeholder text',
+            'schema': {'type': 'custom', 'obj_type': 'SubtitledUnicode'},
+            'default_value': {
+                'content_id': None,
+                'unicode_str': 'Type an expression here, using only numbers.',
+            },
         },
-        'default_value': {
-            'content_id': None,
-            'unicode_str': 'Type an expression here, using only numbers.'
-        }
-    }, {
-        'name': 'useFractionForDivision',
-        'description': (
-            'Represent division using fractions (rather than ÷).'),
-        'schema': {
-            'type': 'bool'
+        {
+            'name': 'useFractionForDivision',
+            'description': (
+                'Represent division using fractions (rather than ÷).'
+            ),
+            'schema': {'type': 'bool'},
+            'default_value': False,
         },
-        'default_value': False
-    }]
+    ]

@@ -44,50 +44,62 @@ class InteractiveMap(base.BaseInteraction):
     can_have_solution: bool = False
     show_generic_submit_button: bool = False
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'latitude',
-        'description': 'Starting center latitude (-90 to 90)',
-        'schema': {
-            'type': 'float',
-            'validators': [{
-                'id': 'is_at_least',
-                'min_value': -90.0,
-            }, {
-                'id': 'is_at_most',
-                'max_value': 90.0,
-            }]
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'latitude',
+            'description': 'Starting center latitude (-90 to 90)',
+            'schema': {
+                'type': 'float',
+                'validators': [
+                    {
+                        'id': 'is_at_least',
+                        'min_value': -90.0,
+                    },
+                    {
+                        'id': 'is_at_most',
+                        'max_value': 90.0,
+                    },
+                ],
+            },
+            'default_value': 0.0,
         },
-        'default_value': 0.0,
-    }, {
-        'name': 'longitude',
-        'description': 'Starting center longitude (-180 to 180)',
-        'schema': {
-            'type': 'float',
-            'validators': [{
-                'id': 'is_at_least',
-                'min_value': -180.0,
-            }, {
-                'id': 'is_at_most',
-                'max_value': 180.0,
-            }]
+        {
+            'name': 'longitude',
+            'description': 'Starting center longitude (-180 to 180)',
+            'schema': {
+                'type': 'float',
+                'validators': [
+                    {
+                        'id': 'is_at_least',
+                        'min_value': -180.0,
+                    },
+                    {
+                        'id': 'is_at_most',
+                        'max_value': 180.0,
+                    },
+                ],
+            },
+            'default_value': 0.0,
         },
-        'default_value': 0.0,
-    }, {
-        'name': 'zoom',
-        'description': 'Starting zoom level (0 shows the entire earth)',
-        'schema': {
-            'type': 'float',
+        {
+            'name': 'zoom',
+            'description': 'Starting zoom level (0 shows the entire earth)',
+            'schema': {
+                'type': 'float',
+            },
+            'default_value': 0.0,
         },
-        'default_value': 0.0,
-    }]
+    ]
 
-    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [{
-        # Table with answer counts for top N answers.
-        'id': 'FrequencyTable',
-        'options': {
-            'column_headers': ['Answer', 'Count'],
-            'title': 'Top 10 answers',
-        },
-        'calculation_id': 'Top10AnswerFrequencies',
-        'addressed_info_is_supported': True,
-    }]
+    _answer_visualization_specs: List[base.AnswerVisualizationSpecsDict] = [
+        {
+            # Table with answer counts for top N answers.
+            'id': 'FrequencyTable',
+            'options': {
+                'column_headers': ['Answer', 'Count'],
+                'title': 'Top 10 answers',
+            },
+            'calculation_id': 'Top10AnswerFrequencies',
+            'addressed_info_is_supported': True,
+        }
+    ]

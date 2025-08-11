@@ -19,7 +19,9 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from extensions.interactions.RatioExpressionInput import RatioExpressionInput # pylint: disable=unused-import, line-too-long # isort: skip
+from extensions.interactions.RatioExpressionInput import (  # pylint: disable=unused-import
+    RatioExpressionInput,
+)
 
 
 class RatioExpressionInputTests(test_utils.GenericTestBase):

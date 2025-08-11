@@ -39,23 +39,26 @@ class AlgebraicExpressionInput(base.BaseInteraction):
     can_have_solution: bool = True
     show_generic_submit_button: bool = True
 
-    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [{
-        'name': 'allowedVariables',
-        'description': (
-            'Shortcut variables that the learner can access in the on-screen '
-            'keyboard. (The order of these variables will be reflected in the '
-            'learner\'s keyboard)'),
-        'schema': {
-            'type': 'custom',
-            'obj_type': 'AllowedVariables',
+    _customization_arg_specs: List[domain.CustomizationArgSpecsDict] = [
+        {
+            'name': 'allowedVariables',
+            'description': (
+                'Shortcut variables that the learner can access in the on-screen '
+                'keyboard. (The order of these variables will be reflected in the '
+                'learner\'s keyboard)'
+            ),
+            'schema': {
+                'type': 'custom',
+                'obj_type': 'AllowedVariables',
+            },
+            'default_value': [],
         },
-        'default_value': []
-    }, {
-        'name': 'useFractionForDivision',
-        'description': (
-            'Represent division using fractions (rather than ÷).'),
-        'schema': {
-            'type': 'bool'
+        {
+            'name': 'useFractionForDivision',
+            'description': (
+                'Represent division using fractions (rather than ÷).'
+            ),
+            'schema': {'type': 'bool'},
+            'default_value': False,
         },
-        'default_value': False
-    }]
+    ]
