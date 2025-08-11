@@ -128,7 +128,7 @@ export class BaseUser {
 
         if (mobile) {
           // This is the default viewport and user agent settings for iPhone 6.
-          await this.page.setViewport({
+          this.page.setViewport({
             width: 375,
             height: 667,
             deviceScaleFactor: 2,
@@ -136,7 +136,7 @@ export class BaseUser {
             hasTouch: true,
             isLandscape: false,
           });
-          await this.page.setUserAgent(
+          this.page.setUserAgent(
             'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
               'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
               'Mobile/15A372 Safari/604.1'
@@ -160,21 +160,18 @@ export class BaseUser {
           }
 
           const config = {
-            followNewTab: true,
-            fps: 25,
-            ffmpeg_Path: null,
             // Below dimensions are of recorded video.
             videoFrame: {
-              width: 1280,
-              height: 720,
+              width: !mobile ? 1280 : 750,
+              height: !mobile ? 720 : 1334,
             },
-            aspectRatio: '16:9',
+            aspectRatio: !mobile ? '16:9' : '9:16',
             videoCrf: 18,
             videoCodec: 'libx264',
             videoPreset: 'medium',
             videoBitrate: 1000,
             autopad: {
-              color: 'black',
+              color: 'green',
             },
             waitForFrameBeforeStart: 2000,
             waitForFrameAfterPageLoad: 2000,
@@ -183,10 +180,16 @@ export class BaseUser {
               // Additional ffmpeg flags for stability.
               '-movflags',
               '+faststart',
-              '-max_muxing_queue_size',
-              '9999',
             ],
           };
+
+          // Ensure compositor has produced frames before starting the recorder
+          await this.page.evaluate(
+            () =>
+              new Promise<void>(r => {
+                requestAnimationFrame(() => requestAnimationFrame(() => r()));
+              })
+          );
 
           const fullScreenRecordingPath = path.join(outputDir, outputFileName);
           showMessage(`Saving screen recording to ${fullScreenRecordingPath}`);
