@@ -33,6 +33,18 @@ const languageSelector = '.e2e-test-language-selector';
 const selectedLanguageSelector = '.e2e-test-language-selector-selected';
 const featuredLanguageOptionSelector = '.e2e-test-featured-language';
 const languageOptionSelector = '.e2e-test-language-selector-option';
+const topicSelector = '.e2e-test-topic-selector';
+const selectedTopicSelector = '.e2e-test-topic-selector-selected';
+const topicOptionSelector = '.e2e-test-topic-selector-option';
+const opportunityItemSelector = '.e2e-test-opportunity-list-item';
+const opportunityItemHeadingSelector =
+  '.e2e-test-opportunity-list-item-heading';
+const opportunitySubHeadingSelector =
+  '.e2e-test-opportunity-list-item-subheading';
+const opportunityTranslateButtonSelector =
+  '.e2e-test-opportunity-list-item-button';
+const translateTextModalHeaderContainerSelector =
+  '.e2e-test-translate-text-header-container';
 
 export class TranslationSubmitter extends BaseUser {
   /**
@@ -47,6 +59,59 @@ export class TranslationSubmitter extends BaseUser {
 
     // TODO: Post-check: Verify if the page is loaded.
   }
+
+  async clickOnTranslateButtonInTranslateTextTab(
+    chapterName: string,
+    storyName: string
+  ) {
+    await this.expectElementToBeVisible(opportunityItemSelector);
+
+    const opportunityItems = await this.page.$$(opportunityItemSelector);
+    let opportunityItem: ElementHandle<Element> | null = null;
+    for (const opportunityItemElement of opportunityItems) {
+      const opportunityItemHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunityItemHeadingSelector
+      );
+      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunitySubHeadingSelector
+      );
+
+      if (
+        opportunityItemHeading === chapterName &&
+        opportunityItemSubHeading === storyName
+      ) {
+        opportunityItem = opportunityItemElement;
+        break;
+      }
+    }
+
+    if (!opportunityItem) {
+      throw new Error(
+        `Opportunity item for chapter ${chapterName} and story ${storyName} not found.`
+      );
+    }
+
+    // Click on translate button in the opportunity item.
+    const translateButton = await opportunityItem.waitForSelector(
+      opportunityTranslateButtonSelector
+    );
+    if (!translateButton) {
+      throw new Error(
+        `Translate button for chapter ${chapterName} and story ${storyName} not found.`
+      );
+    }
+    await translateButton.click();
+
+    // Verify that the translation editor is opened.
+    await this.expectElementToBeVisible(
+      translateTextModalHeaderContainerSelector
+    );
+  }
+
   /**
    * Checks if the pagination button is visible or not.
    * @param button - The button to check for.
@@ -75,7 +140,7 @@ export class TranslationSubmitter extends BaseUser {
       featuredLanguageOptionSelector,
       languageOptionSelector,
     ]) {
-      await this.page.waitForSelector(optionSelector);
+      await this.expectElementToBeVisible(optionSelector);
       // Get the language option element.
       for (const option of await this.page.$$(optionSelector)) {
         const optionText = await option.evaluate(el => el.textContent?.trim());
@@ -100,6 +165,36 @@ export class TranslationSubmitter extends BaseUser {
 
     // Verify language is selected.
     await this.expectTextContentToContain(selectedLanguageSelector, language);
+  }
+
+  /**
+   * Clicks on subject selection dropdown and selects the given subject.
+   * @param subject - The subject to select.
+   */
+  async selectSubjectInTranslateTextTab(subject: string): Promise<void> {
+    await this.expectElementToBeVisible(topicSelector);
+    await this.clickOn(topicSelector);
+
+    // Find the subject option in the dropdown.
+    let subjectOption: ElementHandle<Element> | null = null;
+    await this.expectElementToBeVisible(topicOptionSelector);
+    for (const option of await this.page.$$(topicOptionSelector)) {
+      const optionText = await option.evaluate(el => el.textContent?.trim());
+      if (optionText?.includes(subject)) {
+        subjectOption = option;
+        break;
+      }
+    }
+
+    if (!subjectOption) {
+      throw new Error(`Subject ${subject} not found.`);
+    }
+
+    // Click on the subject option.
+    await subjectOption.click();
+
+    // Verify subject is selected.
+    await this.expectTextContentToContain(selectedTopicSelector, subject);
   }
 
   /**

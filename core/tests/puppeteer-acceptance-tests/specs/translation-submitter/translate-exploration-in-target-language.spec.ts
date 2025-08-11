@@ -65,14 +65,22 @@ describe('Translation Submitter', function () {
       'Fractions'
     );
 
+    await curriculumAdm.createAndPublishTopic(
+      'Test Topic 1',
+      'Test Subtopic 1',
+      'Test Skill 1'
+    );
+    await curriculumAdm.addStoryToTopic(
+      'Test Story 1',
+      'test-story-1',
+      'Test Topic 1'
+    );
+
     for (const id of explorationIds) {
-      await curriculumAdm.openStoryEditor(
-        'Dividing a Birthday Cake',
-        'Fractions'
-      );
+      await curriculumAdm.openStoryEditor('Test Story 1', 'Test Topic 1');
       await curriculumAdm.addChapter(`Chapter ${id}`, id);
     }
-  }, 600000);
+  }, 900000);
 
   it('should be able to check translation opportunities', async function () {
     // Navigate to the contributor dashboard.
@@ -107,6 +115,14 @@ describe('Translation Submitter', function () {
     await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
     await translationSubmitter.expectPaginationButtonToBeVisible('previous');
     await translationSubmitter.clickOnPaginationButton('previous');
+
+    // Change the subject.
+    await translationSubmitter.selectSubjectInTranslateTextTab('Fractions');
+    await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
+    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+      'The Birthday Cake Arrives',
+      'Dividing a Birthday Cake'
+    );
   });
 
   afterAll(async function () {
