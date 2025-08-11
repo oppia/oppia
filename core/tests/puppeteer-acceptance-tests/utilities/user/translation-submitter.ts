@@ -196,6 +196,16 @@ export class TranslationSubmitter extends BaseUser {
     await this.expectElementToBeVisible(saveImageButtonSelector);
     await this.clickOn(saveImageButtonSelector);
     await this.expectElementToBeVisible(saveImageButtonSelector, false);
+
+    await this.page.waitForFunction(
+      (selector: string, n: number) => {
+        const elements = document.querySelectorAll(selector);
+        return elements.length === n;
+      },
+      {},
+      imageSelector,
+      2
+    );
   }
 
   /**

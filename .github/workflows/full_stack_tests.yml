@@ -50,6 +50,7 @@ jobs:
       matrix:
         suite:
           - name: translation-submitter/translate-exploration-in-target-language
+          - name: translation-submitter/check-their-accomplishment
         run1: [1, 2, 3, 4]
         run2: [1, 2, 3, 4]
         mobile: [false, true]
