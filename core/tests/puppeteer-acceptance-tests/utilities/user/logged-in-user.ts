@@ -107,6 +107,7 @@ const reportExplorationTextAreaSelector =
 const submitReportButtonSelector = '.e2e-test-submit-report-button';
 const feedbackThreadSelector = '.e2e-test-feedback-thread';
 const feedbackMessageSelector = '.e2e-test-feedback-message';
+const latestFeedbackMessageSelector = '.e2e-test-conversation-feedback-latest';
 const desktopCompletedLessonsSectionSelector =
   '.e2e-test-completed-community-lessons-section';
 const lessonTileTitleSelector =
@@ -303,6 +304,7 @@ const learnerPlaylistModalSelector = 'oppia-learner-playlist-modal';
 const profileDropdownToggleSelector = '.oppia-navbar-dropdown-toggle';
 const profileDropdownContainerSelector = '.e2e-test-profile-dropdown-container';
 const profileDropdownAnchorSelector = `${profileDropdownContainerSelector} .nav-link`;
+const closeModalButton = '.e2e-test-close-modal-btn';
 const goalsSectionContainerSelector = '.e2e-test-goals-section-container';
 
 export class LoggedInUser extends BaseUser {
@@ -1103,7 +1105,10 @@ export class LoggedInUser extends BaseUser {
           `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
         );
       }
-      await this.page.waitForSelector(toastMessageSelector, {hidden: true});
+      if (this.isViewportAtMobileWidth()) {
+        await this.page.click(toastMessageSelector);
+      }
+      await this.expectElementToBeVisible(toastMessageSelector, false);
     } catch (error) {
       const newError = new Error(`Failed to match toast message: ${error}`);
       newError.stack = error.stack;
@@ -1745,14 +1750,15 @@ export class LoggedInUser extends BaseUser {
     });
     await this.clickOn(reportExplorationButtonSelector);
     await this.page.waitForSelector(issueTypeSelector);
-    const issueTypeElement = await this.page.$(issueTypeSelector);
-    await issueTypeElement?.click();
-    await this.clickOn(reportExplorationTextAreaSelector);
+    // Wait for checkbox to animate before clicking on it.
+    // This ensures that the checkbox is checked.
+    await this.page.waitForTimeout(100);
+    await this.page.click(issueTypeSelector);
     await this.type(reportExplorationTextAreaSelector, issueDescription);
 
     await this.clickOn(submitReportButtonSelector);
 
-    await this.clickOn('Close');
+    await this.clickOn(closeModalButton);
 
     await this.page.waitForSelector(explorationSuccessfullyFlaggedMessage, {
       hidden: true,
@@ -1813,6 +1819,18 @@ export class LoggedInUser extends BaseUser {
         `Response does not match the expected value. Expected: ${expectedResponse}, Found: ${actualResponse}`
       );
     }
+  }
+
+  /**
+   * Verifies that the feedback and response match the expected values.
+   * @param {string} expectedFeedback - The expected feedback.
+   */
+  async expectResponseFeedbackToBe(expectedFeedback: string): Promise<void> {
+    await this.expectElementToBeVisible(latestFeedbackMessageSelector);
+    await this.expectTextContentToBe(
+      latestFeedbackMessageSelector,
+      expectedFeedback
+    );
   }
 
   /**
