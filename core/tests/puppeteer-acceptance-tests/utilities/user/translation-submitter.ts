@@ -45,6 +45,14 @@ const opportunityTranslateButtonSelector =
   '.e2e-test-opportunity-list-item-button';
 const translateTextModalHeaderContainerSelector =
   '.e2e-test-translate-text-header-container';
+const textToTranslateContainerSelector = '.oppia-text-to-translate-container';
+const skipTranslationButtonSelector = '.e2e-test-skip-translation-button';
+const copyButtonSelector = '.e2e-test-copy-button';
+const closeModalButtonSelector = '.e2e-test-close-modal-button';
+const imageSelector = '.e2e-test-image';
+const saveImageButtonSelector = '.e2e-test-close-rich-text-component-editor';
+const textInputSelector = '.e2e-test-text-input';
+const descriptionSelector = '.e2e-test-description-box';
 
 export class TranslationSubmitter extends BaseUser {
   /**
@@ -58,6 +66,31 @@ export class TranslationSubmitter extends BaseUser {
     await this.clickOn(selector);
 
     // TODO: Post-check: Verify if the page is loaded.
+  }
+
+  /**
+   * Clicks on the skip translation button in the translation modal.
+   * This will skip the current translation and load the next one.
+   */
+  async clickOnSkipTranslationButton() {
+    await this.expectElementToBeVisible(textToTranslateContainerSelector);
+    const preClickContent = await this.page.evaluate((sel: string) => {
+      return document.querySelector(sel)?.innerHTML;
+    }, textToTranslateContainerSelector);
+
+    await this.expectElementToBeVisible(skipTranslationButtonSelector);
+    await this.clickOn(skipTranslationButtonSelector);
+
+    // Verify that the text to translate container is updated.
+    await this.page.waitForFunction(
+      (sel: string, htmlContent: string) => {
+        const content = document.querySelector(sel)?.innerHTML;
+        return content !== htmlContent;
+      },
+      {},
+      textToTranslateContainerSelector,
+      preClickContent ?? ''
+    );
   }
 
   async clickOnTranslateButtonInTranslateTextTab(
@@ -113,6 +146,20 @@ export class TranslationSubmitter extends BaseUser {
   }
 
   /**
+   * Closes the translation modal.
+   */
+  async closeTranslateTextModal(): Promise<void> {
+    await this.expectElementToBeVisible(closeModalButtonSelector);
+    await this.clickOn(closeModalButtonSelector);
+
+    // Verify that the modal is closed.
+    await this.expectElementToBeVisible(
+      translateTextModalHeaderContainerSelector,
+      false
+    );
+  }
+
+  /**
    * Checks if the pagination button is visible or not.
    * @param button - The button to check for.
    * @param visible - Whether the button should be visible or not.
@@ -123,6 +170,32 @@ export class TranslationSubmitter extends BaseUser {
   ) {
     const selector = `${paginationBtnSelectorPrefix}-${button}`;
     await this.expectElementToBeVisible(selector, visible);
+  }
+
+  async expectCopyToolWorksProperly(
+    description: string,
+    caption: string
+  ): Promise<void> {
+    await this.toggleCopyButton('On');
+
+    // Click on the image.
+    await this.expectElementToBeVisible(imageSelector);
+    await this.clickOn(imageSelector);
+
+    // Add a caption to the image.
+    await this.expectElementToBeVisible(textInputSelector);
+    await this.clearAllTextFrom(textInputSelector);
+    await this.type(textInputSelector, caption);
+
+    // Add a description to the image.
+    await this.expectElementToBeVisible(descriptionSelector);
+    await this.clearAllTextFrom(descriptionSelector);
+    await this.type(descriptionSelector, description);
+
+    // Save the image.
+    await this.expectElementToBeVisible(saveImageButtonSelector);
+    await this.clickOn(saveImageButtonSelector);
+    await this.expectElementToBeVisible(saveImageButtonSelector, false);
   }
 
   /**
@@ -225,6 +298,24 @@ export class TranslationSubmitter extends BaseUser {
     // Verify tab is active.
     const activeContributionTabSelector = `${contributionTabSelector}${activeTabSelector}`;
     await this.expectTextContentToBe(activeContributionTabSelector, tabName);
+  }
+
+  /**
+   * Toggles the copy button.
+   * @param mode - The mode to toggle the copy button to.
+   */
+  async toggleCopyButton(mode: 'On' | 'Off'): Promise<void> {
+    await this.expectElementToBeVisible(copyButtonSelector);
+    await this.expectTextContentToBe(
+      copyButtonSelector,
+      mode === 'On' ? 'Off' : 'On'
+    );
+
+    await this.clickOn(copyButtonSelector);
+    await this.expectTextContentToBe(
+      copyButtonSelector,
+      mode === 'On' ? 'On' : 'Off'
+    );
   }
 }
 

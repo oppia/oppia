@@ -52,15 +52,14 @@ describe('Translation Submitter', function () {
     await curriculumAdm.navigateToCreatorDashboardPage();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
     await curriculumAdm.dismissTranslationTabWelcomeModal();
-    await curriculumAdm.updateCardContent(
-      'Hello, This is me -- Oppia Web Tester'
-    );
-    await curriculumAdm.addImageRTEToCardContent(
-      FILEPATHS.PROFILE_PHOTO_SVG,
-      'Profile Photo',
-      'Check this. How do I look?'
-    );
+    await curriculumAdm.addExplorationDescriptionContainingAllRTEComponents();
+    await curriculumAdm.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await curriculumAdm.viewOppiaResponses();
+    await curriculumAdm.directLearnersToNewCard('Last Card');
+    await curriculumAdm.saveExplorationDraft();
+    await curriculumAdm.navigateToCard('Last Card');
     await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+
     await curriculumAdm.saveExplorationDraft();
     const explorationId = await curriculumAdm.publishExplorationWithMetadata(
       'Exploration 1',
@@ -150,6 +149,19 @@ describe('Translation Submitter', function () {
       'here',
       'https://oppia-user-guide.readthedocs.io/en/latest/contributor/translate.html'
     );
+
+    // Check if common buttons work properly.
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.toggleCopyButton('On');
+    await translationSubmitter.toggleCopyButton('Off');
+    await translationSubmitter.closeTranslateTextModal();
+
+    // Open the translation modal again.
+    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+      'The Birthday Cake Arrives',
+      'Dividing a Birthday Cake'
+    );
+    await translationSubmitter.toggleCopyButton('On');
   });
 
   afterAll(async function () {
