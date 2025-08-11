@@ -26,7 +26,7 @@ import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillRights} from 'domain/skill/skill-rights.model';
 import {SkillRightsBackendApiService} from 'domain/skill/skill-rights-backend-api.service';
 import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {AlertsService} from 'services/alerts.service';
 import {QuestionsListService} from 'services/questions-list.service';
 import {LoaderService} from 'services/loader.service';
