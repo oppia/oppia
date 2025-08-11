@@ -72,7 +72,7 @@ describe('Translation Submitter', function () {
       );
       await curriculumAdm.addChapter(`Chapter ${id}`, id);
     }
-  });
+  }, 600000);
 
   it('should be able to check translation opportunities', async function () {
     // Navigate to the contributor dashboard.
@@ -90,6 +90,11 @@ describe('Translation Submitter', function () {
     await translationSubmitter.expectScreenshotToMatch(
       'translationTabInContributionDashboard',
       __dirname
+    );
+
+    // Change the translation language.
+    await translationSubmitter.selectLanguageInTranslateTextTab(
+      'हिन्दी (Hindi)'
     );
 
     // Check if pagination works properly.
