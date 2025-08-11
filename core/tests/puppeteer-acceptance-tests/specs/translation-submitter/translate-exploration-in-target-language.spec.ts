@@ -48,6 +48,8 @@ describe('Translation Submitter', function () {
     // Create an exploration.
     const explorationId =
       await curriculumAdm.createAndPublishExplorationWithCards('Exploration 1');
+    const explorationIds =
+      await curriculumAdm.createAndPublishExplorationsWithCards(10);
 
     await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdm.createAndPublishTopic(
@@ -62,6 +64,14 @@ describe('Translation Submitter', function () {
       explorationId as string,
       'Fractions'
     );
+
+    for (const id of explorationIds) {
+      await curriculumAdm.openStoryEditor(
+        'Dividing a Birthday Cake',
+        'Fractions'
+      );
+      await curriculumAdm.addChapter(`Chapter ${id}`, id);
+    }
   });
 
   it('should be able to check translation opportunities', async function () {

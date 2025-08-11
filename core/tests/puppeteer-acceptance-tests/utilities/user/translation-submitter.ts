@@ -18,7 +18,6 @@ import {TranslationAdminFactory} from './translation-admin';
  * @fileoverview Utilty class for translation submitter.
  */
 
-import {LoggedInUser} from './logged-in-user';
 import {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 

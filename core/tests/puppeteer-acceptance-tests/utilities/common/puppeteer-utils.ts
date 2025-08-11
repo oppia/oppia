@@ -387,6 +387,24 @@ export class BaseUser {
   }
 
   /**
+   * Checks for a new page opened in the context of the current page.
+   * @param cotext - The context in which the new page is opened.
+   * @returns A promise that resolves to the new page.
+   */
+  async waitForNewPage(cotext: Page = this.page): Promise<Page> {
+    const pageTarget = cotext.target();
+    const newTarget = await this.browserObject.waitForTarget(
+      target => target.opener() === pageTarget
+    );
+    const newTabPage = await newTarget.page();
+    expect(newTabPage).toBeDefined();
+    if (!newTabPage) {
+      throw new Error('Failed to get new page opened.');
+    }
+    return newTabPage;
+  }
+
+  /**
    * The function coordinates user interactions with the selected modal.
    */
   async doWithinModal({

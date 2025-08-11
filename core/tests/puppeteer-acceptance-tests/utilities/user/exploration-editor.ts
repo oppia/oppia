@@ -4653,6 +4653,22 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Creates and publishes n explorations with cards.
+   * @param n - The number of explorations to create and publish.
+   * @return A promise that resolves to an array of exploration IDs.
+   */
+  async createAndPublishExplorationsWithCards(n: number): Promise<string[]> {
+    const explorationIds: string[] = [];
+    for (let i = 0; i < n; i++) {
+      const explorationTitle = `Quick Exploration ${i + 1}`;
+      const explorationId =
+        await this.createAndPublishExplorationWithCards(explorationTitle);
+      explorationIds.push(explorationId);
+    }
+    return explorationIds;
+  }
+
+  /**
    * This function checks the number of subscribers in the Subscribers tab of the creator dashboard.
    */
   async expectNumberOfSubscribersToBe(subscriberCount: number): Promise<void> {
