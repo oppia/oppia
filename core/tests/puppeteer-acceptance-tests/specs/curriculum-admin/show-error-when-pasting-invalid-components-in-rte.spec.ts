@@ -57,36 +57,61 @@ describe('Blog Editor and curriculum admin', function () {
       'Test skill',
       ''
     );
+    // Open the skill review material rich text editor to copy
+    // its content.
     await curriculumAdmin.clickOnReviewMaterialEditButton();
+    // Copy the workedexample from the rich text editor.
     await curriculumAdmin.copyWorkedExampleFromReviewMaterialRte();
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should create and delete draft blog post',
+    'should show errors when pasting invalid components in rich text editors',
     async function () {
       await blogPostEditor.navigateToBlogDashboardPage();
       await blogPostEditor.expectNumberOfBlogPostsToBe(0);
+      // Create a draft blog post and open the rich text editor
+      // for its content part.
       await blogPostEditor.createDraftBlogPostWithTitleAndOpenBodyRte(
         'Test Blog Post'
       );
+      // Paste the workedexample copied in the setup in the rte.
       await blogPostEditor.pasteContentInBlogPostContentRte();
+      // An error should show up with only a dismiss button as
+      // only invalid content was pasted.
       await blogPostEditor.clickOnDismissPasteErrorButton();
 
+      // Clear all the skill review material rte content.
       await curriculumAdmin.clearRte();
+      // Type text in the skill review material rte. We allow text in the Blog
+      // editor, so this will be valid content.
       await curriculumAdmin.typeTextInReviewMaterialEditor('Sample Text');
+      // Add a workedexample component in the skill review material rte.
+      // We do not allow workedexample components in the Blog editor, so
+      // this will be invalid content.
       await curriculumAdmin.addWorkedExampleRteComponent(
         'Type the number one.',
         '1'
       );
+      // Copy content from the skill review material rte to be pasted
+      // into the Blog editor rte.
       await curriculumAdmin.copyContentFromReviewMaterialRte();
 
       await blogPostEditor.pasteContentInBlogPostContentRte();
+      // As we pasted content that had invalid as well as valid components,
+      // we see two buttons with the error message - Paste valid components
+      // and No, cancel. Here, we click on 'Paste valid components', which
+      // strips out the invalid components (workedexample component in this case)
+      // and pastes only the valid components (text in this case).
       await blogPostEditor.clickOnPasteValidComponentsButton('Sample Text');
 
       await blogPostEditor.pasteContentInBlogPostContentRte();
+      // Here, we click on 'No, cancel', which cancels the paste
+      // operation.
       await blogPostEditor.clickOnCancelPasteButton();
 
       await blogPostEditor.pasteContentInBlogPostContentRte();
+      // Here, we type some random text, which also cancels the paste
+      // operation.
       await blogPostEditor.typeInRteToDismissError();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS

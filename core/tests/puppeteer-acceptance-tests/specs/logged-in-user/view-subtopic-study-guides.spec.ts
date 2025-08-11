@@ -94,7 +94,7 @@ describe('Logged-in User', function () {
       );
       await loggedInUser1.clickOnExpandWorkedexampleButton();
       await loggedInUser1.expectScreenshotToMatch(
-        'finalSubtopicViewerView2',
+        'finalSubtopicViewerViewSolutionExpanded',
         __dirname
       );
       await loggedInUser1.clickOnNextStudyGuideButton();

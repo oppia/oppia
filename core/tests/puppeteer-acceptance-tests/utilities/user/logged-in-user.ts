@@ -159,7 +159,7 @@ const explorationIdElement = 'span.oppia-unique-progress-id';
 const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
 const stateEditSelector = '.e2e-test-state-edit-content';
 const stateContentInputField = 'div.e2e-test-rte';
-const addSkillreviewComponentButton = '.cke_button__oppiaskillreview';
+const addSkillReviewComponentButton = '.cke_button__oppiaskillreview';
 const skillInSkillreviewModal = '.e2e-test-rte-skill-selector-item';
 const saveRteComponentAndCloseCustomizationModalButton =
   '.e2e-test-close-rich-text-component-editor';
@@ -167,7 +167,9 @@ const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 const previewTabButton = '.e2e-test-preview-tab';
 const previewTabContainer = '.e2e-test-preview-tab-container';
 const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
-const skillreviewComponent = 'oppia-noninteractive-skillreview';
+const skillReviewComponent = 'oppia-noninteractive-skillreview';
+const skillReviewComponentModal =
+  'oppia-noninteractive-skillreview-concept-card-modal';
 const toastMessage = '.e2e-test-toast-message';
 const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
 const mobileChangesDropdown = 'div.e2e-test-mobile-changes-dropdown';
@@ -2280,7 +2282,7 @@ export class LoggedInUser extends BaseUser {
     });
     await this.clickOn(stateEditSelector);
     await this.type(stateContentInputField, `${content}`);
-    await this.clickOn(addSkillreviewComponentButton);
+    await this.clickOn(addSkillReviewComponentButton);
     await this.clickOn(skillInSkillreviewModal);
     await this.clickOn(saveRteComponentAndCloseCustomizationModalButton);
     await this.clickOn(saveContentButton);
@@ -2312,8 +2314,41 @@ export class LoggedInUser extends BaseUser {
   /**
    * Function to click on the skillreview component
    */
-  async clickOnSkillreviewComponent(): Promise<void> {
-    await this.clickOn(skillreviewComponent);
+  async clickOnSkillReviewComponent(): Promise<void> {
+    await this.expectElementToBeVisible(skillReviewComponent);
+    await this.clickOn(skillReviewComponent);
+    await this.expectElementToBeVisible(skillReviewComponentModal);
+  }
+
+  /**
+   * Function to check that the concept card is successfully inserted.
+   * @param {string} question - The question of the WorkedExample.
+   * @param {string} answer -  The answer of the WorkedExample.
+   */
+  async checkConceptCardWithWorkedExampleIsInserted(
+    question: string,
+    answer: string
+  ): Promise<void> {
+    try {
+      const isQuestionPresent = this.isTextPresentOnPage(question);
+      if (!isQuestionPresent) {
+        throw new Error(
+          'Expected Concept Card to contain WorkedExample question, but it was not found.'
+        );
+      }
+      const isAnswerPresent = this.isTextPresentOnPage(answer);
+      if (!isAnswerPresent) {
+        throw new Error(
+          'Expected Concept Card to contain WorkedExample answer, but it was not found.'
+        );
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify concept card with WorkedExample: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
   }
 
   /**

@@ -4124,6 +4124,7 @@ export class LoggedOutUser extends BaseUser {
    * Click on the expand workedexample button.
    */
   async clickOnExpandWorkedexampleButton(): Promise<void> {
+    await this.expectElementToBeVisible(expandWorkedExampleButton);
     await this.clickOn(expandWorkedExampleButton);
     await this.page.waitForSelector(collapseWorkedExampleButton, {
       visible: true,

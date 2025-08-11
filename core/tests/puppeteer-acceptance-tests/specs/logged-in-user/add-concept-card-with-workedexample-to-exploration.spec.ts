@@ -70,7 +70,11 @@ describe('Logged-in User', function () {
       await loggedInUser1.updateCardContentWithConceptCard('hello ');
       await loggedInUser1.saveExplorationDraft();
       await loggedInUser1.navigateToExplorationEditorPreviewTab();
-      await loggedInUser1.clickOnSkillreviewComponent();
+      await loggedInUser1.clickOnSkillReviewComponent();
+      await loggedInUser1.checkConceptCardWithWorkedExampleIsInserted(
+        'Type the number one',
+        '1'
+      );
       await loggedInUser1.expectScreenshotToMatch(
         'finalExplorationEditorPreview',
         __dirname

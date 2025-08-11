@@ -2242,6 +2242,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.waitForElementToStabilize(editWorkedExampleModalAnswerRte);
     await this.type(editWorkedExampleModalAnswerRte, answer);
     await this.clickOn(rteComponentSaveButton);
+    await this.page.waitForSelector(editWorkedExampleModalAnswerRte, {
+      hidden: true,
+    });
   }
 
   /**
@@ -2316,6 +2319,9 @@ export class CurriculumAdmin extends BaseUser {
     );
     await this.page.waitForSelector(`${closeSaveModalButton}:not([disabled])`);
     await this.clickOn(closeSaveModalButton);
+    await this.page.waitForSelector('oppia-skill-editor-save-modal', {
+      hidden: true,
+    });
   }
 
   /**
@@ -2335,6 +2341,39 @@ export class CurriculumAdmin extends BaseUser {
     }
     await this.waitForPageToFullyLoad();
     await this.scrollToBottomOfPage();
+  }
+
+  async checkWorkedExamplesExistForSkill(
+    workedExamples: string[][]
+  ): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      try {
+        for (var i = 0; i < workedExamples.length; i++) {
+          const isQuestionPresent = this.isTextPresentOnPage(
+            workedExamples[i][0]
+          );
+          if (!isQuestionPresent) {
+            throw new Error(
+              `Expected WorkedExample Question ${workedExamples[i][0]} to be present on the page, but it was not found.`
+            );
+          }
+          const isAnswerPresent = this.isTextPresentOnPage(
+            workedExamples[i][1]
+          );
+          if (!isAnswerPresent) {
+            throw new Error(
+              `Expected WorkedExample Answer ${workedExamples[i][1]} to be present on the page, but it was not found.`
+            );
+          }
+        }
+      } catch (error) {
+        const newError = new Error(
+          `Failed to verify WorkedExamples of skill: ${error}`
+        );
+        newError.stack = error.stack;
+        throw newError;
+      }
+    }
   }
 
   /**

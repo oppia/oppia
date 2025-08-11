@@ -83,6 +83,10 @@ describe('Curriculum Admin', function () {
     );
     await curriculumAdmin.publishSkillChanges();
     await curriculumAdmin.navigateToSkillPreviewTab();
+    await curriculumAdmin.checkWorkedExamplesExistForSkill([
+      ['Type the number one', '1'],
+      ['Type the number two', '2'],
+    ]);
     await curriculumAdmin.expectScreenshotToMatch(
       'skillWithWorkedExamplePreview',
       __dirname
