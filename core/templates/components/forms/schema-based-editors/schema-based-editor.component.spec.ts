@@ -79,31 +79,16 @@ describe('Schema based editor component', function () {
     expect(component.localValue).toEqual(10);
   });
 
-  it('should set form validity', fakeAsync(() => {
-    let mockEmitter = new EventEmitter();
-    let form = jasmine.createSpyObj('form', ['$setValidity']);
-
+  it('should trigger validator change on form status change', fakeAsync(() => {
+    let mockEmitter = new EventEmitter<void>();
     spyOnProperty(component.form, 'statusChanges').and.returnValue(mockEmitter);
-    spyOn(angular, 'element').and.returnValue(
-      // This throws "Type '{ top: number; }' is not assignable to type
-      // 'JQLite | Coordinates'". We need to suppress this error because
-      // angular element have more properties than offset and top.
-      // @ts-expect-error
-      {
-        controller: (formString: string) => {
-          return form;
-        },
-      }
-    );
+    let validatorSpy = spyOn<any>(component, 'onValidatorChange');
 
     component.ngAfterViewInit();
     tick();
-    mockEmitter.emit('INVALID');
-    tick();
     mockEmitter.emit();
+    tick();
 
-    component.writeValue(10);
-    expect(component.localValue).toEqual(10);
-    expect(form.$setValidity).toHaveBeenCalledTimes(2);
+    expect(validatorSpy).toHaveBeenCalled();
   }));
 });
