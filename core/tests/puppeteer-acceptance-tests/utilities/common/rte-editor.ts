@@ -62,16 +62,24 @@ export class RTEEditor {
 
     await optionElement.click();
 
-    await this.parentPage.waitForFunction(
-      (selector: string, cls: string, present: boolean) => {
+    try {
+      await this.parentPage.waitForFunction(
+        (selector: string, cls: string, present: boolean) => {
+          const element = document.querySelector(selector);
+          return element?.classList.contains(cls) === present;
+        },
+        {},
+        optionSelector,
+        ckeBtnOnClass,
+        !isActive
+      );
+    } catch (error) {
+      await this.parentPage.evaluate((selector: string) => {
         const element = document.querySelector(selector);
-        return element?.classList.contains(cls) === present;
-      },
-      {},
-      optionSelector,
-      ckeBtnOnClass,
-      !isActive
-    );
+        console.log(`[debug] Class List: ${element?.classList}`);
+      }, optionSelector);
+      throw error;
+    }
   }
 
   /**
