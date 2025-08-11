@@ -6367,6 +6367,24 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Adds an Image RTE element to the current card.
+   * @param {string} imageFilePath - Path of Image file to add.
+   * @param {string} imageDescription - Image Description to add.
+   * @param {string} imageCaption - Caption to add with image.
+   */
+  async addImageRTEToCardContent(
+    imageFilePath: string,
+    imageDescription: string,
+    imageCaption: string | null
+  ): Promise<void> {
+    await this.expectElementToBeVisible(stateEditSelector);
+    await this.clickOn(stateEditSelector);
+    await this.addImageRTE(imageFilePath, imageDescription, imageCaption);
+    await this.clickOn(saveContentButton);
+    await this.expectElementToBeVisible(stateContentInputField, false);
+  }
+
+  /**
    * Updates an exploration description containing all RTE elements.
    */
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {

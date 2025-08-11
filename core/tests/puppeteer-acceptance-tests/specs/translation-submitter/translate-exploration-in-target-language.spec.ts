@@ -19,10 +19,13 @@
  * TS.CD.??. Translate exploration in target language.
  */
 
-import testConstants from '../../utilities/common/test-constants';
+import testConstants, {FILEPATHS} from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {
+  ExplorationEditor,
+  INTERACTION_TYPES,
+} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
@@ -46,8 +49,25 @@ describe('Translation Submitter', function () {
     );
 
     // Create an exploration.
-    const explorationId =
-      await curriculumAdm.createAndPublishExplorationWithCards('Exploration 1');
+    await curriculumAdm.navigateToCreatorDashboardPage();
+    await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
+    await curriculumAdm.updateCardContent(
+      'Hello, This is me -- Oppia Web Tester'
+    );
+    await curriculumAdm.addImageRTEToCardContent(
+      FILEPATHS.PROFILE_PHOTO_SVG,
+      'Profile Photo',
+      'Check this. How do I look?'
+    );
+    await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await curriculumAdm.saveExplorationDraft();
+    const explorationId = await curriculumAdm.publishExplorationWithMetadata(
+      'Exploration 1',
+      'This is a test exploration',
+      'Algebra'
+    );
+    // const explorationId =
+    //   await curriculumAdm.createAndPublishExplorationWithCards('Exploration 1');
     const explorationIds =
       await curriculumAdm.createAndPublishExplorationsWithCards(10);
 
