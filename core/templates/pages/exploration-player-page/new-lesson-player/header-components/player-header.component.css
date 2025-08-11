@@ -9,7 +9,7 @@
   background-color: #094142;
   color: #fff;
   display: flex;
-  height: 48px;
+  height: 40px;
   justify-content: space-between;
   padding-left: 15px;
 }
@@ -25,8 +25,33 @@
   color: #fff;
 }
 
+.player-header-close-button button {
+  background: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: none;
+  outline: none;
+  padding: 8px;
+}
+
+.player-header-close-button i {
+  color: #fff;
+}
+
+.other-header {
+  background-color: #c55f45;
+  justify-content: center;
+}
+
 @media screen and (max-width: 767px) {
   .player-header-right {
     display: block;
   }
+}
+
+.player-header-left p {
+  font-family: Capriola;
+  font-weight: 400;
+  font-size: 18px;
 }

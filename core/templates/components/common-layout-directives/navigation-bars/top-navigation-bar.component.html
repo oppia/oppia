@@ -63,7 +63,7 @@
       <ul *ngIf="!windowIsNarrow && !pageIsIframed"
           class="nav oppia-navbar-tabs">
         <li [ngClass]="{'open' : activeMenuName === 'homeMenu'}"
-            *ngIf="userIsLoggedIn"
+            *ngIf="!userIsLoggedIn"
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_HOME"
             aria-hidden="false"
             class="nav-item  oppia-navbar-clickable-dropdown e2e-test-home-oppia-list-item">

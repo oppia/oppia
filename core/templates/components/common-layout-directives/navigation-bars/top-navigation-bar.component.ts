@@ -149,7 +149,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
     'create',
     'explore',
-    'lesson',
     'collection',
     'collection_editor',
     'topics_and_skills_dashboard',

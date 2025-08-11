@@ -1,12 +1,29 @@
-<div class="oppia-question-player-container">
+<div class="oppia-question-player-container"
+     [ngClass]="{'oppia-new-question-player-container': isNewLessonPlayerEnabled()}">
   <!-- Question Player -->
-  <div class="oppia-question-player" *ngIf="!resultsLoaded">
+  <div class="oppia-question-player" *ngIf="!resultsLoaded" 
+       [ngClass]="{'oppia-new-question-player': isNewLessonPlayerEnabled()}">
+    
+    <oppia-player-header *ngIf="isNewLessonPlayerEnabled()"></oppia-player-header>
 
-    <h1 class="oppia-practice-session" tabindex="0">
+    <h1 class="oppia-practice-session" tabindex="0" *ngIf="!isNewLessonPlayerEnabled()">
       Practice Session
     </h1>
 
-    <div class="oppia-question-player-card">
+    <div class="oppia-new-question-player-card" *ngIf="isNewLessonPlayerEnabled()">
+        <div [hidden]="!(totalQuestions > 0)">
+          <p 
+              tabindex="0"
+              [attr.aria-label]="'Question ' + currentQuestion + ' out of ' + totalQuestions">
+            Question {{currentQuestion}}/{{totalQuestions}}
+        </p>
+        </div>
+        <div class="oppia-new-question-player-progress">
+          <div class="new-current-progress" [ngStyle]="{'width': currentProgress + '%'}"></div>
+        </div>
+    </div>
+
+    <div class="oppia-question-player-card" *ngIf="!isNewLessonPlayerEnabled()">
       <span class="beta-label"
             matTooltip="This feature is only available in English for now"
             matTooltipClass="oppia-mat-tooltip-list">
@@ -518,5 +535,66 @@
     text-align: center;
   }
 }
+
+  .oppia-new-question-player-container {
+    max-width: 100vw;
+  }
+
+  .oppia-new-question-player-card p {
+    margin-right: 24px;
+    font-family: Capriola;
+    font-weight: 400;
+    font-size: 18px;
+    color: #C55F45;
+  }
+
+  .oppia-new-question-player {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .oppia-new-question-player-progress {
+    height: 16px;
+    width: 392px;
+    border-radius: 8px;
+    background-color: #E1CBC5;
+  }
+
+  .new-current-progress {
+    height: 16px;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #DD7358 0%, #B35239 100%);
+  }
+
+  .oppia-new-question-player-card {
+    background-color: #fff8e5;
+    width: 100%;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+
+  @media(max-width: 768px) {
+    .oppia-new-question-player-progress {
+      width: 300px;
+    }
+
+    .oppia-new-question-player-card p {
+      font-size: 15px;
+    }
+  }
+
+  @media(max-width: 480px) {
+    .oppia-new-question-player-progress {
+      width: 180px;
+    }
+
+    .oppia-new-question-player-card p {
+      margin-right: 12px;
+      font-size: 13px;
+    }
+  }
 
 </style>

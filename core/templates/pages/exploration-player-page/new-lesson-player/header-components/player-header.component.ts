@@ -36,6 +36,14 @@ import {StatsReportingService} from '../../services/stats-reporting.service';
 import {MobileMenuService} from '../../services/mobile-menu.service';
 
 import './player-header.component.css';
+import {Router} from '@angular/router';
+import {WindowRef} from 'services/contextual/window-ref.service';
+
+enum PageContextConstants {
+  EXPLORATION_PAGE = 'exploration',
+  DIAGNOSTIC_PAGE = 'diagnostic',
+  PRACTICE_PAGE = 'practice',
+}
 
 @Component({
   selector: 'oppia-player-header',
@@ -51,12 +59,15 @@ export class PlayerHeaderComponent {
   explorationTitleTranslationKey!: string;
   storyPlaythroughObject!: StoryPlaythrough;
   topicName!: string;
+  classroomName!: string;
   topicNameTranslationKey!: string;
   isLinkedToTopic!: boolean;
   expInfo!: LearnerExplorationSummaryBackendDict;
   directiveSubscriptions: Subscription = new Subscription();
   isMobileMenuVisible = false;
   pageIsIframed: boolean = false;
+  explorationContext!: PageContextConstants;
+  explorationContextConstants = PageContextConstants;
 
   constructor(
     private pageContextService: PageContextService,
@@ -67,50 +78,52 @@ export class PlayerHeaderComponent {
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private topicViewerBackendApiService: TopicViewerBackendApiService,
-    private mobileMenuService: MobileMenuService
+    private mobileMenuService: MobileMenuService,
+    private router: Router,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
     let pathnameArray = this.urlService.getPathname().split('/');
-    let explorationContext = false;
-    this.pageIsIframed = this.urlService.isIframed();
-
-    for (let i = 0; i < pathnameArray.length; i++) {
-      if (
-        pathnameArray[i] === 'explore' ||
-        pathnameArray[i] === 'create' ||
-        pathnameArray[i] === 'skill_editor' ||
-        pathnameArray[i] === 'embed' ||
-        pathnameArray[i] === 'lesson'
-      ) {
-        explorationContext = true;
-        break;
-      }
+    this.setPageContext();
+    if (this.explorationContext === PageContextConstants.EXPLORATION_PAGE) {
+      this.pageIsIframed = this.urlService.isIframed();
+      this.explorationId = this.pageContextService.getExplorationId();
     }
 
-    this.explorationId = explorationContext
-      ? this.pageContextService.getExplorationId()
-      : 'test_id';
+    //   this.topicViewerBackendApiService
+    // .fetchTopicDataAsync(this.topicUrlFragment, this.classroomUrlFragment)
+    // .then(
+    //   (readOnlyTopic: ReadOnlyTopic) => {
+    //     this.topicId = readOnlyTopic.getTopicId();
+    //     this.topicName = readOnlyTopic.getTopicName();
+    //     this.topicDescription = readOnlyTopic.getTopicDescription();
+    //     this.pageTitleFragment = readOnlyTopic.getPageTitleFragmentForWeb();
+    //     this.classroomName = readOnlyTopic.getClassroomName();
 
     this.explorationTitle = 'Loading...';
-    this.readOnlyExplorationBackendApiService
-      .fetchExplorationAsync(
-        this.explorationId,
-        this.urlService.getExplorationVersionFromUrl(),
-        this.urlService.getPidFromUrl()
-      )
-      .then(response => {
-        this.explorationTitle = response.exploration.title;
-      });
-    this.explorationTitleTranslationKey =
-      this.i18nLanguageCodeService.getExplorationTranslationKey(
-        this.explorationId,
-        TranslationKeyType.TITLE
-      );
+    this.topicName = 'Loading...';
+    // this.readOnlyExplorationBackendApiService
+    //   .fetchExplorationAsync(
+    //     this.explorationId,
+    //     this.urlService.getExplorationVersionFromUrl(),
+    //     this.urlService.getPidFromUrl()
+    //   )
+    //   .then(response => {
+    //     this.explorationTitle = response.exploration.title;
+    //   });
+    // this.explorationTitleTranslationKey =
+    //   this.i18nLanguageCodeService.getExplorationTranslationKey(
+    //     this.explorationId,
+    //     TranslationKeyType.TITLE
+    //   );
     // To check if the exploration is linked to the topic or not.
     this.isLinkedToTopic = this.getTopicUrl() ? true : false;
     // If linked to topic then print topic name in the lesson player.
-    if (this.isLinkedToTopic) {
+    if (
+      this.isLinkedToTopic ||
+      this.explorationContext === PageContextConstants.PRACTICE_PAGE
+    ) {
       let topicUrlFragment =
         this.urlService.getTopicUrlFragmentFromLearnerUrl();
       let classroomUrlFragment =
@@ -119,6 +132,7 @@ export class PlayerHeaderComponent {
         .fetchTopicDataAsync(topicUrlFragment, classroomUrlFragment)
         .then((readOnlyTopic: ReadOnlyTopic) => {
           this.topicName = readOnlyTopic.getTopicName();
+          this.classroomName = readOnlyTopic.getClassroomName();
           this.statsReportingService.setTopicName(this.topicName);
           this.siteAnalyticsService.registerCuratedLessonStarted(
             this.topicName,
@@ -170,6 +184,16 @@ export class PlayerHeaderComponent {
     );
   }
 
+  setPageContext(): void {
+    if (this.pageContextService.isInDiagnosticTestPlayerPage()) {
+      this.explorationContext = PageContextConstants.DIAGNOSTIC_PAGE;
+    } else if (this.pageContextService.isInQuestionPlayerMode()) {
+      this.explorationContext = PageContextConstants.PRACTICE_PAGE;
+    } else {
+      this.explorationContext = PageContextConstants.EXPLORATION_PAGE;
+    }
+  }
+
   isHackyExpTitleTranslationDisplayed(): boolean {
     return (
       this.i18nLanguageCodeService.isHackyTranslationAvailable(
@@ -184,5 +208,22 @@ export class PlayerHeaderComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  closePlayer(): void {
+    const pathnameArray = this.urlService.getPathname().split('/');
+    console.log(pathnameArray);
+    if (this.explorationContext === PageContextConstants.EXPLORATION_PAGE) {
+      console.log('Closing player and navigating to main page');
+    } else if (this.explorationContext === PageContextConstants.PRACTICE_PAGE) {
+      const targetPath = pathnameArray.slice(1, 4);
+      const confirmed = this.windowRef.nativeWindow.confirm(
+        'If you exit, your progress will be lost. Do you still want to exit?'
+      );
+
+      if (confirmed) {
+        this.router.navigate(targetPath);
+      }
+    }
   }
 }

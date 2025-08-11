@@ -215,6 +215,7 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
 import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
+import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-player/header-components/player-header.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -277,6 +278,7 @@ import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
+    PlayerHeaderComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -423,6 +425,7 @@ import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-
     CompletionGraphComponent,
     CorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
+    PlayerHeaderComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ConceptCardComponent,
@@ -611,6 +614,7 @@ import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
     CreateNewSkillModalComponent,
+    PlayerHeaderComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteAnswerGroupModalComponent,

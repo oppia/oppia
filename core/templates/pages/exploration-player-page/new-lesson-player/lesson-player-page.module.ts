@@ -36,7 +36,7 @@ import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
-import {PlayerHeaderComponent} from './lesson-header/player-header.component';
+import {PlayerHeaderComponent} from './header-components/player-header.component';
 import {PlayerSidebarComponent} from './sidebar-components/player-sidebar.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
 
@@ -58,14 +58,12 @@ import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar
   declarations: [
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
-    PlayerHeaderComponent,
     PlayerSidebarComponent,
     NewAudioBarComponent,
   ],
   entryComponents: [
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
-    PlayerHeaderComponent,
     PlayerSidebarComponent,
     NewAudioBarComponent,
   ],

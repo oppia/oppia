@@ -1,0 +1,37 @@
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+<div class="oppia-lesson-player-header" [ngClass]="explorationContext !== explorationContextConstants.EXPLORATION_PAGE ? 'other-header' : ''">
+  <div class="player-header-left">
+    <p *ngIf="explorationContext === explorationContextConstants.PRACTICE_PAGE">Practice Session: {{ topicName }}</p>
+    <p *ngIf="explorationContext === explorationContextConstants.DIAGNOSTIC_PAGE">Diagnostic Test: {{ classroomName }}</p>
+    <!-- <p>
+      <span class="oppia-exploration-header"
+            itemprop="description">
+        <span *ngIf="!isHackyExpTitleTranslationDisplayed()">
+          {{ explorationTitle }}
+        </span>
+        <span *ngIf="isHackyExpTitleTranslationDisplayed()">
+          {{ explorationTitleTranslationKey | translate }}
+        </span>
+      </span>
+    </p>
+    <a class="oppia-topic-title" *ngIf="isLinkedToTopic == true" [href]="getTopicUrl()">
+      <span *ngIf="!isHackyTopicNameTranslationDisplayed()">
+        {{ topicName }}
+      </span>
+      <span *ngIf="isHackyTopicNameTranslationDisplayed()">
+        {{ topicNameTranslationKey | translate }}
+      </span>
+    </a> -->
+  </div>
+  <div class="player-header-right">
+    <button class="header-menu-button" *ngIf="!pageIsIframed && explorationContext === explorationContextConstants.EXPLORATION_PAGE" (click)="toggleMenu()" aria-label="Toggle main menu">
+      <i class="fa fa-lg fa-ellipsis-h"></i>
+    </button>
+  </div>
+  <div class="player-header-close-button">
+    <button class="close-modal-button" (click)="closePlayer()" aria-label="Close player">
+      <i class="fa fa-xmark fa-lg"></i>
+    </button>
+  </div>
+</div>
