@@ -80,12 +80,15 @@ describe('Schema based editor component', function () {
   });
 
   it('should trigger validator change on form status change', fakeAsync(() => {
-    let mockEmitter = new EventEmitter<void>();
+    const mockEmitter = new EventEmitter<void>();
     spyOnProperty(component.form, 'statusChanges').and.returnValue(mockEmitter);
-    let validatorSpy = spyOn<any>(component, 'onValidatorChange');
+
+    const validatorSpy = jasmine.createSpy('validatorSpy');
+    component.registerOnValidatorChange(validatorSpy);
 
     component.ngAfterViewInit();
     tick();
+
     mockEmitter.emit();
     tick();
 
