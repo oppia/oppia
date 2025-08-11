@@ -59,26 +59,43 @@ export class RTEEditor {
       },
       ckeBtnOnClass
     );
+    const initialInnerHTML = await this.parentPage.evaluate(
+      (selector: string) => {
+        return document.querySelector(selector)?.innerHTML;
+      },
+      rteTextAreaSelector
+    );
 
     await optionElement.click();
 
-    try {
+    if (title.includes('Indent')) {
       await this.parentPage.waitForFunction(
-        (selector: string, cls: string, present: boolean) => {
-          const element = document.querySelector(selector);
-          return element?.classList.contains(cls) === present;
+        (selector: string, innerHTML: string) => {
+          return document.querySelector(selector)?.innerHTML !== innerHTML;
         },
         {},
-        optionSelector,
-        ckeBtnOnClass,
-        !isActive
+        rteTextAreaSelector,
+        initialInnerHTML ?? ''
       );
-    } catch (error) {
-      await this.parentPage.evaluate((selector: string) => {
-        const element = document.querySelector(selector);
-        console.log(`[debug] Class List: ${element?.classList}`);
-      }, optionSelector);
-      throw error;
+    } else {
+      try {
+        await this.parentPage.waitForFunction(
+          (selector: string, cls: string, present: boolean) => {
+            const element = document.querySelector(selector);
+            return element?.classList.contains(cls) === present;
+          },
+          {},
+          optionSelector,
+          ckeBtnOnClass,
+          !isActive
+        );
+      } catch (error) {
+        await this.parentPage.evaluate((selector: string) => {
+          const element = document.querySelector(selector);
+          console.log(`[debug] Class List: ${element?.classList}`);
+        }, optionSelector);
+        throw error;
+      }
     }
   }
 
