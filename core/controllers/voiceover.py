@@ -292,8 +292,8 @@ class AutomaticVoiceoverRegenerationRecordHandler(
     within a specified date range."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'start_date': {
                 'schema': {
@@ -312,19 +312,16 @@ class AutomaticVoiceoverRegenerationRecordHandler(
     def get(self) -> None:
         """Retrieves automatic voiceover regeneration records within the
         specified start and end dates.
-
-        Args:
-            start_date: str. The start date for filtering records.
-            end_date: str. The end date for filtering records.
         """
+        assert self.normalized_request is not None
         start_date: str = self.normalized_request.get('start_date', '')
         end_date: str = self.normalized_request.get('end_date', '')
 
         # Convert start_date and end_date to datetime objects.
         start_date_obj: datetime.datetime = datetime.datetime.fromisoformat(
-            start_date.replace("Z", "+00:00"))
+            start_date.replace('Z', '+00:00'))
         end_date_obj: datetime.datetime = datetime.datetime.fromisoformat(
-            end_date.replace("Z", "+00:00"))
+            end_date.replace('Z', '+00:00'))
 
         # Fetch only those records that are related to voiceover regeneration
         # and are within the specified date range.
