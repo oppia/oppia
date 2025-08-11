@@ -205,8 +205,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import {PageTitleService} from 'services/page-title.service';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
 import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {
@@ -594,9 +592,6 @@ export class UpgradedServices {
       upgradedServices['Meta'],
       upgradedServices['Title']
     );
-    upgradedServices['ParamChangesObjectFactory'] =
-      new ParamChangesObjectFactory();
-    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory();
     upgradedServices['PencilCodeEditorValidationService'] =
       new PencilCodeEditorValidationService(
         upgradedServices['BaseInteractionValidationService']
@@ -719,9 +714,7 @@ export class UpgradedServices {
       new NumberWithUnitsValidationService(
         upgradedServices['BaseInteractionValidationService']
       );
-    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
-      upgradedServices['ParamSpecObjectFactory']
-    );
+    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory();
     upgradedServices['PencilCodeEditorRulesService'] =
       new PencilCodeEditorRulesService(
         upgradedServices['NormalizeWhitespacePipe'],
@@ -1109,9 +1102,7 @@ export class UpgradedServices {
       new InteractionAttributesExtractorService(
         upgradedServices['HtmlEscaperService']
       );
-    upgradedServices['StateObjectFactory'] = new StateObjectFactory(
-      upgradedServices['ParamChangesObjectFactory']
-    );
+    upgradedServices['StateObjectFactory'] = new StateObjectFactory();
 
     // Topological level: 8.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
@@ -1124,7 +1115,6 @@ export class UpgradedServices {
     // Topological level: 9.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
       upgradedServices['LoggerService'],
-      upgradedServices['ParamChangesObjectFactory'],
       upgradedServices['ParamSpecsObjectFactory'],
       upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']
