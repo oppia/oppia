@@ -183,7 +183,7 @@ describe('DisplayNewHintModalComponent using BottomSheetRef', () => {
       'stateName',
       'content',
       'interaction',
-      {} as any,
+      {},
       [],
       'content_2'
     );

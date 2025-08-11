@@ -442,7 +442,7 @@ describe('ConceptCardManager service', () => {
     let mockFunction = jasmine.createSpy('mockFunction');
     ccms.enqueueTimeout(mockFunction, 1000);
 
-    // Enqueue another timeout which should clear the first one
+    // Enqueue another timeout which should clear the first one.
     ccms.enqueueTimeout(mockFunction, 2000);
 
     tick(1000);
