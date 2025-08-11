@@ -155,7 +155,7 @@ export class VoiceoverSubmitter extends BaseUser {
   async expectTranslationNumericalStatusToBe(status: string): Promise<void> {
     await this.expectTextContentToBe(
       translationNumericalStatusSelector,
-      status
+      `(${status})`
     );
   }
 }
