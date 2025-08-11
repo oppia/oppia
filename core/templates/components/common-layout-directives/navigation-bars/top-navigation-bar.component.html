@@ -257,6 +257,7 @@
               <div class="top-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-school-and-organizations-button"
                    href="/partnerships"
+                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.PARTNERSHIPS.ROUTE"
                    rel="noopener"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_CLOSE})">
                   <div class="heading">
@@ -287,6 +288,7 @@
               <div class="bottom-section d-flex">
                 <a class="item item-border d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-contact-us-button"
                    href="/contact"
+                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.CONTACT.ROUTE"
                    (keydown)="onMenuKeypress($event, 'getInvolvedMenu', {enter: ACTION_CLOSE})"
                    rel="noopener">
                   <div class="heading">
@@ -301,6 +303,7 @@
                 </a>
                 <a class="item d-flex flex-column innvolved-item e2e-test-navbar-get-involved-menu-donate-button"
                    href="/donate"
+                   [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
                    (blur)="getInvolvedDropdown.close()"
                    rel="noopener">
                   <div class="heading">
@@ -324,6 +327,7 @@
           <a class="nav-link oppia-navbar-tab donate-tab e2e-test-navbar-donate-desktop-button"
              tabindex="0"
              href="/donate"
+             [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.DONATE.ROUTE"
              rel="noopener">
             <span class="oppia-navbar-tab-content"
                  [innerHTML]="'I18N_TOPNAV_DONATE' | translate">
