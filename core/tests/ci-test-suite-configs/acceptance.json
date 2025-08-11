@@ -527,6 +527,10 @@
     {
       "name": "logged-in-learner/export-and-delete-account",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/export-and-delete-account.spec.ts"
+    },
+    {
+      "name": "translation-submitter/translate-exploration-in-target-language",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/translate-exploration-in-target-language.spec.ts"
     }
   ],
   "docker_suites": []
