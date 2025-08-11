@@ -51,6 +51,7 @@ describe('Translation Submitter', function () {
     // Create an exploration.
     await curriculumAdm.navigateToCreatorDashboardPage();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
+    await curriculumAdm.dismissTranslationTabWelcomeModal();
     await curriculumAdm.updateCardContent(
       'Hello, This is me -- Oppia Web Tester'
     );
@@ -142,6 +143,12 @@ describe('Translation Submitter', function () {
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'The Birthday Cake Arrives',
       'Dividing a Birthday Cake'
+    );
+
+    // Check if anchor text for copy tool works properly.
+    await translationSubmitter.clickAndVerifyAnchorWithInnerText(
+      'here',
+      'https://oppia-user-guide.readthedocs.io/en/latest/contributor/translate.html'
     );
   });
 
