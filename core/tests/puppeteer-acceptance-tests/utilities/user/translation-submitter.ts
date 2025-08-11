@@ -20,6 +20,7 @@ import {TranslationAdminFactory} from './translation-admin';
 
 import {LoggedInUser} from './logged-in-user';
 import {ElementHandle} from 'puppeteer';
+import {BaseUser} from '../common/puppeteer-utils';
 
 // Common Selectors.
 const activeTabSelector = '.e2e-test-active-tab';
@@ -28,7 +29,7 @@ const activeTabSelector = '.e2e-test-active-tab';
 const contributionTabSelector = '.e2e-test-contribution-tab';
 const paginationBtnSelectorPrefix = '.e2e-test-pagination-button';
 
-export class TranslationSubmitter extends LoggedInUser {
+export class TranslationSubmitter extends BaseUser {
   /**
    * Clicks on the given pagination button.
    * @param button - The button to click on.
@@ -85,5 +86,5 @@ export class TranslationSubmitter extends LoggedInUser {
   }
 }
 
-export let ExplorationEditorFactory = (): TranslationSubmitter =>
+export let TranslationSubmitterFactory = (): TranslationSubmitter =>
   new TranslationSubmitter();

@@ -42,6 +42,10 @@ import {ModeratorFactory} from '../user/moderator';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import testConstants from './test-constants';
 import {showMessage} from './show-message';
+import {
+  TranslationSubmitter,
+  TranslationSubmitterFactory,
+} from '../user/translation-submitter';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
@@ -179,12 +183,14 @@ export class UserFactory {
       QuestionSubmitter &
       TopicManager &
       CurriculumAdmin &
+      TranslationSubmitter &
       MultipleRoleIntersection<TRoles>
   > {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
       LoggedOutUserFactory(),
       LoggedInUserFactory(),
       ExplorationEditorFactory(),
+      TranslationSubmitterFactory(),
       QuestionSubmitterFactory(),
       TopicManagerFactory(),
       CurriculumAdminFactory(),

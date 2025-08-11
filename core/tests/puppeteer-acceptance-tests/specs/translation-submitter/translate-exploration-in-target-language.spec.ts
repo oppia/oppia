@@ -23,13 +23,14 @@ import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
 
 describe('Translation Submitter', function () {
-  let translationSubmitter: TranslationSubmitter;
+  let translationSubmitter: TranslationSubmitter & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
 
   beforeAll(async function () {
