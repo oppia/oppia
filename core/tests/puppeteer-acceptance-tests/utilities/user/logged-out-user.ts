@@ -2240,6 +2240,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnCreateAccountButtonInSaveProgressModal(): Promise<void> {
     await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector);
+    await this.waitForElementToStabilize(lessonInfoSignUpButtonSelector);
     await this.clickOn(lessonInfoSignUpButtonSelector);
 
     await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector, false);
