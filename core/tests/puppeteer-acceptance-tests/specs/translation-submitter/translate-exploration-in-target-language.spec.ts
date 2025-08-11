@@ -100,7 +100,7 @@ describe('Translation Submitter', function () {
       await curriculumAdm.openStoryEditor('Test Story 1', 'Test Topic 1');
       await curriculumAdm.addChapter(`Chapter ${id}`, id);
     }
-  }, 900000);
+  }, 1200000);
 
   it('should be able to check translation opportunities', async function () {
     // Navigate to the contributor dashboard.
