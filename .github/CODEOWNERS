@@ -712,7 +712,6 @@
 /core/tests/ @oppia/dev-workflow-reviewers
 /assets/ @oppia/lace-frontend-reviewers
 /data/ @oppia/lace-backend-reviewers
-/core/templates/karma.module.ts @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_utils/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_desktop/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio/ @oppia/dev-workflow-reviewers
