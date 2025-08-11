@@ -52,7 +52,6 @@ export class ValidatorsService {
       }
       return false;
     }
-
     for (var i = 0; i < AppConstants.INVALID_NAME_CHARS.length; i++) {
       if (input.indexOf(AppConstants.INVALID_NAME_CHARS[i]) !== -1) {
         if (showWarnings) {
@@ -125,6 +124,15 @@ export class ValidatorsService {
       return false;
     }
     return true;
+  }
+
+  hasValidDescription(description: string): boolean {
+    var allowDescriptionToBeBlank = false;
+    return this.isValidEntityName(
+      description,
+      false,
+      allowDescriptionToBeBlank
+    );
   }
 
   isValidReviewMessage(input: string, showWarnings: boolean): boolean {
