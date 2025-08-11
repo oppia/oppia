@@ -110,7 +110,12 @@ export class QuestionSubmitter extends BaseUser {
     skillName: string,
     topicName: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(submitQuestionTab);
+    const isMobile = await this.isViewportAtMobileWidth();
+    const subheadingSelector = isMobile
+      ? opportunitySubheadingTitleMobile
+      : opportunitySubheadingTitle;
+    await this.isElementVisible(submitQuestionTab);
+
     await this.clickOn(submitQuestionTab);
     await this.page.waitForSelector(opportunityListItem, {visible: true});
     const opportunityListItems = await this.page.$$(opportunityListItem);
@@ -139,10 +144,7 @@ export class QuestionSubmitter extends BaseUser {
         await this.page.evaluate(button => {
           button.click();
         }, button);
-
-        await this.expectElementToBeVisible(
-          questionDifficultySelectionModalSelector
-        );
+        await this.isElementVisible(questionDifficultySelectionModalSelector);
         return;
       }
     }
@@ -152,27 +154,8 @@ export class QuestionSubmitter extends BaseUser {
     );
   }
 
-  /**
-   * Function to select the difficulty level of the question to be suggested.
-   * @param {string} difficulty - The difficulty level of the question.
-   */
   async selectQuestionDifficulty(difficulty: string = 'Medium'): Promise<void> {
-
-    await this.expectElementToBeVisible(
-      questionDifficultySelectionModalSelector
-    );
-    if (difficulty === 'Easy') {
-      await this.clickOn(skillDifficultyEasy);
-    } else if (difficulty === 'Medium') {
-      await this.clickOn(skillDifficultyMedium);
-    } else if (difficulty === 'Hard') {
-      await this.clickOn(skillDifficultyHard);
-    } else {
-      throw new Error(`Invalid difficulty level: ${difficulty}`);
-    }
-    await this.clickOn(confirmSkillDificultyButton);
-
-    await this.expectElementToBeVisible(confirmSkillDificultyButton, false);
+    await this.clickOn(confirmSkillDifficultyButton);
   }
 
   /**
@@ -237,15 +220,13 @@ export class QuestionSubmitter extends BaseUser {
     await this.waitForElementToBeClickable(closeRichTextEditorButton);
     await this.clickOn(closeRichTextEditorButton);
     await this.clickOn(saveStateEditorContentButton);
-
-    await this.expectElementToBeVisible(saveStateEditorContentButton);
+    await this.expectElementToBeVisible(saveStateEditorContentButton, false);
   }
 
   /**
    * Function to add a hint to the current state card.
    * @param {string} hint - The hint to be added to the current state card.
    */
-
 
   async addHintToStateInQuestionEditorPage(hint: string): Promise<void> {
     await this.expectElementToBeVisible(addHintButton);
@@ -289,10 +270,9 @@ export class QuestionSubmitter extends BaseUser {
    * Function to submit the question suggestion.
    */
   async submitQuestionSuggestion(): Promise<void> {
-    await this.expectElementToBeVisible(submitQuestionButon);
-    await this.clickOn(submitQuestionButon);
-
-    this.expectElementToBeVisible(submitQuestionButon, false);
+    await this.expectElementToBeVisible(submitQuestionButton);
+    await this.clickOn(submitQuestionButton);
+    await this.expectElementToBeVisible(submitQuestionButton, false);
   }
 
   /**

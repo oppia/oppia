@@ -266,11 +266,9 @@ const settingsContainerSelector =
 const deleteButtonSelector = 'button.oppia-delete-button';
 
 const misconceptionsHeaderSelector = '.oppia-misconception-card-header';
-const workedExamplesHeaderSelector =
-  '.oppia-editor-card-section.worked-example-content';
 const prerequisiteSkillsHeaderSelector =
-  '.oppia-editor-card-section.prerequisite-skill-content';
-const rubricHeaderSelector = '.oppia-editor-card-section.edit-rubrics-header';
+  '.e2e-test-toggle-prereq-skills-dropdown';
+const rubricHeaderSelector = '.e2e-test-toggle-rubrics-dropdown';
 
 const mobileSkillNavToggle =
   'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
@@ -278,7 +276,6 @@ const mobileSaveOrPublishSkillSelector = '.e2e-test-mobile-save-skill-changes';
 
 const openExplorationEditorNavigationMobile =
   '.oppia-exploration-editor-tabs-dropdown.show';
-
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -929,7 +926,6 @@ export class CurriculumAdmin extends BaseUser {
 
   private async openAllMobileDropdownsOptionsInSkillEditor(): Promise<void> {
     await this.clickOn(misconceptionsHeaderSelector);
-    await this.clickOn(workedExamplesHeaderSelector);
     await this.clickOn(prerequisiteSkillsHeaderSelector);
     await this.clickOn(rubricHeaderSelector);
   }
