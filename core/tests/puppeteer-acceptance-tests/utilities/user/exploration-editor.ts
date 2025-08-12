@@ -3774,7 +3774,6 @@ export class ExplorationEditor extends BaseUser {
     const solutionSelector = isSolutionNumericInput
       ? solutionInputNumeric
       : solutionInputTextArea;
-    await this.page.waitForSelector(stateSolutionTab, {visible: true});
     await this.clickOn(addSolutionButton);
     await this.page.waitForSelector(solutionSelector, {visible: true});
     await this.type(solutionSelector, answer);
