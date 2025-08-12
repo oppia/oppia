@@ -50,6 +50,14 @@ describe('Translation Submitter', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
+    await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
+    await curriculumAdm.createAndPublishTopic(
+      'Fractions',
+      'Understanding Numerators',
+      'Recognize equivalent fractions'
+    );
+    await curriculumAdm.createSkillForTopic('Math', 'Fractions');
+
     // Create an exploration.
     await curriculumAdm.navigateToCreatorDashboardPage();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
@@ -73,12 +81,6 @@ describe('Translation Submitter', function () {
     const explorationIds =
       await curriculumAdm.createAndPublishExplorationsWithCards(10);
 
-    await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdm.createAndPublishTopic(
-      'Fractions',
-      'Understanding Numerators and Denominators',
-      'Recognize equivalent fractions'
-    );
     await curriculumAdm.createAndPublishStoryWithChapter(
       'Dividing a Birthday Cake',
       'dividing-a-birthday-cake',
@@ -322,6 +324,7 @@ describe('Translation Submitter', function () {
       youtubeVideoURL
     );
     await translationSubmitter.clickOn('Done');
+    await translationSubmitter.clickOn('Save and translate another');
   });
 
   afterAll(async function () {

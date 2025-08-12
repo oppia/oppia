@@ -143,12 +143,17 @@ export class BaseUser {
         if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
           const uniqueString = Math.random().toString(36).substring(2, 8);
           const outputFileName =
-            `${mobile ? 'mobile' : 'desktop'}-${specName}-${new Date().toISOString()}-${uniqueString}.mp4`.replace(
+            `${this.username}-${new Date().toISOString()}-${uniqueString}.mp4`.replace(
               /[^a-z0-9.-]/gi,
               '_'
             );
 
-          const outputDir = testConstants.TEST_VIDEO_DIR;
+          const folderName =
+            `${mobile ? 'mobile' : 'desktop'}-${specName}`.replace(
+              /[^a-z0-9.-]/gi,
+              '_'
+            );
+          const outputDir = path.join(testConstants.TEST_VIDEO_DIR, folderName);
           if (!fs.existsSync(outputDir)) {
             fs.mkdirSync(outputDir, {recursive: true});
           }
