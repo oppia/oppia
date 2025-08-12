@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {TranslationAdminFactory} from './translation-admin';
-
 /**
  * @fileoverview Utilty class for translation submitter.
  */
 
 import {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
+import {RTEEditor} from '../common/rte-editor';
 
 // Common Selectors.
 const activeTabSelector = '.e2e-test-active-tab';
@@ -53,6 +52,10 @@ const imageSelector = '.e2e-test-image';
 const saveImageButtonSelector = '.e2e-test-close-rich-text-component-editor';
 const textInputSelector = '.e2e-test-text-input';
 const descriptionSelector = '.e2e-test-description-box';
+const rteEditorBodySelector = '.e2e-test-rte-body';
+const rteHelperModalContainerSelector = '.e2e-test-rte-helper-modal-container';
+const skillNameInput = '.e2e-test-skill-name-input';
+const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 
 export class TranslationSubmitter extends BaseUser {
   /**
@@ -66,6 +69,15 @@ export class TranslationSubmitter extends BaseUser {
     await this.clickOn(selector);
 
     // TODO: Post-check: Verify if the page is loaded.
+  }
+
+  /**
+   * Clicks on the RTE option with the given title.
+   * @param title - The title of RTE option.
+   */
+  async clickOnRTEOptionContainingTitle(title: string) {
+    const rteEditor = new RTEEditor(this.page, this.page);
+    rteEditor.clickOnRTEOptionWithTitle(title);
   }
 
   /**
@@ -209,6 +221,80 @@ export class TranslationSubmitter extends BaseUser {
   }
 
   /**
+   * Fills the value in the customize component.
+   * @param inputType - The type of the component.
+   * @param value - The value to fill.
+   * @param i - The index of the component.
+   */
+  async fillValueInTranslateTextCustomizeComponent(
+    inputType: 'input' | 'rte' | 'textarea',
+    value: string,
+    i: number = 0
+  ): Promise<void> {
+    const baseSelector = inputType === 'rte' ? '.e2e-test-rte' : inputType;
+
+    const rteHelperModal = await this.page.waitForSelector(
+      rteHelperModalContainerSelector,
+      {visible: true}
+    );
+    if (!rteHelperModal) {
+      throw new Error('RTE Helper Modal not found.');
+    }
+    await rteHelperModal.waitForSelector(baseSelector);
+    const elements = await this.page.$$(baseSelector);
+
+    if (elements.length < i + 1) {
+      throw new Error(`Component ${i} not found.`);
+    }
+
+    const element = elements[i];
+    await element.type(value);
+
+    await this.page.waitForFunction(
+      (element: HTMLElement, value: string) => {
+        return (
+          (element as HTMLInputElement).value === value ||
+          element.textContent?.includes(value)
+        );
+      },
+      {},
+      element,
+      value
+    );
+    return;
+
+    // TODO: remove.
+    const selector = `${rteHelperModalContainerSelector} ${baseSelector}`;
+    await this.expectElementToBeVisible(selector);
+    await this.clearAllTextFrom(selector);
+    await this.type(selector, value);
+    await this.page.waitForFunction(
+      (sel: string, val: string) => {
+        const element = document.querySelector(sel);
+        return (
+          element &&
+          ((element as HTMLInputElement).value === val ||
+            (element as HTMLElement).textContent?.includes(val))
+        );
+      },
+      {},
+      selector,
+      value
+    );
+  }
+
+  /**
+   * Searches for a skill in the RTE editor.
+   * @param skillName - The name of the skill to search for.
+   */
+  async searchAndSelectSkillInRTE(skillName: string): Promise<void> {
+    const skillSearchElement = await this.page.$(skillNameInput);
+    await skillSearchElement?.type(skillName);
+    await this.clickOn(skillItemInRTESelector);
+    await this.page.keyboard.press('Enter');
+  }
+
+  /**
    * Clicks on language selection dropdown and selects the given language.
    * @param language - The language to select.
    */
@@ -325,6 +411,33 @@ export class TranslationSubmitter extends BaseUser {
     await this.expectTextContentToBe(
       copyButtonSelector,
       mode === 'On' ? 'On' : 'Off'
+    );
+  }
+
+  /**
+   * Types the given text without clicking on any element.
+   * @param text - The text to type in the RTE editor.
+   */
+  async typeTextForRTE(text: string) {
+    // Pre-checks.
+    await this.expectElementToBeVisible(rteEditorBodySelector);
+    const initialHTMLContent = await this.page.$eval(
+      rteEditorBodySelector,
+      el => (el as HTMLElement).innerHTML
+    );
+
+    // Type the text in the RTE editor.
+    await this.page.keyboard.type(`${text}\n`);
+
+    // Post-checks.
+    await this.page.waitForFunction(
+      (selector: string, initialHTMLContent: string) => {
+        const element = document.querySelector(selector);
+        return element?.innerHTML !== initialHTMLContent;
+      },
+      {},
+      rteEditorBodySelector,
+      initialHTMLContent
     );
   }
 }

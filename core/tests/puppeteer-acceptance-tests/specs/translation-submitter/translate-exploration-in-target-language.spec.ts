@@ -19,7 +19,8 @@
  * TS.CD.??. Translate exploration in target language.
  */
 
-import testConstants, {FILEPATHS} from '../../utilities/common/test-constants';
+import {RTE_BUTTON_TITLES} from '../../utilities/common/rte-editor';
+import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {
@@ -31,6 +32,7 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
+const youtubeVideoURL = 'https://www.youtube.com/watch?v=mDfiDLn2Rko';
 
 describe('Translation Submitter', function () {
   let translationSubmitter: TranslationSubmitter & LoggedInUser;
@@ -155,13 +157,171 @@ describe('Translation Submitter', function () {
     await translationSubmitter.toggleCopyButton('On');
     await translationSubmitter.toggleCopyButton('Off');
     await translationSubmitter.closeTranslateTextModal();
+  });
 
+  it('should be able to use copy tool', async function () {
     // Open the translation modal again.
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'The Birthday Cake Arrives',
       'Dividing a Birthday Cake'
     );
-    await translationSubmitter.toggleCopyButton('On');
+    await translationSubmitter.expectCopyToolWorksProperly(
+      'छवि विवरण',
+      'तस्वीर का शीर्षक'
+    );
+  });
+
+  it('should be able to use RTE', async function () {
+    // Bold Text.
+    await translationSubmitter.clickOnRTEOptionContainingTitle('बोल्ड');
+    await translationSubmitter.typeTextForRTE('बोल्ड टेक्स्ट');
+    await translationSubmitter.clickOnRTEOptionContainingTitle('बोल्ड');
+
+    // Italic Text.
+    await translationSubmitter.clickOnRTEOptionContainingTitle('इटैलिक');
+    await translationSubmitter.typeTextForRTE('इटैलिक टेक्स्ट');
+    await translationSubmitter.clickOnRTEOptionContainingTitle('इटैलिक');
+
+    // Numbered List, INcrease Indent, and Decrease Indent.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.NUM_LIST.HI
+    );
+    await translationSubmitter.typeTextForRTE('अंकीय सूची टेक्स्ट');
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.INCR_INDENT.HI
+    );
+    await translationSubmitter.typeTextForRTE('इन्डॅन्ट बढ़ायें');
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.DECR_INDENT.HI
+    );
+    await translationSubmitter.typeTextForRTE('इन्डॅन्ट कम करें');
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.NUM_LIST.HI
+    );
+
+    // Bulleted List.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.BULLETED_LIST.HI
+    );
+    await translationSubmitter.typeTextForRTE('बुलॅट सूची टेक्स्ट');
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.BULLETED_LIST.HI
+    );
+
+    // Pre formatted Text.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.PRE.HI
+    );
+    await translationSubmitter.typeTextForRTE('Pre स्वरूपित पाठ');
+
+    // Block Quote.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.BLOCK_QUOTE.HI
+    );
+    await translationSubmitter.typeTextForRTE('ब्लॉक-कोट टेक्स्ट');
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.BLOCK_QUOTE.HI
+    );
+
+    // Collapsible Block.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.COLLAPSIBLE.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'नमूना शीर्षलेख'
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'rte',
+      'आपने संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
+    );
+    await translationSubmitter.clickOn('Done');
+
+    // Image.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.IMAGE.HI
+    );
+    await translationSubmitter.clickOn('UPLOAD');
+    await translationSubmitter.uploadFile(testConstants.data.profilePicture);
+    await translationSubmitter.clickOn('Use This Image');
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'textarea',
+      'छवि विवरण'
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'तस्वीर का शीर्षक'
+    );
+    await translationSubmitter.clickOn('Done');
+
+    // Link.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.LINK.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'https://www.oppia.org'
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'ओपीआ',
+      1
+    );
+    await translationSubmitter.clickOn('Done');
+
+    // Math Formula.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.MATH_FORMULA.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'textarea',
+      '\\frac{x}{y}'
+    );
+    await translationSubmitter.clickOn('Done');
+
+    // Concept Card.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.CONCEPT_CARD.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
+    );
+    await translationSubmitter.clickOn('Done');
+
+    // Tabs.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.TABS.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'संकेत परिचय'
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'rte',
+      'टैब सामग्री'
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'संकेत 1',
+      1
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'rte',
+      'टैब सामग्री 1',
+      1
+    );
+    await translationSubmitter.clickOn('Done');
+
+    // Video RTE.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.VIDEO.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      youtubeVideoURL
+    );
+    await translationSubmitter.clickOn('Done');
   });
 
   afterAll(async function () {
