@@ -155,7 +155,7 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.expectCurrentMatTabHeaderToBe('DRAFTS (1)');
 
     // Verify grid view and list view buttons are present (only present in desktop).
-    if (!this.isViewportAtMobileWidth()) {
+    if (!blogPostWriter.isViewportAtMobileWidth()) {
       await blogPostWriter.expectTilesViewAndListViewButtonsArePresent();
       await blogPostWriter.changeBlogPostViewTo('list');
       await blogPostWriter.changeBlogPostViewTo('tiles');
