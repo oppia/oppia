@@ -62,7 +62,12 @@ describe('Translation Submitter', function () {
     await curriculumAdm.navigateToCreatorDashboardPage();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
     await curriculumAdm.dismissWelcomeModal();
-    await curriculumAdm.addExplorationDescriptionContainingAllRTEComponents();
+    await curriculumAdm.addImageRTE(
+      testConstants.data.profilePicture,
+      'Image Description',
+      'Image Caption'
+    );
+    // await curriculumAdm.addExplorationDescriptionContainingAllRTEComponents();
     await curriculumAdm.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
     await curriculumAdm.viewOppiaResponses();
     await curriculumAdm.directLearnersToNewCard('Last Card');
