@@ -67,9 +67,8 @@ export class CreateNewSkillModalComponent {
     private imageLocalStorageService: ImageLocalStorageService,
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
-    private skillObjectFactory: SkillObjectFactory,
     private changeDetectorRef: ChangeDetectorRef,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
     private validatorsService: ValidatorsService
   ) {}
 

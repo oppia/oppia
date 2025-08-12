@@ -818,6 +818,7 @@ export class CurriculumAdmin extends BaseUser {
    * Navigates to the study guide Previews tab.
    */
   async previewStudyGuide(): Promise<void> {
+    await this.expectElementToBeVisible(topicPreviewTab);
     await this.clickOn(topicPreviewTab);
     await this.waitForPageToFullyLoad();
   }
@@ -2343,6 +2344,12 @@ export class CurriculumAdmin extends BaseUser {
     await this.scrollToBottomOfPage();
   }
 
+  /**
+   * Checks of the WorkedExamples have been correctly added to the
+   * skill.
+   * @param {string[][]} workedExamples - A list of WorkedExamples.
+   * Each entry is a list with 2 strings - Question and Answer.
+   */
   async checkWorkedExamplesExistForSkill(
     workedExamples: string[][]
   ): Promise<void> {

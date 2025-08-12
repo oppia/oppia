@@ -77,8 +77,8 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-skill-with-workedexamples.spec.ts"
     },
     {
-      "name": "curriculum-admin/show-error-when-pasting-invalid-components-in-rte",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/show-error-when-pasting-invalid-components-in-rte.spec.ts"
+      "name": "curriculum-admin/try-to-paste-invalid-components-and-get-error",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/try-to-paste-invalid-components-and-get-error.spec.ts"
     },
     {
       "name": "exploration-editor/create-exploration-and-change-basic-settings",
