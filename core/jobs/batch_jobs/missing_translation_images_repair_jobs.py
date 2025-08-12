@@ -22,8 +22,7 @@ import html
 
 from core import feconf
 from core.jobs import base_jobs
-from core.jobs.io import gcs_io
-from core.jobs.io import ndb_io
+from core.jobs.io import gcs_io, ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
 

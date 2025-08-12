@@ -43,8 +43,7 @@ import json
 import re
 import subprocess
 
-from core import constants
-from core import utils
+from core import constants, utils
 from scripts import common
 
 from typing import Final, List, Optional, Pattern, Tuple

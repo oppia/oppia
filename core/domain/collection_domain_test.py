@@ -20,11 +20,9 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import collection_domain
-from core.domain import collection_services
+from core.domain import collection_domain, collection_services
 from core.tests import test_utils
 
 # Dictionary-like data structures within sample YAML must be formatted

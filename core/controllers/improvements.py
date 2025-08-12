@@ -18,19 +18,18 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.controllers import domain_objects_validator
-from core.domain import exp_fetchers
-from core.domain import feature_flag_services
-from core.domain import improvements_domain
-from core.domain import improvements_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base, domain_objects_validator
+from core.domain import (
+    exp_fetchers,
+    feature_flag_services,
+    improvements_domain,
+    improvements_services,
+    platform_parameter_list,
+    platform_parameter_services,
+    user_services,
+)
 
 from typing import Dict, List, Optional, TypedDict
 

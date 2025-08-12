@@ -16,16 +16,16 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import feature_flag_services
-from core.domain import study_guide_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import topic_fetchers
+from core.controllers import acl_decorators, base
+from core.domain import (
+    feature_flag_services,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    topic_fetchers,
+)
 
 from typing import Dict
 

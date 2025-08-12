@@ -24,9 +24,7 @@ import inspect
 import os
 import pkgutil
 
-from core import constants
-from core import feconf
-from core import utils
+from core import constants, feconf, utils
 
 from typing import Any, Dict, List, Type, TypedDict, Union, cast
 

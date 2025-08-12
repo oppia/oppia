@@ -19,13 +19,14 @@ from __future__ import annotations
 import os
 from unittest import mock
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import fs_services
-from core.domain import image_services
-from core.domain import platform_parameter_list
-from core.domain import user_services
+from core.domain import (
+    fs_services,
+    image_services,
+    platform_parameter_list,
+    user_services,
+)
 from core.tests import test_utils
 
 

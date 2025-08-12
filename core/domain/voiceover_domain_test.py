@@ -18,10 +18,8 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
-from core.domain import state_domain
-from core.domain import voiceover_domain
+from core import feconf, utils
+from core.domain import state_domain, voiceover_domain
 from core.tests import test_utils
 
 

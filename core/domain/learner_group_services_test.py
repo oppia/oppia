@@ -20,10 +20,12 @@ from __future__ import annotations
 
 from core import feature_flag_list
 from core.constants import constants
-from core.domain import learner_group_fetchers
-from core.domain import learner_group_services
-from core.domain import topic_domain
-from core.domain import topic_services
+from core.domain import (
+    learner_group_fetchers,
+    learner_group_services,
+    topic_domain,
+    topic_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

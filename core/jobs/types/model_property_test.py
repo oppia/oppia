@@ -26,8 +26,7 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 

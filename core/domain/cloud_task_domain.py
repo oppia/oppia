@@ -17,6 +17,7 @@
 """Domain objects for Cloud task run."""
 
 from __future__ import annotations
+
 import datetime
 
 from typing import List, TypedDict

@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import base64
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.domain import html_validation_service
 
 import filetype

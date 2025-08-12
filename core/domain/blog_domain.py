@@ -21,13 +21,11 @@ from __future__ import annotations
 import datetime
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 
 from typing import Final, List, Optional, TypedDict
-
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.

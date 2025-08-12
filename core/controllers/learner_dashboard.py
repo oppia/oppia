@@ -17,13 +17,14 @@
 from __future__ import annotations
 
 from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import learner_progress_services
-from core.domain import story_fetchers
-from core.domain import subscription_services
-from core.domain import summary_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    learner_progress_services,
+    story_fetchers,
+    subscription_services,
+    summary_services,
+    user_services,
+)
 
 from typing import Dict, Optional, TypedDict
 

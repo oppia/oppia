@@ -21,17 +21,14 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core.domain import event_services
-from core.domain import exp_fetchers
-from core.domain import exp_services
+from core.domain import event_services, exp_fetchers, exp_services
 from core.platform import models
 
 from typing import Dict, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import transaction_services
-    from mypy_imports import user_models
+    from mypy_imports import transaction_services, user_models
 
 (exp_models, user_models,) = models.Registry.import_models([
     models.Names.EXPLORATION, models.Names.USER])

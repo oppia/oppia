@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import recommendations_services
+from core.domain import exp_domain, exp_fetchers, recommendations_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -28,14 +26,15 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Dict, Final, Iterable, List, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import recommendations_models
+    from mypy_imports import (
+        datastore_services,
+        exp_models,
+        recommendations_models,
+    )
 
 (exp_models, recommendations_models) = models.Registry.import_models([
     models.Names.EXPLORATION, models.Names.RECOMMENDATIONS

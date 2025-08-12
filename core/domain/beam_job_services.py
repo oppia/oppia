@@ -20,8 +20,7 @@ from __future__ import annotations
 
 from core.constants import constants
 from core.domain import beam_job_domain
-from core.jobs import base_jobs
-from core.jobs import jobs_manager
+from core.jobs import base_jobs, jobs_manager
 from core.jobs import registry as jobs_registry
 from core.platform import models
 
@@ -29,8 +28,7 @@ from typing import List, Optional, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import beam_job_models
-    from mypy_imports import datastore_services
+    from mypy_imports import beam_job_models, datastore_services
 
 (beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
 

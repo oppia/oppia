@@ -23,24 +23,30 @@ import datetime
 import itertools
 import logging
 
-from core import feconf
-from core import utils
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import question_services
-from core.domain import stats_domain
+from core import feconf, utils
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    question_services,
+    stats_domain,
+)
 from core.platform import models
 
 from typing import (
-    Dict, List, Literal, Optional, Sequence, Union, cast, overload
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Union,
+    cast,
+    overload,
 )
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from core.domain import state_domain
-    from mypy_imports import base_models
-    from mypy_imports import stats_models
-    from mypy_imports import transaction_services
+    from mypy_imports import base_models, stats_models, transaction_services
 
 (base_models, stats_models,) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.STATISTICS]

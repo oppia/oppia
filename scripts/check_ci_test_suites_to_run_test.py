@@ -22,10 +22,9 @@ import subprocess
 import tempfile
 
 from core.tests import test_utils
-from scripts import check_ci_test_suites_to_run
-from scripts import generate_root_files_mapping
-from typing import List, Sequence
+from scripts import check_ci_test_suites_to_run, generate_root_files_mapping
 
+from typing import List, Sequence
 
 LIGHTHOUSE_PAGES_CONFIG = {
     'splash': {

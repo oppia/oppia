@@ -18,13 +18,14 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
-from core.domain import fs_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
+from core.controllers import acl_decorators, base
+from core.domain import (
+    classroom_config_domain,
+    classroom_config_services,
+    fs_services,
+    topic_domain,
+    topic_fetchers,
+)
 
 from typing import Dict, List, TypedDict
 

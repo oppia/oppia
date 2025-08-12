@@ -22,31 +22,31 @@ import collections
 import itertools
 import logging
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
-from core.domain import caching_services
-from core.domain import change_domain
-from core.domain import feature_flag_services
-from core.domain import feedback_services
-from core.domain import fs_services
-from core.domain import opportunity_services
-from core.domain import rights_domain
-from core.domain import role_services
-from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import study_guide_domain
-from core.domain import study_guide_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import user_domain
-from core.domain import user_services
+from core.domain import (
+    caching_services,
+    change_domain,
+    feature_flag_services,
+    feedback_services,
+    fs_services,
+    opportunity_services,
+    rights_domain,
+    role_services,
+    state_domain,
+    story_domain,
+    story_fetchers,
+    story_services,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    user_domain,
+    user_services,
+)
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence, Tuple, Union, cast

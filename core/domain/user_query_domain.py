@@ -21,11 +21,9 @@ from __future__ import annotations
 import collections
 import datetime
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 
 from typing import List, Optional
-
 
 UserQueryParams = collections.namedtuple(
     'UserQueryParams',

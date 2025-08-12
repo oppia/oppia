@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.domain import blog_services
 from core.platform import models

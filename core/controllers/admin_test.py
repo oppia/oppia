@@ -20,51 +20,53 @@ import datetime
 import enum
 import logging
 
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
-from core.domain import blog_services
-from core.domain import caching_services
-from core.domain import classroom_config_services
-from core.domain import collection_services
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import opportunity_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry
-from core.domain import question_fetchers
-from core.domain import recommendations_services
-from core.domain import rights_manager
-from core.domain import search_services
-from core.domain import skill_services
-from core.domain import stats_domain
-from core.domain import stats_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import study_guide_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_services
-from core.domain import voiceover_services
-from core.domain import wipeout_service
+from core.domain import (
+    blog_services,
+    caching_services,
+    classroom_config_services,
+    collection_services,
+    exp_domain,
+    exp_services,
+    fs_services,
+    opportunity_services,
+    platform_parameter_domain,
+    platform_parameter_list,
+    platform_parameter_registry,
+    question_fetchers,
+    recommendations_services,
+    rights_manager,
+    search_services,
+    skill_services,
+    stats_domain,
+    stats_services,
+    story_domain,
+    story_fetchers,
+    story_services,
+    study_guide_services,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    user_services,
+    voiceover_services,
+    wipeout_service,
+)
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import audit_models
-    from mypy_imports import blog_models
-    from mypy_imports import exp_models
-    from mypy_imports import opportunity_models
-    from mypy_imports import user_models
-    from mypy_imports import voiceover_models
+    from mypy_imports import (
+        audit_models,
+        blog_models,
+        exp_models,
+        opportunity_models,
+        user_models,
+        voiceover_models,
+    )
 
 (
     audit_models, blog_models, exp_models, opportunity_models,

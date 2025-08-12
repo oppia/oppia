@@ -20,9 +20,7 @@ import builtins
 import subprocess
 
 from core.tests import test_utils
-from scripts import common
-from scripts import generate_root_files_mapping
-from scripts import run_typescript_checks
+from scripts import common, generate_root_files_mapping, run_typescript_checks
 
 
 class GenerateRootFilesMappingTests(test_utils.GenericTestBase):

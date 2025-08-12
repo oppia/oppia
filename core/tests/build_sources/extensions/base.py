@@ -41,14 +41,11 @@ import json
 import os
 import sys
 
-from core import feconf
-from core import constants
-from core import utils
-from core.domain import object_registry
-from core.domain import visualization_registry
+from core import constants, feconf, utils
+from core.domain import object_registry, visualization_registry
 from extensions import domain
-from extensions.visualizations import models
 from extensions.objects.models import objects
+from extensions.visualizations import models
 
 from typing import Any, Dict, Final, List, Optional, Set, Tuple, TypedDict
 

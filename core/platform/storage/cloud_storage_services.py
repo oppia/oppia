@@ -21,7 +21,6 @@ from __future__ import annotations
 import functools
 
 from google.cloud import storage
-
 from typing import List, Optional, Union
 
 

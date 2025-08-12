@@ -17,9 +17,11 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import platform_parameter_list
-from core.domain import user_query_services
-from core.domain import user_services
+from core.domain import (
+    platform_parameter_list,
+    user_query_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -27,8 +29,7 @@ from typing import Final, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import email_models
-    from mypy_imports import user_models
+    from mypy_imports import email_models, user_models
 
 (user_models, email_models) = models.Registry.import_models(
     [models.Names.USER, models.Names.EMAIL])

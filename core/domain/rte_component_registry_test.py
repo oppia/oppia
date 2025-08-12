@@ -26,16 +26,11 @@ import pkgutil
 import re
 import string
 import struct
-
 from unittest import mock
 
-from core import feconf
-from core import schema_utils
-from core import schema_utils_test
-from core import utils
+from core import feconf, schema_utils, schema_utils_test, utils
 from core.constants import constants
-from core.domain import object_registry
-from core.domain import rte_component_registry
+from core.domain import object_registry, rte_component_registry
 from core.tests import test_utils
 
 from typing import Final, List, Tuple, Type, cast

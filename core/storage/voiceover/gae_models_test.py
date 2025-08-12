@@ -28,8 +28,7 @@ MYPY = False
 if MYPY: # pragma: no cover
     # Here, 'state_domain' is imported only for type checking.
     from core.domain import state_domain
-    from mypy_imports import base_models
-    from mypy_imports import voiceover_models
+    from mypy_imports import base_models, voiceover_models
 
 (base_models, voiceover_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.VOICEOVER

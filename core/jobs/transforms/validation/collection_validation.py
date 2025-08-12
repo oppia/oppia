@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import collection_domain
-from core.domain import rights_domain
+from core.domain import collection_domain, rights_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation

@@ -21,14 +21,16 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import html_cleaner
-from core.domain import opportunity_domain
-from core.domain import opportunity_services
-from core.domain import skill_services
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
-from core.domain import translation_domain
+from core.domain import (
+    exp_domain,
+    html_cleaner,
+    opportunity_domain,
+    opportunity_services,
+    skill_services,
+    suggestion_registry,
+    suggestion_services,
+    translation_domain,
+)
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -36,18 +38,27 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
 import result
-
 from typing import (
-    Dict, Iterable, Iterator, List, Optional, Set, Tuple, Type, TypedDict, Union
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Type,
+    TypedDict,
+    Union,
 )
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import opportunity_models
-    from mypy_imports import suggestion_models
+    from mypy_imports import (
+        datastore_services,
+        opportunity_models,
+        suggestion_models,
+    )
 
 (opportunity_models, suggestion_models) = models.Registry.import_models([
     models.Names.OPPORTUNITY, models.Names.SUGGESTION

@@ -24,9 +24,9 @@ from __future__ import annotations
 
 import os
 
-from typing import Dict, List, Optional, Union
 import xmltodict
 import yaml
+from typing import Dict, List, Optional, Union
 
 XmlIndexesDict = Dict[
     str, Dict[

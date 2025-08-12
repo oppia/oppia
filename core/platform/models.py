@@ -97,7 +97,8 @@ class _Gae(Platform):
                 returned_models.append(activity_models)
             elif name == Names.APP_FEEDBACK_REPORT:
                 from core.storage.app_feedback_report import (
-                    gae_models as app_feedback_report_models)
+                    gae_models as app_feedback_report_models,
+                )
                 returned_models.append(app_feedback_report_models)
             elif name == Names.AUDIT:
                 from core.storage.audit import gae_models as audit_models
@@ -116,19 +117,23 @@ class _Gae(Platform):
                 returned_models.append(blog_models)
             elif name == Names.BLOG_STATISTICS:
                 from core.storage.blog_statistics import (
-                    gae_models as blog_stats_models)
+                    gae_models as blog_stats_models,
+                )
                 returned_models.append(blog_stats_models)
             elif name == Names.CLASSROOM:
                 from core.storage.classroom import (
-                    gae_models as classroom_models)
+                    gae_models as classroom_models,
+                )
                 returned_models.append(classroom_models)
             elif name == Names.CLOUD_TASK:
                 from core.storage.cloud_task import (
-                    gae_models as cloud_task_models)
+                    gae_models as cloud_task_models,
+                )
                 returned_models.append(cloud_task_models)
             elif name == Names.COLLECTION:
                 from core.storage.collection import (
-                    gae_models as collection_models)
+                    gae_models as collection_models,
+                )
                 returned_models.append(collection_models)
             elif name == Names.CONFIG:
                 from core.storage.config import gae_models as config_models
@@ -144,32 +149,37 @@ class _Gae(Platform):
                 returned_models.append(feedback_models)
             elif name == Names.IMPROVEMENTS:
                 from core.storage.improvements import (
-                    gae_models as improvements_models)
+                    gae_models as improvements_models,
+                )
                 returned_models.append(improvements_models)
             elif name == Names.JOB:
                 from core.storage.job import gae_models as job_models
                 returned_models.append(job_models)
             elif name == Names.LEARNER_GROUP:
                 from core.storage.learner_group import (
-                    gae_models as learner_group_models)
+                    gae_models as learner_group_models,
+                )
                 returned_models.append(learner_group_models)
             elif name == Names.OPPORTUNITY:
                 from core.storage.opportunity import (
-                    gae_models as opportunity_models)
+                    gae_models as opportunity_models,
+                )
                 returned_models.append(opportunity_models)
             elif name == Names.QUESTION:
                 from core.storage.question import gae_models as question_models
                 returned_models.append(question_models)
             elif name == Names.RECOMMENDATIONS:
                 from core.storage.recommendations import (
-                    gae_models as recommendations_models)
+                    gae_models as recommendations_models,
+                )
                 returned_models.append(recommendations_models)
             elif name == Names.SKILL:
                 from core.storage.skill import gae_models as skill_models
                 returned_models.append(skill_models)
             elif name == Names.STATISTICS:
                 from core.storage.statistics import (
-                    gae_models as statistics_models)
+                    gae_models as statistics_models,
+                )
                 returned_models.append(statistics_models)
             elif name == Names.STORY:
                 from core.storage.story import gae_models as story_models
@@ -179,21 +189,24 @@ class _Gae(Platform):
                 returned_models.append(subtopic_models)
             elif name == Names.SUGGESTION:
                 from core.storage.suggestion import (
-                    gae_models as suggestion_models)
+                    gae_models as suggestion_models,
+                )
                 returned_models.append(suggestion_models)
             elif name == Names.TOPIC:
                 from core.storage.topic import gae_models as topic_models
                 returned_models.append(topic_models)
             elif name == Names.TRANSLATION:
                 from core.storage.translation import (
-                    gae_models as translation_models)
+                    gae_models as translation_models,
+                )
                 returned_models.append(translation_models)
             elif name == Names.USER:
                 from core.storage.user import gae_models as user_models
                 returned_models.append(user_models)
             elif name == Names.VOICEOVER:
                 from core.storage.voiceover import (
-                    gae_models as voiceover_models)
+                    gae_models as voiceover_models,
+                )
                 returned_models.append(voiceover_models)
             else:
                 raise Exception('Invalid model name: %s' % name)
@@ -288,11 +301,13 @@ class _Gae(Platform):
         """
         if constants.EMULATOR_MODE:
             from core.platform.speech_synthesis import (
-                dev_mode_speech_synthesis_services)
+                dev_mode_speech_synthesis_services,
+            )
             return dev_mode_speech_synthesis_services
 
         from core.platform.speech_synthesis import (
-            azure_speech_synthesis_services)
+            azure_speech_synthesis_services,
+        )
         return azure_speech_synthesis_services
 
     @classmethod

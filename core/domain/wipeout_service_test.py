@@ -19,33 +19,34 @@ from __future__ import annotations
 import datetime
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import auth_services
-from core.domain import collection_services
-from core.domain import email_manager
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import platform_parameter_list
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_domain
-from core.domain import user_services
-from core.domain import wipeout_domain
-from core.domain import wipeout_service
+from core.domain import (
+    auth_services,
+    collection_services,
+    email_manager,
+    exp_services,
+    fs_services,
+    platform_parameter_list,
+    question_domain,
+    question_services,
+    rights_domain,
+    rights_manager,
+    skill_domain,
+    skill_services,
+    story_domain,
+    story_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    user_domain,
+    user_services,
+    wipeout_domain,
+    wipeout_service,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -53,23 +54,25 @@ from typing import Final, List, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import app_feedback_report_models
-    from mypy_imports import auth_models
-    from mypy_imports import blog_models
-    from mypy_imports import collection_models
-    from mypy_imports import config_models
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import feedback_models
-    from mypy_imports import improvements_models
-    from mypy_imports import learner_group_models
-    from mypy_imports import question_models
-    from mypy_imports import skill_models
-    from mypy_imports import story_models
-    from mypy_imports import subtopic_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import topic_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        app_feedback_report_models,
+        auth_models,
+        blog_models,
+        collection_models,
+        config_models,
+        datastore_services,
+        exp_models,
+        feedback_models,
+        improvements_models,
+        learner_group_models,
+        question_models,
+        skill_models,
+        story_models,
+        subtopic_models,
+        suggestion_models,
+        topic_models,
+        user_models,
+    )
 
 (
     app_feedback_report_models, auth_models, blog_models,

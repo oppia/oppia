@@ -16,10 +16,8 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list
-from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
+from core import feature_flag_list, feconf
+from core.controllers import acl_decorators, base
 from core.domain import feature_flag_services
 
 from typing import Dict

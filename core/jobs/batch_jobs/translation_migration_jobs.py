@@ -21,8 +21,7 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import state_domain, translation_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -35,9 +34,7 @@ from typing import Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import translation_models
+    from mypy_imports import datastore_services, exp_models, translation_models
 
 (exp_models, translation_models) = models.Registry.import_models(
     [models.Names.EXPLORATION, models.Names.TRANSLATION])

@@ -26,11 +26,9 @@ from core.tests import test_utils
 
 from typing import Final
 
-
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import blog_stats_models
+    from mypy_imports import base_models, blog_stats_models
 
 (base_models, blog_stats_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.BLOG_STATISTICS, models.Names.USER

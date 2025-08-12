@@ -26,20 +26,21 @@ import copy
 import itertools
 
 from core import feconf
-from core.domain import caching_services
-from core.domain import classroom_config_services
-from core.domain import exp_fetchers
-from core.domain import story_domain
-from core.domain import topic_fetchers
-from core.domain import user_services
+from core.domain import (
+    caching_services,
+    classroom_config_services,
+    exp_fetchers,
+    story_domain,
+    topic_fetchers,
+    user_services,
+)
 from core.platform import models
 
 from typing import Dict, List, Literal, Optional, Sequence, overload
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import story_models
-    from mypy_imports import user_models
+    from mypy_imports import story_models, user_models
 
 (story_models, user_models) = models.Registry.import_models(
     [models.Names.STORY, models.Names.USER])

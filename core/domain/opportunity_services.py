@@ -22,26 +22,26 @@ import collections
 import logging
 
 from core import feconf
-
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import opportunity_domain
-from core.domain import question_fetchers
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import translation_services
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    opportunity_domain,
+    question_fetchers,
+    story_domain,
+    story_fetchers,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    translation_services,
+)
 from core.platform import models
 
 from typing import Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import opportunity_models
-    from mypy_imports import user_models
+    from mypy_imports import opportunity_models, user_models
 
 (opportunity_models, user_models) = models.Registry.import_models([
     models.Names.OPPORTUNITY, models.Names.USER

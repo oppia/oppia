@@ -19,41 +19,46 @@ from __future__ import annotations
 import datetime
 from unittest import mock
 
+import main
 from core import feconf
 from core.constants import constants
-from core.domain import beam_job_services
-from core.domain import email_manager
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import platform_parameter_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_registry
-from core.domain import question_domain
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
-from core.domain import taskqueue_services
-from core.domain import translation_domain
-from core.domain import user_services
-from core.jobs.batch_jobs import blog_post_search_indexing_jobs
-from core.jobs.batch_jobs import exp_recommendation_computation_jobs
-from core.jobs.batch_jobs import exp_search_indexing_jobs
-from core.jobs.batch_jobs import user_stats_computation_jobs
+from core.domain import (
+    beam_job_services,
+    email_manager,
+    exp_domain,
+    exp_services,
+    platform_parameter_domain,
+    platform_parameter_list,
+    platform_parameter_registry,
+    question_domain,
+    story_domain,
+    story_services,
+    suggestion_registry,
+    suggestion_services,
+    taskqueue_services,
+    translation_domain,
+    user_services,
+)
+from core.jobs.batch_jobs import (
+    blog_post_search_indexing_jobs,
+    exp_recommendation_computation_jobs,
+    exp_search_indexing_jobs,
+    user_stats_computation_jobs,
+)
 from core.platform import models
 from core.tests import test_utils
 
-import main
-
-from typing import Dict, Final, List, Set, Union
 import webtest
+from typing import Dict, Final, List, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import app_feedback_report_models
-    from mypy_imports import exp_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        app_feedback_report_models,
+        exp_models,
+        suggestion_models,
+        user_models,
+    )
 
 (
     app_feedback_report_models, exp_models, suggestion_models, user_models

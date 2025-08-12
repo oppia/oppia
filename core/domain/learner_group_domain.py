@@ -19,9 +19,7 @@
 from __future__ import annotations
 
 from core import utils
-
-from core.domain import story_domain
-from core.domain import subtopic_page_domain
+from core.domain import story_domain, subtopic_page_domain
 
 from typing import List, TypedDict
 

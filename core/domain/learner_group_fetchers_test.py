@@ -18,9 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import learner_group_fetchers
-from core.domain import learner_group_services
-
+from core.domain import learner_group_fetchers, learner_group_services
 from core.tests import test_utils
 
 

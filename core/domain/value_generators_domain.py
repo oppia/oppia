@@ -23,8 +23,7 @@ import importlib
 import inspect
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 
 from typing import Any, Dict, Type
 

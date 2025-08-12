@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import copy
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 
 from typing import Any, Dict, List, Mapping, Union, cast
 
@@ -30,11 +29,13 @@ if MYPY: # pragma: no cover
     # Modules imported under the `if MYPY` clause is imported only for
     # type checking purposes and they are not expected to be executed
     # at runtime.
-    from core.domain import param_domain
-    from core.domain import platform_parameter_domain
-    from core.domain import question_domain
-    from core.domain import state_domain
-    from core.domain import translation_domain
+    from core.domain import (
+        param_domain,
+        platform_parameter_domain,
+        question_domain,
+        state_domain,
+        translation_domain,
+    )
 
     # After importing modules under the `if MYPY` clause they are not
     # executed at runtime. So, to avoid `attribute is not defined` error

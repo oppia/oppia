@@ -29,8 +29,7 @@ from typing import Any, Dict, Final, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import cloud_task_models
-    from mypy_imports import platform_taskqueue_services
+    from mypy_imports import cloud_task_models, platform_taskqueue_services
 
 platform_taskqueue_services = models.Registry.import_taskqueue_services()
 

@@ -18,12 +18,9 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import change_domain, state_domain, translation_domain
 
 from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
 

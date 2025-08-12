@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import schema_utils
-from core import utils
+from core import schema_utils, utils
 from core.domain import calculation_registry
 
 from typing import Any, Dict, List, Mapping, TypedDict, Union

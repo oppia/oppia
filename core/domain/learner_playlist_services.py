@@ -19,8 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import subscription_services
-from core.domain import user_domain
+from core.domain import subscription_services, user_domain
 from core.platform import models
 
 from typing import Final, List, Optional, Tuple

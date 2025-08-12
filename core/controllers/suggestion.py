@@ -22,27 +22,35 @@ import base64
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.controllers import domain_objects_validator
-from core.domain import change_domain
-from core.domain import exp_fetchers
-from core.domain import fs_services
-from core.domain import html_cleaner
-from core.domain import image_validation_services
-from core.domain import opportunity_domain
-from core.domain import opportunity_services
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import state_domain
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
-from core.domain import topic_fetchers
-from core.domain import translation_domain
-from core.domain import user_services
+from core.controllers import acl_decorators, base, domain_objects_validator
+from core.domain import (
+    change_domain,
+    exp_fetchers,
+    fs_services,
+    html_cleaner,
+    image_validation_services,
+    opportunity_domain,
+    opportunity_services,
+    skill_domain,
+    skill_fetchers,
+    state_domain,
+    suggestion_registry,
+    suggestion_services,
+    topic_fetchers,
+    translation_domain,
+    user_services,
+)
 
 from typing import (
-    Dict, List, Mapping, Optional, Sequence, TypedDict, TypeVar, Union, cast
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    TypedDict,
+    TypeVar,
+    Union,
+    cast,
 )
 
 # Note: These private type variables are only defined to implement

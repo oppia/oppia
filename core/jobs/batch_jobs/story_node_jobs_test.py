@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import story_node_jobs
 from core.jobs.types import job_run_result
@@ -31,8 +30,7 @@ from typing import Final, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import story_models
-    from mypy_imports import topic_models
+    from mypy_imports import story_models, topic_models
 
 (story_models, topic_models) = models.Registry.import_models([
     models.Names.STORY, models.Names.TOPIC])

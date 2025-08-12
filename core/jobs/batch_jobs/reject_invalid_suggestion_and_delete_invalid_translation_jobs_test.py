@@ -22,21 +22,22 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import rights_domain
-from core.domain import translation_domain
+from core.domain import exp_domain, rights_domain, translation_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import (
-    reject_invalid_suggestion_and_delete_invalid_translation_jobs)
+    reject_invalid_suggestion_and_delete_invalid_translation_jobs,
+)
 from core.jobs.types import job_run_result
 from core.platform import models
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
-    from mypy_imports import opportunity_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import translation_models
+    from mypy_imports import (
+        exp_models,
+        opportunity_models,
+        suggestion_models,
+        translation_models,
+    )
 
 (
     exp_models,

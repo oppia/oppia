@@ -21,11 +21,13 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core.domain import change_domain
-from core.domain import skill_domain
-from core.domain import state_domain
-from core.domain import topic_domain
-from core.domain import topic_services
+from core.domain import (
+    change_domain,
+    skill_domain,
+    state_domain,
+    topic_domain,
+    topic_services,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import contributor_admin_stats_jobs
 from core.jobs.types import job_run_result
@@ -35,10 +37,12 @@ from typing import Final, Mapping, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
-    from mypy_imports import story_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import topic_models
+    from mypy_imports import (
+        exp_models,
+        story_models,
+        suggestion_models,
+        topic_models,
+    )
 
 (
     exp_models,

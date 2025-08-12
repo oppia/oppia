@@ -22,29 +22,33 @@ import datetime
 import itertools
 
 from core import feconf
-from core.domain import email_manager
-from core.domain import feedback_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import rights_manager
-from core.domain import subscription_services
-from core.domain import taskqueue_services
-from core.domain import user_services
+from core.domain import (
+    email_manager,
+    feedback_domain,
+    platform_parameter_list,
+    platform_parameter_services,
+    rights_manager,
+    subscription_services,
+    taskqueue_services,
+    user_services,
+)
 from core.platform import models
 
 from typing import Dict, Final, List, Optional, Tuple, Type, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import feedback_models
-    from mypy_imports import question_models
-    from mypy_imports import skill_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import topic_models
-    from mypy_imports import transaction_services
+    from mypy_imports import (
+        base_models,
+        datastore_services,
+        exp_models,
+        feedback_models,
+        question_models,
+        skill_models,
+        suggestion_models,
+        topic_models,
+        transaction_services,
+    )
 
 (
     base_models,

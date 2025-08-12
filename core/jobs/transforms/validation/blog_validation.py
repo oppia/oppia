@@ -24,18 +24,15 @@ from core.domain import blog_domain
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
-from core.jobs.types import blog_validation_errors
-from core.jobs.types import model_property
+from core.jobs.types import blog_validation_errors, model_property
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Iterator, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import blog_models
-    from mypy_imports import user_models
+    from mypy_imports import blog_models, user_models
 
 (blog_models, user_models) = models.Registry.import_models(
     [models.Names.BLOG, models.Names.USER])

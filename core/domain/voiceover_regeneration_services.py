@@ -27,13 +27,14 @@ import logging
 import time
 import uuid
 
-from core import feconf
-from core import utils
-from core.domain import exp_fetchers
-from core.domain import fs_services
-from core.domain import state_domain
-from core.domain import translation_fetchers
-from core.domain import voiceover_services
+from core import feconf, utils
+from core.domain import (
+    exp_fetchers,
+    fs_services,
+    state_domain,
+    translation_fetchers,
+    voiceover_services,
+)
 from core.platform import models
 
 import bs4
@@ -43,8 +44,7 @@ from typing import Dict, List, Optional, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import speech_synthesis_services
-    from mypy_imports import voiceover_models
+    from mypy_imports import speech_synthesis_services, voiceover_models
 
 (voiceover_models,) = models.Registry.import_models([
     models.Names.VOICEOVER])

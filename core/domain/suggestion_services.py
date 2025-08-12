@@ -23,41 +23,56 @@ import heapq
 import logging
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import contribution_stats_services
-from core.domain import email_manager
-from core.domain import exp_fetchers
-from core.domain import feedback_services
-from core.domain import html_cleaner
-from core.domain import html_validation_service
-from core.domain import opportunity_services
-from core.domain import question_domain
-from core.domain import rte_component_registry
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import suggestion_registry
-from core.domain import taskqueue_services
-from core.domain import translation_domain
-from core.domain import user_domain
-from core.domain import user_services
+from core.domain import (
+    contribution_stats_services,
+    email_manager,
+    exp_fetchers,
+    feedback_services,
+    html_cleaner,
+    html_validation_service,
+    opportunity_services,
+    question_domain,
+    rte_component_registry,
+    skill_services,
+    state_domain,
+    suggestion_registry,
+    taskqueue_services,
+    translation_domain,
+    user_domain,
+    user_services,
+)
 from core.platform import models
 
 import bs4
 from typing import (
-    Callable, Dict, Final, List, Literal, Mapping, Match,
-    Optional, Sequence, Set, Tuple, Union, cast, overload
+    Callable,
+    Dict,
+    Final,
+    List,
+    Literal,
+    Mapping,
+    Match,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    Union,
+    cast,
+    overload,
 )
 
 MYPY = False
 if MYPY:  # pragma: no cover
     # Here, change domain is imported only for type checking.
     from core.domain import change_domain
-    from mypy_imports import feedback_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import transaction_services
-    from mypy_imports import user_models
+    from mypy_imports import (
+        feedback_models,
+        suggestion_models,
+        transaction_services,
+        user_models,
+    )
 
     AllowedSuggestionClasses = Union[
         suggestion_registry.SuggestionEditStateContent,

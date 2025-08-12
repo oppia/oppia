@@ -19,8 +19,7 @@
 from __future__ import annotations
 
 from core import utils
-from core.domain import rights_manager
-from core.domain import user_services
+from core.domain import rights_manager, user_services
 from core.tests import test_utils
 
 

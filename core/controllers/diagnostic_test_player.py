@@ -20,11 +20,8 @@ import collections
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import topic_fetchers
+from core.controllers import acl_decorators, base
+from core.domain import question_domain, question_services, topic_fetchers
 
 from typing import Dict, List, TypedDict, cast
 

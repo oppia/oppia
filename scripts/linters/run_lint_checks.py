@@ -65,19 +65,22 @@ import threading
 
 from core import utils
 from scripts import common
+
 from typing import Dict, List, Optional, Set, Tuple
 
+from .. import concurrent_task_utils, install_third_party_libs
+
 # Install third party dependencies before proceeding.
-from . import codeowner_linter  # isort:skip
-from . import css_linter  # isort:skip
-from . import general_purpose_linter  # isort:skip
-from . import html_linter  # isort:skip
-from . import js_ts_linter  # isort:skip
-from . import linter_utils  # isort:skip
-from . import other_files_linter  # isort:skip
-from . import python_linter  # isort:skip
-from .. import concurrent_task_utils  # isort:skip
-from .. import install_third_party_libs  # isort:skip
+from . import (
+    codeowner_linter,
+    css_linter,
+    general_purpose_linter,
+    html_linter,
+    js_ts_linter,
+    linter_utils,
+    other_files_linter,
+    python_linter,
+)
 
 OTHER_SHARD_NAME = 'other'
 

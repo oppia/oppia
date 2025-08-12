@@ -21,11 +21,8 @@ from __future__ import annotations
 import datetime
 import re
 
-from core import feconf
-from core import utils
-from core.domain import exp_domain
-from core.domain import stats_domain
-from core.domain import stats_services
+from core import feconf, utils
+from core.domain import exp_domain, stats_domain, stats_services
 from core.platform import models
 from core.tests import test_utils
 

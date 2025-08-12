@@ -16,14 +16,14 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import skill_services
-from core.domain import topic_fetchers
+from core import feconf, utils
+from core.controllers import acl_decorators, base
+from core.domain import (
+    skill_domain,
+    skill_fetchers,
+    skill_services,
+    topic_fetchers,
+)
 
 from typing import Dict, List, TypedDict
 

@@ -21,9 +21,7 @@ import json
 
 from core import feconf
 from core.constants import constants
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import user_services
+from core.domain import topic_domain, topic_services, user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -31,8 +29,7 @@ from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import suggestion_models
-    from mypy_imports import user_models
+    from mypy_imports import suggestion_models, user_models
 
 (suggestion_models, user_models) = models.Registry.import_models(
     [models.Names.SUGGESTION, models.Names.USER])

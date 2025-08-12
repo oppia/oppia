@@ -20,23 +20,23 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import role_services
-from core.domain import subscription_services
-from core.domain import suggestion_services
-from core.domain import summary_services
-from core.domain import topic_fetchers
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    collection_domain,
+    collection_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feedback_services,
+    role_services,
+    subscription_services,
+    suggestion_services,
+    summary_services,
+    topic_fetchers,
+    user_services,
+)
 
 from typing import Dict, Final, List, TypedDict
 

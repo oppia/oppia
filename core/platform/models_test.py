@@ -128,7 +128,8 @@ class RegistryUnitTest(test_utils.TestBase):
     def test_import_models_learner_group(self) -> None:
         """Tests import_models function with learner group option."""
         from core.storage.learner_group import (
-            gae_models as learner_group_models)
+            gae_models as learner_group_models,
+        )
         expected_learner_group_models = (learner_group_models,)
         self.assertEqual(
             expected_learner_group_models,
@@ -288,7 +289,8 @@ class RegistryUnitTest(test_utils.TestBase):
     def test_import_speech_synthesis_services_in_dev_mode(self) -> None:
         """Tests import the speech synthesis services function."""
         from core.platform.speech_synthesis import (
-            dev_mode_speech_synthesis_services)
+            dev_mode_speech_synthesis_services,
+        )
         self.assertEqual(
             dev_mode_speech_synthesis_services,
             self.registry_instance.import_speech_synthesis_services())
@@ -296,7 +298,8 @@ class RegistryUnitTest(test_utils.TestBase):
     def test_import_speech_synthesis_services_in_prod_mode(self) -> None:
         """Tests import the speech synthesis services function."""
         from core.platform.speech_synthesis import (
-            azure_speech_synthesis_services)
+            azure_speech_synthesis_services,
+        )
         with self.swap(constants, 'EMULATOR_MODE', False):
             self.assertEqual(
                 azure_speech_synthesis_services,

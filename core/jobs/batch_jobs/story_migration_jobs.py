@@ -21,29 +21,31 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
+from core.domain import (
+    story_domain,
+    story_fetchers,
+    story_services,
+    topic_domain,
+    topic_fetchers,
+)
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
-from core.jobs.transforms import job_result_transforms
-from core.jobs.transforms import results_transforms
+from core.jobs.transforms import job_result_transforms, results_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
 import result
-
 from typing import Dict, Iterable, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-    from mypy_imports import story_models
-    from mypy_imports import topic_models
+    from mypy_imports import (
+        base_models,
+        datastore_services,
+        story_models,
+        topic_models,
+    )
 
 (base_models, story_models, topic_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.STORY, models.Names.TOPIC

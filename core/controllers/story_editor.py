@@ -16,18 +16,18 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import classroom_config_services
-from core.domain import skill_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import topic_fetchers
-from core.domain import topic_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    classroom_config_services,
+    skill_services,
+    story_domain,
+    story_fetchers,
+    story_services,
+    topic_fetchers,
+    topic_services,
+)
 
 from typing import Dict, List, TypedDict
 

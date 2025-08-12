@@ -17,15 +17,17 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import event_services
-from core.domain import exp_domain
-from core.domain import feedback_domain
-from core.domain import feedback_services
-from core.domain import platform_parameter_list
-from core.domain import subscription_services
-from core.domain import suggestion_services
-from core.domain import taskqueue_services
-from core.domain import user_services
+from core.domain import (
+    event_services,
+    exp_domain,
+    feedback_domain,
+    feedback_services,
+    platform_parameter_list,
+    subscription_services,
+    suggestion_services,
+    taskqueue_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -33,8 +35,7 @@ from typing import Final, List, Optional, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import feedback_models
-    from mypy_imports import suggestion_models
+    from mypy_imports import feedback_models, suggestion_models
 
 (feedback_models, suggestion_models) = models.Registry.import_models([
     models.Names.FEEDBACK,

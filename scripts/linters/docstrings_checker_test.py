@@ -19,10 +19,11 @@
 from __future__ import annotations
 
 from core.tests import test_utils
-from . import docstrings_checker  # isort:skip
 
-import astroid  # isort:skip
-from pylint.checkers import utils # isort:skip
+import astroid
+from pylint.checkers import utils
+
+from . import docstrings_checker
 
 
 class DocstringsCheckerTest(test_utils.GenericTestBase):

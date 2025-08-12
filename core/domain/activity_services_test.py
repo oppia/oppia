@@ -19,12 +19,14 @@
 from __future__ import annotations
 
 from core.constants import constants
-from core.domain import activity_domain
-from core.domain import activity_services
-from core.domain import collection_services
-from core.domain import exp_services
-from core.domain import rights_manager
-from core.domain import user_services
+from core.domain import (
+    activity_domain,
+    activity_services,
+    collection_services,
+    exp_services,
+    rights_manager,
+    user_services,
+)
 from core.tests import test_utils
 
 from typing import Final, List

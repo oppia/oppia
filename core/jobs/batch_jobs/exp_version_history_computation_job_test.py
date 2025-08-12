@@ -19,10 +19,12 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    exp_domain,
+    exp_services,
+    translation_domain,
+    user_services,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_version_history_computation_job
 from core.jobs.types import job_run_result
@@ -31,8 +33,7 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
+    from mypy_imports import datastore_services, exp_models
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()

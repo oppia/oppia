@@ -18,17 +18,18 @@ from __future__ import annotations
 
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import rights_manager
-from core.domain import skill_services
-from core.domain import story_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import user_services
+from core.domain import (
+    exp_services,
+    fs_services,
+    rights_manager,
+    skill_services,
+    story_services,
+    topic_domain,
+    topic_fetchers,
+    user_services,
+)
 from core.tests import test_utils
 
 from typing import Final

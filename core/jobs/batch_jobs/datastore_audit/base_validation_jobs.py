@@ -21,18 +21,15 @@ from __future__ import annotations
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms.validation import base_validation
-from core.jobs.types import base_validation_errors
-from core.jobs.types import job_run_result
+from core.jobs.types import base_validation_errors, job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Callable, Dict, Iterator, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 

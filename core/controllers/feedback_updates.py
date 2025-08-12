@@ -16,17 +16,17 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import exp_fetchers
-from core.domain import feedback_services
-from core.domain import subscription_services
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    exp_fetchers,
+    feedback_services,
+    subscription_services,
+    suggestion_registry,
+    suggestion_services,
+    user_services,
+)
 
 from typing import Dict, List, Optional, TypedDict, Union
 

@@ -18,15 +18,15 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import collection_services
-from core.domain import exp_services
-from core.domain import summary_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    collection_services,
+    exp_services,
+    summary_services,
+    user_services,
+)
 
 from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 

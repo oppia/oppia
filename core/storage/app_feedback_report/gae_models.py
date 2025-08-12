@@ -19,12 +19,19 @@ from __future__ import annotations
 import datetime
 import enum
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.platform import models
 
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, TypedDict, TypeVar)
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    TypedDict,
+    TypeVar,
+)
 
 SELF_REPORT_MODEL = TypeVar(  # pylint: disable=invalid-name
     'SELF_REPORT_MODEL', bound='AppFeedbackReportModel'
@@ -32,9 +39,7 @@ SELF_REPORT_MODEL = TypeVar(  # pylint: disable=invalid-name
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-    from mypy_imports import user_models
+    from mypy_imports import base_models, datastore_services, user_models
 
 (base_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.USER

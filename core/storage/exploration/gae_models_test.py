@@ -24,9 +24,7 @@ import types
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import rights_domain
+from core.domain import exp_domain, exp_services, rights_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -34,9 +32,7 @@ from typing import Dict, Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import exp_models
-    from mypy_imports import user_models
+    from mypy_imports import base_models, exp_models, user_models
 
 (base_models, exp_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.EXPLORATION, models.Names.USER

@@ -21,8 +21,7 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import job_models
+    from mypy_imports import base_models, job_models
 
 (base_models, job_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.JOB

@@ -34,11 +34,13 @@ from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import opportunity_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import translation_models
+    from mypy_imports import (
+        datastore_services,
+        exp_models,
+        opportunity_models,
+        suggestion_models,
+        translation_models,
+    )
 
 (
     exp_models,

@@ -17,20 +17,21 @@ and are created.
 """
 
 from __future__ import annotations
+
 import json
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import fs_services
-from core.domain import image_validation_services
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import skill_domain
-from core.domain import skill_fetchers
+from core.controllers import acl_decorators, base
+from core.domain import (
+    fs_services,
+    image_validation_services,
+    question_domain,
+    question_services,
+    skill_domain,
+    skill_fetchers,
+)
 
 from typing import Dict, List, TypedDict
 

@@ -18,16 +18,16 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import learner_group_fetchers
-from core.domain import learner_group_services
-from core.domain import story_fetchers
-from core.domain import subtopic_page_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    learner_group_fetchers,
+    learner_group_services,
+    story_fetchers,
+    subtopic_page_services,
+    user_services,
+)
 
 from typing import Dict, List, TypedDict, Union
-
 
 LEARNER_GROUP_SCHEMA = {
     'group_title': {

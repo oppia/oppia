@@ -21,25 +21,27 @@ import unittest.mock
 
 from core import feconf
 from core.constants import constants
-from core.domain import classroom_config_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import opportunity_domain
-from core.domain import opportunity_services
-from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import translation_services
-from core.domain import user_services
+from core.domain import (
+    classroom_config_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    opportunity_domain,
+    opportunity_services,
+    state_domain,
+    story_domain,
+    story_fetchers,
+    story_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    translation_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

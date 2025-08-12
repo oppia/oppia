@@ -21,9 +21,7 @@ import types
 
 from core import utils
 from core.constants import constants
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import translation_domain
+from core.domain import skill_services, state_domain, translation_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -31,8 +29,7 @@ from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import question_models
+    from mypy_imports import base_models, question_models
 
 (base_models, question_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.QUESTION

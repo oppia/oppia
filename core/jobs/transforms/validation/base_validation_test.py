@@ -21,23 +21,18 @@ from __future__ import annotations
 import re
 
 from core import feconf
-from core.domain import change_domain
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import state_domain
+from core.domain import change_domain, exp_domain, exp_fetchers, state_domain
 from core.jobs import job_test_utils
 from core.jobs.transforms.validation import base_validation
 from core.jobs.types import base_validation_errors
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import exp_models
+    from mypy_imports import base_models, exp_models
 
 (base_models, exp_models) = models.Registry.import_models([
     models.Names.BASE_MODEL,

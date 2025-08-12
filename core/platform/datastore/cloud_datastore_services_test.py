@@ -25,13 +25,11 @@ from core.platform.datastore import cloud_datastore_services
 from core.tests import test_utils
 
 from google.cloud import ndb
-
 from typing import Sequence, Tuple
 
 MYPY = False
 if MYPY:
-    from mypy_imports import datastore_services
-    from mypy_imports import user_models
+    from mypy_imports import datastore_services, user_models
 
 (user_models,) = models.Registry.import_models([models.Names.USER])
 datastore_services = models.Registry.import_datastore_services()

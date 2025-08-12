@@ -20,12 +20,9 @@ from __future__ import annotations
 
 import datetime
 
-from core import android_validation_constants
-from core import feconf
-from core import utils
+from core import android_validation_constants, feconf, utils
 from core.constants import constants
-from core.domain import topic_domain
-from core.domain import user_services
+from core.domain import topic_domain, user_services
 from core.tests import test_utils
 
 

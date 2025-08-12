@@ -19,11 +19,13 @@
 from __future__ import annotations
 
 from core.constants import constants
-from core.domain import auth_domain
-from core.domain import auth_services
-from core.domain import caching_services
-from core.domain import user_domain
-from core.domain import user_services
+from core.domain import (
+    auth_domain,
+    auth_services,
+    caching_services,
+    user_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -31,8 +33,7 @@ import webapp2
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import auth_models
-    from mypy_imports import platform_auth_services
+    from mypy_imports import auth_models, platform_auth_services
 
 auth_models, = (
     models.Registry.import_models([models.Names.AUTH]))

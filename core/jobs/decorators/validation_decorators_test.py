@@ -27,14 +27,11 @@ from core.platform import models
 from core.tests import test_utils
 
 import apache_beam as beam
-
 from typing import Dict, Final, FrozenSet, Iterator, List, Set, Tuple, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
+    from mypy_imports import base_models, datastore_services, exp_models
 
 base_models, exp_models = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.EXPLORATION])

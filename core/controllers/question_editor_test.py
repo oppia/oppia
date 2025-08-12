@@ -15,19 +15,21 @@
 """Tests for the Question Editor controller."""
 
 from __future__ import annotations
+
 import json
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import question_fetchers
-from core.domain import question_services
-from core.domain import skill_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    question_fetchers,
+    question_services,
+    skill_services,
+    topic_domain,
+    topic_fetchers,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

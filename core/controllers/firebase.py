@@ -19,12 +19,10 @@ from __future__ import annotations
 import json
 
 from core import feconf
-from core.controllers import acl_decorators
-from core.controllers import base
+from core.controllers import acl_decorators, base
 
 import requests
 from typing import Any, Dict
-
 
 TIMEOUT_SECS = 60
 """Timeout in seconds for firebase requests."""

@@ -20,31 +20,32 @@ import datetime
 import random
 import string
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import question_domain
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import rte_component_registry
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
-from core.domain import taskqueue_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feedback_services,
+    question_domain,
+    rights_domain,
+    rights_manager,
+    rte_component_registry,
+    skill_services,
+    state_domain,
+    story_domain,
+    story_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    suggestion_registry,
+    suggestion_services,
+    taskqueue_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -53,10 +54,12 @@ from typing import Dict, Final, List, Mapping, Union
 MYPY = False
 if MYPY:  # pragma: no cover
     from core.domain import change_domain
-    from mypy_imports import feedback_models
-    from mypy_imports import opportunity_models
-    from mypy_imports import suggestion_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        feedback_models,
+        opportunity_models,
+        suggestion_models,
+        user_models,
+    )
 
 (suggestion_models, feedback_models, opportunity_models, user_models) = (
     models.Registry.import_models(

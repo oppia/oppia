@@ -23,8 +23,7 @@ import datetime
 from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import audit_topic_related_models_relation_jobs
-from core.jobs.types import base_validation_errors
-from core.jobs.types import model_property
+from core.jobs.types import base_validation_errors, model_property
 from core.platform import models
 from core.tests import test_utils
 

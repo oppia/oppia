@@ -59,17 +59,26 @@ import sys
 import threading
 import time
 
+from core import (  # pylint: disable=wrong-import-position, wrong-import-order
+    feconf,
+    utils,
+)
+
 from typing import Dict, Final, List, Optional, Tuple, cast
 
+from . import (
+    common,  # pylint: disable=wrong-import-position, wrong-import-order
+)
+from . import (
+    concurrent_task_utils,  # pylint: disable=wrong-import-position, wrong-import-order
+)
+from . import (
+    git_changes_utils,  # pylint: disable=wrong-import-position, wrong-import-order
+)
+from . import (
+    servers,  # pylint: disable=wrong-import-position, wrong-import-order
+)
 from . import install_third_party_libs
-
-from core import feconf, utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
-
-from . import common  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import concurrent_task_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import servers  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import git_changes_utils  # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 TEST_RUNNER_PATH: Final = os.path.join(
     os.getcwd(), 'core', 'tests', 'gae_suite.py'

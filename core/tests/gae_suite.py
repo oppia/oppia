@@ -33,7 +33,9 @@ from typing import Final, List, Optional
 
 sys.path.insert(1, os.getcwd())
 
-from scripts import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
+from scripts import (  # pylint: disable=wrong-import-position, wrong-import-order
+    common,
+)
 
 CURR_DIR: Final = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR: Final = os.path.join(CURR_DIR, '..', 'oppia_tools')

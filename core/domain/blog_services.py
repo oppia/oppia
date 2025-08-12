@@ -23,19 +23,28 @@ import html
 import logging
 import re
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import blog_domain
-from core.domain import html_cleaner
-from core.domain import role_services
-from core.domain import search_services
-from core.domain import user_domain
-from core.domain import user_services
+from core.domain import (
+    blog_domain,
+    html_cleaner,
+    role_services,
+    search_services,
+    user_domain,
+    user_services,
+)
 from core.platform import models
 
 from typing import (
-    Callable, List, Literal, Optional, Sequence, Tuple, TypedDict, overload)
+    Callable,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Tuple,
+    TypedDict,
+    overload,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover

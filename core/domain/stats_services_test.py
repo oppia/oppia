@@ -20,16 +20,17 @@ from __future__ import annotations
 
 import os
 
-from core import feconf
-from core import utils
-from core.domain import event_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import question_services
-from core.domain import stats_domain
-from core.domain import stats_services
-from core.domain import translation_domain
+from core import feconf, utils
+from core.domain import (
+    event_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    question_services,
+    stats_domain,
+    stats_services,
+    translation_domain,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -37,8 +38,7 @@ from typing import Dict, Final, List, Optional, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import stats_models
+    from mypy_imports import datastore_services, stats_models
 
 (stats_models,) = models.Registry.import_models([models.Names.STATISTICS])
 datastore_services = models.Registry.import_datastore_services()

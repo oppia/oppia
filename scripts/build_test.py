@@ -30,18 +30,19 @@ import sys
 import tempfile
 import threading
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.tests import test_utils
 
 from typing import ContextManager, Deque, Dict, Iterator, List, Tuple, Union
 
-from . import build
-from . import common
-from . import install_python_dev_dependencies
-from . import install_third_party_libs
-from . import scripts_test_utils
-from . import servers
+from . import (
+    build,
+    common,
+    install_python_dev_dependencies,
+    install_third_party_libs,
+    scripts_test_utils,
+    servers,
+)
 
 TEST_DIR = os.path.join('core', 'tests', 'build', '')
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')

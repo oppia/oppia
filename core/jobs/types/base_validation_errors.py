@@ -18,12 +18,10 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.domain import change_domain
 from core.jobs import job_utils
-from core.jobs.types import job_run_result
-from core.jobs.types import model_property
+from core.jobs.types import job_run_result, model_property
 from core.platform import models
 
 from typing import Mapping, Union

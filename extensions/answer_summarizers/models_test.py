@@ -20,9 +20,7 @@ from __future__ import annotations
 
 import re
 
-from core.domain import calculation_registry
-from core.domain import exp_domain
-from core.domain import stats_domain
+from core.domain import calculation_registry, exp_domain, stats_domain
 from core.tests import test_utils
 from extensions.answer_summarizers import models as answer_models
 

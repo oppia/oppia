@@ -34,56 +34,67 @@ import pprint
 import re
 import zipfile
 
-from core import android_validation_constants
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import android_validation_constants, feature_flag_list, feconf, utils
 from core.constants import constants
-from core.domain import activity_services
-from core.domain import caching_services
-from core.domain import change_domain
-from core.domain import draft_upgrade_services
-from core.domain import email_manager
-from core.domain import email_subscription_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_rights_domain
-from core.domain import feature_flag_services
-from core.domain import feedback_services
-from core.domain import fs_services
-from core.domain import html_cleaner
-from core.domain import html_validation_service
-from core.domain import opportunity_services
-from core.domain import param_domain
-from core.domain import recommendations_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import search_services
-from core.domain import state_domain
-from core.domain import stats_domain
-from core.domain import stats_services
-from core.domain import suggestion_services
-from core.domain import taskqueue_services
-from core.domain import translation_services
-from core.domain import user_domain
-from core.domain import user_services
-from core.domain import voiceover_services
+from core.domain import (
+    activity_services,
+    caching_services,
+    change_domain,
+    draft_upgrade_services,
+    email_manager,
+    email_subscription_services,
+    exp_domain,
+    exp_fetchers,
+    exp_rights_domain,
+    feature_flag_services,
+    feedback_services,
+    fs_services,
+    html_cleaner,
+    html_validation_service,
+    opportunity_services,
+    param_domain,
+    recommendations_services,
+    rights_domain,
+    rights_manager,
+    search_services,
+    state_domain,
+    stats_domain,
+    stats_services,
+    suggestion_services,
+    taskqueue_services,
+    translation_services,
+    user_domain,
+    user_services,
+    voiceover_services,
+)
 from core.platform import models
 from extensions import domain
 
 import deepdiff
 from typing import (
-    Dict, Final, List, Literal, Optional, Sequence, Tuple, Type, TypedDict,
-    Union, cast, overload
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    Sequence,
+    Tuple,
+    Type,
+    TypedDict,
+    Union,
+    cast,
+    overload,
 )
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import stats_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        base_models,
+        datastore_services,
+        exp_models,
+        stats_models,
+        user_models,
+    )
 
 (base_models, exp_models, stats_models, user_models) = (
     models.Registry.import_models([

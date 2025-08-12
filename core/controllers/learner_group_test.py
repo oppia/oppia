@@ -18,19 +18,20 @@ from __future__ import annotations
 
 import json
 
-from core import feature_flag_list
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
-from core.domain import learner_group_fetchers
-from core.domain import learner_group_services
-from core.domain import skill_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_services
+from core.domain import (
+    learner_group_fetchers,
+    learner_group_services,
+    skill_services,
+    story_domain,
+    story_fetchers,
+    story_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    user_services,
+)
 from core.tests import test_utils
 
 from typing import Final

@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core.domain import moderator_services
-from core.domain import platform_parameter_list
+from core.domain import moderator_services, platform_parameter_list
 from core.tests import test_utils
 
 

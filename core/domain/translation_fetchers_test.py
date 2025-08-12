@@ -19,11 +19,9 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import translation_domain
-from core.domain import translation_fetchers
+from core.domain import translation_domain, translation_fetchers
 from core.platform import models
 from core.tests import test_utils
-
 
 MYPY = False
 if MYPY: # pragma: no cover

@@ -23,24 +23,26 @@ import unittest.mock
 
 from core import feconf
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import opportunity_domain
-from core.domain import opportunity_services
-from core.domain import question_services
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    opportunity_domain,
+    opportunity_services,
+    question_services,
+    skill_domain,
+    skill_services,
+    state_domain,
+    story_domain,
+    story_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    suggestion_services,
+    topic_domain,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -48,10 +50,12 @@ from typing import Dict, List, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import feedback_models
-    from mypy_imports import opportunity_models
-    from mypy_imports import story_models
-    from mypy_imports import suggestion_models
+    from mypy_imports import (
+        feedback_models,
+        opportunity_models,
+        story_models,
+        suggestion_models,
+    )
 
 (
     feedback_models,

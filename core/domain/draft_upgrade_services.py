@@ -21,10 +21,12 @@ from __future__ import annotations
 import logging
 
 from core import utils
-from core.domain import exp_domain
-from core.domain import html_validation_service
-from core.domain import rules_registry
-from core.domain import state_domain
+from core.domain import (
+    exp_domain,
+    html_validation_service,
+    rules_registry,
+    state_domain,
+)
 from core.platform import models
 
 from typing import Callable, List, Optional, Union, cast

@@ -25,11 +25,11 @@ import re
 
 from core import utils
 
-from typing import Any, Dict, Final, List, Tuple, TypedDict
 import yaml
+from typing import Any, Dict, Final, List, Tuple, TypedDict
 
-from . import linter_utils
 from .. import concurrent_task_utils
+from . import linter_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover

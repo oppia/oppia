@@ -22,16 +22,18 @@ import logging
 import re
 
 from core import feconf
-from core.domain import question_domain
-from core.domain import question_fetchers
-from core.domain import question_services
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    question_domain,
+    question_fetchers,
+    question_services,
+    skill_domain,
+    skill_services,
+    state_domain,
+    topic_domain,
+    topic_fetchers,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

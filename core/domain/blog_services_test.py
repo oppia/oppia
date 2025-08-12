@@ -22,12 +22,13 @@ import datetime
 import logging
 import math
 
-from core import feconf
-from core import utils
-from core.domain import blog_domain
-from core.domain import blog_services
-from core.domain import search_services
-from core.domain import user_services
+from core import feconf, utils
+from core.domain import (
+    blog_domain,
+    blog_services,
+    search_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

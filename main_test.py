@@ -19,15 +19,15 @@ from __future__ import annotations
 import contextlib
 import importlib
 
+import main
 from core.constants import constants
 from core.platform import models
 from core.tests import test_utils
-import main
 
 import google.cloud.logging
-from typing import ContextManager, Dict, cast
 import webapp2
 import webtest
+from typing import ContextManager, Dict, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover

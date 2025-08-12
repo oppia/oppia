@@ -25,8 +25,9 @@ import sys
 
 from core import utils
 from scripts import common
-from typing import List, Optional, Sequence
+
 import yaml
+from typing import List, Optional, Sequence
 
 from . import build
 

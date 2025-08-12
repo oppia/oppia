@@ -24,27 +24,43 @@ import logging
 import math
 import re
 
-from core import android_validation_constants
-from core import feature_flag_list
-from core import feconf
-from core import schema_utils
-from core import utils
+from core import (
+    android_validation_constants,
+    feature_flag_list,
+    feconf,
+    schema_utils,
+    utils,
+)
 from core.constants import constants
-from core.domain import customization_args_util
-from core.domain import param_domain
-from core.domain import translation_domain
+from core.domain import html_cleaner  # pylint: disable=invalid-import-from
+from core.domain import rules_registry  # pylint: disable=invalid-import-from
+from core.domain import (  # pylint: disable=invalid-import-from
+    customization_args_util,
+    feature_flag_services,
+    interaction_registry,
+    param_domain,
+    translation_domain,
+)
 from extensions import domain
 from extensions.objects.models import objects
 
 from typing import (
-    Any, Callable, Dict, Iterator, List, Literal, Mapping, Optional, Tuple,
-    Type, TypedDict, TypeVar, Union, cast, overload
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    TypedDict,
+    TypeVar,
+    Union,
+    cast,
+    overload,
 )
-
-from core.domain import feature_flag_services # pylint: disable=invalid-import-from # isort:skip
-from core.domain import html_cleaner  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import rules_registry  # pylint: disable=invalid-import-from # isort:skip
 
 MYPY = False
 if MYPY:  # pragma: no cover

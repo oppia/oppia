@@ -28,11 +28,10 @@ from typing import Dict, Final, List, Optional, Sequence, Union
 MYPY = False
 if MYPY: # pragma: no cover
     # Here, 'state_domain' is imported only for type checking.
-    from core.domain import state_domain # pylint: disable=invalid-import # isort:skip
     # Here, 'voiceover_domain' is imported only for type checking.
-    from core.domain import voiceover_domain # pylint: disable=invalid-import # isort:skip
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
+    from core.domain import state_domain  # pylint: disable=invalid-import
+    from core.domain import voiceover_domain  # pylint: disable=invalid-import
+    from mypy_imports import base_models, datastore_services
 
     ContentIdToVoiceoverMappingType = (
         voiceover_domain.ContentIdToVoiceoverMappingType)

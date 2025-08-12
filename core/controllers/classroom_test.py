@@ -19,20 +19,21 @@ from __future__ import annotations
 import json
 import os
 
-from core import feconf
-from core import utils
-from core.constants import constants
-from core.domain import classroom_config_domain
-from core.domain import classroom_config_services
-from core.domain import fs_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.tests import test_utils
 import main
+from core import feconf, utils
+from core.constants import constants
+from core.domain import (
+    classroom_config_domain,
+    classroom_config_services,
+    fs_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+)
+from core.tests import test_utils
 
-from typing import Callable, Dict, Union
 import webtest
+from typing import Callable, Dict, Union
 
 dummy_thumbnail_data = classroom_config_domain.ImageData(
     'thumbnail.svg', 'transparent', 1000

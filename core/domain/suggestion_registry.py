@@ -21,33 +21,44 @@ from __future__ import annotations
 import copy
 import datetime
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import html_cleaner
-from core.domain import opportunity_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import state_domain
-from core.domain import topic_fetchers
-from core.domain import translation_domain
-from core.domain import translation_services
-from core.domain import user_services
+from core.domain import (
+    change_domain,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    fs_services,
+    html_cleaner,
+    opportunity_services,
+    platform_parameter_list,
+    platform_parameter_services,
+    question_domain,
+    question_services,
+    skill_domain,
+    skill_fetchers,
+    state_domain,
+    topic_fetchers,
+    translation_domain,
+    translation_services,
+    user_services,
+)
 from core.platform import models
 from extensions import domain
 
 from typing import (
-    Any, Callable, Dict, List, Mapping, Optional, Set, Type,
-    TypedDict, Union, cast)
+    Any,
+    Callable,
+    Dict,
+    List,
+    Mapping,
+    Optional,
+    Set,
+    Type,
+    TypedDict,
+    Union,
+    cast,
+)
 
 MYPY = False
 if MYPY:  # pragma: no cover

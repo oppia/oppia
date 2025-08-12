@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import unittest
 
-from core.tests import gae_suite
-from core.tests import test_utils
+from core.tests import gae_suite, test_utils
 from scripts import common
 
 from typing import List

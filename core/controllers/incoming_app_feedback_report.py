@@ -16,13 +16,10 @@
 
 from __future__ import annotations
 
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import app_feedback_report_domain
-from core.domain import app_feedback_report_services
+from core.controllers import acl_decorators, base
+from core.domain import app_feedback_report_domain, app_feedback_report_services
 
 from typing import Dict, TypedDict
-
 
 USER_SUPPLIED_FEEDBACK_DICT_SCHEMA = {
     'type': 'dict',

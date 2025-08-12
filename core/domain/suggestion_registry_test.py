@@ -19,25 +19,26 @@ from __future__ import annotations
 import datetime
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import change_domain
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import html_validation_service
-from core.domain import platform_parameter_list
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
-from core.domain import topic_fetchers
-from core.domain import translation_domain
-from core.domain import translation_fetchers
-from core.domain import user_services
+from core.domain import (
+    change_domain,
+    exp_domain,
+    exp_services,
+    fs_services,
+    html_validation_service,
+    platform_parameter_list,
+    question_domain,
+    question_services,
+    skill_services,
+    state_domain,
+    suggestion_registry,
+    suggestion_services,
+    topic_fetchers,
+    translation_domain,
+    translation_fetchers,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 from extensions import domain
@@ -46,8 +47,7 @@ from typing import Dict, Final, List, Optional, TypedDict, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import opportunity_models
-    from mypy_imports import suggestion_models
+    from mypy_imports import opportunity_models, suggestion_models
 
 (
     suggestion_models, opportunity_models

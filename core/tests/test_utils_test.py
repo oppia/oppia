@@ -25,18 +25,20 @@ from unittest import mock
 
 from core import feature_flag_list
 from core.constants import constants
-from core.domain import auth_domain
-from core.domain import feature_flag_services
-from core.domain import param_domain
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import user_services
+from core.domain import (
+    auth_domain,
+    feature_flag_services,
+    param_domain,
+    platform_parameter_list,
+    platform_parameter_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
 import elasticsearch
-from typing import Callable, Final, List, OrderedDict, Tuple
 import webapp2
+from typing import Callable, Final, List, OrderedDict, Tuple
 
 email_services = models.Registry.import_email_services()
 

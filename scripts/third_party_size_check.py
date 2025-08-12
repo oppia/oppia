@@ -26,6 +26,7 @@ import os
 import sys
 
 from core import utils
+
 from typing import List
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')

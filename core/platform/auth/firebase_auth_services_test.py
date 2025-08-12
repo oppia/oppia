@@ -25,20 +25,18 @@ import json
 import logging
 from unittest import mock
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import auth_domain
-from core.domain import user_services
+from core.domain import auth_domain, user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 from core.tests import test_utils
 
 import firebase_admin
+import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
 from typing import ContextManager, Dict, List, Optional, Tuple, Union, cast
-import webapp2
 
 MYPY = False
 if MYPY: # pragma: no cover

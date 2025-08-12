@@ -21,15 +21,16 @@ from __future__ import annotations
 import datetime
 
 from core import feconf
-from core.jobs.types import base_validation_errors
-from core.jobs.types import base_validation_errors_test
-from core.jobs.types import user_validation_errors
+from core.jobs.types import (
+    base_validation_errors,
+    base_validation_errors_test,
+    user_validation_errors,
+)
 from core.platform import models
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import user_models
+    from mypy_imports import base_models, user_models
 
 (base_models, user_models) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.USER])

@@ -26,15 +26,20 @@ import signal
 import subprocess
 import threading
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from scripts import common
 
 import psutil
-
 from typing import (
-    Any, Callable, ContextManager, Dict, Iterator, List, Optional, Sequence,
-    Union
+    Any,
+    Callable,
+    ContextManager,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Union,
 )
 
 

@@ -23,13 +23,8 @@ import re
 
 from typing import Dict, Final, List, Pattern, Tuple, TypedDict
 
-from . import js_ts_linter
-from . import linter_utils
-from . import warranted_angular_security_bypasses
-
-from .. import build
-from .. import common
-from .. import concurrent_task_utils
+from .. import build, common, concurrent_task_utils
+from . import js_ts_linter, linter_utils, warranted_angular_security_bypasses
 
 MYPY = False
 if MYPY:  # pragma: no cover

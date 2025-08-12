@@ -24,17 +24,17 @@ import logging
 import os
 import re
 
-from core import feconf
-from core import schema_utils
-from core import utils
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import html_validation_service
-from core.domain import interaction_registry
-from core.domain import rules_registry
-from core.domain import state_domain
-from core.domain import translation_domain
+from core import feconf, schema_utils, utils
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    html_validation_service,
+    interaction_registry,
+    rules_registry,
+    state_domain,
+    translation_domain,
+)
 from core.tests import test_utils
 from extensions.interactions import base
 

@@ -21,39 +21,42 @@ from __future__ import annotations
 import logging
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import classroom_config_services
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import fs_services
-from core.domain import opportunity_services
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import rights_manager
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import translation_services
-from core.domain import user_services
+from core.domain import (
+    classroom_config_services,
+    exp_fetchers,
+    exp_services,
+    fs_services,
+    opportunity_services,
+    question_domain,
+    question_services,
+    rights_manager,
+    skill_domain,
+    skill_services,
+    state_domain,
+    story_domain,
+    story_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    translation_services,
+    user_services,
+)
 from core.platform import models
 
 from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import secrets_services
-    from mypy_imports import translate_services
-    from mypy_imports import translation_models
+    from mypy_imports import (
+        secrets_services,
+        translate_services,
+        translation_models,
+    )
 
 translate_services = models.Registry.import_translate_services()
 secrets_services = models.Registry.import_secrets_services()

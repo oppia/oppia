@@ -18,14 +18,15 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
-from core.domain import draft_upgrade_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import state_domain
-from core.domain import translation_domain
+from core import feconf, utils
+from core.domain import (
+    draft_upgrade_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    state_domain,
+    translation_domain,
+)
 from core.tests import test_utils
 
 from typing import Dict, Final

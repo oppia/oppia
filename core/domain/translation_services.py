@@ -21,17 +21,14 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import translation_domain
-from core.domain import translation_fetchers
+from core.domain import exp_domain, translation_domain, translation_fetchers
 from core.platform import models
 
 from typing import Dict, List, Optional, Tuple, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import translate_services
-    from mypy_imports import translation_models
+    from mypy_imports import translate_services, translation_models
 
 
 translate_services = models.Registry.import_translate_services()

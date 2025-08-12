@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 
 from typing import Dict, Optional
 

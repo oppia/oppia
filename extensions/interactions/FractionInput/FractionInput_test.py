@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 from core.tests import test_utils
+
 from extensions.interactions.FractionInput import FractionInput # pylint: disable=unused-import # isort: skip
 
 

@@ -21,9 +21,7 @@ from __future__ import annotations
 import logging
 
 from core import utils
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import user_services
+from core.domain import rights_domain, rights_manager, user_services
 from core.tests import test_utils
 
 from typing import Sequence

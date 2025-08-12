@@ -22,14 +22,15 @@ import datetime
 import logging
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import user_services
+from core.domain import (
+    collection_domain,
+    collection_services,
+    rights_domain,
+    rights_manager,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -37,8 +38,7 @@ from typing import Dict, Final, List, Optional
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import collection_models
-    from mypy_imports import datastore_services
+    from mypy_imports import collection_models, datastore_services
     from mypy_imports import search_services as gae_search_services
     from mypy_imports import user_models
 

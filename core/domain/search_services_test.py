@@ -18,14 +18,16 @@
 
 from __future__ import annotations
 
-from core.domain import blog_services
-from core.domain import collection_services
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import rating_services
-from core.domain import rights_manager
-from core.domain import search_services
-from core.domain import user_services
+from core.domain import (
+    blog_services,
+    collection_services,
+    exp_fetchers,
+    exp_services,
+    rating_services,
+    rights_manager,
+    search_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

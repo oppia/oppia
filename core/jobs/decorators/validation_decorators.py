@@ -24,15 +24,22 @@ import itertools
 import re
 
 from core.jobs import job_utils
-from core.jobs.types import base_validation_errors
-from core.jobs.types import model_property
+from core.jobs.types import base_validation_errors, model_property
 from core.platform import models
 
 import apache_beam as beam
 from apache_beam import typehints
-
 from typing import (
-    Callable, Dict, FrozenSet, Iterator, Sequence, Set, Tuple, Type, cast)
+    Callable,
+    Dict,
+    FrozenSet,
+    Iterator,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    cast,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover

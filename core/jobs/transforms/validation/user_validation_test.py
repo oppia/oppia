@@ -24,13 +24,11 @@ from core import feconf
 from core.jobs import job_test_utils
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import user_validation
-from core.jobs.types import base_validation_errors
-from core.jobs.types import user_validation_errors
+from core.jobs.types import base_validation_errors, user_validation_errors
 from core.platform import models
 from core.tests import test_utils
 
 import apache_beam as beam
-
 from typing import Final
 
 MYPY = False

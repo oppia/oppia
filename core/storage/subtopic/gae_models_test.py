@@ -28,8 +28,7 @@ from typing import Final
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import subtopic_models
+    from mypy_imports import base_models, subtopic_models
 
 (base_models, subtopic_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.SUBTOPIC

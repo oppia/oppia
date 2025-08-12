@@ -22,34 +22,33 @@ import functools
 import logging
 import re
 
-from core import android_validation_constants
-from core import feature_flag_list
-from core import feconf
-from core import utils
+from core import android_validation_constants, feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import base
-from core.domain import android_services
-from core.domain import blog_services
-from core.domain import classroom_config_services
-from core.domain import email_manager
-from core.domain import feature_flag_services
-from core.domain import feedback_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import question_services
-from core.domain import rights_manager
-from core.domain import role_services
-from core.domain import skill_domain
-from core.domain import skill_fetchers
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import study_guide_services
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_services
+from core.domain import (
+    android_services,
+    blog_services,
+    classroom_config_services,
+    email_manager,
+    feature_flag_services,
+    feedback_services,
+    platform_parameter_list,
+    platform_parameter_services,
+    question_services,
+    rights_manager,
+    role_services,
+    skill_domain,
+    skill_fetchers,
+    story_domain,
+    story_fetchers,
+    study_guide_services,
+    subtopic_page_services,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    user_services,
+)
 
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
 

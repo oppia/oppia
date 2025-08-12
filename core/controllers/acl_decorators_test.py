@@ -20,45 +20,42 @@ from __future__ import annotations
 
 import json
 
-from core import android_validation_constants
-from core import feature_flag_list
-from core import feconf
+from core import android_validation_constants, feature_flag_list, feconf
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.controllers import incoming_app_feedback_report
-from core.domain import blog_services
-from core.domain import exp_domain
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import story_services
-from core.domain import study_guide_domain
-from core.domain import study_guide_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.controllers import acl_decorators, base, incoming_app_feedback_report
+from core.domain import (
+    blog_services,
+    exp_domain,
+    exp_services,
+    feedback_services,
+    question_domain,
+    question_services,
+    rights_domain,
+    rights_manager,
+    skill_services,
+    state_domain,
+    story_services,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    suggestion_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, Final, List, Union
 import webapp2
 import webtest
+from typing import Dict, Final, List, Union
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import secrets_services
+    from mypy_imports import datastore_services, secrets_services
 
 datastore_services = models.Registry.import_datastore_services()
 secrets_services = models.Registry.import_secrets_services()

@@ -21,18 +21,19 @@ from __future__ import annotations
 import datetime
 import re
 
-from core import feconf
-from core import utils
-from core.domain import app_feedback_report_constants
-from core.domain import story_domain
-from core.domain import topic_domain
-
-from typing import Any, Dict, List, Match, Optional, TypedDict, Union
+from core import feconf, utils
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-from core.domain import exp_services  # pylint: disable=invalid-import-from # isort:skip
-from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import exp_services  # pylint: disable=invalid-import-from
+from core.domain import (
+    app_feedback_report_constants,
+    story_domain,
+    topic_domain,
+)
+from core.platform import models  # pylint: disable=invalid-import-from
+
+from typing import Any, Dict, List, Match, Optional, TypedDict, Union
 
 MYPY = False
 if MYPY: # pragma: no cover

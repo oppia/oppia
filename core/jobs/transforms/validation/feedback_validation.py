@@ -21,18 +21,15 @@ from __future__ import annotations
 from core.domain import feedback_services
 from core.jobs import job_utils
 from core.jobs.decorators import validation_decorators
-from core.jobs.types import feedback_validation_errors
-from core.jobs.types import model_property
+from core.jobs.types import feedback_validation_errors, model_property
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Iterator, List, Tuple, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import exp_models
-    from mypy_imports import feedback_models
+    from mypy_imports import exp_models, feedback_models
 
 (exp_models, feedback_models) = models.Registry.import_models([
     models.Names.EXPLORATION,

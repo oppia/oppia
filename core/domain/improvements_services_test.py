@@ -22,8 +22,7 @@ import datetime
 
 from core import feconf
 from core.constants import constants
-from core.domain import improvements_domain
-from core.domain import improvements_services
+from core.domain import improvements_domain, improvements_services
 from core.platform import models
 from core.tests import test_utils
 

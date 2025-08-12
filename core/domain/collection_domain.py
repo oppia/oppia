@@ -28,8 +28,7 @@ import json
 import re
 import string
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.domain import change_domain
 

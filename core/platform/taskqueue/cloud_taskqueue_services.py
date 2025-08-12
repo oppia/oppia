@@ -24,8 +24,7 @@ import logging
 
 from core import feconf
 from core.constants import constants
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list, platform_parameter_services
 
 from google import auth
 from google.api_core import retry

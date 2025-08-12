@@ -19,8 +19,7 @@ from __future__ import annotations
 import re
 import textwrap
 
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
+from core.domain import platform_parameter_list, platform_parameter_services
 from core.platform import models
 
 from typing import Dict, List, Optional, Union

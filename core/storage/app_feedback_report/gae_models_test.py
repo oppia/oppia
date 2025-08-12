@@ -20,8 +20,7 @@ import datetime
 import enum
 import types
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.platform import models
 from core.tests import test_utils
 
@@ -29,8 +28,7 @@ from typing import Final, List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import app_feedback_report_models
-    from mypy_imports import base_models
+    from mypy_imports import app_feedback_report_models, base_models
 
 (base_models, app_feedback_report_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.APP_FEEDBACK_REPORT

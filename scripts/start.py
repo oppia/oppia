@@ -23,18 +23,26 @@ import argparse
 import contextlib
 import os
 import time
+
+from core.constants import (
+    constants,  # pylint: disable=wrong-import-position, wrong-import-order
+)
+
 from typing import Iterator, Optional, Sequence
 
 # Do not import any Oppia modules here,
 # import them below the "install_third_party_libs.main()" line.
+from . import build  # pylint: disable=wrong-import-position, wrong-import-order
+from . import (
+    common,  # pylint: disable=wrong-import-position, wrong-import-order
+)
+from . import (
+    extend_index_yaml,  # pylint: disable=wrong-import-position, wrong-import-order
+)
+from . import (
+    servers,  # pylint: disable=wrong-import-position, wrong-import-order
+)
 from . import install_third_party_libs
-
-from . import build # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import common # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import extend_index_yaml # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-from . import servers # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
-
-from core.constants import constants # isort:skip  pylint: disable=wrong-import-position, wrong-import-order
 
 _PARSER = argparse.ArgumentParser(
     description="""

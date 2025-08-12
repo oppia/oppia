@@ -28,19 +28,27 @@ import subprocess
 import sys
 import threading
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from scripts import common
 
 import rcssmin
 from typing import (
-    Deque, Dict, List, Optional, Sequence, TextIO, Tuple, TypedDict
+    Deque,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    TextIO,
+    Tuple,
+    TypedDict,
 )
 
 if not feconf.OPPIA_IS_DOCKERIZED:
-    from scripts import install_python_dev_dependencies
-    from scripts import install_third_party_libs
-    from scripts import servers
+    from scripts import (
+        install_python_dev_dependencies,
+        install_third_party_libs,
+        servers,
+    )
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')

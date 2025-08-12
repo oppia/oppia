@@ -22,13 +22,16 @@ import multiprocessing
 import os
 import re
 import tempfile
+
 from core.tests import test_utils
 
 from typing import Final, Pattern, Tuple
 
-from . import general_purpose_linter
-from . import run_lint_checks
-from . import warranted_angular_security_bypasses
+from . import (
+    general_purpose_linter,
+    run_lint_checks,
+    warranted_angular_security_bypasses,
+)
 
 NAME_SPACE: Final = multiprocessing.Manager().Namespace()
 NAME_SPACE.files = run_lint_checks.FileCache()

@@ -24,21 +24,25 @@ import logging
 import re
 
 from core import feconf
-from core.domain import event_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import feedback_services
-from core.domain import stats_services
-from core.domain import user_services
+from core.domain import (
+    event_services,
+    exp_domain,
+    exp_fetchers,
+    feedback_services,
+    stats_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import feedback_models
-    from mypy_imports import stats_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        datastore_services,
+        feedback_models,
+        stats_models,
+        user_models,
+    )
 
 (stats_models, feedback_models, user_models) = models.Registry.import_models([
     models.Names.STATISTICS, models.Names.FEEDBACK, models.Names.USER

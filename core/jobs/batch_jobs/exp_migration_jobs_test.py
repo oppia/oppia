@@ -18,23 +18,24 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import caching_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import opportunity_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import translation_services
-from core.domain import user_services
+from core.domain import (
+    caching_services,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    opportunity_services,
+    rights_domain,
+    rights_manager,
+    story_domain,
+    story_services,
+    topic_domain,
+    topic_services,
+    translation_domain,
+    translation_services,
+    user_services,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_migration_jobs
 from core.jobs.types import job_run_result
@@ -45,10 +46,12 @@ from typing import Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import exp_models
-    from mypy_imports import opportunity_models
-    from mypy_imports import stats_models
-    from mypy_imports import translation_models
+    from mypy_imports import (
+        exp_models,
+        opportunity_models,
+        stats_models,
+        translation_models,
+    )
 
 (
     exp_models, opportunity_models,

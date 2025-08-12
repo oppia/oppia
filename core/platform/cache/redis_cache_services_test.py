@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.platform.cache import redis_cache_services
 from core.tests import test_utils
 from scripts import common

@@ -23,7 +23,6 @@ import threading
 import time
 
 from core.tests import test_utils
-
 from scripts import concurrent_task_utils
 
 from typing import Callable, List

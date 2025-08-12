@@ -21,8 +21,7 @@ from __future__ import annotations
 import types
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import stats_domain
+from core.domain import exp_domain, stats_domain
 from core.platform import models
 from core.tests import test_utils
 
@@ -30,8 +29,7 @@ from typing import List
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import stats_models
+    from mypy_imports import base_models, stats_models
 
 (base_models, stats_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.STATISTICS

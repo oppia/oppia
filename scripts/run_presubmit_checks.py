@@ -26,9 +26,7 @@ import subprocess
 
 from typing import Final, List, Optional
 
-from . import common
-from . import run_backend_tests
-from . import run_frontend_tests
+from . import common, run_backend_tests, run_frontend_tests
 from .linters import run_lint_checks
 
 _PARSER: Final = argparse.ArgumentParser(

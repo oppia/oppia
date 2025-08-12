@@ -19,17 +19,18 @@ from __future__ import annotations
 import datetime
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.controllers import domain_objects_validator
-from core.domain import blog_services
-from core.domain import change_domain
-from core.domain import improvements_domain
-from core.domain import question_domain
-from core.domain import state_domain
-from core.domain import stats_domain
-from core.domain import translation_domain
+from core.domain import (
+    blog_services,
+    change_domain,
+    improvements_domain,
+    question_domain,
+    state_domain,
+    stats_domain,
+    translation_domain,
+)
 from core.tests import test_utils
 
 from typing import Dict, List, Mapping, Optional, Union

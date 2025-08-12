@@ -19,8 +19,7 @@ from __future__ import annotations
 import os
 import subprocess
 
-from scripts import common
-from scripts import run_typescript_checks
+from scripts import common, run_typescript_checks
 
 TEST_DEPENDENCIES_TSCONFIG_FILEPATH = 'tsconfig.test-dependencies.json'
 ROOT_FILES_MAPPING_GENERATOR_FILEPATH = os.path.join(

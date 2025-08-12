@@ -19,14 +19,16 @@ from __future__ import annotations
 import uuid
 
 from core import feconf
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import platform_parameter_list
-from core.domain import stats_domain
-from core.domain import stats_services
-from core.domain import taskqueue_services
-from core.domain import user_services
+from core.domain import (
+    exp_fetchers,
+    exp_services,
+    feedback_services,
+    platform_parameter_list,
+    stats_domain,
+    stats_services,
+    taskqueue_services,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

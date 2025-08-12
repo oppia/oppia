@@ -22,11 +22,8 @@ import json
 import logging
 import re
 
-from core import feconf
-from core import utils
-from core.domain import fs_services
-from core.domain import takeout_domain
-from core.domain import user_services
+from core import feconf, utils
+from core.domain import fs_services, takeout_domain, user_services
 from core.platform import models
 
 from typing import List, Type

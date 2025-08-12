@@ -24,8 +24,7 @@ import io
 import json
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import rights_domain
+from core.domain import exp_domain, rights_domain
 from core.platform import models
 
 from typing import Dict, Final, List, Sequence, cast

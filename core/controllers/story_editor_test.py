@@ -17,10 +17,12 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import topic_fetchers
-from core.domain import user_services
+from core.domain import (
+    story_domain,
+    story_services,
+    topic_fetchers,
+    user_services,
+)
 from core.tests import test_utils
 
 from typing import List

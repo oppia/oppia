@@ -21,12 +21,14 @@ from __future__ import annotations
 import copy
 
 from core import feconf
-from core.domain import change_domain
-from core.domain import classroom_config_services
-from core.domain import learner_group_services
-from core.domain import skill_services
-from core.domain import study_guide_domain
-from core.domain import topic_fetchers
+from core.domain import (
+    change_domain,
+    classroom_config_services,
+    learner_group_services,
+    skill_services,
+    study_guide_domain,
+    topic_fetchers,
+)
 from core.platform import models
 
 from typing import Dict, List, Literal, Optional, Sequence, overload

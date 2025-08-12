@@ -21,29 +21,30 @@ from __future__ import annotations
 import base64
 import os
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import feedback_services
-from core.domain import fs_services
-from core.domain import opportunity_services
-from core.domain import question_domain
-from core.domain import question_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import skill_services
-from core.domain import state_domain
-from core.domain import story_domain
-from core.domain import story_services
-from core.domain import suggestion_registry
-from core.domain import suggestion_services
-from core.domain import topic_domain
-from core.domain import topic_services
-from core.domain import translation_domain
-from core.domain import user_services
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    feedback_services,
+    fs_services,
+    opportunity_services,
+    question_domain,
+    question_services,
+    rights_domain,
+    rights_manager,
+    skill_services,
+    state_domain,
+    story_domain,
+    story_services,
+    suggestion_registry,
+    suggestion_services,
+    topic_domain,
+    topic_services,
+    translation_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -51,8 +52,7 @@ from typing import Dict, Final, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import suggestion_models
+    from mypy_imports import datastore_services, suggestion_models
 
 datastore_services = models.Registry.import_datastore_services()
 (suggestion_models,) = models.Registry.import_models([

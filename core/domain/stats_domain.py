@@ -23,19 +23,20 @@ import json
 import numbers
 import sys
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.domain import customization_args_util
-from core.domain import exp_domain
-
-from typing import Any, Dict, Final, List, Literal, Optional, TypedDict, Union
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-from core.domain import action_registry  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import interaction_registry  # pylint: disable=invalid-import-from # isort:skip
-from core.domain import playthrough_issue_registry  # pylint: disable=invalid-import-from # isort:skip
+from core.domain import action_registry  # pylint: disable=invalid-import-from
+from core.domain import (  # pylint: disable=invalid-import-from
+    customization_args_util,
+    exp_domain,
+    interaction_registry,
+    playthrough_issue_registry,
+)
+
+from typing import Any, Dict, Final, List, Literal, Optional, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover

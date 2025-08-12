@@ -21,14 +21,11 @@ from __future__ import annotations
 import os
 import re
 
-from core import feconf
-from core import utils
-from core.domain import fs_services
-from core.domain import html_validation_service
+from core import feconf, utils
+from core.domain import fs_services, html_validation_service
 from core.tests import test_utils
 
 import bs4
-
 from typing import Dict, List, TypedDict
 
 

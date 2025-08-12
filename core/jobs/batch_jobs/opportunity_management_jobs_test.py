@@ -20,8 +20,7 @@ from __future__ import annotations
 
 from core import feconf
 from core.constants import constants
-from core.domain import opportunity_services
-from core.domain import state_domain
+from core.domain import opportunity_services, state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import opportunity_management_jobs
 from core.jobs.types import job_run_result
@@ -31,13 +30,15 @@ from typing import Final, Type
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
-    from mypy_imports import opportunity_models
-    from mypy_imports import question_models
-    from mypy_imports import skill_models
-    from mypy_imports import story_models
-    from mypy_imports import topic_models
+    from mypy_imports import (
+        datastore_services,
+        exp_models,
+        opportunity_models,
+        question_models,
+        skill_models,
+        story_models,
+        topic_models,
+    )
 
 (
     exp_models,

@@ -20,13 +20,13 @@ from __future__ import annotations
 
 import datetime
 import enum
-
 from unittest import mock
 
-from core import feconf
-from core import utils
-from core.domain import app_feedback_report_constants
-from core.domain import app_feedback_report_domain
+from core import feconf, utils
+from core.domain import (
+    app_feedback_report_constants,
+    app_feedback_report_domain,
+)
 from core.platform import models
 from core.tests import test_utils
 

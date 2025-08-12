@@ -29,8 +29,8 @@ from pylint import lint
 from pylint.reporters import text
 from typing import List, Tuple
 
-from . import linter_utils
 from .. import concurrent_task_utils
+from . import linter_utils
 
 
 class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):

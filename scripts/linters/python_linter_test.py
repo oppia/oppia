@@ -22,10 +22,10 @@ import multiprocessing
 import os
 
 from core.tests import test_utils
+
 from typing import Dict, List
 
-from . import python_linter
-from . import run_lint_checks
+from . import python_linter, run_lint_checks
 
 LINTER_TESTS_DIR = os.path.join(os.getcwd(), 'scripts', 'linters', 'test_files')
 VALID_PY_FILEPATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')

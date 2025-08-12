@@ -21,8 +21,7 @@ from __future__ import annotations
 import datetime
 import types
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.platform import models
 from core.tests import test_utils
 
@@ -30,9 +29,8 @@ from typing import Final, Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import email_models
     from mypy_imports import user_models  # pylint: disable=unused-import
+    from mypy_imports import base_models, email_models
 
 (base_models, email_models, user_models) = models.Registry.import_models([
     models.Names.BASE_MODEL, models.Names.EMAIL, models.Names.USER

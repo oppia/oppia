@@ -21,10 +21,8 @@ from __future__ import annotations
 import os
 import re
 
-from core import feconf
-from core import utils
-from core.domain import customization_args_util
-from core.domain import interaction_registry
+from core import feconf, utils
+from core.domain import customization_args_util, interaction_registry
 from core.tests import test_utils
 
 from typing import Dict, List, Union

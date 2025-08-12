@@ -21,8 +21,7 @@ import subprocess
 
 from core.tests import test_utils
 
-from . import common
-from . import create_expression_parser
+from . import common, create_expression_parser
 
 
 class CreateExpressionParserTests(test_utils.GenericTestBase):

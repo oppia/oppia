@@ -19,8 +19,7 @@
 from __future__ import annotations
 
 from core.constants import constants
-from core.domain import email_manager
-from core.domain import user_query_domain
+from core.domain import email_manager, user_query_domain
 from core.platform import models
 
 from typing import Dict, List, Literal, Optional, Tuple, overload

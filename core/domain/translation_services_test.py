@@ -19,11 +19,13 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import translation_domain
-from core.domain import translation_fetchers
-from core.domain import translation_services
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    translation_domain,
+    translation_fetchers,
+    translation_services,
+)
 from core.platform import models
 from core.tests import test_utils
 
@@ -31,8 +33,7 @@ from typing import Sequence
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import translate_services
-    from mypy_imports import translation_models
+    from mypy_imports import translate_services, translation_models
 
 
 translate_services = models.Registry.import_translate_services()

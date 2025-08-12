@@ -24,9 +24,9 @@ from core.constants import constants
 from core.platform import models
 from core.platform.speech_synthesis import azure_speech_synthesis_services
 from core.tests import test_utils
+
 import azure.cognitiveservices.speech as speechsdk
 from typing import Dict, List, Union
-
 
 secrets_services = models.Registry.import_secrets_services()
 

@@ -20,31 +20,31 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import classroom_config_services
-from core.domain import email_manager
-from core.domain import fs_services
-from core.domain import image_validation_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.domain import question_services
-from core.domain import role_services
-from core.domain import skill_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import study_guide_domain
-from core.domain import study_guide_services
-from core.domain import subtopic_page_domain
-from core.domain import subtopic_page_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import (
+    classroom_config_services,
+    email_manager,
+    fs_services,
+    image_validation_services,
+    platform_parameter_list,
+    platform_parameter_services,
+    question_services,
+    role_services,
+    skill_services,
+    story_domain,
+    story_fetchers,
+    story_services,
+    study_guide_domain,
+    study_guide_services,
+    subtopic_page_domain,
+    subtopic_page_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    user_services,
+)
 
 from typing import Dict, List, TypedDict, Union
 

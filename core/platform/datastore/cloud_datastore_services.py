@@ -24,14 +24,20 @@ import logging
 from core.platform import models
 
 from google.cloud import ndb
-
 from typing import (
-    Any, ContextManager, Dict, List, Optional, Sequence, Tuple, TypeVar)
+    Any,
+    ContextManager,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
+    TypeVar,
+)
 
 MYPY = False
 if MYPY: # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import transaction_services
+    from mypy_imports import base_models, transaction_services
 
 transaction_services = models.Registry.import_transaction_services()
 

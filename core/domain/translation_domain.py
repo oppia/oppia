@@ -20,13 +20,13 @@ from __future__ import annotations
 
 import enum
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
+from core.domain import (  # pylint: disable=invalid-import-from
+    translatable_object_registry,
+)
 
 from typing import Dict, Final, List, Optional, TypedDict, Union
-
-from core.domain import translatable_object_registry  # pylint: disable=invalid-import-from # isort:skip
 
 
 class ContentType(enum.Enum):

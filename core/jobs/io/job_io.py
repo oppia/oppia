@@ -28,8 +28,7 @@ from typing import Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import beam_job_models
-    from mypy_imports import datastore_services
+    from mypy_imports import beam_job_models, datastore_services
 
 (beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
 

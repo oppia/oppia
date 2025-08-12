@@ -24,8 +24,7 @@ import tempfile
 
 from core import utils
 from core.tests import test_utils
-from scripts import common
-from scripts import git_changes_utils
+from scripts import common, git_changes_utils
 
 from typing import Dict, List, Set, Tuple
 

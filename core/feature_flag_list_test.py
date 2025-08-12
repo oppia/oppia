@@ -21,11 +21,12 @@ from __future__ import annotations
 import os
 import re
 
-from core import feature_flag_list
-from core import utils
-from core.domain import feature_flag_domain
-from core.domain import feature_flag_registry
-from core.domain import platform_parameter_list
+from core import feature_flag_list, utils
+from core.domain import (
+    feature_flag_domain,
+    feature_flag_registry,
+    platform_parameter_list,
+)
 from core.tests import test_utils
 
 from typing import Final, List

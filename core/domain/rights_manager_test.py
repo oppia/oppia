@@ -19,17 +19,19 @@ from __future__ import annotations
 import unittest.mock
 
 from core.constants import constants
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import exp_domain
-from core.domain import exp_rights_domain
-from core.domain import exp_services
-from core.domain import learner_progress_services
-from core.domain import rights_domain
-from core.domain import rights_manager
-from core.domain import role_services
-from core.domain import user_domain
-from core.domain import user_services
+from core.domain import (
+    collection_domain,
+    collection_services,
+    exp_domain,
+    exp_rights_domain,
+    exp_services,
+    learner_progress_services,
+    rights_domain,
+    rights_manager,
+    role_services,
+    user_domain,
+    user_services,
+)
 from core.platform import models
 from core.tests import test_utils
 

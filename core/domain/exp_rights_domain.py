@@ -23,14 +23,12 @@ should therefore be independent of the specific storage models used.
 
 from __future__ import annotations
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
 from core.domain import rights_domain
+from core.platform import models  # pylint: disable=invalid-import-from
 
 from typing import List, Optional
-
-from core.platform import models  # pylint: disable=invalid-import-from # isort:skip
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.

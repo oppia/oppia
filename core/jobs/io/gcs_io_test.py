@@ -29,8 +29,7 @@ import result
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import app_identity_services
-    from mypy_imports import storage_services
+    from mypy_imports import app_identity_services, storage_services
 
 storage_services = models.Registry.import_storage_services()
 app_identity_services = models.Registry.import_app_identity_services()

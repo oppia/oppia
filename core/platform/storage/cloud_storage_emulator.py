@@ -25,7 +25,6 @@ from core import feconf
 import redis
 from typing import Dict, List, Mapping, Optional, Union
 
-
 REDIS_CLIENT = redis.StrictRedis(
     host=feconf.REDISHOST,
     port=feconf.REDISPORT,

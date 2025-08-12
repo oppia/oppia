@@ -30,9 +30,7 @@ from scripts import common
 
 from typing import Dict, List, Optional, Tuple
 
-from . import git_changes_utils
-from . import install_python_prod_dependencies
-from . import pre_push_hook
+from . import git_changes_utils, install_python_prod_dependencies, pre_push_hook
 
 
 class PrePushHookTests(test_utils.GenericTestBase):

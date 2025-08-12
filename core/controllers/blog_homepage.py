@@ -18,14 +18,10 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.constants import constants
-from core.controllers import acl_decorators
-from core.controllers import base
-from core.domain import blog_domain
-from core.domain import blog_services
-from core.domain import user_services
+from core.controllers import acl_decorators, base
+from core.domain import blog_domain, blog_services, user_services
 
 from typing import Dict, Final, List, Optional, Tuple, TypedDict
 

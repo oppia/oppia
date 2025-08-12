@@ -22,34 +22,37 @@ import collections
 
 from core import utils
 from core.constants import constants
-from core.domain import classroom_config_services
-from core.domain import collection_domain
-from core.domain import collection_services
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import learner_goals_services
-from core.domain import learner_playlist_services
-from core.domain import learner_progress_domain
-from core.domain import skill_services
-from core.domain import story_domain
-from core.domain import story_fetchers
-from core.domain import story_services
-from core.domain import subscription_services
-from core.domain import topic_domain
-from core.domain import topic_fetchers
-from core.domain import topic_services
-from core.domain import user_domain
+from core.domain import (
+    classroom_config_services,
+    collection_domain,
+    collection_services,
+    exp_domain,
+    exp_fetchers,
+    learner_goals_services,
+    learner_playlist_services,
+    learner_progress_domain,
+    skill_services,
+    story_domain,
+    story_fetchers,
+    story_services,
+    subscription_services,
+    topic_domain,
+    topic_fetchers,
+    topic_services,
+    user_domain,
+)
 from core.platform import models
-
 
 from typing import Dict, List, Optional, Tuple, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import story_models
-    from mypy_imports import topic_models
-    from mypy_imports import user_models
+    from mypy_imports import (
+        datastore_services,
+        story_models,
+        topic_models,
+        user_models,
+    )
 
 (user_models, topic_models, story_models) = models.Registry.import_models([
     models.Names.USER, models.Names.TOPIC, models.Names.STORY

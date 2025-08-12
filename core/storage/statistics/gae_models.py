@@ -22,8 +22,7 @@ import datetime
 import json
 import sys
 
-from core import feconf
-from core import utils
+from core import feconf, utils
 from core.platform import models
 
 from typing import Dict, Final, List, Optional, Sequence, Tuple
@@ -37,11 +36,15 @@ if MYPY: # pragma: no cover
     # used. We had to use this ignore as we need to import the domain layer
     # for type-annotation and we have not imported them globally but inside
     # this if block to prevent circular imports.
-    from core.domain import exp_domain # isort:skip # pylint: disable=invalid-import,unused-import,ungrouped-imports
-    from core.domain import stats_domain # isort:skip # pylint: disable=invalid-import,unused-import,ungrouped-imports
-    from mypy_imports import base_models
-    from mypy_imports import datastore_services
-    from mypy_imports import transaction_services
+    from core.domain import (  # pylint: disable=invalid-import,unused-import,ungrouped-imports
+        exp_domain,
+        stats_domain,
+    )
+    from mypy_imports import (
+        base_models,
+        datastore_services,
+        transaction_services,
+    )
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
 

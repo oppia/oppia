@@ -21,9 +21,7 @@ from __future__ import annotations
 import json
 import os
 
-from core import feconf
-from core import schema_utils
-from core import utils
+from core import feconf, schema_utils, utils
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
