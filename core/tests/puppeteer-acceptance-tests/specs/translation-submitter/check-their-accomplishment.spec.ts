@@ -68,9 +68,33 @@ describe('Translation Submitter', function () {
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
     );
+    await translationSubmitter.selectLanguageInTranslateTextTab(
+      'हिन्दी (Hindi)'
+    );
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'The Birthday Cake Arrives',
       'Dividing a Birthday Cake'
+    );
+    await translationSubmitter.typeTextForRTE('सामग्री 0');
+    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.clickOn('Skip');
+    await translationSubmitter.typeTextForRTE('सामग्री 1');
+    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.switchToTabInContributionDashboard(
+      'My Contributions'
+    );
+
+    // Check contribution stats.
+    await translationSubmitter.clickOn('Contribution Stats');
+    await translationSubmitter.selectContributionTypeInContributionDashboard(
+      'Translation Contributions'
+    );
+    await translationSubmitter.expectContributionTableToContainRow(
+      'Fractions',
+      0,
+      0
     );
   });
 

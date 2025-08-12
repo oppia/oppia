@@ -52,10 +52,11 @@ const imageSelector = '.e2e-test-image';
 const saveImageButtonSelector = '.e2e-test-close-rich-text-component-editor';
 const textInputSelector = '.e2e-test-text-input';
 const descriptionSelector = '.e2e-test-description-box';
-const rteEditorBodySelector = '.e2e-test-rte-body';
+const rteEditorBodySelector = '.e2e-test-rte';
 const rteHelperModalContainerSelector = '.e2e-test-rte-helper-modal-container';
 const skillNameInput = '.e2e-test-skill-name-input';
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
+const contributionTableSelector = '.e2e-test-topics-table';
 
 export class TranslationSubmitter extends BaseUser {
   /**
@@ -221,6 +222,62 @@ export class TranslationSubmitter extends BaseUser {
   }
 
   /**
+   * Expects the contribution table to contain a row with the given topic name,
+   * accepted cards, and accepted words.
+   * @param topicName - The topic name to search for.
+   * @param acceptedCards - The number of accepted cards.
+   * @param acceptedWords - The number of accepted words.
+   */
+  async expectContributionTableToContainRow(
+    topicName: string,
+    acceptedCards: number,
+    acceptedWords: number
+  ): Promise<void> {
+    await this.expectElementToBeVisible(contributionTableSelector);
+
+    const table = await this.page.$(contributionTableSelector);
+    const tableRows = await table?.$$('tr');
+    if (!tableRows || tableRows.length === 0) {
+      throw new Error('No rows found in the contribution table.');
+    }
+
+    for (const row of tableRows) {
+      const rowCells = await row.$$('td');
+      if (rowCells.length === 0) {
+        throw new Error('No cells found in the contribution table row.');
+      }
+
+      const found = await this.page.evaluate(
+        (
+          row: Element,
+          topicName: string,
+          acceptedCards: number,
+          acceptedWords: number
+        ) => {
+          const cells = row.querySelectorAll('td');
+          return (
+            cells[1].textContent?.trim() === topicName &&
+            cells[2].textContent?.trim() === acceptedCards.toString() &&
+            cells[3].textContent?.trim() === acceptedWords.toString()
+          );
+        },
+        {},
+        row,
+        topicName,
+        acceptedCards,
+        acceptedWords
+      );
+      if (found) {
+        return;
+      }
+    }
+
+    throw new Error(
+      `Row with topic name ${topicName} not found in the contribution table.`
+    );
+  }
+
+  /**
    * Fills the value in the customize component.
    * @param inputType - The type of the component.
    * @param value - The value to fill.
@@ -292,6 +349,52 @@ export class TranslationSubmitter extends BaseUser {
     await skillSearchElement?.type(skillName);
     await this.clickOn(skillItemInRTESelector);
     await this.page.keyboard.press('Enter');
+  }
+
+  /**
+   * Selects the contribution type in the contribution dashboard.
+   * @param contributionType - The contribution type to select.
+   */
+  async selectContributionTypeInContributionDashboard(
+    contributionType: 'Translation Contributions'
+  ): Promise<void> {
+    await this.expectElementToBeVisible(topicSelector);
+    const elementIndex = this.isViewportAtMobileWidth() ? 0 : 1;
+
+    const optionSelectElements = await this.page.$$(topicSelector);
+    const optionSelectElement = optionSelectElements[elementIndex];
+    await optionSelectElement.click();
+
+    await this.expectElementToBeVisible(topicOptionSelector);
+    const contibutionTypeOptions = await this.page.$$(topicOptionSelector);
+    let optionElement: ElementHandle<Element> | null = null;
+    for (const option of contibutionTypeOptions) {
+      const optionText = await option.evaluate(el => el.textContent?.trim());
+      if (optionText === contributionType) {
+        optionElement = option;
+        break;
+      }
+    }
+
+    if (!optionElement) {
+      throw new Error(`Option ${contributionType} not found.`);
+    }
+
+    // Click on the option.
+    await optionElement.click();
+
+    // Verify option is selected.
+    await this.expectElementToBeVisible(selectedLanguageSelector);
+    const selectedOptionElements = await this.page.$$(selectedLanguageSelector);
+    const selectedOptionElement = selectedOptionElements[elementIndex];
+    await this.page.waitForFunction(
+      (element: Element, value: string) => {
+        return element.textContent?.trim() === value;
+      },
+      {},
+      selectedOptionElement,
+      contributionType
+    );
   }
 
   /**
@@ -370,7 +473,9 @@ export class TranslationSubmitter extends BaseUser {
    * Switches to the tab in the contribution dashboard.
    * @param tabName - The name of the tab to switch to.
    */
-  async switchToTabInContributionDashboard(tabName: 'Translate Text') {
+  async switchToTabInContributionDashboard(
+    tabName: 'Translate Text' | 'My Contributions'
+  ) {
     await this.page.waitForSelector(contributionTabSelector);
 
     // Get required tab element.
@@ -415,7 +520,8 @@ export class TranslationSubmitter extends BaseUser {
   }
 
   /**
-   * Types the given text without clicking on any element.
+   * Types the given text by simulating keyboard events. Only clicks on the
+   * RTE editor if it is not already focused.
    * @param text - The text to type in the RTE editor.
    */
   async typeTextForRTE(text: string) {
@@ -425,6 +531,12 @@ export class TranslationSubmitter extends BaseUser {
       rteEditorBodySelector,
       el => (el as HTMLElement).innerHTML
     );
+    const isRTEFocused = await this.isElementVisible(
+      `${rteEditorBodySelector}.cke_focus`
+    );
+    if (!isRTEFocused) {
+      await this.clickOn(rteEditorBodySelector);
+    }
 
     // Type the text in the RTE editor.
     await this.page.keyboard.type(`${text}\n`);
