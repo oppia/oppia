@@ -172,6 +172,9 @@ const confirmDeletionButton =
   'button.e2e-test-really-delete-exploration-button';
 
 const mobileOptionsSelector = '.e2e-test-mobile-options-base';
+const mobileNavbarDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-navbar-dropdown';
+const topicMobilePreviewTab = '.e2e-test-mobile-preview-tab';
 const mobileTopicSelector = 'div.e2e-test-mobile-topic-name a';
 const mobileSkillSelector = 'span.e2e-test-mobile-skill-name';
 
@@ -818,8 +821,16 @@ export class CurriculumAdmin extends BaseUser {
    * Navigates to the study guide Previews tab.
    */
   async previewStudyGuide(): Promise<void> {
-    await this.expectElementToBeVisible(topicPreviewTab);
-    await this.clickOn(topicPreviewTab);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(showSubtopicsList);
+      await this.clickOn(firstSubtopicTile);
+      await this.clickOn(mobileOptionsSelector);
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(topicMobilePreviewTab);
+    } else {
+      await this.expectElementToBeVisible(topicPreviewTab);
+      await this.clickOn(topicPreviewTab);
+    }
     await this.waitForPageToFullyLoad();
   }
 
