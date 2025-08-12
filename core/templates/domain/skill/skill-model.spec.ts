@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for SkillObjectFactory.
+ * @fileoverview Unit tests for Skill.
  */
 
 import {TestBed} from '@angular/core/testing';
@@ -28,15 +28,12 @@ import {
 } from 'domain/skill/misconception.model';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {Rubric, RubricBackendDict} from 'domain/skill/rubric.model';
-import {
-  SkillBackendDict,
-  SkillObjectFactory,
-} from 'domain/skill/SkillObjectFactory';
+import {SkillBackendDict, Skill} from 'domain/skill/skill.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {AppConstants} from 'app.constants';
 
-describe('Skill object factory', () => {
-  let skillObjectFactory: SkillObjectFactory;
+describe('Skill', () => {
+  let skill: Skill;
   let misconceptionDict1: MisconceptionBackendDict;
   let misconceptionDict2: MisconceptionBackendDict;
   let rubricDict: RubricBackendDict;
@@ -49,7 +46,6 @@ describe('Skill object factory', () => {
       providers: [NormalizeWhitespacePipe],
     });
     skillDifficulties = AppConstants.SKILL_DIFFICULTIES;
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     misconceptionDict1 = {
       id: 2,
       name: 'test name',
@@ -98,7 +94,7 @@ describe('Skill object factory', () => {
   });
 
   it('should create a new skill from a backend dictionary', () => {
-    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skill = Skill.createFromBackendDict(skillDict);
     expect(skill.getId()).toEqual('1');
     expect(skill.getDescription()).toEqual('test description');
     expect(skill.getMisconceptions()).toEqual([
@@ -119,7 +115,7 @@ describe('Skill object factory', () => {
   });
 
   it('should find misconception by id', () => {
-    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    let skill = Skill.createFromBackendDict(skillDict);
     expect(skill.findMisconceptionById(4)).toEqual(
       Misconception.createFromBackendDict(misconceptionDict2)
     );
@@ -128,7 +124,7 @@ describe('Skill object factory', () => {
   it(
     'should throw error when there is no misconception' + ' by the given id',
     () => {
-      let skill = skillObjectFactory.createFromBackendDict(skillDict);
+      skill = Skill.createFromBackendDict(skillDict);
       expect(() => skill.findMisconceptionById(55)).toThrowError(
         'Could not find misconception with ID: 55'
       );
@@ -136,7 +132,7 @@ describe('Skill object factory', () => {
   );
 
   it('should delete a misconception given its id', () => {
-    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skill = Skill.createFromBackendDict(skillDict);
     skill.deleteMisconception(2);
     expect(skill.getMisconceptions()).toEqual([
       Misconception.createFromBackendDict(misconceptionDict2),
@@ -144,7 +140,7 @@ describe('Skill object factory', () => {
   });
 
   it('should throw validation errors', () => {
-    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skill = Skill.createFromBackendDict(skillDict);
     skill
       .getConceptCard()
       .setExplanation(SubtitledHtml.createDefault('', 'review_material'));
@@ -156,7 +152,7 @@ describe('Skill object factory', () => {
   });
 
   it('should add/update a rubric given difficulty', () => {
-    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skill = Skill.createFromBackendDict(skillDict);
     expect(skill.getRubrics()[0].getExplanations()).toEqual(['explanation']);
     expect(skill.getRubrics().length).toEqual(1);
 
@@ -179,7 +175,7 @@ describe('Skill object factory', () => {
   });
 
   it('should get the correct next misconception id', () => {
-    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skill = Skill.createFromBackendDict(skillDict);
     expect(skill.getNextMisconceptionId()).toEqual(6);
     skill.deleteMisconception(4);
     expect(skill.getNextMisconceptionId()).toEqual(6);
@@ -199,26 +195,21 @@ describe('Skill object factory', () => {
   });
 
   it('should convert to a backend dictionary', () => {
-    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skill = Skill.createFromBackendDict(skillDict);
     expect(skill.toBackendDict()).toEqual(skillDict);
   });
 
-  it(
-    'should throw error when there are no rubrics' +
-      ' for the given difficulty',
-    () => {
-      let skill = skillObjectFactory.createFromBackendDict(skillDict);
-      expect(() => {
-        skill.getRubricExplanations('difficult');
-      }).toThrowError(
-        'Unable to get explanation: The given difficulty does ' +
-          'not match any difficulty in the rubrcs'
-      );
-    }
-  );
+  it('should throw error when there are no rubrics for the given difficulty', () => {
+    skill = Skill.createFromBackendDict(skillDict);
+    expect(() => {
+      skill.getRubricExplanations('difficult');
+    }).toThrowError(
+      'Unable to get explanation: The given difficulty does not match any difficulty in the rubrics.'
+    );
+  });
 
   it('should get misconception id', () => {
-    let skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skill = Skill.createFromBackendDict(skillDict);
     expect(skill.getMisconceptionId(0)).toBe(2);
     expect(skill.getMisconceptionId(1)).toBe(4);
   });
