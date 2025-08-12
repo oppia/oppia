@@ -38,6 +38,9 @@ import {MobileMenuService} from '../../services/mobile-menu.service';
 import './player-header.component.css';
 import {Router} from '@angular/router';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
+import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
+import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
 
 enum PageContextConstants {
   EXPLORATION_PAGE = 'exploration',
@@ -60,6 +63,7 @@ export class PlayerHeaderComponent {
   storyPlaythroughObject!: StoryPlaythrough;
   topicName!: string;
   classroomName!: string;
+  classroomUrlFragment!: string;
   topicNameTranslationKey!: string;
   isLinkedToTopic!: boolean;
   expInfo!: LearnerExplorationSummaryBackendDict;
@@ -74,13 +78,16 @@ export class PlayerHeaderComponent {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private siteAnalyticsService: SiteAnalyticsService,
     private statsReportingService: StatsReportingService,
+    private classroomBackendApiService: ClassroomBackendApiService,
+    private capitalizePipe: CapitalizePipe,
     private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private topicViewerBackendApiService: TopicViewerBackendApiService,
     private mobileMenuService: MobileMenuService,
     private router: Router,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private accessValidationBackendApiService: AccessValidationBackendApiService
   ) {}
 
   ngOnInit(): void {
@@ -89,6 +96,21 @@ export class PlayerHeaderComponent {
     if (this.explorationContext === PageContextConstants.EXPLORATION_PAGE) {
       this.pageIsIframed = this.urlService.isIframed();
       this.explorationId = this.pageContextService.getExplorationId();
+    } else if (
+      this.explorationContext === PageContextConstants.DIAGNOSTIC_PAGE
+    ) {
+      this.classroomUrlFragment = this.urlService.getUrlParams()['classroom'];
+      this.accessValidationBackendApiService
+        .validateAccessToClassroomPage(this.classroomUrlFragment)
+        .then(() => {
+          this.classroomBackendApiService
+            .fetchClassroomDataAsync(this.classroomUrlFragment)
+            .then(classroomData => {
+              this.classroomName = this.capitalizePipe.transform(
+                classroomData.getName()
+              );
+            });
+        });
     }
 
     //   this.topicViewerBackendApiService
@@ -212,7 +234,6 @@ export class PlayerHeaderComponent {
 
   closePlayer(): void {
     const pathnameArray = this.urlService.getPathname().split('/');
-    console.log(pathnameArray);
     if (this.explorationContext === PageContextConstants.EXPLORATION_PAGE) {
       console.log('Closing player and navigating to main page');
     } else if (this.explorationContext === PageContextConstants.PRACTICE_PAGE) {
@@ -223,6 +244,16 @@ export class PlayerHeaderComponent {
 
       if (confirmed) {
         this.router.navigate(targetPath);
+      }
+    } else if (
+      this.explorationContext === PageContextConstants.DIAGNOSTIC_PAGE
+    ) {
+      const confirmed = this.windowRef.nativeWindow.confirm(
+        'If you exit, your progress will be lost. Do you still want to exit?'
+      );
+
+      if (confirmed) {
+        this.router.navigate(['learn', this.classroomUrlFragment]);
       }
     }
   }
