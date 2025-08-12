@@ -72,6 +72,7 @@
 /angular-template-style-url-replacer.webpack-loader.js @oppia/lace-frontend-reviewers
 /angular.json @oppia/lace-frontend-reviewers
 /src @oppia/lace-frontend-reviewers
+/root-files-mapping.json @oppia/lace-frontend-reviewers
 
 # TS typing
 /typings/ @oppia/dev-workflow-reviewers
