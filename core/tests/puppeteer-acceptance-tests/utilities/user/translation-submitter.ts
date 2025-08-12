@@ -106,6 +106,11 @@ export class TranslationSubmitter extends BaseUser {
     );
   }
 
+  /**
+   * Clicks on the translate button in the translation modal.
+   * @param chapterName - The name of the chapter.
+   * @param storyName - The name of the story.
+   */
   async clickOnTranslateButtonInTranslateTextTab(
     chapterName: string,
     storyName: string

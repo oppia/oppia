@@ -57,8 +57,193 @@ const rteHelperModalContainerSelector = '.e2e-test-rte-helper-modal-container';
 const skillNameInput = '.e2e-test-skill-name-input';
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 const contributionTableSelector = '.e2e-test-topics-table';
+const pinIconSelector = '.e2e-test-pin-icon';
+const backToLessonButtonSelector = '.e2e-test-back-to-lesson-button';
+const modalHeaderSelector = '.e2e-test-modal-header';
+const badgeSelector = '.e2e-test-badge';
+const badgeValueSelector = '.e2e-test-badge-value';
+const badgeCaptionSelector = '.e2e-test-badge-caption';
+const badgeLanguageSelector = '.e2e-test-badge-language';
 
-export class TranslationReviewer extends BaseUser {}
+export class TranslationReviewer extends BaseUser {
+  /**
+   * Clicks on the translate button in the translation modal.
+   * @param chapterName - The name of the chapter.
+   * @param storyName - The name of the story.
+   */
+  async clickOnTranslateButtonInTranslateTextTabInTranslationReview(
+    chapterName: string,
+    storyName: string
+  ) {
+    await this.expectElementToBeVisible(opportunityItemSelector);
+    const initbackToLessonButtonVisible = await this.isElementVisible(
+      backToLessonButtonSelector
+    );
+
+    const opportunityItems = await this.page.$$(opportunityItemSelector);
+    let opportunityItem: ElementHandle<Element> | null = null;
+    for (const opportunityItemElement of opportunityItems) {
+      const opportunityItemHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunityItemHeadingSelector
+      );
+      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunitySubHeadingSelector
+      );
+
+      if (
+        opportunityItemHeading === chapterName &&
+        opportunityItemSubHeading?.includes(storyName)
+      ) {
+        opportunityItem = opportunityItemElement;
+        break;
+      }
+    }
+
+    if (!opportunityItem) {
+      throw new Error(
+        `Opportunity item for chapter ${chapterName} and story ${storyName} not found.`
+      );
+    }
+
+    // Click on translate button in the opportunity item.
+    const translateButton = await opportunityItem.waitForSelector(
+      opportunityTranslateButtonSelector
+    );
+    if (!translateButton) {
+      throw new Error(
+        `Translate button for chapter ${chapterName} and story ${storyName} not found.`
+      );
+    }
+    await translateButton.click();
+
+    // Verify that the translation editor is opened.
+    const backToLessonButtonVisible = await this.isElementVisible(
+      backToLessonButtonSelector
+    );
+    const commonModalHeaderVisible =
+      await this.isElementVisible(modalHeaderSelector);
+    const translateTextModalHeaderVisible = await this.isElementVisible(
+      translateTextModalHeaderContainerSelector
+    );
+    if (
+      backToLessonButtonVisible === initbackToLessonButtonVisible &&
+      !commonModalHeaderVisible &&
+      !translateTextModalHeaderVisible
+    ) {
+      throw new Error('Translate/Review button not clicked properly.');
+    }
+  }
+
+  /**
+   * Checks if the pin icon is visible in the review page.
+   */
+  async expectPinIconToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(pinIconSelector);
+  }
+
+  /**
+   * Checks if the badge is present or not.
+   * @param {string} expectedBadgeValue - The expected value of the badge.
+   * @param {string} expectedBadgeCaption - The expected caption of the badge.
+   * @param {string | null} expectedBadgeLanguage - The expected language of the badge.
+   */
+  async expectBadgesToContain(
+    expectedBadgeValue: string,
+    expectedBadgeCaption: string,
+    expectedBadgeLanguage: string | null = null
+  ): Promise<void> {
+    await this.expectElementToBeVisible(badgeSelector);
+
+    const badges = await this.page.$$(badgeSelector);
+    let badge: ElementHandle<Element> | null = null;
+    for (const badgeElement of badges) {
+      const badgeValue = await badgeElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        badgeValueSelector
+      );
+      if (badgeValue !== expectedBadgeValue) {
+        continue;
+      }
+      const badgeCaption = await badgeElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        badgeCaptionSelector
+      );
+      if (badgeCaption !== expectedBadgeCaption) {
+        continue;
+      }
+
+      if (expectedBadgeLanguage) {
+        const badgeLanguage = await badgeElement.evaluate(
+          (el: Element, sel: string) =>
+            el.querySelector(sel)?.textContent?.trim(),
+          languageSelector
+        );
+        if (badgeLanguage !== expectedBadgeLanguage) {
+          continue;
+        }
+      }
+      badge = badgeElement;
+      break;
+    }
+    if (!badge) {
+      throw new Error('Badge not found.');
+    }
+  }
+  /**
+   * Expects the contribution table to contain a row with the given topic name,
+   * accepted cards, and accepted words.
+   * @param topicName - The topic name to search for.
+   * @param acceptedCards - The number of accepted cards.
+   * @param acceptedWords - The number of accepted words.
+   */
+  async expectContributionTableToContainRowInTranslationReview(
+    rowValues: (string | null)[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(contributionTableSelector);
+
+    const table = await this.page.$(contributionTableSelector);
+    const tableRows = await table?.$$('tr');
+    if (!tableRows || tableRows.length === 0) {
+      throw new Error('No rows found in the contribution table.');
+    }
+
+    for (const row of tableRows) {
+      const rowCells = await row.$$('td');
+      if (rowValues.length !== rowCells.length) {
+        continue;
+      }
+
+      let match = true;
+
+      for (let i = 0; i < rowValues.length; i++) {
+        if (!rowCells[i]) {
+          continue;
+        }
+        const rowValue = await rowCells[i].evaluate(
+          (el: Element, sel: string) =>
+            el.querySelector(sel)?.textContent?.trim(),
+          rowValues[i]
+        );
+        if (rowValue !== rowValues[i]) {
+          match = false;
+          break;
+        }
+      }
+
+      if (match) {
+        return;
+      }
+    }
+
+    throw new Error('Row not found in the contribution table with values: ');
+  }
+}
 
 export let TranslationReviewerFactory = (): TranslationReviewer =>
   new TranslationReviewer();

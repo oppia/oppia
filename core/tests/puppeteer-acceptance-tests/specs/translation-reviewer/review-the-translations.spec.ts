@@ -95,6 +95,29 @@ describe('Translation Reviewer', function () {
 
   it('should be able to view all pending reviews', async function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
+    await translationReviewer.expectPinIconToBeVisible();
+    await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
+      'The Birthday Cake Arrives',
+      'Fractions - Dividing a Birthday Cake'
+    );
+    await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
+      'सामग्री 0',
+      'Fractions / Dividing'
+    );
+
+    await translationReviewer.clickOn('Accept and review next');
+  });
+
+  it('should be able to see contribution stats', async function () {
+    await translationSubmitter.clickOn('Contribution Stats');
+    await translationReviewer.expectContributionTableToContainRowInTranslationReview(
+      [null, 'Fractions', '3', '5', '3', '5']
+    );
+  });
+
+  it('should be able to see the badges', async function () {
+    await translationReviewer.clickOn('Badges');
+    await translationReviewer.expectBadgesToContain('1', 'Review', 'हिन्दी');
   });
 
   afterAll(async function () {
