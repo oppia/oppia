@@ -238,6 +238,7 @@ export class UserFactory {
       SuperAdminFactory(),
     ]);
     await superAdmin.assignRoleToUser(username, ROLES.BLOG_ADMIN);
+    await superAdmin.assignRoleToUser(username, ROLES.TRANSLATION_ADMIN);
     await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
     superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
       BlogAdminFactory(),
