@@ -51,7 +51,7 @@ describe('Translation Submitter', function () {
     // Create an exploration.
     await curriculumAdm.navigateToCreatorDashboardPage();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
-    await curriculumAdm.dismissTranslationTabWelcomeModal();
+    await curriculumAdm.dismissWelcomeModal();
     await curriculumAdm.addExplorationDescriptionContainingAllRTEComponents();
     await curriculumAdm.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
     await curriculumAdm.viewOppiaResponses();
