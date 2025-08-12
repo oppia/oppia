@@ -62,7 +62,7 @@ describe('Translation Submitter', function () {
     await curriculumAdm.navigateToCreatorDashboardPage();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
     await curriculumAdm.dismissWelcomeModal();
-    await curriculumAdm.addImageRTE(
+    await curriculumAdm.addImageRTEToCardContent(
       testConstants.data.profilePicture,
       'Image Description',
       'Image Caption'
