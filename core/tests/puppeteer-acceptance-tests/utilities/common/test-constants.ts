@@ -152,6 +152,7 @@ export default {
     MODERATOR: 'moderator',
     RELEASE_COORDINATOR: 'release coordinator',
     COLLECTION_EDITOR: 'collection editor',
+    TRANSLATION_REVIEWER: 'translation reviewer',
   } as const,
 
   BlogRights: {

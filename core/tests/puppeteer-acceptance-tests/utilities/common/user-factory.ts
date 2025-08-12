@@ -18,7 +18,10 @@
 
 import {SuperAdminFactory, SuperAdmin} from '../user/super-admin';
 import {BaseUserFactory, BaseUser} from './puppeteer-utils';
-import {TranslationAdminFactory} from '../user/translation-admin';
+import {
+  TranslationAdmin,
+  TranslationAdminFactory,
+} from '../user/translation-admin';
 import {LoggedOutUserFactory, LoggedOutUser} from '../user/logged-out-user';
 import {BlogAdminFactory, BlogAdmin} from '../user/blog-admin';
 import {QuestionAdminFactory} from '../user/question-admin';
@@ -46,6 +49,7 @@ import {
   TranslationSubmitter,
   TranslationSubmitterFactory,
 } from '../user/translation-submitter';
+import {TranslationReviewerFactory} from '../user/translation-reviewer';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
@@ -65,6 +69,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.MODERATOR]: ModeratorFactory,
   [ROLES.RELEASE_COORDINATOR]: ReleaseCoordinatorFactory,
+  [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
 } as const;
 
 /**
@@ -87,7 +92,8 @@ type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
 /**
  * Global user instances that are created and can be reused again.
  */
-let superAdminInstance: (SuperAdmin & BlogAdmin) | null = null;
+let superAdminInstance: (SuperAdmin & BlogAdmin & TranslationAdmin) | null =
+  null;
 let activeUsers: BaseUser[] = [];
 
 export class UserFactory {
@@ -144,6 +150,13 @@ export class UserFactory {
           await superAdminInstance.assignRoleToUser(
             user.username,
             ROLES.TOPIC_MANAGER,
+            topic
+          );
+          break;
+        case ROLES.TRANSLATION_REVIEWER:
+          await superAdminInstance.navigateToContributorDashboardAdminPage();
+          await superAdminInstance.addTranslationLanguageReviewRights(
+            user.username,
             topic
           );
           break;
@@ -212,7 +225,7 @@ export class UserFactory {
    */
   static createNewSuperAdmin = async function (
     username: string
-  ): Promise<SuperAdmin & BlogAdmin> {
+  ): Promise<SuperAdmin & BlogAdmin & TranslationAdmin> {
     if (superAdminInstance !== null) {
       return superAdminInstance;
     }
@@ -228,6 +241,7 @@ export class UserFactory {
     await superAdmin.expectUserToHaveRole(username, ROLES.BLOG_ADMIN);
     superAdminInstance = UserFactory.composeUserWithRoles(superAdmin, [
       BlogAdminFactory(),
+      TranslationAdminFactory(),
     ]);
 
     return superAdminInstance;

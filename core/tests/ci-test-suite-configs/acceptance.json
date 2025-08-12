@@ -535,6 +535,10 @@
     {
       "name": "translation-submitter/check-their-accomplishment",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-submitter/check-their-accomplishment.spec.ts"
+    },
+    {
+      "name": "translation-reviewer/review-the-translations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/review-the-translations.spec.ts"
     }
   ],
   "docker_suites": []
