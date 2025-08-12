@@ -28,7 +28,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {Misconception} from 'domain/skill/misconception.model';
 
 interface MisconceptionFormSchema {
