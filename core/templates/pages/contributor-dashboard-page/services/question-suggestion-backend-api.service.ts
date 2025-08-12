@@ -20,7 +20,7 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {ImageData} from 'domain/skill/skill-creation-backend-api.service';
 import {Question} from 'domain/question/QuestionObjectFactory';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 
 @Injectable({
