@@ -653,15 +653,28 @@ describe('RTE display component', () => {
     ).toBe('');
   }));
 
-  it('should not highlight sentence when manual voiceover is available', () => {
-    component.previousHighlightedElementId = '';
+  it('should not highlight sentence when manual voiceover is available in player page', () => {
+    component.previousHighlightedElementId = undefined;
     spyOn(
       component,
       'isManualVoiceoverAvailableForActiveContent'
     ).and.returnValue(true);
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(true);
     component.highlightSentenceDuringVoiceoverPlay();
     // No updates were made to the previously highlighted element ID.
-    expect(component.previousHighlightedElementId).toBe('');
+    expect(component.previousHighlightedElementId).toBe(undefined);
+  });
+
+  it('should not highlight sentence when manual voiceover is playing in editor page', () => {
+    component.previousHighlightedElementId = undefined;
+    spyOn(component, 'isInPlayerOrPreviewPage').and.returnValue(false);
+    let audioPlayingSpy = spyOn(audioplayerService, 'isPlaying');
+    audioPlayingSpy.and.returnValue(true);
+    voiceoverPlayerService.isAutomaticVoiceoverPlaying = false;
+
+    component.highlightSentenceDuringVoiceoverPlay();
+    // No updates were made to the previously highlighted element ID.
+    expect(component.previousHighlightedElementId).toBe(undefined);
   });
 
   it('should be able to return manual voiceover status correctly', () => {

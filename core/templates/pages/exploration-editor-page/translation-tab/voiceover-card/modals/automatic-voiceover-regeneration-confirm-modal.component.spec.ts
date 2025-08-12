@@ -124,4 +124,18 @@ describe('Automatic Voiceover Regeneration Confirmation Modal', () => {
     componentInstance.cancel();
     expect(ngbActiveModal.dismiss).toHaveBeenCalled();
   });
+
+  it('should set the correct modal header', () => {
+    componentInstance.isAutomaticVoiceoverPresent = true;
+    componentInstance.ngOnInit();
+    expect(componentInstance.modalHeader).toBe(
+      'Are you sure you want to regenerate voiceover?'
+    );
+
+    componentInstance.isAutomaticVoiceoverPresent = false;
+    componentInstance.ngOnInit();
+    expect(componentInstance.modalHeader).toBe(
+      'Are you sure you want to generate voiceover?'
+    );
+  });
 });

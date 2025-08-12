@@ -21,6 +21,7 @@ import {Injectable} from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {LocalStorageService} from './local-storage.service';
 import {ContentIdToVoiceoversAudioOffsetsMsecs} from 'domain/voiceover/entity-voiceovers.model';
+import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 
 interface SentenceHighlightInterval {
   highlightSentenceId: string;
@@ -43,7 +44,10 @@ export class AutomaticVoiceoverHighlightService {
   } = {};
   public sentenceHighlightIntervalList: SentenceHighlightInterval[] = [];
 
-  constructor(private localStorageService: LocalStorageService) {
+  constructor(
+    private localStorageService: LocalStorageService,
+    private voiceoverPlayerService: VoiceoverPlayerService
+  ) {
     this.languageCode =
       this.localStorageService.getLastSelectedTranslationLanguageCode() as string;
   }
@@ -251,8 +255,8 @@ export class AutomaticVoiceoverHighlightService {
 
         this.sentenceHighlightIntervalList.push({
           highlightSentenceId: currentHighlightId as string,
-          startTimeInSecs: Math.round(minOffsetMsecs / 1000),
-          endTimeInSecs: Math.round(maxOffsetMsecs / 1000),
+          startTimeInSecs: minOffsetMsecs / 1000,
+          endTimeInSecs: maxOffsetMsecs / 1000,
         });
 
         currentHighlightId = highlightIds.shift();

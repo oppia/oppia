@@ -297,14 +297,11 @@ export class TranslatorOverviewComponent implements OnInit {
         this.translationLanguageService.setActiveLanguageCode(
           this.languageCode
         );
-        // We need to refresh the status service once the active language is
-        // set.
-        this.translationStatusService.refresh();
-        this.routerService.onCenterGraph.emit();
 
         this.inTranslationMode = false;
         this.inVoiceoverMode = false;
         this.refreshDirectiveScope();
+        this.entityVoiceoversService.fetchEntityVoiceovers();
       });
 
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
