@@ -24,7 +24,7 @@ import {StateCard} from '../../../../../domain/state_card/state-card.model';
 import {HintsAndSolutionManagerService} from '../../../services/hints-and-solution-manager.service';
 import {PlayerPositionService} from '../../../services/player-position.service';
 import {PlayerTranscriptService} from '../../../services/player-transcript.service';
-import {DisplayNewHintModalComponent} from './display-hint-modal.component';
+import {DisplayNewHintModalComponent} from './display-new-hint-modal.component';
 import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
 import {Interaction} from '../../../../../domain/exploration/interaction.model';
 import {NO_ERRORS_SCHEMA} from '@angular/core';

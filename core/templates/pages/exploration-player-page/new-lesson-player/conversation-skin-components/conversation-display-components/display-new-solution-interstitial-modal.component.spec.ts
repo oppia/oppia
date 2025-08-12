@@ -19,7 +19,7 @@
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
-import {DisplayNewSolutionInterstititalModalComponent} from './display-solution-interstitial-modal.component';
+import {DisplayNewSolutionInterstititalModalComponent} from './display-new-solution-interstitial-modal.component';
 import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
 
 describe('Display Interstitial Solution Modal', () => {
