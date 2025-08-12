@@ -21,14 +21,14 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {DisplayHintModalComponent} from '../current-lesson-player/modals/display-hint-modal.component';
 import {DisplaySolutionInterstititalModalComponent} from '../current-lesson-player/modals/display-solution-interstitial-modal.component';
 import {DisplaySolutionModalComponent} from '../current-lesson-player/modals/display-solution-modal.component';
-import {DisplayNewHintModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/display-hint-modal.component';
+import {DisplayNewHintModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component';
 import {
   MatBottomSheet,
   MatBottomSheetRef,
 } from '@angular/material/bottom-sheet';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {DisplayNewSolutionModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/display-solution-modal.component';
-import {DisplayNewSolutionInterstititalModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/display-solution-interstitial-modal.component';
+import {DisplayNewSolutionModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
+import {DisplayNewSolutionInterstititalModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
 
 const MOBILE_SCREEN_BREAKPOINT = 480;
 

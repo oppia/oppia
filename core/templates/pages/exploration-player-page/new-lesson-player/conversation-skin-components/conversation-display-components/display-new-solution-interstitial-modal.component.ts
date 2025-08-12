@@ -18,13 +18,13 @@
 
 import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import './display-solution-interstitial-modal.component.css';
+import './display-new-solution-interstitial-modal.component.css';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
 @Component({
   selector: 'oppia-display-new-interstitial-modal',
-  templateUrl: './display-solution-interstitial-modal.component.html',
-  styleUrls: ['./display-solution-interstitial-modal.component.css'],
+  templateUrl: './display-new-solution-interstitial-modal.component.html',
+  styleUrls: ['./display-new-solution-interstitial-modal.component.css'],
 })
 export class DisplayNewSolutionInterstititalModalComponent {
   constructor(
