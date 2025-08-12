@@ -302,12 +302,16 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(
       `${confirmSkillCreationButton}:not([disabled])`
     );
+    const newPagePromise = this.waitForNewPage();
     await this.clickOn(confirmSkillCreationButton);
+    // Close new page, so that screenrecorder doesn't capture it and remove
+    // focus from the main page.
+    const newPage = await newPagePromise;
+    await newPage.close();
     await this.waitForNetworkIdle();
     await this.page.waitForSelector(confirmSkillCreationButton, {
       hidden: true,
     });
-    await this.page.bringToFront();
   }
 
   /**
