@@ -3,7 +3,7 @@
   <div *ngIf="voiceoversAreLoaded">
     <div *ngIf="unsupportedLanguageCode" class="unsupported-language-warning">
       <i>Voiceover functionality for this language is not yet supported in Oppia.
-        Please contact a server admin for more details.
+        Please contact a server admin if you would like it to be added.
       </i>
     </div>
     <div *ngIf="!unsupportedLanguageCode && !contentAvailableForVoiceovers" class="content-unavailable-warning">
@@ -235,11 +235,21 @@
     color: #d14836;
     margin: 0 4%;
   }
+
   .voiceover-action-buttons {
-    display: flex;
-    justify-content: space-evenly;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     width: 25%;
   }
+
+  .voiceover-action-buttons button:first-child {
+    grid-column: 1;
+  }
+
+  .voiceover-action-buttons button:nth-child(2) {
+    grid-column: 2;
+  }
+
   .unsupported-language-warning {
     color: #d14836;
     margin: 0 2%;
