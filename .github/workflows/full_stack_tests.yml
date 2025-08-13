@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
       matrix:
         suite: 
-          - name: logged-out-learner/use-the-feedback-and-help-cards
+          - name: logged-out-learner/play-a-complete-community-lesson
         runs1: [1, 2, 3, 4, 5, 6, 7, 8]
         runs2: [1, 2, 3, 4, 5, 6, 7, 8]
         mobile: [false, true]
