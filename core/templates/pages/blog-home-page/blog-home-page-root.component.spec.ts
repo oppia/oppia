@@ -17,6 +17,7 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {By} from '@angular/platform-browser';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
 import {
   ComponentFixture,
@@ -181,5 +182,18 @@ describe('Blog Home Page Root', () => {
     component.ngOnDestroy();
 
     expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
+  });
+
+  it('should render blog homepage breadcrumb link with correct href when viewport is wider than 600px', () => {
+    spyOnProperty(window, 'innerWidth', 'get').and.returnValue(1024);
+    window.dispatchEvent(new Event('resize'));
+    fixture.detectChanges();
+
+    const linkEl = fixture.debugElement.query(
+      By.css('.mobile-navbar-blog-homepage')
+    )?.nativeElement;
+
+    expect(linkEl).toBeTruthy();
+    expect(linkEl.getAttribute('href')).toBe('/blog');
   });
 });

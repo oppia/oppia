@@ -21,7 +21,7 @@ import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-edit
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {SelectSkillModalComponent} from 'components/skill-selector/select-skill-modal.component';
 import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {AlertsService} from 'services/alerts.service';
