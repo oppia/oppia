@@ -37,6 +37,8 @@ export class AutomaticVoiceoverRegenerationConfirmModalComponent extends Confirm
   isAutomaticVoiceoverPresent!: boolean;
   isAutomaticVoiceoverGenerating: boolean = false;
   modalHeader!: string;
+  buttonTextForGenerate!: string;
+  buttonTextDuringGeneration!: string;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -49,8 +51,12 @@ export class AutomaticVoiceoverRegenerationConfirmModalComponent extends Confirm
   ngOnInit(): void {
     if (this.isAutomaticVoiceoverPresent) {
       this.modalHeader = 'Are you sure you want to regenerate voiceover?';
+      this.buttonTextForGenerate = 'Regenerate';
+      this.buttonTextDuringGeneration = 'Regenerating';
     } else {
       this.modalHeader = 'Are you sure you want to generate voiceover?';
+      this.buttonTextForGenerate = 'Generate';
+      this.buttonTextDuringGeneration = 'Generating';
     }
   }
 

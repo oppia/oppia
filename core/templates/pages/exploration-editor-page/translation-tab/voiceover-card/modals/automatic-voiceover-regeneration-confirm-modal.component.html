@@ -24,9 +24,9 @@
           (click)="regenerateAndClose()"
           [disabled]="isAutomaticVoiceoverGenerating"
           [matTooltip]="isAutomaticVoiceoverGenerating ? 'Regenerating voiceover, please wait.' : null">
-    <span *ngIf="!isAutomaticVoiceoverGenerating">Regenerate</span>
+    <span *ngIf="!isAutomaticVoiceoverGenerating">{{buttonTextForGenerate}}</span>
     <span *ngIf="isAutomaticVoiceoverGenerating">
-      Regenerating
+      {{buttonTextDuringGeneration}}
       <loading-dots></loading-dots>
     </span>
   </button>
