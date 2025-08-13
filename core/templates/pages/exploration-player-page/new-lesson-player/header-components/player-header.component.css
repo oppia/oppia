@@ -9,49 +9,68 @@
   background-color: #094142;
   color: #fff;
   display: flex;
+  position: relative;
   height: 40px;
   justify-content: space-between;
   padding-left: 15px;
-}
-
-.player-header-right {
-  display: none;
-  padding: 12px;
 }
 
 .header-menu-button {
   background: none;
   border: none;
   color: #fff;
+  display: none;
+}
+
+.player-header-close-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .player-header-close-button button {
   background: none;
-  position: absolute;
-  right: 0;
-  top: 0;
   border: none;
-  outline: none;
-  padding: 8px;
 }
 
-.player-header-close-button i {
-  color: #fff;
-}
-
-.other-header {
+.question-player-header {
   background-color: #c55f45;
   justify-content: center;
 }
 
-@media screen and (max-width: 767px) {
-  .player-header-right {
-    display: block;
-  }
+.header-menu-button svg {
+  height: 24px;
+  width: 24px;
 }
 
 .player-header-left p {
   font-family: Capriola;
   font-weight: 400;
   font-size: 18px;
+}
+
+.close-modal-button {
+  display: flex;
+}
+
+.close-modal-button i {
+  font-size: 24px;
+  color: #fff;
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
+.question-player-exit-btn {
+  position: absolute;
+  right: 0;
+}
+
+@media (max-width: 480px) {
+  .player-header-left p {
+    font-size: 13px;
+  }  
+
+  .header-menu-button {
+    display: block;
+  }
 }

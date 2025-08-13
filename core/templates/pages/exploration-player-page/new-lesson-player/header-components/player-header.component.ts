@@ -17,20 +17,12 @@
  */
 
 import {Component} from '@angular/core';
-import {ClassroomDomainConstants} from 'domain/classroom/classroom-domain.constants';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
-import {StoryPlaythrough} from 'domain/story_viewer/story-playthrough.model';
-import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
-import {
-  I18nLanguageCodeService,
-  TranslationKeyType,
-} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {MobileMenuService} from '../../services/mobile-menu.service';
@@ -41,6 +33,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 import {CapitalizePipe} from 'filters/string-utility-filters/capitalize.pipe';
 import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
+import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-backend-api.service';
 
 enum PageContextConstants {
   EXPLORATION_PAGE = 'exploration',
@@ -59,16 +52,14 @@ export class PlayerHeaderComponent {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   explorationId!: string;
   explorationTitle!: string;
-  explorationTitleTranslationKey!: string;
-  storyPlaythroughObject!: StoryPlaythrough;
   topicName!: string;
   classroomName!: string;
-  classroomUrlFragment!: string;
-  topicNameTranslationKey!: string;
+  classroomUrlFragment!: string | null;
+  topicUrlFragment!: string | null;
+  storyUrlFragment!: string | null;
   isLinkedToTopic!: boolean;
-  expInfo!: LearnerExplorationSummaryBackendDict;
+  chapterNumber!: number;
   directiveSubscriptions: Subscription = new Subscription();
-  isMobileMenuVisible = false;
   pageIsIframed: boolean = false;
   explorationContext!: PageContextConstants;
   explorationContextConstants = PageContextConstants;
@@ -80,9 +71,8 @@ export class PlayerHeaderComponent {
     private statsReportingService: StatsReportingService,
     private classroomBackendApiService: ClassroomBackendApiService,
     private capitalizePipe: CapitalizePipe,
-    private urlInterpolationService: UrlInterpolationService,
     private urlService: UrlService,
-    private i18nLanguageCodeService: I18nLanguageCodeService,
+    private storyViewerBackendApiService: StoryViewerBackendApiService,
     private topicViewerBackendApiService: TopicViewerBackendApiService,
     private mobileMenuService: MobileMenuService,
     private router: Router,
@@ -91,11 +81,19 @@ export class PlayerHeaderComponent {
   ) {}
 
   ngOnInit(): void {
-    let pathnameArray = this.urlService.getPathname().split('/');
     this.setPageContext();
     if (this.explorationContext === PageContextConstants.EXPLORATION_PAGE) {
       this.pageIsIframed = this.urlService.isIframed();
       this.explorationId = this.pageContextService.getExplorationId();
+      this.readOnlyExplorationBackendApiService
+        .fetchExplorationAsync(
+          this.explorationId,
+          this.urlService.getExplorationVersionFromUrl(),
+          this.urlService.getPidFromUrl()
+        )
+        .then(response => {
+          this.explorationTitle = response.exploration.title;
+        });
     } else if (
       this.explorationContext === PageContextConstants.DIAGNOSTIC_PAGE
     ) {
@@ -113,59 +111,50 @@ export class PlayerHeaderComponent {
         });
     }
 
-    //   this.topicViewerBackendApiService
-    // .fetchTopicDataAsync(this.topicUrlFragment, this.classroomUrlFragment)
-    // .then(
-    //   (readOnlyTopic: ReadOnlyTopic) => {
-    //     this.topicId = readOnlyTopic.getTopicId();
-    //     this.topicName = readOnlyTopic.getTopicName();
-    //     this.topicDescription = readOnlyTopic.getTopicDescription();
-    //     this.pageTitleFragment = readOnlyTopic.getPageTitleFragmentForWeb();
-    //     this.classroomName = readOnlyTopic.getClassroomName();
-
     this.explorationTitle = 'Loading...';
     this.topicName = 'Loading...';
-    // this.readOnlyExplorationBackendApiService
-    //   .fetchExplorationAsync(
-    //     this.explorationId,
-    //     this.urlService.getExplorationVersionFromUrl(),
-    //     this.urlService.getPidFromUrl()
-    //   )
-    //   .then(response => {
-    //     this.explorationTitle = response.exploration.title;
-    //   });
-    // this.explorationTitleTranslationKey =
-    //   this.i18nLanguageCodeService.getExplorationTranslationKey(
-    //     this.explorationId,
-    //     TranslationKeyType.TITLE
-    //   );
-    // To check if the exploration is linked to the topic or not.
+    this.classroomName = 'Loading...';
+
     this.isLinkedToTopic = this.getTopicUrl() ? true : false;
-    // If linked to topic then print topic name in the lesson player.
     if (
       this.isLinkedToTopic ||
       this.explorationContext === PageContextConstants.PRACTICE_PAGE
     ) {
-      let topicUrlFragment =
+      this.topicUrlFragment =
         this.urlService.getTopicUrlFragmentFromLearnerUrl();
-      let classroomUrlFragment =
+      this.classroomUrlFragment =
         this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+
       this.topicViewerBackendApiService
-        .fetchTopicDataAsync(topicUrlFragment, classroomUrlFragment)
+        .fetchTopicDataAsync(this.topicUrlFragment, this.classroomUrlFragment)
         .then((readOnlyTopic: ReadOnlyTopic) => {
           this.topicName = readOnlyTopic.getTopicName();
-          this.classroomName = readOnlyTopic.getClassroomName();
           this.statsReportingService.setTopicName(this.topicName);
           this.siteAnalyticsService.registerCuratedLessonStarted(
             this.topicName,
             this.explorationId
           );
-          this.topicNameTranslationKey =
-            this.i18nLanguageCodeService.getTopicTranslationKey(
-              readOnlyTopic.getTopicId(),
-              TranslationKeyType.TITLE
-            );
         });
+
+      if (this.isLinkedToTopic) {
+        this.storyUrlFragment =
+          this.urlService.getStoryUrlFragmentFromLearnerUrl();
+
+        this.storyViewerBackendApiService
+          .fetchStoryDataAsync(
+            this.topicUrlFragment,
+            this.classroomUrlFragment,
+            this.storyUrlFragment
+          )
+          .then(storyDataObject => {
+            const storyNodes = storyDataObject.getStoryNodes();
+            for (let i = 0; i < storyNodes.length; i++) {
+              if (storyNodes[i].getExplorationId() === this.explorationId) {
+                this.chapterNumber = i + 1;
+              }
+            }
+          });
+      }
     } else {
       this.siteAnalyticsService.registerCommunityLessonStarted(
         this.explorationId
@@ -176,33 +165,19 @@ export class PlayerHeaderComponent {
   // Returns null if the topic is not linked to the learner's current
   // exploration.
   getTopicUrl(): string | null {
-    let topicUrlFragment: string | null = null;
-    let classroomUrlFragment: string | null = null;
-
     try {
-      topicUrlFragment = this.urlService.getTopicUrlFragmentFromLearnerUrl();
-      classroomUrlFragment =
+      this.topicUrlFragment =
+        this.urlService.getTopicUrlFragmentFromLearnerUrl();
+      this.classroomUrlFragment =
         this.urlService.getClassroomUrlFragmentFromLearnerUrl();
+      this.storyUrlFragment =
+        this.urlService.getStoryUrlFragmentFromLearnerUrl();
     } catch (e) {}
 
     return (
-      topicUrlFragment &&
-      classroomUrlFragment &&
-      this.urlInterpolationService.interpolateUrl(
-        ClassroomDomainConstants.TOPIC_VIEWER_STORY_URL_TEMPLATE,
-        {
-          topic_url_fragment: topicUrlFragment,
-          classroom_url_fragment: classroomUrlFragment,
-        }
-      )
-    );
-  }
-
-  isHackyTopicNameTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.topicNameTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
+      this.topicUrlFragment &&
+      this.classroomUrlFragment &&
+      this.storyUrlFragment
     );
   }
 
@@ -216,14 +191,6 @@ export class PlayerHeaderComponent {
     }
   }
 
-  isHackyExpTitleTranslationDisplayed(): boolean {
-    return (
-      this.i18nLanguageCodeService.isHackyTranslationAvailable(
-        this.explorationTitleTranslationKey
-      ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
-    );
-  }
-
   toggleMenu(): void {
     this.mobileMenuService.toggleMenuVisibility();
   }
@@ -235,7 +202,27 @@ export class PlayerHeaderComponent {
   closePlayer(): void {
     const pathnameArray = this.urlService.getPathname().split('/');
     if (this.explorationContext === PageContextConstants.EXPLORATION_PAGE) {
-      console.log('Closing player and navigating to main page');
+      if (this.isLinkedToTopic) {
+        const confirmed = this.windowRef.nativeWindow.confirm(
+          'If you exit, your progress will be lost. Do you still want to exit?'
+        );
+        if (confirmed) {
+          this.router.navigate([
+            'learn',
+            this.classroomUrlFragment,
+            this.topicUrlFragment,
+            'story',
+            this.storyUrlFragment,
+          ]);
+        }
+      } else {
+        const confirmed = this.windowRef.nativeWindow.confirm(
+          'If you exit, your progress will be lost. Do you still want to exit?'
+        );
+        if (confirmed) {
+          this.router.navigate(['community-library']);
+        }
+      }
     } else if (this.explorationContext === PageContextConstants.PRACTICE_PAGE) {
       const targetPath = pathnameArray.slice(1, 4);
       const confirmed = this.windowRef.nativeWindow.confirm(

@@ -13,6 +13,8 @@
   background-color: #cadbda;
   display: flex;
   min-height: calc(100vh - 104px);
+  z-index: 0;
+  overflow: hidden;
 }
 
 .oppia-new-player-main-content {
@@ -34,4 +36,17 @@ oppia-new-conversation-skin {
 
 .card-navigation-control {
   width: 100% ;
+}
+
+
+.oppia-new-player-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/assets/images/background/conversation_skin.svg');
+  background-position: center;
+  z-index: -1;
 }
