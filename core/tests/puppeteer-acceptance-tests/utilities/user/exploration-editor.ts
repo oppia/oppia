@@ -4635,6 +4635,42 @@ export class ExplorationEditor extends BaseUser {
 
     await this.navigateToCard('Card 1');
     await this.updateCardContent('Content 1');
+    await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await this.saveExplorationDraft();
+
+    const explorationId = await this.publishExplorationWithMetadata(
+      explorationTitle,
+      `This is ${explorationTitle}\`s goals.`,
+      category
+    );
+
+    if (explorationId) {
+      showMessage('Exploration published successfully');
+      return explorationId;
+    } else {
+      throw new Error('Exploration not published');
+    }
+  }
+
+  /**
+   * Function for creating an exploration with two cards.
+   */
+  async createAndPublishExplorationWithThreeCards(
+    explorationTitle: string,
+    category: string = 'Mathematics'
+  ): Promise<string> {
+    await this.navigateToCreatorDashboardPage();
+    await this.navigateToExplorationEditorFromCreatorDashboard();
+    await this.dismissWelcomeModal();
+
+    await this.updateCardContent('Content 0');
+    await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+    await this.viewOppiaResponses();
+    await this.directLearnersToNewCard('Card 1');
+    await this.saveExplorationDraft();
+
+    await this.navigateToCard('Card 1');
+    await this.updateCardContent('Content 1');
     await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
     await this.viewOppiaResponses();
     await this.directLearnersToNewCard('Card 2');

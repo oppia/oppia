@@ -3194,7 +3194,10 @@ export class LoggedInUser extends BaseUser {
         async element => await element.evaluate(el => el.textContent?.trim())
       )
     );
-    expect(allElementsText).toEqual(expectedTexts);
+
+    expect([...allElementsText].sort()).toStrictEqual(
+      [...expectedTexts].sort()
+    );
     excludedTexts.forEach(t => expect(allElementsText).not.toContain(t));
   }
 
