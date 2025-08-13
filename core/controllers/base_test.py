@@ -2196,6 +2196,15 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
                 csrf_token=self.csrf_token, source='fake_url',
                 expected_status_int=400)
 
+    def test_post_request_with_None_payload_raise_error(self) -> None:
+        testapp_swap = self.swap(self, 'testapp', self.testapp)
+        payload_swap = self.swap(self, 'payload', None)
+        with testapp_swap, payload_swap:
+            self.post_json(
+                '/mock?arg_a=arg_in_request', None,
+                csrf_token=self.csrf_token,
+                expected_status_int=400)
+
     def test_post_request_with_valid_source_do_not_raise_error(self) -> None:
         with self.swap(self, 'testapp', self.testapp):
             self.post_json(
