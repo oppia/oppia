@@ -192,6 +192,20 @@ export class CkEditor4RteComponent
       }
     }
 
+    // Remove empty oppia-rte-component-container divs that might be left after
+    // component removal.
+    validContent = validContent.replace(
+      /<div[^>]*class="[^"]*oppia-rte-component-container[^"]*"[^>]*>\s*<\/div>/g,
+      ''
+    );
+
+    // Also handle cases where the div might have other attributes or the class
+    // might be in different positions.
+    validContent = validContent.replace(
+      /<div[^>]*oppia-rte-component-container[^>]*>\s*<\/div>/g,
+      ''
+    );
+
     // Clean up any empty paragraphs or extra whitespace left after removing components.
     validContent = validContent.replace(/<p>\s*<\/p>/g, '');
     validContent = validContent.replace(/<div>\s*<\/div>/g, '');
@@ -235,7 +249,7 @@ export class CkEditor4RteComponent
 
     const hasMeaningfulContent = textOnlyContent.length > 0;
 
-    // FIXED: Only return hasValidContent as true if there are invalid components AND meaningful valid content.
+    // Only return hasValidContent as true if there are invalid components AND meaningful valid content.
     const hasValidContent =
       invalidComponents.length > 0 && hasMeaningfulContent;
 

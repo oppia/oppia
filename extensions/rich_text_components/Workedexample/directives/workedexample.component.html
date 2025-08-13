@@ -1,5 +1,5 @@
 <div class="example-box">
-  <strong class="example-title">Example</strong><br>
+  <strong class="example-title">Example</strong>
   <div class="protractor-panel-body">
     <oppia-rte-output-display class="e2e-test-workedexample-question" [rteString]="question">
     </oppia-rte-output-display>
@@ -24,17 +24,20 @@
     border: 2px solid #0d48a1;
     border-radius: 4px;
     border-top: 8px solid #0d48a1;
-    margin-bottom: 12px;
+    margin-bottom: 6px;
     padding: 10px;
   }
 
   .example-title {
     color: #0d48a1;
+    display: inline-block;
+    margin-bottom: 10px;
   }
 
   .solution-box {
     border: 1px solid #c55f45;
     border-radius: 4px;
+    margin-bottom: 18px;
     padding: 10px;
   }
 
@@ -43,9 +46,11 @@
     color: #c55f45;
     display: flex;
     justify-content: space-between;
+    margin-bottom: 10px;
   }
 
   .icon-expand-workedexample .icon-collapse-workedexample {
+    cursor: pointer;
     margin-left: auto;
   }
 </style>
