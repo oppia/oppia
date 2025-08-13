@@ -191,7 +191,6 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
       )
     );
 
-    this.showTranslationTabSubDirectives = false;
     this.languageAccentsAreLoading = true;
     this.loaderService.showLoadingScreen('Loading');
 

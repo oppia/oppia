@@ -55,6 +55,7 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {AdminBackendApiService} from 'domain/admin/admin-backend-api.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
+import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 
 @Component({
   selector: 'oppia-voiceover-card',
@@ -124,7 +125,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     private voiceoverLanguageManagementService: VoiceoverLanguageManagementService,
     private platformFeatureService: PlatformFeatureService,
     private explorationStatesService: ExplorationStatesService,
-    private voiceoverPlayerService: VoiceoverPlayerService
+    private voiceoverPlayerService: VoiceoverPlayerService,
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService
   ) {}
 
   ngOnInit(): void {
@@ -339,6 +341,12 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
           this.setActiveContentManualVoiceover();
           this.setActiveContentAutomaticVoiceover();
           this.updateStatusGraph();
+
+          this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+            this.entityVoiceoversService.getActiveEntityVoiceovers()
+              ?.automatedVoiceoversAudioOffsetsMsecs || {}
+          );
+          this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
         }
       });
     }
@@ -798,9 +806,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.updateStatusGraph();
       },
       () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is
-        // clicked. No further action is needed.
+        this.isAutomaticVoiceoverGenerating = false;
       }
     );
   }

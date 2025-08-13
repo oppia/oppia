@@ -50,6 +50,7 @@ import {
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
+import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 
 @Component({
   selector: 'oppia-translator-overview',
@@ -95,7 +96,8 @@ export class TranslatorOverviewComponent implements OnInit {
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private localStorageService: LocalStorageService,
     private windowRef: WindowRef,
-    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService
+    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService,
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService
   ) {}
 
   canShowTabModeSwitcher(): boolean {
@@ -204,6 +206,12 @@ export class TranslatorOverviewComponent implements OnInit {
           );
           this.routerService.onCenterGraph.emit();
           this.loaderService.hideLoadingScreen();
+
+          this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+            this.entityVoiceoversService.getActiveEntityVoiceovers()
+              ?.automatedVoiceoversAudioOffsetsMsecs || {}
+          );
+          this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
         });
       });
   }
