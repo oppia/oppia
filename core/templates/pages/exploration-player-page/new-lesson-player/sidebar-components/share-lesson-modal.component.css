@@ -60,7 +60,7 @@ oppia-share-lesson-modal .share-modal-btn {
 	width: 210px;
 }
 
-oppia-share-lesson-modal .share-modal-btn p {
+oppia-share-lesson-modal .share-modal-btn .button-content {
 	align-items: center;
 	display: flex;
 	justify-content: space-between;
@@ -110,7 +110,7 @@ oppia-share-lesson-modal .copy-cc-btn {
 	width: 49%;
 }
 
-oppia-share-lesson-modal .copy-cc-btn p {
+oppia-share-lesson-modal .copy-cc-btn .button-content {
 	align-items: center;
 	color: #205d86;
 	display: flex;
