@@ -20,13 +20,11 @@ import {Component} from '@angular/core';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
-import {Subscription} from 'rxjs';
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StatsReportingService} from '../../services/stats-reporting.service';
 import {MobileMenuService} from '../../services/mobile-menu.service';
-
 import './player-header.component.css';
 import {Router} from '@angular/router';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -59,7 +57,6 @@ export class PlayerHeaderComponent {
   storyUrlFragment!: string | null;
   isLinkedToTopic!: boolean;
   chapterNumber!: number;
-  directiveSubscriptions: Subscription = new Subscription();
   pageIsIframed: boolean = false;
   explorationContext!: PageContextConstants;
   explorationContextConstants = PageContextConstants;
@@ -97,7 +94,10 @@ export class PlayerHeaderComponent {
     } else if (
       this.explorationContext === PageContextConstants.DIAGNOSTIC_PAGE
     ) {
-      this.classroomUrlFragment = this.urlService.getUrlParams()['classroom'];
+      this.classroomUrlFragment = this.urlService.getUrlParams().classroom;
+      if (this.classroomUrlFragment === null) {
+        throw new Error('Classroom URL fragment is null');
+      }
       this.accessValidationBackendApiService
         .validateAccessToClassroomPage(this.classroomUrlFragment)
         .then(() => {
@@ -139,6 +139,10 @@ export class PlayerHeaderComponent {
       if (this.isLinkedToTopic) {
         this.storyUrlFragment =
           this.urlService.getStoryUrlFragmentFromLearnerUrl();
+
+        if (this.storyUrlFragment === null) {
+          throw new Error('Story URL fragment is null');
+        }
 
         this.storyViewerBackendApiService
           .fetchStoryDataAsync(
@@ -195,17 +199,17 @@ export class PlayerHeaderComponent {
     this.mobileMenuService.toggleMenuVisibility();
   }
 
-  ngOnDestroy(): void {
-    this.directiveSubscriptions.unsubscribe();
+  confirmExit(): boolean {
+    return this.windowRef.nativeWindow.confirm(
+      'If you exit, your progress will be lost. Do you still want to exit?'
+    );
   }
 
   closePlayer(): void {
     const pathnameArray = this.urlService.getPathname().split('/');
     if (this.explorationContext === PageContextConstants.EXPLORATION_PAGE) {
       if (this.isLinkedToTopic) {
-        const confirmed = this.windowRef.nativeWindow.confirm(
-          'If you exit, your progress will be lost. Do you still want to exit?'
-        );
+        const confirmed = this.confirmExit();
         if (confirmed) {
           this.router.navigate([
             'learn',
@@ -216,29 +220,21 @@ export class PlayerHeaderComponent {
           ]);
         }
       } else {
-        const confirmed = this.windowRef.nativeWindow.confirm(
-          'If you exit, your progress will be lost. Do you still want to exit?'
-        );
+        const confirmed = this.confirmExit();
         if (confirmed) {
           this.router.navigate(['community-library']);
         }
       }
     } else if (this.explorationContext === PageContextConstants.PRACTICE_PAGE) {
       const targetPath = pathnameArray.slice(1, 4);
-      const confirmed = this.windowRef.nativeWindow.confirm(
-        'If you exit, your progress will be lost. Do you still want to exit?'
-      );
-
+      const confirmed = this.confirmExit();
       if (confirmed) {
         this.router.navigate(targetPath);
       }
     } else if (
       this.explorationContext === PageContextConstants.DIAGNOSTIC_PAGE
     ) {
-      const confirmed = this.windowRef.nativeWindow.confirm(
-        'If you exit, your progress will be lost. Do you still want to exit?'
-      );
-
+      const confirmed = this.confirmExit();
       if (confirmed) {
         this.router.navigate(['learn', this.classroomUrlFragment]);
       }

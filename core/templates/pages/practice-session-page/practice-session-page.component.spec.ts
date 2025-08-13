@@ -38,6 +38,15 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {LoaderService} from 'services/loader.service';
 import {PageTitleService} from 'services/page-title.service';
 import {PracticeSessionsBackendApiService} from './practice-session-backend-api.service';
+import {PlatformFeatureService} from '../../services/platform-feature.service';
+
+class MockPlatformFeatureService {
+  status = {
+    NewLessonPlayer: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('Practice session page', () => {
   let component: PracticeSessionPageComponent;
@@ -46,6 +55,7 @@ describe('Practice session page', () => {
   let pageTitleService: PageTitleService;
   let urlService: UrlService;
   let translateService: TranslateService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
   let loaderService: LoaderService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let practiceSessionsBackendApiService: PracticeSessionsBackendApiService;
@@ -70,6 +80,10 @@ describe('Practice session page', () => {
         UrlService,
         LoaderService,
         I18nLanguageCodeService,
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -105,6 +119,11 @@ describe('Practice session page', () => {
     );
 
     fixture.detectChanges();
+  });
+
+  it('should check new lesson player feature flag is enabled', () => {
+    mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
+    expect(component.isNewLessonPlayerEnabled()).toBe(true);
   });
 
   it(

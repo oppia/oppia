@@ -1,9 +1,9 @@
 <div class="oppia-question-player-container"
      [ngClass]="{'oppia-new-question-player-container': isNewLessonPlayerEnabled()}">
   <!-- Question Player -->
-  <div class="oppia-question-player" *ngIf="!resultsLoaded" 
+  <div class="oppia-question-player" *ngIf="!resultsLoaded"
        [ngClass]="{'oppia-new-question-player': isNewLessonPlayerEnabled()}">
-    
+
     <oppia-player-header *ngIf="isNewLessonPlayerEnabled()"></oppia-player-header>
 
     <h1 class="oppia-practice-session" tabindex="0" *ngIf="!isNewLessonPlayerEnabled()">
@@ -11,16 +11,14 @@
     </h1>
 
     <div class="oppia-new-question-player-card" *ngIf="isNewLessonPlayerEnabled()">
-        <div [hidden]="!(totalQuestions > 0)">
-          <p 
-              tabindex="0"
-              [attr.aria-label]="'Question ' + currentQuestion + ' out of ' + totalQuestions">
-            Question {{currentQuestion}}/{{totalQuestions}}
+      <div [hidden]="!(totalQuestions > 0)">
+        <p tabindex="0" [attr.aria-label]="'Question ' + currentQuestion + ' out of ' + totalQuestions">
+          Question {{currentQuestion}}/{{totalQuestions}}
         </p>
-        </div>
-        <div class="oppia-new-question-player-progress">
-          <div class="new-current-progress" [ngStyle]="{'width': currentProgress + '%'}"></div>
-        </div>
+      </div>
+      <div class="oppia-new-question-player-progress">
+        <div class="new-current-progress" [ngStyle]="{'width': currentProgress + '%'}"></div>
+      </div>
     </div>
 
     <div class="oppia-question-player-card" *ngIf="!isNewLessonPlayerEnabled()">
@@ -467,7 +465,7 @@
 
   .oppia-question-player-container .practice-questions-coming-soon-header {
     color: #01645c;
-    font-family: Capriola, Roboto, Arial, sans-serif;
+    font-family: "Capriola", "Roboto", "Arial", sans-serif;
     font-size: 2em;
     margin-left: 0;
     padding-top: 12px;
@@ -541,11 +539,11 @@
   }
 
   .oppia-new-question-player-card p {
-    margin-right: 24px;
-    font-family: Capriola;
-    font-weight: 400;
+    color: #c55f45;
+    font-family: "Capriola", sans-serif;
     font-size: 18px;
-    color: #C55F45;
+    font-weight: 400;
+    margin-right: 24px;
   }
 
   .oppia-new-question-player {
@@ -554,25 +552,25 @@
   }
 
   .oppia-new-question-player-progress {
+    background-color: #e1cbc5;
+    border-radius: 8px;
     height: 16px;
     width: 392px;
-    border-radius: 8px;
-    background-color: #E1CBC5;
   }
 
   .new-current-progress {
-    height: 16px;
+    background: linear-gradient(180deg, #dd7358 0%, #b35239 100%);
     border-radius: 8px;
-    background: linear-gradient(180deg, #DD7358 0%, #B35239 100%);
+    height: 16px;
   }
 
   .oppia-new-question-player-card {
-    background-color: #fff8e5;
-    width: 100%;
-    height: 40px;
-    display: flex;
-    justify-content: center;
     align-items: center;
+    background-color: #fff8e5;
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    width: 100%;
   }
 
 
@@ -592,8 +590,8 @@
     }
 
     .oppia-new-question-player-card p {
-      margin-right: 12px;
       font-size: 13px;
+      margin-right: 12px;
     }
   }
 

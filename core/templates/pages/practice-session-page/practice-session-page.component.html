@@ -1,5 +1,5 @@
 <background-banner *ngIf="!isNewLessonPlayerEnabled()"></background-banner>
-<div class="oppia-practice-session-container position-relative e2e-test-practice-session-container" 
+<div class="oppia-practice-session-container position-relative e2e-test-practice-session-container"
      [ngClass]="{'new-oppia-practice-session-container': isNewLessonPlayerEnabled()}">
 
   <oppia-question-player *ngIf="questionPlayerConfig && questionPlayerConfig.skillList.length > 0"
@@ -28,19 +28,19 @@
   .new-oppia-practice-session-container {
     background-color: #eeebea;
     height: 100vh;
-    z-index: 0;
     overflow: hidden;
+    z-index: 0;
   }
 
   .new-oppia-practice-session-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     background-image: url('/assets/images/background/conversation_skin.svg');
     background-position: center;
+    content: '';
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
     z-index: -1;
   }
 

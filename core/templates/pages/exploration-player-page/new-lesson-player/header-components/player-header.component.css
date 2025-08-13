@@ -9,10 +9,10 @@
   background-color: #094142;
   color: #fff;
   display: flex;
-  position: relative;
   height: 40px;
   justify-content: space-between;
   padding-left: 15px;
+  position: relative;
 }
 
 .header-menu-button {
@@ -23,9 +23,9 @@
 }
 
 .player-header-close-button {
+  align-items: center;
   display: flex;
   justify-content: center;
-  align-items: center;
 }
 
 .player-header-close-button button {
@@ -44,9 +44,9 @@
 }
 
 .player-header-left p {
-  font-family: Capriola;
-  font-weight: 400;
+  font-family: "Capriola", sans-serif;
   font-size: 18px;
+  font-weight: 400;
 }
 
 .close-modal-button {
@@ -54,8 +54,8 @@
 }
 
 .close-modal-button i {
-  font-size: 24px;
   color: #fff;
+  font-size: 24px;
   margin-left: 12px;
   margin-right: 12px;
 }
@@ -65,12 +65,14 @@
   right: 0;
 }
 
+@media (max-width: 767px) {
+  .header-menu-button {
+    display: block;
+  }
+}
+
 @media (max-width: 480px) {
   .player-header-left p {
     font-size: 13px;
-  }  
-
-  .header-menu-button {
-    display: block;
   }
 }
