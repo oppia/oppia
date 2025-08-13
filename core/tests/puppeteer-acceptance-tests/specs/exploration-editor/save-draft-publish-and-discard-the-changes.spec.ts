@@ -47,7 +47,7 @@ describe('Exploration Creator', function () {
     'should draft, discard and publish the changes',
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorPage();
+      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
       await explorationEditor.dismissWelcomeModal();
 
       await explorationEditor.createMinimalExploration(
@@ -70,6 +70,7 @@ describe('Exploration Creator', function () {
 
       await explorationEditor.updateTitleTo('New Title');
       await explorationEditor.discardCurrentChanges();
+      await explorationEditor.expandSettingsTabSection('Basic Settings');
       await explorationEditor.expectTitleToBe('Old Title');
 
       await explorationEditor.updateTitleTo('New Title');

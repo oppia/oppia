@@ -21,12 +21,12 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillOpportunity} from 'domain/opportunity/skill-opportunity.model';
 import {QuestionsOpportunitiesSelectDifficultyModalComponent} from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 import {QuestionSuggestionEditorModalComponent} from '../modal-templates/question-suggestion-editor-modal.component';
 import {AlertsService} from 'services/alerts.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
@@ -59,7 +59,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
 
   constructor(
     private alertsService: AlertsService,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private contributionOpportunitiesService: ContributionOpportunitiesService,
     private ngbModal: NgbModal,
     private questionObjectFactory: QuestionObjectFactory,
@@ -126,7 +126,7 @@ export class QuestionOpportunitiesComponent implements OnInit {
     modalRef.result.then(
       () => {},
       () => {
-        this.contextService.resetImageSaveDestination();
+        this.pageContextService.resetImageSaveDestination();
       }
     );
   }

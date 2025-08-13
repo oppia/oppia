@@ -34,8 +34,7 @@ import {
   TopicsAndSkillDashboardData,
 } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SkillSummaryBackendDict} from 'domain/skill/skill-summary.model';
 import {of} from 'rxjs';
@@ -49,7 +48,6 @@ describe('Skill editor main tab Component', () => {
   let topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService;
   let windowDimensionsService: WindowDimensionsService;
   let ngbModal: NgbModal;
-  let skillObjectFactory: SkillObjectFactory;
 
   let topicAndSkillsDashboardDataBackendDict: TopicsAndSkillDashboardData;
   let sampleSkill: Skill;
@@ -90,7 +88,6 @@ describe('Skill editor main tab Component', () => {
     );
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     ngbModal = TestBed.inject(NgbModal);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
     skillSummaryDict = {
       id: 'skillId1',
@@ -98,7 +95,6 @@ describe('Skill editor main tab Component', () => {
       language_code: 'en',
       version: 1,
       misconception_count: 3,
-      worked_examples_count: 3,
       skill_model_created_on: 1593138898626.193,
       skill_model_last_updated: 1593138898626.193,
     };
@@ -121,13 +117,12 @@ describe('Skill editor main tab Component', () => {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [],
       recorded_voiceovers: {
         voiceovers_mapping: {},
       },
     };
 
-    sampleSkill = skillObjectFactory.createFromBackendDict({
+    sampleSkill = Skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1],
@@ -275,7 +270,6 @@ describe('Skill editor main tab Component', () => {
           description: 'Dummy Skill 3',
           skillModelCreatedOn: 1623851495022.93,
           skillModelLastUpdated: 1623851495022.942,
-          workedExamplesCount: 0,
           id: '4P77sLaU14DE',
           misconceptionCount: 0,
         },
@@ -290,7 +284,6 @@ describe('Skill editor main tab Component', () => {
           description: 'Dummy Skill 1',
           skillModelCreatedOn: 1623851493737.796,
           skillModelLastUpdated: 1623851493737.808,
-          workedExamplesCount: 0,
           id: 'BBB6dzfb5pPt',
           misconceptionCount: 0,
         },
@@ -300,7 +293,6 @@ describe('Skill editor main tab Component', () => {
           description: 'Dummy Skill 2',
           skillModelCreatedOn: 1623851494780.516,
           skillModelLastUpdated: 1623851494780.529,
-          workedExamplesCount: 0,
           id: 'D1FdmljJNXdt',
           misconceptionCount: 0,
         },

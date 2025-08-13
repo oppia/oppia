@@ -28,11 +28,11 @@ import {
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConceptCardBackendDict} from 'domain/skill/concept-card.model';
-import {MisconceptionBackendDict} from 'domain/skill/MisconceptionObjectFactory';
+import {MisconceptionBackendDict} from 'domain/skill/misconception.model';
 import {RubricBackendDict} from 'domain/skill/rubric.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
-import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {ImageFile} from 'domain/utilities/image-file.model';
 import {ExtractImageFilenamesFromModelService} from 'pages/exploration-player-page/services/extract-image-filenames-from-model.service';
 import {AlertsService} from 'services/alerts.service';
@@ -71,14 +71,13 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
   let assetsBackendApiService: AssetsBackendApiService;
   let ngbActiveModal: NgbActiveModal;
   let skillBackendApiService: SkillBackendApiService;
-  let skillObjectFactory: SkillObjectFactory;
+  let skill: Skill;
   let extractImageFilenamesFromModelService: ExtractImageFilenamesFromModelService;
   let mockImageFile: ImageFile;
   let mockBlob: Blob;
 
   let misconceptionDict1: MisconceptionBackendDict;
   let rubricDict: RubricBackendDict;
-  let skill: Skill;
   let skillContentsDict: ConceptCardBackendDict;
   let skillDifficulties: string[] = ['easy', 'medium'];
   let skillId: string = 'skill_1';
@@ -111,7 +110,6 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
       assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
       ngbActiveModal = TestBed.inject(NgbActiveModal);
       skillBackendApiService = TestBed.inject(SkillBackendApiService);
-      skillObjectFactory = TestBed.inject(SkillObjectFactory);
       extractImageFilenamesFromModelService = TestBed.inject(
         ExtractImageFilenamesFromModelService
       );
@@ -132,12 +130,11 @@ describe('Questions Opportunities Select Difficulty Modal Component', () => {
           html: 'test explanation',
           content_id: 'explanation',
         },
-        worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {},
         },
       };
-      skill = skillObjectFactory.createFromBackendDict({
+      skill = Skill.createFromBackendDict({
         id: skillId,
         description: 'Skill 1 description',
         misconceptions: [misconceptionDict1],

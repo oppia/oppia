@@ -25,8 +25,7 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {
   ReadOnlyTopic,
   ReadOnlyTopicBackendDict,
-  ReadOnlyTopicObjectFactory,
-} from 'domain/topic_viewer/read-only-topic-object.factory';
+} from 'domain/topic_viewer/read-only-topic.model';
 import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 
 describe('Topic viewer backend API service', () => {
@@ -34,17 +33,13 @@ describe('Topic viewer backend API service', () => {
   let httpTestingController: HttpTestingController;
   let sampleDataResultsObjects: ReadOnlyTopic;
   let sampleDataResults: ReadOnlyTopicBackendDict;
-  let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory;
 
   beforeEach(() => {
-    readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory();
-
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     topicViewerBackendApiService = TestBed.inject(TopicViewerBackendApiService);
-    readOnlyTopicObjectFactory = TestBed.inject(ReadOnlyTopicObjectFactory);
 
     let nodeDict = {
       id: 'node_1',
@@ -59,9 +54,9 @@ describe('Topic viewer backend API service', () => {
       outline_is_finalized: false,
       thumbnail_bg_color: '#a33f40',
       status: 'Published',
-      planned_publication_date_msecs: 100.0,
-      last_modified_msecs: 100.0,
-      first_publication_date_msecs: 200.0,
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
       unpublishing_reason: null,
     };
 
@@ -124,7 +119,7 @@ describe('Topic viewer backend API service', () => {
     };
 
     sampleDataResultsObjects =
-      readOnlyTopicObjectFactory.createFromBackendDict(sampleDataResults);
+      ReadOnlyTopic.createFromBackendDict(sampleDataResults);
   });
 
   afterEach(() => {

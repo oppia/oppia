@@ -18,18 +18,12 @@
 
 import {TestBed} from '@angular/core/testing';
 
-import {
-  AnswerGroup,
-  AnswerGroupObjectFactory,
-} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {Rule} from 'domain/exploration/rule.model';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {
   TextInputValidationService,
   Validator,
@@ -48,15 +42,11 @@ describe('TextInputValidationService', () => {
   let customizationArguments: TextInputCustomizationArgs;
   let goodAnswerGroups: AnswerGroup[];
   let goodDefaultOutcome: Outcome;
-  let oof: OutcomeObjectFactory;
-  let agof: AnswerGroupObjectFactory;
 
   let createAnswerGroupByRules: (rules: Rule[]) => AnswerGroup;
 
   beforeEach(() => {
     validatorService = TestBed.inject(TextInputValidationService);
-    oof = TestBed.inject(OutcomeObjectFactory);
-    agof = TestBed.inject(AnswerGroupObjectFactory);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     let customizationArgSpecs =
       INTERACTION_SPECS.TextInput.customization_arg_specs;
@@ -66,7 +56,7 @@ describe('TextInputValidationService', () => {
     maxRows = validators[1].max_value;
 
     currentState = 'First State';
-    goodDefaultOutcome = oof.createFromBackendDict({
+    goodDefaultOutcome = Outcome.createFromBackendDict({
       dest: 'Second State',
       dest_if_really_stuck: null,
       feedback: {
@@ -91,9 +81,11 @@ describe('TextInputValidationService', () => {
       },
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, [], null)];
+    goodAnswerGroups = [
+      AnswerGroup.createNew([], goodDefaultOutcome, [], null),
+    ];
     createAnswerGroupByRules = rules =>
-      agof.createNew(rules, goodDefaultOutcome, [], null);
+      AnswerGroup.createNew(rules, goodDefaultOutcome, [], null);
   });
 
   it('should be able to perform basic validation', () => {
@@ -120,7 +112,7 @@ describe('TextInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Placeholder text must be a string.',
+        message: 'Placeholder text must be a string',
       },
     ]);
   });
@@ -141,7 +133,7 @@ describe('TextInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Placeholder text must be a string.',
+        message: 'Placeholder text must be a string',
       },
     ]);
   });
@@ -157,7 +149,7 @@ describe('TextInputValidationService', () => {
     expect(warnings).toEqual([
       {
         type: WARNING_TYPES.ERROR,
-        message: 'Number of rows must be integral.',
+        message: 'Number of rows must be integral',
       },
     ]);
   });
@@ -174,7 +166,7 @@ describe('TextInputValidationService', () => {
       {
         type: WARNING_TYPES.ERROR,
         message:
-          'Number of rows must be between ' + minRows + ' and ' + maxRows + '.',
+          'Number of rows must be between ' + minRows + ' and ' + maxRows,
       },
     ]);
   });
@@ -220,7 +212,7 @@ describe('TextInputValidationService', () => {
         type: WARNING_TYPES.ERROR,
         message:
           'Oppia response 1 has multiple learner answers with ' +
-          "the same type 'Equals' within the same response.",
+          "the same type 'Equals' within the same response",
       },
     ]);
   });
@@ -269,7 +261,7 @@ describe('TextInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be ' +
           "matched because it is preceded by a 'Contains' answer " +
-          'with a matching input.',
+          'with a matching input',
       },
     ]);
 
@@ -316,7 +308,7 @@ describe('TextInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be ' +
           "matched because it is preceded by a 'Contains' answer " +
-          'with a matching input.',
+          'with a matching input',
       },
     ]);
 
@@ -363,7 +355,7 @@ describe('TextInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be ' +
           "matched because it is preceded by a 'Contains' answer " +
-          'with a matching input.',
+          'with a matching input',
       },
     ]);
   });
@@ -412,7 +404,7 @@ describe('TextInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be matched' +
           " because it is preceded by a 'StartsWith' answer" +
-          ' with a matching prefix.',
+          ' with a matching prefix',
       },
     ]);
 
@@ -459,7 +451,7 @@ describe('TextInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be matched' +
           " because it is preceded by a 'StartsWith' answer" +
-          ' with a matching prefix.',
+          ' with a matching prefix',
       },
     ]);
 
@@ -506,7 +498,7 @@ describe('TextInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be matched' +
           " because it is preceded by a 'StartsWith' answer" +
-          ' with a matching prefix.',
+          ' with a matching prefix',
       },
     ]);
   });
@@ -555,7 +547,7 @@ describe('TextInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be matched' +
           " because it is preceded by a 'Equals' answer" +
-          ' with a matching input.',
+          ' with a matching input',
       },
     ]);
 
@@ -602,7 +594,7 @@ describe('TextInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be matched' +
           " because it is preceded by a 'FuzzyEquals' answer" +
-          ' with a matching input.',
+          ' with a matching input',
       },
     ]);
   });
@@ -651,7 +643,7 @@ describe('TextInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be matched' +
           " because it is preceded by a 'FuzzyEquals' answer" +
-          ' with a matching input.',
+          ' with a matching input',
       },
     ]);
 
@@ -698,7 +690,7 @@ describe('TextInputValidationService', () => {
         message:
           'Learner answer 1 from Oppia response 2 will never be matched' +
           " because it is preceded by a 'FuzzyEquals' answer" +
-          ' with a matching input.',
+          ' with a matching input',
       },
     ]);
   });

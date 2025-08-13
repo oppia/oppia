@@ -22,7 +22,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {QuestionSuggestionEditorModalComponent} from './question-suggestion-editor-modal.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
@@ -33,7 +33,7 @@ import {
   Question,
   QuestionObjectFactory,
 } from 'domain/question/QuestionObjectFactory';
-import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {AlertsService} from 'services/alerts.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -112,7 +112,6 @@ describe('Question Suggestion Editor Modal Component', () => {
   let questionObjectFactory: QuestionObjectFactory;
   let questionUndoRedoService: QuestionUndoRedoService;
   let siteAnalyticsService: SiteAnalyticsService;
-  let skillObjectFactory: SkillObjectFactory;
   let stateEditorService: StateEditorService;
   let question: Question;
   let questionId: string;
@@ -125,7 +124,7 @@ describe('Question Suggestion Editor Modal Component', () => {
       imports: [HttpClientTestingModule],
       declarations: [QuestionSuggestionEditorModalComponent],
       providers: [
-        ContextService,
+        PageContextService,
         UrlInterpolationService,
         {
           provide: NgbActiveModal,
@@ -151,7 +150,6 @@ describe('Question Suggestion Editor Modal Component', () => {
         QuestionObjectFactory,
         QuestionUndoRedoService,
         SiteAnalyticsService,
-        SkillObjectFactory,
         StateEditorService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -168,7 +166,6 @@ describe('Question Suggestion Editor Modal Component', () => {
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     questionUndoRedoService = TestBed.inject(QuestionUndoRedoService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
     ngbModal = TestBed.inject(NgbModal);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
@@ -182,7 +179,6 @@ describe('Question Suggestion Editor Modal Component', () => {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [],
       recorded_voiceovers: {
         voiceovers_mapping: {},
       },
@@ -209,7 +205,7 @@ describe('Question Suggestion Editor Modal Component', () => {
       version: 3,
       all_questions_merged: false,
     };
-    skill = skillObjectFactory.createFromBackendDict(skillDict);
+    skill = Skill.createFromBackendDict(skillDict);
     component.skill = skill;
     question = questionObjectFactory.createFromBackendDict({
       id: skill.getId(),

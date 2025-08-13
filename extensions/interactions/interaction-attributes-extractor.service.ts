@@ -24,7 +24,7 @@ import {
   InteractionCustomizationArgs,
   InteractionCustomizationArgsBackendDict,
 } from 'extensions/interactions/customization-args-defs';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {
   InteractionSpecsConstants,
   InteractionSpecsKey,
@@ -57,10 +57,7 @@ export class InteractionAttributesExtractorService {
     'TextInput',
   ];
 
-  constructor(
-    private htmlEscaperService: HtmlEscaperService,
-    private interactionFactory: InteractionObjectFactory
-  ) {}
+  constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   getValuesFromAttributes(
     interactionId: InteractionSpecsKey,
@@ -82,7 +79,7 @@ export class InteractionAttributesExtractorService {
       });
     });
 
-    const ca = this.interactionFactory.convertFromCustomizationArgsBackendDict(
+    const ca = Interaction.convertFromCustomizationArgsBackendDict(
       interactionId,
       caBackendDict
     );

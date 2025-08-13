@@ -32,7 +32,7 @@ import {
 } from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
 import {CertificateDownloadModalComponent} from './certificate-download-modal.component';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
@@ -86,7 +86,8 @@ describe('Contributor Certificate Download Modal Component', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    OppiaAngularRootComponent.contextService = TestBed.inject(ContextService);
+    OppiaAngularRootComponent.pageContextService =
+      TestBed.inject(PageContextService);
   }));
 
   beforeEach(() => {

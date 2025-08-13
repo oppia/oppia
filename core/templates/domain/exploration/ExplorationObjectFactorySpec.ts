@@ -28,10 +28,9 @@ import {
   StateBackendDict,
   StateObjectFactory,
 } from 'domain/state/StateObjectFactory';
-import {Voiceover} from 'domain/exploration/voiceover.model';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {LoggerService} from 'services/contextual/logger.service';
-import {SubtitledUnicode} from 'domain/exploration/SubtitledUnicodeObjectFactory';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {FetchExplorationBackendResponse} from './read-only-exploration-backend-api.service';
 
@@ -39,7 +38,6 @@ describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
   let sof: StateObjectFactory;
   let exploration: Exploration;
-  let iof: InteractionObjectFactory;
   let ls: LoggerService;
   let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
   let firstState: StateBackendDict;
@@ -52,32 +50,12 @@ describe('Exploration object factory', () => {
     });
     eof = TestBed.get(ExplorationObjectFactory);
     sof = TestBed.get(StateObjectFactory);
-    iof = TestBed.get(InteractionObjectFactory);
     ls = TestBed.get(LoggerService);
 
     firstState = {
       content: {
         content_id: 'content',
         html: 'content',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {
-            en: {
-              filename: 'myfile1.mp3',
-              file_size_bytes: 210000,
-              needs_update: false,
-              duration_secs: 4.3,
-            },
-            'hi-en': {
-              filename: 'myfile3.mp3',
-              file_size_bytes: 430000,
-              needs_update: false,
-              duration_secs: 2.1,
-            },
-          },
-          default_outcome: {},
-        },
       },
       inapplicable_skill_misconception_ids: [],
       interaction: {
@@ -118,19 +96,6 @@ describe('Exploration object factory', () => {
       content: {
         content_id: 'content',
         html: 'more content',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {
-            'hi-en': {
-              filename: 'myfile2.mp3',
-              file_size_bytes: 120000,
-              needs_update: false,
-              duration_secs: 1.2,
-            },
-          },
-          default_outcome: {},
-        },
       },
       inapplicable_skill_misconception_ids: [],
       interaction: {
@@ -244,10 +209,6 @@ describe('Exploration object factory', () => {
     loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
   });
 
-  it('should get all language codes of an exploration', () => {
-    expect(exploration.getAllVoiceoverLanguageCodes()).toEqual(['en', 'hi-en']);
-  });
-
   it('should get the language code of an exploration', () => {
     expect(exploration.getLanguageCode()).toBe('en');
   });
@@ -258,49 +219,12 @@ describe('Exploration object factory', () => {
     );
   });
 
-  it('should correctly get all audio translations by language code', () => {
-    expect(exploration.getAllVoiceovers('hi-en')).toEqual({
-      'first state': [
-        Voiceover.createFromBackendDict({
-          filename: 'myfile3.mp3',
-          file_size_bytes: 430000,
-          needs_update: false,
-          duration_secs: 2.1,
-        }),
-      ],
-      'second state': [
-        Voiceover.createFromBackendDict({
-          filename: 'myfile2.mp3',
-          file_size_bytes: 120000,
-          needs_update: false,
-          duration_secs: 1.2,
-        }),
-      ],
-    });
-    expect(exploration.getAllVoiceovers('en')).toEqual({
-      'first state': [
-        Voiceover.createFromBackendDict({
-          filename: 'myfile1.mp3',
-          file_size_bytes: 210000,
-          needs_update: false,
-          duration_secs: 4.3,
-        }),
-      ],
-      'second state': [],
-    });
-
-    expect(exploration.getAllVoiceovers('hi')).toEqual({
-      'first state': [],
-      'second state': [],
-    });
-  });
-
   it('should correctly get the interaction from an exploration', () => {
     expect(exploration.getInteraction('first state')).toEqual(
-      iof.createFromBackendDict(firstState.interaction)
+      Interaction.createFromBackendDict(firstState.interaction)
     );
     expect(exploration.getInteraction('second state')).toEqual(
-      iof.createFromBackendDict(secondState.interaction)
+      Interaction.createFromBackendDict(secondState.interaction)
     );
 
     expect(exploration.getInteraction('invalid state')).toBeNull();
@@ -406,10 +330,10 @@ describe('Exploration object factory', () => {
 
       expect(responseExploration.getLanguageCode()).toBe('en');
       expect(responseExploration.getInteraction('first state')).toEqual(
-        iof.createFromBackendDict(firstState.interaction)
+        Interaction.createFromBackendDict(firstState.interaction)
       );
       expect(responseExploration.getInteraction('second state')).toEqual(
-        iof.createFromBackendDict(secondState.interaction)
+        Interaction.createFromBackendDict(secondState.interaction)
       );
       expect(responseExploration.getInteraction('invalid state')).toBeNull();
     }

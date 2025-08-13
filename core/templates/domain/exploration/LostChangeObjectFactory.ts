@@ -22,15 +22,15 @@ import {} from '@angular/upgrade/static';
 import {UtilsService} from 'services/utils.service';
 import isEqual from 'lodash/isEqual';
 
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {
   SubtitledHtml,
   SubtitledHtmlBackendDict,
 } from 'domain/exploration/subtitled-html.model';
 import {ExplorationChange} from './exploration-draft.model';
-import {InteractionBackendDict} from './InteractionObjectFactory';
-import {ParamChangeBackendDict} from './ParamChangeObjectFactory';
-import {ParamSpecBackendDict} from './ParamSpecObjectFactory';
+import {InteractionBackendDict} from './interaction.model';
+import {ParamChangeBackendDict} from './param-change.model';
+import {ParamSpecBackendDict} from './param-spec.model';
 import {RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
 import {WrittenTranslationsBackendDict} from './WrittenTranslationsObjectFactory';
 import {AppConstants} from 'app.constants';

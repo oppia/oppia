@@ -40,12 +40,14 @@
       <div class="oppia-question-player-progress">
         <div class="oppia-current-progress" [ngStyle]="{'width': progressPercentage + '%'}"></div>
       </div>
-      <div class="oppia-progress-percentage-container">
+      <div class="oppia-progress-percentage-container e2e-test-progress-container">
         <span><i>{{ getProgressText() }}</i></span>
       </div>
     </div>
-    <oppia-conversation-skin [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel">
+    <oppia-conversation-skin [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel" *ngIf="!isNewLessonPlayerEnabled()">
     </oppia-conversation-skin>
+    <oppia-new-conversation-skin class="diagnostic-player-conversation-skin" [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel" *ngIf="isNewLessonPlayerEnabled()">
+    </oppia-new-conversation-skin>
   </div>
 
   <div *ngIf="diagnosticTestIsFinished" class="oppia-result-page-container">
@@ -110,6 +112,13 @@
 </div>
 
 <style>
+  .diagnostic-player-conversation-skin {
+    bottom: 0;
+    left: 0;
+    position: fixed;
+    right: 0;
+    z-index: 1010;
+  }
   .oppia-diagnostic-test-page-header {
     align-items: center;
     display: flex;
@@ -161,6 +170,7 @@
   }
   .oppia-current-progress {
     background: #0d48a1;
+    border-radius: 10px;
     height: 16px;
   }
   .oppia-classroom-button-container {

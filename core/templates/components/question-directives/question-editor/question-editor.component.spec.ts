@@ -27,8 +27,8 @@ import {
 } from '@angular/core/testing';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {Outcome} from 'domain/exploration/OutcomeObjectFactory';
-import {Solution} from 'domain/exploration/SolutionObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {QuestionUpdateService} from 'domain/question/question-update.service';
 import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
@@ -145,24 +145,6 @@ describe('Question Editor Component', () => {
           id: 'TextInput',
         },
         param_changes: [],
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'filename1.mp3',
-                file_size_bytes: 100000,
-                needs_update: false,
-                duration_secs: 10.0,
-              },
-              hi: {
-                filename: 'filename2.mp3',
-                file_size_bytes: 11000,
-                needs_update: false,
-                duration_secs: 0.11,
-              },
-            },
-          },
-        },
         classifier_model_id: null,
         solicit_answer_details: false,
         card_is_checkpoint: false,
@@ -372,7 +354,7 @@ describe('Question Editor Component', () => {
     // because of the need to test validations. This error is thrown because
     // the value of 'htmlFormatter' is null.
     // @ts-ignore
-    let solution = new Solution(null, null, null, null);
+    let solution = new Solution(null, null, null);
     component.saveSolution(solution);
 
     expect(stateEditorService.setInteractionSolution).toHaveBeenCalledWith(

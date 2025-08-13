@@ -28,7 +28,8 @@ if MYPY: # pragma: no cover
 (topic_models,) = models.Registry.import_models([models.Names.TOPIC])
 
 
-class ModelCanonicalNameMismatchError(base_validation_errors.BaseAuditError):
+class ModelCanonicalNameMismatchError(
+    base_validation_errors.BaseValidationError):
     """Error class for models that have mismatching names."""
 
     def __init__(self, model: topic_models.TopicModel) -> None:

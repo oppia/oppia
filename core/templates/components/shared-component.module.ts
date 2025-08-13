@@ -44,7 +44,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 
 // Components.
-import {AudioBarComponent} from 'pages/exploration-player-page/layout-directives/audio-bar.component';
+import {AudioBarComponent} from 'pages/exploration-player-page/current-lesson-player/layout-directives/audio-bar.component';
 import {DeleteAnswerGroupModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-answer-group-modal.component';
 import {ExplorationEmbedButtonModalComponent} from './button-directives/exploration-embed-button-modal.component';
 import {CheckpointCelebrationModalComponent} from './checkpoint-celebration-modal/checkpoint-celebration-modal.component';
@@ -64,7 +64,7 @@ import {SkillMasteryViewerComponent} from './skill-mastery/skill-mastery.compone
 import {ExplorationSummaryTileComponent} from './summary-tile/exploration-summary-tile.component';
 import {PracticeTabComponent} from 'pages/topic-viewer-page/practice-tab/practice-tab.component';
 import {CollectionSummaryTileComponent} from './summary-tile/collection-summary-tile.component';
-import {TakeBreakModalComponent} from 'pages/exploration-player-page/templates/take-break-modal.component';
+import {TakeBreakModalComponent} from 'pages/exploration-player-page/current-lesson-player/templates/take-break-modal.component';
 import {TopicsAndSkillsDashboardNavbarBreadcrumbComponent} from 'pages/topics-and-skills-dashboard-page/navbar/topics-and-skills-dashboard-navbar-breadcrumb.component';
 import {ThreadTableComponent} from 'pages/exploration-editor-page/feedback-tab/thread-table/thread-table.component';
 import {SummaryListHeaderComponent} from './state-directives/answer-group-editor/summary-list-header.component';
@@ -78,23 +78,23 @@ import {CreateActivityModalComponent} from 'pages/creator-dashboard-page/modal-t
 import {UploadActivityModalComponent} from 'pages/creator-dashboard-page/modal-templates/upload-activity-modal.component';
 import {ThumbnailUploaderComponent} from './forms/custom-forms-directives/thumbnail-uploader.component';
 import {EditThumbnailModalComponent} from './forms/custom-forms-directives/edit-thumbnail-modal.component';
-import {CorrectnessFooterComponent} from 'pages/exploration-player-page/layout-directives/correctness-footer.component';
-import {ContinueButtonComponent} from 'pages/exploration-player-page/learner-experience/continue-button.component';
+import {CorrectnessFooterComponent} from 'pages/exploration-player-page/current-lesson-player/layout-directives/correctness-footer.component';
+import {ContinueButtonComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/continue-button.component';
 import {DeleteInteractionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-interaction-modal.component';
 import {DeleteHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-hint-modal.component';
 import {DeleteLastHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-last-hint-modal.component';
 import {DeleteSolutionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-solution-modal.component';
-import {ProgressNavComponent} from 'pages/exploration-player-page/layout-directives/progress-nav.component';
+import {ProgressNavComponent} from 'pages/exploration-player-page/current-lesson-player/layout-directives/progress-nav.component';
 import {QuestionDifficultySelectorComponent} from './question-difficulty-selector/question-difficulty-selector.component';
 import {PreviewThumbnailComponent} from 'pages/topic-editor-page/modal-templates/preview-thumbnail.component';
-import {InputResponsePairComponent} from 'pages/exploration-player-page/learner-experience/input-response-pair.component';
+import {InputResponsePairComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/input-response-pair.component';
 import {ImageUploaderComponent} from './forms/custom-forms-directives/image-uploader.component';
 import {ImageUploaderModalComponent} from './forms/custom-forms-directives/image-uploader-modal.component';
 import {StorySummaryTileComponent} from './summary-tile/story-summary-tile.component';
-import {ExplorationFooterComponent} from 'pages/exploration-player-page/layout-directives/exploration-footer.component';
-import {DisplaySolutionModalComponent} from 'pages/exploration-player-page/modals/display-solution-modal.component';
-import {DisplaySolutionInterstititalModalComponent} from 'pages/exploration-player-page/modals/display-solution-interstitial-modal.component';
-import {DisplayHintModalComponent} from 'pages/exploration-player-page/modals/display-hint-modal.component';
+import {ExplorationFooterComponent} from 'pages/exploration-player-page/current-lesson-player/layout-directives/exploration-footer.component';
+import {DisplaySolutionModalComponent} from 'pages/exploration-player-page/current-lesson-player/modals/display-solution-modal.component';
+import {DisplaySolutionInterstititalModalComponent} from 'pages/exploration-player-page/current-lesson-player/modals/display-solution-interstitial-modal.component';
+import {DisplayHintModalComponent} from 'pages/exploration-player-page/current-lesson-player/modals/display-hint-modal.component';
 import {HintAndSolutionButtonsComponent} from './button-directives/hint-and-solution-buttons.component';
 import {SearchBarModule} from 'pages/library-page/search-bar/search-bar.module';
 import {SubtopicSummaryTileComponent} from './summary-tile/subtopic-summary-tile.component';
@@ -103,20 +103,20 @@ import {MultiSelectionFieldComponent} from './filter-fields/multi-selection-fiel
 import {ConceptCardComponent} from './concept-card/concept-card.component';
 import {ScoreRingComponent} from './score-ring/score-ring.component';
 import {CompletionGraphComponent} from './statistics-directives/completion-graph.component';
-import {TutorCardComponent} from 'pages/exploration-player-page/learner-experience/tutor-card.component';
-import {ContentLanguageSelectorComponent} from 'pages/exploration-player-page/layout-directives/content-language-selector.component';
+import {TutorCardComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/tutor-card.component';
+import {ContentLanguageSelectorComponent} from 'pages/exploration-player-page/current-lesson-player/layout-directives/content-language-selector.component';
 import {RatingDisplayComponent} from './ratings/rating-display/rating-display.component';
-import {SupplementalCardComponent} from 'pages/exploration-player-page/learner-experience/supplemental-card.component';
+import {SupplementalCardComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/supplemental-card.component';
 import {AddOrUpdateSolutionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-or-update-solution-modal.component';
 import {SavePendingChangesModalComponent} from './save-pending-changes/save-pending-changes-modal.component';
 import {AddHintModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/add-hint-modal.component';
 import {QuestionMisconceptionSelectorComponent} from './question-directives/question-misconception-selector/question-misconception-selector.component';
-import {ConversationSkinComponent} from 'pages/exploration-player-page/learner-experience/conversation-skin.component';
-import {EndChapterCheckMarkComponent} from 'pages/exploration-player-page/learner-experience/end-chapter-check-mark.component';
-import {EndChapterConfettiComponent} from 'pages/exploration-player-page/learner-experience/end-chapter-confetti.component';
-import {RatingsAndRecommendationsComponent} from 'pages/exploration-player-page/learner-experience/ratings-and-recommendations.component';
-import {LearnerAnswerInfoCard} from 'pages/exploration-player-page/learner-experience/learner-answer-info-card.component';
-import {FeedbackPopupComponent} from 'pages/exploration-player-page/layout-directives/feedback-popup.component';
+import {ConversationSkinComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/conversation-skin.component';
+import {EndChapterCheckMarkComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/end-chapter-check-mark.component';
+import {EndChapterConfettiComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/end-chapter-confetti.component';
+import {RatingsAndRecommendationsComponent} from 'pages/exploration-player-page/current-lesson-player/learner-experience/ratings-and-recommendations.component';
+import {LearnerAnswerInfoCard} from 'pages/exploration-player-page/current-lesson-player/learner-experience/learner-answer-info-card.component';
+import {FeedbackPopupComponent} from 'pages/exploration-player-page/current-lesson-player/layout-directives/feedback-popup.component';
 import {ConfirmQuestionExitModalComponent} from './question-directives/modal-templates/confirm-question-exit-modal.component';
 import {QuestionsOpportunitiesSelectDifficultyModalComponent} from 'pages/topic-editor-page/modal-templates/questions-opportunities-select-difficulty-modal.component';
 import {QuestionsListSelectSkillAndDifficultyModalComponent} from 'pages/topic-editor-page/modal-templates/questions-list-select-skill-and-difficulty-modal.component';
@@ -179,6 +179,7 @@ import {ExplorationPublishModalComponent} from 'pages/exploration-editor-page/mo
 import {PostPublishModalComponent} from 'pages/exploration-editor-page/modal-templates/post-publish-modal.component';
 import {ExplorationObjectiveEditorComponent} from 'pages/exploration-editor-page/exploration-objective-editor/exploration-objective-editor.component';
 import {ExplorationTitleEditorComponent} from 'pages/exploration-editor-page/exploration-title-editor/exploration-title-editor.component';
+import {ConfirmTranslationExitModalComponent} from 'components/translation-suggestion-page/confirm-translation-exit-modal/confirm-translation-exit-modal.component';
 
 // Pipes.
 import {StringUtilityPipesModule} from 'filters/string-utility-filters/string-utility-pipes.module';
@@ -210,6 +211,10 @@ import {SaveVersionMismatchModalComponent} from 'pages/exploration-editor-page/m
 import {ConfirmDeleteStateModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/confirm-delete-state-modal.component';
 import {SaveValidationFailModalComponent} from 'pages/exploration-editor-page/modal-templates/save-validation-fail-modal.component';
 import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component';
+import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-input-response-pair.component';
+import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
+import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
+import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -267,6 +272,9 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    ConversationDisplayComponent,
+    CardNavigationControlComponent,
+    NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
     CreateNewSkillModalComponent,
@@ -291,6 +299,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    NewInputResponsePairComponent,
     ImageUploaderComponent,
     ImageUploaderModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -405,6 +414,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     ConfirmDeleteStateModalComponent,
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
+    ConfirmTranslationExitModalComponent,
   ],
 
   entryComponents: [
@@ -418,6 +428,9 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     ConceptCardComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    ConversationDisplayComponent,
+    CardNavigationControlComponent,
+    NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
     CreateNewSkillModalComponent,
@@ -462,6 +475,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    NewInputResponsePairComponent,
     ImageUploaderComponent,
     ImageUploaderModalComponent,
     KeyboardShortcutHelpModalComponent,
@@ -559,6 +573,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     ConfirmDeleteStateModalComponent,
     SaveValidationFailModalComponent,
     ModifyTranslationsModalComponent,
+    ConfirmTranslationExitModalComponent,
   ],
 
   exports: [
@@ -590,6 +605,9 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    ConversationDisplayComponent,
+    CardNavigationControlComponent,
+    NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
     CreateNewSkillModalComponent,
@@ -615,6 +633,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     HintAndSolutionButtonsComponent,
     HintEditorComponent,
     InputResponsePairComponent,
+    NewInputResponsePairComponent,
     ImageUploaderComponent,
     ImageUploaderModalComponent,
     LazyLoadingComponent,
@@ -710,6 +729,7 @@ import {ModifyTranslationsModalComponent} from 'pages/exploration-editor-page/mo
     UrlFragmentEditorComponent,
     ExplorationTitleEditorComponent,
     ExplorationObjectiveEditorComponent,
+    ConfirmTranslationExitModalComponent,
   ],
 })
 export class SharedComponentsModule {}

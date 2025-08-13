@@ -17,9 +17,9 @@
  * domain objects.
  */
 
-import {ParamChangeBackendDict} from 'domain/exploration/ParamChangeObjectFactory';
-import {ParamSpecBackendDict} from 'domain/exploration/ParamSpecObjectFactory';
-import {InteractionBackendDict} from 'domain/exploration/InteractionObjectFactory';
+import {ParamChangeBackendDict} from 'domain/exploration/param-change.model';
+import {ParamSpecBackendDict} from 'domain/exploration/param-spec.model';
+import {InteractionBackendDict} from 'domain/exploration/interaction.model';
 import {WrittenTranslationsBackendDict} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {SubtitledHtmlBackendDict} from './subtitled-html.model';
 import {RecordedVoiceOverBackendDict} from './recorded-voiceovers.model';
@@ -34,6 +34,8 @@ export type ExplorationChange =
   | ExplorationChangeMarkTranslationNeedsUpdateForLanguage
   | ExplorationChangeEditTranslation
   | ExplorationChangeEditVoiceovers
+  | ExplorationChangeMarkVoiceoversAsNeedsUpdate
+  | ExplorationChangeRemoveVoiceovers
   | ExplorationChangeRemoveTranslations
   | ExplorationChangeRenameState
   | ExplorationChangeDeleteState
@@ -152,6 +154,18 @@ export interface ExplorationChangeEditVoiceovers {
   content_id: string;
   language_accent_code: string;
   voiceovers: VoiceoverTypeToVoiceoversBackendDict;
+}
+
+export interface ExplorationChangeMarkVoiceoversAsNeedsUpdate {
+  cmd: 'mark_voiceovers_needs_update';
+  content_id: string;
+  language_code: string;
+}
+
+export interface ExplorationChangeRemoveVoiceovers {
+  cmd: 'remove_voiceovers';
+  content_id: string;
+  language_code: string;
 }
 
 export interface ExplorationChangeRemoveTranslations {

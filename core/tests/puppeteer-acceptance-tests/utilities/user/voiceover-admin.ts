@@ -21,6 +21,7 @@ import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 
 const baseURL = testConstants.URLs.BaseURL;
+const voiceoverAdminURL = testConstants.URLs.VoiceoverAdmin;
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
@@ -42,8 +43,23 @@ const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
 const mobileVoiceoverArtistsHeader =
   '.e2e-test-voice-artist-collapsible-card-header';
-const voiceArtistSettingsDropdown =
-  'h3.e2e-test-voice-artists-settings-container';
+
+const languageAccentOptionSelector =
+  '.e2e-test-language-accent-selector-option';
+const addNewLanguageAccentButtonSelector =
+  '.e2e-test-add-new-language-accent-button';
+const languageAccentDropdownSelector =
+  '.e2e-test-language-accent-dropdown-selector';
+const enableAutogenerationConfirmationButtonSelector =
+  '.e2e-test-autogeneration-confirmation';
+const enableAutogenerationSelectorTemplate = (languageAccentCode: string) =>
+  `.e2e-test-${languageAccentCode}-supports-autogeneration-select`;
+const enableAutogenerationOptionSelector =
+  '.e2e-test-autogeneration-option-selector';
+
+const explorationEditorSettingsTabSelector =
+  '.e2e-test-exploration-editor-settings-tab';
+const toastWarningContainer = '.e2e-test-toast-warning';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
@@ -52,21 +68,24 @@ export class VoiceoverAdmin extends BaseUser {
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(mobileNavToggelbutton);
       await this.clickOn(mobileNavToggelbutton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
     } else {
+      await this.expectElementToBeVisible(explorationSettingsTab);
       await this.clickOn(explorationSettingsTab);
     }
 
+    await this.expectElementToBeVisible(explorationEditorSettingsTabSelector);
     showMessage('Navigation to settings tab is successful.');
   }
 
   /**
-   * Function to open voice artist dropdown in mobile view.
+   * Navigate to the voiceover admin page.
    */
-  async openvoiceArtistDropdown(): Promise<void> {
-    await this.clickOn(voiceArtistSettingsDropdown);
+  async navigateToVoiceoverAdminPage(): Promise<void> {
+    await this.goto(voiceoverAdminURL);
   }
 
   /**
@@ -94,7 +113,7 @@ export class VoiceoverAdmin extends BaseUser {
     if (!explorationId) {
       throw new Error('Cannot navigate to editor: explorationId is null');
     }
-    const editorUrl = `${baseURL}/create/${explorationId}`;
+    const editorUrl = `${baseURL}/create/${explorationId}#/`;
     await this.goto(editorUrl);
 
     showMessage('Navigation to exploration editor is successful.');
@@ -110,9 +129,11 @@ export class VoiceoverAdmin extends BaseUser {
         visible: true,
       });
       await this.clickOn(dropdownToggleIcon);
+
+      await this.expectElementToBeVisible(mobileOptionsDropdown, false);
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
+      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -143,9 +164,11 @@ export class VoiceoverAdmin extends BaseUser {
    * @param voiceArtists - The username list of the voiceover artists to add.
    */
   async addVoiceoverArtistsToExploration(
-    voiceArtists: string[]
+    voiceArtists: string[],
+    verify: boolean = true
   ): Promise<void> {
     for (let i = 0; i < voiceArtists.length; i++) {
+      await this.expectElementToBeVisible(editVoiceoverArtistButton);
       await this.clickOn(editVoiceoverArtistButton);
       await this.clickOn(voiceArtistUsernameInputBox);
       await this.page.waitForSelector(voiceArtistUsernameInputBox, {
@@ -156,14 +179,19 @@ export class VoiceoverAdmin extends BaseUser {
       await this.clickOn(saveVoiceoverArtistEditButton);
       // Adding try catch here to avoid unnecessary waiting for selector if
       // the added voice artist is not an user.
-      try {
-        await this.page.waitForSelector(
-          `div.e2e-test-voice-artist-${voiceArtists[i]}`,
-          {visible: true}
-        );
-        showMessage(voiceArtists[i] + ' has been added as a voice artist.');
-      } catch (error) {
-        showMessage(voiceArtists[i] + ' is not added.');
+      if (verify) {
+        try {
+          await this.page.waitForSelector(
+            `div.e2e-test-voice-artist-${voiceArtists[i]}`,
+            {visible: true}
+          );
+          showMessage(voiceArtists[i] + ' has been added as a voice artist.');
+        } catch (error) {
+          throw new Error(
+            `${voiceArtists[i]} is not added.\n` +
+              `Original Error: ${error.stack}`
+          );
+        }
       }
     }
   }
@@ -193,7 +221,10 @@ export class VoiceoverAdmin extends BaseUser {
    * Function to close toast message.
    */
   async closeToastMessage(): Promise<void> {
+    await this.expectElementToBeVisible(toastWarningContainer);
     await this.clickOn(closeToastMessageButton);
+
+    await this.expectElementToBeVisible(toastWarningContainer, false);
   }
 
   /**
@@ -246,6 +277,82 @@ export class VoiceoverAdmin extends BaseUser {
         `Confirmed: Voiceover artist '${artistUsername}' is still not listed.`
       );
     }
+  }
+
+  /**
+   * Function to register supported language and accent combinations for Oppia voiceovers.
+   * @param languageAccentDescription - The language-accent to add.
+   */
+  async addSupportedLanguageAccentPair(
+    languageAccentDescription: string
+  ): Promise<void> {
+    await this.navigateToVoiceoverAdminPage();
+    await this.waitForPageToFullyLoad();
+
+    await this.page.waitForSelector(addNewLanguageAccentButtonSelector);
+    await this.clickOn(addNewLanguageAccentButtonSelector);
+
+    await this.page.waitForSelector(languageAccentDropdownSelector);
+    await this.clickOn(languageAccentDropdownSelector);
+
+    await this.page.waitForSelector(languageAccentOptionSelector);
+    const languageOptions = await this.page.$$(languageAccentOptionSelector);
+
+    for (const option of languageOptions) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === languageAccentDescription) {
+        await option.click();
+
+        await this.expectElementToBeVisible(addNewLanguageAccentButtonSelector);
+        break;
+      }
+    }
+  }
+
+  /**
+   * Function to register supported language and accent combinations for Oppia voiceovers.
+   * @param languageAccentCode - The language-accent code to enable autogeneration for.
+   */
+  async enableAutogenerationForLanguageAccentPair(
+    languageAccentCode: string
+  ): Promise<void> {
+    const enableAutogenerationSelector =
+      enableAutogenerationSelectorTemplate(languageAccentCode);
+    await this.page.waitForSelector(enableAutogenerationSelector);
+    await this.clickOn(enableAutogenerationSelector);
+
+    await this.page.waitForSelector(enableAutogenerationOptionSelector);
+    const options = await this.page.$$(enableAutogenerationOptionSelector);
+    for (const option of options) {
+      const textContent = await option.evaluate(
+        el => el.textContent?.trim() || ''
+      );
+      if (textContent === 'Yes') {
+        await option.click();
+        break;
+      }
+    }
+
+    await this.page.waitForSelector(
+      enableAutogenerationConfirmationButtonSelector,
+      {
+        visible: true,
+        timeout: 5000,
+      }
+    );
+    await this.clickOn(enableAutogenerationConfirmationButtonSelector);
+    await this.page.waitForSelector(
+      enableAutogenerationConfirmationButtonSelector,
+      {
+        hidden: true,
+      }
+    );
+
+    showMessage(
+      `Autogeneration enabled for language-accent pair: ${languageAccentCode}`
+    );
   }
 }
 

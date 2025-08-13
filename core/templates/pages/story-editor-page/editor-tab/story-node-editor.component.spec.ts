@@ -28,7 +28,7 @@ import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ConceptCard} from 'domain/skill/concept-card.model';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {StoryUpdateService} from 'domain/story/story-update.service';
 import {Story} from 'domain/story/story.model';
 import {AlertsService} from 'services/alerts.service';
@@ -226,7 +226,7 @@ describe('Story node editor component', () => {
             outline: 'Outline',
             exploration_id: null,
             outline_is_finalized: false,
-            planned_publication_date_msecs: 168960000000.0,
+            planned_publication_date_msecs: 168960000000,
           },
           {
             id: 'node_2',

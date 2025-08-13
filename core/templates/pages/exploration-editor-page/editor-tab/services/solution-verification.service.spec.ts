@@ -21,8 +21,8 @@ import {TestBed} from '@angular/core/testing';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
-import {SolutionObjectFactory} from 'domain/exploration/SolutionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
+import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
@@ -33,7 +33,6 @@ describe('Solution Verification Service', () => {
   let explorationStatesService: ExplorationStatesService;
   let stateInteractionIdService: StateInteractionIdService;
   let stateCustomizationArgsService: StateCustomizationArgsService;
-  let solutionObjectFactory: SolutionObjectFactory;
   let solutionVerificationService: SolutionVerificationService;
   let stateEditorService: StateEditorService;
   let mockInteractionState: Record<string, unknown>;
@@ -49,10 +48,10 @@ describe('Solution Verification Service', () => {
       providers: [
         StateInteractionIdService,
         StateCustomizationArgsService,
-        SolutionObjectFactory,
         StateEditorService,
         SolutionVerificationService,
         ExplorationStatesService,
+
         {
           provide: INTERACTION_SPECS,
           useValue: mockInteractionState,
@@ -72,22 +71,12 @@ describe('Solution Verification Service', () => {
     stateCustomizationArgsService = TestBed.inject(
       StateCustomizationArgsService
     );
-    solutionObjectFactory = TestBed.inject(SolutionObjectFactory);
     stateEditorService = TestBed.inject(StateEditorService);
     solutionVerificationService = TestBed.inject(SolutionVerificationService);
 
     explorationStatesService.init({
       'First State': {
         content: {content_id: 'content', html: 'First State Content'},
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {},
-            hint_1: {},
-            hint_2: {},
-          },
-        },
         interaction: {
           id: 'TextInput',
           answer_groups: [
@@ -153,7 +142,7 @@ describe('Solution Verification Service', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      solutionObjectFactory.createNew(false, 'abc', 'nothing')
+      Solution.createNew(false, 'abc', 'nothing')
     );
 
     expect(
@@ -184,7 +173,7 @@ describe('Solution Verification Service', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      solutionObjectFactory.createNew(false, 'xyz', 'nothing')
+      Solution.createNew(false, 'xyz', 'nothing')
     );
 
     expect(
@@ -237,7 +226,7 @@ describe('Solution Verification Service', () => {
     stateInteractionIdService.savedMemento = 'TextInput';
     explorationStatesService.saveSolution(
       'First State',
-      solutionObjectFactory.createNew(false, 'abc', 'nothing')
+      Solution.createNew(false, 'abc', 'nothing')
     );
 
     expect(

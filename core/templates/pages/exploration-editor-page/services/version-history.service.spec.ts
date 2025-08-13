@@ -18,14 +18,12 @@
 
 import {TestBed} from '@angular/core/testing';
 import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
 import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
 import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 import {VersionHistoryService} from './version-history.service';
 
 describe('Version history service', () => {
   let versionHistoryService: VersionHistoryService;
-  let paramSpecObjectFactory: ParamSpecObjectFactory;
   let stateObjectFactory: StateObjectFactory;
 
   beforeEach(() => {
@@ -48,7 +46,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -80,7 +78,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -106,12 +104,6 @@ describe('Version history service', () => {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -176,12 +168,6 @@ describe('Version history service', () => {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -251,7 +237,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -288,12 +274,6 @@ describe('Version history service', () => {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -366,12 +346,6 @@ describe('Version history service', () => {
         content_id: 'content',
         html: '',
       },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
-      },
       interaction: {
         answer_groups: [],
         confirmed_unclassified_answers: [],
@@ -439,7 +413,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -466,12 +440,6 @@ describe('Version history service', () => {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -543,7 +511,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -575,12 +543,6 @@ describe('Version history service', () => {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -644,12 +606,6 @@ describe('Version history service', () => {
       content: {
         content_id: 'content',
         html: '',
-      },
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          content: {},
-          default_outcome: {},
-        },
       },
       interaction: {
         answer_groups: [],
@@ -721,7 +677,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}),
       [],
       false,
       true
@@ -758,7 +714,7 @@ describe('Version history service', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}),
       [],
       false,
       true

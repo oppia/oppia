@@ -63,7 +63,7 @@
 
   <div class="image-click-container" *ngIf="!isLoadingIndicatorShown && !isTryAgainShown">
     <img [src]="imageUrl"
-         class="oppia-image-click-img"
+         class="oppia-image-click-img e2e-test-image-interaction-image"
          tabindex="0"
          (keydown)="handleKeyDown($event)"
          (click)="onClickImage()"

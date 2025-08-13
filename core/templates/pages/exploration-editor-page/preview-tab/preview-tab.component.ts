@@ -22,30 +22,28 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {
-  ParamChange,
-  ParamChangeObjectFactory,
-} from 'domain/exploration/ParamChangeObjectFactory';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model';
+import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
-import {ExplorationPlayerStateService} from 'pages/exploration-player-page/services/exploration-player-state.service';
 import {
   ExplorationParams,
   LearnerParamsService,
 } from 'pages/exploration-player-page/services/learner-params.service';
 import {NumberAttemptsService} from 'pages/exploration-player-page/services/number-attempts.service';
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {ExplorationInitStateNameService} from '../services/exploration-init-state-name.service';
 import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
 import {ExplorationStatesService} from '../services/exploration-states.service';
 import {GraphDataService} from '../services/graph-data.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {ParameterMetadataService} from '../services/parameter-metadata.service';
 import {RouterService} from '../services/router.service';
 import {PreviewSetParametersModalComponent} from './templates/preview-set-parameters-modal.component';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-preview-tab',
@@ -54,34 +52,30 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 export class PreviewTabComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
 
-  // These properties below are initialized using Angular lifecycle hooks
-  // where we need to do non-null assertion. For more information see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   previewWarning!: string;
   isExplorationPopulated!: boolean;
   allParams: ExplorationParams | object = {};
   voiceoversAreLoaded: boolean = false;
 
   constructor(
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private editableExplorationBackendApiService: EditableExplorationBackendApiService,
     private explorationDataService: ExplorationDataService,
     private explorationEngineService: ExplorationEngineService,
     private explorationFeaturesService: ExplorationFeaturesService,
     private explorationInitStateNameService: ExplorationInitStateNameService,
     private explorationParamChangesService: ExplorationParamChangesService,
-    private explorationPlayerStateService: ExplorationPlayerStateService,
     private explorationStatesService: ExplorationStatesService,
+    private platformFeatureService: PlatformFeatureService,
     private graphDataService: GraphDataService,
     private learnerParamsService: LearnerParamsService,
     private ngbModal: NgbModal,
     private numberAttemptsService: NumberAttemptsService,
-    private paramChangeObjectFactory: ParamChangeObjectFactory,
     private parameterMetadataService: ParameterMetadataService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
-    private paramChangesObjectFactory: ParamChangesObjectFactory,
-    private entityVoiceoversService: EntityVoiceoversService
+    private entityVoiceoversService: EntityVoiceoversService,
+    private conversationFlowService: ConversationFlowService
   ) {}
 
   getManualParamChanges(
@@ -92,16 +86,14 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         initStateNameForPreview,
       ]);
 
-    // Construct array to hold required parameter changes.
     let manualParamChanges: ParamChange[] = [];
     for (let i = 0; i < unsetParametersInfo.length; i++) {
-      let newParamChange = this.paramChangeObjectFactory.createEmpty(
+      let newParamChange = ParamChange.createEmpty(
         unsetParametersInfo[i].paramName
       );
       manualParamChanges.push(newParamChange);
     }
 
-    // Use modal to populate parameter change values.
     if (manualParamChanges.length > 0) {
       this.showSetParamsModal(manualParamChanges, () => {
         return Promise.resolve(manualParamChanges);
@@ -156,7 +148,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     const initStateNameForPreview =
       this.explorationInitStateNameService.savedMemento;
     setTimeout(() => {
-      const explorationId = this.contextService.getExplorationId();
+      const explorationId = this.pageContextService.getExplorationId();
 
       this.editableExplorationBackendApiService
         .fetchApplyDraftExplorationAsync(explorationId)
@@ -182,7 +174,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     // navigating in preview mode, ensuring that the state does not
     // change when toggling between editor and preview.
     this.directiveSubscriptions.add(
-      this.explorationEngineService.onUpdateActiveStateIfInEditor.subscribe(
+      this.stateEditorService.onUpdateActiveStateIfInEditor.subscribe(
         stateName => {
           this.stateEditorService.setActiveStateName(stateName);
         }
@@ -190,7 +182,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     );
 
     this.directiveSubscriptions.add(
-      this.explorationPlayerStateService.onPlayerStateChange.subscribe(() => {
+      this.conversationFlowService.onPlayerStateChange.subscribe(() => {
         this.allParams = this.learnerParamsService.getAllParams();
       })
     );
@@ -205,9 +197,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         // is fully finished.
         if (!this.explorationParamChangesService.savedMemento) {
           this.explorationParamChangesService.init(
-            this.paramChangesObjectFactory.createFromBackendList(
-              explorationData.param_changes
-            )
+            ParamChanges.createFromBackendList(explorationData.param_changes)
           );
           this.explorationStatesService.init(explorationData.states, false);
           this.explorationInitStateNameService.init(
@@ -256,7 +246,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         }
 
         this.entityVoiceoversService.init(
-          this.contextService.getExplorationId(),
+          this.pageContextService.getExplorationId(),
           'exploration',
           explorationData.version as number,
           explorationData.language_code
@@ -270,5 +260,9 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }

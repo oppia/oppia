@@ -19,7 +19,7 @@
  */
 
 import {Subscription} from 'rxjs';
-import {ContextService} from 'services/context.service';
+import {PageContextService} from 'services/page-context.service';
 import {
   ChangeDetectorRef,
   Component,
@@ -89,6 +89,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   classroomData: CreatorTopicSummary[] = [];
   topicTitlesTranslationKeys: string[] = [];
   learnDropdownOffset: number = 0;
+  classroomSummariesLength: number = 0;
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
   isTopicManager: boolean = false;
@@ -180,7 +181,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private contextService: ContextService,
+    private pageContextService: PageContextService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private i18nService: I18nService,
     private alertsService: AlertsService,
@@ -215,7 +216,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
         return languageInfo;
       }
     );
-    this.showLanguageSelector = !this.contextService
+    this.showLanguageSelector = !this.pageContextService
       .getPageContext()
       .endsWith('editor');
 
@@ -376,11 +377,19 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   ngAfterViewChecked(): void {
-    this.getInvolvedMenuOffset = this.getDropdownOffset('.get-involved', 574);
-    this.donateMenuOffset = this.getDropdownOffset('.donate-tab', 286);
-    this.learnDropdownOffset = this.getDropdownOffset('.learn-tab', 688);
+    this.getInvolvedMenuOffset = this.getDropdownOffset(
+      '.get-involved',
+      '.get-involved-dropdown'
+    );
+    // The '.donate-tab' no longer has a dropdown, so
+    // offset calculation has been removed.
+    this.learnDropdownOffset = this.getDropdownOffset(
+      '.learn-tab',
+      '.classroom-enabled'
+    );
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
     this.changeDetectorRef.detectChanges();
+    this.setClassroomSummariesLength();
   }
 
   // This function is required to shift the dropdown towards left if
@@ -388,18 +397,35 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   // This function compares the width of the dropdown with the space
   // available on the right to calculate the offset. It returns zero if
   // there is enough space to fit the content.
-  getDropdownOffset(cssClass: string, width: number): number {
+  getDropdownOffset(cssClass: string, dropdownClass: string): number {
     let learnTab: HTMLElement | null = document.querySelector(cssClass);
-    if (learnTab) {
-      let leftOffset = learnTab.getBoundingClientRect().left;
-      let space = window.innerWidth - leftOffset;
-      return space < width ? Math.round(space - width) : 0;
+    let dropdown: HTMLElement | null = document.querySelector(dropdownClass);
+    if (!learnTab || !dropdown) {
+      return 0;
     }
-    return 0;
+    let computedStyle = window.getComputedStyle(dropdown);
+    let width: number = parseFloat(computedStyle.minWidth);
+
+    const rect = learnTab.getBoundingClientRect();
+    if (!rect) {
+      return 0;
+    }
+    let leftOffset = learnTab.getBoundingClientRect().left;
+    let space = window.innerWidth - leftOffset;
+    return space < width ? Math.round(space - width) : 0;
   }
 
   getStaticImageUrl(imagePath: string): string {
     return this.urlInterpolationService.getStaticImageUrl(imagePath);
+  }
+
+  setClassroomSummariesLength(): void {
+    const classroomGrid = document.querySelector('.classroom-grid');
+    if (classroomGrid) {
+      const countAttr = classroomGrid.getAttribute('data-classroom-count');
+      const parsed = parseInt(countAttr ?? '0', 10);
+      this.classroomSummariesLength = isNaN(parsed) ? 0 : parsed;
+    }
   }
 
   changeLanguage(languageCode: string): void {
@@ -581,6 +607,13 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       NavbarAndFooterGATrackingPages.TEACH
     );
     this.windowRef.nativeWindow.location.href = '/teach';
+  }
+
+  navigateToBlogPage(): void {
+    this.siteAnalyticsService.registerClickNavbarButtonEvent(
+      NavbarAndFooterGATrackingPages.BLOG
+    );
+    this.windowRef.nativeWindow.location.href = '/blog';
   }
 
   isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {

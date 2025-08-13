@@ -27,18 +27,15 @@ import {
   AnswerChoice,
   StateEditorService,
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {AnswerGroup} from 'domain/exploration/AnswerGroupObjectFactory';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AppConstants} from 'app.constants';
 import {ExplorationEditorPageConstants} from 'pages/exploration-editor-page/exploration-editor-page.constants';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {ItemSelectionInputCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionRuleInputs} from 'interactions/rule-input-defs';
 import {LoggerService} from 'services/contextual/logger.service';
-import {
-  Outcome,
-  OutcomeObjectFactory,
-} from 'domain/exploration/OutcomeObjectFactory';
+import {Outcome} from 'domain/exploration/outcome.model';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {SolutionVerificationService} from 'pages/exploration-editor-page/editor-tab/services/solution-verification.service';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
@@ -49,6 +46,9 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {Rule} from 'domain/exploration/rule.model';
 import {InitializeAnswerGroups} from 'components/state-editor/state-interaction-editor/state-interaction-editor.component';
+import isEqual from 'lodash/isEqual';
+import {ShortAnswerResponse, Solution} from 'domain/exploration/solution.model';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 
 interface UpdateActiveAnswerGroupDest {
   dest: string;
@@ -112,13 +112,13 @@ export class ResponsesService {
   constructor(
     private alertsService: AlertsService,
     private loggerService: LoggerService,
-    private outcomeObjectFactory: OutcomeObjectFactory,
     private solutionValidityService: SolutionValidityService,
     private solutionVerificationService: SolutionVerificationService,
     private stateCustomizationArgsService: StateCustomizationArgsService,
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
-    private stateSolutionService: StateSolutionService
+    private stateSolutionService: StateSolutionService,
+    private explorationHtmlFormatterService: ExplorationHtmlFormatterService
   ) {}
 
   private _verifySolution = () => {
@@ -178,7 +178,7 @@ export class ResponsesService {
     if (
       newAnswerGroups &&
       oldAnswerGroups &&
-      !angular.equals(newAnswerGroups, oldAnswerGroups)
+      !isEqual(newAnswerGroups, oldAnswerGroups)
     ) {
       this._answerGroups = newAnswerGroups;
       this._answerGroupsChangedEventEmitter.emit();
@@ -259,7 +259,7 @@ export class ResponsesService {
 
   private _saveDefaultOutcome = (newDefaultOutcome: Outcome | null) => {
     const oldDefaultOutcome = this._defaultOutcomeMemento;
-    if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
+    if (!isEqual(newDefaultOutcome, oldDefaultOutcome)) {
       this._defaultOutcome = newDefaultOutcome;
       this._verifySolution();
       this._defaultOutcomeMemento = cloneDeep(newDefaultOutcome);
@@ -272,10 +272,7 @@ export class ResponsesService {
     const oldConfirmedUnclassifiedAnswers =
       this._confirmedUnclassifiedAnswersMemento;
     if (
-      !angular.equals(
-        newConfirmedUnclassifiedAnswers,
-        oldConfirmedUnclassifiedAnswers
-      )
+      !isEqual(newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)
     ) {
       this._confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 
@@ -342,6 +339,23 @@ export class ResponsesService {
     return this._activeAnswerGroupIndex;
   }
 
+  getOppiaShortAnswerResponseHtml(
+    interaction: Interaction,
+    solution: Solution
+  ): ShortAnswerResponse {
+    if (interaction.id === null) {
+      throw new Error('Interaction id is possibly null.');
+    }
+    return {
+      prefix: solution.answerIsExclusive ? 'The only' : 'One',
+      answer: this.explorationHtmlFormatterService.getShortAnswerHtml(
+        solution.correctAnswer,
+        interaction.id,
+        interaction.customizationArgs
+      ),
+    };
+  }
+
   onInteractionIdChanged(
     newInteractionId: string,
     callback: (value: AnswerGroup[], value2: Outcome | null) => void
@@ -359,7 +373,7 @@ export class ResponsesService {
       } else if (!this._defaultOutcome) {
         const stateName = this.stateEditorService.getActiveStateName();
         if (stateName) {
-          this._defaultOutcome = this.outcomeObjectFactory.createNew(
+          this._defaultOutcome = Outcome.createNew(
             stateName,
             ExplorationEditorPageConstants.COMPONENT_NAME_DEFAULT_OUTCOME,
             '',

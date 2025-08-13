@@ -18,7 +18,7 @@
 
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Rubric} from 'domain/skill/rubric.model';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {Subscription} from 'rxjs';
 import {
   GroupedSkillSummaries,
@@ -36,6 +36,7 @@ export class SkillQuestionsTabComponent implements OnInit, OnDestroy {
   skill!: Skill;
   groupedSkillSummaries!: GroupedSkillSummaries;
   skillIdToRubricsObject: Record<string, Rubric[]> = {};
+  difficultyCount!: number;
 
   constructor(private skillEditorStateService: SkillEditorStateService) {}
 

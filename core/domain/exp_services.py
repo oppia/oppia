@@ -47,6 +47,7 @@ from core.domain import email_manager
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import exp_rights_domain
 from core.domain import feature_flag_services
 from core.domain import feedback_services
 from core.domain import fs_services
@@ -699,48 +700,6 @@ def apply_change_list(
                     state.update_card_is_checkpoint(
                         edit_card_is_checkpoint_cmd.new_value
                     )
-                elif (change.property_name ==
-                      exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
-                    if not isinstance(change.new_value, dict):
-                        raise Exception(
-                            'Expected recorded_voiceovers to be a dict, '
-                            'received %s' % change.new_value)
-
-                    if not does_exploration_support_voiceovers(exploration_id):
-                        raise Exception(
-                            'Voiceover additions are not allowed for '
-                            'this exploration.')
-
-                    # Explicitly convert the duration_secs value from
-                    # int to float. Reason for this is the data from
-                    # the frontend will be able to match the backend
-                    # state model for Voiceover properly. Also js
-                    # treats any number that can be float and int as
-                    # int (no explicit types). For example,
-                    # 10.000 is not 10.000 it is 10.
-                    # Here we use cast because this 'elif'
-                    # condition forces change to have type
-                    # EditExpStatePropertyRecordedVoiceoversCmd.
-                    edit_recorded_voiceovers_cmd = cast(
-                        exp_domain.EditExpStatePropertyRecordedVoiceoversCmd,
-                        change
-                    )
-                    new_voiceovers_mapping = (
-                        edit_recorded_voiceovers_cmd.new_value[
-                            'voiceovers_mapping'
-                        ]
-                    )
-                    language_codes_to_audio_metadata = (
-                        new_voiceovers_mapping.values())
-                    for language_codes in language_codes_to_audio_metadata:
-                        for audio_metadata in language_codes.values():
-                            audio_metadata['duration_secs'] = (
-                                float(audio_metadata['duration_secs'])
-                            )
-                    recorded_voiceovers = (
-                        state_domain.RecordedVoiceovers.from_dict(
-                            change.new_value))
-                    state.update_recorded_voiceovers(recorded_voiceovers)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     # Here we use cast because this 'if' condition forces
@@ -1057,16 +1016,9 @@ def update_states_version_history(
         state_name: False
         for state_name in states_which_were_not_renamed
     }
-    # The following ignore list contains those state properties which are
-    # related to voiceovers. Hence, they are ignored in order to avoid
-    # updating the version history in case of voiceover-only commits.
-    state_property_ignore_list = [
-        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
-    ]
     for change in change_list:
         if (
-            change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
-            change.property_name not in state_property_ignore_list
+            change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY
         ):
             state_name = change.state_name
             if state_name in state_property_changed_data:
@@ -1568,11 +1520,13 @@ def delete_explorations(
 
     # Remove from subscribers.
     taskqueue_services.defer(
-        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS,
+        feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS'],
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
     # Remove from activities.
     taskqueue_services.defer(
-        taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES,
+        feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_DELETE_EXPS_FROM_ACTIVITIES'],
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS, exploration_ids)
 
 
@@ -2056,9 +2010,6 @@ def compute_models_to_put_when_saving_new_exp_version(
         )
     )
 
-    voiceover_services.update_exploration_voice_artist_link_model(
-        committer_id, change_list, old_exploration, updated_exploration)
-
     new_content_id_set = set(updated_exploration.get_translatable_content_ids())
     content_ids_corresponding_translations_to_remove = (
         old_content_id_set - new_content_id_set
@@ -2066,8 +2017,13 @@ def compute_models_to_put_when_saving_new_exp_version(
 
     voiceover_changes = []
     for change in change_list:
-        if change.cmd == exp_domain.CMD_UPDATE_VOICEOVERS:
-            voiceover_changes.append(change)
+        if change.cmd not in [
+            exp_domain.CMD_UPDATE_VOICEOVERS,
+            exp_domain.CMD_MARK_VOICEOVER_AS_NEEDING_UPDATE,
+            exp_domain.CMD_REMOVE_VOICEOVERS,
+        ]:
+            continue
+        voiceover_changes.append(change)
 
     if (
         voiceover_changes and
@@ -2184,6 +2140,7 @@ def compute_models_to_put_when_saving_new_exp_version(
             exp_summary_model, exp_summary
         )
     )
+
     models_to_put.append(updated_exp_summary_model)
     return models_to_put
 
@@ -2243,7 +2200,7 @@ def regenerate_exploration_and_contributors_summaries(
 
 def update_exploration_summary(
     exploration: exp_domain.Exploration,
-    exp_rights: rights_domain.ActivityRights,
+    exp_rights: exp_rights_domain.ExplorationRights,
     exp_summary: exp_domain.ExplorationSummary,
     skip_exploration_model_last_updated: bool = False
 ) -> exp_domain.ExplorationSummary:
@@ -2303,7 +2260,7 @@ def update_exploration_summary(
 
 def generate_new_exploration_summary(
     exploration: exp_domain.Exploration,
-    exp_rights: rights_domain.ActivityRights
+    exp_rights: exp_rights_domain.ExplorationRights
 ) -> exp_domain.ExplorationSummary:
     """Generates a new exploration summary domain object from a given
     exploration and its rights.
@@ -2485,7 +2442,8 @@ def get_exploration_validation_error(
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     try:
         exploration.validate(
-            exploration_rights.status == rights_domain.ACTIVITY_STATUS_PUBLIC)
+            exploration_rights.status
+            == exp_rights_domain.ACTIVITY_STATUS_PUBLIC)
     except Exception as ex:
         return str(ex)
 
@@ -2533,7 +2491,7 @@ def revert_exploration(
         exploration_id, version=revert_to_version)
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     exploration_is_public = (
-        exploration_rights.status != rights_domain.ACTIVITY_STATUS_PRIVATE
+        exploration_rights.status != exp_rights_domain.ACTIVITY_STATUS_PRIVATE
     )
     exploration.validate(strict=exploration_is_public)
 
@@ -2551,12 +2509,16 @@ def revert_exploration(
     new_translation_models, translation_counts = (
         translation_services.compute_translation_related_changes_upon_revert(
             reverted_exploration, revert_to_version))
+    new_voiceover_models = (
+        voiceover_services.compute_voiceover_related_changes_upon_revert(
+            reverted_exploration, revert_to_version))
 
     translation_and_opportunity_models_to_put: List[
         base_models.BaseModel
     ] = []
 
     translation_and_opportunity_models_to_put.extend(new_translation_models)
+    translation_and_opportunity_models_to_put.extend(new_voiceover_models)
 
     if opportunity_services.is_exploration_available_for_contribution(
         exploration_id
@@ -2624,8 +2586,7 @@ def save_new_exploration_from_yaml_and_assets(
     committer_id: str,
     yaml_content: str,
     exploration_id: str,
-    assets_list: List[Tuple[str, bytes]],
-    strip_voiceovers: bool = False
+    assets_list: List[Tuple[str, bytes]]
 ) -> None:
     """Saves a new exploration given its representation in YAML form and the
     list of assets associated with it.
@@ -2636,8 +2597,6 @@ def save_new_exploration_from_yaml_and_assets(
         exploration_id: str. The id of the exploration.
         assets_list: list(tuple(str, bytes)). A list of lists of assets, which
             contains asset's filename and content.
-        strip_voiceovers: bool. Whether to strip away all audio voiceovers
-            from the imported exploration.
 
     Raises:
         Exception. The yaml file is invalid due to a missing schema version.
@@ -2656,11 +2615,6 @@ def save_new_exploration_from_yaml_and_assets(
         fs.commit(asset_filename, asset_content)
 
     exploration = exp_domain.Exploration.from_yaml(exploration_id, yaml_content)
-
-    # Check whether audio translations should be stripped.
-    if strip_voiceovers:
-        for state in exploration.states.values():
-            state.recorded_voiceovers.strip_all_existing_voiceovers()
 
     create_commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
@@ -2901,22 +2855,9 @@ def is_voiceover_change_list(
         bool. Whether the change_list contains only the changes which are
         allowed for voice artist to do.
     """
-    voiceover_with_accent_feature_is_enabled = (
-        feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value,
-            None)
-    )
-
     for change in change_list:
-        if voiceover_with_accent_feature_is_enabled:
-            if change.cmd != exp_domain.CMD_UPDATE_VOICEOVERS:
-                return False
-        else:
-            if (
-                change.property_name !=
-                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS
-            ):
-                return False
+        if change.cmd != exp_domain.CMD_UPDATE_VOICEOVERS:
+            return False
     return True
 
 

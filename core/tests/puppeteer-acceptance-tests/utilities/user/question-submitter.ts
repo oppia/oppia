@@ -37,6 +37,17 @@ const addInteractionButton = 'button.e2e-test-open-add-interaction-modal';
 const saveInteractionButton = 'button.e2e-test-save-interaction';
 const mathInteractionsTab = '.e2e-test-interaction-tab-math';
 
+const defaultFeedbackTab = 'a.e2e-test-default-response-tab';
+const openOutcomeFeedBackEditor = 'div.e2e-test-open-outcome-feedback-editor';
+const saveOutcomeFeedbackButton = 'button.e2e-test-save-outcome-feedback';
+const openOutcomeDestButton = '.e2e-test-open-outcome-dest-editor';
+const destinationSelectorDropdown = '.e2e-test-destination-selector-dropdown';
+const destinationWhenStuckSelectorDropdown =
+  '.e2e-test-destination-when-stuck-selector-dropdown';
+const addDestinationStateWhenStuckInput = '.protractor-test-add-state-input';
+const outcomeDestWhenStuckSelector =
+  '.protractor-test-open-outcome-dest-if-stuck-editor';
+
 const addInteractionModalSelector = 'customize-interaction-body-container';
 const multipleChoiceInteractionButton =
   'div.e2e-test-interaction-tile-MultipleChoiceInput';
@@ -71,10 +82,6 @@ const solutionInputTextArea =
 const submitQuestionButon = '.e2e-test-save-question-button';
 const feedbackEditorButton =
   'div.oppia-edit-feedback .oppia-click-to-start-editing';
-const defaultResponseTab = '.e2e-test-default-response-tab';
-const saveOutcomeFeedbackButton = '.e2e-test-save-outcome-feedback';
-const openOutcomeFeedBackEditorSelector =
-  'div.e2e-test-open-outcome-feedback-editor';
 const addElementToTextInputInteraction = 'button.e2e-test-add-list-entry';
 const skillDifficultyEasy = '.e2e-test-skill-difficulty-easy';
 const skillDifficultyMedium = '.e2e-test-skill-difficulty-medium';
@@ -82,6 +89,11 @@ const skillDifficultyHard = '.e2e-test-skill-difficulty-hard';
 const viewQuestionSudggestionModalHeader =
   '.e2e-test-question-suggestion-review-modal-header';
 const questionSuggestionModalDifficultySelector = '.oppia-difficulty-title';
+const questionDifficultySelectionModalSelector =
+  '.e2e-test-question-opportunity-difficulty';
+
+const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
+const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
 
 export class QuestionSubmitter extends BaseUser {
   /**
@@ -100,6 +112,7 @@ export class QuestionSubmitter extends BaseUser {
     skillName: string,
     topicName: string
   ): Promise<void> {
+    await this.expectElementToBeVisible(submitQuestionTab);
     await this.clickOn(submitQuestionTab);
     await this.page.waitForSelector(opportunityListItem, {visible: true});
     const opportunityListItems = await this.page.$$(opportunityListItem);
@@ -128,6 +141,10 @@ export class QuestionSubmitter extends BaseUser {
         await this.page.evaluate(button => {
           button.click();
         }, button);
+
+        await this.expectElementToBeVisible(
+          questionDifficultySelectionModalSelector
+        );
         return;
       }
     }
@@ -142,6 +159,9 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} difficulty - The difficulty level of the question.
    */
   async selectQuestionDifficulty(difficulty: string = 'Medium'): Promise<void> {
+    await this.expectElementToBeVisible(
+      questionDifficultySelectionModalSelector
+    );
     if (difficulty === 'Easy') {
       await this.clickOn(skillDifficultyEasy);
     } else if (difficulty === 'Medium') {
@@ -152,6 +172,8 @@ export class QuestionSubmitter extends BaseUser {
       throw new Error(`Invalid difficulty level: ${difficulty}`);
     }
     await this.clickOn(confirmSkillDificultyButton);
+
+    await this.expectElementToBeVisible(confirmSkillDificultyButton, false);
   }
 
   /**
@@ -159,17 +181,21 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} text - The text to be added to the question.
    */
   async seedTextToQuestion(text: string): Promise<void> {
+    await this.expectElementToBeVisible(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.clickOn(stateContentInputField);
     await this.type(stateContentInputField, text);
     await this.clickOn(saveStateEditorContentButton);
+
+    await this.expectElementToBeVisible(saveStateEditorContentButton, false);
   }
 
   /**
    * Function to add a math expression to the question.
    */
   async addMathExpressionToQuestion(): Promise<void> {
+    await this.expectElementToBeVisible(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
     await this.clickOn(stateContentInputField);
@@ -187,12 +213,15 @@ export class QuestionSubmitter extends BaseUser {
     await this.waitForElementToBeClickable(closeRichTextEditorButton);
     await this.clickOn(closeRichTextEditorButton);
     await this.clickOn(saveStateEditorContentButton);
+
+    await this.expectElementToBeVisible(saveStateEditorContentButton, false);
   }
 
   /**
    * Function to add an image to the question.
    */
   async addImageToQuestion(): Promise<void> {
+    await this.expectElementToBeVisible(textStateEditSelector);
     await this.clickOn(textStateEditSelector);
     await this.page.waitForSelector(stateContentInputField, {visible: true});
 
@@ -209,6 +238,8 @@ export class QuestionSubmitter extends BaseUser {
     await this.waitForElementToBeClickable(closeRichTextEditorButton);
     await this.clickOn(closeRichTextEditorButton);
     await this.clickOn(saveStateEditorContentButton);
+
+    await this.expectElementToBeVisible(saveStateEditorContentButton);
   }
 
   /**
@@ -216,9 +247,12 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} hint - The hint to be added to the current state card.
    */
   async addHintToState(hint: string): Promise<void> {
+    await this.expectElementToBeVisible(addHintButton);
     await this.clickOn(addHintButton);
     await this.type(stateContentInputField, hint);
     await this.clickOn(saveHintButton);
+
+    await this.expectElementToBeVisible(saveHintButton, false);
   }
 
   /**
@@ -232,10 +266,12 @@ export class QuestionSubmitter extends BaseUser {
     answerExplanation: string,
     isSolutionNumericInput: boolean
   ): Promise<void> {
+    await this.expectElementToBeVisible(addSolutionButton);
+    await this.clickOn(addSolutionButton);
+
     const solutionSelector = isSolutionNumericInput
       ? solutionInputNumeric
       : solutionInputTextArea;
-    await this.clickOn(addSolutionButton);
     await this.page.waitForSelector(solutionSelector, {visible: true});
     await this.type(solutionSelector, answer);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
@@ -243,14 +279,18 @@ export class QuestionSubmitter extends BaseUser {
     await this.type(stateContentInputField, answerExplanation);
     await this.page.waitForSelector(`${submitSolutionButton}:not([disabled])`);
     await this.clickOn(submitSolutionButton);
+
+    await this.expectElementToBeVisible(submitSolutionButton, false);
   }
 
   /**
    * Function to submit the question suggestion.
    */
   async submitQuestionSuggestion(): Promise<void> {
-    await this.page.waitForSelector(submitQuestionButon, {visible: true});
+    await this.expectElementToBeVisible(submitQuestionButon);
     await this.clickOn(submitQuestionButon);
+
+    this.expectElementToBeVisible(submitQuestionButon, false);
   }
 
   /**
@@ -314,6 +354,8 @@ export class QuestionSubmitter extends BaseUser {
         await this.page.evaluate(button => {
           button.click();
         }, button);
+
+        await item.waitForSelector(suggestQuestionButton, {hidden: true});
         return;
       }
     }
@@ -358,7 +400,10 @@ export class QuestionSubmitter extends BaseUser {
    * using the options array.
    * @param {string[]} options - The options to be added to the multiple choice interaction.
    */
-  async addMultipleChoiceInteraction(options: string[]): Promise<void> {
+  async addMultipleChoiceInteractionByQuestionSubmitter(
+    options: string[]
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(multipleChoiceInteractionButton, {
       visible: true,
@@ -387,13 +432,16 @@ export class QuestionSubmitter extends BaseUser {
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
 
+    await this.expectElementToBeVisible(addNewResponseButton, false);
     showMessage('Multiple Choice interaction has been added successfully.');
   }
 
   /**
    * Add a text input interaction to the card.
+   * @param {string} answer - The answer to be added to the text input interaction.
    */
-  async addTextInputInteraction(answer: string): Promise<void> {
+  async addTextInputInteractionInQuestionEditor(answer: string): Promise<void> {
+    await this.expectElementToBeVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.page.waitForSelector(textInputInteractionButton, {
       visible: true,
@@ -415,6 +463,8 @@ export class QuestionSubmitter extends BaseUser {
     await this.type(stateContentInputField, 'Last Card');
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
+
+    await this.expectElementToBeVisible(addNewResponseButton, false);
     showMessage('Text input interaction has been added successfully.');
   }
 
@@ -423,6 +473,7 @@ export class QuestionSubmitter extends BaseUser {
    * @param {string} interactionToAdd - The interaction type to add to the exploration.
    */
   async addMathInteraction(interactionToAdd: string): Promise<void> {
+    await this.expectElementToBeVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.clickOn(mathInteractionsTab);
     await this.clickOn(` ${interactionToAdd} `);
@@ -436,7 +487,9 @@ export class QuestionSubmitter extends BaseUser {
   /**
    * Adds an Image interaction to the current exploration.
    */
-  async addImageInteraction(): Promise<void> {
+  async addImageInteractionInQuestionEditor(): Promise<void> {
+    await this.isElementVisible(addInteractionButton);
+
     await this.clickOn(addInteractionButton);
     await this.clickOn('Image Region');
     await this.clickOn(uploadImageButton);
@@ -488,18 +541,52 @@ export class QuestionSubmitter extends BaseUser {
     await this.clickOn(correctAnswerInTheGroupSelector);
     await this.clickOn(addNewResponseButton);
 
+    await this.expectElementToBeVisible(addNewResponseButton, false);
     showMessage('Image interaction has been added successfully.');
   }
 
+  // TODO(#22539): This function has a duplicate in exploration-editor.ts.
+  // To avoid unexpected behavior, ensure that any modifications here are also
+  // made in editDefaultResponseFeedbackInExplorationEditorPage() in exploration-editor.ts.
   /**
-   * Function to edit the default response feedback.
+   * Function to add feedback for default responses of a state interaction.
+   * @param {string} defaultResponseFeedback - The feedback for the default responses.
+   * @param {string} [directToCard] - The card to direct to (optional).
+   * @param {string} [directToCardWhenStuck] - The card to direct to when the learner is stuck (optional).
    */
-  async editDefaultResponseFeedback(): Promise<void> {
-    await this.clickOn(defaultResponseTab);
-    await this.clickOn(openOutcomeFeedBackEditorSelector);
-    await this.page.waitForSelector(stateContentInputField, {visible: true});
-    await this.type(stateContentInputField, 'Wrong Answer');
-    await this.clickOn(saveOutcomeFeedbackButton);
+  async editDefaultResponseFeedbackInQuestionEditorPage(
+    defaultResponseFeedback: string,
+    directToCard?: string,
+    directToCardWhenStuck?: string
+  ): Promise<void> {
+    await this.clickOn(defaultFeedbackTab);
+
+    if (defaultResponseFeedback) {
+      await this.clickOn(openOutcomeFeedBackEditor);
+      await this.clickOn(stateContentInputField);
+      await this.type(stateContentInputField, `${defaultResponseFeedback}`);
+      await this.clickOn(saveOutcomeFeedbackButton);
+      await this.expectElementToBeVisible(saveOutcomeFeedbackButton, false);
+    }
+
+    if (directToCard) {
+      await this.clickOn(openOutcomeDestButton);
+      await this.page.select(destinationSelectorDropdown, directToCard);
+      await this.clickOn(saveDestinationButtonSelector);
+      await this.expectElementToBeVisible(saveDestinationButtonSelector, false);
+    }
+
+    if (directToCardWhenStuck) {
+      await this.clickOn(outcomeDestWhenStuckSelector);
+      // The '4: /' value is used to select the 'a new card called' option in the dropdown.
+      await this.select(destinationWhenStuckSelectorDropdown, '4: /');
+      await this.type(addDestinationStateWhenStuckInput, directToCardWhenStuck);
+      await this.clickOn(saveStuckDestinationButtonSelector);
+      await this.expectElementToBeVisible(
+        saveStuckDestinationButtonSelector,
+        false
+      );
+    }
   }
 }
 

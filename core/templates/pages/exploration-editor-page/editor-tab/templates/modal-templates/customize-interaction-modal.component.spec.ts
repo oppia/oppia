@@ -42,9 +42,9 @@ import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/edit
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
-import {SubtitledUnicodeObjectFactory} from 'domain/exploration/SubtitledUnicodeObjectFactory';
-import {ContextService} from 'services/context.service';
+import {Interaction} from 'domain/exploration/interaction.model';
+import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {PageContextService} from 'services/page-context.service';
 import {AppConstants} from 'app.constants';
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
@@ -123,18 +123,16 @@ class MockStateEditorService {
 
 describe('Customize Interaction Modal Component', () => {
   let component: CustomizeInteractionModalComponent;
-  let contextService: ContextService;
+  let pageContextService: PageContextService;
   let changeDetectorRef: ChangeDetectorRef;
   let fixture: ComponentFixture<CustomizeInteractionModalComponent>;
   let generateContentIdService: GenerateContentIdService;
   let interactionDetailsCacheService: InteractionDetailsCacheService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let ngbActiveModal: NgbActiveModal;
   let ngbModal: NgbModal;
   let ratioExpressionInputValidationService: RatioExpressionInputValidationService;
   let stateEditorService: StateEditorService;
   let stateInteractionIdService: StateInteractionIdService;
-  let subtitledUnicodeObjectFactory: SubtitledUnicodeObjectFactory;
   let stateCustomizationArgsService: StateCustomizationArgsService;
 
   beforeEach(waitForAsync(() => {
@@ -144,13 +142,11 @@ describe('Customize Interaction Modal Component', () => {
       providers: [
         NgbActiveModal,
         StateInteractionIdService,
-        InteractionObjectFactory,
         EditorFirstTimeEventsService,
         InteractionDetailsCacheService,
-        SubtitledUnicodeObjectFactory,
         NgbModal,
         RatioExpressionInputValidationService,
-        ContextService,
+        PageContextService,
         {
           provide: INTERACTION_SPECS,
           useValue: MockInteractionState,
@@ -177,21 +173,17 @@ describe('Customize Interaction Modal Component', () => {
     component = fixture.componentInstance;
 
     changeDetectorRef = TestBed.inject(ChangeDetectorRef);
-    contextService = TestBed.inject(ContextService);
+    pageContextService = TestBed.inject(PageContextService);
     interactionDetailsCacheService = TestBed.inject(
       InteractionDetailsCacheService
     );
     ngbModal = TestBed.inject(NgbModal);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     stateCustomizationArgsService = TestBed.inject(
       StateCustomizationArgsService
     );
     stateEditorService = TestBed.inject(StateEditorService);
     stateInteractionIdService = TestBed.inject(StateInteractionIdService);
-    subtitledUnicodeObjectFactory = TestBed.inject(
-      SubtitledUnicodeObjectFactory
-    );
     ratioExpressionInputValidationService = TestBed.inject(
       RatioExpressionInputValidationService
     );
@@ -290,8 +282,10 @@ describe('Customize Interaction Modal Component', () => {
     spyOn(interactionDetailsCacheService, 'contains').and.returnValue(true);
     spyOn(interactionDetailsCacheService, 'get').and.returnValue({});
 
-    component.originalContentIdToContent =
-      subtitledUnicodeObjectFactory.createDefault('unicode', 'contentId');
+    component.originalContentIdToContent = SubtitledUnicode.createDefault(
+      'unicode',
+      'contentId'
+    );
     const mockCustomizeInteractionHeaderRef = new ElementRef(
       document.createElement('h3')
     );
@@ -343,12 +337,14 @@ describe('Customize Interaction Modal Component', () => {
   it('should open save intreaction when user click on it', () => {
     spyOn(interactionDetailsCacheService, 'contains').and.returnValue(false);
     spyOn(
-      interactionObjectFactory,
+      Interaction,
       'convertFromCustomizationArgsBackendDict'
     ).and.returnValue(false);
 
-    component.originalContentIdToContent =
-      subtitledUnicodeObjectFactory.createDefault('unicode', 'contentId');
+    component.originalContentIdToContent = SubtitledUnicode.createDefault(
+      'unicode',
+      'contentId'
+    );
     const mockCustomizeInteractionHeaderRef = new ElementRef(
       document.createElement('h3')
     );
@@ -438,7 +434,9 @@ describe('Customize Interaction Modal Component', () => {
       ' question mode and linked to story',
     fakeAsync(() => {
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
-      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(true);
+      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+        true
+      );
       jasmine
         .createSpy('stateCustomizationArgsService.savedMemento.hasOwnProperty')
         .and.returnValue(false);
@@ -464,7 +462,7 @@ describe('Customize Interaction Modal Component', () => {
       ' question mode and not linked to story',
     fakeAsync(() => {
       spyOn(stateEditorService, 'isInQuestionMode').and.returnValue(false);
-      spyOn(contextService, 'isExplorationLinkedToStory').and.returnValue(
+      spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
         false
       );
 
@@ -527,12 +525,14 @@ describe('Customize Interaction Modal Component', () => {
       ' for DragAndDropSortInput intreaction',
     fakeAsync(() => {
       spyOn(component, 'getContentIdToContent').and.returnValue(
-        subtitledUnicodeObjectFactory.createDefault('unicode', 'contentId 1')
+        SubtitledUnicode.createDefault('unicode', 'contentId 1')
       );
 
       stateInteractionIdService.displayed = 'DragAndDropSortInput';
-      component.originalContentIdToContent =
-        subtitledUnicodeObjectFactory.createDefault('unicode', 'contentId 2');
+      component.originalContentIdToContent = SubtitledUnicode.createDefault(
+        'unicode',
+        'contentId 2'
+      );
       stateCustomizationArgsService.displayed = {
         choices: {
           value: [

@@ -62,6 +62,12 @@ const toastMessageSelector = '.toast-message';
 const memoryCacheProfileTableSelector = '.view-results-table';
 const getMemoryCacheProfileButton = '.e2e-test-get-memory-cache-profile';
 
+const miscTabContainerSelector =
+  '.e2e-test-release-coordiator-misc-tab-container';
+const promoBarSaveButtonSelector =
+  '.e2e-test-release-coordinator-promo-bar-button';
+const beamJobCloseOuputButtonSelector = '.e2e-test-close-beam-job-output';
+
 export class ReleaseCoordinator extends BaseUser {
   /**
    * Navigate to the release coordinator page.
@@ -76,9 +82,11 @@ export class ReleaseCoordinator extends BaseUser {
   async navigateToFeaturesTab(): Promise<void> {
     try {
       if (this.isViewportAtMobileWidth()) {
+        await this.expectElementToBeVisible(mobileNavBar);
         await this.clickOn(mobileNavBar);
         await this.clickOn(mobileFeaturesTab);
       } else {
+        await this.expectElementToBeVisible(featuresTab);
         await this.clickOn(featuresTab);
       }
 
@@ -107,6 +115,8 @@ export class ReleaseCoordinator extends BaseUser {
       await this.waitForElementToBeClickable(navbarElements[2]);
       await navbarElements[2].click();
     }
+
+    await this.expectElementToBeVisible(miscTabContainerSelector);
   }
 
   /**
@@ -169,6 +179,10 @@ export class ReleaseCoordinator extends BaseUser {
             );
           }
 
+          await featureFlags[i].waitForSelector(
+            `${saveButtonSelector}[disabled]`,
+            {visible: true}
+          );
           showMessage(
             `Feature flag: "${featureName}" rollout percentage has been set to ${percentage}%.`
           );
@@ -238,6 +252,11 @@ export class ReleaseCoordinator extends BaseUser {
             );
           }
 
+          await featureFlags[i].waitForSelector(
+            `${saveButtonSelector}[disabled]`,
+            {visible: true}
+          );
+
           showMessage(
             `Feature flag: "${featureName}" has been enabled successfully.`
           );
@@ -260,6 +279,8 @@ export class ReleaseCoordinator extends BaseUser {
   async enablePromoBar(): Promise<void> {
     await this.page.waitForSelector(promoBarToggleSelector);
     await this.clickOn(promoBarToggleSelector);
+
+    await this.expectElementToBeClickable(promoBarSaveButtonSelector);
   }
 
   /**
@@ -269,6 +290,8 @@ export class ReleaseCoordinator extends BaseUser {
   async enterPromoBarMessage(promoMessage: string): Promise<void> {
     await this.page.waitForSelector(promoMessageInputSelector);
     await this.page.type(promoMessageInputSelector, promoMessage);
+
+    await this.expectElementToBeClickable(promoBarSaveButtonSelector);
   }
 
   /**
@@ -279,13 +302,7 @@ export class ReleaseCoordinator extends BaseUser {
     await this.page.waitForSelector(actionStatusMessageSelector, {
       visible: true,
     });
-    const statusMessage = await this.page.$eval(
-      actionStatusMessageSelector,
-      el => el.textContent
-    );
-    if (statusMessage === ' Success! ') {
-      showMessage('Promo bar message saved successfully.');
-    }
+    await this.expectTextContentToBe(actionStatusMessageSelector, 'Success!');
   }
 
   /**
@@ -315,6 +332,7 @@ export class ReleaseCoordinator extends BaseUser {
    */
   async flushCache(): Promise<void> {
     await this.clickOn('Flush Cache');
+    await this.expectActionStatusMessageToBe('Success! Memory Cache Flushed.');
   }
 
   /**
@@ -441,6 +459,8 @@ export class ReleaseCoordinator extends BaseUser {
       const element = document.querySelector(selector) as HTMLElement;
       element?.click();
     }, startNewJobConfirmationButton);
+
+    await this.expectElementToBeClickable(startNewJobConfirmationButton, false);
     showMessage('Job started');
   }
 
@@ -542,7 +562,9 @@ export class ReleaseCoordinator extends BaseUser {
    * @returns {Promise<void>}
    */
   async closeOutputModal(): Promise<void> {
-    await this.clickOn('Close');
+    await this.expectElementToBeVisible(beamJobCloseOuputButtonSelector);
+    await this.page.click(beamJobCloseOuputButtonSelector);
+    await this.expectElementToBeVisible(beamJobCloseOuputButtonSelector, false);
     showMessage('Output modal closed');
   }
 

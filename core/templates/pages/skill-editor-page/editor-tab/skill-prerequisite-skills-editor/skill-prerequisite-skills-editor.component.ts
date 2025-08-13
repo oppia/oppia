@@ -21,7 +21,7 @@ import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-edit
 import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {SelectSkillModalComponent} from 'components/skill-selector/select-skill-modal.component';
 import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {AlertsService} from 'services/alerts.service';
@@ -78,6 +78,10 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
       this.groupedSkillSummaries.others
     );
     const allowSkillsFromOtherTopics = true;
+    const skillIdsToExclude = new Set([
+      ...this.skill.getPrerequisiteSkillIds(),
+      this.skill.getId(),
+    ]);
 
     const modalRef: NgbModalRef = this.ngbModal.open(
       SelectSkillModalComponent,
@@ -95,6 +99,7 @@ export class SkillPrerequisiteSkillsEditorComponent implements OnInit {
       allowSkillsFromOtherTopics;
     modalRef.componentInstance.untriagedSkillSummaries =
       this.untriagedSkillSummaries;
+    modalRef.componentInstance.skillIdsToExclude = skillIdsToExclude;
 
     const whenResolved = (summary: SkillSummary): void => {
       let skillId = summary.id;

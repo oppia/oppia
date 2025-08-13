@@ -297,7 +297,7 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import the speech synthesis services function."""
         from core.platform.speech_synthesis import (
             azure_speech_synthesis_services)
-        with self.swap(constants, 'DEV_MODE', False):
+        with self.swap(constants, 'EMULATOR_MODE', False):
             self.assertEqual(
                 azure_speech_synthesis_services,
                 self.registry_instance.import_speech_synthesis_services())

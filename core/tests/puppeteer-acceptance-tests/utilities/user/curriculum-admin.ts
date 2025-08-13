@@ -97,6 +97,38 @@ const confirmTopicDeletionButton = '.e2e-test-confirm-topic-deletion-button';
 
 const addSubtopicButton = 'button.e2e-test-add-subtopic-button';
 const subtopicTitleField = 'input.e2e-test-new-subtopic-title-field';
+const subtopicStudyGuideHeadingField =
+  '.e2e-test-new-subtopic-study-guide-section-heading-field';
+const subtopicStudyGuideContentField =
+  '.e2e-test-create-subtopic-page-content-rich-text-editor';
+const showSectionsList = '.e2e-test-show-study-guide-sections-list';
+const showSubtopicsList = '.e2e-test-show-subtopics-list';
+const firstSubtopicTile = '.e2e-test-subtopic';
+const firstStudyGuideSectionTile = '.e2e-test-study-guide-section-0';
+const addStudyGuideSectionButton = '.e2e-test-add-study-guide-section';
+const addStudyGuideSectionModalHeading =
+  '.e2e-test-add-study-guide-section-modal-heading-field';
+const addStudyGuideSectionModalContent =
+  '.e2e-test-add-study-guide-section-modal-content-field';
+const addStudyGuideSectionModalSaveButton =
+  '.e2e-test-add-study-guide-section-modal-save-button';
+const addStudyGuideSectionModalCancelButton =
+  '.e2e-test-add-study-guide-section-modal-cancel-button';
+const addStudyGuideSectionContentLength =
+  '.e2e-test-add-study-guide-section-content-length-error';
+const deleteStudyGuideSectionButton = '.e2e-test-delete-example-button';
+const expandedStudyGuideSectionTileHeading =
+  '.e2e-test-study-guide-section-heading-field';
+const expandedStudyGuideSectionTileContent =
+  '.e2e-test-study-guide-section-content-field';
+const editStudyGuideSectionHeadingIcon = '.e2e-test-section-heading-edit-icon';
+const editStudyGuideSectionContentIcon = '.e2e-test-section-content-edit-icon';
+const editStudyGuideSectionHeadingEditor =
+  '.e2e-test-study-guide-section-heading-plaintext-editor';
+const editStudyGuideSectionContentEditor =
+  '.e2e-test-study-guide-section-content-rich-text-editor';
+const studyGuideSectionDeleteConfirmButton =
+  '.e2e-test-confirm-delete-study-guide-section-button';
 const subtopicUrlFragmentField =
   '.e2e-test-create-new-subtopic .e2e-test-url-fragment-field';
 const subtopicDescriptionEditorToggle = 'div.e2e-test-show-schema-editor';
@@ -179,6 +211,8 @@ const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
 const topicSelector = '.e2e-test-classroom-topic-selector-choice';
 const publishClassroomButton =
   '.e2e-test-toggle-classroom-publication-status-btn';
+const enableDiagnosticTestButton =
+  '.e2e-test-toggle-diagnostic-test-status-btn';
 const saveClassroomButton = '.e2e-test-save-classroom-config-button';
 const classroomTileNameSpan = '.e2e-test-classroom-tile-name';
 const deleteClassroomButton = '.e2e-test-delete-classroom-button';
@@ -227,6 +261,12 @@ const saveRubricExplanationButton = '.e2e-test-save-rubric-explanation-button';
 const saveOrPublishSkillSelector = '.e2e-test-save-or-publish-skill';
 const commitMessageInputSelector = '.e2e-test-commit-message-input';
 const closeSaveModalButtonSelector = '.e2e-test-close-save-modal-button';
+const settingsContainerSelector =
+  '.oppia-editor-card.oppia-settings-card-container';
+const deleteButtonSelector = 'button.oppia-delete-button';
+
+const openExplorationEditorNavigationMobile =
+  '.oppia-exploration-editor-tabs-dropdown.show';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -249,6 +289,7 @@ export class CurriculumAdmin extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOn(subtopicReassignHeader);
     }
+    await this.page.waitForSelector(addSkillButton);
     await this.clickOn(addSkillButton);
     await this.type(skillDescriptionField, description);
     await this.page.waitForSelector(skillReviewMaterialHeader);
@@ -262,6 +303,10 @@ export class CurriculumAdmin extends BaseUser {
       `${confirmSkillCreationButton}:not([disabled])`
     );
     await this.clickOn(confirmSkillCreationButton);
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(confirmSkillCreationButton, {
+      hidden: true,
+    });
     await this.page.bringToFront();
   }
 
@@ -275,6 +320,9 @@ export class CurriculumAdmin extends BaseUser {
       : desktopSkillQuestionTab;
 
     if (isMobileWidth) {
+      await this.page.waitForFunction(() =>
+        window.location.href.includes('skill_editor')
+      );
       const currentUrl = new URL(this.page.url());
       const hashParts = currentUrl.hash.split('/');
 
@@ -287,6 +335,7 @@ export class CurriculumAdmin extends BaseUser {
       await this.goto(currentUrl.toString());
       await this.page.reload({waitUntil: 'networkidle0'});
     } else {
+      await this.page.waitForSelector(skillQuestionTab, {visible: true});
       await this.clickAndWaitForNavigation(skillQuestionTab);
     }
   }
@@ -372,6 +421,9 @@ export class CurriculumAdmin extends BaseUser {
     await this.page.waitForSelector(modalDiv, {hidden: true});
 
     await this.clickOn(saveQuestionButton);
+
+    await this.waitForNetworkIdle();
+    await this.page.waitForSelector(modalDiv, {hidden: true});
   }
 
   /**
@@ -452,6 +504,8 @@ export class CurriculumAdmin extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
+
+    expect(this.page.url()).toContain('/topic_editor/');
   }
 
   /**
@@ -486,10 +540,13 @@ export class CurriculumAdmin extends BaseUser {
       ),
       this.page.waitForNavigation(),
     ]);
+
+    expect(this.page.url()).toContain('/skill_editor/');
   }
 
   /**
    * Save a topic as a curriculum admin.
+   * @param {string} topicName - The name of the Topic whose draft is to be saved.
    */
   async saveTopicDraft(topicName: string): Promise<void> {
     await this.page.waitForSelector(modalDiv, {hidden: true});
@@ -515,6 +572,10 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(saveTopicButton);
 
       await this.page.waitForSelector(modalDiv, {visible: true});
+      await this.type(
+        saveChangesMessageInput,
+        'Test saving topic as curriculum admin.'
+      );
       await this.page.waitForSelector(
         `${closeSaveModalButton}:not([disabled])`,
         {visible: true}
@@ -526,6 +587,9 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Create a subtopic as a curriculum admin.
+   * @param {string} title - The title of the Subtopic.
+   * @param {string} urlFragment - The url fragment of the Subtopic.
+   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
    */
   async createSubtopicForTopic(
     title: string,
@@ -560,6 +624,188 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(createSubtopicButton);
     await this.saveTopicDraft(topicName);
     showMessage(`Subtopic ${title} is created.`);
+  }
+
+  /**
+   * Create a subtopic with study guides as a curriculum admin.
+   * @param {string} title - The title of the Subtopic.
+   * @param {string} urlFragment - The url fragment of the Subtopic.
+   * @param {string} heading - The heading of the initial Subtopic Study Guide Section.
+   * @param {string} content - The content of the initial Subtopic Study Guide Section.
+   * @param {string} topicName - The name of the Topic which storing the new Subtopic.
+   */
+  async createSubtopicWithStudyGuideForTopic(
+    title: string,
+    urlFragment: string,
+    heading: string,
+    content: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openTopicEditor(topicName);
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicReassignHeader);
+    }
+    await this.clickOn(addSubtopicButton);
+    await this.type(subtopicTitleField, title);
+    await this.page.waitForSelector(subtopicUrlFragmentField, {
+      visible: true,
+    });
+    await this.page.type(subtopicUrlFragmentField, urlFragment);
+
+    await this.page.type(subtopicStudyGuideHeadingField, heading);
+    await this.clickOn(subtopicStudyGuideContentField);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(richTextAreaField, content);
+
+    await this.clickOn(subtopicPhotoBoxButton);
+    await this.page.waitForSelector(photoUploadModal, {visible: true});
+    await this.uploadFile(curriculumAdminThumbnailImage);
+    await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
+    await this.clickOn(uploadPhotoButton);
+
+    await this.page.waitForSelector(photoUploadModal, {hidden: true});
+    await this.clickOn(createSubtopicButton);
+    await this.page.waitForSelector(modalDiv, {hidden: true});
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(showSectionsList);
+      await this.scrollToBottomOfPage();
+    }
+    await this.page.waitForSelector(firstStudyGuideSectionTile, {
+      visible: true,
+    });
+    showMessage(`Subtopic ${title} is created.`);
+  }
+
+  /**
+   * Add a section to the subtopic study guide. Make sure you are
+   * on the subtopic editor tab for this to work.
+   * @param {string} sectionHeading - The heading of the Section to be added.
+   * @param {string} sectionContent - The content of the Section to be added.
+   * @param {number} currentNumberOfSections - The number of the Sections currently in the Study Guide.
+   */
+  async addSubtopicStudyGuideSection(
+    sectionHeading: string,
+    sectionContent: string,
+    currentNumberOfSections: number
+  ): Promise<void> {
+    await this.clickOn(addStudyGuideSectionButton);
+    await this.type(addStudyGuideSectionModalHeading, sectionHeading);
+    await this.clickOn(addStudyGuideSectionModalContent);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(richTextAreaField, sectionContent);
+    await this.clickOn(addStudyGuideSectionModalSaveButton);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
+    await this.page.waitForSelector(
+      `.e2e-test-study-guide-section-${currentNumberOfSections}`,
+      {
+        visible: true,
+      }
+    );
+    await this.page.waitForSelector(deleteStudyGuideSectionButton, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Checks if the length error shows up in the Add
+   * Study Guide Section Modal of the subtopic study
+   * guide. Make sure you are on the subtopic editor
+   * tab for this to work.
+   */
+  async checkAddSectionModalShowsLengthError(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(showSubtopicsList);
+      await this.clickOn(firstSubtopicTile);
+      await this.clickOn(showSectionsList);
+    }
+    await this.page.waitForSelector(addStudyGuideSectionButton, {
+      visible: true,
+    });
+    await this.clickOn(addStudyGuideSectionButton);
+    await this.type(addStudyGuideSectionModalHeading, 'Section Heading');
+    await this.clickOn(addStudyGuideSectionModalContent);
+    await this.page.waitForSelector(richTextAreaField, {visible: true});
+    await this.type(
+      richTextAreaField,
+      'Section Content Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui. Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam qu'
+    );
+    await this.page.waitForSelector(addStudyGuideSectionContentLength, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Clears the content of the Add Section Modal and closes it.
+   */
+  async clearContentFieldAndCloseAddSectionModal(): Promise<void> {
+    await this.clearAllTextFrom(richTextAreaField);
+    await this.page.waitForSelector(addStudyGuideSectionContentLength, {
+      hidden: true,
+    });
+    await this.clickOn(addStudyGuideSectionModalCancelButton);
+  }
+
+  /**
+   * Clicks on a Study Guide Section Tile to expand it.
+   * Indexes start from 0.
+   * @param {number} index - The index of the Section to be expanded.
+   */
+  async expandStudyGuideSectionTile(index: number): Promise<void> {
+    await this.clickOn(`.e2e-test-study-guide-section-${index}`);
+    await this.page.waitForSelector(
+      `.e2e-test-study-guide-section-${index}-expanded`,
+      {
+        visible: true,
+      }
+    );
+    await this.page.waitForSelector(expandedStudyGuideSectionTileHeading, {
+      visible: true,
+    });
+    await this.page.waitForSelector(expandedStudyGuideSectionTileContent, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Clicks on the Section heading to open the heading editor.
+   */
+  async openSectionHeadingEditor(): Promise<void> {
+    await this.clickOn(editStudyGuideSectionHeadingIcon);
+    await this.page.waitForSelector(editStudyGuideSectionHeadingEditor, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Clicks on the Section content to open the content editor.
+   */
+  async openSectionContentEditor(): Promise<void> {
+    await this.clickOn(editStudyGuideSectionContentIcon);
+    if (this.isViewportAtMobileWidth()) {
+      await this.scrollToBottomOfPage();
+    }
+    await this.page.waitForSelector(editStudyGuideSectionContentEditor, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Deletes a Section of the subtopic study guide.
+   * Indexes start from 0.
+   * @param {number} index - The index of the Section to be deleted.
+   */
+  async deleteStudyGuideSection(index: number): Promise<void> {
+    await this.clickOn(
+      `.e2e-test-study-guide-section-${index} ${deleteStudyGuideSectionButton}`
+    );
+    await this.clickOn(studyGuideSectionDeleteConfirmButton);
+
+    await this.expectElementToBeVisible(
+      studyGuideSectionDeleteConfirmButton,
+      false
+    );
   }
 
   /**
@@ -661,6 +907,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(' + ADD EXPLANATION FOR DIFFICULTY ');
     await this.type(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
+
+    await this.page.waitForSelector(saveRubricExplanationButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -682,6 +932,10 @@ export class CurriculumAdmin extends BaseUser {
       visible: true,
     });
     await this.clickOn(closeSaveModalButtonSelector);
+
+    await this.page.waitForSelector(closeSaveModalButtonSelector, {
+      hidden: true,
+    });
     showMessage('Skill updated successful');
   }
 
@@ -739,8 +993,11 @@ export class CurriculumAdmin extends BaseUser {
       await this.clickOn(mobileSaveTopicDropdown);
       await this.page.waitForSelector(mobilePublishTopicButton);
       await this.clickOn(mobilePublishTopicButton);
+      await this.page.waitForSelector(mobilePublishTopicButton, {hidden: true});
     } else {
       await this.clickOn(publishTopicButton);
+
+      await this.page.waitForSelector(publishTopicButton, {hidden: true});
     }
   }
 
@@ -872,12 +1129,15 @@ export class CurriculumAdmin extends BaseUser {
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavToggleButton, {visible: true});
       await this.clickOn(mobileNavToggleButton);
       await this.clickOn(mobileOptionsDropdown);
       await this.clickOn(mobileSettingsButton);
     } else {
+      await this.page.waitForSelector(explorationSettingsTab, {visible: true});
       await this.clickOn(explorationSettingsTab);
     }
+    await this.page.waitForSelector(settingsContainerSelector, {visible: true});
     showMessage('Navigation to settings tab is successful.');
   }
 
@@ -889,6 +1149,10 @@ export class CurriculumAdmin extends BaseUser {
     await this.waitForStaticAssetsToLoad();
     await this.clickOn(deleteExplorationButton);
     await this.clickOn(confirmDeletionButton);
+
+    await this.page.waitForSelector(confirmDeleteClassroomButton, {
+      hidden: true,
+    });
   }
 
   /**
@@ -896,9 +1160,10 @@ export class CurriculumAdmin extends BaseUser {
    */
   async dismissWelcomeModal(): Promise<void> {
     try {
+      await this.page.waitForNetworkIdle();
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
-        timeout: 5000,
+        timeout: 10000,
       });
       await this.clickOn(dismissWelcomeModalSelector);
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
@@ -921,9 +1186,14 @@ export class CurriculumAdmin extends BaseUser {
         timeout: 5000,
       });
       await this.clickOn(dropdownToggleIcon);
+
+      await this.expectElementToBeVisible(
+        openExplorationEditorNavigationMobile,
+        false
+      );
       showMessage('Editor navigation closed successfully.');
     } catch (error) {
-      showMessage(`Dropdown Toggle Icon not found: ${error.message}`);
+      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
     }
   }
 
@@ -932,7 +1202,14 @@ export class CurriculumAdmin extends BaseUser {
    * in mobile view.
    */
   async openExplorationControlDropdown(): Promise<void> {
+    await this.page.waitForSelector(explorationControlsSettingsDropdown, {
+      visible: true,
+    });
     await this.clickOn(explorationControlsSettingsDropdown);
+
+    await this.page.waitForSelector(deleteButtonSelector, {
+      visible: true,
+    });
   }
 
   /**
@@ -1049,6 +1326,9 @@ export class CurriculumAdmin extends BaseUser {
         await this.clickOn(mobileChapterCollapsibleCard);
       }
     }
+    await this.page.waitForSelector(addChapterButton, {
+      visible: true,
+    });
     await this.clickOn(addChapterButton);
     await this.type(newChapterTitleField, chapterName);
     await this.type(newChapterExplorationIdField, explorationId);
@@ -1075,8 +1355,12 @@ export class CurriculumAdmin extends BaseUser {
       if (!isMobileSaveButtonVisible) {
         await this.clickOn(mobileOptionsSelector);
       }
+      await this.page.waitForSelector(mobileSaveStoryChangesButton, {
+        visible: true,
+      });
       await this.clickOn(mobileSaveStoryChangesButton);
     } else {
+      await this.page.waitForSelector(saveStoryButton, {visible: true});
       await this.clickOn(saveStoryButton);
     }
     await this.type(
@@ -1093,9 +1377,21 @@ export class CurriculumAdmin extends BaseUser {
    */
   async publishStoryDraft(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
+        visible: true,
+      });
       await this.clickOn(mobileSaveStoryChangesDropdown);
       await this.page.waitForSelector(mobilePublishStoryButton);
       await this.clickOn(mobilePublishStoryButton);
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return element?.textContent?.trim() === 'Unpublish Story';
+        },
+        {},
+        mobilePublishStoryButton
+      );
     } else {
       await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
       await this.clickOn(publishStoryButton);
@@ -1190,6 +1486,10 @@ export class CurriculumAdmin extends BaseUser {
           } else {
             throw new Error('Confirm button not found');
           }
+
+          await this.page.waitForSelector(confirmTopicDeletionButton, {
+            hidden: true,
+          });
           break;
         }
       }
@@ -1292,6 +1592,10 @@ export class CurriculumAdmin extends BaseUser {
           } else {
             throw new Error('Confirm button not found');
           }
+
+          await this.page.waitForSelector(confirmSkillDeletionButton, {
+            hidden: true,
+          });
           break;
         }
       }
@@ -1389,9 +1693,9 @@ export class CurriculumAdmin extends BaseUser {
         `All questions have been successfully removed from the skill "${skillName}".`
       );
     } catch (error) {
-      console.error(
-        `Failed to remove all questions from the skill "${skillName}"`,
-        error.stack
+      throw new Error(
+        `Failed to remove all questions from the skill "${skillName}"` +
+          error.stack
       );
     }
   }
@@ -1489,6 +1793,8 @@ export class CurriculumAdmin extends BaseUser {
 
     await this.clickOn(saveClassroomButton);
 
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
     showMessage(`Updated ${classroomName} classroom.`);
   }
 
@@ -1509,6 +1815,7 @@ export class CurriculumAdmin extends BaseUser {
     await this.clickOn(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
     await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
 
     showMessage(`Added ${topicName} topic to the ${classroomName} classroom.`);
   }
@@ -1531,13 +1838,30 @@ export class CurriculumAdmin extends BaseUser {
 
   /**
    * Function for publishing a classroom.
+   * @param {string} classroomName - The name of the classroom.
    */
   async publishClassroom(classroomName: string): Promise<void> {
     await this.navigateToClassroomAdminPage();
     await this.editClassroom(classroomName);
     await this.clickOn(publishClassroomButton);
     await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
     showMessage(`Published ${classroomName} classroom.`);
+  }
+
+  /**
+   * Enables diagnostic test for a classroom.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async enableDiagnosticTestForClassroom(classroomName: string): Promise<void> {
+    await this.navigateToClassroomAdminPage();
+    await this.editClassroom(classroomName);
+    await this.clickOn(enableDiagnosticTestButton);
+    await this.clickOn(saveClassroomButton);
+    await this.page.waitForSelector(saveClassroomButton, {hidden: true});
+
+    showMessage(`Enabled diagnostic test for ${classroomName} classroom.`);
   }
 
   /**
@@ -1574,7 +1898,7 @@ export class CurriculumAdmin extends BaseUser {
 
         await this.page.waitForSelector(deleteClassroomModal, {visible: true});
         await this.clickOn(confirmDeleteClassroomButton);
-        await this.page.waitForSelector(deleteClassroomModal, {visible: false});
+        await this.page.waitForSelector(deleteClassroomModal, {hidden: true});
 
         showMessage(`Deleted ${classroomName} classroom.`);
         foundClassroom = true;
@@ -1646,6 +1970,63 @@ export class CurriculumAdmin extends BaseUser {
       topicName
     );
     await this.addSkillToDiagnosticTest(skillName, topicName);
+
+    await this.publishDraftTopic(topicName);
+  }
+
+  /**
+   * Creates and publishes a topic with a subtopic (having study guides) and skill.
+   * @param {string} topicName - The name of the topic.
+   * @param {string} subtopicName - The name of the subtopic.
+   * @param {string} skillName - The name of the skill.
+   */
+  async createAndPublishTopicWithSubtopicsAndStudyGuides(
+    topicName: string,
+    subtopicName: string,
+    skillName: string
+  ): Promise<void> {
+    await this.createTopic(
+      topicName,
+      topicName.toLowerCase().replace(/ /g, '-')
+    );
+    await this.createSubtopicWithStudyGuideForTopic(
+      subtopicName,
+      subtopicName.toLowerCase().replace(/ /g, '-'),
+      'Adding With Your Fingers',
+      'One way to add is using your...',
+      topicName
+    );
+    await this.addSubtopicStudyGuideSection(
+      'Using an Addition Table',
+      'To add two single-digit...',
+      1
+    );
+    await this.saveTopicDraft(topicName);
+
+    await this.createSkillForTopic(skillName, topicName);
+    await this.createQuestionsForSkill(skillName, 3);
+    await this.assignSkillToSubtopicInTopicEditor(
+      skillName,
+      subtopicName,
+      topicName
+    );
+    await this.addSkillToDiagnosticTest(skillName, topicName);
+
+    await this.createSubtopicWithStudyGuideForTopic(
+      'Subtracting Numbers',
+      'subtract-nos',
+      'Common Mistakes',
+      'Some common mistakes students make are...',
+      topicName
+    );
+    await this.saveTopicDraft(topicName);
+
+    await this.createSkillForTopic('Skill 2', topicName);
+    await this.assignSkillToSubtopicInTopicEditor(
+      'Skill 2',
+      'Subtracting Numbers',
+      topicName
+    );
 
     await this.publishDraftTopic(topicName);
   }

@@ -17,12 +17,12 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {Voiceover} from 'domain/exploration/voiceover.model';
+import {Voiceover} from '../../../domain/exploration/voiceover.model';
 
 import {
   AudioTranslationManagerService,
   AudioTranslations,
-} from 'pages/exploration-player-page/services/audio-translation-manager.service';
+} from './audio-translation-manager.service';
 
 describe('Audio translation manager service', () => {
   let atms: AudioTranslationManagerService;

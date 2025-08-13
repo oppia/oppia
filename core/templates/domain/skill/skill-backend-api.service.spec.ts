@@ -24,16 +24,13 @@ import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {AppConstants} from 'app.constants';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
-import {
-  SkillObjectFactory,
-  SkillBackendDict,
-} from 'domain/skill/SkillObjectFactory';
+import {Skill, SkillBackendDict} from 'domain/skill/skill.model';
 
 describe('Skill backend API service', () => {
   let httpTestingController: HttpTestingController;
   let skillBackendApiService: SkillBackendApiService;
   let skillBackendDict: SkillBackendDict;
-  let skillObjectFactory: SkillObjectFactory;
+  let skill: Skill;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -42,7 +39,6 @@ describe('Skill backend API service', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
     const misconceptionDict = {
       id: 2,
@@ -57,28 +53,14 @@ describe('Skill backend API service', () => {
       explanations: ['explanation'],
     };
 
-    const exampleDict = {
-      question: {
-        html: 'worked example question 1',
-        content_id: 'worked_example_q_1',
-      },
-      explanation: {
-        html: 'worked example explanation 1',
-        content_id: 'worked_example_e_1',
-      },
-    };
-
     const skillContentsDict = {
       explanation: {
         html: 'test explanation',
         content_id: 'explanation',
       },
-      worked_examples: [exampleDict],
       recorded_voiceovers: {
         voiceovers_mapping: {
           explanation: {},
-          worked_example_1: {},
-          worked_example_2: {},
         },
       },
     };
@@ -104,9 +86,7 @@ describe('Skill backend API service', () => {
 
   it('should fetch all skills', fakeAsync(() => {
     const skills: SkillBackendDict[] = [];
-    skills.push(
-      skillObjectFactory.createFromBackendDict(skillBackendDict).toBackendDict()
-    );
+    skills.push(Skill.createFromBackendDict(skillBackendDict).toBackendDict());
     skillBackendApiService
       .fetchAllSkills()
       .toPromise()
@@ -121,7 +101,7 @@ describe('Skill backend API service', () => {
   }));
 
   it('should succesfully fetch an existing skill from the backend.', fakeAsync(() => {
-    const skill = skillObjectFactory.createFromBackendDict(skillBackendDict);
+    skill = Skill.createFromBackendDict(skillBackendDict);
     const assignedSkillTopicData = {
       topic: 'skillId',
     };
@@ -130,7 +110,6 @@ describe('Skill backend API service', () => {
       skill_model_last_updated: 1594649197855.071,
       skill_model_created_on: 1594649197855.059,
       id: 'Q5JuLf64rzV0',
-      worked_examples_count: 0,
       description: 'Dummy Skill 1',
       misconception_count: 0,
       version: 1,
@@ -189,7 +168,7 @@ describe('Skill backend API service', () => {
   }));
 
   it('should make a request to update the skill in the backend.', fakeAsync(() => {
-    const skill = skillObjectFactory.createFromBackendDict(skillBackendDict);
+    skill = Skill.createFromBackendDict(skillBackendDict);
     const backendResponse = {
       skill: skillBackendDict,
     };
@@ -360,7 +339,7 @@ describe('Skill backend API service', () => {
   );
 
   it('should succesfully fetch multiple existing skills from the backend.', fakeAsync(() => {
-    const skill = skillObjectFactory.createFromBackendDict(skillBackendDict);
+    skill = Skill.createFromBackendDict(skillBackendDict);
     const backendResponse = {
       skills: [skillBackendDict, skillBackendDict],
     };

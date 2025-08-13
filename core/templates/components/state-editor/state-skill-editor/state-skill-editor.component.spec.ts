@@ -55,7 +55,7 @@ import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {UserService} from 'services/user.service';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {MaterialModule} from 'modules/material.module';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 
 describe('State Skill Editor Component', () => {
   let fixture: ComponentFixture<StateSkillEditorComponent>;
@@ -65,7 +65,6 @@ describe('State Skill Editor Component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let userService: UserService;
   let skillBackendApiService: SkillBackendApiService;
-  let skillObjectFactory: SkillObjectFactory;
 
   let skillSummaryBackendDict: SkillSummaryBackendDict = {
     id: 'test_id',
@@ -73,7 +72,6 @@ describe('State Skill Editor Component', () => {
     language_code: 'sadf',
     version: 10,
     misconception_count: 0,
-    worked_examples_count: 1,
     skill_model_created_on: 2,
     skill_model_last_updated: 3,
   };
@@ -144,7 +142,6 @@ describe('State Skill Editor Component', () => {
         languageCode: 'en',
         version: 1,
         misconceptionCount: 0,
-        workedExamplesCount: 0,
         skillModelCreatedOn: 1622827020924.104,
         skillModelLastUpdated: 1622827020924.109,
       },
@@ -235,7 +232,6 @@ describe('State Skill Editor Component', () => {
     stateLinkedSkillIdService = TestBed.inject(StateLinkedSkillIdService);
     userService = TestBed.inject(UserService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
   });
 
   beforeEach(() => {
@@ -329,7 +325,6 @@ describe('State Skill Editor Component', () => {
           html: 'test explanation',
           content_id: 'explanation',
         },
-        worked_examples: [],
         recorded_voiceovers: {
           voiceovers_mapping: {},
         },
@@ -342,7 +337,7 @@ describe('State Skill Editor Component', () => {
       superseding_skill_id: '2',
     };
     const fetchSkillResponse = {
-      skill: skillObjectFactory.createFromBackendDict(skillBackendDict),
+      skill: Skill.createFromBackendDict(skillBackendDict),
       assignedSkillTopicData: {},
       groupedSkillSummaries: {},
     };
