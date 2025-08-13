@@ -372,5 +372,13 @@ export class TranslatorOverviewComponent implements OnInit {
     this.translationLanguageService.setActiveLanguageAccentCode(
       languageAccentCode
     );
+    this.entityVoiceoversService.setActiveLanguageAccentCode(
+      languageAccentCode
+    );
+    this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+      this.entityVoiceoversService.getActiveEntityVoiceovers()
+        ?.automatedVoiceoversAudioOffsetsMsecs || {}
+    );
+    this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
   }
 }

@@ -337,7 +337,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
             this.languageAccentCode
           );
 
-          this.updateManualVoiceoverWithChangeList();
           this.setActiveContentManualVoiceover();
           this.setActiveContentAutomaticVoiceover();
           this.updateStatusGraph();
@@ -400,13 +399,13 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     }
 
     this.updateContentAvailabilityStatusForVoiceovers();
-    this.updateManualVoiceoverWithChangeList();
     this.setActiveContentManualVoiceover();
     this.setActiveContentAutomaticVoiceover();
     this.updateStatusGraph();
   }
 
   setActiveContentManualVoiceover(): void {
+    this.updateManualVoiceoverWithChangeList();
     this.activeEntityVoiceoversInstance =
       this.entityVoiceoversService.getEntityVoiceoversByLanguageAccentCode(
         this.languageAccentCode
