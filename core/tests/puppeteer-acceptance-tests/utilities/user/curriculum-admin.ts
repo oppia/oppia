@@ -267,6 +267,17 @@ const deleteButtonSelector = 'button.oppia-delete-button';
 
 const openExplorationEditorNavigationMobile =
   '.oppia-exploration-editor-tabs-dropdown.show';
+const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
+const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
+const mobileSettingsBarSelector = 'li.e2e-test-mobile-settings-button';
+const basicSettingsDropdown = 'h3.e2e-test-settings-container';
+const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
+const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
+const voiceArtistSettingsDropdown =
+  'h3.e2e-test-voice-artists-settings-container';
+const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
+const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
+const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
 
 export class CurriculumAdmin extends BaseUser {
   /**
@@ -1124,21 +1135,45 @@ export class CurriculumAdmin extends BaseUser {
   }
 
   /**
-   * Function to navigate to exploration settings tab
+   * Function to navigate to exploration settings tab.
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileNavToggleButton, {visible: true});
-      await this.clickOn(mobileNavToggleButton);
-      await this.clickOn(mobileOptionsDropdown);
-      await this.clickOn(mobileSettingsButton);
+      const element = await this.page.$(mobileNavbarDropdown);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The option to settings tab appears only in the mobile view after clicking on the mobile options button,
+      // which expands the mobile navigation bar.
+      if (!element) {
+        await this.page.waitForSelector(mobileOptionsButtonSelector, {
+          visible: true,
+        });
+        await this.clickOn(mobileOptionsButtonSelector);
+      }
+      await this.page.waitForSelector(mobileNavbarDropdown, {
+        visible: true,
+      });
+      await this.clickOn(mobileNavbarDropdown);
+      await this.clickOn(mobileSettingsBarSelector);
+
+      // Open all dropdowns because by default all dropdowns are closed in mobile view.
+      await this.clickOn(basicSettingsDropdown);
+      await this.clickOn(advanceSettingsDropdown);
+      await this.clickOn(rolesSettingsDropdown);
+      await this.clickOn(voiceArtistSettingsDropdown);
+      await this.clickOn(permissionSettingsDropdown);
+      await this.clickOn(feedbackSettingsDropdown);
     } else {
-      await this.page.waitForSelector(explorationSettingsTab, {visible: true});
-      await this.clickOn(explorationSettingsTab);
+      await this.page.waitForSelector(settingsTabSelector, {
+        visible: true,
+      });
+      await this.clickOn(settingsTabSelector);
     }
-    await this.page.waitForSelector(settingsContainerSelector, {visible: true});
-    showMessage('Navigation to settings tab is successful.');
+
+    await this.page.waitForSelector(settingsContainerSelector, {
+      visible: true,
+    });
+    showMessage('Settings tab is opened successfully.');
   }
 
   /**
