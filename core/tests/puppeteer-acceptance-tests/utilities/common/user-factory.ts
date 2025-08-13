@@ -50,6 +50,7 @@ import {
   TranslationSubmitterFactory,
 } from '../user/translation-submitter';
 import {TranslationReviewerFactory} from '../user/translation-reviewer';
+import {Contributor, ContributorFactory} from '../user/contributor';
 
 const ROLES = testConstants.Roles;
 const BLOG_RIGHTS = testConstants.BlogRights;
@@ -197,6 +198,7 @@ export class UserFactory {
       TopicManager &
       CurriculumAdmin &
       TranslationSubmitter &
+      Contributor &
       MultipleRoleIntersection<TRoles>
   > {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
@@ -207,6 +209,7 @@ export class UserFactory {
       QuestionSubmitterFactory(),
       TopicManagerFactory(),
       CurriculumAdminFactory(),
+      ContributorFactory(),
     ]);
 
     user.username = username;

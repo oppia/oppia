@@ -22,6 +22,7 @@
 import {RTE_BUTTON_TITLES} from '../../utilities/common/rte-editor';
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
+import {Contributor} from '../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {
   ExplorationEditor,
@@ -35,7 +36,7 @@ const ROLES = testConstants.Roles;
 const youtubeVideoURL = 'https://www.youtube.com/watch?v=mDfiDLn2Rko';
 
 describe('Translation Submitter', function () {
-  let translationSubmitter: TranslationSubmitter & LoggedInUser;
+  let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
 
   beforeAll(async function () {
@@ -123,6 +124,10 @@ describe('Translation Submitter', function () {
     // Switch to the translation tab.
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
+    );
+    await translationSubmitter.expectActiveTabNameToBe('Translate Text');
+    await translationSubmitter.expectActiveTabDescriptionToBe(
+      'Translate the lesson text to help non-English speakers follow the lessons.'
     );
     await translationSubmitter.expectScreenshotToMatch(
       'translationTabInContributionDashboard',
@@ -329,6 +334,9 @@ describe('Translation Submitter', function () {
       youtubeVideoURL
     );
     await translationSubmitter.clickOn('Done');
+  });
+
+  it('should be able submit a translation', async function () {
     await translationSubmitter.clickOn('Save and translate another');
   });
 
