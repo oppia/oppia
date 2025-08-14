@@ -94,4 +94,45 @@ describe('Schema based editor component', function () {
 
     expect(validatorSpy).toHaveBeenCalled();
   }));
+
+  it('should call onTouched when onTouch is called', () => {
+    const onTouchedSpy = jasmine.createSpy('onTouched');
+    component.registerOnTouched(onTouchedSpy);
+
+    component.onTouch();
+
+    expect(onTouchedSpy).toHaveBeenCalled();
+  });
+
+  it('should call onTouch and emit blur event when onInputBlur is called', () => {
+    const touchSpy = spyOn(component, 'onTouch');
+    spyOn(component.inputBlur, 'emit');
+
+    component.onInputBlur();
+
+    expect(touchSpy).toHaveBeenCalled();
+    expect(component.inputBlur.emit).toHaveBeenCalled();
+  });
+
+  it('should emit focus event when onInputFocus is called', () => {
+    spyOn(component.inputFocus, 'emit');
+
+    component.onInputFocus();
+
+    expect(component.inputFocus.emit).toHaveBeenCalled();
+  });
+
+  it('should set disabled state when setDisabledState is called', () => {
+    component.setDisabledState(true);
+    expect(component.disabled).toBeTrue();
+
+    component.setDisabledState(false);
+    expect(component.disabled).toBeFalse();
+  });
+
+  it('should return null when validate is called without form', () => {
+    (component as any).form = null as any;
+    const result = component.validate(new FormControl(1));
+    expect(result).toBeNull();
+  });
 });
