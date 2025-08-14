@@ -115,7 +115,7 @@ export class PlayerHeaderComponent {
     this.topicName = 'Loading...';
     this.classroomName = 'Loading...';
 
-    this.isLinkedToTopic = this.getTopicUrl() ? true : false;
+    this.isLinkedToTopic = this.getTopicUrl();
     if (
       this.isLinkedToTopic ||
       this.explorationContext === PageContextConstants.PRACTICE_PAGE
@@ -166,9 +166,32 @@ export class PlayerHeaderComponent {
     }
   }
 
+  getHeaderTitleText(): string {
+    const context = this.explorationContext;
+    const constants = this.explorationContextConstants;
+
+    if (context === constants.PRACTICE_PAGE) {
+      return `Practice Session: ${this.topicName}`;
+    }
+
+    if (context === constants.DIAGNOSTIC_PAGE) {
+      return `Diagnostic Test: ${this.classroomName}`;
+    }
+
+    if (context === constants.EXPLORATION_PAGE) {
+      if (this.isLinkedToTopic) {
+        return `Chapter ${this.chapterNumber}: ${this.explorationTitle}`;
+      } else {
+        return this.explorationTitle;
+      }
+    }
+
+    return '';
+  }
+
   // Returns null if the topic is not linked to the learner's current
   // exploration.
-  getTopicUrl(): string | null {
+  getTopicUrl(): boolean {
     try {
       this.topicUrlFragment =
         this.urlService.getTopicUrlFragmentFromLearnerUrl();
@@ -178,10 +201,10 @@ export class PlayerHeaderComponent {
         this.urlService.getStoryUrlFragmentFromLearnerUrl();
     } catch (e) {}
 
-    return (
+    return Boolean(
       this.topicUrlFragment &&
-      this.classroomUrlFragment &&
-      this.storyUrlFragment
+        this.classroomUrlFragment &&
+        this.storyUrlFragment
     );
   }
 
@@ -207,9 +230,9 @@ export class PlayerHeaderComponent {
 
   closePlayer(): void {
     const pathnameArray = this.urlService.getPathname().split('/');
+    const confirmed = this.confirmExit();
     if (this.explorationContext === PageContextConstants.EXPLORATION_PAGE) {
       if (this.isLinkedToTopic) {
-        const confirmed = this.confirmExit();
         if (confirmed) {
           this.router.navigate([
             'learn',
@@ -220,21 +243,18 @@ export class PlayerHeaderComponent {
           ]);
         }
       } else {
-        const confirmed = this.confirmExit();
         if (confirmed) {
           this.router.navigate(['community-library']);
         }
       }
     } else if (this.explorationContext === PageContextConstants.PRACTICE_PAGE) {
       const targetPath = pathnameArray.slice(1, 4);
-      const confirmed = this.confirmExit();
       if (confirmed) {
         this.router.navigate(targetPath);
       }
     } else if (
       this.explorationContext === PageContextConstants.DIAGNOSTIC_PAGE
     ) {
-      const confirmed = this.confirmExit();
       if (confirmed) {
         this.router.navigate(['learn', this.classroomUrlFragment]);
       }

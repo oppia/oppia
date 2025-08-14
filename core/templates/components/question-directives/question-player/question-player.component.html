@@ -12,7 +12,7 @@
 
     <div class="oppia-new-question-player-card" *ngIf="isNewLessonPlayerEnabled()">
       <div [hidden]="!(totalQuestions > 0)">
-        <p tabindex="0" [attr.aria-label]="'Question ' + currentQuestion + ' out of ' + totalQuestions">
+        <p [attr.aria-label]="'Question ' + currentQuestion + ' out of ' + totalQuestions">
           Question {{currentQuestion}}/{{totalQuestions}}
         </p>
       </div>
