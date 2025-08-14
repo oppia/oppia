@@ -215,6 +215,10 @@ import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-le
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
 import {RouterModule} from '@angular/router';
+import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-solution-and-concept-card-display.component';
+import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component';
+import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
+import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -231,7 +235,6 @@ import {RouterModule} from '@angular/router';
     DynamicContentModule,
     FormsModule,
     ReactiveFormsModule,
-    RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
     OppiaCkEditorCopyToolBarModule,
@@ -284,8 +287,11 @@ import {RouterModule} from '@angular/router';
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
@@ -295,6 +301,7 @@ import {RouterModule} from '@angular/router';
     ExplorationEmbedButtonModalComponent,
     CheckpointCelebrationModalComponent,
     HintAndSolutionButtonsComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     HintEditorComponent,
     InputResponsePairComponent,
     NewInputResponsePairComponent,
@@ -442,6 +449,7 @@ import {RouterModule} from '@angular/router';
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
     FeedbackPopupComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     MultiSelectionFieldComponent,
     PracticeTabComponent,
     QuestionEditorSaveModalComponent,
@@ -456,8 +464,11 @@ import {RouterModule} from '@angular/router';
     // These elements will remain here even after migration.
     DeleteAnswerGroupModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     SelectSkillModalComponent,
     SkillSelectorComponent,
     TakeBreakModalComponent,
@@ -617,8 +628,11 @@ import {RouterModule} from '@angular/router';
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FeedbackPopupComponent,

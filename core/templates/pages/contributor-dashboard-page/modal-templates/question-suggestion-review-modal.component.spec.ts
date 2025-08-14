@@ -33,7 +33,7 @@ import {
   FetchSkillResponse,
   SkillBackendApiService,
 } from 'domain/skill/skill-backend-api.service';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {SuggestionModalService} from 'services/suggestion-modal.service';
@@ -72,7 +72,6 @@ describe('Question Suggestion Review Modal component', () => {
   let siteAnalyticsService: SiteAnalyticsService;
   let suggestionModalService: SuggestionModalService;
   let skillBackendApiService: SkillBackendApiService;
-  let skillObjectFactory: SkillObjectFactory;
   let pageContextService: PageContextService;
   let cancelSuggestionSpy: jasmine.Spy;
   let threadDataBackendApiService: ThreadDataBackendApiService;
@@ -357,7 +356,6 @@ describe('Question Suggestion Review Modal component', () => {
 
     ngbModal = TestBed.inject(NgbModal);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
     pageContextService = TestBed.inject(PageContextService);
@@ -368,7 +366,7 @@ describe('Question Suggestion Review Modal component', () => {
 
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
-        skill: skillObjectFactory.createFromBackendDict({
+        skill: Skill.createFromBackendDict({
           id: 'skill1',
           description: 'test description 1',
           misconceptions: [
