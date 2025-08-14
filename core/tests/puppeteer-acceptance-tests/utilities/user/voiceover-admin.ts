@@ -83,6 +83,9 @@ export class VoiceoverAdmin extends BaseUser {
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
+    console.log(
+      `[debug] Using navigateToExplorationSettingsTab in voiceover admin`
+    );
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
