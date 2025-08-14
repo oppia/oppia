@@ -986,20 +986,25 @@ def update_topic_and_subtopic_pages(
     ) = apply_change_list(topic_id, change_list)
 
     if (
-            old_topic.url_fragment != updated_topic.url_fragment and
-            does_topic_with_url_fragment_exist(updated_topic.url_fragment)):
+        old_topic.url_fragment != updated_topic.url_fragment and
+        does_topic_with_url_fragment_exist(updated_topic.url_fragment)):
         raise utils.ValidationError(
             'Topic with URL Fragment \'%s\' already exists'
             % updated_topic.url_fragment)
     if (
-            old_topic.name != updated_topic.name and
-            does_topic_with_name_exist(updated_topic.name)):
+        old_topic.name != updated_topic.name and
+        does_topic_with_name_exist(updated_topic.name)):
         raise utils.ValidationError(
             'Topic with name \'%s\' already exists' % updated_topic.name)
 
     _save_topic(
         committer_id, updated_topic, commit_message, change_list
     )
+    
+    # Collect study guide IDs that will be deleted for translation opportunity cleanup
+    deleted_study_guide_ids = []
+    created_study_guide_ids = []
+    
     # The following loop deletes those subtopic pages that are already in the
     # datastore, which are supposed to be deleted in the current changelist.
     for subtopic_id in deleted_subtopic_ids:
@@ -1010,6 +1015,11 @@ def update_topic_and_subtopic_pages(
             ):
                 subtopic_page_services.delete_subtopic_page(
                     committer_id, topic_id, subtopic_id)
+            
+            # Add study guide ID to deletion list for translation opportunities
+            study_guide_id = f"{topic_id}.{subtopic_id}"
+            deleted_study_guide_ids.append(study_guide_id)
+            
             study_guide_services.delete_study_guide(
                 committer_id, topic_id, subtopic_id)
 
@@ -1017,10 +1027,10 @@ def update_topic_and_subtopic_pages(
         feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES
         .value, None
     ):
-        for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items(): # pylint: disable=line-too-long
+        for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items():
             subtopic_page_change_list = (
                 updated_subtopic_pages_change_cmds_dict[
-                subtopic_page_id]
+                    subtopic_page_id]
             )
             subtopic_id = (
                 subtopic_page.get_subtopic_id_from_subtopic_page_id())
@@ -1041,12 +1051,27 @@ def update_topic_and_subtopic_pages(
             study_guide_services.save_study_guide(
                 committer_id, study_guide, commit_message,
                 study_guide_change_list)
+            
+            # Track created study guides for translation opportunities
+            created_study_guide_ids.append(study_guide_id)
+    
+    # Delete translation opportunities for deleted study guides
+    if deleted_study_guide_ids:
+        delete_translation_opportunities({
+            feconf.ENTITY_TYPE_STUDY_GUIDE: deleted_study_guide_ids
+        })
+    
+    # Create translation opportunities for new/updated study guides
+    if created_study_guide_ids:
+        create_translation_opportunity({
+            feconf.ENTITY_TYPE_STUDY_GUIDE: created_study_guide_ids
+        })
+    
     generate_topic_summary(topic_id)
 
     if old_topic.name != updated_topic.name:
         opportunity_services.update_opportunities_with_new_topic_name(
             updated_topic.id, updated_topic.name)
-
 
 def delete_uncategorized_skill(
     user_id: str,
