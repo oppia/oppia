@@ -89,9 +89,9 @@ class MockVoiceoverLanguageManagementService {
   languageCodesMapping = {};
   cloudSupportedLanguageAccentCodes = [];
   init(
-    languageAccentMasterList: any,
-    autoGeneratableLanguageAccentCodes: any,
-    languageCodesMapping: any
+    languageAccentMasterList: Record<string, Record<string, string>>,
+    autoGeneratableLanguageAccentCodes: string[],
+    languageCodesMapping: Record<string, Record<string, boolean>>
   ): void {
     this.languageAccentMasterList = languageAccentMasterList;
     this.autoGeneratableLanguageAccentCodes =

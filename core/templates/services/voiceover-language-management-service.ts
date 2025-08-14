@@ -18,7 +18,6 @@
  */
 
 import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
 import {LanguageAccentMasterList} from 'domain/voiceover/voiceover-backend-api.service';
 
 export interface LanguageCodesMapping {

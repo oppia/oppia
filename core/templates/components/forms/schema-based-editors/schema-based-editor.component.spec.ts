@@ -131,7 +131,7 @@ describe('Schema based editor component', function () {
   });
 
   it('should return null when validate is called without form', () => {
-    (component as any).form = null as any;
+    component.form = null as unknown as typeof component.form;
     const result = component.validate(new FormControl(1));
     expect(result).toBeNull();
   });

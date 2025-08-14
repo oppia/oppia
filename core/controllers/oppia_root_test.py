@@ -29,5 +29,3 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
                 response = self.get_html_response(
                     '/%s' % page['ROUTE'], expected_status_int=200)
                 response.mustcontain('<oppia-root></oppia-root>')
-
-
