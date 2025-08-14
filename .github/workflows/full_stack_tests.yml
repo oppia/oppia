@@ -55,7 +55,7 @@ jobs:
         run1: [1, 2, 3, 4]
         run2: [1]
         mobile: [false, true]
-    name: Acceptance (${{ matrix.suite.name }})
+    name: ${{ matrix.mobile && 'Mobile' || 'Desktop' }} (${{ matrix.suite.name }})
     steps:
       - name: Check for broken suites
         id: check_skip
