@@ -1005,6 +1005,25 @@ def send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
     )
 
 
+def _remove_empty_contents_for_voiceover_regeneration(
+        language_code_to_contents_mapping: Dict[str, Dict[str, str]]) -> None:
+    """Removes empty contents from the provided input.
+
+    Args:
+        language_code_to_contents_mapping: dict. A dictionary mapping language
+            codes to the corresponding content IDs and their associated HTML
+            that require voiceover regeneration.
+    """
+    for _, content_ids_to_content_values in (
+            language_code_to_contents_mapping.items()):
+        content_ids_to_remove = [
+            content_id for content_id, html in (
+                content_ids_to_content_values.items()) if not html.strip()
+        ]
+        for content_id in content_ids_to_remove:
+            del content_ids_to_content_values[content_id]
+
+
 def _regenerate_voiceovers_for_given_contents(
     exploration_id: str,
     exploration_title: str,
@@ -1034,6 +1053,10 @@ def _regenerate_voiceovers_for_given_contents(
     # A dictionary mapping each language code to a list of accent codes that
     # support autogeneration.
     language_code_to_autogeneratable_accent_codes = {}
+
+    # Remove empty contents from the voiceover regeneration mapping.
+    _remove_empty_contents_for_voiceover_regeneration(
+        language_code_to_contents_mapping)
 
     # A list of error collections that occurred during the
     # voiceover regeneration.
@@ -1198,9 +1221,9 @@ def regenerate_voiceovers_on_exploration_curation(
     date_time: str,
     author_id: str,
 ) -> None:
-    """Regenerates all voiceovers (in English and in any available translated
-    languages) for the given exploration when it is curated — i.e., added to a
-    published story.
+    """Regenerates all voiceovers (in English and in all the available
+    translated languages) for the given exploration when it is curated — i.e.,
+    added to a published story.
 
     NOTE: This is a time-intensive operation and must be executed via a
     deferred task to ensure it runs asynchronously.
@@ -1224,10 +1247,11 @@ def regenerate_voiceovers_on_exploration_curation(
 
     # Retrieve all English-language contents from the exploration.
     for state in exploration.states.values():
-        content_id_to_translatable_contents = (
-            state.get_translatable_contents_collection())
+        content_id_to_translatable_content = (
+            state.get_translatable_contents_collection()
+        ).content_id_to_translatable_content
         for translatable_content in (
-                content_id_to_translatable_contents.values()):
+                content_id_to_translatable_content.values()):
             content_id = translatable_content.content_id
             # Check if what happens when this is list of str.
             content_value = translatable_content.content_value
@@ -1311,10 +1335,11 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
     if language_code == constants.DEFAULT_LANGUAGE_CODE:
         # Retrieve all English-language contents from the exploration.
         for state in exploration.states.values():
-            content_id_to_translatable_contents = (
-                state.get_translatable_contents_collection())
+            content_id_to_translatable_content = (
+                state.get_translatable_contents_collection()
+            ).content_id_to_translatable_content
             for translatable_content in (
-                    content_id_to_translatable_contents.values()):
+                    content_id_to_translatable_content.values()):
                 content_id = translatable_content.content_id
                 # Check if what happens when this is list of str.
                 content_value = translatable_content.content_value
