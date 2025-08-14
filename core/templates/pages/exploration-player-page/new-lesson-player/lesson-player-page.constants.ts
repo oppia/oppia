@@ -23,6 +23,15 @@ export const NewLessonPlayerConstants = {
 
   CONTINUE_BUTTON_FOCUS_LABEL: 'continueButton',
 
+  MIN_CARD_LOADING_DELAY_MSEC: 950,
+  TIME_FADEOUT_MSEC: 100,
+  TIME_HEIGHT_CHANGE_MSEC: 500,
+  TIME_FADEIN_MSEC: 100,
+  TIME_NUM_CARDS_CHANGE_MSEC: 500,
+  ALERT_MESSAGE_TIMEOUT: 6000,
+  TIME_PADDING_MSEC: 250,
+  TIME_SCROLL_MSEC: 600,
+
   // The enforced waiting period before the first hint request.
   WAIT_FOR_FIRST_HINT_MSEC: 60000,
   // The enforced waiting period before each of the subsequent hint requests.
