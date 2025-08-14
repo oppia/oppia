@@ -215,6 +215,10 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
 import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
+import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/hint-solution-and-concept-card-display.component';
+import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component';
+import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
+import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
 import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesson-player/sidebar-components/share-lesson-modal.component';
 @NgModule({
   imports: [
@@ -234,7 +238,6 @@ import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesso
     DynamicContentModule,
     FormsModule,
     ReactiveFormsModule,
-    RichTextComponentsModule,
     ObjectComponentsModule,
     OppiaCkEditor4Module,
     OppiaCkEditorCopyToolBarModule,
@@ -287,8 +290,11 @@ import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesso
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
@@ -298,6 +304,7 @@ import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesso
     ExplorationEmbedButtonModalComponent,
     CheckpointCelebrationModalComponent,
     HintAndSolutionButtonsComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     HintEditorComponent,
     InputResponsePairComponent,
     NewInputResponsePairComponent,
@@ -446,6 +453,7 @@ import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesso
     ExplorationSummaryTileComponent,
     FilteredChoicesFieldComponent,
     FeedbackPopupComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     MultiSelectionFieldComponent,
     PracticeTabComponent,
     QuestionEditorSaveModalComponent,
@@ -461,8 +469,11 @@ import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesso
     // These elements will remain here even after migration.
     DeleteAnswerGroupModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     SelectSkillModalComponent,
     SkillSelectorComponent,
     TakeBreakModalComponent,
@@ -622,8 +633,11 @@ import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesso
     DeleteLastHintModalComponent,
     DeleteSolutionModalComponent,
     DisplaySolutionModalComponent,
+    DisplayNewSolutionModalComponent,
     DisplaySolutionInterstititalModalComponent,
+    DisplayNewSolutionInterstititalModalComponent,
     DisplayHintModalComponent,
+    DisplayNewHintModalComponent,
     ExplorationFooterComponent,
     ExplorationSummaryTileComponent,
     FeedbackPopupComponent,
