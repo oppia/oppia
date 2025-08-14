@@ -822,6 +822,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async previewStudyGuide(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(showSubtopicsList);
       await this.clickOn(showSubtopicsList);
       await this.clickOn(firstSubtopicTile);
       await this.clickOn(mobileOptionsSelector);
