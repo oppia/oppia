@@ -341,7 +341,6 @@ import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/service
 import {QuestionValidationService} from './question-validation.service';
 import {MathInteractionsService} from './math-interactions.service';
 import {EntityVoiceoversService} from './entity-voiceovers.services';
-import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
 import {AutomaticVoiceoverHighlightService} from './automatic-voiceover-highlight-service';
 
 interface UpgradedServicesDict {
@@ -406,8 +405,6 @@ export class UpgradedServices {
     upgradedServices['EntityVoiceoversService'] = new EntityVoiceoversService(
       upgradedServices['VoiceoverBackendApiService']
     );
-    upgradedServices['VoiceoverLanguageManagementService'] =
-      new VoiceoverLanguageManagementService();
     upgradedServices['AutomaticVoiceoverHighlightService'] =
       new AutomaticVoiceoverHighlightService(
         upgradedServices['LocalStorageService']

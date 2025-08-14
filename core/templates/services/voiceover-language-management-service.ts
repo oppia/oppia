@@ -71,10 +71,3 @@ export class VoiceoverLanguageManagementService {
     return this.cloudSupportedLanguageAccentCodes.includes(languageAccentCode);
   }
 }
-
-angular
-  .module('oppia')
-  .factory(
-    'VoiceoverLanguageManagementService',
-    downgradeInjectable(VoiceoverLanguageManagementService)
-  );

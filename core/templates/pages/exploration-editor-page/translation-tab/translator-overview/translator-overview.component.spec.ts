@@ -51,6 +51,7 @@ import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.m
 import {Voiceover} from '../../../../domain/exploration/voiceover.model';
 import {LocalStorageService} from 'services/local-storage.service';
 import {VoiceoverPlayerService} from '../../../exploration-player-page/services/voiceover-player.service';
+import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 
 class MockNgbModal {
   open() {
@@ -82,6 +83,34 @@ class MockPlatformFeatureService {
     };
   }
 }
+class MockVoiceoverLanguageManagementService {
+  languageAccentMasterList = {};
+  autoGeneratableLanguageAccentCodes = [];
+  languageCodesMapping = {};
+  cloudSupportedLanguageAccentCodes = [];
+  init(
+    languageAccentMasterList: any,
+    autoGeneratableLanguageAccentCodes: any,
+    languageCodesMapping: any
+  ): void {
+    this.languageAccentMasterList = languageAccentMasterList;
+    this.autoGeneratableLanguageAccentCodes =
+      autoGeneratableLanguageAccentCodes;
+    this.languageCodesMapping = languageCodesMapping;
+  }
+  getAutogeneratableLanguageAccents(languageCode: string): string[] {
+    return [];
+  }
+  canVoiceoverForLanguage(languageCode: string): boolean {
+    return true;
+  }
+  setCloudSupportedLanguageAccents(languageCode: string): void {}
+  isAutogenerationSupportedGivenLanguageAccent(
+    languageAccentCode: string
+  ): boolean {
+    return false;
+  }
+}
 
 describe('Translator Overview component', () => {
   let component: TranslatorOverviewComponent;
@@ -105,6 +134,7 @@ describe('Translator Overview component', () => {
   let voiceoverBackendApiService: VoiceoverBackendApiService;
   let localStorageService: LocalStorageService;
   let voiceoverPlayerService: VoiceoverPlayerService;
+  let voiceoverLanguageManagementService: VoiceoverLanguageManagementService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -123,6 +153,10 @@ describe('Translator Overview component', () => {
         {
           provide: PlatformFeatureService,
           useClass: MockPlatformFeatureService,
+        },
+        {
+          provide: VoiceoverLanguageManagementService,
+          useClass: MockVoiceoverLanguageManagementService,
         },
         WindowRef,
       ],
@@ -156,6 +190,11 @@ describe('Translator Overview component', () => {
     windowRef = TestBed.inject(WindowRef);
     localStorageService = TestBed.inject(LocalStorageService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
+    voiceoverLanguageManagementService = TestBed.inject(
+      VoiceoverLanguageManagementService
+    );
+
+    spyOn(voiceoverLanguageManagementService, 'init').and.callThrough();
 
     spyOn(
       translationTabActiveModeService,
