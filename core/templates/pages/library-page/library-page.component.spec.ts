@@ -60,6 +60,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockWindowRef {
   nativeWindow = {
+    innerWidth: 0,
     location: {
       pathname: '/community-library/top-rated',
       href: '',
@@ -905,7 +906,7 @@ describe('Library Page Component', () => {
     // We mock window.innerWidth to a fixed value within the 2-tile range (e.g., 600px)
     // to make the calculation deterministic and match the expected '400px' result.
 
-    spyOnProperty(window, 'innerWidth').and.returnValue(600);
+    windowRef.nativeWindow.innerWidth = 600;
     componentInstance.initCarousels();
     tick();
 
