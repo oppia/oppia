@@ -52,11 +52,10 @@ describe('ShareLessonModalComponent', () => {
   let alertsService: jasmine.SpyObj<AlertsService>;
   let urlService: jasmine.SpyObj<UrlService>;
   let attributionService: jasmine.SpyObj<AttributionService>;
-  let windowRef: jasmine.SpyObj<WindowRef>;
   let pageContextService: jasmine.SpyObj<PageContextService>;
   let windowDimensionsService: jasmine.SpyObj<WindowDimensionsService>;
-  let mockWindow: any;
-  let mockLocation: any;
+  let mockWindow;
+  let mockLocation;
 
   beforeEach(waitForAsync(() => {
     const ngbActiveModalSpy = jasmine.createSpyObj('NgbActiveModal', [
@@ -128,7 +127,6 @@ describe('ShareLessonModalComponent', () => {
     attributionService = TestBed.inject(
       AttributionService
     ) as jasmine.SpyObj<AttributionService>;
-    windowRef = TestBed.inject(WindowRef) as jasmine.SpyObj<WindowRef>;
     pageContextService = TestBed.inject(
       PageContextService
     ) as jasmine.SpyObj<PageContextService>;
@@ -141,7 +139,6 @@ describe('ShareLessonModalComponent', () => {
     fixture = TestBed.createComponent(ShareLessonModalComponent);
     component = fixture.componentInstance;
 
-    // Setup default return values
     urlService.getCurrentLocation.and.returnValue(mockLocation);
     attributionService.getAuthors.and.returnValue(['Author 1', 'Author 2']);
     pageContextService.getExplorationId.and.returnValue('test-exploration-id');

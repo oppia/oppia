@@ -132,8 +132,8 @@
 
 .player-mobile-menu {
   background-color: #fff;
-  bottom: 0;
   border-radius: 28px 28px 0 0;
+  bottom: 0;
   display: none;
   height: 232px;
   position: fixed;
