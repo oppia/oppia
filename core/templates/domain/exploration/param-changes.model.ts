@@ -13,21 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend arrays of ParamChange
- * domain objects.
+ * @fileoverview Model class for creating new frontend arrays of ParamChange domain objects.
  */
 
-import {Injectable} from '@angular/core';
 import {
   ParamChange,
   ParamChangeBackendDict,
 } from 'domain/exploration/param-change.model';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class ParamChangesObjectFactory {
-  createFromBackendList(
+export class ParamChanges {
+  static createFromBackendList(
     paramChangeBackendList: readonly ParamChangeBackendDict[]
   ): ParamChange[] {
     return paramChangeBackendList.map(paramChangeBackendDict => {
