@@ -219,6 +219,7 @@ import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-play
 import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component';
 import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
 import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
+import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-bar.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -392,6 +393,7 @@ import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-p
     SkillMasteryModalComponent,
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
+    CheckpointBarComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
     AnswerContentModalComponent,
@@ -540,6 +542,7 @@ import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-p
     TestInteractionPanel,
     RuleEditorComponent,
     HtmlSelectComponent,
+    CheckpointBarComponent,
     RuleTypeSelector,
     AddAnswerGroupModalComponent,
     AnswerGroupEditor,
@@ -597,6 +600,7 @@ import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-p
     DynamicContentModule,
     FormsModule,
     MaterialModule,
+    CheckpointBarComponent,
     NgBootstrapModule,
     RichTextComponentsModule,
     ObjectComponentsModule,
