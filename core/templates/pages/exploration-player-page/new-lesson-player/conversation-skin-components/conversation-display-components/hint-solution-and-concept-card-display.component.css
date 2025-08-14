@@ -1,0 +1,85 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-hint-solution-and-concept-card-display {
+  margin-left: 40px;
+}
+
+.hint-solution-individual-container {
+  align-items: center;
+  background-color: white;
+  border-radius: 0 16px 16px 16px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  padding: 20px;
+  padding-bottom: 5px;
+  width: 100%;
+}
+
+.oppia-learner-hint-solution-and-concept-card-display-button {
+  background: #c55f45;
+  border-radius: 4px;
+  color: #fff;
+  font-size: clamp(12px, 2vw, 18px);
+  font-weight: 700;
+  height: 44px;
+  outline: none !important;
+  padding: 0 !important;
+  width: 132px;
+}
+
+.hint-solution-individual-container > p {
+  font-size: clamp(12px, 2vw, 16px);
+  padding-top: 10px;
+  text-wrap: wrap;
+  width: 300px;
+}
+
+.oppia-learner-hint-solution-and-concept-card-display-button.viewed {
+  background-color: #fff;
+  border: 1px solid #c55f45;
+  color: #c55f45;
+}
+
+.oppia-learner-hint-solution-and-concept-card-display-button .solution-button {
+  background: #0d48a1;
+}
+
+.oppia-learner-hint-solution-and-concept-card-display-button .solution-button.viewed {
+  background-color: #fff;
+  border: 1px solid #0d48a1;
+  color: #0d48a1;
+}
+
+.oppia-learner-hint-solution-and-concept-card-display-button .solution-button.viewed:focus {
+  border: 1px solid #0d48a1;
+}
+
+.oppia-learner-hint-solution-and-concept-card-display-button .concept-card-button {
+  font-size: 14px;
+}
+
+@media screen and (max-width: 768px) {
+  .oppia-learner-hint-solution-and-concept-card-display-button {
+    width: 100px;
+  }
+
+  .concept-card-button {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hint-solution-individual-container {
+    padding: 15px 10px 0;
+  }
+
+  .hint-solution-individual-container > p {
+    max-width: 120px;
+  }
+}
