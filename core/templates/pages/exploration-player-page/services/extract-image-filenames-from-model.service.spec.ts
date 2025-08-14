@@ -29,16 +29,12 @@ import {
   // eslint-disable-next-line max-len
 } from './extract-image-filenames-from-model.service';
 
-import {
-  SkillBackendDict,
-  SkillObjectFactory,
-} from '../../../domain/skill/SkillObjectFactory';
+import {SkillBackendDict, Skill} from 'domain/skill/skill.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Extracting Image file names in the state service', () => {
   let eifms: ExtractImageFilenamesFromModelService;
   let eof: ExplorationObjectFactory;
-  let sof: SkillObjectFactory;
   let ecs: PageContextService;
   let explorationDict: ExplorationBackendDict;
   let ImageFilenamesInExploration: {[x: string]: string[]};
@@ -52,7 +48,6 @@ describe('Extracting Image file names in the state service', () => {
     eof = TestBed.inject(ExplorationObjectFactory);
     ecs = TestBed.inject(PageContextService);
     eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
-    sof = TestBed.inject(SkillObjectFactory);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
 
     explorationDict = {
@@ -949,7 +944,7 @@ describe('Extracting Image file names in the state service', () => {
   });
 
   it('should get all the filenames of the images in a skill', () => {
-    let skill = sof.createFromBackendDict(skillDict);
+    let skill = Skill.createFromBackendDict(skillDict);
     let imageFilenamesInSkill = eifms.getImageFilenamesInSkill(skill).sort();
     expect(imageFilenamesInSkill).toEqual(expectedImageFilenamesInSkill.sort());
   });
