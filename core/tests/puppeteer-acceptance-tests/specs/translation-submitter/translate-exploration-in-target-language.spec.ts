@@ -107,7 +107,14 @@ describe('Translation Submitter', function () {
     const explorationIds =
       await curriculumAdm.createAndPublishExplorationsWithCards(10);
 
-    for (const id of explorationIds) {
+    await curriculumAdm.createAndPublishStoryWithChapter(
+      'Test Story',
+      'test-story',
+      `Chapter ${explorationIds[0]}`,
+      explorationIds[0] as string,
+      'Test Topic'
+    );
+    for (const id of explorationIds.slice(1)) {
       await curriculumAdm.openStoryEditor('Test Story', 'Test Topic');
       await curriculumAdm.addChapter(`Chapter ${id}`, id);
     }
