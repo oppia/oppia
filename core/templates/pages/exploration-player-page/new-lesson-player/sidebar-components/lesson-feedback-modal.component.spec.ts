@@ -42,7 +42,6 @@ describe('LessonFeedbackModalComponent', () => {
   let ngbActiveModal: NgbActiveModal;
   let bottomSheetRef: MatBottomSheetRef;
   let focusManagerService: FocusManagerService;
-  let playerPositionService: PlayerPositionService;
   let userService: UserService;
   let feedbackPopupBackendApiService: FeedbackPopupBackendApiService;
 
@@ -125,7 +124,6 @@ describe('LessonFeedbackModalComponent', () => {
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     bottomSheetRef = TestBed.inject(MatBottomSheetRef);
     focusManagerService = TestBed.inject(FocusManagerService);
-    playerPositionService = TestBed.inject(PlayerPositionService);
     userService = TestBed.inject(UserService);
     feedbackPopupBackendApiService = TestBed.inject(
       FeedbackPopupBackendApiService
@@ -168,7 +166,7 @@ describe('LessonFeedbackModalComponent', () => {
     component.feedbackText = 'test feedback';
     component.isLoggedIn = true;
     component.isSubmitterAnonymized = false;
-    // Ensure bottomSheetRef is null so ngbActiveModal is used
+    // Ensure bottomSheetRef is null so ngbActiveModal is used.
     const componentRef = component as unknown as {
       bottomSheetRef: MatBottomSheetRef | null;
     };
@@ -197,7 +195,7 @@ describe('LessonFeedbackModalComponent', () => {
     component.feedbackText = 'test feedback';
     component.isLoggedIn = true;
     component.isSubmitterAnonymized = false;
-    // Mock the component to use bottomSheetRef instead of ngbActiveModal
+    // Mock the component to use bottomSheetRef instead of ngbActiveModal.
     const componentRef = component as unknown as {
       ngbActiveModal: NgbActiveModal | null;
     };
@@ -314,7 +312,7 @@ describe('LessonFeedbackModalComponent', () => {
   });
 
   it('should close modal with NgbActiveModal when bottomSheetRef is not available', () => {
-    // Mock the component to use ngbActiveModal instead of bottomSheetRef
+    // Mock the component to use ngbActiveModal instead of bottomSheetRef.
     const componentRef = component as unknown as {
       bottomSheetRef: MatBottomSheetRef | null;
     };

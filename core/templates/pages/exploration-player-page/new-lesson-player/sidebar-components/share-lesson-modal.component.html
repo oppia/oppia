@@ -1,15 +1,8 @@
 <div class="oppia-share-lesson-modal-header" [ngStyle]="!backBtnIsVisible ? { 'justify-content': 'flex-end' } : {}">
-  <button
-    *ngIf="backBtnIsVisible"
-    mat-icon-button
-    (click)="goBackToCopyModal()"
-    aria-label="Back to the previous step">
+  <button *ngIf="backBtnIsVisible" mat-icon-button (click)="goBackToCopyModal()" aria-label="Back to the previous step">
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <button
-    mat-icon-button
-    (click)="closeModal()"
-    aria-label="Close the modal">
+  <button mat-icon-button (click)="closeModal()" aria-label="Close the modal">
     <mat-icon>close</mat-icon>
   </button>
 </div>
@@ -22,11 +15,7 @@
 
   <ng-container *ngSwitchCase="modalStates.COPY">
     <div class="share-icon-container copy-modal-body">
-      <a
-        [href]="shareWithNetwork('classroom')"
-        target="_blank"
-        rel="noopener"
-        aria-label="Share via Classroom">
+      <a [href]="shareWithNetwork('classroom')" target="_blank" rel="noopener" aria-label="Share via Classroom">
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="share-classroom">
           <title id="share-classroom">Classroom Icon</title>
           <rect x="1" y="1" width="46" height="46" rx="23" fill="#20A366"/>
@@ -40,11 +29,7 @@
         </svg>
       </a>
 
-      <a
-        [href]="shareWithNetwork('facebook')"
-        target="_blank"
-        rel="noopener"
-        aria-label="Share via Facebook">
+      <a [href]="shareWithNetwork('facebook')" target="_blank" rel="noopener" aria-label="Share via Facebook">
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="share-facebook">
           <title id="share-facebook">Facebook Icon</title>
           <path d="M48 24C48 10.7452 37.2549 0 24 0C10.7452 0 0 10.7452 0 24C0 35.9791 8.77645 45.908 20.25 47.7085V30.9375H14.1563V24H20.25V18.7125C20.25 12.6975 23.833 9.37502 29.3152 9.37502C31.941 9.37502 34.6875 9.84376 34.6875 9.84376V15.75H31.6612C28.6798 15.75 27.75 17.6 27.75 19.498V24H34.4063L33.3422 30.9375H27.75V47.7085C39.2236 45.908 48 35.9791 48 24Z" fill="#1877F2"/>
@@ -54,19 +39,11 @@
     </div>
 
     <div class="copy-modal-body copy-modal-body-btn">
-      <button
-        mat-button
-        class="share-modal-btn"
-        (click)="copyLessonLink()"
-        aria-label="Copy lesson link">
+      <button mat-button class="share-modal-btn" (click)="copyLessonLink()" aria-label="Copy lesson link">
         <span class="button-content">{{'I18N_SHARE_MODAL_COPY_LINK_BUTTON' | translate}} <mat-icon>code</mat-icon></span>
       </button>
 
-      <button
-        mat-button
-        class="share-modal-btn"
-        (click)="showEmbedModal()"
-        aria-label="Show embed code for webpage">
+      <button mat-button class="share-modal-btn" (click)="showEmbedModal()" aria-label="Show embed code for webpage">
         <span class="button-content">{{'I18N_SHARE_MODAL_EMBED_IN_WEBPAGE' | translate}} <mat-icon>link</mat-icon></span>
       </button>
     </div>
@@ -79,17 +56,8 @@
       <p>Copy and paste this code into your website.</p>
 
       <div class="cc-attribution-text">
-        <input
-          type="text"
-          class="cc-attribution-input"
-          [value]="embedCode"
-          readonly
-          aria-label="Embed code to copy">
-        <button
-          mat-button
-          class="copy-cc-btn"
-          (click)="copyEmbedCode()"
-          aria-label="Copy embed code">
+        <input type="text" class="cc-attribution-input" [value]="embedCode" readonly aria-label="Embed code to copy">
+        <button mat-button class="copy-cc-btn" (click)="copyEmbedCode()" aria-label="Copy embed code">
           <span class="button-content">{{'Embed in Webpage' | translate}} <mat-icon>link</mat-icon></span>
         </button>
       </div>
@@ -103,17 +71,8 @@
       <p>1. Copy and paste the credit <br> 2. Attach a copy of the "CC BY SA 4.0 license"</p>
 
       <div class="cc-attribution-text">
-        <input
-          type="text"
-          class="cc-attribution-input"
-          [value]="ccAttributionText"
-          readonly
-          aria-label="Creative Commons attribution text">
-        <button
-          mat-button
-          class="copy-cc-btn"
-          (click)="copyAttribution()"
-          aria-label="Copy attribution text">
+        <input type="text" class="cc-attribution-input" [value]="ccAttributionText" readonly aria-label="Creative Commons attribution text">
+        <button mat-button class="copy-cc-btn" (click)="copyAttribution()" aria-label="Copy attribution text">
           <span class="button-content">
             {{'Copy Attribution' | translate}}
             <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="copy-attribution">
@@ -130,27 +89,14 @@
 </div>
 
 <div class="oppia-share-lesson-modal-footer" [ngStyle]="modalState != modalStates.COPY ? { 'justify-content': 'flex-end' } : {}">
-  <span
-    class="lesson-attribution-text"
-    *ngIf="modalState == modalStates.COPY"
-    (click)="showAttributionModal()"
-    role="link"
-    tabindex="0">
+  <span class="lesson-attribution-text" *ngIf="modalState == modalStates.COPY" (click)="showAttributionModal()" role="link" tabindex="0">
     {{'How to attribute this lesson' | translate}}
   </span>
-  <button *ngIf="isWindowNarrow()"
-    mat-button
-    class="cancel-button"
-    (click)="closeModal()"
-    aria-label="Cancel and close the modal">
+  <button *ngIf="isWindowNarrow()" mat-button class="cancel-button" (click)="closeModal()" aria-label="Cancel and close the modal">
     {{'I18N_MODAL_CANCEL_BUTTON' | translate}}
   </button>
 </div>
 
-<div
-  class="success-message"
-  *ngIf="successMessageIsVisible"
-  role="alert"
-  aria-live="assertive">
+<div class="success-message" *ngIf="successMessageIsVisible" role="alert" aria-live="assertive">
   <p>{{ successMessage | translate }} <mat-icon>check_circle</mat-icon></p>
 </div>
