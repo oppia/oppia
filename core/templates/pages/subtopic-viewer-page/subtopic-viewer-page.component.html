@@ -46,7 +46,7 @@
           </oppia-rte-output-display>
         </div>
       </div>
-      <button (click)="openPracticeMenu()" class="btn btn-next-actions e2e-test-go-to-practice-section-button btn-practice-section">
+      <button *ngIf="isPracticeTabDisplayed" (click)="openPracticeMenu()" class="btn btn-next-actions e2e-test-go-to-practice-section-button btn-practice-section">
         <p class="text-practice-section-fixed">
           <img [src]="getStaticImageUrl('/icons/practice-button-edit.png')" alt="Practice button icon" width="15px" height="15px">
           {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_PRACTICE' | translate }} {{ subtopicTitle }}

@@ -69,6 +69,7 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
   prevSubtopic!: Subtopic;
   directiveSubscriptions = new Subscription();
   subtopicSummaryIsShown: boolean = false;
+  isPracticeTabDisplayed: boolean = false;
 
   constructor(
     private alertsService: AlertsService,
@@ -184,6 +185,8 @@ export class SubtopicViewerPageComponent implements OnInit, OnDestroy {
                   topicDataObject.getTopicId(),
                   TranslationKeyType.TITLE
                 );
+              this.isPracticeTabDisplayed =
+                topicDataObject.getPracticeTabIsDisplayed();
             });
 
           this.loaderService.hideLoadingScreen();
