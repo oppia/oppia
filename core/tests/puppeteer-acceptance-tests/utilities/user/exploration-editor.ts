@@ -6550,11 +6550,11 @@ export class ExplorationEditor extends BaseUser {
     // Get Fields.
     const videoUrlInput = await helperModel?.$(textInputField);
 
-    if (videoUrlInput) {
-      await videoUrlInput.type(videoUrl);
-    } else {
+    if (!videoUrlInput) {
       throw new Error('Video URL input not found in the helper modal');
     }
+    await this.waitForElementToStabilize(videoUrlInput);
+    await videoUrlInput.type(videoUrl);
 
     await this.page.waitForSelector(closeButtonForExtraModel);
     await this.page.click(closeButtonForExtraModel);
