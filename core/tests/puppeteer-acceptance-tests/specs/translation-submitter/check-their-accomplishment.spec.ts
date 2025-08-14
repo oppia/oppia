@@ -77,7 +77,7 @@ describe('Translation Submitter', function () {
   it('should be able to check contribution stats', async function () {
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
-      'The Picnic Problem'
+      'Fractions - The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOn('Save and close');
