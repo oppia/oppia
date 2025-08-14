@@ -49,7 +49,7 @@ describe('Logged In Learner', function () {
     // Check if profile dropdown works properly.
     await loggedInUser.clickOnProfileDropdown();
     await loggedInUser.expectProfileDropdownToContainElementWithContent(
-      'learner8'
+      'loggedInUser'
     );
   });
 
