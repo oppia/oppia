@@ -18,7 +18,6 @@
 
 import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {PlayerPositionService} from '../../services/player-position.service';
 import './flag-exploration-modal.component.css';

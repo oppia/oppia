@@ -15,7 +15,7 @@ oppia-share-lesson-modal .oppia-share-lesson-modal-title {
 	font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;	
 	font-size: 1.25em;
 	font-weight: 400;
-	text-align: center;	
+	text-align: center;
 }
 
 oppia-share-lesson-modal .modal-body {
@@ -46,8 +46,8 @@ oppia-share-lesson-modal .lesson-attribution-text {
 
 oppia-share-lesson-modal .share-icon-container svg {
 	cursor: pointer;
-	margin-right: 12px;
 	margin-bottom: 40px;
+	margin-right: 12px;
 }
 
 oppia-share-lesson-modal .share-modal-btn {
@@ -89,8 +89,8 @@ oppia-share-lesson-modal .copy-modal-body {
 
 oppia-share-lesson-modal .cc-attribution-header {
 	color: #0d48a1;
-	font-family: Roboto;
-	font-size: 20px;;
+	font-family: "Roboto", sans-serif;
+	font-size: 20px;
 	font-weight: 400;
 	margin-bottom: 32px;
 	text-align: center;
@@ -154,4 +154,3 @@ oppia-share-lesson-modal .cc-attribution-text {
 		width: 100%;
 	}
 }
-

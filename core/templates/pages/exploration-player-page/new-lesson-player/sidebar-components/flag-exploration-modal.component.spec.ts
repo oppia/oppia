@@ -96,7 +96,7 @@ describe('Flag Exploration modal', () => {
     let flag = true;
     let flagMessage = 'test message';
     spyOn(ngbActiveModal, 'close');
-    // Ensure bottomSheetRef is null so ngbActiveModal is used
+    // Ensure bottomSheetRef is null so ngbActiveModal is used.
     const componentRef = component as unknown as {
       bottomSheetRef: MatBottomSheetRef | null;
     };
@@ -116,7 +116,7 @@ describe('Flag Exploration modal', () => {
     let flag = true;
     let flagMessage = 'test message';
     spyOn(bottomSheetRef, 'dismiss');
-    // Mock the component to use bottomSheetRef instead of ngbActiveModal
+    // Mock the component to use bottomSheetRef instead of ngbActiveModal.
     const componentRef = component as unknown as {
       ngbActiveModal: NgbActiveModal | null;
     };
@@ -143,7 +143,7 @@ describe('Flag Exploration modal', () => {
 
   it('should close modal with NgbActiveModal', () => {
     spyOn(ngbActiveModal, 'dismiss');
-    // Ensure bottomSheetRef is null so ngbActiveModal is used
+    // Ensure bottomSheetRef is null so ngbActiveModal is used.
     const componentRef = component as unknown as {
       bottomSheetRef: MatBottomSheetRef | null;
     };
@@ -154,7 +154,7 @@ describe('Flag Exploration modal', () => {
 
   it('should close modal with MatBottomSheetRef', () => {
     spyOn(bottomSheetRef, 'dismiss');
-    // Mock the component to use bottomSheetRef instead of ngbActiveModal
+    // Mock the component to use bottomSheetRef instead of ngbActiveModal.
     const componentRef = component as unknown as {
       ngbActiveModal: NgbActiveModal | null;
     };

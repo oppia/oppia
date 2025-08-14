@@ -190,7 +190,7 @@ export class LessonPlayerSidebarComponent implements OnInit {
         LessonFeedbackModalComponent
       );
       bottomSheetRef.afterDismissed().subscribe(result => {
-        if (result != 'cancel') {
+        if (result !== 'cancel') {
           this.showThankYouModal('I18N_PLAYER_THANK_FEEDBACK');
         }
       });

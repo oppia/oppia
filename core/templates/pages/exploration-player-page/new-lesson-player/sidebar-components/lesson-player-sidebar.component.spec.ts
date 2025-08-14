@@ -38,11 +38,8 @@ import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {PageContextService} from '../../../../services/page-context.service';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {
-  MatBottomSheet,
-  MatBottomSheetRef,
-} from '@angular/material/bottom-sheet';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {MatBottomSheet} from '@angular/material/bottom-sheet';
 import {LearnerLocalNavBackendApiService} from '../../../../pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import {AlertsService} from '../../../../services/alerts.service';
 import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
@@ -234,7 +231,6 @@ describe('LessonPlayerSidebarComponent', () => {
       component.isHackyExpDescTranslationDisplayed();
     expect(hackyExpDescTranslationIsDisplayed).toBe(true);
 
-    // Reset the spy to return true for English
     (
       i18nLanguageCodeService.isCurrentLanguageEnglish as jasmine.Spy
     ).and.returnValue(true);
@@ -242,7 +238,6 @@ describe('LessonPlayerSidebarComponent', () => {
       component.isHackyExpDescTranslationDisplayed();
     expect(hackyExpDescTranslationIsDisplayed).toBe(false);
 
-    // Test when hacky translation is not available
     (
       i18nLanguageCodeService.isHackyTranslationAvailable as jasmine.Spy
     ).and.returnValue(false);

@@ -30,7 +30,6 @@ import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 describe('Customizable Thank You modal', () => {
   let component: CustomizableThankYouModalComponent;
   let fixture: ComponentFixture<CustomizableThankYouModalComponent>;
-  let ngbActiveModal: jasmine.SpyObj<NgbActiveModal>;
   let bottomSheetRef: jasmine.SpyObj<MatBottomSheetRef>;
 
   beforeEach(waitForAsync(() => {
@@ -51,9 +50,6 @@ describe('Customizable Thank You modal', () => {
       ],
     }).compileComponents();
 
-    ngbActiveModal = TestBed.inject(
-      NgbActiveModal
-    ) as jasmine.SpyObj<NgbActiveModal>;
     bottomSheetRef = TestBed.inject(
       MatBottomSheetRef
     ) as jasmine.SpyObj<MatBottomSheetRef>;
