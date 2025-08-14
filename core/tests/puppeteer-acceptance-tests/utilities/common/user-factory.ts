@@ -73,6 +73,10 @@ const USER_ROLE_MAPPING = {
   [ROLES.TRANSLATION_REVIEWER]: TranslationReviewerFactory,
 } as const;
 
+const USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE: string[] = [
+  ROLES.TRANSLATION_REVIEWER,
+];
+
 /**
  * These types are used to create a union of all the roles and then
  * create an intersection of all the roles. This is used to create a
@@ -166,8 +170,9 @@ export class UserFactory {
           break;
       }
 
-      await superAdminInstance.expectUserToHaveRole(user.username, role);
-
+      if (!USERS_ROLES_NOT_REFLECTED_IN_ADMIN_PAGE.includes(role)) {
+        await superAdminInstance.expectUserToHaveRole(user.username, role);
+      }
       UserFactory.composeUserWithRoles(user, [USER_ROLE_MAPPING[role]()]);
     }
 

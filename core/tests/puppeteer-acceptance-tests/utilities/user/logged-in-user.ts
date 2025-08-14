@@ -2079,19 +2079,13 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the Contributor Dashboard Using Profile Dropdown Menu.
    */
   async navigateToContributorDashboardUsingProfileDropdown(): Promise<void> {
-    await this.page.waitForSelector(profileDropdown, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(profileDropdown);
     await this.clickOn(profileDropdown);
 
-    await this.page.waitForSelector(contributorDashboardMenuLink, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(contributorDashboardMenuLink);
     await this.clickOn(contributorDashboardMenuLink);
 
-    await this.page.waitForSelector(contributorDashboardContainerSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(contributorDashboardContainerSelector);
   }
 
   /**

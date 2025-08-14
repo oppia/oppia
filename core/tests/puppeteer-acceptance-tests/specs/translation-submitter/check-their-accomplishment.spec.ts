@@ -34,6 +34,7 @@ describe('Translation Submitter', function () {
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
 
   beforeAll(async function () {
+    // Create users.
     translationSubmitter = await UserFactory.createNewUser(
       'translator',
       'translator@example.com'
@@ -45,25 +46,25 @@ describe('Translation Submitter', function () {
       [ROLES.CURRICULUM_ADMIN]
     );
 
+    // Create a curated exploration.
     const explorationId =
-      await curriculumAdm.createAndPublishExplorationWithCards('Exploration 1');
+      await curriculumAdm.createAndPublishExplorationWithCards('Fair Share');
 
     await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
-      'Understanding Numerators',
-      'Recognize equivalent fractions'
+      'Fraction Foundations',
+      'Unit Fractions'
     );
     await curriculumAdm.createAndPublishStoryWithChapter(
-      'Dividing a Birthday Cake',
-      'dividing-a-birthday-cake',
-      'The Birthday Cake Arrives',
+      'The Picnic Problem',
+      'the-picnic-problem',
+      'Cutting the Pies',
       explorationId as string,
       'Fractions'
     );
-  });
 
-  it('should be able to check contribution stats', async function () {
+    // Submit a translation.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
@@ -71,9 +72,12 @@ describe('Translation Submitter', function () {
     await translationSubmitter.selectLanguageInTranslateTextTab(
       'हिन्दी (Hindi)'
     );
+  });
+
+  it('should be able to check contribution stats', async function () {
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-      'The Birthday Cake Arrives',
-      'Dividing a Birthday Cake'
+      'Cutting the Pies',
+      'The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOn('Save and close');
