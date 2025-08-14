@@ -35,6 +35,8 @@ import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 const ROLES = testConstants.Roles;
 const youtubeVideoURL = 'https://www.youtube.com/watch?v=mDfiDLn2Rko';
 
+Error.stackTraceLimit = 20;
+
 describe('Translation Submitter', function () {
   let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
@@ -96,18 +98,18 @@ describe('Translation Submitter', function () {
     );
 
     await curriculumAdm.createAndPublishTopic(
-      'Test Topic 1',
-      'Test Subtopic 1',
-      'Test Skill 1'
+      'Test Topic',
+      'Test Subtopic',
+      'Test Skill'
     );
     await curriculumAdm.addStoryToTopic(
-      'Test Story 1',
-      'test-story-1',
-      'Test Topic 1'
+      'Test Story',
+      'test-story',
+      'Test Topic'
     );
 
     for (const id of explorationIds) {
-      await curriculumAdm.openStoryEditor('Test Story 1', 'Test Topic 1');
+      await curriculumAdm.openStoryEditor('Test Story', 'Test Topic');
       await curriculumAdm.addChapter(`Chapter ${id}`, id);
     }
   }, 1200000);
