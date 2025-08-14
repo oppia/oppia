@@ -91,7 +91,6 @@ export class SchemaBasedEditorComponent
 
   constructor() {}
 
-  // ControlValueAccessor implementation.
   writeValue(value: SchemaDefaultValue): void {
     if (value !== null && value !== undefined) {
       this._localValue = value;
@@ -110,7 +109,6 @@ export class SchemaBasedEditorComponent
     this.disabled = isDisabled;
   }
 
-  // Validator implementation.
   registerOnValidatorChange(fn: () => void): void {
     this.onValidatorChange = fn;
   }
@@ -123,7 +121,6 @@ export class SchemaBasedEditorComponent
   }
 
   ngAfterViewInit(): void {
-    // Subscribe to form status changes for validation.
     if (this.form?.statusChanges) {
       this.statusChangesSubscription = this.form.statusChanges.subscribe(() => {
         this.onValidatorChange();
@@ -132,18 +129,15 @@ export class SchemaBasedEditorComponent
   }
 
   ngOnDestroy(): void {
-    // Clean up subscription to prevent memory leaks.
     if (this.statusChangesSubscription) {
       this.statusChangesSubscription.unsubscribe();
     }
   }
 
-  // Helper method to handle touch events.
   onTouch(): void {
     this.onTouched();
   }
 
-  // Event handlers for child components.
   onInputBlur(): void {
     this.onTouch();
     this.inputBlur.emit();
