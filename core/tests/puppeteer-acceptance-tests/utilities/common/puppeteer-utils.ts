@@ -68,7 +68,6 @@ export type ModalUserInteractions = (
 const actionStatusMessageSelector = '.e2e-test-status-message';
 const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
-const imageUploadLabelSelector = '.e2e-test-image-upload-label';
 
 export class BaseUser {
   page!: Page;
