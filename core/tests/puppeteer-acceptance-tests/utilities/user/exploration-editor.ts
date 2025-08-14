@@ -4662,7 +4662,11 @@ export class ExplorationEditor extends BaseUser {
     for (let i = 0; i < n; i++) {
       const explorationTitle = `Quick Exploration ${i + 1}`;
       const explorationId =
-        await this.createAndPublishExplorationWithCards(explorationTitle);
+        await this.createAndPublishAMinimalExplorationWithTitle(
+          explorationTitle,
+          'Algebra',
+          i === 0 // Wait for welcome modal only on first exploration.
+        );
       explorationIds.push(explorationId);
     }
     return explorationIds;
