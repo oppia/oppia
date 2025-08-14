@@ -1,0 +1,38 @@
+<div *ngIf="currentlyOnLatestCard && isHintButtonVisible(0)" class="oppia-hint-solution-and-concept-card-display">
+  <ng-container *ngFor="let hintIndex of hintIndexes; index as idx">
+    <div class="hint-solution-individual-container" *ngIf="hintIndex && isHintButtonVisible(hintIndex)">
+      <p>{{'I18N_FIRST_HINT_DESCRIPTION' | translate}}</p>
+      <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button"
+              [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
+              (click)="displayHintModal(hintIndex)"> {{ 'I18N_VIEW_HINT_BUTTON_TEXT' | translate }}
+      </button>
+    </div>
+    <div class="hint-solution-individual-container" *ngIf="hintIndex && isHintButtonVisible(hintIndex)">
+      <p>{{'I18N_SECOND_PLUS_HINT_DESCRIPTION' | translate}}</p>
+      <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button"
+              [ngClass]="{'viewed': isHintConsumed(hintIndex)}"
+              (click)="displayHintModal(hintIndex)"> {{ 'I18N_VIEW_HINT_WITH_INDEX_BUTTON_TEXT' | translate: { index: hintIndex + 1 } }}
+      </button>
+    </div>
+  </ng-container>
+
+  <div *ngIf="isSolutionButtonVisible()" class="hint-solution-individual-container">
+    <p>{{'I18N_SOLUTION_INTRO_PARAGRAPH' | translate}}</p>
+
+    <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button solution-button"
+            [ngClass]="{'viewed': isSolutionConsumed()}"
+            (click)="onClickSolutionButton()"> {{'I18N_VIEW_SOLUTION_BUTTON_TEXT' | translate }}
+    </button>
+  </div>
+</div>
+
+<div *ngIf="isConceptCardButtonVisible()" class="oppia-hint-solution-and-concept-card-display">
+  <div class="hint-solution-individual-container">
+    <p>{{'I18N_CONCEPT_CARD_INTRO_PARAGRAPH' | translate}}</p>
+
+    <button mat-button class="oppia-learner-hint-solution-and-concept-card-display-button concept-card-button"
+            [ngClass]="{'viewed': isConceptCardConsumed()}"
+            (click)="showConceptCard()"> {{'I18N_VIEW_CONCEPT_CARD_BUTTON_TEXT' | translate }}
+    </button>
+  </div>
+</div>

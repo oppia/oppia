@@ -38,7 +38,7 @@ import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {UserService} from 'services/user.service';
-import {ExplorationPlayerConstants} from '../../../current-lesson-player/exploration-player-page.constants';
+import {NewLessonPlayerConstants} from '../../../new-lesson-player/lesson-player-page.constants';
 import {AudioPreloaderService} from '../../../services/audio-preloader.service';
 import {CurrentInteractionService} from '../../../services/current-interaction.service';
 import {PlayerPositionService} from '../../../services/player-position.service';
@@ -462,14 +462,14 @@ export class ConversationDisplayComponent {
         AppConstants.COMPONENT_NAME_CONTENT &&
       this.audioPlayerService.isPlaying()
     ) {
-      return ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
+      return NewLessonPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
     }
 
     return null;
   }
 
   getContentFocusLabel(index: number): string {
-    return ExplorationPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX + index;
+    return NewLessonPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX + index;
   }
 
   getMilestoneMessageIsToBeDisplayed(): boolean {
@@ -487,7 +487,7 @@ export class ConversationDisplayComponent {
   canWindowShowTwoCards(): boolean {
     return (
       this.windowDimensionsService.getWidth() >
-      ExplorationPlayerConstants.TWO_CARD_THRESHOLD_PX
+      NewLessonPlayerConstants.TWO_CARD_THRESHOLD_PX
     );
   }
 
