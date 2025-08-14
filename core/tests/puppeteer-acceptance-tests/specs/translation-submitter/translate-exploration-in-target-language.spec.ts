@@ -93,19 +93,14 @@ describe('Translation Submitter', function () {
       'Fractions'
     );
 
+    const explorationIds =
+      await curriculumAdm.createAndPublishExplorationsWithCards(10);
+
     await curriculumAdm.createAndPublishTopic(
       'Test Topic',
       'Test Subtopic',
       'Test Skill'
     );
-    await curriculumAdm.addStoryToTopic(
-      'Test Story',
-      'test-story',
-      'Test Topic'
-    );
-
-    const explorationIds =
-      await curriculumAdm.createAndPublishExplorationsWithCards(10);
 
     await curriculumAdm.createAndPublishStoryWithChapter(
       'Test Story',

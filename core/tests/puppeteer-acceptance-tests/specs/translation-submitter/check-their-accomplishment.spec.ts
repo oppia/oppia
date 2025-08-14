@@ -72,15 +72,13 @@ describe('Translation Submitter', function () {
     await translationSubmitter.selectLanguageInTranslateTextTab(
       'हिन्दी (Hindi)'
     );
-  });
 
-  it('should be able to check contribution stats', async function () {
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Cutting the Pies',
       'Fractions - The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
-    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOn('Save and translate another');
     await translationSubmitter.clickOn('Discard changes');
     await translationSubmitter.clickOn('Skip');
     await translationSubmitter.typeTextForRTE('सामग्री 1');
@@ -89,7 +87,9 @@ describe('Translation Submitter', function () {
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
+  });
 
+  it('should be able to check contribution stats', async function () {
     // Check contribution stats.
     await translationSubmitter.clickOn('Contribution Stats');
     await translationSubmitter.selectContributionTypeInContributionDashboard(
