@@ -26,7 +26,7 @@ import {
 } from 'pages/interaction-specs.constants';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {ExplorationPlayerConstants} from '../../../current-lesson-player/exploration-player-page.constants';
+import {NewLessonPlayerConstants} from '../../../new-lesson-player/lesson-player-page.constants';
 import {PlayerPositionService} from '../../../services/player-position.service';
 import {PlayerTranscriptService} from '../../../services/player-transcript.service';
 import {Interaction} from 'domain/exploration/interaction.model';
@@ -149,7 +149,7 @@ export class NewInputResponsePairComponent {
         AppConstants.COMPONENT_NAME_FEEDBACK &&
       this.audioPlayerService.isPlaying()
     ) {
-      return ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
+      return NewLessonPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
     }
     return '';
   }
