@@ -167,6 +167,10 @@ why they need to be overriden.  */
   transform: translate3d(0,-1px,0);
 }
 
+.mat-bottom-sheet-container {
+  border-radius: 28px 28px 0 0;
+}
+
 .oppia-focus-indicator-blue:focus {
   outline: 2px solid rgb(23, 23, 255);
 }

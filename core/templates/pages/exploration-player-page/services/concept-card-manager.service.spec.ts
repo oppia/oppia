@@ -22,21 +22,35 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {TranslateService} from '@ngx-translate/core';
 import {MockTranslateService} from '../../../components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
 import {StateCard} from '../../../domain/state_card/state-card.model';
+import {ConceptCard} from '../../../domain/skill/concept-card.model';
 import {PlayerPositionService} from './player-position.service';
 import {ConceptCardManagerService} from './concept-card-manager.service';
 import {ExplorationEngineService} from './exploration-engine.service';
+import {PlayerTranscriptService} from './player-transcript.service';
 import {StateObjectFactory} from '../../../domain/state/StateObjectFactory';
 import {Interaction} from '../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+
+class MockNgbModalRef {
+  componentInstance = {
+    skillId: null,
+    explorationId: null,
+  };
+}
 
 describe('ConceptCardManager service', () => {
   let ccms: ConceptCardManagerService;
   let pps: PlayerPositionService;
   let ees: ExplorationEngineService;
+  let pts: PlayerTranscriptService;
   let stateObjectFactory: StateObjectFactory;
   let mockNewCardOpenedEmitter = new EventEmitter<StateCard>();
   let mockNewCardAvailableEmitter = new EventEmitter();
   let stateCard: StateCard;
+  let stateCardWithHints: StateCard;
+  let ngbModal: NgbModal;
+  let mockConceptCard: ConceptCard;
 
   const WAIT_BEFORE_REALLY_STUCK_MSEC: number = 160000;
   const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 500;
@@ -54,12 +68,14 @@ describe('ConceptCardManager service', () => {
     });
     pps = TestBed.inject(PlayerPositionService);
     ees = TestBed.inject(ExplorationEngineService);
+    pts = TestBed.inject(PlayerTranscriptService);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
     spyOn(pps, 'onNewCardAvailable').and.returnValue(
       mockNewCardAvailableEmitter
     );
     spyOn(pps, 'onNewCardOpened').and.returnValue(mockNewCardOpenedEmitter);
     ccms = TestBed.inject(ConceptCardManagerService);
+    ngbModal = TestBed.inject(NgbModal);
   }));
 
   beforeEach(() => {
@@ -122,6 +138,56 @@ describe('ConceptCardManager service', () => {
       RecordedVoiceovers.createEmpty(),
       'content'
     );
+
+    stateCardWithHints = StateCard.createNewCard(
+      'State 3',
+      '<p>Content</p>',
+      '<interaction></interaction>',
+      Interaction.createFromBackendDict({
+        id: 'TextInput',
+        answer_groups: [],
+        default_outcome: {
+          dest: 'Hola',
+          dest_if_really_stuck: null,
+          feedback: {
+            content_id: '',
+            html: '',
+          },
+          labelled_as_correct: true,
+          param_changes: [],
+          refresher_exploration_id: 'test',
+          missing_prerequisite_skill_id: 'test_skill_id',
+        },
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: true,
+          },
+          placeholder: {
+            value: 1,
+          },
+        },
+        hints: [
+          {
+            hint_content: {
+              content_id: 'hint_1',
+              html: 'This is a hint',
+            },
+          },
+        ],
+        solution: null,
+      }),
+      RecordedVoiceovers.createEmpty(),
+      'content'
+    );
+
+    mockConceptCard = {
+      getExplanation: () => ({
+        getHtml: () => 'Test explanation',
+      }),
+      getWorkedExamples: () => [],
+      getSkillDescription: () => 'Test skill',
+    } as ConceptCard;
   });
 
   it('should show concept card icon at the right time', fakeAsync(() => {
@@ -143,6 +209,17 @@ describe('ConceptCardManager service', () => {
     expect(ccms.isConceptCardViewable()).toBe(true);
     expect(ccms.isConceptCardConsumed()).toBe(false);
   }));
+
+  it('should open concept card modal', () => {
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
+    ccms.openConceptCardModal('linkedSkillId');
+    expect(modalSpy).toHaveBeenCalled();
+  });
 
   it('should not show concept card when hints exist', fakeAsync(() => {
     // Case when hints exist.
@@ -203,6 +280,7 @@ describe('ConceptCardManager service', () => {
       next_content_id_index: 0,
       card_is_checkpoint: false,
       linked_skill_id: 'Id',
+      inapplicable_skill_misconception_ids: [],
       content: {
         content_id: 'content',
         html: 'Congratulations, you have finished!',
@@ -227,16 +305,68 @@ describe('ConceptCardManager service', () => {
     expect(ccms.isConceptCardConsumed()).toBe(false);
   }));
 
+  it('should return false if concept card for state does not exist', () => {
+    const stateWithoutLinkedSkill = {
+      classifier_model_id: null,
+      solicit_answer_details: false,
+      interaction: {
+        solution: null,
+        confirmed_unclassified_answers: [],
+        id: 'TextInput',
+        hints: [],
+        customization_args: {
+          rows: {
+            value: 1,
+          },
+          placeholder: {
+            value: 'Enter text here',
+          },
+        },
+        answer_groups: [],
+        default_outcome: null,
+      },
+      param_changes: [],
+      next_content_id_index: 0,
+      card_is_checkpoint: false,
+      linked_skill_id: null,
+      inapplicable_skill_misconception_ids: [],
+      content: {
+        content_id: 'content',
+        html: 'Test content',
+      },
+    };
+    spyOn(ees, 'getStateFromStateName')
+      .withArgs('State 2')
+      .and.returnValue(
+        stateObjectFactory.createFromBackendDict(
+          'State2',
+          stateWithoutLinkedSkill
+        )
+      );
+
+    expect(ccms.conceptCardForStateExists(stateCard)).toBe(false);
+  });
+
   it('should set the number of hints available', fakeAsync(() => {
     spyOn(pps.onNewCardOpened, 'subscribe');
-    pps.onNewCardOpened.emit(stateCard);
-    expect(ccms.hintsAvailable).toEqual(0);
+    pps.onNewCardOpened.emit(stateCardWithHints);
+    expect(ccms.hintsAvailable).toEqual(1);
   }));
 
   it('should emit learner stuckness', fakeAsync(() => {
     ccms.learnerIsReallyStuck = false;
     ccms.emitLearnerStuckedness();
     expect(ccms.learnerIsReallyStuck).toEqual(true);
+  }));
+
+  it('should not emit learner stuckness if already stuck', fakeAsync(() => {
+    ccms.learnerIsReallyStuck = true;
+    let emissionCount = 0;
+    ccms.onLearnerGetsReallyStuck.subscribe(() => {
+      emissionCount++;
+    });
+    ccms.emitLearnerStuckedness();
+    expect(emissionCount).toBe(0);
   }));
 
   it('should correctly consume concept card', fakeAsync(() => {
@@ -249,6 +379,13 @@ describe('ConceptCardManager service', () => {
     expect(ccms.wrongAnswersSinceConceptCardConsumed).toEqual(0);
     tick(WAIT_BEFORE_REALLY_STUCK_MSEC);
     expect(ccms.learnerIsReallyStuck).toEqual(true);
+  }));
+
+  it('should clear tooltip timeout when consuming concept card', fakeAsync(() => {
+    ccms.tooltipTimeout = setTimeout(() => {}, 1000);
+    ccms.consumeConceptCard();
+    expect(ccms.tooltipTimeout).toBeNull();
+    flush();
   }));
 
   it('should record the wrong answer twice', fakeAsync(() => {
@@ -277,8 +414,103 @@ describe('ConceptCardManager service', () => {
     flush();
   }));
 
+  it('should not record wrong answer if concept card is not viewable', () => {
+    ccms.conceptCardReleased = false;
+    ccms.wrongAnswersSinceConceptCardConsumed = 0;
+    ccms.recordWrongAnswer();
+    expect(ccms.wrongAnswersSinceConceptCardConsumed).toEqual(0);
+  });
+
+  it('should set and get concept card', () => {
+    ccms.setConceptCard(mockConceptCard);
+    expect(ccms.getConceptCard()).toEqual(mockConceptCard);
+  });
+
+  it('should return to exploration after concept card', () => {
+    spyOn(pts, 'addPreviousCard');
+    spyOn(pts, 'getNumCards').and.returnValue(5);
+    spyOn(pps, 'setDisplayedCardIndex');
+
+    ccms.returnToExplorationAfterConceptCard();
+
+    expect(pts.addPreviousCard).toHaveBeenCalled();
+    expect(pts.getNumCards).toHaveBeenCalled();
+    expect(pps.setDisplayedCardIndex).toHaveBeenCalledWith(4);
+  });
+
+  it('should enqueue timeout and clear previous timeout', fakeAsync(() => {
+    let mockFunction = jasmine.createSpy('mockFunction');
+    ccms.enqueueTimeout(mockFunction, 1000);
+
+    // Enqueue another timeout which should clear the first one.
+    ccms.enqueueTimeout(mockFunction, 2000);
+
+    tick(1000);
+    expect(mockFunction).not.toHaveBeenCalled();
+
+    tick(1000);
+    expect(mockFunction).toHaveBeenCalledTimes(1);
+  }));
+
+  it('should show tooltip and mark concept card as discovered', () => {
+    let timeoutElapsedEmitted = false;
+    ccms.onTimeoutElapsed$.subscribe(() => {
+      timeoutElapsedEmitted = true;
+    });
+    ccms.tooltipIsOpen = false;
+    ccms.conceptCardDiscovered = false;
+
+    ccms.showTooltip();
+
+    expect(ccms.tooltipIsOpen).toBe(true);
+    expect(ccms.conceptCardDiscovered).toBe(true);
+    expect(timeoutElapsedEmitted).toBe(true);
+  });
+
+  it('should release concept card and emit timeout elapsed', fakeAsync(() => {
+    let timeoutElapsedEmitted = false;
+    ccms.onTimeoutElapsed$.subscribe(() => {
+      timeoutElapsedEmitted = true;
+    });
+    ccms.conceptCardReleased = false;
+    ccms.conceptCardDiscovered = false;
+    ccms.tooltipTimeout = null;
+
+    ccms.releaseConceptCard();
+
+    expect(ccms.conceptCardReleased).toBe(true);
+    expect(timeoutElapsedEmitted).toBe(true);
+
+    tick(WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC);
+    expect(ccms.tooltipIsOpen).toBe(true);
+  }));
+
+  it('should not set tooltip timeout if concept card already discovered', () => {
+    ccms.conceptCardReleased = false;
+    ccms.conceptCardDiscovered = true;
+    ccms.tooltipTimeout = null;
+
+    ccms.releaseConceptCard();
+
+    expect(ccms.tooltipTimeout).toBeNull();
+  });
+
+  it('should not set tooltip timeout if tooltip timeout already exists', () => {
+    ccms.conceptCardReleased = false;
+    ccms.conceptCardDiscovered = false;
+    ccms.tooltipTimeout = setTimeout(() => {}, 1000);
+
+    ccms.releaseConceptCard();
+
+    expect(ccms.tooltipTimeout).not.toBeNull();
+  });
+
   it('should fetch EventEmitter for consumption of hint', () => {
     let mockOnLearnerGetsReallyStuck = new EventEmitter();
     expect(ccms.onLearnerGetsReallyStuck).toEqual(mockOnLearnerGetsReallyStuck);
+  });
+
+  it('should subscribe to onTimeoutElapsed observable', () => {
+    expect(ccms.onTimeoutElapsed$).toBeDefined();
   });
 });
