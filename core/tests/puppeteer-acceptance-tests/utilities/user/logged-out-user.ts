@@ -993,7 +993,7 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.clickAndWaitForNavigation(button);
 
-    expect(this.page.url()).toBe(expectedDestinationPageUrl);
+    await this.expectPageURLToContain(expectedDestinationPageUrl);
   }
 
   /**
@@ -2315,6 +2315,9 @@ export class LoggedOutUser extends BaseUser {
    * The button is in the first section of the page.
    */
   async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
+    await this.waitForElementToStabilize(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
     await this.clickLinkButtonToNewTab(
       partnerWithUsButtonAtTheTopOfPartnershipsPage,
       'Partner With Us button at the bottom of the Partnerships page',
@@ -4425,6 +4428,8 @@ export class LoggedOutUser extends BaseUser {
           embedCode
       );
     }
+
+    await this.waitForElementToStabilize(closeButtonSelector);
     await this.page.click(closeButtonSelector);
     await this.page.waitForSelector(embedCodeSelector, {hidden: true});
   }

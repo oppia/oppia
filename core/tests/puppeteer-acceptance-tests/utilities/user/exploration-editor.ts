@@ -2002,6 +2002,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error('Math equation box not found.');
     }
 
+    await this.waitForElementToStabilize(equationBox);
     await equationBox.click();
     await equationBox.type(solution);
 
