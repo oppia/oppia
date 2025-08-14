@@ -5701,12 +5701,6 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.expectElementToBeVisible(conceptCardLinkSelector);
 
-    const conceptCard = await this.page.$(conceptCardLinkSelector);
-    if (!conceptCard) {
-      throw new Error('Concept card link not found.');
-    }
-    await this.waitForElementToStabilize(conceptCard);
-
     await this.clickOn(conceptCardLinkSelector);
     const conceptCardContent: string =
       (await this.page.$eval(
