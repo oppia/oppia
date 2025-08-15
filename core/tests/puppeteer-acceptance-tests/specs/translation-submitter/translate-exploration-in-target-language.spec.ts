@@ -112,6 +112,7 @@ describe('Translation Submitter', function () {
     for (const id of explorationIds.slice(1)) {
       await curriculumAdm.openStoryEditor('Test Story', 'Test Topic');
       await curriculumAdm.addChapter(`Chapter ${id}`, id);
+      await curriculumAdm.saveStoryDraft();
     }
   }, 1200000);
 
