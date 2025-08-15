@@ -722,6 +722,7 @@
 	"I18N_FACILITATOR_DASHBOARD_PAGE_TITLE": "Title of the Facilitator Dashboard page.",
 	"I18N_FEEDBACK_INSTRUCTION": "Message below the feedback input box.",
 	"I18N_FEEDBACK_MESSAGE_ANONYMOUS_AUTHOR": "The name of the author of a message in a feedback thread who wanted to stay anonymous.",
+	"I18N_FEEDBACK_MODAL_HEADER": "Header of the feedback modal.",
 	"I18N_FEEDBACK_UPDATES_BREADCRUMB": "Text displayed in the Feedback updates Page. - Text shown in the top left corner of the nav bar.",
 	"I18N_FEEDBACK_UPDATES_FEEDBACK_THREAD_WARNING": "This message appears when a feedback thread is opened in the feedback updates. It warns the user against divulging private information on a publicly viewable discussion.",
 	"I18N_FEEDBACK_UPDATES_NO_ACTIVITY_CARD_HEADING": "Heading of the feedback updates no activity card",
