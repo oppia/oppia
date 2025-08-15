@@ -33,9 +33,7 @@
       </label>
       <ng-container *ngIf="flagMessageTextareaIsShown">
         <p>{{ 'I18N_PLAYER_REPORT_MODAL_BODY_ADDITIONAL_DETAILS' | translate }}</p>
-        <textarea rows="3" cols="50"
-          [(ngModel)]="flagMessage" [ngModelOptions]="{standalone: true}"
-          class="form-control report-exploration-dialog-box-textarea" oppiaFocusOn="flagMessageTextarea">
+        <textarea rows="3" cols="50" [(ngModel)]="flagMessage" [ngModelOptions]="{standalone: true}" class="form-control report-exploration-dialog-box-textarea" oppiaFocusOn="flagMessageTextarea">
         </textarea>
       </ng-container>
     </div>
