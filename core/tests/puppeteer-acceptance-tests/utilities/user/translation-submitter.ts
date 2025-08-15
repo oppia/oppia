@@ -63,7 +63,9 @@ export class TranslationSubmitter extends BaseUser {
    * Clicks on the given pagination button.
    * @param button - The button to click on.
    */
-  async clickOnPaginationButton(button: 'previous' | 'next') {
+  async clickOnPaginationButtonInTranslationSubmitterPage(
+    button: 'previous' | 'next'
+  ) {
     const selector = `${paginationBtnSelectorPrefix}-${button}`;
     await this.expectElementToBeVisible(selector);
 

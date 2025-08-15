@@ -21,6 +21,7 @@
 
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
+import {Contributor} from '../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
@@ -32,7 +33,10 @@ import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 const ROLES = testConstants.Roles;
 
 describe('Translation Reviewer', function () {
-  let translationReviewer: TranslationReviewer & LoggedInUser & LoggedOutUser;
+  let translationReviewer: TranslationReviewer &
+    LoggedInUser &
+    LoggedOutUser &
+    Contributor;
   let translationSubmitter: TranslationSubmitter & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
 
@@ -57,20 +61,24 @@ describe('Translation Reviewer', function () {
     // Create translation opportunity.
     const explorationId =
       await curriculumAdm.createAndPublishExplorationWithCards('Exploration 1');
+    const explorationId2 =
+      await curriculumAdm.createAndPublishExplorationWithCards('Exploration 2');
 
     await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdm.createAndPublishTopic(
       'Fractions',
-      'Understanding Numerators',
-      'Recognize equivalent fractions'
+      'Fraction Foundations',
+      'Unit Fractions'
     );
     await curriculumAdm.createAndPublishStoryWithChapter(
-      'Dividing a Birthday Cake',
-      'dividing-a-birthday-cake',
-      'The Birthday Cake Arrives',
+      'The Picnic Problem',
+      'the-picnic-problem',
+      'Cutting the Pies',
       explorationId as string,
       'Fractions'
     );
+    await curriculumAdm.openStoryEditor('The Picnic Problem', 'Fractions');
+    await curriculumAdm.addChapter('Trading Slices', explorationId2);
 
     // Translate an exploration.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();
@@ -81,31 +89,69 @@ describe('Translation Reviewer', function () {
       'हिन्दी (Hindi)'
     );
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-      'The Birthday Cake Arrives',
-      'Dividing a Birthday Cake'
+      'Cutting the Pies',
+      'The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
-    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOn('Save and translate another');
     await translationSubmitter.clickOn('Discard changes');
     await translationSubmitter.clickOn('Skip');
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.clickOn('Discard changes');
+
+    // Translate an exploration in a different language.
+    await translationSubmitter.selectLanguageInTranslateTextTab('Ákán (Akan)');
+    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+      'Trading Slices',
+      'The Picnic Problem'
+    );
+    await translationSubmitter.typeTextForRTE('सामग्री 0');
+    await translationSubmitter.clickOn('Save and translate another');
   }, 600000);
 
   it('should be able to view all pending reviews', async function () {
+    // TODO: Can't see the one with different language.
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.expectPinIconToBeVisible();
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
-      'The Birthday Cake Arrives',
-      'Fractions - Dividing a Birthday Cake'
+      'Cutting the Pies',
+      'Fractions - The Picnic Problem'
     );
+  });
+
+  it('should be able to move between reviews', async function () {
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       'सामग्री 0',
       'Fractions / Dividing'
     );
 
-    await translationReviewer.clickOn('Accept and review next');
+    await translationReviewer.expectPaginationButtonToBeDisabled('previous');
+    await translationReviewer.clickOnPaginationButton('next');
+    await translationReviewer.expectPaginationButtonToBeDisabled('next');
+    await translationReviewer.clickOnPaginationButton('previous');
+  });
+
+  it('should be able to accept the translation', async function () {
+    // Accept the translation without adding review comment.
+    await translationReviewer.submitTranslationReview('accept');
+
+    // Accept the translation with adding review comment.
+    await translationReviewer.submitTranslationReview(
+      'accept',
+      'Review comment'
+    );
+  });
+
+  it('should be able to reject a translation', async function () {
+    // Shouldn't be able to reject a review without a comment.
+    await translationReviewer.expectRejectReviewButtonToBeDisabled();
+
+    // Should be able to reject a review with a comment.
+    await translationReviewer.submitTranslationReview(
+      'reject',
+      'Some lines are not translated properly'
+    );
   });
 
   it('should be able to see contribution stats', async function () {

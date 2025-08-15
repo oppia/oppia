@@ -21,10 +21,12 @@
 
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
+import {Contributor} from '../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {TopicManager} from '../../utilities/user/topic-manager';
+import {TranslationReviewer} from '../../utilities/user/translation-reviewer';
 import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 
 const ROLES = testConstants.Roles;
@@ -32,6 +34,7 @@ const ROLES = testConstants.Roles;
 describe('Translation Submitter', function () {
   let translationSubmitter: TranslationSubmitter & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
+  let translationReviewer: TranslationReviewer & Contributor & LoggedInUser;
 
   beforeAll(async function () {
     // Create users.
@@ -44,6 +47,12 @@ describe('Translation Submitter', function () {
       'curriculumAdm',
       'curriculumAdm@example.com',
       [ROLES.CURRICULUM_ADMIN]
+    );
+
+    translationReviewer = await UserFactory.createNewUser(
+      'translationReviewer',
+      'translationReviewer@example.com',
+      [ROLES.TRANSLATION_REVIEWER]
     );
 
     // Create a curated exploration.

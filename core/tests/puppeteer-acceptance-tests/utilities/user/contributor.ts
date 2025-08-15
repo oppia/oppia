@@ -28,6 +28,9 @@ const opportunityItemHeadingSelector =
   '.e2e-test-opportunity-list-item-heading';
 const opportunitySubHeadingSelector =
   '.e2e-test-opportunity-list-item-subheading';
+const paginationButtonPreviousSelector = '.e2e-test-pagination-button-previous';
+const paginationButtonNextSelector = '.e2e-test-pagination-button-next';
+const reviewContentContainerSelector = '.e2e-test-review-content-container';
 
 export class Contributor extends BaseUser {
   /**
@@ -116,6 +119,49 @@ export class Contributor extends BaseUser {
       `Success: Translation opportunity for ${heading} in ${subheading} not found.`
     );
     return null;
+  }
+
+  /**
+   * Expects the pagination button to be disabled.
+   * @param button - The button to check for.
+   */
+  async expectPaginationButtonToBeDisabled(
+    button: 'previous' | 'next'
+  ): Promise<void> {
+    const selector =
+      button === 'previous'
+        ? paginationButtonPreviousSelector
+        : paginationButtonNextSelector;
+    await this.expectElementToBeVisible(selector);
+    await this.expectElementToBeClickable(selector, false);
+  }
+
+  /**
+   * Clicks on the pagination button.
+   * @param button - The button to click on.
+   */
+  async clickOnPaginationButton(button: 'previous' | 'next'): Promise<void> {
+    const initialReviewContent = await this.page.$eval(
+      reviewContentContainerSelector,
+      el => el.textContent
+    );
+
+    const selector =
+      button === 'previous'
+        ? paginationButtonPreviousSelector
+        : paginationButtonNextSelector;
+    await this.expectElementToBeVisible(selector);
+    await this.clickOn(selector);
+
+    await this.page.waitForFunction(
+      (selector: string, initialContent: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent !== initialContent;
+      },
+      {},
+      reviewContentContainerSelector,
+      initialReviewContent
+    );
   }
 }
 

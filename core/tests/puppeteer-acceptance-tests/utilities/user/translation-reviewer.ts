@@ -64,6 +64,10 @@ const badgeSelector = '.e2e-test-badge';
 const badgeValueSelector = '.e2e-test-badge-value';
 const badgeCaptionSelector = '.e2e-test-badge-caption';
 const badgeLanguageSelector = '.e2e-test-badge-language';
+const reviewCommentInputSelector = '.e2e-test-suggestion-review-message';
+const acceptTranslationButtonSelector = '.e2e-test-translation-accept-button';
+const rejectTranslationButtonSelector = '.e2e-test-translation-reject-button';
+const reviewContentContainerSelector = '.e2e-test-review-content-container';
 
 export class TranslationReviewer extends BaseUser {
   /**
@@ -242,6 +246,54 @@ export class TranslationReviewer extends BaseUser {
     }
 
     throw new Error('Row not found in the contribution table with values: ');
+  }
+
+  /**
+   * Adds a translation review.
+   * @param reviewType - The type of the review to add.
+   * @param reviewMessage - The message to add to the review.
+   */
+  async submitTranslationReview(
+    reviewType: 'accept' | 'reject',
+    reviewMessage?: string
+  ): Promise<void> {
+    const buttonSelector =
+      reviewType === 'accept'
+        ? acceptTranslationButtonSelector
+        : rejectTranslationButtonSelector;
+    if (reviewMessage) {
+      await this.expectElementToBeVisible(reviewCommentInputSelector);
+      await this.type(reviewCommentInputSelector, reviewMessage);
+    }
+
+    await this.expectElementToBeVisible(reviewContentContainerSelector);
+    const initialReviewContent = await this.page.$eval(
+      reviewContentContainerSelector,
+      el => el.textContent
+    );
+
+    await this.clickOn(buttonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string, initialContent: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent !== initialContent;
+      },
+      {},
+      reviewContentContainerSelector,
+      initialReviewContent
+    );
+  }
+
+  /**
+   * Expects the reject translation button to be disabled.
+   */
+  async expectRejectReviewButtonToBeDisabled(): Promise<void> {
+    await this.expectElementToBeVisible(rejectTranslationButtonSelector);
+    await this.expectElementToBeClickable(
+      rejectTranslationButtonSelector,
+      false
+    );
   }
 }
 

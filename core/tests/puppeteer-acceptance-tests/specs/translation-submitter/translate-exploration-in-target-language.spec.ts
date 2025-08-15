@@ -170,7 +170,9 @@ describe('Translation Submitter', function () {
     );
 
     // Navigate to the next page.
-    await translationSubmitter.clickOnPaginationButton('next');
+    await translationSubmitter.clickOnPaginationButtonInTranslationSubmitterPage(
+      'next'
+    );
     await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
     await translationSubmitter.expectPaginationButtonToBeVisible('previous');
     await translationSubmitter.expectTranslationOpportunityToBePresent(
@@ -179,7 +181,9 @@ describe('Translation Submitter', function () {
     );
 
     // Change the subject.
-    await translationSubmitter.clickOnPaginationButton('previous');
+    await translationSubmitter.clickOnPaginationButtonInTranslationSubmitterPage(
+      'previous'
+    );
     await translationSubmitter.selectSubjectInTranslateTextTab('Fractions');
     await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
   });
