@@ -62,7 +62,7 @@ export class RTEEditor {
     const initialInnerHTML = await this.parentPage.evaluate(
       (selector: string) => {
         // We are using innerHTML so, we can also track option changes.
-        // eslint-disable-next-line no-inner-html
+        // eslint-disable-next-line oppia/no-inner-html
         return document.querySelector(selector)?.innerHTML;
       },
       rteTextAreaSelector
@@ -74,7 +74,7 @@ export class RTEEditor {
       await this.parentPage.waitForFunction(
         (selector: string, innerHTML: string) => {
           // We are using innerHTML so, we can also track option changes.
-          // eslint-disable-next-line no-inner-html
+          // eslint-disable-next-line oppia/no-inner-html
           return document.querySelector(selector)?.innerHTML !== innerHTML;
         },
         {},
