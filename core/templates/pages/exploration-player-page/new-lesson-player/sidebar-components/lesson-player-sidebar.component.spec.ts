@@ -44,7 +44,7 @@ import {LearnerLocalNavBackendApiService} from '../../../../pages/exploration-pl
 import {AlertsService} from '../../../../services/alerts.service';
 import {WindowDimensionsService} from '../../../../services/contextual/window-dimensions.service';
 import {ShareLessonModalComponent} from './share-lesson-modal.component';
-import {NewFlagExplorationModalComponent} from './flag-exploration-modal.component';
+import {NewFlagExplorationModalComponent} from './flag-lesson-modal.component';
 import {LessonFeedbackModalComponent} from './lesson-feedback-modal.component';
 import {CustomizableThankYouModalComponent} from './customizable-thank-you-modal.component';
 import {of} from 'rxjs';
