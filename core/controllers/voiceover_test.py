@@ -496,15 +496,16 @@ class AutomaticVoiceoverRegenerationRecordHandlerTests(
         cloud_task_run = taskqueue_services.get_cloud_task_run_by_model_id(
             new_model_id)
         assert cloud_task_run is not None
-        start_date = cloud_task_run.created_on.strftime('%a %b %d %Y')
+        start_date = cloud_task_run.created_on.replace(
+            tzinfo=datetime.timezone.utc).isoformat()
         end_date = (
             cloud_task_run.created_on + datetime.timedelta(days=1)
-        ).strftime('%a %b %d %Y')
+        ).replace(tzinfo=datetime.timezone.utc).isoformat()
 
-        url = '/automatic_voiceover_regeneration_record/%s/%s' % (
-            start_date, end_date)
-
-        json_response = self.get_json(url)
+        json_response = self.get_json(
+            '/automatic_voiceover_regeneration_record',
+            params={'start_date': start_date, 'end_date': end_date}
+        )
         self.assertEqual(
             json_response['automatic_voiceover_regeneration_records'],
             [cloud_task_run.to_dict()])

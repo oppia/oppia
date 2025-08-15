@@ -1208,7 +1208,7 @@ URLS = [
         learner_group.LearnerGroupsFeatureStatusHandler),
     get_redirect_route('/android_data', android.AndroidActivityHandler),
     get_redirect_route(
-        '/automatic_voiceover_regeneration_record/<start_date>/<end_date>',
+        '/automatic_voiceover_regeneration_record',
         voiceover.AutomaticVoiceoverRegenerationRecordHandler
     )
 ]

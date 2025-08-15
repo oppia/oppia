@@ -266,7 +266,11 @@ def get_cloud_task_run_by_given_params(
         queue_id)
     filtered_models = [
             model for model in cloud_task_run_models
-            if start_datetime <= model.last_updated <= end_datetime
+            if (
+                start_datetime <=
+                model.last_updated.replace(tzinfo=datetime.timezone.utc) <=
+                end_datetime
+            )
         ]
     return [
         convert_cloud_task_run_model_to_domain_object(model)

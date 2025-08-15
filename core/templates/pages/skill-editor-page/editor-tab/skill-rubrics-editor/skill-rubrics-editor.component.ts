@@ -20,7 +20,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
