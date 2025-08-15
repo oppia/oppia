@@ -54,7 +54,7 @@ describe('LessonFeedbackModalComponent', () => {
   };
 
   class MockUserService {
-    getUserInfoAsync(): Promise<any> {
+    getUserInfoAsync(): Promise<typeof mockUserInfo> {
       return Promise.resolve(mockUserInfo);
     }
   }
