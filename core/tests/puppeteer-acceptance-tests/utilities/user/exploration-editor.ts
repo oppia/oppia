@@ -2631,10 +2631,10 @@ export class ExplorationEditor extends BaseUser {
 
     const confirmPublish = async (): Promise<string> => {
       await this.clickOn(saveExplorationChangesButton);
-      await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(explorationConfirmPublishButton, {
         visible: true,
       });
+      await this.waitForElementToStabilize(explorationConfirmPublishButton);
       await this.clickOn(explorationConfirmPublishButton);
       await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
@@ -2659,7 +2659,6 @@ export class ExplorationEditor extends BaseUser {
       return await confirmPublish();
     } catch (error) {
       showMessage('Failed to publish the exploration.\n' + error.stack);
-      await this.waitForPageToFullyLoad();
 
       const errorSavingExplorationElement = await this.page.$(
         errorSavingExplorationModal

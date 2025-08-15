@@ -52,7 +52,8 @@ describe('Translation Submitter', function () {
     translationReviewer = await UserFactory.createNewUser(
       'translationReviewer',
       'translationReviewer@example.com',
-      [ROLES.TRANSLATION_REVIEWER]
+      [ROLES.TRANSLATION_REVIEWER],
+      'hi'
     );
 
     // Create a curated exploration.

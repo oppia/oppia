@@ -54,11 +54,12 @@ describe('Translation Submitter', function () {
     );
 
     await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdm.createAndPublishTopic(
-      'Fractions',
-      'Fraction Foundations',
-      'Unit Fractions'
-    );
+    // await curriculumAdm.createAndPublishTopic(
+    //   'Fractions',
+    //   'Fraction Foundations',
+    //   'Unit Fractions'
+    // );
+    await curriculumAdm.createTopic('Fractions', 'fractions');
     await curriculumAdm.createSkillForTopic('Math', 'Fractions');
 
     // Create an exploration.
@@ -96,11 +97,12 @@ describe('Translation Submitter', function () {
     const explorationIds =
       await curriculumAdm.createAndPublishExplorationsWithCards(10);
 
-    await curriculumAdm.createAndPublishTopic(
-      'States of Matter',
-      'Properties of Solids',
-      'Classifying States of Matter'
-    );
+    // await curriculumAdm.createAndPublishTopic(
+    //   'States of Matter',
+    //   'Properties of Solids',
+    //   'Classifying States of Matter'
+    // );
+    await curriculumAdm.createTopic('States of Matter', 'states-of-matter');
 
     await curriculumAdm.createAndPublishStoryWithChapter(
       'The Mystery of the Melting Ice',
