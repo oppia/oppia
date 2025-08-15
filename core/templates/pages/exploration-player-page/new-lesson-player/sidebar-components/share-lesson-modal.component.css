@@ -124,33 +124,33 @@ oppia-share-lesson-modal .cc-attribution-text {
 }
 
 @media (max-width: 480px) {
-	oppia-share-lesson-modal .oppia-share-lesson-modal-footer {
-		justify-content: center;
-	}
+  oppia-share-lesson-modal .oppia-share-lesson-modal-footer {
+	  justify-content: center;
+  }
 
-	oppia-share-lesson-modal .lesson-attribution-text {
-		font-size: 15px;
-	}
+  oppia-share-lesson-modal .lesson-attribution-text {
+	  font-size: 15px;
+  }
 
-	oppia-share-lesson-modal .share-modal-btn {
-		margin-bottom: 10px;
-		margin-right: 0;
-	}
+  oppia-share-lesson-modal .share-modal-btn {
+	  margin-bottom: 10px;
+	  margin-right: 0;
+  }
 
-	oppia-share-lesson-modal .copy-modal-body-btn {
-		flex-direction: column;
-	}
+  oppia-share-lesson-modal .copy-modal-body-btn {
+	  flex-direction: column;
+  }
 
-	oppia-share-lesson-modal .cc-attribution-text {
-		flex-direction: column;
-	}
+  oppia-share-lesson-modal .cc-attribution-text {
+	  flex-direction: column;
+  }
 
-	oppia-share-lesson-modal .cc-attribution-input {
-		margin-bottom: 10px;
-		width: 100%;
-	}
+  oppia-share-lesson-modal .cc-attribution-input {
+	  margin-bottom: 10px;
+	  width: 100%;
+  }
 
-	oppia-share-lesson-modal .copy-cc-btn {
-		width: 100%;
-	}
+  oppia-share-lesson-modal .copy-cc-btn {
+	  width: 100%;
+  }
 }
