@@ -12,7 +12,7 @@ oppia-share-lesson-modal .oppia-share-lesson-modal-header {
 
 oppia-share-lesson-modal .oppia-share-lesson-modal-title {
   color: #00645c;
-  font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;	
+  font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
   font-size: 1.25em;
   font-weight: 400;
   text-align: center;
@@ -68,7 +68,7 @@ oppia-share-lesson-modal .share-modal-btn .button-content {
 
 oppia-share-lesson-modal .success-message {
   background-color: #323232;
-  border-radius: 4px;	
+  border-radius: 4px;
   color: white;
   margin: auto;
   padding: 12px 16px;
