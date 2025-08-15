@@ -17,10 +17,17 @@
  * However, it provides common methods that can be used by different contributors.
  */
 
+import {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
+import {showMessage} from '../common/show-message';
 
 const activeTabNameSelector = '.e2e-test-active-tab-name';
 const activeTabDescriptionSelector = '.e2e-test-active-tab-description';
+const opportunityItemSelector = '.e2e-test-opportunity-list-item';
+const opportunityItemHeadingSelector =
+  '.e2e-test-opportunity-list-item-heading';
+const opportunitySubHeadingSelector =
+  '.e2e-test-opportunity-list-item-subheading';
 
 export class Contributor extends BaseUser {
   /**
@@ -42,6 +49,73 @@ export class Contributor extends BaseUser {
       activeTabDescriptionSelector,
       tabDescription
     );
+  }
+
+  /**
+   * Checks if the translation opportunity is visible and matches the expected values.
+   * @param heading - The expected heading of the translation opportunity.
+   * @param subheading - The expected subheading of the translation opportunity.
+   * @param visible - Whether the translation opportunity should be visible or not.
+   */
+  async expectTranslationOpportunityToBePresent(
+    heading: string,
+    subheading: string,
+    visible: boolean = true
+  ): Promise<ElementHandle | null> {
+    const translationOpportunitiesPreset = await this.isElementVisible(
+      opportunityItemSelector
+    );
+
+    // Handle the case where the translation opportunity is not present.
+    if (!translationOpportunitiesPreset) {
+      if (visible) {
+        throw new Error(
+          `Translation opportunity for ${heading} and ${subheading} not found.`
+        );
+      } else {
+        showMessage(
+          `Success: Translation opportunity for ${heading} and ${subheading} not found.`
+        );
+        return null;
+      }
+    }
+
+    // Get the opportunity item element.
+    const opportunityItems = await this.page.$$(opportunityItemSelector);
+    for (const opportunityItemElement of opportunityItems) {
+      const opportunityItemHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunityItemHeadingSelector
+      );
+      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunitySubHeadingSelector
+      );
+
+      if (
+        opportunityItemHeading === heading &&
+        opportunityItemSubHeading?.includes(subheading)
+      ) {
+        if (!visible) {
+          throw new Error(
+            `Failure: Translation opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
+          );
+        }
+        return opportunityItemElement;
+      }
+    }
+
+    if (visible) {
+      throw new Error(
+        `Translation opportunity for ${heading} in ${subheading} not found.`
+      );
+    }
+    showMessage(
+      `Success: Translation opportunity for ${heading} in ${subheading} not found.`
+    );
+    return null;
   }
 }
 

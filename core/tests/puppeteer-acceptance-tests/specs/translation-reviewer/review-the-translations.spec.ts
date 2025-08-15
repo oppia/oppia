@@ -91,7 +91,7 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.clickOn('Discard changes');
-  });
+  }, 600000);
 
   it('should be able to view all pending reviews', async function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();

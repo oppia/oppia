@@ -470,12 +470,14 @@ export class BaseUser {
     /** Normalize-space is used to remove the extra spaces in the text.
      * Check the documentation for the normalize-space function here :
      * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const [button] = await this.page.$x(
-      `\/\/*[contains(text(), normalize-space('${selector}'))]`
-    );
+    const xpath = `\/\/*[contains(text(), normalize-space('${selector}'))]`;
+    const button = await this.page.waitForXPath(xpath, {
+      visible: true,
+      timeout: 10000,
+    });
     // If we fail to find the element by its XPATH, then the button is undefined and
     // we try to find it by its CSS selector.
-    if (button !== undefined && !forceSelector) {
+    if (button !== null && !forceSelector) {
       await this.waitForElementToBeClickable(button);
       showMessage(`Button (text: ${selector}) is clickable, as expected.`);
       await button.click();

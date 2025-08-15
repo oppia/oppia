@@ -97,20 +97,23 @@ describe('Translation Submitter', function () {
       await curriculumAdm.createAndPublishExplorationsWithCards(10);
 
     await curriculumAdm.createAndPublishTopic(
-      'Test Topic',
-      'Test Subtopic',
-      'Test Skill'
+      'States of Matter',
+      'Properties of Solids',
+      'Classifying States of Matter'
     );
 
     await curriculumAdm.createAndPublishStoryWithChapter(
-      'Test Story',
-      'test-story',
-      `Chapter ${explorationIds[0]}`,
+      'The Mystery of the Melting Ice',
+      'melting-ice',
+      `The Foggy Window`,
       explorationIds[0] as string,
-      'Test Topic'
+      'States of Matter'
     );
     for (const id of explorationIds.slice(1)) {
-      await curriculumAdm.openStoryEditor('Test Story', 'Test Topic');
+      await curriculumAdm.openStoryEditor(
+        'The Mystery of the Melting Ice',
+        'States of Matter'
+      );
       await curriculumAdm.addChapter(`Chapter ${id}`, id);
       await curriculumAdm.saveStoryDraft();
     }
@@ -138,14 +141,26 @@ describe('Translation Submitter', function () {
       __dirname
     );
 
-    // TODO: Check: Translations should not contain "Cutting the Pies".
+    await translationSubmitter.expectTranslationOpportunityToBePresent(
+      'The Foggy Window',
+      'States of Matter - The Foggy Window',
+      false
+    );
 
     // Change the translation language.
     await translationSubmitter.selectLanguageInTranslateTextTab(
       'हिन्दी (Hindi)'
     );
 
-    // TODO: Check: Translations should contain "Cutting the Pies".???
+    await translationSubmitter.expectTranslationOpportunityToBePresent(
+      'The Foggy Window',
+      'States of Matter - The Foggy Window'
+    );
+    await translationSubmitter.expectTranslationOpportunityToBePresent(
+      'Cutting the Pies',
+      'Fractions - The Picnic Problem',
+      false
+    );
 
     // Check if pagination works properly.
     await translationSubmitter.expectPaginationButtonToBeVisible('next');
@@ -153,200 +168,227 @@ describe('Translation Submitter', function () {
       'previous',
       false
     );
+
+    // Navigate to the next page.
     await translationSubmitter.clickOnPaginationButton('next');
     await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
     await translationSubmitter.expectPaginationButtonToBeVisible('previous');
+    await translationSubmitter.expectTranslationOpportunityToBePresent(
+      'Cutting the Pies',
+      'Fractions - The Picnic Problem'
+    );
+
+    // Change the subject.
     await translationSubmitter.clickOnPaginationButton('previous');
+    await translationSubmitter.selectSubjectInTranslateTextTab('Fractions');
+    await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
+  });
 
-    // // Change the subject.
-    // await translationSubmitter.selectSubjectInTranslateTextTab('Fractions');
-    // await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
-    // await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-    //   'The Birthday Cake Arrives',
-    //   'Dividing a Birthday Cake'
-    // );
-
-    // // Check if anchor text for copy tool works properly.
-    // await translationSubmitter.clickAndVerifyAnchorWithInnerText(
-    //   'here',
-    //   'https://oppia-user-guide.readthedocs.io/en/latest/contributor/translate.html'
-    // );
+  it('should be able to use copy tool', async function () {
+    // Check if anchor text for copy tool works properly.
+    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+      'Cutting the Pies',
+      'Fractions - The Picnic Problem'
+    );
+    await translationSubmitter.clickAndVerifyAnchorWithInnerText(
+      'here',
+      'https://oppia-user-guide.readthedocs.io/en/latest/contributor/translate.html'
+    );
+    await translationSubmitter.expectCopyToolWorksProperly(
+      'छवि विवरण',
+      'तस्वीर का शीर्षक'
+    );
 
     // // Check if common buttons work properly.
     // await translationSubmitter.clickOnSkipTranslationButton();
     // await translationSubmitter.toggleCopyButton('On');
     // await translationSubmitter.toggleCopyButton('Off');
     // await translationSubmitter.closeTranslateTextModal();
+
+    //   // Open the translation modal again.
+    //   await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+    //     'The Birthday Cake Arrives',
+    //     'Dividing a Birthday Cake'
+    //   );
   });
 
-  // it('should be able to use copy tool', async function () {
-  //   // Open the translation modal again.
-  //   await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-  //     'The Birthday Cake Arrives',
-  //     'Dividing a Birthday Cake'
-  //   );
-  //   await translationSubmitter.expectCopyToolWorksProperly(
-  //     'छवि विवरण',
-  //     'तस्वीर का शीर्षक'
-  //   );
-  // });
+  it('should be able to use RTE', async function () {
+    // Bold Text.
+    await translationSubmitter.clickOnRTEOptionContainingTitle('बोल्ड');
+    await translationSubmitter.typeTextForRTE('बोल्ड टेक्स्ट');
+    await translationSubmitter.clickOnRTEOptionContainingTitle('बोल्ड');
 
-  // it('should be able to use RTE', async function () {
-  //   // Bold Text.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle('बोल्ड');
-  //   await translationSubmitter.typeTextForRTE('बोल्ड टेक्स्ट');
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle('बोल्ड');
+    // Italic Text.
+    await translationSubmitter.clickOnRTEOptionContainingTitle('इटैलिक');
+    await translationSubmitter.typeTextForRTE('इटैलिक टेक्स्ट');
+    await translationSubmitter.clickOnRTEOptionContainingTitle('इटैलिक');
 
-  //   // Italic Text.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle('इटैलिक');
-  //   await translationSubmitter.typeTextForRTE('इटैलिक टेक्स्ट');
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle('इटैलिक');
+    // Numbered List, INcrease Indent, and Decrease Indent.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.NUM_LIST.HI
+    );
+    await translationSubmitter.typeTextForRTE('अंकीय सूची टेक्स्ट');
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.INCR_INDENT.HI
+    );
+    await translationSubmitter.typeTextForRTE('इन्डॅन्ट बढ़ायें');
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.DECR_INDENT.HI
+    );
+    await translationSubmitter.typeTextForRTE('इन्डॅन्ट कम करें');
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.NUM_LIST.HI
+    );
 
-  //   // Numbered List, INcrease Indent, and Decrease Indent.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.NUM_LIST.HI
-  //   );
-  //   await translationSubmitter.typeTextForRTE('अंकीय सूची टेक्स्ट');
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.INCR_INDENT.HI
-  //   );
-  //   await translationSubmitter.typeTextForRTE('इन्डॅन्ट बढ़ायें');
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.DECR_INDENT.HI
-  //   );
-  //   await translationSubmitter.typeTextForRTE('इन्डॅन्ट कम करें');
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.NUM_LIST.HI
-  //   );
+    // Bulleted List.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.BULLETED_LIST.HI
+    );
+    await translationSubmitter.typeTextForRTE('बुलॅट सूची टेक्स्ट');
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.BULLETED_LIST.HI
+    );
 
-  //   // Bulleted List.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.BULLETED_LIST.HI
-  //   );
-  //   await translationSubmitter.typeTextForRTE('बुलॅट सूची टेक्स्ट');
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.BULLETED_LIST.HI
-  //   );
+    // Pre formatted Text.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.PRE.HI
+    );
+    await translationSubmitter.typeTextForRTE('Pre स्वरूपित पाठ');
 
-  //   // Pre formatted Text.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.PRE.HI
-  //   );
-  //   await translationSubmitter.typeTextForRTE('Pre स्वरूपित पाठ');
+    // Block Quote.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.BLOCK_QUOTE.HI
+    );
+    await translationSubmitter.typeTextForRTE('ब्लॉक-कोट टेक्स्ट');
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.BLOCK_QUOTE.HI
+    );
 
-  //   // Block Quote.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.BLOCK_QUOTE.HI
-  //   );
-  //   await translationSubmitter.typeTextForRTE('ब्लॉक-कोट टेक्स्ट');
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.BLOCK_QUOTE.HI
-  //   );
+    // Collapsible Block.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.COLLAPSIBLE.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'नमूना शीर्षलेख'
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'rte',
+      'आपने संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
+    );
+    await translationSubmitter.clickOn('Done');
 
-  //   // Collapsible Block.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.COLLAPSIBLE.HI
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'input',
-  //     'नमूना शीर्षलेख'
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'rte',
-  //     'आपने संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
-  //   );
-  //   await translationSubmitter.clickOn('Done');
+    // Image.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.IMAGE.HI
+    );
+    await translationSubmitter.clickOn('UPLOAD');
+    await translationSubmitter.uploadFile(testConstants.data.profilePicture);
+    await translationSubmitter.clickOn('Use This Image');
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'textarea',
+      'छवि विवरण'
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'तस्वीर का शीर्षक'
+    );
+    await translationSubmitter.clickOn('Done');
 
-  //   // Image.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.IMAGE.HI
-  //   );
-  //   await translationSubmitter.clickOn('UPLOAD');
-  //   await translationSubmitter.uploadFile(testConstants.data.profilePicture);
-  //   await translationSubmitter.clickOn('Use This Image');
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'textarea',
-  //     'छवि विवरण'
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'input',
-  //     'तस्वीर का शीर्षक'
-  //   );
-  //   await translationSubmitter.clickOn('Done');
+    // Link.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.LINK.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'https://www.oppia.org'
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'ओपीआ',
+      1
+    );
+    await translationSubmitter.clickOn('Done');
 
-  //   // Link.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.LINK.HI
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'input',
-  //     'https://www.oppia.org'
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'input',
-  //     'ओपीआ',
-  //     1
-  //   );
-  //   await translationSubmitter.clickOn('Done');
+    // Math Formula.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.MATH_FORMULA.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'textarea',
+      '\\frac{x}{y}'
+    );
+    await translationSubmitter.clickOn('Done');
 
-  //   // Math Formula.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.MATH_FORMULA.HI
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'textarea',
-  //     '\\frac{x}{y}'
-  //   );
-  //   await translationSubmitter.clickOn('Done');
+    // Concept Card.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.CONCEPT_CARD.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
+    );
+    await translationSubmitter.clickOn('Done');
 
-  //   // Concept Card.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.CONCEPT_CARD.HI
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'input',
-  //     'संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
-  //   );
-  //   await translationSubmitter.clickOn('Done');
+    // Tabs.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.TABS.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'संकेत परिचय'
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'rte',
+      'टैब सामग्री'
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      'संकेत 1',
+      1
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'rte',
+      'टैब सामग्री 1',
+      1
+    );
+    await translationSubmitter.clickOn('Done');
 
-  //   // Tabs.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.TABS.HI
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'input',
-  //     'संकेत परिचय'
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'rte',
-  //     'टैब सामग्री'
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'input',
-  //     'संकेत 1',
-  //     1
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'rte',
-  //     'टैब सामग्री 1',
-  //     1
-  //   );
-  //   await translationSubmitter.clickOn('Done');
+    // Video RTE.
+    await translationSubmitter.clickOnRTEOptionContainingTitle(
+      RTE_BUTTON_TITLES.VIDEO.HI
+    );
+    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
+      'input',
+      youtubeVideoURL
+    );
+    await translationSubmitter.clickOn('Done');
+  });
 
-  //   // Video RTE.
-  //   await translationSubmitter.clickOnRTEOptionContainingTitle(
-  //     RTE_BUTTON_TITLES.VIDEO.HI
-  //   );
-  //   await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-  //     'input',
-  //     youtubeVideoURL
-  //   );
-  //   await translationSubmitter.clickOn('Done');
-  // });
+  it('should be able submit a translation', async function () {
+    await translationSubmitter.clickOn('Save and translate another');
+    // TODO: Bug where we are required to click on the dismiss button.
+    await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.clickOn('Skip');
+    await translationSubmitter.typeTextForRTE('बधाई हो, आपका काम पूरा हो गया!');
+    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.expectToolTipMessage(
+      'Submitted translation for review'
+    );
+    // TODO: Bug where we are required to click on the dismiss button.
+    await translationSubmitter.clickOn('Discard changes');
 
-  // it('should be able submit a translation', async function () {
-  //   await translationSubmitter.clickOn('Save and translate another');
-  // });
+    // TODO: translate button should be disabled.
+  });
+
+  it('should be able to check status of the translations', async function () {
+    // TODO: Progress should be 0%
+    await translationSubmitter.switchToTabInContributionDashboard(
+      'My Contributions'
+    );
+
+    // Check for awaiting review.
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
