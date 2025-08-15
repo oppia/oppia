@@ -20,7 +20,7 @@ import {Component, Optional} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {PlayerPositionService} from '../../services/player-position.service';
-import './flag-exploration-modal.component.css';
+import './flag-lesson-modal.component.css';
 import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 
 export interface FlagExplorationModalResult {
@@ -30,9 +30,9 @@ export interface FlagExplorationModalResult {
 }
 
 @Component({
-  selector: 'oppia-new-flag-exploration-modal',
-  templateUrl: './flag-exploration-modal.component.html',
-  styleUrls: ['./flag-exploration-modal.component.css'],
+  selector: 'oppia-new-flag-lesson-modal',
+  templateUrl: './flag-lesson-modal.component.html',
+  styleUrls: ['./flag-lesson-modal.component.css'],
 })
 export class NewFlagExplorationModalComponent {
   // These properties are initialized using Angular lifecycle hooks

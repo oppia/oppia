@@ -24,10 +24,10 @@ import {MatBottomSheetRef} from '@angular/material/bottom-sheet';
 import {SharedPipesModule} from '../../../../filters/shared-pipes.module';
 import {FocusManagerService} from '../../../../services/stateful/focus-manager.service';
 import {PlayerPositionService} from '../../services/player-position.service';
-import {NewFlagExplorationModalComponent} from './flag-exploration-modal.component';
+import {NewFlagExplorationModalComponent} from './flag-lesson-modal.component';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 
-describe('Flag Exploration modal', () => {
+describe('Flag lesson modal', () => {
   let component: NewFlagExplorationModalComponent;
   let fixture: ComponentFixture<NewFlagExplorationModalComponent>;
   let stateName: string = 'test_state';

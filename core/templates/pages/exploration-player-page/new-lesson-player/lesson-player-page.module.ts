@@ -38,7 +38,7 @@ import {PlayerHeaderComponent} from './lesson-header/player-header.component';
 import {LessonPlayerSidebarComponent} from './sidebar-components/lesson-player-sidebar.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
-import {NewFlagExplorationModalComponent} from './sidebar-components/flag-exploration-modal.component';
+import {NewFlagExplorationModalComponent} from './sidebar-components/flag-lesson-modal.component';
 import {CustomizableThankYouModalComponent} from './sidebar-components/customizable-thank-you-modal.component';
 import {LessonFeedbackModalComponent} from './sidebar-components/lesson-feedback-modal.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';

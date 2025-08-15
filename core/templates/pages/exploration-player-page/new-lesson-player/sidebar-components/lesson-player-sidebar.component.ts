@@ -31,7 +31,7 @@ import {ShareLessonModalComponent} from './share-lesson-modal.component';
 import {
   FlagExplorationModalResult,
   NewFlagExplorationModalComponent,
-} from './flag-exploration-modal.component';
+} from './flag-lesson-modal.component';
 import {LearnerLocalNavBackendApiService} from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {CustomizableThankYouModalComponent} from './customizable-thank-you-modal.component';
