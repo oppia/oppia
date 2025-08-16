@@ -2219,7 +2219,7 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
 
     def test_cannot_generate_full_math_classroom_in_production_mode(
         self
-    ) -> None: 
+    ) -> None:
         """Test that full math classroom cannot be generated in production."""
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
