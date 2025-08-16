@@ -60,6 +60,7 @@ import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 class MockWindowRef {
   nativeWindow = {
+    innerWidth: 0,
     location: {
       pathname: '/community-library/top-rated',
       href: '',
@@ -893,6 +894,19 @@ describe('Library Page Component', () => {
       'setStyle'
     ).and.callThrough();
 
+    // In ChromeHeadless (Karma), window.innerWidth, documentElement.clientWidth,
+    // and body.clientWidth may return unpredictable values (0, very large, or layout-dependent)
+    // because there is no real browser viewport or reflow happening like in a normal browser.
+    // This causes initCarousels() to calculate different tileDisplayCount values:
+    //   - Too small width  → 1 tile  → max-width = 200px
+    //   - Width in 2-tile range → 2 tiles → max-width = 400px (expected in this test)
+    //   - Too large width  → 3 or 4 tiles → max-width = 600px or 800px
+    // This results in flaky tests where the expected '400px' might become '200px', '600px',
+    // or '800px' depending on the runtime environment.
+    // We mock window.innerWidth to a fixed value within the 2-tile range (e.g., 600px)
+    // to make the calculation deterministic and match the expected '400px' result.
+
+    windowRef.nativeWindow.innerWidth = 600;
     componentInstance.initCarousels();
     tick();
 
