@@ -96,7 +96,7 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOn('Save and translate another');
     await translationSubmitter.clickOn('Discard changes');
-    await translationSubmitter.clickOn('Skip');
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.clickOn('Discard changes');
@@ -109,7 +109,7 @@ describe('Translation Reviewer', function () {
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOn('Save and translate another');
-  }, 1200000);
+  }, 900000);
 
   it('should be able to view all pending reviews', async function () {
     // TODO: Can't see the one with different language.

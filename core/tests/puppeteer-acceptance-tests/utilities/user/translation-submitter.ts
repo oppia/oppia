@@ -135,7 +135,7 @@ export class TranslationSubmitter extends BaseUser {
 
       if (
         opportunityItemHeading === chapterName &&
-        opportunityItemSubHeading === storyName
+        opportunityItemSubHeading?.includes(storyName)
       ) {
         opportunityItem = opportunityItemElement;
         break;

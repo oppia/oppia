@@ -368,7 +368,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.clickOn('Save and translate another');
     // TODO: Bug where we are required to click on the dismiss button.
     await translationSubmitter.clickOn('Discard changes');
-    await translationSubmitter.clickOn('Skip');
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('बधाई हो, आपका काम पूरा हो गया!');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.expectToolTipMessage(
