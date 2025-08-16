@@ -1,0 +1,59 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are sme additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-learner-solution-interstitial-modal-title {
+  color: #0d48a1;
+  font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
+  font-size: 1.25em;
+  font-weight: bold;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.oppia-learner-solution-interstitial-modal-body {
+  word-wrap: break-word;
+}
+
+.oppia-learner-solution-container {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  justify-content: flex-end;
+  padding: 16px 20px;
+}
+
+.mat-button.oppia-modal-cancel-button {
+  background: #9a9a9a;
+}
+
+.mat-button.oppia-modal-cancel-button:focus,
+.mat-button.oppia-modal-cancel-button:hover {
+  background: #7a7a7a;
+}
+
+.mat-button.oppia-learner-got-it-button {
+  background: #00786d;
+}
+
+.mat-button.oppia-learner-got-it-button:focus,
+.mat-button.oppia-learner-got-it-button:hover {
+  background: #00655a;
+}
+
+.oppia-learner-solution-interstitial-modal-btn {
+  align-items: center;
+  border: none !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  color: #fff;
+  display: inline-flex;
+  font-weight: 500;
+  height: 35px;
+  min-width: 0;
+  outline: none !important;
+  padding: 6px 12px;
+  text-transform: uppercase;
+}

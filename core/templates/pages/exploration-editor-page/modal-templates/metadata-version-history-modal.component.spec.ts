@@ -36,7 +36,6 @@ import {
 import {MetadataVersionHistoryModalComponent} from './metadata-version-history-modal.component';
 import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
 import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
 
 describe('Metadata version history modal', () => {
   let component: MetadataVersionHistoryModalComponent;
@@ -46,7 +45,6 @@ describe('Metadata version history modal', () => {
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let pageContextService: PageContextService;
   let explorationMetadata: ExplorationMetadata;
-  let paramSpecObjectFactory: ParamSpecObjectFactory;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -74,7 +72,6 @@ describe('Metadata version history modal', () => {
       VersionHistoryBackendApiService
     );
     pageContextService = TestBed.inject(PageContextService);
-    paramSpecObjectFactory = TestBed.inject(ParamSpecObjectFactory);
 
     explorationMetadata = new ExplorationMetadata(
       'title',
@@ -86,7 +83,7 @@ describe('Metadata version history modal', () => {
       '',
       55,
       'Introduction',
-      new ParamSpecs({}, paramSpecObjectFactory),
+      new ParamSpecs({}),
       [],
       false,
       true

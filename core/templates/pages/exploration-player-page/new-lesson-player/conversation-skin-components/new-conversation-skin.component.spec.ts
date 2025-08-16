@@ -61,7 +61,7 @@ import {MessengerService} from '../../../../services/messenger.service';
 import {FocusManagerService} from '../../../../services/stateful/focus-manager.service';
 import {UserService} from '../../../../services/user.service';
 import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
-import {ExplorationPlayerConstants} from '../../current-lesson-player/exploration-player-page.constants';
+import {NewLessonPlayerConstants} from '../../new-lesson-player/lesson-player-page.constants';
 import {ContentTranslationManagerService} from '../../services/content-translation-manager.service';
 import {CurrentInteractionService} from '../../services/current-interaction.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
@@ -1181,9 +1181,9 @@ describe('Conversation skin component', () => {
         componentInstance.continueToReviseStateButtonIsVisible = true;
       });
       tick(
-        ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC
+        NewLessonPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC
       );
-      tick(ExplorationPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
+      tick(NewLessonPlayerConstants.WAIT_BEFORE_REALLY_STUCK_MSEC);
 
       expect(solutionSpy).toHaveBeenCalled();
       expect(redirectionSpy).not.toHaveBeenCalled();
@@ -1218,7 +1218,7 @@ describe('Conversation skin component', () => {
         componentInstance.continueToReviseStateButtonIsVisible = true;
       });
       tick(
-        ExplorationPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC
+        NewLessonPlayerConstants.WAIT_BEFORE_RESPONSE_FOR_STUCK_LEARNER_MSEC
       );
 
       expect(translateService.instant).toHaveBeenCalledWith(
