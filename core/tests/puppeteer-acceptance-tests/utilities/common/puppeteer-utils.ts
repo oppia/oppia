@@ -465,7 +465,8 @@ export class BaseUser {
    */
   async clickOn(
     selector: string,
-    forceSelector: boolean = false
+    forceSelector: boolean = false,
+    timeoutForTextButton: number = 1000
   ): Promise<void> {
     /** Normalize-space is used to remove the extra spaces in the text.
      * Check the documentation for the normalize-space function here :
@@ -475,7 +476,7 @@ export class BaseUser {
     try {
       button = await this.page.waitForXPath(xpath, {
         visible: true,
-        timeout: 10000,
+        timeout: timeoutForTextButton,
       });
     } catch (error) {
       if (!(error instanceof puppeteer.errors.TimeoutError)) {
