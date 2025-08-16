@@ -49,8 +49,8 @@ import {ExplorationModeService} from '../../../services/exploration-mode.service
 import {PlayerPositionService} from '../../../services/player-position.service';
 import {ConversationDisplayComponent} from './conversation-display.component';
 import {I18nLanguageCodeService} from '../../../../../services/i18n-language-code.service';
-import {EndChapterCheckMarkComponent} from '../../../current-lesson-player/learner-experience/end-chapter-check-mark.component';
-import {EndChapterConfettiComponent} from './../../../current-lesson-player/learner-experience/end-chapter-confetti.component';
+import {NewEndChapterCheckMarkComponent} from '../../../new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
+import {NewEndChapterConfettiComponent} from '../../../new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-confetti.component.ts';
 import {PlatformFeatureService} from '../../../../../services/platform-feature.service';
 import {InteractionCustomizationArgs} from '../../../../../../../extensions/interactions/customization-args-defs';
 import {UserInfo} from '../../../../../domain/user/user-info.model';
@@ -415,13 +415,13 @@ describe('Tutor card component', () => {
 
       spyOn(windowRef.nativeWindow, 'matchMedia').and.callThrough();
       componentInstance.checkMarkComponent =
-        jasmine.createSpyObj<EndChapterCheckMarkComponent>(
-          'EndChapterCheckMarkComponent',
+        jasmine.createSpyObj<NewEndChapterCheckMarkComponent>(
+          'NewEndChapterCheckMarkComponent',
           ['animateCheckMark']
         );
       componentInstance.confettiComponent =
-        jasmine.createSpyObj<EndChapterConfettiComponent>(
-          'EndChapterConfettiComponent',
+        jasmine.createSpyObj<NewEndChapterConfettiComponent>(
+          'NewEndChapterConfettiComponent',
           ['animateConfetti']
         );
 
@@ -461,13 +461,13 @@ describe('Tutor card component', () => {
         dispatchEvent: (ev: Event) => true,
       });
       componentInstance.checkMarkComponent =
-        jasmine.createSpyObj<EndChapterCheckMarkComponent>(
-          'EndChapterCheckMarkComponent',
+        jasmine.createSpyObj<NewEndChapterCheckMarkComponent>(
+          'NewEndChapterCheckMarkComponent',
           ['animateCheckMark']
         );
       componentInstance.confettiComponent =
-        jasmine.createSpyObj<EndChapterConfettiComponent>(
-          'EndChapterConfettiComponent',
+        jasmine.createSpyObj<NewEndChapterConfettiComponent>(
+          'NewEndChapterConfettiComponent',
           ['animateConfetti']
         );
 
@@ -494,13 +494,13 @@ describe('Tutor card component', () => {
 
     spyOn(window, 'clearTimeout');
     componentInstance.checkMarkComponent =
-      jasmine.createSpyObj<EndChapterCheckMarkComponent>(
-        'EndChapterCheckMarkComponent',
+      jasmine.createSpyObj<NewEndChapterCheckMarkComponent>(
+        'NewEndChapterCheckMarkComponent',
         ['animateCheckMark']
       );
     componentInstance.confettiComponent =
-      jasmine.createSpyObj<EndChapterConfettiComponent>(
-        'EndChapterConfettiComponent',
+      jasmine.createSpyObj<NewEndChapterConfettiComponent>(
+        'NewEndChapterConfettiComponent',
         ['animateConfetti']
       );
     componentInstance.triggerCelebratoryAnimation();

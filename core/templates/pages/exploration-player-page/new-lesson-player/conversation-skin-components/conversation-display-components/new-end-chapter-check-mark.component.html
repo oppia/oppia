@@ -1,0 +1,19 @@
+<div class="end-chapter-celebration-check-mark">
+  <svg class="tick-svg" viewBox="0 0 40 40">
+    <circle class="enclosing-circle"
+            stroke="#00645c"
+            stroke-width="3"
+            fill="none"
+            r="15"
+            cx="20"
+            cy="20"
+            [ngClass]="{'circle-animation': circleIsShown}">
+    </circle>
+    <polyline class="inner-tick"
+              fill="none"
+              stroke="#00645c"
+              stroke-width="3"
+              points="11,20 16,25 28,15"
+              [ngClass]="{'tick-animation': innerTickIsShown}"/>
+  </svg>
+</div>

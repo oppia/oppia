@@ -216,6 +216,8 @@ import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-le
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
 import {NewCorrectnessFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/new-correctness-footer.component';
+import {NewEndChapterConfettiComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-confetti.component';
+import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -278,7 +280,9 @@ import {NewCorrectnessFooterComponent} from 'pages/exploration-player-page/new-l
     CardNavigationControlComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -435,7 +439,9 @@ import {NewCorrectnessFooterComponent} from 'pages/exploration-player-page/new-l
     CardNavigationControlComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -613,7 +619,9 @@ import {NewCorrectnessFooterComponent} from 'pages/exploration-player-page/new-l
     CardNavigationControlComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
