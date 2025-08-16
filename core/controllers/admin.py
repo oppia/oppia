@@ -2154,8 +2154,10 @@ class AdminHandler(
             # Save story thumbnail image (moved here to match
             # _generate_dummy_chapters pattern).
             raw_image = b''
-            with open('core/tests/data/thumbnail.svg', 'rt',
-                      encoding='utf-8') as svg_file:
+            with open(
+                    'core/tests/data/thumbnail.svg', 'rt', 
+                    encoding='utf-8'
+            ) as svg_file:
                 svg_file_content = svg_file.read()
                 raw_image = svg_file_content.encode('ascii')
             entity_type = feconf.ENTITY_TYPE_STORY
@@ -2262,7 +2264,7 @@ class AdminHandler(
             thumbnail_image = b''
             with open(
                     'core/tests/data/thumbnail.svg', 'rt', encoding='utf-8'
-            ) as svg_file:          
+            ) as svg_file:
                 svg_file_content = svg_file.read()
                 thumbnail_image = svg_file_content.encode('ascii')
             classroom_entity_type = feconf.ENTITY_TYPE_CLASSROOM
@@ -2288,7 +2290,6 @@ class AdminHandler(
             raise Exception(
                 'Cannot generate full math classroom in production.'
             )
-
 
 
 class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):

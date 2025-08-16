@@ -19,7 +19,7 @@ from __future__ import annotations
 import datetime
 import enum
 import logging
-from unittest.mock import Mock
+from unittest import mock
 
 from core import feature_flag_list
 from core import feconf
@@ -2217,14 +2217,19 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_cannot_generate_full_math_classroom_in_production_mode(self) -> None:
+    def test_cannot_generate_full_math_classroom_in_production_mode(
+            self
+    ) -> None:
         """Test that full math classroom cannot be generated in production."""
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception, 'Cannot generate full math classroom in production.'
+        assert_raises_regexp_context_manager = (
+            self.assertRaisesRegex(
+                Exception,
+                'Cannot generate full math classroom in production.'
+            )
         )
         with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
@@ -2238,13 +2243,18 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_non_admins_cannot_generate_full_math_classroom(self) -> None:
+    def test_non_admins_cannot_generate_full_math_classroom(
+            self
+    ) -> None:
         """Test that non-curriculum admins cannot generate full math classroom."""
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        assert_raises_regexp = self.assertRaisesRegex(
-            Exception, 'User does not have enough rights to generate data.'
+        assert_raises_regexp = (
+            self.assertRaisesRegex(
+                Exception,
+                'User does not have enough rights to generate data.'
+            )
         )
         with assert_raises_regexp:
             self.post_json(
@@ -2393,8 +2403,8 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
 
         # Create admin handler instance.
         from core.controllers import admin
-        mock_request = Mock()
-        mock_response = Mock()
+        mock_request = mock.Mock()
+        mock_response = mock.Mock()
         admin_handler = admin.AdminHandler(mock_request, mock_response)
         admin_handler.user_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL)
@@ -2417,8 +2427,8 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
 
         # Create admin handler instance.
         from core.controllers import admin
-        mock_request = Mock()
-        mock_response = Mock()
+        mock_request = mock.Mock()
+        mock_response = mock.Mock()
         admin_handler = admin.AdminHandler(mock_request, mock_response)
         admin_handler.user_id = self.get_user_id_from_email(
             self.CURRICULUM_ADMIN_EMAIL)
