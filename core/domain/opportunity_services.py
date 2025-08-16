@@ -30,6 +30,8 @@ from core.domain import opportunity_domain
 from core.domain import question_fetchers
 from core.domain import story_domain
 from core.domain import story_fetchers
+from core.domain import study_guide_domain
+from core.domain import study_guide_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_fetchers
@@ -213,7 +215,7 @@ def create_exp_opportunity_summary(
         # exploration can be voiceovered in its own language.
         language_codes_needing_voice_artists.add(exploration.language_code)
 
-    content_count = exploration.get_content_count()
+    content_count = exploration.get_content_count(feconf.TranslatableEntityType.EXPLORATION)
     translation_counts = translation_services.get_translation_counts(
         feconf.TranslatableEntityType.EXPLORATION, exploration
     )
@@ -1243,25 +1245,66 @@ def create_translation_opportunity(
     Returns:
         None. The generated opportunities are saved to the datastore.
     """
-    entity_to_topics = _compute_topic_ids_of_translation_opportunities(
-        entity_types_and_ids
-    )
+    if 'exploration' in entity_types_and_ids:
+        entity_to_topics = _compute_topic_ids_of_translation_opportunities(
+            entity_types_and_ids
+        )
 
     opportunities_list = []
 
     for entity_type, entity_ids in entity_types_and_ids.items():
-        if entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+        if entity_type != feconf.ENTITY_TYPE_EXPLORATION and entity_type != feconf.ENTITY_TYPE_STUDY_GUIDE:
             # Currently, only exploration-type entities are supported.
             continue
 
-        exp_id_to_exploration = exp_fetchers.get_multiple_explorations_by_id(
-            list(set(entity_ids))
-        )
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            exp_id_to_exploration = exp_fetchers.get_multiple_explorations_by_id(
+                list(set(entity_ids))
+            )
+            for exploration_id, exploration in exp_id_to_exploration.items():
+                complete_langs = (
+                    translation_services.get_languages_with_complete_translation(
+                        exploration
+                    )
+                )
 
-        for exploration_id, exploration in exp_id_to_exploration.items():
+                incomplete_langs = (
+                    _compute_exploration_incomplete_translation_languages(
+                        complete_langs
+                    )
+                )
+
+                # Exclude the exploration's own language from translation targets.
+                incomplete_langs = [
+                    lang for lang in incomplete_langs if (
+                        lang != exploration.language_code
+                    )
+                ]
+
+                translation_counts = translation_services.get_translation_counts(
+                    feconf.TranslatableEntityType.EXPLORATION, exploration
+                )
+
+                opportunity = opportunity_domain.TranslationOpportunity(
+                    topic_ids=entity_to_topics[exploration_id],
+                    entity_id=exploration_id,
+                    content_count=exploration.get_content_count(feconf.TranslatableEntityType.EXPLORATION),
+                    incomplete_translation_language_codes=incomplete_langs,
+                    translation_counts=translation_counts,
+                    entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                )
+
+                opportunities_list.append(opportunity)
+
+        if entity_type == feconf.ENTITY_TYPE_STUDY_GUIDE:
+            print(list(set(entity_ids)))
+            topic_id, subtopic_id = entity_ids[0].split('-')
+            study_guide = study_guide_services.get_study_guide_by_id(
+                topic_id, subtopic_id
+            )
             complete_langs = (
                 translation_services.get_languages_with_complete_translation(
-                    exploration
+                    study_guide
                 )
             )
 
@@ -1271,29 +1314,33 @@ def create_translation_opportunity(
                 )
             )
 
-            # Exclude the exploration's own language from translation targets.
+            # Exclude the study guide's own language from translation targets.
             incomplete_langs = [
                 lang for lang in incomplete_langs if (
-                    lang != exploration.language_code
+                    lang != study_guide.language_code
                 )
             ]
 
             translation_counts = translation_services.get_translation_counts(
-                feconf.TranslatableEntityType.EXPLORATION, exploration
+                feconf.TranslatableEntityType.STUDY_GUIDE, study_guide
             )
 
             opportunity = opportunity_domain.TranslationOpportunity(
-                topic_ids=entity_to_topics[exploration_id],
-                entity_id=exploration_id,
-                content_count=exploration.get_content_count(),
+                topic_ids=[study_guide.topic_id],
+                entity_id=study_guide.id,
+                content_count=study_guide.get_content_count(feconf.TranslatableEntityType.STUDY_GUIDE),
                 incomplete_translation_language_codes=incomplete_langs,
                 translation_counts=translation_counts,
-                entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+                entity_type=feconf.ENTITY_TYPE_STUDY_GUIDE,
             )
 
             opportunities_list.append(opportunity)
 
     if opportunities_list:
+        for opp in opportunities_list:
+            print(opp.topic_ids)
+            print(opp.entity_id)
+            print(opp.content_count)
         _save_multi_translation_opportunities(opportunities_list)
 
 
@@ -1317,10 +1364,13 @@ def _save_multi_translation_opportunities(
     models = _construct_new_translation_opportunity_models(
         translation_opportunity_list
     )
+    print('created models')
 
     if models:
+        print('put models')
         opportunity_models.TranslationOpportunityModel.update_timestamps_multi(
             models)
+        opportunity_models.TranslationOpportunityModel.put_multi(models)
 
 
 def _construct_new_translation_opportunity_models(

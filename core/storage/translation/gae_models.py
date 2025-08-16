@@ -45,7 +45,8 @@ class EntityTranslationsModel(base_models.BaseModel):
     entity_type = datastore_services.StringProperty(
         required=True, indexed=True, choices=[
             feconf.ENTITY_TYPE_EXPLORATION,
-            feconf.ENTITY_TYPE_QUESTION
+            feconf.ENTITY_TYPE_QUESTION,
+            feconf.ENTITY_TYPE_STUDY_GUIDE
         ])
     # The version of the corresponding entity.
     entity_version = datastore_services.IntegerProperty(

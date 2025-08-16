@@ -313,6 +313,7 @@ class BaseTranslatableObject:
 
     def get_all_contents_which_need_translations(
         self,
+        entity_type: feconf.TranslatableEntityType,
         entity_translation: Union[EntityTranslation, None] = None
     ) -> Dict[str, TranslatableContent]:
         """Returns a list of TranslatableContent instances which need new or
@@ -327,7 +328,7 @@ class BaseTranslatableObject:
         """
         if entity_translation is None:
             entity_translation = EntityTranslation.create_empty(
-                entity_type=feconf.TranslatableEntityType.EXPLORATION,
+                entity_type=entity_type,
                 entity_id='',
                 language_code='')
 
@@ -412,7 +413,7 @@ class BaseTranslatableObject:
                 # Rule-related translations cannot be missing.
                 return False
 
-        translatable_content_count = self.get_content_count()
+        translatable_content_count = self.get_content_count(feconf.TranslatableEntityType.EXPLORATION)
         translated_content_count = self.get_translation_count(
             entity_translation)
 
@@ -421,7 +422,7 @@ class BaseTranslatableObject:
         return translations_missing_count < (
             feconf.MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS)
 
-    def get_content_count(self) -> int:
+    def get_content_count(self, entity_type: feconf.TranslatableEntityType) -> int:
         """Returns the total number of distinct content fields available in the
         exploration which are user facing and can be translated into
         different languages.
@@ -432,7 +433,7 @@ class BaseTranslatableObject:
             int. The total number of distinct content fields available inside
             the exploration.
         """
-        return len(self.get_all_contents_which_need_translations())
+        return len(self.get_all_contents_which_need_translations(entity_type))
 
     def get_all_html_content_strings(self) -> List[str]:
         """Gets all html content strings used in the object.

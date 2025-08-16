@@ -312,7 +312,7 @@ class TranslationOpportunityModel(base_models.BaseModel):
 
         # Check if entity_type is valid.
         valid_entity_types = {
-            'exploration', 'skill', 'topic', 'story', 'classroom'
+            'exploration', 'skill', 'topic', 'story', 'classroom', 'study_guide'
         }
         if self.entity_type not in valid_entity_types:
             raise Exception(f'Invalid entity_type: {self.entity_type}')

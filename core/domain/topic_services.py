@@ -1017,7 +1017,10 @@ def update_topic_and_subtopic_pages(
                     committer_id, topic_id, subtopic_id)
             
             # Add study guide ID to deletion list for translation opportunities
-            study_guide_id = f"{topic_id}.{subtopic_id}"
+            study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+                topic_id,
+                subtopic_id
+            )
             deleted_study_guide_ids.append(study_guide_id)
             
             study_guide_services.delete_study_guide(
@@ -1057,13 +1060,13 @@ def update_topic_and_subtopic_pages(
     
     # Delete translation opportunities for deleted study guides
     if deleted_study_guide_ids:
-        delete_translation_opportunities({
+        opportunity_services.delete_translation_opportunities({
             feconf.ENTITY_TYPE_STUDY_GUIDE: deleted_study_guide_ids
         })
     
     # Create translation opportunities for new/updated study guides
     if created_study_guide_ids:
-        create_translation_opportunity({
+        opportunity_services.create_translation_opportunity({
             feconf.ENTITY_TYPE_STUDY_GUIDE: created_study_guide_ids
         })
     

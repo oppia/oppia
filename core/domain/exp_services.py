@@ -2121,7 +2121,7 @@ def compute_models_to_put_when_saving_new_exp_version(
             opportunity_services
             .compute_opportunity_models_with_updated_exploration(
                 exploration_id,
-                updated_exploration.get_content_count(),
+                updated_exploration.get_content_count(feconf.TranslatableEntityType.EXPLORATION),
                 translation_counts
             )
         )
@@ -2527,7 +2527,7 @@ def revert_exploration(
             opportunity_services
             .compute_opportunity_models_with_updated_exploration(
                 exploration_id,
-                exploration.get_content_count(),
+                exploration.get_content_count(feconf.TranslatableEntityType.EXPLORATION),
                 translation_counts
             )
         )

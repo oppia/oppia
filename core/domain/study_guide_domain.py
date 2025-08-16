@@ -157,7 +157,7 @@ class VersionedStudyGuideSectionsDict(TypedDict):
     sections: List[StudyGuideSectionDict]
 
 
-class StudyGuideSection:
+class StudyGuideSection(translation_domain.BaseTranslatableObject):
     """Domain object for the section of a study guide."""
 
     def __init__(
@@ -239,6 +239,31 @@ class StudyGuideSection:
             heading,
             content)
 
+    def get_translatable_contents_collection(
+        self,
+        **kwargs: Optional[str]
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields in the section.
+
+        Returns:
+            translatable_contents_collection: TranslatableContentsCollection.
+            An instance of TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        translatable_contents_collection.add_translatable_field(
+            self.heading.content_id,
+            translation_domain.ContentType.SECTION,
+            translation_domain.TranslatableContentFormat.UNICODE_STRING,
+            self.heading.unicode_str)
+        translatable_contents_collection.add_translatable_field(
+            self.content.content_id,
+            translation_domain.ContentType.SECTION,
+            translation_domain.TranslatableContentFormat.HTML,
+            self.content.html)
+        return translatable_contents_collection
+
 
 class StudyGuideDict(TypedDict):
     """Dictionary representing the StudyGuide object."""
@@ -271,7 +296,7 @@ class StudyGuideAndroidDict(TypedDict):
     version: int
 
 
-class StudyGuide:
+class StudyGuide(translation_domain.BaseTranslatableObject):
     """Domain object for a Study Guide."""
 
     def __init__(
@@ -648,6 +673,26 @@ class StudyGuide:
             content_id_generator.next_content_id_index
         )
         self.sections.append(new_section)
+
+    def get_translatable_contents_collection(
+        self,
+        **kwargs: Optional[str]
+    ) -> translation_domain.TranslatableContentsCollection:
+        """Get all translatable fields in the study guide.
+
+        Returns:
+            TranslatableContentsCollection. An instance of
+            TranslatableContentsCollection class.
+        """
+        translatable_contents_collection = (
+            translation_domain.TranslatableContentsCollection())
+
+        for section in self.sections:
+            (
+                translatable_contents_collection
+                .add_fields_from_translatable_object(section)
+            )
+        return translatable_contents_collection
 
     def delete_section(
         self,

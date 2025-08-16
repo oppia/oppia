@@ -22,6 +22,7 @@ import logging
 
 from core import feconf
 from core.domain import exp_domain
+from core.domain import study_guide_domain
 from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.platform import models
@@ -297,10 +298,30 @@ def get_languages_with_complete_translation(
         list(str). A list of language codes in which the translation for the
         exploration is complete i.e, 100%.
     """
-    content_count = exploration.get_content_count()
+    content_count = exploration.get_content_count(feconf.TranslatableEntityType.EXPLORATION)
     language_code_list = []
     for language_code, count in get_translation_counts(
         feconf.TranslatableEntityType.EXPLORATION, exploration
+    ).items():
+        if count == content_count:
+            language_code_list.append(language_code)
+
+    return language_code_list
+
+def get_languages_with_complete_translation(
+    study_guide: study_guide_domain.StudyGuide
+) -> List[str]:
+    """Returns a list of language codes in which the study guide translation
+    is 100%.
+
+    Returns:
+        list(str). A list of language codes in which the translation for the
+        study guide is complete i.e, 100%.
+    """
+    content_count = study_guide.get_content_count(feconf.TranslatableEntityType.STUDY_GUIDE)
+    language_code_list = []
+    for language_code, count in get_translation_counts(
+        feconf.TranslatableEntityType.STUDY_GUIDE, study_guide
     ).items():
         if count == content_count:
             language_code_list.append(language_code)
@@ -355,6 +376,30 @@ def get_translation_counts(
         ) for entity_translation in entity_translations
     }
 
+def get_translation_counts(
+    entity_type: feconf.TranslatableEntityType,
+    entity: study_guide_domain.StudyGuide
+) -> Dict[str, int]:
+    """Returns a dict representing the number of translations available in a
+    language for which there exists at least one translation in the
+    study guide.
+
+    Returns:
+        dict(str, int). A dict with language code as a key and number of
+        translation available in that language as the value.
+    """
+    entity_translations = (
+        translation_fetchers.get_all_entity_translations_for_entity(
+            entity_type,
+            entity.id,
+            entity.version)
+    )
+    return {
+        entity_translation.language_code: entity.get_translation_count(
+            entity_translation
+        ) for entity_translation in entity_translations
+    }
+
 
 def get_translatable_text(
     exploration: exp_domain.Exploration, language_code: str
@@ -382,6 +427,7 @@ def get_translatable_text(
     for state_name, state in exploration.states.items():
         state_names_to_content_id_mapping[state_name] = (
             state.get_all_contents_which_need_translations(
+                feconf.TranslatableEntityType.EXPLORATION,
                 entity_translations))
 
     return state_names_to_content_id_mapping

@@ -217,6 +217,7 @@ ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_QUESTION = 'question'
 ENTITY_TYPE_USER = 'user'
 ENTITY_TYPE_CLASSROOM = 'classroom'
+ENTITY_TYPE_STUDY_GUIDE = 'study_guide'
 
 DIAGNOSTIC_TEST_QUESTION_TYPE_MAIN = 'main_question'
 DIAGNOSTIC_TEST_QUESTION_TYPE_BACKUP = 'backup_question'
@@ -1605,7 +1606,8 @@ TRANSLATABLE_ENTITY_TYPES = [
     ENTITY_TYPE_TOPIC,
     ENTITY_TYPE_SKILL,
     ENTITY_TYPE_STORY,
-    ENTITY_TYPE_CLASSROOM
+    ENTITY_TYPE_CLASSROOM,
+    ENTITY_TYPE_STUDY_GUIDE
 ]
 
 # Possible suggestion types.
@@ -1663,6 +1665,7 @@ class TranslatableEntityType(enum.Enum):
 
     EXPLORATION = 'exploration'
     QUESTION = 'question'
+    STUDY_GUIDE = 'study_guide'
 
 
 class TranslatedContentDict(TypedDict):
