@@ -37,6 +37,7 @@ from core.domain import platform_parameter_domain
 from core.domain import platform_parameter_list
 from core.domain import platform_parameter_registry
 from core.domain import question_fetchers
+from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import search_services
@@ -2379,7 +2380,10 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         
         # Create admin handler instance
         from core.controllers import admin
-        admin_handler = admin.AdminHandler()
+        from unittest.mock import Mock
+        mock_request = Mock()
+        mock_response = Mock()
+        admin_handler = admin.AdminHandler(mock_request, mock_response)
         admin_handler.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         
         # Test skill creation
@@ -2400,7 +2404,10 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         
         # Create admin handler instance
         from core.controllers import admin
-        admin_handler = admin.AdminHandler()
+        from unittest.mock import Mock
+        mock_request = Mock()
+        mock_response = Mock()
+        admin_handler = admin.AdminHandler(mock_request, mock_response)
         admin_handler.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         
         # Create a skill first

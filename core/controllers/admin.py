@@ -2029,11 +2029,14 @@ class AdminHandler(
             skill_id_3 = skill_services.get_new_skill_id()
 
             skill_1 = self._create_dummy_skill(
-                skill_id_1, 'Basic Fractions', '<p>Understanding basic fractions and their representations.</p>')
+                skill_id_1, 'Basic Fractions',
+                '<p>Understanding basic fractions and their representations.</p>')
             skill_2 = self._create_dummy_skill(
-                skill_id_2, 'Fraction Operations', '<p>Adding, subtracting, multiplying, and dividing fractions.</p>')
+                skill_id_2, 'Fraction Operations',
+                '<p>Adding, subtracting, multiplying, and dividing fractions.</p>')
             skill_3 = self._create_dummy_skill(
-                skill_id_3, 'Advanced Fractions', '<p>Complex fraction problems and real-world applications.</p>')
+                skill_id_3, 'Advanced Fractions',
+                '<p>Complex fraction problems and real-world applications.</p>')
 
             # 2. Create topic
             topic_id = topic_fetchers.get_new_topic_id()
@@ -2045,24 +2048,26 @@ class AdminHandler(
             topic.subtopics = [
                 topic_domain.Subtopic(
                     1, 'Basic Fractions', [skill_id_1], 'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                    'basic-fractions'),
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    21131, 'basic-fractions'),
                 topic_domain.Subtopic(
                     2, 'Fraction Operations', [skill_id_2], 'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                    'fraction-operations'),
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    21131, 'fraction-operations'),
                 topic_domain.Subtopic(
                     3, 'Advanced Fractions', [skill_id_3], 'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
-                    'advanced-fractions')
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    21131, 'advanced-fractions')
             ]
             topic.next_subtopic_id = 4
 
             # 3. Create story
             story_id = story_services.get_new_story_id()
             story = story_domain.Story.create_default_story(
-                story_id, 'Fractions Story', 'A comprehensive story about fractions',
-                topic_id, 'fractions-story', 'Learn fractions through interactive lessons',
+                story_id, 'Fractions Story',
+                'A comprehensive story about fractions',
+                topic_id, 'fractions-story',
+                'Learn fractions through interactive lessons',
                 'thumbnail.svg', '#B3D8F1')
 
             # 4. Create questions
@@ -2072,7 +2077,8 @@ class AdminHandler(
                 question_ids.append(question_id)
                 skill_id = skill_id_1 if i < 3 else (skill_id_2 if i < 6 else skill_id_3)
                 question = self._create_dummy_question(
-                    question_id, f'Question {i + 1}', [skill_id])
+                    question_id, f'Question {i + 1}',
+                    [skill_id])
                 question_services.add_question(self.user_id, question)
                 question_services.create_new_question_skill_link(
                     self.user_id, question_id, skill_id, 0.5)
@@ -2082,9 +2088,10 @@ class AdminHandler(
             for i in range(3):  # 3 chapters
                 exp_id = exp_fetchers.get_new_exploration_id()
                 exp_ids.append(exp_id)
+                objective = f'Learn about fractions - Chapter {i + 1}'
                 exploration = exp_domain.Exploration.create_default_exploration(
                     exp_id, f'Chapter {i + 1}', category='Mathematics',
-                    objective=f'Learn about fractions - Chapter {i + 1}')
+                    objective=objective)
                 exp_services.save_new_exploration(self.user_id, exploration)
 
                 # Update exploration to have proper interaction
@@ -2135,8 +2142,9 @@ class AdminHandler(
             with open('core/tests/data/thumbnail.svg', 'rt', encoding='utf-8') as svg_file:
                 svg_file_content = svg_file.read()
                 raw_image = svg_file_content.encode('ascii')
+            entity_type = feconf.ENTITY_TYPE_STORY
             fs_services.save_original_and_compressed_versions_of_image(
-                'thumbnail.svg', feconf.ENTITY_TYPE_STORY, story_id,
+                'thumbnail.svg', entity_type, story_id,
                 raw_image, 'thumbnail', False)
 
             # 7. Link story to topic BEFORE adding nodes (this is required for update_story_and_topic_summary)
@@ -2202,9 +2210,12 @@ class AdminHandler(
                 classroom_id=classroom_id,
                 name='Math',
                 url_fragment='math',
-                course_details='Comprehensive mathematics course covering fractions and more',
-                teaser_text='Master fractions through interactive lessons',
-                topic_list_intro='Start with our comprehensive fractions topic.',
+                course_details=(
+                    'Comprehensive mathematics course covering fractions and more'),
+                teaser_text=(
+                    'Master fractions through interactive lessons'),
+                topic_list_intro=(
+                    'Start with our comprehensive fractions topic.'),
                 topic_id_to_prerequisite_topic_ids={topic_id: []},
                 is_published=True,
                 diagnostic_test_is_enabled=False,
@@ -2222,22 +2233,24 @@ class AdminHandler(
             with open('core/tests/data/thumbnail.svg', 'rt', encoding='utf-8') as svg_file:
                 svg_file_content = svg_file.read()
                 thumbnail_image = svg_file_content.encode('ascii')
+            classroom_entity_type = feconf.ENTITY_TYPE_CLASSROOM
             fs_services.save_original_and_compressed_versions_of_image(
-                'thumbnail.svg', feconf.ENTITY_TYPE_CLASSROOM, classroom_id,
+                'thumbnail.svg', classroom_entity_type, classroom_id,
                 thumbnail_image, 'thumbnail', False)
 
             banner_image = b''
             with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
                 banner_image = png_file.read()
             fs_services.save_original_and_compressed_versions_of_image(
-                'banner.png', feconf.ENTITY_TYPE_CLASSROOM, classroom_id,
+                'banner.png', classroom_entity_type, classroom_id,
                 banner_image, 'image', False)
 
             classroom_config_services.create_new_classroom(classroom)
 
             logging.info(
                 '[ADMIN] Successfully created full math classroom with topic %s, '
-                'story %s, and classroom %s' % (topic_id, story_id, classroom_id))
+                'story %s, and classroom %s' % (
+                    topic_id, story_id, classroom_id))
         else:
             raise Exception('Cannot generate full math classroom in production.')
 
