@@ -215,6 +215,7 @@ import {NewInputResponsePairComponent} from 'pages/exploration-player-page/new-l
 import {NewConversationSkinComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/new-conversation-skin.component';
 import {ConversationDisplayComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/conversation-display.component';
 import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/card-navigation-control.component';
+import {NewCorrectnessFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/new-correctness-footer.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -267,6 +268,7 @@ import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-
     AttributionGuideComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
@@ -422,6 +424,7 @@ import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-
     AudioFileUploaderComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
@@ -600,6 +603,7 @@ import {CardNavigationControlComponent} from 'pages/exploration-player-page/new-
     AudioFileUploaderComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
