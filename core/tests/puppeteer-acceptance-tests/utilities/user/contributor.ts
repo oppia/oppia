@@ -55,6 +55,15 @@ export class Contributor extends BaseUser {
   }
 
   /**
+   * Checks if the translation opportunities are empty.
+   */
+  async expectTranslationOpportunitiesToBePresent(
+    present: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(opportunityItemSelector, present);
+  }
+
+  /**
    * Checks if the translation opportunity is visible and matches the expected values.
    * @param heading - The expected heading of the translation opportunity.
    * @param subheading - The expected subheading of the translation opportunity.

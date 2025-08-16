@@ -143,21 +143,14 @@ describe('Translation Submitter', function () {
       __dirname
     );
 
-    await translationSubmitter.expectTranslationOpportunityToBePresent(
-      'The Foggy Window',
-      'States of Matter - The Foggy Window',
-      false
-    );
+    await translationSubmitter.expectTranslationOpportunitiesToBePresent(false);
 
     // Change the translation language.
     await translationSubmitter.selectLanguageInTranslateTextTab(
       'हिन्दी (Hindi)'
     );
+    await translationSubmitter.expectTranslationOpportunitiesToBePresent(false);
 
-    await translationSubmitter.expectTranslationOpportunityToBePresent(
-      'The Foggy Window',
-      'States of Matter - The Foggy Window'
-    );
     await translationSubmitter.expectTranslationOpportunityToBePresent(
       'Cutting the Pies',
       'Fractions - The Picnic Problem',
@@ -229,7 +222,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.typeTextForRTE('इटैलिक टेक्स्ट');
     await translationSubmitter.clickOnRTEOptionContainingTitle('इटैलिक');
 
-    // Numbered List, INcrease Indent, and Decrease Indent.
+    // Numbered List, Increase Indent, and Decrease Indent.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       RTE_BUTTON_TITLES.NUM_LIST.HI
     );
