@@ -201,7 +201,7 @@ export class VoiceoverAdmin extends BaseUser {
           return true;
         }
 
-        for (const element of elements) {
+        for (const element of Array.from(elements)) {
           const elementText = element.textContent?.trim();
           if (elementText === artistUsername) {
             return false;
