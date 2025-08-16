@@ -52,6 +52,10 @@ interface Metadata {
   v2Metadata: ExplorationMetadata;
 }
 
+interface VersionMetadataWithTooltip extends VersionMetadata {
+  tooltipText: string;
+}
+
 @Component({
   selector: 'oppia-history-tab',
   templateUrl: './history-tab.component.html',
@@ -63,7 +67,7 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
   secondVersion: string;
   hideHistoryGraph: boolean;
   selectedVersionsArray: number[];
-  filteredVersionMetadata: any[] = [];
+  filteredVersionMetadata: VersionMetadataWithTooltip[] = [];
 
   // Letiable explorationSnapshots is a list of all snapshots for the
   // exploration in ascending order.
