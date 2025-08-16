@@ -277,8 +277,10 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             new_model_id)
         assert cloud_task_run is not None
 
-        start_datetime = cloud_task_run.last_updated
-        end_datetime = cloud_task_run.last_updated
+        start_datetime = cloud_task_run.last_updated.replace(
+            tzinfo=datetime.timezone.utc)
+        end_datetime = cloud_task_run.last_updated.replace(
+            tzinfo=datetime.timezone.utc)
 
         cloud_task_run = taskqueue_services.get_cloud_task_run_by_given_params(
             queue_name, start_datetime, end_datetime)[0]

@@ -24,6 +24,8 @@ import {PlayerPositionService} from 'pages/exploration-player-page/services/play
 import {ExplorationEngineService} from './exploration-engine.service';
 import {ConceptCard} from 'domain/skill/concept-card.model';
 import {PlayerTranscriptService} from './player-transcript.service';
+import {OppiaNoninteractiveSkillreviewConceptCardModalComponent} from '../../../../../extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview-concept-card-modal.component';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Injectable({
   providedIn: 'root',
@@ -59,6 +61,7 @@ export class ConceptCardManagerService {
   constructor(
     private playerPositionService: PlayerPositionService,
     private explorationEngineService: ExplorationEngineService,
+    private ngbModal: NgbModal,
     private playerTranscriptService: PlayerTranscriptService
   ) {
     // TODO(#10904): Refactor to move subscriptions into components.
@@ -83,6 +86,15 @@ export class ConceptCardManagerService {
     this.tooltipIsOpen = true;
     this.conceptCardDiscovered = true;
     this._timeoutElapsedEventEmitter.emit();
+  }
+
+  openConceptCardModal(linkedSkillId: string): void {
+    const modalRef = this.ngbModal.open(
+      OppiaNoninteractiveSkillreviewConceptCardModalComponent,
+      {backdrop: true}
+    );
+    this.consumeConceptCard();
+    modalRef.componentInstance.skillId = linkedSkillId;
   }
 
   releaseConceptCard(): void {

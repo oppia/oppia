@@ -1,0 +1,17 @@
+<p class="oppia-learner-solution-interstitial-modal-title">
+  {{ 'I18N_WARNING_MODAL_TITLE' | translate }}
+</p>
+
+<div class="modal-body oppia-learner-solution-interstitial-modal-body">
+    {{ 'I18N_WARNING_MODAL_DESCRIPTION' | translate }}
+</div>
+
+<div class="oppia-learner-solution-container">
+  <button mat-button class="oppia-modal-cancel-button ml-auto oppia-learner-solution-interstitial-modal-btn" (click)="cancel()">
+    {{ 'I18N_MODAL_CANCEL_BUTTON' | translate }}
+  </button>
+  <button mat-button class="oppia-learner-got-it-button oppia-learner-solution-interstitial-modal-btn"
+          (click)="confirm()">
+    {{ 'I18N_SHOW_SOLUTION_BUTTON' | translate }}
+  </button>
+</div>
