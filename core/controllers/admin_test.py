@@ -19,6 +19,7 @@ from __future__ import annotations
 import datetime
 import enum
 import logging
+from unittest.mock import Mock
 
 from core import feature_flag_list
 from core import feconf
@@ -2223,7 +2224,8 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
-            Exception, 'Cannot generate full math classroom in production.')
+            Exception, 'Cannot generate full math classroom in production.'
+        )
         with assert_raises_regexp_context_manager, self.prod_mode_swap:
             self.post_json(
                 '/adminhandler', {
@@ -2242,7 +2244,8 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         assert_raises_regexp = self.assertRaisesRegex(
-            Exception, 'User does not have enough rights to generate data.')
+            Exception, 'User does not have enough rights to generate data.'
+        )
         with assert_raises_regexp:
             self.post_json(
                 '/adminhandler', {
@@ -2353,7 +2356,8 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
             subtopic_skill_ids.extend(subtopic.skill_ids)
             self.assertIn(
                 subtopic.title,
-                ['Basic Fractions', 'Fraction Operations', 'Advanced Fractions'])
+                ['Basic Fractions', 'Fraction Operations', 'Advanced Fractions']
+            )
 
         # Verify all skills are used in subtopics.
         for skill in skill_summaries:
@@ -2389,7 +2393,6 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
 
         # Create admin handler instance.
         from core.controllers import admin
-        from unittest.mock import Mock
         mock_request = Mock()
         mock_response = Mock()
         admin_handler = admin.AdminHandler(mock_request, mock_response)
@@ -2414,7 +2417,6 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
 
         # Create admin handler instance.
         from core.controllers import admin
-        from unittest.mock import Mock
         mock_request = Mock()
         mock_response = Mock()
         admin_handler = admin.AdminHandler(mock_request, mock_response)
