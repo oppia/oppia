@@ -2023,25 +2023,29 @@ class AdminHandler(
             logging.info(
                 '[ADMIN] %s generated full math classroom.' % self.user_id)
 
-            # 1. Create skills
+            # 1. Create skills.
             skill_id_1 = skill_services.get_new_skill_id()
             skill_id_2 = skill_services.get_new_skill_id()
             skill_id_3 = skill_services.get_new_skill_id()
 
             skill_1 = self._create_dummy_skill(
                 skill_id_1, 'Basic Fractions',
-                '<p>Understanding basic fractions and their representations.</p>')
+                '<p>Understanding basic fractions and their '
+                'representations.</p>')
             skill_2 = self._create_dummy_skill(
                 skill_id_2, 'Fraction Operations',
-                '<p>Adding, subtracting, multiplying, and dividing fractions.</p>')
+                '<p>Adding, subtracting, multiplying, and dividing '
+                'fractions.</p>')
             skill_3 = self._create_dummy_skill(
                 skill_id_3, 'Advanced Fractions',
-                '<p>Complex fraction problems and real-world applications.</p>')
+                '<p>Complex fraction problems and real-world '
+                'applications.</p>')
 
-            # 2. Create topic
+            # 2. Create topic.
             topic_id = topic_fetchers.get_new_topic_id()
             topic = topic_domain.Topic.create_default_topic(
-                topic_id, 'Fractions', 'fractions', 'Learn about fractions', 'fractions-frag')
+                topic_id, 'Fractions', 'fractions', 'Learn about fractions',
+                'fractions-frag')
             topic.skill_ids_for_diagnostic_test = [skill_id_1]
             topic.thumbnail_filename = 'thumbnail.svg'
             topic.thumbnail_bg_color = '#C6DCDA'
@@ -2061,7 +2065,7 @@ class AdminHandler(
             ]
             topic.next_subtopic_id = 4
 
-            # 3. Create story
+            # 3. Create story.
             story_id = story_services.get_new_story_id()
             story = story_domain.Story.create_default_story(
                 story_id, 'Fractions Story',
@@ -2070,12 +2074,15 @@ class AdminHandler(
                 'Learn fractions through interactive lessons',
                 'thumbnail.svg', '#B3D8F1')
 
-            # 4. Create questions
+            # 4. Create questions.
             question_ids = []
-            for i in range(9):  # 3 questions per skill
+            # 3 questions per skill.
+            for i in range(9):
                 question_id = question_services.get_new_question_id()
                 question_ids.append(question_id)
-                skill_id = skill_id_1 if i < 3 else (skill_id_2 if i < 6 else skill_id_3)
+                skill_id = (
+                    skill_id_1 if i < 3 else (
+                        skill_id_2 if i < 6 else skill_id_3))
                 question = self._create_dummy_question(
                     question_id, f'Question {i + 1}',
                     [skill_id])
@@ -2085,7 +2092,8 @@ class AdminHandler(
 
             # 5. Create explorations (chapters)
             exp_ids = []
-            for i in range(3):  # 3 chapters
+            # 3 chapters.
+            for i in range(3):
                 exp_id = exp_fetchers.get_new_exploration_id()
                 exp_ids.append(exp_id)
                 objective = f'Learn about fractions - Chapter {i + 1}'
@@ -2094,18 +2102,22 @@ class AdminHandler(
                     objective=objective)
                 exp_services.save_new_exploration(self.user_id, exploration)
 
-                # Update exploration to have proper interaction
+                # Update exploration to have proper interaction.
+                default_outcome_property = (
+                    exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME)
                 exp_change_list = [
                     exp_domain.ExplorationChange({
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': 'Introduction',
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_ID),
                         'new_value': 'EndExploration'
                     }),
                     exp_domain.ExplorationChange({
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': 'Introduction',
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                        'property_name': (
+                            exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
                         'new_value': {
                             'recommendedExplorationIds': {
                                 'value': []
@@ -2115,21 +2127,23 @@ class AdminHandler(
                     exp_domain.ExplorationChange({
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'state_name': 'Introduction',
-                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+                        'property_name': default_outcome_property,
                         'new_value': None
                     }),
                 ]
                 exp_services.update_exploration(
-                    self.user_id, exp_id, exp_change_list, 'Setup exploration')
+                    self.user_id, exp_id, exp_change_list,
+                    'Setup exploration')
 
-                # Publish the exploration before adding to story
-                user_actions_info = user_services.get_user_actions_info(self.user_id)
+                # Publish the exploration before adding to story.
+                user_actions_info = user_services.get_user_actions_info(
+                    self.user_id)
                 rights_manager.publish_exploration(user_actions_info, exp_id)
 
-            # Index the explorations
+            # Index the explorations.
             exp_services.index_explorations_given_ids(exp_ids)
 
-            # 6. Save everything first
+            # 6. Save everything first.
             skill_services.save_new_skill(self.user_id, skill_1)
             skill_services.save_new_skill(self.user_id, skill_2)
             skill_services.save_new_skill(self.user_id, skill_3)
@@ -2137,9 +2151,11 @@ class AdminHandler(
             topic_services.save_new_topic(self.user_id, topic)
             story_services.save_new_story(self.user_id, story)
 
-            # Save story thumbnail image (moved here to match _generate_dummy_chapters pattern)
+            # Save story thumbnail image (moved here to match
+            # _generate_dummy_chapters pattern).
             raw_image = b''
-            with open('core/tests/data/thumbnail.svg', 'rt', encoding='utf-8') as svg_file:
+            with open('core/tests/data/thumbnail.svg', 'rt',
+                      encoding='utf-8') as svg_file:
                 svg_file_content = svg_file.read()
                 raw_image = svg_file_content.encode('ascii')
             entity_type = feconf.ENTITY_TYPE_STORY
@@ -2147,12 +2163,14 @@ class AdminHandler(
                 'thumbnail.svg', entity_type, story_id,
                 raw_image, 'thumbnail', False)
 
-            # 7. Link story to topic BEFORE adding nodes (this is required for update_story_and_topic_summary)
+            # 7. Link story to topic BEFORE adding nodes (this is required for
+            # update_story_and_topic_summary).
             topic_services.add_canonical_story(self.user_id, topic_id, story_id)
 
-            # 8. Add story nodes using the exact same pattern as _generate_dummy_chapters
+            # 8. Add story nodes using the exact same pattern as
+            # _generate_dummy_chapters.
             for i, exp_id in enumerate(exp_ids):
-                # Use sequential node IDs starting from 1
+                # Use sequential node IDs starting from 1.
                 node_id = f'{story_domain.NODE_ID_PREFIX}{i + 1}'
                 chapter_title = f'Chapter {i + 1}'
 
@@ -2164,21 +2182,26 @@ class AdminHandler(
                     }),
                     story_domain.StoryChange({
                         'cmd': 'update_story_node_property',
-                        'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
                         'new_value': exp_id,
                         'node_id': node_id,
                         'old_value': 'exploration_id'
                     }),
                     story_domain.StoryChange({
                         'cmd': 'update_story_node_property',
-                        'property_name': story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME
+                        ),
                         'new_value': 'thumbnail.svg',
                         'node_id': node_id,
                         'old_value': 'thumbnail_filename'
                     }),
                     story_domain.StoryChange({
                         'cmd': 'update_story_node_property',
-                        'property_name': story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
+                        'property_name': (
+                            story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR
+                        ),
                         'new_value': '#B3D8F1',
                         'node_id': node_id,
                         'old_value': 'thumbnail_bg_color'
@@ -2187,31 +2210,38 @@ class AdminHandler(
 
                 topic_services.update_story_and_topic_summary(
                     self.user_id, story_id, story_change_list,
-                    'Add story node', story.corresponding_topic_id)
+                    'Add story node', story.corresponding_topic_id
+                )
 
-            # Set destination node IDs for linear flow (using direct story object method like working functions)
+            # Set destination node IDs for linear flow (using direct story
+            # object method like working functions).
             story = story_fetchers.get_story_by_id(story_id)
             for i in range(len(exp_ids) - 1):
                 current_node_id = f'{story_domain.NODE_ID_PREFIX}{i + 1}'
                 next_node_id = f'{story_domain.NODE_ID_PREFIX}{i + 2}'
-                story.update_node_destination_node_ids(current_node_id, [next_node_id])
+                story.update_node_destination_node_ids(
+                    current_node_id, [next_node_id]
+                )
 
-            # 9. Publish everything
+            # 9. Publish everything.
             topic_services.publish_topic(topic_id, self.user_id)
             topic_services.publish_story(topic_id, story_id, self.user_id)
 
-            # 10. Generate translation opportunities for the Contributor Dashboard
+            # 10. Generate translation opportunities for the Contributor
+            # Dashboard.
             opportunity_services.add_new_exploration_opportunities(
-                story_id, exp_ids)
+                story_id, exp_ids
+            )
 
-            # 11. Create classroom
+            # 11. Create classroom.
             classroom_id = classroom_config_services.get_new_classroom_id()
             classroom = classroom_config_domain.Classroom(
                 classroom_id=classroom_id,
                 name='Math',
                 url_fragment='math',
                 course_details=(
-                    'Comprehensive mathematics course covering fractions and more'),
+                    'Comprehensive mathematics course covering fractions and '
+                    'more'),
                 teaser_text=(
                     'Master fractions through interactive lessons'),
                 topic_list_intro=(
@@ -2228,15 +2258,17 @@ class AdminHandler(
                 index=0
             )
 
-            # Save thumbnail and banner images
+            # Save thumbnail and banner images.
             thumbnail_image = b''
-            with open('core/tests/data/thumbnail.svg', 'rt', encoding='utf-8') as svg_file:
+            with open('core/tests/data/thumbnail.svg', 'rt',
+                      encoding='utf-8') as svg_file:
                 svg_file_content = svg_file.read()
                 thumbnail_image = svg_file_content.encode('ascii')
             classroom_entity_type = feconf.ENTITY_TYPE_CLASSROOM
             fs_services.save_original_and_compressed_versions_of_image(
                 'thumbnail.svg', classroom_entity_type, classroom_id,
-                thumbnail_image, 'thumbnail', False)
+                thumbnail_image, 'thumbnail', False
+            )
 
             banner_image = b''
             with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
@@ -2247,10 +2279,13 @@ class AdminHandler(
 
             classroom_config_services.create_new_classroom(classroom)
 
-            logging.info(
+            log_message = (
                 '[ADMIN] Successfully created full math classroom with topic %s, '
                 'story %s, and classroom %s' % (
-                    topic_id, story_id, classroom_id))
+                    topic_id, story_id, classroom_id
+                )
+            )
+            logging.info(log_message)
         else:
             raise Exception('Cannot generate full math classroom in production.')
 

@@ -2178,36 +2178,38 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        # Initially there should be no classrooms
+        # Initially there should be no classrooms.
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 0)
 
-        # Generate the full math classroom
+        # Generate the full math classroom.
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_full_math_classroom'
             }, csrf_token=csrf_token)
 
-        # Verify classroom was created
+        # Verify classroom was created.
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 1)
 
-        # Verify topic was created
+        # Verify topic was created.
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 1)
 
-        # Verify story was created - get the topic and check its canonical stories
+        # Verify story was created - get the topic and check its canonical
+        # stories.
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 1)
         topic_id = topic_summaries[0].id
         topic = topic_fetchers.get_topic_by_id(topic_id)
         self.assertEqual(len(topic.canonical_story_references), 1)
 
-        # Verify skills were created - use skill services to get skill summaries
+        # Verify skills were created - use skill services to get skill
+        # summaries.
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 3)
 
-        # Verify questions were created
+        # Verify questions were created.
         questions = question_services.get_questions_by_ids(
             question_services.get_new_question_ids(10))
         self.assertEqual(len(questions), 9)
@@ -2228,7 +2230,7 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
                     'action': 'generate_full_math_classroom'
                 }, csrf_token=csrf_token)
 
-        # Verify nothing was created
+        # Verify nothing was created.
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 0)
 
@@ -2247,40 +2249,42 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
                     'action': 'generate_full_math_classroom'
                 }, csrf_token=csrf_token)
 
-        # Verify nothing was created
+        # Verify nothing was created.
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 0)
 
         self.logout()
 
     def test_entity_creation_order_prevents_missing_entity_errors(self) -> None:
-        """Test that entities are created in correct order to prevent missing-entity errors."""
+        """Test that entities are created in correct order to prevent
+        missing-entity errors.
+        """
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        # Initially there should be no entities
+        # Initially there should be no entities.
         self.assertEqual(len(classroom_config_services.get_all_classrooms()), 0)
         self.assertEqual(len(topic_fetchers.get_all_topic_summaries()), 0)
         self.assertEqual(len(skill_services.get_all_skill_summaries()), 0)
 
-        # Generate the full math classroom
+        # Generate the full math classroom.
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_full_math_classroom'
             }, csrf_token=csrf_token)
 
-        # Verify entities were created in correct order
-        # 1. Skills should exist first (created before topic)
+        # Verify entities were created in correct order.
+        # 1. Skills should exist first (created before topic).
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 3)
 
-        # 2. Topic should exist with skills linked
+        # 2. Topic should exist with skills linked.
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 1)
         topic = topic_fetchers.get_topic_by_id(topic_summaries[0].id)
 
-        # Verify topic has skills linked through subtopics
+        # Verify topic has skills linked through subtopics.
         all_topic_skill_ids = []
         for subtopic in topic.subtopics:
             all_topic_skill_ids.extend(subtopic.skill_ids)
@@ -2288,23 +2292,23 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         for skill_id in all_topic_skill_ids:
             self.assertIn(skill_id, [s.id for s in skill_summaries])
 
-        # 3. Story should exist and be linked to topic
+        # 3. Story should exist and be linked to topic.
         self.assertEqual(len(topic.canonical_story_references), 1)
         story_id = topic.canonical_story_references[0].story_id
         story = story_fetchers.get_story_by_id(story_id)
         self.assertIsNotNone(story)
 
-        # 4. Explorations should exist and be linked to story
+        # 4. Explorations should exist and be linked to story.
         exp_ids_in_story = story.story_contents.get_all_linked_exp_ids()
         self.assertEqual(len(exp_ids_in_story), 3)
 
-        # Verify each exploration exists and is published
+        # Verify each exploration exists and is published.
         for exp_id in exp_ids_in_story:
             exploration = exp_fetchers.get_exploration_by_id(exp_id)
             self.assertIsNotNone(exploration)
             self.assertTrue(rights_manager.is_exploration_public(exp_id))
 
-        # 5. Classroom should exist and be linked to topic
+        # 5. Classroom should exist and be linked to topic.
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 1)
         classroom = classrooms[0]
@@ -2313,18 +2317,20 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_generated_entities_have_correct_relationships(self) -> None:
-        """Test that generated entities are properly linked and have correct properties."""
+        """Test that generated entities are properly linked and have correct
+        properties.
+        """
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        # Generate the full math classroom
+        # Generate the full math classroom.
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_full_math_classroom'
             }, csrf_token=csrf_token)
 
-        # Get all generated entities
+        # Get all generated entities.
         topic_summaries = topic_fetchers.get_all_topic_summaries()
         self.assertEqual(len(topic_summaries), 1)
         topic = topic_fetchers.get_topic_by_id(topic_summaries[0].id)
@@ -2332,36 +2338,39 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         skill_summaries = skill_services.get_all_skill_summaries()
         self.assertEqual(len(skill_summaries), 3)
 
-        story = story_fetchers.get_story_by_id(topic.canonical_story_references[0].story_id)
+        story = story_fetchers.get_story_by_id(
+            topic.canonical_story_references[0].story_id)
 
-        # Verify topic properties
+        # Verify topic properties.
         self.assertEqual(topic.name, 'Fractions')
         self.assertEqual(topic.url_fragment, 'fractions')
         self.assertEqual(len(topic.subtopics), 3)
         self.assertEqual(topic.next_subtopic_id, 4)
 
-        # Verify subtopics have correct skills
+        # Verify subtopics have correct skills.
         subtopic_skill_ids = []
         for subtopic in topic.subtopics:
             subtopic_skill_ids.extend(subtopic.skill_ids)
-            self.assertIn(subtopic.title, ['Basic Fractions', 'Fraction Operations', 'Advanced Fractions'])
+            self.assertIn(
+                subtopic.title,
+                ['Basic Fractions', 'Fraction Operations', 'Advanced Fractions'])
 
-        # Verify all skills are used in subtopics
+        # Verify all skills are used in subtopics.
         for skill in skill_summaries:
             self.assertIn(skill.id, subtopic_skill_ids)
 
-        # Verify story properties
+        # Verify story properties.
         self.assertEqual(story.title, 'Fractions Story')
         self.assertEqual(story.url_fragment, 'fractions-story')
         self.assertEqual(story.corresponding_topic_id, topic.id)
 
-        # Verify story nodes
+        # Verify story nodes.
         self.assertEqual(len(story.story_contents.nodes), 3)
         for i, node in enumerate(story.story_contents.nodes):
             self.assertIsNotNone(node.exploration_id)
             self.assertEqual(node.title, f'Chapter {i + 1}')
 
-        # Verify classroom properties
+        # Verify classroom properties.
         classrooms = classroom_config_services.get_all_classrooms()
         self.assertEqual(len(classrooms), 1)
         classroom = classrooms[0]
@@ -2378,17 +2387,18 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        # Create admin handler instance
+        # Create admin handler instance.
         from core.controllers import admin
         from unittest.mock import Mock
         mock_request = Mock()
         mock_response = Mock()
         admin_handler = admin.AdminHandler(mock_request, mock_response)
-        admin_handler.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        admin_handler.user_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
 
-        # Test skill creation
+        # Test skill creation.
         skill_id = skill_services.get_new_skill_id()
-        skill = admin_handler._create_dummy_skill(
+        skill = admin_handler._create_dummy_skill( # pylint: disable=protected-access
             skill_id, 'Test Skill', '<p>Test description</p>')
 
         self.assertEqual(skill.id, skill_id)
@@ -2402,23 +2412,24 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        # Create admin handler instance
+        # Create admin handler instance.
         from core.controllers import admin
         from unittest.mock import Mock
         mock_request = Mock()
         mock_response = Mock()
         admin_handler = admin.AdminHandler(mock_request, mock_response)
-        admin_handler.user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        admin_handler.user_id = self.get_user_id_from_email(
+            self.CURRICULUM_ADMIN_EMAIL)
 
-        # Create a skill first
+        # Create a skill first.
         skill_id = skill_services.get_new_skill_id()
-        skill = admin_handler._create_dummy_skill(
+        skill = admin_handler._create_dummy_skill( # pylint: disable=protected-access
             skill_id, 'Test Skill', '<p>Test description</p>')
         skill_services.save_new_skill(admin_handler.user_id, skill)
 
-        # Test question creation
+        # Test question creation.
         question_id = question_services.get_new_question_id()
-        question = admin_handler._create_dummy_question(
+        question = admin_handler._create_dummy_question( # pylint: disable=protected-access
             question_id, 'Test Question', [skill_id])
 
         self.assertEqual(question.id, question_id)

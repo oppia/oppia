@@ -44,6 +44,7 @@
 /scripts/ @oppia/dev-workflow-reviewers
 
 
+
 # Angular Migration team
 /core/templates/pages/base-root.component.ts @oppia/lace-frontend-reviewers
 /core/controllers/oppia_root*.py @oppia/lace-frontend-reviewers
@@ -801,3 +802,6 @@
 /core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
 /core/domain/takeout_*.py @oppia/core-reviewers
 /core/domain/wipeout_*.py @oppia/core-reviewers
+/25.2 @VirenPassi
+/docs/admin.md @VirenPassi
+/docs/development.md @VirenPassi
