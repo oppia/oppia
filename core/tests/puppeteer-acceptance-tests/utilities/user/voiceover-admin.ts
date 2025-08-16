@@ -193,16 +193,26 @@ export class VoiceoverAdmin extends BaseUser {
     ) {
       await this.clickOn(mobileVoiceoverArtistsHeader);
     }
-    const allVoiceoverArtists = await this.getAllVoiceoverArtists();
-    if (allVoiceoverArtists.includes(artistUsername)) {
-      throw new Error(
-        `Error: User '${artistUsername}' is already assigned as a voiceover artist for this exploration.`
-      );
-    } else {
-      showMessage(
-        `Voiceover artist '${artistUsername}' does not exist and can be added.`
-      );
-    }
+
+    await this.page.waitForFunction(
+      (selector: string, artistUsername: string) => {
+        let elements = document.querySelectorAll(selector);
+        if (!elements || elements.length === 0) {
+          return true;
+        }
+
+        for (const element of elements) {
+          const elementText = element.textContent?.trim();
+          if (elementText === artistUsername) {
+            return false;
+          }
+        }
+        return true;
+      },
+      {},
+      updatedVoiceoverArtist,
+      artistUsername
+    );
   }
 
   /**
