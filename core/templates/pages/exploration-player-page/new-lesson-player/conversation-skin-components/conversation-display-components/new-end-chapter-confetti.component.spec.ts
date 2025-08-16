@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NewEndChapterConfettiComponent} from './new-end-chapter-confetti.component';
-import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
+import {UrlInterpolationService} from '../../../../../domain/utilities/url-interpolation.service';
 
 describe('End chapter confetti component', function () {
   let component: NewEndChapterConfettiComponent;

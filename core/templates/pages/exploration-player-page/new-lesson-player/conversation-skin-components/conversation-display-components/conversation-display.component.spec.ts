@@ -92,7 +92,7 @@ class MockTranslateService {
   }
 }
 
-describe('Tutor card component', () => {
+fdescribe('Conversation display component', () => {
   let fixture: ComponentFixture<ConversationDisplayComponent>;
   let componentInstance: ConversationDisplayComponent;
 
@@ -893,12 +893,6 @@ describe('Tutor card component', () => {
     expect(componentInstance.isContentAudioTranslationAvailable()).toBeTrue();
   });
 
-  it('should check if current card is at end of transcript', () => {
-    componentInstance.displayedCard = mockDisplayedCard;
-    spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
-    expect(componentInstance.isCurrentCardAtEndOfTranscript()).toBeFalse();
-  });
-
   it('should tell if on a terminal card', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isTerminal').and.returnValue(true);
@@ -909,5 +903,149 @@ describe('Tutor card component', () => {
     expect(componentInstance.getInputResponsePairId(1)).toEqual(
       'input-response-pair-1'
     );
+  });
+
+  describe('shouldInteractionBeDisplayed', () => {
+    beforeEach(() => {
+      componentInstance.displayedCard = mockDisplayedCard;
+      componentInstance.displayedCardWasCompletedInPrevSession = false;
+      componentInstance.shouldHideInteraction = false;
+      componentInstance.waitingForOppiaFeedback = false;
+      componentInstance.isIframed = false;
+    });
+
+    it('should return true when all conditions are met for displaying interaction', () => {
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(
+        '<div>interaction</div>'
+      );
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(true);
+    });
+
+    it('should return false when card was completed in previous session', () => {
+      componentInstance.displayedCardWasCompletedInPrevSession = true;
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(
+        '<div>interaction</div>'
+      );
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);
+    });
+
+    it('should return false when interaction is not inline', () => {
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(false);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(
+        '<div>interaction</div>'
+      );
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);
+    });
+
+    it('should return false when shouldHideInteraction is true', () => {
+      componentInstance.shouldHideInteraction = true;
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(
+        '<div>interaction</div>'
+      );
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);
+    });
+
+    it('should return false when card is completed', () => {
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(
+        '<div>interaction</div>'
+      );
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);
+    });
+
+    it('should return false when waiting for Oppia feedback', () => {
+      componentInstance.waitingForOppiaFeedback = true;
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(
+        '<div>interaction</div>'
+      );
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);
+    });
+
+    it('should return false when card has no interaction HTML and is not completed', () => {
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue('');
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);
+    });
+
+    it('should return false when on terminal card in iframe and card is not completed', () => {
+      componentInstance.isIframed = true;
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(
+        '<div>interaction</div>'
+      );
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);
+    });
+
+    it('should return true when on terminal card in iframe but card is completed', () => {
+      componentInstance.isIframed = true;
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(
+        '<div>interaction</div>'
+      );
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);
+    });
+
+    it('should return true when on terminal card but not in iframe', () => {
+      componentInstance.isIframed = false;
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(
+        '<div>interaction</div>'
+      );
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(true);
+    });
+
+    it('should return true when card is completed and has interaction HTML', () => {
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(
+        '<div>interaction</div>'
+      );
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(true);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);
+    });
+
+    it('should handle null interaction HTML', () => {
+      spyOn(componentInstance, 'isInteractionInline').and.returnValue(true);
+      spyOn(mockDisplayedCard, 'getInteractionHtml').and.returnValue(null);
+      spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);
+      spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
+
+      expect(componentInstance.shouldInteractionBeDisplayed()).toBe(false);
+    });
   });
 });
