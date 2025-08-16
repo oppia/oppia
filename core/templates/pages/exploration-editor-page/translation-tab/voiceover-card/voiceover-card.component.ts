@@ -803,6 +803,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         );
 
         this.updateStatusGraph();
+        this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+          this.activeEntityVoiceoversInstance
+            ?.automatedVoiceoversAudioOffsetsMsecs || {}
+        );
+        this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
       },
       () => {
         this.isAutomaticVoiceoverGenerating = false;

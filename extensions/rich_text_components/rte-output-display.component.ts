@@ -228,7 +228,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         let textContent = '';
 
         for (let tempChildNode of updatedChildNodes) {
-          textContent += this.getReadableTextFromNode(tempChildNode);
+          textContent += this.getReadableTextFromNode(tempChildNode) + ' ';
         }
 
         const sentencesInEarliestParentTag = textContent.split(sentenceRegex);
@@ -324,7 +324,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
     // The regex below is used to split sentences from the lesson content.
     const sentenceRegex = new RegExp(
-      `(?<=[${punctuationsForCurrentLanguage}])(?<!\\.\\.)["']?\\s*(?=[A-Za-z”])`,
+      `(?<=[${punctuationsForCurrentLanguage}]["”']?)\\s+`,
       'g'
     );
 

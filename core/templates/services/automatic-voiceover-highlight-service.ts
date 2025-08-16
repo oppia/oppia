@@ -235,6 +235,7 @@ export class AutomaticVoiceoverHighlightService {
       this.highlightIdToSentenceWithoutSpacesMap[currentHighlightId as string];
 
     minOffsetMsecs = 0.0;
+    let remainingSentence = '';
 
     audioOffsets?.forEach(tokenToAudioOffsetMsecs => {
       let token = tokenToAudioOffsetMsecs.token;
@@ -246,9 +247,14 @@ export class AutomaticVoiceoverHighlightService {
 
       token = token.split(/\s+/).join('').trim();
 
-      currentSentence = currentSentence?.startsWith(token)
-        ? currentSentence.slice(token.length)
-        : currentSentence;
+      if (currentSentence?.startsWith(token)) {
+        currentSentence = currentSentence.slice(token.length);
+      } else {
+        if (token.length > currentSentence.length) {
+          remainingSentence = currentSentence;
+          currentSentence = '';
+        }
+      }
 
       if (currentSentence?.length === 0) {
         maxOffsetMsecs = audioOffsetMsecs;
@@ -269,6 +275,13 @@ export class AutomaticVoiceoverHighlightService {
             currentHighlightId as string
           ];
         minOffsetMsecs = 0.0;
+
+        currentSentence = remainingSentence + currentSentence;
+        if (remainingSentence.length > 0) {
+          currentSentence = currentSentence.slice(token.length);
+          remainingSentence = '';
+          minOffsetMsecs = audioOffsetMsecs;
+        }
       }
     });
   }
