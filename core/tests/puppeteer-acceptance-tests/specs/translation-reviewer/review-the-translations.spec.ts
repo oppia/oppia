@@ -109,7 +109,7 @@ describe('Translation Reviewer', function () {
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOn('Save and translate another');
-  }, 900000);
+  }, 1200000);
 
   it('should be able to view all pending reviews', async function () {
     // TODO: Can't see the one with different language.

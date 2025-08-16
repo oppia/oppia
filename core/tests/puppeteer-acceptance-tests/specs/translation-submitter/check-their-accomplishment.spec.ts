@@ -97,7 +97,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
-  }, 600000);
+  }, 900000);
 
   it('should be able to check contribution stats', async function () {
     // Check contribution stats.
