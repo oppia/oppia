@@ -76,6 +76,8 @@ const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
 const settingsContainerSelector =
   '.oppia-editor-card.oppia-settings-card-container';
 const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
+const navigationDropdownInMobileVisibleSelector =
+  '.oppia-exploration-editor-tabs-dropdown.show';
 
 export class VoiceoverAdmin extends BaseUser {
   /**
@@ -102,6 +104,16 @@ export class VoiceoverAdmin extends BaseUser {
       });
       await this.clickOn(mobileNavbarDropdown);
       await this.clickOn(mobileSettingsBarSelector);
+
+      // Close dropdown if it doesn't automatically close.
+      const isVisible = await this.isElementVisible(
+        navigationDropdownInMobileVisibleSelector
+      );
+      if (isVisible) {
+        // We are using page.click as this button might be overlapped by the
+        // dropdown. Thus, it will fail with onClick.
+        this.page.click(mobileNavbarDropdown);
+      }
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
       await this.clickOn(basicSettingsDropdown);
