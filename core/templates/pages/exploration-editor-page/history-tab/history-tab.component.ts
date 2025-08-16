@@ -418,17 +418,18 @@ export class HistoryTabComponent implements OnInit, OnDestroy {
   }
 
   changeItemsPerPage(): void {
-    const start =
+    const startVersionIndex =
       (this.displayedCurrentPageNumber - 1) * this.VERSIONS_PER_PAGE;
-    const end = this.displayedCurrentPageNumber * this.VERSIONS_PER_PAGE;
+    const endVersionIndex =
+      this.displayedCurrentPageNumber * this.VERSIONS_PER_PAGE;
 
     this.explorationVersionMetadata = this.filteredVersionMetadata.slice(
-      start,
-      end
+      startVersionIndex,
+      endVersionIndex
     );
 
-    this.startingIndex = start + 1;
-    this.endIndex = Math.min(end, this.versionNumbersToDisplay);
+    this.startingIndex = startVersionIndex + 1;
+    this.endIndex = Math.min(endVersionIndex, this.versionNumbersToDisplay);
   }
 
   isEditable(): boolean {
