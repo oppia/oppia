@@ -1,10 +1,7 @@
-<oppia-new-end-chapter-confetti #confetti
-                            class="end-chapter-confetti">
+<oppia-new-end-chapter-confetti #confetti class="end-chapter-confetti">
 </oppia-new-end-chapter-confetti>
 <div class="oppia-learner-view-card" [@fadeInOut]="this.displayedCard">
-  <oppia-new-end-chapter-check-mark #checkMark
-                                [ngClass]="{'check-mark-hidden': checkMarkHidden, 'check-mark-skipped': checkMarkSkipped}"
-                                class="end-chapter-check-mark">
+  <oppia-new-end-chapter-check-mark #checkMark [ngClass]="{'check-mark-hidden': checkMarkHidden, 'check-mark-skipped': checkMarkSkipped}" class="end-chapter-check-mark">
   </oppia-new-end-chapter-check-mark>
   <!-- New UI for the question -->
   <div class="oppia-learner-view-card-top-section" [ngClass]="{'card-content-hidden': !checkMarkHidden}">

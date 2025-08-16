@@ -92,7 +92,7 @@ class MockTranslateService {
   }
 }
 
-fdescribe('Conversation display component', () => {
+describe('Conversation display component', () => {
   let fixture: ComponentFixture<ConversationDisplayComponent>;
   let componentInstance: ConversationDisplayComponent;
 
