@@ -502,15 +502,35 @@ export class ConversationDisplayComponent {
     return true;
   }
 
-  isCurrentCardAtEndOfTranscript(): boolean {
-    return !this.displayedCard.isCompleted();
-  }
-
   isOnTerminalCard(): boolean {
     return this.displayedCard.isTerminal();
   }
 
   getInputResponsePairId(index: number): string {
     return 'input-response-pair-' + index;
+  }
+
+  shouldInteractionBeDisplayed(): boolean {
+    const card = this.displayedCard;
+
+    const isInline = this.isInteractionInline();
+    const hasInteractionHtml = card.getInteractionHtml();
+    const isCardCompleted = card.isCompleted();
+
+    const isInteractionConditionMet =
+      (hasInteractionHtml && !isCardCompleted) || isCardCompleted;
+
+    const isTerminalOrAllowed =
+      !this.isOnTerminalCard() || !this.isIframed || isCardCompleted;
+
+    return (
+      !this.displayedCardWasCompletedInPrevSession &&
+      isInline &&
+      !this.shouldHideInteraction &&
+      !isCardCompleted &&
+      !this.waitingForOppiaFeedback &&
+      isInteractionConditionMet &&
+      isTerminalOrAllowed
+    );
   }
 }

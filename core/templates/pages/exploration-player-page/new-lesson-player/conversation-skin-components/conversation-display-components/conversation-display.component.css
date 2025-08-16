@@ -126,15 +126,8 @@ oppia-conversation-display .end-chapter-check-mark {
   transition-property: opacity;
 }
 
-oppia-conversation-display .learner-view-card-transition-class {
-  transition-duration: 1s;
-  transition-property: transform, opacity;
-}
-
 oppia-conversation-display .card-content-hidden {
   opacity: 0;
-  position: fixed;
-  transform: translate(0, 7px);
 }
 
 .conversation-skin-responses-dropdown-container {
