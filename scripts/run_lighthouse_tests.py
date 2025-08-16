@@ -158,7 +158,7 @@ def get_entity(line: str) -> tuple[str, str] | None:
     """Gets the entity in the given line if the line is a URL.
 
     Args:
-        line: str. The line to parse and extract the entity name and ID from. 
+        line: str. The line to parse and extract the entity name and ID from.
             If no recognizable URL is present, nothing is returned.
 
     Returns:
@@ -247,7 +247,7 @@ def inject_entities_into_url(url: str, entities: dict[str, str]) -> str:
         str. The URL with the entity ID injected into it.
 
     Raises:
-        ValueError. The entity referenced in the URL is not found in the 
+        ValueError. The entity referenced in the URL is not found in the
             entities.
     """
     entity_matcher = r'\{\{(.*?)\}\}'
@@ -270,7 +270,7 @@ def get_lighthouse_urls_to_run(
 
     Args:
         pages: list(str). The pages to run the Lighthouse checks on.
-        entities: dict(str, str). The available entities to inject 
+        entities: dict(str, str). The available entities to inject
             into the URLs.
         pages_config: dict(str, str). The configuration for the pages.
 

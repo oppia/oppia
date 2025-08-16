@@ -465,7 +465,7 @@ class ComputeTranslationsWithInvalidContentIds(beam.DoFn):  # type: ignore[misc]
         translation model and reject them if needed.
 
         Args:
-            entity_translation_model: EntityTranslationsModel. An entity 
+            entity_translation_model: EntityTranslationsModel. An entity
                 translation model.
 
         Yields:
@@ -550,7 +550,7 @@ class ComputeUpdatedExpOpportunityModel(beam.DoFn):  # type: ignore[misc]
         count for an updated entity translation model.
 
         Args:
-            entity_translation_model: EntityTranslationsModel. An entity 
+            entity_translation_model: EntityTranslationsModel. An entity
                 translation model.
 
         Yields:

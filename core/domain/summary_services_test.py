@@ -907,7 +907,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
 
 
 class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
-    """Tests for checking id validity of activities 
+    """Tests for checking id validity of activities
     that don't exist or are private."""
 
     EXP_ID_0: Final = 'exp_id_0'

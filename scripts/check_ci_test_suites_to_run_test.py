@@ -182,7 +182,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     'CODEOWNERS'
                 ],
                 'RUN_ALL_TESTS_ROOT_FILES': [
-                    'src/main.ts' 
+                    'src/main.ts'
                 ]
             }))
         lighthouse_pages_config_file = os.path.join(
@@ -332,11 +332,11 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         self.all_test_suites = {
             'acceptance': {
                 'docker': {
-                    'count': 1, 
+                    'count': 1,
                     'suites': [
                         {
                             'name': 'exploration-player/view-exploration',
-                            'module': 
+                            'module':
                                 'exploration-player/view-exploration.spec.ts',
                             'environment': 'docker'
                         }
@@ -434,23 +434,23 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             extended_test_suites,
             [
                 {
-                    'name': 'suite1', 
-                    'module': 'module1', 
+                    'name': 'suite1',
+                    'module': 'module1',
                     'environment': 'python'
                 },
                 {
-                    'name': 'suite2', 
-                    'module': 'module2', 
+                    'name': 'suite2',
+                    'module': 'module2',
                     'environment': 'python'
                 },
                 {
-                    'name': 'suite3', 
-                    'module': 'module3', 
+                    'name': 'suite3',
+                    'module': 'module3',
                     'environment': 'python'
                 },
                 {
-                    'name': 'suite4', 
-                    'module': 'module4', 
+                    'name': 'suite4',
+                    'module': 'module4',
                     'environment': 'python'
                 }
             ]

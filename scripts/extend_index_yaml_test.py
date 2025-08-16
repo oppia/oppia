@@ -225,7 +225,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
     direction: desc
 """
         web_inf_index_xml = """
-<datastore-indexes autoGenerate="true">    
+<datastore-indexes autoGenerate="true">
     <datastore-index kind="TestModel" ancestor="false" source="auto">
         <property name="status" direction="asc"/>
         <property name="next_scheduled_check_time" direction="asc"/>
@@ -272,7 +272,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
     direction: desc
 """
         web_inf_index_xml = """
-<datastore-indexes autoGenerate="true">    
+<datastore-indexes autoGenerate="true">
     <datastore-index kind="BlogPostRightsModel" ancestor="false" source="auto">
         <property name="blog_post_is_published" direction="asc"/>
         <property name="editor_ids" direction="asc"/>
@@ -328,7 +328,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
   - name: next_scheduled_check_time
 """
         web_inf_index_xml = """
-<datastore-indexes autoGenerate="true">    
+<datastore-indexes autoGenerate="true">
     <datastore-index kind="TestModel" ancestor="false" source="auto">
         <property name="status" direction="asc"/>
         <property name="next_scheduled_check_time" direction="asc"/>
@@ -380,7 +380,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
     direction: desc
 """
         web_inf_index_xml = """
-<datastore-indexes autoGenerate="true">    
+<datastore-indexes autoGenerate="true">
     <datastore-index kind="TestModel" ancestor="false" source="auto">
         <property name="task" direction="asc"/>
         <property name="status" direction="asc"/>
@@ -438,13 +438,13 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
     direction: desc
 """
         web_inf_index_xml = """
-<datastore-indexes autoGenerate="true">  
+<datastore-indexes autoGenerate="true">
     <datastore-index kind="BlogPostRightsModel" ancestor="false" source="auto">
         <property name="editor_ids" direction="asc"/>
         <property name="blog_post_is_published" direction="asc"/>
         <property name="story_ids2" direction="asc"/>
         <property name="last_updated" direction="desc"/>
-    </datastore-index>  
+    </datastore-index>
     <datastore-index kind="TestModel" ancestor="false" source="auto">
         <property name="task" direction="asc"/>
         <property name="status" direction="asc"/>

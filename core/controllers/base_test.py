@@ -2501,7 +2501,7 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
 
 NotLoggedInException: Unauthenticated user
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}
@@ -2525,7 +2525,7 @@ Handler class name: BaseHandler
 
 NotFoundException: Invalid URL requested
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}
@@ -2549,7 +2549,7 @@ Handler class name: BaseHandler
 
 UnauthorizedUserException: Exception raised
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}
@@ -2573,7 +2573,7 @@ Handler class name: BaseHandler
 
 InvalidInputException: Exception raised
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}
@@ -2597,7 +2597,7 @@ Handler class name: BaseHandler
 
 InternalErrorException: Exception raised
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}
@@ -2625,7 +2625,7 @@ Handler class name: BaseHandler
 
 Exception: Exception raised
 
-Stack Trace: 
+Stack Trace:
 NoneType: None
 
 URL requested: {self.handler.request.uri}

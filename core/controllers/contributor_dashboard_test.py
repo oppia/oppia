@@ -1978,7 +1978,7 @@ class TranslatableTopicNamesPerClassroomHandlerTest(
                     'topics': ['topic']
                 },
                 {
-                    'classroom': 'Class 2', 
+                    'classroom': 'Class 2',
                     'topics': ['topic 2']
                 }
             ]

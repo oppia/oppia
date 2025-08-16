@@ -60,7 +60,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
             classroom_models.ClassroomModel.generate_new_classroom_id())
         classroom_model_instance = (classroom_models.ClassroomModel.create(
             classroom_id, 'physics', 'physics', 'Curated physics course.',
-            'Learn physics through fun stories!', 
+            'Learn physics through fun stories!',
             'Start from the basic physics.', {}, False, False,
             'thumbnail.svg', 'transparent', 1000, 'banner.png',
             'transparent', 1000, 0))

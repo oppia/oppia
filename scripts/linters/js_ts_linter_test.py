@@ -294,7 +294,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
     def test_angular_services_index_success(self) -> None:
         def mock_compile_all_ts_files() -> None:
             cmd = (
-                './node_modules/typescript/bin/tsc -outDir %s' 
+                './node_modules/typescript/bin/tsc -outDir %s'
                 'scripts/linters/test_files/ -allowJS %s '
                 '-lib %s -noImplicitUseStrict %s -skipLibCheck '
                 '%s -target %s -typeRoots %s %s typings/*') % (

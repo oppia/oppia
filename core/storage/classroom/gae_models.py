@@ -163,7 +163,7 @@ class ClassroomModel(base_models.BaseModel):
             topic_id_to_prerequisite_topic_ids: dict(str, list(str)). A dict
                 with topic ID as key and list of topic IDs as value.
             is_published: bool. Whether this classroom is published or not.
-            diagnostic_test_is_enabled: bool. Whether diagnostic test 
+            diagnostic_test_is_enabled: bool. Whether diagnostic test
                 is enabled.
             thumbnail_filename: str. Classroom's thumbnail filename.
             thumbnail_bg_color: str. Classroom's thumbnail background color.

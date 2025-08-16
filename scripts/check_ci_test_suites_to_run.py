@@ -27,7 +27,7 @@ from typing import Final, List, Optional, Sequence, Set, TypedDict
 
 _PARSER: Final = argparse.ArgumentParser(
     description="""
-Checks and outputs which test suites to run in the CI. 
+Checks and outputs which test suites to run in the CI.
 """)
 
 _PARSER.add_argument(
@@ -155,7 +155,7 @@ def create_ci_test_suites_to_run_dict(
     return {
         'e2e': e2e or
             create_ci_test_suites_dict(),
-        'acceptance': acceptance or 
+        'acceptance': acceptance or
             create_ci_test_suites_dict(),
         'lighthouse_performance': lighthouse_performance or
             create_ci_test_suites_dict(),

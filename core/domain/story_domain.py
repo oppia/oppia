@@ -765,7 +765,7 @@ class StoryNode:
         """
         if self.exploration_id is None:
             raise utils.ValidationError(
-                'Expected exploration ID to not be None') 
+                'Expected exploration ID to not be None')
         if self.exploration_id and not isinstance(self.exploration_id, str):
             raise utils.ValidationError(
                 'Expected exploration ID to be a string, received %s' %
@@ -1661,9 +1661,9 @@ class Story:
                 belongs.
             url_fragment: str. The url fragment of the story.
             meta_tag_content: Optional[str]. The meta tag content of the story.
-            thumbnail_filename: Optional[str]. The filename for the thumbnail 
+            thumbnail_filename: Optional[str]. The filename for the thumbnail
                 of the story.
-            thumbnail_bg_color: Optional[str]. The background color for the 
+            thumbnail_bg_color: Optional[str]. The background color for the
                 thumbnail of the story.
 
         Returns:

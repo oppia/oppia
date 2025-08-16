@@ -94,23 +94,23 @@ EDUCATION_BLOG_POST_TITLE = 'Education'
 
 EDUCATION_BLOG_POST_CONTENT = """
     <p>
-        Education is a constantly evolving landscape, and innovation lies at its core. 
-        This summer, Oppia had the privilege of hosting a group of exceptional minds 
-        through the prestigious Google Summer of Code (GSoC) program. These talented 
+        Education is a constantly evolving landscape, and innovation lies at its core.
+        This summer, Oppia had the privilege of hosting a group of exceptional minds
+        through the prestigious Google Summer of Code (GSoC) program. These talented
         individuals embarked on a journey to transform learning, one code at a time.
     </p>\n
     <p>
-        You should check out main 
-        <oppia-noninteractive-link 
-            text-with-value=\"&amp;quot;website.&amp;quot;\" 
+        You should check out main
+        <oppia-noninteractive-link
+            text-with-value=\"&amp;quot;website.&amp;quot;\"
             url-with-value=\"&amp;quot;https://www.oppia.org&amp;quot;\">
         </oppia-noninteractive-link><br>\n&nbsp;
     </p>\n\n
     <p>Introduction to Oppia - Youtube Video</p>
-    <oppia-noninteractive-video 
-        autoplay-with-value=\"false\" 
-        end-with-value=\"0\" 
-        start-with-value=\"0\" 
+    <oppia-noninteractive-video
+        autoplay-with-value=\"false\"
+        end-with-value=\"0\"
+        start-with-value=\"0\"
         video_id-with-value=\"&amp;quot;Wmvt-HH5-dI&amp;quot;\">
     </oppia-noninteractive-video>
 """
@@ -472,7 +472,7 @@ class AdminHandler(
             Exception. The num_dummy_exps_to_publish must be provided when
                 the action is generate_dummy_explorations.
             Exception. The num_dummy_translation_opportunities_to_generate
-                must be provided when the action is 
+                must be provided when the action is
                 generate_dummy_translation_opportunities.
             InvalidInputException. Generate count cannot be less than publish
                 count.
@@ -491,15 +491,15 @@ class AdminHandler(
             InvalidInputException. The input provided is not valid.
             Exception. The skill_id must be provided when
                 the action is generate_dummy_question_suggestions.
-            Exception. The num_dummy_question_suggestions_generate must be 
+            Exception. The num_dummy_question_suggestions_generate must be
                 provided when the action is generate_dummy_question_suggestions.
             Exception. The topic_id must be provided when
                 the action is generate_dummy_stories.
-            Exception. The num_dummy_question_stories must be 
+            Exception. The num_dummy_question_stories must be
                 provided when the action is generate_dummy_stories.
             Exception. The story_id must be provided when
                 the action is generate_dummy_chapters.
-            Exception. The num_dummy_chapters_to_generate must be 
+            Exception. The num_dummy_chapters_to_generate must be
                 provided when the action is generate_dummy_chapters.
         """
         assert self.user_id is not None
@@ -1240,7 +1240,7 @@ class AdminHandler(
                     'User does not have enough rights to generate data.')
             logging.info(
                 '[ADMIN] %s generated %s number of dummy '
-                'translation opportunities (explorations)' % 
+                'translation opportunities (explorations)' %
                 (self.user_id, num_dummy_translation_opportunities_to_generate)
             )
 
@@ -2121,7 +2121,7 @@ class AdminHandler(
                 ]
                 exp_services.update_exploration(
                     self.user_id, exp_id, exp_change_list, 'Setup exploration')
-                
+
                 # Publish the exploration before adding to story
                 user_actions_info = user_services.get_user_actions_info(self.user_id)
                 rights_manager.publish_exploration(user_actions_info, exp_id)
@@ -2149,13 +2149,13 @@ class AdminHandler(
 
             # 7. Link story to topic BEFORE adding nodes (this is required for update_story_and_topic_summary)
             topic_services.add_canonical_story(self.user_id, topic_id, story_id)
-            
+
             # 8. Add story nodes using the exact same pattern as _generate_dummy_chapters
             for i, exp_id in enumerate(exp_ids):
                 # Use sequential node IDs starting from 1
                 node_id = f'{story_domain.NODE_ID_PREFIX}{i + 1}'
                 chapter_title = f'Chapter {i + 1}'
-                
+
                 story_change_list = [
                     story_domain.StoryChange({
                         'cmd': 'add_story_node',
@@ -2184,7 +2184,7 @@ class AdminHandler(
                         'old_value': 'thumbnail_bg_color'
                     })
                 ]
-                
+
                 topic_services.update_story_and_topic_summary(
                     self.user_id, story_id, story_change_list,
                     'Add story node', story.corresponding_topic_id)

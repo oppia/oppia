@@ -46,8 +46,8 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
     def test_compiled_js_dir_validation(self) -> None:
-        """Test that run_typescript_checks.COMPILED_JS_DIR is validated 
-        correctly with outDir in 
+        """Test that run_typescript_checks.COMPILED_JS_DIR is validated
+        correctly with outDir in
         run_typescript_checks.TSCONFIG_FILEPATH.
         """
         with self.popen_swap:

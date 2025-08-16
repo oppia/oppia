@@ -488,7 +488,7 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(study_guide_commit_log_entry.user_id, self.user_id)
 
     def test_get_study_guide_sections_by_id_with_strict_mode(self) -> None:
-        """Test getting study guide sections with strict mode 
+        """Test getting study guide sections with strict mode
             enabled/disabled.
         """
         # Test with strict=True (default) - should not raise exception

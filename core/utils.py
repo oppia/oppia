@@ -429,7 +429,7 @@ def convert_image_binary_to_data_url(
     file_details = filetype.guess(content)
     if file_details is None or file_details.extension != file_type:
         raise Exception(
-            'The given binary string does not represent a %s image.' 
+            'The given binary string does not represent a %s image.'
             % file_type)
 
     return '%s%s' % (

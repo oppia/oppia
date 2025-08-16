@@ -1454,7 +1454,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 }, csrf_token=csrf_token, expected_status_int=400)
 
             self.assertIn(
-                'Schema validation for \'revert_to_version\' failed:', 
+                'Schema validation for \'revert_to_version\' failed:',
                 response_dict['error'],
             )
 

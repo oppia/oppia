@@ -702,7 +702,7 @@ def check_activity_id_validity(
             ActivityReference domain objects.
 
     Returns:
-        Tuple[List[str], List[str], List[str], List[str]]. 
+        Tuple[List[str], List[str], List[str], List[str]].
         The Tuple contains 4 Lists of string type. Each List
         corresponds to a type of Invalid ID.
     """

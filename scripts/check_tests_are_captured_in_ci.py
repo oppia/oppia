@@ -178,7 +178,7 @@ def get_e2e_test_suites_from_webdriverio_config_file() -> List[TestSuiteDict]:
 
 
 def get_acceptance_test_suites_from_acceptance_directory() -> List[TestSuiteDict]: # pylint: disable=line-too-long
-    """Gets the acceptance test suites from the acceptance test 
+    """Gets the acceptance test suites from the acceptance test
     specs directory.
 
     Returns:
@@ -221,12 +221,12 @@ def compute_test_suites_difference(
         test_suites_from_config: list(dict). A list of dictionaries sorted
             by name, each containing the name and module of a test suite from
             the CI config files.
-        test_suites_from_directory: list(dict). A list of dictionaries sorted 
+        test_suites_from_directory: list(dict). A list of dictionaries sorted
             by name, each containing the name and module of a test suite from
             the test files.
 
     Returns:
-        list(dict). A list of test suites which are not present in both 
+        list(dict). A list of test suites which are not present in both
         the CI config files and the test files, but are present in
         either of them.
     """
@@ -239,7 +239,7 @@ def compute_test_suites_difference(
 
 
 def main() -> None:
-    """Checks that the CI config files and the test files have 
+    """Checks that the CI config files and the test files have
     the same test suites.
     """
 

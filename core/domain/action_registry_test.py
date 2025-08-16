@@ -32,7 +32,7 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
     def test_action_registry_with_compliant_and_non_compliant_actions(
         self, mock_import_module: mock.MagicMock
     ) -> None:
-        """Test that only subclasses of BaseLearnerActionSpec 
+        """Test that only subclasses of BaseLearnerActionSpec
         are added to the registry.
         """
 

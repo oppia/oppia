@@ -187,7 +187,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         expected_error_messages = [
             'Line 2: The following keys: chunks, filename, meta, template,'
             ' minify, inject are missing in HtmlWebpackPlugin block in '
-            'webpack.common.config.ts', 
+            'webpack.common.config.ts',
             'FAILED  Webpack config file check failed']
         self.assertEqual(
             error_messages.get_report(), expected_error_messages)

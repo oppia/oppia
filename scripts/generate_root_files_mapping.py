@@ -28,7 +28,7 @@ ROOT_FILES_MAPPING_GENERATOR_FILEPATH = os.path.join(
 
 
 def main() -> None:
-    """Generates a mapping of files and their root files.""" 
+    """Generates a mapping of files and their root files."""
 
     run_typescript_checks.compile_and_check_typescript(
         TEST_DEPENDENCIES_TSCONFIG_FILEPATH)

@@ -143,7 +143,7 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             },
             {
                 'name': 'test2',
-                'module': 'test2.js' 
+                'module': 'test2.js'
             }
         ]
 

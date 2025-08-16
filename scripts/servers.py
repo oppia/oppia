@@ -747,7 +747,7 @@ def managed_acceptance_tests_server(
         headless: bool. Whether to run the acceptance tests in headless mode.
         mobile: bool. Whether to run the acceptance tests in mobile mode.
         prod_env: bool. Whether to run the acceptance tests in production mode.
-        stdout: int. The file descriptor where the standard output of the 
+        stdout: int. The file descriptor where the standard output of the
             subprocess is sent.
 
     Yields:

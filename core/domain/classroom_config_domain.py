@@ -79,7 +79,7 @@ class Classroom:
                 with topic ID as key and a list of prerequisite topic IDs as
                 value.
             is_published: bool. Whether this classroom is published or not.
-            diagnostic_test_is_enabled: bool. Whether this classroom 
+            diagnostic_test_is_enabled: bool. Whether this classroom
                 is published or not.
             thumbnail_data: ImageData. Image data object for classroom
                 thumbnail.
@@ -308,7 +308,7 @@ class Classroom:
         """Checks for loop in topic_id_to_prerequisite_topic_ids.
 
         Args:
-            topic_id_to_prerequisite_topic_ids: 
+            topic_id_to_prerequisite_topic_ids:
                 Dict[str, List[str]]. The topic ID to prerequisite ID mapping.
         """
         if not isinstance(topic_id_to_prerequisite_topic_ids, dict):
