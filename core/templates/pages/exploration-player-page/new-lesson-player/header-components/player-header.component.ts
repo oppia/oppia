@@ -95,20 +95,22 @@ export class PlayerHeaderComponent {
       this.explorationContext === PageContextConstants.DIAGNOSTIC_PAGE
     ) {
       this.classroomUrlFragment = this.urlService.getUrlParams().classroom;
-      if (this.classroomUrlFragment === null) {
+      if (this.classroomUrlFragment !== null) {
+        const classroomUrlFragment: string = this.classroomUrlFragment;
+        this.accessValidationBackendApiService
+          .validateAccessToClassroomPage(classroomUrlFragment)
+          .then(() => {
+            this.classroomBackendApiService
+              .fetchClassroomDataAsync(classroomUrlFragment)
+              .then(classroomData => {
+                this.classroomName = this.capitalizePipe.transform(
+                  classroomData.getName()
+                );
+              });
+          });
+      } else {
         throw new Error('Classroom URL fragment is null');
       }
-      this.accessValidationBackendApiService
-        .validateAccessToClassroomPage(this.classroomUrlFragment)
-        .then(() => {
-          this.classroomBackendApiService
-            .fetchClassroomDataAsync(this.classroomUrlFragment)
-            .then(classroomData => {
-              this.classroomName = this.capitalizePipe.transform(
-                classroomData.getName()
-              );
-            });
-        });
     }
 
     this.explorationTitle = 'Loading...';
@@ -137,6 +139,7 @@ export class PlayerHeaderComponent {
         });
 
       if (this.isLinkedToTopic) {
+        console.warn('yooooooooooo');
         this.storyUrlFragment =
           this.urlService.getStoryUrlFragmentFromLearnerUrl();
 
