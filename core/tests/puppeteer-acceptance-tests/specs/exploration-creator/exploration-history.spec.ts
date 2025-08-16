@@ -63,10 +63,11 @@ describe('Exploration Editor', function () {
     await explorationEditor.expectNumberOfHistoryItemsToBe(0);
 
     await explorationEditor.searchUserInHistoryTab('');
-    // TODO(#22976): After searching pagination doesn't work and shows
-    // all of the history items, until we change max items per page to a
-    // different value.
+    await explorationEditor.expectNumberOfHistoryItemsToBe(10);
+
     await explorationEditor.changePaginationInHistoryTabTo(15);
+    await explorationEditor.expectNumberOfHistoryItemsToBe(15);
+
     await explorationEditor.changePaginationInHistoryTabTo(10);
     await explorationEditor.expectNumberOfHistoryItemsToBe(10);
 
