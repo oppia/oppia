@@ -2161,8 +2161,7 @@ class AdminHandler(
             entity_type = feconf.ENTITY_TYPE_STORY
             fs_services.save_original_and_compressed_versions_of_image(
                 'thumbnail.svg', entity_type, story_id,
-                raw_image, 'thumbnail', False
-            )
+                raw_image, 'thumbnail', False)
 
             # 7. Link story to topic BEFORE adding nodes (this is required for
             # update_story_and_topic_summary).
@@ -2261,33 +2260,35 @@ class AdminHandler(
 
             # Save thumbnail and banner images.
             thumbnail_image = b''
-            with open('core/tests/data/thumbnail.svg', 'rt',
-                      encoding='utf-8') as svg_file:
+            with open(
+                    'core/tests/data/thumbnail.svg', 'rt', encoding='utf-8'
+            ) as svg_file:          
                 svg_file_content = svg_file.read()
                 thumbnail_image = svg_file_content.encode('ascii')
             classroom_entity_type = feconf.ENTITY_TYPE_CLASSROOM
             fs_services.save_original_and_compressed_versions_of_image(
                 'thumbnail.svg', classroom_entity_type, classroom_id,
-                thumbnail_image, 'thumbnail', False
-            )
+                thumbnail_image, 'thumbnail', False)
 
             banner_image = b''
             with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
                 banner_image = png_file.read()
             fs_services.save_original_and_compressed_versions_of_image(
                 'banner.png', classroom_entity_type, classroom_id,
-                banner_image, 'image', False
-            )
+                banner_image, 'image', False)
 
             classroom_config_services.create_new_classroom(classroom)
 
             log_message = (
-                '[ADMIN] Successfully created full math classroom with topic %s, '
+                '[ADMIN] Created full math classroom with topic %s,'
                 'story %s, and classroom %s' % (
                     topic_id, story_id, classroom_id))
             logging.info(log_message)
         else:
-            raise Exception('Cannot generate full math classroom in production.')
+            raise Exception(
+                'Cannot generate full math classroom in production.'
+            )
+
 
 
 class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):
