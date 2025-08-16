@@ -324,7 +324,7 @@ describe('Lesson player header component', () => {
       );
     });
 
-    fit('should throw error when story URL fragment is null for linked topic', () => {
+    it('should throw error when story URL fragment is null for linked topic', () => {
       spyOn(pageContextService, 'isInDiagnosticTestPlayerPage').and.returnValue(
         false
       );
