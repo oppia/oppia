@@ -5797,7 +5797,6 @@ export class LoggedOutUser extends BaseUser {
   async expectErrorMessageForWrongInputToBe(
     errorMessage: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(wrongInputErrorContainerSelector);
     await this.expectTextContentToContain(
       wrongInputErrorContainerSelector,
       errorMessage
