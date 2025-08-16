@@ -2218,7 +2218,7 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_generate_full_math_classroom_in_production_mode(
-            self
+        self
     ) -> None: 
         """Test that full math classroom cannot be generated in production."""
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -2244,11 +2244,11 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_non_admins_cannot_generate_full_math_classroom(
-            self
+        self
     ) -> None:
-      """Test that non-curriculum admins cannot generate
-      full math classroom.
-      """
+        """Test that non-curriculum admins cannot generate
+        full math classroom.
+        """
 
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
