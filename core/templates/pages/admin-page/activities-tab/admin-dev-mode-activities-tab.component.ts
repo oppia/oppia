@@ -374,6 +374,21 @@ export class AdminDevModeActivitiesTabComponent implements OnInit {
     this.storyList = adminDataObject.storyList;
   }
 
+  generateFullMathClassroom(): void {
+    this.adminTaskManagerService.startTask();
+    this.setStatusMessage.emit('Processing...');
+
+    this.adminBackendApiService
+      .generateFullMathClassroomAsync()
+      .then(() =>
+        this.setStatusMessage.emit(
+          'Full Math Classroom generated (with story & chapters).'
+        )
+      )
+      .catch(err => this.setStatusMessage.emit('Server error: ' + err))
+      .finally(() => this.adminTaskManagerService.finishTask());
+  }
+
   ngOnInit(): void {
     this.getDataAsync();
   }

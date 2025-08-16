@@ -135,11 +135,11 @@ ARABIC_BLOG_POST_TITLE = 'Leading The Arabic Translations Team'
 ARABIC_BLOG_POST_CONTENT = """
     <h1>Introduction:</h1>\n
     <oppia-noninteractive-image alt-with-value=\"Oppia Arabic Blogpost Graphic\" caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;blog_post_image_height_326_width_490.svg&amp;quot;\"></oppia-noninteractive-image>\n\n
-    <p><strong>Editor’s note:</strong> <em>The Arabic team at Oppia plays a pivotal role in breaking down language barriers and making educational content accessible to Arabic-speaking learners. One of the primary challenges lies in finding a suitable tone and language that can resonate with all Arabic-speaking regions, each of which has its unique dialects.</em></p>\n\n
+    <p><strong>Editor's note:</strong> <em>The Arabic team at Oppia plays a pivotal role in breaking down language barriers and making educational content accessible to Arabic-speaking learners. One of the primary challenges lies in finding a suitable tone and language that can resonate with all Arabic-speaking regions, each of which has its unique dialects.</em></p>\n\n
     <p><em>In this blog post, our team lead, Sarah, explains how teamwork can lead not only to professional accomplishments but also personal growth and lasting connections. The Arabic team's journey exemplifies the transformative power of collaboration, cultural exchange, and the profound impact of education on individuals and communities.</em></p>\n\n<p>Translating educational lessons presents a unique set of challenges, particularly when it comes to bridging language barriers and adapting content to suit diverse regional dialects. In this blog post, we will delve into the experiences of our dedicated team and explore how we tackled these obstacles head-on. We will also highlight the inspiring stories of past members, shedding light on their motivations and the invaluable skills they acquired through their contributions.</p>\n\n<p>&nbsp;</p>\n\n<h1>Finding the Right Tone and Language</h1>\n\n\n
     <p>Contributing to this project offered more than just an opportunity to make a difference. For many of us, it served as a valuable stepping stone in our career paths. As an example, some of our team members were students, and through their involvement, they received practical experience and exposure to real-world challenges. This helped them develop essential skills such as teamwork, project management, and time management. We expect these acquired competencies to prove beneficial in their future professional endeavors.</p>\n\n
     <h1>Conclusion</h1>\n\n
-    <p>Overcoming the challenges associated with translating lessons into Arabic required a dedicated and passionate team. By focusing on finding the right tone and language, our team members collaborated to ensure that educational content reached a wider audience across diverse Arabic-speaking regions. Through their contributions, they not only empowered learners but also experienced personal growth and acquired valuable skills. With this blog post, I would like to thank and celebrate the contributions of all the members of Oppia’s Arabic translation team. Our journey together stands as a testament to the power of teamwork, cultural exchange, and the positive impact of education on individuals and communities.</p>\n\n
+    <p>Overcoming the challenges associated with translating lessons into Arabic required a dedicated and passionate team. By focusing on finding the right tone and language, our team members collaborated to ensure that educational content reached a wider audience across diverse Arabic-speaking regions. Through their contributions, they not only empowered learners but also experienced personal growth and acquired valuable skills. With this blog post, I would like to thank and celebrate the contributions of all the members of Oppia's Arabic translation team. Our journey together stands as a testament to the power of teamwork, cultural exchange, and the positive impact of education on individuals and communities.</p>\n\n
     <h1>Arabic hashtags:</h1>\n\n
     <p>&nbsp;#تحديات_الترجمة</p>\n\n
     <p>&nbsp;#حاجز_اللغة</p>\n\n
@@ -265,6 +265,7 @@ class AdminHandler(
                         'generate_dummy_new_skill_data',
                         'generate_dummy_blog_post',
                         'generate_dummy_classroom',
+                        'generate_full_math_classroom',
                         'generate_dummy_chapters',
                         'generate_dummy_question_suggestions',
                         'generate_dummy_stories',
@@ -668,6 +669,8 @@ class AdminHandler(
                 result = {
                     'version': version
                 }
+            elif action == 'generate_full_math_classroom':
+                self._generate_full_math_classroom()
             else:
                 # The handler schema defines the possible values of 'action'.
                 # If 'action' has a value other than those defined in the
@@ -2005,6 +2008,239 @@ class AdminHandler(
             raise Exception(
                 'Cannot generate dummy chapters in production.')
 
+    def _generate_full_math_classroom(self) -> None:
+        """Generate and loads the database with a full math classroom setup.
+
+        Raises:
+            Exception. Cannot generate full math classroom in production.
+            Exception. User does not have enough rights to generate data.
+        """
+        assert self.user_id is not None
+        if constants.DEV_MODE:
+            if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
+                raise Exception(
+                    'User does not have enough rights to generate data.')
+            logging.info(
+                '[ADMIN] %s generated full math classroom.' % self.user_id)
+
+            # 1. Create skills
+            skill_id_1 = skill_services.get_new_skill_id()
+            skill_id_2 = skill_services.get_new_skill_id()
+            skill_id_3 = skill_services.get_new_skill_id()
+
+            skill_1 = self._create_dummy_skill(
+                skill_id_1, 'Basic Fractions', '<p>Understanding basic fractions and their representations.</p>')
+            skill_2 = self._create_dummy_skill(
+                skill_id_2, 'Fraction Operations', '<p>Adding, subtracting, multiplying, and dividing fractions.</p>')
+            skill_3 = self._create_dummy_skill(
+                skill_id_3, 'Advanced Fractions', '<p>Complex fraction problems and real-world applications.</p>')
+
+            # 2. Create topic
+            topic_id = topic_fetchers.get_new_topic_id()
+            topic = topic_domain.Topic.create_default_topic(
+                topic_id, 'Fractions', 'fractions', 'Learn about fractions', 'fractions-frag')
+            topic.skill_ids_for_diagnostic_test = [skill_id_1]
+            topic.thumbnail_filename = 'thumbnail.svg'
+            topic.thumbnail_bg_color = '#C6DCDA'
+            topic.subtopics = [
+                topic_domain.Subtopic(
+                    1, 'Basic Fractions', [skill_id_1], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'basic-fractions'),
+                topic_domain.Subtopic(
+                    2, 'Fraction Operations', [skill_id_2], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'fraction-operations'),
+                topic_domain.Subtopic(
+                    3, 'Advanced Fractions', [skill_id_3], 'image.svg',
+                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0], 21131,
+                    'advanced-fractions')
+            ]
+            topic.next_subtopic_id = 4
+
+            # 3. Create story
+            story_id = story_services.get_new_story_id()
+            story = story_domain.Story.create_default_story(
+                story_id, 'Fractions Story', 'A comprehensive story about fractions',
+                topic_id, 'fractions-story', 'Learn fractions through interactive lessons',
+                'thumbnail.svg', '#B3D8F1')
+
+            # 4. Create questions
+            question_ids = []
+            for i in range(9):  # 3 questions per skill
+                question_id = question_services.get_new_question_id()
+                question_ids.append(question_id)
+                skill_id = skill_id_1 if i < 3 else (skill_id_2 if i < 6 else skill_id_3)
+                question = self._create_dummy_question(
+                    question_id, f'Question {i + 1}', [skill_id])
+                question_services.add_question(self.user_id, question)
+                question_services.create_new_question_skill_link(
+                    self.user_id, question_id, skill_id, 0.5)
+
+            # 5. Create explorations (chapters)
+            exp_ids = []
+            for i in range(3):  # 3 chapters
+                exp_id = exp_fetchers.get_new_exploration_id()
+                exp_ids.append(exp_id)
+                exploration = exp_domain.Exploration.create_default_exploration(
+                    exp_id, f'Chapter {i + 1}', category='Mathematics',
+                    objective=f'Learn about fractions - Chapter {i + 1}')
+                exp_services.save_new_exploration(self.user_id, exploration)
+
+                # Update exploration to have proper interaction
+                exp_change_list = [
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Introduction',
+                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                        'new_value': 'EndExploration'
+                    }),
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Introduction',
+                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                        'new_value': {
+                            'recommendedExplorationIds': {
+                                'value': []
+                            }
+                        }
+                    }),
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Introduction',
+                        'property_name': exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
+                        'new_value': None
+                    }),
+                ]
+                exp_services.update_exploration(
+                    self.user_id, exp_id, exp_change_list, 'Setup exploration')
+                
+                # Publish the exploration before adding to story
+                user_actions_info = user_services.get_user_actions_info(self.user_id)
+                rights_manager.publish_exploration(user_actions_info, exp_id)
+
+            # Index the explorations
+            exp_services.index_explorations_given_ids(exp_ids)
+
+            # 6. Save everything first
+            skill_services.save_new_skill(self.user_id, skill_1)
+            skill_services.save_new_skill(self.user_id, skill_2)
+            skill_services.save_new_skill(self.user_id, skill_3)
+
+            topic_services.save_new_topic(self.user_id, topic)
+            story_services.save_new_story(self.user_id, story)
+
+            # Save story thumbnail image (moved here to match _generate_dummy_chapters pattern)
+            raw_image = b''
+            with open('core/tests/data/thumbnail.svg', 'rt', encoding='utf-8') as svg_file:
+                svg_file_content = svg_file.read()
+                raw_image = svg_file_content.encode('ascii')
+            fs_services.save_original_and_compressed_versions_of_image(
+                'thumbnail.svg', feconf.ENTITY_TYPE_STORY, story_id,
+                raw_image, 'thumbnail', False)
+
+            # 7. Link story to topic BEFORE adding nodes (this is required for update_story_and_topic_summary)
+            topic_services.add_canonical_story(self.user_id, topic_id, story_id)
+            
+            # 8. Add story nodes using the exact same pattern as _generate_dummy_chapters
+            for i, exp_id in enumerate(exp_ids):
+                # Use sequential node IDs starting from 1
+                node_id = f'{story_domain.NODE_ID_PREFIX}{i + 1}'
+                chapter_title = f'Chapter {i + 1}'
+                
+                story_change_list = [
+                    story_domain.StoryChange({
+                        'cmd': 'add_story_node',
+                        'title': chapter_title,
+                        'node_id': node_id
+                    }),
+                    story_domain.StoryChange({
+                        'cmd': 'update_story_node_property',
+                        'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                        'new_value': exp_id,
+                        'node_id': node_id,
+                        'old_value': 'exploration_id'
+                    }),
+                    story_domain.StoryChange({
+                        'cmd': 'update_story_node_property',
+                        'property_name': story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME,
+                        'new_value': 'thumbnail.svg',
+                        'node_id': node_id,
+                        'old_value': 'thumbnail_filename'
+                    }),
+                    story_domain.StoryChange({
+                        'cmd': 'update_story_node_property',
+                        'property_name': story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR,
+                        'new_value': '#B3D8F1',
+                        'node_id': node_id,
+                        'old_value': 'thumbnail_bg_color'
+                    })
+                ]
+                
+                topic_services.update_story_and_topic_summary(
+                    self.user_id, story_id, story_change_list,
+                    'Add story node', story.corresponding_topic_id)
+
+            # Set destination node IDs for linear flow (using direct story object method like working functions)
+            story = story_fetchers.get_story_by_id(story_id)
+            for i in range(len(exp_ids) - 1):
+                current_node_id = f'{story_domain.NODE_ID_PREFIX}{i + 1}'
+                next_node_id = f'{story_domain.NODE_ID_PREFIX}{i + 2}'
+                story.update_node_destination_node_ids(current_node_id, [next_node_id])
+
+            # 9. Publish everything
+            topic_services.publish_topic(topic_id, self.user_id)
+            topic_services.publish_story(topic_id, story_id, self.user_id)
+
+            # 10. Generate translation opportunities for the Contributor Dashboard
+            opportunity_services.add_new_exploration_opportunities(
+                story_id, exp_ids)
+
+            # 11. Create classroom
+            classroom_id = classroom_config_services.get_new_classroom_id()
+            classroom = classroom_config_domain.Classroom(
+                classroom_id=classroom_id,
+                name='Math',
+                url_fragment='math',
+                course_details='Comprehensive mathematics course covering fractions and more',
+                teaser_text='Master fractions through interactive lessons',
+                topic_list_intro='Start with our comprehensive fractions topic.',
+                topic_id_to_prerequisite_topic_ids={topic_id: []},
+                is_published=True,
+                diagnostic_test_is_enabled=False,
+                thumbnail_data=classroom_config_domain.ImageData(
+                    'thumbnail.svg', 'transparent', 1000
+                ),
+                banner_data=classroom_config_domain.ImageData(
+                    'banner.png', 'transparent', 1000
+                ),
+                index=0
+            )
+
+            # Save thumbnail and banner images
+            thumbnail_image = b''
+            with open('core/tests/data/thumbnail.svg', 'rt', encoding='utf-8') as svg_file:
+                svg_file_content = svg_file.read()
+                thumbnail_image = svg_file_content.encode('ascii')
+            fs_services.save_original_and_compressed_versions_of_image(
+                'thumbnail.svg', feconf.ENTITY_TYPE_CLASSROOM, classroom_id,
+                thumbnail_image, 'thumbnail', False)
+
+            banner_image = b''
+            with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
+                banner_image = png_file.read()
+            fs_services.save_original_and_compressed_versions_of_image(
+                'banner.png', feconf.ENTITY_TYPE_CLASSROOM, classroom_id,
+                banner_image, 'image', False)
+
+            classroom_config_services.create_new_classroom(classroom)
+
+            logging.info(
+                '[ADMIN] Successfully created full math classroom with topic %s, '
+                'story %s, and classroom %s' % (topic_id, story_id, classroom_id))
+        else:
+            raise Exception('Cannot generate full math classroom in production.')
+
 
 class AdminRoleHandlerNormalizedGetRequestDict(TypedDict):
     """Dict representation of AdminRoleHandler's GET normalized_request
@@ -2260,7 +2496,7 @@ class TopicManagerRoleHandler(
         TopicManagerRoleHandlerNormalizedPayloadDict, Dict[str, str]
     ]
 ):
-    """Handler to assign or deassigning manager to a topic."""
+    """Handler to assign or deassign manager to a topic."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}

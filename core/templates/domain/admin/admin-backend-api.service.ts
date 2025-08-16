@@ -622,6 +622,12 @@ export class AdminBackendApiService {
     });
   }
 
+  async generateFullMathClassroomAsync(): Promise<void> {
+    return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
+      action: 'generate_full_math_classroom',
+    });
+  }
+
   async generateDummyClassroomDataAsync(): Promise<void> {
     return this._postRequestAsync(AdminPageConstants.ADMIN_HANDLER_URL, {
       action: 'generate_dummy_classroom',
