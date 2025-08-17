@@ -2125,6 +2125,23 @@ def compute_models_to_put_when_saving_new_exp_version(
                 translation_counts
             )
         )
+
+        # Regenerates voiceovers when curated exploration contents are updated.
+        if feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames
+            .AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE.value, None
+        ):
+            taskqueue_services.defer(
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_UPDATE'],
+                taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+                updated_exploration.id,
+                updated_exploration.title,
+                updated_exploration.version,
+                committer_id,
+                datetime.datetime.utcnow().isoformat()
+            )
+
     exp_rights = rights_manager.get_exploration_rights(exploration_id)
     exp_summary_model = exp_models.ExpSummaryModel.get(exploration_id)
     exp_summary = update_exploration_summary(

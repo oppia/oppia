@@ -259,7 +259,12 @@ class DeferredTasksHandler(
                 .remove_user_from_activities_with_associated_rights_models),
         fn_ids_to_names[
             'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_UPDATE']: (
-                voiceover_services.regenerate_voiceover_for_updated_exploration)
+                voiceover_services.regenerate_voiceover_for_updated_exploration
+        ),
+        fn_ids_to_names[
+            'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_CURATION']: (
+                voiceover_services.regenerate_voiceovers_on_exploration_curation
+        )
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue

@@ -70,7 +70,10 @@ class FeatureNames(enum.Enum):
         'enable_translation_opps_with_new_opp_models')
     ENABLE_WORKED_EXAMPLES_RTE_COMPONENT = (
         'enable_worked_examples_rte_component'
-     )
+    )
+    AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE = (
+        'automated_voiceover_synthesis_from_task_queue'
+    )
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -110,7 +113,8 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
-    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES
+    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
+    FeatureNames.AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -307,5 +311,12 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'section of skills and explanation of the study guides.',
             feature_flag_domain.ServerMode.DEV
         )
-    )
+    ),
+    FeatureNames.AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE.value: (
+        (
+            'The flag enables the automated voiceover synthesis from the '
+            'task queue.',
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
 }

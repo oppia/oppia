@@ -1705,5 +1705,7 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
     'FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS': (
         'remove_user_from_rights_models'),
     'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_UPDATE': (
-        'regenerate_voiceover_for_updated_exploration')
+        'regenerate_voiceover_for_updated_exploration'),
+    'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_CURATION': (
+        'regenerate_voiceovers_on_exploration_curation')
 }
