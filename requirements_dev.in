@@ -4,6 +4,7 @@
 #
 # to update `requirements_dev.txt` and your current Python environment.
 Pillow==10.1.0
+black==25.1.0
 certifi==2023.7.22
 coverage==7.8.0
 esprima==4.0.1
@@ -18,4 +19,3 @@ pyyaml==6.0
 rcssmin==1.1.1
 webtest==3.0.0
 xmltodict==0.13.0
-black==25.1.0
