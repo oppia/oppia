@@ -36,7 +36,7 @@
         </div>
         <div>
           <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
-            <button mat-raised-button class="oppia-new-button-raised e2e-test-next-lesson-button">
+            <button mat-raised-button class="oppia-new-button-raised">
               <i class="material-icons oppia-vcenter oppia-button-icon" aria-hidden="true">&#xE5C8;</i>
             </button>
           </a>
@@ -76,7 +76,7 @@
 <div *ngIf="isProgressClearanceMessageShown()" class="oppia-exploration-checkpoints-message">
   <div id="toast-container" class="toast-top-center toast-container">
     <div class="toast-info checkpoints-toast-info ngx-toastr ng-trigger ng-trigger-flyInOut">
-      <div aria-live="polite" role="alertdialog" class="toast-message e2e-test-lesson-completion-message" attr.aria-label="{{'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate}}">
+      <div aria-live="polite" role="alertdialog" class="toast-message">
         {{ 'I18N_EXPLORATION_STARTING_FROM_BEGINNING' | translate }}
       </div>
     </div>
