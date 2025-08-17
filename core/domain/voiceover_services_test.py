@@ -1673,7 +1673,12 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                 'content_value': arabic_translation,
                 'content_format': 'html',
                 'needs_update': False
-            }
+            },
+            'content_1': {
+                'content_value': arabic_translation,
+                'content_format': 'html',
+                'needs_update': True
+            },
         }
 
         translation_models.EntityTranslationsModel.create_new(
@@ -1756,6 +1761,26 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                 ]
             }
         )
+
+    def test_should_raise_exception_when_language_accent_code_is_not_supported(
+        self
+    ) -> None:
+        language_accent_code = 'ar-non-existent'
+        exploration_id = 'exp_id_1'
+        self.signup('tester@org.com', 'tester')
+        author_id = self.get_user_id_from_email('tester@org.com')
+        date_time = datetime.datetime.utcnow().isoformat()
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Invalid language accent code: %s' % language_accent_code
+        ):
+            (
+                voiceover_services.
+                regenerate_voiceovers_of_exploration_for_given_language_accent(
+                    exploration_id, language_accent_code, author_id, date_time
+                )
+            )
 
     def test_should_regenerate_voiceover_for_english_language(
         self
