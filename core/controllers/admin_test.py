@@ -2420,7 +2420,8 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
 
         self.assertEqual(skill.id, skill_id)
         self.assertEqual(skill.description, 'Test Skill')
-        self.assertEqual(skill.skill_contents.explanation.html, '<p>Test description</p>')
+        self.assertEqual(
+            skill.skill_contents.explanation.html, '<p>Test description</p>')
 
         self.logout()
 
