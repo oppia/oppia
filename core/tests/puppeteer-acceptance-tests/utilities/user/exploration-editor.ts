@@ -100,6 +100,7 @@ const discardDraftDropdownSelector = 'button.e2e-test-save-discard-toggle';
 const desktopDiscardDraftButton = 'a.e2e-test-discard-changes';
 const confirmDiscardButton = 'button.e2e-test-confirm-discard-changes';
 const currentCardNameSelector = 'strong.e2e-test-state-name-text';
+const currentCardNameContainerSelector = '.e2e-test-state-name-container';
 
 const previewTabButton = '.e2e-test-preview-tab';
 const previewTabContainer = '.e2e-test-preview-tab-container';
@@ -3683,7 +3684,7 @@ export class ExplorationEditor extends BaseUser {
           return element?.textContent?.includes(value);
         },
         {},
-        currentCardNameSelector,
+        currentCardNameContainerSelector,
         headingName
       );
     } catch (error) {
