@@ -90,14 +90,22 @@ describe('Voiceover Submitter', function () {
       'Content',
       testConstants.data.VoiceoverEnglishIndia
     );
+    // TODO(#23129): Once fixed remove the unnecessary navigation to editor
+    // tab to change the card.
+    await voiceoverSubmitter.navigateToEditorTab();
     await voiceoverSubmitter.navigateToCard('Card 1');
+    await voiceoverSubmitter.navigateToTranslationsTab();
     await voiceoverSubmitter.addVoiceoverToContent(
       'English',
       'English (India)',
       'Content',
       testConstants.data.VoiceoverEnglishIndia
     );
+    // TODO(#23129): Once fixed remove the unnecessary navigation to editor
+    // tab to change the card.
+    await voiceoverSubmitter.navigateToEditorTab();
     await voiceoverSubmitter.navigateToCard('Introduction');
+    await voiceoverSubmitter.navigateToTranslationsTab();
     await voiceoverSubmitter.expectScreenshotToMatch(
       'voiceoverPageWithOneVoiceoverAddEnIndia',
       __dirname
