@@ -338,7 +338,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
 
         blog_post_five_id = (
                 blog_services.create_new_blog_post(blog_editor_id).id)
-        change_dict_five: blog_services.BlogPostChangeDict = {{
+        change_dict_five: blog_services.BlogPostChangeDic t= {
             'title': 'Unique Title Five',
             'thumbnail_filename': 'unique_thumb.svg',
             'content': '<p>Unique Content</p>',
