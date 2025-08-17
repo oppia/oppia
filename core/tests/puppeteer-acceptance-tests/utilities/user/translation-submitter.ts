@@ -129,13 +129,13 @@ export class TranslationSubmitter extends BaseUser {
       );
       const opportunityItemSubHeading = await opportunityItemElement.evaluate(
         (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
+          el.querySelector(sel)?.textContent?.trim() ?? '',
         opportunitySubHeadingSelector
       );
 
       if (
         opportunityItemHeading === chapterName &&
-        opportunityItemSubHeading?.includes(storyName)
+        opportunityItemSubHeading.includes(storyName)
       ) {
         opportunityItem = opportunityItemElement;
         break;

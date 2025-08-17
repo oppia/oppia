@@ -122,9 +122,9 @@ describe('Translation Reviewer', function () {
   });
 
   it('should be able to move between reviews', async function () {
-    await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
+    await translationReviewer.startTranslationReview(
       'सामग्री 0',
-      'Fractions / Dividing'
+      'Fractions / The Picnic'
     );
 
     await translationReviewer.expectPaginationButtonToBeDisabled('previous');
