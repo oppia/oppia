@@ -13,29 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ParamChangesObjectFactory.
+ * @fileoverview Unit tests for ParamChanges model class.
  */
 
-import {TestBed} from '@angular/core/testing';
-
 import {ParamChange} from './param-change.model';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {ParamChanges} from 'domain/exploration/param-changes.model';
 
-describe('ParamChangesObjectFactory', () => {
-  let pcsof: ParamChangesObjectFactory;
+describe('ParamChanges', () => {
   const cArgs = {
     parse_with_jinja: true,
     value: '',
   };
   const gId = 'Copier';
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [ParamChangesObjectFactory],
-    });
-
-    pcsof = TestBed.inject(ParamChangesObjectFactory);
-  });
 
   it('should create a ParamChange array from a list of dictionaries', () => {
     const paramName1 = 'param_1';
@@ -53,7 +42,8 @@ describe('ParamChangesObjectFactory', () => {
       },
     ];
 
-    const testOutcome: ParamChange[] = pcsof.createFromBackendList(backendList);
+    const testOutcome: ParamChange[] =
+      ParamChanges.createFromBackendList(backendList);
 
     expect(testOutcome.length).toBe(2);
     expect(testOutcome[0].customizationArgs).toEqual(cArgs);
