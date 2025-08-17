@@ -18,7 +18,7 @@
 
 import {Injectable} from '@angular/core';
 import {ParamChange, ParamChangeBackendDict} from './param-change.model';
-import {ParamChangesObjectFactory} from './ParamChangesObjectFactory';
+import {ParamChanges} from './param-changes.model';
 import {
   ParamSpecs,
   ParamSpecsBackendDict,
@@ -120,15 +120,12 @@ export class ExplorationMetadata {
   providedIn: 'root',
 })
 export class ExplorationMetadataObjectFactory {
-  constructor(
-    private paramChangesObjectFactory: ParamChangesObjectFactory,
-    private paramSpecsObjectFactory: ParamSpecsObjectFactory
-  ) {}
+  constructor(private paramSpecsObjectFactory: ParamSpecsObjectFactory) {}
 
   createFromBackendDict(
     explorationMetadataBackendDict: ExplorationMetadataBackendDict
   ): ExplorationMetadata {
-    const paramChanges = this.paramChangesObjectFactory.createFromBackendList(
+    const paramChanges = ParamChanges.createFromBackendList(
       explorationMetadataBackendDict.param_changes
     );
     const paramSpecs = this.paramSpecsObjectFactory.createFromBackendDict(

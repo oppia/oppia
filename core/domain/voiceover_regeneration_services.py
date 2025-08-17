@@ -24,6 +24,7 @@ import html
 import io
 import json
 import logging
+import time
 import uuid
 
 from core import feconf
@@ -33,7 +34,6 @@ from core.domain import fs_services
 from core.domain import state_domain
 from core.domain import translation_fetchers
 from core.domain import voiceover_services
-
 from core.platform import models
 
 import bs4
@@ -63,6 +63,8 @@ ALLOWED_CUSTOM_OPPIA_RTE_TAGS = [
     'oppia-noninteractive-tabs',
     'oppia-noninteractive-workedexample'
 ]
+
+WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
 
 
 def convert_custom_oppia_tags_to_generic_tags(element: bs4.Tag) -> bs4.Tag:
@@ -356,21 +358,8 @@ def regenerate_voiceover_for_exploration_content(
     sentence_tokens_with_durations = synthesize_voiceover_for_html_string(
         exploration_id, content_html, language_accent_code, voiceover_filename)
 
-    fs = fs_services.GcsFileSystem(
-        feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
-
-    binary_audio_data = fs.get('%s/%s' % ('audio', voiceover_filename))
-
-    tempbuffer = io.BytesIO()
-    tempbuffer.write(binary_audio_data)
-    tempbuffer.seek(0)
-    audio = mp3.MP3(tempbuffer)
-
-    duration_secs = audio.info.length
-    audio_size_bytes = tempbuffer.getbuffer().nbytes
-
-    voiceover = state_domain.Voiceover(
-        voiceover_filename, audio_size_bytes, False, duration_secs)
+    voiceover = fetch_voiceover_by_filename(
+        exploration_id, voiceover_filename)
 
     entity_voiceovers = (
         voiceover_services.get_voiceovers_for_given_language_accent_code(
@@ -388,3 +377,102 @@ def regenerate_voiceover_for_exploration_content(
     voiceover_services.save_entity_voiceovers(entity_voiceovers)
 
     return voiceover, sentence_tokens_with_durations
+
+
+def fetch_voiceover_by_filename(
+    exploration_id: str, filename: str
+) -> state_domain.Voiceover:
+    """Fetches the voiceover by filename from the GCS file system.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        filename: str. The filename of the voiceover to be fetched.
+
+    Returns:
+        Voiceover. The fetched voiceover object.
+    """
+    fs = fs_services.GcsFileSystem(
+        feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
+
+    binary_audio_data = fs.get('%s/%s' % ('audio', filename))
+
+    tempbuffer = io.BytesIO()
+    tempbuffer.write(binary_audio_data)
+    tempbuffer.seek(0)
+    audio = mp3.MP3(tempbuffer)
+
+    duration_secs = audio.info.length
+    audio_size_bytes = tempbuffer.getbuffer().nbytes
+
+    return state_domain.Voiceover(
+        filename, audio_size_bytes, False, duration_secs)
+
+
+def regenerate_voiceovers_of_exploration(
+    exploration_id: str,
+    exploration_version: int,
+    content_id_to_content_html: Dict[str, str],
+    language_accent_code: str
+) -> List[Tuple[str, str]]:
+    """Regenerates voiceovers for the updated content (in English or any
+    other supported language) of a curated exploration.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        exploration_version: int. The version of the exploration.
+        content_id_to_content_html: dict(str, str). A dictionary mapping content
+            IDs to their corresponding updated HTML content strings.
+        language_accent_code: str. The language accent code for the voiceover.
+
+    Returns:
+        list(tuple(str, str)). A list of tuples containing content IDs and
+        error messages for any content IDs that failed to regenerate voiceovers.
+    """
+    errors_while_voiceover_regeneration = []
+    for content_id, content_html in (content_id_to_content_html.items()):
+        voiceover_filename = generate_new_voiceover_filename(
+            content_id, language_accent_code)
+
+        # Pause for 3 seconds to prevent sudden spikes in workload.
+        time.sleep(WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS)
+
+        try:
+            # Generates a voiceover for the provided HTML content in the
+            # specified language accent.
+            sentence_tokens_with_durations = (
+                synthesize_voiceover_for_html_string(
+                    exploration_id,
+                    content_html,
+                    language_accent_code,
+                    voiceover_filename
+                )
+            )
+
+            # Fetches the generated voiceover.
+            voiceover = fetch_voiceover_by_filename(
+                exploration_id, voiceover_filename)
+
+            # Saves the voiceover into EntityVoiceoversModel.
+            entity_voiceovers = (
+                voiceover_services.
+                get_voiceovers_for_given_language_accent_code(
+                    feconf.ENTITY_TYPE_EXPLORATION,
+                    exploration_id,
+                    exploration_version,
+                    language_accent_code
+                )
+            )
+            entity_voiceovers.add_voiceover(
+                content_id, feconf.VoiceoverType.AUTO, voiceover)
+            entity_voiceovers.add_automated_voiceovers_audio_offsets(
+                content_id, sentence_tokens_with_durations)
+            entity_voiceovers.validate()
+            voiceover_services.save_entity_voiceovers(entity_voiceovers)
+        except Exception as e:
+            logging.error(
+                'Failed to regenerate voiceover for content_id %s in '
+                'exploration %s: %s' % (content_id, exploration_id, str(e)))
+            errors_while_voiceover_regeneration.append((content_id, str(e)))
+            continue
+
+    return errors_while_voiceover_regeneration

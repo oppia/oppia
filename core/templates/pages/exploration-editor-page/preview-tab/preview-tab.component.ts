@@ -23,7 +23,7 @@ import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {ParamChange} from 'domain/exploration/param-change.model';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
 import {
   ExplorationParams,
@@ -74,7 +74,6 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
     private parameterMetadataService: ParameterMetadataService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
-    private paramChangesObjectFactory: ParamChangesObjectFactory,
     private entityVoiceoversService: EntityVoiceoversService,
     private conversationFlowService: ConversationFlowService
   ) {}
@@ -198,9 +197,7 @@ export class PreviewTabComponent implements OnInit, OnDestroy {
         // is fully finished.
         if (!this.explorationParamChangesService.savedMemento) {
           this.explorationParamChangesService.init(
-            this.paramChangesObjectFactory.createFromBackendList(
-              explorationData.param_changes
-            )
+            ParamChanges.createFromBackendList(explorationData.param_changes)
           );
           this.explorationStatesService.init(explorationData.states, false);
           this.explorationInitStateNameService.init(

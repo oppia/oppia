@@ -13,26 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ParamSpecObjectFactory.
+ * @fileoverview Unit tests for ParamSpec.
  */
 
-import {TestBed} from '@angular/core/testing';
-
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
+import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {ParamType} from 'domain/exploration/param-type.model';
 
-describe('Param Spec Object Factory', () => {
-  let psof: ParamSpecObjectFactory;
+describe('Param Spec', () => {
   let paramType: ParamType;
 
   beforeEach(() => {
-    psof = TestBed.inject(ParamSpecObjectFactory);
-
     paramType = ParamType.getDefaultType();
   });
 
   it('should create a param spec object from backend dict', () => {
-    const paramSpecObject = psof.createFromBackendDict({
+    const paramSpecObject = ParamSpec.createFromBackendDict({
       obj_type: 'UnicodeString',
     });
 
@@ -44,7 +39,7 @@ describe('Param Spec Object Factory', () => {
 
   it('should create a param spec objec from a non default type', () => {
     const paramType = ParamType.getTypeFromBackendName('UnicodeString');
-    const paramSpecObject = psof.createFromBackendDict({
+    const paramSpecObject = ParamSpec.createFromBackendDict({
       obj_type: 'UnicodeString',
     });
 
@@ -59,7 +54,7 @@ describe('Param Spec Object Factory', () => {
       'is invalid',
     () => {
       expect(() => {
-        psof.createFromBackendDict({
+        ParamSpec.createFromBackendDict({
           obj_type: 'Invalid',
         });
       }).toThrowError('Invalid is not a registered parameter type.');
@@ -67,7 +62,7 @@ describe('Param Spec Object Factory', () => {
   );
 
   it('should create a default param spec object', () => {
-    const paramSpecObject = psof.createDefault();
+    const paramSpecObject = ParamSpec.createDefault();
 
     expect(paramSpecObject.getType()).toEqual(paramType);
     expect(paramSpecObject.toBackendDict()).toEqual({
