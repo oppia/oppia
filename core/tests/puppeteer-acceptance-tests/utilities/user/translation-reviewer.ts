@@ -79,40 +79,14 @@ export class TranslationReviewer extends BaseUser {
     chapterName: string,
     storyName: string
   ) {
-    await this.expectElementToBeVisible(opportunityItemSelector);
     const initbackToLessonButtonVisible = await this.isElementVisible(
       backToLessonButtonSelector
     );
 
-    const opportunityItems = await this.page.$$(opportunityItemSelector);
-    let opportunityItem: ElementHandle<Element> | null = null;
-    for (const opportunityItemElement of opportunityItems) {
-      const opportunityItemHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunityItemHeadingSelector
-      );
-      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunitySubHeadingSelector
-      );
-
-      if (
-        opportunityItemHeading === chapterName &&
-        opportunityItemSubHeading?.includes(storyName)
-      ) {
-        opportunityItem = opportunityItemElement;
-        break;
-      }
-    }
-
-    if (!opportunityItem) {
-      throw new Error(
-        `Opportunity item for chapter ${chapterName} and story ${storyName} not found.`
-      );
-    }
-
+    const opportunityItem = await this.getTranslationOpportunityCard(
+      chapterName,
+      storyName
+    );
     // Click on translate button in the opportunity item.
     const translateButton = await opportunityItem.waitForSelector(
       opportunityTranslateButtonSelector
@@ -140,6 +114,81 @@ export class TranslationReviewer extends BaseUser {
     ) {
       throw new Error('Translate/Review button not clicked properly.');
     }
+  }
+
+  /**
+   * Returns the opportunity card for the given chapter and story.
+   * @param {string} heading - The name of the chapter.
+   * @param {string} storyName - The name of the story.
+   * @returns {Promise<ElementHandle<Element>>} A promise that resolves to the opportunity card element.
+   */
+  async getTranslationOpportunityCard(
+    heading: string,
+    subheading: string
+  ): Promise<ElementHandle<Element>> {
+    await this.expectElementToBeVisible(opportunityItemSelector);
+
+    const opportunityItems = await this.page.$$(opportunityItemSelector);
+    let opportunityItem: ElementHandle<Element> | null = null;
+    for (const opportunityItemElement of opportunityItems) {
+      const opportunityItemHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunityItemHeadingSelector
+      );
+      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunitySubHeadingSelector
+      );
+
+      if (
+        opportunityItemHeading === heading &&
+        opportunityItemSubHeading?.includes(subheading)
+      ) {
+        opportunityItem = opportunityItemElement;
+        break;
+      }
+    }
+
+    if (!opportunityItem) {
+      throw new Error(
+        `Opportunity item for chapter ${heading} and story ${subheading} not found.`
+      );
+    }
+    return opportunityItem;
+  }
+
+  /**
+   * Starts a translation review.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} subheading - The subheading of the chapter.
+   */
+  async startTranslationReview(
+    chapterName: string,
+    subheading: string
+  ): Promise<void> {
+    const opportunityItem = await this.getTranslationOpportunityCard(
+      chapterName,
+      subheading
+    );
+
+    if (this.isViewportAtMobileWidth()) {
+      await opportunityItem.click();
+    } else {
+      // Click on translate button in the opportunity item.
+      const translateButton = await opportunityItem.waitForSelector(
+        opportunityTranslateButtonSelector
+      );
+      if (!translateButton) {
+        throw new Error(
+          `Translate button for chapter ${chapterName} and story ${subheading} not found.`
+        );
+      }
+      await translateButton.click();
+    }
+
+    await this.expectModalTitleToBe('Review Translation Contributions');
   }
 
   /**

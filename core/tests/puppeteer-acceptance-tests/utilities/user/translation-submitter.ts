@@ -443,6 +443,7 @@ export class TranslationSubmitter extends BaseUser {
     await languageOption.click();
 
     // Verify language is selected.
+    await this.expectElementToBeVisible(opportunityItemSelector, false);
     await this.expectTextContentToContain(selectedLanguageSelector, language);
   }
 

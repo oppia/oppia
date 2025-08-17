@@ -64,6 +64,7 @@ export type ModalUserInteractions = (
 ) => Promise<void>;
 
 const actionStatusMessageSelector = '.e2e-test-status-message';
+const commonModalTitleSelector = '.e2e-test-modal-header';
 
 export class BaseUser {
   page!: Page;
@@ -1585,6 +1586,15 @@ export class BaseUser {
       await this.expectPageURLToContain(targetPageUrl, context);
       await context.goBack();
     }
+  }
+
+  /**
+   * Checks if the modal title matches the expected title.
+   * @param expectedTitle The expected title of the modal.
+   */
+  async expectModalTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToBe(commonModalTitleSelector, expectedTitle);
   }
 }
 

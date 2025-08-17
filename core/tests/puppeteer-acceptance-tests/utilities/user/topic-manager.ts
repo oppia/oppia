@@ -2614,6 +2614,9 @@ export class TopicManager extends BaseUser {
     try {
       await this.openTopicEditor(topicName);
       if (this.isViewportAtMobileWidth()) {
+        await this.expectElementToBeVisible(
+          mobileCollapsibleCardHeaderSelector
+        );
         const elements = await this.page.$$(
           mobileCollapsibleCardHeaderSelector
         );
