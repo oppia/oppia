@@ -2407,7 +2407,7 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         # Create admin handler instance.
         from core.controllers import admin
         mock_request = mock.Mock()
-        mock_request.body = '{}'
+        mock_request.get = mock.Mock(return_value='{}')
         mock_response = mock.Mock()
         admin_handler = admin.AdminHandler(mock_request, mock_response)
         admin_handler.user_id = self.get_user_id_from_email(
@@ -2419,7 +2419,8 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
             skill_id, 'Test Skill', '<p>Test description</p>')
 
         self.assertEqual(skill.id, skill_id)
-        self.assertEqual(skill.description, '<p>Test description</p>')
+        self.assertEqual(skill.description, 'Test Skill')
+        self.assertEqual(skill.skill_contents.explanation.html, '<p>Test description</p>')
 
         self.logout()
 
@@ -2431,7 +2432,7 @@ class GenerateFullMathClassroomTest(test_utils.GenericTestBase):
         # Create admin handler instance.
         from core.controllers import admin
         mock_request = mock.Mock()
-        mock_request.body = '{}'
+        mock_request.get = mock.Mock(return_value='{}')
         mock_response = mock.Mock()
         admin_handler = admin.AdminHandler(mock_request, mock_response)
         admin_handler.user_id = self.get_user_id_from_email(
