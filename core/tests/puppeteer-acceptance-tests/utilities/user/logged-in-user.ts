@@ -1784,9 +1784,7 @@ export class LoggedInUser extends BaseUser {
     });
     await this.clickOn(reportExplorationButtonSelector);
     await this.page.waitForSelector(issueTypeSelector);
-    // Wait for checkbox to animate before clicking on it.
-    // This ensures that the checkbox is checked.
-    await this.page.waitForTimeout(100);
+    await this.waitForElementToStabilize(issueTypeSelector);
     await this.page.click(issueTypeSelector);
     await this.type(reportExplorationTextAreaSelector, issueDescription);
 
