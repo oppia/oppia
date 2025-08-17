@@ -26,7 +26,7 @@ import {Subscription} from 'rxjs';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {ExplorationPlayerConstants} from '../../current-lesson-player/exploration-player-page.constants';
+import {NewLessonPlayerConstants} from '../../new-lesson-player/lesson-player-page.constants';
 import {PlayerPositionService} from '../../services/player-position.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {ExplorationModeService} from '../../services/exploration-mode.service';
@@ -93,7 +93,7 @@ export class CardNavigationControlComponent {
   directiveSubscriptions = new Subscription();
   interactionIsInline: boolean = true;
   CONTINUE_BUTTON_FOCUS_LABEL: string =
-    ExplorationPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL;
+    NewLessonPlayerConstants.CONTINUE_BUTTON_FOCUS_LABEL;
 
   SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE: string[] = [
     'ItemSelectionInput',

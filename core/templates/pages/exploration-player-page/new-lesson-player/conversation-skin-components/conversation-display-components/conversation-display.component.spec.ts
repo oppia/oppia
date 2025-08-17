@@ -42,7 +42,7 @@ import {WindowDimensionsService} from '../../../../../services/contextual/window
 import {WindowRef} from '../../../../../services/contextual/window-ref.service';
 import {UserService} from '../../../../../services/user.service';
 import {MockTranslatePipe} from '../../../../../tests/unit-test-utils';
-import {ExplorationPlayerConstants} from '../../../current-lesson-player/exploration-player-page.constants';
+import {NewLessonPlayerConstants} from '../../../new-lesson-player/lesson-player-page.constants';
 import {AudioPreloaderService} from '../../../services/audio-preloader.service';
 import {CurrentInteractionService} from '../../../services/current-interaction.service';
 import {ExplorationModeService} from '../../../services/exploration-mode.service';
@@ -846,7 +846,7 @@ describe('Tutor card component', () => {
       AppConstants.COMPONENT_NAME_CONTENT
     );
     expect(componentInstance.getContentAudioHighlightClass()).toBe(
-      ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS
+      NewLessonPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS
     );
   });
 
@@ -858,7 +858,7 @@ describe('Tutor card component', () => {
 
   it('should get content focus label', () => {
     expect(componentInstance.getContentFocusLabel(1)).toEqual(
-      ExplorationPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX + 1
+      NewLessonPlayerConstants.CONTENT_FOCUS_LABEL_PREFIX + 1
     );
   });
 
