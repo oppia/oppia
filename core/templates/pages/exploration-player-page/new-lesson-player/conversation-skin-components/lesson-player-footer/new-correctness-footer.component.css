@@ -61,9 +61,9 @@
 }
 
 .dot1 {
-	-webkit-animation: flasha 2s 1;
-	animation: flasha 2s 1;
-	opacity: 0;
+  -webkit-animation: flasha 2s 1;
+  animation: flasha 2s 1;
+  opacity: 0;
 }
 
 .dot2 {
@@ -392,7 +392,7 @@
   100% { background-color: #b34700; opacity: 1;right: -80px; top: -80px; }
 }
 /* Some mobile devices have CSS width below 520px, use a responsive min-width
-	when under 520px to prevent pushing things offscreen. */
+  when under 520px to prevent pushing things offscreen. */
 @media(max-width: 500px) {
   .inner-container {
     min-width: 250px;
@@ -401,11 +401,11 @@
 
 @media(max-width: 959px) {
   .inner-container-alignment {
-	  padding-left: 30px;
-	  padding-right: 30px;
+    padding-left: 30px;
+    padding-right: 30px;
   }
 
   .inner-container {
-	  max-width: 650px;
+    max-width: 650px;
   }
 }
