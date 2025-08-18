@@ -28,6 +28,8 @@ from core.constants import constants
 from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
+from core.domain import platform_parameter_list
+from core.domain import platform_parameter_services
 from core.domain import state_domain
 from core.domain import translation_fetchers
 from core.domain import user_services
@@ -1125,16 +1127,23 @@ def _regenerate_voiceovers_for_given_contents(
                 number_of_contents_failed_to_regenerate += len(
                     errors_while_voiceover_regeneration)
 
-    send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
-        exploration_id,
-        exploration_title,
-        date_time,
-        language_accents_used_for_voiceover_regeneration,
-        error_collections_during_voiceover_regeneration,
-        number_of_contents_for_voiceover_regeneration,
-        number_of_contents_failed_to_regenerate,
-        author_id
+    # Confirming that the app can deliver emails.
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
     )
+    if server_can_send_emails:
+        send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
+            exploration_id,
+            exploration_title,
+            date_time,
+            language_accents_used_for_voiceover_regeneration,
+            error_collections_during_voiceover_regeneration,
+            number_of_contents_for_voiceover_regeneration,
+            number_of_contents_failed_to_regenerate,
+            author_id
+        )
 
 
 def regenerate_voiceover_for_updated_exploration(
@@ -1373,4 +1382,42 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
         language_code_to_contents_mapping,
         date_time,
         author_id
+    )
+
+
+def generate_voiceover_from_translated_content(
+    exploration_id: str,
+    exploration_version: int,
+    translation_content: str,
+    content_id: str,
+    language_code: str
+) -> None:
+    """Generates a new voiceover for translated content once translation
+    suggestions are approved by reviewers.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        exploration_version: int. The version of the exploration.
+        translation_content: str. The translated content for which the
+            voiceover needs to be generated.
+        content_id: str. The content ID for which the voiceover is being
+            generated.
+        language_code: str. The language code for the voiceover.
+    """
+    language_code_to_contents_mapping = {
+        language_code: {
+            content_id: translation_content
+        }
+    }
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    assert exploration is not None
+    exploration_title = exploration.title
+
+    _regenerate_voiceovers_for_given_contents(
+        exploration_id,
+        exploration_title,
+        exploration_version,
+        language_code_to_contents_mapping,
+        datetime.datetime.utcnow().isoformat(),
+        feconf.SYSTEM_COMMITTER_ID
     )
