@@ -18,7 +18,8 @@
 
 export default function isElementClickable(
   element: Element,
-  clickable: boolean = true
+  clickable: boolean = true,
+  showDebugLogs: boolean = false
 ): boolean {
   /**
    * This function gets the overlapping element if any by checking the
@@ -38,6 +39,14 @@ export default function isElementClickable(
     const x = elementDimensions.left + element.clientWidth / 2;
     const y = elementDimensions.top + element.clientHeight / 2;
 
+    if (showDebugLogs) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[debug]: Element ${element.tagName}\n` +
+          `Dimensions: ${elementDimensions.left}, ${elementDimensions.top}, ${elementDimensions.width}, ${elementDimensions.height}\n` +
+          `Center point: ${x}, ${y}`
+      );
+    }
     return rootElement.elementFromPoint(x, y);
   };
 
@@ -133,6 +142,13 @@ export default function isElementClickable(
       el => !overlappingElements.includes(el)
     );
 
+    if (showDebugLogs) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[debug]: Element ${element.tagName} shadow elements: ${shadowElements.length}`
+      );
+    }
+
     if (shadowElements.length === 0) {
       return false;
     }
@@ -160,6 +176,13 @@ export default function isElementClickable(
     const horizontalInView =
       elementDimensions.left <= windowWidth &&
       elementDimensions.left + elementDimensions.width > 0;
+
+    if (showDebugLogs) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[debug]: Element ${element.tagName} is in viewport: ${verticalInView}, ${horizontalInView}`
+      );
+    }
     return verticalInView && horizontalInView;
   };
 
@@ -168,11 +191,17 @@ export default function isElementClickable(
    * then it checks if it is disabled.
    */
   const isElementDisabled = (element: Element): boolean => {
-    return (
+    const isDisabled =
       (element instanceof HTMLFormElement ||
         element instanceof HTMLButtonElement) &&
-      element.disabled
-    );
+      element.disabled;
+    if (showDebugLogs) {
+      // eslint-disable-next-line no-console
+      console.log(
+        `[debug]: Element ${element.tagName} is disabled: ${isDisabled}`
+      );
+    }
+    return isDisabled;
   };
 
   /**

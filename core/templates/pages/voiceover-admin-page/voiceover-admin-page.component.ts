@@ -379,10 +379,10 @@ export class VoiceoverAdminPageComponent implements OnInit {
       !this.fetchingrenegenratedVoiceoverData;
 
     let startDate = this.range.value.start;
-    let startDateText = startDate ? startDate.toDateString() : '';
+    let startDateText = startDate ? startDate.toISOString() : '';
 
     let endDate = this.range.value.end;
-    let endDateText = endDate ? endDate.toDateString() : '';
+    let endDateText = endDate ? endDate.toISOString() : '';
 
     this.voiceoverBackendApiService
       .fetchVoiceoverRegenerationRecordAsync(startDateText, endDateText)

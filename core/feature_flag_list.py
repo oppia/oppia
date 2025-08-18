@@ -71,9 +71,6 @@ class FeatureNames(enum.Enum):
     ENABLE_WORKED_EXAMPLES_RTE_COMPONENT = (
         'enable_worked_examples_rte_component'
      )
-    ENABLE_STUDY_GUIDE_TRANSLATIONS = (
-        'enable_study_guide_translations'
-    )
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -99,8 +96,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
-    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
-    FeatureNames.ENABLE_STUDY_GUIDE_TRANSLATIONS
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -309,13 +305,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'Allows creators to add worked examples to the review material '
             'section of skills and explanation of the study guides.',
-            feature_flag_domain.ServerMode.DEV
-        )
-    ),
-    FeatureNames.ENABLE_STUDY_GUIDE_TRANSLATIONS.value: (
-        (
-            'Study guide translations will be accessible via a temporary '
-            'form on the admin page.',
             feature_flag_domain.ServerMode.DEV
         )
     )

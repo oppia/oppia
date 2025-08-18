@@ -542,15 +542,16 @@ describe('Voiceover backend API service', function () {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let startDate = new Date('2023-01-01T00:00:00Z').toDateString();
-    let endDate = new Date('2023-01-02T00:00:00Z').toDateString();
+    let startDate = new Date('2023-01-01T00:00:00Z').toISOString();
+    let endDate = new Date('2023-01-02T00:00:00Z').toISOString();
+
     voiceoverBackendApiService
       .fetchVoiceoverRegenerationRecordAsync(startDate, endDate)
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      'automatic_voiceover_regeneration_record/Sun%20Jan%2001%202023/Mon%20Jan%2002%202023'
-    );
+    const expectedUrl = `/automatic_voiceover_regeneration_record?start_date=${startDate}&end_date=${endDate}`;
+
+    let req = httpTestingController.expectOne(expectedUrl);
     expect(req.request.method).toEqual('GET');
 
     let automaticVoiceoverRegenerationRecords = [
@@ -589,15 +590,15 @@ describe('Voiceover backend API service', function () {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 
-    let startDate = new Date('2023-01-01T00:00:00Z').toDateString();
-    let endDate = new Date('2023-01-02T00:00:00Z').toDateString();
+    let startDate = new Date('2023-01-01T00:00:00Z').toISOString();
+    let endDate = new Date('2023-01-02T00:00:00Z').toISOString();
     voiceoverBackendApiService
       .fetchVoiceoverRegenerationRecordAsync(startDate, endDate)
       .then(successHandler, failHandler);
 
-    let req = httpTestingController.expectOne(
-      'automatic_voiceover_regeneration_record/Sun%20Jan%2001%202023/Mon%20Jan%2002%202023'
-    );
+    const expectedUrl = `/automatic_voiceover_regeneration_record?start_date=${startDate}&end_date=${endDate}`;
+
+    let req = httpTestingController.expectOne(expectedUrl);
     expect(req.request.method).toEqual('GET');
 
     req.flush('Invalid request', {

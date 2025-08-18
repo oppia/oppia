@@ -527,6 +527,18 @@
     {
       "name": "logged-in-learner/export-and-delete-account",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/export-and-delete-account.spec.ts"
+    },
+    {
+      "name": "blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles.spec.ts"
+    },
+    {
+      "name": "blog-post-writer/register-and-update-blog-profile",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/register-and-update-blog-profile.spec.ts"
+    },
+    {
+      "name": "blog-post-writer/create-and-edit-blog-post",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts"
     }
   ],
   "docker_suites": []
