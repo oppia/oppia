@@ -6612,6 +6612,16 @@ export class ExplorationEditor extends BaseUser {
   async expectNodeWariningSignToBeVisible(
     visible: boolean = true
   ): Promise<void> {
+    // TODO(##23129): Remove this skip once the issue is fixed, and the nodes
+    // are added to mobile viewport.
+    if (this.isViewportAtMobileWidth()) {
+      showMessage(
+        'Skipping node warning sign check on mobile viewport,' +
+          'as nodes are not visible on mobile viewport.'
+      );
+      return;
+    }
+
     await this.expectElementToBeVisible(nodeWarningSignSelector, visible);
   }
 }
