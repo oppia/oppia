@@ -13,11 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of ParamSpec
- * domain objects.
+ * @fileoverview Model class for creating new frontend instances of ParamSpec domain objects.
  */
-
-import {Injectable} from '@angular/core';
 
 import {ParamType} from 'domain/exploration/param-type.model';
 
@@ -27,12 +24,12 @@ export interface ParamSpecBackendDict {
 
 export class ParamSpec {
   _objType: ParamType;
+
   /**
    * @constructor
    * @param {!ParamType} objType - The type of the parameter.
    */
   constructor(objType: ParamType) {
-    /** @member {ParamType} */
     this._objType = objType;
   }
 
@@ -41,32 +38,24 @@ export class ParamSpec {
     return this._objType;
   }
 
-  /** @returns {{obj_type: String}} - Basic dict for backend consumption. */
+  /** @returns {{obj_type: string}} - Basic dict for backend consumption. */
   toBackendDict(): ParamSpecBackendDict {
     return {
       obj_type: this._objType.getName(),
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class ParamSpecObjectFactory {
-  constructor() {}
-  /**
-   * @param {!{obj_type: String}} paramSpecBackendDict - Basic dict from
-   *    backend.
-   * @returns {ParamSpec} - A new ParamSpec instance.
-   */
-  createFromBackendDict(paramSpecBackendDict: ParamSpecBackendDict): ParamSpec {
+  /** @returns {ParamSpec} - A default instance for ParamSpec. */
+  static createDefault(): ParamSpec {
+    return new ParamSpec(ParamType.getDefaultType());
+  }
+
+  /** @returns {ParamSpec} - A ParamSpec instance from backend dict. */
+  static createFromBackendDict(
+    paramSpecBackendDict: ParamSpecBackendDict
+  ): ParamSpec {
     return new ParamSpec(
       ParamType.getTypeFromBackendName(paramSpecBackendDict.obj_type)
     );
-  }
-
-  /** @returns {ParamSpec} - A default instance for ParamSpec. */
-  createDefault(): ParamSpec {
-    return new ParamSpec(ParamType.getDefaultType());
   }
 }

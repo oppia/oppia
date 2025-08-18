@@ -19,8 +19,6 @@
 import {NgModule} from '@angular/core';
 import {NgbModalModule, NgbPopoverModule} from '@ng-bootstrap/ng-bootstrap';
 import {CommonModule} from '@angular/common';
-import {ExplorationPlayerViewerCommonModule} from '../current-lesson-player/exploration-player-viewer-common.module';
-import {ExplorationPlayerPageModule} from '../current-lesson-player/exploration-player-page.module';
 import {SharedComponentsModule} from 'components/shared-component.module';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {MatButtonModule} from '@angular/material/button';
@@ -37,8 +35,13 @@ import 'third-party-imports/skulpt.import';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
 import {PlayerHeaderComponent} from './lesson-header/player-header.component';
-import {PlayerSidebarComponent} from './sidebar-components/player-sidebar.component';
+import {LessonPlayerSidebarComponent} from './sidebar-components/lesson-player-sidebar.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
+import {ConceptCardManagerService} from '../services/concept-card-manager.service';
+import {NewFlagExplorationModalComponent} from './sidebar-components/flag-lesson-modal.component';
+import {CustomizableThankYouModalComponent} from './sidebar-components/customizable-thank-you-modal.component';
+import {LessonFeedbackModalComponent} from './sidebar-components/lesson-feedback-modal.component';
+import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 
 @NgModule({
   imports: [
@@ -46,29 +49,39 @@ import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar
     NewLessonPlayerPageRoutingModule,
     InteractionExtensionsModule,
     MatButtonModule,
+    MatBottomSheetModule,
     NgbModalModule,
     MaterialModule,
     NgbPopoverModule,
-    ExplorationPlayerViewerCommonModule,
-    ExplorationPlayerPageModule,
     SharedComponentsModule,
     ToastrModule,
+    MatBottomSheetModule,
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
     PlayerHeaderComponent,
-    PlayerSidebarComponent,
+    LessonPlayerSidebarComponent,
     NewAudioBarComponent,
+    NewFlagExplorationModalComponent,
+    CustomizableThankYouModalComponent,
+    LessonFeedbackModalComponent,
   ],
   entryComponents: [
+    NewFlagExplorationModalComponent,
+    CustomizableThankYouModalComponent,
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
     PlayerHeaderComponent,
-    PlayerSidebarComponent,
+    LessonPlayerSidebarComponent,
     NewAudioBarComponent,
+    LessonFeedbackModalComponent,
   ],
-  providers: [HintAndSolutionModalService, FatigueDetectionService],
+  providers: [
+    HintAndSolutionModalService,
+    FatigueDetectionService,
+    ConceptCardManagerService,
+  ],
 })
 export class NewLessonPlayerPageModule {}
