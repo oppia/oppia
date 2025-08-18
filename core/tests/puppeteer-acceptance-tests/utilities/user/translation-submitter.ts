@@ -19,6 +19,7 @@
 import {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import {RTEEditor} from '../common/rte-editor';
+import isElementClickable from '../../functions/is-element-clickable';
 
 // Common Selectors.
 const activeTabSelector = '.e2e-test-active-tab';
@@ -500,6 +501,8 @@ export class TranslationSubmitter extends BaseUser {
     if (!tabElement) {
       throw new Error(`Tab ${tabName} not found.`);
     }
+
+    await this.page.waitForFunction(isElementClickable, {}, tabElement);
 
     // Click on the tab.
     await tabElement.click();

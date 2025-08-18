@@ -54,12 +54,12 @@ describe('Translation Submitter', function () {
     );
 
     await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
-    // await curriculumAdm.createAndPublishTopic(
-    //   'Fractions',
-    //   'Fraction Foundations',
-    //   'Unit Fractions'
-    // );
-    await curriculumAdm.createTopic('Fractions', 'fractions');
+    await curriculumAdm.createAndPublishTopic(
+      'Fractions',
+      'Fraction Foundations',
+      'Unit Fractions'
+    );
+    // await curriculumAdm.createTopic('Fractions', 'fractions');
     await curriculumAdm.createSkillForTopic('Math', 'Fractions');
 
     // Create an exploration.

@@ -82,11 +82,11 @@ export class Contributor extends BaseUser {
     if (!translationOpportunitiesPreset) {
       if (visible) {
         throw new Error(
-          `Translation opportunity for ${heading} and ${subheading} not found.`
+          `Translation opportunity for ${heading} in ${subheading} not found.`
         );
       } else {
         showMessage(
-          `Success: Translation opportunity for ${heading} and ${subheading} not found.`
+          `Success: Translation opportunity for ${heading} in ${subheading} not found.`
         );
         return null;
       }
