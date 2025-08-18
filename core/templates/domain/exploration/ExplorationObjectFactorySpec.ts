@@ -33,7 +33,6 @@ import {FetchExplorationBackendResponse} from './read-only-exploration-backend-a
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
-  let sof: State;
   let exploration: Exploration;
   let ls: LoggerService;
   let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
@@ -285,12 +284,12 @@ describe('Exploration object factory', () => {
 
   it('should get and set initial state of an exploration', () => {
     expect(exploration.getInitialState()).toEqual(
-      sof.createFromBackendDict('first state', firstState)
+      State.createFromBackendDict('first state', firstState)
     );
 
     exploration.setInitialStateName('second state');
     expect(exploration.getInitialState()).toEqual(
-      sof.createFromBackendDict('second state', secondState)
+      State.createFromBackendDict('second state', secondState)
     );
   });
 
