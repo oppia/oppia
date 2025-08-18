@@ -58,6 +58,7 @@ const rteHelperModalContainerSelector = '.e2e-test-rte-helper-modal-container';
 const skillNameInput = '.e2e-test-skill-name-input';
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 const contributionTableSelector = '.e2e-test-topics-table';
+const discardChangeButton = '.e2e-test-discard-translation-chages';
 
 export class TranslationSubmitter extends BaseUser {
   /**
@@ -107,6 +108,15 @@ export class TranslationSubmitter extends BaseUser {
       textToTranslateContainerSelector,
       preClickContent ?? ''
     );
+  }
+
+  /**
+   * Clicks on the discard changes button in the translation modal.
+   */
+  async clickOnDiscardChangesButton(): Promise<void> {
+    await this.expectElementToBeVisible(discardChangeButton);
+    await this.clickOn(discardChangeButton);
+    await this.expectElementToBeVisible(discardChangeButton, false);
   }
 
   /**
@@ -543,7 +553,9 @@ export class TranslationSubmitter extends BaseUser {
       el => (el as HTMLElement).innerHTML
     );
     const isRTEFocused = await this.isElementVisible(
-      `${rteEditorBodySelector}.cke_focus`
+      `${rteEditorBodySelector}.cke_focus`,
+      true,
+      5000
     );
     if (!isRTEFocused) {
       await this.clickOn(rteEditorBodySelector);

@@ -364,7 +364,7 @@ describe('Translation Submitter', function () {
   it('should be able submit a translation', async function () {
     await translationSubmitter.clickOn('Save and translate another');
     // TODO: Bug where we are required to click on the dismiss button.
-    await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('बधाई हो, आपका काम पूरा हो गया!');
     await translationSubmitter.clickOn('Save and close');
@@ -372,7 +372,7 @@ describe('Translation Submitter', function () {
       'Submitted translation for review'
     );
     // TODO: Bug where we are required to click on the dismiss button.
-    await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.clickOnDiscardChangesButton();
 
     // TODO: translate button should be disabled.
   });

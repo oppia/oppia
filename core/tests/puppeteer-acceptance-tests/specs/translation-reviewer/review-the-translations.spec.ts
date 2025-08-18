@@ -69,7 +69,11 @@ describe('Translation Reviewer', function () {
       await curriculumAdm.createAndPublishExplorationWithCards('Exploration 2');
 
     await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdm.createTopic('Fractions', 'fractions');
+    await curriculumAdm.createAndPublishTopic(
+      'Fractions',
+      'Fraction Foundations',
+      'Unit Fractions'
+    );
     await curriculumAdm.createAndPublishStoryWithChapter(
       'The Picnic Problem',
       'the-picnic-problem',
@@ -96,15 +100,15 @@ describe('Translation Reviewer', function () {
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 2');
     await translationSubmitter.clickOn('Save and close');
-    await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.clickOnDiscardChangesButton();
 
     // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageInTranslateTextTab('Ákán (Akan)');
@@ -114,11 +118,11 @@ describe('Translation Reviewer', function () {
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.clickOnDiscardChangesButton();
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and close');
-    await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.clickOnDiscardChangesButton();
 
     // // Add translation to "Cutting the Pies" in Akan.
     // await translationSubmitter.selectLanguageInTranslateTextTab('Ákán (Akan)');
@@ -128,7 +132,7 @@ describe('Translation Reviewer', function () {
     // );
     // await translationSubmitter.typeTextForRTE('सामग्री 0');
     // await translationSubmitter.clickOn('Save and translate another');
-  }, 600000);
+  }, 900000);
 
   it('should be able to view all pending reviews', async function () {
     // TODO: Can't see the one with different language.
