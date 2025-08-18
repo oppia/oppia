@@ -27,6 +27,18 @@ import {InteractionCustomizationArgs} from 'interactions/customization-args-defs
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {PageContextService} from 'services/page-context.service';
 import {ImagePreloaderService} from './image-preloader.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
+import {AudioPreloaderService} from '../services/audio-preloader.service';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
+import {VoiceoverPlayerService} from '../services/voiceover-player.service';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {PlayerPositionService} from '../services/player-position.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NewSwitchContentLanguageRefreshRequiredModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
 
 @Injectable({
   providedIn: 'root',
@@ -48,8 +60,21 @@ export class ContentTranslationManagerService {
     private extensionTagAssemblerService: ExtensionTagAssemblerService,
     private entityTranslationsService: EntityTranslationsService,
     private pageContextService: PageContextService,
-    private imagePreloaderService: ImagePreloaderService
-  ) {}
+    private imagePreloaderService: ImagePreloaderService,
+    private entityVoiceoversService: EntityVoiceoversService,
+    private ngbModal: NgbModal,
+    private voiceoverPlayerService: VoiceoverPlayerService,
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService,
+    private playerPositionService: PlayerPositionService,
+    private stateEditorService: StateEditorService,
+    private windowRef: WindowRef,
+    private contentTranslationLanguageService: ContentTranslationLanguageService,
+    private audioPreloaderService: AudioPreloaderService,
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private i18nLanguageCodeService: I18nLanguageCodeService
+  ) {
+    this._initLessonTranslations();
+  }
 
   setOriginalTranscript(explorationLanguageCode: string): void {
     this.explorationLanguageCode = explorationLanguageCode;
@@ -118,5 +143,127 @@ export class ContentTranslationManagerService {
       );
       card.setInteractionHtml(element.outerHTML);
     }
+  }
+
+  private shouldPromptForRefresh(): boolean {
+    const firstCard = this.playerTranscriptService.getCard(0);
+    return firstCard.getInputResponsePairs().length > 0;
+  }
+
+  showLanguageSwitchModal(newLanguageCode: string, modalText: string): void {
+    const modalRef = this.ngbModal.open(
+      NewSwitchContentLanguageRefreshRequiredModalComponent
+    );
+    modalRef.componentInstance.languageCode = newLanguageCode;
+    modalRef.componentInstance.modalText = modalText;
+  }
+
+  onLanguageChange(newLanguageCode: string): void {
+    const lessonLanguageOptions =
+      this.contentTranslationLanguageService.getLanguageOptionsForDropdown();
+    const userHasMadeProgress = this.shouldPromptForRefresh();
+    let lessonIsTranslatedIntoSelectedLanguage = false;
+    for (const option of lessonLanguageOptions) {
+      if (option.value === newLanguageCode) {
+        if (!userHasMadeProgress) {
+          this.changeCurrentContentLanguage(newLanguageCode);
+        } else {
+          this.showLanguageSwitchModal(
+            newLanguageCode,
+            'This will refresh the page and restart the lesson from the beginning.'
+          );
+        }
+        lessonIsTranslatedIntoSelectedLanguage = true;
+        break;
+      }
+    }
+    if (!lessonIsTranslatedIntoSelectedLanguage && !userHasMadeProgress) {
+      this.showLanguageSwitchModal(
+        newLanguageCode,
+        'tell them that lesson will be shown in english only as no translation is available but site language will be changed'
+      );
+      console.log(
+        'tell them that lesson will be shown in english only as no translation is available but site language will be changed'
+      );
+    } else if (!lessonIsTranslatedIntoSelectedLanguage && userHasMadeProgress) {
+      this.showLanguageSwitchModal(
+        newLanguageCode,
+        'tell about page reload, progress loss and defaulting to english'
+      );
+      console.log(
+        'tell about page reload, progress loss and defaulting to english'
+      );
+    }
+  }
+
+  changeCurrentContentLanguage(newLanguageCode: string): void {
+    this.entityVoiceoversService.setLanguageCode(newLanguageCode);
+
+    this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+      this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+        newLanguageCode,
+        this.entityVoiceoversService.getLanguageAccentCodes()
+      );
+      this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+        this.entityVoiceoversService.getActiveEntityVoiceovers()
+          ?.automatedVoiceoversAudioOffsetsMsecs || {}
+      );
+      this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+    });
+    this.contentTranslationLanguageService.setCurrentContentLanguageCode(
+      newLanguageCode
+    );
+    this.displayTranslations(newLanguageCode);
+  }
+
+  _initLessonTranslations(): void {
+    const url = new URL(this.windowRef.nativeWindow.location.href);
+    const currentGlobalLanguageCode =
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+    const newLanguageCode =
+      url.searchParams.get('initialContentLanguageCode') ||
+      currentGlobalLanguageCode;
+    let selectedLanguageCode =
+      this.contentTranslationLanguageService.getCurrentContentLanguageCode();
+
+    const languageOptions =
+      this.contentTranslationLanguageService.getLanguageOptionsForDropdown();
+
+    for (let option of languageOptions) {
+      if (option.value === newLanguageCode) {
+        this.contentTranslationLanguageService.setCurrentContentLanguageCode(
+          option.value
+        );
+        selectedLanguageCode = option.value;
+        break;
+      }
+    }
+
+    if (this.audioPreloaderService.exploration !== undefined) {
+      this.voiceoverBackendApiService
+        .fetchVoiceoverAdminDataAsync()
+        .then(response => {
+          this.voiceoverPlayerService.languageAccentMasterList =
+            response.languageAccentMasterList;
+          this.voiceoverPlayerService.languageCodesMapping =
+            response.languageCodesMapping;
+
+          this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
+            selectedLanguageCode,
+            this.entityVoiceoversService.getLanguageAccentCodes()
+          );
+
+          this.audioPreloaderService.kickOffAudioPreloader(
+            this.getCurrentStateName()
+          );
+        });
+    }
+  }
+
+  getCurrentStateName(): string {
+    if (this.pageContextService.isInExplorationPlayerPage()) {
+      return this.playerPositionService.getCurrentStateName();
+    }
+    return this.stateEditorService.getActiveStateName() as string;
   }
 }

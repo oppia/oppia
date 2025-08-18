@@ -21,7 +21,7 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CookieModule} from 'ngx-cookie';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModalModule, NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {DirectivesModule} from 'directives/directives.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
@@ -56,6 +56,9 @@ import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component
 import {NgBootstrapModule} from 'modules/ng-boostrap.module';
 import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
 import {PrimaryButtonComponent} from 'components/button-directives/primary-button.component';
+import {NewSwitchContentLanguageRefreshRequiredModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
+import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
+import {MatIconModule} from '@angular/material/icon';
 
 @NgModule({
   imports: [
@@ -66,7 +69,9 @@ import {PrimaryButtonComponent} from 'components/button-directives/primary-butto
     FormsModule,
     ReactiveFormsModule,
     NgbModule,
+    NgbModalModule,
     NgBootstrapModule,
+    MatIconModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,
@@ -94,6 +99,7 @@ import {PrimaryButtonComponent} from 'components/button-directives/primary-butto
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
     LanguageBannerComponent,
+    NewSwitchContentLanguageRefreshRequiredModalComponent,
   ],
 
   entryComponents: [
@@ -111,6 +117,7 @@ import {PrimaryButtonComponent} from 'components/button-directives/primary-butto
     ThanksForSubscribingModalComponent,
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
+    NewSwitchContentLanguageRefreshRequiredModalComponent,
   ],
 
   exports: [
@@ -138,6 +145,8 @@ import {PrimaryButtonComponent} from 'components/button-directives/primary-butto
     TopNavigationBarComponent,
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
+    NewSwitchContentLanguageRefreshRequiredModalComponent,
   ],
+  providers: [ContentTranslationManagerService],
 })
 export class BaseModule {}

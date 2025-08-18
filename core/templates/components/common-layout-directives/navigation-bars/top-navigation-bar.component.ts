@@ -52,6 +52,7 @@ import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
 
 import './top-navigation-bar.component.css';
+import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 
 interface LanguageInfo {
   id: string;
@@ -199,7 +200,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private focusManagerService: FocusManagerService,
     private platformFeatureService: PlatformFeatureService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
-    private languageBannerService: LanguageBannerService
+    private languageBannerService: LanguageBannerService,
+    private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
 
   ngOnInit(): void {
@@ -429,6 +431,12 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   changeLanguage(languageCode: string): void {
+    console.log(languageCode);
+    const pathname = this.urlService.getPathname().split('/');
+    if (pathname.includes('explore')) {
+      this.contentTranslationManagerService.onLanguageChange(languageCode);
+    }
+
     this.i18nService.updateUserPreferredLanguage(languageCode);
     this.languageBannerService.markLanguageBannerAsDismissed();
   }
