@@ -172,7 +172,7 @@ describe('Exploration Property Service', () => {
     let normalizeSpy = spyOn(child, '_normalize').and.callThrough();
 
     child.init(
-      paramSpecsObjectFactory.createFromBackendDict({
+      ParamSpecs.createFromBackendDict({
         x: {
           obj_type: 'UnicodeString',
         },

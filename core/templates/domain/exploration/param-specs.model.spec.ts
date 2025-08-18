@@ -13,9 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the Param Specs object factory.
+ * @fileoverview Unit tests for the Param Specs.
  */
-
 
 import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {ParamSpecs} from 'domain/exploration/param-specs.model';

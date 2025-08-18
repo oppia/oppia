@@ -21,6 +21,7 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ParameterNameEditorComponent} from './parameter-name-editor.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ExplorationParamSpecsService} from 'pages/exploration-editor-page/services/exploration-param-specs.service';
+import {ParamSpecs} from '../../../core/templates/domain/exploration/param-specs.model';
 
 describe('StateHintsEditorComponent', () => {
   let component: ParameterNameEditorComponent;
@@ -47,7 +48,7 @@ describe('StateHintsEditorComponent', () => {
       // 'string'." We need to suppress this error
       // because of the need to test validations.
       // @ts-ignore
-      paramSpecsObjectFactory.createFromBackendDict({
+      ParamSpecs.createFromBackendDict({
         y: {
           obj_type: 'UnicodeString',
         },
