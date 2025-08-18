@@ -512,25 +512,23 @@ export class ConversationDisplayComponent {
 
   shouldInteractionBeDisplayed(): boolean {
     const card = this.displayedCard;
+    const interactionHasHtml = card.getInteractionHtml();
+    const cardIsCompleted = card.isCompleted();
 
-    const isInline = this.isInteractionInline();
-    const hasInteractionHtml = card.getInteractionHtml();
-    const isCardCompleted = card.isCompleted();
+    const interactionConditionIsMet =
+      (interactionHasHtml && !cardIsCompleted) || cardIsCompleted;
 
-    const isInteractionConditionMet =
-      (hasInteractionHtml && !isCardCompleted) || isCardCompleted;
-
-    const isTerminalOrAllowed =
-      !this.isOnTerminalCard() || !this.isIframed || isCardCompleted;
+    const terminalCardCondition =
+      !this.isOnTerminalCard() || !this.isIframed || cardIsCompleted;
 
     return (
       !this.displayedCardWasCompletedInPrevSession &&
-      isInline &&
       !this.shouldHideInteraction &&
-      !isCardCompleted &&
+      !cardIsCompleted &&
       !this.waitingForOppiaFeedback &&
-      isInteractionConditionMet &&
-      isTerminalOrAllowed
+      this.isInteractionInline() &&
+      interactionConditionIsMet &&
+      terminalCardCondition
     );
   }
 }
