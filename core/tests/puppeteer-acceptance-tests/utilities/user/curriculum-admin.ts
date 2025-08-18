@@ -2040,6 +2040,7 @@ export class CurriculumAdmin extends BaseUser {
    */
   async togglePracticeTabCheckbox(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(subtopicExpandHeaderSelector);
       await this.clickOn(subtopicExpandHeaderSelector);
     }
     try {
