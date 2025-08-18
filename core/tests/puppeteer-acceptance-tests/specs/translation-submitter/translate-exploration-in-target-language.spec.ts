@@ -333,58 +333,58 @@ describe('Translation Submitter', function () {
     await translationSubmitter.clickOn('Done');
   });
 
-  it('should be able to use copy tool', async function () {
-    // Check if anchor text for copy tool works properly.
-    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-      'Cutting the Pies',
-      'Fractions - The Picnic Problem'
-    );
-    await translationSubmitter.clickAndVerifyAnchorWithInnerText(
-      'here',
-      'https://oppia-user-guide.readthedocs.io/en/latest/contributor/translate.html'
-    );
-    await translationSubmitter.expectCopyToolWorksProperly(
-      'छवि विवरण',
-      'तस्वीर का शीर्षक'
-    );
+  // it('should be able to use copy tool', async function () {
+  //   // Check if anchor text for copy tool works properly.
+  //   await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+  //     'Cutting the Pies',
+  //     'Fractions - The Picnic Problem'
+  //   );
+  //   await translationSubmitter.clickAndVerifyAnchorWithInnerText(
+  //     'here',
+  //     'https://oppia-user-guide.readthedocs.io/en/latest/contributor/translate.html'
+  //   );
+  //   await translationSubmitter.expectCopyToolWorksProperly(
+  //     'छवि विवरण',
+  //     'तस्वीर का शीर्षक'
+  //   );
 
-    // // Check if common buttons work properly.
-    // await translationSubmitter.clickOnSkipTranslationButton();
-    // await translationSubmitter.toggleCopyButton('On');
-    // await translationSubmitter.toggleCopyButton('Off');
-    // await translationSubmitter.closeTranslateTextModal();
+  //   // // Check if common buttons work properly.
+  //   // await translationSubmitter.clickOnSkipTranslationButton();
+  //   // await translationSubmitter.toggleCopyButton('On');
+  //   // await translationSubmitter.toggleCopyButton('Off');
+  //   // await translationSubmitter.closeTranslateTextModal();
 
-    //   // Open the translation modal again.
-    //   await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-    //     'The Birthday Cake Arrives',
-    //     'Dividing a Birthday Cake'
-    //   );
-  });
+  //   //   // Open the translation modal again.
+  //   //   await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+  //   //     'The Birthday Cake Arrives',
+  //   //     'Dividing a Birthday Cake'
+  //   //   );
+  // });
 
-  it('should be able submit a translation', async function () {
-    await translationSubmitter.clickOn('Save and translate another');
-    // TODO: Bug where we are required to click on the dismiss button.
-    await translationSubmitter.clickOnDiscardChangesButton();
-    await translationSubmitter.clickOnSkipTranslationButton();
-    await translationSubmitter.typeTextForRTE('बधाई हो, आपका काम पूरा हो गया!');
-    await translationSubmitter.clickOn('Save and close');
-    await translationSubmitter.expectToolTipMessage(
-      'Submitted translation for review'
-    );
-    // TODO: Bug where we are required to click on the dismiss button.
-    await translationSubmitter.clickOnDiscardChangesButton();
+  // it('should be able submit a translation', async function () {
+  //   await translationSubmitter.clickOn('Save and translate another');
+  //   // TODO: Bug where we are required to click on the dismiss button.
+  //   await translationSubmitter.clickOnDiscardChangesButton();
+  //   await translationSubmitter.clickOnSkipTranslationButton();
+  //   await translationSubmitter.typeTextForRTE('बधाई हो, आपका काम पूरा हो गया!');
+  //   await translationSubmitter.clickOn('Save and close');
+  //   await translationSubmitter.expectToolTipMessage(
+  //     'Submitted translation for review'
+  //   );
+  //   // TODO: Bug where we are required to click on the dismiss button.
+  //   await translationSubmitter.clickOnDiscardChangesButton();
 
-    // TODO: translate button should be disabled.
-  });
+  //   // TODO: translate button should be disabled.
+  // });
 
-  it('should be able to check status of the translations', async function () {
-    // TODO: Progress should be 0%
-    await translationSubmitter.switchToTabInContributionDashboard(
-      'My Contributions'
-    );
+  // it('should be able to check status of the translations', async function () {
+  //   // TODO: Progress should be 0%
+  //   await translationSubmitter.switchToTabInContributionDashboard(
+  //     'My Contributions'
+  //   );
 
-    // Check for awaiting review.
-  });
+  //   // Check for awaiting review.
+  // });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

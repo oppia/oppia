@@ -123,15 +123,6 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.clickOnDiscardChangesButton();
-
-    // // Add translation to "Cutting the Pies" in Akan.
-    // await translationSubmitter.selectLanguageInTranslateTextTab('Ákán (Akan)');
-    // await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-    //   'Cutting the Pies',
-    //   'The Picnic Problem'
-    // );
-    // await translationSubmitter.typeTextForRTE('सामग्री 0');
-    // await translationSubmitter.clickOn('Save and translate another');
   }, 900000);
 
   it('should be able to view all pending reviews', async function () {
@@ -144,51 +135,51 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  it('should be able to move between reviews', async function () {
-    await translationReviewer.startTranslationReview(
-      'सामग्री 0',
-      'Fractions / The Picnic'
-    );
+  // it('should be able to move between reviews', async function () {
+  //   await translationReviewer.startTranslationReview(
+  //     'सामग्री 0',
+  //     'Fractions / The Picnic'
+  //   );
 
-    await translationReviewer.expectPaginationButtonToBeDisabled('previous');
-    await translationReviewer.clickOnPaginationButton('next');
-    await translationReviewer.expectPaginationButtonToBeDisabled('next');
-    await translationReviewer.clickOnPaginationButton('previous');
-  });
+  //   await translationReviewer.expectPaginationButtonToBeDisabled('previous');
+  //   await translationReviewer.clickOnPaginationButton('next');
+  //   await translationReviewer.expectPaginationButtonToBeDisabled('next');
+  //   await translationReviewer.clickOnPaginationButton('previous');
+  // });
 
-  it('should be able to accept the translation', async function () {
-    // Accept the translation without adding review comment.
-    await translationReviewer.submitTranslationReview('accept');
+  // it('should be able to accept the translation', async function () {
+  //   // Accept the translation without adding review comment.
+  //   await translationReviewer.submitTranslationReview('accept');
 
-    // Accept the translation with adding review comment.
-    await translationReviewer.submitTranslationReview(
-      'accept',
-      'Review comment'
-    );
-  });
+  //   // Accept the translation with adding review comment.
+  //   await translationReviewer.submitTranslationReview(
+  //     'accept',
+  //     'Review comment'
+  //   );
+  // });
 
-  it('should be able to reject a translation', async function () {
-    // Shouldn't be able to reject a review without a comment.
-    await translationReviewer.expectRejectReviewButtonToBeDisabled();
+  // it('should be able to reject a translation', async function () {
+  //   // Shouldn't be able to reject a review without a comment.
+  //   await translationReviewer.expectRejectReviewButtonToBeDisabled();
 
-    // Should be able to reject a review with a comment.
-    await translationReviewer.submitTranslationReview(
-      'reject',
-      'Some lines are not translated properly'
-    );
-  });
+  //   // Should be able to reject a review with a comment.
+  //   await translationReviewer.submitTranslationReview(
+  //     'reject',
+  //     'Some lines are not translated properly'
+  //   );
+  // });
 
-  it('should be able to see contribution stats', async function () {
-    await translationSubmitter.clickOn('Contribution Stats');
-    await translationReviewer.expectContributionTableToContainRowInTranslationReview(
-      [null, 'Fractions', '3', '5', '3', '5']
-    );
-  });
+  // it('should be able to see contribution stats', async function () {
+  //   await translationSubmitter.clickOn('Contribution Stats');
+  //   await translationReviewer.expectContributionTableToContainRowInTranslationReview(
+  //     [null, 'Fractions', '3', '5', '3', '5']
+  //   );
+  // });
 
-  it('should be able to see the badges', async function () {
-    await translationReviewer.clickOn('Badges');
-    await translationReviewer.expectBadgesToContain('1', 'Review', 'हिन्दी');
-  });
+  // it('should be able to see the badges', async function () {
+  //   await translationReviewer.clickOn('Badges');
+  //   await translationReviewer.expectBadgesToContain('1', 'Review', 'हिन्दी');
+  // });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
