@@ -1254,7 +1254,7 @@ def create_translation_opportunity(
 
     for entity_type, entity_ids in entity_types_and_ids.items():
         if entity_type != feconf.ENTITY_TYPE_EXPLORATION and entity_type != feconf.ENTITY_TYPE_STUDY_GUIDE:
-            # Currently, only exploration-type entities are supported.
+            # Currently, only exploration and study guide entities are supported.
             continue
 
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
@@ -1294,8 +1294,6 @@ def create_translation_opportunity(
                     entity_type=feconf.ENTITY_TYPE_EXPLORATION,
                 )
 
-                opportunities_list.append(opportunity)
-
         if entity_type == feconf.ENTITY_TYPE_STUDY_GUIDE:
             print(list(set(entity_ids)))
             topic_id, subtopic_id = entity_ids[0].split('-')
@@ -1334,13 +1332,9 @@ def create_translation_opportunity(
                 entity_type=feconf.ENTITY_TYPE_STUDY_GUIDE,
             )
 
-            opportunities_list.append(opportunity)
+        opportunities_list.append(opportunity)
 
     if opportunities_list:
-        for opp in opportunities_list:
-            print(opp.topic_ids)
-            print(opp.entity_id)
-            print(opp.content_count)
         _save_multi_translation_opportunities(opportunities_list)
 
 
@@ -1364,10 +1358,8 @@ def _save_multi_translation_opportunities(
     models = _construct_new_translation_opportunity_models(
         translation_opportunity_list
     )
-    print('created models')
 
     if models:
-        print('put models')
         opportunity_models.TranslationOpportunityModel.update_timestamps_multi(
             models)
         opportunity_models.TranslationOpportunityModel.put_multi(models)
