@@ -25,7 +25,7 @@ import {
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {SavePendingChangesModalComponent} from 'components/save-pending-changes/save-pending-changes-modal.component';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {Topic} from 'domain/topic/topic-object.model';
 import {PageTitleService} from 'services/page-title.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';

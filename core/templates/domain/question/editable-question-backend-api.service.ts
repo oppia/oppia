@@ -27,7 +27,7 @@ import {
 } from 'domain/question/QuestionObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
-import {SkillBackendDict} from 'domain/skill/SkillObjectFactory';
+import {SkillBackendDict} from 'domain/skill/skill.model.ts';
 import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
 import cloneDeep from 'lodash/cloneDeep';
 

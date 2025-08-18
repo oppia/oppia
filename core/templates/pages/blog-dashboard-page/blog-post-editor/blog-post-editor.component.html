@@ -1,4 +1,4 @@
-<div *ngIf="blogPostData" class="blog-post-editor row">
+<div *ngIf="blogPostData" class="blog-post-editor row e2e-test-blog-post-editor-container">
   <mat-card class="editor-field-card col-sm-8 ml-auto">
     <div class="blog-post-thumbnail d-flex e2e-test-photo-clickable"
          (mouseenter)="showEditImageIcon=true"
@@ -52,7 +52,7 @@
                 {{ 'I18N_BLOG_POST_EDITOR_LAST_SAVED_PREFIX' | translate }} {{ dateTimeLastSaved }}
               </mat-card-subtitle>
             </div>
-            <button mat-icon-button (click)="showPreview()" class="preview-button">
+            <button mat-icon-button (click)="showPreview()" class="preview-button e2e-test-blog-card-preview-button">
               <i class="fas fa-eye"></i>
               <h6 class="mt-1">{{'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</h6>
             </button>
@@ -92,20 +92,20 @@
                   (click)="activateTitleEditor()">
           </button>
         </div>
-        <span class="oppia-input-box-subtitle" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
+        <span class="oppia-input-box-subtitle e2e-test-blog-title-help" *ngIf="title.length > MAX_CHARS_IN_BLOG_POST_TITLE">
           <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MAX_LENGTH_ERROR' | translate: { maxChars: MAX_CHARS_IN_BLOG_POST_TITLE }">
           </em>
         </span>
-        <span class="oppia-input-box-subtitle" *ngIf="title.length < MIN_CHARS_IN_BLOG_POST_TITLE">
+        <span class="oppia-input-box-subtitle e2e-test-blog-title-help" *ngIf="title.length < MIN_CHARS_IN_BLOG_POST_TITLE">
           <em [innerHTML]="'I18N_BLOG_POST_EDITOR_TITLE_MIN_LENGTH_ERROR' | translate: { minChars: MIN_CHARS_IN_BLOG_POST_TITLE }">
           </em>
         </span>
-        <span class="oppia-input-box-subtitle" *ngIf="!isTitlePatternValid()">
+        <span class="oppia-input-box-subtitle e2e-test-blog-title-help" *ngIf="!isTitlePatternValid()">
           <em>
             {{ 'I18N_BLOG_POST_EDITOR_TITLE_INVALID_CHARACTERS_ERROR' | translate }}
           </em>
         </span>
-        <span class="oppia-input-box-subtitle" *ngIf="blogPostData.titleIsDuplicate">
+        <span class="oppia-input-box-subtitle e2e-test-blog-title-help" *ngIf="blogPostData.titleIsDuplicate">
           <em>
             {{ 'I18N_BLOG_POST_EDITOR_TITLE_IS_DUPLICATE_ERROR' | translate }}
           </em>
@@ -151,10 +151,10 @@
               <span class="tag-heading general-text-format">
                 {{ 'I18N_BLOG_POST_EDITOR_TAGS_HEADING' | translate}}
               </span>
-              <span class="sub-text tag-limit-text general-text-format">
+              <span class="sub-text tag-limit-text e2e-test-tag-limit-text general-text-format">
                 {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_PREFIX' | translate}} {{maxAllowedTags}}
               </span>
-              <span class="sub-text d-block tag-limit-text general-text-format">
+              <span class="sub-text d-block tag-limit-text e2e-test-remaining-tags-limit-text general-text-format">
                 {{maxAllowedTags-blogPostData.tags.length}} {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX' | translate}}
               </span>
             </div>
@@ -241,10 +241,10 @@
           <span class="tag-heading general-text-format">
             {{ 'I18N_BLOG_POST_EDITOR_TAGS_HEADING' | translate}}
           </span>
-          <span class="sub-text tag-limit-text general-text-format">
+          <span class="sub-text tag-limit-text e2e-test-tag-limit-text general-text-format">
             {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_PREFIX' | translate}} {{maxAllowedTags}}
           </span>
-          <span class="sub-text d-block tag-limit-text general-text-format">
+          <span class="sub-text d-block tag-limit-text e2e-test-remaining-tags-limit-text general-text-format">
             {{maxAllowedTags-blogPostData.tags.length}} {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX' | translate}}
           </span>
         </div>

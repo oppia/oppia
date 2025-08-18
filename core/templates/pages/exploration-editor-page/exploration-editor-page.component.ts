@@ -24,7 +24,7 @@ import {HelpModalComponent} from './modal-templates/help-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {
   ParamSpecsBackendDict,
   ParamSpecsObjectFactory,
@@ -172,7 +172,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private ngbModal: NgbModal,
     private pageTitleService: PageTitleService,
-    private paramChangesObjectFactory: ParamChangesObjectFactory,
     private paramSpecsObjectFactory: ParamSpecsObjectFactory,
     private platformFeatureService: PlatformFeatureService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
@@ -284,9 +283,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         )
       );
       this.explorationParamChangesService.init(
-        this.paramChangesObjectFactory.createFromBackendList(
-          explorationData.param_changes
-        )
+        ParamChanges.createFromBackendList(explorationData.param_changes)
       );
       this.explorationAutomaticTextToSpeechService.init(
         explorationData.auto_tts_enabled
