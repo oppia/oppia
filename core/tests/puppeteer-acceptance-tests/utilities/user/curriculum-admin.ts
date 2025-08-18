@@ -1128,9 +1128,6 @@ export class CurriculumAdmin extends BaseUser {
    * Function to navigate to exploration settings tab
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
-    console.log(
-      `[debug] Using navigateToExplorationSettingsTab in curriculum admin`
-    );
     await this.waitForStaticAssetsToLoad();
     if (this.isViewportAtMobileWidth()) {
       await this.page.waitForSelector(mobileNavToggleButton, {visible: true});

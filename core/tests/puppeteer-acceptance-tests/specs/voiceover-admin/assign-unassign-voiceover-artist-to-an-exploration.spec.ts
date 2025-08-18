@@ -25,7 +25,6 @@ import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {ConsoleReporter} from '../../utilities/common/console-reporter';
 
-const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 const invalidIdErrorToastMessage =
   'Sorry, we could not find the specified user.';

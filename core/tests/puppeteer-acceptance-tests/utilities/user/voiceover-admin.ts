@@ -26,7 +26,6 @@ const voiceoverAdminURL = testConstants.URLs.VoiceoverAdmin;
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 
-const explorationSettingsTab = '.e2e-test-settings-tab';
 const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
 const voiceArtistUsernameInputBox = 'input#newVoicAartistUsername';
 const saveVoiceoverArtistEditButton =
@@ -38,9 +37,7 @@ const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
 const updatedVoiceoverArtist = 'div.e2e-test-voiceArtist-role-names';
 const allVoiceoverArtistsList = 'ul.e2e-test-voiceArtist-list';
 
-const mobileNavToggelbutton = '.e2e-test-mobile-options';
 const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
-const mobileSettingsButton = 'li.e2e-test-mobile-settings-button';
 const mobileVoiceoverArtistsHeader =
   '.e2e-test-voice-artist-collapsible-card-header';
 
@@ -57,8 +54,6 @@ const enableAutogenerationSelectorTemplate = (languageAccentCode: string) =>
 const enableAutogenerationOptionSelector =
   '.e2e-test-autogeneration-option-selector';
 
-const explorationEditorSettingsTabSelector =
-  '.e2e-test-exploration-editor-settings-tab';
 const toastWarningContainer = '.e2e-test-toast-warning';
 const voiceArtistSectionHeaderSelector = '.e2e-test-voice-artists-header';
 const voiceArtistSectionBodySelector = '.e2e-test-voice-artists-content';
@@ -85,9 +80,6 @@ export class VoiceoverAdmin extends BaseUser {
    */
   async navigateToExplorationSettingsTab(): Promise<void> {
     await this.waitForStaticAssetsToLoad();
-    console.log(
-      `[debug] Using navigateToExplorationSettingsTab in voiceover admin`
-    );
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
