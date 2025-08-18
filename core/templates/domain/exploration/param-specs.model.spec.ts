@@ -19,23 +19,14 @@
 import {TestBed} from '@angular/core/testing';
 
 import {ParamSpec} from 'domain/exploration/param-spec.model';
-import {
-  ParamSpecs,
-  ParamSpecsObjectFactory,
-} from 'domain/exploration/ParamSpecsObjectFactory';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
 
 describe('ParamSpecs', () => {
-  let paramSpecsObjectFactory: ParamSpecsObjectFactory;
   let emptyParamSpecs: ParamSpecs;
   let paramName = 'x';
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [ParamSpecsObjectFactory],
-    });
-
-    paramSpecsObjectFactory = TestBed.get(ParamSpecsObjectFactory);
-    emptyParamSpecs = paramSpecsObjectFactory.createFromBackendDict({});
+    emptyParamSpecs = ParamSpecs.createFromBackendDict({});
   });
 
   it('should be undefined for missing param names', () => {
@@ -80,7 +71,7 @@ describe('ParamSpecs', () => {
 
   it('should create a non empty param specs', () => {
     const paramSpec = ParamSpec.createDefault();
-    const nonEmptyParamSpecs = paramSpecsObjectFactory.createFromBackendDict({
+    const nonEmptyParamSpecs = ParamSpecs.createFromBackendDict({
       [paramName]: paramSpec.toBackendDict(),
     });
 

@@ -20,20 +20,18 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ParameterNameEditorComponent} from './parameter-name-editor.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
 import {ExplorationParamSpecsService} from 'pages/exploration-editor-page/services/exploration-param-specs.service';
 
 describe('StateHintsEditorComponent', () => {
   let component: ParameterNameEditorComponent;
   let fixture: ComponentFixture<ParameterNameEditorComponent>;
-  let paramSpecsObjectFactory: ParamSpecsObjectFactory;
   let explorationParamSpecsService: ExplorationParamSpecsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [ParameterNameEditorComponent],
-      providers: [ParamSpecsObjectFactory, ExplorationParamSpecsService],
+      providers: [ExplorationParamSpecsService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -42,7 +40,6 @@ describe('StateHintsEditorComponent', () => {
     fixture = TestBed.createComponent(ParameterNameEditorComponent);
     component = fixture.componentInstance;
 
-    paramSpecsObjectFactory = TestBed.inject(ParamSpecsObjectFactory);
     explorationParamSpecsService = TestBed.inject(ExplorationParamSpecsService);
 
     explorationParamSpecsService.init(
