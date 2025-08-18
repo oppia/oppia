@@ -21,6 +21,8 @@ from __future__ import annotations
 from core import feconf
 from core.platform import models
 
+from typing import Optional
+
 MYPY = False
 if MYPY: # pragma: no cover
     from mypy_imports import redis_client_models
@@ -29,7 +31,7 @@ if MYPY: # pragma: no cover
     models.Names.REDIS_CLIENT])
 
 
-def get_redis_host() -> str:
+def get_redis_host() -> Optional[str]:
     """Fetches Redis host from datastore.
 
     Returns:
@@ -40,7 +42,7 @@ def get_redis_host() -> str:
     if redis_client_model is not None:
         assert isinstance(redis_client_model.redishost, str)
         return redis_client_model.redishost
-    return feconf.REDISHOST
+    return None
 
 
 def update_redis_host(redis_host: str) -> None:
