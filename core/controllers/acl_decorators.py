@@ -4698,8 +4698,11 @@ def can_update_suggestion(
                     self.user_id,
                     language_code=suggestion.change_cmd.language_code):
                 return handler(self, suggestion_id, **kwargs)
-        elif suggestion.suggestion_type == (
-                feconf.SUGGESTION_TYPE_ADD_QUESTION):
+        else:
+            # Suggestion type must be SUGGESTION_TYPE_ADD_QUESTION.
+            # Invalid suggestion type exception above guarantees this behavior.
+            assert suggestion.suggestion_type == (
+                feconf.SUGGESTION_TYPE_ADD_QUESTION)
             if user_services.can_review_question_suggestions(self.user_id):
                 return handler(self, suggestion_id, **kwargs)
 
