@@ -153,8 +153,7 @@ describe('Translation Submitter', function () {
 
     await translationSubmitter.expectTranslationOpportunityToBePresent(
       'Cutting the Pies',
-      'Fractions - The Picnic Problem',
-      true
+      'Fractions - The Picnic Problem'
     );
 
     // Check if pagination works properly.

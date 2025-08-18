@@ -104,6 +104,7 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 2');
     await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOn('Discard changes');
 
     // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageInTranslateTextTab('Ákán (Akan)');
