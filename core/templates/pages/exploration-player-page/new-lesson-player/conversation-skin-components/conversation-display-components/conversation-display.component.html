@@ -10,8 +10,7 @@
     <div class="oppia-rte-viewer oppia-learner-view-card-top-content"
           [ngClass]="getContentAudioHighlightClass()">
       <div tabindex="0">
-        <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()"
-                                  class="e2e-test-conversation-content">
+        <oppia-rte-output-display [rteString]="displayedCard.getContentHtml()">
         </oppia-rte-output-display>
       </div>
       <div *ngIf="isContentAudioTranslationAvailable()" class="conversation-skin-audio-controls">
@@ -80,8 +79,7 @@ have no learner input section, so we do not show it.
       This can lead to two conflicting copies of the interaction for
       non-inline interactions. -->
     <div *ngIf="isInteractionInline() && displayedCard.getInteractionHtml() && !displayedCard.isCompleted() && !conceptCardIsBeingShown">
-      <oppia-interaction-display classStr="e2e-test-conversation-input"
-                                  [htmlData]="displayedCard.getInteractionHtml()">
+      <oppia-interaction-display [htmlData]="displayedCard.getInteractionHtml()">
       </oppia-interaction-display>
     </div>
   </div>

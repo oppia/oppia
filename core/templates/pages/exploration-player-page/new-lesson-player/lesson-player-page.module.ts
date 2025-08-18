@@ -34,9 +34,12 @@ import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
-import {PlayerSidebarComponent} from './sidebar-components/player-sidebar.component';
+import {LessonPlayerSidebarComponent} from './sidebar-components/lesson-player-sidebar.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
+import {NewFlagExplorationModalComponent} from './sidebar-components/flag-lesson-modal.component';
+import {CustomizableThankYouModalComponent} from './sidebar-components/customizable-thank-you-modal.component';
+import {LessonFeedbackModalComponent} from './sidebar-components/lesson-feedback-modal.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 
 @NgModule({
@@ -51,19 +54,26 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
     NgbPopoverModule,
     SharedComponentsModule,
     ToastrModule,
+    MatBottomSheetModule,
     ToastrModule.forRoot(toastrConfig),
   ],
   declarations: [
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
-    PlayerSidebarComponent,
+    LessonPlayerSidebarComponent,
     NewAudioBarComponent,
+    NewFlagExplorationModalComponent,
+    CustomizableThankYouModalComponent,
+    LessonFeedbackModalComponent,
   ],
   entryComponents: [
+    NewFlagExplorationModalComponent,
+    CustomizableThankYouModalComponent,
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
-    PlayerSidebarComponent,
+    LessonPlayerSidebarComponent,
     NewAudioBarComponent,
+    LessonFeedbackModalComponent,
   ],
   providers: [
     HintAndSolutionModalService,
