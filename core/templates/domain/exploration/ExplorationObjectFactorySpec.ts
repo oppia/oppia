@@ -24,10 +24,7 @@ import {
   ExplorationBackendDict,
   ExplorationObjectFactory,
 } from 'domain/exploration/ExplorationObjectFactory';
-import {
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {StateBackendDict, State} from 'domain/state/state.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {LoggerService} from 'services/contextual/logger.service';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
@@ -36,7 +33,7 @@ import {FetchExplorationBackendResponse} from './read-only-exploration-backend-a
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
-  let sof: StateObjectFactory;
+  let sof: State;
   let exploration: Exploration;
   let ls: LoggerService;
   let loggerErrorSpy: jasmine.Spy<(msg: string) => void>;
@@ -49,7 +46,6 @@ describe('Exploration object factory', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     eof = TestBed.get(ExplorationObjectFactory);
-    sof = TestBed.get(StateObjectFactory);
     ls = TestBed.get(LoggerService);
 
     firstState = {

@@ -13,18 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for StateObjectFactory.
+ * @fileoverview Unit tests for State.
  */
 
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {
-  StateBackendDict,
-  StateObjectFactory,
-} from 'domain/state/StateObjectFactory';
+import {StateBackendDict, State} from 'domain/state/state.model';
 import {TestBed} from '@angular/core/testing';
 
-describe('State Object Factory', () => {
-  let sof: StateObjectFactory;
+describe('State', () => {
+  let sof: State;
   let stateObject: StateBackendDict;
   let TextInputInteraction = {
     classifier_model_id: null,
@@ -80,7 +77,6 @@ describe('State Object Factory', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe],
     });
-    sof = TestBed.inject(StateObjectFactory);
 
     spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue(
       TextInputInteraction

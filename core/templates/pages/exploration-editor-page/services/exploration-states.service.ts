@@ -45,7 +45,7 @@ import {ValidatorsService} from 'services/validators.service';
 import {ExplorationInitStateNameService} from 'pages/exploration-editor-page/services/exploration-init-state-name.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {WrittenTranslations} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';

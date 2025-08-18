@@ -19,12 +19,12 @@
 import {TestBed} from '@angular/core/testing';
 
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 describe('States Object Factory', () => {
-  let sof: StateObjectFactory = null;
+  let sof: State = null;
   let ssof = null;
   let statesDict = null;
   let newState = null;
@@ -38,7 +38,6 @@ describe('States Object Factory', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     ssof = TestBed.get(StatesObjectFactory);
-    sof = TestBed.get(StateObjectFactory);
     spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,
       content: {
