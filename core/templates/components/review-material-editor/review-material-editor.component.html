@@ -25,13 +25,17 @@
                        [localValue]="editableExplanation"
                        (localValueChange)="updateLocalExp($event)">
   </schema-based-editor>
+  <div *ngIf="workedExampleLimitExceeded" class="oppia-length-validation-error e2e-test-more-than-2-workedexamples" aria-live="assertive">
+    <p>Skills can have a maximum of 2 workedexamples. Please remove any additional ones.</p>
+  </div>
   <div class="editor-buttons">
     <button type="button"
             class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-concept-card"
-            (click)="saveConceptCardExplanation()">
+            (click)="saveConceptCardExplanation()"
+            [disabled]="workedExampleLimitExceeded">
       Save
     </button>
-    <button type="button" class="btn btn-secondary float-right" (click)="closeConceptCardExplanationEditor()">Cancel</button>
+    <button type="button" class="btn btn-secondary float-right e2e-test-cancel-concept-card-save" (click)="closeConceptCardExplanationEditor()">Cancel</button>
     <div class="oppia-clear"></div>
   </div>
 </div>
