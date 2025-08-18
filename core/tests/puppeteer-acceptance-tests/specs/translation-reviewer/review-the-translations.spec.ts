@@ -60,16 +60,15 @@ describe('Translation Reviewer', function () {
 
     // Create translation opportunity.
     const explorationId =
-      await curriculumAdm.createAndPublishExplorationWithCards('Exploration 1');
+      await curriculumAdm.createAndPublishExplorationWithCards(
+        'Exploration 1',
+        'Mathematics',
+        3
+      );
     const explorationId2 =
       await curriculumAdm.createAndPublishExplorationWithCards('Exploration 2');
 
     await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
-    // await curriculumAdm.createAndPublishTopic(
-    //   'Fractions',
-    //   'Fraction Foundations',
-    //   'Unit Fractions'
-    // );
     await curriculumAdm.createTopic('Fractions', 'fractions');
     await curriculumAdm.createAndPublishStoryWithChapter(
       'The Picnic Problem',
@@ -86,6 +85,8 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.switchToTabInContributionDashboard(
       'Translate Text'
     );
+
+    // Add translations to "Cutting the Pies" in Hindi.
     await translationSubmitter.selectLanguageInTranslateTextTab(
       'हिन्दी (Hindi)'
     );
@@ -98,10 +99,13 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.clickOn('Discard changes');
     await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.typeTextForRTE('सामग्री 1');
-    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOn('Save and translate another');
     await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.typeTextForRTE('सामग्री 2');
+    await translationSubmitter.clickOn('Save and close');
 
-    // Translate an exploration in a different language.
+    // Add translations to "Trading Slices" in Akan.
     await translationSubmitter.selectLanguageInTranslateTextTab('Ákán (Akan)');
     await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
       'Trading Slices',
@@ -109,7 +113,21 @@ describe('Translation Reviewer', function () {
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
     await translationSubmitter.clickOn('Save and translate another');
-  }, 900000);
+    await translationSubmitter.clickOn('Discard changes');
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.typeTextForRTE('सामग्री 1');
+    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.clickOn('Discard changes');
+
+    // // Add translation to "Cutting the Pies" in Akan.
+    // await translationSubmitter.selectLanguageInTranslateTextTab('Ákán (Akan)');
+    // await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+    //   'Cutting the Pies',
+    //   'The Picnic Problem'
+    // );
+    // await translationSubmitter.typeTextForRTE('सामग्री 0');
+    // await translationSubmitter.clickOn('Save and translate another');
+  }, 600000);
 
   it('should be able to view all pending reviews', async function () {
     // TODO: Can't see the one with different language.

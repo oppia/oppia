@@ -440,7 +440,6 @@ export class BaseUser {
   async waitForElementToBeClickable(
     selector: string | ElementHandle<Element>
   ): Promise<void> {
-    showMessage(`Checking if element ${selector} is clickable...`);
     try {
       const element =
         typeof selector === 'string'
@@ -456,7 +455,6 @@ export class BaseUser {
       }
       throw error;
     }
-    showMessage(`Element (${selector}) is clickable, as expected.`);
   }
 
   /**
@@ -487,7 +485,6 @@ export class BaseUser {
     }
     if (button !== null && !forceSelector) {
       await this.waitForElementToBeClickable(button);
-      showMessage(`Button (text: ${selector}) is clickable, as expected.`);
       await button.click();
       showMessage(`Button (text: ${selector}) is clicked.`);
     } else {

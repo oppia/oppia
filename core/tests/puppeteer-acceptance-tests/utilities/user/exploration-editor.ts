@@ -4617,23 +4617,29 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function for creating an exploration with two cards.
+   * @param {string} explorationTitle - The title of the exploration.
+   * @param {string} category - The category of the exploration.,
+   * @param {number} numberOfCards - The number of cards to create.
    */
   async createAndPublishExplorationWithCards(
     explorationTitle: string,
-    category: string = 'Mathematics'
+    category: string = 'Mathematics',
+    numberOfCards: number = 2
   ): Promise<string> {
     await this.navigateToCreatorDashboardPage();
     await this.navigateToExplorationEditorFromCreatorDashboard();
     await this.dismissWelcomeModal();
 
-    await this.updateCardContent('Content 0');
-    await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-    await this.viewOppiaResponses();
-    await this.directLearnersToNewCard('Card 1');
-    await this.saveExplorationDraft();
+    for (let i = 0; i < numberOfCards - 1; i++) {
+      await this.updateCardContent(`Content ${i}`);
+      await this.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await this.viewOppiaResponses();
+      await this.directLearnersToNewCard(`Card ${i + 1}`);
+      await this.saveExplorationDraft();
+      await this.navigateToCard(`Card ${i + 1}`);
+    }
 
-    await this.navigateToCard('Card 1');
-    await this.updateCardContent('Content 1');
+    await this.updateCardContent(`Content ${numberOfCards - 1}`);
     await this.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await this.saveExplorationDraft();
 
