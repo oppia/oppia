@@ -219,6 +219,7 @@ import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-play
 import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component';
 import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
 import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
+import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesson-player/sidebar-components/share-lesson-modal.component';
 import {NewCorrectnessFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/new-correctness-footer.component';
 import {NewEndChapterConfettiComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-confetti.component';
 import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
@@ -336,6 +337,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     ScoreRingComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     StateContentEditorComponent,
@@ -466,6 +468,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     QuestionEditorSaveModalComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillMasteryViewerComponent,
     AttributionGuideComponent,
     LazyLoadingComponent,
@@ -684,6 +687,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     StateSkillEditorComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillSelectorComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,
