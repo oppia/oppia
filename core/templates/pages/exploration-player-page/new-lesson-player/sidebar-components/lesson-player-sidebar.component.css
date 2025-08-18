@@ -107,7 +107,7 @@
   color: #0d48a1;
 }
 
-.player-sidebar-button div {
+.player-sidebar-button span {
   align-items: center;
   display: flex;
   gap: 10px;

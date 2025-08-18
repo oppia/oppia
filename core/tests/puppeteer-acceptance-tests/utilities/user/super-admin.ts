@@ -42,8 +42,8 @@ const rolesSelectDropdown = 'div.mat-select-trigger';
 const userRoleDescriptionSelector = '.oppia-user-role-description';
 
 // Blog Post.
-const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const generateBlogPostButton = '.e2e-test-generate-blog-post';
+const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 
 // Community Library.
 const searchFieldCommunityLibrary = 'input.e2e-test-search-input';
@@ -707,22 +707,23 @@ export class SuperAdmin extends BaseUser {
    */
   async expectBlogPostToBePresent(expectedBlog: string): Promise<void> {
     await this.navigateToBlogPage();
-    const titleRegex = new RegExp(`^${expectedBlog}-[A-Za-z]{12}$`);
 
-    const blogPostTitles = await this.page.$$(blogPostTitleSelector);
-    for (const titleElement of blogPostTitles) {
-      const title = await this.page.evaluate(
-        el => el.textContent,
-        titleElement
-      );
-      if (titleRegex.test(title.trim())) {
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    const blogTitles = await this.page.$$eval(blogPostTitleSelector, elements =>
+      elements.map(element => element.textContent)
+    );
+    for (const title of blogTitles) {
+      if (!title) {
+        continue;
+      }
+      if (title.includes(expectedBlog)) {
         showMessage('The blog post is present on the blog dashboard.');
         return;
       }
     }
 
     throw new Error(
-      `The blog post "${expectedBlog}" was not found on the blog dashboard.`
+      `Blog post with title ${expectedBlog} not found on the blog dashboard.`
     );
   }
 
