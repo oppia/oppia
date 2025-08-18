@@ -4,12 +4,11 @@
     <div class="oppia-input-box-subtitle">
       <i>This is the name of the skill as visible to learners and other creators.</i>
     </div>
-    <div class="skill-description-spacing" *ngIf="canEditSkillDescription()"></div>
+    <br>
     <div [ngClass]="{'has-error': !(tmpSkillDescription.length > 0)}">
-      <input type="text" aria-label="Skill Description" class="form-control e2e-test-skill-description-field"
-        *ngIf="canEditSkillDescription()" [(ngModel)]="tmpSkillDescription" (change)="resetErrorMsg()"
-        (blur)="saveSkillDescription(tmpSkillDescription)" [attr.maxlength]="MAX_CHARS_IN_SKILL_DESCRIPTION"
-        ng-trim="false">
+      <input type="text" aria-label="Skill Description" class="form-control e2e-test-skill-description-field" *ngIf="canEditSkillDescription()"
+             [(ngModel)]="tmpSkillDescription" (change)="resetErrorMsg()" (blur)="saveSkillDescription(tmpSkillDescription)"
+             [attr.maxlength]="MAX_CHARS_IN_SKILL_DESCRIPTION" ng-trim="false">
       <span class="oppia-input-box-subtitle" *ngIf="canEditSkillDescription()">
         <i>
           Skill description should be at most {{ MAX_CHARS_IN_SKILL_DESCRIPTION }} characters.
@@ -21,16 +20,11 @@
         </i>
       </span>
     </div>
-    <div class="skill-description-spacing" ></div>
+    <br *ngIf="canEditSkillDescription()">
     <div *ngIf="!canEditSkillDescription()">{{ tmpSkillDescription }}</div>
   </div>
 </div>
 <style>
-  .skill-description-spacing {
-    height: 1em;
-    width: 100%;
-  }
-
   span.skill-description-error-message {
     color: #f00;
     display: block;
