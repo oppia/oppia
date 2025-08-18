@@ -230,7 +230,7 @@
   50% { background-color: #0ff; left: 40px; opacity: 1; top: 15px; }
   100% { background-color: #0ff; left: -20px; opacity: 1; top: -50px; }
 }
-  @-webkit-keyframes flashe {
+@-webkit-keyframes flashe {
   0% { opacity: 0; }
   50% { background-color: #0ff; left: 40px; opacity: 1; top: 15px; }
   100% { background-color: #0ff; left: -20px; opacity: 1; top: -50px; }
