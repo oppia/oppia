@@ -221,6 +221,7 @@ import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/ne
 import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
 import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesson-player/sidebar-components/share-lesson-modal.component';
 import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-player/header-components/player-header.component';
+import {ProgressBarComponent} from './progress-bar/progress-bar.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -279,6 +280,7 @@ import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-pl
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    ProgressBarComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
@@ -444,6 +446,7 @@ import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-pl
     CardNavigationControlComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    ProgressBarComponent,
     EndChapterConfettiComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -621,6 +624,7 @@ import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-pl
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
+    ProgressBarComponent,
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,

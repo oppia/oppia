@@ -16,9 +16,7 @@
           Question {{currentQuestion}}/{{totalQuestions}}
         </p>
       </div>
-      <div class="oppia-new-question-player-progress">
-        <div class="new-current-progress" [ngStyle]="{'width': currentProgress + '%'}"></div>
-      </div>
+      <oppia-progress-bar [progressPercentage]="currentProgress"></oppia-progress-bar>
     </div>
 
     <div class="oppia-question-player-card" *ngIf="!isNewLessonPlayerEnabled()">
@@ -551,19 +549,6 @@
     flex-direction: column;
   }
 
-  .oppia-new-question-player-progress {
-    background-color: #e1cbc5;
-    border-radius: 8px;
-    height: 16px;
-    width: 392px;
-  }
-
-  .new-current-progress {
-    background: linear-gradient(180deg, #dd7358 0%, #b35239 100%);
-    border-radius: 8px;
-    height: 16px;
-  }
-
   .oppia-new-question-player-card {
     align-items: center;
     background-color: #fff8e5;
@@ -575,20 +560,12 @@
 
 
   @media(max-width: 768px) {
-    .oppia-new-question-player-progress {
-      width: 300px;
-    }
-
     .oppia-new-question-player-card p {
       font-size: 15px;
     }
   }
 
   @media(max-width: 480px) {
-    .oppia-new-question-player-progress {
-      width: 180px;
-    }
-
     .oppia-new-question-player-card p {
       font-size: 13px;
       margin-right: 12px;
