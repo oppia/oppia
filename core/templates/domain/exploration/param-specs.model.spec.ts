@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the Param Specs object factory.
  */
 
-import {TestBed} from '@angular/core/testing';
 
 import {ParamSpec} from 'domain/exploration/param-spec.model';
 import {ParamSpecs} from 'domain/exploration/param-specs.model';
