@@ -4,9 +4,7 @@
     <div class="oppia-input-box-subtitle">
       <i>This is the name of the skill as visible to learners and other creators.</i>
     </div>
-    <ng-container *ngIf="canEditSkillDescription()">
-      <br />
-    </ng-container>
+    <br *ngIf="canEditSkillDescription()" />
     <div [ngClass]="{'has-error': !(tmpSkillDescription.length > 0)}">
       <input type="text" aria-label="Skill Description" class="form-control e2e-test-skill-description-field"
         *ngIf="canEditSkillDescription()" [(ngModel)]="tmpSkillDescription" (change)="resetErrorMsg()"
