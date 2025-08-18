@@ -4,7 +4,7 @@
     <div class="oppia-input-box-subtitle">
       <i>This is the name of the skill as visible to learners and other creators.</i>
     </div>
-    <br *ngIf="canEditSkillDescription()" />
+    <div class="skill-description-spacing" *ngIf="canEditSkillDescription()"></div>
     <div [ngClass]="{'has-error': !(tmpSkillDescription.length > 0)}">
       <input type="text" aria-label="Skill Description" class="form-control e2e-test-skill-description-field"
         *ngIf="canEditSkillDescription()" [(ngModel)]="tmpSkillDescription" (change)="resetErrorMsg()"
@@ -26,6 +26,11 @@
   </div>
 </div>
 <style>
+  .skill-description-spacing {
+    height: 1em;
+    width: 100%;
+  }
+
   span.skill-description-error-message {
     color: #f00;
     display: block;
