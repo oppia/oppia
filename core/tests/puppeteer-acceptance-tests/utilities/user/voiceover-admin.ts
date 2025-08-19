@@ -166,24 +166,6 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
-   * Function to close editor navigation dropdown. Can be done by clicking
-   * on the dropdown toggle.
-   */
-  async closeEditorNavigationDropdownOnMobile(): Promise<void> {
-    try {
-      await this.page.waitForSelector(dropdownToggleIcon, {
-        visible: true,
-      });
-      await this.clickOn(dropdownToggleIcon);
-
-      await this.expectElementToBeVisible(mobileOptionsDropdown, false);
-      showMessage('Editor navigation closed successfully.');
-    } catch (error) {
-      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
-    }
-  }
-
-  /**
    * Asserts that a voiceover artist does not exist in the list.
    * @param artistUsername - The username of the voiceover artist to check for.
    */

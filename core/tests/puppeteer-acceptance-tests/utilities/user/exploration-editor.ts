@@ -2742,22 +2742,21 @@ export class ExplorationEditor extends BaseUser {
    * on the dropdown toggle.
    */
   async closeEditorNavigationDropdownOnMobile(): Promise<void> {
-    try {
-      await this.page.waitForSelector(dropdownToggleIcon, {
-        visible: true,
-        timeout: 5000,
-      });
-      await this.clickOn(dropdownToggleIcon);
+    const isDropdownOpen = this.expectElementToBeVisible(
+      openExplorationEditorNavigationMobile
+    );
 
-      await this.expectElementToBeVisible(
-        openExplorationEditorNavigationMobile,
-        false
+    if (!isDropdownOpen) {
+      showMessage(
+        'Skipped closing editor navigation dropdown, already closed.'
       );
-
-      showMessage('Editor navigation closed successfully.');
-    } catch (error) {
-      throw new Error(`Dropdown Toggle Icon not found: ${error.message}`);
     }
+
+    await this.clickOn(dropdownToggleIcon);
+    await this.expectElementToBeVisible(
+      openExplorationEditorNavigationMobile,
+      false
+    );
   }
 
   /**
