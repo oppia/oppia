@@ -37,7 +37,7 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {PlayerPositionService} from '../services/player-position.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {NewSwitchContentLanguageRefreshRequiredModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
 
 @Injectable({
@@ -72,9 +72,7 @@ export class ContentTranslationManagerService {
     private audioPreloaderService: AudioPreloaderService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private i18nLanguageCodeService: I18nLanguageCodeService
-  ) {
-    this._initLessonTranslations();
-  }
+  ) {}
 
   setOriginalTranscript(explorationLanguageCode: string): void {
     this.explorationLanguageCode = explorationLanguageCode;
@@ -99,12 +97,15 @@ export class ContentTranslationManagerService {
    * @param {string} languageCode The language code to display translations for.
    */
   displayTranslations(languageCode: string): void {
+    console.log('3', languageCode, this.explorationLanguageCode);
     if (languageCode === this.explorationLanguageCode) {
+      console.log('31');
       this.playerTranscriptService.restoreImmutably(
         cloneDeep(this.originalTranscript)
       );
       this.onStateCardContentUpdateEmitter.emit();
     } else {
+      console.log('32');
       this.entityTranslationsService
         .getEntityTranslationsAsync(languageCode)
         .then(entityTranslations => {
@@ -128,8 +129,10 @@ export class ContentTranslationManagerService {
     card: StateCard,
     entityTranslations: EntityTranslation
   ): void {
+    console.log('321');
     card.swapContentsWithTranslation(entityTranslations);
     if (card.getInteractionId()) {
+      console.log('3211');
       // DOMParser().parseFromString() creates a HTML document from
       // the HTML string and it's body contains our required element
       // as a childnode.
@@ -150,15 +153,15 @@ export class ContentTranslationManagerService {
     return firstCard.getInputResponsePairs().length > 0;
   }
 
-  showLanguageSwitchModal(newLanguageCode: string, modalText: string): void {
+  showLanguageSwitchModal(modalText: string): NgbModalRef {
     const modalRef = this.ngbModal.open(
       NewSwitchContentLanguageRefreshRequiredModalComponent
     );
-    modalRef.componentInstance.languageCode = newLanguageCode;
     modalRef.componentInstance.modalText = modalText;
+    return modalRef;
   }
 
-  onLanguageChange(newLanguageCode: string): void {
+  onLanguageChange(newLanguageCode: string): NgbModalRef | void {
     const lessonLanguageOptions =
       this.contentTranslationLanguageService.getLanguageOptionsForDropdown();
     const userHasMadeProgress = this.shouldPromptForRefresh();
@@ -166,11 +169,11 @@ export class ContentTranslationManagerService {
     for (const option of lessonLanguageOptions) {
       if (option.value === newLanguageCode) {
         if (!userHasMadeProgress) {
+          console.log('one');
           this.changeCurrentContentLanguage(newLanguageCode);
         } else {
-          this.showLanguageSwitchModal(
-            newLanguageCode,
-            'This will refresh the page and restart the lesson from the beginning.'
+          return this.showLanguageSwitchModal(
+            'I18N_SWITCH_LANGUAGES_PAGE_REFRESH_NOTICE'
           );
         }
         lessonIsTranslatedIntoSelectedLanguage = true;
@@ -178,22 +181,15 @@ export class ContentTranslationManagerService {
       }
     }
     if (!lessonIsTranslatedIntoSelectedLanguage && !userHasMadeProgress) {
-      this.showLanguageSwitchModal(
-        newLanguageCode,
-        'tell them that lesson will be shown in english only as no translation is available but site language will be changed'
-      );
-      console.log(
-        'tell them that lesson will be shown in english only as no translation is available but site language will be changed'
+      return this.showLanguageSwitchModal(
+        'I18N_SWITCH_LANGUAGES_ENGLISH_ONLY_NOTICE'
       );
     } else if (!lessonIsTranslatedIntoSelectedLanguage && userHasMadeProgress) {
-      this.showLanguageSwitchModal(
-        newLanguageCode,
-        'tell about page reload, progress loss and defaulting to english'
-      );
-      console.log(
-        'tell about page reload, progress loss and defaulting to english'
+      return this.showLanguageSwitchModal(
+        'I18N_SWITCH_LANGUAGES_RESET_AND_ENGLISH_RESTART'
       );
     }
+    return;
   }
 
   changeCurrentContentLanguage(newLanguageCode: string): void {
@@ -216,13 +212,9 @@ export class ContentTranslationManagerService {
     this.displayTranslations(newLanguageCode);
   }
 
-  _initLessonTranslations(): void {
-    const url = new URL(this.windowRef.nativeWindow.location.href);
-    const currentGlobalLanguageCode =
-      this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+  initLessonTranslations(): void {
     const newLanguageCode =
-      url.searchParams.get('initialContentLanguageCode') ||
-      currentGlobalLanguageCode;
+      this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
     let selectedLanguageCode =
       this.contentTranslationLanguageService.getCurrentContentLanguageCode();
 

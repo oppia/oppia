@@ -19,11 +19,7 @@
 
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {WindowRef} from 'services/contextual/window-ref.service';
 import './new-switch-content-language-refresh-required-modal.component.css';
-
-export const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM =
-  'initialContentLanguageCode';
 
 @Component({
   selector: 'new-switch-content-language-refresh-required-modal',
@@ -34,24 +30,15 @@ export const INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM =
   ],
 })
 export class NewSwitchContentLanguageRefreshRequiredModalComponent {
-  @Input() languageCode!: string;
   @Input() modalText!: string;
 
-  constructor(
-    private activeModal: NgbActiveModal,
-    private windowRef: WindowRef
-  ) {}
+  constructor(private activeModal: NgbActiveModal) {}
 
   cancel(): void {
     this.activeModal.dismiss();
   }
 
   confirm(): void {
-    const url = new URL(this.windowRef.nativeWindow.location.href);
-    url.searchParams.set(
-      INITIAL_CONTENT_LANGUAGE_CODE_URL_PARAM,
-      this.languageCode
-    );
-    this.windowRef.nativeWindow.location.href = url.href;
+    this.activeModal.close();
   }
 }

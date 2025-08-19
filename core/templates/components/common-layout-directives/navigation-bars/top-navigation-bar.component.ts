@@ -431,14 +431,28 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   }
 
   changeLanguage(languageCode: string): void {
-    console.log(languageCode);
     const pathname = this.urlService.getPathname().split('/');
+    const handleLanguageUpdate = () => {
+      this.i18nService.updateUserPreferredLanguage(languageCode);
+      this.languageBannerService.markLanguageBannerAsDismissed();
+    };
     if (pathname.includes('explore')) {
-      this.contentTranslationManagerService.onLanguageChange(languageCode);
-    }
+      const switchLanguageModalPromise =
+        this.contentTranslationManagerService.onLanguageChange(languageCode);
 
-    this.i18nService.updateUserPreferredLanguage(languageCode);
-    this.languageBannerService.markLanguageBannerAsDismissed();
+      if (switchLanguageModalPromise) {
+        switchLanguageModalPromise.result.then(
+          () => {
+            handleLanguageUpdate();
+          },
+          () => {}
+        );
+      } else {
+        handleLanguageUpdate();
+      }
+    } else {
+      handleLanguageUpdate();
+    }
   }
 
   isLanguageRTL(): boolean {
