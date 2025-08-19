@@ -42,6 +42,12 @@ const badgeValueSelector = '.e2e-test-badge-value';
 const badgeCaptionSelector = '.e2e-test-badge-caption';
 const badgeLanguageSelector = '.e2e-test-badge-language';
 
+const topicSelector = '.e2e-test-topic-selector';
+const selectedTopicSelector = '.e2e-test-topic-selector-selected';
+const topicOptionSelector = '.e2e-test-topic-selector-option';
+const mobileElementSelector = '.e2e-test-mobile-element';
+const desktopElementSelector = '.e2e-test-desktop-element';
+
 export class Contributor extends BaseUser {
   /**
    * Checks if the active tab name is visible and matches the expected values.
@@ -288,6 +294,45 @@ export class Contributor extends BaseUser {
     if (!badge) {
       throw new Error('Badge not found.');
     }
+  }
+
+  /**
+   * Selects the contribution type in the contribution dashboard.
+   * @param contributionType - The contribution type to select.
+   */
+  async selectContributionTypeInContributionDashboard(
+    contributionType: 'Translation Contributions' | 'Translation Reviews'
+  ): Promise<void> {
+    const dropdownSelector = this.isViewportAtMobileWidth()
+      ? `${topicSelector}${mobileElementSelector}`
+      : `${topicSelector}${desktopElementSelector}`;
+    const selectedOptionSelector = this.isViewportAtMobileWidth()
+      ? `${selectedTopicSelector}${mobileElementSelector}`
+      : `${selectedTopicSelector}${desktopElementSelector}`;
+
+    await this.expectElementToBeVisible(dropdownSelector);
+    await this.clickOn(dropdownSelector);
+
+    await this.expectElementToBeVisible(topicOptionSelector);
+    const contibutionTypeOptions = await this.page.$$(topicOptionSelector);
+    let optionElement: ElementHandle<Element> | null = null;
+    for (const option of contibutionTypeOptions) {
+      const optionText = await option.evaluate(el => el.textContent?.trim());
+      if (optionText === contributionType) {
+        optionElement = option;
+        break;
+      }
+    }
+
+    if (!optionElement) {
+      throw new Error(`Option ${contributionType} not found.`);
+    }
+
+    // Click on the option.
+    await optionElement.click();
+
+    // Verify option is selected.
+    await this.expectTextContentToBe(selectedOptionSelector, contributionType);
   }
 }
 

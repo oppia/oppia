@@ -98,6 +98,7 @@ describe('Translation Submitter', function () {
       'My Contributions'
     );
 
+    await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       'Cutting the Pies',
       'Fractions - The Picnic Problem'

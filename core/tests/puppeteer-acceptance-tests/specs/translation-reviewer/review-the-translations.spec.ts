@@ -173,6 +173,10 @@ describe('Translation Reviewer', function () {
     await translationReviewer.navigateToTabInMyContributions(
       'Contribution Stats'
     );
+    await translationReviewer.selectContributionTypeInContributionDashboard(
+      'Translation Reviews'
+    );
+
     await translationReviewer.expectContributionTableToContainRowInTranslationReview(
       [null, 'Fractions', '3', '5', '3', '5']
     );

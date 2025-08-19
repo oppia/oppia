@@ -61,8 +61,6 @@ const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 const contributionTableSelector = '.e2e-test-topics-table';
 const discardChangeButton = '.e2e-test-discard-translation-chages';
 
-const mobileElementSelector = '.e2e-test-mobile-element';
-const desktopElementSelector = '.e2e-test-desktop-element';
 const currentProgressSelector =
   '.e2e-test-opportunity-list-item-progress-percentage';
 const opportunityStatusLabelSelector = '.e2e-test-opportunity-list-item-label';
@@ -299,14 +297,7 @@ export class TranslationSubmitter extends BaseUser {
       throw new Error('Context not found.');
     }
 
-    const rteHelperModal = await context.waitForSelector(
-      rteHelperModalContainerSelector,
-      {visible: true}
-    );
-    if (!rteHelperModal) {
-      throw new Error('RTE Helper Modal not found.');
-    }
-    await rteHelperModal.waitForSelector(baseSelector);
+    await context.waitForSelector(baseSelector);
     const elements = await context.$$(baseSelector);
 
     if (elements.length < i + 1) {
@@ -369,45 +360,6 @@ export class TranslationSubmitter extends BaseUser {
     await skillSearchElement?.type(skillName);
     await this.clickOn(skillItemInRTESelector);
     await this.page.keyboard.press('Enter');
-  }
-
-  /**
-   * Selects the contribution type in the contribution dashboard.
-   * @param contributionType - The contribution type to select.
-   */
-  async selectContributionTypeInContributionDashboard(
-    contributionType: 'Translation Contributions'
-  ): Promise<void> {
-    const dropdownSelector = this.isViewportAtMobileWidth()
-      ? `${topicSelector}${mobileElementSelector}`
-      : `${topicSelector}${desktopElementSelector}`;
-    const selectedOptionSelector = this.isViewportAtMobileWidth()
-      ? `${selectedTopicSelector}${mobileElementSelector}`
-      : `${selectedTopicSelector}${desktopElementSelector}`;
-
-    await this.expectElementToBeVisible(dropdownSelector);
-    await this.clickOn(dropdownSelector);
-
-    await this.expectElementToBeVisible(topicOptionSelector);
-    const contibutionTypeOptions = await this.page.$$(topicOptionSelector);
-    let optionElement: ElementHandle<Element> | null = null;
-    for (const option of contibutionTypeOptions) {
-      const optionText = await option.evaluate(el => el.textContent?.trim());
-      if (optionText === contributionType) {
-        optionElement = option;
-        break;
-      }
-    }
-
-    if (!optionElement) {
-      throw new Error(`Option ${contributionType} not found.`);
-    }
-
-    // Click on the option.
-    await optionElement.click();
-
-    // Verify option is selected.
-    await this.expectTextContentToBe(selectedOptionSelector, contributionType);
   }
 
   /**
