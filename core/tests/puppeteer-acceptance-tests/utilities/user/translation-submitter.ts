@@ -290,8 +290,16 @@ export class TranslationSubmitter extends BaseUser {
     i: number = 0
   ): Promise<void> {
     const baseSelector = inputType === 'rte' ? '.e2e-test-rte' : inputType;
+    const context =
+      inputType === 'rte'
+        ? await this.page.waitForSelector(rteHelperModalContainerSelector)
+        : this.page;
 
-    const rteHelperModal = await this.page.waitForSelector(
+    if (!context) {
+      throw new Error('Context not found.');
+    }
+
+    const rteHelperModal = await context.waitForSelector(
       rteHelperModalContainerSelector,
       {visible: true}
     );
@@ -299,7 +307,7 @@ export class TranslationSubmitter extends BaseUser {
       throw new Error('RTE Helper Modal not found.');
     }
     await rteHelperModal.waitForSelector(baseSelector);
-    const elements = await this.page.$$(baseSelector);
+    const elements = await context.$$(baseSelector);
 
     if (elements.length < i + 1) {
       throw new Error(`Component ${i} not found.`);
