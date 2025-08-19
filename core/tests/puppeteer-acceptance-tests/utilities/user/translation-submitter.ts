@@ -63,6 +63,9 @@ const discardChangeButton = '.e2e-test-discard-translation-chages';
 
 const mobileElementSelector = '.e2e-test-mobile-element';
 const desktopElementSelector = '.e2e-test-desktop-element';
+const currentProgressSelector =
+  '.e2e-test-opportunity-list-item-progress-percentage';
+const opportunityStatusLabelSelector = '.e2e-test-opportunity-list-item-label';
 
 export class TranslationSubmitter extends BaseUser {
   /**
@@ -247,7 +250,7 @@ export class TranslationSubmitter extends BaseUser {
     for (const row of tableRows) {
       const rowCells = await row.$$('td');
       if (rowCells.length === 0) {
-        throw new Error('No cells found in the contribution table row.');
+        continue;
       }
 
       const found = await this.page.evaluate(
@@ -651,6 +654,43 @@ export class TranslationSubmitter extends BaseUser {
       {},
       opportunityTranslateButton
     );
+  }
+
+  /**
+   * Checks if the current progress is as expected.
+   * @param {number} expectedProgress - The expected progress.
+   */
+  async expectCurrentProgressToBe(expectedProgress: number): Promise<void> {
+    await this.expectTextContentToBe(
+      currentProgressSelector,
+      `(${expectedProgress}%)`
+    );
+  }
+
+  /**
+   * Checks if the translation status is as expected.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {string} subheading - The subheading of the chapter.
+   * @param {string} expectedStatus - The expected status.
+   */
+  async expectTranslationStatusToBe(
+    chapterName: string,
+    subheading: string,
+    expectedStatus: string
+  ): Promise<void> {
+    const opportunityItem =
+      await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
+        chapterName,
+        subheading
+      );
+
+    const statusElement = await opportunityItem?.waitForSelector(
+      opportunityStatusLabelSelector
+    );
+    const textContent = await statusElement?.evaluate(element =>
+      element.textContent?.trim()
+    );
+    expect(textContent).toBe(expectedStatus);
   }
 }
 

@@ -55,12 +55,6 @@ export class RTEEditor {
     }
 
     // Check if element is active or not to use in post check.
-    const isActive = await optionElement.evaluate(
-      (el: Element, cls: string) => {
-        return el.classList.contains(cls);
-      },
-      ckeBtnOnClass
-    );
     const initialInnerHTML = await this.parentPage.evaluate(
       (selector: string) => {
         return document.querySelector(selector)?.innerHTML;
@@ -70,43 +64,26 @@ export class RTEEditor {
 
     await optionElement.click();
 
-    if (title.includes('Indent')) {
+    try {
       await this.parentPage.waitForFunction(
-        (selector: string, innerHTML: string) => {
-          return document.querySelector(selector)?.innerHTML !== innerHTML;
+        (selector: string, innerHTML: string, ele2Selector: string) => {
+          const element = document.querySelector(selector);
+          const classChanged = element?.innerHTML !== innerHTML;
+          const headerElement = document.querySelector(ele2Selector);
+
+          return classChanged || headerElement;
         },
         {},
-        rteTextAreaSelector,
-        initialInnerHTML ?? ''
+        optionSelector,
+        initialInnerHTML ?? '',
+        customizeInteractionModalHeaderSelector
       );
-    } else {
-      try {
-        await this.parentPage.waitForFunction(
-          (
-            selector: string,
-            cls: string,
-            present: boolean,
-            ele2Selector: string
-          ) => {
-            const element = document.querySelector(selector);
-            const classChanged = element?.classList.contains(cls) === present;
-            const headerElement = document.querySelector(ele2Selector);
-
-            return classChanged || headerElement !== null;
-          },
-          {},
-          optionSelector,
-          ckeBtnOnClass,
-          !isActive,
-          customizeInteractionModalHeaderSelector
-        );
-      } catch (error) {
-        await this.parentPage.evaluate((selector: string) => {
-          const element = document.querySelector(selector);
-          console.log(`[debug] Class List: ${element?.classList}`);
-        }, optionSelector);
-        throw error;
-      }
+    } catch (error) {
+      await this.parentPage.evaluate((selector: string) => {
+        const element = document.querySelector(selector);
+        console.log(`[debug] Class List: ${element?.classList}`);
+      }, optionSelector);
+      throw error;
     }
   }
 

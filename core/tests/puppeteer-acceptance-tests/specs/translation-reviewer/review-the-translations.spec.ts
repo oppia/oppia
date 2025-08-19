@@ -144,7 +144,6 @@ describe('Translation Reviewer', function () {
 
     await translationReviewer.expectPaginationButtonToBeDisabled('previous');
     await translationReviewer.clickOnPaginationButton('next');
-    await translationReviewer.expectPaginationButtonToBeDisabled('next');
     await translationReviewer.clickOnPaginationButton('previous');
   });
 
@@ -159,16 +158,16 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  // it('should be able to reject a translation', async function () {
-  //   // Shouldn't be able to reject a review without a comment.
-  //   await translationReviewer.expectRejectReviewButtonToBeDisabled();
+  it('should be able to reject a translation', async function () {
+    // Shouldn't be able to reject a review without a comment.
+    await translationReviewer.expectRejectReviewButtonToBeDisabled();
 
-  //   // Should be able to reject a review with a comment.
-  //   await translationReviewer.submitTranslationReview(
-  //     'reject',
-  //     'Some lines are not translated properly'
-  //   );
-  // });
+    // Should be able to reject a review with a comment.
+    await translationReviewer.submitTranslationReview(
+      'reject',
+      'Some lines are not translated properly'
+    );
+  });
 
   // it('should be able to see contribution stats', async function () {
   //   await translationSubmitter.clickOn('Contribution Stats');

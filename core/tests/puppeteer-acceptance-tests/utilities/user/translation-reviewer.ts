@@ -275,15 +275,16 @@ export class TranslationReviewer extends BaseUser {
       let match = true;
 
       for (let i = 0; i < rowValues.length; i++) {
-        if (!rowCells[i]) {
+        if (!rowValues[i]) {
+          // If row cell from input is null, we skip comparing it.
           continue;
         }
-        const rowValue = await rowCells[i].evaluate(
+        const cellValue = await rowCells[i].evaluate(
           (el: Element, sel: string) =>
             el.querySelector(sel)?.textContent?.trim(),
           rowValues[i]
         );
-        if (rowValue !== rowValues[i]) {
+        if (cellValue !== rowValues[i]) {
           match = false;
           break;
         }

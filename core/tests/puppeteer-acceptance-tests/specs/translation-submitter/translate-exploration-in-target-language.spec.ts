@@ -353,19 +353,6 @@ describe('Translation Submitter', function () {
     );
   });
 
-  // // Check if common buttons work properly.
-  // await translationSubmitter.clickOnSkipTranslationButton();
-  // await translationSubmitter.toggleCopyButton('On');
-  // await translationSubmitter.toggleCopyButton('Off');
-  // await translationSubmitter.closeTranslateTextModal();
-
-  //   // Open the translation modal again.
-  //   await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-  //     'The Birthday Cake Arrives',
-  //     'Dividing a Birthday Cake'
-  //   );
-  // });
-
   it('should be able submit a translation', async function () {
     await translationSubmitter.clickOn('Save and translate another');
     // TODO(#23140): Remove click on discard changes button step below once the
@@ -387,14 +374,19 @@ describe('Translation Submitter', function () {
     );
   });
 
-  // it('should be able to check status of the translations', async function () {
-  //   // TODO: Progress should be 0%
-  //   await translationSubmitter.switchToTabInContributionDashboard(
-  //     'My Contributions'
-  //   );
+  it('should be able to check status of the translations', async function () {
+    await translationSubmitter.expectCurrentProgressToBe(0);
+    await translationSubmitter.switchToTabInContributionDashboard(
+      'My Contributions'
+    );
 
-  //   // Check for awaiting review.
-  // });
+    // Check for awaiting review.
+    await translationSubmitter.expectTranslationStatusToBe(
+      'बोल्ड टेक्स्ट',
+      'Fractions / The Picnic',
+      'Awaiting review'
+    );
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
