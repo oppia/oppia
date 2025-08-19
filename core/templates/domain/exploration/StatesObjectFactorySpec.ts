@@ -24,7 +24,6 @@ import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 describe('States Object Factory', () => {
-  let sof: State = null;
   let ssof = null;
   let statesDict = null;
   let newState = null;
@@ -38,7 +37,7 @@ describe('States Object Factory', () => {
       providers: [CamelCaseToHyphensPipe],
     });
     ssof = TestBed.get(StatesObjectFactory);
-    spyOnProperty(sof, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
+    spyOnProperty(State, 'NEW_STATE_TEMPLATE', 'get').and.returnValue({
       classifier_model_id: null,
       content: {
         content_id: 'content',
@@ -387,10 +386,10 @@ describe('States Object Factory', () => {
 
       newStates.setState(
         'new state',
-        sof.createFromBackendDict('new state', newState)
+        State.createFromBackendDict('new state', newState)
       );
       expect(newStates.getState('new state')).toEqual(
-        sof.createFromBackendDict('new state', newState)
+        State.createFromBackendDict('new state', newState)
       );
     }
   );
@@ -400,7 +399,7 @@ describe('States Object Factory', () => {
 
     newStates.setState(
       'first state',
-      sof.createFromBackendDict('first state', newState)
+      State.createFromBackendDict('first state', newState)
     );
     expect(newStates.getFinalStateNames()).toEqual['new state'];
   });

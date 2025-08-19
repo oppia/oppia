@@ -168,9 +168,9 @@ describe('Learner answer info service', () => {
     ladbas = TestBed.get(LearnerAnswerDetailsBackendApiService);
     DEFAULT_OUTCOME_CLASSIFICATION =
       ExplorationPlayerConstants.DEFAULT_OUTCOME_CLASSIFICATION;
-    firstState = sof.createFromBackendDict('new state', stateDict);
-    secondState = sof.createFromBackendDict('fake state', stateDict);
-    thirdState = sof.createFromBackendDict('demo state', stateDict);
+    firstState = State.createFromBackendDict('new state', stateDict);
+    secondState = State.createFromBackendDict('fake state', stateDict);
+    thirdState = State.createFromBackendDict('demo state', stateDict);
     tirs = TestBed.get(TextInputRulesService);
 
     spyOn(
