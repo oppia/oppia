@@ -61,19 +61,10 @@ ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS: Final = [
 
 ALLOWED_LINES_OF_GAP_IN_COMMENT: Final = 15
 
-import astroid  # pylint: disable=wrong-import-order, wrong-import-position
-from pylint import (
-    checkers,  # pylint: disable=wrong-import-order, wrong-import-position
-)
-from pylint import (
-    interfaces,  # pylint: disable=wrong-import-order, wrong-import-position
-)
-from pylint.checkers import (
-    utils as checker_utils,  # pylint: disable=wrong-import-order, wrong-import-position
-)
-from pylint.extensions import (
-    _check_docs_utils,  # pylint: disable=wrong-import-order, wrong-import-position
-)
+import astroid
+from pylint import checkers, interfaces
+from pylint.checkers import utils as checker_utils
+from pylint.extensions import _check_docs_utils
 
 
 def read_from_node(node: astroid.scoped_nodes.Module) -> List[str]:
