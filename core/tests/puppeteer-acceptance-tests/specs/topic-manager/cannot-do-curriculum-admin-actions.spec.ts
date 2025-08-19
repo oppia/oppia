@@ -46,7 +46,8 @@ describe('Topic Manager', function () {
     await curriculumAdmin.createTopic('Addition', 'add');
     await curriculumAdmin.createSkillForTopic(
       'Single Digit Addition',
-      'Addition'
+      'Addition',
+      false
     );
 
     await curriculumAdmin.createTopic('Subtraction', 'subtract');

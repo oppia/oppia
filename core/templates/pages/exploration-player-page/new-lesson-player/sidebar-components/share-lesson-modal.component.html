@@ -1,0 +1,102 @@
+<div class="oppia-share-lesson-modal-header" [ngStyle]="!backBtnIsVisible ? { 'justify-content': 'flex-end' } : {}">
+  <button *ngIf="backBtnIsVisible" mat-icon-button (click)="goBackToCopyModal()" aria-label="Back to the previous step">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <button mat-icon-button (click)="closeModal()" aria-label="Close the modal">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div class="oppia-share-lesson-modal-title" role="heading" aria-level="2">
+  {{'I18N_SHARE_TITLE' | translate: { explorationTitle: explorationTitle } }}
+</div>
+
+<div class="modal-body" [ngSwitch]="modalState">
+
+  <ng-container *ngSwitchCase="modalStates.COPY">
+    <div class="share-icon-container copy-modal-body">
+      <a [href]="shareWithNetwork('classroom')" target="_blank" rel="noopener" aria-label="Share via Classroom">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="share-classroom">
+          <title id="share-classroom">Classroom Icon</title>
+          <rect x="1" y="1" width="46" height="46" rx="23" fill="#20A366"/>
+          <rect x="1" y="1" width="46" height="46" rx="23" stroke="#FABE32" stroke-width="2"/>
+          <ellipse cx="23.9325" cy="19.1607" rx="4.28016" ry="4.16072" fill="white"/>
+          <ellipse cx="35.6482" cy="22.9097" rx="2.87473" ry="2.79451" fill="white" fill-opacity="0.5"/>
+          <ellipse cx="12.4529" cy="22.9097" rx="2.87473" ry="2.79451" fill="white" fill-opacity="0.5"/>
+          <path d="M32.355 29.7643C32.355 32.2846 32.355 32.9855 32.355 32.9855C29.4243 32.9855 20.7572 32.9855 15.2344 32.9855C15.2355 30.838 15.2344 30.7223 15.2344 29.7643C15.2344 27.244 19.067 24.6641 23.7947 24.6641C28.5224 24.6641 32.355 27.244 32.355 29.7643Z" fill="white"/>
+          <path d="M42.4993 30.714C42.4993 32.5026 42.4993 33 42.4993 33C40.3249 33 33.8945 33 29.7969 33C29.7977 31.476 29.7969 31.3939 29.7969 30.714C29.7969 28.9254 32.6404 27.0945 36.1481 27.0945C39.6558 27.0945 42.4993 28.9254 42.4993 30.714Z" fill="white" fill-opacity="0.5"/>
+          <path d="M18.2024 30.714C18.2024 32.5026 18.2024 33 18.2024 33C16.028 33 9.59758 33 5.5 33C5.50084 31.476 5.5 31.3939 5.5 30.714C5.5 28.9254 8.34353 27.0945 11.8512 27.0945C15.3589 27.0945 18.2024 28.9254 18.2024 30.714Z" fill="white" fill-opacity="0.5"/>
+        </svg>
+      </a>
+
+      <a [href]="shareWithNetwork('facebook')" target="_blank" rel="noopener" aria-label="Share via Facebook">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="share-facebook">
+          <title id="share-facebook">Facebook Icon</title>
+          <path d="M48 24C48 10.7452 37.2549 0 24 0C10.7452 0 0 10.7452 0 24C0 35.9791 8.77645 45.908 20.25 47.7085V30.9375H14.1563V24H20.25V18.7125C20.25 12.6975 23.833 9.37502 29.3152 9.37502C31.941 9.37502 34.6875 9.84376 34.6875 9.84376V15.75H31.6612C28.6798 15.75 27.75 17.6 27.75 19.498V24H34.4063L33.3422 30.9375H27.75V47.7085C39.2236 45.908 48 35.9791 48 24Z" fill="#1877F2"/>
+          <path d="M33.3422 30.9375L34.4063 24H27.75V19.498C27.75 17.6 28.6798 15.75 31.6612 15.75H34.6875V9.84374C34.6875 9.84374 31.941 9.375 29.3151 9.375C23.833 9.375 20.25 12.6975 20.25 18.7125V24H14.1562V30.9375H20.25V47.7085C21.4905 47.9029 22.7443 48.0003 24 48C25.2758 48 26.5281 47.9002 27.75 47.7085V30.9375H33.3422Z" fill="white"/>
+        </svg>
+      </a>
+    </div>
+
+    <div class="copy-modal-body copy-modal-body-btn">
+      <button mat-button class="share-modal-btn" (click)="copyLessonLink()" aria-label="Copy lesson link">
+        <span class="button-content">{{'I18N_SHARE_MODAL_COPY_LINK_BUTTON' | translate}} <mat-icon>code</mat-icon></span>
+      </button>
+
+      <button mat-button class="share-modal-btn" (click)="showEmbedModal()" aria-label="Show embed code for webpage">
+        <span class="button-content">{{'I18N_SHARE_MODAL_EMBED_IN_WEBPAGE' | translate}} <mat-icon>link</mat-icon></span>
+      </button>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="modalStates.EMBED">
+    <p class="cc-attribution-header" role="heading" aria-level="3">Embed in Webpage</p>
+
+    <div class="cc-attribution">
+      <p>Copy and paste this code into your website.</p>
+
+      <div class="cc-attribution-text">
+        <input type="text" class="cc-attribution-input" [value]="embedCode" readonly aria-label="Embed code to copy">
+        <button mat-button class="copy-cc-btn" (click)="copyEmbedCode()" aria-label="Copy embed code">
+          <span class="button-content">{{'Embed in Webpage' | translate}} <mat-icon>link</mat-icon></span>
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="modalStates.ATTRIBUTION">
+    <p class="cc-attribution-header" role="heading" aria-level="3">Generate Creative Commons Attribution</p>
+
+    <div class="cc-attribution">
+      <p>1. Copy and paste the credit <br> 2. Attach a copy of the "CC BY SA 4.0 license"</p>
+
+      <div class="cc-attribution-text">
+        <input type="text" class="cc-attribution-input" [value]="ccAttributionText" readonly aria-label="Creative Commons attribution text">
+        <button mat-button class="copy-cc-btn" (click)="copyAttribution()" aria-label="Copy attribution text">
+          <span class="button-content">
+            {{'Copy Attribution' | translate}}
+            <svg width="25" height="25" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="copy-attribution">
+              <title id="copy-attribution">Copy Attribution Icon</title>
+              <circle cx="12.5" cy="12.5" r="9.08333" stroke="#205D86" stroke-width="1.83333"/>
+              <path d="M10.0678 15.3869C9.5334 15.3869 9.07373 15.2737 8.68879 15.0473C8.30611 14.8186 8.01175 14.5016 7.80569 14.0962C7.6019 13.6909 7.5 13.2245 7.5 12.6969C7.5 12.1625 7.60303 11.6937 7.80909 11.2907C8.01741 10.8854 8.31291 10.5695 8.69558 10.3431C9.07826 10.1144 9.5334 10 10.061 10C10.5161 10 10.9147 10.0826 11.2566 10.2479C11.5985 10.4132 11.8691 10.6453 12.0684 10.9442C12.2676 11.2431 12.3774 11.5941 12.3978 11.9972H11.0324C10.9939 11.7368 10.892 11.5273 10.7267 11.3688C10.5637 11.208 10.3497 11.1277 10.0848 11.1277C9.8606 11.1277 9.66473 11.1888 9.49717 11.3111C9.33187 11.4311 9.2028 11.6066 9.10996 11.8375C9.01712 12.0685 8.9707 12.3481 8.9707 12.6765C8.9707 13.0093 9.01599 13.2924 9.10657 13.5256C9.1994 13.7588 9.32961 13.9366 9.49717 14.0589C9.66473 14.1811 9.8606 14.2423 10.0848 14.2423C10.2501 14.2423 10.3984 14.2083 10.5297 14.1404C10.6633 14.0725 10.7731 13.974 10.8592 13.8449C10.9475 13.7136 11.0052 13.5562 11.0324 13.3728H12.3978C12.3752 13.7713 12.2665 14.1223 12.0718 14.4257C11.8793 14.7269 11.6132 14.9624 11.2736 15.1322C10.9339 15.302 10.532 15.3869 10.0678 15.3869Z" fill="#205D86"/>
+              <path d="M15.0678 15.3869C14.5334 15.3869 14.0737 15.2737 13.6888 15.0473C13.3061 14.8186 13.0117 14.5016 12.8057 14.0962C12.6019 13.6909 12.5 13.2245 12.5 12.6969C12.5 12.1625 12.603 11.6937 12.8091 11.2907C13.0174 10.8854 13.3129 10.5695 13.6956 10.3431C14.0783 10.1144 14.5334 10 15.061 10C15.5161 10 15.9147 10.0826 16.2566 10.2479C16.5985 10.4132 16.8691 10.6453 17.0684 10.9442C17.2676 11.2431 17.3774 11.5941 17.3978 11.9972H16.0324C15.9939 11.7368 15.892 11.5273 15.7267 11.3688C15.5637 11.208 15.3497 11.1277 15.0848 11.1277C14.8606 11.1277 14.6647 11.1888 14.4972 11.3111C14.3319 11.4311 14.2028 11.6066 14.11 11.8375C14.0171 12.0685 13.9707 12.3481 13.9707 12.6765C13.9707 13.0093 14.016 13.2924 14.1066 13.5256C14.1994 13.7588 14.3296 13.9366 14.4972 14.0589C14.6647 14.1811 14.8606 14.2423 15.0848 14.2423C15.2501 14.2423 15.3984 14.2083 15.5297 14.1404C15.6633 14.0725 15.7731 13.974 15.8592 13.8449C15.9475 13.7136 16.0052 13.5562 16.0324 13.3728H17.3978C17.3752 13.7713 17.2665 14.1223 17.0718 14.4257C16.8793 14.7269 16.6132 14.9624 16.2736 15.1322C15.9339 15.302 15.532 15.3869 15.0678 15.3869Z" fill="#205D86"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<div class="oppia-share-lesson-modal-footer" [ngStyle]="modalState != modalStates.COPY ? { 'justify-content': 'flex-end' } : {}">
+  <span class="lesson-attribution-text" *ngIf="modalState == modalStates.COPY" (click)="showAttributionModal()" role="link" tabindex="0">
+    {{'How to attribute this lesson' | translate}}
+  </span>
+  <button *ngIf="isWindowNarrow()" mat-button class="cancel-button" (click)="closeModal()" aria-label="Cancel and close the modal">
+    {{'I18N_MODAL_CANCEL_BUTTON' | translate}}
+  </button>
+</div>
+
+<div class="success-message" *ngIf="successMessageIsVisible" role="alert" aria-live="assertive">
+  <p>{{ successMessage | translate }} <mat-icon>check_circle</mat-icon></p>
+</div>
