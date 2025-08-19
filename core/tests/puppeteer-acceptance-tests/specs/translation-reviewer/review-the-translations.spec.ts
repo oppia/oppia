@@ -136,28 +136,28 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  // it('should be able to move between reviews', async function () {
-  //   await translationReviewer.startTranslationReview(
-  //     'सामग्री 0',
-  //     'Fractions / The Picnic'
-  //   );
+  it('should be able to move between reviews', async function () {
+    await translationReviewer.startTranslationReview(
+      'सामग्री 0',
+      'Fractions / The Picnic'
+    );
 
-  //   await translationReviewer.expectPaginationButtonToBeDisabled('previous');
-  //   await translationReviewer.clickOnPaginationButton('next');
-  //   await translationReviewer.expectPaginationButtonToBeDisabled('next');
-  //   await translationReviewer.clickOnPaginationButton('previous');
-  // });
+    await translationReviewer.expectPaginationButtonToBeDisabled('previous');
+    await translationReviewer.clickOnPaginationButton('next');
+    await translationReviewer.expectPaginationButtonToBeDisabled('next');
+    await translationReviewer.clickOnPaginationButton('previous');
+  });
 
-  // it('should be able to accept the translation', async function () {
-  //   // Accept the translation without adding review comment.
-  //   await translationReviewer.submitTranslationReview('accept');
+  it('should be able to accept the translation', async function () {
+    // Accept the translation without adding review comment.
+    await translationReviewer.submitTranslationReview('accept');
 
-  //   // Accept the translation with adding review comment.
-  //   await translationReviewer.submitTranslationReview(
-  //     'accept',
-  //     'Review comment'
-  //   );
-  // });
+    // Accept the translation with adding review comment.
+    await translationReviewer.submitTranslationReview(
+      'accept',
+      'Review comment'
+    );
+  });
 
   // it('should be able to reject a translation', async function () {
   //   // Shouldn't be able to reject a review without a comment.

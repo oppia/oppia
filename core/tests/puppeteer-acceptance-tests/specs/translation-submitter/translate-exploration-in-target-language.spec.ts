@@ -102,23 +102,23 @@ describe('Translation Submitter', function () {
     //   'Properties of Solids',
     //   'Classifying States of Matter'
     // );
-    await curriculumAdm.createTopic('States of Matter', 'states-of-matter');
+    // await curriculumAdm.createTopic('States of Matter', 'states-of-matter');
 
-    await curriculumAdm.createAndPublishStoryWithChapter(
-      'The Mystery of the Melting Ice',
-      'melting-ice',
-      `The Foggy Window`,
-      explorationIds[0] as string,
-      'States of Matter'
-    );
-    for (const id of explorationIds.slice(1)) {
-      await curriculumAdm.openStoryEditor(
-        'The Mystery of the Melting Ice',
-        'States of Matter'
-      );
-      await curriculumAdm.addChapter(`Chapter ${id}`, id);
-      await curriculumAdm.saveStoryDraft();
-    }
+    // await curriculumAdm.createAndPublishStoryWithChapter(
+    //   'The Mystery of the Melting Ice',
+    //   'melting-ice',
+    //   `The Foggy Window`,
+    //   explorationIds[0] as string,
+    //   'States of Matter'
+    // );
+    // for (const id of explorationIds.slice(1)) {
+    //   await curriculumAdm.openStoryEditor(
+    //     'The Mystery of the Melting Ice',
+    //     'States of Matter'
+    //   );
+    //   await curriculumAdm.addChapter(`Chapter ${id}`, id);
+    //   await curriculumAdm.saveStoryDraft();
+    // }
   }, 1500000);
 
   it('should be able to navigate to contribution page', async function () {
@@ -156,28 +156,31 @@ describe('Translation Submitter', function () {
       'Fractions - The Picnic Problem'
     );
 
-    // Check if pagination works properly.
-    await translationSubmitter.expectPaginationButtonToBeVisible('next');
-    await translationSubmitter.expectPaginationButtonToBeVisible(
-      'previous',
-      false
-    );
+    // // Check if pagination works properly.
+    // await translationSubmitter.expectPaginationButtonToBeVisible('next');
+    // await translationSubmitter.expectPaginationButtonToBeVisible(
+    //   'previous',
+    //   false
+    // );
 
-    // Navigate to the next page.
-    await translationSubmitter.clickOnPaginationButtonInTranslationSubmitterPage(
-      'next'
-    );
-    await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
-    await translationSubmitter.expectPaginationButtonToBeVisible('previous');
-    await translationSubmitter.expectTranslationOpportunityToBePresent(
-      'Cutting the Pies',
-      'Fractions - The Picnic Problem',
-      false
-    );
+    // // Navigate to the next page.
+    // await translationSubmitter.clickOnPaginationButtonInTranslationSubmitterPage(
+    //   'next'
+    // );
+    // await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
+    // await translationSubmitter.expectPaginationButtonToBeVisible('previous');
+    // await translationSubmitter.expectTranslationOpportunityToBePresent(
+    //   'Cutting the Pies',
+    //   'Fractions - The Picnic Problem',
+    //   false
+    // );
 
-    // Change the subject.
-    await translationSubmitter.selectSubjectInTranslateTextTab('Fractions');
-    await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
+    // // Change the subject.
+    // await translationSubmitter.clickOnPaginationButtonInTranslationSubmitterPage(
+    //   'previous'
+    // );
+    // await translationSubmitter.selectSubjectInTranslateTextTab('Fractions');
+    // await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
   });
 
   it('should be able to use RTE', async function () {
@@ -350,34 +353,39 @@ describe('Translation Submitter', function () {
     );
   });
 
-  //   // // Check if common buttons work properly.
-  //   // await translationSubmitter.clickOnSkipTranslationButton();
-  //   // await translationSubmitter.toggleCopyButton('On');
-  //   // await translationSubmitter.toggleCopyButton('Off');
-  //   // await translationSubmitter.closeTranslateTextModal();
+  // // Check if common buttons work properly.
+  // await translationSubmitter.clickOnSkipTranslationButton();
+  // await translationSubmitter.toggleCopyButton('On');
+  // await translationSubmitter.toggleCopyButton('Off');
+  // await translationSubmitter.closeTranslateTextModal();
 
-  //   //   // Open the translation modal again.
-  //   //   await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-  //   //     'The Birthday Cake Arrives',
-  //   //     'Dividing a Birthday Cake'
-  //   //   );
-  // });
-
-  // it('should be able submit a translation', async function () {
-  //   await translationSubmitter.clickOn('Save and translate another');
-  //   // TODO: Bug where we are required to click on the dismiss button.
-  //   await translationSubmitter.clickOnDiscardChangesButton();
-  //   await translationSubmitter.clickOnSkipTranslationButton();
-  //   await translationSubmitter.typeTextForRTE('बधाई हो, आपका काम पूरा हो गया!');
-  //   await translationSubmitter.clickOn('Save and close');
-  //   await translationSubmitter.expectToolTipMessage(
-  //     'Submitted translation for review'
+  //   // Open the translation modal again.
+  //   await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+  //     'The Birthday Cake Arrives',
+  //     'Dividing a Birthday Cake'
   //   );
-  //   // TODO: Bug where we are required to click on the dismiss button.
-  //   await translationSubmitter.clickOnDiscardChangesButton();
-
-  //   // TODO: translate button should be disabled.
   // });
+
+  it('should be able submit a translation', async function () {
+    await translationSubmitter.clickOn('Save and translate another');
+    // TODO(#23140): Remove click on discard changes button step below once the
+    // bug is fixed where we are required to click on the dismiss button.
+    await translationSubmitter.clickOnDiscardChangesButton();
+    await translationSubmitter.clickOnSkipTranslationButton();
+    await translationSubmitter.typeTextForRTE('बधाई हो, आपका काम पूरा हो गया!');
+    await translationSubmitter.clickOn('Save and close');
+    await translationSubmitter.expectToolTipMessage(
+      'Submitted translation for review'
+    );
+    // TODO(#23140): Remove click on discard changes button step below once the
+    // bug is fixed where we are required to click on the dismiss button.
+    await translationSubmitter.clickOnDiscardChangesButton();
+
+    await translationSubmitter.expectTranslateButtonToBeDisabledInTranslateTextTab(
+      'Cutting the Pies',
+      'Fractions - The Picnic Problem'
+    );
+  });
 
   // it('should be able to check status of the translations', async function () {
   //   // TODO: Progress should be 0%

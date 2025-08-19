@@ -1,8 +1,8 @@
 <div class="stats-container" [hidden]="dataLoading">
   <div class="stats-contribution-type-mobile-container">
     <div class="dropdown-label">Type</div>
-    <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector">
-      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected"
+    <div #mobileDropdown class="oppia-contribution-stats-type-selector-mobile-container e2e-test-topic-selector e2e-test-mobile-element">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected e2e-test-mobile-element"
            (click)="toggleMobileDropdown()">
         {{selectedContributionType}}
         <span class="fas fa-sort-down oppia-contributions-dropdown-arrow"
@@ -28,8 +28,8 @@
     Explore the impact of your contributions!
   </div>
   <div class="stats-contribution-type-container">
-    <div #dropdown class="oppia-stats-type-selector-container e2e-test-topic-selector">
-      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected"
+    <div #dropdown class="oppia-stats-type-selector-container e2e-test-topic-selector e2e-test-desktop-element">
+      <div class="oppia-stats-type-selector-inner-container e2e-test-topic-selector-selected e2e-test-desktop-element"
            (click)="toggleDropdown()">
         {{selectedContributionType}}
         <span class="fas fa-caret-down oppia-stats-type-selector-inner-container-arrow"

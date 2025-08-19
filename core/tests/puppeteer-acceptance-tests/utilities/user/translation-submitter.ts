@@ -20,6 +20,7 @@ import {ElementHandle} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import {RTEEditor} from '../common/rte-editor';
 import isElementClickable from '../../functions/is-element-clickable';
+import {showMessage} from '../common/show-message';
 
 // Common Selectors.
 const activeTabSelector = '.e2e-test-active-tab';
@@ -59,6 +60,9 @@ const skillNameInput = '.e2e-test-skill-name-input';
 const skillItemInRTESelector = '.e2e-test-rte-skill-selector-item';
 const contributionTableSelector = '.e2e-test-topics-table';
 const discardChangeButton = '.e2e-test-discard-translation-chages';
+
+const mobileElementSelector = '.e2e-test-mobile-element';
+const desktopElementSelector = '.e2e-test-desktop-element';
 
 export class TranslationSubmitter extends BaseUser {
   /**
@@ -128,30 +132,11 @@ export class TranslationSubmitter extends BaseUser {
     chapterName: string,
     storyName: string
   ) {
-    await this.expectElementToBeVisible(opportunityItemSelector);
-
-    const opportunityItems = await this.page.$$(opportunityItemSelector);
-    let opportunityItem: ElementHandle<Element> | null = null;
-    for (const opportunityItemElement of opportunityItems) {
-      const opportunityItemHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        opportunityItemHeadingSelector
+    const opportunityItem =
+      await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
+        chapterName,
+        storyName
       );
-      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim() ?? '',
-        opportunitySubHeadingSelector
-      );
-
-      if (
-        opportunityItemHeading === chapterName &&
-        opportunityItemSubHeading.includes(storyName)
-      ) {
-        opportunityItem = opportunityItemElement;
-        break;
-      }
-    }
 
     if (!opportunityItem) {
       throw new Error(
@@ -376,12 +361,15 @@ export class TranslationSubmitter extends BaseUser {
   async selectContributionTypeInContributionDashboard(
     contributionType: 'Translation Contributions'
   ): Promise<void> {
-    await this.page.waitForSelector(topicSelector);
-    const elementIndex = this.isViewportAtMobileWidth() ? 0 : 1;
+    const dropdownSelector = this.isViewportAtMobileWidth()
+      ? `${topicSelector}${mobileElementSelector}`
+      : `${topicSelector}${desktopElementSelector}`;
+    const selectedOptionSelector = this.isViewportAtMobileWidth()
+      ? `${selectedTopicSelector}${mobileElementSelector}`
+      : `${selectedTopicSelector}${desktopElementSelector}`;
 
-    const optionSelectElements = await this.page.$$(topicSelector);
-    const optionSelectElement = optionSelectElements[elementIndex];
-    await optionSelectElement.click();
+    await this.expectElementToBeVisible(dropdownSelector);
+    await this.clickOn(dropdownSelector);
 
     await this.expectElementToBeVisible(topicOptionSelector);
     const contibutionTypeOptions = await this.page.$$(topicOptionSelector);
@@ -402,17 +390,7 @@ export class TranslationSubmitter extends BaseUser {
     await optionElement.click();
 
     // Verify option is selected.
-    await this.expectElementToBeVisible(selectedLanguageSelector);
-    const selectedOptionElements = await this.page.$$(selectedLanguageSelector);
-    const selectedOptionElement = selectedOptionElements[elementIndex];
-    await this.page.waitForFunction(
-      (element: Element, value: string) => {
-        return element.textContent?.trim() === value;
-      },
-      {},
-      selectedOptionElement,
-      contributionType
-    );
+    await this.expectTextContentToBe(selectedOptionSelector, contributionType);
   }
 
   /**
@@ -573,6 +551,105 @@ export class TranslationSubmitter extends BaseUser {
       {},
       rteEditorBodySelector,
       initialHTMLContent
+    );
+  }
+
+  /**
+   * TODO(#22539): Below function is duplicate of expectTranslationOpportunityToBePresent
+   * in contributor.ts. Once fixed, combine these functions.
+   * Checks if the translation opportunity is visible and matches the expected values.
+   * @param heading - The expected heading of the translation opportunity.
+   * @param subheading - The expected subheading of the translation opportunity.
+   * @param visible - Whether the translation opportunity should be visible or not.
+   */
+  async expectTranslationOpportunityToBePresentInTranslateTextTab(
+    heading: string,
+    subheading: string,
+    visible: boolean = true
+  ): Promise<ElementHandle | null> {
+    const translationOpportunitiesPreset = await this.isElementVisible(
+      opportunityItemSelector
+    );
+
+    // Handle the case where the translation opportunity is not present.
+    if (!translationOpportunitiesPreset) {
+      if (visible) {
+        throw new Error(
+          `Translation opportunity for ${heading} in ${subheading} not found.`
+        );
+      } else {
+        showMessage(
+          `Success: Translation opportunity for ${heading} in ${subheading} not found.`
+        );
+        return null;
+      }
+    }
+
+    // Get the opportunity item element.
+    const opportunityItems = await this.page.$$(opportunityItemSelector);
+    for (const opportunityItemElement of opportunityItems) {
+      const opportunityItemHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunityItemHeadingSelector
+      );
+      const opportunityItemSubHeading = await opportunityItemElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        opportunitySubHeadingSelector
+      );
+
+      if (
+        opportunityItemHeading === heading &&
+        opportunityItemSubHeading?.includes(subheading)
+      ) {
+        if (!visible) {
+          throw new Error(
+            `Failure: Translation opportunity for ${heading} in ${opportunityItemSubHeading} was found.`
+          );
+        }
+        return opportunityItemElement;
+      }
+    }
+
+    if (visible) {
+      throw new Error(
+        `Translation opportunity for ${heading} in ${subheading} not found.`
+      );
+    }
+    showMessage(
+      `Success: Translation opportunity for ${heading} in ${subheading} not found.`
+    );
+    return null;
+  }
+
+  /**
+   * Checks if the translate button is disabled in the translation tab.
+   * @param heading - The expected heading of the translation opportunity.
+   * @param subheading - The expected subheading of the translation opportunity.
+   */
+  async expectTranslateButtonToBeDisabledInTranslateTextTab(
+    heading: string,
+    subheading: string
+  ): Promise<void> {
+    const opportunityItem =
+      await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
+        heading,
+        subheading
+      );
+    if (!opportunityItem) {
+      throw new Error(
+        `Translation opportunity for ${heading} in ${subheading} not found.`
+      );
+    }
+    const opportunityTranslateButton = await opportunityItem.waitForSelector(
+      opportunityTranslateButtonSelector
+    );
+
+    this.page.waitForFunction(
+      isElementClickable,
+      {},
+      opportunityTranslateButton
     );
   }
 }
