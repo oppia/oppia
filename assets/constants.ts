@@ -7818,6 +7818,18 @@ export default {
       "^": "لِلْقُوَّةِ",
       "^2": "تَرْبِيعْ",
       "^3": "تَكْعِيبْ"
+    },
+    "es": {
+      "+": "más",
+      "-": "menos",
+      "*": "multiplicado por",
+      "×": "multiplicado por",
+      "÷": "dividido",
+      "=": "igual",
+      "!": "factorial",
+      "^": "elevado a",
+      "^2": "al cuadrado",
+      "^3": "al cubo"
     }
   },
   // Please consult the translation team before adding any entries here.
@@ -7826,6 +7838,7 @@ export default {
   "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
     "ar": "؟!",
     "en": ".!?",
+    "es": ".!?",
     "pt": ".!?",
     "hi": "।!?"
   }

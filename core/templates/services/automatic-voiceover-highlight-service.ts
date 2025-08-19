@@ -236,6 +236,7 @@ export class AutomaticVoiceoverHighlightService {
 
     minOffsetMsecs = 0.0;
     let remainingSentence = '';
+    let isRemainingSentenceUsed = false;
 
     audioOffsets?.forEach(tokenToAudioOffsetMsecs => {
       let token = tokenToAudioOffsetMsecs.token;
@@ -253,6 +254,7 @@ export class AutomaticVoiceoverHighlightService {
         if (token.length > currentSentence.length) {
           remainingSentence = currentSentence;
           currentSentence = '';
+          isRemainingSentenceUsed = true;
         }
       }
 
@@ -277,10 +279,11 @@ export class AutomaticVoiceoverHighlightService {
         minOffsetMsecs = 0.0;
 
         currentSentence = remainingSentence + currentSentence;
-        if (remainingSentence.length > 0) {
+        if (isRemainingSentenceUsed) {
           currentSentence = currentSentence.slice(token.length);
           remainingSentence = '';
           minOffsetMsecs = audioOffsetMsecs;
+          isRemainingSentenceUsed = false;
         }
       }
     });
