@@ -17,6 +17,7 @@
  */
 
 import {Component, ElementRef, Input, OnInit} from '@angular/core';
+import {LoggerService} from 'services/contextual/logger.service';
 import {
   LostChange,
   LostChangeBackendDict,
@@ -35,31 +36,30 @@ export class LostChangesModalComponent
   extends ConfirmOrCancelModal
   implements OnInit
 {
+  // The property is initialized using Angular lifecycle hooks
+  // and we need to do non-null assertion. For more information, see
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() lostChanges!: (ExplorationChange | LostChangeBackendDict)[];
   hasLostChanges: boolean = false;
+  processedLostChanges: LostChange[] = [];
 
   constructor(
     private utilsService: UtilsService,
     private elRef: ElementRef,
     private windowRef: WindowRef,
+    private loggerService: LoggerService,
     private ngbActiveModal: NgbActiveModal
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
-    this.hasLostChanges =
-      Array.isArray(this.lostChanges) && this.lostChanges.length > 0;
-
+    this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
     if (this.hasLostChanges) {
-      this.lostChanges = this.lostChanges
-        .filter(
-          (change: ExplorationChange | LostChangeBackendDict) =>
-            change && typeof change === 'object' && 'cmd' in change
-        )
-        .map((change: ExplorationChange | LostChangeBackendDict) =>
+      this.processedLostChanges = this.lostChanges.map(
+        (change: ExplorationChange | LostChangeBackendDict) =>
           LostChange.createNew(this.utilsService, change)
-        );
+      );
     }
   }
 
@@ -68,12 +68,14 @@ export class LostChangesModalComponent
   }
 
   exportChangesAndClose(): void {
-    const lostChangesData = this.elRef.nativeElement.getElementsByClassName(
+    // 'getElementsByClassName' returns null if the class name is not
+    // found, here we know that the class name is available, so we
+    // are explicitly typecasting it to remove type error.
+    let lostChangesData = this.elRef.nativeElement.getElementsByClassName(
       'oppia-lost-changes'
     )[0] as HTMLInputElement;
-
-    const blob = new Blob([lostChangesData.innerText], {type: 'text/plain'});
-    const elem = this.windowRef.nativeWindow.document.createElement('a');
+    let blob = new Blob([lostChangesData.innerText], {type: 'text/plain'});
+    let elem = this.windowRef.nativeWindow.document.createElement('a');
     elem.href = URL.createObjectURL(blob);
     elem.download = 'lostChanges.txt';
     elem.click();

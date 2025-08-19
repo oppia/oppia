@@ -242,32 +242,33 @@ export class LostChange {
     return language;
   }
 
+  /**
+   * @param {String} lostChangeDict - the name of the type to fetch.
+   * @returns {LostChange} - The associated type, if any.
+   */
   static createNew(
     utilsService: UtilsService,
     lostChangeDict: ExplorationChange | LostChangeBackendDict
   ): LostChange {
-    if (
-      !lostChangeDict ||
-      typeof lostChangeDict !== 'object' ||
-      typeof lostChangeDict.cmd !== 'string'
-    ) {
-      throw new Error('Invalid lostChangeDict passed to LostChange.createNew');
+    if (!lostChangeDict) {
+      throw new Error('lostChangeDict cannot be null or undefined');
     }
-
-    const dict = lostChangeDict as Partial<LostChangeBackendDict>;
-
+    const backendDict = lostChangeDict as LostChangeBackendDict;
+    if (!backendDict.cmd) {
+      throw new Error('lostChangeDict must have a cmd property');
+    }
     return new LostChange(
       utilsService,
-      dict.cmd ?? '',
-      dict.new_state_name ?? null,
-      dict.old_state_name ?? null,
-      dict.state_name ?? null,
-      dict.new_value ?? null,
-      dict.old_value ?? null,
-      dict.property_name ?? null,
-      dict.content_id ?? null,
-      dict.language_code ?? null,
-      dict.translation_html ?? null
+      backendDict.cmd,
+      backendDict.new_state_name,
+      backendDict.old_state_name,
+      backendDict.state_name,
+      backendDict.new_value,
+      backendDict.old_value,
+      backendDict.property_name,
+      backendDict.content_id,
+      backendDict.language_code,
+      backendDict.translation_html
     );
   }
 }
