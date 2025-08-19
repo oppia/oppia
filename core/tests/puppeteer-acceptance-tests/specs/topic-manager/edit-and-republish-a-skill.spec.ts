@@ -38,11 +38,13 @@ describe('Topic Manager User Journey', function () {
     await curriculumAdmin.createTopic('Addition', 'add');
     await curriculumAdmin.createSkillForTopic(
       'Single Digit Addition',
-      'Addition'
+      'Addition',
+      false
     );
     await curriculumAdmin.createSkillForTopic(
       'Double Digit Addition',
-      'Addition'
+      'Addition',
+      false
     );
 
     topicManager = await UserFactory.createNewUser(
