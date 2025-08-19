@@ -43,9 +43,12 @@ describe('Curriculum Admin', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    // Enable the feature flag.
+    // Enable the feature flags.
     await releaseCoordinator.enableFeatureFlag(
       'show_restructured_study_guides'
+    );
+    await releaseCoordinator.enableFeatureFlag(
+      'enable_worked_examples_rte_component'
     );
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
@@ -54,13 +57,14 @@ describe('Curriculum Admin', function () {
     // Setup taking longer than 300000 ms.
   }, 480000);
 
-  it('should create a study guide with multiple sections.', async function () {
+  it('should create a study guide with multiple sections containing workedexamples.', async function () {
     await curriculumAdmin.createSubtopicWithStudyGuideForTopic(
       'subtopic1',
       'abcd',
       'abcd',
       '1234567',
-      'Addition and Subtraction'
+      'Addition and Subtraction',
+      false
     );
     await curriculumAdmin.expectScreenshotToMatch(
       'subtopicWithSingleSection',
@@ -82,10 +86,12 @@ describe('Curriculum Admin', function () {
       'subtopicWithTwoSections',
       __dirname
     );
-    await curriculumAdmin.addSubtopicStudyGuideSection(
+    await curriculumAdmin.addSubtopicStudyGuideSectionWithWorkedExample(
       'Section heading 2',
       'Section content 2',
-      2
+      2,
+      'Type the number one',
+      '1'
     );
     await curriculumAdmin.expandStudyGuideSectionTile(0);
     await curriculumAdmin.expectScreenshotToMatch(
@@ -109,6 +115,15 @@ describe('Curriculum Admin', function () {
     );
     await curriculumAdmin.deleteStudyGuideSection(1);
     await curriculumAdmin.saveTopicDraft('Addition and Subtraction');
+    await curriculumAdmin.previewStudyGuide();
+    await curriculumAdmin.expectSubtopicStudyGuideToHaveTitleAndSections(
+      'subtopic1',
+      [
+        ['abcd', '1234567'],
+        ['Section heading 2', 'Section content 2'],
+      ],
+      true
+    );
   });
 
   afterAll(async function () {

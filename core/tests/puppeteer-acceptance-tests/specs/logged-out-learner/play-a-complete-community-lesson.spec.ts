@@ -49,7 +49,11 @@ describe('Logged-Out Learner', function () {
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Introduction to Oppia', 'intro-oppia');
-    await curriculumAdmin.createSkillForTopic('Math', 'Introduction to Oppia');
+    await curriculumAdmin.createSkillForTopic(
+      'Math',
+      'Introduction to Oppia',
+      false
+    );
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',

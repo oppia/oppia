@@ -53,6 +53,7 @@ describe('NoninteractiveWorkedexample', () => {
 
     component.questionWithValue = 'question';
     component.answerWithValue = 'answer';
+    component.allowSolutionToBeCollapsed = true;
   });
 
   it(
@@ -63,6 +64,7 @@ describe('NoninteractiveWorkedexample', () => {
 
       expect(component.question).toBe('question');
       expect(component.answer).toBe('answer');
+      expect(component.allowSolutionToBeCollapsed).toBe(true);
     }
   );
 
@@ -89,5 +91,19 @@ describe('NoninteractiveWorkedexample', () => {
 
     expect(component.question).toBe('');
     expect(component.answer).toBe('');
+  });
+
+  it('should set isSolutionCollapsed based on allowSolutionToBeCollapsed', () => {
+    component.allowSolutionToBeCollapsed = false;
+    component.ngOnInit();
+    expect(component.isSolutionCollapsed).toEqual(false);
+  });
+
+  it('should update collapsible status when changeSolutionState method is called', () => {
+    component.isSolutionCollapsed = false;
+    component.changeSolutionState();
+    expect(component.isSolutionCollapsed).toBe(true);
+    component.changeSolutionState();
+    expect(component.isSolutionCollapsed).toBe(false);
   });
 });
