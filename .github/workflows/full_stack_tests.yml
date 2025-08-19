@@ -118,3 +118,9 @@ jobs:
           # Note: The path must be kept in sync with the one specified in
           # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
           path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+      - name: Upload PNG snapshots
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: png-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-new
+          path: core/tests/puppeteer-acceptance-tests/specs/**/*.png
