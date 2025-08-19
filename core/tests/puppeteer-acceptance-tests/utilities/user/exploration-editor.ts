@@ -2742,17 +2742,21 @@ export class ExplorationEditor extends BaseUser {
    * on the dropdown toggle.
    */
   async closeEditorNavigationDropdownOnMobile(): Promise<void> {
-    const isDropdownOpen = this.expectElementToBeVisible(
-      openExplorationEditorNavigationMobile
+    const isDropdownClosed = await this.isElementVisible(
+      openExplorationEditorNavigationMobile,
+      false,
+      5000
     );
 
-    if (!isDropdownOpen) {
+    if (isDropdownClosed) {
       showMessage(
         'Skipped closing editor navigation dropdown, already closed.'
       );
     }
 
-    await this.clickOn(dropdownToggleIcon);
+    // We are using page.click as this button might be overlapped by the
+    // dropdown. Thus, it will fail with onClick.
+    await this.page.click(dropdownToggleIcon);
     await this.expectElementToBeVisible(
       openExplorationEditorNavigationMobile,
       false
@@ -4332,7 +4336,7 @@ export class ExplorationEditor extends BaseUser {
       if (isVisible) {
         // We are using page.click as this button might be overlapped by the
         // dropdown. Thus, it will fail with onClick.
-        this.page.click(dropdownToggleIcon);
+        await this.page.click(dropdownToggleIcon);
       }
     } else {
       await this.page.waitForSelector(translationTabButton, {
@@ -4370,7 +4374,7 @@ export class ExplorationEditor extends BaseUser {
       if (isVisible) {
         // We are using page.click as this button might be overlapped by the
         // dropdown. Thus, it will fail with onClick.
-        this.page.click(dropdownToggleIcon);
+        await this.page.click(dropdownToggleIcon);
       }
     } else {
       await this.page.waitForSelector(mainTabButton, {
