@@ -33,6 +33,8 @@ from typing import Final, List, Optional
 
 sys.path.insert(1, os.getcwd())
 
+# These imports must come after sys.path modification,
+# so the pylint import-position rules are disabled.
 from scripts import (  # pylint: disable=wrong-import-position, wrong-import-order
     common,
 )
