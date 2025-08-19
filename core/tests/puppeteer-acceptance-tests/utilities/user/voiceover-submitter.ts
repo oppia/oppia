@@ -25,7 +25,6 @@ const voiceoverProgressBarSelector = '.e2e-test-voiceover-progress-bar';
 const deleteVoiceoverBtnSelector = '.e2e-test-delete-voiceover-button';
 
 const voiceoverPlayBtnInAudioBarSelector = '.e2e-test-play-circle';
-const voiceoverPauseBtnInAudioBarSelector = '.e2e-test-pause-circle';
 const audioNotAvailableIconSelector = '.audio-controls-audio-not-available';
 const saveUploadedAudioBtnSelector = '.e2e-test-save-uploaded-audio-button';
 

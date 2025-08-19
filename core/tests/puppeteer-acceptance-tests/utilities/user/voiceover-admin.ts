@@ -24,7 +24,6 @@ const baseURL = testConstants.URLs.BaseURL;
 const voiceoverAdminURL = testConstants.URLs.VoiceoverAdmin;
 
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
-const dropdownToggleIcon = '.e2e-test-mobile-options-dropdown';
 
 const editVoiceoverArtistButton = 'span.e2e-test-edit-voice-artist-roles';
 const voiceArtistUsernameInputBox = 'input#newVoicAartistUsername';
@@ -37,7 +36,6 @@ const closeToastMessageButton = 'button.e2e-test-close-toast-warning';
 const updatedVoiceoverArtist = 'div.e2e-test-voiceArtist-role-names';
 const allVoiceoverArtistsList = 'ul.e2e-test-voiceArtist-list';
 
-const mobileOptionsDropdown = '.e2e-test-mobile-options-dropdown';
 const mobileVoiceoverArtistsHeader =
   '.e2e-test-voice-artist-collapsible-card-header';
 
