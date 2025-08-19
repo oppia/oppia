@@ -32,7 +32,7 @@ import {TranslationSubmitter} from '../../utilities/user/translation-submitter';
 const ROLES = testConstants.Roles;
 
 describe('Translation Submitter', function () {
-  let translationSubmitter: TranslationSubmitter & LoggedInUser;
+  let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
   let translationReviewer: TranslationReviewer & Contributor & LoggedInUser;
 
@@ -97,18 +97,40 @@ describe('Translation Submitter', function () {
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );
+
+    await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
+      'Cutting the Pies',
+      'Fractions - The Picnic Problem'
+    );
+    await translationReviewer.startTranslationReview(
+      'सामग्री 0',
+      'Fractions / The Picnic'
+    );
+    await translationReviewer.submitTranslationReview('accept');
+    await translationReviewer.submitTranslationReview('accept');
   }, 900000);
 
   it('should be able to check contribution stats', async function () {
     // Check contribution stats.
-    await translationSubmitter.clickOn('Contribution Stats');
+    await translationSubmitter.navigateToTabInMyContributions(
+      'Contribution Stats'
+    );
     await translationSubmitter.selectContributionTypeInContributionDashboard(
       'Translation Contributions'
     );
     await translationSubmitter.expectContributionTableToContainRow(
       'Fractions',
-      0,
-      0
+      2,
+      4
+    );
+  });
+
+  it('should be able to check badges earned', async function () {
+    await translationSubmitter.navigateToTabInMyContributions('Badges');
+    await translationSubmitter.expectBadgesToContain(
+      '1',
+      'Submission',
+      'हिन्दी'
     );
   });
 

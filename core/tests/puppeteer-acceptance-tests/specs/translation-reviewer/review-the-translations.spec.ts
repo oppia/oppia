@@ -170,7 +170,7 @@ describe('Translation Reviewer', function () {
   });
 
   it('should be able to see contribution stats', async function () {
-    await translationSubmitter.navigateToTabInMyContributions(
+    await translationReviewer.navigateToTabInMyContributions(
       'Contribution Stats'
     );
     await translationReviewer.expectContributionTableToContainRowInTranslationReview(

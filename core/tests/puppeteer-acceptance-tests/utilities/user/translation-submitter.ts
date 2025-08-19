@@ -239,21 +239,26 @@ export class TranslationSubmitter extends BaseUser {
     acceptedCards: number,
     acceptedWords: number
   ): Promise<void> {
-    await this.expectElementToBeVisible(contributionTableSelector);
+    const rowSelector = this.isViewportAtMobileWidth()
+      ? '.e2e-test-mobile-stats-row'
+      : 'tr';
+    const cellSelector = this.isViewportAtMobileWidth()
+      ? '.e2e-test-mobile-stats-cell'
+      : 'td';
+    await this.expectElementToBeVisible(rowSelector);
 
-    const table = await this.page.$(contributionTableSelector);
-    const tableRows = await table?.$$('tr');
+    const tableRows = await this.page.$$(rowSelector);
     if (!tableRows || tableRows.length === 0) {
       throw new Error('No rows found in the contribution table.');
     }
 
     for (const row of tableRows) {
-      const rowCells = await row.$$('td');
+      const rowCells = await row.$$(cellSelector);
       if (rowCells.length === 0) {
         continue;
       }
 
-      const cellValues = await row.$$eval('td', cells =>
+      const cellValues = await row.$$eval(cellSelector, cells =>
         cells.map(cell => cell.textContent?.trim())
       );
 

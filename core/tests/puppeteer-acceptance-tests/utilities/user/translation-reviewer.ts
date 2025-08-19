@@ -60,10 +60,6 @@ const contributionTableSelector = '.e2e-test-topics-table';
 const pinIconSelector = '.e2e-test-pin-icon';
 const backToLessonButtonSelector = '.e2e-test-back-to-lesson-button';
 const modalHeaderSelector = '.e2e-test-modal-header';
-const badgeSelector = '.e2e-test-badge';
-const badgeValueSelector = '.e2e-test-badge-value';
-const badgeCaptionSelector = '.e2e-test-badge-caption';
-const badgeLanguageSelector = '.e2e-test-badge-language';
 const reviewCommentInputSelector = '.e2e-test-suggestion-review-message';
 const acceptTranslationButtonSelector = '.e2e-test-translation-accept-button';
 const rejectTranslationButtonSelector = '.e2e-test-translation-reject-button';
@@ -198,59 +194,6 @@ export class TranslationReviewer extends BaseUser {
     await this.expectElementToBeVisible(pinIconSelector);
   }
 
-  /**
-   * Checks if the badge is present or not.
-   * @param {string} expectedBadgeValue - The expected value of the badge.
-   * @param {string} expectedBadgeCaption - The expected caption of the badge.
-   * @param {string | null} expectedBadgeLanguage - The expected language of the badge.
-   */
-  async expectBadgesToContain(
-    expectedBadgeValue: string,
-    expectedBadgeCaption: string,
-    expectedBadgeLanguage: string | null = null
-  ): Promise<void> {
-    await this.expectElementToBeVisible(badgeSelector);
-
-    const badges = await this.page.$$(badgeSelector);
-    let badge: ElementHandle<Element> | null = null;
-    for (const badgeElement of badges) {
-      const badgeValue = await badgeElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        badgeValueSelector
-      );
-      console.log(`[debug] badgeValue: ${badgeValue}`);
-      if (badgeValue !== expectedBadgeValue) {
-        continue;
-      }
-      const badgeCaption = await badgeElement.evaluate(
-        (el: Element, sel: string) =>
-          el.querySelector(sel)?.textContent?.trim(),
-        badgeCaptionSelector
-      );
-      console.log(`[debug] badgeCaption: ${badgeCaption}`);
-      if (badgeCaption !== expectedBadgeCaption) {
-        continue;
-      }
-
-      if (expectedBadgeLanguage) {
-        const badgeLanguage = await badgeElement.evaluate(
-          (el: Element, sel: string) =>
-            el.querySelector(sel)?.textContent?.trim(),
-          languageSelector
-        );
-        console.log(`[debug] badgeLanguage: ${badgeLanguage}`);
-        if (badgeLanguage !== expectedBadgeLanguage) {
-          continue;
-        }
-      }
-      badge = badgeElement;
-      break;
-    }
-    if (!badge) {
-      throw new Error('Badge not found.');
-    }
-  }
   /**
    * Expects the contribution table to contain a row with the given topic name,
    * accepted cards, and accepted words.

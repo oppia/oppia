@@ -34,6 +34,13 @@ const reviewContentContainerSelector = '.e2e-test-review-content-container';
 
 const contributionTabClass = 'e2e-test-contribution-tab';
 const activeElementClass = 'e2e-test-active';
+const viewDropdownSelector = '.e2e-test-mobile-contribution-dropdown';
+const viewDropdownOptionSelector =
+  '.e2e-test-mobile-contribution-dropdown-option';
+const badgeSelector = '.e2e-test-badge';
+const badgeValueSelector = '.e2e-test-badge-value';
+const badgeCaptionSelector = '.e2e-test-badge-caption';
+const badgeLanguageSelector = '.e2e-test-badge-language';
 
 export class Contributor extends BaseUser {
   /**
@@ -180,18 +187,107 @@ export class Contributor extends BaseUser {
    * Navigates to the tab in the My Contributions tab.
    * @param tabName - The name of the tab to navigate to.
    */
-  async navigateToTabInMyContributions(tabName: string): Promise<void> {
-    const xpath = `//div[contains(@class, "${contributionTabClass}") and contains(text(), "${tabName}")]`;
+  async navigateToTabInMyContributions(
+    tabName: 'Contribution Stats' | 'Badges'
+  ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(viewDropdownSelector);
+      await this.clickOn(viewDropdownSelector);
 
-    const element = await this.page.waitForXPath(xpath);
-    if (!element) {
-      throw new Error(`Tab ${tabName} not found in the contributions tab.`);
+      await this.expectElementToBeVisible(viewDropdownOptionSelector);
+      const contibutionTypeOptions = await this.page.$$(
+        viewDropdownOptionSelector
+      );
+      let optionElement: ElementHandle<Element> | null = null;
+      for (const option of contibutionTypeOptions) {
+        const optionText = await option.evaluate(el => el.textContent?.trim());
+        if (optionText === tabName) {
+          optionElement = option;
+          break;
+        }
+      }
+
+      if (!optionElement) {
+        throw new Error(`Option ${tabName} not found.`);
+      }
+
+      // Click on the option.
+      await this.waitForElementToStabilize(optionElement);
+      await optionElement.click();
+
+      await this.expectTextContentToContain(viewDropdownSelector, tabName);
+    } else {
+      const xpath = `//button[contains(@class, "${contributionTabClass}") and contains(text(), "${tabName}")]`;
+
+      const element = await this.page.waitForXPath(xpath);
+      if (!element) {
+        throw new Error(`Tab ${tabName} not found in the contributions tab.`);
+      }
+
+      await element.click();
+
+      const xpathActive = `//button[contains(@class, "${contributionTabClass}") and contains(text(), "${tabName}") and contains(@class, ${activeElementClass})]`;
+      await this.page.waitForXPath(xpathActive);
     }
+  }
 
-    await element.click();
+  /**
+   * Checks if the badge is present or not.
+   * @param {string} expectedBadgeValue - The expected value of the badge.
+   * @param {string} expectedBadgeCaption - The expected caption of the badge.
+   * @param {string | null} expectedBadgeLanguage - The expected language of the badge.
+   */
+  async expectBadgesToContain(
+    expectedBadgeValue: string,
+    expectedBadgeCaption: string,
+    expectedBadgeLanguage: string | null = null
+  ): Promise<void> {
+    // We are not checking if the badge is visible because first badge might
+    // be hidden.
+    const viewBasedBadgeSelector = this.isViewportAtMobileWidth()
+      ? `.mobile-badge-container ${badgeSelector}`
+      : `.desktop-badge-container ${badgeSelector}`;
+    await this.expectElementToBeVisible(viewBasedBadgeSelector);
 
-    const xpathActive = `//div[contains(@class, ${contributionTabClass}) and contains(text(), ${tabName}) and contains(@class, ${activeElementClass})]`;
-    await this.page.waitForXPath(xpathActive);
+    const badges = await this.page.$$(viewBasedBadgeSelector);
+    let badge: ElementHandle<Element> | null = null;
+    for (const badgeElement of badges) {
+      const badgeValue = await badgeElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        badgeValueSelector
+      );
+      console.log(`[debug] badgeValue: ${badgeValue}`);
+      if (badgeValue !== expectedBadgeValue) {
+        continue;
+      }
+      const badgeCaption = await badgeElement.evaluate(
+        (el: Element, sel: string) =>
+          el.querySelector(sel)?.textContent?.trim(),
+        badgeCaptionSelector
+      );
+      console.log(`[debug] badgeCaption: ${badgeCaption}`);
+      if (badgeCaption !== expectedBadgeCaption) {
+        continue;
+      }
+
+      if (expectedBadgeLanguage) {
+        const badgeLanguage = await badgeElement.evaluate(
+          (el: Element, sel: string) =>
+            el.querySelector(sel)?.textContent?.trim(),
+          badgeLanguageSelector
+        );
+        console.log(`[debug] badgeLanguage: ${badgeLanguage}`);
+        if (badgeLanguage !== expectedBadgeLanguage) {
+          continue;
+        }
+      }
+      badge = badgeElement;
+      break;
+    }
+    if (!badge) {
+      throw new Error('Badge not found.');
+    }
   }
 }
 

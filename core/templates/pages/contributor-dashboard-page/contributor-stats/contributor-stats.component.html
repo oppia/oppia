@@ -89,12 +89,12 @@
       </table>
       <div *ngIf="type == 'translationContribution'"
            class="mobile-stats-page">
-        <div class="mobile-stats-data-container" *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)">
+        <div class="mobile-stats-data-container e2e-test-mobile-stats-row" *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].months}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.firstContributionDate}} - {{translationStat.lastContributionDate}}
             </div>
           </div>
@@ -102,7 +102,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].topicNames}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.topicName}}
             </div>
           </div>
@@ -110,7 +110,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].acceptedCards}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.acceptedCards}}
             </div>
           </div>
@@ -118,7 +118,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].acceptedWordCount}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.acceptedWordCount}}
             </div>
           </div>
@@ -126,13 +126,13 @@
       </div>
       <div *ngIf="type == 'translationReview'"
            class="mobile-stats-page">
-        <div class="mobile-stats-data-container"
+        <div class="mobile-stats-data-container e2e-test-mobile-stats-row"
              *ngFor="let translationStat of translationStatByLanguageAndTopic.value.data.slice(translationStatByLanguageAndTopic.value.currentPageStartIndex, translationStatByLanguageAndTopic.value.currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].months}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.firstContributionDate}} - {{translationStat.lastContributionDate}}
             </div>
           </div>
@@ -140,7 +140,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].topicNames}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.topicName}}
             </div>
           </div>
@@ -148,7 +148,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].reviewedCards}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.reviewedCards}}
             </div>
           </div>
@@ -156,7 +156,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].reviewedWordCount}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.reviewedWordCount}}
             </div>
           </div>
@@ -164,7 +164,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].acceptedCards}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.acceptedCards}}
             </div>
           </div>
@@ -172,7 +172,7 @@
             <div class="mobile-stats-name">
               <b>{{COLUMNS[type].acceptedWordCount}}</b>
             </div>
-            <div>
+            <div class="e2e-test-mobile-stats-cell">
               {{translationStat.acceptedWordCount}}
             </div>
           </div>
@@ -252,7 +252,7 @@
       </table>
       <div *ngIf="type == 'questionContribution'"
            class="mobile-stats-page">
-        <div class="mobile-stats-data-container"
+        <div class="mobile-stats-data-container e2e-test-mobile-stats-row"
              *ngFor="let questionStat of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">
@@ -290,7 +290,7 @@
       </div>
       <div *ngIf="type == 'questionReview'"
            class="mobile-stats-page">
-        <div class="mobile-stats-data-container"
+        <div class="mobile-stats-data-container e2e-test-mobile-stats-row"
              *ngFor="let questionStat of statsData[type].data.slice(statsData[type].currentPageStartIndex, statsData[type].currentPageStartIndex + ITEMS_PER_PAGE)">
           <div class="mobile-stats-row">
             <div class="mobile-stats-name">

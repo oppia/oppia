@@ -1,7 +1,7 @@
 <div class="oppia-contributions-show-review">
   <div class="oppia-contributions-dropdown-section">
     <div class="dropdown-label">View</div>
-    <div class="oppia-contributions-dropdown-container">
+    <div class="oppia-contributions-dropdown-container e2e-test-mobile-contribution-dropdown">
       <div class="oppia-contributions-selection-container" (click)="toggleDropdown()">
         {{ activeDropdownTabChoice }}
         <span class="fas fa-sort-down oppia-contributions-dropdown-arrow" [ngStyle]="{ 'transform': dropdownShown ? 'scaleY(-1)' : 'scaleY(1)' }">
@@ -13,7 +13,7 @@
              *ngIf="reviewTabs.length > 0">
           Available Tasks
         </div>
-        <div class="oppia-contributions-dropdown-list-option"
+        <div class="oppia-contributions-dropdown-list-option e2e-test-mobile-contribution-dropdown-option"
              *ngFor="let tab of reviewTabs"
              (click)="switchToTab(TAB_TYPE_REVIEWS, tab.tabSubType)"
              [ngClass]="isActiveTab(TAB_TYPE_REVIEWS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
@@ -25,6 +25,7 @@
         </div>
         <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of contributionTabs">
           <div *ngIf="tab && tab.enabled"
+               class="e2e-test-mobile-contribution-dropdown-option"
                (click)="switchToTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType)"
                [ngClass]="isActiveTab(TAB_TYPE_CONTRIBUTIONS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
             {{ tab.text }}
@@ -36,6 +37,7 @@
         </div>
         <div class="oppia-contributions-dropdown-list-option" *ngFor="let tab of accomplishmentsTabs">
           <div *ngIf="tab && tab.enabled"
+               class="e2e-test-mobile-contribution-dropdown-option"
                (click)="switchToTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType)"
                [ngClass]="isActiveTab(TAB_TYPE_ACCOMPLISHMENTS, tab.tabSubType) ? 'oppia-contributions-dropdown-list-option-selected' : ''">
             {{ tab.text }}
