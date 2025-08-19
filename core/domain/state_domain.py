@@ -4043,8 +4043,13 @@ class State(translation_domain.BaseTranslatableObject):
                                 param_type,
                                 objects.BaseTranslatableObject
                         ):
-                            new_content_id_list.append(value['contentId'])
-
+                            if isinstance(value, dict) and 'contentId' in value:
+                                new_content_id_list.append(value['contentId'])
+                            else:
+                                raise Exception(
+                                    'Expected value to be a dictionary with a '
+                                    '"contentId" key, received %s' % value
+                                )
                         try:
                             normalized_param = param_type.normalize(value)
                         except Exception as e:
@@ -4586,7 +4591,7 @@ class State(translation_domain.BaseTranslatableObject):
             old_to_new_content_id: Dict[str, str] = {}
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
-            old_voiceovers_mapping = state['recorded_voiceovers'][ # type: ignore[misc]
+            old_voiceovers_mapping = state['recorded_voiceovers'][ # type: ignore[typeddict-item]
                 'voiceovers_mapping']
 
             for content, content_type, extra_prefix in (
@@ -4601,11 +4606,11 @@ class State(translation_domain.BaseTranslatableObject):
                 # Here we use MyPy ignore because the content Id key for the
                 # contents in the rule inputs is contentId instead of
                 # content_id.
-                old_content_id = content[content_id_key]  # type: ignore[misc]
+                old_content_id = content[content_id_key]  # type: ignore[literal-required]
                 # Here we use MyPy ignore because the content Id key for the
                 # contents in the rule inputs is contentId instead of
                 # content_id.
-                content[content_id_key] = new_content_id  # type: ignore[index]
+                content[content_id_key] = new_content_id  # type: ignore[literal-required]
 
                 assert isinstance(old_content_id, str)
                 old_to_new_content_id[old_content_id] = new_content_id
@@ -4615,7 +4620,7 @@ class State(translation_domain.BaseTranslatableObject):
 
             # Here we use MyPy ignore because the latest schema of state
             # dict doesn't contains recorded_voiceovers property.
-            state['recorded_voiceovers']['voiceovers_mapping'] = ( # type: ignore[misc]
+            state['recorded_voiceovers']['voiceovers_mapping'] = ( # type: ignore[typeddict-item]
                 new_voiceovers_mapping
             )
 
@@ -4708,7 +4713,7 @@ class State(translation_domain.BaseTranslatableObject):
                     # Here we use MyPy ignore because the content Id key for the
                     # contents in the rule inputs is contentId instead of
                     # content_id.
-                    content_id = content['contentId']  # type: ignore[misc]
+                    content_id = content['contentId']  # type: ignore[typeddict-item]
                 else:
                     content_id = content['content_id']
 
