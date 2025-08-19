@@ -37,7 +37,7 @@ describe('Translation Reviewer', function () {
     LoggedInUser &
     LoggedOutUser &
     Contributor;
-  let translationSubmitter: TranslationSubmitter & LoggedInUser;
+  let translationSubmitter: TranslationSubmitter & Contributor & LoggedInUser;
   let curriculumAdm: CurriculumAdmin & ExplorationEditor & TopicManager;
 
   beforeAll(async function () {
@@ -170,7 +170,9 @@ describe('Translation Reviewer', function () {
   });
 
   it('should be able to see contribution stats', async function () {
-    await translationSubmitter.clickOn('Contribution Stats');
+    await translationSubmitter.navigateToTabInMyContributions(
+      'Contribution Stats'
+    );
     await translationReviewer.expectContributionTableToContainRowInTranslationReview(
       [null, 'Fractions', '3', '5', '3', '5']
     );

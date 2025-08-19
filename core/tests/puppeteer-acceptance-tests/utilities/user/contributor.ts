@@ -32,6 +32,9 @@ const paginationButtonPreviousSelector = '.e2e-test-pagination-button-previous';
 const paginationButtonNextSelector = '.e2e-test-pagination-button-next';
 const reviewContentContainerSelector = '.e2e-test-review-content-container';
 
+const contributionTabClass = 'e2e-test-contribution-tab';
+const activeElementClass = 'e2e-test-active';
+
 export class Contributor extends BaseUser {
   /**
    * Checks if the active tab name is visible and matches the expected values.
@@ -171,6 +174,24 @@ export class Contributor extends BaseUser {
       reviewContentContainerSelector,
       initialReviewContent
     );
+  }
+
+  /**
+   * Navigates to the tab in the My Contributions tab.
+   * @param tabName - The name of the tab to navigate to.
+   */
+  async navigateToTabInMyContributions(tabName: string): Promise<void> {
+    const xpath = `//div[contains(@class, ${contributionTabClass}) and contains(text(), ${tabName})]`;
+
+    const element = await this.page.waitForXPath(xpath);
+    if (!element) {
+      throw new Error(`Tab ${tabName} not found in the contributions tab.`);
+    }
+
+    await element.click();
+
+    const xpathActive = `//div[contains(@class, ${contributionTabClass}) and contains(text(), ${tabName}) and contains(@class, ${activeElementClass})]`;
+    await this.page.waitForXPath(xpathActive);
   }
 }
 

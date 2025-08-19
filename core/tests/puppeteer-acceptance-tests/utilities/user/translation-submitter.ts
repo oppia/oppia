@@ -253,9 +253,11 @@ export class TranslationSubmitter extends BaseUser {
         continue;
       }
 
-      const cellValues = row.$$eval('td', cells =>
+      const cellValues = await row.$$eval('td', cells =>
         cells.map(cell => cell.textContent?.trim())
       );
+
+      console.log(`[debug]: cellValues: "${cellValues.join('", "')}"`);
 
       const found =
         cellValues[1] === topicName &&
@@ -299,6 +301,11 @@ export class TranslationSubmitter extends BaseUser {
     }
 
     const element = elements[i];
+
+    // Clear all text from the element.
+    await element.click({clickCount: 3});
+    await this.page.keyboard.press('Backspace');
+
     await element.type(value);
 
     await this.page.waitForFunction(
@@ -392,7 +399,7 @@ export class TranslationSubmitter extends BaseUser {
     // Open the language selector dropdown.
     await this.expectElementToBeVisible(languageSelector);
     await this.clickOn(languageSelector);
-    await this.waitForStaticAssetsToLoad();
+    await this.waitForPageToFullyLoad();
 
     // Find the language option in the dropdown.
     let languageOption: ElementHandle<Element> | null = null;
