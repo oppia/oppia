@@ -574,6 +574,8 @@ const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
 const profilePictureSelector = '.e2e-test-profile-dropdown';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const floatFormInput = '.e2e-test-float-form-input';
+const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
+const collapseWorkedExampleButton = '.e2e-test-collapse-workedexample';
 const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
 const toastMessageSelector = '.e2e-test-toast-message';
 const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
@@ -4120,6 +4122,17 @@ export class LoggedOutUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  /**
+   * Click on the expand workedexample button.
+   */
+  async clickOnExpandWorkedexampleButton(): Promise<void> {
+    await this.expectElementToBeVisible(expandWorkedExampleButton);
+    await this.clickOn(expandWorkedExampleButton);
+    await this.page.waitForSelector(collapseWorkedExampleButton, {
+      visible: true,
+    });
   }
 
   /**
