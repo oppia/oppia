@@ -169,17 +169,17 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  // it('should be able to see contribution stats', async function () {
-  //   await translationSubmitter.clickOn('Contribution Stats');
-  //   await translationReviewer.expectContributionTableToContainRowInTranslationReview(
-  //     [null, 'Fractions', '3', '5', '3', '5']
-  //   );
-  // });
+  it('should be able to see contribution stats', async function () {
+    await translationSubmitter.clickOn('Contribution Stats');
+    await translationReviewer.expectContributionTableToContainRowInTranslationReview(
+      [null, 'Fractions', '3', '5', '3', '5']
+    );
+  });
 
-  // it('should be able to see the badges', async function () {
-  //   await translationReviewer.clickOn('Badges');
-  //   await translationReviewer.expectBadgesToContain('1', 'Review', 'हिन्दी');
-  // });
+  it('should be able to see the badges', async function () {
+    await translationReviewer.clickOn('Badges');
+    await translationReviewer.expectBadgesToContain('1', 'Review', 'हिन्दी');
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

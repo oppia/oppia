@@ -89,7 +89,7 @@ export class TranslationSubmitter extends BaseUser {
    */
   async clickOnRTEOptionContainingTitle(title: string) {
     const rteEditor = new RTEEditor(this.page, this.page);
-    rteEditor.clickOnRTEOptionWithTitle(title);
+    await rteEditor.clickOnRTEOptionWithTitle(title);
   }
 
   /**
@@ -253,26 +253,14 @@ export class TranslationSubmitter extends BaseUser {
         continue;
       }
 
-      const found = await this.page.evaluate(
-        (
-          row: Element,
-          topicName: string,
-          acceptedCards: number,
-          acceptedWords: number
-        ) => {
-          const cells = row.querySelectorAll('td');
-          return (
-            cells[1].textContent?.trim() === topicName &&
-            cells[2].textContent?.trim() === acceptedCards.toString() &&
-            cells[3].textContent?.trim() === acceptedWords.toString()
-          );
-        },
-        {},
-        row,
-        topicName,
-        acceptedCards,
-        acceptedWords
+      const cellValues = row.$$eval('td', cells =>
+        cells.map(cell => cell.textContent?.trim())
       );
+
+      const found =
+        cellValues[1] === topicName &&
+        cellValues[2] === acceptedCards.toString() &&
+        cellValues[3] === acceptedWords.toString();
       if (found) {
         return;
       }
@@ -404,6 +392,7 @@ export class TranslationSubmitter extends BaseUser {
     // Open the language selector dropdown.
     await this.expectElementToBeVisible(languageSelector);
     await this.clickOn(languageSelector);
+    await this.waitForStaticAssetsToLoad();
 
     // Find the language option in the dropdown.
     let languageOption: ElementHandle<Element> | null = null;

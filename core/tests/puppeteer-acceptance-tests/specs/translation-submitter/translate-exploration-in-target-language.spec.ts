@@ -220,7 +220,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       RTE_BUTTON_TITLES.BULLETED_LIST.HI
     );
-    await translationSubmitter.typeTextForRTE('बुलॅट सूची टेक्स्ट');
+    await translationSubmitter.typeTextForRTE('बुलॅट सूची टेक्स्ट\n');
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       RTE_BUTTON_TITLES.BULLETED_LIST.HI
     );
@@ -362,7 +362,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.typeTextForRTE('बधाई हो, आपका काम पूरा हो गया!');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.expectToolTipMessage(
-      'Submitted translation for review'
+      'Submitted translation for review.'
     );
     // TODO(#23140): Remove click on discard changes button step below once the
     // bug is fixed where we are required to click on the dismiss button.
