@@ -51,6 +51,9 @@ from typing import Final, List, Optional, Type
 # rather than the opipa/oppia root. To correct this problem, we add the
 # current working directory to sys.path.
 sys.path.append(os.getcwd())
+
+# These imports must come after sys.path modification,
+# so the pylint import-position rules are disabled.
 from scripts import common  # pylint: disable=wrong-import-position
 from scripts import git_changes_utils  # pylint: disable=wrong-import-position
 from scripts import (  # pylint: disable=wrong-import-position

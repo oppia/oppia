@@ -46,6 +46,9 @@ import sys
 # rather than the opipa/oppia root. To correct this problem, we add the
 # current working directory to sys.path.
 sys.path.append(os.getcwd())
+
+# These imports must come after sys.path modification,
+# so the pylint import-position rules are disabled.
 from core import feconf  # pylint: disable=wrong-import-position
 
 from typing import (  # pylint: disable=wrong-import-position
