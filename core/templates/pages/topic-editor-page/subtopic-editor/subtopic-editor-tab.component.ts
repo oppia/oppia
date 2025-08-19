@@ -171,6 +171,11 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     }
   }
 
+  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
+      .isEnabled;
+  }
+
   updateSubtopicTitle(title: string): void {
     if (title === this.subtopic.getTitle()) {
       return;
@@ -431,12 +436,13 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const rteComponents =
+      this.isEnableWorkedexamplesRteComponentFeatureEnabled()
+        ? 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS'
+        : 'ALL_COMPONENTS';
     this.SUBTOPIC_PAGE_SCHEMA = {
       type: 'html',
-      ui_config: {
-        rte_components: 'ALL_COMPONENTS',
-        rows: 100,
-      },
+      ui_config: {rte_components: rteComponents, rows: 100},
     };
     this.htmlData = '';
     this.sections = [];
