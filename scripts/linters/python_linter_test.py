@@ -38,10 +38,6 @@ INVALID_PYTHON3_FILEPATH = os.path.join(
 INVALID_DOCSTRING_FILEPATH = os.path.join(
     LINTER_TESTS_DIR, 'invalid_docstring.py')
 
-INVALID_DOCSTRING_FILEPATH = os.path.join(
-    LINTER_TESTS_DIR, 'invalid_docstring.py'
-)
-
 INVALID_PYCODESTYLE_CONTENT = """from __future__ import annotations
 
 class FakeClass:
