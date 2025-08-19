@@ -181,7 +181,7 @@ export class Contributor extends BaseUser {
    * @param tabName - The name of the tab to navigate to.
    */
   async navigateToTabInMyContributions(tabName: string): Promise<void> {
-    const xpath = `//div[contains(@class, ${contributionTabClass}) and contains(text(), ${tabName})]`;
+    const xpath = `//div[contains(@class, "${contributionTabClass}") and contains(text(), "${tabName}")]`;
 
     const element = await this.page.waitForXPath(xpath);
     if (!element) {

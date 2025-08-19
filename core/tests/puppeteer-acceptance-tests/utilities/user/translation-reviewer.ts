@@ -219,6 +219,7 @@ export class TranslationReviewer extends BaseUser {
           el.querySelector(sel)?.textContent?.trim(),
         badgeValueSelector
       );
+      console.log(`[debug] badgeValue: ${badgeValue}`);
       if (badgeValue !== expectedBadgeValue) {
         continue;
       }
@@ -227,6 +228,7 @@ export class TranslationReviewer extends BaseUser {
           el.querySelector(sel)?.textContent?.trim(),
         badgeCaptionSelector
       );
+      console.log(`[debug] badgeCaption: ${badgeCaption}`);
       if (badgeCaption !== expectedBadgeCaption) {
         continue;
       }
@@ -237,6 +239,7 @@ export class TranslationReviewer extends BaseUser {
             el.querySelector(sel)?.textContent?.trim(),
           languageSelector
         );
+        console.log(`[debug] badgeLanguage: ${badgeLanguage}`);
         if (badgeLanguage !== expectedBadgeLanguage) {
           continue;
         }

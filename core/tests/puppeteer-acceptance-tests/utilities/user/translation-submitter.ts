@@ -310,6 +310,12 @@ export class TranslationSubmitter extends BaseUser {
 
     await this.page.waitForFunction(
       (element: HTMLElement, value: string) => {
+        console.log(`[debug] element: ${element}`);
+        console.log(`[debug] value: ${value}`);
+        console.log(
+          `[debug] element.value: ${(element as HTMLInputElement).value}`
+        );
+        console.log(`[debug] element.textContent: ${element.textContent}`);
         return (
           (element as HTMLInputElement).value === value ||
           element.textContent?.includes(value)
