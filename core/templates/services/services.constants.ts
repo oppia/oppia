@@ -33,6 +33,7 @@ export const ServicesConstants = {
     CONTRIBUTOR_DASHBOARD: 'contributor_dashboard',
     BLOG_DASHBOARD: 'blog_dashboard',
     DIAGNOSTIC_TEST_PLAYER: 'diagnostic_test_player',
+    STUDY_GUIDE_VIEWER: 'studyguide',
     OTHER: 'other',
   },
 
