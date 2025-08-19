@@ -83,6 +83,7 @@ describe('Translation Reviewer', function () {
     );
     await curriculumAdm.openStoryEditor('The Picnic Problem', 'Fractions');
     await curriculumAdm.addChapter('Trading Slices', explorationId2);
+    await curriculumAdm.saveStoryDraft();
 
     // Translate an exploration.
     await translationSubmitter.navigateToContributorDashboardUsingProfileDropdown();

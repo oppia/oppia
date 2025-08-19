@@ -181,6 +181,11 @@ describe('Translation Submitter', function () {
   });
 
   it('should be able to use RTE', async function () {
+    await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
+      'Cutting the Pies',
+      'Fractions - The Picnic Problem'
+    );
+
     // Bold Text.
     await translationSubmitter.clickOnRTEOptionContainingTitle('बोल्ड');
     await translationSubmitter.typeTextForRTE('बोल्ड टेक्स्ट');
@@ -333,20 +338,17 @@ describe('Translation Submitter', function () {
     await translationSubmitter.clickOn('Done');
   });
 
-  // it('should be able to use copy tool', async function () {
-  //   // Check if anchor text for copy tool works properly.
-  //   await translationSubmitter.clickOnTranslateButtonInTranslateTextTab(
-  //     'Cutting the Pies',
-  //     'Fractions - The Picnic Problem'
-  //   );
-  //   await translationSubmitter.clickAndVerifyAnchorWithInnerText(
-  //     'here',
-  //     'https://oppia-user-guide.readthedocs.io/en/latest/contributor/translate.html'
-  //   );
-  //   await translationSubmitter.expectCopyToolWorksProperly(
-  //     'छवि विवरण',
-  //     'तस्वीर का शीर्षक'
-  //   );
+  it('should be able to use copy tool', async function () {
+    // Check if anchor text for copy tool works properly.
+    await translationSubmitter.clickAndVerifyAnchorWithInnerText(
+      'here',
+      'https://oppia-user-guide.readthedocs.io/en/latest/contributor/translate.html'
+    );
+    await translationSubmitter.expectCopyToolWorksProperly(
+      'छवि विवरण',
+      'तस्वीर का शीर्षक'
+    );
+  });
 
   //   // // Check if common buttons work properly.
   //   // await translationSubmitter.clickOnSkipTranslationButton();

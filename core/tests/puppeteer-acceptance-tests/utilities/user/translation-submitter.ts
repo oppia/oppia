@@ -376,7 +376,7 @@ export class TranslationSubmitter extends BaseUser {
   async selectContributionTypeInContributionDashboard(
     contributionType: 'Translation Contributions'
   ): Promise<void> {
-    await this.expectElementToBeVisible(topicSelector);
+    await this.page.waitForSelector(topicSelector);
     const elementIndex = this.isViewportAtMobileWidth() ? 0 : 1;
 
     const optionSelectElements = await this.page.$$(topicSelector);
