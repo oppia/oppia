@@ -2752,6 +2752,7 @@ export class ExplorationEditor extends BaseUser {
       showMessage(
         'Skipped closing editor navigation dropdown, already closed.'
       );
+      return;
     }
 
     // We are using page.click as this button might be overlapped by the
