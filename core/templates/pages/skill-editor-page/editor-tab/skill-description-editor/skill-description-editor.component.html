@@ -20,7 +20,7 @@
         </i>
       </span>
     </div>
-    <br *ngIf="canEditSkillDescription()">
+    <span class="line-break" *ngIf="canEditSkillDescription()" ></span>
     <div *ngIf="!canEditSkillDescription()">{{ tmpSkillDescription }}</div>
   </div>
 </div>
@@ -29,6 +29,11 @@
     color: #f00;
     display: block;
     font-size: 0.8em;
+  }
+
+  span.line-break {
+    display: block;  
+    height: 1rem;   
   }
 
   @media screen and (max-width: 768px) {
