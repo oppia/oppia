@@ -11,14 +11,14 @@
       <mat-card-title class="w-100 d-flex justify-content-between">
         <span class="blog-dashboard-card-title e2e-test-username-visible">
           {{ authorName }}
-          <button class="fas fa-pen oppia-editor-edit-icon"
+          <button class="fas fa-pen oppia-editor-edit-icon e2e-test-update-blog-editor-username"
                   title="Edit Author Name"
                   (click)="showAuthorDetailsEditor()">
           </button>
         </span>
         <button mat-button
                 *ngIf="blogDashboardData.numOfDraftBlogPosts || blogDashboardData.numOfPublishedBlogPosts"
-                class="new-post-button e2e-test-create-blog-post-button"
+                class="new-post-button e2e-test-create-blog-post-button e2e-test-new-post-button"
                 (click)="createNewBlogPost()">
           <mat-icon class="new-post-icon position-absolute">+</mat-icon>
           <span class="d-flex pl-3">
@@ -29,10 +29,10 @@
       <mat-card-subtitle class="mt-2">
         <div class="blog-author-bio-container">
           <span class="d-flex">
-            <span class="blog-author-bio">
+            <span class="blog-author-bio e2e-test-bio-visible">
               {{ authorBio }}
             </span>
-            <button class="fas fa-pen oppia-editor-edit-icon mb-auto"
+            <button class="fas fa-pen oppia-editor-edit-icon mb-auto e2e-test-update-blog-editor-bio"
                     title="Edit Author Name"
                     (click)="showAuthorDetailsEditor()">
             </button>
@@ -48,7 +48,7 @@
             {{ 'I18N_BLOG_DASHBOARD_INTRO_MESSAGE' | translate }}
           </p>
           <button mat-button
-                  class="mx-2 my-2 create-new-blog-post-button e2e-test-create-blog-post-button"
+                  class="mx-2 my-2 create-new-blog-post-button e2e-test-create-blog-post-button e2e-test-first-post-button"
                   (click)="createNewBlogPost()"
                   aria-label="New blog post button.">
             {{ 'I18N_BLOG_DASHBOARD_CREATE_NEW_BLOG_POST_BUTTON' | translate | uppercase }}
@@ -79,7 +79,7 @@
               </i>
             </button>
           </div>
-          <div class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table"
+          <div class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table e2e-test-tiles-view-dashboard"
                *ngIf="activeView === 'gridView'">
             <div *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"
@@ -90,7 +90,7 @@
               </oppia-blog-dashboard-tile>
             </div>
           </div>
-          <mat-list class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table"
+          <mat-list class="blog-dashboard-tiles-container e2e-test-drafts-blog-post-table e2e-test-list-view-dashboard"
                     *ngIf="activeView === 'listView'">
             <mat-list-item *ngFor="let blogPostSummary of blogDashboardData.draftBlogPostSummaryDicts; last as last">
               <oppia-blog-dashboard-tile [blogPostSummary]="blogPostSummary"

@@ -219,6 +219,7 @@ import {HintSolutionAndConceptCardDisplayComponent} from 'pages/exploration-play
 import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-hint-modal.component';
 import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
 import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
+import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesson-player/sidebar-components/share-lesson-modal.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -330,6 +331,7 @@ import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-p
     ScoreRingComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillSelectorComponent,
     SkillMasteryViewerComponent,
     StateContentEditorComponent,
@@ -457,6 +459,7 @@ import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-p
     QuestionEditorSaveModalComponent,
     CollectionSummaryTileComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillMasteryViewerComponent,
     AttributionGuideComponent,
     LazyLoadingComponent,
@@ -672,6 +675,7 @@ import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-p
     StateSkillEditorComponent,
     SelectSkillModalComponent,
     SharingLinksComponent,
+    ShareLessonModalComponent,
     SkillSelectorComponent,
     StorySummaryTileComponent,
     SubtopicSummaryTileComponent,

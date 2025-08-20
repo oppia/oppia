@@ -113,6 +113,7 @@
 </ng-template>
 <ng-template #workedexample let-attrs>
   <oppia-noninteractive-workedexample [questionWithValue]="attrs.questionWithValue" attr.question-with-value="{{attrs.questionWithValue}}"
-                                      [answerWithValue]="attrs.answerWithValue" attr.answer-with-value="{{attrs.answerWithValue}}">
+                                      [answerWithValue]="attrs.answerWithValue" attr.answer-with-value="{{attrs.answerWithValue}}"
+                                      [allowSolutionToBeCollapsed]="isSolutionCollapsedForWorkedexample()">
   </oppia-noninteractive-workedexample>
 </ng-template>
