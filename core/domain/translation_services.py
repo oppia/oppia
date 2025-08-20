@@ -27,7 +27,7 @@ from core.domain import translation_domain
 from core.domain import translation_fetchers
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, cast
+from typing import Dict, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY: # pragma: no cover
@@ -289,40 +289,23 @@ def compute_translation_related_changes_upon_revert(
 
 
 def get_languages_with_complete_translation(
-    exploration: exp_domain.Exploration
+    entity: Union[exp_domain.Exploration, study_guide_domain.StudyGuide],
+    entity_type: feconf.TranslatableEntityType
 ) -> List[str]:
-    """Returns a list of language codes in which the exploration translation
-    is 100%.
+    """Returns a list of language codes in which the entity translation is 100%.
+
+    Args:
+        entity: The translatable entity (Exploration, Study Guide, etc.).
+        entity_type: The type of the translatable entity.
 
     Returns:
         list(str). A list of language codes in which the translation for the
-        exploration is complete i.e, 100%.
+        entity is complete i.e, 100%.
     """
-    content_count = exploration.get_content_count(feconf.TranslatableEntityType.EXPLORATION)
+    content_count = entity.get_content_count(entity_type)
     language_code_list = []
-    for language_code, count in get_translation_counts(
-        feconf.TranslatableEntityType.EXPLORATION, exploration
-    ).items():
-        if count == content_count:
-            language_code_list.append(language_code)
-
-    return language_code_list
-
-def get_languages_with_complete_translation(
-    study_guide: study_guide_domain.StudyGuide
-) -> List[str]:
-    """Returns a list of language codes in which the study guide translation
-    is 100%.
-
-    Returns:
-        list(str). A list of language codes in which the translation for the
-        study guide is complete i.e, 100%.
-    """
-    content_count = study_guide.get_content_count(feconf.TranslatableEntityType.STUDY_GUIDE)
-    language_code_list = []
-    for language_code, count in get_translation_counts(
-        feconf.TranslatableEntityType.STUDY_GUIDE, study_guide
-    ).items():
+    
+    for language_code, count in get_translation_counts(entity_type, entity).items():
         if count == content_count:
             language_code_list.append(language_code)
 
