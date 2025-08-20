@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+"""Python file containing a prohibited Black directive ("# fmt: skip"),
+used by scripts/linters/python_linter_test.
+"""
 
 class FakeClass:
     """This is a fake docstring for prohibited Black pragma purposes.""" # fmt: skip
