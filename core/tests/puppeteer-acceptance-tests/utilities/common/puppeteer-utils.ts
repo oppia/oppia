@@ -446,35 +446,38 @@ export class BaseUser {
    * The function clicks the element using the text on the button.
    * @param selector The text of the button to click on.
    * @param forceSelector If true, the function will try to find the element by its CSS selector.
-   * @param parentElement The parent element to search within.
+   * @param timeoutForTextButton The timeout for the text button.
    */
   async clickOn(
     selector: string,
     forceSelector: boolean = false,
-    parentElement?: puppeteer.ElementHandle
+    timeoutForTextButton: number = 1000
   ): Promise<void> {
-    const context = parentElement ?? this.page;
     /** Normalize-space is used to remove the extra spaces in the text.
      * Check the documentation for the normalize-space function here :
      * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const [button] = await context.$x(
-      `\/\/*[contains(text(), normalize-space('${selector}'))]`
-    );
-    // If we fail to find the element by its XPATH, then the button is undefined and
-    // we try to find it by its CSS selector.
-    if (button !== undefined && !forceSelector) {
+    const xpath = `\/\/*[contains(text(), normalize-space('${selector}'))]`;
+    let button: ElementHandle | null = null;
+    try {
+      button = await this.page.waitForXPath(xpath, {
+        visible: true,
+        timeout: timeoutForTextButton,
+      });
+    } catch (error) {
+      if (!(error instanceof puppeteer.errors.TimeoutError)) {
+        throw error;
+      }
+      showMessage(`Using CSS selector to find button: ${selector}`);
+    }
+    if (button !== null && !forceSelector) {
       await this.waitForElementToBeClickable(button);
-      showMessage(`Button (text: ${selector}) is clickable, as expected.`);
       await button.click();
       showMessage(`Button (text: ${selector}) is clicked.`);
     } else {
-      const element = await context.waitForSelector(selector, {visible: true});
-      if (!element) {
-        throw new Error(`Element not found for selector ${selector}`);
-      }
-      await this.waitForElementToBeClickable(element);
+      showMessage(`Clicking on button with selector: ${selector}`);
+      await this.waitForElementToBeClickable(selector);
       showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
-      await element.click();
+      await this.page.click(selector);
       showMessage(`Element (selector: ${selector}) is clicked.`);
     }
   }
