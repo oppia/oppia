@@ -178,7 +178,7 @@ describe('Translation Reviewer', function () {
     );
 
     await translationReviewer.expectContributionTableToContainRowInTranslationReview(
-      [null, 'Fractions', '3', '5', '3', '5']
+      [null, 'Fractions', '3', '6', '2', '4']
     );
   });
 
