@@ -200,7 +200,7 @@ def create_exp_opportunity_summary(
     # languages.
     complete_translation_language_list = (
         translation_services.get_languages_with_complete_translation(
-            exploration))
+            exploration, feconf.TranslatableEntityType.EXPLORATION))
     # TODO(#13912): Revisit voiceover language logic.
     language_codes_needing_voice_artists = set(
         complete_translation_language_list)
@@ -1264,7 +1264,7 @@ def create_translation_opportunity(
             for exploration_id, exploration in exp_id_to_exploration.items():
                 complete_langs = (
                     translation_services.get_languages_with_complete_translation(
-                        exploration
+                        exploration, feconf. TranslatableEntityType.EXPLORATION
                     )
                 )
 
@@ -1294,45 +1294,47 @@ def create_translation_opportunity(
                     entity_type=feconf.ENTITY_TYPE_EXPLORATION,
                 )
 
+                opportunities_list.append(opportunity)
+
         if entity_type == feconf.ENTITY_TYPE_STUDY_GUIDE:
-            print(list(set(entity_ids)))
-            topic_id, subtopic_id = entity_ids[0].split('-')
-            study_guide = study_guide_services.get_study_guide_by_id(
-                topic_id, subtopic_id
-            )
-            complete_langs = (
-                translation_services.get_languages_with_complete_translation(
-                    study_guide
+            for entity_id in entity_ids:
+                topic_id, subtopic_id = entity_id.split('-')
+                study_guide = study_guide_services.get_study_guide_by_id(
+                    topic_id, subtopic_id
                 )
-            )
-
-            incomplete_langs = (
-                _compute_exploration_incomplete_translation_languages(
-                    complete_langs
+                complete_langs = (
+                    translation_services.get_languages_with_complete_translation(
+                        study_guide, feconf.TranslatableEntityType.STUDY_GUIDE
+                    )
                 )
-            )
 
-            # Exclude the study guide's own language from translation targets.
-            incomplete_langs = [
-                lang for lang in incomplete_langs if (
-                    lang != study_guide.language_code
+                incomplete_langs = (
+                    _compute_exploration_incomplete_translation_languages(
+                        complete_langs
+                    )
                 )
-            ]
 
-            translation_counts = translation_services.get_translation_counts(
-                feconf.TranslatableEntityType.STUDY_GUIDE, study_guide
-            )
+                # Exclude the study guide's own language from translation targets.
+                incomplete_langs = [
+                    lang for lang in incomplete_langs if (
+                        lang != study_guide.language_code
+                    )
+                ]
 
-            opportunity = opportunity_domain.TranslationOpportunity(
-                topic_ids=[study_guide.topic_id],
-                entity_id=study_guide.id,
-                content_count=study_guide.get_content_count(feconf.TranslatableEntityType.STUDY_GUIDE),
-                incomplete_translation_language_codes=incomplete_langs,
-                translation_counts=translation_counts,
-                entity_type=feconf.ENTITY_TYPE_STUDY_GUIDE,
-            )
+                translation_counts = translation_services.get_translation_counts(
+                    feconf.TranslatableEntityType.STUDY_GUIDE, study_guide
+                )
 
-        opportunities_list.append(opportunity)
+                opportunity = opportunity_domain.TranslationOpportunity(
+                    topic_ids=[study_guide.topic_id],
+                    entity_id=study_guide.id,
+                    content_count=study_guide.get_content_count(feconf.TranslatableEntityType.STUDY_GUIDE),
+                    incomplete_translation_language_codes=incomplete_langs,
+                    translation_counts=translation_counts,
+                    entity_type=feconf.ENTITY_TYPE_STUDY_GUIDE,
+                )
+
+                opportunities_list.append(opportunity)
 
     if opportunities_list:
         _save_multi_translation_opportunities(opportunities_list)

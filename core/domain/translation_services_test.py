@@ -637,7 +637,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
 
         observed_language_list = (
             translation_services.get_languages_with_complete_translation(
-                exp
+                exp, feconf.TranslatableEntityType.EXPLORATION
             )
         )
         self.assertItemsEqual(observed_language_list, expected_language_list)
