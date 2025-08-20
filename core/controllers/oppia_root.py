@@ -81,4 +81,3 @@ class OppiaLightweightRootPage(
             self.render_template('lightweight-oppia-root.mainpage.html')
             return
         self.render_template('index.html', template_is_aot_compiled=True)
-        
