@@ -1,4 +1,4 @@
-// Copyright 2022 The Oppia Authors. All Rights Reserved.
+// Copyright 2021 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,21 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Entry point for angular AoT build.
+ * @fileoverview Directive scripts for the oppia pages.
  */
 
 import 'pages/common-imports';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {enableProdMode} from '@angular/core';
-import {LighweightAppModule} from 'pages/lightweight-oppia-root/app.module';
 
-enableProdMode();
+import {AppConstants} from 'app.constants';
+import {LighweightAppModule} from './app.module';
+import {LoggerService} from 'services/contextual/logger.service';
 
+if (!AppConstants.DEV_MODE) {
+  enableProdMode();
+}
+
+const loggerService = new LoggerService();
 platformBrowserDynamic()
   .bootstrapModule(LighweightAppModule)
-  .catch(err => console.error(err));
+  .catch(err => loggerService.error(err));
 
-// This prevents angular pages causing side effects to hybrid pages.
+// This prevents angular pages to cause side effects to hybrid pages.
 // TODO(#13080): Remove window.name statement from import.ts files
 // after migration is complete.
 window.name = '';

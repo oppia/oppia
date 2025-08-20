@@ -66,6 +66,8 @@ module.exports = {
   },
   entry: {
     oppia_root: commonPrefix + '/pages/oppia-root/index.ts',
+    lightweight_oppia_root:
+      commonPrefix + '/pages/lightweight-oppia-root/index.ts',
   },
 
   /**
@@ -102,6 +104,17 @@ module.exports = {
       template: commonPrefix + '/pages/oppia-root/oppia-root.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['lightweight_oppia_root'],
+      filename: 'lightweight-oppia-root.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix +
+        '/pages/lightweight-oppia-root/lightweight-oppia-root.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false,
+      lightweight: true,
     }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],

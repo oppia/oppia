@@ -513,7 +513,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             ))
             response = self.get_html_response('/', expected_status_int=200)
             self.assertIn(
-                b'<oppia-root></oppia-root>',
+                b'<lightweight-oppia-root></lightweight-oppia-root>',
                 response.body
             )
 
