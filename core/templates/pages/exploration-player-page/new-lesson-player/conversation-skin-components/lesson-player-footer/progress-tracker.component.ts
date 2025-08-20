@@ -16,23 +16,68 @@
  * @fileoverview Component for an input/response pair in the learner view.
  */
 
-import {Component, Input} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import './progress-tracker.component.css';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {SaveProgressModalComponent} from './save-progress-modal.component';
+import {ProgressUrlService} from 'pages/exploration-player-page/services/progress-url.service';
+import {UrlService} from 'services/contextual/url.service';
 
 @Component({
   selector: 'oppia-progress-tracker',
   templateUrl: './progress-tracker.component.html',
   styleUrls: ['./progress-tracker.component.css'],
 })
-export class ProgressTrackerComponent {
+export class ProgressTrackerComponent implements OnInit {
   @Input() userIsLoggedIn: boolean = false;
-  constructor(private ngbModal: NgbModal) {}
+  loggedOutProgressUniqueUrlId!: string | null;
+  loggedOutProgressUniqueUrl!: string;
+
+  constructor(
+    private ngbModal: NgbModal,
+    private progressUrlService: ProgressUrlService,
+    private urlService: UrlService
+  ) {}
+
+  ngOnInit(): void {
+    const urlParams = this.urlService.getUrlParams();
+    this.loggedOutProgressUniqueUrlId =
+      urlParams.pid || this.progressUrlService.getUniqueProgressUrlId();
+    if (this.loggedOutProgressUniqueUrlId) {
+      this.loggedOutProgressUniqueUrl =
+        this.urlService.getOrigin() +
+        '/progress/' +
+        this.loggedOutProgressUniqueUrlId;
+    }
+  }
 
   showSaveProgressModal(): void {
-    this.ngbModal.open(SaveProgressModalComponent, {
-      backdrop: 'static',
-    });
+    const modalInstance: NgbModalRef = this.ngbModal.open(
+      SaveProgressModalComponent,
+      {
+        backdrop: 'static',
+      }
+    );
+    modalInstance.componentInstance.loggedOutProgressUniqueUrlId =
+      this.loggedOutProgressUniqueUrlId;
+    modalInstance.componentInstance.loggedOutProgressUniqueUrl =
+      this.loggedOutProgressUniqueUrl;
+  }
+
+  async saveLoggedOutProgress(): Promise<void> {
+    console.log(this.loggedOutProgressUniqueUrlId);
+    if (!this.loggedOutProgressUniqueUrlId) {
+      this.progressUrlService.setUniqueProgressUrlId().then(() => {
+        this.loggedOutProgressUniqueUrlId =
+          this.progressUrlService.getUniqueProgressUrlId();
+        this.loggedOutProgressUniqueUrl =
+          this.urlService.getOrigin() +
+          '/progress/' +
+          this.loggedOutProgressUniqueUrlId;
+        this.showSaveProgressModal();
+      });
+    } else {
+      this.showSaveProgressModal();
+    }
   }
 }

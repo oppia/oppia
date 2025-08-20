@@ -16,14 +16,12 @@
  * @fileoverview Component for display hint modal.
  */
 
-import {Component} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
-import {UrlService} from 'services/contextual/url.service';
 import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {ProgressUrlService} from '../../../services/progress-url.service';
 
 @Component({
   selector: 'oppia-save-progress-modal',
@@ -31,28 +29,15 @@ import {ProgressUrlService} from '../../../services/progress-url.service';
   styleUrls: ['./save-progress-modal.component.css'],
 })
 export class SaveProgressModalComponent {
-  loggedOutProgressUniqueUrlId!: string | null;
-  loggedOutProgressUniqueUrl!: string;
+  @Input() loggedOutProgressUniqueUrlId!: string | null;
+  @Input() loggedOutProgressUniqueUrl!: string;
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private urlService: UrlService,
     private userService: UserService,
     private windowRef: WindowRef,
-    private localStorageService: LocalStorageService,
-    private progressUrlService: ProgressUrlService
+    private localStorageService: LocalStorageService
   ) {}
-
-  ngOnInit(): void {
-    this.loggedOutProgressUniqueUrlId =
-      this.progressUrlService.getUniqueProgressUrlId();
-    if (this.loggedOutProgressUniqueUrlId) {
-      this.loggedOutProgressUniqueUrl =
-        this.urlService.getOrigin() +
-        '/progress/' +
-        this.loggedOutProgressUniqueUrlId;
-    }
-  }
 
   isLanguageRTL(): boolean {
     return this.i18nLanguageCodeService.isCurrentLanguageRTL();
