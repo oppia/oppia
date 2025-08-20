@@ -85,4 +85,8 @@ export class TopicPreviewTabComponent {
         break;
     }
   }
+
+  isPracticeTabEnabled(): boolean {
+    return this.topic.getPracticeTabIsDisplayed();
+  }
 }

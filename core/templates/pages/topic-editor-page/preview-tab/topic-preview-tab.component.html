@@ -16,7 +16,7 @@
             Learn
           </div>
         </div>
-        <div class="topic-preview-navbar-tab"
+        <div *ngIf="isPracticeTabEnabled()" class="topic-preview-navbar-tab"
              [ngClass]="{'topic-preview-nav-active': activeTab === 'practice'}"
              (click)="changePreviewTab('practice')">
           <div class="topic-preview-icon">
@@ -58,7 +58,7 @@
                       [topicUrlFragment]="''">
       </subtopics-list>
     </div>
-    <div *ngIf="activeTab === 'practice'">
+    <div  *ngIf="activeTab === 'practice' && isPracticeTabEnabled()">
       <practice-tab [subtopicsList]="subtopics"
                     [topicName]="topicName"
                     [topicUrlFragment]="topicUrlFragment"
@@ -97,7 +97,7 @@
     height: 100%;
     padding: 20px 0;
     text-align: center;
-    width: 25%;
+    flex:1;
   }
   .topic-preview-icon img {
     height: 40px;
