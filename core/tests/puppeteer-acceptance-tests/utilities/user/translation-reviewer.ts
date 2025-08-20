@@ -232,10 +232,8 @@ export class TranslationReviewer extends BaseUser {
           console.log('[debug] row cell from input is null');
           continue;
         }
-        const cellValue = await rowCells[i].evaluate(
-          (el: Element, sel: string) =>
-            el.querySelector(sel)?.textContent?.trim(),
-          rowValues[i]
+        const cellValue = await rowCells[i].evaluate((el: Element) =>
+          el.textContent?.trim()
         );
         console.log('[debug] cell value: ' + cellValue);
         console.log('[debug] row value: ' + rowValues[i]);
