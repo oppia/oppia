@@ -73,8 +73,8 @@ export class BaseUser {
   page!: Page;
   browserObject!: Browser;
   userHasAcceptedCookies: boolean = false;
-  email: string;
-  username: string;
+  email: string | null = null;
+  username: string | null = null;
   startTimeInMilliseconds: number = -1;
   screenRecorder!: PuppeteerScreenRecorder;
   static instances: BaseUser[] = []; // Track instances.
