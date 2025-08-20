@@ -122,6 +122,14 @@ BAD_PATTERNS: Dict[str, BadPatternsDict] = {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
         'excluded_files': (),
         'excluded_dirs': ()},
+    'fmt: off': {
+        'message': 'Use of "fmt: off" is prohibited. All code must be formatted by Black.',
+        'excluded_files': (),
+        'excluded_dirs': ()},
+    'fmt: skip':{
+        'message': 'Use of "fmt: skip" is prohibited. All code must be formatted by Black.',
+        'excluded_files': (),
+        'excluded_dirs': ()},
     '<<<<<<<': {
         'message': 'Please fully resolve existing merge conflicts.',
         'excluded_files': (),
