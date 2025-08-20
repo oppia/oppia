@@ -290,9 +290,13 @@ jobs:
         if: ${{ failure() }}
         # We use xvfb-run to create a virtual screen to run tests without headless mode.
         # Numbers in 1920x1080x24 represents screen width, height and color depth respectively.
+
+        # TODO(#23155): We are temporarily disabling video recording for mobile tests.
+        # Once the issue is resolved (see: https://github.com/oppia/oppia/issues/23155),
+        # update the VIDEO_RECORDING_IS_ENABLED flag to 1.
         run: >
           set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=1
+          VIDEO_RECORDING_IS_ENABLED=0
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests --skip-build
           --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info
