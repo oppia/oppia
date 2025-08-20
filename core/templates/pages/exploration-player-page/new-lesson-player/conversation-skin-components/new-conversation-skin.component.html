@@ -62,7 +62,8 @@
                         [submitButtonIsShown]="!getAnswerIsBeingProcessed() && !continueToReviseStateButtonIsVisible"
                         [showContinueToReviseButton]="continueToReviseStateButtonIsVisible"
                         (clickContinueToReviseButton)="triggerRedirectionToStuckState()"
-                        (skipQuestion)="skipCurrentQuestion()">
+                        (skipQuestion)="skipCurrentQuestion()"
+                        [userIsLoggedIn]="isLoggedIn">
     </oppia-card-navigation-control>
   </div>
 

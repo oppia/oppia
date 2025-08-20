@@ -20,6 +20,7 @@
       <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
     </button>
   </div>
+  <oppia-progress-tracker [userIsLoggedIn]="userIsLoggedIn"></oppia-progress-tracker>
   <div *ngIf="!hasNext">
     <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button">
       <button mat-button

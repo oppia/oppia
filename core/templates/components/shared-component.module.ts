@@ -220,7 +220,9 @@ import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-le
 import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
 import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
 import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesson-player/sidebar-components/share-lesson-modal.component';
+import {ProgressTrackerComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/progress-tracker.component';
 import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/checkpoint-bar.component';
+import {SaveProgressModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/save-progress-modal.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -280,6 +282,8 @@ import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-p
     ConversationDisplayComponent,
     CardNavigationControlComponent,
     NewConversationSkinComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
     CreateNewSkillModalComponent,
@@ -301,6 +305,7 @@ import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-p
     FilteredChoicesFieldComponent,
     FeedbackPopupComponent,
     PracticeTabComponent,
+    SaveProgressModalComponent,
     CollectionSummaryTileComponent,
     ExplorationEmbedButtonModalComponent,
     CheckpointCelebrationModalComponent,
@@ -395,7 +400,6 @@ import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-p
     SkillMasteryModalComponent,
     StateGraphVisualization,
     VersionDiffVisualizationComponent,
-    CheckpointBarComponent,
     QuestionSuggestionEditorModalComponent,
     QuestionSuggestionReviewModalComponent,
     AnswerContentModalComponent,
@@ -441,10 +445,13 @@ import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-p
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
     CreateNewSkillModalComponent,
+    SaveProgressModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteHintModalComponent,
@@ -545,7 +552,6 @@ import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-p
     TestInteractionPanel,
     RuleEditorComponent,
     HtmlSelectComponent,
-    CheckpointBarComponent,
     RuleTypeSelector,
     AddAnswerGroupModalComponent,
     AnswerGroupEditor,
@@ -603,7 +609,6 @@ import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-p
     DynamicContentModule,
     FormsModule,
     MaterialModule,
-    CheckpointBarComponent,
     NgBootstrapModule,
     RichTextComponentsModule,
     ObjectComponentsModule,
@@ -620,6 +625,9 @@ import {CheckpointBarComponent} from 'pages/exploration-player-page/new-lesson-p
     CorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
+    SaveProgressModalComponent,
+    ProgressTrackerComponent,
+    CheckpointBarComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,

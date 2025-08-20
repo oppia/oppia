@@ -8,6 +8,14 @@
 /*
   This affects the progress nav bar.
 */
+
+oppia-progress-tracker {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+
 .card-navigation-control .oppia-nav-button .mat-button.oppia-autofocus:focus {
   background-color: #0d48a1;
 }
@@ -67,6 +75,7 @@
   margin-left: 0;
   margin-right: 0;
   max-width: 100%;
+  height: 60px;
 }
 
 .card-navigation-control .oppia-nav-button {

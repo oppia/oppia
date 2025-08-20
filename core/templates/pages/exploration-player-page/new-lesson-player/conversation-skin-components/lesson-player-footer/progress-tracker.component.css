@@ -1,0 +1,18 @@
+.progress-tracker-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progress-tracker-container button {
+  margin-left: 22px;
+  width: 90px;
+  height: 44px;
+  padding: 10px 12px;
+  color: #c55f45;
+  border: 1px solid #c55f45;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

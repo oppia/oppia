@@ -1,0 +1,29 @@
+<div class="save-progress-menu">
+  <h3>{{ 'I18N_SAVE_PROGRESS_TEXT' | translate }}</h3>
+  <div class="sign-in-box">
+    <p>{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_1' | translate }}</p>
+    <button type="button"
+            class="btn btn-secondary create-account-btn e2e-test-sign-up-button"
+            (click)="onLoginButtonClicked()">
+          {{ 'I18N_CREATE_ACCOUNT' | translate }}
+    </button>
+    <p class="sign-in-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_2' | translate }}<a class="sign-in-link" (click)="onLoginButtonClicked()">{{ 'I18N_TOPNAV_SIGN_IN' | translate }}</a></p>
+  </div>
+  <div class="separator">
+    <div class="bars"></div>
+    <div class="mid">or</div>
+    <div class="bars"></div>
+  </div>
+  <div class="uid-box">
+    <p class="guide-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_3' | translate }}</p>
+    <p class="copy-text">{{ 'I18N_SAVE_EXPLORATION_PROGRESS_TEXT_5' | translate }}</p>
+    <div [ngStyle]="{ 'flex-direction': isLanguageRTL() ? 'row-reverse' : 'row' }"
+         class="oppia-tooltip-container">
+      <oppia-copy-url [urlToCopy]="loggedOutProgressUniqueUrl"></oppia-copy-url>
+    </div>
+  </div>
+  <button type="button" class="save-progress-close-button e2e-test-save-progress-close-button" (click)="closeSaveProgressMenu()">
+    <i class="material-icons md-24">&#xE5CD;</i>
+    <span class="oppia-icon-accessibility-label">Close</span>
+  </button>
+</div>
