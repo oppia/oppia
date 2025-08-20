@@ -52,6 +52,7 @@ jobs:
           - name: translation-submitter/translate-exploration-in-target-language
           - name: translation-submitter/check-their-accomplishment
           - name: translation-reviewer/review-the-translations
+          - name: translation-reviewer/filter-the-translations
         run1: [1, 2]
         run2: [1]
         mobile: [false, true]

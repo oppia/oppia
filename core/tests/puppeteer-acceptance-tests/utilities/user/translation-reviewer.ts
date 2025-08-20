@@ -217,6 +217,7 @@ export class TranslationReviewer extends BaseUser {
       throw new Error('No rows found in the contribution table.');
     }
 
+    console.log('[debug] found rows:' + tableRows.length);
     for (const row of tableRows) {
       const rowCells = await row.$$(cellSelector);
       if (rowValues.length !== rowCells.length) {
@@ -228,6 +229,7 @@ export class TranslationReviewer extends BaseUser {
       for (let i = 0; i < rowValues.length; i++) {
         if (!rowValues[i]) {
           // If row cell from input is null, we skip comparing it.
+          console.log('[debug] row cell from input is null');
           continue;
         }
         const cellValue = await rowCells[i].evaluate(
@@ -235,18 +237,23 @@ export class TranslationReviewer extends BaseUser {
             el.querySelector(sel)?.textContent?.trim(),
           rowValues[i]
         );
+        console.log('[debug] cell value: ' + cellValue);
+        console.log('[debug] row value: ' + rowValues[i]);
         if (cellValue !== rowValues[i]) {
+          console.log('[debug] cell value does not match');
           match = false;
           break;
         }
       }
+
+      console.log('[debug] match: ' + match);
 
       if (match) {
         return;
       }
     }
 
-    throw new Error('Row not found in the contribution table with values: ');
+    throw new Error('Row not found in the contribution table with values.');
   }
 
   /**

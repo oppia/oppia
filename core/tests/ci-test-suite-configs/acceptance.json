@@ -539,6 +539,10 @@
     {
       "name": "translation-reviewer/review-the-translations",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/review-the-translations.spec.ts"
+    },
+    {
+      "name": "translation-reviewer/filter-the-translations",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/translation-reviewer/filter-the-translations.spec.ts"
     }
   ],
   "docker_suites": []
