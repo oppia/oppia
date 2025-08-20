@@ -227,7 +227,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
             lint_task_report.trimmed_messages)
         self.assertEqual('Bad pattern', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
-    
+
     def test_invalid_use_of_fmt_off(self) -> None:
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_BLACK_FMT_OFF_PRAGMA_FILEPATH], FILE_CACHE)
@@ -248,8 +248,8 @@ class GeneralLintTests(test_utils.LinterTestBase):
             lint_task_report.trimmed_messages
         )
         self.assertEqual('Bad pattern', lint_task_report.name)
-        self.assertTrue(lint_task_report.failed) 
-        
+        self.assertTrue(lint_task_report.failed)
+
     def test_merge_conflict_present(self) -> None:
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_MERGE_CONFLICT_FILEPATH], FILE_CACHE)

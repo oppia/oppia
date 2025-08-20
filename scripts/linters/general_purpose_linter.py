@@ -126,7 +126,7 @@ BAD_PATTERNS: Dict[str, BadPatternsDict] = {
         'message': 'Use of "fmt: off" is prohibited. All code must be formatted by Black.',
         'excluded_files': (),
         'excluded_dirs': ()},
-    'fmt: skip':{
+    'fmt: skip': {
         'message': 'Use of "fmt: skip" is prohibited. All code must be formatted by Black.',
         'excluded_files': (),
         'excluded_dirs': ()},
