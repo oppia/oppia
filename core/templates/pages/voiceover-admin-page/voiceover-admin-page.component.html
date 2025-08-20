@@ -33,7 +33,7 @@
                 <span *ngIf="!isAutogenerationSupportedByCloudService(languageAccentCodeToDescription.key)"
                       matTooltip="This language accent does not support autogeneration functionality."
                       matTooltipPosition="after">
-                  <span>No</span>
+                  <span class="autogeneration-disabled-text">No</span>
                   <span>
                     <mat-icon>info</mat-icon>
                   </span>
@@ -404,6 +404,11 @@
     align-items: center;
     display: flex;
     width: auto;
+  }
+
+  .autogeneration-disabled-text {
+    font-style: italic;
+    margin-right: 15px;
   }
 
   @media (max-width: 600px) {
