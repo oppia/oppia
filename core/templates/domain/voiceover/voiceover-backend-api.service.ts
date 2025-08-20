@@ -359,13 +359,13 @@ export class VoiceoverBackendApiService {
     return new Promise((resolve, reject) => {
       this.http
         .get<CloudTaskRunBackendResponseDict>(
-          this.urlInterpolationService.interpolateUrl(
-            VoiceoverDomainConstants.AUTOMATIC_VOICEOVER_REGENERATION_RECORD_URL,
-            {
+          VoiceoverDomainConstants.AUTOMATIC_VOICEOVER_REGENERATION_RECORD_URL,
+          {
+            params: {
               start_date: stateDate,
               end_date: endDate,
-            }
-          )
+            },
+          }
         )
         .toPromise()
         .then(

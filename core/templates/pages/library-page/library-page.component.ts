@@ -143,9 +143,9 @@ export class LibraryPageComponent {
     // Using multiple fallbacks to avoid test failures in headless browsers,
     // Reference: https://stackoverflow.com/a/11744120
     const width =
-      window.innerWidth ||
-      document.documentElement?.clientWidth ||
-      document.body?.clientWidth;
+      this.windowRef.nativeWindow.innerWidth ||
+      this.windowRef.nativeWindow.document?.documentElement?.clientWidth ||
+      this.windowRef.nativeWindow.document?.body?.clientWidth;
 
     const windowWidth = width * 0.85;
 

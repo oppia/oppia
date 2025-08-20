@@ -46,9 +46,12 @@ describe('Logged-in User', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    // Enable the feature flag.
+    // Enable the feature flags.
     await releaseCoordinator.enableFeatureFlag(
       'show_restructured_study_guides'
+    );
+    await releaseCoordinator.enableFeatureFlag(
+      'enable_worked_examples_rte_component'
     );
 
     await curriculumAdmin.createAndPublishTopicWithSubtopicsAndStudyGuides(
@@ -87,6 +90,11 @@ describe('Logged-in User', function () {
       );
       await loggedInUser1.expectScreenshotToMatch(
         'finalSubtopicViewerView',
+        __dirname
+      );
+      await loggedInUser1.clickOnExpandWorkedexampleButton();
+      await loggedInUser1.expectScreenshotToMatch(
+        'finalSubtopicViewerViewSolutionExpanded',
         __dirname
       );
       await loggedInUser1.clickOnNextStudyGuideButton();

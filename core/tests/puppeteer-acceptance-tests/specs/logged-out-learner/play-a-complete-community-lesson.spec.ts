@@ -49,7 +49,11 @@ describe('Logged-Out Learner', function () {
 
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Introduction to Oppia', 'intro-oppia');
-    await curriculumAdmin.createSkillForTopic('Math', 'Introduction to Oppia');
+    await curriculumAdmin.createSkillForTopic(
+      'Math',
+      'Introduction to Oppia',
+      false
+    );
 
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
@@ -108,7 +112,7 @@ describe('Logged-Out Learner', function () {
       'Dummy Exploration 2',
       'Algorithms'
     );
-  }, 600000); // Setup takes loner than default timeout.
+  }, 900000); // Setup takes loner than default timeout.
 
   it('should use all RTE components in the exploration', async function () {
     // Navigate to community library page and expect it to contain 3
