@@ -5726,17 +5726,7 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForElementToStabilize(conceptCard);
 
     await this.clickOn(conceptCardLinkSelector);
-    const conceptCardContent: string =
-      (await this.page.$eval(
-        conceptCardViewerSelector,
-        el => (el as HTMLElement).textContent
-      )) ?? '';
-
-    if (!conceptCardContent.includes(content)) {
-      throw new Error(
-        `Expected concept card content to be ${content}, but it was ${conceptCardContent}`
-      );
-    }
+    await this.expectTextContentToContain(conceptCardViewerSelector, content);
 
     await this.waitForElementToStabilize(conceptCardCloseButtonSelector);
     await this.clickOn(conceptCardCloseButtonSelector);
