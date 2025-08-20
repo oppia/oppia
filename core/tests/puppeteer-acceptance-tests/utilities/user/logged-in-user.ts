@@ -470,6 +470,22 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the given page using the profile dropdown.
+   * @param page The page or dashboard to navigate to.
+   */
+  async navigateToPageUsingProfileMenu(page: 'Blog Dashboard'): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOn(profileDropdown);
+
+    const selector = `.e2e-test-${page.toLowerCase().replace(/ /g, '-')}-link`;
+    await this.clickOn(selector);
+    await this.expectElementToBeVisible(`${profileDropdown}.show`, false);
+  }
+
+  /**
    * Navigates to the progress section of the learner dashboard.
    */
   async navigateToProgressSection(): Promise<void> {
@@ -1092,28 +1108,22 @@ export class LoggedInUser extends BaseUser {
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
   async expectToolTipMessage(expectedMessage: string): Promise<void> {
-    try {
-      await this.page.waitForSelector(toastMessageSelector, {visible: true});
-      const toastMessageElement = await this.page.$(toastMessageSelector);
-      const toastMessage = await this.page.evaluate(
-        el => el.textContent.trim(),
-        toastMessageElement
-      );
+    await this.page.waitForSelector(toastMessageSelector, {visible: true});
+    const toastMessageElement = await this.page.$(toastMessageSelector);
+    const toastMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      toastMessageElement
+    );
 
-      if (toastMessage !== expectedMessage) {
-        throw new Error(
-          `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
-        );
-      }
-      if (this.isViewportAtMobileWidth()) {
-        await this.page.click(toastMessageSelector);
-      }
-      await this.expectElementToBeVisible(toastMessageSelector, false);
-    } catch (error) {
-      const newError = new Error(`Failed to match toast message: ${error}`);
-      newError.stack = error.stack;
-      throw newError;
+    if (toastMessage !== expectedMessage) {
+      throw new Error(
+        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+      );
     }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.click(toastMessageSelector);
+    }
+    await this.expectElementToBeVisible(toastMessageSelector, false);
   }
 
   /**
@@ -1280,6 +1290,30 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(addProfilePictureButton, {
       hidden: true,
     });
+  }
+
+  /**
+   * Checks if the photo upload error message is visible.
+   * @param expectedText - The expected text of the error message.
+   */
+  async expectPhotoUploadErrorMessageToBe(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(photoUploadErrorMessage);
+    await this.expectTextContentToContain(
+      photoUploadErrorMessage,
+      expectedText
+    );
+  }
+
+  /**
+   * Cancels the photo upload.
+   */
+  async cancelPhotoUpload(): Promise<void> {
+    await this.expectElementToBeVisible(cancelProfileUploadButtonSelector);
+    await this.clickOn(cancelProfileUploadButtonSelector);
+    await this.expectElementToBeVisible(
+      cancelProfileUploadButtonSelector,
+      false
+    );
   }
 
   /**
@@ -1750,9 +1784,7 @@ export class LoggedInUser extends BaseUser {
     });
     await this.clickOn(reportExplorationButtonSelector);
     await this.page.waitForSelector(issueTypeSelector);
-    // Wait for checkbox to animate before clicking on it.
-    // This ensures that the checkbox is checked.
-    await this.page.waitForTimeout(100);
+    await this.waitForElementToStabilize(issueTypeSelector);
     await this.page.click(issueTypeSelector);
     await this.type(reportExplorationTextAreaSelector, issueDescription);
 

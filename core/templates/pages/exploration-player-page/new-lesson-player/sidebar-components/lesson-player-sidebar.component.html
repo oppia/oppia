@@ -27,33 +27,26 @@
       </div>
     </div>
     <div class="player-sidebar-button-container">
-      <button class="player-sidebar-button">
+      <button class="player-sidebar-button" (click)="showShareLessonModal()" aria-label="Share lesson">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-share-alt"></i>
-        <div *ngIf="sidebarIsExpanded">
+        <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-share-alt"></i>
           {{ 'I18N_SHARE_LESSON' | translate }}
-        </div>
+        </span>
       </button>
-      <button class="player-sidebar-button">
+      <button class="player-sidebar-button" (click)="showFeedbackModal()" aria-label="Give feedback">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-comments"></i>
-        <div *ngIf="sidebarIsExpanded">
+        <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-comments"></i>
           {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
-        </div>
+        </span>
       </button>
-      <button class="player-sidebar-button">
+      <button class="player-sidebar-button" (click)="showFlagExplorationModal()" aria-label="Report content">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-flag"></i>
-        <div *ngIf="sidebarIsExpanded">
+        <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-flag"></i>
           {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
-        </div>
-      </button>
-      <button class="player-sidebar-button">
-        <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-question-circle"></i>
-        <div *ngIf="sidebarIsExpanded">
-          <i class="fa fa-lg fa-question-circle"></i>
-          {{ 'I18N_LESSON_PLAYER_HELP_BUTTON' | translate }}
-        </div>
+        </span>
       </button>
     </div>
   </div>
@@ -67,21 +60,17 @@
         <i class="fa fa-lg fa-times"></i>
       </div>
       <div class="player-mobile-menu-options">
-        <button>
+        <button (click)="showShareLessonModal()">
           <i class="fa fa-lg fa-share-alt"></i>
           {{ 'I18N_SHARE_LESSON' | translate }}
         </button>
-        <button>
+        <button (click)="showFeedbackModal()">
           <i class="fa fa-lg fa-comments"></i>
           {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
         </button>
-        <button>
+        <button (click)="showFlagExplorationModal()">
           <i class="fa fa-lg fa-flag"></i>
           {{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}
-        </button>
-        <button>
-          <i class="fa fa-lg fa-question-circle"></i>
-          {{ 'I18N_LESSON_PLAYER_HELP_BUTTON' | translate }}
         </button>
       </div>
     </div>
