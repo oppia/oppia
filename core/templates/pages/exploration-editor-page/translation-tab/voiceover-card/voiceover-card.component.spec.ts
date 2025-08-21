@@ -40,9 +40,7 @@ import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {VoiceoverCardComponent} from './voiceover-card.component';
 import {FormatTimePipe} from 'filters/format-timer.pipe';
 import {VoiceoverBackendDict} from 'domain/exploration/voiceover.model';
-import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {AppConstants} from 'app.constants';
-import {AlertsService} from 'services/alerts.service';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {FeatureStatusChecker} from 'domain/feature-flag/feature-status-summary.model';
@@ -74,7 +72,6 @@ class MockPlatformFeatureService {
     };
   }
 }
-
 describe('Voiceover card component', () => {
   let component: VoiceoverCardComponent;
   let fixture: ComponentFixture<VoiceoverCardComponent>;
@@ -86,8 +83,6 @@ describe('Voiceover card component', () => {
   let changeListService: ChangeListService;
   let localStorageService: LocalStorageService;
   let entityVoiceoversService: EntityVoiceoversService;
-  let voiceoverBackendApiService: VoiceoverBackendApiService;
-  let alertsService: AlertsService;
   let voiceoverLanguageManagementService: VoiceoverLanguageManagementService;
   let platformFeatureService: PlatformFeatureService;
   let explorationStatesService: ExplorationStatesService;
@@ -131,8 +126,6 @@ describe('Voiceover card component', () => {
     changeListService = TestBed.inject(ChangeListService);
     localStorageService = TestBed.inject(LocalStorageService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
-    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
-    alertsService = TestBed.inject(AlertsService);
     voiceoverLanguageManagementService = TestBed.inject(
       VoiceoverLanguageManagementService
     );
@@ -697,75 +690,6 @@ describe('Voiceover card component', () => {
     expect(component.manualVoiceover).toBeUndefined();
   }));
 
-  it('should be able to regenerate automatic voiceovers', fakeAsync(() => {
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
-    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
-    component.activeContentId = 'content0';
-    component.languageAccentCode = 'en-US';
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {},
-      result: Promise.resolve(),
-    } as NgbModalRef);
-
-    let response = {
-      filename: 'filename.mp3',
-      durationSecs: 10.0,
-      fileSizeBytes: 200000,
-      needsUpdate: false,
-      sentenceTokenWithDurations: [
-        {token: 'This', audioOffsetMsecs: 0.0},
-        {token: 'is', audioOffsetMsecs: 100.0},
-        {token: 'a', audioOffsetMsecs: 200.0},
-        {token: 'text', audioOffsetMsecs: 300.0},
-      ],
-    };
-
-    spyOn(
-      voiceoverBackendApiService,
-      'generateAutotmaticVoiceoverAsync'
-    ).and.returnValue(Promise.resolve(response));
-
-    expect(component.automaticVoiceover).toBeUndefined();
-
-    component.generateVoiceover();
-
-    flush();
-    tick(5000);
-    discardPeriodicTasks();
-
-    expect(component.automaticVoiceover?.filename).toEqual('filename.mp3');
-    expect(component.automaticVoiceover?.durationSecs).toEqual(10.0);
-  }));
-
-  it('should not be able to regenerate automatic voiceovers if any error is raised', fakeAsync(() => {
-    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
-    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
-    component.activeContentId = 'content0';
-    component.languageAccentCode = 'en-US';
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {},
-      result: Promise.resolve(),
-    } as NgbModalRef);
-    spyOn(
-      voiceoverBackendApiService,
-      'generateAutotmaticVoiceoverAsync'
-    ).and.returnValue(Promise.reject({error: 'Voiceover regenration failed'}));
-    spyOn(alertsService, 'addWarning');
-
-    expect(component.automaticVoiceover).toBeUndefined();
-
-    component.generateVoiceover();
-
-    flush();
-    tick(5000);
-    discardPeriodicTasks();
-
-    expect(alertsService.addWarning).toHaveBeenCalledWith(
-      'Voiceover regenration failed'
-    );
-    expect(component.automaticVoiceover).toBeUndefined();
-  }));
-
   it('should not regenerate automatic voiceovers for reject handler', fakeAsync(() => {
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
     spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
@@ -781,6 +705,61 @@ describe('Voiceover card component', () => {
     flush();
     discardPeriodicTasks();
 
+    expect(component.automaticVoiceover).toBeUndefined();
+  }));
+
+  it('should be able to regenerate automatic voiceovers', fakeAsync(() => {
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
+    component.activeContentId = 'content0';
+    component.languageAccentCode = 'en-US';
+
+    const voiceover = new Voiceover('filename.mp3', 200000, false, 10.0);
+    const sentenceTokenWithDurations = [
+      {token: 'This', audioOffsetMsecs: 0.0},
+      {token: 'is', audioOffsetMsecs: 100.0},
+      {token: 'a', audioOffsetMsecs: 200.0},
+      {token: 'text', audioOffsetMsecs: 300.0},
+    ];
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {},
+      result: Promise.resolve({
+        voiceover: voiceover,
+        sentenceTokenWithDurations: sentenceTokenWithDurations,
+      }),
+    } as NgbModalRef);
+
+    expect(component.automaticVoiceover).toBeUndefined();
+
+    component.generateVoiceover();
+
+    flush();
+    tick(5000);
+    discardPeriodicTasks();
+
+    expect(component.automaticVoiceover?.filename).toEqual('filename.mp3');
+    expect(component.automaticVoiceover?.durationSecs).toEqual(10.0);
+  }));
+
+  it('should not regenerate automatic voiceovers if any error is raised', fakeAsync(() => {
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_1');
+    spyOn(pageContextService, 'getExplorationVersion').and.returnValue(1);
+    component.activeContentId = 'content0';
+    component.languageAccentCode = 'en-US';
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {},
+      result: Promise.resolve(),
+    } as NgbModalRef);
+
+    expect(component.automaticVoiceover).toBeUndefined();
+
+    component.generateVoiceover();
+
+    flush();
+    tick(5000);
+    discardPeriodicTasks();
     expect(component.automaticVoiceover).toBeUndefined();
   }));
 
@@ -956,5 +935,38 @@ describe('Voiceover card component', () => {
     expect(component.automaticVoiceoverIsLoading).toBeTrue();
     component.disableVoiceoverLoading(AppConstants.VOICEOVER_TYPE_AUTO);
     expect(component.automaticVoiceoverIsLoading).toBeFalse();
+  });
+
+  it('should be able to get automatic voiceover disable reason', () => {
+    component.isVoiceoverAutogenerationSupportedForSelectedAccent = false;
+
+    expect(component.getAutomaticVoiceoverDisableReason()).toEqual(
+      'Autogenerated voiceovers are not supported for the selected ' +
+        'language accent. Please reach out to the voiceover admin if you ' +
+        'would like them to be supported.'
+    );
+
+    component.isVoiceoverAutogenerationSupportedForSelectedAccent = true;
+    let explorationLinkedToStorySpy = spyOn(
+      component,
+      'isExplorationLinkedToStory'
+    );
+    explorationLinkedToStorySpy.and.returnValue(false);
+
+    expect(component.getAutomaticVoiceoverDisableReason()).toEqual(
+      'Autogenerated voiceovers are only available for explorations linked ' +
+        'to a published story. Please contact the curriculum admin for help.'
+    );
+
+    explorationLinkedToStorySpy.and.returnValue(true);
+    component.isVoiceoverAutogenerationEnabledByAdmins = false;
+
+    expect(component.getAutomaticVoiceoverDisableReason()).toEqual(
+      'Voiceover autogeneration via cloud services is currently disabled. ' +
+        'Please contact the admins for more information.'
+    );
+    component.isVoiceoverAutogenerationEnabledByAdmins = true;
+
+    expect(component.getAutomaticVoiceoverDisableReason()).toEqual('');
   });
 });
