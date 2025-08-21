@@ -10,7 +10,7 @@
             </a>
           </div>
         </li>
-        <li [ngClass]="{'topic-viewer-tabs-active': activeTab === 'practice'}" tabindex="0" (keydown.enter)="setActiveTab('practice')">
+        <li *ngIf="isPracticeTabEnabled()" [ngClass]="{'topic-viewer-tabs-active': activeTab === 'practice'}" tabindex="0" (keydown.enter)="setActiveTab('practice')">
           <div class="topic-viewer-tabs-text" (click)="setActiveTab('practice')">
             <img *ngIf="!checkTabletView()" alt="practice icon" class="tab-icon" [src]="getStaticImageUrl('/icons/train_icon_24px.svg')">
             <a class="tab-title e2e-test-practice-tab-link"
@@ -48,7 +48,7 @@
         </div>
       </mat-card>
     </div>
-    <div *ngIf="activeTab === 'practice'">
+    <div *ngIf="activeTab === 'practice' && isPracticeTabEnabled()">
       <practice-tab *ngIf="practiceTabIsDisplayed && topicId"
                     [subtopicsList]="subtopics"
                     [topicName]="topicName"
