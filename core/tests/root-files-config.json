@@ -32,7 +32,6 @@
     "core/templates/domain/exploration/TranslatedContentObjectFactorySpec.ts",
     "core/templates/domain/exploration/WrittenTranslationObjectFactorySpec.ts",
     "core/templates/domain/exploration/WrittenTranslationsObjectFactorySpec.ts",
-    "core/templates/domain/feedback_thread/FeedbackThreadObjectFactorySpec.ts",
     "core/templates/pages/about-page/about-page.constants.ts",
     "core/templates/pages/exploration-player-page/new-lesson-player/README.md",
     "core/templates/pages/exploration-player-page/current-lesson-player/README.md",
