@@ -220,7 +220,7 @@ describe('Translation Submitter', function () {
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       RTE_BUTTON_TITLES.BULLETED_LIST.HI
     );
-    await translationSubmitter.typeTextForRTE('बुलॅट सूची टेक्स्ट\n');
+    await translationSubmitter.typeTextForRTE('बुलॅट सूची टेक्स्ट');
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       RTE_BUTTON_TITLES.BULLETED_LIST.HI
     );
@@ -252,7 +252,7 @@ describe('Translation Submitter', function () {
       'rte',
       'आपने संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
     );
-    await translationSubmitter.clickOn('Done');
+    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
 
     // Image.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -269,7 +269,7 @@ describe('Translation Submitter', function () {
       'input',
       'तस्वीर का शीर्षक'
     );
-    await translationSubmitter.clickOn('Done');
+    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
 
     // Link.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -284,7 +284,7 @@ describe('Translation Submitter', function () {
       'ओपीआ',
       1
     );
-    await translationSubmitter.clickOn('Done');
+    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
 
     // Math Formula.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -294,7 +294,7 @@ describe('Translation Submitter', function () {
       'textarea',
       '\\frac{x}{y}'
     );
-    await translationSubmitter.clickOn('Done');
+    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
 
     // Concept Card.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -304,7 +304,7 @@ describe('Translation Submitter', function () {
       'input',
       'संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
     );
-    await translationSubmitter.clickOn('Done');
+    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
 
     // Tabs.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -328,7 +328,7 @@ describe('Translation Submitter', function () {
       'टैब सामग्री 1',
       1
     );
-    await translationSubmitter.clickOn('Done');
+    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
 
     // Video RTE.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -338,7 +338,7 @@ describe('Translation Submitter', function () {
       'input',
       youtubeVideoURL
     );
-    await translationSubmitter.clickOn('Done');
+    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
   });
 
   it('should be able to use copy tool', async function () {

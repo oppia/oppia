@@ -51,7 +51,8 @@ const skipTranslationButtonSelector = '.e2e-test-skip-translation-button';
 const copyButtonSelector = '.e2e-test-copy-button';
 const closeModalButtonSelector = '.e2e-test-close-modal-button';
 const imageSelector = '.e2e-test-image';
-const saveImageButtonSelector = '.e2e-test-close-rich-text-component-editor';
+const saveRTECustomizationButtonSelector =
+  '.e2e-test-close-rich-text-component-editor';
 const textInputSelector = '.e2e-test-text-input';
 const descriptionSelector = '.e2e-test-description-box';
 const rteEditorBodySelector = '.e2e-test-rte';
@@ -210,9 +211,7 @@ export class TranslationSubmitter extends BaseUser {
     await this.type(descriptionSelector, description);
 
     // Save the image.
-    await this.expectElementToBeVisible(saveImageButtonSelector);
-    await this.clickOn(saveImageButtonSelector);
-    await this.expectElementToBeVisible(saveImageButtonSelector, false);
+    await this.clickOnSaveButtonInCustomizeRTEModal();
 
     await this.page.waitForFunction(
       (selector: string, n: number) => {
@@ -222,6 +221,18 @@ export class TranslationSubmitter extends BaseUser {
       {},
       imageSelector,
       2
+    );
+  }
+
+  /**
+   * Clicks on the save button in the customize RTE modal.
+   */
+  async clickOnSaveButtonInCustomizeRTEModal(): Promise<void> {
+    await this.expectElementToBeVisible(saveRTECustomizationButtonSelector);
+    await this.clickOn(saveRTECustomizationButtonSelector);
+    await this.expectElementToBeVisible(
+      saveRTECustomizationButtonSelector,
+      false
     );
   }
 

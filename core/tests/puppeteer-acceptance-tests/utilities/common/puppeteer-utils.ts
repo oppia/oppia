@@ -470,7 +470,7 @@ export class BaseUser {
     /** Normalize-space is used to remove the extra spaces in the text.
      * Check the documentation for the normalize-space function here :
      * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const xpath = `\/\/*[contains(text(), normalize-space('${selector}'))]`;
+    const xpath = `//*[contains(text(), normalize-space('${selector}'))]`;
     let button: ElementHandle | null = null;
     try {
       button = await this.page.waitForXPath(xpath, {
