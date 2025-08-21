@@ -24,10 +24,7 @@ import {
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {Hint} from 'domain/exploration/hint-object.model';
-import {
-  Interaction,
-  InteractionObjectFactory,
-} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
@@ -37,7 +34,6 @@ import {Subscription} from 'rxjs';
 
 describe('Editor state service', () => {
   let ecs: StateEditorService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let solutionValidityService: SolutionValidityService;
   let mockInteraction: Interaction;
   let stateEditorInitializedSpy: jasmine.Spy<jasmine.Func>;
@@ -57,13 +53,12 @@ describe('Editor state service', () => {
     });
 
     ecs = TestBed.inject(StateEditorService);
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     solutionValidityService = TestBed.inject(SolutionValidityService);
 
     // Here, mockInteraction consists of an TextInput interaction with an
     // answer group leading to 'State' state and a default outcome leading to
     // 'Hola' state.
-    mockInteraction = interactionObjectFactory.createFromBackendDict({
+    mockInteraction = Interaction.createFromBackendDict({
       id: 'TextInput',
       answer_groups: [
         {

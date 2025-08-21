@@ -28,7 +28,7 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {
   ParamChange,
   ParamChangeBackendDict,
-} from 'domain/exploration/ParamChangeObjectFactory';
+} from 'domain/exploration/param-change.model';
 import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
 import isEqual from 'lodash/isEqual';
 

@@ -131,7 +131,10 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
       this.imagePath
     );
 
-    const wrapperWidth = $('.click-hexbin-wrapper').width() || 300;
+    const wrapperEl = document.querySelector(
+      '.click-hexbin-wrapper'
+    ) as HTMLElement;
+    const wrapperWidth = wrapperEl?.offsetWidth || 300;
     const wrapperHeight =
       this.imageSize.width === 0
         ? this.imageSize.height

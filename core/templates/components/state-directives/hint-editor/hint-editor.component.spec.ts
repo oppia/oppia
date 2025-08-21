@@ -138,6 +138,7 @@ describe('HintEditorComponent', () => {
     const schema = (component.HINT_FORM_SCHEMA = {
       type: 'html',
       ui_config: {
+        rte_components: 'ALL_COMPONENTS',
         hide_complex_extensions: true,
       },
     });

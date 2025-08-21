@@ -2740,7 +2740,7 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
         self.assertEqual(messages[0].sender, 'Site Admin <system@example.com>')
         self.assertEqual(messages[0].to, [self.EDITOR_EMAIL])
-        self.assertFalse(hasattr(messages[0], 'cc'))
+        self.assertIsNone(messages[0].cc)
 
         self.assertEqual(messages[0].bcc, 'testadmin@example.com')
         self.assertEqual(

@@ -52,6 +52,7 @@ describe('Outcome Feedback Editor Component', () => {
     expect(component.OUTCOME_FEEDBACK_SCHEMA).toEqual({
       type: 'html',
       ui_config: {
+        rte_components: 'ALL_COMPONENTS',
         hide_complex_extensions: false,
       },
     });

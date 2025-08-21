@@ -112,7 +112,6 @@ import {
 import {ExpressionSyntaxTreeService} from 'expressions/expression-syntax-tree.service';
 import {ExtensionTagAssemblerService} from 'services/extension-tag-assembler.service';
 import {ExternalSaveService} from 'services/external-save.service';
-import {FeedbackThreadObjectFactory} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {FractionInputRulesService} from 'interactions/FractionInput/directives/fraction-input-rules.service';
 import {FractionInputValidationService} from 'interactions/FractionInput/directives/fraction-input-validation.service';
@@ -135,7 +134,6 @@ import {
   InteractionDetailsCacheService,
   // eslint-disable-next-line max-len
 } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
 import {InteractionRulesRegistryService} from 'services/interaction-rules-registry.service';
 import {InteractionSpecsService} from 'services/interaction-specs.service';
 import {InteractiveMapRulesService} from 'interactions/InteractiveMap/directives/interactive-map-rules.service';
@@ -206,9 +204,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import {PageTitleService} from 'services/page-title.service';
-import {ParamChangeObjectFactory} from 'domain/exploration/ParamChangeObjectFactory';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
-import {ParamSpecObjectFactory} from 'domain/exploration/ParamSpecObjectFactory';
 import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {
@@ -250,7 +245,6 @@ import {SidebarStatusService} from 'services/sidebar-status.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {SkillCreationBackendApiService} from 'domain/skill/skill-creation-backend-api.service';
 import {SkillMasteryBackendApiService} from 'domain/skill/skill-mastery-backend-api.service';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
 import {SkillRightsBackendApiService} from 'domain/skill/skill-rights-backend-api.service';
 import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import {SpeechSynthesisChunkerService} from 'services/speech-synthesis-chunker.service';
@@ -343,6 +337,7 @@ import {MathInteractionsService} from './math-interactions.service';
 import {EntityVoiceoversService} from './entity-voiceovers.services';
 import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
 import {AutomaticVoiceoverHighlightService} from './automatic-voiceover-highlight-service';
+import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 
 interface UpgradedServicesDict {
   // Type 'unknown' is used here because we don't know the exact type of
@@ -408,9 +403,13 @@ export class UpgradedServices {
     );
     upgradedServices['VoiceoverLanguageManagementService'] =
       new VoiceoverLanguageManagementService();
+    upgradedServices['VoiceoverPlayerService'] = new VoiceoverPlayerService(
+      upgradedServices['EntityVoiceoversService']
+    );
     upgradedServices['AutomaticVoiceoverHighlightService'] =
       new AutomaticVoiceoverHighlightService(
-        upgradedServices['LocalStorageService']
+        upgradedServices['LocalStorageService'],
+        upgradedServices['VoiceoverPlayerService']
       );
     upgradedServices['GraphDetailService'] = new GraphDetailService();
     upgradedServices['GraphUtilsService'] = new GraphUtilsService();
@@ -448,8 +447,6 @@ export class UpgradedServices {
       new NumericExpressionInputRulesService();
     upgradedServices['NumericInputRulesService'] =
       new NumericInputRulesService();
-    upgradedServices['ParamChangeObjectFactory'] =
-      new ParamChangeObjectFactory();
     upgradedServices['RatingComputationService'] =
       new RatingComputationService();
     upgradedServices['RatioExpressionInputRulesService'] =
@@ -518,8 +515,6 @@ export class UpgradedServices {
       new ExpressionSyntaxTreeService(
         upgradedServices['ExpressionParserService']
       );
-    upgradedServices['FeedbackThreadObjectFactory'] =
-      new FeedbackThreadObjectFactory();
     upgradedServices['FractionInputRulesService'] =
       new FractionInputRulesService(upgradedServices['UtilsService']);
     upgradedServices['FractionInputValidationService'] =
@@ -594,11 +589,6 @@ export class UpgradedServices {
       upgradedServices['Meta'],
       upgradedServices['Title']
     );
-    upgradedServices['ParamChangesObjectFactory'] =
-      new ParamChangesObjectFactory(
-        upgradedServices['ParamChangeObjectFactory']
-      );
-    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory();
     upgradedServices['PencilCodeEditorValidationService'] =
       new PencilCodeEditorValidationService(
         upgradedServices['BaseInteractionValidationService']
@@ -717,9 +707,7 @@ export class UpgradedServices {
       new NumberWithUnitsValidationService(
         upgradedServices['BaseInteractionValidationService']
       );
-    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
-      upgradedServices['ParamSpecObjectFactory']
-    );
+    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory();
     upgradedServices['PencilCodeEditorRulesService'] =
       new PencilCodeEditorRulesService(
         upgradedServices['NormalizeWhitespacePipe'],
@@ -849,7 +837,6 @@ export class UpgradedServices {
     upgradedServices['CreatorDashboardBackendApiService'] =
       new CreatorDashboardBackendApiService(
         upgradedServices['HttpClient'],
-        upgradedServices['FeedbackThreadObjectFactory'],
         upgradedServices['SuggestionsService'],
         upgradedServices['LoggerService']
       );
@@ -952,9 +939,6 @@ export class UpgradedServices {
       );
     upgradedServices['SkillMasteryBackendApiService'] =
       new SkillMasteryBackendApiService(upgradedServices['HttpClient']);
-    upgradedServices['SkillObjectFactory'] = new SkillObjectFactory(
-      upgradedServices['ValidatorsService']
-    );
     upgradedServices['SkillRightsBackendApiService'] =
       new SkillRightsBackendApiService(
         upgradedServices['HttpClient'],
@@ -1103,21 +1087,13 @@ export class UpgradedServices {
       );
 
     // Topological level: 7.
-    upgradedServices['InteractionObjectFactory'] =
-      new InteractionObjectFactory();
-
-    // Topological level: 8.
     upgradedServices['InteractionAttributesExtractorService'] =
       new InteractionAttributesExtractorService(
-        upgradedServices['HtmlEscaperService'],
-        upgradedServices['InteractionObjectFactory']
+        upgradedServices['HtmlEscaperService']
       );
-    upgradedServices['StateObjectFactory'] = new StateObjectFactory(
-      upgradedServices['InteractionObjectFactory'],
-      upgradedServices['ParamChangesObjectFactory']
-    );
+    upgradedServices['StateObjectFactory'] = new StateObjectFactory();
 
-    // Topological level: 9.
+    // Topological level: 8.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']
     );
@@ -1125,10 +1101,9 @@ export class UpgradedServices {
       upgradedServices['StateObjectFactory']
     );
 
-    // Topological level: 10.
+    // Topological level: 9.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
       upgradedServices['LoggerService'],
-      upgradedServices['ParamChangesObjectFactory'],
       upgradedServices['ParamSpecsObjectFactory'],
       upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']

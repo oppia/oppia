@@ -111,7 +111,9 @@ describe('Solution editor component', () => {
     expect(editabilityService.isEditable).toHaveBeenCalled();
     expect(component.EXPLANATION_FORM_SCHEMA).toEqual({
       type: 'html',
-      ui_config: {},
+      ui_config: {
+        rte_components: 'ALL_COMPONENTS',
+      },
     });
   });
 

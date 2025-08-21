@@ -79,7 +79,9 @@ export class RubricsEditorComponent {
   editableExplanations: Explanation = {};
   EXPLANATION_FORM_SCHEMA: ExplanationFormSchema = {
     type: 'html',
-    ui_config: {},
+    ui_config: {
+      rte_components: 'ALL_COMPONENTS',
+    },
   };
 
   maximumNumberofExplanations: number = 10;

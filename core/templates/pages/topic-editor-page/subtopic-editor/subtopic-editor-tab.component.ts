@@ -82,7 +82,13 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   selectedSkillEditOptionsIndex: number;
   maxCharsInSubtopicTitle!: number;
   MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT!: number;
-  SUBTOPIC_PAGE_SCHEMA: {type: string; ui_config: {rows: number}};
+  SUBTOPIC_PAGE_SCHEMA: {
+    type: string;
+    ui_config: {
+      rte_components: string;
+      rows: number;
+    };
+  };
   generatedUrlPrefix: string;
 
   constructor(
@@ -163,6 +169,11 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
           this.editableUrlFragment
         );
     }
+  }
+
+  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
+      .isEnabled;
   }
 
   updateSubtopicTitle(title: string): void {
@@ -425,11 +436,13 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const rteComponents =
+      this.isEnableWorkedexamplesRteComponentFeatureEnabled()
+        ? 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS'
+        : 'ALL_COMPONENTS';
     this.SUBTOPIC_PAGE_SCHEMA = {
       type: 'html',
-      ui_config: {
-        rows: 100,
-      },
+      ui_config: {rte_components: rteComponents, rows: 100},
     };
     this.htmlData = '';
     this.sections = [];

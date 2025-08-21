@@ -245,5 +245,5 @@ describe('Exploration Editor', function () {
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  });
+  }, 450000);
 });

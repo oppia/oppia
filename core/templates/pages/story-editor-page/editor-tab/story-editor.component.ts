@@ -77,6 +77,7 @@ export class StoryEditorComponent implements OnInit, OnDestroy {
   NOTES_SCHEMA = {
     type: 'html',
     ui_config: {
+      rte_components: 'ALL_COMPONENTS',
       startupFocusEnabled: false,
     },
   };

@@ -51,10 +51,20 @@ export class ExplorationPlayerPageAuthGuard implements CanActivate {
         .validateAccessToExplorationPlayerPage(explorationId, version)
         .then(() => {
           if (this.platformFeatureService.status.NewLessonPlayer.isEnabled) {
-            const tree = this.router.createUrlTree(['/lesson', explorationId], {
-              queryParams: route.queryParams,
-            });
-            this.router.navigateByUrl(tree).then(() => resolve(false));
+            if (state.url.includes('embed')) {
+              this.router.navigate(['/embed/lesson', explorationId], {
+                queryParams: route.queryParams,
+              });
+              resolve(false);
+            } else {
+              const tree = this.router.createUrlTree(
+                ['/lesson', explorationId],
+                {
+                  queryParams: route.queryParams,
+                }
+              );
+              this.router.navigateByUrl(tree).then(() => resolve(false));
+            }
           } else {
             resolve(true);
           }

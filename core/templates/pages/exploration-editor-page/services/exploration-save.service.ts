@@ -47,7 +47,7 @@ import {StatesObjectFactory} from 'domain/exploration/StatesObjectFactory';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {HttpErrorResponse} from '@angular/common/http';
-import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model';
 import {DiffNodeData} from 'components/version-diff-visualization/version-diff-visualization.component';
 
 @Injectable({

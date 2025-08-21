@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+import datetime
+
 from core import utils
 from core.domain import blog_domain
 from core.domain import blog_services
@@ -144,6 +146,9 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             )
 
     def test_blog_post_id_validation_for_blog_post(self) -> None:
+        self.assertIsNone(
+        blog_domain.BlogPost.require_valid_blog_post_id(
+            self.blog_post.id))
         self._assert_valid_blog_post_id_for_blog_post(
             'Blog ID abcdef is invalid', 'abcdef')
 
@@ -169,7 +174,12 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
             'Very long title with more than sixty five chars and therefore an'
             ' invalid blog post title')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_title_with_strict_validation(self) -> None:
+        self._assert_strict_valid_title_for_blog_post(
+            'Title should be a string.', 123) # type: ignore[arg-type]
         self._assert_strict_valid_title_for_blog_post(
             'Title should not be empty', '')
         self._assert_strict_valid_title_for_blog_post(
@@ -246,9 +256,14 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self.blog_post.update_content('<p>Hello</p>')
         self.assertEqual(self.blog_post.content, '<p>Hello</p>')
 
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally
+    # test wrong inputs that we can normally catch by typing.
     def test_tags_validation_for_blog_post(self) -> None:
         """Tests tags validation for blog post."""
-
+        self._assert_valid_tags_for_blog_post(
+            'Expected each tag in \'tags\' to be a string, received: '
+            '\'%s\'' % '123', [123]) # type: ignore[list-item]
         self._assert_valid_tags_for_blog_post(
             'Tags should only contain alphanumeric characters and spaces, '
             'received: \'%s\'' % 'Alpha@', ['Alpha@'])
@@ -344,6 +359,11 @@ class BlogPostDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_thumbnail_update(
             'Expected image filename to be a string, received 123'
         )
+        self.blog_post.thumbnail_filename = None
+        updated_blog_post = blog_services.get_blog_post_by_id(self.blog_post.id)
+        self.blog_post.update_thumbnail_filename(
+            self.blog_post.thumbnail_filename)
+        self.assertEqual(updated_blog_post.thumbnail_filename, None)
 
 
 class BlogPostRightsDomainUnitTests(test_utils.GenericTestBase):
@@ -535,6 +555,32 @@ class BlogPostSummaryUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring):
             self.blog_post_summary.validate()
+
+    def test_to_dict_returns_correct_representation(self) -> None:
+        """Tests that to_dict returns the expected dictionary."""
+        self.blog_post_summary.title = 'Sample Title'
+        self.blog_post_summary.summary = 'Sample summary'
+        self.blog_post_summary.thumbnail_filename = 'sample-thumbnail.svg'
+        self.blog_post_summary.tags = ['tag1', 'tag2']
+        self.blog_post_summary.url_fragment = 'sample-url'
+        self.blog_post_summary.published_on = datetime.datetime.utcnow()
+        self.blog_post_summary.last_updated = datetime.datetime.utcnow()
+
+        expected_dict = {
+            'id': self.blog_post_summary.id,
+            'author_id': self.blog_post_summary.author_id,
+            'title': self.blog_post_summary.title,
+            'summary': self.blog_post_summary.summary,
+            'thumbnail_filename': self.blog_post_summary.thumbnail_filename,
+            'tags': self.blog_post_summary.tags,
+            'url_fragment': self.blog_post_summary.url_fragment,
+            'published_on': utils.convert_naive_datetime_to_string(
+                self.blog_post_summary.published_on),
+            'last_updated': utils.convert_naive_datetime_to_string(
+                self.blog_post_summary.last_updated)
+        }
+
+        self.assertEqual(self.blog_post_summary.to_dict(), expected_dict)
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type
     # the codebase we plan to get rid of the tests that intentionally

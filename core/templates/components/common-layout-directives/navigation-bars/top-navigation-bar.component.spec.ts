@@ -775,47 +775,91 @@ describe('TopNavigationBarComponent', () => {
   );
 
   it('should return proper offset for dropdown', () => {
-    var dummyElement = document.createElement('div');
-    spyOn(document, 'querySelector').and.returnValue(dummyElement);
+    var dummyLearnTab = document.createElement('div');
+    var dummyDropdown = document.createElement('div');
 
-    spyOn(Element.prototype, 'getBoundingClientRect').and.callFake(
-      jasmine
-        .createSpy('getBoundingClientRect')
-        .and.returnValue({top: 1, height: 100, left: 0, width: 200, right: 202})
-    );
+    spyOn(document, 'querySelector').and.callFake((selector: string) => {
+      if (selector === '.dummy') {
+        return dummyLearnTab;
+      } else if (selector === '.dropdown') {
+        return dummyDropdown;
+      }
+      return null;
+    });
 
-    expect(component.getDropdownOffset('.dummy', 0)).toBe(0);
+    spyOn(dummyLearnTab, 'getBoundingClientRect').and.returnValue({
+      top: 1,
+      height: 100,
+      left: 0,
+      width: 200,
+      right: 202,
+    });
+
+    spyOn(window, 'getComputedStyle').and.callFake((el: HTMLElement) => {
+      return {
+        minWidth: '150px',
+      } as CSSStyleDeclaration;
+    });
+    expect(component.getDropdownOffset('.dummy', '.dropdown')).toBe(0);
   });
 
   it('should return proper offset for learn dropdown when element is undefined', () => {
-    spyOn(document, 'querySelector').and.returnValue(null);
-
-    expect(component.getDropdownOffset('.dummy', 0)).toBe(0);
+    spyOn(document, 'querySelector').and.callFake((selector: string) => {
+      return null;
+    });
+    expect(component.getDropdownOffset('.dummy', '.dropdown')).toBe(0);
   });
 
   it('should check if dropdown offsets are updated', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();
     spyOn(component, 'getDropdownOffset')
-      .withArgs('.learn-tab', 688)
+      .withArgs('.learn-tab', '.classroom-enabled')
       .and.returnValue(-10)
-      .withArgs('.learn-tab', 300)
-      .and.returnValue(-10)
-      .withArgs('.donate-tab', 286)
-      .and.returnValue(-10)
-      .withArgs('.get-involved', 574)
+      .withArgs('.get-involved', '.get-involved-dropdown')
       .and.returnValue(-10);
 
     expect(component.learnDropdownOffset).toBe(0);
     expect(component.getInvolvedMenuOffset).toBe(0);
-    expect(component.donateMenuOffset).toBe(0);
 
     component.ngAfterViewChecked();
     tick();
 
     expect(component.learnDropdownOffset).toBe(-10);
     expect(component.getInvolvedMenuOffset).toBe(-10);
-    expect(component.donateMenuOffset).toBe(-10);
   }));
+
+  it('should handle non-numeric minWidth gracefully', () => {
+    const dummyLearnTab = document.createElement('div');
+    const dummyDropdown = document.createElement('div');
+
+    spyOn(document, 'querySelector').and.callFake((selector: string) => {
+      return selector === '.dummy' ? dummyLearnTab : dummyDropdown;
+    });
+
+    spyOn(dummyLearnTab, 'getBoundingClientRect').and.returnValue({
+      top: 1,
+      height: 100,
+      left: 0,
+      width: 200,
+      right: 202,
+    });
+
+    spyOn(window, 'getComputedStyle').and.returnValue({
+      minWidth: 'invalid-px',
+    } as CSSStyleDeclaration);
+
+    const offset = component.getDropdownOffset('.dummy', '.dropdown');
+    expect(offset).toBe(0);
+  });
+
+  it('should handle null bounding rect gracefully', () => {
+    const dummyLearnTab = document.createElement('div');
+    spyOn(document, 'querySelector').and.returnValue(dummyLearnTab);
+    spyOn(dummyLearnTab, 'getBoundingClientRect').and.returnValue(null);
+
+    const offset = component.getDropdownOffset('.dummy', '.dropdown');
+    expect(offset).toBe(0);
+  });
 
   it('should check whether hacky translations are displayed or not', () => {
     spyOn(
@@ -879,5 +923,41 @@ describe('TopNavigationBarComponent', () => {
     component.PAGES_WITH_BACK_STATE = ['/blog/', '/learner-dashboard/'];
     component.ngOnInit();
     expect(component.menuIconIsShown).toBeTrue();
+  });
+
+  it('should set classroomSummariesLength from DOM data attribute', () => {
+    const mockCount = '5';
+    const mockElement = document.createElement('div');
+    mockElement.classList.add('classroom-grid');
+    mockElement.setAttribute('data-classroom-count', mockCount);
+    document.body.appendChild(mockElement);
+
+    component.setClassroomSummariesLength();
+
+    expect(component.classroomSummariesLength).toBe(parseInt(mockCount, 10));
+    document.body.removeChild(mockElement);
+  });
+
+  it('should default classroomSummariesLength to 0 if attribute is missing', () => {
+    const mockElement = document.createElement('div');
+    mockElement.classList.add('classroom-grid');
+    document.body.appendChild(mockElement);
+
+    component.setClassroomSummariesLength();
+
+    expect(component.classroomSummariesLength).toBe(0);
+    document.body.removeChild(mockElement);
+  });
+
+  it('should default classroomSummariesLength to 0 if count is NaN', () => {
+    const mockElement = document.createElement('div');
+    mockElement.classList.add('classroom-grid');
+    mockElement.setAttribute('data-classroom-count', 'invalid');
+    document.body.appendChild(mockElement);
+
+    component.setClassroomSummariesLength();
+
+    expect(component.classroomSummariesLength).toBe(0);
+    document.body.removeChild(mockElement);
   });
 });

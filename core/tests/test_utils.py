@@ -1223,7 +1223,7 @@ class TaskqueueServicesStub:
         payload: Optional[Dict[str, str]] = None,
         scheduled_for: Optional[datetime.datetime] = None,
         task_name: Optional[str] = None
-    ) -> None:
+    ) -> cloud_tasks_emulator.Task:
         """Creates a Task in the corresponding queue that will be executed when
         the 'scheduled_for' countdown expires using the cloud tasks emulator.
 
@@ -1235,12 +1235,15 @@ class TaskqueueServicesStub:
             scheduled_for: datetime|None. The naive datetime object for the time
                 to execute the task. Ignored by this stub.
             task_name: str|None. Optional. The name of the task.
+
+        Returns:
+            Task. The task that was created in the queue.
         """
         # Causes the task to execute immediately by setting the scheduled_for
         # time to 0. If we allow scheduled_for to be non-zero, then tests that
         # rely on the actions made by the task will become unreliable.
         scheduled_for = None
-        self._client.create_task(
+        return self._client.create_task(
             queue_name, url, payload, scheduled_for=scheduled_for,
             task_name=task_name)
 
@@ -3224,10 +3227,14 @@ version: 1
             expect_errors=expect_errors
         )
 
+    # Here we use type Any because the 'payload' argument can accept
+    # different types of dictionaries that need to be sent over to the handler,
+    # those dictionaries can contain any type of values. So, to allow different
+    # dictionaries, we used Any type here.
     def post_task(
         self,
         url: str,
-        payload: Dict[str, str],
+        payload: Dict[str, Any],
         headers: Dict[str, bytes] | Dict[str, str],
         csrf_token: Optional[str] = None,
         expect_errors: bool = False,
@@ -4349,6 +4356,7 @@ class EmailMessageMock:
         subject: str,
         plaintext_body: str,
         html_body: str,
+        cc: Optional[Sequence[str]] = None,
         bcc: Optional[Sequence[str]] = None,
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
@@ -4368,6 +4376,8 @@ class EmailMessageMock:
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
+            cc: list(str)|None. Optional argument. List of cc emails. Emails
+                must be utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails. Emails
                 must be utf-8.
             reply_to: str|None. Optional argument. Reply address formatted like
@@ -4394,6 +4404,7 @@ class EmailMessageMock:
         self.subject = subject
         self.body = plaintext_body
         self.html = html_body
+        self.cc = cc
         self.bcc = bcc
         self.reply_to = reply_to
         self.recipient_variables = recipient_variables
@@ -4433,6 +4444,7 @@ class GenericEmailTestBase(GenericTestBase):
         subject: str,
         plaintext_body: str,
         html_body: str,
+        cc: Optional[List[str]] = None,
         bcc: Optional[List[str]] = None,
         reply_to: Optional[str] = None,
         recipient_variables: Optional[
@@ -4452,6 +4464,8 @@ class GenericEmailTestBase(GenericTestBase):
             plaintext_body: str. The plaintext body of the email. Must be utf-8.
             html_body: str. The HTML body of the email. Must fit in a datastore
                 entity. Must be utf-8.
+            cc: list(str)|None. Optional argument. List of cc emails. Must be
+                utf-8.
             bcc: list(str)|None. Optional argument. List of bcc emails. Must be
                 utf-8.
             reply_to: str|None. Optional Argument. Reply address formatted like
@@ -4476,13 +4490,17 @@ class GenericEmailTestBase(GenericTestBase):
         Returns:
             bool. Whether the emails are sent successfully.
         """
+        cc_emails = None
+        if cc:
+            cc_emails = cc[0] if len(cc) == 1 else cc
         bcc_emails = None
         if bcc:
             bcc_emails = bcc[0] if len(bcc) == 1 else bcc
 
         new_email = EmailMessageMock(
             sender_email, recipient_emails, subject, plaintext_body, html_body,
-            bcc=bcc_emails, reply_to=(reply_to if reply_to else None),
+            cc=cc_emails, bcc=bcc_emails,
+            reply_to=(reply_to if reply_to else None),
             recipient_variables=(
                 recipient_variables if recipient_variables else None),
             attachments=attachments if attachments else None)

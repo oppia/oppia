@@ -37,7 +37,7 @@ import {PlayerPositionService} from 'pages/exploration-player-page/services/play
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {InteractionObjectFactory} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {StateObjectsBackendDict} from 'domain/exploration/StatesObjectFactory';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
 
@@ -194,7 +194,6 @@ describe('Checkpoint celebration modal component', function () {
   let playerPositionService: PlayerPositionService;
   let windowDimensionsService: WindowDimensionsService;
   let urlInterpolationService: UrlInterpolationService;
-  let interactionObjectFactory: InteractionObjectFactory;
   let explorationModeService: ExplorationModeService;
   let dummyStateCard: StateCard;
   let mockResizeEmitter: EventEmitter<void>;
@@ -210,7 +209,6 @@ describe('Checkpoint celebration modal component', function () {
         I18nLanguageCodeService,
         PlayerPositionService,
         UrlInterpolationService,
-        InteractionObjectFactory,
         ExplorationModeService,
         {
           provide: WindowDimensionsService,
@@ -243,7 +241,6 @@ describe('Checkpoint celebration modal component', function () {
     playerPositionService = TestBed.inject(PlayerPositionService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
     explorationModeService = TestBed.inject(ExplorationModeService);
     fixture = TestBed.createComponent(CheckpointCelebrationModalComponent);
     component = fixture.componentInstance;
@@ -252,7 +249,7 @@ describe('Checkpoint celebration modal component', function () {
       'State 2',
       '<p>Content</p>',
       '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict({
+      Interaction.createFromBackendDict({
         id: 'TextInput',
         answer_groups: [
           {

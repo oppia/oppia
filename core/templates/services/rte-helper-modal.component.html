@@ -6,12 +6,17 @@
   <div class="modal-body">
     <form *ngIf="customizationArgsForm" [formGroup]="customizationArgsForm">
       <div *ngFor="let customizationArgSpec of customizationArgSpecs;let ind = index"
-           class="oppia-customization-arg-editor">
+           class="oppia-customization-arg-editor e2e-test-arg-editor-{{ ind }}">
         <strong>{{ customizationArgSpec.description }}</strong>
-        <div class="oppia-customization-arg-editor-inner">
+        <div class="oppia-customization-arg-editor-inner e2e-test-arg-editor-inner-{{ ind }}">
           <schema-based-editor [formControlName]="ind"
                                [schema]="customizationArgSpec.schema">
           </schema-based-editor>
+        </div>
+        <div *ngIf="customizationArgSpec.schema?.type === 'html' && customizationArgsForm.get(ind.toString())?.value &&
+                     isContentLengthExceeded(customizationArgsForm.get(ind.toString())?.value, componentId)"
+             class="oppia-length-validation-error">
+          The content length is too long. Please use at most {{ getCharacterLimit(componentId) }} characters.
         </div>
       </div>
     </form>
@@ -38,7 +43,6 @@
             [disabled]="!customizationArgsForm.valid || isErrorMessageNonempty()">
             Done
     </button>
-
   </div>
 </div>
 <style>

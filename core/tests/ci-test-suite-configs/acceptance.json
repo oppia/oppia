@@ -1,6 +1,14 @@
 {
   "suites": [
     {
+      "name": "logged-in-user/deny-access-to-pages-without-additional-roles",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
+    },
+    {
+      "name": "logged-in-user/save-an-exploration-to-play-later",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/save-an-exploration-to-play-later.spec.ts"
+    },
+    {
       "name": "interested-partner-organization/submit-a-partnership-application",
       "module": "core/tests/puppeteer-acceptance-tests/specs/interested-partner-organization/submit-a-partnership-application.spec.ts"
     },
@@ -65,6 +73,14 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-subtopic-study-guide-with-multiple-sections.spec.ts"
     },
     {
+      "name": "curriculum-admin/create-skill-with-workedexamples",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-skill-with-workedexamples.spec.ts"
+    },
+    {
+      "name": "curriculum-admin/try-to-paste-invalid-components-and-get-error",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/try-to-paste-invalid-components-and-get-error.spec.ts"
+    },
+    {
       "name": "exploration-editor/create-exploration-and-change-basic-settings",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-exploration-and-change-basic-settings.spec.ts"
     },
@@ -109,6 +125,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions.spec.ts"
     },
     {
+      "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/add-concept-card-with-workedexample-to-exploration.spec.ts"
+    },
+    {
       "name": "logged-in-user/view-subtopic-study-guides",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/view-subtopic-study-guides.spec.ts"
     },
@@ -127,10 +147,6 @@
     {
       "name": "logged-in-user/restart-or-continue-exploration-on-revisit",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/restart-or-continue-exploration-on-revisit.spec.ts"
-    },
-    {
-      "name": "logged-in-user/save-an-exploration-to-play-later",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/save-an-exploration-to-play-later.spec.ts"
     },
     {
       "name": "logged-in-user/edit-profile-preferences-and-export-their-account",
@@ -159,10 +175,6 @@
     {
       "name": "logged-in-user/manage-exploration-progress-in-learner-dashboard",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-exploration-progress-in-learner-dashboard.spec.ts"
-    },
-    {
-      "name": "logged-in-user/deny-access-to-pages-without-additional-roles",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/deny-access-to-pages-without-additional-roles.spec.ts"
     },
     {
       "name": "logged-out-user/click-all-buttons-on-about-page",
@@ -391,6 +403,154 @@
     {
       "name": "voiceover-admin/add-voiceover-artist-to-an-exploration",
       "module": "core/tests/puppeteer-acceptance-tests/specs/voiceover-admin/add-voiceover-artist-to-an-exploration.spec.ts"
+    },
+    {
+      "name": "exploration-creator/create-an-exploration-with-all-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/create-an-exploration-with-all-interactions.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-history",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-history.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-settings",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-settings.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-feedback",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-feedback.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-help",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-help.spec.ts"
+    },
+    {
+      "name": "exploration-creator/exploration-navbar-header",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/exploration-navbar-header.spec.ts"
+    },
+    {
+      "name": "exploration-creator/preview-commonly-used-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-commonly-used-interactions.spec.ts"
+    },
+    {
+      "name": "exploration-creator/preview-math-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-math-interactions.spec.ts"
+    },
+    {
+      "name": "exploration-creator/preview-rarely-used-interactions",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-creator/preview-rarely-used-interactions.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/complete-some-practice-question",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-some-practice-question.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/discover-the-website-and-navigate-to-math-classroom",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/discover-the-website-and-navigate-to-math-classroom.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/pick-a-lesson-to-learn",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/pick-a-lesson-to-learn.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/search-for-a-specific-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/search-for-a-specific-exploration.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/visits-the-community-library-and-look-around",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/visits-the-community-library-and-look-around.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/completes-the-exploration-and-decides-what-to-do-next",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/completes-the-exploration-and-decides-what-to-do-next.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/listen-to-voiceovers-of-the-lessons-in-the-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/play-a-complete-community-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/play-a-complete-community-lesson.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/reaches-a-checkpoint-and-saves-their-progress",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/use-the-feedback-and-help-cards",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/use-the-feedback-and-help-cards.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/share-the-lesson-from-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/share-the-lesson-from-the-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/sets-goal-on-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/sets-goal-on-learner-dashboard.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/add-and-remove-exploration-from-play-later",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/add-and-remove-exploration-from-play-later.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/provide-feedback-on-the-lesson-or-report-it-from-the-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/access-pages-that-require-higher-privileges",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/access-pages-that-require-higher-privileges.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/goes-through-the-sign-in-flow",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/goes-through-the-sign-in-flow.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/reaches-a-checkpoint-and-saves-their-progress",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/reaches-a-checkpoint-and-saves-their-progress.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/starts-from-beginning-after-completing-a-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/starts-from-beginning-after-completing-a-lesson.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/access-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/access-the-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/complete-the-embedded-lesson",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-the-embedded-lesson.spec.ts"
+    },
+    {
+      "name": "logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/give-feedback-on-the-lesson-from-the-lesson-player.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/changes-site-language-to-rtl",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/changes-site-language-to-rtl.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/edit-the-profile",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/edit-the-profile.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/export-and-delete-account",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/export-and-delete-account.spec.ts"
+    },
+    {
+      "name": "blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles.spec.ts"
+    },
+    {
+      "name": "blog-post-writer/register-and-update-blog-profile",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/register-and-update-blog-profile.spec.ts"
+    },
+    {
+      "name": "blog-post-writer/create-and-edit-blog-post",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/blog-post-writer/create-and-edit-blog-post.spec.ts"
     }
   ],
   "docker_suites": []

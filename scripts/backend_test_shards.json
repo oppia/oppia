@@ -54,6 +54,8 @@
         "core.platform.secrets.dev_mode_secrets_services_test",
         "scripts.generate_root_files_mapping_test",
         "core.jobs.batch_jobs.delete_voiceover_models_data_job_test",
+        "core.storage.cloud_task.gae_models_test",
+        "core.domain.cloud_task_domain_test",
         "core.jobs.batch_jobs.exploration_voiceover_sync_jobs_test"
     ],
     "2": [

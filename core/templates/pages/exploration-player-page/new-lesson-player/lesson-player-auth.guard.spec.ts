@@ -58,6 +58,17 @@ class MockLocation {
   replaceState(_url: string): void {}
 }
 
+const createMockRoute = (explorationId: string): ActivatedRouteSnapshot => {
+  const route = new ActivatedRouteSnapshot();
+  Object.defineProperty(route, 'paramMap', {
+    get: () => convertToParamMap({exploration_id: explorationId}),
+  });
+  Object.defineProperty(route, 'queryParams', {
+    get: () => ({}),
+  });
+  return route;
+};
+
 describe('LessonPlayerPageAuthGuard', () => {
   let guard: LessonPlayerPageAuthGuard;
   let platformFeatureService: PlatformFeatureService;
@@ -93,12 +104,11 @@ describe('LessonPlayerPageAuthGuard', () => {
 
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
 
-    const route = {
-      paramMap: convertToParamMap({exploration_id: '123'}),
-      queryParams: {},
-    } as unknown as ActivatedRouteSnapshot;
-
-    const state = {url: '/explore/123'} as RouterStateSnapshot;
+    const route = createMockRoute('123');
+    const state: RouterStateSnapshot = {
+      url: '/explore/123',
+      root: new ActivatedRouteSnapshot(),
+    };
 
     guard.canActivate(route, state).then(result => {
       expect(result).toBeFalse();
@@ -115,12 +125,11 @@ describe('LessonPlayerPageAuthGuard', () => {
       'validateAccessToExplorationPlayerPage'
     ).and.returnValue(Promise.resolve());
 
-    const route = {
-      paramMap: convertToParamMap({exploration_id: 'exp123'}),
-      queryParams: {},
-    } as unknown as ActivatedRouteSnapshot;
-
-    const state = {url: '/explore/exp123'} as RouterStateSnapshot;
+    const route = createMockRoute('exp123');
+    const state: RouterStateSnapshot = {
+      url: '/explore/exp123',
+      root: new ActivatedRouteSnapshot(),
+    };
 
     guard.canActivate(route, state).then(result => {
       expect(result).toBeTrue();
@@ -133,15 +142,15 @@ describe('LessonPlayerPageAuthGuard', () => {
       backendApiService,
       'validateAccessToExplorationPlayerPage'
     ).and.returnValue(Promise.reject({status: 403}));
+
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
     const replaceStateSpy = spyOn(location, 'replaceState');
 
-    const route = {
-      paramMap: convertToParamMap({exploration_id: 'exp123'}),
-      queryParams: {},
-    } as unknown as ActivatedRouteSnapshot;
-
-    const state = {url: '/embed/explore/exp123'} as RouterStateSnapshot;
+    const route = createMockRoute('exp123');
+    const state: RouterStateSnapshot = {
+      url: '/embed/explore/exp123',
+      root: new ActivatedRouteSnapshot(),
+    };
 
     guard.canActivate(route, state).then(result => {
       expect(result).toBeFalse();
@@ -158,15 +167,15 @@ describe('LessonPlayerPageAuthGuard', () => {
       backendApiService,
       'validateAccessToExplorationPlayerPage'
     ).and.returnValue(Promise.reject({status: 403}));
+
     const navigateSpy = spyOn(router, 'navigate').and.callThrough();
     const replaceStateSpy = spyOn(location, 'replaceState');
 
-    const route = {
-      paramMap: convertToParamMap({exploration_id: 'exp123'}),
-      queryParams: {},
-    } as unknown as ActivatedRouteSnapshot;
-
-    const state = {url: '/explore/exp123'} as RouterStateSnapshot;
+    const route = createMockRoute('exp123');
+    const state: RouterStateSnapshot = {
+      url: '/explore/exp123',
+      root: new ActivatedRouteSnapshot(),
+    };
 
     guard.canActivate(route, state).then(result => {
       expect(result).toBeFalse();

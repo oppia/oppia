@@ -47,6 +47,7 @@ export class OutcomeFeedbackEditorComponent implements OnInit {
     this.OUTCOME_FEEDBACK_SCHEMA = {
       type: 'html',
       ui_config: {
+        rte_components: 'ALL_COMPONENTS',
         hide_complex_extensions:
           this.pageContextService.getEntityType() === 'question',
       },

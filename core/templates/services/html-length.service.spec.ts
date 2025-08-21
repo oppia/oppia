@@ -246,18 +246,18 @@ describe('Html Length Service', () => {
 
       const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
       /*
-      The 'collapsible' and 'tab' tags each add a count of 1000 words,
-      totaling 2000 words. The phrases "Demo hint just to check" and "done!"
+      The 'collapsible' and 'tab' tags each add a count of 0 characters,
+      The phrases "Demo hint just to check" and "done!"
       contribute 5 and 1 words respectively, adding up to 6 words. The 'math'
       tag is counted as 1 word. "Code image for testing" is the alt text for
       an image, contributing 4 words, and the image itself counts as 10 words.
       The 'skillreview' tag contains "Concept card" and the 'link' tag
       contains "oppia link", each contributing 2 words. Therefore, the total
-      word count is 2000 (tag counts) + 6 (paragraphs) + 1 ('math' tag) +
+      word count is 0 (tag counts) + 6 (paragraphs) + 1 ('math' tag) +
       4 (alt text) + 10 (image count) + 2 ('skillreview' tag) +
-      2 ('link' tag) = 2025 words.
+      2 ('link' tag) = 25 words.
     */
-      expect(result).toBe(2025);
+      expect(result).toBe(25);
     }
   );
 
@@ -285,12 +285,12 @@ describe('Html Length Service', () => {
 
       const result = htmlLengthService.computeHtmlLength(htmlString, 'word');
       /*
-      The 'collapsible' and 'tab' tags each add a count of 1000 words,
-      totaling 2000 words. "Demo hint just to check" is a paragraph with
-      5 words. Therefore, the total word count is 5 (paragraph) + 2000
-      (tag counts) = 2005 words.
+      The 'collapsible' and 'tab' tags each add a count of 0 characters.
+      "Demo hint just to check" is a paragraph with
+      5 words. Therefore, the total word count is 5 (paragraph) + 0
+      (tag counts) = 5 characters.
     */
-      expect(result).toBe(2005);
+      expect(result).toBe(5);
     }
   );
 
@@ -522,12 +522,12 @@ describe('Html Length Service', () => {
       );
 
       /*
-      The 'collapsible' and 'tab' tags each add a count of 1000 characters,
-      totaling 2000 characters. "Demo hint just to check" is a paragraph with
+      The 'collapsible' and 'tab' tags each add a count of 0 characters,
+      "Demo hint just to check" is a paragraph with
       23 characters. Therefore, the total character count is 23 (paragraph)
-      + 2000 (tag counts) = 2023 characters.
+      + 0 (tag counts) = 23 characters.
     */
-      expect(result).toBe(2023);
+      expect(result).toBe(23);
     }
   );
 
@@ -614,8 +614,8 @@ describe('Html Length Service', () => {
       );
 
       /*
-      The 'collapsible' and 'tab' tags each add a count of 1000 characters,
-      totaling 2000 characters. "Demo hint just to check" and "done!" are
+      The 'collapsible' and 'tab' tags each add a count of 0 characters.
+      "Demo hint just to check" and "done!" are
       paragraphs with 23 and 5 characters respectively, adding up
       to 28 characters. The 'math' tag is counted as 1 character.
       "Code image for testing" is the alt text for an image, contributing
@@ -623,11 +623,11 @@ describe('Html Length Service', () => {
       The 'skillreview' tag contains "Concept card" and
       the 'link' tag contains "oppia link", each contributing
       12 and 10 characters respectively. Therefore, the total character
-      count is 2000 (tag counts) + 28 (paragraphs) + 1 ('math' tag)
+      count is 0 (tag counts) + 28 (paragraphs) + 1 ('math' tag)
       + 22 (alt text) + 10 (image count) +
-      12 ('skillreview' tag) + 10 ('link' tag) = 2083 characters.
+      12 ('skillreview' tag) + 10 ('link' tag) = 83 characters.
     */
-      expect(result).toBe(2083);
+      expect(result).toBe(83);
     }
   );
 

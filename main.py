@@ -1206,7 +1206,11 @@ URLS = [
     get_redirect_route(
         '/learner_groups_feature_status_handler',
         learner_group.LearnerGroupsFeatureStatusHandler),
-    get_redirect_route('/android_data', android.AndroidActivityHandler)
+    get_redirect_route('/android_data', android.AndroidActivityHandler),
+    get_redirect_route(
+        '/automatic_voiceover_regeneration_record',
+        voiceover.AutomaticVoiceoverRegenerationRecordHandler
+    )
 ]
 
 # Adding redirects for topic landing pages.

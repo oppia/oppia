@@ -602,4 +602,25 @@ describe('Subtopic viewer page', function () {
       imagePath
     );
   });
+
+  it('should modify next subtopic title based on length', () => {
+    const longTitle =
+      'This is a very long subtopic title that exceeds twenty characters';
+    component.nextSubtopic = {
+      getTitle: () => longTitle,
+      getUrlFragment: () => 'test-fragment',
+    };
+    const result1 = component.checkNextSubtopicTitleLengthAndModify();
+    expect(result1).toBe('This is a very lo...');
+    expect(result1.length).toBe(20);
+
+    const shortTitle = 'Short title';
+    component.nextSubtopic = {
+      getTitle: () => shortTitle,
+      getUrlFragment: () => 'test-fragment',
+    };
+    const result2 = component.checkNextSubtopicTitleLengthAndModify();
+    expect(result2).toBe(shortTitle);
+    expect(result2).toBe('Short title');
+  });
 });

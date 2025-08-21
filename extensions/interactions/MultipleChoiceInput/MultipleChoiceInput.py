@@ -66,6 +66,7 @@ class MultipleChoiceInput(base.BaseInteraction):
                     'id': 'has_subtitled_html_non_empty'
                 }],
                 'replacement_ui_config': {
+                    'rte_components': 'ALL_COMPONENTS',
                     'html': {
                         'hide_complex_extensions': True,
                         'placeholder': (

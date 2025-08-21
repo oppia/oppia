@@ -62,12 +62,12 @@
         <i class="material-icons icon-study-guide-menu">exit_to_app</i>
         {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_STUDY_GUIDE_MENU_BUTTON' | translate }}
       </button>
-      <button (click)="openStudyGuide()" *ngIf="nextSubtopic" class="btn btn-next-actions e2e-test-go-to-next-study-guide-button btn-next-study-guide">
+      <button (click)="openStudyGuide()" *ngIf="nextSubtopic" [title]="nextSubtopic.getTitle()" class="btn btn-next-actions e2e-test-go-to-next-study-guide-button btn-next-study-guide">
         <p class="text-next-study-guide-fixed">
           <i class="material-icons icon-next-study-guide">arrow_forward</i>
           {{ 'I18N_SUBTOPIC_VIEWER_GO_TO_NEXT_STUDY_GUIDE_BUTTON' | translate }}
         </p>
-        <span class="revision-subtitle">"{{ nextSubtopic.getTitle() }}"</span>
+        <span class="revision-subtitle">"{{ checkNextSubtopicTitleLengthAndModify() }}"</span>
       </button>
     </div>
   </div>

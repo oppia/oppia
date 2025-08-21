@@ -106,6 +106,12 @@ const navbarGetInvolvedTabContactUsButton =
 const navbarDonateDesktopButton = 'a.e2e-test-navbar-donate-desktop-button';
 const navbarDonateMobileButton = 'a.e2e-test-navbar-donate-mobile-button';
 
+const navbarLearnDropdownContainerSelector =
+  '.e2e-test-classroom-oppia-list-item';
+const navbarAboutDropdownConatinaerSelector = '.e2e-test-about-oppia-list-item';
+const navbarGetInvolvedDropdownContainerSelector =
+  '.e2e-test-navbar-get-involved-menu';
+
 const footerAboutLink = 'a.e2e-test-footer-about-link';
 const footerBlogLink = 'a.e2e-test-footer-blog-link';
 const footerForumlink = 'a.e2e-test-footer-forum-link';
@@ -275,6 +281,7 @@ const partnerLearnMoreMobileButtonInAboutPage =
   '.e2e-test-about-page-partner-learn-more-mobile-button';
 const impactReportButtonInAboutPage =
   '.e2e-test-about-page-impact-report-button';
+const profileContainerSelector = '.e2e-test-profile-container';
 
 const subscribeButton = 'button.oppia-subscription-button';
 const unsubscribeLabel = '.e2e-test-unsubscribe-label';
@@ -294,6 +301,8 @@ const errorPageHeading = '.e2e-test-error-page-heading';
 const classroomTileContainer = '.oppia-classroom-tile-container';
 
 const submitResponseToInteractionInput = 'oppia-interaction-display input';
+const submitResponseToInteractionTextArea =
+  'oppia-interaction-display textarea';
 const nextCardButton = '.e2e-test-next-card-button';
 const nextCardArrowButton = '.e2e-test-next-button';
 const submitAnswerButton = '.e2e-test-submit-answer-button';
@@ -364,6 +373,9 @@ const viewsContainerSelector = '.e2e-test-info-card-views';
 const lastUpdatedInfoSelector = '.e2e-test-info-card-last-updated';
 const tagsContainerSelector = '.exploration-tags span';
 const ratingContainerSelector = '.e2e-test-info-card-rating span:nth-child(2)';
+const saveProgressCloseButtonSelector = '.e2e-test-save-progress-close-button';
+const recommendedNextChapterSelector =
+  '.e2e-test-recommended-next-chapter-button';
 
 const topicDescriptionSelector = '.e2e-test-topic-description';
 const storyViewerContainerSelector = '.e2e-test-story-viewer-container';
@@ -405,6 +417,25 @@ const blogPostTitleContainerSelector =
   '.e2e-test-blog-post-page-title-container';
 const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
+const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
+
+// Common Selectors.
+const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalBodySelector = '.e2e-test-modal-body';
+const returnToStoryFromLastStateSelector =
+  '.e2e-test-end-chapter-return-to-story';
+const contributorsContainerSelector = '.e2e-test-contributors-container';
+const contributorIconPrefix = `${contributorsContainerSelector} .contributor-`;
+
+// Common Selectors.
+const devModeLabelSelector = '.e2e-test-dev-mode';
+
+// Home Page Selectors.
+const homePageHeadingSelector =
+  '.e2e-test-splash-page .e2e-test-home-page-title';
+const browseLessonButtonSelector =
+  '.e2e-test-splash-page .e2e-test-explore-lessons-btn';
+const audioSliderSelector = 'oppia-audio-slider mat-slider';
 
 // Topic Viewer Page Selectors.
 const topicPageRevisionTabContentSelector =
@@ -414,6 +445,29 @@ const topicPageRevisionTabContentSelector =
 const learnerViewCardSelector = '.oppia-learner-view-card-content';
 const signInBoxInSaveProressModalSelector = '.sign-in-box';
 const loginButtonSelector = '.e2e-mobile-test-login';
+
+const youtubePlayerSelector = '.e2e-test-youtube-player';
+const collapsibleRTEHeaderSelector = '.e2e-test-collapsible-heading';
+const collapsibleRTEContentSelector = '.e2e-test-collapsible-content';
+
+const returnToLibraryButtonSelector = '.e2e-test-exploration-return-to-library';
+const conceptCardLinkSelector = '.e2e-test-concept-card-link';
+const conceptCardViewerSelector = '.e2e-test-concept-card-viewer';
+const nonInteractiveTabsHeaderSelector =
+  '.e2e-test-non-interactive-tabs-headers';
+
+const audioExpandButtonInLPSelector = '.e2e-test-lp-audio-expand-button';
+const audioForwardButtonSelector = '.e2e-test-audio-forward-button';
+const audioBackwardButtonSelector = '.e2e-test-audio-backward-button';
+
+const fractionInputSelector = '.e2e-test-fraction-input';
+const wrongInputErrorContainerSelector = '.oppia-form-error-container';
+const communityLibraryLinkInNavbarSelector =
+  '.e2e-test-topnb-go-to-community-library-link';
+const communityLibraryContainerSelector = '.e2e-test-library-container';
+const communityLibraryLinkInNavMenuSelector = '.e2e-mobile-test-library-link';
+const contributorIconInLessonInfoSelctor =
+  '.e2e-test-lesson-info-contributor-profile';
 
 // Splash page.
 const getAndroidAppButtonSelector = '.e2e-test-splash-android-app-button';
@@ -467,6 +521,64 @@ const contactUsSubheadingSelector = '.e2e-test-contact-subheading';
 const contactUsContentCard = '.e2e-test-contact-page-content';
 const contactUsContentCardHeadingSelector = `${contactUsContentCard} h2`;
 
+// Community Library.
+const communityLibraryHeading = '.e2e-test-library-main-header';
+const communityLibraryGroupHeader = '.e2e-test-library-group-header';
+
+// Other Selectors.
+const closeButtonSelector = '.e2e-test-close-button';
+const backToClassroomBreadcrumbSelectorMobile =
+  '.e2e-test-mobile-breadcrumbs-classroom';
+
+// Learn Page (/learn).
+const classroomHeadingSelector = '.e2e-test-classroom-heading';
+const classroomTileContainerSelector = '.e2e-test-classroom-tile';
+const classroomNameSelector = '.e2e-test-classroom-name';
+
+// Classroom Page.
+const classroomContentHeadingSelector = '.e2e-test-classroom-content-heading';
+const diagnosticTestBoxSelector = '.e2e-test-diagnostic-test-box';
+const diagnosticTestHeadingSelector = `${diagnosticTestBoxSelector} h4`;
+const diagnosticTestButtonSelector = `${diagnosticTestBoxSelector} a`;
+
+const startHereButtonSelector = '.e2e-test-start-here-button';
+const takeQuizButtonSelector = '.e2e-test-take-diagnostic-test';
+
+const startDiagnosticTestButtonSelector = '.e2e-test-start-diagnostic-test';
+
+// Diagnostic Test Player.
+const diagnosticTestPlayerSelector = 'oppia-dignostic-test-player';
+const skipQuestionButton = '.e2e-test-skip-question-button';
+const currentProgessSelector = '.e2e-test-progress-container';
+
+// Topic Page.
+const tabTitleInTopicPageSelector = '.e2e-test-topic-page-tab-title';
+const practiceTabButtonSelector = '.e2e-test-practice-tab-link';
+const lessonsTabButtonSelector = '.e2e-test-lesson-tab-link';
+const revisionTabButtonSelector = '.e2e-test-study-tab-link';
+const practiceTabContainerSelector = '.e2e-test-practice-tab-container';
+const lessonsTabContainerSelector = '.e2e-test-lessons-tab-container';
+const revisionTabSelector = 'subtopics-list';
+
+const subtopicListItemInPracticeTabSelector = '.e2e-test-subtopic-item';
+const startPracticeButtonSelector = '.e2e-test-practice-start-button';
+const practiceSessionContainerSelector = 'practice-session-page';
+
+const backToClassroomLinkSelector = '.e2e-test-classroom-name';
+
+const storyTitleSelector = '.e2e-test-story-title';
+const lessonInfoModalHeaderSelector = '.e2e-test-lesson-info-modal-header';
+const progressReminderModalHeaderSelector =
+  '.e2e-test-progress-reminder-continue-text';
+const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
+const profilePictureSelector = '.e2e-test-profile-dropdown';
+const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
+const floatFormInput = '.e2e-test-float-form-input';
+const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
+const collapseWorkedExampleButton = '.e2e-test-collapse-workedexample';
+const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
+const toastMessageSelector = '.e2e-test-toast-message';
+const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
  * According to this specification, the keys for the numbers 0 through 9 are named 'Digit0' through 'Digit9'.
@@ -501,9 +613,10 @@ type KeyInput =
 export class LoggedOutUser extends BaseUser {
   /**
    * Function to navigate to the home page.
+   * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
    */
-  async navigateToHome(): Promise<void> {
-    await this.goto(homeUrl);
+  async navigateToHome(verifyURL: boolean = true): Promise<void> {
+    await this.goto(homeUrl, verifyURL);
   }
 
   /**
@@ -566,6 +679,35 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Navigates to the community library page using the navbar.
+   */
+  async navigateToCommunityLibraryOnNavbar(): Promise<void> {
+    // Open navigation menu for mobile view.
+    await this.openNavMenuInMobile();
+
+    // Click on "Learn" if in desktop view.
+    if (!this.isViewportAtMobileWidth()) {
+      if ((await this.isElementVisible(navbarLearnTab)) !== true) {
+        throw new Error('Learn tab is not visible in the navbar.');
+      }
+      await this.clickOn(navbarLearnTab);
+    }
+
+    // Click on Community Library link.
+    const selector = this.isViewportAtMobileWidth()
+      ? communityLibraryLinkInNavMenuSelector
+      : communityLibraryLinkInNavbarSelector;
+    await this.clickOn(selector);
+
+    // Verify navigated to Community Library.
+    if (
+      (await this.isElementVisible(communityLibraryContainerSelector)) !== true
+    ) {
+      throw new Error('Community Library container is not visible.');
+    }
+  }
+
+  /**
    * Function to navigate to the Parents and Teachers page.
    */
   async navigateToTeachPage(): Promise<void> {
@@ -605,6 +747,11 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToClassroomPage(urlFragment: string): Promise<void> {
     await this.goto(`${classroomsPageUrl}/${urlFragment}`);
+
+    await this.waitForPageToFullyLoad();
+    showMessage(
+      `Navigated to classroom page: ${classroomsPageUrl}/${urlFragment}`
+    );
   }
 
   /**
@@ -669,6 +816,14 @@ export class LoggedOutUser extends BaseUser {
     if (!allPostsHaveTags) {
       throw new Error('Not all blog posts have tags');
     }
+  }
+
+  /**
+   * Return to Learner Dashboard from exploration completion card.
+   */
+  async returnToLibraryFromExplorationCompletion(): Promise<void> {
+    await this.expectElementToBeVisible(returnToLibraryButtonSelector);
+    await this.clickOn(returnToLibraryButtonSelector);
   }
 
   /**
@@ -840,7 +995,7 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.clickAndWaitForNavigation(button);
 
-    expect(this.page.url()).toBe(expectedDestinationPageUrl);
+    await this.expectPageURLToContain(expectedDestinationPageUrl);
   }
 
   /**
@@ -990,6 +1145,24 @@ export class LoggedOutUser extends BaseUser {
     if (url !== expectedUrl) {
       throw new Error(`Actual URL differs from expected. Found: ${url}.`);
     }
+  }
+
+  /**
+   * Open the navigation menu in mobile view.
+   */
+  async openNavMenuInMobile(): Promise<void> {
+    if (!this.isViewportAtMobileWidth()) {
+      showMessage('Skipped: Open Navigation Menu (mobile).');
+      return;
+    }
+    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
+      visible: true,
+    });
+    await this.clickOn(mobileNavbarOpenSidebarButton);
+    await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
+      visible: true,
+    });
+    showMessage('Opened Navigation Menu (mobile).');
   }
 
   /**
@@ -2065,6 +2238,17 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Click on create account button in save progress modal
+   */
+  async clickOnCreateAccountButtonInSaveProgressModal(): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector);
+    await this.waitForElementToStabilize(lessonInfoSignUpButtonSelector);
+    await this.clickOn(lessonInfoSignUpButtonSelector);
+
+    await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector, false);
+  }
+
+  /**
    * Function to change the site language to the given language code.
    * @param langCode - The language code to change the site language to. Example: 'pt-br', 'en'
    */
@@ -2081,12 +2265,50 @@ export class LoggedOutUser extends BaseUser {
     }
     await this.page.waitForSelector(languageDropdown);
     const languageDropdownElement = await this.page.$(languageDropdown);
-    if (languageDropdownElement) {
-      await languageDropdownElement.click();
+    if (!languageDropdownElement) {
+      throw new Error('Language dropdown element not found');
     }
+    const initialLanguage = await this.page.$eval(
+      languageDropdown,
+      el => el.textContent
+    );
+    await languageDropdownElement.click();
     await this.clickOn(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
+
+    await this.page.waitForFunction(
+      (selector: string, textContent: string) => {
+        const element = document.querySelector(selector);
+        return element && element.textContent !== textContent;
+      },
+      {},
+      languageOption,
+      initialLanguage
+    );
+  }
+
+  /**
+   * Checks if the the language dropdown is available or not.
+   * @param status - Status of language dropdown.
+   */
+  async expectLanguageDropdownToBePresent(
+    status: boolean = true
+  ): Promise<void> {
+    const languageDropdownElement = await this.page.$(languageDropdown);
+    if (status && !languageDropdownElement) {
+      throw new Error(
+        'The language dropdown was expected to be present on the page, but it is not.'
+      );
+    } else if (!status && languageDropdownElement) {
+      throw new Error(
+        'The language dropdown was expected to be absent on the page, but it is present.'
+      );
+    } else {
+      showMessage(
+        `The language dropdown is ${status ? 'present' : 'not present'} on the page.`
+      );
+    }
   }
 
   /**
@@ -2095,6 +2317,9 @@ export class LoggedOutUser extends BaseUser {
    * The button is in the first section of the page.
    */
   async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
+    await this.waitForElementToStabilize(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
     await this.clickLinkButtonToNewTab(
       partnerWithUsButtonAtTheTopOfPartnershipsPage,
       'Partner With Us button at the bottom of the Partnerships page',
@@ -2913,13 +3138,64 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Clicks on continue button in continue button interaction.
+   */
+  async clickOnContinueButtonInInteractionCard(): Promise<void> {
+    await this.isElementVisible(nextCardButton);
+    await this.clickOn(nextCardButton);
+
+    await this.isElementVisible(nextCardButton, false);
+  }
+
+  /**
    * Function to submit an answer to a form input field.
    * @param {string} answer - The answer to submit.
    */
   async submitAnswer(answer: string): Promise<void> {
+    // Allow input elements to be rendered and ready for interaction.
+    await this.page.waitForTimeout(1000);
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
+    await this.clearAllTextFrom(submitResponseToInteractionInput);
     await this.type(submitResponseToInteractionInput, answer);
     await this.clickOn(submitAnswerButton);
+  }
+
+  async submitAnswerInTextArea(answer: string): Promise<void> {
+    await this.waitForElementToBeClickable(submitResponseToInteractionTextArea);
+    await this.type(submitResponseToInteractionTextArea, answer);
+    await this.clickOn(submitAnswerButton);
+  }
+
+  /**
+   * Checks if value of input is equal to the given value.
+   * @param {string} value - The value to check.
+   */
+  async expectAnswerInputValueToBe(value: string): Promise<void> {
+    await this.expectInputValueToBe(floatFormInput, value);
+  }
+
+  /**
+   * Checks if submit button is visible.
+   */
+  async expectSubmitButtonToBe(
+    state: 'Visible' | 'Hidden' | 'Disabled'
+  ): Promise<void> {
+    if (state === 'Disabled') {
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const submitButton: HTMLButtonElement | null =
+            document.querySelector(selector);
+          return submitButton?.disabled;
+        },
+        {},
+        submitAnswerButton
+      );
+    } else {
+      await this.expectElementToBeVisible(
+        submitAnswerButton,
+        state === 'Visible'
+      );
+    }
   }
 
   /**
@@ -2930,6 +3206,7 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForElementToBeClickable(newsletterEmailInputField);
     await this.type(newsletterEmailInputField, email);
     await this.clickOn(newsletterSubscribeButton);
+    await this.expectElementToBeVisible(newsletterSubscriptionThanksMessage);
   }
 
   /**
@@ -3003,8 +3280,14 @@ export class LoggedOutUser extends BaseUser {
    * Function to verify that the user is on the login page.
    */
   async expectToBeOnLoginPage(): Promise<void> {
-    const currentUrl = new URL(this.page.url());
-    expect(currentUrl.pathname.startsWith('/login')).toBe(true);
+    await this.page.waitForFunction(
+      (url: string) => {
+        const currentURL = window.location.href;
+        return currentURL.includes(url);
+      },
+      {},
+      testConstants.URLs.Login
+    );
   }
 
   /**
@@ -3128,6 +3411,17 @@ export class LoggedOutUser extends BaseUser {
 
     await this.clickOn(searchInputSelector);
     await this.page.keyboard.press('Enter');
+
+    await this.page.waitForFunction(
+      (categoryNames: string[]) => {
+        // Check if URL contains all the categories. Added %22 to remove false positives.
+        return categoryNames.every(category =>
+          window.location.href.includes(`%22${category}%22`)
+        );
+      },
+      {},
+      categoryNames
+    );
   }
 
   /**
@@ -3185,48 +3479,53 @@ export class LoggedOutUser extends BaseUser {
 
     await this.clickOn(searchInputSelector);
     await this.page.keyboard.press('Enter');
+
+    const buttonTextContent =
+      languageNames.length === 1
+        ? languageNames[0]
+        : `${languageNames.length} Languages`;
+    await this.expectTextContentToBe(
+      languageFilterDropdownToggler,
+      buttonTextContent
+    );
   }
 
   /**
    * Checks if the search results contain a specific result.
    * @param {string[]} searchResultsExpected - The search result to check for.
+   * @param {boolean} present - Whether the search results should be present or not.
    */
   async expectSearchResultsToContain(
-    searchResultsExpected: string[]
+    searchResultsExpected: string[],
+    present: boolean = true
   ): Promise<void> {
-    try {
-      if (searchResultsExpected.length === 0) {
-        await this.waitForPageToFullyLoad();
-        const searchResultsElements = await this.page.$$(
-          lessonCardTitleSelector
-        );
-        if (searchResultsElements.length !== 0) {
-          throw new Error('No search results expected, but some were found.');
-        }
-      } else {
-        await this.page.waitForSelector(lessonCardTitleSelector);
-        const searchResultsElements = await this.page.$$(
-          lessonCardTitleSelector
-        );
-        const searchResults = await Promise.all(
-          searchResultsElements.map(result =>
-            this.page.evaluate(el => el.textContent.trim(), result)
-          )
-        );
+    const selector = this.isViewportAtMobileWidth()
+      ? explorationTitleSelector
+      : lessonCardTitleSelector;
+    await this.waitForPageToFullyLoad();
+    if (!present && !(await this.isElementVisible(selector))) {
+      return;
+    }
+    await this.page.waitForSelector(selector);
+    const searchResultsElements = await this.page.$$(selector);
+    const searchResults = await Promise.all(
+      searchResultsElements.map(result =>
+        this.page.evaluate(el => el.textContent.trim(), result)
+      )
+    );
 
-        for (const resultExpected of searchResultsExpected) {
-          if (!searchResults.includes(resultExpected)) {
-            throw new Error(
-              `Search result "${resultExpected}" not found in search results.`
-            );
-          }
-        }
-        showMessage('All expected search results found in search results.');
+    for (const searchResultExpected of searchResultsExpected) {
+      if (searchResults.includes(searchResultExpected) === present) {
+        showMessage(
+          `Success: Search result "${searchResultExpected}" is ${present ? 'present' : 'not present'}.`
+        );
+      } else {
+        throw new Error(
+          `Expected search result "${searchResultExpected}" to be ${
+            present ? 'present' : 'not present'
+          }, but it was ${present ? 'not ' : ''}found.\nFound search results: ${searchResults}`
+        );
       }
-    } catch (error) {
-      const newError = new Error(`Failed to check search results: ${error}`);
-      newError.stack = error.stack;
-      throw newError;
     }
   }
 
@@ -3369,6 +3668,9 @@ export class LoggedOutUser extends BaseUser {
             this.waitForElementToBeClickable(name),
             name.click(),
           ]);
+
+          await this.expectElementToBeVisible(topicViewerContainerSelector);
+          showMessage(`Topic ${topicName} is opened successfully.`);
           return;
         }
       }
@@ -3379,6 +3681,156 @@ export class LoggedOutUser extends BaseUser {
       newError.stack = error.stack;
       throw newError;
     }
+  }
+
+  async expectTopicToContainStories(storyNames: string[]): Promise<void> {
+    const selector = this.isViewportAtMobileWidth()
+      ? mobileStoryTitleSelector
+      : desktopStoryTitleSelector;
+
+    const storyElements = await this.getAllElementsBySelector(selector);
+    const storyNamesInPage =
+      await this.getTextContentsFromElements(storyElements);
+
+    for (const storyName of storyNames) {
+      expect(storyNamesInPage).toContain(storyName);
+    }
+  }
+
+  /**
+   * Navigates to the learn tab in the topic page.
+   */
+  async navigateToLessonsTabInTopic(): Promise<void> {
+    await this.expectElementToBeVisible(lessonsTabButtonSelector);
+    await this.clickOn(lessonsTabButtonSelector);
+
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(lessonsTabContainerSelector);
+  }
+
+  /**
+   * Navigates to the practice tab in the topic page.
+   */
+  async navigateToPracticeTabInTopic(): Promise<void> {
+    await this.expectElementToBeVisible(practiceTabButtonSelector);
+    await this.clickOn(practiceTabButtonSelector);
+
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(practiceTabContainerSelector);
+
+    showMessage('Navigated to practice tab in topic page.');
+  }
+
+  /**
+   * Navigates to the revision tab in the topic page.
+   */
+  async navigateToRevisionTabInTopic(): Promise<void> {
+    await this.isElementVisible(revisionTabButtonSelector);
+    await this.clickOn(revisionTabButtonSelector);
+
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(revisionTabSelector);
+  }
+
+  /**
+   * Navigates back to the classroom from the topic page.
+   */
+  async navigateBackToClassroomFromTopicPage(): Promise<void> {
+    const selector = this.isViewportAtMobileWidth()
+      ? backToClassroomBreadcrumbSelectorMobile
+      : backToClassroomLinkSelector;
+    await this.isElementVisible(selector);
+    await this.clickOn(selector);
+
+    await this.isElementVisible(selector, false);
+  }
+
+  async expectToBeInClassroomPage(classroomURLFragment: string): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => {
+        return window.location.href === url;
+      },
+      {},
+      `${testConstants.URLs.ClassroomsPage}/${classroomURLFragment}`
+    );
+  }
+
+  /**
+   * Clicks on the start here button in the classroom page.
+   */
+  async clickOnStartHereButtonInClassroomPage(): Promise<void> {
+    await this.isElementVisible(startHereButtonSelector);
+
+    await this.clickAndWaitForNavigation(startHereButtonSelector);
+    await this.isElementVisible(startHereButtonSelector, false);
+  }
+
+  /**
+   * Clicks on the take quiz button in the classroom page.
+   */
+  async clickOnTakeQuizButtonInClassroomPage(): Promise<void> {
+    await this.isElementVisible(takeQuizButtonSelector);
+
+    await this.clickOn(takeQuizButtonSelector);
+    await this.isElementVisible(takeQuizButtonSelector, false);
+  }
+
+  /**
+   * Starts a diagnostic test.
+   */
+  async startDiagnosticTest(): Promise<void> {
+    await this.isElementVisible(startDiagnosticTestButtonSelector);
+
+    await this.clickOn(startDiagnosticTestButtonSelector);
+    await this.isElementVisible(startDiagnosticTestButtonSelector, false);
+  }
+
+  /**
+   * Skips the current question in the diagnostic test.
+   */
+  async skipQuestionInDiagnosticTest(): Promise<void> {
+    const initialProgress =
+      (await this.page.$eval(currentProgessSelector, el =>
+        el.textContent?.trim()
+      )) ?? '';
+    await this.isElementVisible(skipQuestionButton);
+
+    await this.clickOn(skipQuestionButton);
+
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() !== value;
+      },
+      {},
+      currentProgessSelector,
+      initialProgress
+    );
+  }
+
+  async playChapterFromStory(chapterName: string): Promise<void> {
+    await this.skipLoginPrompt();
+
+    await this.page.waitForSelector(chapterTitleSelector);
+    const chapterTitles = await this.page.$$(chapterTitleSelector);
+    for (const chapter of chapterTitles) {
+      const chapterText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        chapter
+      );
+      if (chapterText.trim().includes(chapterName.trim())) {
+        await Promise.all([
+          this.page.waitForNavigation({
+            waitUntil: ['networkidle2', 'load'],
+          }),
+          this.waitForElementToBeClickable(chapter),
+          chapter.click(),
+        ]);
+        return;
+      }
+    }
+
+    throw new Error(`Chapter "${chapterName}" not found.`);
   }
 
   /**
@@ -3427,6 +3879,11 @@ export class LoggedOutUser extends BaseUser {
                 this.waitForElementToBeClickable(chapter),
                 chapter.click(),
               ]);
+
+              await this.expectPageURLToContain(
+                testConstants.URLs.ExplorationPlayer
+              );
+              showMessage(`Chapter ${chapterName} is opened successfully.`);
               return;
             }
           }
@@ -3470,6 +3927,10 @@ export class LoggedOutUser extends BaseUser {
             this.waitForElementToBeClickable(chapter),
             chapter.click(),
           ]);
+
+          await this.expectPageURLToContain(
+            testConstants.URLs.ExplorationPlayer
+          );
           return;
         }
       }
@@ -3536,6 +3997,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async selectReviewCardToLearn(subtopicName: string): Promise<void> {
     try {
+      await this.expectElementToBeVisible(subTopicTitleInLessTabSelector);
       const subtopicElements = await this.page.$$(
         subTopicTitleInLessTabSelector
       );
@@ -3554,6 +4016,11 @@ export class LoggedOutUser extends BaseUser {
             this.waitForElementToBeClickable(subtopicElements[i]),
             subtopicElements[i].click(),
           ]);
+
+          await this.expectElementToBeVisible(
+            subTopicTitleInLessTabSelector,
+            false
+          );
           return;
         }
       }
@@ -3658,6 +4125,17 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Click on the expand workedexample button.
+   */
+  async clickOnExpandWorkedexampleButton(): Promise<void> {
+    await this.expectElementToBeVisible(expandWorkedExampleButton);
+    await this.clickOn(expandWorkedExampleButton);
+    await this.page.waitForSelector(collapseWorkedExampleButton, {
+      visible: true,
+    });
+  }
+
+  /**
    * Click on the next study guide button.
    */
   async clickOnNextStudyGuideButton(): Promise<void> {
@@ -3715,7 +4193,10 @@ export class LoggedOutUser extends BaseUser {
    * Returns to the story from the last state of an exploration.
    */
   async returnToStoryFromLastState(): Promise<void> {
-    await this.clickAndWaitForNavigation('Return to Story');
+    await this.page.waitForSelector(returnToStoryFromLastStateSelector, {
+      visible: true,
+    });
+    await this.page.click(returnToStoryFromLastStateSelector);
 
     await this.page.waitForSelector(storyViewerContainerSelector, {
       visible: true,
@@ -3739,7 +4220,9 @@ export class LoggedOutUser extends BaseUser {
 
       const lessonIndex = searchResults.indexOf(lessonTitle);
       if (lessonIndex === -1) {
-        throw new Error(`Lesson "${lessonTitle}" not found in search results.`);
+        throw new Error(
+          `Lesson "${lessonTitle}" not found in search results.\nFound: ${searchResults.join(', ')}`
+        );
       }
 
       await this.waitForElementToBeClickable(
@@ -3876,7 +4359,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
    * @param {string | null} explorationId - The id of the exploration.
    */
-  async shareExploration(
+  async shareExplorationAndVerifyRedirect(
     platform: string,
     explorationId: string | null
   ): Promise<void> {
@@ -3933,6 +4416,16 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickOn(shareExplorationButtonSelector);
 
+    await this.expectEmbedClassroomLinkToWorkProperly(expectedCode);
+  }
+
+  /**
+   * Checks if embed button works properly, and shows correct embed code.
+   * @param {string} expectedCode - The expected embed code.
+   */
+  async expectEmbedClassroomLinkToWorkProperly(
+    expectedCode: string
+  ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     await this.clickOn(embedLessonButton);
     await this.page.waitForSelector(embedCodeSelector);
@@ -3948,9 +4441,22 @@ export class LoggedOutUser extends BaseUser {
           embedCode
       );
     }
-    await this.clickOn('Close');
 
+    await this.waitForElementToStabilize(closeButtonSelector);
+    await this.page.click(closeButtonSelector);
     await this.page.waitForSelector(embedCodeSelector, {hidden: true});
+  }
+
+  /**
+   * Checks if the embed classroom in lesson info works properly.
+   * @param explorationId The exploration id.
+   */
+  async expectEmbedClassroomInLessonInfoToWorkProperly(
+    explorationId: string
+  ): Promise<void> {
+    const expectedCode = `<iframe src="http://localhost:8181/embed/exploration/${explorationId}" width="700" height="1000">`;
+
+    await this.expectEmbedClassroomLinkToWorkProperly(expectedCode);
   }
 
   /**
@@ -3977,6 +4483,21 @@ export class LoggedOutUser extends BaseUser {
     }
   }
 
+  /**
+   * Checks if the lesson info text is present.
+   * @param lessonText - The expected lesson info text.
+   */
+  async expectLessonInfoTextToBe(lessonText: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      showMessage('Skipping lesson info text check on mobile viewport.');
+      return;
+    }
+    await this.expectTextContentInElementWithSelectorToBe(
+      lessonInfoTextSelector,
+      lessonText
+    );
+  }
+
   /*
    * Function to verify if the checkpoint modal appears on the screen.
    */
@@ -3984,7 +4505,6 @@ export class LoggedOutUser extends BaseUser {
     try {
       await this.page.waitForSelector(checkpointModalSelector, {
         visible: true,
-        timeout: 5000,
       });
       showMessage('Checkpoint modal found.');
       // Closing the checkpoint modal.
@@ -4045,12 +4565,49 @@ export class LoggedOutUser extends BaseUser {
    * Function to use a hint.
    */
   async viewHint(): Promise<void> {
-    await this.page.waitForSelector(hintButtonSelector);
+    await this.page.waitForSelector(hintButtonSelector, {
+      // Hint is shown after one minute.
+      timeout: 80000,
+    });
     await this.clickOn(hintButtonSelector);
 
     await this.page.waitForSelector(gotItButtonSelector, {
       visible: true,
     });
+  }
+
+  /**
+   * Function to verify the number of hint models.
+   * @param {number} n - The expected number of hint models.
+   */
+  async expectHintModelsToBe(n: number): Promise<void> {
+    const actualNumberOfHintModels = await this.page.$$(hintButtonSelector);
+
+    if (actualNumberOfHintModels.length !== n) {
+      throw new Error(
+        `Expected ${n} hint models, but found ${actualNumberOfHintModels.length}`
+      );
+    }
+  }
+
+  /**
+   * Waits until the number of hint models is not equal to given.
+   * @param {number} numberOfHintModals - The expected number of hint models.
+   */
+  async waitForHintModelsToBe(numberOfHintModals: number): Promise<void> {
+    // Wait until number of elements is not equal to given.
+    await this.page.waitForFunction(
+      (selector: string, expectedLength: number) => {
+        const elements = document.querySelectorAll(selector);
+        return elements.length === expectedLength;
+      },
+      {
+        // Each hint modal takes about 1 minute to appear.
+        timeout: numberOfHintModals * 65000,
+      },
+      hintButtonSelector,
+      numberOfHintModals
+    );
   }
 
   /**
@@ -4061,11 +4618,15 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(gotItButtonSelector);
     await this.page.waitForSelector(gotItButtonSelector, {hidden: true});
   }
+
   /**
    * Simulates the action of viewing the solution by clicking on the view solution button and the continue to solution button.
    */
-  async viewSolution(): Promise<void> {
-    await this.page.waitForSelector(viewSolutionButton, {visible: true});
+  async viewSolution(timeout: number = 60000): Promise<void> {
+    await this.page.waitForSelector(viewSolutionButton, {
+      visible: true,
+      timeout: timeout,
+    });
     await this.clickOn(viewSolutionButton);
     await this.clickOn(continueToSolutionButton);
     await this.page.waitForSelector(closeSolutionModalButton, {
@@ -4078,11 +4639,13 @@ export class LoggedOutUser extends BaseUser {
    */
   async closeSolutionModal(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(closeSolutionModalButton, {visible: true});
+    await this.expectElementToBeVisible(closeSolutionModalButton);
     const closeSolutionModalButtonElement = await this.page.$(
       closeSolutionModalButton
     );
     await closeSolutionModalButtonElement?.click();
+
+    await this.expectElementToBeVisible(closeSolutionModalButton, false);
   }
   /**
    * Function to view previous responses in a state.
@@ -4144,11 +4707,7 @@ export class LoggedOutUser extends BaseUser {
       element => element.textContent,
       element
     );
-    if (cardContent.trim() !== expectedCardContent) {
-      throw new Error(
-        `Card content is not same as expected. Actual: ${cardContent.trim()}, Expected: ${expectedCardContent}.`
-      );
-    }
+    expect(cardContent.trim()).toBe(expectedCardContent);
     showMessage('Card content is as expected.');
   }
 
@@ -4172,7 +4731,7 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Checks if the sign-in button is present on the page.
    */
-  async expectSignInButtonToBePresent(): Promise<void> {
+  async expectSignInButtonToBePresent(present: boolean = true): Promise<void> {
     await this.waitForStaticAssetsToLoad();
     try {
       await this.page.waitForSelector(signInButton, {timeout: 5000});
@@ -4181,11 +4740,23 @@ export class LoggedOutUser extends BaseUser {
         await this.page.waitForSelector(singInButtonInProgressModal, {
           timeout: 5000,
         });
+
+        showMessage('Sign-in button present.');
       } catch (error) {
-        throw new Error('Sign-in button not found.');
+        if (error instanceof puppeteer.errors.TimeoutError && !present) {
+          showMessage('Sign-in button not present.');
+          return;
+        }
+
+        throw new Error(
+          'Sign-in button not found.\n' + `Original error: ${error.message}`
+        );
       }
     }
-    showMessage('Sign-in button present.');
+
+    if (!present) {
+      throw new Error('Sign-in button is present, expected to be absent.');
+    }
   }
 
   /**
@@ -4212,7 +4783,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the progress remainder is found or not, based on the shouldBeFound parameter. (It can be found when the an already played exploration is revisited or an ongoing exploration is reloaded, but only if the first checkpoint is reached.)
    * @param {boolean} shouldBeFound - Whether the progress remainder should be found or not.
    */
-  async expectProgressRemainder(shouldBeFound: boolean): Promise<void> {
+  async expectProgressReminder(shouldBeFound: boolean): Promise<void> {
     await this.waitForPageToFullyLoad();
     try {
       await this.page.waitForSelector(progressRemainderModalSelector, {
@@ -4325,6 +4896,7 @@ export class LoggedOutUser extends BaseUser {
       ]);
 
       // Click on the copy button.
+      await this.waitForPageToFullyLoad();
       await this.page.waitForSelector(copyProgressUrlButton, {visible: true});
       await this.page.click(copyProgressUrlButton);
 
@@ -4332,6 +4904,10 @@ export class LoggedOutUser extends BaseUser {
       const clipboardData = await this.page.evaluate(async () => {
         return await navigator.clipboard.readText();
       });
+
+      if (!clipboardData) {
+        throw new Error('Failed to copy the exploration URL.');
+      }
 
       return clipboardData;
     } catch (error) {
@@ -4349,6 +4925,20 @@ export class LoggedOutUser extends BaseUser {
     verifyURL: boolean = true
   ): Promise<void> {
     await this.goto(progressUrl, verifyURL);
+  }
+
+  /**
+   * Clicks on first contributor in Lesson Info model.
+   */
+  async clickOnProfileIconInLessonInfoModel(): Promise<void> {
+    await this.page.waitForSelector(contributorIconInLessonInfoSelctor, {
+      visible: true,
+    });
+    await this.waitForElementToStabilize(contributorIconInLessonInfoSelctor);
+    await this.clickOn(contributorIconInLessonInfoSelctor);
+    await this.expectElementToBeVisible(profileContainerSelector);
+
+    expect(this.page.url()).toContain('/profile');
   }
 
   /**
@@ -4436,10 +5026,10 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Shares the exploration.
    * @param {string} platform - The platform to share the exploration on. This should be the name of the platform (e.g., 'facebook', 'twitter')
-   * @param {string} explorationId - The id of the exploration.
+   * @param {'FaceBook' | 'Twitter' | 'Classroom'} explorationId - The id of the exploration.
    */
   async shareExplorationFromLessonInfoModal(
-    platform: string,
+    platform: 'Facebook' | 'Twitter' | 'Classroom',
     explorationId: string | null
   ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
@@ -4465,6 +5055,10 @@ export class LoggedOutUser extends BaseUser {
       case 'Twitter':
         expectedUrl = testConstants.SocialsShare.Twitter.Domain + explorationId;
         break;
+      case 'Classroom':
+        expectedUrl =
+          testConstants.SocialsShare.Classroom.Domain + explorationId;
+        break;
       default:
         throw new Error(`Unsupported platform: ${platform}`);
     }
@@ -4474,6 +5068,33 @@ export class LoggedOutUser extends BaseUser {
         `The ${platform} share link does not match the expected URL. Expected: ${expectedUrl}, Found: ${href}`
       );
     }
+  }
+
+  /**
+   * Goes through the sign up process.
+   * @param {string} email - The email to sign up with.
+   * @param {string} username - The username to sign up with.
+   */
+  async goThoroughSignUpProcess(
+    email: string,
+    username: string
+  ): Promise<void> {
+    await this.page.waitForSelector(testConstants.SignInDetails.inputField, {
+      visible: true,
+    });
+    await this.type(testConstants.SignInDetails.inputField, email);
+    await this.clickOn('Sign In');
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    await this.type('input.e2e-test-username-input', username);
+    await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
+    await this.page.waitForSelector(
+      'button.e2e-test-register-user:not([disabled])'
+    );
+    await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
+    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    await this.page.waitForSelector('button.e2e-test-register-user', {
+      hidden: true,
+    });
   }
 
   /**
@@ -4489,19 +5110,8 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
     });
     await this.clickOn('Sign in');
-    await this.type(testConstants.SignInDetails.inputField, email);
-    await this.clickOn('Sign In');
-    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-    await this.type('input.e2e-test-username-input', username);
-    await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
-    await this.page.waitForSelector(
-      'button.e2e-test-register-user:not([disabled])'
-    );
-    await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
-    await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-    await this.page.waitForSelector('button.e2e-test-register-user', {
-      hidden: true,
-    });
+
+    await this.goThoroughSignUpProcess(email, username);
   }
 
   /**
@@ -4530,7 +5140,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(openMobileNavbarMenuButton);
+      await this.clickOn(openMobileNavbarMenuButton, true);
     }
 
     const isMobileViewport = this.isViewportAtMobileWidth();
@@ -4612,7 +5222,7 @@ export class LoggedOutUser extends BaseUser {
     // Replace spaces in the expectedPage with hyphens.
     const expectedPageInUrl = expectedPage.replace(/\s+/g, '-');
 
-    if (!url.includes(expectedPageInUrl.toLowerCase())) {
+    if (!url.includes(expectedPageInUrl)) {
       throw new Error(
         `Expected to be on page ${expectedPage}, but found ${url}`
       );
@@ -4705,24 +5315,93 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickOn(playVoiceoverButton);
     await this.page.waitForSelector(pauseVoiceoverButton, {visible: true});
+
+    showMessage('Started playing the voiceover.');
   }
 
   /**
    * Verifies if the voiceover is playing.
+   * @param {boolean} shouldBePlaying - If the voiceover should be playing or not.
    */
   async verifyVoiceoverIsPlaying(shouldBePlaying: boolean): Promise<void> {
-    if (shouldBePlaying) {
-      // If the pause button is present, it means the audio is playing.
-      await this.page.waitForSelector(pauseVoiceoverButton);
-    } else {
-      const pauseButton = await this.page.$(pauseVoiceoverButton);
-      if (pauseButton !== null) {
+    try {
+      const currentSliderValue = await this.page.$eval(
+        audioSliderSelector,
+        el => parseInt(el.textContent?.trim() ?? '', 10)
+      );
+
+      // Wait until value of audio slider is greater than to currentSliderValue.
+      await this.page.waitForFunction(
+        (selector: string, value: number) => {
+          const element = document.querySelector(selector);
+          return parseInt(element?.textContent?.trim() ?? '', 10) >= value;
+        },
+        {},
+        audioSliderSelector,
+        currentSliderValue
+      );
+
+      if (shouldBePlaying) {
+        showMessage('Voiceover is playing, as expected.');
+      } else {
+        throw new Error('Voiceover is playing, expected to be paused.');
+      }
+    } catch (error) {
+      if (shouldBePlaying) {
         throw new Error(
-          'Pause button should not be present when voiceover is paused.'
+          'Voiceover is not playing, expected to be playing.' + error
         );
+      } else {
+        showMessage('Voiceover is not playing, as expected.');
       }
     }
-    showMessage(`Voiceover is ${shouldBePlaying ? 'playing' : 'paused'}.`);
+  }
+
+  /**
+   * Checks if the voiceover is skippable.
+   */
+  async expectVoiceoverIsSkippable(): Promise<void> {
+    await this.waitForPageToFullyLoad();
+    const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
+    if (voiceoverDropdownElement) {
+      await this.clickOn(voiceoverDropdown);
+    }
+
+    // Start playing the voiceover.
+    await this.page.waitForSelector(playVoiceoverButton);
+    await this.clickOn(playVoiceoverButton);
+
+    // Check voiceover current time and compare.
+    await this.page.waitForFunction(
+      (selector: string, value: number) => {
+        const element = document.querySelector(selector);
+        return parseInt(element?.textContent?.trim() ?? '', 10) >= value;
+      },
+      {},
+      audioSliderSelector,
+      2
+    );
+
+    const currentSliderValue = await this.page.$eval(audioSliderSelector, el =>
+      parseInt(el.textContent?.trim() ?? '', 10)
+    );
+
+    // Skipping the voiceover for 10 seconds.
+    await this.page.waitForSelector(audioForwardButtonSelector);
+    await this.page.click(audioForwardButtonSelector);
+    await this.page.click(audioForwardButtonSelector);
+
+    // If we skip voiceover twice, and wait for 5 seconds, the audio value should increase
+    // between 10 to 15 seconds. We are checking for more than 12 seconds to avoid flaky test.
+    await this.page.waitForFunction(
+      (selector: string, value: number) => {
+        const element = document.querySelector(selector);
+        return parseInt(element?.textContent?.trim() ?? '', 10) >= value;
+      },
+      {},
+      audioSliderSelector,
+      currentSliderValue + 12
+    );
   }
 
   /**
@@ -4733,6 +5412,76 @@ export class LoggedOutUser extends BaseUser {
     await this.clickOn(pauseVoiceoverButton);
     await this.page.waitForSelector(playVoiceoverButton, {visible: true});
     showMessage('Voiceover paused successfully.');
+  }
+
+  /**
+   * Checks if voiceover is playable.
+   * @param playable - If voiceover should be playable or not.
+   */
+  async expectVoiceoverIsPlayable(playable: boolean = true): Promise<void> {
+    try {
+      await this.startVoiceover();
+
+      // Wait until slider value changes.
+      const currentSliderValue = await this.page.$eval(
+        audioSliderSelector,
+        el => parseInt(el.textContent?.trim() ?? '', 10)
+      );
+
+      await this.page.waitForFunction(
+        (selector: string, value: number) => {
+          const element = document.querySelector(selector);
+          return parseInt(element?.textContent?.trim() ?? '', 10) >= value;
+        },
+        {},
+        audioSliderSelector,
+        currentSliderValue
+      );
+
+      // Pause voiceover once checking is done.
+      await this.pauseVoiceover();
+
+      if (!playable) {
+        throw new Error(
+          'Voiceover expected to be not playable, but is playable'
+        );
+      }
+
+      showMessage('Voiceover is playable.');
+    } catch (error) {
+      // If we don't press play button again, the voiceover in next interaction
+      // will start playing automatically as we continue to next interaction.
+      // This will make the test flaky. So, we need to press play button again.
+      await this.page.waitForSelector(playVoiceoverButton, {
+        visible: true,
+      });
+
+      // Report error / success based on playable flag.
+      await this.clickOn(playVoiceoverButton);
+      if (playable) {
+        throw new Error(
+          'Voiceover expected to be playable, but is not playable' + error
+        );
+      }
+
+      showMessage('Voiceover is not playable.');
+    }
+  }
+
+  /**
+   * Waits until audio is playing.
+   * @param {number} timeout - The timeout for waiting until audio is playing.
+   */
+  async waitUntilAudioIsPlaying(timeout: number = 20000): Promise<void> {
+    await this.page.waitForFunction((selector: string) => {
+      const element = document.querySelector(selector);
+      return (
+        element?.textContent?.trim() === element?.getAttribute('aria-valuemax')
+      );
+    });
+
+    // While mouse is over pause button, the pause button doesn't change its state.
+    await this.page.mouse.move(10, 10);
   }
 
   /**
@@ -4798,11 +5547,304 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Checks if Video RTE is present in current lesson card.
+   */
+  async expectVideoRTEToBePresent(): Promise<void> {
+    await this.page.waitForSelector(youtubePlayerSelector, {visible: true});
+  }
+
+  /**
+   * Checks if there is link text RTE present in current lesson card.
+   * @param linkURL - The URL to which link text should redirect when clicked.
+   */
+  async expectLinkRTEToPresent(linkURL: string): Promise<void> {
+    const linkSelector = `oppia-noninteractive-link a.linkText[href="${linkURL}"]`;
+    await this.page.waitForSelector(linkSelector, {visible: true});
+  }
+
+  /**
+   * Check if colllapsible RTE element is present or not.
+   * @param header - The header of collapsible RTE element.
+   * @param content - The content collapsible RTE element should have.
+   */
+  async expectCollapsibleRTEToBePresent(
+    header: string = 'Sample Header',
+    content: string = 'You have opened the collapsible block.'
+  ): Promise<void> {
+    await this.page.waitForSelector(collapsibleRTEHeaderSelector, {
+      visible: true,
+    });
+    const collapsibleRTEHeader = await this.page.$(
+      collapsibleRTEHeaderSelector
+    );
+    if (!collapsibleRTEHeader) {
+      throw new Error('Collapsible RTE header not found.');
+    }
+    const collapsibleRTEHeaderText = await this.page.evaluate(
+      element => element.textContent?.trim(),
+      collapsibleRTEHeader
+    );
+    if (collapsibleRTEHeaderText !== header) {
+      throw new Error(
+        `Expected collapsible RTE header to be ${header}, but it was ${collapsibleRTEHeaderText}`
+      );
+    }
+
+    await this.clickOn(collapsibleRTEHeaderSelector);
+    await this.page.waitForSelector(collapsibleRTEContentSelector, {
+      visible: true,
+    });
+    const collapsibleRTEContent = await this.page.$(
+      collapsibleRTEContentSelector
+    );
+    const collapsibleRTEContentText = await this.page.evaluate(
+      element => element.textContent,
+      collapsibleRTEContent
+    );
+    expect(collapsibleRTEContentText).toContain(content);
+  }
+
+  /**
+   * Checks if button with "left arrow" icon is present to move back to previous lesson card.
+   * @param visibility - Boolean value representing should be visible or not.
+   */
+  async expectGoBackToPreviousCardButton(
+    visibility: boolean = true
+  ): Promise<void> {
+    if (visibility) {
+      await this.page.waitForSelector(previousCardButton, {visible: true});
+    } else {
+      await this.page.waitForSelector(previousCardButton, {hidden: true});
+    }
+  }
+
+  /**
+   * Checks if "Stay Anonymous" checkbox is checked or not.
+   * @param status - Boolean value representing that checkbox should be checked or not.
+   */
+  async expectStayAnonymousCheckboxToBePresent(
+    status: boolean = true
+  ): Promise<void> {
+    if (status) {
+      await this.page.waitForSelector(stayAnonymousCheckbox, {visible: true});
+      showMessage('Stay anonymous checkbox is present.');
+      return;
+    } else {
+      try {
+        await this.page.waitForSelector(stayAnonymousCheckbox, {visible: true});
+        throw new Error(
+          'Stay anonymous checkbox is present, but it should not be.'
+        );
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          showMessage('Stay anonymous checkbox is not present, as expected.');
+        } else {
+          throw error;
+        }
+      }
+    }
+  }
+
+  /**
+   * Checks if "Continue" button is present in the lesson card.
+   * @param status - Boolean value representing that button should be present or not. Default is true (visible)
+   */
+  async expectContinueToNextCardButtonToBePresent(
+    status: boolean = true
+  ): Promise<void> {
+    if (status) {
+      await this.page.waitForSelector(nextCardButton, {visible: true});
+      showMessage('Continue button is present.');
+      return;
+    } else {
+      try {
+        await this.page.waitForSelector(nextCardButton, {visible: true});
+        throw new Error('Continue button is present, but it should not be.');
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          showMessage('Continue button is not present, as expected.');
+        } else {
+          throw error;
+        }
+      }
+    }
+  }
+
+  /**
+   * Checks if lesson info text is visible or not.
+   * @param status - Boolean value representing that info text should be visible or not.
+   */
+  async expectLessonInfoTextToBePresent(status: boolean = true): Promise<void> {
+    if (status) {
+      await this.page.waitForSelector(lessonInfoButton, {visible: true});
+      showMessage('Lesson info text is present.');
+      return;
+    } else {
+      try {
+        await this.page.waitForSelector(lessonInfoButton, {visible: true});
+        throw new Error('Lesson info text is present, but it should not be.');
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          showMessage('Lesson info text is not present, as expected.');
+        } else {
+          throw error;
+        }
+      }
+    }
+  }
+
+  /**
+   * Checks if all dropdowns in navbar open properly.
+   */
+  async expectDropdownsInNavbarToWorkProperly(): Promise<void> {
+    await this.expectElementToBeVisible(navbarLearnTab);
+    await this.clickOn(navbarLearnTab);
+    await this.expectElementToBeVisible(navbarLearnDropdownContainerSelector);
+
+    await this.clickOn(navbarAboutTab);
+    await this.expectElementToBeVisible(navbarAboutDropdownConatinaerSelector);
+
+    await this.clickOn(navbarGetInvolvedTab);
+    await this.expectElementToBeVisible(
+      navbarGetInvolvedDropdownContainerSelector
+    );
+  }
+
+  /**
+   * Checks if the concept card link in the lesson works properly.
+   * @param {string} content - The expected content of the concept card.
+   */
+  async expectConceptCardLinkInLessonToWorkProperly(
+    content: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(conceptCardLinkSelector);
+
+    const conceptCard = await this.page.$(conceptCardLinkSelector);
+    if (!conceptCard) {
+      throw new Error('Concept card link not found.');
+    }
+    await this.waitForElementToStabilize(conceptCard);
+
+    await this.clickOn(conceptCardLinkSelector);
+    const conceptCardContent: string =
+      (await this.page.$eval(
+        conceptCardViewerSelector,
+        el => (el as HTMLElement).textContent
+      )) ?? '';
+
+    if (!conceptCardContent.includes(content)) {
+      throw new Error(
+        `Expected concept card content to be ${content}, but it was ${conceptCardContent}`
+      );
+    }
+
+    await this.waitForElementToStabilize(conceptCardCloseButtonSelector);
+    await this.clickOn(conceptCardCloseButtonSelector);
+    await this.expectElementToBeVisible(conceptCardViewerSelector, false);
+  }
+
+  /**
+   * Checks if non-interactive tab with given heading contains expected content in lesson card.
+   * @param tabHeading - The tab heading to check content for.
+   * @param tabContent - The content of tab
+   */
+  async expectTabElementInLessonCardToContain(
+    tabHeading: string,
+    tabContent: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(nonInteractiveTabsHeaderSelector);
+    const tabHeaders = await this.page.$$eval(
+      nonInteractiveTabsHeaderSelector,
+      elements => elements.map(element => element.textContent?.trim())
+    );
+
+    const tabIndex = tabHeaders.indexOf(tabHeading);
+    if (tabIndex === -1) {
+      throw new Error(`Tab ${tabHeading} not found`);
+    }
+
+    const selector = `${nonInteractiveTabsHeaderSelector} .e2e-test-element-${tabIndex}`;
+    await this.page.waitForSelector(selector);
+    await this.clickOn(selector);
+
+    const contentSelector = `.e2e-test-tab-content-${tabIndex}`;
+    await this.page.waitForSelector(contentSelector);
+    const actualContent = await this.page.$eval(
+      contentSelector,
+      el => el.textContent
+    );
+
+    expect(actualContent).toContain(tabContent);
+  }
+
+  /**
+   * Checks if audio expand button is visible in lesson player.
+   */
+  async expectAudioExpandButtonToBeVisibleInLP(): Promise<void> {
+    await this.expectElementToBeVisible(audioExpandButtonInLPSelector);
+    showMessage('Audio Expand button is visible in lesson player.');
+  }
+
+  /**
+   * Checks if audio forward and backward buttons are visible in lesson player.
+   */
+  async expectAudioForwardBackwardButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(audioBackwardButtonSelector);
+    await this.expectElementToBeVisible(audioForwardButtonSelector);
+
+    showMessage(
+      'Audio forward and backward buttons are visible in lesson player.'
+    );
+  }
+
+  /**
+   * Checks if fraction input is visible.
+   */
+  async expectFractionInputToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(fractionInputSelector);
+  }
+
+  /**
+   * Checks if the error message for wrong input is present.
+   * @param {string} errorMessage - The expected error message.
+   */
+  async expectErrorMessageForWrongInputToBe(
+    errorMessage: string
+  ): Promise<void> {
+    await this.expectTextContentToContain(
+      wrongInputErrorContainerSelector,
+      errorMessage
+    );
+  }
+
+  /**
+   * Checks if Audio bar is visible or not.
+   * @param visible - Expected visibility.
+   */
+  async expectVoiceoverBarToBePresent(visible: boolean = true): Promise<void> {
+    let isVisible = true;
+
+    try {
+      await this.page.waitForSelector(voiceoverDropdown);
+    } catch (error) {
+      isVisible = false;
+    }
+
+    if (!visible === isVisible) {
+      throw new Error(
+        `Expected voiceover bar to be ${
+          visible ? 'visible' : 'hidden'
+        }, but it was ${isVisible ? 'visible' : 'hidden'}`
+      );
+    }
+  }
+
+  /**
    * Checks if the text content of an element matches the expected value.
    * @param selector - The CSS selector to find the element.
    * @param value - The expected text content value.
    * @param exactMatch - If true, checks for exact match. If false, checks if value is contained in text content.
-\   */
+   */
   async expectTextContentInElementWithSelectorToBe(
     selector: string,
     value: string,
@@ -5224,6 +6266,506 @@ export class LoggedOutUser extends BaseUser {
     // Confirm new slide ID is different.
     const newSlideId = await this.page.$eval(activeItemSelector, el => el.id);
     expect(newSlideId).not.toBe(initialSlideId);
+  }
+
+  /**
+   * Function to verify the hint in the hint modal.
+   * @param {string} expectedHint - The expected hint.
+   */
+  async expectHintInHintModalToContain(expectedHint: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+
+    await this.expectTextContentToBe(commonModalTitleSelector, 'Hint');
+    await this.expectTextContentToContain(
+      commonModalBodySelector,
+      expectedHint
+    );
+  }
+  /**
+   * Function to verify the community library heading is present.
+   * @param {string} heading - The heading to verify.
+   */
+  async expectCommunityLibraryHeadingToBePresent(
+    heading: string
+  ): Promise<void> {
+    await this.page.waitForSelector(communityLibraryHeading, {
+      visible: true,
+      timeout: 5000,
+    });
+
+    const communityLibraryHeadingText = await this.page.$eval(
+      communityLibraryHeading,
+      el => el.textContent
+    );
+
+    if (communityLibraryHeadingText?.trim() !== heading) {
+      throw new Error(
+        `Expected community library heading to be ${heading}, but found ${communityLibraryHeadingText}`
+      );
+    }
+
+    showMessage(`Success: Community library heading is ${heading}.`);
+  }
+
+  /**
+   * Function to verify the community library group header is present.
+   * @param {string[]} groupHeaders - The group headers to verify.
+   */
+  async expectCommunityLibraryGroupHeaderToContain(
+    groupHeaders: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(communityLibraryGroupHeader, {
+      visible: true,
+    });
+
+    const communityLibraryGroupHeaderText = await this.page.$$eval(
+      communityLibraryGroupHeader,
+      el => el.map(el => el.textContent)
+    );
+
+    for (const groupHeader of groupHeaders) {
+      if (
+        communityLibraryGroupHeaderText?.some(el =>
+          el?.trim().includes(groupHeader)
+        ) === false
+      ) {
+        throw new Error(
+          `Failed: Community library group header does not contain ${groupHeader}.\nActual: ${communityLibraryGroupHeaderText}`
+        );
+      }
+      showMessage(
+        `Success: Community library group header contains ${groupHeader}.`
+      );
+    }
+  }
+
+  /**
+   * Function to verify the dev mode label is visible or not.
+   * @param {boolean} visible - Whether the dev mode label should be visible or not.
+   */
+  async expectDevModeLabelToBeVisible(visible: boolean = true): Promise<void> {
+    try {
+      await this.page.waitForSelector(devModeLabelSelector, {
+        visible: true,
+      });
+
+      if (visible) {
+        showMessage('Verified: Dev mode label is visible.');
+      } else {
+        throw new Error('Dev mode label is visible.');
+      }
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        if (visible) {
+          throw new Error('Dev mode label is not visible.');
+        } else {
+          showMessage('Verified: Dev mode label is not visible.');
+        }
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Function to click the Browse Lessons button on the home page.
+   */
+  async clickBrowseLessonsButtonInHomePage(): Promise<void> {
+    await this.expectElementToBeVisible(browseLessonButtonSelector);
+    await this.page.click(browseLessonButtonSelector);
+    showMessage('Clicked on browse lessons button.');
+
+    await this.expectElementToBeVisible(browseLessonButtonSelector, false);
+  }
+
+  /**
+   * Function to verify the home page title.
+   * @param {string} title - The expected title of the home page.
+   */
+  async expectHomePageTitleToBe(title: string): Promise<void> {
+    await this.page.waitForSelector(homePageHeadingSelector);
+    expect(
+      await this.page.$eval(homePageHeadingSelector, el => el.textContent)
+    ).toBe(title);
+  }
+
+  /**
+   * Function to click on the classroom tile in the learn page.
+   * @param {string} classroomName - The name of the classroom.
+   */
+  async clickOnClassroomTileInLearnPage(classroomName: string): Promise<void> {
+    await this.isElementVisible(classroomTileContainerSelector);
+
+    const classroomTiles = await this.page.$$(classroomTileContainerSelector);
+
+    for (const classroomTile of classroomTiles) {
+      const classroomTileName = await classroomTile.$eval(
+        classroomNameSelector,
+        el => el.textContent
+      );
+
+      if (classroomTileName === classroomName) {
+        await classroomTile.click();
+        break;
+      }
+    }
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForFunction(
+      (url: string) => {
+        return url !== `${baseUrl}/learn`;
+      },
+      {},
+      this.page.url()
+    );
+  }
+
+  /**
+   * Function to verify the diagnostic test box is present.
+   * @param {string} expectedHeading - The expected heading of the diagnostic test box.
+   * @param {string} expectedButtonText - The expected button text of the diagnostic test box.
+   */
+  async expectDiagnosticTestBoxToBePresent(
+    expectedHeading: string,
+    expectedButtonText: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(diagnosticTestBoxSelector);
+    const headings = await this.page.$$eval(diagnosticTestHeadingSelector, el =>
+      el.map(el => el.textContent)
+    );
+
+    expect(headings).toContain(expectedHeading);
+    showMessage(`Success: Heading is ${expectedHeading}.`);
+
+    const buttons = await this.page.$$eval(diagnosticTestButtonSelector, el =>
+      el.map(el => el.textContent)
+    );
+
+    expect(buttons).toContain(expectedButtonText);
+    showMessage(`Success: Button is ${expectedButtonText}.`);
+  }
+
+  /**
+   * Function to verify the heading in classroom page.
+   * @param {string} expectedHeading - The expected heading of the classroom.
+   */
+  async expectHeadingInClassroomPageToContain(
+    expectedHeading: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(classroomContentHeadingSelector);
+    const headings = await this.page.$$eval(
+      classroomContentHeadingSelector,
+      el => el.map(el => el.textContent)
+    );
+
+    expect(headings).toContain(expectedHeading);
+    showMessage(`Success: Heading is ${expectedHeading}.`);
+  }
+
+  /**
+   * Checks if the views of a lesson card matches the expected views.
+   * @param {number} expectedViews - The expected views of the card.
+   * @param {string} explorationName - The name of the exploration.
+   */
+  async expectLessonViewsToBe(
+    expectedViews: number,
+    explorationName: string
+  ): Promise<void> {
+    await this.page.waitForSelector(lessonCardSelector);
+    const cards = await this.page.$$(lessonCardSelector);
+    for (const card of cards) {
+      await card.waitForSelector(lessonCardTitleSelector);
+      const titleElement = await card.$(lessonCardTitleSelector);
+      const titleText = await this.page.evaluate(
+        el => el.textContent.trim(),
+        titleElement
+      );
+      if (titleText === explorationName) {
+        await card.waitForSelector(explorationViewsSelector);
+        const views = await card.$eval(explorationViewsSelector, el =>
+          parseInt(el?.textContent?.trim() ?? '0', 10)
+        );
+
+        if (views !== expectedViews) {
+          throw new Error(
+            `Expected views to be ${expectedViews}, but found ${views}`
+          );
+        }
+        return;
+      }
+    }
+  }
+
+  /**
+   * Function to verify the classroom heading.
+   * @param {string} expectedHeading - The expected heading of the classroom.
+   */
+  async expectClassroomHeadingToBe(expectedHeading: string): Promise<void> {
+    await this.expectTextContentToBe(classroomHeadingSelector, expectedHeading);
+  }
+
+  /**
+   * Starts a practice session for the given subtopics.
+   * @param {string[]} subtopicNames - The names of the subtopics to start a practice session for.
+   */
+  async startPracticeSession(subtopicNames: string[]): Promise<void> {
+    await this.page.waitForSelector(subtopicListItemInPracticeTabSelector);
+
+    const subtopicElements = await this.page.$$(
+      subtopicListItemInPracticeTabSelector
+    );
+
+    const subtopicsAdded = new Set<string>();
+
+    for (const subtopicElement of subtopicElements) {
+      const subtopicName = await subtopicElement.evaluate(el =>
+        el.textContent?.trim()
+      );
+      if (!subtopicName) {
+        continue;
+      }
+      if (subtopicNames.includes(subtopicName)) {
+        const labelElement = await subtopicElement.$('label');
+
+        if (labelElement) {
+          await labelElement.click();
+          await this.page.waitForFunction(
+            (element: HTMLInputElement) => element.checked === true,
+            {},
+            await labelElement.$('input')
+          );
+
+          subtopicsAdded.add(subtopicName);
+        }
+      }
+    }
+
+    await this.page.waitForSelector(startPracticeButtonSelector);
+    await this.clickOn(startPracticeButtonSelector);
+    await this.page.waitForSelector(startPracticeButtonSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Expects the tab title in the topic page to be the expected tab title.
+   * @param expectedTabTitle The expected tab title.
+   */
+  async expectTabTitleInTopicPageToBe(expectedTabTitle: string): Promise<void> {
+    await this.page.waitForSelector(tabTitleInTopicPageSelector);
+
+    await this.page.waitForFunction(
+      (selector: string, expectedTabTitle: string) => {
+        const tabTitle = document.querySelector(selector)?.textContent?.trim();
+        return tabTitle === expectedTabTitle;
+      },
+      {},
+      tabTitleInTopicPageSelector,
+      expectedTabTitle
+    );
+  }
+
+  /**
+   * Expects the subtopics in the practice tab to contain the expected subtopics.
+   * @param subtopicNames The expected subtopics.
+   */
+  async expectSubtopicListInPracticeTabToContain(
+    subtopicNames: string[]
+  ): Promise<void> {
+    await this.page.waitForSelector(subtopicListItemInPracticeTabSelector);
+    const subtopicsInList = await this.page.$$eval(
+      subtopicListItemInPracticeTabSelector,
+      subtopics => subtopics.map(subtopic => subtopic.textContent?.trim())
+    );
+
+    for (const subtopicName of subtopicNames) {
+      expect(subtopicsInList).toContain(subtopicName);
+    }
+  }
+
+  async expectToBeInPracticeSession(): Promise<void> {
+    expect(await this.isElementVisible(practiceSessionContainerSelector)).toBe(
+      true
+    );
+  }
+
+  /**
+   * Expects the user to be in the diagnostic test player.
+   */
+  async expectToBeInDiagnosticTestPlayer(): Promise<void> {
+    await this.isElementVisible(diagnosticTestPlayerSelector);
+
+    await this.isTextPresentOnPage('Learner Diagnostic Test');
+  }
+
+  /**
+   * Function to close the save progress menu.
+   */
+  async closeSaveProgressMenu(): Promise<void> {
+    await this.page.waitForSelector(saveProgressCloseButtonSelector);
+    await this.clickOn(saveProgressCloseButtonSelector);
+
+    await this.page.waitForSelector(saveProgressCloseButtonSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Clicks on the next recommended chapter button.
+   */
+  async continueToNextRecommendedLesson(): Promise<void> {
+    await this.page.waitForSelector(recommendedNextChapterSelector);
+    await this.clickOn(recommendedNextChapterSelector);
+
+    await this.page.waitForSelector(recommendedNextChapterSelector, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Verifies the contributor icon in the lesson info modal.
+   * @param {string} contributorName - The name of the contributor.
+   * @param {number} index - The 1-based index of the contributor.
+   */
+  async expectContributorsInLessonInfoModalToBe(
+    contributorName: string,
+    index: number
+  ): Promise<void> {
+    await this.page.waitForSelector(contributorsContainerSelector);
+    await this.page.waitForSelector(`${contributorIconPrefix}${index - 1}`);
+
+    const contributorIcon = await this.page.$(
+      `${contributorIconPrefix}${index - 1}`
+    );
+    if (!contributorIcon) {
+      throw new Error('Contributor icon not found');
+    }
+
+    const userNameInAltText = await contributorIcon.$eval('img', el =>
+      el.getAttribute('alt')
+    );
+
+    expect(userNameInAltText).toBe(contributorName);
+  }
+
+  /**
+   * Function to verify if the user is on the story page.
+   * @param {string} storyTitle - The title of the story.
+   */
+  async expectToBeOnStoryPage(storyTitle: string): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent?.trim() === value;
+      },
+      {},
+      storyTitleSelector,
+      storyTitle
+    );
+  }
+
+  /**
+   * Checks if the lesson info modal header matches the expected header.
+   * @param header - The expected header.
+   */
+  async expectLessonInfoModalHeaderToBe(header: string): Promise<void> {
+    await this.expectElementToBeVisible(lessonInfoModalHeaderSelector);
+    await this.expectTextContentToMatch(lessonInfoModalHeaderSelector, header);
+  }
+
+  /**
+   * Checks if the save progress button is visible.
+   */
+  async expectSaveProgressButtonToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(saveProgressButton, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Checks if the progress reminder modal text matches the expected text.
+   * @param expectedText - The expected text.
+   */
+  async expectProgressReminderModalTextToBe(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(progressReminderModalHeaderSelector);
+    await this.expectTextContentToMatch(
+      progressReminderModalHeaderSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Expects the profile picture to be present.
+   */
+  async expectProfilePictureToBePresent(): Promise<void> {
+    await this.page.waitForSelector(profilePictureSelector, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Checks if the user is on the community library page.
+   */
+  async expectToBeOnCommunityLibraryPage(): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => {
+        return window.location.href.includes(url);
+      },
+      {},
+      testConstants.URLs.CommunityLibrary
+    );
+  }
+
+  /**
+   * Hovers over the toast message to see the error message.
+   */
+  async hoverOverToastMessage(): Promise<void> {
+    await this.page.waitForSelector(toastMessageSelector);
+    await this.page.hover(toastMessageSelector);
+  }
+
+  /**
+   * Updates the toast style to make it visible.
+   */
+  async updateToastStyle(): Promise<void> {
+    await this.page.addStyleTag({
+      content: `
+        .e2e-test-toast-message {
+          opacity: 1 !important;
+          transition: none !important;
+          animation: none !important;
+        }
+      `,
+    });
+  }
+
+  /**
+   * Checks if the blog post is present.
+   * @param {string} expectedBlog - the title of the expected blog post.
+   */
+  async expectBlogPostToBePresent(expectedBlog: string): Promise<void> {
+    await this.navigateToBlogPage();
+
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    const blogTitles = await this.page.$$eval(blogPostTitleSelector, elements =>
+      elements.map(element => element.textContent)
+    );
+    for (const title of blogTitles) {
+      if (!title) {
+        continue;
+      }
+      if (title.includes(expectedBlog)) {
+        showMessage('The blog post is present on the blog dashboard.');
+        return;
+      }
+    }
+
+    throw new Error(
+      `The blog post "${expectedBlog}" was not found on the blog dashboard.\n` +
+        `Found blog posts: "${blogTitles.join('", "')}"`
+    );
   }
 }
 

@@ -97,6 +97,7 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
   OUTLINE_SCHEMA = {
     type: 'html',
     ui_config: {
+      rte_components: 'ALL_COMPONENTS',
       startupFocusEnabled: false,
       rows: 100,
     },

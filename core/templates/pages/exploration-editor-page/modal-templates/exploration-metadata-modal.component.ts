@@ -29,7 +29,7 @@ import {ExplorationTagsService} from '../services/exploration-tags.service';
 import {ExplorationTitleService} from '../services/exploration-title.service';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationStatesService} from '../services/exploration-states.service';
-import {ParamChange} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model';
 
 interface CategoryChoices {
   id: string;

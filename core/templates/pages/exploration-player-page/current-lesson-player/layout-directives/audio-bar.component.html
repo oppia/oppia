@@ -1,12 +1,12 @@
 <div aria-label="audio menu" class="audio-header" *ngIf="isAudioBarAvailable()"
      [ngClass]="{'audio-header-margin': explorationPlayerModeIsActive}" headroom>
 
-  <div *ngIf="audioBarIsExpanded" class="audio-bar-expanded" headroom>
+  <div *ngIf="audioBarIsExpanded" class="audio-bar-expanded e2e-test-lp-audio-bar" headroom>
     <div #audioControls tabindex="0" class="audio-controls" [ngClass]="{'audio-controls-margin': progressBarIsShown}">
       <div class="oppia-audio-header-control-buttons fx-row fx-main-center fx-cross-center">
         <div class="audio-header-control-icons">
           <a (click)="onBackwardButtonClicked()">
-            <span class="oppia-replay-white-circle" *ngIf="progressBarIsShown">
+            <span class="oppia-replay-white-circle e2e-test-audio-backward-button" *ngIf="progressBarIsShown">
               <i class="fas fa-undo audio-undo-icon"></i>
               <span class="oppia-five-icon">5</span>
             </span>
@@ -19,7 +19,7 @@
             </i>
           </a>
           <a (click)="onForwardButtonClicked()">
-            <span class="oppia-replay-white-circle oppia-replay-white-circle-forward" *ngIf="progressBarIsShown">
+            <span class="oppia-replay-white-circle oppia-replay-white-circle-forward e2e-test-audio-forward-button" *ngIf="progressBarIsShown">
               <i class="fas fa-undo audio-undo-icon audio-undo-icon-forward"></i>
               <span class="oppia-five-icon oppia-five-icon-forward">5</span>
             </span>
@@ -66,7 +66,7 @@
       <i class="fas fa-sort-up"></i>
     </div>
   </div>
-  <div class="audio-expand-button audio-toggle-button"
+  <div class="audio-expand-button audio-toggle-button e2e-test-lp-audio-expand-button"
        *ngIf="!audioBarIsExpanded"
        (click)="expandAudioBar()"
        (keydown.enter)="expandAudioBar()"

@@ -32,7 +32,7 @@ import {MockTranslateService} from '../../../../components/forms/schema-based-ed
 import {Collection} from '../../../../domain/collection/collection.model';
 import {GuestCollectionProgressService} from '../../../../domain/collection/guest-collection-progress.service';
 import {ReadOnlyCollectionBackendApiService} from '../../../../domain/collection/read-only-collection-backend-api.service';
-import {Interaction} from '../../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {StateObjectFactory} from '../../../../domain/state/StateObjectFactory';
 import {CheckpointProgressService} from '../../services/checkpoint-progress.service';
 import {

@@ -162,6 +162,7 @@ class EmailTests(test_utils.GenericTestBase):
         recipient_variables: Dict[str, Dict[str, Union[str, float]]] = {
             'b@b.com': {'first': 'Bob', 'id': 1}}
         bcc = ['c@example.com']
+        cc = ['cc@example.com']
         reply_to = 'abc'
         attachments = None
 
@@ -172,6 +173,7 @@ class EmailTests(test_utils.GenericTestBase):
                 subject,
                 plaintext_body,
                 html_body,
+                cc,
                 bcc,
                 reply_to,
                 recipient_variables)
@@ -185,6 +187,7 @@ class EmailTests(test_utils.GenericTestBase):
             'recipient_variables': recipient_variables,
             'h:Reply-To': reply_to,
             'bcc': bcc[0],
+            'cc': cc[0]
         }
 
         mock_post.assert_called_once_with(
@@ -218,6 +221,7 @@ class EmailTests(test_utils.GenericTestBase):
         bcc = ['c@example.com', 'd@example.com']
         reply_to = 'abc'
         attachments = None
+        cc = None
 
         with self.swap_api_key_secrets_return_secret:
             resp = mailgun_email_services.send_email_to_recipients(
@@ -226,6 +230,7 @@ class EmailTests(test_utils.GenericTestBase):
                 subject,
                 plaintext_body,
                 html_body,
+                cc,
                 bcc,
                 reply_to,
                 recipient_variables
@@ -314,6 +319,7 @@ class EmailTests(test_utils.GenericTestBase):
                 Data length: 13
                 Html content: Hi abc,<br> 😂
 
+            Cc: None
             Bcc: None
             Reply_to: None
             Recipient Variables:
@@ -353,6 +359,7 @@ class EmailTests(test_utils.GenericTestBase):
                 Data length: 13
                 Html content: Hi abc,<br> 😂
 
+            Cc: None
             Bcc: None
             Reply_to: None
             Recipient Variables:

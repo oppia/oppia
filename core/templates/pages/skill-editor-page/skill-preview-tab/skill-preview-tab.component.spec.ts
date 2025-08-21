@@ -29,7 +29,7 @@ import {MockTranslateService} from 'components/forms/schema-based-editors/integr
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {QuestionBackendDict} from 'domain/question/QuestionObjectFactory';
 import {InteractionRulesService} from '../../../pages/exploration-player-page/services/answer-classification.service';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
 import {ExplorationPlayerConstants} from '../../../pages/exploration-player-page/current-lesson-player/exploration-player-page.constants.ts';

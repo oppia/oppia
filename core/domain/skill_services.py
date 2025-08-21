@@ -1078,7 +1078,8 @@ def update_skill(
                     )
                 )
         taskqueue_services.defer(
-            taskqueue_services.FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_UNTAG_DELETED_MISCONCEPTIONS'],
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
             committer_id, skill_id, skill.description,
             deleted_skill_misconception_ids)

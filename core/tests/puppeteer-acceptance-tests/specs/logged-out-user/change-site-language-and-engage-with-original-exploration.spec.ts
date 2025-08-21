@@ -73,9 +73,6 @@ describe('Logged-out User', function () {
       'We have learnt positive numbers.'
     );
     await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
-    // Navigate back to the introduction card and save the draft.
-    await explorationEditor.navigateToCard(CARD_NAME.INTRODUCTION);
     await explorationEditor.saveExplorationDraft();
 
     await explorationEditor.publishExplorationWithMetadata(

@@ -27,8 +27,8 @@ import {LoggerService} from 'services/contextual/logger.service';
 import {
   ParamChangeBackendDict,
   ParamChange,
-} from 'domain/exploration/ParamChangeObjectFactory';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+} from 'domain/exploration/param-change.model';
+import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {
   ParamSpecsBackendDict,
   ParamSpecs,
@@ -38,7 +38,7 @@ import {
   EndExplorationCustomizationArgs,
   InteractionCustomizationArgs,
 } from 'interactions/customization-args-defs';
-import {Interaction} from 'domain/exploration/InteractionObjectFactory';
+import {Interaction} from 'domain/exploration/interaction.model';
 import {State} from 'domain/state/StateObjectFactory';
 import {
   StateObjectsBackendDict,
@@ -210,7 +210,6 @@ export class Exploration extends BaseTranslatableObject {
 export class ExplorationObjectFactory {
   constructor(
     private logger: LoggerService,
-    private paramChangesObjectFactory: ParamChangesObjectFactory,
     private paramSpecsObjectFactory: ParamSpecsObjectFactory,
     private statesObjectFactory: StatesObjectFactory,
     private urlInterpolationService: UrlInterpolationService
@@ -221,9 +220,7 @@ export class ExplorationObjectFactory {
   ): Exploration {
     return new Exploration(
       explorationBackendDict.init_state_name,
-      this.paramChangesObjectFactory.createFromBackendList(
-        explorationBackendDict.param_changes
-      ),
+      ParamChanges.createFromBackendList(explorationBackendDict.param_changes),
       this.paramSpecsObjectFactory.createFromBackendDict(
         explorationBackendDict.param_specs
       ),

@@ -36,24 +36,24 @@
   <div class="classroom-content-container">
     <div class="classroom-content">
       <div class="content-section">
-        <h1 class="classroom-content-heading">{{'I18N_CLASSROOM_PAGE_COURSE_DETAILS' | translate}}</h1>
+        <h1 class="classroom-content-heading e2e-test-classroom-content-heading">{{'I18N_CLASSROOM_PAGE_COURSE_DETAILS' | translate}}</h1>
         <p class="classroom-content-text" *ngIf="!isHackyClassroomTranslationDisplayed('courseDetails')">{{classroomData.getCourseDetails()}}</p>
         <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('courseDetails')">{{classroomTranslationKeys.courseDetails | translate}}</p>
       </div>
       <div class="content-section">
-        <h1 class="classroom-content-heading">{{'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate}}</h1>
+        <h1 class="classroom-content-heading e2e-test-classroom-content-heading">{{'I18N_CLASSROOM_PAGE_TOPICS_COVERED' | translate}}</h1>
         <p class="classroom-content-text" *ngIf="!isHackyClassroomTranslationDisplayed('topicListIntro')">{{classroomData.getTopicListIntro()}}</p>
         <p class="classroom-content-text" *ngIf="isHackyClassroomTranslationDisplayed('topicListIntro')">{{ classroomTranslationKeys.topicListIntro | translate }}</p>
       </div>
       <div *ngIf="diagnosticTestIsEnabled()" class="content-section diagnostic-test-container">
-        <div class="diagnostic-test-box">
+        <div class="diagnostic-test-box e2e-test-diagnostic-test-box">
           <div class="diagnostic-test-info">
             <h4>{{ 'I18N_CLASSROOM_PAGE_NEW_TO_MATH_HEADING' | translate }}</h4>
             <p>{{ beginWithFirstTopicButtonText }}</p>
           </div>
-          <a [href]="firstTopicUrl">{{ 'I18N_START_FIRST_CLASSROOM_TOPIC' | translate }}</a>
+          <a [href]="firstTopicUrl" class="e2e-test-start-here-button">{{ 'I18N_START_FIRST_CLASSROOM_TOPIC' | translate }}</a>
         </div>
-        <div class="diagnostic-test-box">
+        <div class="diagnostic-test-box e2e-test-diagnostic-test-box">
           <div class="diagnostic-test-info">
             <h4>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_HEADING' | translate:{ classroomName: classroomData.getName() } }}</h4>
             <p>{{ 'I18N_CLASSROOM_PAGE_ALREADY_KNOW_SOME_TEXT' | translate:{ classroomName: classroomData.getName() } }}</p>

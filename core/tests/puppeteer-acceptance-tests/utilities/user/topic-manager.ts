@@ -231,7 +231,7 @@ const confirmDeleteChapterButton = '.e2e-test-confirm-delete-chapter-button';
 const questionContainerSelector = '.e2e-test-skill-questions-container';
 const skillPreviewContainerSelector = '.e2e-test-skill-preview-container';
 const topicEditorContainerSelector = '.e2e-test-topic-editor-container';
-const topicEditorMainTabFormSelector = 'e2e-test-topic-editor-main-tab';
+const topicEditorMainTabFormSelector = '.e2e-test-topic-editor-main-tab';
 const topicEditorSaveModelSelector = 'oppia-topic-editor-save-modal';
 const topicPreviewContainerSelector = '.e2e-test-topic-preview-container';
 const subtopicEditorContainerSelector = '.e2e-test-subtopic-editor-container';
@@ -244,6 +244,18 @@ const storyEditorContainerSelector = '.e2e-test-story-editor';
 const chapterEditorContainerSelector = '.e2e-test-chapter-editor';
 const chapterPreviewContainerSelector = '.e2e-test-thumbnail-container';
 const multiSelectionInputChipSelector = '.e2e-test-multi-selection-chip';
+
+const subtopicExpandHeaderSelector = '.e2e-test-show-subtopics-list';
+const addSkillButton = 'button.e2e-test-add-skill-button';
+const skillNameInput = '.e2e-test-skill-name-input';
+const skillItem = '.e2e-test-skills-list-item';
+const confirmSkillButton = '.e2e-test-confirm-skill-selection-button';
+const deleteSkillButton = 'i.skill-delete-button';
+const mobileToggleSkillCard = '.e2e-test-toggle-skill-card';
+const removeSkillModalHeaderSelector =
+  '.e2e-test-delete-state-skill-modal-header';
+const addMisconceptionHeaderSelector =
+  '.e2e-test-oppia-misconception-card-header';
 
 export class TopicManager extends BaseUser {
   /**
@@ -277,11 +289,11 @@ export class TopicManager extends BaseUser {
       await this.goto(currentUrl.toString());
       await this.page.reload({waitUntil: 'networkidle0'});
     } else {
-      await this.isElementVisible(skillQuestionTab);
+      await this.expectElementToBeVisible(skillQuestionTab);
       await this.clickAndWaitForNavigation(skillQuestionTab);
     }
 
-    await this.isElementVisible(questionContainerSelector);
+    await this.expectElementToBeVisible(questionContainerSelector);
   }
 
   /**
@@ -297,7 +309,7 @@ export class TopicManager extends BaseUser {
    */
   async navigateToQuestionPreviewTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.isElementVisible(mobileOptionsSelector);
+      await this.expectElementToBeVisible(mobileOptionsSelector);
       await this.clickOn(mobileOptionsSelector);
 
       await this.page.waitForSelector(navigationDropdown);
@@ -308,12 +320,12 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(mobilePreviewTab);
       await this.clickOn(mobilePreviewTab);
     } else {
-      await this.isElementVisible(questionPreviewTab);
+      await this.expectElementToBeVisible(questionPreviewTab);
       await this.page.waitForSelector(questionPreviewTab);
       await this.clickAndWaitForNavigation(questionPreviewTab);
     }
 
-    await this.isElementVisible(skillPreviewContainerSelector);
+    await this.expectElementToBeVisible(skillPreviewContainerSelector);
   }
 
   /**
@@ -347,6 +359,41 @@ export class TopicManager extends BaseUser {
         `Text did not match within the specified time. Actual message: "${actualMessage}", expected message: "${expectedMessage}"`
       );
     }
+  }
+
+  /**
+   * Removes the attached skill from the current state card.
+   */
+  async removeSkillFromState(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addSkillButton);
+      // If the skill menu was collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(mobileToggleSkillCard);
+      }
+    }
+    await this.clickOn(deleteSkillButton);
+    await this.clickOn('Delete skill');
+    await this.expectElementToBeVisible(removeSkillModalHeaderSelector, false);
+  }
+
+  /**
+   * Adds a particular skill to the current state card.
+   * @param skillName - Name of the skill to be linked to state.
+   */
+  async addSkillToState(skillName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(addSkillButton);
+      // If the skill menu was collapsed in mobile view.
+      if (!element) {
+        await this.clickOn(mobileToggleSkillCard);
+      }
+    }
+    await this.clickOn(addSkillButton);
+    await this.type(skillNameInput, skillName);
+    await this.clickOn(skillItem);
+    await this.clickOn(confirmSkillButton);
+    await this.expectPageURLToContain(testConstants.URLs.SkillEditor);
   }
 
   /**
@@ -410,7 +457,7 @@ export class TopicManager extends BaseUser {
     ]);
     await this.waitForStaticAssetsToLoad();
 
-    await this.isElementVisible(topicEditorContainerSelector);
+    await this.expectElementToBeVisible(topicEditorContainerSelector);
   }
 
   /**
@@ -430,10 +477,11 @@ export class TopicManager extends BaseUser {
     topicName?: string,
     urlFragment?: string
   ): Promise<void> {
-    await this.isElementVisible(topicEditorMainTabFormSelector);
+    await this.expectElementToBeVisible(topicEditorMainTabFormSelector);
     if (topicName) {
       await this.clearAllTextFrom(topicNameField);
       await this.type(topicNameField, topicName);
+      await this.expectInputValueToBe(topicNameField, topicName);
     }
     if (urlFragment) {
       await this.page.waitForSelector(topicEditorUrlFragmentField, {
@@ -441,11 +489,13 @@ export class TopicManager extends BaseUser {
       });
       await this.clearAllTextFrom(topicEditorUrlFragmentField);
       await this.page.type(topicEditorUrlFragmentField, urlFragment);
+      await this.expectInputValueToBe(topicEditorUrlFragmentField, urlFragment);
     }
     await this.clearAllTextFrom(updateTopicWebFragmentField);
     await this.type(updateTopicWebFragmentField, titleFragments);
     await this.clearAllTextFrom(updateTopicDescriptionField);
     await this.type(updateTopicDescriptionField, description);
+    await this.expectInputValueToBe(updateTopicDescriptionField, description);
 
     await this.clickOn(photoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
@@ -459,14 +509,7 @@ export class TopicManager extends BaseUser {
     await this.clearAllTextFrom(topicMetaTagInput);
     await this.page.type(topicMetaTagInput, metaTags);
     await this.page.keyboard.press('Tab');
-
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(mobileOptionsSelector);
-      await this.waitForElementToBeClickable(mobileSaveTopicButton);
-      await this.clickOn(mobileOptionsSelector);
-    } else {
-      await this.waitForElementToBeClickable(saveTopicButton);
-    }
+    await this.expectInputValueToBe(topicMetaTagInput, metaTags);
   }
 
   /**
@@ -517,7 +560,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(topicStatusDropdownSelector);
       await this.selectOption(topicStatusDropdownSelector, status);
 
-      await this.expectTextContentToMatch(
+      await this.expectTextContentToBe(
         `${topicStatusDropdownSelector} .mat-select-value-text`,
         status
       );
@@ -544,7 +587,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(classroomDropdownSelector);
       await this.selectOption(classroomDropdownSelector, classroom);
 
-      await this.expectTextContentToMatch(
+      await this.expectTextContentToBe(
         `${classroomDropdownSelector} .mat-select-min-line`,
         classroom
       );
@@ -573,7 +616,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(multiSelectionInputSelector);
       await this.type(multiSelectionInputSelector, keyword);
       await this.page.keyboard.press('Enter');
-      await this.expectTextContentToMatch(
+      await this.expectTextContentToBe(
         `${multiSelectionInputChipSelector}`,
         // We are checking multi-selection-field components and it has cancel
         // icon (text) within the chip element, so we need to add cancel.
@@ -601,7 +644,7 @@ export class TopicManager extends BaseUser {
       }
       await this.page.waitForSelector(sortDropdownSelector);
       await this.selectOption(sortDropdownSelector, sortOption);
-      await this.expectTextContentToMatch(
+      await this.expectTextContentToBe(
         `${sortDropdownSelector} .mat-select-value-text`,
         sortOption
       );
@@ -693,6 +736,36 @@ export class TopicManager extends BaseUser {
   }
 
   /**
+   * Toggles the "Show practice tab to learners" in Topic Editor.
+   */
+  async togglePracticeTabCheckbox(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOn(subtopicExpandHeaderSelector);
+    }
+    try {
+      await this.page.waitForSelector(practiceTabToggle);
+      const practiceTabToggleElement = await this.page.$(practiceTabToggle);
+      if (!practiceTabToggleElement) {
+        throw new Error('Practice tab toggle not found.');
+      }
+      await this.waitForElementToBeClickable(practiceTabToggleElement);
+      await practiceTabToggleElement.click();
+
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const element = document.querySelector(selector);
+          return (element as HTMLInputElement).checked === true;
+        },
+        {},
+        practiceTabToggle
+      );
+    } catch (error) {
+      console.error(error.stack);
+      throw error;
+    }
+  }
+
+  /**
    * Verifies the status of the practice tab.
    * @param {string} expectedStatus - The expected status of the practice tab.
    */
@@ -742,7 +815,7 @@ export class TopicManager extends BaseUser {
       await this.clickOn(topicPreviewTab);
     }
 
-    await this.isElementVisible(topicPreviewContainerSelector);
+    await this.expectElementToBeVisible(topicPreviewContainerSelector);
   }
 
   /**
@@ -883,13 +956,13 @@ export class TopicManager extends BaseUser {
    * Function to navigate the skills tab in topics and skills dashboard.
    */
   async navigateToSkillsTab(): Promise<void> {
-    await this.isElementVisible(skillsTab);
+    await this.expectElementToBeVisible(skillsTab);
     await this.clickOn(skillsTab);
 
     const skillSelector = this.isViewportAtMobileWidth()
       ? mobileSkillSelector
       : desktopSkillSelector;
-    await this.isElementVisible(skillSelector);
+    await this.expectElementToBeVisible(skillSelector);
   }
 
   /**
@@ -926,7 +999,7 @@ export class TopicManager extends BaseUser {
       this.waitForStaticAssetsToLoad(),
     ]);
 
-    await this.isElementVisible(skillEditorContainer);
+    await this.expectElementToBeVisible(skillEditorContainer);
   }
 
   /**
@@ -1004,7 +1077,7 @@ export class TopicManager extends BaseUser {
     }
     await this.clickOn(confirmUnassignSkillButton);
 
-    await this.isElementVisible(confirmUnassignSkillButton, false);
+    await this.expectElementToBeVisible(confirmUnassignSkillButton, false);
   }
 
   /**
@@ -1114,7 +1187,7 @@ export class TopicManager extends BaseUser {
     }
     await this.clickOn(confirmMoveButton);
 
-    await this.isElementVisible(confirmMoveButton, false);
+    await this.expectElementToBeVisible(confirmMoveButton, false);
   }
 
   /**
@@ -1124,7 +1197,7 @@ export class TopicManager extends BaseUser {
    */
   async filterAndSelectSkillInSkillSelector(skillName: string): Promise<void> {
     // Searching by skill name.
-    await this.isElementVisible(skillNameInputSelector);
+    await this.expectElementToBeVisible(skillNameInputSelector);
     await this.type(skillNameInputSelector, skillName);
 
     await this.page.waitForSelector(radioInnerCircleSelector);
@@ -1146,7 +1219,10 @@ export class TopicManager extends BaseUser {
       throw new Error('Confirm skill selection button selector not found');
     }
     await this.clickOn(confirmSkillSelectionButtonSelector);
-    await this.isElementVisible(confirmSkillSelectionButtonSelector, false);
+    await this.expectElementToBeVisible(
+      confirmSkillSelectionButtonSelector,
+      false
+    );
   }
 
   /**
@@ -1247,7 +1323,7 @@ export class TopicManager extends BaseUser {
         );
         await removeQuestionConfirmationButtonElement.click();
 
-        await this.isElementVisible(
+        await this.expectElementToBeVisible(
           removeQuestionConfirmationButtonSelector,
           false
         );
@@ -1266,14 +1342,11 @@ export class TopicManager extends BaseUser {
    * @param {string} questionText - The text of the question to preview.
    */
   async previewQuestion(questionText: string): Promise<void> {
-    try {
-      await this.isElementVisible(questionTextInput);
-      await this.type(questionTextInput, questionText);
-      await this.page.keyboard.press('Enter');
-    } catch (error) {
-      console.error(`Error previewing question: ${error.message}`);
-      throw error;
-    }
+    await this.expectElementToBeVisible(questionTextInput);
+    await this.type(questionTextInput, questionText);
+    await this.page.keyboard.press('Enter');
+
+    await this.expectInputValueToBe(questionTextInput, questionText);
   }
 
   /**
@@ -1350,7 +1423,7 @@ export class TopicManager extends BaseUser {
       }
       await this.page.waitForSelector(skillStatusDropdownSelector);
       await this.selectOption(skillStatusDropdownSelector, status);
-      await this.expectTextContentToMatch(
+      await this.expectTextContentToBe(
         `${skillStatusDropdownSelector} .mat-select-value-text`,
         status
       );
@@ -1380,7 +1453,7 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(multiSelectionInputSelector);
       await this.type(multiSelectionInputSelector, keyword);
       await this.page.keyboard.press('Enter');
-      await this.expectTextContentToMatch(
+      await this.expectTextContentToBe(
         `${multiSelectionInputChipSelector}`,
         // We are checking multi-selection-field components and it has cancel
         // icon (text) within the chip element, so we need to add cancel.
@@ -1410,7 +1483,7 @@ export class TopicManager extends BaseUser {
       }
       await this.page.waitForSelector(sortDropdownSelector);
       await this.selectOption(sortDropdownSelector, sortOption);
-      await this.expectTextContentToMatch(
+      await this.expectTextContentToBe(
         `${sortDropdownSelector} .mat-select-value-text`,
         sortOption
       );
@@ -1433,7 +1506,7 @@ export class TopicManager extends BaseUser {
     selector: string,
     optionText: string
   ): Promise<void> {
-    await this.isElementVisible(selector);
+    await this.expectElementToBeVisible(selector);
     await this.clickOn(selector);
     await this.page.waitForSelector(filterOptionSelector);
 
@@ -1448,9 +1521,13 @@ export class TopicManager extends BaseUser {
       if (text === optionText) {
         await this.waitForElementToBeClickable(optionElement);
         await optionElement.click();
-        break;
+
+        await this.expectElementToBeVisible(filterOptionSelector, false);
+        return;
       }
     }
+
+    throw new Error(`Option ${optionText} not found.`);
   }
 
   /**
@@ -1745,6 +1822,10 @@ export class TopicManager extends BaseUser {
     optional: boolean = false
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      if (!(await this.isElementVisible(addButtonSelector))) {
+        await this.clickOn(addMisconceptionHeaderSelector, true);
+      }
+      await this.page.waitForSelector(addButtonSelector);
       const element = await this.page.$(addButtonSelector);
       // If the misconceptions were collapsed in mobile view.
       if (!element) {
@@ -1768,7 +1849,7 @@ export class TopicManager extends BaseUser {
     }
     await this.clickOn(saveMisconceptionButton);
 
-    await this.isElementVisible(saveMisconceptionButton, false);
+    await this.expectElementToBeVisible(saveMisconceptionButton, false);
   }
 
   /**
@@ -1853,7 +1934,7 @@ export class TopicManager extends BaseUser {
             await this.waitForStaticAssetsToLoad();
             await this.clickOn(confirmDeleteMisconceptionButton);
 
-            await this.isElementVisible(
+            await this.expectElementToBeVisible(
               confirmDeleteMisconceptionButton,
               false
             );
@@ -1877,10 +1958,12 @@ export class TopicManager extends BaseUser {
    */
   async updateReviewMaterial(updatedMaterial: string): Promise<void> {
     try {
+      await this.expectElementToBeVisible(editConceptCardSelector);
       await this.clickOn(editConceptCardSelector);
       await this.clearAllTextFrom(rteSelector);
       await this.type(rteSelector, updatedMaterial);
       await this.clickOn(saveConceptCardSelector);
+      await this.expectElementToBeVisible(saveConceptCardSelector, false);
       showMessage('Updated review material');
     } catch (error) {
       console.error(error);
@@ -1917,6 +2000,7 @@ export class TopicManager extends BaseUser {
   async addPrerequisiteSkillInSkillEditor(skillName: string): Promise<void> {
     try {
       if (this.isViewportAtMobileWidth()) {
+        await this.page.waitForSelector(togglePrerequisiteSkillsDropdown);
         await this.clickOn(togglePrerequisiteSkillsDropdown);
       }
       await this.clickOn(addPrerequisiteSkillInSkillEditorButton);
@@ -1943,7 +2027,10 @@ export class TopicManager extends BaseUser {
       }
       await this.clickOn(confirmSkillSelectionButtonSelector);
 
-      await this.isElementVisible(confirmSkillSelectionButtonSelector, false);
+      await this.expectElementToBeVisible(
+        confirmSkillSelectionButtonSelector,
+        false
+      );
       showMessage(`Added prerequisite skill: ${skillName}`);
     } catch (error) {
       console.error(error);
@@ -1982,6 +2069,22 @@ export class TopicManager extends BaseUser {
           }
         }
       }
+
+      await this.page.waitForFunction(
+        (selector: string, skillName: string) => {
+          const skillElements = document.querySelectorAll(selector);
+          for (const skillElement of Array.from(skillElements)) {
+            const skillNameElement = skillElement.querySelector('span');
+            if (skillNameElement?.textContent?.trim() === skillName) {
+              return false;
+            }
+          }
+          return true;
+        },
+        {},
+        `${skillDescriptionCardSelector} a`,
+        skillName
+      );
 
       throw new Error(`The skill ${skillName} was not found`);
     } catch (error) {
@@ -2075,7 +2178,7 @@ export class TopicManager extends BaseUser {
     await this.type(rteSelector, explanation);
     await this.clickOn(saveRubricExplanationButton);
 
-    await this.isElementVisible(saveRubricExplanationButton, false);
+    await this.expectElementToBeVisible(saveRubricExplanationButton, false);
   }
 
   /**
@@ -2084,7 +2187,7 @@ export class TopicManager extends BaseUser {
    */
   async publishUpdatedSkill(updateMessage: string): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.isElementVisible(mobileOptionsSelector);
+      await this.expectElementToBeVisible(mobileOptionsSelector);
       await this.clickOn(mobileOptionsSelector);
       // The mobile view has 2 instances of the element, from which
       // the first one is inapplicable here.
@@ -2119,7 +2222,7 @@ export class TopicManager extends BaseUser {
    */
   async previewConceptCard(): Promise<void> {
     await this.clickOn(' Preview Concept Card ');
-    await this.isElementVisible(conceptCardPreviewModelSelector);
+    await this.expectElementToBeVisible(conceptCardPreviewModelSelector);
   }
 
   /**
@@ -2219,7 +2322,7 @@ export class TopicManager extends BaseUser {
       throw newError;
     }
 
-    await this.isElementVisible(subtopicEditorContainerSelector);
+    await this.expectElementToBeVisible(subtopicEditorContainerSelector);
   }
 
   /**
@@ -2236,7 +2339,7 @@ export class TopicManager extends BaseUser {
     explanation: string,
     thumbnail: string
   ): Promise<void> {
-    await this.isElementVisible(subtopicTitleField);
+    await this.expectElementToBeVisible(subtopicTitleField);
     await this.clearAllTextFrom(subtopicTitleField);
     await this.type(subtopicTitleField, title);
     if (urlFragment) {
@@ -2258,7 +2361,7 @@ export class TopicManager extends BaseUser {
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
 
-    await this.isElementVisible(photoUploadModal, false);
+    await this.expectElementToBeVisible(photoUploadModal, false);
   }
 
   /**
@@ -2298,7 +2401,10 @@ export class TopicManager extends BaseUser {
             if (deleteButton) {
               await this.waitForElementToBeClickable(deleteButton);
               await deleteButton.click();
-              await this.isElementVisible(deleteSubtopicButtonSelector, false);
+              await this.expectElementToBeVisible(
+                deleteSubtopicButtonSelector,
+                false
+              );
               showMessage(
                 `Subtopic ${subtopicName} deleted from the topic ${topicName}.`
               );
@@ -2395,7 +2501,7 @@ export class TopicManager extends BaseUser {
       await this.clickOn(topicPreviewTab);
     }
 
-    await this.isElementVisible(subtopicPreviewContainerSelector);
+    await this.expectElementToBeVisible(subtopicPreviewContainerSelector);
     showMessage('Navigated to Subtopic Preview Tab');
   }
 
@@ -2533,7 +2639,7 @@ export class TopicManager extends BaseUser {
             waitUntil: ['load', 'networkidle0'],
           });
 
-          await this.isElementVisible(storyEditorContainerSelector);
+          await this.expectElementToBeVisible(storyEditorContainerSelector);
           return;
         }
       }
@@ -2641,7 +2747,10 @@ export class TopicManager extends BaseUser {
               await this.waitForElementToBeClickable(deleteButton);
               await deleteButton.click();
               await this.clickOn(confirmStoryDeletionButton);
-              await this.isElementVisible(confirmStoryDeletionButton);
+              await this.expectElementToBeVisible(
+                confirmStoryDeletionButton,
+                false
+              );
               showMessage(
                 `Story ${storyName} deleted from the topic ${topicName}.`
               );
@@ -2693,10 +2802,22 @@ export class TopicManager extends BaseUser {
    * Click on save new chapter button.
    */
   async clickOnSaveNewChapterButton(): Promise<void> {
-    await this.isElementVisible(createChapterButton);
+    await this.expectElementToBeVisible(createChapterButton);
     await this.clickOn(createChapterButton);
 
-    await this.isElementVisible(createChapterButton, false);
+    const saveChapterButtonHidden = await this.isElementVisible(
+      createChapterButton,
+      false
+    );
+    const errorSpanShown = await this.isElementVisible(
+      newChapterErrorMessageSelector
+    );
+    if (saveChapterButtonHidden || errorSpanShown) {
+      return;
+    }
+    throw new Error(
+      'Save chapter button is not visible, nor error span is shown.'
+    );
   }
 
   /**
@@ -2757,7 +2878,7 @@ export class TopicManager extends BaseUser {
         if (title === chapterName) {
           await titleElement.click();
           await this.waitForStaticAssetsToLoad();
-          await this.isElementVisible(chapterEditorContainerSelector);
+          await this.expectElementToBeVisible(chapterEditorContainerSelector);
           showMessage(`Chapter ${chapterName} opened in chapter editor.`);
 
           // Collapsing all the collapsible card of chapter editor in the mobile viewport.
@@ -2817,7 +2938,7 @@ export class TopicManager extends BaseUser {
     await this.uploadFile(thumbnailImage);
     await this.page.waitForSelector(`${uploadPhotoButton}:not([disabled])`);
     await this.clickOn(uploadPhotoButton);
-    await this.isElementVisible(uploadPhotoButton, false);
+    await this.expectElementToBeVisible(uploadPhotoButton, false);
   }
 
   /**
@@ -2832,7 +2953,7 @@ export class TopicManager extends BaseUser {
     }
     await elementHandle.click();
 
-    await this.isElementVisible(chapterPreviewContainerSelector);
+    await this.expectElementToBeVisible(chapterPreviewContainerSelector);
   }
 
   /**
@@ -3019,7 +3140,10 @@ export class TopicManager extends BaseUser {
               await deleteButton.click();
               await this.clickOn(confirmDeleteChapterButton);
 
-              await this.isElementVisible(confirmDeleteChapterButton, false);
+              await this.expectElementToBeVisible(
+                confirmDeleteChapterButton,
+                false
+              );
 
               showMessage(
                 `Chapter ${chapterName} deleted from the story ${storyName}.`

@@ -21,10 +21,7 @@ import {Component, Injector, Input, OnDestroy, OnInit} from '@angular/core';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {Subscription} from 'rxjs';
 import {ExplorationParamSpecsService} from '../services/exploration-param-specs.service';
-import {
-  ParamChange,
-  ParamChangeObjectFactory,
-} from 'domain/exploration/ParamChangeObjectFactory';
+import {ParamChange} from 'domain/exploration/param-change.model';
 import {EditabilityService} from 'services/editability.service';
 import {AlertsService} from 'services/alerts.service';
 import {ExplorationStatesService} from '../services/exploration-states.service';
@@ -73,7 +70,6 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
     private externalSaveService: ExternalSaveService,
     private explorationStatesService: ExplorationStatesService,
     private explorationParamSpecsService: ExplorationParamSpecsService,
-    private paramChangeObjectFactory: ParamChangeObjectFactory,
     public editabilityService: EditabilityService,
     private urlInterpolationService: UrlInterpolationService,
     private injector: Injector
@@ -103,8 +99,7 @@ export class ParamChangesEditorComponent implements OnInit, OnDestroy {
   addParamChange(): void {
     let newParamName =
       this.paramNameChoices.length > 0 ? this.paramNameChoices[0].id : 'x';
-    let newParamChange =
-      this.paramChangeObjectFactory.createDefault(newParamName);
+    let newParamChange = ParamChange.createDefault(newParamName);
     // Add the new param name to this.paramNameChoices, if necessary,
     // so that it shows up in the dropdown.
     if (

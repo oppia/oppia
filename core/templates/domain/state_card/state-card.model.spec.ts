@@ -21,8 +21,8 @@ import {TestBed} from '@angular/core/testing';
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import {
   InteractionBackendDict,
-  InteractionObjectFactory,
-} from 'domain/exploration/InteractionObjectFactory';
+  Interaction,
+} from 'domain/exploration/interaction.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
@@ -31,7 +31,6 @@ import {Solution} from 'domain/exploration/solution.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('State card object factory', () => {
-  let interactionObjectFactory: InteractionObjectFactory;
   let _sampleCard1: StateCard;
   let _sampleCard2: StateCard;
 
@@ -39,8 +38,6 @@ describe('State card object factory', () => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe],
     });
-
-    interactionObjectFactory = TestBed.inject(InteractionObjectFactory);
 
     let interactionDict: InteractionBackendDict = {
       answer_groups: [],
@@ -93,7 +90,7 @@ describe('State card object factory', () => {
       'State 1',
       '<p>Content</p>',
       '<interaction></interaction>',
-      interactionObjectFactory.createFromBackendDict(interactionDict),
+      Interaction.createFromBackendDict(interactionDict),
       'content'
     );
     _sampleCard2 = StateCard.createNewCard(

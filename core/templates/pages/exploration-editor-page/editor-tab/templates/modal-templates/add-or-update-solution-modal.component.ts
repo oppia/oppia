@@ -83,6 +83,7 @@ export class AddOrUpdateSolutionModalComponent
   EXPLANATION_FORM_SCHEMA: HtmlFormSchema = {
     type: 'html',
     ui_config: {
+      rte_components: 'ALL_COMPONENTS',
       hide_complex_extensions:
         this.pageContextService.getEntityType() === 'question',
     },

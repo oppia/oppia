@@ -107,12 +107,14 @@ class PopulateStudyGuidesJob(base_jobs.JobBase):
             # Create sections list with heading and content.
             sections = [
                 {
-                    'content_id': 'section_heading_0',
-                    'unicode_str': subtopic_title
-                },
-                {
-                    'content_id': 'section_content_1',
-                    'html': subtopic_page.page_contents.subtitled_html.html
+                    'heading': {
+                        'content_id': 'section_heading_0',
+                        'unicode_str': subtopic_title
+                    },
+                    'content': {
+                        'content_id': 'section_content_1',
+                        'html': subtopic_page.page_contents.subtitled_html.html
+                    }
                 }
             ]
 

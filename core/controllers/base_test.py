@@ -397,9 +397,27 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             expected_status_int=404)
 
     def test_no_redirection_for_tasks(self) -> None:
-        tasks_data = '{"fn_identifier": "%s", "args": [[]], "kwargs": {}}' % (
-            taskqueue_services.FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = 'task_id_123'
+        queue_name = 'test_queue_name'
+
+        task_name = (
+            'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+                project_id, location_id, queue_name, task_id
+            )
         )
+        function_id = feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS']
+
+        cloud_task_model = taskqueue_services.create_new_cloud_task_model(
+            'model_123', task_name, function_id)
+        cloud_task_model.update_timestamps()
+        cloud_task_model.put()
+
+        tasks_data = (
+            '{"fn_identifier": "%s", "args": [[]], "kwargs": {}, '
+            '"cloud_task_model_id": "model_123"}' % function_id)
 
         # Valid URL, where user now has permissions.
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)

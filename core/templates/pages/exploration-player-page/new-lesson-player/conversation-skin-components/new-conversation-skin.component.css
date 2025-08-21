@@ -56,11 +56,6 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   width: 100%;
 }
 
-.new-conversation-skin-cards-container-embedded {
-  margin-bottom: 25%;
-  padding: 10px 14px 0 !important;
-}
-
 .conversation-skin-help-card-content {
   padding: 12px;
 }
@@ -81,7 +76,6 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   margin-top: 30px;
   max-width: 650px;
   position: relative;
-  width: 42%;
   z-index: 2;
 }
 
@@ -112,7 +106,37 @@ oppia-new-conversation-skin .oppia-button-icon {
   cursor: default;
 }
 
-@media (max-width: 959px) {
+
+@media(min-width: 768px) {
+  .new-progress-nav-bar-container {
+    display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .new-conversation-skin-cards-container {
+    display: block;
+    padding: 0 50px 20px 8px;
+    position: relative;
+    width: 100%;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .new-conversation-skin-cards-container {
+    display: block;
+    padding: 66px 80px 66px 25px;
+    position: relative;
+    width: 100%;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  .new-conversation-skin-cards-container {
+    display: block;
+    padding-left: 80px;
+    padding-right: 80px;
+  }
 
   .new-conversation-skin-tutor-card-container {
     left: 0;
@@ -126,10 +150,6 @@ oppia-new-conversation-skin .oppia-button-icon {
   .new-conversation-skin-tutor-card-alone {
     position: relative;
     top: 0;
-  }
-
-  .new-supplemental-card-parent-container {
-    position: unset;
   }
 
   .new-conversation-skin-supplemental-card-container {
@@ -152,30 +172,5 @@ oppia-new-conversation-skin .oppia-button-icon {
 
   .conversation-skin-oppia-avatar.show-tutor-card:hover {
     opacity: 0.8;
-  }
-}
-
-@media(min-width: 768px) {
-  .new-progress-nav-bar-container {
-    display: block;
-  }
-}
-
-@media (max-width: 480px) {
-  .new-conversation-skin-cards-container {
-    display: block;
-    padding: 0 40px 20px 8px;
-    position: relative;
-    width: 100%;
-  }
-}
-
-@media (min-width: 481px) and (max-width: 768px) {
-  .new-conversation-skin-cards-container {
-    display: block;
-    padding: 66px;
-    padding-right: 75px;
-    position: relative;
-    width: 100%;
   }
 }

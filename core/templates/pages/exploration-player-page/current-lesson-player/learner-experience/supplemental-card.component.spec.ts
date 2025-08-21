@@ -43,7 +43,7 @@ import {
 } from '../../services/player-position.service';
 import {SupplementalCardComponent} from './supplemental-card.component';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
-import {Interaction} from '../../../../domain/exploration/InteractionObjectFactory';
+import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {PlatformFeatureService} from '../../../../services/platform-feature.service';
