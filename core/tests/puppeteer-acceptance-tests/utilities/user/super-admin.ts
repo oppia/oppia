@@ -232,6 +232,7 @@ export class SuperAdmin extends BaseUser {
             return true;
           }
         }
+        return false;
       },
       {},
       selectedLanguageSelector,
