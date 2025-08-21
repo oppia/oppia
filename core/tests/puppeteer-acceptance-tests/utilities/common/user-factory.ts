@@ -131,6 +131,10 @@ export class UserFactory {
         superAdminInstance = await UserFactory.createNewSuperAdmin('superAdm');
       }
 
+      if (!user.username) {
+        throw new Error('Username is null while adding roles');
+      }
+
       switch (role) {
         case ROLES.BLOG_POST_EDITOR:
           await superAdminInstance.navigateToBlogAdminPage();
@@ -207,6 +211,9 @@ export class UserFactory {
       CurriculumAdminFactory(),
       VoiceoverSubmitterFactory(),
     ]);
+
+    user.username = username;
+    user.email = email;
 
     await user.openBrowser();
     await user.signUpNewUser(username, email);
