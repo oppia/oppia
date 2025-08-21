@@ -1892,3 +1892,53 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         # method supports three language accents for Oppia's voiceover
         # autogeneration: 'en-US', 'en-IN', and 'ar-AE'.
         self.assertEqual(len(entity_voiceovers_list), 3)
+
+    def test_should_generate_voiceover_for_translated_content(self) -> None:
+        language_code = 'ar'
+        exploration_id = 'exp_id_1'
+        exploration_version = 1
+        language_accent_code = 'ar-AE'
+        translation_content = 'المحتوى المترجم'
+        content_id = 'content_id_0'
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id, title='A Title',
+            category='A Category', objective='An Objective')
+        exploration.states['Introduction'].content.html = 'First Card!'
+        exp_services.save_new_exploration(exploration_id, exploration)
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code
+            )
+        )
+        self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
+
+        with self.swap(
+            voiceover_services,
+            'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
+            self.mock_send_email_to_voiceover_admins_and_tech_leads
+        ):
+            (
+                voiceover_services.
+                generate_voiceover_from_translated_content(
+                    exploration_id,
+                    exploration_version,
+                    translation_content,
+                    content_id,
+                    language_code
+                )
+            )
+
+        entity_voiceovers = (
+            voiceover_services.get_voiceovers_for_given_language_accent_code(
+                feconf.ENTITY_TYPE_EXPLORATION,
+                exploration_id,
+                exploration_version,
+                language_accent_code
+            )
+        )
+        self.assertNotEqual(entity_voiceovers.voiceovers_mapping, {})
