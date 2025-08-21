@@ -29,8 +29,7 @@ const INTRO_CONTENT_VOICEOVER_IN_HI =
   testConstants.data.IntroContentVoiceoverInHindi;
 const CONTINUE_INTERACTION_VOICEOVER_IN_HI =
   testConstants.data.ContinueInteractionVoiceoverInHindi;
-const LAST_CARD_VOICEOVER_IN_HI =
-  testConstants.data.LastCardContentVoiceoverInHindi;
+const LAST_CARD_VOICEOVER_IN_HI = testConstants.data.VoiceoverEnglishIndia;
 const ROLES = testConstants.Roles;
 
 const INTRODUCTION_CARD_CONTENT: string =

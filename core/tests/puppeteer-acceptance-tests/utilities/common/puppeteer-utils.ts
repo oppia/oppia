@@ -463,16 +463,18 @@ export class BaseUser {
      * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
     const xpath = `\/\/*[contains(text(), normalize-space('${selector}'))]`;
     let button: ElementHandle | null = null;
-    try {
-      button = await this.page.waitForXPath(xpath, {
-        visible: true,
-        timeout: timeoutForTextButton,
-      });
-    } catch (error) {
-      if (!(error instanceof puppeteer.errors.TimeoutError)) {
-        throw error;
+    if (!forceSelector) {
+      try {
+        button = await this.page.waitForXPath(xpath, {
+          visible: true,
+          timeout: timeoutForTextButton,
+        });
+      } catch (error) {
+        if (!(error instanceof puppeteer.errors.TimeoutError)) {
+          throw error;
+        }
+        showMessage(`Using CSS selector to find button: ${selector}`);
       }
-      showMessage(`Using CSS selector to find button: ${selector}`);
     }
     if (button !== null && !forceSelector) {
       await this.waitForElementToBeClickable(button);

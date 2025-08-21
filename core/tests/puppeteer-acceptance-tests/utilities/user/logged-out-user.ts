@@ -5430,7 +5430,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async pauseVoiceover(): Promise<void> {
     await this.page.waitForSelector(pauseVoiceoverButton, {visible: true});
-    await this.clickOn(pauseVoiceoverButton);
+    await this.clickOn(pauseVoiceoverButton, true);
     await this.page.waitForSelector(playVoiceoverButton, {visible: true});
     showMessage('Voiceover paused successfully.');
   }
