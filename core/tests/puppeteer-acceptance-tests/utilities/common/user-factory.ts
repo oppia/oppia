@@ -159,6 +159,7 @@ export class UserFactory {
             ROLES.TRANSLATION_COORDINATOR,
             args
           );
+          break;
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;

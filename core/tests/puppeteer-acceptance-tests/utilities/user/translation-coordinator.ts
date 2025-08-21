@@ -63,7 +63,7 @@ export class TranslationCoordinator extends BaseUser {
     await this.page.waitForFunction(
       (selector: string, language: string, visible: boolean) => {
         const elements = document.querySelectorAll(selector);
-        for (const element of elements) {
+        for (const element of Array.from(elements)) {
           const elementText = element.textContent?.trim();
           if (elementText === language) {
             return visible === true;

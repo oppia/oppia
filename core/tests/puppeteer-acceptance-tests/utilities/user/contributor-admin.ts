@@ -55,7 +55,7 @@ export class ContributorAdmin extends BaseUser {
       const activeTabSelector = `${activeTabInContributorAdminPageSelector} ${tabSelector}`;
       await this.expectTextContentToBe(
         activeTabSelector,
-        tabName.toUpperCase()
+        tabName.replace(' ', '')
       );
     }
   }

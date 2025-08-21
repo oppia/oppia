@@ -218,25 +218,27 @@ export class SuperAdmin extends BaseUser {
     const addLanguageButtonSelector = '.e2e-test-language-selector-add-button';
     const selectedLanguageSelector = '.e2e-test-selected-language';
 
+    const visible = await this.isElementVisible(
+      selectedLanguageSelector,
+      true,
+      5000
+    );
+    const initalNumberOfLanguages = !visible
+      ? 0
+      : (await this.page.$$(selectedLanguageSelector)).length;
     const selectElementSelector = `${languageSelectorBodySelector} select`;
     await this.select(selectElementSelector, language);
 
     await this.clickOn(addLanguageButtonSelector);
 
     await this.page.waitForFunction(
-      (selector: string, language: string) => {
+      (selector: string, numberOfLanguages: number) => {
         const elements = document.querySelectorAll(selector);
-        for (const element of Array.from(elements)) {
-          const elementText = element.textContent?.trim();
-          if (elementText === language) {
-            return true;
-          }
-        }
-        return false;
+        return elements.length === numberOfLanguages;
       },
       {},
       selectedLanguageSelector,
-      language
+      initalNumberOfLanguages + 1
     );
   }
 
