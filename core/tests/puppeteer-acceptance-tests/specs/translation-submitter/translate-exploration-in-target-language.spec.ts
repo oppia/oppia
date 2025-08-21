@@ -253,6 +253,7 @@ describe('Translation Submitter', function () {
       'आपने संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
     );
     await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
+    await translationSubmitter.page.keyboard.press('ArrowRight');
 
     // Image.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -270,6 +271,7 @@ describe('Translation Submitter', function () {
       'तस्वीर का शीर्षक'
     );
     await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
+    await translationSubmitter.page.keyboard.press('ArrowRight');
 
     // Link.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -285,6 +287,7 @@ describe('Translation Submitter', function () {
       1
     );
     await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
+    await translationSubmitter.page.keyboard.press('Enter');
 
     // Math Formula.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -295,6 +298,7 @@ describe('Translation Submitter', function () {
       '\\frac{x}{y}'
     );
     await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
+    await translationSubmitter.page.keyboard.press('Enter');
 
     // Concept Card.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -305,6 +309,7 @@ describe('Translation Submitter', function () {
       'संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
     );
     await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
+    await translationSubmitter.page.keyboard.press('Enter');
 
     // Tabs.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -329,6 +334,7 @@ describe('Translation Submitter', function () {
       1
     );
     await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
+    await translationSubmitter.page.keyboard.press('ArrowRight');
 
     // Video RTE.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -339,6 +345,7 @@ describe('Translation Submitter', function () {
       youtubeVideoURL
     );
     await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
+    await translationSubmitter.page.keyboard.press('ArrowRight');
   });
 
   it('should be able to use copy tool', async function () {

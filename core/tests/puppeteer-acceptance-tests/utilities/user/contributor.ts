@@ -219,6 +219,7 @@ export class Contributor extends BaseUser {
 
       // Click on the option.
       await this.waitForElementToStabilize(optionElement);
+      await this.expectElementToBeClickable(optionElement);
       await optionElement.click();
 
       await this.expectTextContentToContain(viewDropdownSelector, tabName);
