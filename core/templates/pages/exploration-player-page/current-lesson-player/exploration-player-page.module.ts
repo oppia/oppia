@@ -31,7 +31,7 @@ import {MaterialModule} from 'modules/material.module';
 import {RefresherExplorationConfirmationModal} from './modals/refresher-exploration-confirmation-modal.component';
 import {ExplorationPlayerPageComponent} from './exploration-player-page.component';
 import {ExplorationPlayerPageRootComponent} from './exploration-player-page-root.component';
-import {ProgressReminderModalComponent} from './templates/progress-reminder-modal.component';
+// import {ProgressReminderModalComponent} from './templates/progress-reminder-modal.component';
 import {HintAndSolutionModalService} from '../services/hint-and-solution-modal.service';
 import {FatigueDetectionService} from '../services/fatigue-detection.service';
 
@@ -67,7 +67,7 @@ import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.gua
     ExplorationPlayerPageComponent,
     ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    ProgressReminderModalComponent,
+    // ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,
@@ -77,7 +77,7 @@ import {ExplorationPlayerPageAuthGuard} from './exploration-player-page-auth.gua
     ExplorationPlayerPageComponent,
     ExplorationPlayerPageRootComponent,
     ExplorationSuccessfullyFlaggedModalComponent,
-    ProgressReminderModalComponent,
+    // ProgressReminderModalComponent,
     FlagExplorationModalComponent,
     LearnerLocalNavComponent,
     LearnerViewInfoComponent,

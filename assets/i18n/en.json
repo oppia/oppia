@@ -390,7 +390,7 @@
     "I18N_CORRECT_FEEDBACK": "Correct!",
     "I18N_COUNT_OF_LESSONS": "{lessonCountValue, plural, =1{Lesson} other{Lessons}}",
     "I18N_CREATED_LEARNER_GROUP_LINK_MESSAGE": "Your group link",
-    "I18N_CREATE_ACCOUNT": "Create Account",
+    "I18N_CREATE_ACCOUNT": "Create an account",
     "I18N_CREATE_ACTIVITY_QUESTION": "What do you want to create?",
     "I18N_CREATE_ACTIVITY_TITLE": "Create an Activity",
     "I18N_CREATE_COLLECTION": "Create Collection",

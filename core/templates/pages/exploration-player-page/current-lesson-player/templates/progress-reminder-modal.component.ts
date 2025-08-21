@@ -49,6 +49,8 @@ export class ProgressReminderModalComponent extends ConfirmOrCancelModal {
   }
 
   ngOnInit(): void {
+    console.log(this.explorationTitle);
+    this.explorationTitle = 'dffff';
     this.checkpointStatusArray = new Array(this.checkpointCount);
     for (let i = 0; i < this.completedCheckpointsCount; i++) {
       this.checkpointStatusArray[i] = CHECKPOINT_STATUS_COMPLETED;

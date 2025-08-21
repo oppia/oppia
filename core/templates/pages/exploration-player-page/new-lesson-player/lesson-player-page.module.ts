@@ -42,6 +42,7 @@ import {NewFlagExplorationModalComponent} from './sidebar-components/flag-lesson
 import {CustomizableThankYouModalComponent} from './sidebar-components/customizable-thank-you-modal.component';
 import {LessonFeedbackModalComponent} from './sidebar-components/lesson-feedback-modal.component';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
+import {ProgressReminderModalComponent} from '../current-lesson-player/templates/progress-reminder-modal.component';
 
 @NgModule({
   imports: [
@@ -67,6 +68,7 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
     NewFlagExplorationModalComponent,
     CustomizableThankYouModalComponent,
     LessonFeedbackModalComponent,
+    ProgressReminderModalComponent,
   ],
   entryComponents: [
     NewFlagExplorationModalComponent,
@@ -77,6 +79,7 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
     LessonPlayerSidebarComponent,
     NewAudioBarComponent,
     LessonFeedbackModalComponent,
+    ProgressReminderModalComponent,
   ],
   providers: [
     HintAndSolutionModalService,

@@ -844,6 +844,7 @@ export class ConversationFlowService {
       .loadLatestExplorationAsync(explorationId, pidInUrl)
       .then(response => {
         states = response.exploration.states;
+        console.log(`${response.most_recently_reached_checkpoint_state_name}`);
 
         let mostRecentlyReachedCheckpoint =
           this.checkpointProgressService.getMostRecentlyReachedCheckpoint() ||

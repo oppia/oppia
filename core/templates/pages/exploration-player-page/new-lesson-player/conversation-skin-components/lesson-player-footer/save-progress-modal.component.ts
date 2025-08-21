@@ -22,6 +22,7 @@ import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import './save-progress-modal.component.css';
 
 @Component({
   selector: 'oppia-save-progress-modal',
@@ -36,7 +37,8 @@ export class SaveProgressModalComponent {
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private userService: UserService,
     private windowRef: WindowRef,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private ngbActiveModal: NgbActiveModal
   ) {}
 
   isLanguageRTL(): boolean {
@@ -55,5 +57,9 @@ export class SaveProgressModalComponent {
       this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(urlId);
       this.windowRef.nativeWindow.location.href = loginUrl;
     });
+  }
+
+  closeModal(): void {
+    this.ngbActiveModal.dismiss();
   }
 }

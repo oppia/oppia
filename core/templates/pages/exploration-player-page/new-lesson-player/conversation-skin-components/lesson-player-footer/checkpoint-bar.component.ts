@@ -28,6 +28,7 @@ import {PlayerTranscriptService} from '../../../services/player-transcript.servi
 import {PlayerPositionService} from '../../../services/player-position.service';
 import {Subscription} from 'rxjs';
 import {PageContextService} from 'services/page-context.service';
+import {CheckpointProgressService} from 'pages/exploration-player-page/services/checkpoint-progress.service';
 
 const CHECKPOINT_STATUS_INCOMPLETE = 'incomplete';
 const CHECKPOINT_STATUS_COMPLETED = 'completed';
@@ -52,13 +53,15 @@ export class CheckpointBarComponent implements OnInit {
     private explorationEngineService: ExplorationEngineService,
     private playerTranscriptService: PlayerTranscriptService,
     private playerPositionService: PlayerPositionService,
-    private pageContextService: PageContextService
+    private pageContextService: PageContextService,
+    private checkpointProgressService: CheckpointProgressService
   ) {}
 
   ngOnInit(): void {
     this.explorationId = this.pageContextService.getExplorationId();
 
-    this.getCheckpointCount().then(() => {
+    this.checkpointProgressService.fetchCheckpointCount().then(count => {
+      this.checkpointCount = count;
       this.updateLessonProgressBar();
     });
 
@@ -99,24 +102,10 @@ export class CheckpointBarComponent implements OnInit {
     return progressPercentage.toString();
   }
 
-  getMostRecentlyReachedCheckpointIndex(): number {
-    let checkpointIndex = 0;
-    let numberOfCards = this.playerTranscriptService.getNumCards();
-    for (let i = 0; i < numberOfCards; i++) {
-      let stateName = this.playerTranscriptService.getCard(i).getStateName();
-      let correspondingState =
-        this.explorationEngineService.getStateFromStateName(stateName);
-      if (correspondingState.cardIsCheckpoint) {
-        checkpointIndex++;
-      }
-    }
-    return checkpointIndex;
-  }
-
   updateLessonProgressBar(): void {
     if (!this.expEnded) {
       const mostRecentlyReachedCheckpointIndex =
-        this.getMostRecentlyReachedCheckpointIndex();
+        this.checkpointProgressService.getMostRecentlyReachedCheckpointIndex();
       this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
 
       let displayedCardIndex =

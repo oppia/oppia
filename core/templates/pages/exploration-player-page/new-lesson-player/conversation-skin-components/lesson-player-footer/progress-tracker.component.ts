@@ -16,30 +16,61 @@
  * @fileoverview Component for an input/response pair in the learner view.
  */
 
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import './progress-tracker.component.css';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {SaveProgressModalComponent} from './save-progress-modal.component';
 import {ProgressUrlService} from 'pages/exploration-player-page/services/progress-url.service';
 import {UrlService} from 'services/contextual/url.service';
+import {Subscription} from 'rxjs';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {CheckpointProgressService} from 'pages/exploration-player-page/services/checkpoint-progress.service';
+import {ConversationFlowService} from 'pages/exploration-player-page/services/conversation-flow.service';
+import {ProgressReminderModalComponent} from 'pages/exploration-player-page/current-lesson-player/templates/progress-reminder-modal.component';
+import {ExplorationEngineService} from 'pages/exploration-player-page/services/exploration-engine.service';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'oppia-progress-tracker',
   templateUrl: './progress-tracker.component.html',
   styleUrls: ['./progress-tracker.component.css'],
 })
-export class ProgressTrackerComponent implements OnInit {
+export class ProgressTrackerComponent implements OnInit, OnDestroy {
   @Input() userIsLoggedIn: boolean = false;
+  directiveSubscriptions = new Subscription();
   loggedOutProgressUniqueUrlId!: string | null;
   loggedOutProgressUniqueUrl!: string;
+  checkpointCount: number = 0;
+  completedCheckpointsCount: number = 0;
 
   constructor(
     private ngbModal: NgbModal,
     private progressUrlService: ProgressUrlService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private playerPositionService: PlayerPositionService,
+    private checkpointProgressService: CheckpointProgressService,
+    private conversationFlowService: ConversationFlowService,
+    private explorationEngineService: ExplorationEngineService,
+    private editableExplorationBackendApiService: EditableExplorationBackendApiService,
+    private pageContextService: PageContextService,
+    private windowRef: WindowRef
   ) {}
 
   ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(() => {
+        if (this.checkpointCount) {
+          this.showProgressReminderModal();
+        } else {
+          this.checkpointProgressService.fetchCheckpointCount().then(count => {
+            this.checkpointCount = count;
+            this.showProgressReminderModal();
+          });
+        }
+      })
+    );
     const urlParams = this.urlService.getUrlParams();
     this.loggedOutProgressUniqueUrlId =
       urlParams.pid || this.progressUrlService.getUniqueProgressUrlId();
@@ -49,6 +80,63 @@ export class ProgressTrackerComponent implements OnInit {
         '/progress/' +
         this.loggedOutProgressUniqueUrlId;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.directiveSubscriptions.unsubscribe();
+  }
+
+  showProgressReminderModal(): void {
+    const mostRecentlyReachedCheckpointIndex =
+      this.checkpointProgressService.getMostRecentlyReachedCheckpointIndex();
+
+    this.completedCheckpointsCount = mostRecentlyReachedCheckpointIndex - 1;
+
+    if (this.completedCheckpointsCount === 0) {
+      this.conversationFlowService.onShowProgressModal.emit();
+      return;
+    }
+    this.openProgressReminderModal();
+  }
+
+  openProgressReminderModal(): void {
+    const explorationId = this.pageContextService.getExplorationId();
+    let modalRef = this.ngbModal.open(ProgressReminderModalComponent, {
+      windowClass: 'oppia-progress-reminder-modal',
+    });
+    this.conversationFlowService.onShowProgressModal.emit();
+
+    let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
+    if (displayedCardIndex > 0) {
+      let state = this.explorationEngineService.getState();
+      let stateCard = this.explorationEngineService.getStateCardByName(
+        state.name
+      );
+      if (stateCard.isTerminal()) {
+        this.completedCheckpointsCount += 1;
+      }
+    }
+
+    modalRef.componentInstance.checkpointCount = this.checkpointCount;
+    modalRef.componentInstance.completedCheckpointsCount =
+      this.completedCheckpointsCount;
+    // modalRef.componentInstance.explorationTitle = this.expInfo.title;
+
+    modalRef.result.then(
+      () => {
+        // This callback is used for when the learner chooses to restart
+        // the exploration.
+        this.editableExplorationBackendApiService
+          .resetExplorationProgressAsync(explorationId)
+          .then(() => {
+            this.windowRef.nativeWindow.location.reload();
+          });
+      },
+      () => {
+        // This callback is used for when the learner chooses to resume
+        // the exploration.
+      }
+    );
   }
 
   showSaveProgressModal(): void {
