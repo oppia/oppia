@@ -29,6 +29,7 @@ import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-ed
 import {PageContextService} from 'services/page-context.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {TopicsAndSkillsDashboardPageConstants} from '../topics-and-skills-dashboard-page.constants';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ValidatorsService} from 'services/validators.service';
 
 @Component({
@@ -50,7 +51,7 @@ export class CreateNewSkillModalComponent {
   HTML_SCHEMA = {
     type: 'html',
     ui_config: {
-      rte_components: 'ALL_COMPONENTS',
+      rte_components: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
     },
   };
   MAX_CHARS_IN_SKILL_DESCRIPTION = AppConstants.MAX_CHARS_IN_SKILL_DESCRIPTION;
@@ -67,6 +68,7 @@ export class CreateNewSkillModalComponent {
     private skillCreationService: SkillCreationService,
     private skillEditorStateService: SkillEditorStateService,
     private changeDetectorRef: ChangeDetectorRef,
+    private platformFeatureService: PlatformFeatureService,
     private validatorsService: ValidatorsService
   ) {}
 
@@ -86,6 +88,14 @@ export class CreateNewSkillModalComponent {
   }
 
   getHtmlSchema(): {type: string} {
+    if (!this.isEnableWorkedexamplesRteComponentFeatureEnabled()) {
+      this.HTML_SCHEMA = {
+        type: 'html',
+        ui_config: {
+          rte_components: 'ALL_COMPONENTS',
+        },
+      };
+    }
     return this.HTML_SCHEMA;
   }
 
@@ -124,6 +134,11 @@ export class CreateNewSkillModalComponent {
       this.rubrics[1].setExplanations([this.newSkillDescription]);
       this.skillCreationService.markChangeInSkillDescription();
     }
+  }
+
+  isEnableWorkedexamplesRteComponentFeatureEnabled(): boolean {
+    return this.platformFeatureService.status.EnableWorkedExamplesRteComponent
+      .isEnabled;
   }
 
   resetErrorMsg(): void {

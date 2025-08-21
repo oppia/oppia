@@ -45,8 +45,6 @@ import {ChangeListService} from '../../services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.model';
 import {Voiceover} from '../../../../domain/exploration/voiceover.model';
 import {LocalStorageService} from 'services/local-storage.service';
@@ -131,7 +129,6 @@ describe('Translator Overview component', () => {
   let changeListService: ChangeListService;
   let windowRef: WindowRef;
   let entityTranslation: EntityTranslation;
-  let voiceoverBackendApiService: VoiceoverBackendApiService;
   let localStorageService: LocalStorageService;
   let voiceoverPlayerService: VoiceoverPlayerService;
   let voiceoverLanguageManagementService: VoiceoverLanguageManagementService;
@@ -185,7 +182,6 @@ describe('Translator Overview component', () => {
     routerService = TestBed.inject(RouterService);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
     entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
-    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     changeListService = TestBed.inject(ChangeListService);
     windowRef = TestBed.inject(WindowRef);
     localStorageService = TestBed.inject(LocalStorageService);
@@ -226,16 +222,12 @@ describe('Translator Overview component', () => {
         'hi-IN': true,
       },
     };
+    voiceoverLanguageManagementService.languageCodesMapping =
+      languageCodesMapping;
+    voiceoverLanguageManagementService.languageAccentMasterList =
+      languageAccentMasterList;
 
-    let voiceoverAdminDataResponse = {
-      languageAccentMasterList: languageAccentMasterList,
-      languageCodesMapping: languageCodesMapping,
-    };
     spyOn(translationLanguageService, 'setActiveLanguageAccentCode');
-    spyOn(
-      voiceoverBackendApiService,
-      'fetchVoiceoverAdminDataAsync'
-    ).and.resolveTo(Promise.resolve(voiceoverAdminDataResponse));
     spyOn(voiceoverPlayerService, 'setLanguageAccentCodesDescriptions');
 
     explorationLanguageCodeService.init(explorationLanguageCode);
