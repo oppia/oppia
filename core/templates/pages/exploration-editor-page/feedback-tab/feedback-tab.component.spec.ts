@@ -37,7 +37,7 @@ import {ExplorationStatesService} from '../services/exploration-states.service';
 import {ThreadDataBackendApiService} from './services/thread-data-backend-api.service';
 import {FeedbackTabComponent} from './feedback-tab.component';
 import {UserInfo} from 'domain/user/user-info.model';
-import {FeedbackThread} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import {FeedbackThread} from 'domain/feedback_thread/feedback-thread.model';
 
 describe('Feedback Tab Component', () => {
   let component: FeedbackTabComponent;

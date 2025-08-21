@@ -13,21 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for FeedbackThreadObjectFactory.
+ * @fileoverview Unit tests for FeedbackThread.
  */
 
-import {TestBed} from '@angular/core/testing';
-
-import {FeedbackThreadObjectFactory} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import {FeedbackThread} from 'domain/feedback_thread/feedback-thread.model';
 import {ThreadMessage} from 'domain/feedback_message/ThreadMessage.model';
 
-describe('FeedbackThreadObjectFactory', () => {
-  let feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
-
-  beforeEach(() => {
-    feedbackThreadObjectFactory = TestBed.get(FeedbackThreadObjectFactory);
-  });
-
+describe('FeedbackThread', () => {
   describe('.createFromBackendDict', () => {
     it('should create a new feedback thread from a backend dict.', () => {
       let feedbackThreadBackendDict = {
@@ -43,7 +35,7 @@ describe('FeedbackThreadObjectFactory', () => {
         last_nonempty_message_text: 'tenth message',
       };
 
-      let feedbackThread = feedbackThreadObjectFactory.createFromBackendDict(
+      const feedbackThread = FeedbackThread.createFromBackendDict(
         feedbackThreadBackendDict
       );
       expect(feedbackThread.status).toEqual('accepted');
@@ -67,7 +59,7 @@ describe('FeedbackThreadObjectFactory', () => {
   describe('FeedbackThread', () => {
     describe('.setMessages', () => {
       it('should update message-related fields', () => {
-        let feedbackThread = feedbackThreadObjectFactory.createFromBackendDict({
+        const feedbackThread = FeedbackThread.createFromBackendDict({
           last_updated_msecs: 1000,
           original_author_username: 'author',
           status: 'accepted',
