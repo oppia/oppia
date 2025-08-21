@@ -88,6 +88,9 @@ describe('Exploration Editor', function () {
     await releaseCoordinator.enableFeatureFlag(
       'automatic_voiceover_regeneration_from_exp'
     );
+    await releaseCoordinator.enableFeatureFlag(
+      'show_regenerated_voiceovers_to_learners'
+    );
 
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
