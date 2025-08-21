@@ -1,12 +1,12 @@
 <mat-card>
   <h3>Voiceovers</h3>
   <div *ngIf="voiceoversAreLoaded">
-    <div *ngIf="unsupportedLanguageCode">
+    <div *ngIf="unsupportedLanguageCode" class="unsupported-language-warning">
       <i>Voiceover functionality for this language is not yet supported in Oppia.
-        Please contact a server admin for more details.
+        Please contact a server admin if you would like it to be added.
       </i>
     </div>
-    <div *ngIf="!unsupportedLanguageCode && !contentAvailableForVoiceovers">
+    <div *ngIf="!unsupportedLanguageCode && !contentAvailableForVoiceovers" class="content-unavailable-warning">
       <i>
         There is no content available for voiceover in the selected language.
       </i>
@@ -15,7 +15,7 @@
 
   <div *ngIf="voiceoversAreLoaded && !unsupportedLanguageCode">
     <div class="manual-voiceovers">
-      <h4 class="voiceover-type-heading">Manual Voiceovers</h4>
+      <h4 class="voiceover-type-heading">Manual Voiceover</h4>
       <div class="voiceovers-component" *ngIf="manualVoiceover">
         <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(manualVoiceover.filename, 'manual')">
           <mat-icon *ngIf="!isManualVoiceoverPlaying && !manualVoiceoverIsLoading" matTooltip="Play">play_arrow</mat-icon>
@@ -33,94 +33,97 @@
           {{manualVoiceoverCurrentDuration | formatTime}} / {{manualVoiceoverTotalDuration | formatTime}}
         </span>
 
-        <button (click)="deleteManualVoiceover()"
-                mat-icon-button
-                mat-button>
-          <mat-icon matTooltip="Delete voiceover">close</mat-icon>
-        </button>
-        <button (click)="toggleAudioNeedsUpdate()"
-                mat-icon-button
-                mat-button
-                [ngClass]="manualVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
-          <mat-icon matTooltip="Audio needs update"
-                    *ngIf="manualVoiceover.needsUpdate"
-                    class="warning-icon">
-            warning
-          </mat-icon>
-          <mat-icon matTooltip="Audio is up-to-date"
-                    *ngIf="!manualVoiceover.needsUpdate">
-            check_circle
-          </mat-icon>
-        </button>
+        <div class="voiceover-action-buttons">
+          <button (click)="toggleAudioNeedsUpdate()"
+                  mat-icon-button
+                  mat-button
+                  [ngClass]="manualVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
+            <mat-icon matTooltip="Audio needs update"
+                      *ngIf="manualVoiceover.needsUpdate"
+                      class="warning-icon">
+              warning
+            </mat-icon>
+            <mat-icon matTooltip="Audio is up-to-date"
+                      *ngIf="!manualVoiceover.needsUpdate">
+              check_circle
+            </mat-icon>
+          </button>
+
+          <button (click)="deleteManualVoiceover()"
+                  mat-icon-button
+                  mat-button
+                  class="delete-manual-voiceover-icon">
+            <mat-icon matTooltip="Delete voiceover">delete</mat-icon>
+          </button>
+        </div>
+
       </div>
 
-      <div *ngIf="manualVoiceover">
-        <i *ngIf="manualVoiceover.needsUpdate">The current voiceover is stale.</i>
+      <div *ngIf="manualVoiceover" class="stale-manual-voiceover-warning">
+        <i *ngIf="manualVoiceover.needsUpdate">The current manual voiceover is stale.</i>
       </div>
       <div class="add-new-manual-voiceovers" *ngIf="!manualVoiceover">
         <button (click)="addManualVoiceover()"
                 class="add-manual-voiceover-button e2e-test-voiceover-upload-audio"
                 [disabled]="!contentAvailableForVoiceovers">
+          <mat-icon>attach_file</mat-icon>
           ADD MANUAL VOICEOVER
         </button>
       </div>
     </div>
 
-    <div class="automatic-voiceovers"
-         *ngIf="shouldShowAutoVoiceoverRegenerationSection()">
-      <h4 class="voiceover-type-heading">Automatic Voiceovers (generated using cloud service)</h4>
-      <div class="voiceovers-component" *ngIf="automaticVoiceover">
-        <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'auto')">
-          <mat-icon *ngIf="!isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Play">play_arrow</mat-icon>
-          <mat-icon *ngIf="isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Pause">pause_arrow</mat-icon>
-          <mat-spinner class="mx-auto" [diameter]="30" *ngIf="automaticVoiceoverIsLoading"></mat-spinner>
-        </button>
-        <mat-progress-bar mode="determinate"
-                          [value]="automaticVoiceoverProgress"
-                          class="voiceover-progress">
-        </mat-progress-bar>
-        <span class="voiceover-timer">
-          {{automaticVoiceoverCurrentDuration | formatTime}} / {{automaticVoiceoverTotalDuration | formatTime}}
-        </span>
-        <button (click)="generateVoiceover()"
-                mat-icon-button
-                mat-button
-                *ngIf="!isAutomaticVoiceoverGenerating"
-                [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
-          <mat-icon matTooltip="Regenerate voiceover">sync</mat-icon>
-        </button>
-        <div *ngIf="isAutomaticVoiceoverGenerating">
-          <mat-icon class="rotating">rotate_right</mat-icon>
+    <div class="automatic-voiceovers" *ngIf="isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()">
+      <h4 class="voiceover-type-heading">Automatic Voiceover (generated using cloud service)</h4>
+      <div *ngIf="shouldShowAutoVoiceoverRegenerationSection()">
+        <div class="voiceovers-component" *ngIf="automaticVoiceover">
+          <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'auto')">
+            <mat-icon *ngIf="!isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Play">play_arrow</mat-icon>
+            <mat-icon *ngIf="isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Pause">pause_arrow</mat-icon>
+            <mat-spinner class="mx-auto" [diameter]="30" *ngIf="automaticVoiceoverIsLoading"></mat-spinner>
+          </button>
+          <mat-progress-bar mode="determinate"
+                            [value]="automaticVoiceoverProgress"
+                            class="voiceover-progress">
+          </mat-progress-bar>
+          <span class="voiceover-timer">
+            {{automaticVoiceoverCurrentDuration | formatTime}} / {{automaticVoiceoverTotalDuration | formatTime}}
+          </span>
+          <div class="voiceover-action-buttons">
+            <button (click)="generateVoiceover()"
+                    mat-icon-button
+                    mat-button
+                    [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers"
+                    class="regenerate-voiceover-button">
+              <mat-icon matTooltip="Regenerate voiceover" *ngIf="!isAutomaticVoiceoverGenerating">
+                sync
+              </mat-icon>
+              <mat-icon class="rotating" *ngIf="isAutomaticVoiceoverGenerating">
+                rotate_right
+              </mat-icon>
+            </button>
+          </div>
         </div>
-        <button mat-icon-button
-                mat-button
-                [ngClass]="automaticVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
-          <mat-icon matTooltip="Audio needs update"
-                    *ngIf="automaticVoiceover.needsUpdate"
-                    class="warning-icon">
-            warning
-          </mat-icon>
-          <mat-icon matTooltip="Audio is up-to-date"
-                    *ngIf="!automaticVoiceover.needsUpdate">
-            check_circle
-          </mat-icon>
-        </button>
-      </div>
-      <div class="add-new-manual-voiceovers" *ngIf="!automaticVoiceover">
-        <button (click)="generateVoiceover()"
-                class="add-automatic-voiceover-button e2e-test-regenerate-voiceover"
-                *ngIf="!isAutomaticVoiceoverGenerating"
-                [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
-          GENERATE AUTOMATIC VOICEOVER
-        </button>
-        <div *ngIf="isAutomaticVoiceoverGenerating">
-          <span>Generating voiceover</span>
-          <mat-icon class="rotating">rotate_right</mat-icon>
+        <div class="add-new-manual-voiceovers" *ngIf="!automaticVoiceover">
+          <button (click)="generateVoiceover()"
+                  class="add-automatic-voiceover-button e2e-test-regenerate-voiceover"
+                  [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
+            <span *ngIf="!isAutomaticVoiceoverGenerating">
+              <mat-icon>sync</mat-icon>
+              GENERATE AUTOMATIC VOICEOVER
+            </span>
+            <span *ngIf="isAutomaticVoiceoverGenerating">
+              <span>GENERATING VOICEOVER</span>
+              <span><mat-icon class="rotating">rotate_right</mat-icon></span>
+            </span>
+          </button>
+        </div>
+        <div class="automatic-voiceover-enable-instruction"
+             *ngIf="!isGenerateAutomaticVoiceoverOptionEnabled">
+          <i>Save all the draft changes to activate the Generate Automatic Voiceover button.</i>
         </div>
       </div>
-      <div class="automatic-voiceover-enable-instruction"
-           *ngIf="!isGenerateAutomaticVoiceoverOptionEnabled">
-        Save all the draft changes to activate the Generate Automatic Voiceovers button.
+      <div *ngIf="!shouldShowAutoVoiceoverRegenerationSection()" class="automatic-voiceover-disable-reason">
+        <i>{{getAutomaticVoiceoverDisableReason()}}</i>
       </div>
     </div>
   </div>
@@ -149,7 +152,8 @@
     }
   }
   .automatic-voiceover-enable-instruction {
-    color: #f00;
+    color: #d14836;
+    margin: 0 4%;
   }
   .warning-icon {
     margin-bottom: 4px;
@@ -166,9 +170,8 @@
     width: 350px;
   }
   .voiceover-timer {
-    margin: 10px;
     text-align: center;
-    width: 14%;
+    width: 25%;
   }
   .audio-button {
     background-color: #009688;
@@ -182,28 +185,81 @@
   }
   .voiceovers-component {
     align-items: center;
+    background: #e8e7e3;
+    border-radius: 10px;
     display: flex;
-    justify-content: space-evenly;
+    height: 50px;
+    margin: 0 4%;
   }
   .add-new-manual-voiceovers {
+    align-items: center;
+    color: #009688;
+    display: flex;
+    margin: 0 4%;
     text-align: center;
   }
   .add-manual-voiceover-button {
-    border-style: dashed;
+    background: #e8e7e3;
+    border: 0;
+    border-radius: 10px;
     color: #009688;
-    height: 40px;
+    height: 50px;
     width: 100%;
   }
   .add-manual-voiceover-button:disabled {
     color: #a1c5c3;
   }
   .add-automatic-voiceover-button {
-    border-style: dashed;
+    background: #e8e7e3;
+    border: 0;
+    border-radius: 10px;
     color: #009688;
-    height: 40px;
+    height: 50px;
     width: 100%;
   }
   .add-automatic-voiceover-button:disabled {
     color: #a1c5c3;
+  }
+  .delete-manual-voiceover-icon {
+    background-color: #d14836;
+    color: #fff;
+  }
+  .regenerate-voiceover-button {
+    background-color: #009688;
+    color: #fff;
+  }
+  .regenerate-voiceover-button:disabled {
+    background-color: #a1c5c3;
+  }
+  .stale-manual-voiceover-warning {
+    color: #d14836;
+    margin: 0 4%;
+  }
+
+  .voiceover-action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 25%;
+  }
+
+  .voiceover-action-buttons button:first-child {
+    grid-column: 1;
+  }
+
+  .voiceover-action-buttons button:nth-child(2) {
+    grid-column: 2;
+  }
+
+  .unsupported-language-warning {
+    color: #d14836;
+    margin: 0 2%;
+  }
+  .content-unavailable-warning {
+    color: #d14836;
+    margin: 0 2%;
+  }
+  .automatic-voiceover-disable-reason {
+    color: #d14836;
+    margin: 0 4%;
   }
 </style>
