@@ -72,7 +72,9 @@ class FeatureNames(enum.Enum):
         'enable_worked_examples_rte_component'
     )
     AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE = (
-        'automated_voiceover_synthesis_from_task_queue'
+        'automated_voiceover_synthesis_from_task_queue')
+    SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS = (
+        'show_regenerated_voiceovers_to_learners'
     )
 
 
@@ -99,7 +101,6 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
-    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -115,6 +116,8 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE,
+    FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -309,13 +312,20 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'Allows creators to add worked examples to the review material '
             'section of skills and explanation of the study guides.',
-            feature_flag_domain.ServerMode.DEV
+            feature_flag_domain.ServerMode.TEST
         )
     ),
     FeatureNames.AUTOMATED_VOICEOVER_SYNTHESIS_FROM_TASK_QUEUE.value: (
         (
             'The flag enables the automated voiceover synthesis from the '
             'task queue.',
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
+    FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (
+        (
+            'This flag allows learners to see the regenerated voiceovers '
+            'in the exploration player.',
             feature_flag_domain.ServerMode.TEST
         )
     ),
