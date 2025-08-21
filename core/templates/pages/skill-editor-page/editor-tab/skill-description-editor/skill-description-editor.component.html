@@ -20,7 +20,7 @@
         </i>
       </span>
     </div>
-    <div [ngClass]="{'editor-spacing': canEditSkillDescription() }"></div>
+    <div [ngClass]="{'skill-editor-spacing': canEditSkillDescription() }"></div>
     <div *ngIf="!canEditSkillDescription()">{{ tmpSkillDescription }}</div>
   </div>
 </div>
@@ -31,7 +31,7 @@
     font-size: 0.8em;
   }
 
-  .editor-spacing {
+  .skill-editor-spacing {
     margin-bottom: 1em;
   }
 
