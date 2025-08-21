@@ -238,7 +238,7 @@ export class VoiceoverBackendApiService {
     });
   }
 
-  async generateAutotmaticVoiceoverAsync(
+  async generateAutomaticVoiceoverAsync(
     explorationID: string,
     explorationVersion: number,
     stateName: string,
