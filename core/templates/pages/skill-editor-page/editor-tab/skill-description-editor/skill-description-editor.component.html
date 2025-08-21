@@ -20,10 +20,7 @@
         </i>
       </span>
     </div>
-    <span class="line-break" [ngStyle]="{
-      'margin-bottom': canEditSkillDescription() ? '1em' : '0',
-      'display': canEditSkillDescription() ? 'block' : 'none'
-    }" ></span>
+    <div [ngClass]="{'editor-spacing': canEditSkillDescription() }"></div>
     <div *ngIf="!canEditSkillDescription()">{{ tmpSkillDescription }}</div>
   </div>
 </div>
@@ -32,6 +29,10 @@
     color: #f00;
     display: block;
     font-size: 0.8em;
+  }
+
+  .editor-spacing {
+    margin-bottom: 1em;
   }
 
   @media screen and (max-width: 768px) {
