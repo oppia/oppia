@@ -23,16 +23,24 @@ import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {SkillCreationService} from 'components/entity-creation-services/skill-creation.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {PageContextService} from 'services/page-context.service';
 import {CreateNewSkillModalComponent} from './create-new-skill-modal.component';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ValidatorsService} from 'services/validators.service';
+
+class MockPlatformFeatureService {
+  status = {
+    EnableWorkedExamplesRteComponent: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('Create new skill modal', () => {
   let fixture: ComponentFixture<CreateNewSkillModalComponent>;
   let componentInstance: CreateNewSkillModalComponent;
   let pageContextService: PageContextService;
-  let skillObjectFactory: SkillObjectFactory;
   let testObj: SubtitledHtml = SubtitledHtml.createDefault(
     'test_html',
     'test_id'
@@ -40,12 +48,22 @@ describe('Create new skill modal', () => {
   let ngbActiveModal: NgbActiveModal;
   let skillEditorStateService: SkillEditorStateService;
   let skillCreationService: SkillCreationService;
+  let platformFeatureService: PlatformFeatureService;
+  let validatorsService: ValidatorsService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule, FormsModule],
       declarations: [CreateNewSkillModalComponent],
-      providers: [NgbActiveModal, ChangeDetectorRef],
+      providers: [
+        NgbActiveModal,
+        ChangeDetectorRef,
+        ValidatorsService,
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -54,10 +72,11 @@ describe('Create new skill modal', () => {
     fixture = TestBed.createComponent(CreateNewSkillModalComponent);
     componentInstance = fixture.componentInstance;
     pageContextService = TestBed.inject(PageContextService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
     skillCreationService = TestBed.inject(SkillCreationService);
+    platformFeatureService = TestBed.inject(PlatformFeatureService);
+    validatorsService = TestBed.inject(ValidatorsService);
   });
 
   it('should create', () => {
@@ -85,14 +104,34 @@ describe('Create new skill modal', () => {
     expect(componentInstance.conceptCardExplanationEditorIsShown).toBeTrue();
   });
 
-  it('should get html schema', () => {
-    let schema: {type: string} = {type: 'html'};
-    componentInstance.HTML_SCHEMA = schema;
-    expect(componentInstance.getHtmlSchema()).toEqual(schema);
+  it('should get html schema when feature is disabled', () => {
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      false;
+    const result = componentInstance.getHtmlSchema();
+    expect(result).toEqual({
+      type: 'html',
+      ui_config: {
+        rte_components: 'ALL_COMPONENTS',
+      },
+    });
+  });
+
+  it('should check if EnableWorkedexamplesRteComponent feature is enabled', () => {
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      true;
+    expect(
+      componentInstance.isEnableWorkedexamplesRteComponentFeatureEnabled()
+    ).toBeTrue();
+
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      false;
+    expect(
+      componentInstance.isEnableWorkedexamplesRteComponentFeatureEnabled()
+    ).toBeFalse();
   });
 
   it('should set error message if needed', () => {
-    spyOn(skillObjectFactory, 'hasValidDescription').and.returnValue(false);
+    spyOn(validatorsService, 'hasValidDescription').and.returnValue(false);
     componentInstance.skillDescriptionExists = false;
     componentInstance.setErrorMessageIfNeeded();
     expect(componentInstance.errorMsg).toEqual(
@@ -144,7 +183,7 @@ describe('Create new skill modal', () => {
   });
 
   it('should create new skill modal', () => {
-    spyOn(skillObjectFactory, 'hasValidDescription').and.returnValue(true);
+    spyOn(validatorsService, 'hasValidDescription').and.returnValue(true);
     componentInstance.skillDescriptionExists = false;
     spyOn(ngbActiveModal, 'close');
     componentInstance.createNewSkill();

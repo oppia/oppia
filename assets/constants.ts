@@ -67,7 +67,9 @@ export default {
 
     "RTE_COMPONENT_CONFIGS": {
       "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
-      "BLOG_COMPONENTS": ["image", "link", "video"]
+      "BLOG_COMPONENTS": ["image", "link", "video"],
+      "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video", "workedexample"],
+      "WORKED_EXAMPLE_MODAL_COMPONENTS": ["image", "math", "skillreview"]
     },
 
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
@@ -7816,6 +7818,18 @@ export default {
       "^": "لِلْقُوَّةِ",
       "^2": "تَرْبِيعْ",
       "^3": "تَكْعِيبْ"
+    },
+    "es": {
+      "+": "más",
+      "-": "menos",
+      "*": "multiplicado por",
+      "×": "multiplicado por",
+      "÷": "dividido",
+      "=": "igual",
+      "!": "factorial",
+      "^": "elevado a",
+      "^2": "al cuadrado",
+      "^3": "al cubo"
     }
   },
   // Please consult the translation team before adding any entries here.
@@ -7824,6 +7838,7 @@ export default {
   "LANGUAGE_CODE_TO_SENTENCE_ENDING_PUNCTUATION_MARKS": {
     "ar": "؟!",
     "en": ".!?",
+    "es": ".!?",
     "pt": ".!?",
     "hi": "।!?"
   }

@@ -20,7 +20,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
-import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {SkillQuestionsTabComponent} from './skill-questions-tab.component';
 
 describe('Skill question tab component', () => {
@@ -28,7 +28,6 @@ describe('Skill question tab component', () => {
   let fixture: ComponentFixture<SkillQuestionsTabComponent>;
   let skillEditorStateService: SkillEditorStateService;
   let initEventEmitter = new EventEmitter();
-  let skillObjectFactory: SkillObjectFactory;
   let sampleSkill: Skill;
 
   beforeEach(() => {
@@ -44,7 +43,6 @@ describe('Skill question tab component', () => {
     fixture = TestBed.createComponent(SkillQuestionsTabComponent);
     component = fixture.componentInstance;
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
 
     let misconceptionDict1 = {
       id: 2,
@@ -69,7 +67,7 @@ describe('Skill question tab component', () => {
       },
     };
 
-    sampleSkill = skillObjectFactory.createFromBackendDict({
+    sampleSkill = Skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1],
