@@ -339,6 +339,7 @@ import {MathInteractionsService} from './math-interactions.service';
 import {EntityVoiceoversService} from './entity-voiceovers.services';
 import {AutomaticVoiceoverHighlightService} from './automatic-voiceover-highlight-service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
+import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
 
 interface UpgradedServicesDict {
   // Type 'unknown' is used here because we don't know the exact type of
