@@ -70,7 +70,10 @@ class FeatureNames(enum.Enum):
         'enable_translation_opps_with_new_opp_models')
     ENABLE_WORKED_EXAMPLES_RTE_COMPONENT = (
         'enable_worked_examples_rte_component'
-     )
+    )
+    SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS = (
+        'show_regenerated_voiceovers_to_learners'
+    )
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -111,6 +114,7 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
     FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES
+    FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -307,5 +311,12 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'section of skills and explanation of the study guides.',
             feature_flag_domain.ServerMode.DEV
         )
-    )
+    ),
+    FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (
+        (
+            'This flag allows learners to see the regenerated voiceovers '
+            'in the exploration player.',
+            feature_flag_domain.ServerMode.TEST
+        )
+    ),
 }
