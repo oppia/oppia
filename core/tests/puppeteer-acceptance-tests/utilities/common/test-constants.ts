@@ -143,6 +143,7 @@ export default {
 
   Roles: {
     TRANSLATION_ADMIN: 'translation admin',
+    TRANSLATION_COORDINATOR: 'translation coordinator',
     BLOG_ADMIN: 'blog admin',
     BLOG_POST_EDITOR: 'blog post editor',
     CURRICULUM_ADMIN: 'curriculum admin',

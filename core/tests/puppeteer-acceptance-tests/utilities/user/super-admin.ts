@@ -116,7 +116,8 @@ const enableAutogenerationToggleSelector =
   '.e2e-test-cloud-service-autogeneration-toggle';
 const assignedTopicSelector = '.e2e-test-assigned-topic';
 const selectedRoleHeadingSelector = '.e2e-test-active-role';
-
+const languageSelectorCloseButtonSelector =
+  '.e2e-test-language-selector-close-button';
 export class SuperAdmin extends BaseUser {
   /**
    * Navigates to the Admin Page Activities Tab.
@@ -167,7 +168,7 @@ export class SuperAdmin extends BaseUser {
   async assignRoleToUser(
     username: string,
     role: string,
-    topicName?: string
+    args?: string | string[]
   ): Promise<void> {
     await this.goto(adminPageRolesTab);
     await this.type(roleEditorInputField, username);
@@ -186,12 +187,56 @@ export class SuperAdmin extends BaseUser {
         );
         await this.waitForStaticAssetsToLoad();
         if (role === topicManagerRole) {
+          if (typeof args !== 'string') {
+            throw new Error('Expected additional argument to be string.');
+          }
+          const topicName = args as string;
           await this.selectTopicForTopicManagerRole(topicName as string);
+        }
+        if (role === testConstants.Roles.TRANSLATION_COORDINATOR) {
+          for (const language of args as string[]) {
+            await this.selectLanguageForTranslationCoordinatorRole(language);
+          }
+
+          await this.clickOn(languageSelectorCloseButtonSelector);
+          await this.expectElementToBeVisible(
+            languageSelectorCloseButtonSelector,
+            false
+          );
         }
         return;
       }
     }
     throw new Error(`Role ${role} does not exists.`);
+  }
+
+  private async selectLanguageForTranslationCoordinatorRole(
+    language: string
+  ): Promise<void> {
+    const languageSelectorBodySelector =
+      '.e2e-test-language-selector-modal-body';
+    const addLanguageButtonSelector = '.e2e-test-language-selector-add-button';
+    const selectedLanguageSelector = '.e2e-test-selected-language';
+
+    const selectElementSelector = `${languageSelectorBodySelector} select`;
+    await this.select(selectElementSelector, language);
+
+    await this.clickOn(addLanguageButtonSelector);
+
+    await this.page.waitForFunction(
+      (selector: string, language: string) => {
+        const elements = document.querySelectorAll(selector);
+        for (const element of Array.from(elements)) {
+          const elementText = element.textContent?.trim();
+          if (elementText === language) {
+            return true;
+          }
+        }
+      },
+      {},
+      selectedLanguageSelector,
+      language
+    );
   }
 
   /**

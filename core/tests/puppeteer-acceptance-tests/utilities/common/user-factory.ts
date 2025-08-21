@@ -42,6 +42,11 @@ import {ModeratorFactory} from '../user/moderator';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
 import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
+import {
+  ContributorAdmin,
+  ContributorAdminFactory,
+} from '../user/contributor-admin';
+import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -52,6 +57,7 @@ const cookieBannerAcceptButton =
  */
 const USER_ROLE_MAPPING = {
   [ROLES.TRANSLATION_ADMIN]: TranslationAdminFactory,
+  [ROLES.TRANSLATION_COORDINATOR]: TranslationCoordinatorFactory,
   [ROLES.BLOG_ADMIN]: BlogAdminFactory,
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
@@ -121,7 +127,7 @@ export class UserFactory {
   >(
     user: TUser,
     roles: TRoles,
-    topic: string = ''
+    args?: string | string[]
   ): Promise<TUser & MultipleRoleIntersection<TRoles>> {
     for (const role of roles) {
       if (superAdminInstance === null) {
@@ -137,12 +143,22 @@ export class UserFactory {
           );
           break;
         case ROLES.TOPIC_MANAGER:
+          if (typeof args !== 'string') {
+            throw new Error('Expected additional argument to be string.');
+          }
+          const topic = args as string;
           await superAdminInstance.assignRoleToUser(
             user.username,
             ROLES.TOPIC_MANAGER,
             topic
           );
           break;
+        case ROLES.TRANSLATION_COORDINATOR:
+          await superAdminInstance.assignRoleToUser(
+            user.username,
+            ROLES.TRANSLATION_COORDINATOR,
+            args
+          );
         default:
           await superAdminInstance.assignRoleToUser(user.username, role);
           break;
@@ -171,7 +187,7 @@ export class UserFactory {
     username: string,
     email: string,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
-    topic: string = ''
+    args?: string | string[]
   ): Promise<
     LoggedOutUser &
       LoggedInUser &
@@ -179,6 +195,7 @@ export class UserFactory {
       QuestionSubmitter &
       TopicManager &
       CurriculumAdmin &
+      ContributorAdmin &
       MultipleRoleIntersection<TRoles>
   > {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
@@ -188,13 +205,14 @@ export class UserFactory {
       QuestionSubmitterFactory(),
       TopicManagerFactory(),
       CurriculumAdminFactory(),
+      ContributorAdminFactory(),
     ]);
 
     await user.openBrowser();
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
-    return await UserFactory.assignRolesToUser(user, roles, topic);
+    return await UserFactory.assignRolesToUser(user, roles, args);
   };
 
   /**

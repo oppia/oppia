@@ -16,7 +16,7 @@
       <mat-card layout="row" class="oppia-mat-card">
         <div class="translation-reviewer stats-card" [attr.aria-label]="'Translation Reviewer '" tabindex="0" *ngIf="isTranslationCoordinator">
           <p class="stat-description">Translation Reviewers <br>[{{selectedLanguage.language}}]</p>
-          <h2 class="stat-value-with-rating e2e-test-oppia-average-rating">
+          <h2 class="stat-value-with-rating e2e-test-oppia-average-rating e2e-test-contributor-count">
             {{ translationReviewersCount ? translationReviewersCount : 0 }}
           </h2>
         </div>
@@ -58,7 +58,7 @@
       <div class="filter-container">
         <div class="filter-rights-sub-container">
           <div class="add-rights-button-container">
-            <button class="add-rights-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
+            <button class="add-rights-button e2e-test-add-contributor-button" (click)="openUsernameInputModal()" *ngIf="!(activeTab === TAB_NAME_TRANSLATION_SUBMITTER)">
               + ADD {{ (activeTab === TAB_NAME_QUESTION_SUBMITTER) ? 'SUBMITTER' : 'REVIEWER' }}
             </button>
           </div>
