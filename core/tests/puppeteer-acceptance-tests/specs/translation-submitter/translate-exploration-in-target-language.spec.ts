@@ -382,7 +382,7 @@ describe('Translation Submitter', function () {
 
     // Check for awaiting review.
     await translationSubmitter.expectTranslationStatusToBe(
-      'बोल्ड टेक्स्ट',
+      'बोल्ड टेक्स्ट इटैलिक टेक्स्...',
       'Fractions / The Picnic',
       'Awaiting review'
     );
