@@ -13,37 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for WrittenTranslationsObjectFactory.ts
+ * @fileoverview Unit tests for WrittenTranslations.
  */
 import {TestBed} from '@angular/core/testing';
 
-import {
-  WrittenTranslations,
-  WrittenTranslationsObjectFactory,
-} from 'domain/exploration/WrittenTranslationsObjectFactory';
+import {WrittenTranslations} from 'domain/exploration/written-translations.model';
 import {WrittenTranslation} from 'domain/exploration/written-translation.model';
 
-describe('Written Translations Object Factory', () => {
-  let writtenTranslationsObjectFactory: WrittenTranslationsObjectFactory;
+describe('Written Translations', () => {
   let writtenTranslationsBackendDict: WrittenTranslations;
 
   beforeEach(() => {
-    writtenTranslationsObjectFactory = TestBed.inject(
-      WrittenTranslationsObjectFactory
-    );
-
-    writtenTranslationsBackendDict =
-      writtenTranslationsObjectFactory.createFromBackendDict({
-        translations_mapping: {
-          content_1: {
-            'hi-en': {
-              data_format: 'html',
-              translation: '',
-              needs_update: false,
-            },
+    writtenTranslationsBackendDict = WrittenTranslations.createFromBackendDict({
+      translations_mapping: {
+        content_1: {
+          'hi-en': {
+            data_format: 'html',
+            translation: '',
+            needs_update: false,
           },
         },
-      });
+      },
+    });
   });
 
   it('should create a written translations object from backend dict', () => {
@@ -61,8 +52,7 @@ describe('Written Translations Object Factory', () => {
   });
 
   it('should create an empty written translations object', () => {
-    const emptyWrittenTranslationsObject =
-      writtenTranslationsObjectFactory.createEmpty();
+    const emptyWrittenTranslationsObject = WrittenTranslations.createEmpty();
     expect(emptyWrittenTranslationsObject.getAllContentIds()).toEqual([]);
   });
 
@@ -118,7 +108,7 @@ describe('Written Translations Object Factory', () => {
 
   it('should update the html language code of a written translations object', () => {
     const writtenTranslationsBackendDict =
-      writtenTranslationsObjectFactory.createFromBackendDict({
+      WrittenTranslations.createFromBackendDict({
         translations_mapping: {
           content_1: {
             'hi-en': {
@@ -202,7 +192,7 @@ describe('Written Translations Object Factory', () => {
 
   it('should set needs_update to true in all translations from a content', () => {
     const writtenTranslationsBackendDict =
-      writtenTranslationsObjectFactory.createFromBackendDict({
+      WrittenTranslations.createFromBackendDict({
         translations_mapping: {
           content_1: {
             'hi-en': {
