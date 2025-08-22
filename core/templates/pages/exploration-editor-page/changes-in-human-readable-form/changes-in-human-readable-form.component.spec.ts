@@ -47,25 +47,21 @@ describe('Changes in Human Readable Form Component', () => {
         .replace(/::marker/, '')
     );
   };
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [UtilsService],
-    });
-    utilsService = TestBed.inject(UtilsService);
-  });
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [FormsModule],
       declarations: [ChangesInHumanReadableFormComponent],
+      providers: [UtilsService],
     }).compileComponents();
   }));
 
-  beforeEach(waitForAsync(() => {
+  beforeEach(() => {
     fixture = TestBed.createComponent(ChangesInHumanReadableFormComponent);
     component = fixture.componentInstance;
+    utilsService = TestBed.inject(UtilsService);
     fixture.detectChanges();
-  }));
+  });
 
   it('should make human readable when adding a state', () => {
     component.lostChanges = [
