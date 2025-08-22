@@ -102,7 +102,7 @@ describe('Translation Coordinator', function () {
       'Translation Reviewers'
     );
     await translationCoordinator.selectLanguageInAdminPage('Hindi (हिन्दी)');
-    await translationCoordinator.expectNumberOfContributorsToBe(1);
+    await translationCoordinator.expectNumberOfContributorsToBe(0);
   });
 
   afterAll(async function () {
