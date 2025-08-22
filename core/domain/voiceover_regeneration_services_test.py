@@ -33,6 +33,7 @@ from core.domain import voiceover_services
 from core.platform import models
 from core.tests import test_utils
 
+import bs4
 from typing import Dict, List, Union
 
 MYPY = False
@@ -492,6 +493,24 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.assertEqual(
             sentence_tokens_with_durations,
             expected_sentence_tokens_with_durations)
+
+    def test_get_text_with_delimiters_from_html_paragraphs(self) -> None:
+        html = """
+            <html>
+                <body>
+                    Text directly in the body.
+                    <p> Hello world, <strong>this is a test</strong> text. </p>
+                    <p> This is the third paragraph.</p>
+                </body>
+            </html>
+        """
+        soup = bs4.BeautifulSoup(html, 'html.parser')
+        result = voiceover_regeneration_services.get_text_with_delimiters(
+            soup, delimiter=feconf.OPPIA_CONTENT_TAG_DELIMITER)
+        self.assertEqual(
+            result,
+            'Text directly in the body.; Hello world, this is a test text.; '
+            'This is the third paragraph.')
 
     def test_should_regenerate_voiceovers_of_exploration(self) -> None:
         editor_email = 'editor1@example.com'
