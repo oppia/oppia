@@ -24,7 +24,6 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {ContributorAdmin} from '../../utilities/user/contributor-admin';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {TranslationAdmin} from '../../utilities/user/translation-admin';
 import {TranslationCoordinator} from '../../utilities/user/translation-coordinator';
 
 const ROLES = testConstants.Roles;
@@ -79,6 +78,7 @@ describe('Translation Coordinator', function () {
       'हिन्दी (Hindi)'
     );
     await translationCoordinator.closeLanguageSelectorModal();
+    await translationCoordinator.page.reload();
 
     await translationCoordinator.selectLanguageInAdminPage('Hindi (हिन्दी)');
     await translationCoordinator.expectNumberOfContributorsToBe(1);

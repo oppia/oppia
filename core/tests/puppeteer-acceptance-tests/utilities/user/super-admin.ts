@@ -227,6 +227,19 @@ export class SuperAdmin extends BaseUser {
       ? 0
       : (await this.page.$$(selectedLanguageSelector)).length;
     const selectElementSelector = `${languageSelectorBodySelector} select`;
+
+    // Page updates select value to the first option by default.
+    // If we don't wait for the page to update the value, we end up in race
+    // condition where the page updates the value to the first option after
+    // we select the language.
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const element = document.querySelector(selector);
+        return element && (element as HTMLSelectElement).value;
+      },
+      {},
+      selectElementSelector
+    );
     await this.select(selectElementSelector, language);
 
     await this.clickOn(addLanguageButtonSelector);

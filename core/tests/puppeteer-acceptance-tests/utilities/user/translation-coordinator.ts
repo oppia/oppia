@@ -109,7 +109,15 @@ export class TranslationCoordinator extends BaseUser {
     }
 
     if (!languageOption) {
-      throw new Error(`Language ${language} not found.`);
+      const languageOptionTexts = await this.page.$$eval(
+        languageOptionInAdminPageSelector,
+        elements => elements.map(element => element.textContent)
+      );
+
+      throw new Error(
+        `Language ${language} not found.\n` +
+          `Found languages: ${languageOptionTexts.join(', ')}`
+      );
     }
 
     await languageOption.click();
