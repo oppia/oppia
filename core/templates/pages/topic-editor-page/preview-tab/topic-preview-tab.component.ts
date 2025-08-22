@@ -48,6 +48,7 @@ export class TopicPreviewTabComponent {
   canonicalStorySummaries!: StorySummary[];
   activeTab: string = this._TAB_STORY;
   chapterCount: number = 0;
+  practiceTabIsDisplayed: boolean = false;
 
   constructor(
     private topicEditorStateService: TopicEditorStateService,

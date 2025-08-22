@@ -156,12 +156,12 @@ describe('Topic Preview Tab Component', () => {
   });
 
   it('should return true when practiceTabIsDisplayed is true', () => {
-    componentInstance['practiceTabIsDisplayed'] = true;
+    componentInstance.practiceTabIsDisplayed = true;
     expect(componentInstance.isPracticeTabEnabled()).toBeTrue();
   });
 
   it('should return false when practiceTabIsDisplayed is false', () => {
-    componentInstance['practiceTabIsDisplayed'] = false;
+    componentInstance.practiceTabIsDisplayed = false;
     expect(componentInstance.isPracticeTabEnabled()).toBeFalse();
   });
 
