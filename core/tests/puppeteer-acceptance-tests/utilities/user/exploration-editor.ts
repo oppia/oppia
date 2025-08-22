@@ -3337,6 +3337,7 @@ export class ExplorationEditor extends BaseUser {
    * Enables Automatic Text-to-Speech switch present in settings tab.
    */
   async enableAutomaticTextToSpeech(): Promise<void> {
+    await this.expandSettingsTabSection('Advanced Features');
     await this.page.waitForSelector(textToSpeechToggle, {
       visible: true,
     });
