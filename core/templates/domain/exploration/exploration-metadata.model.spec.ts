@@ -13,14 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for exploration metadata object factory.
+ * @fileoverview Unit tests for ExplorationMetadata.
  */
 
-import {TestBed} from '@angular/core/testing';
-import {AppConstants} from 'app.constants';
 import {
   ExplorationMetadata,
-  ExplorationMetadataBackendDict,
+  ExplorationMetadataBackendDict
 } from './exploration-metadata.model';
 
 describe('Exploration metadata object factory', () => {
