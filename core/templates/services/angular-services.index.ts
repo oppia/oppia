@@ -68,7 +68,6 @@ import { ExplorationObjectFactory } from 'domain/exploration/ExplorationObjectFa
 import { LostChangeObjectFactory } from 'domain/exploration/LostChangeObjectFactory';
 import { ParamSpecsObjectFactory } from 'domain/exploration/ParamSpecsObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
-import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
 import { CuratedExplorationValidationService } from 'domain/exploration/curated-exploration-validation.service';
 import { EditableExplorationBackendApiService } from 'domain/exploration/editable-exploration-backend-api.service';
@@ -76,7 +75,6 @@ import { ExplorationPermissionsBackendApiService } from 'domain/exploration/expl
 import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
 import { StateInteractionStatsBackendApiService } from 'domain/exploration/state-interaction-stats-backend-api.service';
 import { StatsReportingBackendApiService } from 'domain/exploration/stats-reporting-backend-api.service';
-import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import { LearnerDashboardActivityBackendApiService} from 'domain/learner_dashboard/learner-dashboard-activity-backend-api.service';
 import { LearnerDashboardBackendApiService } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
@@ -620,7 +618,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['FatigueDetectionService',
     FatigueDetectionService],
   ['FeedbackPopupBackendApiService', FeedbackPopupBackendApiService],
-  ['FeedbackThreadObjectFactory', FeedbackThreadObjectFactory],
   ['FeedbackUpdatesBackendApiService', FeedbackUpdatesBackendApiService],
   ['FilterForMatchingSubstringPipe', FilterForMatchingSubstringPipe],
   ['FocusManagerService', FocusManagerService],
@@ -891,7 +888,6 @@ export const angularServices: [string, Type<{}>][] = [
   ['VersionTreeService', VersionTreeService],
   ['WindowDimensionsService', WindowDimensionsService],
   ['WindowRef', WindowRef],
-  ['WrittenTranslationObjectFactory', WrittenTranslationObjectFactory],
   ['WrittenTranslationsObjectFactory', WrittenTranslationsObjectFactory],
   ['YamlService', YamlService],
   ['BaseInteractionValidationService', BaseInteractionValidationService],
