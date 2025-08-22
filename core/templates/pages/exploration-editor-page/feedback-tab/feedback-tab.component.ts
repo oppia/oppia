@@ -30,7 +30,7 @@ import {ChangeListService} from '../services/change-list.service';
 import {ExplorationStatesService} from '../services/exploration-states.service';
 import {ThreadDataBackendApiService} from './services/thread-data-backend-api.service';
 import {ThreadStatusDisplayService} from './services/thread-status-display.service';
-import {FeedbackThread} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import {FeedbackThread} from 'domain/feedback_thread/feedback-thread.model';
 import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
 
 @Component({

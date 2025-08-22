@@ -23,6 +23,7 @@ import {RTEEditor} from '../common/rte-editor';
 
 const blogTitleInput = 'input.e2e-test-blog-post-title-field';
 const blogBodyInput = 'div.e2e-test-rte';
+const mobileBlogBodyInputWithText = 'div.e2e-test-rte p';
 const thumbnailPhotoBox = 'div.e2e-test-photo-clickable';
 const unauthErrorContainer = 'div.e2e-test-error-container';
 const blogDashboardAuthorDetailsModal = 'div.modal-dialog';
@@ -53,6 +54,10 @@ const publisedBlogsTabContainerSelector = '.e2e-test-published-blogs-tab';
 const tagSelector = '.e2e-test-blog-post-tags';
 const saveDraftButtonSelector = '.e2e-test-save-as-draft-button';
 const newBlogPostButtonSelector = '.e2e-test-create-blog-post-button';
+const pasteErrorBox = '.e2e-test-oppia-rte-paste-error-box';
+const dismissPasteErrorButton = '.e2e-test-oppia-dismiss-paste-error-button';
+const pasteValidComponentsButton = '.e2e-test-oppia-paste-valid-content-button';
+const cancelPasteButton = '.e2e-test-oppia-cancel-rte-paste-button';
 
 const blogPostEditorContainerSelector = '.e2e-test-blog-post-editor-container';
 const editBlogBodySelector = '.e2e-test-ck-editor';
@@ -246,6 +251,96 @@ export class BlogPostEditor extends BaseUser {
 
     showMessage('Successfully created a draft blog post!');
     await this.goto(blogDashboardUrl);
+  }
+
+  /**
+   * This function creates a blog post with given title.
+   * to be created.
+   * @param {string} draftBlogPostTitle - The title of the blog post.
+   */
+  async createDraftBlogPostWithTitleAndOpenBodyRte(
+    draftBlogPostTitle: string
+  ): Promise<void> {
+    await this.addUserBioInBlogDashboard();
+    await this.clickOn(newBlogPostButtonSelector);
+    await this.updateBlogPostTitle(draftBlogPostTitle);
+    await this.updateBodyTextTo('test blog post body content');
+  }
+
+  /**
+   * This function pastes the contents of the clipboard to the
+   * blog post content rich text editor.
+   */
+  async pasteContentInBlogPostContentRte(): Promise<void> {
+    // OverridePermissions is used to allow clipboard access.
+    const context = this.page.browser().defaultBrowserContext();
+    await context.overridePermissions('http://localhost:8181', [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
+    if (this.isViewportAtMobileWidth()) {
+      await this.pasteTextTo(mobileBlogBodyInputWithText);
+    } else {
+      await this.pasteTextTo(blogBodyInput);
+    }
+  }
+
+  /**
+   * This function dismisses the paste error that appears when only an
+   * invalid component is pasted in the rich text editor.
+   */
+  async clickOnDismissPasteErrorButton(): Promise<void> {
+    await this.page.waitForSelector(pasteErrorBox, {visible: true});
+    await this.clickOn(dismissPasteErrorButton);
+    await this.page.waitForSelector(pasteErrorBox, {hidden: true});
+  }
+
+  /**
+   * This function clicks on the button that pastes the valid component/text.
+   * The button appears when an invalid component is pasted along with a valid
+   * component/text in the rich text editor.
+   * @param {string} textPasted - The text to be pasted in the editor.
+   */
+  async clickOnPasteValidComponentsButton(textPasted: string): Promise<void> {
+    await this.page.waitForSelector(pasteErrorBox, {visible: true});
+    await this.clickOn(pasteValidComponentsButton);
+    await this.page.waitForSelector(pasteErrorBox, {hidden: true});
+    try {
+      const isTextPresent = await this.isTextPresentOnPage(textPasted);
+
+      if (!isTextPresent) {
+        throw new Error(
+          'Expected pasted text to be present, but it was not found.'
+        );
+      }
+    } catch (error) {
+      const newError = new Error(`Failed to verify pasted content: ${error}`);
+      newError.stack = error.stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * This function clicks on the button that cancels the paste.
+   * The button appears when an invalid component is pasted along with a valid
+   * component/text in the rich text editor.
+   */
+  async clickOnCancelPasteButton(): Promise<void> {
+    await this.page.waitForSelector(pasteErrorBox, {visible: true});
+    await this.clickOn(cancelPasteButton);
+    await this.page.waitForSelector(pasteErrorBox, {hidden: true});
+  }
+
+  /**
+   * This function types some random words that cancels the paste.
+   * This is done when an invalid component is pasted along with a valid
+   * component/text in the rich text editor.
+   */
+  async typeInRteToDismissError(): Promise<void> {
+    await this.page.waitForSelector(pasteErrorBox, {visible: true});
+    await this.expectElementToBeVisible(blogBodyInput);
+    await this.type(blogBodyInput, 'qwerty');
+    await this.page.waitForSelector(pasteErrorBox, {hidden: true});
   }
 
   /**
