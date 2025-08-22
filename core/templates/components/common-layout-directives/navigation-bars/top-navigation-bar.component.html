@@ -54,7 +54,7 @@
     {{ subheaderText }}
   </span>
 </div>
-<div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}"
+<div [ngClass]="{'float-start': isLanguageRTL(), 'float-end': !isLanguageRTL()}"
      class="navbar-header oppia-top-navigation-bar"
      *ngIf="userMenuIsShown">
   <ul class="nav oppia-navbar-nav"

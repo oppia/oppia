@@ -679,7 +679,7 @@
   <mat-card class="oppia-settings-card-container oppia-editor-card">
     <div *ngIf="canShowExploreVersionHistoryButton();" tabindex="0">
       Metadata last changed by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }} of the exploration</strong>.
-      <a class="text-primary explore-version-history-button" tabindex="0" (keydown.enter)="onClickExploreVersionHistoryButton()" (click)="onClickExploreVersionHistoryButton()"> More details</a>.
+      <a class="link-primary explore-version-history-button" tabindex="0" (keydown.enter)="onClickExploreVersionHistoryButton()" (click)="onClickExploreVersionHistoryButton()"> More details</a>.
     </div>
     <div *ngIf="!canShowExploreVersionHistoryButton();" tabindex="0">
       <span *ngIf="!validationErrorIsShown">No changes have been made to the exploration metadata after the initial creation of the exploration.</span>

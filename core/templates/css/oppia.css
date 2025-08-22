@@ -844,7 +844,7 @@ textarea {
   display: block;
 }
 
-.float-right > .dropdown-menu {
+.float-end > .dropdown-menu {
   left: auto;
   right: 0;
 }
@@ -998,7 +998,7 @@ textarea {
     margin-left: 5px;
     margin-top: 0;
   }
-  ul.nav.navbar-nav.oppia-navbar-nav.float-right {
+  ul.nav.navbar-nav.oppia-navbar-nav.float-end {
     display: flex;
     flex-direction: row;
     float: right;
@@ -1006,7 +1006,7 @@ textarea {
   }
 }
 @media (min-width: 767px) and (max-width: 992px) {
-  ul.nav.navbar-nav.oppia-navbar-nav.float-right {
+  ul.nav.navbar-nav.oppia-navbar-nav.float-end {
     display: flex;
     flex-direction: row;
     float: right;
@@ -2615,7 +2615,7 @@ div#ng-curtain {
   border-left-color: #fff;
 }
 
-.oppia-dropdown-submenu.float-left {
+.oppia-dropdown-submenu.float-start {
   float: none;
 }
 

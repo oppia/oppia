@@ -28,7 +28,7 @@
       </button>
     </div>
     <div class="col-sm-7">
-      <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
+      <div [ngClass]="{'float-start': isLanguageRTL(), 'float-end': !isLanguageRTL()}">
         <oppia-hint-and-solution-buttons *ngIf="hintsAndSolutionsAreSupported">
         </oppia-hint-and-solution-buttons>
         <div class="hint-container">

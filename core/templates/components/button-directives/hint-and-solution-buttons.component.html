@@ -1,5 +1,5 @@
 <div *ngIf="currentlyOnLatestCard" class="oppia-hint-and-solution-buttons float-start">
-  <ul [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}" class="list-inline">
+  <ul [ngClass]="{'float-start': isLanguageRTL(), 'float-end': !isLanguageRTL()}" class="list-inline">
     <span class="float-start footer-hints-label"
           translate="I18N_PLAYER_HINTS"
           *ngIf="isHintButtonVisible(0)">
