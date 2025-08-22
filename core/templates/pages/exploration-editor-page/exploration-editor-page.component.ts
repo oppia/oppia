@@ -27,8 +27,8 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {
   ParamSpecsBackendDict,
-  ParamSpecsObjectFactory,
-} from 'domain/exploration/ParamSpecsObjectFactory';
+  ParamSpecs,
+} from 'domain/exploration/param-specs.model';
 import {AlertsService} from 'services/alerts.service';
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {PageContextService} from 'services/page-context.service';
@@ -172,7 +172,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private ngbModal: NgbModal,
     private pageTitleService: PageTitleService,
-    private paramSpecsObjectFactory: ParamSpecsObjectFactory,
     private platformFeatureService: PlatformFeatureService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private routerService: RouterService,
@@ -279,7 +278,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         (explorationData as ExplorationData).tags
       );
       this.explorationParamSpecsService.init(
-        this.paramSpecsObjectFactory.createFromBackendDict(
+        ParamSpecs.createFromBackendDict(
           explorationData.param_specs as ParamSpecsBackendDict
         )
       );
