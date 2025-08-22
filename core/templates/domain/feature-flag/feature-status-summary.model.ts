@@ -47,8 +47,8 @@ export enum FeatureNames {
   ShowRestructuredStudyGuides = 'show_restructured_study_guides',
   EnableTranslationOppsWithNewOppModels = 'enable_translation_opps_with_new_opp_models',
   EnableWorkedExamplesRteComponent = 'enable_worked_examples_rte_component',
-  AutomatedVoiceoverSynthesisFromTaskQueue = 'automated_voiceover_synthesis_from_task_queue',
   ShowRegeneratedVoiceoversToLearners = 'show_regenerated_voiceovers_to_learners',
+  AutomatedVoiceoverSynthesisFromTaskQueue = 'automated_voiceover_synthesis_from_task_queue',
 }
 
 export interface FeatureStatusSummaryBackendDict {
