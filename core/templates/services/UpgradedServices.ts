@@ -327,7 +327,6 @@ import {VersionTreeService} from 'pages/exploration-editor-page/history-tab/serv
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {WrittenTranslationObjectFactory} from 'domain/exploration/WrittenTranslationObjectFactory';
 import {WrittenTranslationsObjectFactory} from 'domain/exploration/WrittenTranslationsObjectFactory';
 import {
   SolutionVerificationService,
@@ -476,8 +475,6 @@ export class UpgradedServices {
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VersionTreeService'] = new VersionTreeService();
     upgradedServices['WindowRef'] = new WindowRef();
-    upgradedServices['WrittenTranslationObjectFactory'] =
-      new WrittenTranslationObjectFactory();
     upgradedServices['BaseInteractionValidationService'] =
       new BaseInteractionValidationService();
     upgradedServices['ɵangular_packages_common_http_http_d'] =
@@ -656,9 +653,7 @@ export class UpgradedServices {
       upgradedServices['WindowRef']
     );
     upgradedServices['WrittenTranslationsObjectFactory'] =
-      new WrittenTranslationsObjectFactory(
-        upgradedServices['WrittenTranslationObjectFactory']
-      );
+      new WrittenTranslationsObjectFactory();
 
     // Topological level: 2.
     upgradedServices['CsrfTokenService'] = new CsrfTokenService(

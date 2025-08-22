@@ -13,12 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of
- * WrittenTranslation domain objects.
+ * @fileoverview Model class for creating frontend instances of written translations.
  */
-
-import {Injectable} from '@angular/core';
-import cloneDeep from 'lodash/cloneDeep';
 
 export const TRANSLATION_DATA_FORMAT_HTML = 'html';
 export const TRANSLATION_DATA_FORMAT_UNICODE = 'unicode';
@@ -100,29 +96,22 @@ export class WrittenTranslation {
       needs_update: this.needsUpdate,
     };
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class WrittenTranslationObjectFactory {
-  createNew(dataFormat: string): WrittenTranslation {
+  static createNew(
+    dataFormat: DataFormatToDefaultValuesKey
+  ): WrittenTranslation {
     if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
       throw new Error('Invalid translation data format: ' + dataFormat);
     }
 
     return new WrittenTranslation(
-      dataFormat as DataFormatToDefaultValuesKey,
-      cloneDeep(
-        DATA_FORMAT_TO_DEFAULT_VALUES[
-          dataFormat as DataFormatToDefaultValuesKey
-        ]
-      ),
+      dataFormat,
+      JSON.parse(JSON.stringify(DATA_FORMAT_TO_DEFAULT_VALUES[dataFormat])),
       false
     );
   }
 
-  createFromBackendDict(
+  static createFromBackendDict(
     translationBackendDict: TranslationBackendDict
   ): WrittenTranslation {
     return new WrittenTranslation(
