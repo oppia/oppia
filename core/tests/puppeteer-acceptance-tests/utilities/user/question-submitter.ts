@@ -476,7 +476,7 @@ export class QuestionSubmitter extends BaseUser {
     await this.expectElementToBeVisible(addInteractionButton);
     await this.clickOn(addInteractionButton);
     await this.clickOn(mathInteractionsTab);
-    await this.clickOn(` ${interactionToAdd} `);
+    await this.clickOnElementWithText(` ${interactionToAdd} `);
     await this.clickOn(saveInteractionButton);
     await this.page.waitForSelector(addInteractionModalSelector, {
       hidden: true,

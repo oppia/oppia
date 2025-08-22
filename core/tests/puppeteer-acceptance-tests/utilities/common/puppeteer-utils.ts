@@ -490,6 +490,31 @@ export class BaseUser {
   }
 
   /**
+   * Clicks on the element with the given text.
+   * @param text The text of the element to click on.
+   * @param timeout The timeout for the element to be clickable.
+   */
+  async clickOnElementWithText(
+    text: string,
+    timeout: number = 5000
+  ): Promise<void> {
+    const xpath = `//*[contains(text(), normalize-space('${text}'))]`;
+
+    const element = await this.page.waitForXPath(xpath, {
+      visible: true,
+      timeout: timeout,
+    });
+
+    if (!element) {
+      throw new Error(`Element with text "${text}" not found.`);
+    }
+
+    await this.waitForElementToBeClickable(element);
+    await element.click();
+    showMessage(`Element (text: "${text}") is clicked.`);
+  }
+
+  /**
    * Selects the mat-option with the given value.
    * @param value The value of the mat-option to select.
    */

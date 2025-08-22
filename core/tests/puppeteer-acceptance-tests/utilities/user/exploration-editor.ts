@@ -2627,7 +2627,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOn(explorationGoalInput);
       await this.type(explorationGoalInput, goal);
       await this.clickOn(explorationCategoryDropdown);
-      await this.clickOn(category);
+      await this.clickOnElementWithText(category);
       if (tags) {
         await this.type(tagsField, tags);
       }
@@ -3197,7 +3197,7 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
     });
     await this.clickOn(languageUpdateDropdown);
-    await this.clickOn(language);
+    await this.clickOnElementWithText(language);
     await this.page.waitForNetworkIdle();
 
     await this.expectSelectedLanguageToBe(language);
