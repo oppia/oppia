@@ -59,6 +59,10 @@ describe('Topic Preview Tab Component', () => {
   ];
 
   class MockTopicEditorStateService {
+    private practiceTabDisplayed = false;
+    setPracticeTabDisplayed(value: boolean) {
+      this.practiceTabDisplayed = value;
+    }
     getTopic() {
       return {
         getName(): string {
@@ -70,6 +74,7 @@ describe('Topic Preview Tab Component', () => {
         getUrlFragment() {
           return topicUrl;
         },
+        getPracticeTabIsDisplayed: () => this.practiceTabDisplayed,
       };
     }
 
@@ -126,6 +131,7 @@ describe('Topic Preview Tab Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TopicPreviewTabComponent);
     componentInstance = fixture.componentInstance;
+    componentInstance.ngOnInit();
   });
 
   it('should create', () => {
@@ -156,14 +162,18 @@ describe('Topic Preview Tab Component', () => {
   });
 
   it('should return true when practiceTabIsDisplayed is true', () => {
+    (
+      componentInstance.topicEditorStateService as MockTopicEditorStateService
+    ).setPracticeTabDisplayed(true);
     componentInstance.ngOnInit();
-    componentInstance.practiceTabIsDisplayed = true;
     expect(componentInstance.isPracticeTabEnabled()).toBeTrue();
   });
 
   it('should return false when practiceTabIsDisplayed is false', () => {
+    (
+      componentInstance.topicEditorStateService as MockTopicEditorStateService
+    ).setPracticeTabDisplayed(false);
     componentInstance.ngOnInit();
-    componentInstance.practiceTabIsDisplayed = false;
     expect(componentInstance.isPracticeTabEnabled()).toBeFalse();
   });
 
