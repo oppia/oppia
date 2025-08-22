@@ -15,8 +15,6 @@
 /**
  * @fileoverview Unit tests for WrittenTranslations.
  */
-import {TestBed} from '@angular/core/testing';
-
 import {WrittenTranslations} from 'domain/exploration/written-translations.model';
 import {WrittenTranslation} from 'domain/exploration/written-translation.model';
 
