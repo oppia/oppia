@@ -156,11 +156,13 @@ describe('Topic Preview Tab Component', () => {
   });
 
   it('should return true when practiceTabIsDisplayed is true', () => {
+    componentInstance.ngOnInit();
     componentInstance.practiceTabIsDisplayed = true;
     expect(componentInstance.isPracticeTabEnabled()).toBeTrue();
   });
 
   it('should return false when practiceTabIsDisplayed is false', () => {
+    componentInstance.ngOnInit();
     componentInstance.practiceTabIsDisplayed = false;
     expect(componentInstance.isPracticeTabEnabled()).toBeFalse();
   });
