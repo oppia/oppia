@@ -62,7 +62,7 @@ import {
   VersionHistoryService,
 } from '../services/version-history.service';
 import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {VersionHistoryBackendApiService} from '../services/version-history-backend-api.service';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {Interaction} from 'domain/exploration/interaction.model';

@@ -204,7 +204,6 @@ import {
   // eslint-disable-next-line max-len
 } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import {PageTitleService} from 'services/page-title.service';
-import {ParamSpecsObjectFactory} from 'domain/exploration/ParamSpecsObjectFactory';
 import {PencilCodeEditorRulesService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import {
   PencilCodeEditorValidationService,
@@ -710,7 +709,6 @@ export class UpgradedServices {
       new NumberWithUnitsValidationService(
         upgradedServices['BaseInteractionValidationService']
       );
-    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory();
     upgradedServices['PencilCodeEditorRulesService'] =
       new PencilCodeEditorRulesService(
         upgradedServices['NormalizeWhitespacePipe'],
@@ -1107,7 +1105,6 @@ export class UpgradedServices {
     // Topological level: 9.
     upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
       upgradedServices['LoggerService'],
-      upgradedServices['ParamSpecsObjectFactory'],
       upgradedServices['StatesObjectFactory'],
       upgradedServices['UrlInterpolationService']
     );
