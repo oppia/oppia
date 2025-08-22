@@ -20,7 +20,7 @@ import {Injectable} from '@angular/core';
 
 import {StateBackendDict, State} from 'domain/state/state.model';
 import {Voiceover} from 'domain/exploration/voiceover.model';
-import {WrittenTranslation} from 'domain/exploration/WrittenTranslationObjectFactory';
+import {WrittenTranslation} from 'domain/exploration/written-translation.model';
 
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';

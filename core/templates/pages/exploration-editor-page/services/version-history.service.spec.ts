@@ -18,7 +18,7 @@
 
 import {TestBed} from '@angular/core/testing';
 import {ExplorationMetadata} from 'domain/exploration/ExplorationMetadataObjectFactory';
-import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {State} from 'domain/state/state.model';
 import {VersionHistoryService} from './version-history.service';
 

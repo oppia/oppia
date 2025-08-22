@@ -73,6 +73,14 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-subtopic-study-guide-with-multiple-sections.spec.ts"
     },
     {
+      "name": "curriculum-admin/create-skill-with-workedexamples",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/create-skill-with-workedexamples.spec.ts"
+    },
+    {
+      "name": "curriculum-admin/try-to-paste-invalid-components-and-get-error",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/curriculum-admin/try-to-paste-invalid-components-and-get-error.spec.ts"
+    },
+    {
       "name": "exploration-editor/create-exploration-and-change-basic-settings",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/create-exploration-and-change-basic-settings.spec.ts"
     },
@@ -115,6 +123,10 @@
     {
       "name": "exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/validate-exploration-managers-collaborators-playtesters-access-permissions.spec.ts"
+    },
+    {
+      "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/add-concept-card-with-workedexample-to-exploration.spec.ts"
     },
     {
       "name": "logged-in-user/view-subtopic-study-guides",
