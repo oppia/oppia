@@ -189,57 +189,63 @@ jobs:
               break
             fi
           done
+
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
+
       - name: Merge develop and set up dependencies
         uses: ./.github/actions/merge-develop-and-set-up-dependencies
+
       - name: Generate build files
         uses: ./.github/actions/generate-build-files
+
       - name: Generate modified suite name for artifacts
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with underscores.
         run: |
           SUITE_NAME=${{ matrix.suite.name }}
           echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
+
+      # Desktop Test (Attempt 1)
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }}
+        id: desktop-test-attempt-1
         # TODO(#22448): Remove once all suites are fixed.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
         run: >
           set -o pipefail;
-          VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Uploading Desktop test recordings as Artifacts
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: desktop-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}-original
-          path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
+
       - name: Upload desktop acceptance test logs
-        if: ${{ failure() }}
+        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: desktop-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: desktop_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+
       - name: Upload desktop test failure screenshots as artifacts
-        if: ${{ failure() }}
+        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
+
         # TODO(#22667): We are running this step twice, as snapshot gets deleted if 2nd attempt passes.
-      - name: Uploading diff screenshots as an artifact
-        if: ${{ failure() }}
+      - name: Upload diff screenshots as an artifact
+        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
-          name: diff-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          name: diff-snapshots-desktop-attempt-1-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           # Note: The path must be kept in sync with the one specified in
           # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
           path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+
+      # Desktop Test (Attempt 2)
       - name: Run Desktop Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
-        if: ${{ failure() }}
+        id: desktop-test-attempt-2
+        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
         run: >
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=1
@@ -247,47 +253,72 @@ jobs:
           python -m scripts.run_acceptance_tests
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+
       - name: Upload desktop acceptance retry test logs
-        if: ${{ failure() }}
+        if: ${{ steps.desktop-test-attempt-2.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: desktop-acceptance-test-retry-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: desktop_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Uploading Desktop test recordings as Artifacts
-        if: ${{ failure() }}
+      
+      - name: Upload desktop test recordings as an artifact
+        # We are checking for failure of desktop-test-attempt-1 and not desktop-test-attempt-2 because
+        # because we want to upload video recording regardless of whether desktop-test-attempt-2 passes or fails.
+        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: desktop-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
-      - name: Uploading generated test to angular module mapping as an artifact
-        if: ${{ failure() }}
+
+        # TODO(#22667): We are running this step twice, as snapshot gets deleted if 2nd attempt passes.
+      - name: Upload diff screenshots as an artifact
+        if: ${{ steps.desktop-test-attempt-2.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
-          name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
+          name: diff-snapshots-desktop-attempt-2-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          # Note: The path must be kept in sync with the one specified in
+          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
+          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+
+      # Mobile Test (Attempt 1)
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }}
+        id: mobile-test-attempt-1
         # TODO(#22448): Remove once all suites are fixed.
-        if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' }}
+        if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' && always() }}
         run: >
           set -o pipefail;
           xvfb-run -a --server-args="-screen 0, 1920x1080x24"
           python -m scripts.run_acceptance_tests --skip-build --suite=${{ matrix.suite.name }}
           --prod_env --mobile --server_log_level=info
           | tee mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+
       - name: Upload mobile acceptance test logs
-        if: ${{ failure() }}
+        if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: mobile-acceptance-test-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: mobile_acceptance_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+      
       - name: Upload mobile test failure screenshots as artifacts
-        if: ${{ failure() }}
+        if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: desktop-acceptance-test-failure-screenshot-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
+
+      - name: Upload diff screenshots as an artifact
+        if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: diff-snapshots-mobile-attempt-1-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          # Note: The path must be kept in sync with the one specified in
+          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
+          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+
+      # Mobile Test (Attempt 2)
       - name: Run Mobile Acceptance Test ${{ matrix.suite.name }} (Attempt 2 with screen recording)
-        if: ${{ failure() }}
+        id: mobile-test-attempt-2
+        if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
         # We use xvfb-run to create a virtual screen to run tests without headless mode.
         # Numbers in 1920x1080x24 represents screen width, height and color depth respectively.
         run: >
@@ -297,32 +328,47 @@ jobs:
           python -m scripts.run_acceptance_tests --skip-build
           --suite=${{ matrix.suite.name }} --prod_env --mobile --server_log_level=info
           | tee mobile_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
+
       - name: Upload mobile acceptance test logs
-        if: ${{ failure() }}
+        if: ${{ steps.mobile-test-attempt-2.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: mobile-acceptance-test-retry-logs-${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
           path: mobile_acceptance_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
-      - name: Uploading Mobile test recordings as Artifacts
-        if: ${{ failure() }}
+
+      - name: Upload diff screenshots as an artifact
+        if: ${{ steps.mobile-test-attempt-2.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: diff-snapshots-mobile-attempt-2-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          # Note: The path must be kept in sync with the one specified in
+          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
+          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+
+      - name: Upload Mobile test recordings as Artifacts
+        # We are checking for failure of mobile-test-attempt-1 and not mobile-test-attempt-2 because
+        # because we want to upload video recording regardless of whether mobile-test-attempt-2 passes or fails.
+        if: ${{ steps.mobile-test-attempt-1.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: mobile-acceptance-test-video-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance
-      - name: Uploading webpack bundles as an artifact
+
+      # Upload build files.
+      - name: Uploading generated test to angular module mapping as an artifact
+        if: ${{ steps.desktop-test-attempt-1.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
+          path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
+      
+      - name: Upload webpack bundles as an artifact
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
           name: webpack-bundles-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/build
-      - name: Uploading diff screenshots as an artifact
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: diff-snapshots-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
-          # Note: The path must be kept in sync with the one specified in
-          # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
-          path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+
       - name: Report failure if failed on oppia/oppia develop branch
         if: ${{
           failure() &&
@@ -334,6 +380,7 @@ jobs:
         with:
           message: "An acceptance test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
+
   lighthouse_accessibility_test:
     needs: [check_test_suites_to_run]
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_accessibility.count > 0 }}
