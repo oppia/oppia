@@ -32,7 +32,88 @@ const languageOptionInAdminPageSelector = '.e2e-test-language-selector-option';
 const languageSelectorSelectedInAdminPageSelector =
   '.e2e-test-language-selector-selected';
 
-export class QuestionCoordinator extends BaseUser {}
+const questionRoleEditorModalSelector =
+  '.e2e-test-question-role-editor-container';
+const checkedCheckboxSelector = '.e2e-test-checkbox-checked';
+const uncheckedCheckboxSelector = '.e2e-test-checkbox-unchecked';
+const saveButtonSelector = '.e2e-test-save-button';
+
+const totalQuestionReviewersSelector = '.e2e-test-total-question-reviewers';
+
+export class QuestionCoordinator extends BaseUser {
+  /**
+   * Clicks on the add reviewer or submitter button.
+   * @param {'Submitter' | 'Reviewer'} right - The right to add.
+   * @param {'add' | 'remove'} action - The action to perform.
+   */
+  async addOrRemoveQuestionRightsInQuestionRoleEditorModal(
+    right: 'Submitter' | 'Reviewer',
+    action: 'add' | 'remove' = 'add'
+  ): Promise<void> {
+    // Get some required selectors.
+    const roleCheckboxSelector = `.e2e-test-question-${right.toLowerCase()}-checkbox`;
+
+    const initialCheckboxStateSelector =
+      action === 'add'
+        ? `${roleCheckboxSelector}${uncheckedCheckboxSelector}`
+        : `${roleCheckboxSelector}${checkedCheckboxSelector}`;
+    const requiredCheckboxStateSelector =
+      action === 'add'
+        ? `${roleCheckboxSelector}${checkedCheckboxSelector}`
+        : `${roleCheckboxSelector}${uncheckedCheckboxSelector}`;
+
+    // Get Question Role Editor Modal.
+    const questionRoleEditorModal = await this.getElementInParent(
+      questionRoleEditorModalSelector
+    );
+
+    const checkboxElement = await questionRoleEditorModal.$(
+      initialCheckboxStateSelector
+    );
+
+    if (!checkboxElement) {
+      throw new Error(
+        `Could not find unchecked role checkbox for ${right} role.`
+      );
+    }
+
+    await checkboxElement.click();
+
+    await this.expectElementToBeVisible(requiredCheckboxStateSelector);
+  }
+
+  /**
+   * Saves and closes the question role editor modal.
+   */
+  async saveAndCloseQuestionRoleEditorModal(): Promise<void> {
+    const questionRoleEditorModal = await this.getElementInParent(
+      questionRoleEditorModalSelector
+    );
+
+    const saveButton = await questionRoleEditorModal.$(saveButtonSelector);
+
+    if (!saveButton) {
+      throw new Error(
+        'Could not find save button in question role editor modal.'
+      );
+    }
+
+    await saveButton.click();
+
+    await this.expectElementToBeVisible(questionRoleEditorModalSelector, false);
+  }
+
+  /**
+   * Checks if the total number of question reviewers is as expected.
+   * @param {number} number - The expected number of question reviewers.
+   */
+  async expectTotalQuestionReviewersToBe(number: number): Promise<void> {
+    await this.expectTextContentToBe(
+      totalQuestionReviewersSelector,
+      number.toString()
+    );
+  }
+}
 
 export let QuestionCoordinatorFactory = (): QuestionCoordinator =>
   new QuestionCoordinator();

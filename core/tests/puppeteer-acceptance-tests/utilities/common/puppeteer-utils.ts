@@ -1297,8 +1297,7 @@ export class BaseUser {
     parentElement?: ElementHandle<Element>
   ): Promise<ElementHandle<Element>> {
     const context = parentElement ?? this.page;
-    await context.waitForSelector(selector, {visible: true});
-    const element = await this.page.$(selector);
+    const element = await context.waitForSelector(selector, {visible: true});
     if (!element) {
       throw new Error(`Element with selector ${selector} not found.`);
     }

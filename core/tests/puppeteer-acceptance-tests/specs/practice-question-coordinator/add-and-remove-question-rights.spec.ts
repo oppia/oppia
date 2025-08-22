@@ -16,22 +16,22 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * TC. Add and remove question review rights.
+ * TC. Add and remove question rights.
  */
 
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ContributorAdmin} from '../../utilities/user/contributor-admin';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {QuestionCoordinator} from '../../utilities/user/question-coordinator';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {TranslationCoordinator} from '../../utilities/user/translation-coordinator';
 
 const ROLES = testConstants.Roles;
 
 describe('Practice Question Coordinator', function () {});
 
 describe('Translation Coordinator', function () {
-  let questionCoordinator: ContributorAdmin;
+  let questionCoordinator: QuestionCoordinator & ContributorAdmin;
   let loggedInUser1: LoggedInUser;
   let releaseCoordinator: ReleaseCoordinator;
 
@@ -57,7 +57,7 @@ describe('Translation Coordinator', function () {
     await releaseCoordinator.enableFeatureFlag('cd_admin_dashboard_new_ui');
   });
 
-  it('should be able to add question contribution rights', async function () {
+  it('should be able to add question submitter rights', async function () {
     // Navigate to the contributor dashboard admin page.
     await questionCoordinator.navigateToContributorDashboardAdminPage();
 
@@ -65,13 +65,43 @@ describe('Translation Coordinator', function () {
     await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
     await questionCoordinator.addUsernameInUsernameInputModal('loggedInUser1');
     await questionCoordinator.expectScreenshotToMatch(
-      'addTranslationRightsModal',
+      'addQuestionRightsModal',
       __dirname
     );
+
+    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
+      'Submitter'
+    );
+    await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
+  });
+
+  it('should be able to add question reviewer rights', async function () {
+    await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await questionCoordinator.addUsernameInUsernameInputModal('loggedInUser1');
+    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
+      'Reviewer'
+    );
+    await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
+
+    await questionCoordinator.page.reload();
+    await questionCoordinator.expectTotalQuestionReviewersToBe(1);
   });
 
   it('should be able to remove translation rights', async function () {
     await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await questionCoordinator.addUsernameInUsernameInputModal('loggedInUser1');
+    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
+      'Submitter',
+      'remove'
+    );
+    await questionCoordinator.addOrRemoveQuestionRightsInQuestionRoleEditorModal(
+      'Reviewer',
+      'remove'
+    );
+    await questionCoordinator.saveAndCloseQuestionRoleEditorModal();
+
+    await questionCoordinator.page.reload();
+    await questionCoordinator.expectTotalQuestionReviewersToBe(0);
   });
 
   afterAll(async function () {
