@@ -22,8 +22,7 @@ import {Injectable} from '@angular/core';
 import {
   ExplorationMetadata,
   ExplorationMetadataBackendDict,
-  ExplorationMetadataObjectFactory,
-} from 'domain/exploration/ExplorationMetadataObjectFactory';
+} from 'domain/exploration/exploration-metadata.model';
 import {
   State,
   StateBackendDict,
@@ -68,7 +67,6 @@ export class VersionHistoryBackendApiService {
     '/version_history_handler/metadata/<exploration_id>/<version>';
 
   constructor(
-    private explorationMetadataObjectFactory: ExplorationMetadataObjectFactory,
     private http: HttpClient,
     private stateObjectFactory: StateObjectFactory,
     private urlInterpolationService: UrlInterpolationService

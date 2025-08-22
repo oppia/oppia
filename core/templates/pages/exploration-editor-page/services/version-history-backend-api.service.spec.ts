@@ -21,7 +21,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
-import {ExplorationMetadataObjectFactory} from 'domain/exploration/ExplorationMetadataObjectFactory';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
 import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {VersionHistoryBackendApiService} from './version-history-backend-api.service';
@@ -30,16 +30,11 @@ describe('Version history backend api service', () => {
   let versionHistoryBackendApiService: VersionHistoryBackendApiService;
   let http: HttpTestingController;
   let stateObjectFactory: StateObjectFactory;
-  let explorationMetadataObjectFactory: ExplorationMetadataObjectFactory;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        ExplorationMetadataObjectFactory,
-        StateObjectFactory,
-        UrlInterpolationService,
-      ],
+      providers: [StateObjectFactory, UrlInterpolationService],
     });
 
     versionHistoryBackendApiService = TestBed.inject(
@@ -47,9 +42,6 @@ describe('Version history backend api service', () => {
     );
     http = TestBed.inject(HttpTestingController);
     stateObjectFactory = TestBed.inject(StateObjectFactory);
-    explorationMetadataObjectFactory = TestBed.inject(
-      ExplorationMetadataObjectFactory
-    );
   });
 
   it('should correctly fetch the version history of a state', fakeAsync(() => {
@@ -139,10 +131,9 @@ describe('Version history backend api service', () => {
     const sampleMetadataVersionHistory = {
       lastEditedVersionNumber: 1,
       lastEditedCommitterUsername: 'user1',
-      metadataInPreviousVersion:
-        explorationMetadataObjectFactory.createFromBackendDict(
-          sampleMetadataVersionHistoryDict.metadata_dict_in_previous_version
-        ),
+      metadataInPreviousVersion: ExplorationMetadata.createFromBackendDict(
+        sampleMetadataVersionHistoryDict.metadata_dict_in_previous_version
+      ),
     };
     versionHistoryBackendApiService
       .fetchMetadataVersionHistoryAsync('1', 2)
