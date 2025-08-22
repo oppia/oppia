@@ -175,7 +175,7 @@ export class WrittenTranslations {
     return new WrittenTranslations(translationsMapping);
   }
 
-  createEmpty(): WrittenTranslations {
+  static createEmpty(): WrittenTranslations {
     return new WrittenTranslations({});
   }
 }

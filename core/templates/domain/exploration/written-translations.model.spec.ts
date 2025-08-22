@@ -35,7 +35,7 @@ describe('Written Translations', () => {
     });
   });
 
-  it('should create a written translations object from backend dict', () => {
+  it('should create a written translations from backend dict', () => {
     expect(writtenTranslationsBackendDict.toBackendDict()).toEqual({
       translations_mapping: {
         content_1: {
@@ -49,12 +49,12 @@ describe('Written Translations', () => {
     });
   });
 
-  it('should create an empty written translations object', () => {
-    const emptyWrittenTranslationsObject = WrittenTranslations.createEmpty();
-    expect(emptyWrittenTranslationsObject.getAllContentIds()).toEqual([]);
+  it('should create an empty written translations', () => {
+    const emptyWrittenTranslations = WrittenTranslations.createEmpty();
+    expect(emptyWrittenTranslations.getAllContentIds()).toEqual([]);
   });
 
-  it('should add and delete contents from a written translations object', () => {
+  it('should add and delete contents from a written translations', () => {
     expect(writtenTranslationsBackendDict.getAllContentIds()).toEqual([
       'content_1',
     ]);
@@ -83,7 +83,7 @@ describe('Written Translations', () => {
     ]);
   });
 
-  it('should add translation in a written translations object', () => {
+  it('should add translation in a written translations', () => {
     expect(() => {
       writtenTranslationsBackendDict.addWrittenTranslation(
         'content_1',
@@ -104,7 +104,7 @@ describe('Written Translations', () => {
     ).toEqual(['hi-en', 'en']);
   });
 
-  it('should update the html language code of a written translations object', () => {
+  it('should update the html language code of a written translations', () => {
     const writtenTranslationsBackendDict =
       WrittenTranslations.createFromBackendDict({
         translations_mapping: {
