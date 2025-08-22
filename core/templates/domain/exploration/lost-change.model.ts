@@ -13,11 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Model class for creating new frontend instances of LostChange
- * domain objects.
+ * @fileoverview Model class for creating new frontend instances of LostChange.
  */
 
-import {} from '@angular/upgrade/static';
 import {UtilsService} from 'services/utils.service';
 import isEqual from 'lodash/isEqual';
 
@@ -242,33 +240,23 @@ export class LostChange {
     return language;
   }
 
-  /**
-   * @param {String} lostChangeDict - the name of the type to fetch.
-   * @returns {LostChange} - The associated type, if any.
-   */
   static createNew(
     utilsService: UtilsService,
     lostChangeDict: ExplorationChange | LostChangeBackendDict
   ): LostChange {
-    if (!lostChangeDict) {
-      throw new Error('lostChangeDict cannot be null or undefined');
-    }
-    const backendDict = lostChangeDict as LostChangeBackendDict;
-    if (!backendDict.cmd) {
-      throw new Error('lostChangeDict must have a cmd property');
-    }
+    lostChangeDict = lostChangeDict as LostChangeBackendDict;
     return new LostChange(
       utilsService,
-      backendDict.cmd,
-      backendDict.new_state_name,
-      backendDict.old_state_name,
-      backendDict.state_name,
-      backendDict.new_value,
-      backendDict.old_value,
-      backendDict.property_name,
-      backendDict.content_id,
-      backendDict.language_code,
-      backendDict.translation_html
+      lostChangeDict.cmd,
+      lostChangeDict.new_state_name,
+      lostChangeDict.old_state_name,
+      lostChangeDict.state_name,
+      lostChangeDict.new_value,
+      lostChangeDict.old_value,
+      lostChangeDict.property_name,
+      lostChangeDict.content_id,
+      lostChangeDict.language_code,
+      lostChangeDict.translation_html
     );
   }
 }

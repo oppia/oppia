@@ -18,6 +18,7 @@
 
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
+import {UtilsService} from 'services/utils.service';
 
 import {
   LostChangeBackendDict,
@@ -31,6 +32,7 @@ import {ChangesInHumanReadableFormComponent} from './changes-in-human-readable-f
 describe('Changes in Human Readable Form Component', () => {
   let component: ChangesInHumanReadableFormComponent;
   let fixture: ComponentFixture<ChangesInHumanReadableFormComponent>;
+  let utilsService: UtilsService;
 
   // This is a helper function to clean the compiled html
   // for each test, in order to make a cleaner assertion.
@@ -45,6 +47,12 @@ describe('Changes in Human Readable Form Component', () => {
         .replace(/::marker/, '')
     );
   };
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [UtilsService],
+    });
+    utilsService = TestBed.inject(UtilsService);
+  });
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -61,7 +69,7 @@ describe('Changes in Human Readable Form Component', () => {
 
   it('should make human readable when adding a state', () => {
     component.lostChanges = [
-      LostChange.createNew({
+      LostChange.createNew(utilsService, {
         cmd: 'add_state',
         state_name: 'State name',
         content_id_for_state_content: 'content_0',
@@ -92,7 +100,7 @@ describe('Changes in Human Readable Form Component', () => {
 
   it('should make human readable when renaming a state', () => {
     component.lostChanges = [
-      LostChange.createNew({
+      LostChange.createNew(utilsService, {
         cmd: 'rename_state',
         old_state_name: 'Old state name',
         new_state_name: 'New state name',
@@ -123,7 +131,7 @@ describe('Changes in Human Readable Form Component', () => {
 
   it('should make human readable when deleting a state', () => {
     component.lostChanges = [
-      LostChange.createNew({
+      LostChange.createNew(utilsService, {
         cmd: 'delete_state',
         state_name: 'Deleted state name',
       }),
@@ -151,7 +159,7 @@ describe('Changes in Human Readable Form Component', () => {
 
   it('should make human readable when editing a state with property content', () => {
     component.lostChanges = [
-      LostChange.createNew({
+      LostChange.createNew(utilsService, {
         cmd: 'edit_state_property',
         state_name: 'Edited state name',
         new_value: {
@@ -208,7 +216,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' widget_id and exploration ended',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: 'EndExploration',
@@ -255,7 +263,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' widget_id and an interaction is added',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: 'Exploration',
@@ -306,7 +314,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' widget_id and an interaction is deleted',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: null,
@@ -356,7 +364,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' widget_customization_args and an interaction is added',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: {
@@ -407,7 +415,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' widget_customization_args and an interaction is removed',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: {},
@@ -458,7 +466,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' widget_customization_args and an interaction is edited',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: {
@@ -511,7 +519,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' answer_groups and a change is added',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: {
@@ -577,7 +585,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' answer_groups and a change is edited',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: {
@@ -662,7 +670,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' answer_groups and a change is deleted',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: {} as LostChangeValue,
@@ -729,7 +737,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' default_outcome and a change is added',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: Outcome.createFromBackendDict({
@@ -802,7 +810,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' default_outcome and a change is edited',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: Outcome.createFromBackendDict({
@@ -876,7 +884,7 @@ describe('Changes in Human Readable Form Component', () => {
       ' default_outcome and a change is deleted',
     () => {
       component.lostChanges = [
-        LostChange.createNew({
+        LostChange.createNew(utilsService, {
           cmd: 'edit_state_property',
           state_name: 'Edited state name',
           new_value: {} as LostChangeValue,

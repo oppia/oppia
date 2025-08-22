@@ -55,12 +55,9 @@ export class LostChangesModalComponent
 
   ngOnInit(): void {
     this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
-    if (this.hasLostChanges) {
-      this.processedLostChanges = this.lostChanges.map(
-        (change: ExplorationChange | LostChangeBackendDict) =>
-          LostChange.createNew(this.utilsService, change)
-      );
-    }
+    this.lostChanges = this.lostChanges.map(lostChangeDict =>
+      LostChange.createNew(this.utilsService, lostChangeDict)
+    );
   }
 
   cancel(): void {

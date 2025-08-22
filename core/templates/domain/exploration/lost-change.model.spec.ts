@@ -115,7 +115,7 @@ describe('LostChange', () => {
     expect(lostChange.isOldValueEmpty()).toBeFalse();
     expect(lostChange.isNewValueEmpty()).toBeFalse();
 
-    const lostChange2 = LostChange.createNew({
+    const lostChange2 = LostChange.createNew(utilsService, {
       cmd: 'edit_state_property',
       state_name: 'Edited state name',
       new_value: ['value 1'],
@@ -348,7 +348,7 @@ describe('LostChange', () => {
       property_name: 'language_code',
     });
     expect(lostChange.getLanguage()).toBe('বাংলা (Bangla)');
-    const lostChange2 = LostChange.createNew({
+    const lostChange2 = LostChange.createNew(utilsService, {
       language_code: 'en',
       cmd: 'add_written_translation',
       content_id: 'content',
