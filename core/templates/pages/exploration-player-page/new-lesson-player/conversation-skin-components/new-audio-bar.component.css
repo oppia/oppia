@@ -10,6 +10,7 @@
   position: relative;
   width: 100%;
   padding: 10px 8px;
+  padding-right: 48px;
   display: flex;
 }
 
@@ -25,6 +26,7 @@
   color: #205D86;
   margin-left: 8px;
   margin-right: 8px;
+  min-width: 161px;
 }
 
 .oppia-new-audio-header-select select{
@@ -50,11 +52,15 @@
   width: 100%;
 }
 
-/* .oppia-new-audio-header-control-buttons .mat-slider-thumb {
-  background-color: #C55F45;
+oppia-new-audio-bar .mat-slider-horizontal {
+  height: 0;
 }
 
-.oppia-new-audio-header-control-buttons .mat-slider-horizontal .mat-slider-track-wrapper {
-  width: 806px;
-  background-color: #205D86;
-}*/
+oppia-new-audio-bar .mat-slider {
+  padding: 0;
+}
+
+oppia-new-audio-bar .mat-slider-wrapper {
+  position: static;
+}
+
