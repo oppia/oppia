@@ -101,7 +101,7 @@ export class TopicPreviewTabComponent {
   }
 
   isPracticeTabEnabled(): boolean {
-    return this.topic.getPracticeTabIsDisplayed();
+    return this.topic ? this.topic.getPracticeTabIsDisplayed() : false;
   }
 
   subscribeToOnLangChange(): void {
