@@ -323,7 +323,7 @@ legend {
   padding: 6px 12px 6px 12px;
 }
 
-.form-group select {
+.mb-3 select {
   margin-right: 5px;
 }
 
@@ -640,13 +640,13 @@ p:last-child {
 .label, .badge {
   margin: auto 4px;
 }
-.label-default, .badge-default {
+.label-default, .bg-secondary {
   background-color: #888;
 }
-.label-info, .badge-info {
+.label-info, .bg-info {
   background-color: #18447e;
 }
-.label-success, .badge-success {
+.label-success, .bg-success {
   background-color: #009688;
 }
 
@@ -2764,7 +2764,7 @@ mat-card.preview-conversation-skin-supplemental-card {
   max-width: 560px;
 }
 
-.oppia-settings-container .form-group > label {
+.oppia-settings-container .mb-3 > label {
   padding-left: 0;
   padding-right: 0;
 }
