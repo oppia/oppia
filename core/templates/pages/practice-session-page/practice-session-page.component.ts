@@ -132,6 +132,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
         this.topicName = result.topic_name;
         this.setPageTitle();
         this.subscribeToOnLanguageCodeChange();
+        this.loaderService.hideLoadingScreen();
       });
   }
 
