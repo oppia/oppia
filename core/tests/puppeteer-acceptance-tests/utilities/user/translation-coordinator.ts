@@ -141,7 +141,7 @@ export class TranslationCoordinator extends BaseUser {
       const containerText = await container.evaluate(el =>
         el.textContent?.trim()
       );
-      if (containerText === language) {
+      if (containerText?.includes(language)) {
         languageContainer = container;
         break;
       }
