@@ -29,6 +29,7 @@ const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalContainerSelector = '.e2e-test-modal-container';
 const addRightsButtonSelector = '.e2e-test-add-rights-button';
 const contributorCountSelector = '.e2e-test-contributor-count';
+const tabSelectionDropdownMobileSelector = '.e2e-test-tab-selection-dropdown';
 
 export class ContributorAdmin extends BaseUser {
   /**
@@ -46,6 +47,8 @@ export class ContributorAdmin extends BaseUser {
     tabName: 'Translation Submitters' | 'Translation Reviewers'
   ) {
     if (this.isViewportAtMobileWidth()) {
+      await this.expectElementToBeVisible(tabSelectionDropdownMobileSelector);
+      await this.updateMatOption(tabSelectionDropdownMobileSelector, tabName);
     } else {
       const tabNameInLowerCase = tabName.toLocaleLowerCase().replace(' ', '-');
       const tabSelector = `.e2e-test-${tabNameInLowerCase}-tab`;
