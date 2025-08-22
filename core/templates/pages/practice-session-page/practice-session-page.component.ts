@@ -40,6 +40,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
   topicName!: string;
   stringifiedSubtopicIds!: string;
   questionPlayerConfig!: QuestionPlayerConfig;
+  loadingMessage: string = 'Loading';
 
   constructor(
     private urlService: UrlService,
@@ -131,11 +132,16 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
         this.topicName = result.topic_name;
         this.setPageTitle();
         this.subscribeToOnLanguageCodeChange();
-        this.loaderService.hideLoadingScreen();
       });
   }
 
   ngOnInit(): void {
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe((msg: string) => {
+        this.loadingMessage = msg;
+      })
+    );
+
     this.topicName = this.urlService.getTopicUrlFragmentFromLearnerUrl();
     this.stringifiedSubtopicIds = this.urlService.getSelectedSubtopicsFromUrl();
     this._fetchSkillDetails();
