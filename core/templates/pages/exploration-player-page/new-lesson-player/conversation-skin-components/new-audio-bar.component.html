@@ -2,17 +2,17 @@
 
 <div class="oppia-new-audio-bar">
 	<i class="fa-solid fa-headphones"></i>
-	<span>Listen to this lesson in</span>
+	<p>Listen to this lesson in <span>{{selectedLanguageAccentDescription}}</span></p>
 
 	<div class="oppia-new-audio-header-control-buttons" #audioControls>
 
-		<div class="oppia-new-audio-header-select">
+		<!-- <div class="oppia-new-audio-header-select">
 			<select class="audio-language-select e2e-test-audio-lang-select"
 							[(ngModel)]="selectedLanguageAccentDescription"
 							(change)="updateSelectedLanguageAccent()">
 				<option *ngFor="let opt of languageAccentDecriptions" [value]="opt">{{ opt }}</option>
 			</select>
-		</div>
+		</div> -->
 
 		<div class="audio-new-header-control-icons">
 				<a (click)="onPlayButtonClicked()" (keydown.enter)="onPlayButtonClicked()"

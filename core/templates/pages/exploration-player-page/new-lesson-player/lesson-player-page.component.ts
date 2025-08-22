@@ -30,6 +30,8 @@ import {UrlService} from 'services/contextual/url.service';
 import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
 import {PageTitleService} from 'services/page-title.service';
 import './lesson-player-page.component.css';
+import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 
 require('interactions/interactionsRequires.ts');
 
@@ -43,13 +45,17 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
   pageIsIframed: boolean = false;
   explorationTitle!: string;
   isLoadingExploration: boolean = true;
+  explorationIsUnpublished: boolean = false;
+  voiceoversAreLoaded: boolean = false;
 
   constructor(
     private pageContextService: PageContextService,
+    private explorationPermissionsBackendApiService: ExplorationPermissionsBackendApiService,
     private keyboardShortcutService: KeyboardShortcutService,
     private metaTagCustomizationService: MetaTagCustomizationService,
     private pageTitleService: PageTitleService,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
+    private entityVoiceoversService: EntityVoiceoversService,
     private urlService: UrlService,
     private translateService: TranslateService
   ) {}
@@ -65,6 +71,16 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
         // manually, and the onLangChange subscription is added after
         // the exploration is fetch from the backend.
         this.setPageTitle();
+        this.entityVoiceoversService.init(
+          explorationId,
+          'exploration',
+          response.version,
+          response.exploration.language_code
+        );
+
+        this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+          this.voiceoversAreLoaded = true;
+        });
         this.subscribeToOnLangChange();
         this.metaTagCustomizationService.addOrReplaceMetaTags([
           {
@@ -95,6 +111,12 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
 
     this.pageIsIframed = this.urlService.isIframed();
     this.keyboardShortcutService.bindExplorationPlayerShortcuts();
+
+    this.explorationPermissionsBackendApiService
+      .getPermissionsAsync()
+      .then(response => {
+        this.explorationIsUnpublished = response.canPublish;
+      });
   }
 
   subscribeToOnLangChange(): void {
