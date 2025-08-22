@@ -32,8 +32,7 @@ import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {
   ParamSpecsBackendDict,
   ParamSpecs,
-  ParamSpecsObjectFactory,
-} from 'domain/exploration/ParamSpecsObjectFactory';
+} from 'domain/exploration/param-specs.model';
 import {
   EndExplorationCustomizationArgs,
   InteractionCustomizationArgs,
@@ -210,7 +209,6 @@ export class Exploration extends BaseTranslatableObject {
 export class ExplorationObjectFactory {
   constructor(
     private logger: LoggerService,
-    private paramSpecsObjectFactory: ParamSpecsObjectFactory,
     private statesObjectFactory: StatesObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
@@ -221,9 +219,7 @@ export class ExplorationObjectFactory {
     return new Exploration(
       explorationBackendDict.init_state_name,
       ParamChanges.createFromBackendList(explorationBackendDict.param_changes),
-      this.paramSpecsObjectFactory.createFromBackendDict(
-        explorationBackendDict.param_specs
-      ),
+      ParamSpecs.createFromBackendDict(explorationBackendDict.param_specs),
       this.statesObjectFactory.createFromBackendDict(
         explorationBackendDict.states
       ),
