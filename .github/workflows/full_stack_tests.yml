@@ -50,6 +50,7 @@ jobs:
       matrix:
         suite:
           - name: translation-coordinator/add-remove-translation-rights
+          - name: practice-question-coordinator/add-and-remove-question-review-rights
         run1: [1, 2]
         run2: [1]
         mobile: [false, true]

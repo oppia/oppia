@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * TC. Add and remove translation rights.
+ * TC. Add and remove question review rights.
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -28,17 +28,18 @@ import {TranslationCoordinator} from '../../utilities/user/translation-coordinat
 
 const ROLES = testConstants.Roles;
 
+describe('Practice Question Coordinator', function () {});
+
 describe('Translation Coordinator', function () {
-  let translationCoordinator: TranslationCoordinator & ContributorAdmin;
+  let questionCoordinator: ContributorAdmin;
   let loggedInUser1: LoggedInUser;
   let releaseCoordinator: ReleaseCoordinator;
 
   beforeAll(async function () {
-    translationCoordinator = await UserFactory.createNewUser(
+    questionCoordinator = await UserFactory.createNewUser(
       'translationCoordinator',
       'translationCoordinator@example.com',
-      [ROLES.TRANSLATION_COORDINATOR],
-      ['en', 'hi']
+      [ROLES.QUESTION_COORDINATOR]
     );
 
     releaseCoordinator = await UserFactory.createNewUser(
@@ -56,53 +57,21 @@ describe('Translation Coordinator', function () {
     await releaseCoordinator.enableFeatureFlag('cd_admin_dashboard_new_ui');
   });
 
-  it('should be able to add translation rights in a language for a user', async function () {
+  it('should be able to add question contribution rights', async function () {
     // Navigate to the contributor dashboard admin page.
-    await translationCoordinator.navigateToContributorDashboardAdminPage();
-    await translationCoordinator.switchToTabInContributorAdminPage(
-      'Translation Reviewers'
-    );
+    await questionCoordinator.navigateToContributorDashboardAdminPage();
 
     // Add translation rights.
-    await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
-    await translationCoordinator.addUsernameInUsernameInputModal(
-      'loggedInUser1'
-    );
-    await translationCoordinator.expectScreenshotToMatch(
+    await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
+    await questionCoordinator.addUsernameInUsernameInputModal('loggedInUser1');
+    await questionCoordinator.expectScreenshotToMatch(
       'addTranslationRightsModal',
       __dirname
     );
-
-    await translationCoordinator.addLanguageInLanguageSelectorModal(
-      'hi',
-      'हिन्दी (Hindi)'
-    );
-    await translationCoordinator.closeLanguageSelectorModal();
-    await translationCoordinator.page.reload();
-    await translationCoordinator.switchToTabInContributorAdminPage(
-      'Translation Reviewers'
-    );
-
-    await translationCoordinator.selectLanguageInAdminPage('Hindi (हिन्दी)');
-    await translationCoordinator.expectNumberOfContributorsToBe(1);
   });
 
   it('should be able to remove translation rights', async function () {
-    await translationCoordinator.clickOnAddReviewerOrSubmitterButton();
-    await translationCoordinator.addUsernameInUsernameInputModal(
-      'loggedInUser1'
-    );
-
-    await translationCoordinator.removeLanguageFromLanguageSelectorModal(
-      'हिन्दी (Hindi)'
-    );
-    await translationCoordinator.closeLanguageSelectorModal();
-    await translationCoordinator.page.reload();
-    await translationCoordinator.switchToTabInContributorAdminPage(
-      'Translation Reviewers'
-    );
-    await translationCoordinator.selectLanguageInAdminPage('Hindi (हिन्दी)');
-    await translationCoordinator.expectNumberOfContributorsToBe(1);
+    await questionCoordinator.clickOnAddReviewerOrSubmitterButton();
   });
 
   afterAll(async function () {

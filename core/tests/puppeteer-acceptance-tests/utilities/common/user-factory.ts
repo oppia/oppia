@@ -47,6 +47,7 @@ import {
   ContributorAdminFactory,
 } from '../user/contributor-admin';
 import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
+import {QuestionCoordinatorFactory} from '../user/question-coordinator';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -62,6 +63,7 @@ const USER_ROLE_MAPPING = {
   [ROLES.BLOG_POST_EDITOR]: BlogPostEditorFactory,
   [ROLES.CURRICULUM_ADMIN]: CurriculumAdminFactory,
   [ROLES.QUESTION_ADMIN]: QuestionAdminFactory,
+  [ROLES.QUESTION_COORDINATOR]: QuestionCoordinatorFactory,
   [ROLES.VOICEOVER_ADMIN]: VoiceoverAdminFactory,
   [ROLES.TOPIC_MANAGER]: TopicManagerFactory,
   [ROLES.MODERATOR]: ModeratorFactory,

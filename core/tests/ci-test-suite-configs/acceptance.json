@@ -555,6 +555,10 @@
     {
       "name": "translation-coordinator/add-remove-translation-rights",
       "module": "core/tests/puppeteer-acceptance-tests/specs/translation-coordinator/add-remove-translation-rights.spec.ts"
+    },
+    {
+      "name": "practice-question-coordinator/add-and-remove-question-review-rights",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-coordinator/add-and-remove-question-review-rights.spec.ts"
     }
   ],
   "docker_suites": []
