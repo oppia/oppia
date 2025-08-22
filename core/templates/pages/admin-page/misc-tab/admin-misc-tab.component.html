@@ -19,14 +19,14 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="submitQuery()">
       <div class="mb-3 row">
-        <label>Exploration ID:</label>
+        <label class="form-label">Exploration ID:</label>
         <input type="text"
                [(ngModel)]="expId"
                [ngModelOptions]="{standalone: true}"
                required="true">
       </div>
       <div class="mb-3 row">
-        <label>Exploration version:</label>
+        <label class="form-label">Exploration version:</label>
         <input type="number"
                min="0"
                [(ngModel)]="expVersion"
@@ -34,14 +34,14 @@
                required="true">
       </div>
       <div class="mb-3 row">
-        <label>State name:</label>
+        <label class="form-label">State name:</label>
         <input type="text"
                [(ngModel)]="stateName"
                [ngModelOptions]="{standalone: true}"
                required="true">
       </div>
       <div class="mb-3 row">
-        <label>Number of answers:</label>
+        <label class="form-label">Number of answers:</label>
         <input type="number"
                min="0"
                [(ngModel)]="numAnswers"
@@ -63,7 +63,7 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="regenerateOpportunitiesRelatedToTopic()">
       <div class="mb-3 row">
-        <label>Topic ID:</label>
+        <label class="form-label">Topic ID:</label>
         <input type="text"
                [(ngModel)]="topicIdForRegeneratingOpportunities"
                [ngModelOptions]="{standalone: true}"
@@ -101,7 +101,7 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="rollbackExploration()">
       <div class="mb-3 row">
-        <label>Exploration ID:</label>
+        <label class="form-label">Exploration ID:</label>
         <input type="text"
                [(ngModel)]="expIdToRollback"
                [ngModelOptions]="{standalone: true}"
@@ -132,7 +132,7 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="updateUsername()">
       <div class="mb-3 row">
-        <label>Old username:</label>
+        <label class="form-label">Old username:</label>
         <input type="text"
                [(ngModel)]="oldUsername"
                [ngModelOptions]="{standalone: true}"
@@ -140,7 +140,7 @@
                required="true">
       </div>
       <div class="mb-3 row">
-        <label>New username:</label>
+        <label class="form-label">New username:</label>
         <input type="text"
                [(ngModel)]="newUsername"
                [ngModelOptions]="{standalone: true}"
@@ -174,7 +174,7 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="getModelsRelatedToUser()">
       <div class="mb-3 row">
-        <label>User ID:</label>
+        <label class="form-label">User ID:</label>
         <input type="text"
                [(ngModel)]="userIdToGet"
                [ngModelOptions]="{standalone: true}"
@@ -192,14 +192,14 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="deleteUser()">
       <div class="mb-3 row">
-        <label>User ID:</label>
+        <label class="form-label">User ID:</label>
         <input type="text"
                [(ngModel)]="userIdToDelete"
                [ngModelOptions]="{standalone: true}"
                required="true">
       </div>
       <div class="mb-3 row">
-        <label>Username:</label>
+        <label class="form-label">Username:</label>
         <input type="text"
                [(ngModel)]="usernameToDelete"
                [ngModelOptions]="{standalone: true}"
@@ -219,7 +219,7 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="grantSuperAdminPrivileges()">
       <div class="mb-3 row">
-        <label>Username:</label>
+        <label class="form-label">Username:</label>
         <input type="text"
                [(ngModel)]="usernameToGrant"
                [ngModelOptions]="{standalone: true}"
@@ -239,7 +239,7 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="updateBlogPostData()">
       <div class="mb-3 row">
-        <label>Blog Post Id:</label>
+        <label class="form-label">Blog Post Id:</label>
         <input type="text"
                [(ngModel)]="blogPostId"
                [ngModelOptions]="{standalone: true}"
@@ -247,7 +247,7 @@
                required="true">
       </div>
       <div class="mb-3 row">
-        <label>Author Username:</label>
+        <label class="form-label">Author Username:</label>
         <input type="text"
                [(ngModel)]="authorUsername"
                [ngModelOptions]="{standalone: true}"
@@ -255,7 +255,7 @@
                required="true">
       </div>
       <div class="mb-3 row">
-        <label>Published On:</label>
+        <label class="form-label">Published On:</label>
         <input type="text"
                [(ngModel)]="publishedOn"
                [ngModelOptions]="{standalone: true}"
@@ -277,7 +277,7 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="revokeSuperAdminPrivileges()">
       <div class="mb-3 row">
-        <label>Username:</label>
+        <label class="form-label">Username:</label>
         <input type="text"
                [(ngModel)]="usernameToRevoke"
                [ngModelOptions]="{standalone: true}"
@@ -296,7 +296,7 @@
   <div class="oppia-query-form">
     <form class="form" (submit)="retrieveExplorationInteractionIds()">
       <div class="mb-3 row">
-        <label>Exploration ID:</label>
+        <label class="form-label">Exploration ID:</label>
         <input type="text"
                [(ngModel)]="expIdToGetInteractionIdsFor"
                [ngModelOptions]="{standalone: true}"
