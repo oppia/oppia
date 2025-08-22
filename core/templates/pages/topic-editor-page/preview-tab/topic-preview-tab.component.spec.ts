@@ -18,6 +18,7 @@
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {TranslateModule} from '@ngx-translate/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from 'modules/material.module';
 import {StorySummary} from 'domain/story/story-summary.model';
@@ -91,7 +92,11 @@ describe('Topic Preview Tab Component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [BrowserAnimationsModule, MaterialModule],
+      imports: [
+        BrowserAnimationsModule,
+        MaterialModule,
+        TranslateModule.forRoot(),
+      ],
       declarations: [TopicPreviewTabComponent],
       providers: [
         {
