@@ -42,13 +42,6 @@ const routes: Route[] = [
       ),
   },
   {
-    path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.SPLASH.ROUTE,
-    loadChildren: () =>
-      import('pages/splash-page/splash-page.module').then(
-        m => m.SplashPageModule
-      ),
-  },
-  {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ADMIN.ROUTE,
     loadChildren: () =>
       import('pages/admin-page/admin-page.module').then(m => m.AdminPageModule),

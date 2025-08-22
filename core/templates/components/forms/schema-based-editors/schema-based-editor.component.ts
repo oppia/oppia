@@ -90,13 +90,13 @@ export class SchemaBasedEditorComponent
   }
 
   constructor() {}
-
+  // Implemented as a part of ControlValueAccessor interface.
   writeValue(value: SchemaDefaultValue): void {
     if (value !== null && value !== undefined) {
       this._localValue = value;
     }
   }
-
+  // Implemented as a part of ControlValueAccessor interface.
   registerOnChange(fn: (val: SchemaDefaultValue) => void): void {
     this.onChange = fn;
   }
@@ -113,6 +113,7 @@ export class SchemaBasedEditorComponent
     this.onValidatorChange = fn;
   }
 
+  // Implemented as a part of Validator interface.
   validate(control: AbstractControl): ValidationErrors | null {
     if (!this.form) {
       return null;
