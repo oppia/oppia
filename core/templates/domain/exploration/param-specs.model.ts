@@ -13,12 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of ParamSpecs
+ * @fileoverview Model class for creating new frontend instances of ParamSpecs
  * domain objects. ParamSpecs map parameter names to the specifications
  * which defines them (represented as ParamSpec objects).
  */
-
-import {Injectable} from '@angular/core';
 
 import {
   ParamSpecBackendDict,
@@ -104,19 +102,14 @@ export class ParamSpecs {
     });
     return paramSpecsBackendDict;
   }
-}
 
-@Injectable({
-  providedIn: 'root',
-})
-export class ParamSpecsObjectFactory {
   /**
    * @param {!Object.<String, {obj_type: String}>} paramSpecsBackendDict -
    *    Basic dict of backend representation.
    * @returns {ParamSpecs} - An instance with properties from the backend
    *    dict.
    */
-  createFromBackendDict(
+  static createFromBackendDict(
     paramSpecsBackendDict: ParamSpecsBackendDict
   ): ParamSpecs {
     var paramDict: ParamDict = {};
