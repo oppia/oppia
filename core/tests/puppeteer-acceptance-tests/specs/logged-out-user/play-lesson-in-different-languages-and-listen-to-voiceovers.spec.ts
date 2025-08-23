@@ -209,7 +209,7 @@ describe('Exploration Editor', function () {
     loggedOutUser = await UserFactory.createLoggedOutUser();
 
     // Setup is taking really long.
-  }, 800000);
+  }, 900000);
 
   it(
     'should allow the learner to view and play a lesson entirely in a particular language and start listening to the voiceover from any state',

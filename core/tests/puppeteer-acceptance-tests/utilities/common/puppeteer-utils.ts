@@ -541,43 +541,12 @@ export class BaseUser {
    * and wait until the new page is fully loaded.
    */
   async clickAndWaitForNavigation(selector: string): Promise<void> {
-    try {
-      const button = await this.page.waitForXPath(
-        `\/\/*[contains(text(), normalize-space('${selector}'))]`,
-        {
-          timeout: 5000,
-        }
-      );
+    const navigationPromise = this.page.waitForNavigation({
+      waitUntil: ['networkidle2', 'load'],
+    });
 
-      if (button === null) {
-        throw new Error('Element not found');
-      }
-
-      await Promise.all([
-        this.page.waitForNavigation({
-          waitUntil: ['networkidle2', 'load'],
-        }),
-        button.click(),
-      ]);
-    } catch (error) {
-      if (
-        error instanceof puppeteer.errors.TimeoutError ||
-        (error instanceof Error && error.message.includes('Element not found'))
-      ) {
-        // If we fail to find the element by its XPATH, then the button is undefined and
-        // we try to find it by its CSS selector.
-
-        await this.waitForElementToBeClickable(selector);
-        await Promise.all([
-          this.page.waitForNavigation({
-            waitUntil: ['networkidle2', 'load'],
-          }),
-          this.page.click(selector),
-        ]);
-      } else {
-        throw error;
-      }
-    }
+    await this.clickOn(selector, false, 10000);
+    await navigationPromise;
   }
 
   /**

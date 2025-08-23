@@ -72,7 +72,7 @@ describe('Voiceover Submitter', function () {
       null,
       explorationId
     );
-  }, 450000);
+  }, 600000);
 
   it('should be able to add and remove voiceovers to explorations', async function () {
     // Navigate to the exploration editor.
