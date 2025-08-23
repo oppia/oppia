@@ -335,6 +335,37 @@ export class Contributor extends BaseUser {
     // Verify option is selected.
     await this.expectTextContentToBe(selectedOptionSelector, contributionType);
   }
+
+  /**
+   * Filters content by topic.
+   * @param {string} topicName - The name of the topic to filter by.
+   */
+  async filterContentByTopic(topicName: string): Promise<void> {
+    await this.expectElementToBeVisible(topicSelector);
+    await this.clickOn(topicSelector);
+
+    await this.expectElementToBeVisible(topicOptionSelector);
+    const optionElements = await this.page.$$(topicOptionSelector);
+    let optionElement: ElementHandle<Element> | null = null;
+
+    for (const option of optionElements) {
+      const optionText = await option.evaluate(el => el.textContent?.trim());
+      if (optionText === topicName) {
+        optionElement = option;
+        break;
+      }
+    }
+
+    if (!optionElement) {
+      throw new Error(`Option ${topicName} not found.`);
+    }
+
+    // Click on the option.
+    await optionElement.click();
+
+    // Verify option is selected.
+    await this.expectTextContentToBe(selectedTopicSelector, topicName);
+  }
 }
 
 export const ContributorFactory = (): Contributor => new Contributor();

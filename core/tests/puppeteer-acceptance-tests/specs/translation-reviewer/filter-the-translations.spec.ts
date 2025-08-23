@@ -145,6 +145,18 @@ describe('Translation Reviewer', function () {
 
   it('should be able to filter by topic', async function () {
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
+    await translationReviewer.filterContentByTopic('Fractions');
+
+    await translationReviewer.expectTranslationOpportunityToBePresent(
+      'सामग्री 0',
+      'States of Matter',
+      false
+    );
+    await translationReviewer.expectTranslationOpportunityToBePresent(
+      'सामग्री 0',
+      'Fractions',
+      true
+    );
   });
 
   afterAll(async function () {
