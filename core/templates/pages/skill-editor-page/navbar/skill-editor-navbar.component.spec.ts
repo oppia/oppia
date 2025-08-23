@@ -24,7 +24,7 @@ import {
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {UrlService} from 'services/contextual/url.service';

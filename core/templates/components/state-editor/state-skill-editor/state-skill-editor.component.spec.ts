@@ -55,7 +55,7 @@ import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
 import {UserService} from 'services/user.service';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {MaterialModule} from 'modules/material.module';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 
 describe('State Skill Editor Component', () => {
   let fixture: ComponentFixture<StateSkillEditorComponent>;
@@ -65,7 +65,6 @@ describe('State Skill Editor Component', () => {
   let urlInterpolationService: UrlInterpolationService;
   let userService: UserService;
   let skillBackendApiService: SkillBackendApiService;
-  let skillObjectFactory: SkillObjectFactory;
 
   let skillSummaryBackendDict: SkillSummaryBackendDict = {
     id: 'test_id',
@@ -233,7 +232,6 @@ describe('State Skill Editor Component', () => {
     stateLinkedSkillIdService = TestBed.inject(StateLinkedSkillIdService);
     userService = TestBed.inject(UserService);
     skillBackendApiService = TestBed.inject(SkillBackendApiService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
   });
 
   beforeEach(() => {
@@ -339,7 +337,7 @@ describe('State Skill Editor Component', () => {
       superseding_skill_id: '2',
     };
     const fetchSkillResponse = {
-      skill: skillObjectFactory.createFromBackendDict(skillBackendDict),
+      skill: Skill.createFromBackendDict(skillBackendDict),
       assignedSkillTopicData: {},
       groupedSkillSummaries: {},
     };

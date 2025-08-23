@@ -26,7 +26,7 @@ import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {UrlService} from 'services/contextual/url.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AlertsService} from 'services/alerts.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 
 @Component({

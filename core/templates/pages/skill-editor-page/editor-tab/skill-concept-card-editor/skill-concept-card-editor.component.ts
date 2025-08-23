@@ -27,7 +27,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import {SkillPreviewModalComponent} from '../skill-preview-modal.component';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 
 interface BindableFieldDict {
   displayedConceptCardExplanation: string;

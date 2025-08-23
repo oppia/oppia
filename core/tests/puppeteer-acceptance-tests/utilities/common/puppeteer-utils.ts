@@ -32,6 +32,8 @@ expect.extend({toMatchImageSnapshot});
 const backgroundBanner = '.oppia-background-image';
 const libraryBanner = '.e2e-test-library-banner';
 
+const currentMatTabHeaderSelector = '.mat-tab-label-active';
+
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -65,6 +67,7 @@ export type ModalUserInteractions = (
 
 const actionStatusMessageSelector = '.e2e-test-status-message';
 const commonModalTitleSelector = '.e2e-test-modal-header';
+const commonModalBodySelector = '.e2e-test-modal-body';
 
 export class BaseUser {
   page!: Page;
@@ -440,14 +443,16 @@ export class BaseUser {
   async waitForElementToBeClickable(
     selector: string | ElementHandle<Element>
   ): Promise<void> {
+    showMessage(`Checking if element ${selector} is clickable...`);
+    const element =
+      typeof selector === 'string'
+        ? await this.page.waitForSelector(selector)
+        : selector;
     try {
-      const element =
-        typeof selector === 'string'
-          ? await this.page.waitForSelector(selector)
-          : selector;
       await this.page.waitForFunction(isElementClickable, {}, element);
     } catch (error) {
       if (error instanceof Error) {
+        await this.page.evaluate(isElementClickable, element, true, true);
         error.message =
           `Element with selector ${selector} took too long to be clickable.\n` +
           'Original Error:\n' +
@@ -461,6 +466,7 @@ export class BaseUser {
    * The function clicks the element using the text on the button.
    * @param selector The text of the button to click on.
    * @param forceSelector If true, the function will try to find the element by its CSS selector.
+   * @param parentElement The parent element to search within.
    */
   async clickOn(
     selector: string,
@@ -488,10 +494,15 @@ export class BaseUser {
       await button.click();
       showMessage(`Button (text: ${selector}) is clicked.`);
     } else {
-      showMessage(`Clicking on button with selector: ${selector}`);
-      await this.waitForElementToBeClickable(selector);
+      const element = await this.page.waitForSelector(selector, {
+        visible: true,
+      });
+      if (!element) {
+        throw new Error(`Element not found for selector ${selector}`);
+      }
+      await this.waitForElementToBeClickable(element);
       showMessage(`Element (selector: ${selector}) is clickable, as expected.`);
-      await this.page.click(selector);
+      await element.click();
       showMessage(`Element (selector: ${selector}) is clicked.`);
     }
   }
@@ -571,6 +582,47 @@ export class BaseUser {
   }
 
   /**
+   * The function selects all text content and copies it.
+   * @param {string} selector - The element from which the text is to
+   * be copied.
+   */
+  async copyTextFrom(selector: string): Promise<void> {
+    await this.waitForElementToBeClickable(selector);
+    await this.page.click(selector, {clickCount: 3});
+    await this.page.keyboard.down('ControlLeft');
+    await this.page.keyboard.press('C');
+    await this.page.keyboard.up('ControlLeft');
+  }
+
+  /**
+   * The function selects all text content using Control+A and copies it.
+   * @param {string} selector - The element from which the text is to
+   * be copied.
+   */
+  async copyAllTextFrom(selector: string): Promise<void> {
+    await this.waitForElementToBeClickable(selector);
+    await this.page.click(selector);
+    await this.page.keyboard.down('ControlLeft');
+    await this.page.keyboard.press('A');
+    await this.page.keyboard.press('C');
+    await this.page.keyboard.up('ControlLeft');
+  }
+
+  /**
+   * The function pastes all the text on the clipboard to
+   * the given selector.
+   * @param {string} selector - The element to which the text is to
+   * be pasted.
+   */
+  async pasteTextTo(selector: string): Promise<void> {
+    await this.waitForElementToBeClickable(selector);
+    await this.page.click(selector);
+    await this.page.keyboard.down('ControlLeft');
+    await this.page.keyboard.press('V');
+    await this.page.keyboard.up('ControlLeft');
+  }
+
+  /**
    * This function types the text in the input field using its CSS selector.
    */
   async type(selector: string, text: string): Promise<void> {
@@ -594,10 +646,13 @@ export class BaseUser {
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
     await this.page.goto(url, {waitUntil: ['networkidle0', 'load']});
 
-    if (verifyURL && this.page.url() !== url) {
-      // If the URL is not the expected one, throw an error.
-      throw new Error(
-        `Failed to navigate to ${url}. Current URL is ${this.page.url()}.`
+    if (verifyURL) {
+      await this.page.waitForFunction(
+        (url: string) => {
+          return window.location.href.includes(url);
+        },
+        {},
+        url
       );
     }
   }
@@ -766,14 +821,19 @@ export class BaseUser {
           visible: true,
           timeout: timeout,
         });
+        showMessage(`Element (selector: ${selector}) is visible.`);
       } else {
         await this.page.waitForSelector(selector, {
           hidden: true,
           timeout: timeout,
         });
+        showMessage(`Element (selector: ${selector}) is hidden.`);
       }
       return true;
     } catch {
+      showMessage(
+        `Element (selector: ${selector}) is not ${visible ? 'visible' : 'hidden'}.`
+      );
       return false;
     }
   }
@@ -911,9 +971,6 @@ export class BaseUser {
             )
           : path.join(testPath, dirName, 'diff-snapshots'),
       });
-      if (typeof newPage !== 'undefined') {
-        await newPage.close();
-      }
     } catch (error) {
       if (__dirname.startsWith('/home/runner')) {
         throw new Error(
@@ -963,18 +1020,100 @@ export class BaseUser {
    */
   async clickLinkAnchorToNewTab(
     anchorInnerText: string,
-    expectedDestinationPageUrl: string
-  ): Promise<void> {
-    await this.page.waitForXPath(`//a[contains(text(),"${anchorInnerText}")]`);
-    const pageTarget = this.page.target();
-    await this.clickOn(anchorInnerText);
+    expectedDestinationPageUrl: string,
+    closePage: boolean = true,
+    context: Page = this.page
+  ): Promise<Page | null> {
+    const xpath = `//a[normalize-space(.)="${anchorInnerText}"]`;
+    const element = await context.waitForXPath(xpath);
+    const pageTarget = context.target();
+    await element?.click();
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );
     const newTabPage = await newTarget.page();
+    if (!newTabPage) {
+      throw new Error('No new tab opened.');
+    }
+    await newTabPage.bringToFront();
     expect(newTabPage).toBeDefined();
-    expect(newTabPage?.url()).toBe(expectedDestinationPageUrl);
-    await newTabPage?.close();
+    expect(newTabPage.url()).toBe(expectedDestinationPageUrl);
+    if (closePage) {
+      await newTabPage.close();
+      return null;
+    }
+    return newTabPage;
+  }
+
+  /**
+   * Verify that the anchor tag with the given inner text is present on the page.
+   * @param {string} anchorInnerText - The inner text of the anchor tag.
+   * @param {string} targetPageUrl - The URL of the page to which the anchor tag should link.
+   * @param {puppeteer.Page} context - The page on which the anchor tag should be verified.
+   */
+  async verifyAnchorTagIsPresent(
+    anchorInnerText: string,
+    targetPageUrl: string,
+    context: puppeteer.Page = this.page
+  ): Promise<void> {
+    const anchor = await context.waitForSelector(`a[href="${targetPageUrl}"]`);
+    expect(anchor).toBeTruthy();
+    const anchorText = await anchor?.evaluate(el =>
+      (el as HTMLAnchorElement).innerText.trim()
+    );
+    expect(anchorText).toEqual(anchorInnerText);
+  }
+
+  /**
+   * Clicks on an anchor element with the given inner text and verifies that the
+   * target page URL contains the given URL.
+   * @param anchorInnerText The inner text of the anchor element.
+   * @param targetPageUrl The URL of the target page.
+   * @param context The context in which the anchor element is located.
+   */
+  async clickAndVerifyAnchorWithInnerText(
+    anchorInnerText: string,
+    targetPageUrl: string,
+    context: Page = this.page
+  ): Promise<void> {
+    // Get an anchor element with the given inner text.
+    await context.waitForSelector('a');
+    const anchorElements = await context.$$('a');
+    let element: puppeteer.ElementHandle<Element> | null = null;
+    for (const anchorElement of anchorElements) {
+      const innerText = await anchorElement.evaluate(el =>
+        (el as HTMLAnchorElement).innerText.trim()
+      );
+      if (innerText === anchorInnerText) {
+        element = anchorElement;
+        break;
+      }
+    }
+    if (!element) {
+      throw new Error(`Anchor with inner text ${anchorInnerText} not found.`);
+    }
+
+    // Check if anchor target is the same as the current page.
+    const isTargetSamePage = await element.evaluate(el => {
+      return (el as HTMLAnchorElement).target !== '_blank';
+    });
+    if (!isTargetSamePage) {
+      showMessage('Anchor target is not the same as the current page.');
+      const pageTarget = context.target();
+      await element.click();
+      const newTarget = await this.browserObject.waitForTarget(
+        target => target.opener() === pageTarget
+      );
+      const newTabPage = await newTarget.page();
+      expect(newTabPage).toBeDefined();
+      expect(newTabPage?.url()).toBe(targetPageUrl);
+      await newTabPage?.close();
+    } else {
+      showMessage('Anchor target is the same as the current page.');
+      await element.click();
+      await this.expectPageURLToContain(targetPageUrl, context);
+      await context.goBack();
+    }
   }
 
   /**
@@ -1069,6 +1208,7 @@ export class BaseUser {
   ): Promise<void> {
     const options = visibility ? {visible: true} : {hidden: true};
     await this.page.waitForSelector(selector, options);
+    showMessage(`Element ${selector} is ${visibility ? 'visible' : 'hidden'}.`);
   }
 
   /**
@@ -1155,7 +1295,6 @@ export class BaseUser {
     selector: string,
     text: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(selector);
     try {
       await this.page.waitForFunction(
         (selector: string, text: string) => {
@@ -1299,7 +1438,7 @@ export class BaseUser {
   /**
    * This function checks if the page URL contains the given URL.
    * @param {string} url - The URL to check.
-   * @param {Page} context - The page on which the URL should be check
+   * @param {Page} context - The page on which the URL should be checked.
    */
   async expectPageURLToContain(
     url: string,
@@ -1516,6 +1655,39 @@ export class BaseUser {
   }
 
   /**
+   * Checks if the modal title matches the expected title.
+   * @param expectedTitle The expected title of the modal.
+   */
+  async expectModalTitleToBe(expectedTitle: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalTitleSelector);
+    await this.expectTextContentToBe(commonModalTitleSelector, expectedTitle);
+  }
+
+  /**
+   * Checks if the modal body contains the expected text.
+   * @param expectedText The expected text of the modal body.
+   */
+  async expectModalBodyToContain(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(commonModalBodySelector);
+    await this.expectTextContentToContain(
+      commonModalBodySelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Checks if the current mat tab header matches the expected header.
+   * @param expectedHeader The expected header of the mat tab.
+   */
+  async expectCurrentMatTabHeaderToBe(expectedHeader: string): Promise<void> {
+    await this.expectElementToBeVisible(currentMatTabHeaderSelector);
+    await this.expectTextContentToBe(
+      currentMatTabHeaderSelector,
+      expectedHeader
+    );
+  }
+
+  /**
    * Returns all elements matching the given selector.
    * @param selector - The selector to find elements for.
    * @param parentElement - The parent element to search within.
@@ -1531,67 +1703,6 @@ export class BaseUser {
     const elements = await this.page.$$(selector);
 
     return elements;
-  }
-
-  /**
-   * Clicks on an anchor element with the given inner text and verifies that the
-   * target page URL contains the given URL.
-   * @param anchorInnerText The inner text of the anchor element.
-   * @param targetPageUrl The URL of the target page.
-   * @param context The context in which the anchor element is located.
-   */
-  async clickAndVerifyAnchorWithInnerText(
-    anchorInnerText: string,
-    targetPageUrl: string,
-    context: Page = this.page
-  ): Promise<void> {
-    // Get an anchor element with the given inner text.
-    await context.waitForSelector('a');
-    const anchorElements = await context.$$('a');
-    let element: puppeteer.ElementHandle<Element> | null = null;
-    for (const anchorElement of anchorElements) {
-      const innerText = await anchorElement.evaluate(el =>
-        (el as HTMLAnchorElement).innerText.trim()
-      );
-      if (innerText === anchorInnerText) {
-        element = anchorElement;
-        break;
-      }
-    }
-    if (!element) {
-      throw new Error(`Anchor with inner text ${anchorInnerText} not found.`);
-    }
-
-    // Check if anchor target is the same as the current page.
-    const isTargetSamePage = await element.evaluate(el => {
-      return (el as HTMLAnchorElement).target !== '_blank';
-    });
-    if (!isTargetSamePage) {
-      showMessage('Anchor target is not the same as the current page.');
-      const pageTarget = context.target();
-      await element.click();
-      const newTarget = await this.browserObject.waitForTarget(
-        target => target.opener() === pageTarget
-      );
-      const newTabPage = await newTarget.page();
-      expect(newTabPage).toBeDefined();
-      expect(newTabPage?.url()).toBe(targetPageUrl);
-      await newTabPage?.close();
-    } else {
-      showMessage('Anchor target is the same as the current page.');
-      await element.click();
-      await this.expectPageURLToContain(targetPageUrl, context);
-      await context.goBack();
-    }
-  }
-
-  /**
-   * Checks if the modal title matches the expected title.
-   * @param expectedTitle The expected title of the modal.
-   */
-  async expectModalTitleToBe(expectedTitle: string): Promise<void> {
-    await this.expectElementToBeVisible(commonModalTitleSelector);
-    await this.expectTextContentToBe(commonModalTitleSelector, expectedTitle);
   }
 }
 

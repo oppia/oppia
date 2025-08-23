@@ -24,11 +24,11 @@ import {HelpModalComponent} from './modal-templates/help-modal.component';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {ParamChangesObjectFactory} from 'domain/exploration/ParamChangesObjectFactory';
+import {ParamChanges} from 'domain/exploration/param-changes.model';
 import {
   ParamSpecsBackendDict,
-  ParamSpecsObjectFactory,
-} from 'domain/exploration/ParamSpecsObjectFactory';
+  ParamSpecs,
+} from 'domain/exploration/param-specs.model';
 import {AlertsService} from 'services/alerts.service';
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {PageContextService} from 'services/page-context.service';
@@ -172,8 +172,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private ngbModal: NgbModal,
     private pageTitleService: PageTitleService,
-    private paramChangesObjectFactory: ParamChangesObjectFactory,
-    private paramSpecsObjectFactory: ParamSpecsObjectFactory,
     private platformFeatureService: PlatformFeatureService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
     private routerService: RouterService,
@@ -263,6 +261,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         explorationData.version,
         languageCode
       );
+      this.entityVoiceoversService.fetchEntityVoiceovers();
 
       this.explorationTitleService.init(explorationData.title);
       this.explorationCategoryService.init(
@@ -279,14 +278,12 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         (explorationData as ExplorationData).tags
       );
       this.explorationParamSpecsService.init(
-        this.paramSpecsObjectFactory.createFromBackendDict(
+        ParamSpecs.createFromBackendDict(
           explorationData.param_specs as ParamSpecsBackendDict
         )
       );
       this.explorationParamChangesService.init(
-        this.paramChangesObjectFactory.createFromBackendList(
-          explorationData.param_changes
-        )
+        ParamChanges.createFromBackendList(explorationData.param_changes)
       );
       this.explorationAutomaticTextToSpeechService.init(
         explorationData.auto_tts_enabled

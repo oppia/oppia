@@ -18,12 +18,8 @@
 
 import {Injectable} from '@angular/core';
 import {ParamChange, ParamChangeBackendDict} from './param-change.model';
-import {ParamChangesObjectFactory} from './ParamChangesObjectFactory';
-import {
-  ParamSpecs,
-  ParamSpecsBackendDict,
-  ParamSpecsObjectFactory,
-} from './ParamSpecsObjectFactory';
+import {ParamChanges} from './param-changes.model';
+import {ParamSpecs, ParamSpecsBackendDict} from './param-specs.model';
 
 export interface ExplorationMetadataBackendDict {
   title: string;
@@ -116,22 +112,18 @@ export class ExplorationMetadata {
 // TODO(#15599): Refactor ExplorationMetadataObjectFactory to a model.ts once
 // ParamSpecsObjectFactory and ParamChangesObjectFactory are refactored
 // into model.ts files.
+
 @Injectable({
   providedIn: 'root',
 })
 export class ExplorationMetadataObjectFactory {
-  constructor(
-    private paramChangesObjectFactory: ParamChangesObjectFactory,
-    private paramSpecsObjectFactory: ParamSpecsObjectFactory
-  ) {}
-
   createFromBackendDict(
     explorationMetadataBackendDict: ExplorationMetadataBackendDict
   ): ExplorationMetadata {
-    const paramChanges = this.paramChangesObjectFactory.createFromBackendList(
+    const paramChanges = ParamChanges.createFromBackendList(
       explorationMetadataBackendDict.param_changes
     );
-    const paramSpecs = this.paramSpecsObjectFactory.createFromBackendDict(
+    const paramSpecs = ParamSpecs.createFromBackendDict(
       explorationMetadataBackendDict.param_specs
     );
 
