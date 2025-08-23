@@ -154,11 +154,6 @@ export default {
     COLLECTION_EDITOR: 'collection editor',
   } as const,
 
-  BlogRights: {
-    BLOG_ADMIN: 'BLOG_ADMIN',
-    BLOG_POST_EDITOR: 'BLOG_POST_EDITOR',
-  } as const,
-
   ViewportWidthBreakpoints: {
     MOBILE_PX: 768,
   },
@@ -284,4 +279,20 @@ export const FILEPATHS = {
     __dirname,
     '../../data/profile-pictures/profile.svg'
   ),
+  BANNER_BMP: path.resolve(__dirname, '../../data/banners/banner.bmp'),
+  BANNER_GIF: path.resolve(__dirname, '../../data/banners/banner.gif'),
+  BANNER_JPG: path.resolve(__dirname, '../../data/banners/banner.jpg'),
+  BANNER_PNG: path.resolve(__dirname, '../../data/banners/banner.png'),
+  BANNER_SVG: path.resolve(__dirname, '../../data/banners/banner-small.svg'),
+  BANNER_HIGH_RES: path.resolve(
+    __dirname,
+    '../../data/banners/banner-HiRes.png'
+  ),
 } as const;
+
+// Blog Rights.
+export const BLOG_RIGHTS = {
+  BLOG_ADMIN: 'BLOG_ADMIN',
+  BLOG_POST_EDITOR: 'BLOG_POST_EDITOR',
+} as const;
+export type BlogRoles = (typeof BLOG_RIGHTS)[keyof typeof BLOG_RIGHTS];

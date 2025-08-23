@@ -159,6 +159,17 @@ const explorationIdElement = 'span.oppia-unique-progress-id';
 const closePublishedPopUpButton = 'button.e2e-test-share-publish-close';
 const stateEditSelector = '.e2e-test-state-edit-content';
 const stateContentInputField = 'div.e2e-test-rte';
+const addSkillReviewComponentButton = '.cke_button__oppiaskillreview';
+const skillInSkillreviewModal = '.e2e-test-rte-skill-selector-item';
+const saveRteComponentAndCloseCustomizationModalButton =
+  '.e2e-test-close-rich-text-component-editor';
+const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
+const previewTabButton = '.e2e-test-preview-tab';
+const previewTabContainer = '.e2e-test-preview-tab-container';
+const mobilePreviewTabButton = '.e2e-test-mobile-preview-button';
+const skillReviewComponent = 'oppia-noninteractive-skillreview';
+const skillReviewComponentModal =
+  'oppia-noninteractive-skillreview-concept-card-modal';
 const toastMessage = '.e2e-test-toast-message';
 const mobileSettingsBar = 'li.e2e-test-mobile-settings-button';
 const mobileChangesDropdown = 'div.e2e-test-mobile-changes-dropdown';
@@ -467,6 +478,22 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
       visible: true,
     });
+  }
+
+  /**
+   * Navigates to the given page using the profile dropdown.
+   * @param page The page or dashboard to navigate to.
+   */
+  async navigateToPageUsingProfileMenu(page: 'Blog Dashboard'): Promise<void> {
+    await this.page.evaluate(() => {
+      window.scrollTo(0, 0);
+    });
+    await this.expectElementToBeVisible(profileDropdown);
+    await this.clickOn(profileDropdown);
+
+    const selector = `.e2e-test-${page.toLowerCase().replace(/ /g, '-')}-link`;
+    await this.clickOn(selector);
+    await this.expectElementToBeVisible(`${profileDropdown}.show`, false);
   }
 
   /**
@@ -1092,28 +1119,22 @@ export class LoggedInUser extends BaseUser {
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
   async expectToolTipMessage(expectedMessage: string): Promise<void> {
-    try {
-      await this.page.waitForSelector(toastMessageSelector, {visible: true});
-      const toastMessageElement = await this.page.$(toastMessageSelector);
-      const toastMessage = await this.page.evaluate(
-        el => el.textContent.trim(),
-        toastMessageElement
-      );
+    await this.page.waitForSelector(toastMessageSelector, {visible: true});
+    const toastMessageElement = await this.page.$(toastMessageSelector);
+    const toastMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      toastMessageElement
+    );
 
-      if (toastMessage !== expectedMessage) {
-        throw new Error(
-          `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
-        );
-      }
-      if (this.isViewportAtMobileWidth()) {
-        await this.page.click(toastMessageSelector);
-      }
-      await this.expectElementToBeVisible(toastMessageSelector, false);
-    } catch (error) {
-      const newError = new Error(`Failed to match toast message: ${error}`);
-      newError.stack = error.stack;
-      throw newError;
+    if (toastMessage !== expectedMessage) {
+      throw new Error(
+        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+      );
     }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.click(toastMessageSelector);
+    }
+    await this.expectElementToBeVisible(toastMessageSelector, false);
   }
 
   /**
@@ -1280,6 +1301,30 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(addProfilePictureButton, {
       hidden: true,
     });
+  }
+
+  /**
+   * Checks if the photo upload error message is visible.
+   * @param expectedText - The expected text of the error message.
+   */
+  async expectPhotoUploadErrorMessageToBe(expectedText: string): Promise<void> {
+    await this.expectElementToBeVisible(photoUploadErrorMessage);
+    await this.expectTextContentToContain(
+      photoUploadErrorMessage,
+      expectedText
+    );
+  }
+
+  /**
+   * Cancels the photo upload.
+   */
+  async cancelPhotoUpload(): Promise<void> {
+    await this.expectElementToBeVisible(cancelProfileUploadButtonSelector);
+    await this.clickOn(cancelProfileUploadButtonSelector);
+    await this.expectElementToBeVisible(
+      cancelProfileUploadButtonSelector,
+      false
+    );
   }
 
   /**
@@ -1750,9 +1795,7 @@ export class LoggedInUser extends BaseUser {
     });
     await this.clickOn(reportExplorationButtonSelector);
     await this.page.waitForSelector(issueTypeSelector);
-    // Wait for checkbox to animate before clicking on it.
-    // This ensures that the checkbox is checked.
-    await this.page.waitForTimeout(100);
+    await this.waitForElementToStabilize(issueTypeSelector);
     await this.page.click(issueTypeSelector);
     await this.type(reportExplorationTextAreaSelector, issueDescription);
 
@@ -2258,6 +2301,86 @@ export class LoggedInUser extends BaseUser {
     await this.clickOn(saveContentButton);
     await this.page.waitForSelector(stateContentInputField, {hidden: true});
     showMessage('Card content is updated successfully.');
+  }
+
+  /**
+   * Function to add content to a card.
+   * @param {string} content - The content to be added to the card.
+   */
+  async updateCardContentWithConceptCard(content: string): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(stateEditSelector, {
+      visible: true,
+    });
+    await this.clickOn(stateEditSelector);
+    await this.type(stateContentInputField, `${content}`);
+    await this.clickOn(addSkillReviewComponentButton);
+    await this.clickOn(skillInSkillreviewModal);
+    await this.clickOn(saveRteComponentAndCloseCustomizationModalButton);
+    await this.clickOn(saveContentButton);
+    await this.page.waitForSelector(stateContentInputField, {hidden: true});
+    showMessage('Card content is updated successfully with concept card.');
+  }
+
+  /**
+   * Function to navigate to the exploration editor preview tab.
+   */
+  async navigateToExplorationEditorPreviewTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileNavbarDropdown, {
+        visible: true,
+      });
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobilePreviewTabButton);
+    } else {
+      await this.page.waitForSelector(previewTabButton, {
+        visible: true,
+      });
+      await this.clickOn(previewTabButton);
+    }
+
+    await this.expectElementToBeVisible(previewTabContainer);
+  }
+
+  /**
+   * Function to click on the skillreview component
+   */
+  async clickOnSkillReviewComponent(): Promise<void> {
+    await this.expectElementToBeVisible(skillReviewComponent);
+    await this.clickOn(skillReviewComponent);
+    await this.expectElementToBeVisible(skillReviewComponentModal);
+  }
+
+  /**
+   * Function to check that the concept card is successfully inserted.
+   * @param {string} question - The question of the WorkedExample.
+   * @param {string} answer -  The answer of the WorkedExample.
+   */
+  async checkConceptCardWithWorkedExampleIsInserted(
+    question: string,
+    answer: string
+  ): Promise<void> {
+    try {
+      const isQuestionPresent = this.isTextPresentOnPage(question);
+      if (!isQuestionPresent) {
+        throw new Error(
+          'Expected Concept Card to contain WorkedExample question, but it was not found.'
+        );
+      }
+      const isAnswerPresent = this.isTextPresentOnPage(answer);
+      if (!isAnswerPresent) {
+        throw new Error(
+          'Expected Concept Card to contain WorkedExample answer, but it was not found.'
+        );
+      }
+    } catch (error) {
+      const newError = new Error(
+        `Failed to verify concept card with WorkedExample: ${error}`
+      );
+      newError.stack = error.stack;
+      throw newError;
+    }
   }
 
   /**
