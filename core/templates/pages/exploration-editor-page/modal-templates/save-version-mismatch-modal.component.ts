@@ -59,8 +59,8 @@ export class SaveVersionMismatchModalComponent
     this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
     if (this.hasLostChanges) {
       this.lostChanges = this.lostChanges.map(
-        (change: ExplorationChange | LostChangeBackendDict) =>
-          LostChange.createNew(this.utilsService, change)
+        (lostChangeDict: ExplorationChange | LostChangeBackendDict) =>
+          LostChange.createNew(this.utilsService, lostChangeDict)
       );
     }
   }
