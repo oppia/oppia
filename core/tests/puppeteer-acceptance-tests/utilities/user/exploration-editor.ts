@@ -6178,7 +6178,7 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(explorationLanguageSelector);
     await this.clickOn(explorationLanguageSelector);
-    await this.clickOn(language);
+    await this.clickOnElementWithText(language);
     await this.expectTextContentToBe(explorationLanguageSelector, language);
 
     await this.expectElementToBeVisible(tagsField);

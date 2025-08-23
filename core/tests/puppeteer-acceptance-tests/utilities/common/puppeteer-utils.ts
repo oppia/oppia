@@ -496,7 +496,7 @@ export class BaseUser {
    */
   async clickOnElementWithText(
     text: string,
-    timeout: number = 5000
+    timeout: number = 10000
   ): Promise<void> {
     const xpath = `//*[contains(text(), normalize-space('${text}'))]`;
 
@@ -541,30 +541,42 @@ export class BaseUser {
    * and wait until the new page is fully loaded.
    */
   async clickAndWaitForNavigation(selector: string): Promise<void> {
-    /** Normalize-space is used to remove the extra spaces in the text.
-     * Check the documentation for the normalize-space function here :
-     * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const [button] = await this.page.$x(
-      `\/\/*[contains(text(), normalize-space('${selector}'))]`
-    );
-    // If we fail to find the element by its XPATH, then the button is undefined and
-    // we try to find it by its CSS selector.
-    if (button !== undefined) {
-      await this.waitForElementToBeClickable(button);
+    try {
+      const button = await this.page.waitForXPath(
+        `\/\/*[contains(text(), normalize-space('${selector}'))]`,
+        {
+          timeout: 5000,
+        }
+      );
+
+      if (button === null) {
+        throw new Error('Element not found');
+      }
+
       await Promise.all([
         this.page.waitForNavigation({
           waitUntil: ['networkidle2', 'load'],
         }),
         button.click(),
       ]);
-    } else {
-      await this.waitForElementToBeClickable(selector);
-      await Promise.all([
-        this.page.waitForNavigation({
-          waitUntil: ['networkidle2', 'load'],
-        }),
-        this.page.click(selector),
-      ]);
+    } catch (error) {
+      if (
+        error instanceof puppeteer.errors.TimeoutError ||
+        (error instanceof Error && error.message.includes('Element not found'))
+      ) {
+        // If we fail to find the element by its XPATH, then the button is undefined and
+        // we try to find it by its CSS selector.
+
+        await this.waitForElementToBeClickable(selector);
+        await Promise.all([
+          this.page.waitForNavigation({
+            waitUntil: ['networkidle2', 'load'],
+          }),
+          this.page.click(selector),
+        ]);
+      } else {
+        throw error;
+      }
     }
   }
 
