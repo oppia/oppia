@@ -132,7 +132,6 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
     this.directiveSubscriptions.add(
       this.contentTranslationManagerService.onLanguageChange.subscribe(
         languageCode => {
-          console.log('hey');
           const switchLanguageModalPromise =
             this.onLanguageChange(languageCode);
 

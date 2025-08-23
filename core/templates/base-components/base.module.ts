@@ -21,7 +21,7 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {CookieModule} from 'ngx-cookie';
-import {NgbModalModule, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 import {DirectivesModule} from 'directives/directives.module';
 import {SharedPipesModule} from 'filters/shared-pipes.module';
@@ -56,7 +56,6 @@ import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component
 import {NgBootstrapModule} from 'modules/ng-boostrap.module';
 import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
 import {PrimaryButtonComponent} from 'components/button-directives/primary-button.component';
-import {MatIconModule} from '@angular/material/icon';
 
 @NgModule({
   imports: [
@@ -67,9 +66,7 @@ import {MatIconModule} from '@angular/material/icon';
     FormsModule,
     ReactiveFormsModule,
     NgbModule,
-    NgbModalModule,
     NgBootstrapModule,
-    MatIconModule,
     // TODO(#13443): Remove smart router module provider once all pages are
     // migrated to angular router.
     SmartRouterModule,

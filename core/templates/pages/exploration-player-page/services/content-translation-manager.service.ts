@@ -27,7 +27,6 @@ import {InteractionCustomizationArgs} from 'interactions/customization-args-defs
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {PageContextService} from 'services/page-context.service';
 import {ImagePreloaderService} from './image-preloader.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
 import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
 import {AudioPreloaderService} from '../services/audio-preloader.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
@@ -37,8 +36,6 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {PlayerPositionService} from '../services/player-position.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
-import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {NewSwitchContentLanguageRefreshRequiredModalComponent} from '../new-lesson-player/conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
 
 @Injectable({
   providedIn: 'root',
@@ -63,12 +60,10 @@ export class ContentTranslationManagerService {
     private pageContextService: PageContextService,
     private imagePreloaderService: ImagePreloaderService,
     private entityVoiceoversService: EntityVoiceoversService,
-    private ngbModal: NgbModal,
     private voiceoverPlayerService: VoiceoverPlayerService,
     private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService,
     private playerPositionService: PlayerPositionService,
     private stateEditorService: StateEditorService,
-    private windowRef: WindowRef,
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private audioPreloaderService: AudioPreloaderService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
@@ -76,9 +71,7 @@ export class ContentTranslationManagerService {
   ) {}
 
   setOriginalTranscript(explorationLanguageCode: string): void {
-    console.log('Before', explorationLanguageCode);
     this.explorationLanguageCode = explorationLanguageCode;
-    console.log('After', this.explorationLanguageCode);
     this.originalTranscript = cloneDeep(
       this.playerTranscriptService.transcript
     );
@@ -134,10 +127,8 @@ export class ContentTranslationManagerService {
     card: StateCard,
     entityTranslations: EntityTranslation
   ): void {
-    console.log('321');
     card.swapContentsWithTranslation(entityTranslations);
     if (card.getInteractionId()) {
-      console.log('3211');
       // DOMParser().parseFromString() creates a HTML document from
       // the HTML string and it's body contains our required element
       // as a childnode.

@@ -546,6 +546,9 @@ export class ExplorationEngineService {
     );
 
     if (this.isNewLessonPlayerEnabled()) {
+      this.contentTranslationManagerService.displayTranslations(
+        this.contentTranslationLanguageService.getCurrentContentLanguageCode()
+      );
       this.contentTranslationManagerService.initLessonTranslations();
     }
   }
