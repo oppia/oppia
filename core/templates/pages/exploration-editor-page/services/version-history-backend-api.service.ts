@@ -127,10 +127,9 @@ export class VersionHistoryBackendApiService {
       .then(response => {
         let metadataInPreviousVersion: ExplorationMetadata | null = null;
         if (response.metadata_dict_in_previous_version) {
-          metadataInPreviousVersion =
-            this.explorationMetadataObjectFactory.createFromBackendDict(
-              response.metadata_dict_in_previous_version
-            );
+          metadataInPreviousVersion = ExplorationMetadata.createFromBackendDict(
+            response.metadata_dict_in_previous_version
+          );
         }
         return {
           lastEditedVersionNumber: response.last_edited_version_number,

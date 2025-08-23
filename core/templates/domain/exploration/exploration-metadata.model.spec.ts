@@ -16,9 +16,10 @@
  * @fileoverview Unit tests for ExplorationMetadata.
  */
 
+import {AppConstants} from 'app.constants';
 import {
   ExplorationMetadata,
-  ExplorationMetadataBackendDict
+  ExplorationMetadataBackendDict,
 } from './exploration-metadata.model';
 
 describe('Exploration metadata object factory', () => {
