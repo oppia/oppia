@@ -19,7 +19,8 @@
         </a>
         <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-options-dropdown"
              joyrideStep="editorTabTourMobilePreview"
-             [stepContent]="EditorTabTourMobilePreview"></div>
+             [stepContent]="EditorTabTourMobilePreview">
+        </div>
         <ul ngbDropdownMenu class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'dropdown': countWarnings()}">
             <a href="#" ngbTooltip="Editor" placement="{{countWarnings() ? 'left' : 'bottom'}}" (click)="selectMainTab()"
