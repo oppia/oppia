@@ -2516,18 +2516,18 @@ div#ng-curtain {
   top: 28px;
   width: 100%;
 }
-.oppia-editor-sidebar ngb-accordion .card {
+.oppia-editor-sidebar ngb-accordion .accordion-iteam {
   border-radius: 0;
 }
-.oppia-editor-sidebar ngb-accordion .card .card-heading {
+.oppia-editor-sidebar ngb-accordion .accordion .accordion-heading {
   background-color: #ddd;
   border-radius: 0;
   padding: 3px 10px;
 }
-.oppia-editor-sidebar ngb-accordion .card .card-title {
+.oppia-editor-sidebar ngb-accordion .accordion .accordion-title {
   font-weight: bold;
 }
-.oppia-editor-sidebar ngb-accordion .card .card-body {
+.oppia-editor-sidebar ngb-accordion .accordion .accordion-body {
   border-radius: 0;
   padding-right: 25px;
 }

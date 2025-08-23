@@ -37,11 +37,11 @@
   <p *ngIf="isHackySubtopicTitleTranslationDisplayed()" class="content-title">{{ subtopicTitleTranslationKey | translate }}</p>
   <div class="content-box">
     <div class="content">
-      <div class="card" *ngFor="let section of sections">
-        <div class="card-header">
-          <h3 class="card-title">{{ section.heading.unicode }}</h3>
+      <div class="accordion-item" *ngFor="let section of sections">
+        <div class="accordion-header">
+          <h3 class="accordion-title">{{ section.heading.unicode }}</h3>
         </div>
-        <div class="card-content">
+        <div class="accordion-body">
           <oppia-rte-output-display [rteString]="section.content.html">
           </oppia-rte-output-display>
         </div>
@@ -127,18 +127,18 @@
     padding: 15px 25px;
   }
 
-  .card {
+  .accordion {
     background-color: #fff;
     border: none !important;
     overflow: hidden;
   }
 
-  .card-header {
+  .accordion-header {
     background-color: #003b36;
     padding: 15px 20px;
   }
 
-  .card-title {
+  .accordion-title {
     color: #fff;
     font-family: Roboto, Arial, sans-serif;
     font-size: 20px;
@@ -253,7 +253,7 @@
       padding: 30px;
     }
 
-    .card-header {
+    .accordion-header {
       padding: 12px 15px;
     }
 
@@ -261,7 +261,7 @@
       font-size: 18.2px;
     }
 
-    .card-title {
+    .accordion-title {
       font-size: 18px;
     }
 
