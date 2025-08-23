@@ -40,6 +40,7 @@ export class VoiceoverPlayerService {
   public languageAccentDescriptions: string[] = [];
   public languageAccentDescriptionsToCodes: LanguageAccentDescriptionToCode =
     {};
+  public isAutomaticVoiceoverPlaying: boolean = false;
   private _translationLanguageChangedEventEmitter = new EventEmitter<void>();
   private _activeVoiceoverChangedEventEmitter = new EventEmitter<void>();
   constructor(private entityVoiceoversService: EntityVoiceoversService) {}

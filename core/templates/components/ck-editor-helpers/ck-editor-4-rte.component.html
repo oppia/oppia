@@ -4,20 +4,20 @@
   </div>
 
   <!-- Paste error message display with selective paste option -->
-  <div *ngIf="getPasteError()" class="oppia-rte-paste-error-box">
+  <div *ngIf="getPasteError()" class="oppia-rte-paste-error-box e2e-test-oppia-rte-paste-error-box">
     <div>
       <span>{{ getPasteError() }}</span>
 
       <!-- Show confirmation buttons only when selective paste is available -->
       <div *ngIf="shouldShowPasteConfirmation()" class="oppia-rte-paste-confirmation-buttons">
         <button type="button"
-                class="oppia-rte-paste-confirm-btn oppia-rte-paste-yes-btn"
+                class="oppia-rte-paste-confirm-btn oppia-rte-paste-yes-btn e2e-test-oppia-paste-valid-content-button"
                 (click)="confirmSelectivePaste()"
                 aria-label="Paste valid content"
                 [innerHTML]="'I18N_RTE_ACCEPT_VALID_CONTENT_PASTE' | translate">
         </button>
         <button type="button"
-                class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn"
+                class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn e2e-test-oppia-cancel-rte-paste-button"
                 (click)="rejectSelectivePaste()"
                 aria-label="Cancel paste"
                 [innerHTML]="'I18N_RTE_CANCEL_VALID_CONTENT_PASTE' | translate">
@@ -28,7 +28,7 @@
     <!-- Show dismiss button only when no confirmation is needed -->
     <button *ngIf="!shouldShowPasteConfirmation()"
             type="button"
-            class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn"
+            class="oppia-rte-paste-confirm-btn oppia-rte-paste-no-btn e2e-test-oppia-dismiss-paste-error-button"
             (click)="dismissPasteError()"
             aria-label="Dismiss error"
             [innerHTML]="'I18N_RTE_DISMISS_WARNING' | translate">

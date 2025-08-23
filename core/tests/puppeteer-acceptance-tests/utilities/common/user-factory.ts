@@ -40,11 +40,10 @@ import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
 import {ModeratorFactory} from '../user/moderator';
 import {ReleaseCoordinatorFactory} from '../user/release-coordinator';
-import testConstants from './test-constants';
+import testConstants, {BLOG_RIGHTS} from './test-constants';
 import {showMessage} from './show-message';
 
 const ROLES = testConstants.Roles;
-const BLOG_RIGHTS = testConstants.BlogRights;
 const cookieBannerAcceptButton =
   'button.e2e-test-oppia-cookie-banner-accept-button';
 
@@ -131,6 +130,7 @@ export class UserFactory {
 
       switch (role) {
         case ROLES.BLOG_POST_EDITOR:
+          await superAdminInstance.navigateToBlogAdminPage();
           await superAdminInstance.assignUserToRoleFromBlogAdminPage(
             user.username,
             BLOG_RIGHTS.BLOG_POST_EDITOR

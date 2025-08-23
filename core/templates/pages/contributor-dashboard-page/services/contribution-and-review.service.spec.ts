@@ -41,7 +41,7 @@ import {
 } from 'domain/exploration/StatesObjectFactory';
 import {FetchExplorationBackendResponse} from '../../../domain/exploration/read-only-exploration-backend-api.service';
 import {LoggerService} from 'services/contextual/logger.service';
-import {ParamSpecs} from '../../../domain/exploration/ParamSpecsObjectFactory';
+import {ParamSpecs} from '../../../domain/exploration/param-specs.model';
 
 describe('Contribution and review service', () => {
   let cars: ContributionAndReviewService;
