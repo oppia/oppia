@@ -471,7 +471,7 @@ export class BaseUser {
   async clickOn(
     selector: string,
     forceSelector: boolean = false,
-    timeoutForTextButton: number = 1000
+    timeoutForTextButton: number = 100
   ): Promise<void> {
     /** Normalize-space is used to remove the extra spaces in the text.
      * Check the documentation for the normalize-space function here :

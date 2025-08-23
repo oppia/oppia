@@ -130,7 +130,7 @@ describe('Translation Submitter', function () {
     );
 
     // Download Certificate.
-    // TODO(##22743): Unable to download certificate when To date is of today
+    // TODO(#22743): Unable to download certificate when To date is of today
     // and only contribution is made today.
   });
 

@@ -130,19 +130,23 @@ describe('Translation Reviewer', function () {
     // TODO: Can't see the one with different language.
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
     await translationReviewer.expectPinIconToBeVisible();
+    await translationReviewer.expectScreenshotToMatch(
+      'translationReviewerReviewTab',
+      __dirname
+    );
+  });
+
+  it('should be able to move between review cards', async function () {
     await translationReviewer.clickOnTranslateButtonInTranslateTextTabInTranslationReview(
       'Cutting the Pies',
       'Fractions - The Picnic Problem'
     );
-  });
-
-  it('should be able to move between reviews', async function () {
     await translationReviewer.startTranslationReview(
       'सामग्री 0',
       'Fractions / The Picnic'
     );
-
     await translationReviewer.expectPaginationButtonToBeDisabled('previous');
+
     await translationReviewer.clickOnPaginationButton('next');
     await translationReviewer.clickOnPaginationButton('previous');
   });
@@ -169,7 +173,7 @@ describe('Translation Reviewer', function () {
     );
   });
 
-  it('should be able to see contribution stats', async function () {
+  it('should be able to check contribution stats', async function () {
     await translationReviewer.navigateToTabInMyContributions(
       'Contribution Stats'
     );
@@ -180,6 +184,10 @@ describe('Translation Reviewer', function () {
     await translationReviewer.expectContributionTableToContainRowInTranslationReview(
       [null, 'Fractions', '3', '6', '2', '4']
     );
+
+    // Download certificate.
+    // TODO(#22743): Unable to download certificate when To date is of today
+    // and only contribution is made today.
   });
 
   it('should be able to see the badges', async function () {

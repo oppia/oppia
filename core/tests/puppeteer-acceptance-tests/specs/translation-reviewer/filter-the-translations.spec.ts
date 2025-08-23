@@ -117,14 +117,6 @@ describe('Translation Reviewer', function () {
       'The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
-    await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOnDiscardChangesButton();
-    await translationSubmitter.clickOnSkipTranslationButton();
-    await translationSubmitter.typeTextForRTE('सामग्री 1');
-    await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOnDiscardChangesButton();
-    await translationSubmitter.clickOnSkipTranslationButton();
-    await translationSubmitter.typeTextForRTE('सामग्री 2');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.clickOnDiscardChangesButton();
 
@@ -135,10 +127,6 @@ describe('Translation Reviewer', function () {
       'The Picnic Problem'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
-    await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOnDiscardChangesButton();
-    await translationSubmitter.clickOnSkipTranslationButton();
-    await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.clickOnDiscardChangesButton();
 
@@ -151,10 +139,6 @@ describe('Translation Reviewer', function () {
       'The Ideal Gas Law'
     );
     await translationSubmitter.typeTextForRTE('सामग्री 0');
-    await translationSubmitter.clickOn('Save and translate another');
-    await translationSubmitter.clickOnDiscardChangesButton();
-    await translationSubmitter.clickOnSkipTranslationButton();
-    await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.clickOnDiscardChangesButton();
   }, 1200000);
