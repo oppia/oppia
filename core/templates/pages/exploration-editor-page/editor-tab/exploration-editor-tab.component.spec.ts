@@ -98,7 +98,7 @@ describe('Exploration editor tab component', () => {
   var generateContentIdService: GenerateContentIdService;
   var explorationNextContentIdIndexService: ExplorationNextContentIdIndexService;
   let mockRefreshStateEditorEventEmitter = null;
-  // Mobile tour tests
+  // Mobile tour tests.
   describe('Mobile tour functionality', () => {
     it('should initialize with mobile joyride steps', () => {
       expect(component.mobileJoyRideSteps).toEqual([

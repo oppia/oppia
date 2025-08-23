@@ -125,7 +125,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     if (this.permissions.canVoiceover) {
       this.tutorialInProgress = true;
 
-      // Use mobile-specific steps on narrow screens to skip elements not visible on mobile
+      // Use mobile-specific steps on narrow screens to skip elements not visible on mobile.
       const tourSteps = this.windowDimensionsService.isWindowNarrow()
         ? this.mobileTranslationTabTourSteps
         : this.translationTabTourSteps;

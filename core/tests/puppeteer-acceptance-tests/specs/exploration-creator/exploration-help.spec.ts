@@ -19,7 +19,6 @@
  * EC. Help.
  */
 
-import {showMessage} from '../../utilities/common/show-message';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 

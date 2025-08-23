@@ -85,8 +85,8 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     'editorTabTourContentEditorTab',
     'editorTabTourSlideStateInteractionEditorTab',
     'editorTabTourStateResponsesTab',
-    'editorTabTourMobilePreview', // Mobile-specific preview in dropdown
-    'editorTabTourMobileSaveDraft', // Mobile-specific save draft selector
+    'editorTabTourMobilePreview', // Mobile-specific preview in dropdown.
+    'editorTabTourMobileSaveDraft', // Mobile-specific save draft selector.
     'editorTabTourTutorialComplete',
   ];
 
@@ -148,7 +148,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   startTutorial(): void {
     this.tutorialInProgress = true;
 
-    // Use mobile-specific tour steps if viewport is mobile
+    // Use mobile-specific tour steps if viewport is mobile.
     const tourSteps = this.windowDimensionsService.isWindowNarrow()
       ? this.mobileJoyRideSteps
       : this.joyRideSteps;
@@ -175,11 +175,11 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
             .querySelector<HTMLElement>('.e2e-test-joyride-title')
             .focus();
 
-          // Handle mobile tour specific steps
+          // Handle mobile tour specific steps.
           if (this.windowDimensionsService.isWindowNarrow()) {
-            // For mobile preview step (step 5), ensure mobile navigation is shown
+            // For mobile preview step (step 5), ensure mobile navigation is shown.
             if (value.number === 5) {
-              // Ensure the mobile nav options are shown
+              // Ensure the mobile nav options are shown.
               const mobileOptionsIcon = document.querySelector<HTMLElement>(
                 '.e2e-test-mobile-options'
               );

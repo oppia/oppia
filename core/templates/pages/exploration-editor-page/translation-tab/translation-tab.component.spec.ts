@@ -93,7 +93,7 @@ describe('Translation tab component', () => {
         ) => {
           value1({number: 2});
           value1({number: 4});
-          // Call the completion callback to properly end the tutorial
+          // Call the completion callback to properly end the tutorial.
           value3();
         },
       };
