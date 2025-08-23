@@ -240,6 +240,11 @@ export class LostChange {
     return language;
   }
 
+  /**
+   * @param {String} lostChangeDict - the name of the type to fetch.
+   * @returns {LostChange} - The associated type, if any.
+   */
+
   static createNew(
     utilsService: UtilsService,
     lostChangeDict: ExplorationChange | LostChangeBackendDict
