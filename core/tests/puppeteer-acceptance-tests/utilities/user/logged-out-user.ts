@@ -4429,7 +4429,7 @@ export class LoggedOutUser extends BaseUser {
     expectedCode: string
   ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
-    await this.clickOn(embedLessonButton);
+    await this.clickOn(embedLessonButton, true);
     await this.page.waitForSelector(embedCodeSelector);
     const embedCode = await this.page.$eval(
       embedCodeSelector,
