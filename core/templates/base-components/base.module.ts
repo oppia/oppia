@@ -56,8 +56,6 @@ import {OppiaAngularRootComponent} from 'components/oppia-angular-root.component
 import {NgBootstrapModule} from 'modules/ng-boostrap.module';
 import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
 import {PrimaryButtonComponent} from 'components/button-directives/primary-button.component';
-import {NewSwitchContentLanguageRefreshRequiredModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
-import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
 import {MatIconModule} from '@angular/material/icon';
 
 @NgModule({
@@ -99,7 +97,6 @@ import {MatIconModule} from '@angular/material/icon';
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
     LanguageBannerComponent,
-    NewSwitchContentLanguageRefreshRequiredModalComponent,
   ],
 
   entryComponents: [
@@ -117,7 +114,6 @@ import {MatIconModule} from '@angular/material/icon';
     ThanksForSubscribingModalComponent,
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
-    NewSwitchContentLanguageRefreshRequiredModalComponent,
   ],
 
   exports: [
@@ -145,8 +141,6 @@ import {MatIconModule} from '@angular/material/icon';
     TopNavigationBarComponent,
     WarningsAndAlertsComponent,
     ClassroomNavigationLinksComponent,
-    NewSwitchContentLanguageRefreshRequiredModalComponent,
   ],
-  providers: [ContentTranslationManagerService],
 })
 export class BaseModule {}

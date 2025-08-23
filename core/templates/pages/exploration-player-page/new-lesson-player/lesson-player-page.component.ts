@@ -32,6 +32,12 @@ import {PageTitleService} from 'services/page-title.service';
 import './lesson-player-page.component.css';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
+import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {ContentTranslationLanguageService} from '../services/content-translation-language.service';
+import {PlayerTranscriptService} from '../services/player-transcript.service';
+import {I18nService} from 'i18n/i18n.service';
 
 require('interactions/interactionsRequires.ts');
 
@@ -57,7 +63,12 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private entityVoiceoversService: EntityVoiceoversService,
     private urlService: UrlService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private ngbModal: NgbModal,
+    private i18nService: I18nService,
+    private contentTranslationLanguageService: ContentTranslationLanguageService,
+    private playerTranscriptService: PlayerTranscriptService,
+    private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
 
   ngOnInit(): void {
@@ -117,6 +128,27 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
       .then(response => {
         this.explorationIsUnpublished = response.canPublish;
       });
+
+    this.directiveSubscriptions.add(
+      this.contentTranslationManagerService.onLanguageChange.subscribe(
+        languageCode => {
+          console.log('hey');
+          const switchLanguageModalPromise =
+            this.onLanguageChange(languageCode);
+
+          if (switchLanguageModalPromise) {
+            switchLanguageModalPromise.result.then(
+              () => {
+                this.i18nService.handleLanguageUpdate(languageCode);
+              },
+              () => {}
+            );
+          } else {
+            this.i18nService.handleLanguageUpdate(languageCode);
+          }
+        }
+      )
+    );
   }
 
   subscribeToOnLangChange(): void {
@@ -139,5 +171,50 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  private shouldPromptForRefresh(): boolean {
+    const firstCard = this.playerTranscriptService.getCard(0);
+    return firstCard.getInputResponsePairs().length > 0;
+  }
+
+  showLanguageSwitchModal(modalText: string): NgbModalRef {
+    const modalRef = this.ngbModal.open(
+      NewSwitchContentLanguageRefreshRequiredModalComponent
+    );
+    modalRef.componentInstance.modalText = modalText;
+    return modalRef;
+  }
+
+  onLanguageChange(newLanguageCode: string): NgbModalRef | void {
+    const lessonLanguageOptions =
+      this.contentTranslationLanguageService.getLanguageOptionsForDropdown();
+    const userHasMadeProgress = this.shouldPromptForRefresh();
+    let lessonIsTranslatedIntoSelectedLanguage = false;
+    for (const option of lessonLanguageOptions) {
+      if (option.value === newLanguageCode) {
+        if (!userHasMadeProgress) {
+          this.contentTranslationManagerService.changeCurrentContentLanguage(
+            newLanguageCode
+          );
+        } else {
+          return this.showLanguageSwitchModal(
+            'I18N_SWITCH_LANGUAGES_PAGE_REFRESH_NOTICE'
+          );
+        }
+        lessonIsTranslatedIntoSelectedLanguage = true;
+        break;
+      }
+    }
+    if (!lessonIsTranslatedIntoSelectedLanguage && !userHasMadeProgress) {
+      return this.showLanguageSwitchModal(
+        'I18N_SWITCH_LANGUAGES_ENGLISH_ONLY_NOTICE'
+      );
+    } else if (!lessonIsTranslatedIntoSelectedLanguage && userHasMadeProgress) {
+      return this.showLanguageSwitchModal(
+        'I18N_SWITCH_LANGUAGES_RESET_AND_ENGLISH_RESTART'
+      );
+    }
+    return;
   }
 }

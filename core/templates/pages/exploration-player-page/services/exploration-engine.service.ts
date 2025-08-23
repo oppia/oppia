@@ -545,9 +545,9 @@ export class ExplorationEngineService {
       this.exploration.getLanguageCode()
     );
 
-    // if (this.isNewLessonPlayerEnabled()) {
-    this.contentTranslationManagerService.initLessonTranslations();
-    // }
+    if (this.isNewLessonPlayerEnabled()) {
+      this.contentTranslationManagerService.initLessonTranslations();
+    }
   }
 
   /**

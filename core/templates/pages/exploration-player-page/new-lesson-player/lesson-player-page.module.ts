@@ -40,6 +40,7 @@ import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
 import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import {ContentTranslationManagerService} from '../services/content-translation-manager.service';
+import {NewSwitchContentLanguageRefreshRequiredModalComponent} from './conversation-skin-components/conversation-display-components/new-switch-content-language-refresh-required-modal.component';
 
 @NgModule({
   imports: [
@@ -60,6 +61,7 @@ import {ContentTranslationManagerService} from '../services/content-translation-
     NewLessonPlayerPageRootComponent,
     PlayerHeaderComponent,
     PlayerSidebarComponent,
+    NewSwitchContentLanguageRefreshRequiredModalComponent,
     NewAudioBarComponent,
   ],
   entryComponents: [
@@ -68,12 +70,12 @@ import {ContentTranslationManagerService} from '../services/content-translation-
     PlayerHeaderComponent,
     PlayerSidebarComponent,
     NewAudioBarComponent,
+    NewSwitchContentLanguageRefreshRequiredModalComponent,
   ],
   providers: [
     HintAndSolutionModalService,
     FatigueDetectionService,
     ConceptCardManagerService,
-    ContentTranslationManagerService,
   ],
 })
 export class NewLessonPlayerPageModule {}

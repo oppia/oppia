@@ -616,6 +616,7 @@ import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-p
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
     ConversationSkinComponent,
+    HintSolutionAndConceptCardDisplayComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
     NewConversationSkinComponent,

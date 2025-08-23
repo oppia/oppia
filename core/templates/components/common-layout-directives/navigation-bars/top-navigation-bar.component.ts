@@ -432,26 +432,10 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
 
   changeLanguage(languageCode: string): void {
     const pathname = this.urlService.getPathname().split('/');
-    const handleLanguageUpdate = () => {
-      this.i18nService.updateUserPreferredLanguage(languageCode);
-      this.languageBannerService.markLanguageBannerAsDismissed();
-    };
-    if (pathname.includes('explore')) {
-      const switchLanguageModalPromise =
-        this.contentTranslationManagerService.onLanguageChange(languageCode);
-
-      if (switchLanguageModalPromise) {
-        switchLanguageModalPromise.result.then(
-          () => {
-            handleLanguageUpdate();
-          },
-          () => {}
-        );
-      } else {
-        handleLanguageUpdate();
-      }
+    if (pathname.includes('lesson')) {
+      this.contentTranslationManagerService.onLanguageChange.emit(languageCode);
     } else {
-      handleLanguageUpdate();
+      this.i18nService.handleLanguageUpdate(languageCode);
     }
   }
 

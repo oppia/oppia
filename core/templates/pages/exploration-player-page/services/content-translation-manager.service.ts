@@ -50,6 +50,7 @@ export class ContentTranslationManagerService {
   private explorationLanguageCode!: string;
   private onStateCardContentUpdateEmitter: EventEmitter<void> =
     new EventEmitter();
+  private onLanguageChangeEmitter: EventEmitter<string> = new EventEmitter();
 
   // The 'originalTranscript' is a copy of the transcript in the exploration
   // language in it's initial state.
@@ -75,7 +76,9 @@ export class ContentTranslationManagerService {
   ) {}
 
   setOriginalTranscript(explorationLanguageCode: string): void {
+    console.log('Before', explorationLanguageCode);
     this.explorationLanguageCode = explorationLanguageCode;
+    console.log('After', this.explorationLanguageCode);
     this.originalTranscript = cloneDeep(
       this.playerTranscriptService.transcript
     );
@@ -83,6 +86,10 @@ export class ContentTranslationManagerService {
 
   get onStateCardContentUpdate(): EventEmitter<void> {
     return this.onStateCardContentUpdateEmitter;
+  }
+
+  get onLanguageChange(): EventEmitter<string> {
+    return this.onLanguageChangeEmitter;
   }
 
   /**
@@ -99,13 +106,11 @@ export class ContentTranslationManagerService {
   displayTranslations(languageCode: string): void {
     console.log('3', languageCode, this.explorationLanguageCode);
     if (languageCode === this.explorationLanguageCode) {
-      console.log('31');
       this.playerTranscriptService.restoreImmutably(
         cloneDeep(this.originalTranscript)
       );
       this.onStateCardContentUpdateEmitter.emit();
     } else {
-      console.log('32');
       this.entityTranslationsService
         .getEntityTranslationsAsync(languageCode)
         .then(entityTranslations => {
@@ -146,50 +151,6 @@ export class ContentTranslationManagerService {
       );
       card.setInteractionHtml(element.outerHTML);
     }
-  }
-
-  private shouldPromptForRefresh(): boolean {
-    const firstCard = this.playerTranscriptService.getCard(0);
-    return firstCard.getInputResponsePairs().length > 0;
-  }
-
-  showLanguageSwitchModal(modalText: string): NgbModalRef {
-    const modalRef = this.ngbModal.open(
-      NewSwitchContentLanguageRefreshRequiredModalComponent
-    );
-    modalRef.componentInstance.modalText = modalText;
-    return modalRef;
-  }
-
-  onLanguageChange(newLanguageCode: string): NgbModalRef | void {
-    const lessonLanguageOptions =
-      this.contentTranslationLanguageService.getLanguageOptionsForDropdown();
-    const userHasMadeProgress = this.shouldPromptForRefresh();
-    let lessonIsTranslatedIntoSelectedLanguage = false;
-    for (const option of lessonLanguageOptions) {
-      if (option.value === newLanguageCode) {
-        if (!userHasMadeProgress) {
-          console.log('one');
-          this.changeCurrentContentLanguage(newLanguageCode);
-        } else {
-          return this.showLanguageSwitchModal(
-            'I18N_SWITCH_LANGUAGES_PAGE_REFRESH_NOTICE'
-          );
-        }
-        lessonIsTranslatedIntoSelectedLanguage = true;
-        break;
-      }
-    }
-    if (!lessonIsTranslatedIntoSelectedLanguage && !userHasMadeProgress) {
-      return this.showLanguageSwitchModal(
-        'I18N_SWITCH_LANGUAGES_ENGLISH_ONLY_NOTICE'
-      );
-    } else if (!lessonIsTranslatedIntoSelectedLanguage && userHasMadeProgress) {
-      return this.showLanguageSwitchModal(
-        'I18N_SWITCH_LANGUAGES_RESET_AND_ENGLISH_RESTART'
-      );
-    }
-    return;
   }
 
   changeCurrentContentLanguage(newLanguageCode: string): void {
