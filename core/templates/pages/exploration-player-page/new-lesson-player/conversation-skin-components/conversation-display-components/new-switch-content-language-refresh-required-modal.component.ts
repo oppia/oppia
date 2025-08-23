@@ -20,6 +20,7 @@
 import {Component, Input} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import './new-switch-content-language-refresh-required-modal.component.css';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'new-switch-content-language-refresh-required-modal',
@@ -32,7 +33,10 @@ import './new-switch-content-language-refresh-required-modal.component.css';
 export class NewSwitchContentLanguageRefreshRequiredModalComponent {
   @Input() modalText!: string;
 
-  constructor(private activeModal: NgbActiveModal) {}
+  constructor(
+    private activeModal: NgbActiveModal,
+    private windowRef: WindowRef
+  ) {}
 
   cancel(): void {
     this.activeModal.dismiss();
@@ -40,5 +44,6 @@ export class NewSwitchContentLanguageRefreshRequiredModalComponent {
 
   confirm(): void {
     this.activeModal.close();
+    this.windowRef.nativeWindow.location.reload();
   }
 }
