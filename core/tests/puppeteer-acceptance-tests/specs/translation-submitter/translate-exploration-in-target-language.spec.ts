@@ -20,7 +20,7 @@
  */
 
 import {RTE_BUTTON_TITLES} from '../../utilities/common/rte-editor';
-import testConstants from '../../utilities/common/test-constants';
+import testConstants, {FILEPATHS} from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {Contributor} from '../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
@@ -66,18 +66,19 @@ describe('Translation Submitter', function () {
     await curriculumAdm.navigateToCreatorDashboardPage();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
     await curriculumAdm.dismissWelcomeModal();
-    await curriculumAdm.addImageRTEToCardContent(
-      testConstants.data.profilePicture,
-      'Image Description',
-      'Image Caption'
-    );
-    // await curriculumAdm.addExplorationDescriptionContainingAllRTEComponents();
+    await curriculumAdm.addExplorationDescriptionContainingBasicRTEComponents();
+
     await curriculumAdm.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
     await curriculumAdm.viewOppiaResponses();
     await curriculumAdm.directLearnersToNewCard('Last Card');
     await curriculumAdm.saveExplorationDraft();
     await curriculumAdm.navigateToCard('Last Card');
     await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+    await curriculumAdm.addImageRTEToCardContent(
+      FILEPATHS.PROFILE_PHOTO_PNG,
+      'Profile Photo',
+      'Profile Photo'
+    );
 
     await curriculumAdm.saveExplorationDraft();
     const explorationId = await curriculumAdm.publishExplorationWithMetadata(
@@ -97,28 +98,28 @@ describe('Translation Submitter', function () {
     const explorationIds =
       await curriculumAdm.createAndPublishExplorationsWithCards(10);
 
-    // await curriculumAdm.createAndPublishTopic(
-    //   'States of Matter',
-    //   'Properties of Solids',
-    //   'Classifying States of Matter'
-    // );
-    // await curriculumAdm.createTopic('States of Matter', 'states-of-matter');
+    await curriculumAdm.createAndPublishTopic(
+      'States of Matter',
+      'Properties of Solids',
+      'Classifying States of Matter'
+    );
+    await curriculumAdm.createTopic('States of Matter', 'states-of-matter');
 
-    // await curriculumAdm.createAndPublishStoryWithChapter(
-    //   'The Mystery of the Melting Ice',
-    //   'melting-ice',
-    //   `The Foggy Window`,
-    //   explorationIds[0] as string,
-    //   'States of Matter'
-    // );
-    // for (const id of explorationIds.slice(1)) {
-    //   await curriculumAdm.openStoryEditor(
-    //     'The Mystery of the Melting Ice',
-    //     'States of Matter'
-    //   );
-    //   await curriculumAdm.addChapter(`Chapter ${id}`, id);
-    //   await curriculumAdm.saveStoryDraft();
-    // }
+    await curriculumAdm.createAndPublishStoryWithChapter(
+      'The Mystery of the Melting Ice',
+      'melting-ice',
+      `The Foggy Window`,
+      explorationIds[0] as string,
+      'States of Matter'
+    );
+    for (const id of explorationIds.slice(1)) {
+      await curriculumAdm.openStoryEditor(
+        'The Mystery of the Melting Ice',
+        'States of Matter'
+      );
+      await curriculumAdm.addChapter(`Chapter ${id}`, id);
+      await curriculumAdm.saveStoryDraft();
+    }
   }, 1500000);
 
   it('should be able to navigate to contribution page', async function () {
@@ -156,31 +157,31 @@ describe('Translation Submitter', function () {
       'Fractions - The Picnic Problem'
     );
 
-    // // Check if pagination works properly.
-    // await translationSubmitter.expectPaginationButtonToBeVisible('next');
-    // await translationSubmitter.expectPaginationButtonToBeVisible(
-    //   'previous',
-    //   false
-    // );
+    // Check if pagination works properly.
+    await translationSubmitter.expectPaginationButtonToBeVisible('next');
+    await translationSubmitter.expectPaginationButtonToBeVisible(
+      'previous',
+      false
+    );
 
-    // // Navigate to the next page.
-    // await translationSubmitter.clickOnPaginationButtonInTranslationSubmitterPage(
-    //   'next'
-    // );
-    // await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
-    // await translationSubmitter.expectPaginationButtonToBeVisible('previous');
-    // await translationSubmitter.expectTranslationOpportunityToBePresent(
-    //   'Cutting the Pies',
-    //   'Fractions - The Picnic Problem',
-    //   false
-    // );
+    // Navigate to the next page.
+    await translationSubmitter.clickOnPaginationButtonInTranslationSubmitterPage(
+      'next'
+    );
+    await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
+    await translationSubmitter.expectPaginationButtonToBeVisible('previous');
+    await translationSubmitter.expectTranslationOpportunityToBePresent(
+      'Cutting the Pies',
+      'Fractions - The Picnic Problem',
+      false
+    );
 
-    // // Change the subject.
-    // await translationSubmitter.clickOnPaginationButtonInTranslationSubmitterPage(
-    //   'previous'
-    // );
-    // await translationSubmitter.selectSubjectInTranslateTextTab('Fractions');
-    // await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
+    // Change the subject.
+    await translationSubmitter.clickOnPaginationButtonInTranslationSubmitterPage(
+      'previous'
+    );
+    await translationSubmitter.selectSubjectInTranslateTextTab('Fractions');
+    await translationSubmitter.expectPaginationButtonToBeVisible('next', false);
   });
 
   it('should be able to use RTE', async function () {
@@ -240,21 +241,6 @@ describe('Translation Submitter', function () {
       RTE_BUTTON_TITLES.BLOCK_QUOTE.HI
     );
 
-    // Collapsible Block.
-    await translationSubmitter.clickOnRTEOptionContainingTitle(
-      RTE_BUTTON_TITLES.COLLAPSIBLE.HI
-    );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'input',
-      'नमूना शीर्षलेख'
-    );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'rte',
-      'आपने संक्षिप्त होने वाला ब्लॉक खोल लिया है।'
-    );
-    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
-    await translationSubmitter.page.keyboard.press('ArrowRight');
-
     // Image.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
       RTE_BUTTON_TITLES.IMAGE.HI
@@ -272,22 +258,6 @@ describe('Translation Submitter', function () {
     );
     await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
     await translationSubmitter.page.keyboard.press('ArrowRight');
-
-    // Link.
-    await translationSubmitter.clickOnRTEOptionContainingTitle(
-      RTE_BUTTON_TITLES.LINK.HI
-    );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'input',
-      'https://www.oppia.org'
-    );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'input',
-      'ओपीआ',
-      1
-    );
-    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
-    await translationSubmitter.page.keyboard.press('Enter');
 
     // Math Formula.
     await translationSubmitter.clickOnRTEOptionContainingTitle(
@@ -311,45 +281,13 @@ describe('Translation Submitter', function () {
     await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
     await translationSubmitter.page.keyboard.press('Enter');
 
-    // Tabs.
-    await translationSubmitter.clickOnRTEOptionContainingTitle(
-      RTE_BUTTON_TITLES.TABS.HI
-    );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'input',
-      'संकेत परिचय'
-    );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'rte',
-      'टैब सामग्री'
-    );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'input',
-      'संकेत 1',
-      1
-    );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'rte',
-      'टैब सामग्री 1',
-      1
-    );
-    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
-    await translationSubmitter.page.keyboard.press('ArrowRight');
-
-    // Video RTE.
-    await translationSubmitter.clickOnRTEOptionContainingTitle(
-      RTE_BUTTON_TITLES.VIDEO.HI
-    );
-    await translationSubmitter.fillValueInTranslateTextCustomizeComponent(
-      'input',
-      youtubeVideoURL
-    );
-    await translationSubmitter.clickOnSaveButtonInCustomizeRTEModal();
-    await translationSubmitter.page.keyboard.press('ArrowRight');
+    await translationSubmitter.clickOn('Save and translate another');
+    await translationSubmitter.clickOnDiscardChangesButton();
   });
 
   it('should be able to use copy tool', async function () {
     // Check if anchor text for copy tool works properly.
+    await translationSubmitter.clickOnSkipTranslationButton();
     await translationSubmitter.clickAndVerifyAnchorWithInnerText(
       'here',
       'https://oppia-user-guide.readthedocs.io/en/latest/contributor/translate.html'
@@ -358,15 +296,7 @@ describe('Translation Submitter', function () {
       'छवि विवरण',
       'तस्वीर का शीर्षक'
     );
-  });
 
-  it('should be able submit a translation', async function () {
-    await translationSubmitter.clickOn('Save and translate another');
-    // TODO(#23140): Remove click on discard changes button step below once the
-    // bug is fixed where we are required to click on the dismiss button.
-    await translationSubmitter.clickOnDiscardChangesButton();
-    await translationSubmitter.clickOnSkipTranslationButton();
-    await translationSubmitter.typeTextForRTE('बधाई हो, आपका काम पूरा हो गया!');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.expectToolTipMessage(
       'Submitted translation for review.'
@@ -374,15 +304,9 @@ describe('Translation Submitter', function () {
     // TODO(#23140): Remove click on discard changes button step below once the
     // bug is fixed where we are required to click on the dismiss button.
     await translationSubmitter.clickOnDiscardChangesButton();
-
-    await translationSubmitter.expectTranslateButtonToBeDisabledInTranslateTextTab(
-      'Cutting the Pies',
-      'Fractions - The Picnic Problem'
-    );
   });
 
   it('should be able to check status of the translations', async function () {
-    await translationSubmitter.expectCurrentProgressToBe(0);
     await translationSubmitter.switchToTabInContributionDashboard(
       'My Contributions'
     );

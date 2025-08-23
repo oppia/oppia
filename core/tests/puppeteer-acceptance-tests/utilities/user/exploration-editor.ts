@@ -6395,6 +6395,93 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Adds basic RTE components to the exploration.
+   * It includes Bold, Italic, Numbered List, Bulleted List, Pre formatted Text,
+   * Block Quote, Image, Math Formula, and Concept Card.
+   */
+  async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
+    // Click on RTE.
+    await this.page.waitForSelector(stateEditSelector, {visible: true});
+    await this.clickOn(stateEditSelector);
+
+    // Add Bold text.
+    await this.clickOnRTEOptionWithTitle('Bold');
+    await this.type(stateContentInputField, 'Bold text');
+    await this.page.keyboard.press('Enter');
+    await this.clickOnRTEOptionWithTitle('Bold');
+
+    // Add Italic text.
+    await this.clickOnRTEOptionWithTitle('Italic');
+    await this.type(stateContentInputField, 'Italic text');
+    await this.page.keyboard.press('Enter');
+    await this.clickOnRTEOptionWithTitle('Italic');
+
+    // Add Numbered List.
+    await this.clickOnRTEOptionWithTitle('Numbered List');
+    await this.type(stateContentInputField, 'Numbered List Item 1');
+    await this.page.keyboard.press('Enter');
+    await this.type(stateContentInputField, 'Numbered List Item 2');
+    await this.page.keyboard.press('Enter');
+    await this.page.keyboard.press('Enter');
+
+    // Add Bulleted List.
+    await this.clickOnRTEOptionWithTitle('Bulleted List');
+    await this.type(stateContentInputField, 'Bulleted List Item 1');
+    await this.page.keyboard.press('Enter');
+    await this.type(stateContentInputField, 'Bulleted List Item 2');
+    await this.page.keyboard.press('Enter');
+    await this.page.keyboard.press('Enter');
+
+    // Add Pre formatted Text.
+    await this.clickOnRTEOptionWithTitle('Pre');
+    await this.type(stateContentInputField, 'Pre formatted text');
+    await this.clickOnRTEOptionWithTitle('Pre');
+    await this.page.keyboard.press('Enter');
+
+    // Add Block Quote.
+    await this.clickOnRTEOptionWithTitle('Block Quote');
+    await this.type(stateContentInputField, 'Block Quote text');
+    await this.page.keyboard.press('Enter');
+    await this.clickOnRTEOptionWithTitle('Block Quote');
+
+    // Add Image.
+    await this.addImageRTE(
+      testConstants.data.profilePicture,
+      'Test Image',
+      'Test Image Caption'
+    );
+    await this.waitForNetworkIdle();
+
+    await this.page.keyboard.press('ArrowRight');
+
+    // Math Formula.
+    await this.clickOnRTEOptionWithTitle('Insert mathematical formula');
+    await this.waitForNetworkIdle();
+    const textareaElement = await this.page.$(
+      'textarea[placeholder*="Enter a math expression using LaTeX"]'
+    );
+    await textareaElement?.type('x^2 + y^2 = z^2');
+    await this.clickOn(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
+
+    // Concept Card.
+    await this.clickOnRTEOptionWithTitle('Insert Concept Card Link');
+    await this.waitForNetworkIdle();
+    const skillSearchElement = await this.page.$(skillNameInput);
+    await skillSearchElement?.type('Math');
+    await this.clickOn(skillItemInRTESelector);
+    await this.page.keyboard.press('Enter');
+    await this.clickOn(closeButtonForExtraModel);
+    await this.waitForNetworkIdle();
+    await this.page.keyboard.press('Enter');
+
+    // Save content.
+    await this.clickOn(saveContentButton);
+    await this.expectElementToBeVisible(saveContentButton, false);
+  }
+
+  /**
    * Updates an exploration description containing all RTE elements.
    */
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
@@ -6462,7 +6549,7 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('ArrowRight');
 
-    // Add LinkEnter.
+    // Add Link.
     await this.addTextWithLinkRTE('Oppia', oppiaWebURL);
     await this.waitForNetworkIdle();
     await this.page.keyboard.press('Enter');
