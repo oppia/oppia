@@ -1950,6 +1950,28 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         contrib.update_timestamps()
         models_to_put.append(contrib)
 
+        exp_opportunity_model_x = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='expX',
+            topic_id='topicx',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='storyx',
+            story_title='story title',
+            topic_name='namex'
+        )
+        exp_opportunity_model_x.update_timestamps()
+        models_to_put.append(exp_opportunity_model_x)
+
+        skill_opportunity_model_1 = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='expY',
+            skill_description='A skill description',
+            question_count=1,
+        )
+        skill_opportunity_model_1.update_timestamps()
+        models_to_put.append(skill_opportunity_model_1)
+
         # 3) Two GeneralSuggestionModels for translation.
         for status, edited in [
             ('accepted', False),
@@ -2087,6 +2109,32 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         )
         bad_contrib.update_timestamps()
         models_to_put.append(bad_contrib)
+
+        exp_opportunity_model_1 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='exp1',
+            topic_id='topicx',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='storyx',
+            story_title='story title',
+            topic_name='namex'
+        )
+        exp_opportunity_model_1.update_timestamps()
+        models_to_put.append(exp_opportunity_model_1)
+
+        exp_opportunity_model_2 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='exp2',
+            topic_id='topicx',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='storyx',
+            story_title='story title',
+            topic_name='namex'
+        )
+        exp_opportunity_model_2.update_timestamps()
+        models_to_put.append(exp_opportunity_model_2)
 
         # 2) Create two GeneralSuggestionModels with mixed outcomes.
         gs1 = self.create_model(
@@ -2228,6 +2276,15 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         q_contrib.update_timestamps()
         models_to_put.append(q_contrib)
 
+        skill_opportunity_model_q = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='exp_q',
+            skill_description='A skill description',
+            question_count=1,
+        )
+        skill_opportunity_model_q.update_timestamps()
+        models_to_put.append(skill_opportunity_model_q)
+
         # 3) Create rejected GeneralSuggestionModel for the recent outcomes.
         qsugg = self.create_model(
             suggestion_models.GeneralSuggestionModel,
@@ -2305,6 +2362,28 @@ class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
         # kinds.
         models_to_put: List[Any] = []
         recent_review_outcomes: List[str] = []
+
+        exp_opportunity_model_x = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='expX',
+            topic_id='topicx',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='storyx',
+            story_title='story title',
+            topic_name='namex'
+        )
+        exp_opportunity_model_x.update_timestamps()
+        models_to_put.append(exp_opportunity_model_x)
+
+        skill_opportunity_model_x = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='expX',
+            skill_description='A skill description',
+            question_count=1,
+        )
+        skill_opportunity_model_x.update_timestamps()
+        models_to_put.append(skill_opportunity_model_x)
 
         sugg = self.create_model(
             suggestion_models.GeneralSuggestionModel,

@@ -1262,7 +1262,15 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             PCollection. A PCollection of job results.
         """
 
-        # Fetch all datasets up front.
+        # Fetch all the data.
+        general_suggestions_models = (
+            self.pipeline
+            | 'Get General Suggestions' >> ndb_io.GetModels(
+                suggestion_models.GeneralSuggestionModel.get_all(
+                    include_deleted=False)
+            )
+        )
+
         translation_totals = (
             self.pipeline
             | 'Get Translation Totals' >> ndb_io.GetModels(
@@ -1281,15 +1289,48 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             )
         )
 
-        translation_suggestions = (
+        all_translation_suggestions_grouped_by_topic_id = (
+            general_suggestions_models
+            | 'Filter translation suggestions' >> beam.Filter(
+                lambda m: (
+                    m.suggestion_type ==
+                    feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT
+                ))
+            | 'Group submitted translation suggestions by target' >> (
+                beam.GroupBy(lambda m: m.target_id))
+        )
+
+        exp_opportunities = (
             self.pipeline
-            | 'Get Translation Suggestions' >> ndb_io.GetModels(
-                suggestion_models.GeneralSuggestionModel.get_all(
-                    include_deleted=False)
-            )
-            | 'Filter Translation Suggestion Type' >> beam.Filter(
-                lambda s: s.suggestion_type == 'translate_content'
-            )
+            | 'Get all non-deleted exp opportunity models' >> ndb_io.GetModels(
+                opportunity_models.ExplorationOpportunitySummaryModel.get_all(
+                    include_deleted=False))
+            | 'Transform to exp opportunity domain object' >> beam.Map(
+                opportunity_services.
+                get_exploration_opportunity_summary_from_model)
+            | 'Group exp opportunity by ID' >> beam.GroupBy(lambda m: m.id)
+        )
+
+        exp_opportunity_to_translation_suggestions = (
+            {
+                'suggestion': all_translation_suggestions_grouped_by_topic_id,
+                'opportunity': exp_opportunities
+            }
+            | 'Merge translation suggestion objects' >> beam.CoGroupByKey()
+            | 'Get rid of key of submitted translation objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
+        )
+
+        translation_suggestions = (
+            exp_opportunity_to_translation_suggestions
+            | 'Filter valid translation suggestions' >> beam.Filter(
+                lambda grouped_data: (
+                    len(grouped_data['opportunity']) > 0 and
+                    len(grouped_data['suggestion']) > 0
+                ))
+            | 'Extract translation suggestions only' >> beam.Map(
+                lambda grouped_data: grouped_data['suggestion'])
+            | 'Extract and fully flatten t suggestions' >> beam.FlatMap(
+                lambda grouped_data: list(grouped_data[0]))
         )
 
         question_totals = (
@@ -1309,16 +1350,48 @@ class ValidateTotalContributionStatsJob(base_jobs.JobBase):
             )
         )
 
-        question_suggestions = (
+        all_question_suggestions_grouped_by_skill_id = (
+            general_suggestions_models
+            | 'Filter question suggestions' >> beam.Filter(
+                lambda m: (
+                    m.suggestion_type ==
+                    feconf.SUGGESTION_TYPE_ADD_QUESTION
+                ))
+            | 'Group submitted question suggestions by target' >> (
+                beam.GroupBy(lambda m: m.target_id))
+        )
+
+        skill_opportunities = (
             self.pipeline
-            | 'Get Question Suggestions' >> ndb_io.GetModels(
-                suggestion_models.GeneralSuggestionModel.get_all(
-                    include_deleted=False)
-            )
-            | 'Filter Question Suggestion Type' >> beam.Filter(
-                lambda s: (
-                    s.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION)
-            )
+            | 'Get all non-deleted skill opportunity models' >> (
+                ndb_io.GetModels(
+                    opportunity_models.SkillOpportunityModel.get_all(
+                        include_deleted=False)))
+            | 'Transform to skill opportunity domain object' >> beam.Map(
+                opportunity_services.get_skill_opportunity_from_model)
+            | 'Group skill opportunity by ID' >> beam.GroupBy(lambda m: m.id)
+        )
+
+        skill_opportunity_to_question_suggestions = (
+            {
+                'suggestion': all_question_suggestions_grouped_by_skill_id,
+                'opportunity': skill_opportunities
+            }
+            | 'Merge submitted question objects' >> beam.CoGroupByKey()
+            | 'Get rid of key of submitted question objects' >> beam.Values()  # pylint: disable=no-value-for-parameter
+        )
+
+        question_suggestions = (
+            skill_opportunity_to_question_suggestions
+            | 'Filter valid question suggestions' >> beam.Filter(
+                lambda grouped_data: (
+                    len(grouped_data['opportunity']) > 0 and
+                    len(grouped_data['suggestion']) > 0
+                ))
+            | 'Extract question suggestions only' >> beam.Map(
+                lambda grouped_data: grouped_data['suggestion'])
+            | 'Extract and fully flatten suggestions' >> beam.FlatMap(
+                lambda grouped_data: list(grouped_data[0]))
         )
 
         topics_set = (
