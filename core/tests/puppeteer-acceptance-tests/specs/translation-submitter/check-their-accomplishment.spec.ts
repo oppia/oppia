@@ -119,15 +119,27 @@ describe('Translation Submitter', function () {
     await translationSubmitter.selectContributionTypeInContributionDashboard(
       'Translation Contributions'
     );
+    await translationSubmitter.expectScreenshotToMatch(
+      'translationSubmitterAccomplishment',
+      __dirname
+    );
     await translationSubmitter.expectContributionTableToContainRow(
       'Fractions',
       2,
       4
     );
+
+    // Download Certificate.
+    // TODO(##22743): Unable to download certificate when To date is of today
+    // and only contribution is made today.
   });
 
   it('should be able to check badges earned', async function () {
     await translationSubmitter.navigateToTabInMyContributions('Badges');
+    await translationSubmitter.expectScreenshotToMatch(
+      'translationSubmitterBadges',
+      __dirname
+    );
     await translationSubmitter.expectBadgesToContain(
       '1',
       'Submission',
