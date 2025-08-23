@@ -220,6 +220,9 @@ import {DisplayNewHintModalComponent} from 'pages/exploration-player-page/new-le
 import {DisplayNewSolutionModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-modal.component';
 import {DisplayNewSolutionInterstititalModalComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/display-new-solution-interstitial-modal.component';
 import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesson-player/sidebar-components/share-lesson-modal.component';
+import {NewCorrectnessFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/new-correctness-footer.component';
+import {NewEndChapterConfettiComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-confetti.component';
+import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
 import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-player/header-components/player-header.component';
 import {ProgressBarComponent} from './progress-bar/progress-bar.component';
 @NgModule({
@@ -273,6 +276,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     AttributionGuideComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
@@ -283,7 +287,9 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     ProgressBarComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
     PlayerHeaderComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
@@ -435,6 +441,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     AudioFileUploaderComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     PlayerHeaderComponent,
     ConfirmQuestionExitModalComponent,
@@ -446,8 +453,10 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     CardNavigationControlComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
     ProgressBarComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -620,6 +629,7 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     AudioFileUploaderComponent,
     CompletionGraphComponent,
     CorrectnessFooterComponent,
+    NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
@@ -630,7 +640,9 @@ import {ProgressBarComponent} from './progress-bar/progress-bar.component';
     CardNavigationControlComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
+    NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
+    NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
     PlayerHeaderComponent,
     CreateActivityModalComponent,

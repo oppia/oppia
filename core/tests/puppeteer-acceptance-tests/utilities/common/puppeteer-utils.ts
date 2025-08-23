@@ -552,6 +552,47 @@ export class BaseUser {
   }
 
   /**
+   * The function selects all text content and copies it.
+   * @param {string} selector - The element from which the text is to
+   * be copied.
+   */
+  async copyTextFrom(selector: string): Promise<void> {
+    await this.waitForElementToBeClickable(selector);
+    await this.page.click(selector, {clickCount: 3});
+    await this.page.keyboard.down('ControlLeft');
+    await this.page.keyboard.press('C');
+    await this.page.keyboard.up('ControlLeft');
+  }
+
+  /**
+   * The function selects all text content using Control+A and copies it.
+   * @param {string} selector - The element from which the text is to
+   * be copied.
+   */
+  async copyAllTextFrom(selector: string): Promise<void> {
+    await this.waitForElementToBeClickable(selector);
+    await this.page.click(selector);
+    await this.page.keyboard.down('ControlLeft');
+    await this.page.keyboard.press('A');
+    await this.page.keyboard.press('C');
+    await this.page.keyboard.up('ControlLeft');
+  }
+
+  /**
+   * The function pastes all the text on the clipboard to
+   * the given selector.
+   * @param {string} selector - The element to which the text is to
+   * be pasted.
+   */
+  async pasteTextTo(selector: string): Promise<void> {
+    await this.waitForElementToBeClickable(selector);
+    await this.page.click(selector);
+    await this.page.keyboard.down('ControlLeft');
+    await this.page.keyboard.press('V');
+    await this.page.keyboard.up('ControlLeft');
+  }
+
+  /**
    * This function types the text in the input field using its CSS selector.
    */
   async type(selector: string, text: string): Promise<void> {
