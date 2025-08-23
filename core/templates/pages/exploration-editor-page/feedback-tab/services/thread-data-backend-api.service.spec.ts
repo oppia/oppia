@@ -27,8 +27,7 @@ import {ThreadMessageBackendDict} from 'domain/feedback_message/ThreadMessage.mo
 import {
   FeedbackThread,
   FeedbackThreadBackendDict,
-  FeedbackThreadObjectFactory,
-} from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+} from 'domain/feedback_thread/feedback-thread.model';
 import {SuggestionBackendDict} from 'domain/suggestion/suggestion.model';
 import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
 import {ThreadDataBackendApiService} from 'pages/exploration-editor-page/feedback-tab/services/thread-data-backend-api.service';
@@ -39,7 +38,6 @@ describe('retrieving threads service', () => {
   let httpTestingController: HttpTestingController;
   let pageContextService: PageContextService;
   let csrfTokenService: CsrfTokenService;
-  let feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
   let threadDataBackendApiService: ThreadDataBackendApiService;
 
   let mockFeedbackThreads: FeedbackThreadBackendDict[];
@@ -147,7 +145,6 @@ describe('retrieving threads service', () => {
   beforeEach(() => {
     pageContextService = TestBed.inject(PageContextService);
     csrfTokenService = TestBed.inject(CsrfTokenService);
-    feedbackThreadObjectFactory = TestBed.inject(FeedbackThreadObjectFactory);
     threadDataBackendApiService = TestBed.inject(ThreadDataBackendApiService);
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
@@ -211,7 +208,7 @@ describe('retrieving threads service', () => {
 
   it('should successfully fetch the messages of a thread', fakeAsync(() => {
     let mockThread = mockFeedbackThreads[0];
-    let thread = feedbackThreadObjectFactory.createFromBackendDict(mockThread);
+    let thread = FeedbackThread.createFromBackendDict(mockThread);
 
     let setMessagesSpy = spyOn(thread, 'setMessages').and.callThrough();
 
@@ -246,7 +243,7 @@ describe('retrieving threads service', () => {
 
   it('should call reject handler when fetching messages fails', fakeAsync(() => {
     let mockThread = mockFeedbackThreads[0];
-    let thread = feedbackThreadObjectFactory.createFromBackendDict(mockThread);
+    let thread = FeedbackThread.createFromBackendDict(mockThread);
 
     let setMessagesSpy = spyOn(thread, 'setMessages').and.callThrough();
 
@@ -349,7 +346,7 @@ describe('retrieving threads service', () => {
 
   it('should successfully mark thread as seen', fakeAsync(() => {
     let mockThread = mockFeedbackThreads[0];
-    let thread = feedbackThreadObjectFactory.createFromBackendDict(mockThread);
+    let thread = FeedbackThread.createFromBackendDict(mockThread);
     threadDataBackendApiService.markThreadAsSeenAsync(thread);
 
     let req = httpTestingController.expectOne(
@@ -374,7 +371,7 @@ describe('retrieving threads service', () => {
 
   it('should use reject handler when marking thread as seen fails', fakeAsync(() => {
     let mockThread = mockFeedbackThreads[0];
-    let thread = feedbackThreadObjectFactory.createFromBackendDict(mockThread);
+    let thread = FeedbackThread.createFromBackendDict(mockThread);
 
     threadDataBackendApiService
       .markThreadAsSeenAsync(thread)
@@ -412,8 +409,7 @@ describe('retrieving threads service', () => {
       'is different than old status and its status is close',
     fakeAsync(() => {
       let mockThread = mockFeedbackThreads[0];
-      let thread =
-        feedbackThreadObjectFactory.createFromBackendDict(mockThread);
+      let thread = FeedbackThread.createFromBackendDict(mockThread);
 
       // Fetch feedback stats.
       threadDataBackendApiService.getFeedbackThreadsAsync();
@@ -447,8 +443,7 @@ describe('retrieving threads service', () => {
     fakeAsync(() => {
       let mockThread = mockFeedbackThreads[0];
       mockThread.status = 'close';
-      let thread =
-        feedbackThreadObjectFactory.createFromBackendDict(mockThread);
+      let thread = FeedbackThread.createFromBackendDict(mockThread);
 
       // Fetch feedback stats.
       threadDataBackendApiService.getFeedbackThreadsAsync();
@@ -481,8 +476,7 @@ describe('retrieving threads service', () => {
       'is equal old status',
     fakeAsync(() => {
       let mockThread = mockFeedbackThreads[0];
-      let thread =
-        feedbackThreadObjectFactory.createFromBackendDict(mockThread);
+      let thread = FeedbackThread.createFromBackendDict(mockThread);
 
       // Fetch feedback stats.
       threadDataBackendApiService.getFeedbackThreadsAsync();
@@ -556,7 +550,7 @@ describe('retrieving threads service', () => {
     var failHandler = jasmine.createSpy('fail');
 
     let mockThread = mockFeedbackThreads[0];
-    let thread = feedbackThreadObjectFactory.createFromBackendDict(mockThread);
+    let thread = FeedbackThread.createFromBackendDict(mockThread);
 
     threadDataBackendApiService
       .fetchMessagesAsync(thread.threadId)

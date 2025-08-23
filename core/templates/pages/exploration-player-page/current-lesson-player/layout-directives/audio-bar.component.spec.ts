@@ -43,6 +43,19 @@ import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.se
 import {EntityVoiceovers} from '../../../../domain/voiceover/entity-voiceovers.model';
 import {VoiceoverBackendDict} from '../../../../domain/exploration/voiceover.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ServicesConstants} from 'services/services.constants';
+
+class MockPlatformFeatureService {
+  status = {
+    ShowRegeneratedVoiceoversToLearners: {
+      isEnabled: false,
+    },
+    AutomaticVoiceoverRegenerationFromExp: {
+      isEnabled: false,
+    },
+  };
+}
 
 describe('Audio Bar Component', () => {
   let component: AudioBarComponent;
@@ -58,12 +71,18 @@ describe('Audio Bar Component', () => {
   let voiceoverPlayerService: VoiceoverPlayerService;
   let entityVoiceoversService: EntityVoiceoversService;
   let stateEditorService: StateEditorService;
+  let mockPlatformFeatureService = new MockPlatformFeatureService();
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [AudioBarComponent, MockTranslatePipe],
-      providers: [],
+      providers: [
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
+      ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -352,11 +371,19 @@ describe('Audio Bar Component', () => {
         entity_version: entityVersion,
         language_accent_code: languageAccentCode,
         voiceovers_mapping: contentIdToVoiceoversMappingBackendDict,
+        automated_voiceovers_audio_offsets_msecs: {},
       };
       let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
         entityVoiceoversBackendDict
       );
       let languageAccentDecriptions = ['en-US', 'en-IN'];
+
+      spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+        true
+      );
+      spyOn(pageContextService, 'getEditorTabContext').and.returnValue(
+        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW
+      );
 
       spyOn(
         voiceoverPlayerService,
@@ -389,6 +416,15 @@ describe('Audio Bar Component', () => {
           auto: autoVoiceoverBackendDict,
         },
       };
+      let contentIdToVoiceoversAudioOffsetsMsecsBackendDict = {
+        content0: [
+          {token: 'This', audio_offset_msecs: 0.0},
+          {token: 'is', audio_offset_msecs: 100.0},
+          {token: 'from', audio_offset_msecs: 200.0},
+          {token: 'cached', audio_offset_msecs: 300.0},
+          {token: 'model', audio_offset_msecs: 400.0},
+        ],
+      };
       let entityId = 'exploration_1';
       let entityType = 'exploration';
       let entityVersion = 1;
@@ -399,6 +435,8 @@ describe('Audio Bar Component', () => {
         entity_version: entityVersion,
         language_accent_code: languageAccentCode,
         voiceovers_mapping: contentIdToVoiceoversMappingBackendDict,
+        automated_voiceovers_audio_offsets_msecs:
+          contentIdToVoiceoversAudioOffsetsMsecsBackendDict,
       };
       let entityVoiceovers = EntityVoiceovers.createFromBackendDict(
         entityVoiceoversBackendDict
@@ -415,11 +453,11 @@ describe('Audio Bar Component', () => {
       ).and.returnValue(entityVoiceovers);
       spyOn(playerPositionService, 'getCurrentStateName');
       spyOn(audioPreloaderService, 'restartAudioPreloader');
+      spyOn(component, 'isAutoVoiceoversEnabled').and.returnValue(true);
       voiceoverPlayerService.activeContentId = 'content0';
 
       component.voiceoverToBePlayed = undefined;
       component.updateDisplayableLanguageAccentDescription();
-
       expect(component.voiceoverToBePlayed.filename).toEqual('b.mp3');
     });
 
@@ -561,5 +599,30 @@ describe('Audio Bar Component', () => {
     explorationPlayerPageSpy.and.returnValue(false);
     currentStateName = component.getCurrentStateName();
     expect(currentStateName).toEqual('Second State');
+  });
+
+  it('should be able to return auto voiceovers enabled status', () => {
+    spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
+      true
+    );
+    mockPlatformFeatureService.status.ShowRegeneratedVoiceoversToLearners.isEnabled =
+      true;
+
+    expect(component.isAutoVoiceoversEnabled()).toEqual(true);
+
+    spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
+      true
+    );
+    mockPlatformFeatureService.status.ShowRegeneratedVoiceoversToLearners.isEnabled =
+      false;
+    mockPlatformFeatureService.status.AutomaticVoiceoverRegenerationFromExp.isEnabled =
+      true;
+
+    expect(component.isAutoVoiceoversEnabled()).toEqual(true);
+
+    mockPlatformFeatureService.status.AutomaticVoiceoverRegenerationFromExp.isEnabled =
+      false;
+
+    expect(component.isAutoVoiceoversEnabled()).toEqual(false);
   });
 });

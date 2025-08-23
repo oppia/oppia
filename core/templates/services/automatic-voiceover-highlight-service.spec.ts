@@ -19,12 +19,15 @@
 
 import {async, TestBed} from '@angular/core/testing';
 import {AutomaticVoiceoverHighlightService} from './automatic-voiceover-highlight-service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Automatic voiceover highlight service', () => {
   let automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService;
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
     automaticVoiceoverHighlightService = TestBed.inject(
       AutomaticVoiceoverHighlightService
     );
@@ -75,7 +78,7 @@ describe('Automatic voiceover highlight service', () => {
     ).toEqual({});
 
     automaticVoiceoverHighlightService.languageCode = 'en';
-    automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap(
+    automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
       highlightIdToSentenceMap
     );
 
@@ -136,7 +139,7 @@ describe('Automatic voiceover highlight service', () => {
     automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
       automatedVoiceoversAudioOffsetsMsecs
     );
-    automaticVoiceoverHighlightService.setHighlightIdToSenetenceMap(
+    automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
       highlightIdToSentenceMap
     );
     automaticVoiceoverHighlightService.setActiveContentId('content0');
@@ -146,13 +149,59 @@ describe('Automatic voiceover highlight service', () => {
     let exptectedSentenceHighlightIntervalList = [
       {
         highlightSentenceId: 'highlightId1',
-        startTimeInSecs: 0,
-        endTimeInSecs: 2,
+        startTimeInSecs: 0.1,
+        endTimeInSecs: 1.5,
       },
       {
         highlightSentenceId: 'highlightId2',
-        startTimeInSecs: 2,
-        endTimeInSecs: 3,
+        startTimeInSecs: 1.6,
+        endTimeInSecs: 3.2,
+      },
+    ];
+
+    expect(
+      automaticVoiceoverHighlightService.sentenceHighlightIntervalList
+    ).toEqual(exptectedSentenceHighlightIntervalList);
+  });
+
+  it('should get sentence to highlight interval list with overlapping tokens', () => {
+    let automatedVoiceoversAudioOffsetsMsecs = {
+      content0: [
+        {token: '"', audioOffsetMsecs: 0.0},
+        {token: 'Hello', audioOffsetMsecs: 100.0},
+        {token: 'World', audioOffsetMsecs: 200.0},
+        {token: '!', audioOffsetMsecs: 300.0},
+        {token: '" Second', audioOffsetMsecs: 400.0},
+        {token: 'Sentence', audioOffsetMsecs: 500.0},
+        {token: '.', audioOffsetMsecs: 600.0},
+      ],
+    };
+
+    let highlightIdToSentenceMap = {
+      highlightId1: '"Hello World!"',
+      highlightId2: 'Second Sentence.',
+    };
+    automaticVoiceoverHighlightService.languageCode = 'en';
+    automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+      automatedVoiceoversAudioOffsetsMsecs
+    );
+    automaticVoiceoverHighlightService.setHighlightIdToSentenceMap(
+      highlightIdToSentenceMap
+    );
+    automaticVoiceoverHighlightService.setActiveContentId('content0');
+
+    automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+
+    let exptectedSentenceHighlightIntervalList = [
+      {
+        highlightSentenceId: 'highlightId1',
+        startTimeInSecs: 0.1,
+        endTimeInSecs: 0.4,
+      },
+      {
+        highlightSentenceId: 'highlightId2',
+        startTimeInSecs: 0.4,
+        endTimeInSecs: 0.6,
       },
     ];
 
