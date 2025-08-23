@@ -27,13 +27,6 @@ describe('Exploration Editor', function () {
   let explorationEditor: ExplorationEditor;
 
   beforeAll(async function () {
-    // TODO(#22991): Currently, the help button is not available in mobile viewport.
-    // So, we skip the test in mobile viewport.
-    if (process.env.MOBILE === 'true') {
-      showMessage('Test skipped in mobile viewport');
-
-      process.exit(0);
-    }
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
       'exploration_editor@example.com'
@@ -110,12 +103,6 @@ describe('Exploration Editor', function () {
   });
 
   it('should be able to take a tour of translations tab', async function () {
-    if (explorationEditor.isViewportAtMobileWidth()) {
-      showMessage(
-        'Skipping translations tab tour in mobile view, as help button is not visible.'
-      );
-      return;
-    }
     await explorationEditor.clickOnHelpButton();
     await explorationEditor.clickOnTakeATranslationsTourButton();
     await explorationEditor.dismissTranslationTabWelcomeModal();

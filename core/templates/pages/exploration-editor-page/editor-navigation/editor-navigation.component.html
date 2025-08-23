@@ -1,3 +1,13 @@
+<ng-template #EditorTabTourMobileSaveDraft>
+  <h3 class="e2e-test-joyride-title" tabindex="0">Save</h3>
+  <p tabindex="0">When you're done making changes, tap the "Save Draft" button to save your work.</p>
+</ng-template>
+
+<ng-template #EditorTabTourMobilePreview>
+  <h3 class="e2e-test-joyride-title" tabindex="0">Preview</h3>
+  <p tabindex="0">Tap on this "Options" dropdown to access the Preview option and play through your exploration.</p>
+</ng-template>
+
 <i class="fa fa-book show-mobile-navbar-icon e2e-test-mobile-options" (click)="toggleMobileNavOptions()" [ngClass]="{'mobile-navbar-toggled': mobileNavOptionsAreShown}" aria-label="Mobile navbar options" role="button"></i>
 <div class="navbar-mobile-container">
   <div class="navbar-mobile-options" *ngIf="mobileNavOptionsAreShown">
@@ -7,7 +17,9 @@
           <i class="fa fa-pen"></i>
           Options
         </a>
-        <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-options-dropdown"></div>
+        <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-options-dropdown" 
+             joyrideStep="editorTabTourMobilePreview"
+             [stepContent]="EditorTabTourMobilePreview"></div>
         <ul ngbDropdownMenu class="dropdown-menu oppia-exploration-editor-tabs-dropdown" aria-labelledby="dropdownMenuButton">
           <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" [ngClass]="{'dropdown': countWarnings()}">
             <a href="#" ngbTooltip="Editor" placement="{{countWarnings() ? 'left' : 'bottom'}}" (click)="selectMainTab()"
@@ -76,6 +88,13 @@
               </span>
             </div>
           </li>
+          <li ngbDropdownItem class="dropdown-item oppia-exploration-editor-tabs-dropdown-item e2e-test-mobile-help-button">
+            <a href="#" ngbTooltip="Help" placement="bottom" (click)="showUserHelpModal()"
+               class="oppia-exploration-editor-tabs-dropdown-element">
+              <i class="fa fa-question oppia-mobile-exploration-editor-tabs-icon"></i>
+              <span class="oppia-exploration-editor-tabs-dropdown-inner">Help</span>
+            </a>
+          </li>
         </ul>
       </div>
     </div>
@@ -87,7 +106,9 @@
             <button class="btn publish-button e2e-test-save-changes-for-small-screens"
                     [ngClass]="{'btn-success': connectedToInternet && isExplorationSaveable()}"
                     (click)="saveChanges()"
-                    [disabled]="!connectedToInternet || !isExplorationSaveable()">
+                    [disabled]="!connectedToInternet || !isExplorationSaveable()"
+                    joyrideStep="editorTabTourMobileSaveDraft"
+                    [stepContent]="EditorTabTourMobileSaveDraft">
               <span *ngIf="!saveIsInProcess">
                 <span *ngIf="isPrivate()">
                   <i class="fa fa-floppy-disk md-18 oppia-save-publish-button-icon"></i>

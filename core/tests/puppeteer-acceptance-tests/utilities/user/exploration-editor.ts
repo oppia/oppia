@@ -246,6 +246,7 @@ const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const historyTabButton = '.e2e-test-history-tab';
 const historyListContent = '.e2e-test-history-list-item';
 const mobileHistoryTabButton = '.e2e-test-mobile-history-button';
+const mobileHelpButton = '.e2e-test-mobile-help-button';
 const totalPlaysSelector = '.e2e-test-oppia-total-plays';
 const numberOfOpenFeedbacksSelector = '.e2e-test-oppia-open-feedback';
 const avarageRatingSelector = '.e2e-test-oppia-average-rating';
@@ -5646,12 +5647,26 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Navigates to the help tab in the exploration editor.
+   * Navigates to the help tab in the exploration editor (both desktop and mobile viewport).
    */
   async clickOnHelpButton(): Promise<void> {
-    await this.expectElementToBeVisible(helpTabSelector);
-
-    await this.clickOn(helpTabSelector);
+    if (this.isViewportAtMobileWidth()) {
+      const element = await this.page.$(mobileNavbarOptions);
+      // If the element is not present, it means the mobile navigation bar is not expanded.
+      // The Help button appears only in the mobile view after clicking on the mobile options button.
+      if (!element) {
+        await this.clickOn(mobileOptionsButtonSelector);
+      }
+      await this.page.waitForSelector(mobileNavbarDropdown, {
+        visible: true,
+      });
+      await this.clickOn(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOn(mobileHelpButton);
+    } else {
+      await this.expectElementToBeVisible(helpTabSelector);
+      await this.clickOn(helpTabSelector);
+    }
     await this.expectElementToBeVisible(helpModalContainerSelector);
   }
 

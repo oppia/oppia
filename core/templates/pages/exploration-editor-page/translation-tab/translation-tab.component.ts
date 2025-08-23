@@ -38,6 +38,7 @@ import {RouterService} from '../services/router.service';
 import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
 import {UserExplorationPermissionsService} from '../services/user-exploration-permissions.service';
 import {TranslationTabActiveModeService} from './services/translation-tab-active-mode.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @Component({
   selector: 'oppia-translation-tab',
@@ -56,6 +57,26 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   isTranslationTabBusy!: boolean;
+  translationTabTourSteps = [
+    'translationTabTourContainer',
+    'translationTabLanguageSelector',
+    'translationTabStatusGraph',
+    'translationTabCardOptions',
+    'translationTabRecordingOverview',
+    'translationTabReRecordingOverview',
+    'translationTabTutorialComplete',
+  ];
+
+  // Mobile-specific tour steps (skip steps that don't have mobile elements)
+  mobileTranslationTabTourSteps = [
+    'translationTabTourContainer',
+    'translationTabLanguageSelector',
+    'translationTabCardOptions',
+    'translationTabRecordingOverview',
+    'translationTabReRecordingOverview',
+    'translationTabTutorialComplete',
+  ];
+
   tutorialInProgress!: boolean;
   showTranslationTabSubDirectives!: boolean;
   permissions!: {
@@ -74,7 +95,8 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,
-    private joyride: JoyrideService
+    private joyride: JoyrideService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   initTranslationTab(): void {
@@ -102,28 +124,42 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     }
     if (this.permissions.canVoiceover) {
       this.tutorialInProgress = true;
+
+      // Use mobile-specific steps on narrow screens to skip elements not visible on mobile
+      const tourSteps = this.windowDimensionsService.isWindowNarrow()
+        ? this.mobileTranslationTabTourSteps
+        : this.translationTabTourSteps;
+
       this.joyride
         .startTour({
-          steps: [
-            'translationTabTourContainer',
-            'translationTabOverview',
-            'translationTabStatusGraph',
-            'translationTabCardOptions',
-            'translationTabRecordingOverview',
-            'translationTabReRecordingOverview',
-            'translationTabTutorialComplete',
-          ],
-          stepDefaultPosition: 'bottom',
+          steps: tourSteps,
+          stepDefaultPosition: 'top',
           themeColor: '#212f23',
         })
         .subscribe(
           () => {
+            // This code make the joyride visible over navbar
+            // by overriding the properties of joyride-step__holder class.
             let element = document.querySelector<HTMLElement>(
               '.joyride-step__holder'
             ) as HTMLElement;
-            // This code make the joyride visible over navbar
-            // by overriding the properties of joyride-step__holder class.
-            element.style.zIndex = '1020';
+            if (element) {
+              element.style.zIndex = '1020';
+            }
+
+            const counter = document.querySelector<HTMLElement>(
+              '.joyride-step__counter'
+            );
+            if (counter) {
+              counter.tabIndex = 0;
+            }
+
+            const title = document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title'
+            );
+            if (title) {
+              title.focus();
+            }
           },
           () => {},
           () => {
@@ -183,5 +219,9 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  isViewportMobile(): boolean {
+    return this.windowDimensionsService.isWindowNarrow();
   }
 }

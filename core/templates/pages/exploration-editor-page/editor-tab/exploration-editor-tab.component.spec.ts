@@ -98,6 +98,27 @@ describe('Exploration editor tab component', () => {
   var generateContentIdService: GenerateContentIdService;
   var explorationNextContentIdIndexService: ExplorationNextContentIdIndexService;
   let mockRefreshStateEditorEventEmitter = null;
+  // Mobile tour tests
+  describe('Mobile tour functionality', () => {
+    it('should initialize with mobile joyride steps', () => {
+      expect(component.mobileJoyRideSteps).toEqual([
+        'editorTabTourContainer',
+        'editorTabTourContentEditorTab',
+        'editorTabTourSlideStateInteractionEditorTab',
+        'editorTabTourStateResponsesTab',
+        'editorTabTourMobilePreview',
+        'editorTabTourMobileSaveDraft',
+        'editorTabTourTutorialComplete',
+      ]);
+    });
+
+    it('should have mobile tour step targets for preview and save buttons', () => {
+      const mobileSteps = component.mobileJoyRideSteps;
+      expect(mobileSteps).toContain('editorTabTourMobilePreview');
+      expect(mobileSteps).toContain('editorTabTourMobileSaveDraft');
+      expect(mobileSteps.length).toBe(7);
+    });
+  });
   let versionHistoryService: VersionHistoryService;
   let stateObjectFactory: StateObjectFactory;
   let stateObject: StateBackendDict;

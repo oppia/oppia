@@ -37,6 +37,7 @@ import {RouterService} from '../services/router.service';
 import {StateTutorialFirstTimeService} from '../services/state-tutorial-first-time.service';
 import {TranslationTabComponent} from './translation-tab.component';
 import {ExplorationPermissions} from 'domain/exploration/exploration-permissions.model';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {
   JoyrideDirective,
   JoyrideOptionsService,
@@ -77,6 +78,8 @@ describe('Translation tab component', () => {
   let stateEditorService: StateEditorService;
   let stateTutorialFirstTimeService: StateTutorialFirstTimeService;
   let userExplorationPermissionsService: UserExplorationPermissionsService;
+  let windowDimensionsService: WindowDimensionsService;
+  let joyrideService: JoyrideService;
   let refreshTranslationTabEmitter = new EventEmitter<void>();
   let enterTranslationForTheFirstTimeEmitter = new EventEmitter<string>();
 
@@ -90,9 +93,7 @@ describe('Translation tab component', () => {
         ) => {
           value1({number: 2});
           value1({number: 4});
-          value1({number: 6});
-          value1({number: 8});
-          value2();
+          // Call the completion callback to properly end the tutorial
           value3();
         },
       };
@@ -144,6 +145,7 @@ describe('Translation tab component', () => {
           provide: PageContextService,
           useClass: MockPageContextService,
         },
+        WindowDimensionsService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -167,6 +169,8 @@ describe('Translation tab component', () => {
     stateTutorialFirstTimeService = TestBed.inject(
       StateTutorialFirstTimeService
     );
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    joyrideService = TestBed.inject(JoyrideService);
 
     spyOn(pageContextService, 'getExplorationId').and.returnValue('exp1');
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue(
@@ -500,5 +504,80 @@ describe('Translation tab component', () => {
     component.startTutorial();
 
     expect(component.tutorialInProgress).toBe(false);
+  });
+
+  it('should use mobile-specific tour steps on narrow screens', fakeAsync(() => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    spyOn(joyrideService, 'startTour').and.callThrough();
+
+    component.permissions = {
+      canVoiceover: true,
+    };
+
+    component.startTutorial();
+    tick();
+
+    expect(joyrideService.startTour).toHaveBeenCalledWith({
+      steps: component.mobileTranslationTabTourSteps,
+      stepDefaultPosition: 'top',
+      themeColor: '#212f23',
+    });
+  }));
+
+  it('should use desktop tour steps on wide screens', fakeAsync(() => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
+    spyOn(joyrideService, 'startTour').and.callThrough();
+
+    component.permissions = {
+      canVoiceover: true,
+    };
+
+    component.startTutorial();
+    tick();
+
+    expect(joyrideService.startTour).toHaveBeenCalledWith({
+      steps: component.translationTabTourSteps,
+      stepDefaultPosition: 'top',
+      themeColor: '#212f23',
+    });
+  }));
+
+  it('should have different tour steps for mobile and desktop', () => {
+    expect(component.mobileTranslationTabTourSteps).toEqual([
+      'translationTabTourContainer',
+      'translationTabLanguageSelector',
+      'translationTabCardOptions',
+      'translationTabRecordingOverview',
+      'translationTabReRecordingOverview',
+      'translationTabTutorialComplete',
+    ]);
+
+    expect(component.translationTabTourSteps).toEqual([
+      'translationTabTourContainer',
+      'translationTabLanguageSelector',
+      'translationTabStatusGraph',
+      'translationTabCardOptions',
+      'translationTabRecordingOverview',
+      'translationTabReRecordingOverview',
+      'translationTabTutorialComplete',
+    ]);
+
+    // Mobile tour should skip translationTabStatusGraph (not visible on mobile)
+    expect(component.mobileTranslationTabTourSteps).not.toContain(
+      'translationTabStatusGraph'
+    );
+    expect(component.translationTabTourSteps).toContain(
+      'translationTabStatusGraph'
+    );
+  });
+
+  it('should return correct viewport status', () => {
+    spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(true);
+    expect(component.isViewportMobile()).toBe(true);
+
+    (windowDimensionsService.isWindowNarrow as jasmine.Spy).and.returnValue(
+      false
+    );
+    expect(component.isViewportMobile()).toBe(false);
   });
 });

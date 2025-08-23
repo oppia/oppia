@@ -28,6 +28,7 @@ import {UserExplorationPermissionsService} from '../services/user-exploration-pe
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {RouterService} from '../services/router.service';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {InteractionData} from 'interactions/customization-args-defs';
 import {Outcome} from 'domain/exploration/outcome.model';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
@@ -78,6 +79,17 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     'editorTabTourTutorialComplete',
   ];
 
+  // Mobile-specific tour steps (uses mobile-specific elements)
+  mobileJoyRideSteps: string[] = [
+    'editorTabTourContainer',
+    'editorTabTourContentEditorTab',
+    'editorTabTourSlideStateInteractionEditorTab',
+    'editorTabTourStateResponsesTab',
+    'editorTabTourMobilePreview', // Mobile-specific preview in dropdown
+    'editorTabTourMobileSaveDraft', // Mobile-specific save draft selector
+    'editorTabTourTutorialComplete',
+  ];
+
   constructor(
     private editabilityService: EditabilityService,
     private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService,
@@ -101,7 +113,8 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
     private pageContextService: PageContextService,
     private skillBackendApiService: SkillBackendApiService,
-    private alertsService: AlertsService
+    private alertsService: AlertsService,
+    private windowDimensionsService: WindowDimensionsService
   ) {}
 
   private smoothScrollTo(targetY: number, duration: number): void {
@@ -134,9 +147,15 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
 
   startTutorial(): void {
     this.tutorialInProgress = true;
+
+    // Use mobile-specific tour steps if viewport is mobile
+    const tourSteps = this.windowDimensionsService.isWindowNarrow()
+      ? this.mobileJoyRideSteps
+      : this.joyRideSteps;
+
     this.joyride
       .startTour({
-        steps: this.joyRideSteps,
+        steps: tourSteps,
         stepDefaultPosition: 'top',
         themeColor: '#212f23',
       })
@@ -155,6 +174,24 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
           document
             .querySelector<HTMLElement>('.e2e-test-joyride-title')
             .focus();
+
+          // Handle mobile tour specific steps
+          if (this.windowDimensionsService.isWindowNarrow()) {
+            // For mobile preview step (step 5), ensure mobile navigation is shown
+            if (value.number === 5) {
+              // Ensure the mobile nav options are shown
+              const mobileOptionsIcon = document.querySelector<HTMLElement>(
+                '.e2e-test-mobile-options'
+              );
+              const isMobileNavOpen = mobileOptionsIcon?.classList.contains(
+                'mobile-navbar-toggled'
+              );
+
+              if (mobileOptionsIcon && !isMobileNavOpen) {
+                mobileOptionsIcon.click();
+              }
+            }
+          }
 
           if (value.number === 2) {
             this.smoothScrollTo(0, 1000);

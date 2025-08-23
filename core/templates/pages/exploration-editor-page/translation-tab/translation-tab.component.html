@@ -5,10 +5,10 @@
   </p>
 </ng-template>
 
-<ng-template #TranslationTabOverview>
+<ng-template #TranslationTabLanguageSelector>
   <h3 class="e2e-test-joyride-title" tabindex="0">Choose Language</h3>
   <p tabindex="0">
-    Start your translation by choosing the language that you want to translate to.
+    Start your translation by choosing the voiceover language that you want to translate to.
   </p>
 </ng-template>
 
@@ -21,9 +21,13 @@
 
 <div class="oppia-translation-tab e2e-test-translation-tab-container" *ngIf="showTranslationTabSubDirectives">
   <div class="oppia-translator-overview">
-    <oppia-translator-overview [isTranslationTabBusy]="isTranslationTabBusy" joyrideStep="translationTabOverview" [stepContent]="TranslationTabOverview"></oppia-translator-overview>
+    <oppia-translator-overview [isTranslationTabBusy]="isTranslationTabBusy" 
+                              joyrideStep="translationTabLanguageSelector" 
+                              [stepContent]="TranslationTabLanguageSelector"></oppia-translator-overview>
   </div>
-  <div class="row" joyrideStep="translationTabTourContainer" [stepContent]="TranslationTabTourContainer">
+  <div class="row" 
+       joyrideStep="translationTabTourContainer" 
+       [stepContent]="TranslationTabTourContainer">
     <div class="col-lg-8 col-md-8 col-sm-8">
       <oppia-state-translation [isTranslationTabBusy]="isTranslationTabBusy"></oppia-state-translation>
     </div>
