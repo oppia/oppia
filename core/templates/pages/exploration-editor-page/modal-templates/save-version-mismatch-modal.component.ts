@@ -43,7 +43,6 @@ export class SaveVersionMismatchModalComponent
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() lostChanges!: LostChange[];
-  processedLostChanges: LostChange[] = [];
 
   constructor(
     private windowRef: WindowRef,
@@ -59,7 +58,7 @@ export class SaveVersionMismatchModalComponent
   ngOnInit(): void {
     this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
     if (this.hasLostChanges) {
-      this.processedLostChanges = this.lostChanges.map(
+      this.lostChanges = this.lostChanges.map(
         (change: ExplorationChange | LostChangeBackendDict) =>
           LostChange.createNew(this.utilsService, change)
       );

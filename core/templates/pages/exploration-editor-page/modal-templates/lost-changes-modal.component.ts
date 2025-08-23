@@ -39,24 +39,24 @@ export class LostChangesModalComponent
   // The property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() lostChanges!: (ExplorationChange | LostChangeBackendDict)[];
+  @Input() lostChanges!: LostChange[];
   hasLostChanges: boolean = false;
-  processedLostChanges: LostChange[] = [];
 
   constructor(
-    private utilsService: UtilsService,
     private elRef: ElementRef,
     private windowRef: WindowRef,
     private loggerService: LoggerService,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private utilsService: UtilsService
   ) {
     super(ngbActiveModal);
   }
 
   ngOnInit(): void {
     this.hasLostChanges = this.lostChanges && this.lostChanges.length > 0;
-    this.lostChanges = this.lostChanges.map(lostChangeDict =>
-      LostChange.createNew(this.utilsService, lostChangeDict)
+    this.lostChanges = this.lostChanges.map(
+      (change: ExplorationChange | LostChangeBackendDict) =>
+        LostChange.createNew(this.utilsService, change)
     );
   }
 
