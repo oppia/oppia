@@ -70,7 +70,7 @@
                   </mat-select>
                 </mat-form-field>
                 <div>
-                  <span class="form-text secondary-info-text" tabindex="0">
+                  <span class="form-text d-block secondary-info-text" tabindex="0">
                     <em>
                       Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank" rel="noopener">Tell us.</a>
                     </em>
@@ -94,7 +94,7 @@
                   </mat-form-field>
                 </div>
                 <div>
-                  <span class="form-text secondary-info-text">
+                  <span class="form-text  d-block secondary-info-text">
                     <em>This is the first card the learner sees when playing your exploration.</em>
                   </span>
                 </div>
@@ -128,7 +128,7 @@
                 </div>
               </div>
               <div>
-                <span class="form-text secondary-info-text">
+                <span class="form-text d-block secondary-info-text">
                   <em>Tags help learners discover your exploration when searching.</em>
                 </span>
               </div>
@@ -235,10 +235,10 @@
             </div>
           </div>
         </div>
-        <span class="form-text secondary-info-text">
+        <span class="form-text  d-block secondary-info-text">
           Parameters are values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank" rel="noopener">more info</a>).
         </span>
-        <span class="form-text secondary-info-text" *ngIf="explorationIsLinkedToStory">
+        <span class="form-text d-block secondary-info-text" *ngIf="explorationIsLinkedToStory">
           Explorations in a story cannot have parameters enabled.
         </span>
       </div>
@@ -263,7 +263,7 @@
                 </div>
               </div>
             </div>
-            <span class="form-text secondary-info-text" tabindex="0">
+            <span class="form-text d-block secondary-info-text" tabindex="0">
               Automatic text-to-speech generates audio from your content for learners to listen to. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
             </span>
           </div>
@@ -356,7 +356,7 @@
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
-                <span class="form-text" tabindex="0">
+                <span class="form-text d-block" tabindex="0">
                   <p>Note that managers also have the permissions of collaborators, collaborators also have the permissions of playtesters, and playtesters also have the permissions of viewers.</p>
                 </span>
               </div>
@@ -526,10 +526,10 @@
             </div>
           </div>
         </div>
-        <span class="form-text secondary-info-text" *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" tabindex="0">
+        <span class="form-text  d-block secondary-info-text" *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" tabindex="0">
           You are currently receiving notifications of new feedback for this exploration.
         </span>
-        <span class="form-text secondary-info-text" *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" tabindex="0">
           You have muted feedback notifications for this exploration. You will not receive an email when new feedback is submitted.
         </span>
       </div>
@@ -552,10 +552,10 @@
             </div>
           </div>
         </div>
-        <span class="form-text secondary-info-text" *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" tabindex="0">
           You are currently receiving notifications of new suggestions for this exploration.
         </span>
-        <span class="form-text secondary-info-text" *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" tabindex="0">
           You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
         </span>
       </div>
@@ -632,10 +632,10 @@
             </label>
           </div>
         </div>
-        <span class="form-text secondary-info-text" *ngIf="isExplorationEditable()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="isExplorationEditable()" tabindex="0">
           Further edits to the exploration are currently allowed.
         </span>
-        <span class="form-text secondary-info-text" *ngIf="!isExplorationEditable()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="!isExplorationEditable()" tabindex="0">
           Further edits to the exploration are no longer allowed.
         </span>
       </div>
