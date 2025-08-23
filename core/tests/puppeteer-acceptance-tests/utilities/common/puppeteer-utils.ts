@@ -354,7 +354,7 @@ export class BaseUser {
       await this.clickOn('OK');
       this.userHasAcceptedCookies = true;
     }
-    await this.clickOn('Sign in');
+    await this.clickOnElementWithText('Sign in');
     await this.type(testConstants.SignInDetails.inputField, email);
     await this.clickAndWaitForNavigation('Sign In');
   }
