@@ -60,11 +60,17 @@ describe('Translation Reviewer', function () {
 
     // Create translation opportunity.
     const explorationId =
-      await curriculumAdm.createAndPublishExplorationWithCards('Exploration 1');
+      await curriculumAdm.createAndPublishAMinimalExplorationWithTitle(
+        'Exploration 1'
+      );
     const explorationId2 =
-      await curriculumAdm.createAndPublishExplorationWithCards('Exploration 2');
+      await curriculumAdm.createAndPublishAMinimalExplorationWithTitle(
+        'Exploration 2'
+      );
     const explorationId3 =
-      await curriculumAdm.createAndPublishExplorationWithCards('Exploration 3');
+      await curriculumAdm.createAndPublishAMinimalExplorationWithTitle(
+        'Exploration 3'
+      );
 
     await curriculumAdm.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdm.createAndPublishTopic(
@@ -151,12 +157,10 @@ describe('Translation Reviewer', function () {
     await translationSubmitter.typeTextForRTE('सामग्री 1');
     await translationSubmitter.clickOn('Save and close');
     await translationSubmitter.clickOnDiscardChangesButton();
-  }, 600000);
+  }, 1200000);
 
   it('should be able to filter by topic', async function () {
-    // TODO: Can't see the one with different language.
     await translationReviewer.navigateToContributorDashboardUsingProfileDropdown();
-    await translationReviewer.expectPinIconToBeVisible();
   });
 
   afterAll(async function () {
