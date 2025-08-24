@@ -25,7 +25,6 @@ import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {TopicManager} from '../../utilities/user/topic-manager';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
-import {showMessage} from '../../utilities/common/show-message';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
@@ -74,13 +73,18 @@ describe('Logged-in User', function () {
       'Find the Value of a Number',
     ];
 
-    for (const chapter of placeValueChapters) {
-      const id =
-        await curriculumAdmin.createAndPublishExplorationWithThreeCards(
-          chapter
-        );
-      chapterIds.push(id ?? '');
-    }
+    const firstChapterId =
+      await curriculumAdmin.createAndPublishExplorationWithThreeCards(
+        placeValueChapters[0]
+      );
+
+    // Speed up set-up by making the second chapter auto-complete with no cards.
+    const secondChapterId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        placeValueChapters[1]
+      );
+
+    chapterIds.push(firstChapterId, secondChapterId);
 
     await curriculumAdmin.addStoryToTopic(
       "Jamie's Adventures in the Arcade",
@@ -141,6 +145,12 @@ describe('Logged-in User', function () {
         section: 'In Progress',
       });
 
+      await loggedInUser.expectSkillCardsToBePresent({
+        subsection: 'Skills',
+        expectedTitles: ['Place Value skills'],
+        section: 'In Progress',
+      });
+
       await loggedInUser.navigateToLessonByCard(
         'Classroom Lessons',
         'Chapter 1: What are the Place Values',
@@ -149,9 +159,49 @@ describe('Logged-in User', function () {
 
       await loggedInUser.continueToNextCard();
       await loggedInUser.continueToNextCard();
+      await loggedInUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
 
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToTab('progress');
+
+      await loggedInUser.expectLessonCardsToBePresent({
+        subsection: 'Classroom Lessons',
+        expectedTitles: ['Chapter 2: Find the Value of a Number'],
+        section: 'In Progress',
+      });
+
+      await loggedInUser.expectLessonCardsToBePresent({
+        subsection: 'Classroom Lessons',
+        expectedTitles: ['Chapter 1: What are the Place Values'],
+        section: 'Completed',
+      });
+
+      await loggedInUser.navigateToLessonByCard(
+        'Classroom Lessons',
+        'Chapter 2: Find the Value of a Number',
+        'In Progress'
+      );
+
+      await loggedInUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
+
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToTab('progress');
+
+      await loggedInUser.expectLessonCardsToBePresent({
+        subsection: 'Classroom Lessons',
+        expectedTitles: ['Chapter 2: Find the Value of a Number'],
+        section: 'Completed',
+      });
+
+      await loggedInUser.expectSkillCardsToBePresent({
+        subsection: 'Skills',
+        expectedTitles: ['Place Value skills'],
+        section: 'Completed',
+      });
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

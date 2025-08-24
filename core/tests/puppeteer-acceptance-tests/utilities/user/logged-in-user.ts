@@ -216,6 +216,11 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
     content: '.e2e-test-progress-empty-div',
     heading: '.e2e-test-progress-empty-text',
   },
+  skillCard: {
+    content: '.e2e-test-skill-card',
+    heading: '.e2e-test-skill-card-title',
+    button: '.e2e-test-skill-card-button',
+  },
 };
 const greetingSelector = '.e2e-learner-dashboard-greeting';
 
@@ -3433,6 +3438,33 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementsPresence({
       expectedTexts: expectedTitles,
       selector: 'lessonCard',
+      parentElement: subsectionElement ?? this.page,
+    });
+  }
+
+  /**
+   * TODO(#18384) - Merge with lesson card helper function.
+   * @param {string} subsection - Subsection title value to match.
+   * @param {string[]} expectedTitles - Lesson card titles expected.
+   * @param {string} [section] - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async expectSkillCardsToBePresent({
+    subsection,
+    expectedTitles,
+    section,
+  }: {
+    subsection: string;
+    expectedTitles: string[];
+    section: string;
+  }): Promise<void> {
+    const subsectionElement = await this.findSubsectionElement(
+      subsection,
+      section
+    );
+
+    await this.expectElementsPresence({
+      expectedTexts: expectedTitles,
+      selector: 'skillCard',
       parentElement: subsectionElement ?? this.page,
     });
   }
