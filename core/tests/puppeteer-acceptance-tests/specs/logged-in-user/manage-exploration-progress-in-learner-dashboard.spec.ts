@@ -56,7 +56,7 @@ describe('Logged-in User', function () {
     ];
 
     for (const title of explorationTitles) {
-      await curriculumAdmin.createAndPublishExplorationWithMultipleCards(title);
+      await curriculumAdmin.createAndPublishExplorationWithThreeCards(title);
     }
 
     loggedInUser = await UserFactory.createNewUser(

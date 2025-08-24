@@ -32,13 +32,9 @@ describe('Logged-in User', function () {
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
-  const explorationTitles = [
-    'Exploration 1',
-    'Exploration 2',
-    'Exploration 3',
-    'Exploration 4',
-  ];
+  const explorationTitles = ['Exploration 1', 'Exploration 2', 'Exploration 3'];
   const explorationIds: string[] = [];
+  const playLaterExplorationTitle = 'Exploration 4';
 
   beforeAll(async function () {
     curriculumAdmin = await UserFactory.createNewUser(
@@ -59,9 +55,16 @@ describe('Logged-in User', function () {
 
     for (const title of explorationTitles) {
       const id =
-        await curriculumAdmin.createAndPublishExplorationWithCards(title);
+        await curriculumAdmin.createAndPublishExplorationWithThreeCards(title);
       explorationIds.push(id ?? '');
     }
+
+    // Create a simple exploration (no need to play) for saved community lessons to shorten setup time.
+    const playLaterId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        playLaterExplorationTitle
+      );
+    explorationIds.push(playLaterId);
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
@@ -73,8 +76,8 @@ describe('Logged-in User', function () {
     'should display saved community lessons after adding to playlist',
     async function () {
       await loggedInUser.navigateToCommunityLibraryPage();
-      await loggedInUser.searchForLessonInSearchBar(explorationTitles[3]);
-      await loggedInUser.addLessonToPlayLater(explorationTitles[3]);
+      await loggedInUser.searchForLessonInSearchBar(playLaterExplorationTitle);
+      await loggedInUser.addLessonToPlayLater(playLaterExplorationTitle);
       await loggedInUser.expectToolTipMessage(
         "Successfully added to your 'Play Later' list."
       );
@@ -83,7 +86,7 @@ describe('Logged-in User', function () {
 
       await loggedInUser.expectLessonCardsToBePresent({
         subsection: 'Lessons you saved for later',
-        expectedTitles: explorationTitles.slice(3),
+        expectedTitles: [playLaterExplorationTitle],
       });
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -91,7 +94,7 @@ describe('Logged-in User', function () {
 
   describe('In-progress lessons', function () {
     beforeAll(async function () {
-      for (const id of explorationIds.slice(0, -1)) {
+      for (const id of explorationIds) {
         await loggedInUser.playExploration(id);
         await loggedInUser.continueToNextCard();
       }
@@ -103,7 +106,7 @@ describe('Logged-in User', function () {
         await loggedInUser.navigateToLearnerDashboard();
         await loggedInUser.expectLessonCardsToBePresent({
           subsection: 'Lessons in progress',
-          expectedTitles: explorationTitles.slice(0, -1),
+          expectedTitles: explorationTitles,
         });
       },
       DEFAULT_SPEC_TIMEOUT_MSECS
