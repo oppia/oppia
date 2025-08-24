@@ -19,6 +19,7 @@
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
+import {ElementHandle} from 'puppeteer';
 
 const contributorDashboardUrl = testConstants.URLs.ContributorDashboard;
 const imageToUpload = testConstants.data.curriculumAdminThumbnailImage;
@@ -94,6 +95,19 @@ const questionDifficultySelectionModalSelector =
 
 const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
 const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
+const responseModalBodySelector = '.e2e-test-response-modal-body';
+const opportunityItemSelector = '.e2e-test-opportunity-list-item';
+const opportunityItemHeadingSelector =
+  '.e2e-test-opportunity-list-item-heading';
+const opportunitySubHeadingSelector =
+  '.e2e-test-opportunity-list-item-subheading';
+const paginationButtonPreviousSelector = '.e2e-test-pagination-button-previous';
+const paginationButtonNextSelector = '.e2e-test-pagination-button-next';
+const reviewContentContainerSelector = '.e2e-test-review-content-container';
+
+const contributionTabClass = 'e2e-test-contribution-tab';
+const activeElementClass = 'e2e-test-active';
+const viewDropdownSelector = '.e2e-test-mobile-contribution-dropdown';
 
 export class PracticeQuestionSubmitter extends BaseUser {
   /**
@@ -481,6 +495,22 @@ export class PracticeQuestionSubmitter extends BaseUser {
     showMessage(`${interactionToAdd} interaction has been added successfully.`);
   }
 
+  async addResponseDetailsInQuestionResponseModal(
+    feedback: string,
+    correctResponse: boolean = true
+  ): Promise<void> {
+    await this.waitForElementToBeClickable(feedbackEditorButton);
+    await this.clickOn(feedbackEditorButton);
+
+    await this.type(stateContentInputField, feedback);
+    if (correctResponse) {
+      await this.clickOn(correctAnswerInTheGroupSelector);
+    }
+    await this.clickOn(addNewResponseButton);
+
+    await this.expectElementToBeVisible(addNewResponseButton, false);
+  }
+
   /**
    * Adds an Image interaction to the current exploration.
    */
@@ -584,6 +614,39 @@ export class PracticeQuestionSubmitter extends BaseUser {
         false
       );
     }
+  }
+
+  /**
+   * Fills the value in the input field in the response modal.
+   * @param {string} value - The value to fill.
+   * @param {'input' | 'textarea'} inputType - The type of the input field.
+   * @param {number} index - The index of the input field.
+   */
+  async fillValueInInteractionResponseModal(
+    value: string,
+    inputType: 'input' | 'textarea',
+    index: number = 0
+  ): Promise<void> {
+    await this.expectElementToBeVisible(responseModalBodySelector);
+
+    const xpath = `//div[contains(@class, '${responseModalBodySelector})]//${inputType === 'textarea' ? 'textarea' : 'input'}[${index + 1}]`;
+    const inputElement = await this.page.waitForXPath(xpath);
+
+    if (!inputElement) {
+      throw new Error(`Input element not found for selector ${xpath}`);
+    }
+
+    await inputElement.click({clickCount: 3});
+    await this.page.keyboard.type(value);
+
+    await this.page.waitForFunction(
+      (element: HTMLInputElement | HTMLTextAreaElement, value: string) => {
+        return element.value.trim() === value;
+      },
+      {},
+      inputElement,
+      value
+    );
   }
 }
 

@@ -23,7 +23,10 @@ import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {Contributor} from '../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {
+  ExplorationEditor,
+  INTERACTION_TYPES,
+} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {PracticeQuestionReviewer} from '../../utilities/user/practice-question-reviewer';
 import {PracticeQuestionSubmitter} from '../../utilities/user/practice-question-submitter';
@@ -33,7 +36,10 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 const ROLES = testConstants.Roles;
 
 describe('Practice Question Submitter', function () {
-  let questionSubmitter: PracticeQuestionSubmitter & Contributor & LoggedInUser;
+  let questionSubmitter: PracticeQuestionSubmitter &
+    Contributor &
+    ExplorationEditor &
+    LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
   let questionAdmin: QuestionAdmin;
   let questionReviewer: PracticeQuestionReviewer & LoggedInUser;
@@ -258,6 +264,225 @@ describe('Practice Question Submitter', function () {
     );
 
     // Image Region Interaction.
+    await questionSubmitter.suggestQuestionsForSkillandTopic(
+      'Addition',
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.selectQuestionDifficulty('Easy');
+    await questionSubmitter.seedTextToQuestion('What is 10 + 11?');
+    await questionSubmitter.addImageInteraction();
+    await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+      'Wrong Answer.'
+    );
+    await questionSubmitter.addHintToState(
+      'Select area in the bottom of the image.'
+    );
+    await questionSubmitter.submitQuestionSuggestion();
+
+    // Item Selection Interaction.
+    await questionSubmitter.suggestQuestionsForSkillandTopic(
+      'Addition',
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.selectQuestionDifficulty('Medium');
+    await questionSubmitter.seedTextToQuestion('What is 14 + 12?');
+    await questionSubmitter.addInteraction(INTERACTION_TYPES.ITEM_SELECTION);
+    await questionSubmitter.customizeItemSelectionInteraction(
+      ['Option 1', 'Option 2', 'Correct Option 1', 'Correct Option 2'],
+      1,
+      2
+    );
+    await questionSubmitter.updateItemSelectionLearnersAnswerInResponseModal(
+      'contains at least one of',
+      ['Correct Option 1', 'Correct Option 2']
+    );
+    await questionSubmitter.addResponseDetailsInQuestionResponseModal(
+      'Great!',
+      true
+    );
+    await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+      'Wrong Answer. Please try again'
+    );
+    await questionSubmitter.addHintToState('Select the correct option.');
+    await questionSubmitter.submitQuestionSuggestion();
+
+    // Multiple Choice Interaction.
+    await questionSubmitter.suggestQuestionsForSkillandTopic(
+      'Addition',
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.selectQuestionDifficulty('Medium');
+    await questionSubmitter.seedTextToQuestion('What is 12 + 13?');
+    await questionSubmitter.addMultipleChoiceInteraction([
+      'Option 1',
+      'Option 2',
+      'Correct Response',
+      'Option 4',
+    ]);
+    await questionSubmitter.updateMultipleChoiceLearnersAnswerInResponseModal(
+      'is equal to',
+      'Correct Response'
+    );
+    await questionSubmitter.addResponseDetailsInQuestionResponseModal(
+      'Great!',
+      true
+    );
+    await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+      'Wrong Answer. Please try again'
+    );
+    await questionSubmitter.addHintToState('Select the correct option.');
+    await questionSubmitter.submitQuestionSuggestion();
+
+    // Text Input Interaction.
+    await questionSubmitter.suggestQuestionsForSkillandTopic(
+      'Addition',
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.seedTextToQuestion('What is 10 + 11?');
+    await questionSubmitter.addTextInputInteraction();
+    await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+      'Wrong Answer'
+    );
+    await questionSubmitter.addHintToState('Test Hint 3');
+    await questionSubmitter.addSolutionToState(
+      'Answer',
+      'Test Solution 1',
+      false
+    );
+    await questionSubmitter.submitQuestionSuggestion();
+
+    // Drag and Drop Sort Interaction.
+    await questionSubmitter.suggestQuestionsForSkillandTopic(
+      'Addition',
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.seedTextToQuestion('What is 14 + 12?');
+    await questionSubmitter.addInteraction(
+      INTERACTION_TYPES.DRAG_AND_DROP_SORT,
+      false
+    );
+    await questionSubmitter.customizeDragAndDropSortInteraction([
+      'First',
+      'Third',
+      'Second',
+    ]);
+    await questionSubmitter.updateDragAndDropSortLearnersAnswerInResponseModal(
+      'is equal to ordering ...',
+      [1, 3, 2]
+    );
+    await questionSubmitter.addResponseDetailsInQuestionResponseModal(
+      'Great!',
+      true
+    );
+    await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+      'Try Again!'
+    );
+    // TODO: Verify works properly.
+    await questionSubmitter.addDragAndDropSortSolution(
+      ['First', 'Second', 'Third'],
+      'As given in the question.'
+    );
+
+    // Number Input Interaction.
+    await questionSubmitter.suggestQuestionsForSkillandTopic(
+      'Addition',
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.seedTextToQuestion('What is 10 + 11?');
+    await questionSubmitter.addInteraction(
+      INTERACTION_TYPES.NUMBER_INPUT,
+      false
+    );
+    await questionSubmitter.customizeNumberInputInteraction(true);
+    await questionSubmitter.fillValueInInteractionResponseModal('100', 'input');
+    await questionSubmitter.addResponseDetailsInQuestionResponseModal(
+      'Perfect!'
+    );
+
+    await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+      'Wrong Answer'
+    );
+    await questionSubmitter.addHintToState('Test Hint 3');
+    await questionSubmitter.addSolutionToState(
+      '100',
+      'As said in the question itself.',
+      true
+    );
+    await questionSubmitter.expectSolutionsToContain(
+      'One solution is "100". As said in the question itself..'
+    );
+    await questionSubmitter.submitQuestionSuggestion();
+
+    // Fraction Input Interaction.
+    await questionSubmitter.suggestQuestionsForSkillandTopic(
+      'Addition',
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.seedTextToQuestion('What is 10/11?');
+    await questionSubmitter.addInteraction(INTERACTION_TYPES.FRACTION_INPUT);
+    await questionSubmitter.customizeFractionInputInteraction(
+      true,
+      false,
+      true
+    );
+    await questionSubmitter.fillValueInInteractionResponseModal('2', 'input');
+    await questionSubmitter.addResponseDetailsInQuestionResponseModal(
+      'Perfect!'
+    );
+    await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+      'Wrong Answer'
+    );
+    await questionSubmitter.addHintToState('Test Hint');
+    await questionSubmitter.addSolutionToState(
+      '1/2',
+      'As given in the question.',
+      true
+    );
+    await questionSubmitter.submitQuestionSuggestion();
+
+    // Number With Units Interaction.
+    await questionSubmitter.suggestQuestionsForSkillandTopic(
+      'Addition',
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.seedTextToQuestion('What is 10km + 11km?');
+    await questionSubmitter.addInteraction(INTERACTION_TYPES.NUMBER_WITH_UNITS);
+    await questionSubmitter.fillValueInInteractionResponseModal(
+      '21km',
+      'input'
+    );
+    await questionSubmitter.addResponseDetailsInQuestionResponseModal(
+      'Perfect!'
+    );
+    await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+      'Wrong Answer'
+    );
+    await questionSubmitter.addHintToState('Test Hint');
+    await questionSubmitter.addSolutionToState(
+      '21km',
+      'As given in the question.',
+      true
+    );
+
+    // Verify question submitted.
+    await questionSubmitter.switchToTabInContributionDashboard(
+      'My Contributions'
+    );
+    await questionSubmitter.expectContributionStatusToBe(
+      'What is 10km + 11km?',
+      'Arithmetic Operations',
+      'Awaiting review'
+    );
+    await questionSubmitter.viewQuestionSuggestion('What is 10km + 11km?');
+    await questionSubmitter.expectScreenshotToMatch(
+      'questionContributionPreviewModal',
+      __dirname
+    );
   });
 
   afterAll(async function () {
