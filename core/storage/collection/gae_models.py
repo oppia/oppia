@@ -910,17 +910,6 @@ class CollectionSummaryModel(base_models.BaseModel):
             cls.contributor_ids == user_id)).get(keys_only=True) is not None
 
     @classmethod
-    def get_non_private(cls) -> Sequence[CollectionSummaryModel]:
-        """Returns an iterable with non-private collection summary models.
-
-        Returns:
-            iterable. An iterable with non-private collection summary models.
-        """
-        return cls.get_all().filter(
-            cls.status != constants.ACTIVITY_STATUS_PRIVATE
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
     def get_private_at_least_viewable(
         cls, user_id: str
     ) -> Sequence[CollectionSummaryModel]:
