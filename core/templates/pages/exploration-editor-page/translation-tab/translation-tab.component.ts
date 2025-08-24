@@ -102,7 +102,7 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     private translationTabActiveModeService: TranslationTabActiveModeService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,
     private joyride: JoyrideService,
-    private windowDimensionsService: WindowDimensionsService
+    private windowDimensionsService: WindowDimensionsService,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
     private voiceoverLanguageManagementService: VoiceoverLanguageManagementService,
     private entityVoiceoversService: EntityVoiceoversService,
