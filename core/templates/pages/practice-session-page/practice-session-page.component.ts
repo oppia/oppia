@@ -27,6 +27,7 @@ import {LoaderService} from 'services/loader.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {PageTitleService} from 'services/page-title.service';
 import {PracticeSessionsBackendApiService} from './practice-session-backend-api.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'practice-session-page',
@@ -48,6 +49,7 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
     private pageTitleService: PageTitleService,
+    private platformFeatureService: PlatformFeatureService,
     private translateService: TranslateService,
     private practiceSessionsBackendApiService: PracticeSessionsBackendApiService
   ) {}
@@ -150,5 +152,9 @@ export class PracticeSessionPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    return this.platformFeatureService.status.NewLessonPlayer.isEnabled;
   }
 }
