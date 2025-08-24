@@ -3615,16 +3615,15 @@ export class LoggedInUser extends BaseUser {
   /**
    * Verifies the proper controls display based on card display container. If the screen is too small,
    * control buttons should appear and shift correctly to the last and first cards.
-   * @param {puppeteer.ElementHandle | null | undefined} containerElement - Full list of elements.
-   * @param {puppeteer.ElementHandle | null | undefined} shiftButton - Button that handles shifting cards.
-   * @param {() => Promise<Record<string, boolean>>} cardsInView - Async function that returns the dimensions of first and last of element list.
+   * @param {string} subsection - Subsection title value to match.
+   * @param {string} [section="N/A"] - Overarching section
    */
   async expectCardDisplayControls(
-    criteria: string,
+    subsection: string,
     section: string = 'N/A'
   ): Promise<void> {
     const subsectionElement = await this.findSubsectionElement(
-      criteria,
+      subsection,
       section
     );
 
@@ -3664,7 +3663,7 @@ export class LoggedInUser extends BaseUser {
       }
     } else {
       throw new Error(
-        `Unexpected error retrieving card display controls from ${criteria} section in ${section}`
+        `Unexpected error retrieving card display controls from ${subsection} section in ${section}`
       );
     }
   }
