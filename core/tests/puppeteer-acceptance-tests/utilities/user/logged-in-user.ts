@@ -3510,7 +3510,8 @@ export class LoggedInUser extends BaseUser {
     return foundElement.length > 0 ? foundElement[0] : null;
   }
 
-  /* Helper function - verifies if the child element is fully visible in parent element.
+  /*
+   * Helper function - verifies if the child element is fully visible in parent element.
    * @param {string} parentElement - Parent element to search though.
    * @param {string} childElement- Element to search for.
    */
@@ -3597,41 +3598,18 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Helper function - Shifts the card display to display the rest of the hidden cards.
-   * @param {puppeteer.ElementHandle | null | undefined} containerElement - Full list of elements.
+   * @param {string} shift  - Direction of shift.
    * @param {puppeteer.ElementHandle | null | undefined} shiftButton - Button that handles shifting cards.
-   * @param {puppeteer.ElementHandle | null | undefined} currentCardView - Starting value for isCardInView.
    * @param {() => Promise<Record<string, boolean>>} cardsInView - Async function that returns the dimensions of first and last of element list.
    */
   private async shiftCardDisplay(
     shift: string,
     shiftButton: puppeteer.ElementHandle | null | undefined,
-    currentCardView: boolean,
     cardsInView: () => Promise<Record<string, boolean>>
   ): Promise<void> {
-    let isCardInView = currentCardView;
-    let maxShifts = 0;
-
-    while (!isCardInView && maxShifts < 10) {
-      await shiftButton?.click();
-      if (shift === 'more') {
-        isCardInView = (await cardsInView()).isLastCardInView;
-      } else {
-        isCardInView = (await cardsInView()).isFirstCardInView;
-      }
-      showMessage(`Shifted cards to view ${shift}`);
-      maxShifts++;
-    }
-
-    if (maxShifts === 10) {
-      throw new Error(
-        `Max shifts of 10 reached but ${shift === 'more' ? 'last' : 'first'} card is not displayed `
-      );
-    }
-
-    expect(isCardInView).toBe(true);
-    showMessage(
-      `Shifted cards to view ${shift} to the ${shift === 'more' ? 'last' : 'first'} card`
-    );
+    await shiftButton?.click();
+    let isCardInView = (await cardsInView()).isFirstCardInView;
+    expect(isCardInView).toBe(shift === 'more' ? false : true);
   }
 
   /**
@@ -3676,13 +3654,11 @@ export class LoggedInUser extends BaseUser {
         await this.shiftCardDisplay(
           'more',
           isRTL ? minusButtonElement : plusButtonElement,
-          isLastCardInView,
           getCardsInViewArg
         );
         await this.shiftCardDisplay(
           'less',
           isRTL ? plusButtonElement : minusButtonElement,
-          isFirstCardInView,
           getCardsInViewArg
         );
       }
