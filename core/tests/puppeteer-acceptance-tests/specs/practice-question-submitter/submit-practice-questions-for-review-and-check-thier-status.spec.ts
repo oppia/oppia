@@ -35,6 +35,8 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
+Error.stackTraceLimit = 30;
+
 describe('Practice Question Submitter', function () {
   let questionSubmitter: PracticeQuestionSubmitter &
     Contributor &

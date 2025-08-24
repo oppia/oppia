@@ -17,9 +17,12 @@
  */
 
 import {RTEEditor} from '../common/rte-editor';
-import {UserFactory} from '../common/user-factory';
 import {Contributor} from './contributor';
 
+// Contributor Dashboard Selectors.
+const opportunityButtonSelector = '.e2e-test-opportunity-list-item-button';
+
+// Question Review Modal Selector.
 const reviewButtonPrefix = 'e2e-test-question-suggestion-review';
 const editButtonSelector = `.${reviewButtonPrefix}-edit-button`;
 
@@ -47,7 +50,7 @@ export class PracticeQuestionReviewer extends Contributor {
       throw new Error(`Opportunity item for question ${question} not found.`);
     }
 
-    await this.clickOn('Review', false, questionElement);
+    await this.clickOn(opportunityButtonSelector, false, questionElement);
     await this.expectModalTitleToBe(skill);
   }
 
