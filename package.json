@@ -227,7 +227,7 @@
   },
   "resolutions": {
     "@types/babel__traverse": "7.20.6",
-    "pretty-format": "27.4.0",
+    "pretty-format": "27.5.1",
     "expect": "27.0.0"
   }
 }
