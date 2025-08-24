@@ -83,7 +83,9 @@ export class SkillEditorNavabarComponent implements OnInit {
           run();
         },
         () => {
-          // user canceled → do nothing
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         }
       );
     } else {

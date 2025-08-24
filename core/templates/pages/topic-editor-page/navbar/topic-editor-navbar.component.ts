@@ -323,7 +323,7 @@ export class TopicEditorNavbarComponent
           this.questionUndoRedoService.clearChanges();
           this._navigateToMainTab(activeTab);
         },
-        () => {} // Cancel → do nothing
+        () => {}
       );
     } else {
       this._navigateToMainTab(activeTab);

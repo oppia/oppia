@@ -72,21 +72,9 @@ export class SkillEditorPageComponent implements OnInit {
     const hasUnsavedQuestionChanges = this.questionUndoRedoService.hasChanges();
 
     const hasUnsavedChanges = hasUnsavedQuestionChanges;
-
-    console.log(this.skillEditorRoutingService.getActiveTabName());
-    console.log(
-      'UndoRedoService change count:',
-      this.questionUndoRedoService.hasChanges()
-    );
-    console.log(
-      'Question being created:',
-      this.skillEditorRoutingService.questionIsBeingCreated
-    );
-    console.log('Has unsaved changes?', hasUnsavedChanges);
     if (hasUnsavedChanges) {
-      // Open the modal similar to your Cancel button
       const modalRef = this.ngbModal.open(ConfirmQuestionExitModalComponent, {
-        backdrop: true, // modal is dismissible via backdrop
+        backdrop: true,
       });
 
       modalRef.result.then(
@@ -97,18 +85,19 @@ export class SkillEditorPageComponent implements OnInit {
           this.questionUndoRedoService.clearChanges();
         },
         () => {
-          // User cancelled: stay on the current tab
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         }
       );
     } else {
-      // No unsaved changes: navigate immediately
       navigateFunction();
       this.questionUndoRedoService.clearChanges();
     }
   }
 
   selectMainTab(): void {
-    if (this.skillEditorRoutingService.getActiveTabName() == 'questions') {
+    if (this.skillEditorRoutingService.getActiveTabName() === 'questions') {
       this.navigationWithConfirmation(() => {
         this.skillEditorRoutingService.navigateToMainTab();
       });
@@ -118,7 +107,7 @@ export class SkillEditorPageComponent implements OnInit {
   }
 
   selectPreviewTab(): void {
-    if (this.skillEditorRoutingService.getActiveTabName() == 'questions') {
+    if (this.skillEditorRoutingService.getActiveTabName() === 'questions') {
       this.navigationWithConfirmation(() => {
         this.skillEditorRoutingService.navigateToPreviewTab();
       });
