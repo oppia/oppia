@@ -26,7 +26,7 @@
              class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
              (mouseover)="warningsAreShown=true"
              (mouseleave)="hideWarnings()"
-             (click)="navigationWithConfirmation(() => selectMainTab())">
+             (click)="selectMainTab()"
              (focus)="warningsAreShown=true"
              role="menuitem"
              tabindex="0"
@@ -75,14 +75,14 @@
       <li [ngClass]="{'navbar-tab-active': isInPreviewTab()}"
           class="nav-item icon nav-list-item e2e-test-topic-preview-tab"
           role="menu"
-          (click)="navigationWithConfirmation(() => openTopicViewer())">
+          (click)="openTopicViewer()">
         <a class="nav-link navbar-tab"
            ngbTooltip="Preview"
            placement="bottom"
            tabindex="0"
            aria-label="Preview button"
            role="menuitem"
-           (keydown.enter)="navigationWithConfirmation(() => openTopicViewer())">
+           (keydown.enter)="openTopicViewer()">
           <i class="fas fa-play navbar-tab-icon e2e-test-topic-preview-button"
              [ngClass]="{'navbar-tab-active-icon': isInPreviewTab()}">
           </i>
