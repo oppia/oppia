@@ -93,12 +93,12 @@
       </div>
       <div [ngClass]="{'col-4': !isSmallScreenViewActive()}">
         <div class="blog-home-page-search-column pt-4 mt-2 d-inline-block"
-             [ngClass]="{'pl-5': !isSmallScreenViewActive(), 'mobile-view-columns-separator': isSmallScreenViewActive()}">
+             [ngClass]="{'ps-5': !isSmallScreenViewActive(), 'mobile-view-columns-separator': isSmallScreenViewActive()}">
           <span [ngClass]="{'d-inline-flex': isSmallScreenViewActive()}">
             <img [src]="oppiaAvatarImgUrl" alt="image of Oppia Avatar"
                  class="me-auto ms-auto oppia-blog-home-page-card-avatar d-flex flex-grow-1 e2e-test-oppia-avatar-image">
             <h1 class="d-flex flex-grow-1 blog-home-page-welcome e2e-test-blog-welcome-heading"
-                [ngClass]="{'mx-auto my-2': !isSmallScreenViewActive(), 'ml-5 my-auto': isSmallScreenViewActive()}">
+                [ngClass]="{'mx-auto my-2': !isSmallScreenViewActive(), 'ms-5 my-auto': isSmallScreenViewActive()}">
               {{ 'I18N_BLOG_HOME_PAGE_WELCOME_HEADING' | translate }}
             </h1>
           </span>
