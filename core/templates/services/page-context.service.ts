@@ -150,6 +150,9 @@ export class PageContextService {
           this.pageContext =
             ServicesConstants.PAGE_CONTEXT.DIAGNOSTIC_TEST_PLAYER;
           return ServicesConstants.PAGE_CONTEXT.DIAGNOSTIC_TEST_PLAYER;
+        } else if (pathnameArray[i] === 'studyguide') {
+          this.pageContext = ServicesConstants.PAGE_CONTEXT.STUDY_GUIDE_VIEWER;
+          return ServicesConstants.PAGE_CONTEXT.STUDY_GUIDE_VIEWER;
         }
       }
 

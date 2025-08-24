@@ -2140,6 +2140,7 @@ def compute_models_to_put_when_saving_new_exp_version(
             exp_summary_model, exp_summary
         )
     )
+
     models_to_put.append(updated_exp_summary_model)
     return models_to_put
 

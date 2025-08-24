@@ -71,11 +71,13 @@ describe('Topic Manager', function () {
 
     await curriculumAdmin.createSkillForTopic(
       'Quadratic Equations',
-      'Algebra II'
+      'Algebra II',
+      false
     );
     await curriculumAdmin.createSkillForTopic(
       'Polynomial Functions',
-      'Algebra II'
+      'Algebra II',
+      false
     );
 
     await curriculumAdmin.addStoryToTopic(

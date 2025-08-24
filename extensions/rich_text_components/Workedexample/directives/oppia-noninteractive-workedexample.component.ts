@@ -54,6 +54,8 @@ export class NoninteractiveWorkedexample implements OnInit, OnChanges {
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() questionWithValue!: string;
   @Input() answerWithValue!: string;
+  @Input() allowSolutionToBeCollapsed!: boolean;
+  isSolutionCollapsed: boolean = true;
   question: string = '';
   answer: string = '';
   constructor(private htmlEscaperService: HtmlEscaperService) {}
@@ -70,8 +72,15 @@ export class NoninteractiveWorkedexample implements OnInit, OnChanges {
     ) as string;
   }
 
+  changeSolutionState(): void {
+    this.isSolutionCollapsed = !this.isSolutionCollapsed;
+  }
+
   ngOnInit(): void {
     this._updateViewOnInputChange();
+    if (!this.allowSolutionToBeCollapsed) {
+      this.isSolutionCollapsed = false;
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {

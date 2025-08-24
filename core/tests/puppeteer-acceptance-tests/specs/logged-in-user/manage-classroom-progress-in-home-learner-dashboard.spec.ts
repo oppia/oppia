@@ -178,6 +178,7 @@ describe('Logged-in User', function () {
       );
 
       await loggedInUser.continueToNextCard();
+      await loggedInUser.continueToNextCard();
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
