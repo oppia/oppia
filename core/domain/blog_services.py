@@ -415,7 +415,7 @@ def get_published_blog_post_summaries_by_user_id(
     """
     # All the blog posts which are not published and are saved as 'draft' will
     # have 'published_on' field as 'None'. We use "2000 or later" as shorthand
-    #" for "not None", since checking directly for "not None" results in a
+    # for "not None", since checking directly for "not None" results in a
     # query error.
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
