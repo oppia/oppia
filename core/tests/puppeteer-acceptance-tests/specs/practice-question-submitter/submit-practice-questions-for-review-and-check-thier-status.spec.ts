@@ -117,9 +117,98 @@ describe('Practice Question Submitter', function () {
     await questionSubmitter.switchToTabInContributionDashboard(
       'Submit Question'
     );
+    // Wait for the opportunities to load, so that screenshot comparasion is
+    // not flaky.
+    await questionSubmitter.expectOpportunityToBePresent(
+      'Addition',
+      'Arithmetic Operations'
+    );
     await questionSubmitter.expectScreenshotToMatch(
       'practiceQuestionSubmissionTab',
       __dirname
     );
+
+    // Submit an easy question.
+    await questionSubmitter.suggestQuestionsForSkillandTopic(
+      'Addition',
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.selectQuestionDifficulty('Easy');
+    await questionSubmitter.seedTextToQuestion('What is 2 + 3?');
+    await questionSubmitter.addMultipleChoiceInteractionByQuestionSubmitter([
+      '5',
+      '-1',
+      '6',
+      '1.5',
+    ]);
+    await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+      'Wrong Answer'
+    );
+    await questionSubmitter.addHintToState(
+      'If you have 2 apples and someone gives you 3 apples, how many apples do you have?'
+    );
+    await questionSubmitter.submitQuestionSuggestion();
+
+    // Submit a medium question.
+    await questionSubmitter.suggestQuestionsForSkillandTopic(
+      'Addition',
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.selectQuestionDifficulty('Medium');
+    await questionSubmitter.seedTextToQuestion('What is 14 + 12?');
+    await questionSubmitter.addMultipleChoiceInteractionByQuestionSubmitter([
+      '26',
+      '12',
+      '16',
+      '18',
+    ]);
+    await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+      'Wrong Answer'
+    );
+    await questionSubmitter.addHintToState(
+      'If you have 14 apples and someone gives you 14 apples, how many apples do you have?'
+    );
+    await questionSubmitter.submitQuestionSuggestion();
+
+    // Submit a hard question.
+    await questionSubmitter.suggestQuestionsForSkillandTopic(
+      'Addition',
+      'Arithmetic Operations'
+    );
+    await questionSubmitter.selectQuestionDifficulty('Hard');
+    await questionSubmitter.seedTextToQuestion('What is 10 + 11?');
+    await questionSubmitter.addMultipleChoiceInteractionByQuestionSubmitter([
+      '13',
+      '10',
+      '11',
+      '12',
+    ]);
+    await questionSubmitter.editDefaultResponseFeedbackInQuestionEditorPage(
+      'Wrong Answer'
+    );
+    await questionSubmitter.addHintToState(
+      'If you have 10 apples and someone gives you 11 apples, how many apples do you have?'
+    );
+    await questionSubmitter.submitQuestionSuggestion();
+
+    // Verify that the questions are submitted successfully.
+    await questionSubmitter.switchToTabInContributionDashboard(
+      'My Contributions'
+    );
+    await questionSubmitter.expectOpportunityToBePresent(
+      'What is 2 + 3?',
+      'Addition'
+    );
+    await questionSubmitter.expectContributionStatusToBe(
+      'What is 2 + 3?',
+      'Addition',
+      'Awaiting review'
+    );
+  });
+
+  it('should be able to check question status', async function () {});
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
   });
 });

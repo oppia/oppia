@@ -64,7 +64,6 @@ const discardChangeButton = '.e2e-test-discard-translation-chages';
 
 const currentProgressSelector =
   '.e2e-test-opportunity-list-item-progress-percentage';
-const opportunityStatusLabelSelector = '.e2e-test-opportunity-list-item-label';
 
 export class TranslationSubmitter extends BaseUser {
   /**
@@ -609,32 +608,6 @@ export class TranslationSubmitter extends BaseUser {
       currentProgressSelector,
       `(${expectedProgress}%)`
     );
-  }
-
-  /**
-   * Checks if the translation status is as expected.
-   * @param {string} chapterName - The name of the chapter.
-   * @param {string} subheading - The subheading of the chapter.
-   * @param {string} expectedStatus - The expected status.
-   */
-  async expectTranslationStatusToBe(
-    chapterName: string,
-    subheading: string,
-    expectedStatus: string
-  ): Promise<void> {
-    const opportunityItem =
-      await this.expectTranslationOpportunityToBePresentInTranslateTextTab(
-        chapterName,
-        subheading
-      );
-
-    const statusElement = await opportunityItem?.waitForSelector(
-      opportunityStatusLabelSelector
-    );
-    const textContent = await statusElement?.evaluate(element =>
-      element.textContent?.trim()
-    );
-    expect(textContent).toBe(expectedStatus);
   }
 }
 

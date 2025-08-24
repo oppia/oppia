@@ -51,6 +51,7 @@ const selectedTopicSelector = '.e2e-test-topic-selector-selected';
 const topicOptionSelector = '.e2e-test-topic-selector-option';
 const mobileElementSelector = '.e2e-test-mobile-element';
 const desktopElementSelector = '.e2e-test-desktop-element';
+const opportunityStatusLabelSelector = '.e2e-test-opportunity-list-item-label';
 
 export class Contributor extends BaseUser {
   /**
@@ -89,7 +90,7 @@ export class Contributor extends BaseUser {
    * @param subheading - The expected subheading of the translation opportunity.
    * @param visible - Whether the translation opportunity should be visible or not.
    */
-  async expectTranslationOpportunityToBePresent(
+  async expectOpportunityToBePresent(
     heading: string,
     subheading: string,
     visible: boolean = true
@@ -406,6 +407,34 @@ export class Contributor extends BaseUser {
     } else {
       await this.expectElementToBeVisible(activeTabNameSelector, false);
     }
+  }
+
+  /**
+   * Checks if the translation status is as expected.
+   * @param {string} heading - The name of the chapter.
+   * @param {string} subheading - The subheading of the chapter.
+   * @param {string} expectedStatus - The expected status.
+   */
+  async expectContributionStatusToBe(
+    heading: string,
+    subheading: string,
+    expectedStatus: string
+  ): Promise<void> {
+    const opportunityItem = await this.expectOpportunityToBePresent(
+      heading,
+      subheading
+    );
+
+    if (!opportunityItem) {
+      throw new Error(`Opportunity item ${heading} (${subheading}) not found.`);
+    }
+    const statusElement = await opportunityItem?.waitForSelector(
+      opportunityStatusLabelSelector
+    );
+    const textContent = await statusElement?.evaluate(element =>
+      element.textContent?.trim()
+    );
+    expect(textContent).toBe(expectedStatus);
   }
 }
 
