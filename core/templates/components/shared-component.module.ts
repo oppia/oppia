@@ -223,6 +223,8 @@ import {ShareLessonModalComponent} from 'pages/exploration-player-page/new-lesso
 import {NewCorrectnessFooterComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/lesson-player-footer/new-correctness-footer.component';
 import {NewEndChapterConfettiComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-confetti.component';
 import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
+import {PlayerHeaderComponent} from 'pages/exploration-player-page/new-lesson-player/header-components/player-header.component';
+import {ProgressBarComponent} from './progress-bar/progress-bar.component';
 @NgModule({
   imports: [
     BackgroundBannerModule,
@@ -282,11 +284,13 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
+    ProgressBarComponent,
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     NewEndChapterCheckMarkComponent,
     EndChapterConfettiComponent,
     NewEndChapterConfettiComponent,
+    PlayerHeaderComponent,
     CreateNewSkillModalComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
@@ -439,6 +443,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     CorrectnessFooterComponent,
     NewCorrectnessFooterComponent,
     ConfirmLeaveModalComponent,
+    PlayerHeaderComponent,
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ConceptCardComponent,
@@ -449,6 +454,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     NewConversationSkinComponent,
     EndChapterCheckMarkComponent,
     NewEndChapterCheckMarkComponent,
+    ProgressBarComponent,
     EndChapterConfettiComponent,
     NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
@@ -628,6 +634,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     ConfirmQuestionExitModalComponent,
     ContinueButtonComponent,
     ContentLanguageSelectorComponent,
+    ProgressBarComponent,
     ConversationSkinComponent,
     ConversationDisplayComponent,
     CardNavigationControlComponent,
@@ -637,6 +644,7 @@ import {NewEndChapterCheckMarkComponent} from 'pages/exploration-player-page/new
     EndChapterConfettiComponent,
     NewEndChapterConfettiComponent,
     CreateNewSkillModalComponent,
+    PlayerHeaderComponent,
     CreateActivityModalComponent,
     CustomizeInteractionModalComponent,
     DeleteAnswerGroupModalComponent,
