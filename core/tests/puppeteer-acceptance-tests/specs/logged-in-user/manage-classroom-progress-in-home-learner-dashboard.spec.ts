@@ -76,7 +76,9 @@ describe('Logged-in User', function () {
 
     for (const chapter of placeValueChapters) {
       const id =
-        await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
+        await curriculumAdmin.createAndPublishExplorationWithThreeCards(
+          chapter
+        );
       chapterIds.push(id ?? '');
     }
 
