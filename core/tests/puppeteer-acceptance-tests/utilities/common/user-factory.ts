@@ -36,9 +36,9 @@ import {
   CurriculumAdminFactory,
 } from '../user/curriculum-admin';
 import {
-  QuestionSubmitter,
+  PracticeQuestionSubmitter,
   QuestionSubmitterFactory,
-} from '../user/question-submitter';
+} from '../user/practice-question-submitter';
 import {TopicManager, TopicManagerFactory} from '../user/topic-manager';
 import {LoggedInUserFactory, LoggedInUser} from '../user/logged-in-user';
 import {ModeratorFactory} from '../user/moderator';
@@ -199,7 +199,7 @@ export class UserFactory {
     LoggedOutUser &
       LoggedInUser &
       ExplorationEditor &
-      QuestionSubmitter &
+      PracticeQuestionSubmitter &
       TopicManager &
       CurriculumAdmin &
       TranslationSubmitter &

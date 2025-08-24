@@ -448,40 +448,6 @@ export class TranslationSubmitter extends BaseUser {
   }
 
   /**
-   * Switches to the tab in the contribution dashboard.
-   * @param tabName - The name of the tab to switch to.
-   */
-  async switchToTabInContributionDashboard(
-    tabName: 'Translate Text' | 'My Contributions'
-  ) {
-    await this.page.waitForSelector(contributionTabSelector);
-
-    // Get required tab element.
-    const tabElements = await this.page.$$(contributionTabSelector);
-    let tabElement: ElementHandle<Element> | null = null;
-    for (const tabEle of tabElements) {
-      const tabText = await tabEle.evaluate(el => el.textContent?.trim());
-      if (tabText === tabName) {
-        tabElement = tabEle;
-        break;
-      }
-    }
-
-    if (!tabElement) {
-      throw new Error(`Tab ${tabName} not found.`);
-    }
-
-    await this.page.waitForFunction(isElementClickable, {}, tabElement);
-
-    // Click on the tab.
-    await tabElement.click();
-
-    // Verify tab is active.
-    const activeContributionTabSelector = `${contributionTabSelector}${activeTabSelector}`;
-    await this.expectTextContentToBe(activeContributionTabSelector, tabName);
-  }
-
-  /**
    * Toggles the copy button.
    * @param mode - The mode to toggle the copy button to.
    */

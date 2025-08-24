@@ -95,7 +95,7 @@ const questionDifficultySelectionModalSelector =
 const saveDestinationButtonSelector = '.e2e-test-save-outcome-dest';
 const saveStuckDestinationButtonSelector = '.e2e-test-save-stuck-destination';
 
-export class QuestionSubmitter extends BaseUser {
+export class PracticeQuestionSubmitter extends BaseUser {
   /**
    * Function for navigating to the contributor dashboard admin page.
    */
@@ -590,5 +590,5 @@ export class QuestionSubmitter extends BaseUser {
   }
 }
 
-export let QuestionSubmitterFactory = (): QuestionSubmitter =>
-  new QuestionSubmitter();
+export let QuestionSubmitterFactory = (): PracticeQuestionSubmitter =>
+  new PracticeQuestionSubmitter();
