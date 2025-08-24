@@ -62,7 +62,6 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   misconceptionsBySkill: MisconceptionSkillMap;
   TabName: string;
   interactionIsShown: boolean;
-  _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
   _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
   tutorialInProgress: boolean;
   explorationId: string;
@@ -206,11 +205,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
           }
 
           if (value.number === 4) {
-            let idToScrollTo = true
-              ? this._ID_TUTORIAL_PREVIEW_TAB
-              : this._ID_TUTORIAL_STATE_INTERACTION;
-
-            const element = document.getElementById(idToScrollTo);
+            const element = document.getElementById(
+              this._ID_TUTORIAL_PREVIEW_TAB
+            );
             if (element) {
               this.smoothScrollTo(element.offsetTop - 200, 1000);
             }
@@ -225,11 +222,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
           }
 
           if (value.number === 6) {
-            let idToScrollTo = true
-              ? this._ID_TUTORIAL_PREVIEW_TAB
-              : this._ID_TUTORIAL_STATE_INTERACTION;
-
-            const element = document.getElementById(idToScrollTo);
+            const element = document.getElementById(
+              this._ID_TUTORIAL_PREVIEW_TAB
+            );
             if (element) {
               this.smoothScrollTo(element.offsetTop - 200, 1000);
             }
