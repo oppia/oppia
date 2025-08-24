@@ -1,6 +1,6 @@
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the    public windowDimensionsService: WindowDimensionsService,"License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -94,7 +94,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private explorationNextContentIdIndexService: ExplorationNextContentIdIndexService,
     private generateContentIdService: GenerateContentIdService,
     private stateTutorialFirstTimeService: StateTutorialFirstTimeService,
-    private siteAnalyticsService: SiteAnalyticsService,
+    public siteAnalyticsService: SiteAnalyticsService,
     private explorationStatesService: ExplorationStatesService,
     private userExplorationPermissionsService: UserExplorationPermissionsService,
     private stateEditorService: StateEditorService,
@@ -106,17 +106,17 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     private focusManagerService: FocusManagerService,
     private stateEditorRefreshService: StateEditorRefreshService,
     private loaderService: LoaderService,
-    private graphDataService: GraphDataService,
-    private joyride: JoyrideService,
+    public graphDataService: GraphDataService,
+    public joyride: JoyrideService,
     private versionHistoryService: VersionHistoryService,
     private versionHistoryBackendApiService: VersionHistoryBackendApiService,
     private pageContextService: PageContextService,
     private skillBackendApiService: SkillBackendApiService,
     private alertsService: AlertsService,
-    private windowDimensionsService: WindowDimensionsService
+    public windowDimensionsService: WindowDimensionsService
   ) {}
 
-  private smoothScrollTo(targetY: number, duration: number): void {
+  public smoothScrollTo(targetY: number, duration: number): void {
     const startY = window.scrollY;
     const difference = targetY - startY;
     const startTime = performance.now();

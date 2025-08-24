@@ -121,14 +121,14 @@ describe('Exploration editor tab component', () => {
 
     it('should use mobile tour steps when window is narrow', () => {
       spyOn(
-        component['windowDimensionsService'],
+        component.windowDimensionsService,
         'isWindowNarrow'
       ).and.returnValue(true);
-      spyOn(component['joyride'], 'startTour').and.callThrough();
+      spyOn(component.joyride, 'startTour').and.callThrough();
 
       component.startTutorial();
 
-      expect(component['joyride'].startTour).toHaveBeenCalledWith({
+      expect(component.joyride.startTour).toHaveBeenCalledWith({
         steps: component.mobileJoyRideSteps,
         stepDefaultPosition: 'top',
         themeColor: '#212f23',
@@ -137,14 +137,14 @@ describe('Exploration editor tab component', () => {
 
     it('should use desktop tour steps when window is wide', () => {
       spyOn(
-        component['windowDimensionsService'],
+        component.windowDimensionsService,
         'isWindowNarrow'
       ).and.returnValue(false);
-      spyOn(component['joyride'], 'startTour').and.callThrough();
+      spyOn(component.joyride, 'startTour').and.callThrough();
 
       component.startTutorial();
 
-      expect(component['joyride'].startTour).toHaveBeenCalledWith({
+      expect(component.joyride.startTour).toHaveBeenCalledWith({
         steps: component.joyRideSteps,
         stepDefaultPosition: 'top',
         themeColor: '#212f23',
@@ -1143,7 +1143,7 @@ describe('Exploration editor tab component', () => {
     expect(component.validationErrorIsShown).toBeTrue();
   }));
 
-  // Additional function coverage tests
+  // Additional function coverage tests.
   describe('Additional function coverage', () => {
     it('should return state content placeholder for first state', () => {
       explorationInitStateNameService.init('First State');
@@ -1239,10 +1239,10 @@ describe('Exploration editor tab component', () => {
       spyOn(component, 'initStateEditor');
       spyOn(component, 'removeTutorialSaveButtonIfNoPermissions');
 
-      // Reset and initialize
+      // Reset and initialize.
       component.ngOnInit();
 
-      // Trigger the state editor refresh event
+      // Trigger the state editor refresh event.
       mockRefreshStateEditorEventEmitter.emit();
 
       expect(component.initStateEditor).toHaveBeenCalled();
@@ -1256,7 +1256,7 @@ describe('Exploration editor tab component', () => {
         explorationStatesService,
         'registerOnStatesChangedCallback'
       ).and.callFake(callback => {
-        // Simulate states changed
+        // Simulate states changed.
         callback();
       });
       spyOn(stateEditorService, 'setStateNames');
@@ -1276,18 +1276,18 @@ describe('Exploration editor tab component', () => {
 
       expect(generateContentIdService.init).toHaveBeenCalled();
 
-      // Test the callback functions passed to init
+      // Test the callback functions passed to init.
       const initCall = generateContentIdService.init.calls.mostRecent();
       const incrementCallback = initCall.args[0];
       const restoreCallback = initCall.args[1];
 
-      // Test increment callback
+      // Test increment callback.
       explorationNextContentIdIndexService.displayed = 5;
       const result = incrementCallback();
       expect(result).toBe(5);
       expect(explorationNextContentIdIndexService.displayed).toBe(6);
 
-      // Test restore callback
+      // Test restore callback.
       spyOn(explorationNextContentIdIndexService, 'restoreFromMemento');
       restoreCallback();
       expect(
@@ -1306,10 +1306,10 @@ describe('Exploration editor tab component', () => {
         return 1;
       });
 
-      component['smoothScrollTo'](targetY, duration);
+      component.smoothScrollTo(targetY, duration);
 
-      // Fast forward through animation frames
-      tick(1100); // More than duration to complete animation
+      // Fast forward through animation frames.
+      tick(1100); // More than duration to complete animation.
 
       expect(window.scrollTo).toHaveBeenCalled();
     }));
@@ -1317,46 +1317,54 @@ describe('Exploration editor tab component', () => {
 
   describe('recomputeGraph function', () => {
     it('should call recompute on graph data service', () => {
-      // Since GraphDataService is private, we'll test the method indirectly
-      spyOn(component['graphDataService'], 'recompute');
+      // Since GraphDataService is private, we'll test the method indirectly.
+      spyOn(component.graphDataService, 'recompute');
 
       component.recomputeGraph();
 
-      expect(component['graphDataService'].recompute).toHaveBeenCalled();
+      expect(component.graphDataService.recompute).toHaveBeenCalled();
     });
   });
 
   describe('startTutorial function', () => {
     it('should set tutorialInProgress to true and start tour', () => {
       spyOn(
-        component['windowDimensionsService'],
+        component.windowDimensionsService,
         'isWindowNarrow'
       ).and.returnValue(false);
-      spyOn(component['joyride'], 'startTour').and.returnValue({
-        subscribe: (onNext, onError, onComplete) => {
-          // Mock successful tour start
+      spyOn(component.joyride, 'startTour').and.returnValue({
+        subscribe: (
+          onNext?: (value: {number: number}) => void,
+          onError?: () => void,
+          onComplete?: () => void
+        ) => {
+          // Mock successful tour start.
         },
-      } as any);
+      } as unknown as jasmine.Spy);
 
       component.tutorialInProgress = false;
       component.startTutorial();
 
       expect(component.tutorialInProgress).toBe(true);
-      expect(component['joyride'].startTour).toHaveBeenCalled();
+      expect(component.joyride.startTour).toHaveBeenCalled();
     });
 
     it('should use mobile tour steps when window is narrow', () => {
       spyOn(
-        component['windowDimensionsService'],
+        component.windowDimensionsService,
         'isWindowNarrow'
       ).and.returnValue(true);
-      spyOn(component['joyride'], 'startTour').and.returnValue({
-        subscribe: (onNext, onError, onComplete) => {},
-      } as any);
+      spyOn(component.joyride, 'startTour').and.returnValue({
+        subscribe: (
+          onNext?: (value: {number: number}) => void,
+          onError?: () => void,
+          onComplete?: () => void
+        ) => {},
+      } as unknown as jasmine.Spy);
 
       component.startTutorial();
 
-      expect(component['joyride'].startTour).toHaveBeenCalledWith({
+      expect(component.joyride.startTour).toHaveBeenCalledWith({
         steps: component.mobileJoyRideSteps,
         stepDefaultPosition: 'top',
         themeColor: '#212f23',
@@ -1365,39 +1373,52 @@ describe('Exploration editor tab component', () => {
 
     it('should register finish tutorial event on completion', () => {
       spyOn(
-        component['windowDimensionsService'],
+        component.windowDimensionsService,
         'isWindowNarrow'
       ).and.returnValue(false);
-      spyOn(component['siteAnalyticsService'], 'registerFinishTutorialEvent');
+      spyOn(component.siteAnalyticsService, 'registerFinishTutorialEvent');
       spyOn(component, 'leaveTutorial');
 
-      // Set exploration ID for the test
+      // Set exploration ID for the test.
       component.explorationId = 'test-exploration-id';
 
-      // Mock JoyrideService to simulate tour completion
-      spyOn(component['joyride'], 'startTour').and.returnValue({
-        subscribe: (onNext, onError, onComplete) => {
-          onComplete(); // Simulate completion
+      // Mock JoyrideService to simulate tour completion.
+      spyOn(component.joyride, 'startTour').and.returnValue({
+        subscribe: (
+          onNext?: (value: {number: number}) => void,
+          onError?: () => void,
+          onComplete?: () => void
+        ) => {
+          onComplete?.(); // Simulate completion.
         },
-      } as any);
+      } as unknown as jasmine.Spy);
 
       component.startTutorial();
 
       expect(
-        component['siteAnalyticsService'].registerFinishTutorialEvent
+        component.siteAnalyticsService.registerFinishTutorialEvent
       ).toHaveBeenCalledWith('test-exploration-id');
       expect(component.leaveTutorial).toHaveBeenCalled();
     });
   });
 
   describe('Mobile navigation tour handling', () => {
-    let originalQuerySelector: any;
-    let mockDocument: any;
+    let originalQuerySelector: typeof document.querySelector;
+    let mockDocument: {
+      holderElement: {style: {zIndex: string}};
+      counterElement: {tabIndex: number; style: Record<string, unknown>};
+      titleElement: {focus: jasmine.Spy; style: Record<string, unknown>};
+      mobileOptionsElement: {
+        classList: {contains: jasmine.Spy};
+        click: jasmine.Spy;
+        style: Record<string, unknown>;
+      } | null;
+    };
 
     beforeEach(() => {
       originalQuerySelector = document.querySelector;
 
-      // Mock document elements required by joyride
+      // Mock document elements required by joyride.
       mockDocument = {
         holderElement: {
           style: {zIndex: '1000'},
@@ -1410,10 +1431,10 @@ describe('Exploration editor tab component', () => {
           focus: jasmine.createSpy('focus'),
           style: {},
         },
-        mobileOptionsElement: null, // Will be set per test
+        mobileOptionsElement: null, // Will be set per test.
       };
 
-      // Mock querySelector to return appropriate elements
+      // Mock querySelector to return appropriate elements.
       document.querySelector = jasmine
         .createSpy('querySelector')
         .and.callFake((selector: string) => {
@@ -1436,11 +1457,11 @@ describe('Exploration editor tab component', () => {
 
     it('should handle mobile navigation on step 5 of mobile tour', () => {
       spyOn(
-        component['windowDimensionsService'],
+        component.windowDimensionsService,
         'isWindowNarrow'
       ).and.returnValue(true);
 
-      // Mock mobile options icon that needs to be clicked
+      // Mock mobile options icon that needs to be clicked.
       mockDocument.mobileOptionsElement = {
         classList: {
           contains: jasmine.createSpy('contains').and.returnValue(false),
@@ -1449,12 +1470,16 @@ describe('Exploration editor tab component', () => {
         style: {},
       };
 
-      // Mock JoyrideService to simulate step 5 in mobile tour
-      spyOn(component['joyride'], 'startTour').and.returnValue({
-        subscribe: (onNext, onError, onComplete) => {
-          onNext({number: 5}); // Simulate step 5
+      // Mock JoyrideService to simulate step 5 in mobile tour.
+      spyOn(component.joyride, 'startTour').and.returnValue({
+        subscribe: (
+          onNext: (value: {number: number}) => void,
+          onError?: () => void,
+          onComplete?: () => void
+        ) => {
+          onNext({number: 5}); // Simulate step 5.
         },
-      } as any);
+      } as unknown as jasmine.Spy);
 
       component.startTutorial();
 
@@ -1466,58 +1491,66 @@ describe('Exploration editor tab component', () => {
 
     it('should not click mobile navigation if already open on step 5', () => {
       spyOn(
-        component['windowDimensionsService'],
+        component.windowDimensionsService,
         'isWindowNarrow'
       ).and.returnValue(true);
 
-      // Mock mobile options icon that's already open
+      // Mock mobile options icon that's already open.
       mockDocument.mobileOptionsElement = {
         classList: {
-          contains: jasmine.createSpy('contains').and.returnValue(true), // Already open
+          contains: jasmine.createSpy('contains').and.returnValue(true), // Already open.
         },
         click: jasmine.createSpy('click'),
         style: {},
       };
 
-      // Mock JoyrideService to simulate step 5 in mobile tour
-      spyOn(component['joyride'], 'startTour').and.returnValue({
-        subscribe: (onNext, onError, onComplete) => {
-          onNext({number: 5}); // Simulate step 5
+      // Mock JoyrideService to simulate step 5 in mobile tour.
+      spyOn(component.joyride, 'startTour').and.returnValue({
+        subscribe: (
+          onNext: (value: {number: number}) => void,
+          onError?: () => void,
+          onComplete?: () => void
+        ) => {
+          onNext({number: 5}); // Simulate step 5.
         },
-      } as any);
+      } as unknown as jasmine.Spy);
 
       component.startTutorial();
 
       expect(
         mockDocument.mobileOptionsElement.classList.contains
       ).toHaveBeenCalledWith('mobile-navbar-toggled');
-      expect(mockDocument.mobileOptionsElement.click).not.toHaveBeenCalled(); // Should not click if already open
+      expect(mockDocument.mobileOptionsElement.click).not.toHaveBeenCalled(); // Should not click if already open.
     });
 
     it('should handle case where mobile options icon is not found on step 5', () => {
       spyOn(
-        component['windowDimensionsService'],
+        component.windowDimensionsService,
         'isWindowNarrow'
       ).and.returnValue(true);
 
-      // Mock mobile options element as null (not found)
+      // Mock mobile options element as null (not found).
       mockDocument.mobileOptionsElement = null;
 
-      // Mock JoyrideService to simulate step 5 in mobile tour
-      spyOn(component['joyride'], 'startTour').and.returnValue({
-        subscribe: (onNext, onError, onComplete) => {
-          onNext({number: 5}); // Simulate step 5
+      // Mock JoyrideService to simulate step 5 in mobile tour.
+      spyOn(component.joyride, 'startTour').and.returnValue({
+        subscribe: (
+          onNext: (value: {number: number}) => void,
+          onError?: () => void,
+          onComplete?: () => void
+        ) => {
+          onNext({number: 5}); // Simulate step 5.
         },
-      } as any);
+      } as unknown as jasmine.Spy);
 
-      // This should not throw an error even if element is not found
-      expect(() => component.startTutorial()).not.toThrow();
+      // This should not throw an error even if element is not found.
+      expect(() => component.startTutorial()).not.toThrowError();
     });
   });
 
   describe('WindowDimensionsService integration', () => {
     it('should inject WindowDimensionsService', () => {
-      expect(component['windowDimensionsService']).toBeDefined();
+      expect(component.windowDimensionsService).toBeDefined();
     });
   });
 });
