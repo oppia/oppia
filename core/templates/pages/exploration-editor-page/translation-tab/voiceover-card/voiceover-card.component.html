@@ -17,16 +17,16 @@
     <div class="manual-voiceovers">
       <h4 class="voiceover-type-heading">Manual Voiceover</h4>
       <div class="voiceovers-component" *ngIf="manualVoiceover">
-        <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(manualVoiceover.filename, 'manual')">
-          <mat-icon *ngIf="!isManualVoiceoverPlaying && !manualVoiceoverIsLoading" matTooltip="Play">play_arrow</mat-icon>
-          <mat-icon *ngIf="isManualVoiceoverPlaying && !manualVoiceoverIsLoading" matTooltip="Pause">pause_arrow</mat-icon>
+        <button class="btn btn-secondary audio-button e2e-test-play-voiceover-button" (click)="playAndPauseVoiceover(manualVoiceover.filename, 'manual')">
+          <mat-icon *ngIf="!isManualVoiceoverPlaying && !manualVoiceoverIsLoading" matTooltip="Play" class="e2e-test-play">play_arrow</mat-icon>
+          <mat-icon *ngIf="isManualVoiceoverPlaying && !manualVoiceoverIsLoading" matTooltip="Pause" class="e2e-test-pause">pause_arrow</mat-icon>
           <mat-spinner class="mx-auto" [diameter]="30" *ngIf="manualVoiceoverIsLoading"></mat-spinner>
 
         </button>
 
         <mat-progress-bar mode="determinate"
                           [value]="manualVoiceoverProgress"
-                          class="voiceover-progress">
+                          class="voiceover-progress e2e-test-voiceover-progress-bar">
         </mat-progress-bar>
 
         <span class="voiceover-timer">
@@ -37,6 +37,7 @@
           <button (click)="toggleAudioNeedsUpdate()"
                   mat-icon-button
                   mat-button
+                  class="e2e-test-audio-status-update-button"
                   [ngClass]="manualVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
             <mat-icon matTooltip="Audio needs update"
                       *ngIf="manualVoiceover.needsUpdate"
@@ -52,7 +53,7 @@
           <button (click)="deleteManualVoiceover()"
                   mat-icon-button
                   mat-button
-                  class="delete-manual-voiceover-icon">
+                  class="delete-manual-voiceover-icon e2e-test-delete-voiceover-button">
             <mat-icon matTooltip="Delete voiceover">delete</mat-icon>
           </button>
         </div>
