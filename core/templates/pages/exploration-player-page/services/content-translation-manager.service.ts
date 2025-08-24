@@ -97,7 +97,6 @@ export class ContentTranslationManagerService {
    * @param {string} languageCode The language code to display translations for.
    */
   displayTranslations(languageCode: string): void {
-    console.log('3', languageCode, this.explorationLanguageCode);
     if (languageCode === this.explorationLanguageCode) {
       this.playerTranscriptService.restoreImmutably(
         cloneDeep(this.originalTranscript)
