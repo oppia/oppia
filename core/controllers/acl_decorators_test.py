@@ -3842,12 +3842,13 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_user_without_review_rights_cannot_accept_translation_suggestion(
-        self) -> None:
+        self
+    ) -> None:
         self.login(self.VIEWER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_accept_suggestion/%s/%s' % (
-                    self.EXPLORATION_ID, self.suggestion_id_2))
+                self.EXPLORATION_ID, self.suggestion_id_2))
         self.logout()
 
     def test_user_with_review_rights_can_accept_question_suggestion(
@@ -3866,7 +3867,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_user_without_review_rights_cannot_accept_question_suggestion(
-            self
+        self
     ) -> None:
         self.login(self.VIEWER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -5197,8 +5198,8 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
         self.login(self.user_email)
 
     def test_guest_cannot_access_story_viewer_page_as_logged_in_user(
-            self
-        ) -> None:
+        self
+    ) -> None:
         self.logout()
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5439,7 +5440,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
     def test_story_with_no_topic_id_raises_exception(self) -> None:
         self.save_new_story(
             # Story id can't be None, only a string.
-             story_services.get_new_story_id(), self.admin_id, '',
+            story_services.get_new_story_id(), self.admin_id, '',
             url_fragment='story-no-topic-id')
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -5455,11 +5456,12 @@ class StoryViewerTests(test_utils.GenericTestBase):
                 expected_status_int=404)
 
     def test_story_not_referenced_in_topic_raises_exception(
-            self) -> None:
+        self
+    ) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
         # This story is not added or referenced in the topic.
         self.save_new_story(
-             story_services.get_new_story_id(), self.admin_id, self.topic_id,
+            story_services.get_new_story_id(), self.admin_id, self.topic_id,
             url_fragment='unreferenced-story-frag')
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(

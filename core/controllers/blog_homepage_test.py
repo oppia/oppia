@@ -148,7 +148,7 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         blog_services.unpublish_blog_post(self.blog_post.id)
         self.login(self.user_email)
         json_response = self.get_json(
-                '%s?offset=0' % feconf.BLOG_HOMEPAGE_DATA_URL)
+            '%s?offset=0' % feconf.BLOG_HOMEPAGE_DATA_URL)
 
         self.assertEqual(len(json_response['blog_post_summary_dicts']), 0)
         self.assertEqual(json_response['no_of_blog_post_summaries'], 0)
@@ -337,7 +337,7 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
             json_response['summary_dicts'][1]['id'], blog_post_two_id)
 
         blog_post_five_id = (
-                blog_services.create_new_blog_post(blog_editor_id).id)
+            blog_services.create_new_blog_post(blog_editor_id).id)
         change_dict_five: blog_services.BlogPostChangeDict = {
             'title': 'Unique Title Five',
             'thumbnail_filename': 'unique_thumb.svg',
