@@ -71,7 +71,7 @@
           </oppia-upload-blog-post-thumbnail>
         </div>
       </div>
-      <div class="title-heading col-sm-2 me-2" [ngClass]="windowIsNarrow ? 'text-left mb-2' : 'text-center mb-4'">
+      <div class="title-heading col-sm-2 me-2" [ngClass]="windowIsNarrow ? 'text-start mb-2' : 'text-center mb-4'">
         <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_TITLE_HEADING' | translate | uppercase }}</span>
       </div>
       <div class="d-block flex-grow-1">
@@ -113,7 +113,7 @@
       </div>
     </div>
     <div class="blog-post-content d-flex mt-2" [ngClass]="{'flex-column': windowIsNarrow}">
-      <div class="title-heading me-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left w-100' : 'text-center col-sm-2'">
+      <div class="title-heading me-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-start w-100' : 'text-center col-sm-2'">
         <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_BODY_HEADING' | translate | uppercase }}</span>
         <button class="fas fa-pen oppia-editor-edit-icon position-relative"
                 *ngIf="!contentEditorIsActive && windowIsNarrow"
