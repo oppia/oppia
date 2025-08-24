@@ -220,7 +220,7 @@ export class I18nService {
     });
   }
 
-  handleLanguageUpdate(languageCode: string) {
+  handleLanguageUpdate(languageCode: string): void {
     this.updateUserPreferredLanguage(languageCode);
     this.languageBannerService.markLanguageBannerAsDismissed();
   }

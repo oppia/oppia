@@ -36,14 +36,17 @@ import {SearchService} from 'services/search.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {UserService} from 'services/user.service';
 import {AlertsService} from 'services/alerts.service';
-import {MockI18nService, MockTranslatePipe} from 'tests/unit-test-utils';
+import {
+  MockI18nService,
+  MockTranslatePipe,
+} from '../../../tests/unit-test-utils';
 import {TopNavigationBarComponent} from './top-navigation-bar.component';
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {UserInfo} from 'domain/user/user-info.model';
 import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import {FeedbackThreadSummary} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {I18nService} from 'i18n/i18n.service';
+import {I18nService} from '../../../i18n/i18n.service';
 import {CookieService, CookieModule} from 'ngx-cookie';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
@@ -51,6 +54,7 @@ import {AppConstants} from 'app.constants';
 import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
+import {ContentTranslationManagerService} from '../../../pages/exploration-player-page/services/content-translation-manager.service';
 
 class MockPlatformFeatureService {
   status = {
@@ -105,6 +109,7 @@ describe('TopNavigationBarComponent', () => {
   let deviceInfoService: DeviceInfoService;
   let sidebarStatusService: SidebarStatusService;
   let feedbackUpdatesBackendApiService: FeedbackUpdatesBackendApiService;
+  let contentTranslationManagerService: ContentTranslationManagerService;
   let learnerGroupBackendApiService: LearnerGroupBackendApiService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let i18nService: I18nService;
@@ -198,6 +203,9 @@ describe('TopNavigationBarComponent', () => {
     sidebarStatusService = TestBed.inject(SidebarStatusService);
     i18nService = TestBed.inject(I18nService);
     urlService = TestBed.inject(UrlService);
+    contentTranslationManagerService = TestBed.inject(
+      ContentTranslationManagerService
+    );
     feedbackUpdatesBackendApiService = TestBed.inject(
       FeedbackUpdatesBackendApiService
     );
@@ -575,18 +583,27 @@ describe('TopNavigationBarComponent', () => {
     });
   }));
 
-  it(
-    'should change the language when user clicks on new language' +
-      ' from dropdown',
-    () => {
-      let langCode = 'hi';
-      spyOn(i18nService, 'updateUserPreferredLanguage');
-      component.changeLanguage(langCode);
-      expect(i18nService.updateUserPreferredLanguage).toHaveBeenCalledWith(
-        langCode
-      );
-    }
-  );
+  it('should emit language change event when URL contains lesson', () => {
+    const langCode = 'hi';
+    spyOn(urlService, 'getPathname').and.returnValue('/lesson/1');
+    spyOn(contentTranslationManagerService.onLanguageChange, 'emit');
+
+    component.changeLanguage(langCode);
+
+    expect(
+      contentTranslationManagerService.onLanguageChange.emit
+    ).toHaveBeenCalledWith(langCode);
+  });
+
+  it('should call handleLanguageUpdate when URL does not contain lesson', () => {
+    const langCode = 'hi';
+    spyOn(urlService, 'getPathname').and.returnValue('/explore/1');
+    spyOn(i18nService, 'handleLanguageUpdate');
+
+    component.changeLanguage(langCode);
+
+    expect(i18nService.handleLanguageUpdate).toHaveBeenCalledWith(langCode);
+  });
 
   it('should check if learner groups feature is enabled', fakeAsync(() => {
     spyOn(component, 'truncateNavbar').and.stub();

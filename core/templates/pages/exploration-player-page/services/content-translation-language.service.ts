@@ -62,11 +62,34 @@ export class ContentTranslationLanguageService {
     this.languageOptions = [];
     allContentLanguageCodesInExploration.push(explorationLanguageCode);
 
-    if (!this.isNewLessonPlayerEnabled()) {
+    if (this.isNewLessonPlayerEnabled()) {
+      // Set the content language that is chosen initially.
+      // Use the following priority (highest to lowest):
+      // 1. Preferred site language.
+      // 2. Otherwise, the exploration language code.
+
+      const preferredSiteLanguage =
+        this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
+      if (
+        !this.currentContentLanguageCode &&
+        preferredSiteLanguage !== null &&
+        allContentLanguageCodesInExploration.includes(preferredSiteLanguage)
+      ) {
+        this.currentContentLanguageCode = preferredSiteLanguage;
+      }
+
+      if (
+        !this.currentContentLanguageCode &&
+        explorationLanguageCode !== null
+      ) {
+        this.currentContentLanguageCode = explorationLanguageCode;
+      }
+    } else {
       // Set the content language that is chosen initially.
       // Use the following priority (highest to lowest):
       // 1. The URL parameter "initialContentLanguageCode".
-      // 2. Otherwise, the exploration language code.
+      // 2. Preferred content languages.
+      // 3. Otherwise, the exploration language code.
 
       const urlParams = this.urlService.getUrlParams();
       if (
@@ -90,28 +113,6 @@ export class ContentTranslationLanguageService {
             break;
           }
         }
-      }
-
-      if (
-        !this.currentContentLanguageCode &&
-        explorationLanguageCode !== null
-      ) {
-        this.currentContentLanguageCode = explorationLanguageCode;
-      }
-    } else {
-      // Set the content language that is chosen initially.
-      // Use the following priority (highest to lowest):
-      // 1. Preferred site language.
-      // 2. Otherwise, the exploration language code.
-
-      const preferredSiteLanguage =
-        this.i18nLanguageCodeService.getCurrentI18nLanguageCode();
-      if (
-        !this.currentContentLanguageCode &&
-        preferredSiteLanguage !== null &&
-        allContentLanguageCodesInExploration.includes(preferredSiteLanguage)
-      ) {
-        this.currentContentLanguageCode = preferredSiteLanguage;
       }
 
       if (

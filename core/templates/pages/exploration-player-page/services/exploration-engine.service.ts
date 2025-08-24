@@ -545,7 +545,8 @@ export class ExplorationEngineService {
       this.exploration.getLanguageCode()
     );
 
-    if (this.isNewLessonPlayerEnabled()) {
+    let pathnameArray = this.urlService.getPathname().split('/');
+    if (this.isNewLessonPlayerEnabled() && pathnameArray.includes('lesson')) {
       this.contentTranslationManagerService.displayTranslations(
         this.contentTranslationLanguageService.getCurrentContentLanguageCode()
       );

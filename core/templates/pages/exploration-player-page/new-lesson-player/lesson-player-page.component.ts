@@ -172,7 +172,7 @@ export class NewLessonPlayerPageComponent implements OnDestroy {
     this.directiveSubscriptions.unsubscribe();
   }
 
-  private shouldPromptForRefresh(): boolean {
+  shouldPromptForRefresh(): boolean {
     const firstCard = this.playerTranscriptService.getCard(0);
     return firstCard.getInputResponsePairs().length > 0;
   }
