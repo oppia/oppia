@@ -3319,9 +3319,8 @@ export class LoggedInUser extends BaseUser {
       )
     );
 
-    expect([...allElementsText].sort()).toStrictEqual(
-      [...expectedTexts].sort()
-    );
+    expect(allElementsText).toEqual(expectedTexts);
+
     excludedTexts.forEach(t => expect(allElementsText).not.toContain(t));
   }
 
