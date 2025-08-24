@@ -1,6 +1,7 @@
-<background-banner></background-banner>
-<div class="diagnostic-test-container position-relative">
-  <div class="oppia-diagnostic-test-page-header">
+<background-banner *ngIf="!(diagnosticTestIsStarted && !diagnosticTestIsFinished && !isNewLessonPlayerEnabled())"></background-banner>
+<div class="diagnostic-test-container position-relative" [ngClass]="{'new-diagnostic-test-container': isNewLessonPlayerEnabled()}">
+  <oppia-player-header *ngIf="diagnosticTestIsStarted && !diagnosticTestIsFinished && isNewLessonPlayerEnabled()"></oppia-player-header>
+  <div class="oppia-diagnostic-test-page-header" *ngIf="!(diagnosticTestIsStarted && !diagnosticTestIsFinished && isNewLessonPlayerEnabled())">
     <button class="btn oppia-back-to-classroom-button">
       <a class="oppia-anchor-tag-under-button" [href]="'/learn/' + classroomUrlFragment">
         <span>
@@ -36,13 +37,19 @@
     </button>
   </mat-card>
   <div *ngIf="diagnosticTestIsStarted && !diagnosticTestIsFinished">
-    <div class="oppia-question-player-card">
+    <div class="oppia-question-player-card" *ngIf="!(diagnosticTestIsStarted && !diagnosticTestIsFinished && isNewLessonPlayerEnabled())">
       <div class="oppia-question-player-progress">
         <div class="oppia-current-progress" [ngStyle]="{'width': progressPercentage + '%'}"></div>
       </div>
       <div class="oppia-progress-percentage-container e2e-test-progress-container">
         <span><i>{{ getProgressText() }}</i></span>
       </div>
+    </div>
+    <div class="oppia-new-question-player-card">
+      <div class="oppia-progress-percentage-container">
+        <p>{{ getProgressText() }}</p>
+      </div>
+      <oppia-progress-bar [progressPercentage]="progressPercentage"></oppia-progress-bar>
     </div>
     <oppia-conversation-skin [diagnosticTestTopicTrackerModel]="diagnosticTestTopicTrackerModel" *ngIf="!isNewLessonPlayerEnabled()">
     </oppia-conversation-skin>
@@ -270,6 +277,44 @@
     width: 200%;
   }
 
+  .oppia-new-question-player-card {
+    align-items: center;
+    background-color: #fff8e5;
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .oppia-new-question-player-card p {
+    color: #c55f45;
+    font-family: "Capriola", sans-serif;
+    font-size: 18px;
+    font-weight: 400;
+    margin-right: 24px;
+  }
+
+  .new-diagnostic-test-container {
+    background-color: #eeebea;
+    height: 94vh;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .new-diagnostic-test-container::before {
+    background-image: url(/assets/images/background/conversation_skin.svg);
+    background-position: center;
+    content: '';
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -1;
+  }
+
+
+
   @media(max-width: 500px) {
     .oppia-introductory-card {
       margin-left: auto;
@@ -349,6 +394,19 @@
       padding: 10px;
       text-transform: uppercase;
       width: fit-content;
+    }
+  }
+
+  @media(max-width: 768px) {
+    .oppia-new-question-player-card p {
+      font-size: 15px;
+    }
+  }
+
+  @media(max-width: 480px) {
+    .oppia-new-question-player-card p {
+      font-size: 13px;
+      margin-right: 12px;
     }
   }
 </style>
