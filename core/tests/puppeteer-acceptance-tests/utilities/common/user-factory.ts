@@ -51,6 +51,10 @@ import {
 } from '../user/translation-submitter';
 import {TranslationReviewerFactory} from '../user/translation-reviewer';
 import {Contributor, ContributorFactory} from '../user/contributor';
+import {
+  PracticeQuestionReviewer,
+  PracticeQuestionReviewerFactory,
+} from '../user/practice-question-reviewer';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -92,6 +96,16 @@ type MultipleRoleIntersection<T extends (keyof typeof USER_ROLE_MAPPING)[]> =
 
 type OptionalRoles<TRoles extends (keyof typeof USER_ROLE_MAPPING)[]> =
   TRoles extends never[] ? [] : TRoles | [];
+
+type BasicRolesUser = LoggedOutUser &
+  LoggedInUser &
+  ExplorationEditor &
+  PracticeQuestionSubmitter &
+  TopicManager &
+  CurriculumAdmin &
+  TranslationSubmitter &
+  Contributor &
+  PracticeQuestionReviewer;
 
 /**
  * Global user instances that are created and can be reused again.
@@ -195,17 +209,7 @@ export class UserFactory {
     email: string,
     roles: OptionalRoles<TRoles> = [] as OptionalRoles<TRoles>,
     topic: string = ''
-  ): Promise<
-    LoggedOutUser &
-      LoggedInUser &
-      ExplorationEditor &
-      PracticeQuestionSubmitter &
-      TopicManager &
-      CurriculumAdmin &
-      TranslationSubmitter &
-      Contributor &
-      MultipleRoleIntersection<TRoles>
-  > {
+  ): Promise<BasicRolesUser & MultipleRoleIntersection<TRoles>> {
     let user = UserFactory.composeUserWithRoles(BaseUserFactory(), [
       LoggedOutUserFactory(),
       LoggedInUserFactory(),
@@ -215,6 +219,7 @@ export class UserFactory {
       TopicManagerFactory(),
       CurriculumAdminFactory(),
       ContributorFactory(),
+      PracticeQuestionReviewerFactory(),
     ]);
 
     user.username = username;
@@ -224,7 +229,11 @@ export class UserFactory {
     await user.signUpNewUser(username, email);
     activeUsers.push(user);
 
-    return await UserFactory.assignRolesToUser(user, roles, topic);
+    return (await UserFactory.assignRolesToUser(
+      user,
+      roles,
+      topic
+    )) as BasicRolesUser & MultipleRoleIntersection<TRoles>;
   };
 
   /**

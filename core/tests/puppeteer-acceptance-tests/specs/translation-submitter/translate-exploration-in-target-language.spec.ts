@@ -298,7 +298,7 @@ describe('Translation Submitter', function () {
     );
 
     await translationSubmitter.clickOn('Save and close');
-    await translationSubmitter.expectToolTipMessage(
+    await translationSubmitter.expectToastMessage(
       'Submitted translation for review.'
     );
     // TODO(#23140): Remove click on discard changes button step below once the

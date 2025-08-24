@@ -481,7 +481,7 @@ export class TopicManager extends BaseUser {
     if (topicName) {
       await this.clearAllTextFrom(topicNameField);
       await this.type(topicNameField, topicName);
-      await this.expectInputValueToBe(topicNameField, topicName);
+      await this.expectElementValueToBe(topicNameField, topicName);
     }
     if (urlFragment) {
       await this.page.waitForSelector(topicEditorUrlFragmentField, {
@@ -489,13 +489,16 @@ export class TopicManager extends BaseUser {
       });
       await this.clearAllTextFrom(topicEditorUrlFragmentField);
       await this.page.type(topicEditorUrlFragmentField, urlFragment);
-      await this.expectInputValueToBe(topicEditorUrlFragmentField, urlFragment);
+      await this.expectElementValueToBe(
+        topicEditorUrlFragmentField,
+        urlFragment
+      );
     }
     await this.clearAllTextFrom(updateTopicWebFragmentField);
     await this.type(updateTopicWebFragmentField, titleFragments);
     await this.clearAllTextFrom(updateTopicDescriptionField);
     await this.type(updateTopicDescriptionField, description);
-    await this.expectInputValueToBe(updateTopicDescriptionField, description);
+    await this.expectElementValueToBe(updateTopicDescriptionField, description);
 
     await this.clickOn(photoBoxButton);
     await this.page.waitForSelector(photoUploadModal, {visible: true});
@@ -509,7 +512,7 @@ export class TopicManager extends BaseUser {
     await this.clearAllTextFrom(topicMetaTagInput);
     await this.page.type(topicMetaTagInput, metaTags);
     await this.page.keyboard.press('Tab');
-    await this.expectInputValueToBe(topicMetaTagInput, metaTags);
+    await this.expectElementValueToBe(topicMetaTagInput, metaTags);
   }
 
   /**
@@ -1346,7 +1349,7 @@ export class TopicManager extends BaseUser {
     await this.type(questionTextInput, questionText);
     await this.page.keyboard.press('Enter');
 
-    await this.expectInputValueToBe(questionTextInput, questionText);
+    await this.expectElementValueToBe(questionTextInput, questionText);
   }
 
   /**

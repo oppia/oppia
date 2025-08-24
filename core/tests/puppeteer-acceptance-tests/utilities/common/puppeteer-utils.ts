@@ -68,6 +68,7 @@ export type ModalUserInteractions = (
 const actionStatusMessageSelector = '.e2e-test-status-message';
 const commonModalTitleSelector = '.e2e-test-modal-header';
 const commonModalBodySelector = '.e2e-test-modal-body';
+const toastMessageSelector = '.e2e-test-toast-message';
 
 export class BaseUser {
   page!: Page;
@@ -471,32 +472,24 @@ export class BaseUser {
   async clickOn(
     selector: string,
     forceSelector: boolean = false,
-    timeoutForTextButton: number = 100
+    parentElement?: puppeteer.ElementHandle
   ): Promise<void> {
+    const context = parentElement ?? this.page;
     /** Normalize-space is used to remove the extra spaces in the text.
      * Check the documentation for the normalize-space function here :
      * https://developer.mozilla.org/en-US/docs/Web/XPath/Functions/normalize-space */
-    const xpath = `//*[contains(text(), normalize-space('${selector}'))]`;
-    let button: ElementHandle | null = null;
-    try {
-      button = await this.page.waitForXPath(xpath, {
-        visible: true,
-        timeout: timeoutForTextButton,
-      });
-    } catch (error) {
-      if (!(error instanceof puppeteer.errors.TimeoutError)) {
-        throw error;
-      }
-      showMessage(`Using CSS selector to find button: ${selector}`);
-    }
-    if (button !== null && !forceSelector) {
+    const [button] = await context.$x(
+      `\/\/*[contains(text(), normalize-space('${selector}'))]`
+    );
+    // If we fail to find the element by its XPATH, then the button is undefined and
+    // we try to find it by its CSS selector.
+    if (button !== undefined && !forceSelector) {
       await this.waitForElementToBeClickable(button);
+      showMessage(`Button (text: ${selector}) is clickable, as expected.`);
       await button.click();
       showMessage(`Button (text: ${selector}) is clicked.`);
     } else {
-      const element = await this.page.waitForSelector(selector, {
-        visible: true,
-      });
+      const element = await context.waitForSelector(selector, {visible: true});
       if (!element) {
         throw new Error(`Element not found for selector ${selector}`);
       }
@@ -1354,8 +1347,8 @@ export class BaseUser {
     // Wait until the element value matches the expected value.
     try {
       await this.page.waitForFunction(
-        (element: HTMLElement, value: string) => {
-          return (element as HTMLInputElement)?.value?.trim() === value.trim();
+        (element: HTMLInputElement | HTMLTextAreaElement, value: string) => {
+          return element.value.trim() === value;
         },
         {},
         selector,
@@ -1450,24 +1443,6 @@ export class BaseUser {
       },
       {},
       url
-    );
-  }
-
-  /**
-   * Function to verify the value of the input field.
-   * @param {string} selector - The selector of the input field.
-   * @param {string} value - The expected value of the input field.
-   */
-  async expectInputValueToBe(selector: string, value: string): Promise<void> {
-    await this.page.waitForFunction(
-      (selector: string, value: string) => {
-        const element: HTMLInputElement | null =
-          document.querySelector(selector);
-        return element?.value === value;
-      },
-      {},
-      selector,
-      value
     );
   }
 
@@ -1703,6 +1678,29 @@ export class BaseUser {
     const elements = await this.page.$$(selector);
 
     return elements;
+  }
+
+  /**
+   * Expects the text content of the toast message to match the given expected message.
+   * @param {string} expectedMessage - The expected message to match the toast message against.
+   */
+  async expectToastMessage(expectedMessage: string): Promise<void> {
+    await this.page.waitForSelector(toastMessageSelector, {visible: true});
+    const toastMessageElement = await this.page.$(toastMessageSelector);
+    const toastMessage = await this.page.evaluate(
+      el => el.textContent.trim(),
+      toastMessageElement
+    );
+
+    if (toastMessage !== expectedMessage) {
+      throw new Error(
+        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
+      );
+    }
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.click(toastMessageSelector);
+    }
+    await this.expectElementToBeVisible(toastMessageSelector, false);
   }
 }
 

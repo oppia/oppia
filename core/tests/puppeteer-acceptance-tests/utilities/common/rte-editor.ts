@@ -19,11 +19,11 @@
 import puppeteer from 'puppeteer';
 
 const rteTextAreaSelector = '.e2e-test-rte';
-const ckeBtnOnClass = 'cke_button_on';
 const paragraphFormatOptionSelector = `a[title*="Format"]`;
 const bodyFocusedSelector = '.cke_focus';
 const customizeInteractionModalHeaderSelector =
   '.e2e-test-rte-helper-modal-header';
+const saveRTEButtonSelector = '.e2e-test-save-state-content';
 
 export class RTEEditor {
   parentPage: puppeteer.Page;
@@ -145,6 +145,20 @@ export class RTEEditor {
     await this.parentPage.waitForSelector(
       `${rteTextAreaSelector}${bodyFocusedSelector}`
     );
+  }
+
+  /**
+   * Updates the content of the editor and saves it.
+   * After calling this function, the editor is closed,
+   * so it should not be used anymore.
+   * @param {string} content - The content to update the editor with.
+   */
+  async updateAndSaveContent(content: string): Promise<void> {
+    await this.parentPage.type(rteTextAreaSelector, content);
+    await this.parentPage.click(saveRTEButtonSelector);
+    await this.parentPage.waitForSelector(rteTextAreaSelector, {
+      hidden: true,
+    });
   }
 }
 

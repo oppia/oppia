@@ -3171,7 +3171,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} value - The value to check.
    */
   async expectAnswerInputValueToBe(value: string): Promise<void> {
-    await this.expectInputValueToBe(floatFormInput, value);
+    await this.expectElementValueToBe(floatFormInput, value);
   }
 
   /**

@@ -25,6 +25,7 @@ import {Contributor} from '../../utilities/user/contributor';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
 import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
+import {PracticeQuestionReviewer} from '../../utilities/user/practice-question-reviewer';
 import {PracticeQuestionSubmitter} from '../../utilities/user/practice-question-submitter';
 import {QuestionAdmin} from '../../utilities/user/question-admin';
 import {TopicManager} from '../../utilities/user/topic-manager';
@@ -35,12 +36,18 @@ describe('Practice Question Submitter', function () {
   let questionSubmitter: PracticeQuestionSubmitter & Contributor & LoggedInUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
   let questionAdmin: QuestionAdmin;
+  let questionReviewer: PracticeQuestionReviewer & LoggedInUser;
 
   beforeAll(async function () {
     // Create users.
     questionSubmitter = await UserFactory.createNewUser(
       'questionSubmitter',
       'question_submitter@example.com'
+    );
+
+    questionReviewer = await UserFactory.createNewUser(
+      'questionReviewer',
+      'question_reviewer@example.com'
     );
 
     questionAdmin = await UserFactory.createNewUser(
@@ -58,6 +65,7 @@ describe('Practice Question Submitter', function () {
     // Add submit question rights to the question submitter.
     await questionAdmin.navigateToContributorDashboardAdminPage();
     await questionAdmin.addSubmitQuestionRights('questionSubmitter');
+    await questionAdmin.addReviewQuestionRights('questionReviewer');
 
     // Create a topic and add story with a chapter.
     const explorationId1 =
@@ -155,7 +163,7 @@ describe('Practice Question Submitter', function () {
       'Arithmetic Operations'
     );
     await questionSubmitter.selectQuestionDifficulty('Medium');
-    await questionSubmitter.seedTextToQuestion('What is 14 + 12?');
+    await questionSubmitter.seedTextToQuestion('14 + 12');
     await questionSubmitter.addMultipleChoiceInteractionByQuestionSubmitter([
       '26',
       '12',
@@ -206,7 +214,51 @@ describe('Practice Question Submitter', function () {
     );
   });
 
-  it('should be able to check question status', async function () {});
+  it('should be able to check question status', async function () {
+    // Accept the question suggestion.
+    await questionReviewer.navigateToContributorDashboardUsingProfileDropdown();
+    await questionReviewer.startQuestionReview('What is 2 + 3?', 'Addition');
+    await questionReviewer.submitReview('accept', 'Test Review Message');
+    // Edit the question suggestion.
+    await questionReviewer.startQuestionReview('14 + 12', 'Addition');
+    await questionReviewer.editQuestionInReview('What is 14 + 12?');
+    await questionReviewer.submitReview(
+      'accept',
+      'Please make sure to use full sentences.'
+    );
+    // Reject the question suggestion.
+    await questionReviewer.startQuestionReview('What is 10 + 11?', 'Addition');
+    await questionReviewer.submitReview(
+      'reject',
+      'It is not of Hard difficulty.'
+    );
+
+    // Check question status.
+    await questionSubmitter.page.reload();
+    await questionSubmitter.expectContributionStatusToBe(
+      'What is 2 + 3?',
+      'Addition',
+      'Accepted'
+    );
+    await questionSubmitter.expectContributionStatusToBe(
+      'What is 14 + 12?',
+      'Addition',
+      ' Accepted'
+    );
+    await questionSubmitter.expectContributionStatusToBe(
+      'What is 10 + 11?',
+      'Addition',
+      'Revisions Requested'
+    );
+  });
+
+  it('should be able to use all interactions in the question', async function () {
+    await questionSubmitter.switchToTabInContributionDashboard(
+      'Submit Question'
+    );
+
+    // Image Region Interaction.
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

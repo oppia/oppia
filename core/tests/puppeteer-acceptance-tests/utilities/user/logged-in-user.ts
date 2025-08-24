@@ -66,7 +66,6 @@ const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const desktopAddToPlayLaterButton = '.e2e-test-add-to-playlist-btn';
 const mobileAddToPlayLaterButton = '.e2e-test-mobile-add-to-playlist-btn';
-const toastMessageSelector = '.e2e-test-toast-message';
 const mobileLessonCardTitleSelector = '.e2e-test-exp-summary-tile-title';
 const mobileCommunityLessonSectionButton = '.e2e-test-mobile-lessons-section';
 const communityLessonsSectionButton = '.e2e-test-community-lessons-section';
@@ -1008,7 +1007,7 @@ export class LoggedInUser extends BaseUser {
 
       // Post-check: Verify if the tooltip appears.
       if (!skipVerification) {
-        await this.expectToolTipMessage(
+        await this.expectToastMessage(
           "Successfully added to your 'Play Later' list."
         );
       }
@@ -1113,29 +1112,6 @@ export class LoggedInUser extends BaseUser {
     // Check the tooltip content.
     const tooltipText = await this.page.$eval('.tooltip', el => el.textContent);
     expect(tooltipText).toBe(expectedTooltip);
-  }
-
-  /**
-   * Expects the text content of the toast message to match the given expected message.
-   * @param {string} expectedMessage - The expected message to match the toast message against.
-   */
-  async expectToolTipMessage(expectedMessage: string): Promise<void> {
-    await this.page.waitForSelector(toastMessageSelector, {visible: true});
-    const toastMessageElement = await this.page.$(toastMessageSelector);
-    const toastMessage = await this.page.evaluate(
-      el => el.textContent.trim(),
-      toastMessageElement
-    );
-
-    if (toastMessage !== expectedMessage) {
-      throw new Error(
-        `Expected toast message to be "${expectedMessage}", but it was "${toastMessage}".`
-      );
-    }
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.click(toastMessageSelector);
-    }
-    await this.expectElementToBeVisible(toastMessageSelector, false);
   }
 
   /**

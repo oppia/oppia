@@ -53,6 +53,8 @@ const mobileElementSelector = '.e2e-test-mobile-element';
 const desktopElementSelector = '.e2e-test-desktop-element';
 const opportunityStatusLabelSelector = '.e2e-test-opportunity-list-item-label';
 
+const reviewCommentTextareaSelector = '.e2e-test-suggestion-review-message';
+
 export class Contributor extends BaseUser {
   /**
    * Checks if the active tab name is visible and matches the expected values.
@@ -435,6 +437,17 @@ export class Contributor extends BaseUser {
       element.textContent?.trim()
     );
     expect(textContent).toBe(expectedStatus);
+  }
+
+  /**
+   * Fills the review comment textarea with the given comment.
+   * @param comment The comment to fill the textarea with.
+   */
+  async fillReviewComment(comment: string): Promise<void> {
+    await this.expectElementToBeVisible(reviewCommentTextareaSelector);
+    await this.type(reviewCommentTextareaSelector, comment);
+
+    await this.expectElementValueToBe(reviewCommentTextareaSelector, comment);
   }
 }
 
