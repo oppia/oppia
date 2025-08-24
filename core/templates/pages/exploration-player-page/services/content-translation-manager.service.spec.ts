@@ -90,7 +90,6 @@ describe('Content translation manager service', () => {
     voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
-    // Initialize the PlayerTranscriptService
     pts.init();
 
     entityTranslation = EntityTranslation.createFromBackendDict({
@@ -166,7 +165,6 @@ describe('Content translation manager service', () => {
     );
     spyOn(contentTranslationLanguageService, 'setCurrentContentLanguageCode');
 
-    // Mock the getInteractionHtml method to avoid DOM errors
     spyOn(ehfs, 'getInteractionHtml').and.returnValue(
       '<div>mock interaction html</div>'
     );
@@ -411,7 +409,6 @@ describe('Content translation manager service', () => {
   }));
 
   it('should handle empty automated voiceovers audio offsets when changing language', fakeAsync(() => {
-    // Override the spy for this specific test
     entityVoiceoversService.getActiveEntityVoiceovers = jasmine
       .createSpy()
       .and.returnValue(null);
@@ -454,7 +451,7 @@ describe('Content translation manager service', () => {
     spyOn(audioPreloaderService, 'kickOffAudioPreloader');
     spyOn(ctms, 'getCurrentStateName').and.returnValue('State1');
 
-    audioPreloaderService.exploration = {} as any;
+    audioPreloaderService.exploration = {};
 
     ctms.initLessonTranslations();
     tick();

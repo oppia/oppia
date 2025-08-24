@@ -192,7 +192,7 @@ describe('New Lesson Player Page', () => {
       'subscribe'
     ).and.returnValue({
       unsubscribe: jasmine.createSpy('unsubscribe'),
-    } as any);
+    });
 
     componentInstance.ngOnInit();
     tick();
@@ -287,7 +287,7 @@ describe('New Lesson Player Page', () => {
       'subscribe'
     ).and.returnValue({
       unsubscribe: jasmine.createSpy('unsubscribe'),
-    } as any);
+    });
 
     componentInstance.ngOnInit();
     tick();
@@ -340,13 +340,12 @@ describe('New Lesson Player Page', () => {
       languageChangeCallback = callback;
       return {
         unsubscribe: jasmine.createSpy('unsubscribe'),
-      } as any;
+      };
     });
 
     componentInstance.ngOnInit();
     tick();
 
-    // Trigger the language change callback
     languageChangeCallback('es');
     tick();
 
@@ -393,13 +392,12 @@ describe('New Lesson Player Page', () => {
       languageChangeCallback = callback;
       return {
         unsubscribe: jasmine.createSpy('unsubscribe'),
-      } as any;
+      };
     });
 
     componentInstance.ngOnInit();
     tick();
 
-    // Trigger the language change callback
     languageChangeCallback('es');
 
     expect(componentInstance.onLanguageChange).toHaveBeenCalledWith('es');
