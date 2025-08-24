@@ -212,6 +212,10 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
     heading: '.e2e-test-lesson-card-title-1',
     button: '.e2e-test-lesson-card-button',
   },
+  emptyProgress: {
+    content: '.e2e-test-progress-empty-div',
+    heading: '.e2e-test-progress-empty-text',
+  },
 };
 const greetingSelector = '.e2e-learner-dashboard-greeting';
 
@@ -3667,6 +3671,18 @@ export class LoggedInUser extends BaseUser {
         `Unexpected error retrieving card display controls from ${subsection} section in ${section}`
       );
     }
+  }
+
+  async navigateToTab(tab: string): Promise<void> {
+    let tabSelector = homeSectionSelector;
+    if (tab.toLowerCase() === 'progress') {
+      tabSelector = communityLessonsSectionButton;
+    } else if (tab.toLowerCase() === 'goals') {
+      tabSelector = goalsSectionSelector;
+    }
+    await this.page.waitForSelector(tabSelector);
+    const tabButton = await this.page.$(tabSelector);
+    tabButton?.click();
   }
 }
 
