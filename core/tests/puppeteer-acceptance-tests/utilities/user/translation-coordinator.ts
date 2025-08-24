@@ -1,4 +1,4 @@
-// Copyright 2024 The Oppia Authors. All Rights Reserved.
+// Copyright 2025 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ export class TranslationCoordinator extends BaseUser {
   /**
    * Adds a language to the language selector modal.
    * @param {string} languageCode - The language code to add.
+   * @param {string} language - The language to add. Used to check if the
+   *     language is added correctly.
    */
   async addLanguageInLanguageSelectorModal(
     languageCode: string,
@@ -54,6 +56,7 @@ export class TranslationCoordinator extends BaseUser {
   /**
    * Checks if the language selector modal contains the given language.
    * @param {string} language - The language to check for.
+   * @param {boolean} visible - Whether the language is expected to be visible.
    */
   async expectLanguageModalToContainLanguage(
     language: string,
@@ -128,6 +131,10 @@ export class TranslationCoordinator extends BaseUser {
     );
   }
 
+  /**
+   * Removes a language from the language selector modal.
+   * @param {string} language - The language to remove.
+   */
   async removeLanguageFromLanguageSelectorModal(
     language: string
   ): Promise<void> {

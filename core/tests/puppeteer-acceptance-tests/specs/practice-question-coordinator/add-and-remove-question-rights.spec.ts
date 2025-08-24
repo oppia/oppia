@@ -23,14 +23,12 @@ import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {ContributorAdmin} from '../../utilities/user/contributor-admin';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
-import {QuestionCoordinator} from '../../utilities/user/question-coordinator';
+import {QuestionCoordinator} from '../../utilities/user/practice-question-coordinator';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const ROLES = testConstants.Roles;
 
-describe('Practice Question Coordinator', function () {});
-
-describe('Translation Coordinator', function () {
+describe('Practice Question Coordinator', function () {
   let questionCoordinator: QuestionCoordinator & ContributorAdmin;
   let loggedInUser1: LoggedInUser;
   let releaseCoordinator: ReleaseCoordinator;

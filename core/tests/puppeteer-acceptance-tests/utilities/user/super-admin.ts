@@ -118,6 +118,10 @@ const assignedTopicSelector = '.e2e-test-assigned-topic';
 const selectedRoleHeadingSelector = '.e2e-test-active-role';
 const languageSelectorCloseButtonSelector =
   '.e2e-test-language-selector-close-button';
+const languageSelectorBodySelector = '.e2e-test-language-selector-modal-body';
+const addLanguageButtonSelector = '.e2e-test-language-selector-add-button';
+const selectedLanguageSelector = '.e2e-test-selected-language';
+
 export class SuperAdmin extends BaseUser {
   /**
    * Navigates to the Admin Page Activities Tab.
@@ -164,6 +168,12 @@ export class SuperAdmin extends BaseUser {
 
   /**
    * The function to assign a role to a user.
+   * @param {string} username - The username of the user to assign the role to.
+   * @param {string} role - The role to assign to the user.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function. For Topic Manager, it should be the topic
+   *     name. For Translation Coordinator, it should be the array of
+   *     language code.
    */
   async assignRoleToUser(
     username: string,
@@ -213,11 +223,6 @@ export class SuperAdmin extends BaseUser {
   private async selectLanguageForTranslationCoordinatorRole(
     language: string
   ): Promise<void> {
-    const languageSelectorBodySelector =
-      '.e2e-test-language-selector-modal-body';
-    const addLanguageButtonSelector = '.e2e-test-language-selector-add-button';
-    const selectedLanguageSelector = '.e2e-test-selected-language';
-
     const visible = await this.isElementVisible(
       selectedLanguageSelector,
       true,

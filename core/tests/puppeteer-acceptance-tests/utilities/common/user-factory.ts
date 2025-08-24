@@ -47,7 +47,7 @@ import {
   ContributorAdminFactory,
 } from '../user/contributor-admin';
 import {TranslationCoordinatorFactory} from '../user/translation-coordinator';
-import {QuestionCoordinatorFactory} from '../user/question-coordinator';
+import {QuestionCoordinatorFactory} from '../user/practice-question-coordinator';
 
 const ROLES = testConstants.Roles;
 const cookieBannerAcceptButton =
@@ -122,6 +122,14 @@ export class UserFactory {
   /**
    * This function assigns roles to a user and returns the instance of
    * that user.
+   * @param {TUser} user - The user to assign roles to.
+   * @param {TRoles} roles - The roles to assign to the user.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function. For Topic Manager, it should be the topic
+   *     name. For Translation Coordinator, it should be the array of
+   *     language code.
+   * @returns {TUser & MultipleRoleIntersection<TRoles>} - The user with
+   *     the roles assigned.
    */
   static assignRolesToUser = async function <
     TUser extends BaseUser,
@@ -184,6 +192,27 @@ export class UserFactory {
       showMessage('Enabled text to speech synthesis using cloud service.');
     };
 
+  /**
+   * This function creates a new user with the specified roles and returns
+   * the instance of that user.
+   * @param {string} username - The username of the user.
+   * @param {string} email - The email of the user.
+   * @param {OptionalRoles<TRoles>} roles - The roles to assign to the user.
+   * @param {string | string[]} args - The arguments to pass to the role
+   *     assignment function. For Topic Manager, it should be the topic
+   *     name. For Translation Coordinator, it should be the array of
+   *     language code.
+   * @returns {Promise<
+   *     LoggedOutUser &
+   *       LoggedInUser &
+   *       ExplorationEditor &
+   *       QuestionSubmitter &
+   *       TopicManager &
+   *       CurriculumAdmin &
+   *       ContributorAdmin &
+   *       MultipleRoleIntersection<TRoles>
+   *   >} - The user with the roles assigned.
+   */
   static createNewUser = async function <
     TRoles extends (keyof typeof USER_ROLE_MAPPING)[] = never[],
   >(
