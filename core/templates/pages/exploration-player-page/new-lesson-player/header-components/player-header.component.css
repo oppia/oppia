@@ -1,0 +1,78 @@
+/*
+  NOTE to developers: We generate RTL CSS from this file in the webpack
+  compilation, here are some additional rules that can be added to the CSS files:
+  https://rtlcss.com/learn/usage-guide/control-directives .
+*/
+
+.oppia-lesson-player-header {
+  align-items: center;
+  background-color: #094142;
+  color: #fff;
+  display: flex;
+  height: 40px;
+  justify-content: space-between;
+  padding-left: 15px;
+  position: relative;
+}
+
+.header-menu-button {
+  background: none;
+  border: none;
+  color: #fff;
+  display: none;
+}
+
+.lesson-player-header-close-button {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+.lesson-player-header-close-button button {
+  background: none;
+  border: none;
+}
+
+.question-player-header {
+  background-color: #c55f45;
+  justify-content: center;
+}
+
+.header-menu-button svg {
+  height: 24px;
+  width: 24px;
+}
+
+.lesson-player-header-left p {
+  font-family: "Capriola", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+}
+
+.lesson-player-close-modal-button {
+  display: flex;
+}
+
+.lesson-player-close-modal-button i {
+  color: #fff;
+  font-size: 24px;
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
+.question-player-exit-btn {
+  position: absolute;
+  right: 0;
+}
+
+@media (max-width: 767px) {
+  .header-menu-button {
+    display: block;
+  }
+}
+
+@media (max-width: 480px) {
+  .lesson-player-header-left p {
+    font-size: 13px;
+  }
+}
