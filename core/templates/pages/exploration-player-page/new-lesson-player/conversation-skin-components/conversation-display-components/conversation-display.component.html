@@ -1,6 +1,10 @@
+<oppia-new-end-chapter-confetti #confetti class="end-chapter-confetti">
+</oppia-new-end-chapter-confetti>
 <div class="oppia-learner-view-card" [@fadeInOut]="this.displayedCard">
+  <oppia-new-end-chapter-check-mark #checkMark [ngClass]="{'check-mark-hidden': checkMarkHidden, 'check-mark-skipped': checkMarkSkipped}" class="end-chapter-check-mark">
+  </oppia-new-end-chapter-check-mark>
   <!-- New UI for the question -->
-  <div class="oppia-learner-view-card-top-section">
+  <div class="oppia-learner-view-card-top-section" [ngClass]="{'card-content-hidden': !checkMarkHidden}">
     <svg width="30" class="left-side-curve" height="24" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg"
     [ngStyle]="isLanguageRTL() ? {'transform': 'scaleX(-1)'} : {}">
       <path fill-rule="evenodd" clip-rule="evenodd" d="M0.832031 0C12.8267 5.31326 22.692 13.4676 29.1014 23.3701V0H0.832031Z" fill="white"/>
@@ -68,9 +72,7 @@ Show the interaction (if it is inline) or the interaction instructions
 In addition, if the exploration is iframed, the terminal card will
 have no learner input section, so we do not show it.
 -->
-<div *ngIf="!displayedCardWasCompletedInPrevSession && isInteractionInline() && !shouldHideInteraction && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
-((displayedCard.getInteractionHtml() && !displayedCard.isCompleted()) || displayedCard.isCompleted()) &&
-(!isOnTerminalCard() || !isIframed || displayedCard.isCompleted())">
+<div *ngIf="shouldInteractionBeDisplayed() && !isOnTerminalCard()">
   <div class="conversation-skin-inline-interaction"
       [ngStyle]="(displayedCard.getInteractionId() != 'Continue') ?
                   {'background-color': '#fff', 'box-shadow': '0px 0px 10px 0px rgba(0, 100, 92, 0.5)'} : {}">
