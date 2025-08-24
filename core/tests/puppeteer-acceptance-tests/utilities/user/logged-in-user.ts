@@ -191,6 +191,7 @@ const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const errorSavingExplorationModal = '.e2e-test-discard-lost-changes-button';
 const tabTitle = '.e2e-test-learner-dash-tab-title';
 const classroomButton = '.e2e-test-learner-dash-classroom-button';
+const contentToggleButton = '.e2e-test-content-toggle-button';
 const learnerDashSelectors: Record<string, Record<string, string>> = {
   tabSection: {
     content: '.e2e-test-learner-dash-section',
@@ -3550,31 +3551,36 @@ export class LoggedInUser extends BaseUser {
    * Helper function - verifies if the child element is fully visible in parent element.
    * @param {string} parentElement - Parent element to search though.
    * @param {string} childElement- Element to search for.
+   * @param {string} direction - Checking whether the item fits in dropdown or carousel.
    */
   private async isBoxWithinRange(
     parentElement: puppeteer.ElementHandle | null = null,
-    childElement: puppeteer.ElementHandle | null = null
+    childElement: puppeteer.ElementHandle | null = null,
+    direction: string = 'horizontal'
   ): Promise<boolean> {
     if (parentElement === null || childElement === null) {
       return false;
     }
-    const {parentLeft, parentRight} = await parentElement.evaluate(el => {
-      const dimensions = el.getBoundingClientRect();
-      return {
-        parentLeft: dimensions.left,
-        parentRight: dimensions.right,
-      };
+    const parentBounds = await parentElement.evaluate(el => {
+      const {top, right, bottom, left} = el.getBoundingClientRect();
+      return {top, right, bottom, left};
     });
 
-    const {childLeft, childRight} = await childElement.evaluate(el => {
-      const dimensions = el.getBoundingClientRect();
-      return {
-        childLeft: dimensions.left,
-        childRight: dimensions.right,
-      };
+    const childBounds = await childElement.evaluate(el => {
+      const {top, right, bottom, left} = el.getBoundingClientRect();
+      return {top, right, bottom, left};
     });
 
-    return childLeft >= parentLeft && childRight <= parentRight;
+    if (direction === 'vertical') {
+      return (
+        childBounds.top >= parentBounds.top &&
+        childBounds.bottom <= parentBounds.bottom
+      );
+    }
+    return (
+      childBounds.left >= parentBounds.left &&
+      childBounds.right <= parentBounds.right
+    );
   }
 
   /**
@@ -3603,10 +3609,12 @@ export class LoggedInUser extends BaseUser {
    * based on RTL.
    * @param {puppeteer.ElementHandle | null | undefined} containerElement - Full list of elements.
    * @param {boolean} isRTL - Current language is RTL.
+   * @param {string} [direction] - Direction to check if element is present.
    */
   private async createCardViewChecker(
     containerElement: puppeteer.ElementHandle | null | undefined,
-    isRTL: boolean
+    isRTL: boolean,
+    direction?: string
   ): Promise<
     (a: puppeteer.ElementHandle[]) => Promise<Record<string, boolean>>
   > {
@@ -3621,11 +3629,13 @@ export class LoggedInUser extends BaseUser {
         : allCardElements[allCardElements.length - 1];
       const isFirstCardInView = await this.isBoxWithinRange(
         containerElement,
-        firstCardBox
+        firstCardBox,
+        direction
       );
       const isLastCardInView = await this.isBoxWithinRange(
         containerElement,
-        lastCardBox
+        lastCardBox,
+        direction
       );
       return {isFirstCardInView, isLastCardInView};
     };
@@ -3715,6 +3725,80 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(tabSelector);
     const tabButton = await this.page.$(tabSelector);
     await tabButton?.click();
+  }
+
+  /**
+   * Verifies the proper controls display based on card display container in progress tab If the screen is too small,
+   * dropdown button should appear.
+   * @param {string} subsection - Subsection title value to match.
+   * @param {string} section - Overarching section.
+   */
+  async expectDropdownButton(
+    subsection: string,
+    section: string
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElement(
+      subsection,
+      section
+    );
+
+    const containerElement = await subsectionElement?.$(
+      learnerDashSelectors.cardDisplay.container
+    );
+
+    const [allCardElements, contentToggleButtonElement] = await Promise.all([
+      containerElement?.$$(learnerDashSelectors.lessonCard.content),
+      subsectionElement?.$(contentToggleButton),
+    ]);
+
+    const isRTL = await this.isPageRTL();
+    if (allCardElements && allCardElements.length > 1) {
+      const getCardsInView = await this.createCardViewChecker(
+        containerElement,
+        isRTL,
+        'vertical'
+      );
+
+      if (allCardElements.length > 1) {
+        let {isFirstCardInView, isLastCardInView} =
+          await getCardsInView(allCardElements);
+        if (!isLastCardInView) {
+          expect(contentToggleButtonElement).toBeTruthy();
+          await contentToggleButtonElement?.click();
+          isLastCardInView = (await getCardsInView(allCardElements))
+            .isLastCardInView;
+          expect(isLastCardInView).toBe(true);
+
+          await contentToggleButtonElement?.click();
+          isLastCardInView = (await getCardsInView(allCardElements))
+            .isLastCardInView;
+          expect(isLastCardInView).toBe(false);
+        } else {
+          expect(isFirstCardInView && isLastCardInView).toBe(true);
+          expect(contentToggleButton).toBeFalsy();
+        }
+      } else if (allCardElements.length === 0) {
+        expect(contentToggleButton).toBeFalsy();
+        expect(
+          this.isBoxWithinRange(
+            containerElement,
+            allCardElements[0],
+            'vertical'
+          )
+        ).toBe(true);
+        expect(
+          this.isBoxWithinRange(
+            containerElement,
+            allCardElements[0],
+            'horizontal'
+          )
+        ).toBe(true);
+      } else {
+        throw new Error(
+          'No lessons to display, section should not be displayed'
+        );
+      }
+    }
   }
 }
 
