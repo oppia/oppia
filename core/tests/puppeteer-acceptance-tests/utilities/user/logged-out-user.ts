@@ -578,6 +578,8 @@ const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
 const collapseWorkedExampleButton = '.e2e-test-collapse-workedexample';
 const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
 const toastMessageSelector = '.e2e-test-toast-message';
+const voiceoverSelectSelector = '.e2e-test-audio-lang-select';
+
 const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -4427,7 +4429,7 @@ export class LoggedOutUser extends BaseUser {
     expectedCode: string
   ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
-    await this.clickOn(embedLessonButton);
+    await this.clickOn(embedLessonButton, true);
     await this.page.waitForSelector(embedCodeSelector);
     const embedCode = await this.page.$eval(
       embedCodeSelector,
@@ -5302,13 +5304,32 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Expands the voiceover bar by clicking on the dropdown.
+   */
+  async expandVoiceoverBar(): Promise<void> {
+    await this.expectElementToBeVisible(voiceoverDropdown);
+    await this.clickOn(voiceoverDropdown);
+    await this.expectElementToBeVisible(voiceoverDropdown, false);
+  }
+
+  /**
+   * Checks if the current voiceover language matches the expected language.
+   * @param language - The expected language.
+   */
+  async expectCurrentVoiceoverLanguageToBe(language: string): Promise<void> {
+    await this.expectElementToBeVisible(voiceoverSelectSelector);
+    await this.expectElementValueToBe(voiceoverSelectSelector, language);
+  }
+
+  /**
    * Starts the voiceover by clicking on the audio bar (dropdown) and the play circle.
    */
   async startVoiceover(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
-    if (voiceoverDropdownElement) {
-      await this.clickOn(voiceoverDropdown);
+
+    const isDropdownVisible = await this.isElementVisible(voiceoverDropdown);
+    if (isDropdownVisible) {
+      await this.expandVoiceoverBar();
     }
     await this.page.waitForSelector(playVoiceoverButton, {
       visible: true,
@@ -5409,7 +5430,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async pauseVoiceover(): Promise<void> {
     await this.page.waitForSelector(pauseVoiceoverButton, {visible: true});
-    await this.clickOn(pauseVoiceoverButton);
+    await this.clickOn(pauseVoiceoverButton, true);
     await this.page.waitForSelector(playVoiceoverButton, {visible: true});
     showMessage('Voiceover paused successfully.');
   }
@@ -5726,17 +5747,10 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForElementToStabilize(conceptCard);
 
     await this.clickOn(conceptCardLinkSelector);
-    const conceptCardContent: string =
-      (await this.page.$eval(
-        conceptCardViewerSelector,
-        el => (el as HTMLElement).textContent
-      )) ?? '';
-
-    if (!conceptCardContent.includes(content)) {
-      throw new Error(
-        `Expected concept card content to be ${content}, but it was ${conceptCardContent}`
-      );
-    }
+    await this.expectElementContentToContain(
+      conceptCardViewerSelector,
+      content
+    );
 
     await this.waitForElementToStabilize(conceptCardCloseButtonSelector);
     await this.clickOn(conceptCardCloseButtonSelector);
@@ -5778,9 +5792,9 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Checks if audio expand button is visible in lesson player.
+   * Checks if audio expand button is visible in lesson player and in exploration preview.
    */
-  async expectAudioExpandButtonToBeVisibleInLP(): Promise<void> {
+  async expectAudioExpandButtonToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(audioExpandButtonInLPSelector);
     showMessage('Audio Expand button is visible in lesson player.');
   }
