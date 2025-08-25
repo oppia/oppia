@@ -30,7 +30,7 @@ import {AppConstants} from 'app.constants';
 import {StateParamChangesService} from 'components/state-editor/state-editor-properties-services/state-param-changes.service';
 import {ExplorationParamChangesService} from '../services/exploration-param-changes.service';
 import cloneDeep from 'lodash/cloneDeep';
-import {ParamSpecs} from 'domain/exploration/ParamSpecsObjectFactory';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {CdkDragSortEvent, moveItemInArray} from '@angular/cdk/drag-drop';
 
 @Component({

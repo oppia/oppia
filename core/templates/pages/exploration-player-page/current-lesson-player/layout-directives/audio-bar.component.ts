@@ -38,6 +38,7 @@ import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-audio-bar',
@@ -72,7 +73,8 @@ export class AudioBarComponent {
     private voiceoverPlayerService: VoiceoverPlayerService,
     private localStorageService: LocalStorageService,
     private stateEditorService: StateEditorService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
+    private platformFeatureService: PlatformFeatureService
   ) {
     this.explorationPlayerModeIsActive =
       this.pageContextService.isInExplorationPlayerPage();
@@ -214,22 +216,32 @@ export class AudioBarComponent {
     this.entityVoiceoversService.setActiveLanguageAccentCode(
       languageAccentCode
     );
-    let entityVoiceover =
+    let entityVoiceovers =
       this.entityVoiceoversService.getActiveEntityVoiceovers();
+    this.entityVoiceoversService.languageAccentCodeChangeEventEmitter.emit();
 
     let contentId = this.voiceoverPlayerService.activeContentId;
 
-    let manualVoiceover = entityVoiceover.getManualVoiceover(
+    let manualVoiceover = entityVoiceovers.getManualVoiceover(
       contentId
     ) as Voiceover;
-    let automaticVoiceover = entityVoiceover.getAutomaticVoiceover(
+    let automaticVoiceover = entityVoiceovers.getAutomaticVoiceover(
       contentId
     ) as Voiceover;
 
-    if (manualVoiceover && manualVoiceover.needsUpdate === false) {
+    const hasValidManualVoiceover =
+      manualVoiceover && manualVoiceover.needsUpdate === false;
+    const hasOutdatedOrMissingManualVoiceover =
+      manualVoiceover === undefined ||
+      (manualVoiceover && manualVoiceover.needsUpdate === true);
+
+    if (hasValidManualVoiceover) {
       this.voiceoverToBePlayed = manualVoiceover;
-    } else if (automaticVoiceover && automaticVoiceover.needsUpdate === false) {
-      this.voiceoverToBePlayed = automaticVoiceover;
+    } else if (hasOutdatedOrMissingManualVoiceover) {
+      this.voiceoverToBePlayed =
+        this.isAutoVoiceoversEnabled() && automaticVoiceover
+          ? automaticVoiceover
+          : manualVoiceover;
     }
 
     this.audioPreloaderService.contentIdsToVoiceovers =
@@ -237,6 +249,20 @@ export class AudioBarComponent {
     this.audioPreloaderService.restartAudioPreloader(
       this.getCurrentStateName()
     );
+  }
+
+  isAutoVoiceoversEnabled(): boolean {
+    const showToLearners =
+      this.platformFeatureService.status.ShowRegeneratedVoiceoversToLearners
+        .isEnabled;
+    const showToEditors =
+      this.platformFeatureService.status.AutomaticVoiceoverRegenerationFromExp
+        .isEnabled;
+
+    const onPlayerPage = this.pageContextService.isInExplorationPlayerPage();
+    const onEditorPage = this.pageContextService.isInExplorationEditorPage();
+
+    return (onPlayerPage && showToLearners) || (onEditorPage && showToEditors);
   }
 
   getCurrentStateName(): string {

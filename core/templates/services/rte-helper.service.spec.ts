@@ -333,7 +333,7 @@ describe('Rte Helper Service', () => {
             schema: {
               type: 'html',
               ui_config: {
-                rte_components: 'ALL_COMPONENTS',
+                rte_components: 'WORKED_EXAMPLE_MODAL_COMPONENTS',
                 hide_complex_extensions: true,
               },
             },
@@ -346,7 +346,7 @@ describe('Rte Helper Service', () => {
             schema: {
               type: 'html',
               ui_config: {
-                rte_components: 'ALL_COMPONENTS',
+                rte_components: 'WORKED_EXAMPLE_MODAL_COMPONENTS',
                 hide_complex_extensions: true,
               },
             },

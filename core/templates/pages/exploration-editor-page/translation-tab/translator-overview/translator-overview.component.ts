@@ -35,7 +35,6 @@ import {LoaderService} from 'services/loader.service';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
 import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
 import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {
   ExplorationChangeEditTranslation,
   ExplorationChangeMarkTranslationsNeedsUpdate,
@@ -48,11 +47,10 @@ import {
   LanguageAccentMasterList,
   LanguageAccentToDescription,
   LanguageCodesMapping,
-  VoiceoverBackendApiService,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {LocalStorageService} from 'services/local-storage.service';
-import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {VoiceoverLanguageManagementService} from 'services/voiceover-language-management-service';
+import {AutomaticVoiceoverHighlightService} from 'services/automatic-voiceover-highlight-service';
 
 @Component({
   selector: 'oppia-translator-overview',
@@ -96,12 +94,10 @@ export class TranslatorOverviewComponent implements OnInit {
     private translationLanguageService: TranslationLanguageService,
     private translationStatusService: TranslationStatusService,
     private translationTabActiveModeService: TranslationTabActiveModeService,
-    private platformFeatureService: PlatformFeatureService,
-    private voiceoverBackendApiService: VoiceoverBackendApiService,
     private localStorageService: LocalStorageService,
     private windowRef: WindowRef,
-    private voiceoverPlayerService: VoiceoverPlayerService,
-    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService
+    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService,
+    private automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService
   ) {}
 
   canShowTabModeSwitcher(): boolean {
@@ -210,6 +206,12 @@ export class TranslatorOverviewComponent implements OnInit {
           );
           this.routerService.onCenterGraph.emit();
           this.loaderService.hideLoadingScreen();
+
+          this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+            this.entityVoiceoversService.getActiveEntityVoiceovers()
+              ?.automatedVoiceoversAudioOffsetsMsecs || {}
+          );
+          this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
         });
       });
   }
@@ -303,41 +305,20 @@ export class TranslatorOverviewComponent implements OnInit {
         this.translationLanguageService.setActiveLanguageCode(
           this.languageCode
         );
-        // We need to refresh the status service once the active language is
-        // set.
-        this.translationStatusService.refresh();
-        this.routerService.onCenterGraph.emit();
 
         this.inTranslationMode = false;
         this.inVoiceoverMode = false;
         this.refreshDirectiveScope();
+        this.entityVoiceoversService.fetchEntityVoiceovers();
       });
 
     this.entityVoiceoversService.setLanguageCode(this.languageCode);
 
-    this.voiceoverBackendApiService
-      .fetchVoiceoverAdminDataAsync()
-      .then(response => {
-        this.voiceoverLanguageManagementService.init(
-          response.languageAccentMasterList,
-          response.autoGeneratableLanguageAccentCodes,
-          response.languageCodesMapping
-        );
-
-        this.languageAccentMasterList = response.languageAccentMasterList;
-        this.languageCodesMapping = response.languageCodesMapping;
-
-        this.voiceoverPlayerService.languageAccentMasterList =
-          this.languageAccentMasterList;
-        this.voiceoverPlayerService.setLanguageAccentCodesDescriptions(
-          this.languageCode,
-          this.entityVoiceoversService.getLanguageAccentCodes()
-        );
-
-        this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
-          this.updateLanguageAccentCodesDropdownOptions();
-        });
-      });
+    this.languageAccentMasterList =
+      this.voiceoverLanguageManagementService.languageAccentMasterList;
+    this.languageCodesMapping =
+      this.voiceoverLanguageManagementService.languageCodesMapping;
+    this.updateLanguageAccentCodesDropdownOptions();
   }
 
   updateLanguageAccentCodesDropdownOptions(): void {
@@ -391,5 +372,13 @@ export class TranslatorOverviewComponent implements OnInit {
     this.translationLanguageService.setActiveLanguageAccentCode(
       languageAccentCode
     );
+    this.entityVoiceoversService.setActiveLanguageAccentCode(
+      languageAccentCode
+    );
+    this.automaticVoiceoverHighlightService.setAutomatedVoiceoversAudioOffsets(
+      this.entityVoiceoversService.getActiveEntityVoiceovers()
+        ?.automatedVoiceoversAudioOffsetsMsecs || {}
+    );
+    this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
   }
 }

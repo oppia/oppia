@@ -23,8 +23,7 @@ import {
   DataFormatToDefaultValuesKey,
   TranslationBackendDict,
   WrittenTranslation,
-  WrittenTranslationObjectFactory,
-} from 'domain/exploration/WrittenTranslationObjectFactory';
+} from 'domain/exploration/written-translation.model';
 
 export interface WrittenTranslationsBackendDict {
   translations_mapping: {
@@ -48,13 +47,8 @@ interface WrittenTranslationsMapping {
 
 export class WrittenTranslations {
   translationsMapping: WrittenTranslationsMapping;
-  _writtenTranslationObjectFactory: WrittenTranslationObjectFactory;
-  constructor(
-    translationsMapping: WrittenTranslationsMapping,
-    writtenTranslationObjectFactory: WrittenTranslationObjectFactory
-  ) {
+  constructor(translationsMapping: WrittenTranslationsMapping) {
     this.translationsMapping = translationsMapping;
-    this._writtenTranslationObjectFactory = writtenTranslationObjectFactory;
   }
 
   getAllContentIds(): string[] {
@@ -122,7 +116,7 @@ export class WrittenTranslations {
       throw new Error('Trying to add duplicate language code.');
     }
     writtenTranslations[languageCode] =
-      this._writtenTranslationObjectFactory.createNew(dataFormat);
+      WrittenTranslation.createNew(dataFormat);
     writtenTranslations[languageCode].setTranslation(translation);
   }
 
@@ -168,9 +162,7 @@ export class WrittenTranslations {
   providedIn: 'root',
 })
 export class WrittenTranslationsObjectFactory {
-  constructor(
-    private writtenTranslationObjectFactory: WrittenTranslationObjectFactory
-  ) {}
+  constructor() {}
 
   createFromBackendDict(
     writtenTranslationsDict: WrittenTranslationsBackendDict
@@ -183,19 +175,16 @@ export class WrittenTranslationsObjectFactory {
           writtenTranslationsDict.translations_mapping[contentId];
         Object.keys(languageCodeToWrittenTranslationDict).forEach(langCode => {
           translationsMapping[contentId][langCode] =
-            this.writtenTranslationObjectFactory.createFromBackendDict(
+            WrittenTranslation.createFromBackendDict(
               languageCodeToWrittenTranslationDict[langCode]
             );
         });
       }
     );
-    return new WrittenTranslations(
-      translationsMapping,
-      this.writtenTranslationObjectFactory
-    );
+    return new WrittenTranslations(translationsMapping);
   }
 
   createEmpty(): WrittenTranslations {
-    return new WrittenTranslations({}, this.writtenTranslationObjectFactory);
+    return new WrittenTranslations({});
   }
 }

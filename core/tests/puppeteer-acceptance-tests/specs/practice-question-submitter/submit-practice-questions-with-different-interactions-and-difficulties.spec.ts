@@ -40,7 +40,11 @@ describe('Question Submitter', function () {
     // Create a skill and link it to a Topic.
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     await curriculumAdmin.createTopic('Test Topic 1', 'test-topic-one');
-    await curriculumAdmin.createSkillForTopic('Test Skill 1', 'Test Topic 1');
+    await curriculumAdmin.createSkillForTopic(
+      'Test Skill 1',
+      'Test Topic 1',
+      false
+    );
 
     // Add difficulty rubrics to the skill.
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
