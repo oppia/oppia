@@ -86,7 +86,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
     return !activeTab.startsWith('subtopic');
   }
 
-  private confirmLeavingQuestionsAnd(run: () => void): void {
+  private confirmBeforeLeavingQuestions(run: () => void): void {
     const active = this.getActiveTabName();
 
     if (active === 'questions' && this.questionUndoRedoService.hasChanges()) {
@@ -116,7 +116,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   }
 
   openTopicViewer(): void {
-    this.confirmLeavingQuestionsAnd(() => {
+    this.confirmBeforeLeavingQuestions(() => {
       const activeTab = this.topicEditorRoutingService.getActiveTabName();
       const lastSubtopicIdVisited =
         this.topicEditorRoutingService.getLastSubtopicIdVisited();
@@ -133,7 +133,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   }
 
   selectMainTab(): void {
-    this.confirmLeavingQuestionsAnd(() => {
+    this.confirmBeforeLeavingQuestions(() => {
       const activeTab = this.getActiveTabName();
       const subtopicId =
         this.topicEditorRoutingService.getSubtopicIdFromUrl() ??

@@ -67,7 +67,7 @@ export class SkillEditorNavabarComponent implements OnInit {
     return this.skillEditorRoutingService.getActiveTabName();
   }
 
-  private confirmLeavingQuestionsAnd(run: () => void): void {
+  private confirmBeforeLeavingQuestions(run: () => void): void {
     const routeTab = this.getActiveTabName();
     const hasQuestionDraft = this.questionUndoRedoService.hasChanges();
 
@@ -94,14 +94,14 @@ export class SkillEditorNavabarComponent implements OnInit {
   }
 
   selectMainTab(): void {
-    this.confirmLeavingQuestionsAnd(() => {
+    this.confirmBeforeLeavingQuestions(() => {
       this.activeTab = this.ACTIVE_TAB_EDITOR;
       this.skillEditorRoutingService.navigateToMainTab();
     });
   }
 
   selectPreviewTab(): void {
-    this.confirmLeavingQuestionsAnd(() => {
+    this.confirmBeforeLeavingQuestions(() => {
       this.activeTab = this.ACTIVE_TAB_PREVIEW;
       this.skillEditorRoutingService.navigateToPreviewTab();
     });
