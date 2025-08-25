@@ -3980,6 +3980,15 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * Navigates to the study tab on the topic page.
+   * @param {string} topicUrlFragment - The url fragment of the current topic
+   */
+  async navigateToPracticeTabUsingURL(topicUrlFragment: string): Promise<void> {
+    await this.goto(`${mathClassroomUrl}/${topicUrlFragment}/practice`);
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
+   * Navigates to the study tab on the topic page.
    */
   async navigateToStudyTab(): Promise<void> {
     await this.page.waitForSelector(topicPageLessonTabSelector);
