@@ -158,6 +158,7 @@ describe('Practice Question Reviewer', function () {
     // Modify and accept the question suggestion.
     await questionReviewer.startQuestionReview('What is 2 + 3?', 'Addition');
     await questionReviewer.editQuestionInReview('Updated Question');
+    // TODO: Update interaction type.
     await questionReviewer.submitReview(
       'accept',
       'Please make sure to use full sentences.'
