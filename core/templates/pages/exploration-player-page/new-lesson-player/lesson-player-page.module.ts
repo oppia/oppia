@@ -34,7 +34,6 @@ import 'third-party-imports/midi-js.import';
 import 'third-party-imports/skulpt.import';
 import {ToastrModule} from 'ngx-toastr';
 import {toastrConfig} from 'pages/oppia-root/app.module';
-import {PlayerHeaderComponent} from './lesson-header/player-header.component';
 import {LessonPlayerSidebarComponent} from './sidebar-components/lesson-player-sidebar.component';
 import {NewAudioBarComponent} from './conversation-skin-components/new-audio-bar.component';
 import {ConceptCardManagerService} from '../services/concept-card-manager.service';
@@ -61,7 +60,6 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
   declarations: [
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
-    PlayerHeaderComponent,
     LessonPlayerSidebarComponent,
     NewAudioBarComponent,
     NewFlagExplorationModalComponent,
@@ -73,7 +71,6 @@ import {MatBottomSheetModule} from '@angular/material/bottom-sheet';
     CustomizableThankYouModalComponent,
     NewLessonPlayerPageComponent,
     NewLessonPlayerPageRootComponent,
-    PlayerHeaderComponent,
     LessonPlayerSidebarComponent,
     NewAudioBarComponent,
     LessonFeedbackModalComponent,
