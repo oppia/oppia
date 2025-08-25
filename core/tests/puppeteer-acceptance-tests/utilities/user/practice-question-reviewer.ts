@@ -25,6 +25,8 @@ const opportunityButtonSelector = '.e2e-test-opportunity-list-item-button';
 // Question Review Modal Selector.
 const reviewButtonPrefix = 'e2e-test-question-suggestion-review';
 const editButtonSelector = `.${reviewButtonPrefix}-edit-button`;
+const reviewModalHeaderSelector =
+  '.e2e-test-question-suggestion-review-modal-header';
 
 // Question Suggestion Editor Modal Selectors.
 const questionSuggestionEditorModalSelector =
@@ -33,6 +35,7 @@ const editQuestionPencilIconSelector = '.e2e-test-edit-content-pencil-button';
 const saveQuestionButtonSelector = '.e2e-test-save-question-button';
 
 // Other Selectors.
+const rteDisplaySelector = '.e2e-test-state-content-display';
 
 export class PracticeQuestionReviewer extends Contributor {
   /**
@@ -106,6 +109,22 @@ export class PracticeQuestionReviewer extends Contributor {
     // Save the question.
     await this.clickOn(saveQuestionButtonSelector);
     await this.expectToastMessage('Updated question.');
+  }
+
+  /**
+   * Checks that the question in the review modal is the same as the one passed in.
+   * @param question The question to check.
+   */
+  async expectQuestionInReviewModalToBe(question: string) {
+    await this.expectTextContentToBe(rteDisplaySelector, question);
+  }
+
+  /**
+   * Checks if the question review modal is present or not.
+   * @param visible - Whether the modal should be visible or not.
+   */
+  async expectQuestionReviewModalToBePresent(visible: boolean = true) {
+    await this.expectElementToBeVisible(reviewModalHeaderSelector, visible);
   }
 }
 

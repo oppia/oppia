@@ -227,7 +227,7 @@ export class Contributor extends BaseUser {
    * @param tabName - The name of the tab to navigate to.
    */
   async navigateToTabInMyContributions(
-    tabName: 'Contribution Stats' | 'Badges'
+    tabName: 'Contribution Stats' | 'Badges' | 'Review Questions'
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.expectElementToBeVisible(viewDropdownSelector);
