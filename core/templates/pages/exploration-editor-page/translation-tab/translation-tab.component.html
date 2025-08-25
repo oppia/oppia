@@ -19,7 +19,9 @@
   </p>
 </ng-template>
 
-<div class="oppia-translation-tab e2e-test-translation-tab-container" *ngIf="showTranslationTabSubDirectives">
+<oppia-loading-message [message]="'Loading'" *ngIf="languageAccentsAreLoading"></oppia-loading-message>
+
+<div class="oppia-translation-tab e2e-test-translation-tab-container" *ngIf="showTranslationTabSubDirectives && !languageAccentsAreLoading">
   <div class="oppia-translator-overview">
     <oppia-translator-overview [isTranslationTabBusy]="isTranslationTabBusy" joyrideStep="translationTabOverview" [stepContent]="TranslationTabOverview"></oppia-translator-overview>
   </div>
