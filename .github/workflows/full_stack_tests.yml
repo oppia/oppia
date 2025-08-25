@@ -55,6 +55,7 @@ jobs:
           - name: translation-reviewer/filter-the-
           - name: practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties
           - name: practice-question-submitter/submit-practice-questions-for-review-and-check-thier-status
+          - name: practice-question-submitter/check-contribution-stats-download-certificate-and-check-badges-earned
         run1: [1, 2]
         run2: [1]
         mobile: [false, true]

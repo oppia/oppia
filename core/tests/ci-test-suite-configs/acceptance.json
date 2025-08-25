@@ -571,6 +571,10 @@
     {
       "name": "practice-question-submitter/submit-practice-questions-for-review-and-check-thier-status",
       "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-for-review-and-check-thier-status.spec.ts"
+    },
+    {
+      "name": "practice-question-submitter/check-contribution-stats-download-certificate-and-check-badges-earned",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/check-contribution-stats-download-certificate-and-check-badges-earned.spec.ts"
     }
   ],
   "docker_suites": []
